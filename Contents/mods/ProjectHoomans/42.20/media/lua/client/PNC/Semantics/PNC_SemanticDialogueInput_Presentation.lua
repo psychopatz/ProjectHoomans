@@ -202,8 +202,24 @@ function Internal.QueueDeterministicResponse(
         and type(taskResponses.UseExistingResultResponse) == "function"
         and taskResponses.UseExistingResultResponse(
             actionResult, nil, actionResult and actionResult.action)
+    local flowResultApplied = result.flow
+        and result.flow.generated == true
+        and (result.flow.resultNodeId ~= nil
+            or result.flow.gate
+            and result.flow.gate.status == "FAIL")
+        and actionResult
+        and (actionResult.status ~= "semantic_dispatch_blocked"
+            or result.flow.resultNodeId == "rejected"
+            or result.flow.resultNodeId == "failed"
+            or result.flow.gate
+            and result.flow.gate.status == "FAIL")
+    local actionAccepted = not (ir and ir.action)
+        or actionResult and actionResult.accepted == true
+        or flowResultApplied
     if not (actionResult and type(actionResult.response) == "table")
-        and result.flow and result.flow.generated == true
+        and result.flow and result.flow.matched == true
+        and ir and ir.action ~= nil
+        and actionAccepted
         and preserveTaskResponse ~= true
         and type(result.flow.responsePool) == "string"
         and localResponse

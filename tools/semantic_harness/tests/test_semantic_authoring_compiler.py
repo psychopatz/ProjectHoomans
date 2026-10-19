@@ -36,12 +36,21 @@ class SemanticAuthoringCompilerWorkerTests(unittest.TestCase):
             "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/Generated.json",
             report["generatedPaths"],
         )
-        self.assertEqual(report["capabilityIDs"], ["pnc:companion.follow"])
+        self.assertEqual(
+            report["capabilityIDs"],
+            ["pnc:companion.follow", "pnc:companion.stay"],
+        )
         self.assertEqual(
             report["translationKeys"],
             {
-                "EN": ["UI_PNC_Conversation_Semantic_AuthoredFollowAccepted"],
-                "TL": ["UI_PNC_Conversation_Semantic_AuthoredFollowAccepted"],
+                "EN": [
+                    "UI_PNC_Conversation_Semantic_AuthoredFollowAccepted",
+                    "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted",
+                ],
+                "TL": [
+                    "UI_PNC_Conversation_Semantic_AuthoredFollowAccepted",
+                    "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted",
+                ],
             },
         )
 
@@ -130,6 +139,51 @@ class SemanticAuthoringCompilerWorkerTests(unittest.TestCase):
             "pnc.dialogue.follow.please_keep_close_behind_me",
         )
         self.assertEqual(after_restart["result"]["actionResult"]["commandID"], "follow")
+
+    def test_authored_action_flow_uses_its_real_response_pool_after_dispatch(self) -> None:
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            accepted = worker.input("stay with you")
+            denied_scenario = {
+                **DEFAULT_SCENARIO,
+                "runtime": {
+                    **DEFAULT_SCENARIO["runtime"],
+                    "commandResponses": {
+                        "stay": {
+                            "accepted": False,
+                            "reason": "unauthorized_companion",
+                        },
+                    },
+                },
+            }
+        with LuaSemanticWorker(denied_scenario) as worker:
+            denied = worker.input("stay with you")
+
+        self.assertEqual(
+            accepted["result"]["ir"]["provenance"]["pattern"],
+            "pnc.lab.stay_with_you.stay_with_you",
+        )
+        self.assertEqual(
+            accepted["messages"][0]["payload"]["text"],
+            "Okay, I'll stay with you.",
+        )
+        self.assertEqual(
+            accepted["messages"][0]["payload"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted",
+        )
+        self.assertEqual(
+            accepted["result"]["actionResult"]["capabilityID"],
+            "pnc:companion.stay",
+        )
+        self.assertEqual(accepted["transport"][0]["payload"]["commandID"], "stay")
+        self.assertEqual(
+            denied["messages"][0]["payload"]["text"],
+            "I can't stay here right now.",
+        )
+        self.assertEqual(
+            denied["messages"][0]["payload"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_GeneratedStayRejected",
+        )
+        self.assertFalse(denied["result"]["actionResult"]["accepted"])
 
 
 if __name__ == "__main__":

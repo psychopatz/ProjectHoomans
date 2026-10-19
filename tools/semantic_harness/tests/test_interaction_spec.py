@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
+import json
+import tempfile
 import unittest
 
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
@@ -112,8 +114,8 @@ class InteractionSpecTests(unittest.TestCase):
         self.assertTrue(report["ok"], report)
         self.assertTrue(report["previewOnly"])
         self.assertTrue(report["effectFree"])
-        self.assertEqual(report["compiledSummary"]["flowIDs"][-1], "pnc.lab.stay.flow")
-        self.assertEqual(report["compiledSummary"]["responsePoolIDs"][-1], "semantic.lab.stay")
+        self.assertIn("pnc.lab.stay.flow", report["compiledSummary"]["flowIDs"])
+        self.assertIn("semantic.lab.stay", report["compiledSummary"]["responsePoolIDs"])
         generated = "\n".join(item["source"] for item in report["generatedLua"])
         self.assertIn("stay_with_me", generated)
         self.assertIn('"STAY"', generated)
@@ -136,6 +138,46 @@ class InteractionSpecTests(unittest.TestCase):
             [item["sha256"] for item in original["generatedLua"]],
             [item["sha256"] for item in changed["generatedLua"]],
         )
+
+    def test_approved_spec_persists_canonical_source_and_reports_artifact_diffs(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            source_path = repository / "tools/semantic_compiler/semantic_definitions.json"
+            source_path.parent.mkdir(parents=True)
+            source_path.write_text(
+                (REPOSITORY / "tools/semantic_compiler/semantic_definitions.json")
+                .read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            service = SemanticLabAuthoringService(
+                repository=repository,
+                runtime_root=REPOSITORY,
+            )
+
+            preview = service.preview_interaction_spec(stay_spec())
+            self.assertTrue(preview["ok"], preview)
+            self.assertEqual(preview["canonicalSourceDiff"]["status"], "changed")
+            self.assertTrue(
+                any(
+                    row["path"].endswith("EN/Conversation/Semantic/Generated.json")
+                    and row["status"] == "added"
+                    for row in preview["generatedArtifactDiffs"]
+                )
+            )
+
+            generated = service.generate_interaction_spec(stay_spec(), approved=True)
+            self.assertTrue(generated["ok"], generated)
+            self.assertTrue(generated["generationApproved"])
+            self.assertIn(str(source_path), generated["writes"])
+            document = json.loads(source_path.read_text(encoding="utf-8"))
+            self.assertIn(
+                "pnc.lab.stay",
+                [definition["id"] for definition in document["definitions"]],
+            )
+            self.assertEqual(generated["canonicalSourceDiff"]["status"], "unchanged")
+            self.assertTrue(
+                all(row["status"] == "unchanged" for row in generated["generatedArtifactDiffs"])
+            )
 
     def test_wrong_typed_connection_is_rejected_without_writes(self) -> None:
         service = SemanticLabAuthoringService(repository=REPOSITORY)

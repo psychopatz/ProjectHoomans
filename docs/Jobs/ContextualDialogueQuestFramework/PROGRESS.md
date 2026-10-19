@@ -1,84 +1,55 @@
 # Contextual Dialogue & Quest Framework — Current Progress
 
-**Updated:** 2026-10-19
+Updated: 2026-10-19
 
-**Repository:** `psychopatz/ProjectHoomans`
+Repository: `psychopatz/ProjectHoomans`
 
-**Branch:** `codex/contextual-dialogue-quest-framework-0a`
+Branch: `codex/contextual-dialogue-quest-framework-0a`
 
-**Upstream:** `origin/docs/contextual-dialogue-quest-framework-20261018`
+Upstream: `origin/docs/contextual-dialogue-quest-framework-20261018`
 
-**Core dependency:** `/home/psychopatz/Zomboid/Workshop/psychopatzCore` at `50022acf90d5a39995be552b7a1e1de21b59168b`
+Base HEAD before this implementation: `3b5004889ddceace8d6d95ca2dca6260b1175919`
 
-**Historical implementation evidence:** `HISTORY_S0_S6_20261019.md` preserved untouched.
+Core dependency: `/home/psychopatz/Zomboid/Workshop/psychopatzCore` at `50022acf90d5a39995be552b7a1e1de21b59168b`
+
+Historical S0–S6 evidence remains preserved in `HISTORY_S0_S6_20261019.md`.
 
 ## Status
 
-R0A and R0B are accepted. R1 typed/shared semantic composition is accepted for the implemented scope, including a reusable world-fact block proven in the real Lua worker. R2 has a usable first-pass Studio/Simulation workbench. R3 is accepted for the reviewed WordNet expansion and bounded real MASSIVE/SGD production slice described below. R4 is accepted for the bounded contextual-reference slice described below. Overall status remains **IN PROGRESS** and is not ready for user live testing because R5 and four legacy Lua failures remain open.
+R0A, R0B, R1, R2, R3 and R4 are implemented and verified in the existing Hoomans/Core architecture. R5 is implemented through the real Semantic Lab Tk/X11 authoring path and the production Lua worker, but the repository is not yet READY FOR USER LIVE TEST because two legacy Core smoke failures remain. No Project Zomboid process, multiplayer host, mod installation or Workshop publish was used.
 
-The checkout, branch, HEAD, upstream, dirty files, and Core dependency were verified before implementation. No Project Zomboid process, multiplayer host, mod installation, or Workshop publish was used.
+## Completed recovery evidence
 
-## Completed recovery work
+- R0A (`a591ec7e2df1b0fe4cdf751948a587e07870c387`): the real worker recognizes `fuck you` as `INSULT`, selects `HOSTILE_REMARK_RECEIVED`, records directed social authority/transport status and reason, and presents truthful EN/TL rejection or unavailable text. Self-directed non-hostile input has no social effect; THREAT remains covered. The Simulation inspector exposes the route, authority result, rejection reason, response pool and final text.
+- R0B (`dd775b0e0c5b1fe35b2c10392dd6e4545e85cfb9`): the live Interaction Explorer catalogs Core language concepts, policy branches, registered flows, capabilities, generated flows and response pools. INSULT, FOLLOW and NEEDS are searchable with their real execution routes.
+- R1 (`e50a2ae318052e665bd88f7fe537230d7987744d`, `787fe2ba362e998a4f04262eb1bcb41a04f84e70`): typed `semantic.interaction_spec.v1` / collection composition and reusable shared blocks compile through the existing CodeBuilder. A `world_facts.engine_fact` block changes generated Lua and real worker behavior; it is not JSON-only validation.
+- R2 (`5d335b26405be4223c27cdb1df827f2a8d993304`): Semantic Lab has Studio/Simulation workspaces, live explorer, block palette, graph/code authoring, dataset browser, generated-output controls and worker restart controls.
+- R3 (`b45d95aab5e98b8a17e24700eabef72644eb54fa`): pinned WordNet 3.0 builds 29 aliases/91 forms for 14 reviewed concepts. The canonical dataset contains reviewed MASSIVE and SGD records with source version/hash, record references and imported/mapped/approved/compiled/worker-verified status. A fresh worker resolves both records to the existing weather response with no transport or side effect. Runtime never reads WordNet archives, ZIPs, URLs or full external corpora.
+- R4 (`633f54a9814f9320cb9fe00b6d0aa36410fd73ef`): bounded discourse references such as `Wait there` resolve only from grounded prior context; unresolved references return clarification/rejection with no task transport. Existing memory, facts, personality, relationship, topic and EN/TL contextual tests remain green.
 
-### R0A — Production INSULT response repair
+## R5 — Actual modular authoring acceptance
 
-The real worker recognizes `"fuck you"` as `INSULT` (`pnc.social.insult`, confidence `0.99`) and selects `HOSTILE_REMARK_RECEIVED`. Rejected social authority and unavailable transport now produce truthful social-specific EN/TL responses instead of the generic failure. The Simulation inspector exposes route, policy branch, authority, accepted/status, rejection reason, response pool, and final text. Self-directed non-hostile speech remains without social authority/effects; THREAT remains covered.
+The Interaction Composer now previews canonical source plus generated Lua and EN/TL artifact diffs, requires explicit approval, persists the canonical source through the existing CodeBuilder writer, writes the generated artifacts, and requests a production-worker restart. A real Tk/X11 run invoked Preview, Approve and Generate on the existing Semantic Lab app and produced the canonical `pnc.lab.stay_with_you` definition, pattern, flow, response pool and translations.
 
-Implementation: `a591ec7e2df1b0fe4cdf751948a587e07870c387`.
+Real worker evidence after restart:
 
-### R0B — Live Interaction Explorer
+- `stay with you` → pattern `pnc.lab.stay_with_you.stay_with_you`, authored flow `pnc.lab.stay_with_you.flow`, capability `pnc:companion.stay`, `CompanionCommand`, accepted `network_queued`, action count 1, final EN `Okay, I'll stay with you.` and TL `Sige, mananatili ako sa iyo.`.
+- Denied STAY uses the binding rejection pool and truthful `I can't stay here right now.` / `Hindi ako makapananatili rito ngayon.` with no accepted action.
+- Generated WAIT_AT rejection and failed/gated flows still use their authoritative generated result-node response. Greeting/identity multi-turn plans remain two-message plans.
+- Missing gift generated lifecycle keys were added to EN/TL `GeneratedTaskCommands.json`, so the generated gift rejection path no longer falls back from TL to EN.
 
-The existing production Lua FlowEditor catalog now exposes policy branches resolved by `DialoguePolicy`, Core concepts/speech acts/triggers, 100 bounded response-pool entries, and searchable INSULT, FOLLOW, and NEEDS routes. It uses the existing runtime catalogs and does not create a duplicate parser or dispatcher.
-
-### R1 — Actual modular semantic composition
-
-Typed `semantic.interaction_spec.v1` definitions and `semantic.interaction_collection.v1` shared block instances now flow through the existing CodeBuilder. A shared `world_facts.engine_fact` block and typed `conditions.gate` connection change generated production Lua and real worker behavior. Two distinct generated patterns both passed the `world.time.week` gate, dispatched the existing `pnc:companion.stay` capability, emitted one real harness transport event, and selected the existing NPC response `Okay.`. No fabricated gameplay or relationship change was created.
-
-Implementations: `e50a2ae318052e665bd88f7fe537230d7987744d`, `5d335b26405be4223c27cdb1df827f2a8d993304`, and `787fe2ba362e998a4f04262eb1bcb41a04f84e70`.
-
-### R2 — Studio/Simulation workbench
-
-The GUI has two primary workspaces: Studio and Simulation. Studio contains workflow selection, Flow and interaction views, Dataset Library, block palette, live Interaction Explorer, ordinary-field Interaction Composer, approval/generation controls, and worker restart. Simulation retains conversation execution traces.
-
-### R3 — Verifiable lexical and corpus integration
-
-Commit `b45d95aa` expands the pinned WordNet 3.0 allowlist from the original FETCH/FOLLOW subset to 14 reviewed registered concepts. The canonical build produced 29 aliases and 91 inflected forms in `PNC_SemanticGeneratedLexicon.lua`; the real Lua smoke test confirms new Core/parser matches including `assist`, `assisting`, `declined`, `locomote`, `possess`, `desire`, `concur`, and `dissent`. WordNet remains build-time only; no archive or URL is read by Lua.
-
-The existing CodeBuilder now has two reviewed records from the official build-time sources in the canonical `common_interactions.json` source:
-
-- MASSIVE 1.0 `en-US` train record `98`, intent `weather_query`, utterance `is it currently snowing`.
-- SGD/DSTC8 `train/dialogues_090.json`, dialogue `90_00031`, turn `6`, service `Weather_1`, intent `GetWeather`, utterance `How is the weather on 9th of March?`.
-
-Both records carry source version/hash, source record references, canonical WEATHER mapping, negative/collision review, and imported/mapped/approved/compiled/worker-verified status. The authoring preview exposes those references and aggregate status; Dataset Library shows `imported 2 · mapped 2 · approved 2 · compiled 2 · worker verified 2`. `MASSIVE-SGD-NOTICES.md` records the licenses and source hashes. Raw corpora remain outside repository/runtime media.
-
-After a fresh production Lua worker restart, the two utterances resolve to their distinct generated pattern IDs, select `QUESTION_RECEIVED`, produce the existing weather response text `The weather looks clear right now.`, emit no transport event, and report no side effects. This is actual worker evidence, not JSON-only validation.
-
-### R4 — Contextual conversational intelligence slice
-
-Commit `633f54a9` extends the existing movement catalog with `pnc.command.wait_at_reference`, so `Wait there` and `Stay there` are resolved through the existing discourse-reference resolver instead of falling through to generic clarification. The same resolver now marks an unresolved reference explicitly before policy/flow evaluation. A fresh real Lua worker proves `Wait at the campfire` → `Wait there` and `Stay there` reuse the grounded `CAMPFIRE` target, retain the existing `pnc:task.wait_at` route, produce `Okay, I'll wait there.`, and emit real task transport. An ungrounded `Wait there` is blocked with `clarification_required`, truthful `I can't wait there right now.`, no transport, and no successful action. Existing C1–C6 contextual tests continue to cover interruptions, follow-ups, topic switches, references, confirmations, grounded facts, personality/relationship state, EN/TL output, and no-effect branches.
+The existing response architecture was corrected so authored action flows use their configured response pool only after an accepted dispatch, while generated rejected/failed/gated result nodes remain truthful. No successful server event or relationship change is fabricated.
 
 ## Verification evidence
 
-- Full Python harness discovery: `238/238 PASS`.
-- Focused interaction-spec suite: `6/6 PASS`.
-- Focused dataset review/worker suite: `7/7 PASS`.
-- Compiler unit suite: `8/8 PASS`.
-- Generated WordNet Lua smoke: `1/1 PASS`.
-- Focused real-Lua social smoke: `2/2 PASS` (`pnc_semantic_social_chat_smoke`, `pnc_semantic_social_smoke`).
-- Focused movement/reference worker suite: `3/3 PASS`.
-- Existing `pnc_semantic` suite: `64/68 PASS`; the same four legacy failures remain:
-  - `pnc_semantic_gift_offer_smoke`: agreement without live offer expected `SOCIAL_ACKNOWLEDGED`, got `COMMAND_ACCEPTED`.
-  - `pnc_semantic_local_route_smoke`: local greeting expected one queued response, got two.
-  - `pnc_semantic_inventory_dialogue_smoke`: second local turn expected queue size two, got three.
-  - `pnc_semantic_state_response_smoke`: expected `SOCIAL_ACKNOWLEDGED`, got `COMMAND_ACCEPTED`.
-- Doctor: PASS for Python 3.12.3, Tk/display, Core, Lua 5.3.6, worker syntax/boot/PING/CAPABILITIES.
-- Changed Python and Lua syntax: PASS; EN/TL generated JSON validation and `git diff --check`: PASS.
-- `pz-verify`: zero errors on the semantic directory; one pre-existing `load(string)` warning and existing hardcoded-string/token-bloat advisories remain, including the generated lexicon and dialogue shards.
+- Full real-Lua Python harness discovery: **218/218 PASS**.
+- Semantic compiler unit suite: **16/16 PASS**.
+- Focused real-worker suites: contextual social **11/11**, dataset review **7/7**, follow binding **4/4**, authoring compiler **5/5**, interaction spec **7/7**, stay/wait binding **3/3**, flow editor **9/9**, gift binding **3/3**, semantic dialogue flows **8/8**, translation integration **1/1**.
+- Harness doctor: **PASS** — Python 3.12.3, Tk/display, Core path, Lua 5.3.6, worker syntax/boot/PING/CAPABILITIES.
+- Existing real-Lua `pnc_semantic` suite: **66/68 PASS**. Two of the four previously reported failures are fixed by requiring `help` and `supplies` in the quest-accept patterns; bare `yes` now remains `SOCIAL_ACKNOWLEDGED` and `Sure` no longer becomes `COMMAND_ACCEPTED`.
+- Remaining two failures: `pnc_semantic_local_route_smoke.lua:208` expects one greeting line while the authoritative greeting plan queues two; `pnc_semantic_inventory_dialogue_smoke.lua:282` expects queue size two while the second local inventory turn leaves three. These need a dedicated queue-ownership audit; they were not hidden or relabeled.
+- `git diff --check`, changed Python compilation, changed Lua `luac5.3 -p`, EN/TL JSON parsing and changed-file `pz_verify` checks are clean.
 
-## Remaining defects and boundaries
+## Boundaries and next chunk
 
-The four legacy Lua failures above remain open and must not be hidden by the R3/R4 work. R5 still needs the complete in-app edit → changed source/diff → approval → generation → worker reload → conversation → revision workflow and measured resource evidence. Native Project Zomboid single-player and multiplayer behavior remain user-owned and untested.
-
-## ONE next chunk
-
-**R5 — Complete developer acceptance:** drive the existing Semantic Lab Studio and Simulation path end to end with an actual changed interaction: edit one supported interaction through the in-app authoring controls, preview the changed canonical source and generated Lua/EN/TL diff, approve and generate through CodeBuilder, restart the production worker, converse using the changed route, inspect final text/authority/effects, and revise or document the first remaining in-app workflow defect. Preserve the existing canonical pipeline and measure the worker/UI path without launching Project Zomboid.
+The repository is not yet ready for user-owned Project Zomboid live testing. Native game testing remains explicitly user-owned. The next and only next chunk is **R5B — reconcile the remaining Core greeting/inventory queue ownership contract, rerun all 68 real-Lua semantic smoke tests, and only then declare READY FOR USER LIVE TEST if the queue trace and final wording are correct**.

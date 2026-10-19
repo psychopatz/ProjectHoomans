@@ -2,6 +2,8 @@
   "UI_PNC_Conversation_Semantic_GeneratedCampQueuedFriendly": "Sige, magse-set up ako ng kampo roon.",
   "UI_PNC_Conversation_Semantic_GeneratedCampQueuedTrusted": "Sige, magtatayo ako ng kampo roon.",
   "UI_PNC_Conversation_Semantic_GeneratedCampQueuedWithdrawn": "Magtatayo ako ng kampo roon.",
+  "UI_PNC_Conversation_Semantic_GeneratedFollowFailed": "Hindi ko masimulan ang pagsunod sa iyo.",
+  "UI_PNC_Conversation_Semantic_GeneratedFollowRejected": "Hindi kita masusundan ngayon.",
   "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedFriendly": "Siyempre, susundan kita.",
   "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedTrusted": "Kilala kita. Susunod ako.",
   "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedWithdrawn": "Susunod ako.",
@@ -11,6 +13,8 @@
   "UI_PNC_Conversation_Semantic_GeneratedStopQueuedFriendly": "Nakuha ko, titigil ako sa pagsunod.",
   "UI_PNC_Conversation_Semantic_GeneratedStopQueuedTrusted": "Naiintindihan ko, titigil ako.",
   "UI_PNC_Conversation_Semantic_GeneratedStopQueuedWithdrawn": "Sige, titigil ako.",
+  "UI_PNC_Conversation_Semantic_GeneratedStayFailed": "Hindi ko masimulan ang utos na manatili.",
+  "UI_PNC_Conversation_Semantic_GeneratedStayRejected": "Hindi ako makapananatili rito ngayon.",
   "UI_PNC_Conversation_Semantic_GeneratedStayQueuedFriendly": "Sige, mananatili ako rito.",
   "UI_PNC_Conversation_Semantic_GeneratedStayQueuedTrusted": "Sige, mananatili ako.",
   "UI_PNC_Conversation_Semantic_GeneratedStayQueuedWithdrawn": "Sige, mananatili ako."

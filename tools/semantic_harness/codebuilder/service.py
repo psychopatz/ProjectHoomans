@@ -17,7 +17,11 @@ from tools.semantic_harness import authoring
 from .blocks import SemanticBlockRegistry
 from .codeblocks import validate_codeblock_document
 from .compiler import CompileError
-from .compiler import discover_registered_capability_ids, render_semantic_lua_shards
+from .compiler import (
+    discover_registered_capability_ids,
+    render_semantic_lua_shards,
+    render_semantic_manifest,
+)
 from .dataset_adapters import preview_dataset_adapter, promote_reviewed_candidates
 from ..interaction_explorer import build_interaction_rows, search_interactions
 from .interaction_spec import (
@@ -366,6 +370,70 @@ class SemanticLabAuthoringService:
     ) -> dict[str, Any]:
         return validate_interaction_spec(spec, production_catalog=production_catalog)
 
+    def _semantic_preview_artifacts(
+        self,
+        compiled: dict[str, Any],
+        source_document: dict[str, Any],
+        source_path: Path,
+    ) -> dict[str, Any]:
+        """Expose canonical-source and generated Lua/translation diffs effect-free."""
+
+        source_text = json.dumps(source_document, ensure_ascii=False, indent=2) + "\n"
+        source_relative = str(source_path.resolve().relative_to(self.repository))
+        rendered = render_semantic_lua_shards(
+            compiled,
+            "PNC/Semantics/PNC_SemanticGeneratedDefinitions",
+        )
+        pattern_modules = [module for module, _source in rendered if "_Patterns_" in module]
+        flow_modules = [module for module, _source in rendered if "_Flows_" in module]
+        response_modules = [module for module, _source in rendered if "_Responses_" in module]
+        translation_paths = {
+            "EN": ["EN/Conversation/Semantic/Generated.json"],
+            "TL": ["TL/Conversation/Semantic/Generated.json"],
+        }
+        semantic_root = Path(
+            "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics"
+        )
+        expected_sources: dict[str, str] = {
+            str(semantic_root / "PNC_SemanticGeneratedDefinitions.lua"):
+                render_semantic_manifest(
+                    compiled,
+                    pattern_modules,
+                    flow_modules,
+                    response_modules,
+                    translation_paths,
+                ),
+        }
+        expected_sources.update({
+            str(semantic_root / (Path(module).name + ".lua")): source
+            for module, source in rendered
+        })
+        translation_root = Path(
+            "Contents/mods/ProjectHoomans/common/media/translation"
+        )
+        expected_sources.update({
+            str(translation_root / language / "Conversation/Semantic/Generated.json"):
+                json.dumps(
+                    compiled["translations"][language],
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ) + "\n"
+            for language in ("EN", "TL")
+        })
+        return {
+            "canonicalSourceDiff": authoring._artifact_diff(
+                self.repository,
+                source_relative,
+                source_text,
+            ),
+            "generatedArtifactDiffs": [
+                authoring._artifact_diff(self.repository, path, expected)
+                for path, expected in expected_sources.items()
+            ],
+            "generatedPaths": list(expected_sources),
+        }
+
     def preview_interaction_spec(
         self,
         spec: dict[str, Any],
@@ -429,6 +497,13 @@ class SemanticLabAuthoringService:
             "flowIDs": [item["id"] for item in compiled["flows"]],
             "responsePoolIDs": [item["id"] for item in compiled["responsePools"]],
         }
+        report.update(
+            self._semantic_preview_artifacts(
+                compiled,
+                report["sourceDocument"],
+                self._dataset_path(source_id),
+            )
+        )
         return report
 
     def generate_interaction_spec(
@@ -468,9 +543,25 @@ class SemanticLabAuthoringService:
             }
         from .build import write_semantic_output
 
-        writes = write_semantic_output(self.repository, preview["compiled"])
+        canonical = self.write_dataset_document(source_id, preview["sourceDocument"])
+        if canonical.get("ok") is not True:
+            return {
+                **preview,
+                "type": "semantic_interaction_spec_generation",
+                "generationApproved": True,
+                "ok": False,
+                "diagnostics": canonical.get("diagnostics", []),
+                "writes": [],
+            }
+        writes = [Path(path) for path in canonical.get("writes", [])]
+        writes.extend(write_semantic_output(self.repository, preview["compiled"]))
+        post_write = self.preview_interaction_spec(
+            spec,
+            source_id=source_id,
+            production_catalog=production_catalog,
+        )
         return {
-            **preview,
+            **post_write,
             "type": "semantic_interaction_spec_generation",
             "generationApproved": True,
             "previewOnly": False,
@@ -541,6 +632,13 @@ class SemanticLabAuthoringService:
             "flowIDs": [item["id"] for item in compiled["flows"]],
             "responsePoolIDs": [item["id"] for item in compiled["responsePools"]],
         }
+        report.update(
+            self._semantic_preview_artifacts(
+                compiled,
+                report["sourceDocument"],
+                self._dataset_path(source_id),
+            )
+        )
         return report
 
     def generate_interaction_collection(
@@ -580,9 +678,25 @@ class SemanticLabAuthoringService:
             }
         from .build import write_semantic_output
 
-        writes = write_semantic_output(self.repository, preview["compiled"])
+        canonical = self.write_dataset_document(source_id, preview["sourceDocument"])
+        if canonical.get("ok") is not True:
+            return {
+                **preview,
+                "type": "semantic_interaction_collection_generation",
+                "generationApproved": True,
+                "ok": False,
+                "diagnostics": canonical.get("diagnostics", []),
+                "writes": [],
+            }
+        writes = [Path(path) for path in canonical.get("writes", [])]
+        writes.extend(write_semantic_output(self.repository, preview["compiled"]))
+        post_write = self.preview_interaction_collection(
+            collection,
+            source_id=source_id,
+            production_catalog=production_catalog,
+        )
         return {
-            **preview,
+            **post_write,
             "type": "semantic_interaction_collection_generation",
             "generationApproved": True,
             "previewOnly": False,

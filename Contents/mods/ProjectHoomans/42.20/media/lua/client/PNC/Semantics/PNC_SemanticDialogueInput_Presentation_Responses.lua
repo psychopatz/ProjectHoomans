@@ -34,6 +34,8 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_IdentityExchangeUnavailable",
         ["semantic.action.follow.unavailable"] =
             "UI_PNC_Conversation_Semantic_ActionFollowUnavailable",
+        ["semantic.action.stay.unavailable"] =
+            "UI_PNC_Conversation_Semantic_ActionStayUnavailable",
         ["semantic.action.stop.unavailable"] =
             "UI_PNC_Conversation_Semantic_ActionStopUnavailable",
         ["semantic.social.interaction.unavailable"] =
@@ -448,6 +450,30 @@ function ResponseAdapter.ActionRejected(result, actionResult)
             },
         })
     end
+    local binding = actionResult.binding
+    local bindingPools = type(binding) == "table"
+        and binding.responsePools or nil
+    local bindingFailed = actionResult.status == "failed"
+        or type(actionResult.details) == "table"
+        and actionResult.details.status == "failed"
+    local bindingOutcome = bindingFailed and "failed" or "rejected"
+    local bindingResponse = type(bindingPools) == "table"
+        and bindingPools[bindingOutcome] or nil
+    if type(bindingResponse) == "table"
+        and type(bindingResponse.key) == "string"
+        and bindingResponse.key ~= ""
+    then
+        return ResponseAdapter.Payload({
+            response = {
+                templateID = bindingResponse.key,
+                fallback = bindingResponse.en or bindingResponse.fallback,
+                args = {
+                    action = action,
+                    reason = actionResult.reason,
+                },
+            },
+        })
+    end
     -- Task admission failures already flow through ReceiveSemanticTaskResult,
     -- which owns their single authoritative task-result line. Avoid adding a
     -- second generic action-unavailable line for WAIT_AT.
@@ -455,7 +481,9 @@ function ResponseAdapter.ActionRejected(result, actionResult)
     local fallback = "I couldn't do that right now."
     if action == "FOLLOW" or tostring(actionResult.commandID) == "follow" then
         fallback = "I can't follow you right now."
-    elseif action == "STOP" or action == "STAY"
+    elseif action == "STAY" then
+        fallback = "I can't stay right now."
+    elseif action == "STOP"
         or tostring(actionResult.commandID) == "stay"
     then
         fallback = "I can't stop right now."
@@ -463,7 +491,9 @@ function ResponseAdapter.ActionRejected(result, actionResult)
     local templateID = "semantic.action.unavailable"
     if action == "FOLLOW" or tostring(actionResult.commandID) == "follow" then
         templateID = "semantic.action.follow.unavailable"
-    elseif action == "STOP" or action == "STAY"
+    elseif action == "STAY" then
+        templateID = "semantic.action.stay.unavailable"
+    elseif action == "STOP"
         or tostring(actionResult.commandID) == "stay"
     then
         templateID = "semantic.action.stop.unavailable"

@@ -88,6 +88,7 @@
   "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly": "You're welcome. It's good to see you too.",
   "UI_PNC_Conversation_Semantic_FlowGreetingFollowup": "You're welcome. Take care.",
   "UI_PNC_Conversation_Semantic_ActionFollowUnavailable": "I can't follow you right now.",
+  "UI_PNC_Conversation_Semantic_ActionStayUnavailable": "I can't stay right now.",
   "UI_PNC_Conversation_Semantic_ActionStopUnavailable": "I can't stop right now.",
   "UI_PNC_Conversation_Semantic_SocialInteractionUnavailable": "I heard you, but I couldn't send that social reaction right now.",
   "UI_PNC_Conversation_Semantic_SocialInteractionRejected": "I heard you, but I couldn't apply that social reaction.",

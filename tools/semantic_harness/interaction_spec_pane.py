@@ -188,7 +188,7 @@ class InteractionSpecPane:
         self._preview_key = self._key(spec)
         self._approved_key = None
         self._status_var.set(
-            "Generated Lua preview is ready; no files written."
+            "Canonical source + generated Lua/EN-TL diff is ready; no files written."
             if report.get("ok") is True else "Interaction spec rejected; no files written."
         )
         return report
@@ -207,7 +207,7 @@ class InteractionSpecPane:
             return False
         if not self._messagebox.askyesno(
             "Approve Semantic Lab interaction",
-            "Approve this typed interaction and write generated Lua/EN/TL artifacts?",
+            "Approve this typed interaction and write its canonical source plus generated Lua/EN/TL artifacts?",
         ):
             self._status_var.set("Approval cancelled; preview remains unchanged")
             return False
@@ -231,7 +231,9 @@ class InteractionSpecPane:
         self._last_preview = report
         self._approved_key = None
         if report.get("ok") is True:
-            self._status_var.set("Artifacts generated; Lua worker restart requested.")
+            self._status_var.set(
+                "Canonical source and artifacts generated; Lua worker restart requested."
+            )
         else:
             self._status_var.set("Generation failed; no worker restart was requested.")
 

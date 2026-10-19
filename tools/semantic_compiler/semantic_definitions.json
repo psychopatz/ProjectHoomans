@@ -65,6 +65,57 @@
           }
         ]
       }
+    },
+    {
+      "id": "pnc.lab.stay_with_you",
+      "owner": "SemanticLab",
+      "capability": "pnc:companion.stay",
+      "utterances": {
+        "positives": [
+          "stay with you"
+        ],
+        "negatives": [
+          "don't stay with you"
+        ]
+      },
+      "emit": {
+        "intent": "REQUEST",
+        "speechAct": "REQUEST",
+        "action": "STAY"
+      },
+      "confidence": 0.99,
+      "priority": 170,
+      "flow": {
+        "id": "pnc.lab.stay_with_you.flow",
+        "version": 1,
+        "owner": "SemanticLab",
+        "triggers": [
+          {
+            "intent": "REQUEST",
+            "speechAct": "REQUEST",
+            "action": "STAY",
+            "pattern": "pnc.lab.stay_with_you.stay_with_you"
+          }
+        ],
+        "initial": "accepted",
+        "nodes": {
+          "accepted": {
+            "terminal": true,
+            "responsePool": "semantic.lab.stay.with.you"
+          }
+        }
+      },
+      "responses": {
+        "poolID": "semantic.lab.stay.with.you",
+        "variants": [
+          {
+            "id": "accepted",
+            "key": "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted",
+            "en": "Okay, I'll stay with you.",
+            "tl": "Sige, mananatili ako sa iyo."
+          }
+        ]
+      }
     }
   ]
 }

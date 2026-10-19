@@ -88,6 +88,7 @@
   "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly": "Walang anuman. Mabuti at nakita rin kita.",
   "UI_PNC_Conversation_Semantic_FlowGreetingFollowup": "Walang anuman. Mag-ingat ka.",
   "UI_PNC_Conversation_Semantic_ActionFollowUnavailable": "Hindi kita masusundan ngayon.",
+  "UI_PNC_Conversation_Semantic_ActionStayUnavailable": "Hindi ako makapananatili ngayon.",
   "UI_PNC_Conversation_Semantic_ActionStopUnavailable": "Hindi ako makahinto ngayon.",
   "UI_PNC_Conversation_Semantic_SocialInteractionUnavailable": "Narinig kita, pero hindi ko maipadala ang sosyal na reaksyon ngayon.",
   "UI_PNC_Conversation_Semantic_SocialInteractionRejected": "Narinig kita, pero hindi ko mailapat ang sosyal na reaksyon.",
