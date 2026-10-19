@@ -1,3 +1,5 @@
+> **HISTORICAL C7 PHASE NOTE (2026-10-20):** The original C7 design below predates source implementation. Its C7A–C7G results were subsequently recorded accepted at remote `263c132ea87678024cd81f8310bb85608dec28df`. New user-observed out-of-sample compliment/inventory semantic arbitration and sparse backstory/Knowledge/Dossier requirements are NEW B-phase tasks. See `GROUNDED_PERSONAL_DIALOGUE_B.md`, `ROADMAP.md` and `PROGRESS.md` for active work. Do NOT run old C7A next-chunk instructions.
+
 # C7 — Conversational Competence and Conversation-First Semantic Lab
 
 **Approved product expansion: PLANNED / NOT IMPLEMENTED.** 2026-10-19 remote source checkpoint `93cbb77498d8d35ded43d3594f59147d71a666e9`. New C7 is not an assertion that current agent tests failed; it is a distinct user-observed product gap. Prior R0A–R5B developer acceptance and its SHA/test ledger are preserved verbatim in `HISTORY_R0_R5B_20261019.md`. The old READY FOR USER LIVE TEST applied to those narrowly exercised flows. This expanded goal is OPEN.

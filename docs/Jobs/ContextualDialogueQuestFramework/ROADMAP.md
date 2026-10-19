@@ -1,16 +1,16 @@
-# Roadmap — Conversational Competence C7 (2026-10-19)
+# Roadmap — Grounded NPC Personal Dialogue, Seed/Deltas, Knowledge and Dossier
 
-The R0A–R5B recovery is **RECORDED DEVELOPER-ACCEPTED** at remote 93cbb77498d8d35ded43d3594f59147d71a666e9: 218/218 harness, 16/16 compiler and 68/68 semantic Lua smoke PASS as reported in `HISTORY_R0_R5B_20261019.md`. Those are not new runs for C7 and are not proof of ordinary conversation quality. Historical S0–S6 and other C0–C6 evidence remains preserved. New user screenshots expose out-of-sample NPC talk failures. New goal is **IN PROGRESS**. `PROGRESS.md` defines the only current Next Chunk.
+**Phase opened 2026-10-20 from audited remote `263c132ea87678024cd81f8310bb85608dec28df`.** The previous C7A–C7G implementation is **recorded developer accepted** (244/244 harness, 68/68 Lua smoke, 16/16 compiler, per historic ledger). No new worker/GUI/backend tests were executed by this docs-only commit. User-observed out-of-sample compliment/inventory bug and desired protected personal-knowledge gameplay open a NEW product gate; do NOT rerun C7/earlier work unnecessarily. The ONE active chunk is in `PROGRESS.md`.
 
-| Phase | State | Deliverable | Real-worker acceptance |
-| --- | --- | --- | --- |
-| R0A–R5B (prior) | RECORDED ACCEPTED | INSULT, explorer, actual block composition, Studio, limited datasets, reference resolution, modular generation and repaired semantic smoke | Preserve commit/test records, don't redo |
-| **C7A — ordinary talk baseline + first two repairs** | **CURRENT — NOT STARTED** | Diagnose screenshot phrases, improve generic clothing compliment and directly addressed bite-status question using typed semantics and real provider/uncertainty | Multiple positive/negative utterances, real Core IR→NPC response/trace, no accidental commands, protected WAIT/news/social flows |
-| C7B — general fact questions | PLANNED | Reusable subject/attribute/fact resolution for residence, health, knowledge, inventory and relationship | Cross-domain paraphrases, truthful known/unknown, no fabricated NPC home |
-| C7C — NPC conversational initiative | PLANNED | Reusable bounded dialogue-act/follow-up planner with relationship, danger and cooldown | NPC naturally follows up sometimes, responds to answer, respects dismissal |
-| C7D — memory and continuity | PLANNED | Bounded discourse/agenda, referents, episodic commitments and topic resume | Multi-turn continuity, proper uncertainty and player/NPC isolation |
-| C7E — conversation-first Studio view | PLANNED | Readable interpretation/fact/plan graph and concise turn explanation in existing Simulation; action graph separately accessible | Selecting a real NPC turn highlights authentic semantic path and source, without raw JSON dependency |
-| C7F — licensed dataset precision | PLANNED | Reviewed corpus and lexical expansion, held-out paraphrase and collision tests via existing CodeBuilder | Observed improvement on worker quality/negative sets, not source counts alone |
-| C7G — complete developer conversational gate | PLANNED | Realistic long dialogues, EN/TL, personality, optional PBrainZ parity, CPU/memory budget and regressions | Grounded sustained NPC chat with no false authority, then READY FOR USER LIVE TEST |
+| Phase | Status | Meaningful developer result |
+| --- | --- | --- |
+| R/C7 (earlier) | RECORDED ACCEPTED in `HISTORY_C7_20261020.md` and earlier ledgers | Existing Studio, parser, dialogue plans, social/quest authority, reviewed language, context and real worker acceptance preserved |
+| **B0 — Semantic correctness + backstory feasibility** | **CURRENT / NOT ACCEPTED** | Real worker routes short evaluative clothing compliments to social reaction with **zero inventory transport**, while explicit inventory questions still query; source-backed backstory replay feasibility |
+| B1 — Identity-seed stability and sparse deltas | PLANNED | Version/epoch-pinned backstory selection, no silent reroll on catalog changes, minimal override IDs only where truly needed; save size measured |
+| B2 — Offline personal fact-provider integration | PLANNED | Hometown/former job/hobby from existing backstory APIs answered via existing DialogueFacts/Knowledge owners, distinguish current residence/medical |
+| B3 — Graceful Knowledge disclosure | PLANNED | Per-descriptor familiarity/approval/privacy/consent gates, earned evidence; milestone is opportunity not automatic reveal; MP player isolation |
+| B4 — Dossier learned-background display | PLANNED | Existing descriptor/snapshot-driven History UI shows confirmed/suspected only for authorized player; no secret leak/client truth |
+| B5 — Backstory-aware personal conversation | PLANNED | Multi-turn follow-ups, tone/personality, privacy refusal and optional PBrainZ filtered parity using same truth/knowledge |
+| B6 — ModData, scale, EN/TL and acceptance | PLANNED | Compare before/after serialized sizes, zero-added-payload ordinary NPCs, deterministic saves, lazy cache, 100-NPC baseline and synthetic larger load, no all-NPC tick scan; READY FOR USER LIVE TEST only after real developer gates |
 
-Do not call full LLM-level unrestricted generation an offline Lua capability. Improve specific grounded dialogue skills through existing runtime ownership. Avoid adding extra standalone GUI tabs, hand-authoring one branch per phrase or creating another parser/dispatcher. Native PZ SP/MP and Workshop remain user-owned.
+**Exact design/acceptance:** `GROUNDED_PERSONAL_DIALOGUE_B.md`; next executable chunk: `PROGRESS.md`. Use existing identitySeed and stable generator epoch, seed-derived fact selection, sparse exceptions, server `PNC_NPCKnowledge` as sole player knowledge store, descriptor-driven Dossier and authoritative game data. No local multiplayer host, native Project Zomboid launch, Workshop operations or repeated CUA polling by Codex.
