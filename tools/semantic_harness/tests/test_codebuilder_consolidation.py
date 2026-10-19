@@ -32,6 +32,7 @@ from tools.semantic_harness.codebuilder.build import (
     write_dialogue_output,
     write_semantic_output,
 )
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
@@ -124,11 +125,23 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
         ])
         output = io.StringIO()
         report = {"ok": True, "type": "semantic_compile_preview", "writes": []}
-        with patch("tools.semantic_harness.cli.preview_semantic_source", return_value=report) as preview:
+        with patch.object(
+            SemanticLabAuthoringService,
+            "preview_semantic_source",
+            return_value=report,
+        ) as preview:
             with redirect_stdout(output):
                 self.assertEqual(cli(arguments), 0)
         preview.assert_called_once()
         self.assertEqual(json.loads(output.getvalue()), report)
+
+    def test_authoring_service_binds_repository_for_direct_callers(self) -> None:
+        service = SemanticLabAuthoringService(repository=REPOSITORY)
+        self.assertEqual(service.repository, REPOSITORY.resolve())
+        report = service.preview_semantic_source(SEMANTIC_SOURCE)
+        self.assertTrue(report["ok"])
+        self.assertTrue(report["previewOnly"])
+        self.assertEqual(report["writes"], [])
 
     def test_app_selects_headless_mode_for_authoring_operation(self) -> None:
         with patch.object(app, "install_shutdown_handler"), patch.object(app, "cli", return_value=0) as run_cli:

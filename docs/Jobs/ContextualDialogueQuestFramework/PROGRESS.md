@@ -22,9 +22,30 @@ architecture, workbench, compiler, pipeline, roadmap, runbook, acceptance,
 and historical documents were used instead. Native Project Zomboid SP/MP and
 live external PBrainZ remain user-owned.
 
-**ONE Next Chunk:** **S0B — establish one canonical authoring/build service
-object shared by Semantic Lab GUI, headless CLI, and Codex API, preserving the
-S0A CodeBuilder entrypoints and deterministic artifact contract.**
+## S0B accepted — one shared authoring/build service
+
+`SemanticLabAuthoringService` now binds one repository/runtime configuration
+and is used by the Tk Semantic Lab, headless authoring CLI, and direct
+Python/Codex callers. It delegates to the existing authoring reports and the
+embedded CodeBuilder; module-level authoring functions remain compatibility
+helpers, not a second pipeline. The service does not change compiler
+algorithms, parser contracts, output paths, translation manifests, or worker
+authority.
+
+S0B evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_codebuilder_consolidation tools.semantic_harness.tests.test_app tools.semantic_harness.tests.test_dataset_review tools.semantic_harness.tests.test_semantic_authoring_compiler -q` — **26/26 passed**.
+- `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **185/185 passed** after service routing.
+- `./tools/semantic_harness/run_harness.sh --no-gui --jsonl --compile-source tools/semantic_compiler/semantic_definitions.json` — **PASS**, effect-free canonical preview through the shared service.
+- `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` — **PASS**.
+
+**Current goal status:** **S0A and S0B accepted; prior C6 developer gates
+remain preserved, and native Project Zomboid SP/MP plus live external PBrainZ
+validation remain user-owned.**
+
+**ONE Next Chunk:** **S1 — build the Dataset Library inside Semantic Lab,
+backed by the canonical CodeBuilder source catalog, so users can browse,
+search, review, and edit definitions without manually selecting JSON files.**
 
 **Updated:** 2026-10-19, after the C6-C optional-provider parity slice and S0A acceptance.
 

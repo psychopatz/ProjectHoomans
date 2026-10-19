@@ -1,8 +1,9 @@
 # Semantic Lab CodeBuilder
 
 This package is the single offline implementation of the Project Hoomans
-semantic compiler and deterministic artifact writer. Semantic Lab's GUI,
-headless authoring commands, and Codex-facing Python API use these modules.
+semantic compiler and deterministic artifact writer. The shared
+`SemanticLabAuthoringService` binds repository/runtime configuration for
+Semantic Lab's GUI, headless authoring commands, and Codex-facing Python API.
 
 The reviewed canonical JSON inputs remain in `tools/semantic_compiler/`:
 

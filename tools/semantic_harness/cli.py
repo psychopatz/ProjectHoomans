@@ -7,13 +7,7 @@ from pathlib import Path
 import sys
 
 from .config import ConfigurationError
-from .authoring import (
-    REPOSITORY as AUTHORING_REPOSITORY,
-    generate_dialogue_source,
-    generate_semantic_source,
-    preview_dialogue_source,
-    preview_semantic_source,
-)
+from .codebuilder.service import SemanticLabAuthoringService
 from .rendering import print_result as _print_result
 from .runner import ConflictLedger, load_case, run_case
 from .scenario import load_scenario
@@ -28,37 +22,47 @@ AUTHORING_OPERATIONS = (
 )
 
 
-def _resolve_authoring_source(arguments: argparse.Namespace, value: str) -> tuple[Path, Path]:
-    repository = (
-        Path(arguments.repository).expanduser().resolve()
-        if arguments.repository
-        else AUTHORING_REPOSITORY
-    )
+def _resolve_authoring_source(
+    service: SemanticLabAuthoringService,
+    value: str,
+) -> Path:
     source = Path(value).expanduser()
     if not source.is_absolute():
-        source = repository / source
-    return repository, source.resolve()
+        source = service.repository / source
+    return source.resolve()
 
 
-def _run_authoring_operation(arguments: argparse.Namespace) -> dict | None:
+def _run_authoring_operation(
+    arguments: argparse.Namespace,
+    service: SemanticLabAuthoringService,
+) -> dict | None:
     if arguments.compile_source:
-        repository, source = _resolve_authoring_source(arguments, arguments.compile_source)
-        return preview_semantic_source(source, repository=repository, runtime_root=repository)
+        return service.preview_semantic_source(
+            _resolve_authoring_source(service, arguments.compile_source)
+        )
     if arguments.generate_source:
-        repository, source = _resolve_authoring_source(arguments, arguments.generate_source)
-        return generate_semantic_source(source, repository=repository, runtime_root=repository)
+        return service.generate_semantic_source(
+            _resolve_authoring_source(service, arguments.generate_source)
+        )
     if arguments.review_dataset:
-        repository, source = _resolve_authoring_source(arguments, arguments.review_dataset)
-        return preview_dialogue_source(source, repository=repository)
+        return service.preview_dialogue_source(
+            _resolve_authoring_source(service, arguments.review_dataset)
+        )
     if arguments.generate_dataset:
-        repository, source = _resolve_authoring_source(arguments, arguments.generate_dataset)
-        return generate_dialogue_source(source, repository=repository)
+        return service.generate_dialogue_source(
+            _resolve_authoring_source(service, arguments.generate_dataset)
+        )
     return None
 
 
 def cli(arguments: argparse.Namespace) -> int:
     try:
-        authoring_report = _run_authoring_operation(arguments)
+        repository = Path(arguments.repository) if arguments.repository else None
+        authoring_service = SemanticLabAuthoringService(
+            repository=repository,
+            runtime_root=repository,
+        )
+        authoring_report = _run_authoring_operation(arguments, authoring_service)
         if authoring_report is not None:
             _print_result(authoring_report, arguments.jsonl)
             return 0 if authoring_report.get("ok") is True else 2

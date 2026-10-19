@@ -10,12 +10,7 @@ from typing import Any, Callable
 
 from .config import ConfigurationError
 from .conversation_inspector import build_conversation_inspector
-from .authoring import (
-    generate_dialogue_source as generate_dialogue_artifacts,
-    generate_semantic_source as generate_source_artifacts,
-    preview_dialogue_source,
-    preview_semantic_source,
-)
+from .codebuilder.service import SemanticLabAuthoringService
 from .flow_editor import FlowEditorPane
 from .rendering import pretty
 from .scenario import load_scenario, save_scenario
@@ -47,6 +42,11 @@ class SemanticHarnessApp:
         self._ttk = ttk
         self._ScrolledText = ScrolledText
         self.arguments = arguments
+        repository = Path(arguments.repository) if arguments.repository else None
+        self.authoring_service = SemanticLabAuthoringService(
+            repository=repository,
+            runtime_root=repository,
+        )
         self.root.title("Project Hoomans Semantic Lab")
         self.root.geometry("1320x860")
         self.scenario_path = Path(arguments.scenario) if arguments.scenario else None
@@ -443,7 +443,7 @@ class SemanticHarnessApp:
 
     def compile_semantic_source(self, source_path: Path) -> None:
         """Preview canonical source offline; do not mutate the Lua worker."""
-        report = preview_semantic_source(source_path)
+        report = self.authoring_service.preview_semantic_source(source_path)
         self.flow_editor.show_source_report(report)
         self._set_text(self.inspector, pretty(report))
         self._set_text(self.trace, pretty(report))
@@ -459,7 +459,7 @@ class SemanticHarnessApp:
 
     def review_dialogue_source(self, source_path: Path) -> None:
         """Review the canonical dialogue dataset through the existing Code Builder."""
-        report = preview_dialogue_source(source_path)
+        report = self.authoring_service.preview_dialogue_source(source_path)
         self.flow_editor.show_dataset_report(report)
         self._set_text(self.inspector, pretty(report))
         self._set_text(self.trace, pretty(report))
@@ -486,7 +486,7 @@ class SemanticHarnessApp:
 
     def generate_dialogue_source(self, source_path: Path) -> None:
         """Write approved dialogue artifacts through the existing Code Builder writer."""
-        report = generate_dialogue_artifacts(source_path)
+        report = self.authoring_service.generate_dialogue_source(source_path)
         self.flow_editor.show_dataset_report(report)
         self._set_text(self.inspector, pretty(report))
         self._set_text(self.trace, pretty(report))
@@ -504,7 +504,7 @@ class SemanticHarnessApp:
 
     def generate_semantic_source(self, source_path: Path) -> None:
         """Generate approved artifacts, then restart the existing worker."""
-        report = generate_source_artifacts(source_path)
+        report = self.authoring_service.generate_semantic_source(source_path)
         self.flow_editor.show_source_report(report)
         self._set_text(self.inspector, pretty(report))
         self._set_text(self.trace, pretty(report))
