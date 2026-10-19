@@ -11,6 +11,7 @@ from typing import Any, Callable
 from .config import ConfigurationError
 from .conversation_inspector import build_conversation_inspector
 from .codebuilder.service import SemanticLabAuthoringService
+from .dataset_library import DatasetLibraryPane
 from .flow_editor import FlowEditorPane
 from .rendering import pretty
 from .scenario import load_scenario, save_scenario
@@ -74,12 +75,16 @@ class SemanticHarnessApp:
 
         simulation_tab = ttk.Frame(self.main_tabs, padding=8)
         editor_tab = ttk.Frame(self.main_tabs, padding=8)
+        library_tab = ttk.Frame(self.main_tabs, padding=8)
         simulation_tab.rowconfigure(0, weight=1)
         simulation_tab.columnconfigure(0, weight=1)
         editor_tab.rowconfigure(0, weight=1)
         editor_tab.columnconfigure(0, weight=1)
+        library_tab.rowconfigure(0, weight=1)
+        library_tab.columnconfigure(0, weight=1)
         self.main_tabs.add(simulation_tab, text="Simulation")
         self.main_tabs.add(editor_tab, text="Flow editor")
+        self.main_tabs.add(library_tab, text="Dataset library")
 
         container = ttk.Frame(simulation_tab)
         container.pack(fill="both", expand=True)
@@ -170,6 +175,14 @@ class SemanticHarnessApp:
             on_generate_source=self.generate_semantic_source,
             on_review_dataset=self.review_dialogue_source,
             on_generate_dataset=self.generate_dialogue_source,
+        )
+        self.dataset_library = DatasetLibraryPane(
+            library_tab,
+            self._tk,
+            ttk,
+            ScrolledText,
+            self._messagebox,
+            self.authoring_service,
         )
 
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")

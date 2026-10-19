@@ -1,4 +1,4 @@
-"""S0A proof that Semantic Lab owns one compiler and preserves old entrypoints."""
+"""S0A/S1 proof for the unified CodeBuilder and Dataset Library boundaries."""
 
 from __future__ import annotations
 
@@ -143,9 +143,49 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
         self.assertTrue(report["previewOnly"])
         self.assertEqual(report["writes"], [])
 
+    def test_dataset_library_catalog_search_and_validation_use_canonical_sources(self) -> None:
+        service = SemanticLabAuthoringService(repository=REPOSITORY)
+        sources = service.list_dataset_sources()
+        self.assertEqual(
+            [source["id"] for source in sources],
+            ["semantic_definitions", "common_interactions", "wordnet_concepts"],
+        )
+        self.assertTrue(all(source["exists"] and source["editable"] for source in sources))
+
+        matches = service.search_dataset("follow", limit=8)
+        self.assertTrue(matches)
+        self.assertTrue(any(row["sourceID"] == "semantic_definitions" for row in matches))
+        self.assertTrue(any(row["sourceID"] == "wordnet_concepts" for row in matches))
+
+        for source in sources:
+            report = service.preview_dataset_edit(
+                source["id"],
+                service.load_dataset_document(source["id"]),
+            )
+            self.assertTrue(report["ok"], source["id"])
+            self.assertTrue(report["previewOnly"])
+            self.assertTrue(report["effectFree"])
+            self.assertEqual(report["writes"], [])
+
+    def test_headless_cli_routes_dataset_library_operation(self) -> None:
+        arguments = _parser().parse_args(["--list-datasets", "--jsonl"])
+        output = io.StringIO()
+        report = {"ok": True, "type": "dataset_library", "sources": []}
+        with patch.object(
+            SemanticLabAuthoringService,
+            "list_dataset_sources",
+            return_value=[],
+        ) as list_sources:
+            with redirect_stdout(output):
+                self.assertEqual(cli(arguments), 0)
+        list_sources.assert_called_once()
+        record = json.loads(output.getvalue())
+        self.assertEqual(record["type"], report["type"])
+        self.assertEqual(record["sources"], report["sources"])
+
     def test_app_selects_headless_mode_for_authoring_operation(self) -> None:
         with patch.object(app, "install_shutdown_handler"), patch.object(app, "cli", return_value=0) as run_cli:
-            self.assertEqual(app.main(["--compile-source", str(SEMANTIC_SOURCE)]), 0)
+            self.assertEqual(app.main(["--list-datasets"]), 0)
         run_cli.assert_called_once()
 
 

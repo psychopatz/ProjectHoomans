@@ -19,6 +19,10 @@ AUTHORING_OPERATIONS = (
     "generate_source",
     "review_dataset",
     "generate_dataset",
+    "list_datasets",
+    "search_datasets",
+    "show_dataset",
+    "validate_dataset",
 )
 
 
@@ -36,6 +40,39 @@ def _run_authoring_operation(
     arguments: argparse.Namespace,
     service: SemanticLabAuthoringService,
 ) -> dict | None:
+    if arguments.list_datasets:
+        return {
+            "ok": True,
+            "type": "dataset_library",
+            "sources": service.list_dataset_sources(),
+        }
+    if arguments.search_datasets is not None:
+        return {
+            "ok": True,
+            "type": "dataset_search",
+            "query": arguments.search_datasets,
+            "results": service.search_dataset(arguments.search_datasets),
+        }
+    if arguments.show_dataset:
+        source_id = arguments.show_dataset
+        source = next(
+            (item for item in service.list_dataset_sources() if item["id"] == source_id),
+            None,
+        )
+        if source is None:
+            raise ValueError(f"unknown canonical dataset source: {source_id}")
+        return {
+            "ok": True,
+            "type": "dataset",
+            "source": source,
+            "entries": service.search_dataset("", source_id=source_id, limit=64),
+        }
+    if arguments.validate_dataset:
+        source_id = arguments.validate_dataset
+        return service.preview_dataset_edit(
+            source_id,
+            service.load_dataset_document(source_id),
+        )
     if arguments.compile_source:
         return service.preview_semantic_source(
             _resolve_authoring_source(service, arguments.compile_source)
@@ -144,6 +181,26 @@ def _parser() -> argparse.ArgumentParser:
         "--generate-dataset",
         metavar="PATH",
         help="write one approved dialogue dataset through the embedded CodeBuilder",
+    )
+    authoring.add_argument(
+        "--list-datasets",
+        action="store_true",
+        help="list canonical datasets available in the Semantic Lab Dataset Library",
+    )
+    authoring.add_argument(
+        "--search-datasets",
+        metavar="QUERY",
+        help="search canonical dataset entries through the Semantic Lab Dataset Library",
+    )
+    authoring.add_argument(
+        "--show-dataset",
+        metavar="SOURCE_ID",
+        help="show bounded entries for a canonical Dataset Library source",
+    )
+    authoring.add_argument(
+        "--validate-dataset",
+        metavar="SOURCE_ID",
+        help="validate the current canonical Dataset Library source without writing",
     )
     parser.add_argument("--doctor", action="store_true", help="run bounded headless runtime diagnostics")
     parser.add_argument("--doctor-json", action="store_true", help="emit doctor diagnostics as one JSON record")
