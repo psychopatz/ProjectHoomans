@@ -78,6 +78,7 @@ function Internal.RegisterVocabulary()
         "rumour", "rumours",
     })
     registerConcept("BITTEN", { "bitten", "got bitten", "was bitten" })
+    registerConcept("BITE", { "bite", "bites", "biting" })
     registerConcept("WATER", {
         "water", "drinking water",
     })

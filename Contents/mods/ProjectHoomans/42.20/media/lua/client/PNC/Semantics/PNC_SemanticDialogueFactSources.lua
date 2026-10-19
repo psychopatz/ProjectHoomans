@@ -12,7 +12,7 @@ end
 
 local Sources = PNC.Semantics.DialogueFactSources or {}
 PNC.Semantics.DialogueFactSources = Sources
-Sources.VERSION = 1
+Sources.VERSION = 2
 
 local function finite(value)
     value = tonumber(value)
@@ -123,6 +123,65 @@ local function freshness(snapshot)
     return "last_known"
 end
 
+local function bodyHealthFrom(value)
+    if type(value) ~= "table" then return nil end
+    if type(value.bodyHealth) == "table" then
+        return value.bodyHealth
+    end
+    if type(value.snapshot) == "table"
+        and type(value.snapshot.bodyHealth) == "table"
+    then
+        return value.snapshot.bodyHealth
+    end
+    return nil
+end
+
+local function ownBodyHealth(context)
+    local candidates = {
+        context,
+        context and context.entry,
+        context and context.npcState,
+        context and context.npcSnapshot,
+        context and context.npcRecord,
+    }
+    local index
+    local snapshot
+    for index = 1, #candidates do
+        snapshot = bodyHealthFrom(candidates[index])
+        if snapshot then return snapshot end
+    end
+    return nil
+end
+
+local function biteStatus(snapshot)
+    if type(snapshot) ~= "table" then return nil end
+    if type(snapshot.biteStatus) == "boolean" then
+        return snapshot.biteStatus
+    end
+    if type(snapshot.bitten) == "boolean" then
+        return snapshot.bitten
+    end
+    if type(snapshot.wounds) ~= "table" then
+        return nil
+    end
+
+    local inspected = 0
+    local _, wound
+    for _, wound in pairs(snapshot.wounds) do
+        inspected = inspected + 1
+        if inspected > 32 then break end
+        if type(wound) == "table"
+            and string.lower(tostring(wound.type or "")) == "bite"
+        then
+            return true
+        end
+    end
+    -- A complete Wounds.BuildSnapshot projection has a wounds table. An
+    -- empty table is therefore a known negative; a missing table above is
+    -- deliberately unknown rather than a fabricated no.
+    return false
+end
+
 Facts.RegisterProvider("client_roster_projection", {
     priority = 100,
     subjects = { LOCATION = true },
@@ -161,6 +220,37 @@ Facts.RegisterProvider("client_roster_projection", {
                 precision = label and "named" or "position",
             },
             confidence = freshness(snapshot) == "current" and .94 or .78,
+        }
+    end,
+})
+
+Facts.RegisterProvider("client_npc_health_projection", {
+    priority = 175,
+    subjects = { NPC_BITE_STATUS = true },
+    Resolve = function(ir, state, context)
+        local snapshot = ownBodyHealth(context)
+        local value
+        if not snapshot then
+            return {
+                status = "unknown",
+                reason = "npc_health_projection_unavailable",
+            }
+        end
+        value = biteStatus(snapshot)
+        if value == nil then
+            return {
+                status = "unknown",
+                reason = "npc_bite_status_unavailable",
+            }
+        end
+        return {
+            status = "known",
+            value = value,
+            factRef = "npc.health.body.wounds",
+            observedAt = snapshot.observedAt or snapshot.updatedAt,
+            freshness = snapshot.freshness or "authoritative_projection",
+            provenance = "PNC.NPCWounds.BuildSnapshot",
+            confidence = 0.96,
         }
     end,
 })

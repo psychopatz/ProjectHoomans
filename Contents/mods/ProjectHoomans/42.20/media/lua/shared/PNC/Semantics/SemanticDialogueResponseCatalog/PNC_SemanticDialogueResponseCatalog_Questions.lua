@@ -150,6 +150,50 @@ Catalog.Register("semantic.question.wellbeing", {
     },
 })
 
+Catalog.Register("semantic.question.medical_bite.positive", {
+    variants = {
+        {
+            id = "semantic.question.medical_bite.positive.default",
+            templateID = "semantic.question.medical_bite.positive",
+            fallback = "Yes, I've been bitten.",
+            dialogueAct = "MEDICAL_STATUS",
+            topic = "MEDICAL",
+            groundedFactRefs = { "npc.health.body.wounds" },
+            uncertainty = "known",
+            tone = "direct",
+        },
+    },
+})
+
+Catalog.Register("semantic.question.medical_bite.negative", {
+    variants = {
+        {
+            id = "semantic.question.medical_bite.negative.default",
+            templateID = "semantic.question.medical_bite.negative",
+            fallback = "No, I don't have a recorded bite.",
+            dialogueAct = "MEDICAL_STATUS",
+            topic = "MEDICAL",
+            groundedFactRefs = { "npc.health.body.wounds" },
+            uncertainty = "known",
+            tone = "direct",
+        },
+    },
+})
+
+Catalog.Register("semantic.question.medical_bite.unknown", {
+    variants = {
+        {
+            id = "semantic.question.medical_bite.unknown.default",
+            templateID = "semantic.question.medical_bite.unknown",
+            fallback = "I can't confirm whether I've been bitten.",
+            dialogueAct = "MEDICAL_STATUS",
+            topic = "MEDICAL",
+            uncertainty = "unknown",
+            tone = "cautious",
+        },
+    },
+})
+
 -- Grounded wellbeing uses a separate bounded pool so the generated dataset
 -- cannot crowd out the base question variants. The resolver enters this
 -- pool only when the existing situation provider exposes a known injury and

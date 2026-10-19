@@ -158,6 +158,23 @@ local function resolveWellbeing(ir, state, context)
     )
 end
 
+local function resolveMedicalBiteStatus(ir, state, context)
+    local fact = factFor(ir)
+    local poolID = "semantic.question.medical_bite.unknown"
+    if fact and fact.status == "known" then
+        if fact.value == true then
+            poolID = "semantic.question.medical_bite.positive"
+        elseif fact.value == false then
+            poolID = "semantic.question.medical_bite.negative"
+        end
+    end
+    return catalogResponse(poolID, ir, state, context, {
+        factStatus = fact and fact.status or "unknown",
+        factProvider = fact and fact.provider,
+        factRef = fact and fact.factRef,
+    })
+end
+
 local function isCommittedRelation(value)
     if type(value) ~= "string" then return false end
     value = string.lower(value)
@@ -324,6 +341,9 @@ return function(ir, state, context)
     end
     if ir.subject == "WELLBEING" then
         return resolveWellbeing(ir, state, context)
+    end
+    if ir.subject == "NPC_BITE_STATUS" then
+        return resolveMedicalBiteStatus(ir, state, context)
     end
     if ir.subject == "NEEDS" or ir.subject == "QUANTITY" then
         return resolveNeeds(ir, state, context)

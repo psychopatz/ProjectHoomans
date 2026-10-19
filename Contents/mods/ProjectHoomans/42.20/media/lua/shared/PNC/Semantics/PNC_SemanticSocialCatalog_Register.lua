@@ -12,6 +12,7 @@ local literalPattern = Internal.LiteralPattern
 local registerComplimentPrefix = Internal.RegisterComplimentPrefix
 local registerFeatureCompliment = Internal.RegisterFeatureCompliment
 local registerFeatureOnlyCompliment = Internal.RegisterFeatureOnlyCompliment
+local registerFeatureObjectCompliment = Internal.RegisterFeatureObjectCompliment
 local COMPLIMENT_PREFIXES = Internal.ComplimentPrefixes
 local RELATIONSHIP_STATUS_QUESTIONS = Internal.RelationshipStatusQuestions
 
@@ -68,7 +69,10 @@ function Social.Register()
         "kind", "lovely", "nice", "pretty", "sweet", "wonderful",
     }, 3)
     registerConcept("COMPLIMENT_FEATURE", {
-        "eyes", "hair", "outfit", "smile", "voice",
+        "appearance", "attire", "boots", "blouse", "clothes",
+        "coat", "dress", "eyes", "hair", "hat", "jacket", "jeans",
+        "look", "outfit", "pants", "shirt", "shoes", "skirt", "smile", "style",
+        "suit", "uniform", "voice",
     }, 2)
 
     local index
@@ -80,7 +84,7 @@ function Social.Register()
     registerFeatureCompliment({
         id = "you_have_feature",
         words = { "you", "have" },
-    }, 116)
+    }, 116, true)
     registerFeatureCompliment({
         id = "i_like_your_adjective_feature",
         words = { "i", "like", "your" },
@@ -93,6 +97,18 @@ function Social.Register()
         id = "i_really_like_your_feature",
         words = { "i", "really", "like", "your" },
     }, 116)
+
+    local objectDeterminer
+    local objectCopula
+    for _, objectDeterminer in ipairs({ "your", "that" }) do
+        for _, objectCopula in ipairs({ "is", "looks" }) do
+            registerFeatureObjectCompliment(
+                objectDeterminer,
+                objectCopula,
+                115
+            )
+        end
+    end
 
     local question
     for index = 1, #RELATIONSHIP_STATUS_QUESTIONS do

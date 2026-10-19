@@ -325,11 +325,6 @@ function Internal.SubmitSingle(view, value, part)
     recordAcceptedContextTurn(view, result, options)
     recordConversationTopics(view, result, value)
 
-    traceTurn(view, value, result, "semantic_input_local", {
-        providerAvailable = context.llmAvailable == true,
-        providerUsed = false,
-    })
-
     -- Claimed identity and targeted preference disclosures are authoritative
     -- server responses. Do not also queue a local reply for those turns.
     local deferIdentityResponse = identityRequest
@@ -342,6 +337,18 @@ function Internal.SubmitSingle(view, value, part)
         { deferResponse = deferIdentityResponse == true
             or deferGossipResponse == true }
     )
+    traceTurn(view, value, result, "semantic_input_local", {
+        providerAvailable = context.llmAvailable == true,
+        providerUsed = false,
+        actionStatus = view.lastSemanticActionResult
+            and view.lastSemanticActionResult.status,
+        actionAccepted = view.lastSemanticActionResult
+            and view.lastSemanticActionResult.accepted,
+        actionReason = view.lastSemanticActionResult
+            and view.lastSemanticActionResult.reason,
+        responseSubmitted = submitted == true,
+        responseReason = submitReason,
+    })
     if identityRequest then
         local dispatched = false
         local dispatchReason
