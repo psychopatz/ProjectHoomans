@@ -48,6 +48,21 @@ return {
         license = "WordNet 3.0 license",
     },
     aliasesByConcept = {
+        ["ACCEPT"] = {
+            "consent",
+            "go for",
+        },
+        ["ACKNOWLEDGE"] = {
+            "notice",
+        },
+        ["AGREE"] = {
+            "concord",
+            "concur",
+        },
+        ["DISAGREE"] = {
+            "differ",
+            "dissent",
+        },
         ["FETCH"] = {
             "bring",
             "fetch",
@@ -60,8 +75,68 @@ return {
         ["FOLLOW"] = {
             "follow",
         },
+        ["GO"] = {
+            "locomote",
+            "move",
+        },
+        ["HAVE"] = {
+            "own",
+            "possess",
+        },
+        ["HELP"] = {
+            "aid",
+            "assist",
+        },
+        ["REFUSE"] = {
+            "decline",
+        },
+        ["STOP"] = {
+            "cease",
+            "discontinue",
+            "quit",
+        },
+        ["TAKE"] = {
+            "get hold of",
+        },
+        ["THANK"] = {
+            "give thanks",
+            "thank",
+        },
+        ["WANT"] = {
+            "desire",
+        },
     },
     verbFormsBySurface = {
+        ["aided"] = {
+            concept = "HELP",
+            lemma = "aid",
+            form = "PAST",
+        },
+        ["aiding"] = {
+            concept = "HELP",
+            lemma = "aid",
+            form = "PROGRESSIVE",
+        },
+        ["aids"] = {
+            concept = "HELP",
+            lemma = "aid",
+            form = "THIRD_PERSON",
+        },
+        ["assisted"] = {
+            concept = "HELP",
+            lemma = "assist",
+            form = "PAST",
+        },
+        ["assisting"] = {
+            concept = "HELP",
+            lemma = "assist",
+            form = "PROGRESSIVE",
+        },
+        ["assists"] = {
+            concept = "HELP",
+            lemma = "assist",
+            form = "THIRD_PERSON",
+        },
         ["bringing"] = {
             concept = "FETCH",
             lemma = "bring",
@@ -76,6 +151,141 @@ return {
             concept = "FETCH",
             lemma = "bring",
             form = "PAST",
+        },
+        ["ceased"] = {
+            concept = "STOP",
+            lemma = "cease",
+            form = "PAST",
+        },
+        ["ceases"] = {
+            concept = "STOP",
+            lemma = "cease",
+            form = "THIRD_PERSON",
+        },
+        ["ceasing"] = {
+            concept = "STOP",
+            lemma = "cease",
+            form = "PROGRESSIVE",
+        },
+        ["concorded"] = {
+            concept = "AGREE",
+            lemma = "concord",
+            form = "PAST",
+        },
+        ["concording"] = {
+            concept = "AGREE",
+            lemma = "concord",
+            form = "PROGRESSIVE",
+        },
+        ["concords"] = {
+            concept = "AGREE",
+            lemma = "concord",
+            form = "THIRD_PERSON",
+        },
+        ["concurred"] = {
+            concept = "AGREE",
+            lemma = "concur",
+            form = "PAST",
+        },
+        ["concurring"] = {
+            concept = "AGREE",
+            lemma = "concur",
+            form = "PROGRESSIVE",
+        },
+        ["concurs"] = {
+            concept = "AGREE",
+            lemma = "concur",
+            form = "THIRD_PERSON",
+        },
+        ["consented"] = {
+            concept = "ACCEPT",
+            lemma = "consent",
+            form = "PAST",
+        },
+        ["consenting"] = {
+            concept = "ACCEPT",
+            lemma = "consent",
+            form = "PROGRESSIVE",
+        },
+        ["consents"] = {
+            concept = "ACCEPT",
+            lemma = "consent",
+            form = "THIRD_PERSON",
+        },
+        ["declined"] = {
+            concept = "REFUSE",
+            lemma = "decline",
+            form = "PAST",
+        },
+        ["declines"] = {
+            concept = "REFUSE",
+            lemma = "decline",
+            form = "THIRD_PERSON",
+        },
+        ["declining"] = {
+            concept = "REFUSE",
+            lemma = "decline",
+            form = "PROGRESSIVE",
+        },
+        ["desired"] = {
+            concept = "WANT",
+            lemma = "desire",
+            form = "PAST",
+        },
+        ["desires"] = {
+            concept = "WANT",
+            lemma = "desire",
+            form = "THIRD_PERSON",
+        },
+        ["desiring"] = {
+            concept = "WANT",
+            lemma = "desire",
+            form = "PROGRESSIVE",
+        },
+        ["differred"] = {
+            concept = "DISAGREE",
+            lemma = "differ",
+            form = "PAST",
+        },
+        ["differring"] = {
+            concept = "DISAGREE",
+            lemma = "differ",
+            form = "PROGRESSIVE",
+        },
+        ["differs"] = {
+            concept = "DISAGREE",
+            lemma = "differ",
+            form = "THIRD_PERSON",
+        },
+        ["discontinued"] = {
+            concept = "STOP",
+            lemma = "discontinue",
+            form = "PAST",
+        },
+        ["discontinues"] = {
+            concept = "STOP",
+            lemma = "discontinue",
+            form = "THIRD_PERSON",
+        },
+        ["discontinuing"] = {
+            concept = "STOP",
+            lemma = "discontinue",
+            form = "PROGRESSIVE",
+        },
+        ["dissented"] = {
+            concept = "DISAGREE",
+            lemma = "dissent",
+            form = "PAST",
+        },
+        ["dissenting"] = {
+            concept = "DISAGREE",
+            lemma = "dissent",
+            form = "PROGRESSIVE",
+        },
+        ["dissents"] = {
+            concept = "DISAGREE",
+            lemma = "dissent",
+            form = "THIRD_PERSON",
         },
         ["fetched"] = {
             concept = "FETCH",
@@ -107,15 +317,70 @@ return {
             lemma = "follow",
             form = "THIRD_PERSON",
         },
+        ["gave thanks"] = {
+            concept = "THANK",
+            lemma = "give thanks",
+            form = "PAST",
+        },
         ["gets"] = {
             concept = "FETCH",
             lemma = "get",
+            form = "THIRD_PERSON",
+        },
+        ["gets hold of"] = {
+            concept = "TAKE",
+            lemma = "get hold of",
             form = "THIRD_PERSON",
         },
         ["getting"] = {
             concept = "FETCH",
             lemma = "get",
             form = "PROGRESSIVE",
+        },
+        ["getting hold of"] = {
+            concept = "TAKE",
+            lemma = "get hold of",
+            form = "PROGRESSIVE",
+        },
+        ["given thanks"] = {
+            concept = "THANK",
+            lemma = "give thanks",
+            form = "PAST",
+        },
+        ["gives thanks"] = {
+            concept = "THANK",
+            lemma = "give thanks",
+            form = "THIRD_PERSON",
+        },
+        ["giving thanks"] = {
+            concept = "THANK",
+            lemma = "give thanks",
+            form = "PROGRESSIVE",
+        },
+        ["goes for"] = {
+            concept = "ACCEPT",
+            lemma = "go for",
+            form = "THIRD_PERSON",
+        },
+        ["going for"] = {
+            concept = "ACCEPT",
+            lemma = "go for",
+            form = "PROGRESSIVE",
+        },
+        ["gone for"] = {
+            concept = "ACCEPT",
+            lemma = "go for",
+            form = "PAST",
+        },
+        ["got hold of"] = {
+            concept = "TAKE",
+            lemma = "get hold of",
+            form = "PAST",
+        },
+        ["gotten hold of"] = {
+            concept = "TAKE",
+            lemma = "get hold of",
+            form = "PAST",
         },
         ["grabbed"] = {
             concept = "FETCH",
@@ -132,6 +397,66 @@ return {
             lemma = "grab",
             form = "THIRD_PERSON",
         },
+        ["locomoted"] = {
+            concept = "GO",
+            lemma = "locomote",
+            form = "PAST",
+        },
+        ["locomotes"] = {
+            concept = "GO",
+            lemma = "locomote",
+            form = "THIRD_PERSON",
+        },
+        ["locomoting"] = {
+            concept = "GO",
+            lemma = "locomote",
+            form = "PROGRESSIVE",
+        },
+        ["moved"] = {
+            concept = "GO",
+            lemma = "move",
+            form = "PAST",
+        },
+        ["moves"] = {
+            concept = "GO",
+            lemma = "move",
+            form = "THIRD_PERSON",
+        },
+        ["moving"] = {
+            concept = "GO",
+            lemma = "move",
+            form = "PROGRESSIVE",
+        },
+        ["noticed"] = {
+            concept = "ACKNOWLEDGE",
+            lemma = "notice",
+            form = "PAST",
+        },
+        ["notices"] = {
+            concept = "ACKNOWLEDGE",
+            lemma = "notice",
+            form = "THIRD_PERSON",
+        },
+        ["noticing"] = {
+            concept = "ACKNOWLEDGE",
+            lemma = "notice",
+            form = "PROGRESSIVE",
+        },
+        ["owned"] = {
+            concept = "HAVE",
+            lemma = "own",
+            form = "PAST",
+        },
+        ["owning"] = {
+            concept = "HAVE",
+            lemma = "own",
+            form = "PROGRESSIVE",
+        },
+        ["owns"] = {
+            concept = "HAVE",
+            lemma = "own",
+            form = "THIRD_PERSON",
+        },
         ["picked up"] = {
             concept = "FETCH",
             lemma = "pick up",
@@ -146,6 +471,41 @@ return {
             concept = "FETCH",
             lemma = "pick up",
             form = "THIRD_PERSON",
+        },
+        ["possessed"] = {
+            concept = "HAVE",
+            lemma = "possess",
+            form = "PAST",
+        },
+        ["possesses"] = {
+            concept = "HAVE",
+            lemma = "possess",
+            form = "THIRD_PERSON",
+        },
+        ["possessing"] = {
+            concept = "HAVE",
+            lemma = "possess",
+            form = "PROGRESSIVE",
+        },
+        ["quiting"] = {
+            concept = "STOP",
+            lemma = "quit",
+            form = "PROGRESSIVE",
+        },
+        ["quits"] = {
+            concept = "STOP",
+            lemma = "quit",
+            form = "THIRD_PERSON",
+        },
+        ["quitted"] = {
+            concept = "STOP",
+            lemma = "quit",
+            form = "PAST",
+        },
+        ["quitting"] = {
+            concept = "STOP",
+            lemma = "quit",
+            form = "PROGRESSIVE",
         },
         ["retrieved"] = {
             concept = "FETCH",
@@ -177,9 +537,29 @@ return {
             lemma = "take hold of",
             form = "PROGRESSIVE",
         },
+        ["thanked"] = {
+            concept = "THANK",
+            lemma = "thank",
+            form = "PAST",
+        },
+        ["thanking"] = {
+            concept = "THANK",
+            lemma = "thank",
+            form = "PROGRESSIVE",
+        },
+        ["thanks"] = {
+            concept = "THANK",
+            lemma = "thank",
+            form = "THIRD_PERSON",
+        },
         ["took hold of"] = {
             concept = "FETCH",
             lemma = "take hold of",
+            form = "PAST",
+        },
+        ["went for"] = {
+            concept = "ACCEPT",
+            lemma = "go for",
             form = "PAST",
         },
     },

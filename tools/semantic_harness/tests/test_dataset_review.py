@@ -28,15 +28,37 @@ class DatasetReviewTests(unittest.TestCase):
         self.assertTrue(first["previewOnly"])
         self.assertTrue(first["effectFree"])
         self.assertEqual(first["writes"], [])
-        self.assertEqual(first["patternCount"], 31)
+        self.assertEqual(first["patternCount"], 33)
         self.assertEqual(first["responseVariantCount"], 31)
         self.assertEqual(
             first["candidateReview"]["summary"],
-            {"approved": 8, "rejected": 0, "not_candidate": 54},
+            {"approved": 10, "rejected": 0, "not_candidate": 54},
         )
         self.assertEqual(
             first["candidateReview"]["provenance"]["approvedWithProvenance"],
-            8,
+            10,
+        )
+        self.assertEqual(
+            first["sourceMetadata"]["integrationStatus"],
+            {
+                "imported": 2,
+                "mapped": 2,
+                "approved": 2,
+                "compiled": 2,
+                "workerVerified": 2,
+            },
+        )
+        references = {
+            reference["name"]: reference
+            for reference in first["sourceMetadata"]["references"]
+        }
+        self.assertEqual(
+            references["MASSIVE"]["recordRefs"][0]["recordID"],
+            "98",
+        )
+        self.assertEqual(
+            references["SGD"]["recordRefs"][0]["dialogueID"],
+            "90_00031",
         )
         self.assertEqual(first["candidateReview"]["collisions"], [])
         self.assertTrue(all(row["status"] == "unchanged" for row in first["artifactDiffs"]))
@@ -180,6 +202,11 @@ class DatasetReviewTests(unittest.TestCase):
             restart = worker.restart()
             after = worker.input("Can we talk about the weather")
 
+            dataset_turns = [
+                worker.input("is it currently snowing"),
+                worker.input("How is the weather on 9th of March?"),
+            ]
+
         self.assertTrue(restart.get("accepted", True))
         for turn in (before, after):
             self.assertEqual(
@@ -191,6 +218,23 @@ class DatasetReviewTests(unittest.TestCase):
         self.assertEqual(after["transport"], [])
         self.assertEqual(after["toolCalls"], [])
         self.assertTrue(after["observation"]["sideEffects"]["none"])
+
+        self.assertEqual(
+            dataset_turns[0]["result"]["ir"]["provenance"]["pattern"],
+            "pnc.dataset.massive.weather.is_it_currently_snowing",
+        )
+        self.assertEqual(
+            dataset_turns[1]["result"]["ir"]["provenance"]["pattern"],
+            "pnc.dataset.sgd.weather.how_is_the_weather_on_9th_of_march",
+        )
+        for turn in dataset_turns:
+            self.assertEqual(
+                turn["result"]["decision"]["response"]["plan"]["dialogueAct"],
+                "QUESTION_RECEIVED",
+            )
+            self.assertTrue(turn["messages"][0]["payload"]["text"])
+            self.assertEqual(turn["transport"], [])
+            self.assertTrue(turn["observation"]["sideEffects"]["none"])
 
 
 if __name__ == "__main__":

@@ -48,6 +48,13 @@ MAX_DATASET_REVIEW_ROWS = 64
 MAX_DATASET_COLLISIONS = 16
 MAX_ARTIFACT_DIFF_LINES = 96
 MAX_ARTIFACT_DIFF_CHARS = 12_000
+INTEGRATION_STATUS_FIELDS = (
+    "imported",
+    "mapped",
+    "approved",
+    "compiled",
+    "workerVerified",
+)
 
 
 def _planned_paths(compiled: dict[str, Any]) -> list[str]:
@@ -175,6 +182,50 @@ def _bounded_text(value: Any, limit: int = 256) -> str:
     return text[:limit]
 
 
+def _bounded_record_refs(value: Any) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        return []
+    rows: list[dict[str, Any]] = []
+    for record in value[:8]:
+        if not isinstance(record, dict):
+            continue
+        row: dict[str, Any] = {}
+        for key, item in record.items():
+            if not isinstance(key, str):
+                continue
+            if isinstance(item, (str, int, float, bool)):
+                row[_bounded_text(key, 64)] = _bounded_text(item, 256)
+        if row:
+            rows.append(row)
+    return rows
+
+
+def _bounded_integration_status(value: Any) -> dict[str, int]:
+    status = {
+        field: 0
+        for field in INTEGRATION_STATUS_FIELDS
+    }
+    if not isinstance(value, dict):
+        return status
+    for field in INTEGRATION_STATUS_FIELDS:
+        item = value.get(field)
+        if isinstance(item, int) and not isinstance(item, bool) and item >= 0:
+            status[field] = item
+    return status
+
+
+def _integration_status(references: list[dict[str, Any]]) -> dict[str, int]:
+    totals = {
+        field: 0
+        for field in INTEGRATION_STATUS_FIELDS
+    }
+    for reference in references:
+        status = _bounded_integration_status(reference.get("importStatus"))
+        for field in INTEGRATION_STATUS_FIELDS:
+            totals[field] += status[field]
+    return totals
+
+
 def _source_reference_rows(document: dict[str, Any]) -> tuple[list[dict[str, Any]], set[str]]:
     source = document.get("source") if isinstance(document.get("source"), dict) else {}
     references = source.get("references") if isinstance(source.get("references"), list) else []
@@ -189,11 +240,18 @@ def _source_reference_rows(document: dict[str, Any]) -> tuple[list[dict[str, Any
             names.add(name)
         rows.append({
             "name": name or "<missing>",
-            "version": _bounded_text(source.get("version"), 32),
+            "version": _bounded_text(
+                reference.get("sourceVersion") or source.get("version"), 64
+            ),
             "url": _bounded_text(reference.get("url"), 512),
             "license": _bounded_text(reference.get("license"), 128),
             "use": _bounded_text(reference.get("use"), 256),
             "reviewedOn": _bounded_text(reference.get("reviewedOn"), 32),
+            "sourceSha256": _bounded_text(reference.get("sourceSha256"), 128),
+            "recordRefs": _bounded_record_refs(reference.get("recordRefs")),
+            "integrationStatus": _bounded_integration_status(
+                reference.get("importStatus")
+            ),
             "valid": all(
                 isinstance(reference.get(field), str) and reference[field].strip()
                 for field in ("name", "url", "license", "use", "reviewedOn")
@@ -470,6 +528,11 @@ def preview_dialogue_source(
 
     counts = Counter(candidate["status"] for candidate in candidates)
     source = document.get("source") if isinstance(document.get("source"), dict) else {}
+    source_references = (
+        source.get("references")
+        if isinstance(source.get("references"), list)
+        else []
+    )
     candidate_review = {
         "candidates": candidates,
         "summary": {key: counts[key] for key in ("approved", "rejected", "not_candidate")},
@@ -482,6 +545,10 @@ def preview_dialogue_source(
                 1 for candidate in candidates
                 if candidate.get("status") == "approved" and candidate.get("sourceRefs")
             ),
+            "integrationStatus": _integration_status(
+                [reference for reference in source_references
+                 if isinstance(reference, dict)]
+            ),
         },
     }
     base["sourceMetadata"] = {
@@ -489,6 +556,10 @@ def preview_dialogue_source(
         "version": _bounded_text(source.get("version"), 32),
         "contentLicense": _bounded_text(source.get("contentLicense"), 128),
         "references": references,
+        "integrationStatus": _integration_status(
+            [reference for reference in source_references
+             if isinstance(reference, dict)]
+        ),
     }
     base["candidateReview"] = candidate_review
 

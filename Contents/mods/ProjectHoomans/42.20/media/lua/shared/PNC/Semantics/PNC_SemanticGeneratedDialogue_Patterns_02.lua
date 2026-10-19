@@ -8,6 +8,74 @@ return {
                 ["speechAct"] = "QUESTION",
                 ["subject"] = "IDENTITY",
             },
+            ["id"] = "pnc.dataset.question.identity.can_you_tell_me_your_name",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "can",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "you",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "tell",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "me",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "your",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "name",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "IDENTITY",
+            },
+            ["id"] = "pnc.dataset.question.identity.may_i_ask_your_name",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "may",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "i",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "ask",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "your",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "name",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "IDENTITY",
+            },
             ["id"] = "pnc.dataset.question.identity.may_i_know_your_name",
             ["match"] = {
                 {
@@ -360,98 +428,6 @@ return {
                 {
                     ["kind"] = "literal",
                     ["value"] = "doing",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.99,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "WELLBEING",
-            },
-            ["id"] = "pnc.dataset.question.wellbeing.how_are_you_holding_up",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "how",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "are",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "you",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "holding",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "up",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.97,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "WELLBEING",
-            },
-            ["id"] = "pnc.dataset.question.wellbeing.how_are_you_managing",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "how",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "are",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "you",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "managing",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.97,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "WELLBEING",
-            },
-            ["id"] = "pnc.dataset.question.wellbeing.how_has_your_day_been",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "how",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "has",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "your",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "day",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "been",
                 },
             },
             ["priority"] = 120,

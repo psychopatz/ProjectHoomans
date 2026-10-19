@@ -2,6 +2,98 @@
 -- Dialogue patterns shard 03; keep this file data-only.
 return {
     {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "WELLBEING",
+            },
+            ["id"] = "pnc.dataset.question.wellbeing.how_are_you_holding_up",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "how",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "are",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "you",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "holding",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "up",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
+            ["confidence"] = 0.97,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "WELLBEING",
+            },
+            ["id"] = "pnc.dataset.question.wellbeing.how_are_you_managing",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "how",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "are",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "you",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "managing",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
+            ["confidence"] = 0.97,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "WELLBEING",
+            },
+            ["id"] = "pnc.dataset.question.wellbeing.how_has_your_day_been",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "how",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "has",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "your",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "day",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "been",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
             ["confidence"] = 0.98,
             ["emit"] = {
                 ["intent"] = "QUESTION",
@@ -131,5 +223,62 @@ return {
                 },
             },
             ["priority"] = 120,
+        },
+    {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "WEATHER",
+            },
+            ["id"] = "pnc.dataset.sgd.weather.how_is_the_weather_on_9th_of_march",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "how",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "is",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "the",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "weather",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "on",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "9th",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "of",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "march",
+                },
+            },
+            ["metadata"] = {
+                ["mapping"] = {
+                    ["canonicalConcept"] = "WEATHER",
+                    ["dialogueState"] = "WEATHER_TOPIC",
+                    ["sourceRefs"] = {
+                        "SGD",
+                    },
+                },
+                ["reviewed"] = true,
+                ["sourceRefs"] = {
+                    "SGD",
+                },
+            },
+            ["priority"] = 166,
         },
 }

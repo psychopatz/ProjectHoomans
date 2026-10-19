@@ -9,6 +9,43 @@ from typing import Any, Callable
 from .codebuilder.service import SemanticLabAuthoringService
 
 
+_INTEGRATION_STATUS_FIELDS = (
+    "imported",
+    "mapped",
+    "approved",
+    "compiled",
+    "workerVerified",
+)
+
+
+def _integration_status(document: dict[str, Any]) -> dict[str, int]:
+    source = document.get("source") if isinstance(document.get("source"), dict) else {}
+    references = source.get("references") if isinstance(source.get("references"), list) else []
+    totals = {field: 0 for field in _INTEGRATION_STATUS_FIELDS}
+    for reference in references:
+        if not isinstance(reference, dict):
+            continue
+        status = reference.get("importStatus")
+        if not isinstance(status, dict):
+            continue
+        for field in _INTEGRATION_STATUS_FIELDS:
+            value = status.get(field)
+            if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+                totals[field] += value
+    return totals
+
+
+def _status_text(source_id: str, document: dict[str, Any]) -> str:
+    status = _integration_status(document)
+    if not any(status.values()):
+        return f"Editing {source_id}; write requires explicit approval"
+    return (
+        f"Editing {source_id} · imported {status['imported']} · "
+        f"mapped {status['mapped']} · approved {status['approved']} · "
+        f"compiled {status['compiled']} · worker verified {status['workerVerified']}"
+    )
+
+
 class DatasetLibraryPane:
     """Browse, search, validate, and explicitly edit canonical JSON sources."""
 
@@ -137,7 +174,7 @@ class DatasetLibraryPane:
             self._status_var.set(f"Load failed: {error}")
             return
         self._set_editor(document)
-        self._status_var.set(f"Editing {source_id}; write requires explicit approval")
+        self._status_var.set(_status_text(source_id, document))
 
     def _draft_document(self) -> dict[str, Any] | None:
         try:

@@ -175,6 +175,47 @@ return {
     {
             ["confidence"] = 0.99,
             ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "WEATHER",
+            },
+            ["id"] = "pnc.dataset.massive.weather.is_it_currently_snowing",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "is",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "it",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "currently",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "snowing",
+                },
+            },
+            ["metadata"] = {
+                ["mapping"] = {
+                    ["canonicalConcept"] = "WEATHER",
+                    ["dialogueState"] = "WEATHER_TOPIC",
+                    ["sourceRefs"] = {
+                        "MASSIVE",
+                    },
+                },
+                ["reviewed"] = true,
+                ["sourceRefs"] = {
+                    "MASSIVE",
+                },
+            },
+            ["priority"] = 166,
+        },
+    {
+            ["confidence"] = 0.99,
+            ["emit"] = {
                 ["extensions"] = {
                     ["dialogueFollowUp"] = "NEEDS_PROPOSAL",
                     ["topic"] = "NEEDS",
@@ -373,74 +414,6 @@ return {
                 {
                     ["kind"] = "literal",
                     ["value"] = "can",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "i",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "ask",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "your",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "name",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.99,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "IDENTITY",
-            },
-            ["id"] = "pnc.dataset.question.identity.can_you_tell_me_your_name",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "can",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "you",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "tell",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "me",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "your",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "name",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.99,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "IDENTITY",
-            },
-            ["id"] = "pnc.dataset.question.identity.may_i_ask_your_name",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "may",
                 },
                 {
                     ["kind"] = "literal",
