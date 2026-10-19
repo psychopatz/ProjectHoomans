@@ -4,6 +4,8 @@
 
 The authoritative new phase design/low-ModData contract is `GROUNDED_PERSONAL_DIALOGUE_B.md`; `ROADMAP.md` has phase order; **`PROGRESS.md` defines exactly ONE current Next Chunk: B0**. Prior C7 ledger is archived verbatim in `HISTORY_C7_20261020.md`, preserving recorded 244/244 harness, 68/68 Lua smoke and 16/16 compiler results. It has NOT been rerun for B. Older ledgers are not active instructions.
 
+**Full-goal execution:** Codex must implement and verify ALL B0–B6 phases autonomously, one safe bounded chunk at a time with immediate continuation, and may not stop after B0 or mark a passing subphase as completed overall. Final handoff only after all developer acceptance, before user-owned native PZ testing.
+
 **Goal:** NPC identity seed + catalog epoch → deterministic personal truth → sparse authored/event deltas → existing read-only fact resolver and server Knowledge disclosure → player-character-scoped discovered evidence → existing descriptor-driven NPC Dossier. NPCs converse about known past, current residence and remembered events with gradual consent/familiarity-based knowledge sharing. PBrainZ must use a filtered permitted subset; native PZ live testing belongs to the user.
 
 ## Read order

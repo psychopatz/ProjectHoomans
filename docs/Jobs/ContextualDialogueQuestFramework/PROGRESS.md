@@ -3,7 +3,8 @@
 **Updated:** 2026-10-20. Documentation-only approved phase transition; NO new source implementation or runtime test passes.
 **Audited remote:** `263c132ea87678024cd81f8310bb85608dec28df`, branch `docs/contextual-dialogue-quest-framework-20261018`, PR #4 OPEN/unmerged at inspection. Local Codex checkout/Core state/parallel changes unknown: verify before edits.
 **Status:** **B PHASE — IN PROGRESS, NOT READY FOR USER LIVE TEST FOR THE EXPANDED PERSONAL-KNOWLEDGE GOAL.**
-**EXACTLY ONE NEXT CHUNK: B0 — Compliment vs Inventory arbitration + identity-seeded backstory read/replay feasibility.**
+**PARENT COMPLETION CONTRACT:** Finish ALL developer-owned B0–B6 features and integration/MP privacy/ModData acceptance; after B0 immediately continue B1 and so forth within the SAME /goal. Subphase success is not parent-goal completion. Final developer handoff only after B6, absent a genuine blocker.
+**EXACTLY ONE CURRENT EXECUTION CHUNK: B0 — Compliment vs Inventory arbitration + identity-seeded backstory read/replay feasibility.**
 
 ## Historic acceptance (preserve unchanged)
 
