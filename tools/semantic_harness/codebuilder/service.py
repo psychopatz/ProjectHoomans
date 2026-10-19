@@ -16,6 +16,7 @@ from tools.semantic_harness import authoring
 from .blocks import SemanticBlockRegistry
 from .codeblocks import validate_codeblock_document
 from .compiler import CompileError
+from .dataset_adapters import preview_dataset_adapter, promote_reviewed_candidates
 
 
 DATASET_SOURCE_SPECS = (
@@ -281,6 +282,30 @@ class SemanticLabAuthoringService:
         report = validate_codeblock_document(document)
         report["sourcePath"] = str(source_path)
         return report
+
+    def preview_external_dataset(
+        self,
+        adapter: str,
+        source_path: Path,
+        manifest_path: Path,
+        *,
+        max_records: int = 128,
+    ) -> dict[str, Any]:
+        """Review one external source without touching canonical or runtime files."""
+        return preview_dataset_adapter(
+            adapter,
+            source_path,
+            manifest_path,
+            max_records=max_records,
+        )
+
+    def promote_external_candidates(
+        self,
+        report: dict[str, Any],
+        decisions: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        """Convert explicit license-cleared review decisions to canonical records."""
+        return promote_reviewed_candidates(report, decisions)
 
     def preview_semantic_source(self, source_path: Path) -> dict[str, Any]:
         return authoring.preview_semantic_source(

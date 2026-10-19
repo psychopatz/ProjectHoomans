@@ -1,5 +1,40 @@
 # Contextual Dialogue & Quest Framework — current progress
 
+## S4 accepted — reviewed build-time MASSIVE/SGD dataset adapters
+
+Semantic Lab's embedded CodeBuilder now contains reviewed build-time adapters
+for MASSIVE- and SGD-shaped sources. Each adapter requires a provenance and
+license manifest, verifies the source SHA-256, reads only a bounded number of
+records, and produces effect-free review candidates. Explicit reviewer
+decisions can promote candidates into the existing canonical dialogue source,
+but only when the manifest approves derived raw-text redistribution. The
+adapters never write raw corpora to `Contents/mods/**/media`, package raw
+records for Lua, create a second dataset store, or replace the existing
+dialogue compiler.
+
+S4 evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_dataset_adapters -v` — **5/5 passed**, including MASSIVE/SGD normalization, bounded candidate shape, provenance-gated promotion through the existing compiler, runtime-media rejection, and headless Semantic Lab CLI routing.
+- `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **200/200 passed in 90.443s**, including actual Lua-worker conversations, GUI startup, and the existing Semantic Lab acceptance suites.
+- `python3 -m unittest discover -s tools/semantic_compiler/tests -p 'test_*.py' -q` — **15/15 passed**; `python3 -m unittest tools.semantic_harness.tests.test_codebuilder_consolidation -q` — **9/9 passed**, preserving compiler/writer identity and artifact parity.
+- `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` — **PASS** for Python 3.12.3, repository/Core paths, Tk/display, Lua 5.3, worker syntax, boot, PING, and CAPABILITIES.
+- `./tools/semantic_harness/run_harness.sh --test pnc_semantic` — **4 pre-existing Lua smoke failures / 68 executed** in gift/inventory/local-route/state-response behavior; S4 changed no production Lua and did not alter the documented baseline.
+- Python compilation and `git diff --check` — **PASS**.
+
+The graph coverage check for the S4 files reported no recorded parse gaps,
+but the new files were not tracked and edited files were metadata-changed in
+the older 2026-10-07 generation; direct source reads and the executable tests
+above are therefore the authority for this slice.
+
+**Current goal status:** **S4 accepted; S0A/S0B, S1, S2, S3, and prior C6
+developer gates remain preserved. Native Project Zomboid SP/MP plus live
+external PBrainZ validation remain user-owned.**
+
+**ONE Next Chunk:** **S5 — complete the in-app workflow: select dataset →
+compose blocks → validate → preview generated source → approve → generate
+modular Lua/EN-TL/manifests → restart the production worker → inspect real NPC
+dialogue.**
+
 ## S3 accepted — synchronized visual graph and codeblock editing
 
 The existing Flow editor now has a deterministic `semantic.codeblocks.v1`
@@ -21,14 +56,6 @@ S3 evidence:
 - `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` — **PASS** for Python 3.12.3, repository/Core paths, Tk/display, Lua 5.3, worker syntax, boot, PING, and CAPABILITIES.
 - `./tools/semantic_harness/run_harness.sh --test pnc_semantic` — **4 pre-existing Lua smoke failures** in gift/inventory/local-route/state-response behavior; S3 changed no production Lua and did not alter the documented baseline.
 - Python compilation and `git diff --check` — **PASS**.
-
-**Current goal status:** **S3 accepted; S0A/S0B, S1, S2, and prior C6
-developer gates remain preserved. Native Project Zomboid SP/MP plus live
-external PBrainZ validation remain user-owned.**
-
-**ONE Next Chunk:** **S4 — add reviewed build-time adapters for licensed
-expansive datasets such as MASSIVE and SGD, preserving provenance/collision
-review and ensuring raw corpora never enter the production Lua worker.**
 
 ## S2 accepted — reusable Semantic Lab block registry
 
@@ -123,18 +150,18 @@ S0B evidence:
 - `./tools/semantic_harness/run_harness.sh --no-gui --jsonl --compile-source tools/semantic_compiler/semantic_definitions.json` — **PASS**, effect-free canonical preview through the shared service.
 - `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` — **PASS**.
 
-**Updated:** 2026-10-19, after the S3 codeblock round-trip acceptance slice.
+**Updated:** 2026-10-19, after the S4 reviewed dataset-adapter acceptance slice.
 
 **Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`;
-S0A, S0B, S1, and S3 are accepted in the rebased local history. The earlier
+S0A, S0B, S1, S3, and S4 are accepted in the rebased local history. The earlier
 acceptance commits were rewritten by this rebase; preserved source-history
 references in the historical records refer to their pre-rebase commit IDs.
 
 The previous `PROGRESS.md` has been archived verbatim in `HISTORY_C0_C6_20261019.md` and remains recoverable in Git at `71162cb4f78cc4cd408a4a145486d5ebadc943c1`. It records the action-flow/quest work and C0–C6 contextual conversation, small reviewed dataset codebuilding, Tk X11, worker, performance, EN/TL and optional-provider parity acceptance, ending READY FOR USER LIVE TEST for that **earlier scoped implementation**. Native PZ SP/MP and live external PBrainZ validation remain user-owned, unclaimed.
 
 The prior user-live-test handoff is historical evidence and is superseded for
-this consolidation goal by the single S4 chunk above; it was not re-run or
-claimed as part of S3.
+this consolidation goal by the single S5 chunk above; it was not re-run or
+claimed as part of S4.
 
 ## Productization roadmap
 

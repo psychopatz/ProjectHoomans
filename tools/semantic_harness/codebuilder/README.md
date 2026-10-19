@@ -41,3 +41,18 @@ result edges carry explicit types, and nested-flow references are bounded
 editor metadata validated against known flow IDs. Applying codeblocks changes
 only the current draft; production `Registry.Validate` remains the final
 registration authority.
+
+Reviewed external dataset adapters are also part of CodeBuilder. The MASSIVE
+and SGD adapters accept only bounded build-time sources plus a provenance
+manifest, verify the source hash, and emit effect-free review candidates. A
+candidate can become a canonical dialogue pattern only after an explicit
+review decision and a manifest with approved derived-text redistribution.
+Adapters never write raw corpora to `Contents/mods/**/media`, package raw
+records for Lua, or replace the existing dialogue compiler.
+
+```sh
+tools/semantic_harness/run_harness.sh --no-gui --jsonl \
+  --adapt-dataset massive \
+  --dataset-source /path/to/massive.jsonl \
+  --dataset-manifest /path/to/massive.manifest.json
+```

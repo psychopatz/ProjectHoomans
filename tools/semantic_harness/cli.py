@@ -27,6 +27,7 @@ AUTHORING_OPERATIONS = (
     "search_blocks",
     "validate_blocks",
     "validate_codeblocks",
+    "adapt_dataset",
 )
 
 
@@ -96,6 +97,14 @@ def _run_authoring_operation(
     if arguments.validate_codeblocks:
         return service.validate_codeblock_source(
             _resolve_authoring_source(service, arguments.validate_codeblocks)
+        )
+    if arguments.adapt_dataset:
+        if not arguments.dataset_source or not arguments.dataset_manifest:
+            raise ValueError("--adapt-dataset requires --dataset-source and --dataset-manifest")
+        return service.preview_external_dataset(
+            arguments.adapt_dataset,
+            _resolve_authoring_source(service, arguments.dataset_source),
+            _resolve_authoring_source(service, arguments.dataset_manifest),
         )
     if arguments.compile_source:
         return service.preview_semantic_source(
@@ -245,6 +254,22 @@ def _parser() -> argparse.ArgumentParser:
         "--validate-codeblocks",
         metavar="PATH",
         help="validate a declarative semantic.codeblocks.v1 file without writing or dispatching",
+    )
+    authoring.add_argument(
+        "--adapt-dataset",
+        choices=("massive", "sgd"),
+        metavar="ADAPTER",
+        help="review one bounded external MASSIVE/SGD-style source through a build-time adapter",
+    )
+    parser.add_argument(
+        "--dataset-source",
+        metavar="PATH",
+        help="external dataset source path for --adapt-dataset; never a runtime media path",
+    )
+    parser.add_argument(
+        "--dataset-manifest",
+        metavar="PATH",
+        help="provenance/license manifest path for --adapt-dataset",
     )
     parser.add_argument("--doctor", action="store_true", help="run bounded headless runtime diagnostics")
     parser.add_argument("--doctor-json", action="store_true", help="emit doctor diagnostics as one JSON record")
