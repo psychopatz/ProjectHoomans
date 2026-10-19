@@ -36,6 +36,10 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_ActionFollowUnavailable",
         ["semantic.action.stop.unavailable"] =
             "UI_PNC_Conversation_Semantic_ActionStopUnavailable",
+        ["semantic.social.interaction.unavailable"] =
+            "UI_PNC_Conversation_Semantic_SocialInteractionUnavailable",
+        ["semantic.social.interaction.rejected"] =
+            "UI_PNC_Conversation_Semantic_SocialInteractionRejected",
         ["semantic.question.identity.stranger_alt_1"] =
             "UI_PNC_Conversation_Semantic_QuestionIdentityStrangerAlt1",
         ["semantic.question.identity.stranger_alt_2"] =
@@ -415,6 +419,35 @@ function ResponseAdapter.ActionRejected(result, actionResult)
         result and result.ir and result.ir.action
         or actionResult.action or ""
     ))
+    local speechAct = string.upper(tostring(
+        result and result.ir
+        and (result.ir.speechAct or result.ir.intent) or ""
+    ))
+    local socialAct = speechAct == "INSULT"
+        or speechAct == "HOSTILE_REMARK"
+        or speechAct == "THREATEN"
+    if socialAct then
+        local reason = tostring(actionResult.reason or "")
+        local unavailable = string.find(reason, "unavailable", 1, true)
+            or string.find(reason, "transport", 1, true)
+            or actionResult.status == "semantic_social_dispatch_unavailable"
+        local templateID = unavailable
+            and "semantic.social.interaction.unavailable"
+            or "semantic.social.interaction.rejected"
+        local fallback = unavailable
+            and "I heard you, but I couldn't send that social reaction right now."
+            or "I heard you, but I couldn't apply that social reaction."
+        return ResponseAdapter.Payload({
+            response = {
+                templateID = templateID,
+                fallback = fallback,
+                args = {
+                    reason = reason,
+                    speechAct = speechAct,
+                },
+            },
+        })
+    end
     -- Task admission failures already flow through ReceiveSemanticTaskResult,
     -- which owns their single authoritative task-result line. Avoid adding a
     -- second generic action-unavailable line for WAIT_AT.

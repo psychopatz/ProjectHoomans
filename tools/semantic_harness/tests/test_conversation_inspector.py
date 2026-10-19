@@ -79,6 +79,33 @@ class ConversationInspectorTests(unittest.TestCase):
         self.assertNotIn("transcript", view)
         self.assertIsNone(view["dialoguePlan"])
 
+    def test_projects_social_policy_authority_result_and_final_text(self) -> None:
+        scenario = merge(
+            DEFAULT_SCENARIO,
+            {
+                "npc": {
+                    "runtime": {
+                        "conversationLease": {"token": "authority-token"},
+                    },
+                },
+                "conversation": {"token": "client-token"},
+            },
+        )
+        with LuaSemanticWorker(scenario) as worker:
+            turn = worker.input("fuck you")
+
+        view = build_conversation_inspector(turn)
+        self.assertEqual(view["execution"]["route"], "deterministic")
+        self.assertEqual(view["execution"]["branch"], "HOSTILE_REMARK_RECEIVED")
+        self.assertEqual(view["execution"]["owner"], "policy")
+        self.assertEqual(view["execution"]["status"], "rejected")
+        self.assertEqual(view["execution"]["rejectionReason"], "invalid_lease")
+        self.assertEqual(view["execution"]["authority"], "server")
+        self.assertEqual(
+            view["execution"]["finalText"],
+            "I heard you, but I couldn't apply that social reaction.",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

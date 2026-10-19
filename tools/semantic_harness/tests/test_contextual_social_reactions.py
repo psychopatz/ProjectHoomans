@@ -183,6 +183,86 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 self.assertEqual(result["llmCalls"], 0)
                 self.assertEqual(result["toolCalls"], [])
 
+    def test_rejected_and_unavailable_insults_are_truthful_and_social_specific(self) -> None:
+        denied_scenario = merge(
+            DEFAULT_SCENARIO,
+            {
+                "npc": {
+                    "runtime": {
+                        "conversationLease": {"token": "authority-token"},
+                    },
+                },
+                "conversation": {"token": "client-token"},
+            },
+        )
+        with LuaSemanticWorker(denied_scenario) as worker:
+            denied = worker.input("fuck you")
+        denied_action = denied["result"]["actionResult"]
+        self.assertFalse(denied_action["accepted"])
+        self.assertEqual(denied_action["status"], "rejected")
+        self.assertEqual(denied_action["reason"], "invalid_lease")
+        self.assertEqual(denied_action["authority"], "server")
+        self.assertEqual(
+            denied["messages"][0]["payload"]["key"],
+            "semantic.social.interaction.rejected",
+        )
+        self.assertNotEqual(
+            denied["messages"][0]["payload"]["text"],
+            "I couldn't do that right now.",
+        )
+        self.assertEqual(denied["relationshipBefore"], denied["relationshipAfter"])
+
+        unavailable = self.scenario({})
+        unavailable["runtime"]["socialTransportAvailable"] = False
+        with LuaSemanticWorker(unavailable) as worker:
+            missing_transport = worker.input("fuck you")
+        unavailable_action = missing_transport["result"]["actionResult"]
+        self.assertFalse(unavailable_action["accepted"])
+        self.assertEqual(
+            unavailable_action["status"],
+            "semantic_social_dispatch_unavailable",
+        )
+        self.assertEqual(
+            unavailable_action["reason"],
+            "semantic_social_transport_unavailable",
+        )
+        self.assertEqual(
+            missing_transport["messages"][0]["payload"]["key"],
+            "semantic.social.interaction.unavailable",
+        )
+        self.assertEqual(missing_transport["transport"], [])
+        self.assertEqual(missing_transport["relationshipBefore"],
+                         missing_transport["relationshipAfter"])
+
+    def test_self_directed_insult_does_not_dispatch_social_authority(self) -> None:
+        with LuaSemanticWorker(self.scenario({})) as worker:
+            result = worker.input("I'm an idiot")
+        self.assertEqual(result["result"]["ir"]["intent"], "SELF_REFLECTION")
+        self.assertEqual(
+            result["result"]["decision"]["branch"],
+            "SELF_REFLECTION_RECEIVED",
+        )
+        self.assertIsNone(result["result"].get("actionResult"))
+        self.assertEqual(result["transport"], [])
+
+    def test_social_rejection_translation_is_available_in_tl(self) -> None:
+        scenario = merge(
+            DEFAULT_SCENARIO,
+            {
+                "runtime": {"language": "TL", "socialTransportAvailable": False},
+            },
+        )
+        with LuaSemanticWorker(scenario) as worker:
+            result = worker.input("fuck you")
+        self.assertEqual(
+            result["messages"][0]["payload"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_SocialInteractionUnavailable",
+        )
+        self.assertNotEqual(
+            result["messages"][0]["payload"]["text"],
+            result["messages"][0]["payload"]["fallback"],
+        )
+
     def test_threat_uses_guarded_emotion_relationship_and_precedence(self) -> None:
         cases = (
             (
@@ -455,6 +535,36 @@ class ContextualSocialReactionTests(unittest.TestCase):
         self.assertEqual(
             {key: value for key, value in before.items() if key != "id"},
             {key: value for key, value in after.items() if key != "id"},
+        )
+
+    def test_insult_preview_is_pure_and_does_not_emit_social_effects(self) -> None:
+        with LuaSemanticWorker(self.scenario({})) as worker:
+            before = worker.snapshot()
+            preview = worker.preview("fuck you")
+            after = worker.snapshot()
+        self.assertTrue(preview["accepted"], preview.get("reason"))
+        self.assertEqual(preview["result"]["ir"]["intent"], "INSULT")
+        self.assertEqual(
+            preview["result"]["decision"]["branch"],
+            "HOSTILE_REMARK_RECEIVED",
+        )
+        self.assertIsNone(preview["result"].get("actionResult"))
+        self.assertEqual(preview["messages"], [])
+        self.assertEqual(preview["transport"], [])
+        self.assertEqual(preview["toolCalls"], [])
+        self.assertEqual(preview["llmCalls"], 0)
+        self.assertEqual(preview["contextBefore"], preview["contextAfter"])
+        self.assertEqual(
+            {
+                key: value
+                for key, value in before.items()
+                if key not in {"id", "context"}
+            },
+            {
+                key: value
+                for key, value in after.items()
+                if key not in {"id", "context"}
+            },
         )
 
 

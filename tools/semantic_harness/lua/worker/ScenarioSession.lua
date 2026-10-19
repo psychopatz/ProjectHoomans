@@ -45,6 +45,20 @@ function ScenarioSession.reset(context, scenario)
     Runtime.scenario = scenario
     context.RuntimeState.resetContainers(Runtime)
     ScenarioSession.configureRuntime(context)
+    PNC.Client = PNC.Client or {}
+    Runtime.productionSocialRequest = Runtime.productionSocialRequest
+        or PNC.Client.RequestSemanticSocialInteraction
+    if Runtime.productionSocialRequest then
+        local runtime = scenario.runtime or {}
+        if runtime.socialTransportAvailable == false then
+            -- Harness-only boundary control: exercise the real production
+            -- response path without inventing a server event or effect.
+            PNC.Client.RequestSemanticSocialInteraction = nil
+        else
+            PNC.Client.RequestSemanticSocialInteraction =
+                Runtime.productionSocialRequest
+        end
+    end
     if scenario.runtime and scenario.runtime.mode == "multiplayer"
         and type(Runtime.questProductionWrapper) == "function"
     then

@@ -123,6 +123,32 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(response_refs, list):
         response_refs = []
 
+    action_result = observation.get("actionResult")
+    if not isinstance(action_result, dict):
+        action_result = result.get("actionResult")
+    if not isinstance(action_result, dict):
+        action_result = {}
+    decision = result.get("decision", {})
+    decision = decision if isinstance(decision, dict) else {}
+    visible_response = _visible_text(record, response)
+    flow_owner = "flow" if flow.get("matched") is True else "policy"
+    execution = {
+        "route": decision.get("route"),
+        "branch": decision.get("branch"),
+        "owner": flow_owner,
+        "status": action_result.get("status"),
+        "accepted": action_result.get("accepted"),
+        "requestID": action_result.get("requestID"),
+        "npcID": action_result.get("npcID"),
+        "speechAct": action_result.get("speechAct") or ir.get("speechAct"),
+        "authority": action_result.get("authority"),
+        "result": _bounded(action_result, limit=24),
+        "rejectionReason": action_result.get("reason"),
+        "finalText": visible_response.get("text"),
+        "responseTemplate": response.get("templateID"),
+        "responsePool": response.get("sourcePoolID"),
+    }
+
     return {
         "schemaVersion": 1,
         "source": "real_lua_worker",
@@ -165,7 +191,8 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
         },
         "dialoguePlan": _bounded(plan, limit=32),
         "selectedFlow": _bounded(flow, limit=32),
-        "visibleResponse": _bounded(_visible_text(record, response)),
+        "visibleResponse": _bounded(visible_response),
+        "execution": _bounded(execution, limit=24),
         "workerTrace": _bounded(record.get("trace", []), limit=MAX_TRACE_ITEMS),
         "effects": _bounded({
             "transport": record.get("transport", []),
