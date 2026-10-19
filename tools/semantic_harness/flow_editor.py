@@ -7,12 +7,11 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
-from .codebuilder.blocks import GATE_TYPES
-
-
-TRANSITION_FIELDS = (
-    "next", "onMatch", "onRefuse", "onUnrelated",
-    "onPass", "onFail", "onUnknown",
+from .codebuilder.blocks import GATE_TYPES, TRANSITION_FIELDS
+from .codebuilder.codeblocks import (
+    codeblocks_to_flow,
+    flow_to_codeblocks,
+    validate_codeblock_document,
 )
 
 def graph_transform(point: tuple[float, float], zoom: float, pan: tuple[float, float]) -> tuple[float, float]:
@@ -231,6 +230,7 @@ class FlowEditorPane:
         self._coverage: list[dict[str, Any]] = []
         self._history: list[dict[str, Any]] = []
         self._history_index = -1
+        self._nested_flows: list[dict[str, Any]] = []
         self._zoom = 1.0
         self._pan = (24.0, 42.0)
         self._drag_node: str | None = None
@@ -439,6 +439,7 @@ class FlowEditorPane:
         form_frame = ttk.Frame(form_canvas)
         form_frame.columnconfigure(1, weight=1)
         form_frame.rowconfigure(11, weight=1)
+        form_frame.rowconfigure(13, weight=1)
         form_window = form_canvas.create_window((0, 0), window=form_frame, anchor="nw")
 
         def update_form_scroll_region(_event: Any = None) -> None:
@@ -531,7 +532,34 @@ class FlowEditorPane:
             form_frame, text="Apply node fields", command=self.apply_node_fields
         )
         self.apply_button.grid(row=12, column=1, sticky="e", padx=6, pady=(0, 6))
-        self._action_buttons = self._action_buttons + (self.apply_button,)
+        codeblocks_frame = ttk.LabelFrame(form_frame, text="Declarative codeblocks · typed round trip")
+        codeblocks_frame.grid(row=13, column=0, columnspan=2, sticky="nsew", padx=6, pady=6)
+        codeblocks_frame.rowconfigure(0, weight=1)
+        codeblocks_frame.columnconfigure(0, weight=1)
+        self.codeblocks_text = self._ScrolledText(
+            codeblocks_frame, height=12, width=38, wrap="none"
+        )
+        self.codeblocks_text.grid(row=0, column=0, sticky="nsew")
+        codeblock_buttons = ttk.Frame(codeblocks_frame)
+        codeblock_buttons.grid(row=1, column=0, sticky="e", pady=(6, 0))
+        self.sync_codeblocks_button = ttk.Button(
+            codeblock_buttons, text="Sync from graph", command=self.sync_codeblocks
+        )
+        self.sync_codeblocks_button.pack(side="left")
+        self.validate_codeblocks_button = ttk.Button(
+            codeblock_buttons, text="Validate codeblocks", command=self.validate_codeblocks
+        )
+        self.validate_codeblocks_button.pack(side="left", padx=6)
+        self.apply_codeblocks_button = ttk.Button(
+            codeblock_buttons, text="Apply codeblocks", command=self.apply_codeblocks
+        )
+        self.apply_codeblocks_button.pack(side="left")
+        self._action_buttons = self._action_buttons + (
+            self.apply_button,
+            self.sync_codeblocks_button,
+            self.validate_codeblocks_button,
+            self.apply_codeblocks_button,
+        )
 
     def _add_entry(self, parent: Any, row: int, label: str, variable: Any) -> None:
         self._ttk.Label(parent, text=label).grid(
@@ -558,6 +586,7 @@ class FlowEditorPane:
             button.configure(state=state)
         self.flow_list.configure(state=state)
         self.node_box.configure(state="readonly" if enabled else "disabled")
+        self.codeblocks_text.configure(state=state)
 
     def set_status(self, value: str) -> None:
         self.status_var.set(value)
@@ -680,6 +709,13 @@ class FlowEditorPane:
             self._draw_graph()
             return
         self._draft = flow_draft(flow)
+        authoring_metadata = self._draft.get("_semanticLab")
+        self._nested_flows = (
+            copy.deepcopy(authoring_metadata.get("nestedFlows", []))
+            if isinstance(authoring_metadata, dict)
+            and isinstance(authoring_metadata.get("nestedFlows"), list)
+            else []
+        )
         self._history = [flow_draft(self._draft)]
         self._history_index = 0
         self._node_positions = {}
@@ -698,6 +734,77 @@ class FlowEditorPane:
     def _read_text(self, widget: Any) -> str:
         return widget.get("1.0", "end").strip()
 
+    def _read_codeblock_document(self) -> dict[str, Any] | None:
+        try:
+            document = json.loads(self._read_text(self.codeblocks_text) or "{}")
+        except json.JSONDecodeError as error:
+            self.set_status(f"Codeblocks JSON is invalid: {error.msg}")
+            return None
+        if not isinstance(document, dict):
+            self.set_status("Codeblocks document must be a JSON object")
+            return None
+        return document
+
+    def sync_codeblocks(self) -> None:
+        if not self._draft:
+            self.set_status("Select a flow before syncing codeblocks")
+            return
+        self._write_text(
+            self.codeblocks_text,
+            _json_text(flow_to_codeblocks(self._draft, nested_flows=self._nested_flows)),
+        )
+        self.set_status("Codeblocks synchronized from the visual graph")
+
+    def validate_codeblocks(self) -> dict[str, Any] | None:
+        document = self._read_codeblock_document()
+        if document is None:
+            return None
+        report = validate_codeblock_document(
+            document,
+            known_flow_ids=self._catalog,
+        )
+        if report["valid"]:
+            self.set_status("Codeblocks valid; no flow or worker state changed")
+        else:
+            message = report["diagnostics"][0]["message"] if report["diagnostics"] else "invalid codeblocks"
+            self.set_status(f"Codeblocks rejected: {message}")
+        return report
+
+    def apply_codeblocks(self) -> dict[str, Any] | None:
+        if not self._draft:
+            self.set_status("Select a flow before applying codeblocks")
+            return None
+        document = self._read_codeblock_document()
+        if document is None:
+            return None
+        before = flow_draft(self._draft)
+        result = codeblocks_to_flow(
+            document,
+            base_flow=self._draft,
+            known_flow_ids=self._catalog,
+        )
+        if result["valid"] is not True or not isinstance(result.get("flow"), dict):
+            message = result["diagnostics"][0]["message"] if result["diagnostics"] else "invalid codeblocks"
+            self.set_status(f"Codeblocks rejected: {message}")
+            return result
+        self._draft = flow_draft(result["flow"])
+        self._nested_flows = copy.deepcopy(result.get("nestedFlows", []))
+        if self._nested_flows:
+            self._draft.setdefault("_semanticLab", {})["nestedFlows"] = copy.deepcopy(self._nested_flows)
+        elif isinstance(self._draft.get("_semanticLab"), dict):
+            self._draft["_semanticLab"].pop("nestedFlows", None)
+            if not self._draft["_semanticLab"]:
+                self._draft.pop("_semanticLab", None)
+        self._selected_node = self._draft.get("initial")
+        self._commit_history_change(before)
+        self._populate_flow_fields()
+        self._populate_node_fields()
+        self._draw_graph()
+        self.set_status(
+            "Codeblocks applied to the visual graph; validate through the production Registry before registering"
+        )
+        return result
+
     def _populate_flow_fields(self) -> None:
         if not self._draft:
             return
@@ -705,6 +812,11 @@ class FlowEditorPane:
         self.owner_var.set(str(self._draft.get("owner", "")))
         self.initial_var.set(str(self._draft.get("initial", "")))
         self._write_text(self.triggers_text, _json_text(self._draft.get("triggers", [])))
+        if hasattr(self, "codeblocks_text"):
+            self._write_text(
+                self.codeblocks_text,
+                _json_text(flow_to_codeblocks(self._draft, nested_flows=self._nested_flows)),
+            )
 
     def _populate_node_fields(self) -> None:
         nodes = self._draft.get("nodes", {}) if self._draft else {}
@@ -1333,6 +1445,8 @@ class FlowEditorPane:
         )
         if not filename:
             return
+        if self._nested_flows:
+            draft.setdefault("_semanticLab", {})["nestedFlows"] = copy.deepcopy(self._nested_flows)
         try:
             Path(filename).write_text(
                 json.dumps(draft, indent=2, ensure_ascii=False) + "\n",
@@ -1358,6 +1472,13 @@ class FlowEditorPane:
             self._messagebox.showerror("Flow draft error", str(error))
             return
         self._draft = flow_draft(loaded)
+        authoring_metadata = loaded.get("_semanticLab")
+        self._nested_flows = (
+            copy.deepcopy(authoring_metadata.get("nestedFlows", []))
+            if isinstance(authoring_metadata, dict)
+            and isinstance(authoring_metadata.get("nestedFlows"), list)
+            else []
+        )
         self._history = [flow_draft(self._draft)]
         self._history_index = 0
         self._node_positions = {}

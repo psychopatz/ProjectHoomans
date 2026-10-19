@@ -1,5 +1,35 @@
 # Contextual Dialogue & Quest Framework — current progress
 
+## S3 accepted — synchronized visual graph and codeblock editing
+
+The existing Flow editor now has a deterministic `semantic.codeblocks.v1`
+representation synchronized with the visual graph. It preserves complete node
+definitions, emits explicit `flow` and `result` connection types, validates
+bounded reachability and special targets, and supports bounded nested-flow
+references against known registry IDs. Syncing is effect-free; applying a
+document changes only the local draft and leaves production registration to
+the existing Lua `Registry.Validate`/`Registry.Register` boundary. Nested
+references remain explicit Semantic Lab authoring metadata because the current
+production registry has no nested-flow execution contract; they are not
+silently turned into runtime dispatch.
+
+S3 evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_codeblocks tools.semantic_harness.tests.test_semantic_blocks tools.semantic_harness.tests.test_flow_editor tools.semantic_harness.tests.test_app tools.semantic_harness.tests.test_codebuilder_consolidation -q` — **33/33 passed**, including typed result-edge round trips, special targets, nested-flow validation, headless validation, the live Flow editor, and GUI startup.
+- `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **195/195 passed**, including actual Lua-worker conversations and GUI startup.
+- Production Lua round-trip proof — a generated FOLLOW flow converted to codeblocks and back with identical node definitions; the reconstructed draft passed the real Lua `Registry.Validate` contract.
+- `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` — **PASS** for Python 3.12.3, repository/Core paths, Tk/display, Lua 5.3, worker syntax, boot, PING, and CAPABILITIES.
+- `./tools/semantic_harness/run_harness.sh --test pnc_semantic` — **4 pre-existing Lua smoke failures** in gift/inventory/local-route/state-response behavior; S3 changed no production Lua and did not alter the documented baseline.
+- Python compilation and `git diff --check` — **PASS**.
+
+**Current goal status:** **S3 accepted; S0A/S0B, S1, S2, and prior C6
+developer gates remain preserved. Native Project Zomboid SP/MP plus live
+external PBrainZ validation remain user-owned.**
+
+**ONE Next Chunk:** **S4 — add reviewed build-time adapters for licensed
+expansive datasets such as MASSIVE and SGD, preserving provenance/collision
+review and ensuring raw corpora never enter the production Lua worker.**
+
 ## S2 accepted — reusable Semantic Lab block registry
 
 Semantic Lab now has a shared `SemanticBlockRegistry` inside CodeBuilder and a
@@ -23,14 +53,6 @@ S2 evidence:
 - `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` — **PASS** for Python 3.12.3, repository/Core paths, Tk/display, Lua 5.3, worker syntax, boot, PING, and CAPABILITIES.
 - `./tools/semantic_harness/run_harness.sh --test pnc_semantic` — **4 pre-existing Lua smoke failures** in gift/inventory/local-route/state-response behavior; S2 changed no production Lua and did not alter the documented baseline.
 - Python compilation and `git diff --check` — **PASS**.
-
-**Current goal status:** **S2 accepted; S0A/S0B, S1, and prior C6 developer
-gates remain preserved. Native Project Zomboid SP/MP plus live external
-PBrainZ validation remain user-owned.**
-
-**ONE Next Chunk:** **S3 — synchronize the existing visual flow graph with a
-declarative codeblock editor, including reusable nested flows, typed
-connections, safe round-trip editing, and production-registry validation.**
 
 ## S1 accepted — Dataset Library inside Semantic Lab
 
@@ -101,18 +123,18 @@ S0B evidence:
 - `./tools/semantic_harness/run_harness.sh --no-gui --jsonl --compile-source tools/semantic_compiler/semantic_definitions.json` — **PASS**, effect-free canonical preview through the shared service.
 - `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` — **PASS**.
 
-**Updated:** 2026-10-19, after the S1 Dataset Library acceptance slice.
+**Updated:** 2026-10-19, after the S3 codeblock round-trip acceptance slice.
 
 **Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`;
-S0A, S0B, and S1 are accepted in the rebased local history. The earlier
+S0A, S0B, S1, and S3 are accepted in the rebased local history. The earlier
 acceptance commits were rewritten by this rebase; preserved source-history
 references in the historical records refer to their pre-rebase commit IDs.
 
 The previous `PROGRESS.md` has been archived verbatim in `HISTORY_C0_C6_20261019.md` and remains recoverable in Git at `71162cb4f78cc4cd408a4a145486d5ebadc943c1`. It records the action-flow/quest work and C0–C6 contextual conversation, small reviewed dataset codebuilding, Tk X11, worker, performance, EN/TL and optional-provider parity acceptance, ending READY FOR USER LIVE TEST for that **earlier scoped implementation**. Native PZ SP/MP and live external PBrainZ validation remain user-owned, unclaimed.
 
 The prior user-live-test handoff is historical evidence and is superseded for
-this consolidation goal by the single S3 chunk above; it was not re-run or
-claimed as part of S2.
+this consolidation goal by the single S4 chunk above; it was not re-run or
+claimed as part of S3.
 
 ## Productization roadmap
 

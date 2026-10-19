@@ -20,6 +20,10 @@ GATE_TYPES = (
     "pnc:trait", "pnc:personality", "pnc:relationship",
     "pnc:relationship_state", "pnc:audience", "pnc:history",
 )
+TRANSITION_FIELDS = (
+    "next", "onMatch", "onRefuse", "onUnrelated", "onClarify",
+    "onPass", "onFail", "onUnknown",
+)
 
 CATEGORY_SPECS = (
     ("language", "Language", "Registered speech acts, concepts, and trigger frames."),

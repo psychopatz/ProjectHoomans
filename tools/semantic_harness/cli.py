@@ -26,6 +26,7 @@ AUTHORING_OPERATIONS = (
     "list_blocks",
     "search_blocks",
     "validate_blocks",
+    "validate_codeblocks",
 )
 
 
@@ -92,6 +93,10 @@ def _run_authoring_operation(
             if value.strip()
         ]
         return service.validate_semantic_blocks(block_ids)
+    if arguments.validate_codeblocks:
+        return service.validate_codeblock_source(
+            _resolve_authoring_source(service, arguments.validate_codeblocks)
+        )
     if arguments.compile_source:
         return service.preview_semantic_source(
             _resolve_authoring_source(service, arguments.compile_source)
@@ -235,6 +240,11 @@ def _parser() -> argparse.ArgumentParser:
         "--validate-blocks",
         metavar="IDS",
         help="validate comma-separated reusable block IDs without writing or dispatching",
+    )
+    authoring.add_argument(
+        "--validate-codeblocks",
+        metavar="PATH",
+        help="validate a declarative semantic.codeblocks.v1 file without writing or dispatching",
     )
     parser.add_argument("--doctor", action="store_true", help="run bounded headless runtime diagnostics")
     parser.add_argument("--doctor-json", action="store_true", help="emit doctor diagnostics as one JSON record")

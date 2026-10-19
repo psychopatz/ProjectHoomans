@@ -14,6 +14,7 @@ from typing import Any
 
 from tools.semantic_harness import authoring
 from .blocks import SemanticBlockRegistry
+from .codeblocks import validate_codeblock_document
 from .compiler import CompileError
 
 
@@ -261,6 +262,25 @@ class SemanticLabAuthoringService:
             block_ids,
             production_catalog=production_catalog,
         )
+
+    def validate_codeblock_source(self, source_path: Path) -> dict[str, Any]:
+        """Validate a declarative codeblock file without writing or dispatching."""
+        source_path = source_path.expanduser().resolve()
+        try:
+            document = json.loads(source_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as error:
+            return {
+                "ok": False,
+                "type": "codeblock_validation",
+                "valid": False,
+                "sourcePath": str(source_path),
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "effectFree": True,
+                "writes": [],
+            }
+        report = validate_codeblock_document(document)
+        report["sourcePath"] = str(source_path)
+        return report
 
     def preview_semantic_source(self, source_path: Path) -> dict[str, Any]:
         return authoring.preview_semantic_source(

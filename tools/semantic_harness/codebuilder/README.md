@@ -34,3 +34,10 @@ and quest blocks. Live Semantic Lab passes the existing Lua FlowEditor catalog
 into it; the registry only describes and validates references. Gate evaluation,
 NLU interpretation, gameplay dispatch, and quest authority remain in their
 existing production owners.
+
+The Flow editor also uses `semantic.codeblocks.v1` for a deterministic
+graph/codeblock round trip. Node definitions are retained, ordinary and
+result edges carry explicit types, and nested-flow references are bounded
+editor metadata validated against known flow IDs. Applying codeblocks changes
+only the current draft; production `Registry.Validate` remains the final
+registration authority.
