@@ -1,6 +1,6 @@
 # C7 Conversational Competence — Progress
 
-Status: C7 is in progress. C7A–C7F are implemented and validated on the real PsychopatzCore + Project Hoomans Lua worker with PBrainZ disabled. Native Project Zomboid live testing remains user-owned.
+Status: READY FOR USER LIVE TEST. C7A–C7G are implemented and validated on the real PsychopatzCore + Project Hoomans Lua worker with PBrainZ disabled, with optional-provider parity covered. Native Project Zomboid live testing remains user-owned.
 
 Repository baseline: `574b0898c92a6a19fb611897b4ff8647633cc651`.
 
@@ -75,6 +75,16 @@ Implementation commit: `d647af50 feat(semantic): measure reviewed language compe
 - Added a bounded 14-case evaluation-only holdout with metadata-only WordNet 3.0/MASSIVE/SGD references. The real Lua worker scored 9 true positives, 0 false positives, and 0 false negatives: precision `1.0`, recall `1.0`, and 0 false executable dispatches across 14 protected cases.
 - Real-worker response probes confirmed `what is the weather like` and `is it still snowing` select grounded weather plans with final NPC text “The weather looks clear right now.”; `what item do you mean` selects the clarification plan with “Understood.” Negative subject/scope/negation/follow-statement cases remain unrecognized and effect-free. EN/TL worker paths and generated key parity were checked.
 
+## C7G accepted
+
+Implementation commit: `f3b571e3 test(semantic): add C7G conversational acceptance gate`.
+
+- Added a 14-turn EN/TL real-worker dialogue gate covering grounded residence, pronoun reference, continuation, medical status, needs/quantity/proposal context, weather interruption/resumption, NPC knowledge, compliments, gossip, effect-free preview, and one authorized STAY action.
+- Verified personality variation changes response tone, template, and final text while preserving the same authoritative health fact reference and zero gameplay effects.
+- Verified two participant scopes retain separate residence facts and participant IDs; one NPC/player's conversation cannot resolve another scope's residence.
+- Compared the same long grounded conversation with the optional provider enabled and disabled. IR, response plan, context, final messages, transport, and tool calls remained identical; recognized turns made no provider or gameplay authority call.
+- Measured the sustained real-worker dialogue within the existing latency and bounded-context budgets: p95 turn latency at or below 1 second, mean at or below 250 ms, recent turns at or below 12, mentions at or below 32, and focus at or below 8.
+
 ## Validation evidence
 
 All semantic behavior below used the real Lua worker unless explicitly marked compiler/static validation:
@@ -82,7 +92,8 @@ All semantic behavior below used the real Lua worker unless explicitly marked co
 - C7A + C7B + C7C + C7D focused harness tests: `18/18`.
 - C7E conversation-inspector plus C7A–C7D focused tests: `22/22`.
 - C7F focused held-out/compiler tests: `2/2`.
-- Full semantic harness suite after C7F: `239/239`.
+- C7G integrated acceptance gate: `5/5`.
+- Full semantic harness suite after C7G: `244/244`.
 - Production semantic Lua smoke tests: `68/68`.
 - Semantic compiler tests: `16/16`.
 - Reviewed lexicon smoke: `1/1`.
@@ -93,4 +104,4 @@ All semantic behavior below used the real Lua worker unless explicitly marked co
 
 ## Next Chunk
 
-C7G — Full multi-turn conversational acceptance with real Lua, EN/TL, personality differences, memory isolation, performance, safe gameplay authority and optional PBrainZ parity.
+USER LIVE TEST — run the mandatory five-turn conversation in native Project Zomboid SP/MP with the intended mod/Core loadout, then optionally validate a real PBrainZ bridge and report any native-only authority, translation, persistence, or multiplayer divergence.
