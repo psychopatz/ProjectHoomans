@@ -1,12 +1,12 @@
 # C7 Conversational Competence — Progress
 
-Status: C7 is in progress. C7A, C7B, C7C, and C7D are implemented and validated on the real PsychopatzCore + Project Hoomans Lua worker with PBrainZ disabled. Native Project Zomboid live testing remains user-owned.
+Status: C7 is in progress. C7A, C7B, C7C, C7D, and C7E are implemented and validated on the real PsychopatzCore + Project Hoomans Lua worker with PBrainZ disabled. Native Project Zomboid live testing remains user-owned.
 
 Repository baseline: `574b0898c92a6b19fb611897b4ff8647633cc651`.
 
 Implementation branch: `codex/contextual-dialogue-quest-framework-0a`.
 
-Accepted implementation commits: `72a9c54c` (C7A), `608494f7` (C7B), `8e36a4df` (C7C), and `f362ab02` (C7D).
+Accepted implementation commits: `72a9c54c` (C7A), `608494f7` (C7B), `8e36a4df` (C7C), `f362ab02` (C7D), and `31eb2c81` (C7E).
 
 PsychopatzCore was inspected at `/home/psychopatz/Zomboid/Workshop/psychopatzCore`, HEAD `50022acf90d5a39995be552b7a1e1de21b59168b`; it was clean and was not modified.
 
@@ -51,7 +51,7 @@ Commit: `8e36a4df feat(semantic): add C7C conversational continuity`.
 
 ## C7D accepted
 
-C7D implements conversation continuity, pronoun resolution, commitment preservation across topic switches, and participant-scoped context using existing dialogue state, reference resolution, flow state, and fact providers.
+Commit: `f362ab02 feat(semantic): add C7D discourse continuity`.
 
 - Added bounded exact reference-question patterns for `what about it/that/this`, `is it safe there`, `what is it like there`, and `does it still hurt`. These produce normal QUESTION IR with captured references; they are not a second parser or an action route.
 - Reused the existing `PNC.SemanticDialogueReferenceResolver` and participant-scoped context mentions. NPC response topics are compact discourse focus only; authoritative providers answer the bound subject.
@@ -62,22 +62,32 @@ C7D implements conversation continuity, pronoun resolution, commitment preservat
 - Separate worker sessions do not share residence or topic mentions. Preview does not mutate context, queue messages, or transport gameplay effects.
 - Added EN/TL response keys for unknown context references, location safety, place description, and medical pain.
 
+## C7E accepted
+
+Commit: `31eb2c81 feat(studio): add conversation-first semantic inspection`.
+
+- Extended the existing read-only Conversation Inspector projection with explicit bounded `understanding`, `context`, `facts`, `dialoguePlanning`, and `finalResponse` sections sourced from the real worker record.
+- Added reference resolution details, fact providers/status/grounded references, selected response source, dialogue plan, final translated NPC text, and trace classification to the conversation-first projection.
+- Kept gameplay dispatch separate in a `commandAuthority` projection containing action, binding, capability, authority, status, and effect counts. The raw worker record remains available as a separate view.
+- Updated the Semantic Studio Simulation pane to render conversation understanding first, command authority in a separate tab, and raw worker data separately.
+- Added real-worker inspector coverage proving grounded residence pronoun resolution is visible while STAY remains an isolated authorized gameplay action.
+
 ## Validation evidence
 
 All semantic behavior below used the real Lua worker unless explicitly marked compiler/static validation:
 
 - C7A + C7B + C7C + C7D focused harness tests: `18/18`.
-- Full semantic harness suite: `236/236`.
+- C7E conversation-inspector plus C7A–C7D focused tests: `22/22`.
+- Full semantic harness suite after C7E: `237/237`.
 - Production semantic Lua smoke tests: `68/68`.
 - Semantic compiler tests: `16/16`.
 - Generated lexicon smoke: `1/1`.
 - Harness doctor: PASS — Python 3.12.3, Tk/display, Core repository, Lua 5.3.6, worker syntax, worker boot, PING, and CAPABILITIES.
-- `luac5.3 -p` passed every changed Lua file.
 - `pz_verify --kahlua --severity ERROR --no-snippets`: 3049 files scanned, 0 flagged, 0 errors.
-- EN/TL response JSON parsed successfully with exact key parity: `132/132`.
-- `git diff --check` passed and the new C7D Python test compiled.
+- Changed Python compiled successfully; `git diff --check` passed.
+- The prior C7D Lua parse and EN/TL response parity checks remain green: `luac5.3 -p` changed Lua passed; EN/TL response JSON exact parity was `132/132`.
 - No native Project Zomboid launch, multiplayer host, mod installation, Workshop publish, second NLP parser, second dialogue engine, runtime LLM, or invented NPC fact was introduced.
 
 ## Next Chunk
 
-C7E — Conversation-first Semantic Studio visualization showing actual understanding, context, facts, dialogue planning, and final response. Keep command-authority graphs separately.
+C7F — Expand verified language competence using reviewed WordNet, MASSIVE and SGD data through the existing embedded CodeBuilder. Measure performance against held-out conversation examples.
