@@ -56,6 +56,22 @@ function Internal.RegisterBasicCommands()
     )
 
     registerPattern(
+        "pnc.command.wait_at_reference",
+        {
+            { kind = "concept", id = "WAIT" },
+            { kind = "literal", value = "there" },
+        },
+        {
+            intent = "REQUEST",
+            speechAct = "REQUEST",
+            action = "WAIT_AT",
+            target = { reference = "THAT" },
+        },
+        0.96,
+        135
+    )
+
+    registerPattern(
         "pnc.command.wait_at",
         {
             { kind = "concept", id = "WAIT" },

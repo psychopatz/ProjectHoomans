@@ -39,6 +39,8 @@ class StayWaitAtBindingTests(unittest.TestCase):
             previews = [worker.preview("Wait at the campfire") for _ in range(2)]
             stay = worker.input("Stay here")
             wait_at = worker.input("Wait at the campfire")
+            wait_at_reference = worker.input("Wait there")
+            stay_at_reference = worker.input("Stay there")
             unresolved = worker.input("stay at the recycle bin")
             question = worker.input("Are you waiting at the campfire?")
 
@@ -107,6 +109,30 @@ class StayWaitAtBindingTests(unittest.TestCase):
             wait_at["messages"][0]["payload"]["text"], "Okay, I'll wait there."
         )
 
+        for reference_turn in (wait_at_reference, stay_at_reference):
+            reference_result = reference_turn["result"]
+            self.assertEqual(
+                reference_result["ir"]["provenance"]["pattern"],
+                "pnc.command.wait_at_reference",
+            )
+            self.assertEqual(reference_result["ir"]["action"], "WAIT_AT")
+            self.assertTrue(reference_result["actionResult"]["accepted"])
+            self.assertEqual(
+                reference_result["actionResult"]["request"]["target"]["category"],
+                "CAMPFIRE",
+            )
+            self.assertEqual(
+                reference_turn["messages"][0]["payload"]["text"],
+                "Okay, I'll wait there.",
+            )
+            self.assertEqual(
+                reference_turn["transport"][0]["command"],
+                "SemanticTaskRequest",
+            )
+            self.assertTrue(
+                reference_result["ir"]["diagnostics"]["contextResolved"]
+            )
+
         unresolved_result = unresolved["result"]
         self.assertFalse(unresolved_result["actionResult"]["accepted"])
         self.assertEqual(
@@ -125,6 +151,27 @@ class StayWaitAtBindingTests(unittest.TestCase):
         )
         self.assertEqual(question["transport"], [])
         self.assertEqual(question["toolCalls"], [])
+
+    def test_unresolved_location_reference_cannot_dispatch(self) -> None:
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            turn = worker.input("Wait there")
+
+        result = turn["result"]
+        self.assertEqual(
+            result["ir"]["provenance"]["pattern"],
+            "pnc.command.wait_at_reference",
+        )
+        self.assertTrue(result["ir"]["diagnostics"]["unresolvedEntity"])
+        self.assertFalse(result["actionResult"]["accepted"])
+        self.assertEqual(
+            result["actionResult"]["reason"], "clarification_required"
+        )
+        self.assertEqual(
+            turn["messages"][0]["payload"]["text"],
+            "I can't wait there right now.",
+        )
+        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["toolCalls"][0]["reason"], "clarification_required")
 
 
 if __name__ == "__main__":

@@ -122,6 +122,7 @@ local function resolveField(output, field, state, context, diagnostics)
                 or contextualReason == "low_reference_confidence"
                 or contextualReason == "capability_unknown"
         ) then
+            value.unresolved = true
             diagnostics.contextualResolver = true
             diagnostics.contextualReferenceDetails =
                 diagnostics.contextualReferenceDetails or {}
@@ -159,6 +160,7 @@ local function resolveField(output, field, state, context, diagnostics)
         return true
     end
 
+    value.unresolved = true
     appendBounded(diagnostics.contextUnresolvedReferences, {
         field = field,
         reference = value.reference,
