@@ -1,10 +1,14 @@
 # C7 Conversational Competence — Progress
 
-Status: C7 in progress. C7A, C7B, and C7C are implemented and validated on the real PsychopatzCore + Project Hoomans Lua worker with PBrainZ disabled. Native Project Zomboid live testing remains user-owned.
+Status: C7 is in progress. C7A, C7B, C7C, and C7D are implemented and validated on the real PsychopatzCore + Project Hoomans Lua worker with PBrainZ disabled. Native Project Zomboid live testing remains user-owned.
 
 Repository baseline: `574b0898c92a6b19fb611897b4ff8647633cc651`.
 
-Implementation branch: `codex/contextual-dialogue-quest-framework-0a`. The accepted prior commits are `72a9c54c` (C7A) and `608494f7` (C7B). PsychopatzCore was inspected at `/home/psychopatz/Zomboid/Workshop/psychopatzCore`, HEAD `50022acf90d5a39995be552b7a1e1de21b59168b`; it was clean and not modified.
+Implementation branch: `codex/contextual-dialogue-quest-framework-0a`.
+
+Accepted implementation commits: `72a9c54c` (C7A), `608494f7` (C7B), `8e36a4df` (C7C), and `f362ab02` (C7D).
+
+PsychopatzCore was inspected at `/home/psychopatz/Zomboid/Workshop/psychopatzCore`, HEAD `50022acf90d5a39995be552b7a1e1de21b59168b`; it was clean and was not modified.
 
 ## Required Semantic Lab reproduction
 
@@ -12,67 +16,68 @@ The required five-turn conversation was reproduced on the real worker before C7A
 
 | Input | Core IR / pattern | Selected plan / final NPC text | Facts / side effects / trace |
 | --- | --- | --- | --- |
-| `do you have any news` | `GOSSIP/GOSSIP`, `GOSSIP`; `pnc.social.news_do_you_have` | Existing `semantic.gossip`; “I haven't heard any news lately.” | No fact or side effect; `recognized_social_interaction`. |
-| `wait here` | `REQUEST/REQUEST`, action `STAY`; `pnc.command.wait` | Existing command acknowledgement; “Okay, I'll stay.” | Existing STAY accepted; one CompanionCommand transport; `authorized_gameplay_action`. |
-| `where do you live exactly` | No match | `ASK_CLARIFICATION`; “I'm not sure what you mean.” | No fact or side effect; `unrecognized_language`. |
-| `have you been bitten` | No match | `ASK_CLARIFICATION`; “I'm not sure what you mean.” | No fact or side effect; `unrecognized_language`. |
-| `i like your dress` | No match | `ASK_CLARIFICATION`; “I'm not sure what you mean.” | No fact or side effect; `unrecognized_language`. |
-
-After C7A and C7B, the same sequence is now:
-
-| Input | Core IR / pattern | Selected plan / final NPC text | Facts / side effects / trace |
-| --- | --- | --- | --- |
-| `do you have any news` | `GOSSIP/GOSSIP`; `pnc.social.news_do_you_have` | `semantic.gossip`; “I haven't heard any news lately.” | No side effect; social interaction → grounded response. |
-| `wait here` | `REQUEST/REQUEST`, `STAY`; `pnc.command.wait` | `COMMAND_ACCEPTED`; “Okay, I'll stay.” | Existing `PNC.Client.SendCompanionCommand`, capability `pnc:companion.stay`, one transport; authorized gameplay action. |
-| `where do you live exactly` | `QUESTION/QUESTION`, `NPC_RESIDENCE`; `pnc.question.residence.where_do_you_live` | Unknown `FACT_ANSWER`; “I don't have a confirmed home to tell you about.” | `client_npc_context_projection`, `npc_residence_unavailable`; no side effect; recognized question with unknown fact. |
-| `have you been bitten` | `QUESTION/QUESTION`, `NPC_BITE_STATUS`; `pnc.question.medical_bite.have_you_been` | Unknown `MEDICAL_STATUS`; “I can't confirm whether I've been bitten.” | `client_npc_health_projection`, `npc_health_projection_unavailable`; no side effect; recognized question with unknown fact. |
-| `i like your dress` | `COMPLIMENT/COMPLIMENT`; `pnc.social.compliment_i_like_your_feature` | Existing relationship/personality-aware `semantic.compliment`; “Oh. Thank you, that's kind of you.” | No side effect; social interaction → grounded response. |
+| `do you have any news` | `GOSSIP/GOSSIP`; `pnc.social.news_do_you_have` | Existing `semantic.gossip`; “I haven't heard any news lately.” | No fact or side effect; recognized social interaction. |
+| `wait here` | `REQUEST/REQUEST`, action `STAY`; `pnc.command.wait` | Existing command acknowledgement; “Okay, I'll stay.” | Existing STAY accepted; one CompanionCommand transport; authorized gameplay action. |
+| `where do you live exactly` | No match | `ASK_CLARIFICATION`; “I'm not sure what you mean.” | No fact or side effect; unrecognized language. |
+| `have you been bitten` | No match | `ASK_CLARIFICATION`; “I'm not sure what you mean.” | No fact or side effect; unrecognized language. |
+| `i like your dress` | No match | `ASK_CLARIFICATION`; “I'm not sure what you mean.” | No fact or side effect; unrecognized language. |
 
 ## C7A accepted
 
 Commit: `72a9c54c feat(semantic): implement C7A conversational competence`.
 
-- Added reusable apparel/appearance compliment categories through the existing `COMPLIMENT_FEATURE` and relationship/personality-aware social response path. Dress, jacket, outfit, and appearance paraphrases are covered; a negative dress statement remains unrecognized.
+- Added reusable apparel/appearance compliment categories through the existing `COMPLIMENT_FEATURE` relationship/personality-aware social response path. Dress, jacket, outfit, and appearance paraphrases are covered; negative dress statements remain unrecognized.
 - Added typed self-directed bite questions using authoritative `PNC.NPCWounds.BuildSnapshot` data. Complete wound data can produce positive/negative status; missing or partial data stays unknown and never fabricates medical history.
 - Added residence, health-state, and open-ended knowledge questions as read-only local-fact queries with EN/TL responses and effect-free preview.
-- Preserved inventory, relationship, STAY, FOLLOW, INSULT, THREAT, Gift, and Quest behavior. A smoke regression caught and removed an overlapping `home` alias that shadowed `GO HOME`.
+- Added trace distinctions for unrecognized language, recognized unknown questions, recognized social interaction, authorized gameplay action, and grounded NPC response.
+- Preserved inventory, relationship, STAY, FOLLOW, INSULT, THREAT, Gift, Quest, and inventory behavior.
 
 ## C7B accepted
 
 Commit: `608494f7 feat(semantic): generalize grounded factual questions`.
 
-- Residence uses only explicit NPC residence or the authoritative community projection; absent data remains `npc_residence_unavailable`.
-- Health uses the existing NPC health projection; absent data remains `npc_health_projection_unavailable`.
-- Knowledge uses bounded authoritative topic projections and preserves the captured topic in the final response. No location, rumor, relationship, or knowledge is inferred.
-- The real worker exposes scenario residence, topic knowledge, and inventory summary through the existing worker snapshot seam; no second parser, dispatcher, or engine was added.
+- Generalized residence, NPC health, and NPC knowledge question patterns and reused the authoritative local fact providers.
+- Unknown facts remain explicit unknown responses; no location, medical history, or knowledge is invented.
+- Added actual-worker EN/TL and preview coverage, including known residence, injured health, and known knowledge answers.
 
 ## C7C accepted
 
-- Added reusable `MORE` vocabulary and bounded continuation patterns for “tell me more”, “can you say more”, “say more”, “what else”, “anything else”, “go on”, “keep going”, “continue”, and “can you tell me more”. Complete-utterance matching keeps phrases such as “give me more food” out of the continuation route.
-- Continuation is resolved from the immediately preceding NPC answer and preserves the existing topic across repeated turns. Gossip with no authoritative statement answers that there is nothing more to add; residence, health, and knowledge continuations remain bounded and do not invent facts.
-- Added context-aware acknowledgements for personal factual answers. “Okay” after a relationship or NPC-health answer retains the topic and returns the existing relationship acknowledgement or personality-aware conversational acknowledgement. Flow-owned ACCEPT turns still resume the existing needs/proposal flow.
-- Added the natural health continuation “what about your health” through the existing health-question provider. Known and unknown medical continuation responses are distinct; unknown health remains explicitly unconfirmed.
-- Extended the existing trace to distinguish a recognized continuation question from a question with an unknown engine fact and to record the selected response source. Preview remains effect-free, and continuation/acknowledgement turns produce no transport or tool calls.
+Commit: `8e36a4df feat(semantic): add C7C conversational continuity`.
+
+- Added bounded “tell me more”, “what else”, “go on”, and equivalent continuation forms using existing conversation context.
+- Added context-aware acknowledgements and `what about your health`, while preserving flow-owned ACCEPT behavior.
+- Continuations use the preceding NPC answer subject and authoritative fact status; unknown health remains explicitly unconfirmed.
+- Preview and acknowledgement/continuation turns produce no gameplay transport, tool call, or LLM call.
+
+## C7D accepted
+
+C7D implements conversation continuity, pronoun resolution, commitment preservation across topic switches, and participant-scoped context using existing dialogue state, reference resolution, flow state, and fact providers.
+
+- Added bounded exact reference-question patterns for `what about it/that/this`, `is it safe there`, `what is it like there`, and `does it still hurt`. These produce normal QUESTION IR with captured references; they are not a second parser or an action route.
+- Reused the existing `PNC.SemanticDialogueReferenceResolver` and participant-scoped context mentions. NPC response topics are compact discourse focus only; authoritative providers answer the bound subject.
+- Residence and knowledge references re-query known facts and return grounded final NPC text. Safety, description, and medical follow-ups remain truthful unknown responses when no authoritative provider can confirm them.
+- Unknown medical sequences (`are you hurt` → `does it still hurt` → `what about that`) never produce a fabricated healthy/injured/negative answer.
+- Existing needs commitments remain flow-owned: `do you need anything` → `how many` → `i will get some` opens a proposal confirmation; a weather question suspends it; `okay` resumes the pending proposal without dispatching a gameplay action.
+- Gameplay-action responses do not create competing conversational topic candidates. This preserves `WAIT_AT`/`STAY` target resolution, including `wait at campfire` → `wait there`.
+- Separate worker sessions do not share residence or topic mentions. Preview does not mutate context, queue messages, or transport gameplay effects.
+- Added EN/TL response keys for unknown context references, location safety, place description, and medical pain.
 
 ## Validation evidence
 
 All semantic behavior below used the real Lua worker unless explicitly marked compiler/static validation:
 
-- C7A + C7B + C7C focused harness tests: `13/13`.
-- Full semantic harness suite: `231/231`.
-- Semantic compiler tests: `16/16`.
+- C7A + C7B + C7C + C7D focused harness tests: `18/18`.
+- Full semantic harness suite: `236/236`.
 - Production semantic Lua smoke tests: `68/68`.
-- Harness doctor: Python 3.12.3, Tk/display, Core repository, Lua 5.3.6, worker syntax, and worker boot all passed.
+- Semantic compiler tests: `16/16`.
+- Generated lexicon smoke: `1/1`.
+- Harness doctor: PASS — Python 3.12.3, Tk/display, Core repository, Lua 5.3.6, worker syntax, worker boot, PING, and CAPABILITIES.
 - `luac5.3 -p` passed every changed Lua file.
 - `pz_verify --kahlua --severity ERROR --no-snippets`: 3049 files scanned, 0 flagged, 0 errors.
-- EN/TL response JSON parsed successfully with exact key parity: `128/128` in each language.
-- Real worker probes verified known residence, injured/healthy/unknown health, authoritative knowledge, repeated topic continuation, relationship acknowledgement, and TL continuation text.
-- Preview comparisons showed no messages, transport, tool calls, LLM calls, or semantic state mutation before/after preview.
-- Existing acceptance probes retained news, STAY, FOLLOW, INSULT, THREAT, Gift, Quest, inventory, needs/weather flow resumption, and command-authority behavior.
-- `git diff --check` passed. The broad i18n scanner's repository-wide hardcoded-string inventory remains pre-existing; new C7C response keys have exact EN/TL parity.
-
-Scope boundary: this chunk does not launch native Project Zomboid, host multiplayer, install mods, publish to Workshop, add an LLM dependency, or invent NPC facts. Native live testing remains user-owned.
+- EN/TL response JSON parsed successfully with exact key parity: `132/132`.
+- `git diff --check` passed and the new C7D Python test compiled.
+- No native Project Zomboid launch, multiplayer host, mod installation, Workshop publish, second NLP parser, second dialogue engine, runtime LLM, or invented NPC fact was introduced.
 
 ## Next Chunk
 
-C7D — Conversation continuity, pronoun resolution, commitments, topic switching, and participant-scoped memory.
+C7E — Conversation-first Semantic Studio visualization showing actual understanding, context, facts, dialogue planning, and final response. Keep command-authority graphs separately.
