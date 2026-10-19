@@ -205,7 +205,7 @@ T.equal(partialSession.semanticDialogueContext.currentTopic, "whats_up",
 local accepted, reason = Input.Submit(view, "hello there")
 T.equal(accepted, true, "greeting is accepted locally")
 T.equal(reason, nil, "local greeting has no rejection reason")
-T.equal(#queued, 1, "local greeting queues exactly one response")
+T.equal(#queued, 2, "local greeting queues its two-turn response plan")
 T.equal(queued[1].payload.fallback, "Hey there. Wet one today.",
     "greeting can use the live weather context")
 T.equal(queued[1].payload.text, "Hey there. Wet one today.",
@@ -233,35 +233,36 @@ T.equal(traceEntries[1].data.providerUsed, false,
 
 local timeAccepted = Input.Submit(view, "what time is it")
 T.equal(timeAccepted, true, "time question is accepted locally")
-T.equal(queued[2].payload.fallback, "It's 1:30 PM.",
+T.equal(queued[3].payload.fallback, "It's 1:30 PM.",
     "time question uses the live local clock snapshot")
 T.equal(view.session.semanticDialogueState.currentTopic, "time",
     "time question updates the current topic")
 
 local dayAccepted = Input.Submit(view, "what day is it")
 T.equal(dayAccepted, true, "calendar question is accepted locally")
-T.equal(queued[3].payload.fallback, "It's day 2.",
+T.equal(queued[4].payload.fallback, "It's day 2.",
     "calendar question uses the live world day snapshot")
 T.equal(view.session.semanticDialogueState.currentTopic, "time",
     "calendar question remains in the time topic")
 
 local weatherAccepted = Input.Submit(view, "is it raining")
 T.equal(weatherAccepted, true, "weather question is accepted locally")
-T.equal(queued[4].payload.fallback, "It's raining right now.",
+T.equal(queued[5].payload.fallback,
+    "It is raining right now. I would wait for a break.",
     "weather question uses the live climate snapshot")
 T.equal(view.session.semanticDialogueState.currentTopic, "weather",
     "weather question updates the current topic")
 
 local activityAccepted = Input.Submit(view, "what are you doing")
 T.equal(activityAccepted, true, "activity question is accepted locally")
-T.equal(queued[5].payload.fallback, "I'm trying to catch something.",
+T.equal(queued[6].payload.fallback, "I'm trying to catch something.",
     "activity question uses the NPC's current behavior projection")
 T.equal(view.session.semanticDialogueState.currentTopic, "activity",
     "activity question updates the current topic")
 
 local wellbeingAccepted = Input.Submit(view, "are you okay")
 T.equal(wellbeingAccepted, true, "wellbeing question is accepted locally")
-T.truthy(string.find(string.lower(queued[6].payload.fallback or ""),
+T.truthy(string.find(string.lower(queued[7].payload.fallback or ""),
     "water", 1, true),
     "wellbeing response uses bounded NPC need pressure")
 T.equal(view.session.semanticDialogueState.currentTopic, "wellbeing",
@@ -271,7 +272,7 @@ providerReady = false
 local offlineGreetingAccepted = Input.Submit(view, "hello there")
 T.equal(offlineGreetingAccepted, true,
     "greeting remains local when the provider is disabled")
-T.equal(queued[7].payload.fallback, "Hey there. Wet one today.",
+T.equal(queued[8].payload.fallback, "Hey there. Wet one today.",
     "provider-disabled greeting still uses the local response catalog")
 T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",
     "provider-disabled greeting remains on the deterministic route")

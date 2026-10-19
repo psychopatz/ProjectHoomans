@@ -70,6 +70,8 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_IdentityEvasionDefault",
         ["semantic.flow.greeting.opening.friendly"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly",
+        ["semantic.flow.greeting.opening.rain"] =
+            "UI_PNC_Conversation_Semantic_FlowGreetingOpeningRain",
         ["semantic.flow.greeting.opening.default"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingOpening",
         ["semantic.flow.greeting.opening.question.friendly"] =

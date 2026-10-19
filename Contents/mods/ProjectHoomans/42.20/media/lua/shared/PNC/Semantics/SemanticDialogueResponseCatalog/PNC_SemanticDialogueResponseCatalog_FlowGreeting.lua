@@ -11,6 +11,41 @@ end
 Catalog.Register("semantic.flow.greeting.opening", {
     variants = {
         {
+            id = "semantic.flow.greeting.opening.rain",
+            templateID = "semantic.flow.greeting.opening.rain",
+            fallback = "Hey there. Wet one today.",
+            when = { raining = true },
+            priority = 3,
+            plan = {
+                dialogueAct = "GREETING_OPENING",
+                sourcePoolID = "semantic.flow.greeting.opening",
+                turns = {
+                    {
+                        id = "greeting",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.flow.greeting.opening.rain",
+                                fallback = "Hey there. Wet one today.",
+                            },
+                        },
+                    },
+                    {
+                        id = "check_in",
+                        continuation = "await_player",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.flow.greeting.opening.question.default",
+                                fallback = "How have you been?",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
             id = "semantic.flow.greeting.opening.friendly",
             templateID = "semantic.flow.greeting.opening.friendly",
             fallback = "Hey! Good to see you.",

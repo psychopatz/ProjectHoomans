@@ -104,5 +104,6 @@
   "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityUnknown": "Hindi ko makumpirma ang eksaktong dami. Anong gamit ang tinutukoy mo?",
   "UI_PNC_Conversation_Semantic_QuestionNeedsProposalHunger": "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
   "UI_PNC_Conversation_Semantic_QuestionNeedsProposalThirst": "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
-  "UI_PNC_Conversation_Semantic_QuestionNeedsProposalUnknown": "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako."
+  "UI_PNC_Conversation_Semantic_QuestionNeedsProposalUnknown": "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingOpeningRain": "Kumusta. Basa ang araw ngayon."
 }

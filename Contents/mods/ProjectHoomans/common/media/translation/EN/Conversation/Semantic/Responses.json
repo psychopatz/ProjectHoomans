@@ -104,5 +104,6 @@
   "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityUnknown": "I can't confirm an exact amount yet. Which item do you mean?",
   "UI_PNC_Conversation_Semantic_QuestionNeedsProposalHunger": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
   "UI_PNC_Conversation_Semantic_QuestionNeedsProposalThirst": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
-  "UI_PNC_Conversation_Semantic_QuestionNeedsProposalUnknown": "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment."
+  "UI_PNC_Conversation_Semantic_QuestionNeedsProposalUnknown": "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingOpeningRain": "Hey there. Wet one today."
 }

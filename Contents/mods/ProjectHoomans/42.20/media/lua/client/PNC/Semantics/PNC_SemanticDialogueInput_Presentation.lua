@@ -264,6 +264,15 @@ function Internal.QueueDeterministicResponse(
         -- in front of it.
         return true
     end
+    if decision.branch == "INVENTORY_QUERY_RECEIVED"
+        and actionResult
+        and actionResult.accepted == false
+        and actionResult.reason == "inventory_query_pending_limit"
+    then
+        -- The bounded pending map already prevents another request. Do not
+        -- add a generic action failure beside the next authoritative result.
+        return true
+    end
     if actionResult and actionResult.accepted == false
         and actionResult.status ~= "unmapped"
         and actionResult.status ~= "skipped"
