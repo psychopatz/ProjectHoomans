@@ -1,3 +1,5 @@
+> **2026-10-19 Active C7 clarification:** The C0–C6 text below is historical design/acceptance scope, partly implemented and recorded passed in previous ledgers. The NEW required conversation-quality gates are in `CONVERSATIONAL_COMPETENCE_C7.md` and active `PROGRESS.md`. C7A first: real worker reproduces user screenshot and improves clothing compliments and directed bite questions across paraphrases with truthful facts/unknown and actual final NPC text. Following phases require NPC follow-up initiative, context across turns and a conversation-first graph. Do not treat previous 218/218 harness results as C7 acceptance.
+
 # Contextual conversation developer acceptance — real Lua worker
 
 **These gates are NEW, planned, and have NOT been executed by this docs update.** Real production PsychopatzCore and Hoomans Lua worker loaded from a known checkout is required. Python-only IR simulation, dataset statistics, generated JSON, mock screenshot or fabricated NPC transcript do not qualify. Mocked world/authority boundaries must be identified.

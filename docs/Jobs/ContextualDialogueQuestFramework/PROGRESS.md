@@ -1,62 +1,27 @@
-# Contextual Dialogue & Quest Framework — Current Progress
+# Contextual Dialogue & Quest Framework — CURRENT Progress
 
-Updated: 2026-10-19
+**Updated:** 2026-10-19, documentation-only phase transition; no new production Lua/GUI implementation or runtime test in this commit.
+**Remote audit baseline:** `93cbb77498d8d35ded43d3594f59147d71a666e9` on `docs/contextual-dialogue-quest-framework-20261018`, PR #4 OPEN/unmerged at inspection. Local Codex checkout/upstream/parallel work must be reconciled before changes.
+**STATUS:** **C7 CONVERSATIONAL COMPETENCE — IN PROGRESS**, NOT YET READY FOR USER LIVE TEST **for this expanded goal**.
+**ONE NEXT CHUNK:** **C7A — Real-worker conversation baseline and reusable clothing-compliment + NPC bite-status question vertical slice.**
 
-Repository: `psychopatz/ProjectHoomans`
+## Accepted historical foundation (preserved, don't reimplement)
 
-Branch: `codex/contextual-dialogue-quest-framework-0a`
+Prior R0A–R5B developer work accepted INSULT trace, Interaction Explorer, `semantic.interaction_spec.v1` composition/CodeBuilder generated Lua, Studio/Simulation, bounded reviewed WordNet (29 aliases/91 forms for 14 concepts), limited MASSIVE/SGD records, contextual movement references, exact Worker Tk/source generation and repaired older semantic Lua failures. The previously reported **218/218 Python harness**, **16/16 compiler**, **68/68 Lua semantic smoke** passes belong to the prior checkpoint; not rerun today. Full prior PROGRESS is archived verbatim in `HISTORY_R0_R5B_20261019.md`. No claim the new conversational gap is accepted.
 
-Upstream: `origin/docs/contextual-dialogue-quest-framework-20261018`
+## New product evidence
 
-Base HEAD before Semantic Lab recovery: `3b5004889ddceace8d6d95ca2dca6260b1175919`
+User-shared current Semantic Lab GUI conversation: `do you have any news` → `I haven't heard any news lately.` (recognized gossip but no initiative); `wait here` → accepted STAY (must retain); `where do you live exactly` → generic clarification; `have you been bitten` → generic clarification; `i like your dress` → generic clarification. These are **user screenshot observations**, not a fresh worker rerun at this exact source SHA.
 
-Earlier R5 implementation commit: `25f7bd38785f89454876514d5e79fbd31d0ab824`
+Read-only source confirms the complimentary social templates exist but `COMPLIMENT_FEATURE` excludes dress; `BITTEN` exists but an inspected phrase is a third-person gossip event, not a direct addressed medical-history inquiry. The local response question resolver is specific-subject based (TIME/DATE/WEATHER/IDENTITY/RELATIONSHIP_STATUS/ACTIVITY/WELLBEING/NEEDS/QUANTITY/LOCATION/SEEN), and existing ResponsePlan/ContextState has infrastructure but not broadly open-ended spontaneous talk. FlowGraph defaults to gameplay command/quest result nodes, not a full interpretation/explanation tree.
 
-R5B final real-Lua acceptance commit: `23d1cd1106cf9fe301c705ff62c64052b549a957`
+## C7A: exactly what to do next
 
-Core dependency: `/home/psychopatz/Zomboid/Workshop/psychopatzCore` at `50022acf90d5a39995be552b7a1e1de21b59168b`
+1. Check actual local Hoomans/Core HEAD, dirty state, parallel agent ownership and source/translation paths. Read AGENTS + job docs; `PROGRESS.md` LAST.
+2. Run a **real production Lua worker** with appropriately configured NPC/world facts and reproduce the exact five screenshot utterances as one multi-turn scenario. Record IR candidates, actual semantic branch/flow, fact availability/provenance, actual response plan/final visible text, context transitions and side effects. Include positive and adversarial rephrasings; avoid interpreting a single screenshot as a new code-level proof.
+3. Fix only two *reusable* target deficiencies first: (a) apparel/appearance compliment recognition + appropriate existing social response for multiple natural variants, with negative and unrelated-text protection; (b) directly addressed bite-status question understanding and actual NPC medical-fact owner/unknown response, distinct from gossip about someone else. Source must not assume no bite without medical evidence. Do not hardcode one literal phrase per case or invent unregistered provider data.
+4. Assert original `wait here` still dispatches exactly once and no change to gossip/no-news truth, INSULT/THREAT, command/quest/gift authority, preview purity or TL fallback. Where relevant update existing Simulation inspector's last-turn *explanation* (not another UI tab), distinguishing unknown semantic intent vs unknown world fact.
+5. Test actual new worker final NPC text and EN/TL, Core IR with positives/negatives, full relevant semantic smoke, focused Python harness/compiler, doctor/Kahlua syntax/pz_verify, deterministic compiled artifacts where changed. Record executed counts, failures, repo/core SHAs and exact transcript/side effect evidence; if no real bite-status owner exists, document the gap and preserve truthful unknown response rather than fabricating a source.
+6. Commit bounded implementation/tests/progress to checked authorized branch with safe expected state. If accepted, set ONE Next Chunk **C7B**; else keep C7A open with precise repro and blocker.
 
-Historical S0–S6 evidence remains preserved in `HISTORY_S0_S6_20261019.md`.
-
-## Status
-
-R0A, R0B, R1, R2, R3, R4, R5 and R5B are implemented and verified in the existing Hoomans/Core architecture. Semantic Lab is **READY FOR USER LIVE TEST**. Native Project Zomboid testing remains user-owned; no Project Zomboid process, multiplayer host, mod installation or Workshop publish was used.
-
-## Completed recovery evidence
-
-- R0A (`a591ec7e2df1b0fe4cdf751948a587e07870c387`): the real worker recognizes `fuck you` as `INSULT`, selects `HOSTILE_REMARK_RECEIVED`, records directed social authority/transport status and reason, and presents truthful EN/TL rejection or unavailable text. Self-directed non-hostile input has no social effect; THREAT remains covered. The Simulation inspector exposes route, authority result, rejection reason, response pool and final text.
-- R0B (`dd775b0e0c5b1fe35b2c10392dd6e4545e85cfb9`): the live Interaction Explorer catalogs Core language concepts, policy branches, registered flows, capabilities, generated flows and response pools. INSULT, FOLLOW and NEEDS are searchable with their real execution routes.
-- R1 (`e50a2ae318052e665bd88f7fe537230d7987744d`, `787fe2ba362e998a4f04262eb1bcb41a04f84e70`): typed `semantic.interaction_spec.v1` / collection composition and reusable shared blocks compile through the existing CodeBuilder. A `world_facts.engine_fact` block changes generated Lua and real worker behavior; it is not JSON-only validation.
-- R2 (`5d335b26405be4223c27cdb1df827f2a8d993304`): Semantic Lab has Studio/Simulation workspaces, live explorer, block palette, graph/code authoring, dataset browser, generated-output controls and worker restart controls.
-- R3 (`b45d95aab5e98b8a17e24700eabef72644eb54fa`): pinned WordNet 3.0 builds 29 aliases/91 forms for 14 reviewed concepts. The canonical dataset contains reviewed MASSIVE and SGD records with source version/hash, record references and imported/mapped/approved/compiled/worker-verified status. A fresh worker resolves both records to the existing weather response with no transport or side effect. Runtime never reads WordNet archives, ZIPs, URLs or full external corpora.
-- R4 (`633f54a9814f9320cb9fe00b6d0aa36410fd73ef`): bounded discourse references such as `Wait there` resolve only from grounded prior context; unresolved references return clarification/rejection with no task transport. Existing memory, facts, personality, relationship, topic and EN/TL contextual tests remain green.
-
-## R5 — Actual modular authoring acceptance
-
-The Interaction Composer previews canonical source plus generated Lua and EN/TL artifact diffs, requires explicit approval, persists the canonical source through the existing CodeBuilder writer, writes the generated artifacts, and requests a production-worker restart. A real Tk/X11 run invoked Preview, Approve and Generate on the existing Semantic Lab app and produced the canonical `pnc.lab.stay_with_you` definition, pattern, flow, response pool and translations.
-
-Real worker evidence after restart:
-
-- `stay with you` → pattern `pnc.lab.stay_with_you.stay_with_you`, authored flow `pnc.lab.stay_with_you.flow`, capability `pnc:companion.stay`, `CompanionCommand`, accepted `network_queued`, action count 1, final EN `Okay, I'll stay with you.` and TL `Sige, mananatili ako sa iyo.`.
-- Denied STAY uses the binding rejection pool and truthful `I can't stay here right now.` / `Hindi ako makapananatili rito ngayon.` with no accepted action.
-- Generated WAIT_AT rejection and failed/gated flows still use their authoritative generated result-node response. Greeting/identity multi-turn plans remain two-message plans.
-- Missing gift generated lifecycle keys were added to EN/TL `GeneratedTaskCommands.json`, so the generated gift rejection path no longer falls back from TL to EN.
-
-## R5B — Final real-Lua repair
-
-- Quest-accept patterns now require the semantic anchors `help` and `supplies`; bare `yes` and `Sure` remain social acknowledgements instead of becoming `COMMAND_ACCEPTED`.
-- Inventory pending-limit rejection no longer queues a misleading generic action-failure line beside the next authoritative inventory result.
-- The greeting flow now has a rain-aware response-plan variant, preserving grounded weather context while retaining its two-message plan. The local Core smoke contract now checks the real two-turn queue and current contextual wording.
-
-## Verification evidence
-
-- Full real-Lua Python harness discovery: **218/218 PASS**.
-- Semantic compiler unit suite: **16/16 PASS**.
-- Existing real-Lua `pnc_semantic` suite: **68/68 PASS**. The four previously reported failures are resolved: gift/state acceptance classification, greeting queue ownership/context, and inventory queue ownership.
-- Focused real-worker suites: contextual social **11/11**, dataset review **7/7**, follow binding **4/4**, authoring compiler **5/5**, interaction spec **7/7**, stay/wait binding **3/3**, flow editor **9/9**, gift binding **3/3**, semantic dialogue flows **8/8**, translation integration **1/1**.
-- Harness doctor: **PASS** — Python 3.12.3, Tk/display, Core path, Lua 5.3.6, worker syntax/boot/PING/CAPABILITIES.
-- `git diff --check`, changed Python compilation, changed Lua `luac5.3 -p`, EN/TL JSON parsing and changed-file `pz_verify` checks are clean.
-
-## Boundaries and next chunk
-
-The next and only next chunk is **user-owned Project Zomboid live testing**: exercise the documented Semantic Lab workflow in the native game and report any native-runtime discrepancy. The agent must not launch Project Zomboid, host multiplayer, install mods or publish to Workshop.
+**No user-native game test is required to finish C7A**. No Codex PZ launch, multiplayer hosting, Workshop publishing/install. Source docs and acceptance details: `CONVERSATIONAL_COMPETENCE_C7.md`.

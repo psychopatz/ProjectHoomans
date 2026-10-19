@@ -1,5 +1,8 @@
 # Agent runbook — Contextual Dialogue & Quest Framework (Semantic Studio productization)
 
+> **2026-10-19 CURRENT PHASE OVERRIDE:** The earlier R0A/S0A next-chunk statements in this runbook are historical. At remote `93cbb77498d8d35ded43d3594f59147d71a666e9`, R0A–R5B were developer accepted; the new user-observed C7 conversation deficit is the active phase, and `PROGRESS.md` defines exactly ONE Next Chunk: C7A. Read `CONVERSATIONAL_COMPETENCE_C7.md`; do not repeat old S/R phases or wait for user-owned native PZ testing. Accept actual comprehensible NPC final dialogue, not only parser/worker unit counts. No new parser, GUI app, ungrounded NPC knowledge, Workshop installation or publication.
+
+
 **Current job:** `docs/Jobs/ContextualDialogueQuestFramework/`. **Current Next Chunk:** always read `PROGRESS.md` LAST; at remote `71162cb4f78cc4cd408a4a145486d5ebadc943c1` the new S0A migration is planned and older G0/C0–C6 recorded accepted.
 
 ## New active recovery policy — 2026-10-19 (supersedes obsolete S0A Next Chunk instructions)

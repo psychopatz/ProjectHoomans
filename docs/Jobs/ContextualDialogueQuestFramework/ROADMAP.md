@@ -1,16 +1,16 @@
-# Roadmap — Semantic Studio Recovery (2026-10-19)
+# Roadmap — Conversational Competence C7 (2026-10-19)
 
-The former S0–S6 implementation milestones are **HISTORICALLY RECORDED** and archived in HISTORY_S0_S6_20261019.md. They did not prove usable block composition or broad conversational intelligence. Remote source checkpoint 36f0beb2dc8a280094307700d601adc60c93d07b. No fresh runtime tests have been run for this phase transition. PROGRESS.md alone owns the ONE active Next Chunk.
+The R0A–R5B recovery is **RECORDED DEVELOPER-ACCEPTED** at remote 93cbb77498d8d35ded43d3594f59147d71a666e9: 218/218 harness, 16/16 compiler and 68/68 semantic Lua smoke PASS as reported in `HISTORY_R0_R5B_20261019.md`. Those are not new runs for C7 and are not proof of ordinary conversation quality. Historical S0–S6 and other C0–C6 evidence remains preserved. New user screenshots expose out-of-sample NPC talk failures. New goal is **IN PROGRESS**. `PROGRESS.md` defines the only current Next Chunk.
 
-| Phase | Status | Product deliverable | Mandatory acceptance |
+| Phase | State | Deliverable | Real-worker acceptance |
 | --- | --- | --- | --- |
-| Previous G/C/S | Recorded technical baseline | Core NLP, action/quest flow generation, embedded CodeBuilder, GUI tabs, bounded dataset adapters | Preserve 203 Python passed, 9 output hashes, 4 unresolved Lua failures as recorded evidence |
-| **R0A** | **CURRENT / UNACCEPTED** | Real social INSULT diagnosis + truthful final response and Simulation trace | Actual production worker authorized/denied/unavailable insult, correct response, no false effect, focused regression |
-| R0B | Planned | Full Interaction Explorer covering policy, Core concepts, registered flows and responses | Search INSULT/FOLLOW/NEEDS and see authentic route, owner and editability |
-| R1 | Planned | Canonical typed block instances/edges compiled by ONE CodeBuilder | Block edit changes generated Lua + actual worker behavior, shared reusable block in two flows |
-| R2 | Planned | Cohesive Studio/Simulation UX, visual/code/trace integration | Actual X11 mouse authoring, understandable graph, source and trace deep links |
-| R3 | Planned | WordNet runtime lexicon transparency + genuine licensed corpus imports | Source/approved/compiled/registered/worker-proven counts and negative language safeguards |
-| R4 | Planned | General grounded multi-turn conversation quality | Known/unknown follow-ups, identity isolation, personality, memory, EN/TL, no false actions |
-| R5 | Planned | Full human/agent author-to-Lua-to-worker workflow | Same app and headless service demonstrate new production interaction, real dialogue and measured scaling |
+| R0A–R5B (prior) | RECORDED ACCEPTED | INSULT, explorer, actual block composition, Studio, limited datasets, reference resolution, modular generation and repaired semantic smoke | Preserve commit/test records, don't redo |
+| **C7A — ordinary talk baseline + first two repairs** | **CURRENT — NOT STARTED** | Diagnose screenshot phrases, improve generic clothing compliment and directly addressed bite-status question using typed semantics and real provider/uncertainty | Multiple positive/negative utterances, real Core IR→NPC response/trace, no accidental commands, protected WAIT/news/social flows |
+| C7B — general fact questions | PLANNED | Reusable subject/attribute/fact resolution for residence, health, knowledge, inventory and relationship | Cross-domain paraphrases, truthful known/unknown, no fabricated NPC home |
+| C7C — NPC conversational initiative | PLANNED | Reusable bounded dialogue-act/follow-up planner with relationship, danger and cooldown | NPC naturally follows up sometimes, responds to answer, respects dismissal |
+| C7D — memory and continuity | PLANNED | Bounded discourse/agenda, referents, episodic commitments and topic resume | Multi-turn continuity, proper uncertainty and player/NPC isolation |
+| C7E — conversation-first Studio view | PLANNED | Readable interpretation/fact/plan graph and concise turn explanation in existing Simulation; action graph separately accessible | Selecting a real NPC turn highlights authentic semantic path and source, without raw JSON dependency |
+| C7F — licensed dataset precision | PLANNED | Reviewed corpus and lexical expansion, held-out paraphrase and collision tests via existing CodeBuilder | Observed improvement on worker quality/negative sets, not source counts alone |
+| C7G — complete developer conversational gate | PLANNED | Realistic long dialogues, EN/TL, personality, optional PBrainZ parity, CPU/memory budget and regressions | Grounded sustained NPC chat with no false authority, then READY FOR USER LIVE TEST |
 
-Do not restart accepted S phases, create a sixth disconnected tab, add broad synonyms/huge corpora before baseline correctness, or call a validated block list a generated composition. Keep authoritative Lua/Kahlua, PsychopatzCore, Hoomans domain dispatch/quest, EN/TL and optional PBrainZ constraints. Native Project Zomboid testing and Steam Workshop entirely user-owned.
+Do not call full LLM-level unrestricted generation an offline Lua capability. Improve specific grounded dialogue skills through existing runtime ownership. Avoid adding extra standalone GUI tabs, hand-authoring one branch per phrase or creating another parser/dispatcher. Native PZ SP/MP and Workshop remain user-owned.
