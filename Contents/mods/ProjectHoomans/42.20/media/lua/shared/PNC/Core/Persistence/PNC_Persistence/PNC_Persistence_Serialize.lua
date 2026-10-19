@@ -179,6 +179,8 @@ end
 
 function Persistence.SerializeRecord(record)
     local identity
+    local appearance
+    local appearanceContract
     local progression
     local payload
     local inventoryPayload
@@ -186,7 +188,18 @@ function Persistence.SerializeRecord(record)
     if not record or record.persist == false then
         return nil
     end
+    if type(record.appearance) == "table"
+        and (tonumber(record.appearance.schemaVersion) ~= 2
+            or PNC.Identity.Appearance
+                and PNC.Identity.Appearance.Validate
+                and not PNC.Identity.Appearance.Validate(record.appearance))
+    then
+        return nil
+    end
     identity = Internal.sanitizeIdentity(record.identity, record)
+    appearance = type(record.appearance) == "table"
+        and Core.DeepCopy(record.appearance) or nil
+    appearanceContract = Internal.BuildAppearanceContract(record)
     progression = prepareProgression(record)
     inventoryPayload = serializeInventory(record)
     recipeKnowledge = PNC.RecipeKnowledge
@@ -215,6 +228,8 @@ function Persistence.SerializeRecord(record)
         tacticalClass = record.tacticalClass,
         ownerUsername = Internal.normalizeString(record.ownerUsername),
         identity = identity,
+        appearance = appearance,
+        appearanceContract = appearanceContract,
         m = MemoryEvents
             and MemoryEvents.Serialize(record.memory) or nil,
         position = {

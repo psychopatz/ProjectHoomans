@@ -16,6 +16,12 @@ function Types.NewRecord(definition)
                 or def.tacticalClass or "PNC NPC") .. ":" .. tostring(generatedID)
         ) or (tonumber(def.identitySeed) or 1),
         identity = Internal.NormalizeIdentity(def.identity),
+        appearance = type(def.appearance) == "table"
+            and PNC.Core.DeepCopy(def.appearance) or nil,
+        appearanceAuthored = def.appearanceAuthored == true
+            or type(def.appearance) == "table",
+        appearanceProvenance = type(def.appearanceProvenance) == "table"
+            and PNC.Core.DeepCopy(def.appearanceProvenance) or nil,
         uniqueDefinitionId = def.uniqueDefinitionId,
         uniqueDefinitionVersion = def.uniqueDefinitionVersion,
         inventoryTemplateRef = def.inventoryTemplateRef,

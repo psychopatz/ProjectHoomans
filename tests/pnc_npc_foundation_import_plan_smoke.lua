@@ -140,24 +140,25 @@ T.truthy(legacyPlan.rollback and legacyPlan.rollback.sourcePreserved,
 T.equal(legacyPlan.rollback.strategy, "DISABLE_CANDIDATE_MAPPING",
     "legacy rollback strategy changed")
 
--- A current schema-16 payload is not a complete restoration source for the
--- authored appearance policy or the full SurvivorFactory voice profile.  It
--- must remain untouched and quarantine instead of rerolling either field.
+-- A current schema-16 payload now carries the authored policy and complete
+-- voice profile.  The raw persistence envelope is still not the normalized
+-- planner source shape, so it remains quarantined without a source snapshot
+-- for that independent reason.
 local rawOnlyBefore = ImportPlan.Copy(rawPayload)
 local rawOnlyPlan = ImportPlan.Build(rawPayload, {
     candidateCodec = Fixtures.CandidateCodec(),
 })
 T.equal(rawOnlyPlan.status, "quarantined",
     "raw schema-16 payload was accepted without a source snapshot")
-T.equal(rawOnlyPlan.reason, "voice_profile_incomplete",
-    "raw-only voice loss was not the blocking reason")
-T.truthy(Fixtures.HasDecision(
+T.equal(rawOnlyPlan.reason, "generator_provenance_incomplete",
+    "raw-only planner reason changed")
+T.falsy(Fixtures.HasDecision(
     rawOnlyPlan, "identity.voice", "quarantined", "voice_profile_incomplete"
-), "raw-only voice quarantine decision missing")
-T.truthy(Fixtures.HasDecision(
+), "complete voice profile was treated as incomplete")
+T.falsy(Fixtures.HasDecision(
     rawOnlyPlan, "appearance.policy", "quarantined",
     "authored_appearance_policy_missing"
-), "raw-only appearance quarantine decision missing")
+), "authored appearance policy was treated as missing")
 T.falsy(rawOnlyPlan.candidate, "raw-only payload produced a candidate")
 T.truthy(Fixtures.EqualValue(rawOnlyPlan.rawPayload, rawOnlyBefore),
     "raw-only payload was mutated")

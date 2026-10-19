@@ -62,6 +62,13 @@ local function buildDefinition(
         identitySeed = raw.identitySeed
             or (identity and identity.seed) or nil,
         identity = identity,
+        appearance = type(raw.appearance) == "table"
+            and Core.DeepCopy(raw.appearance) or nil,
+        appearanceAuthored = raw.appearanceContract
+            and raw.appearanceContract.authored == true
+            or type(raw.appearance) == "table",
+        appearanceProvenance = type(raw.appearanceContract) == "table"
+            and Core.DeepCopy(raw.appearanceContract) or nil,
         orderSpec = raw.orderSpec,
         patrolPoints = raw.patrolPoints,
         weaponMode = raw.weaponMode,
@@ -114,11 +121,19 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     if reason ~= nil then
         return nil
     end
+    if Internal.ValidateAppearancePersistence then
+        reason = Internal.ValidateAppearancePersistence(raw)
+        if reason ~= nil then
+            return nil
+        end
+    end
     position = raw.position or raw
     spawn = raw.spawn or raw
     anchor = raw.anchor or raw
     identity = type(raw.identity) == "table"
         and Core.DeepCopy(raw.identity) or nil
+    identity = Internal.RestoreVoiceProfile
+        and Internal.RestoreVoiceProfile(identity) or identity
     identityBirthBefore = identity and identity.birth or nil
     inventoryData = type(raw.inventory) == "table"
         and Core.DeepCopy(raw.inventory) or nil

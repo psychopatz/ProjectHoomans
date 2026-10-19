@@ -22,8 +22,7 @@ local function newRecord(id)
     })
 end
 
--- The authored policy is valid input to the appearance normalizer, but it is
--- not accepted by the current record definition or persistence serializer.
+-- Authored policy is now part of the normal versioned persistence contract.
 local authoredPolicy = {
     schemaVersion = 2,
     outfit = "none",
@@ -39,16 +38,18 @@ local authoredPolicy = {
 local authored = newRecord("npc:p0b:appearance")
 authored.appearance = authoredPolicy
 local authoredPayload = PNC.Persistence.SerializeRecord(authored)
-T.equal(authoredPayload.appearance, nil,
-    "authored appearance policy was unexpectedly serialized")
+T.truthy(authoredPayload.appearance,
+    "authored appearance policy was unexpectedly omitted")
+T.equal(authoredPayload.appearanceContract.authored, true,
+    "authored appearance contract missing")
 local restoredAuthored = PNC.Persistence.DeserializeRecord(
     authoredPayload, authored.id)
 T.truthy(restoredAuthored, "authored appearance record rejected")
-T.equal(restoredAuthored.appearance, nil,
-    "authored appearance policy was unexpectedly restored")
+T.truthy(restoredAuthored.appearance,
+    "authored appearance policy was not restored")
 
--- SurvivorFactory resolves all four voice values, while the current identity
--- sanitizer persists only the legacy voice string.
+-- SurvivorFactory resolves all four voice values and the serializer carries
+-- them under an explicit versioned profile.
 local voiced = newRecord("npc:p0b:voice")
 local sourceVoice = voiced.identity.survivor
 T.equal(sourceVoice.voice, "parity_voice", "factory voice")
@@ -58,10 +59,16 @@ T.near(sourceVoice.voicePitch, 1.25, 0.000001, "factory voice pitch")
 local voicePayload = PNC.Persistence.SerializeRecord(voiced)
 local persistedVoice = voicePayload.identity.survivor
 T.equal(persistedVoice.voice, "parity_voice", "legacy voice persistence")
-T.equal(persistedVoice.voicePrefix, nil,
-    "voice prefix unexpectedly persisted")
-T.equal(persistedVoice.voiceType, nil, "voice type unexpectedly persisted")
-T.equal(persistedVoice.voicePitch, nil, "voice pitch unexpectedly persisted")
+T.equal(persistedVoice.voiceProfile.schemaVersion, 1,
+    "voice profile schema")
+T.equal(persistedVoice.voiceProfile.voicePrefix, "parity_voice",
+    "voice prefix persistence")
+T.equal(persistedVoice.voiceProfile.voiceType, 3,
+    "voice type persistence")
+T.near(persistedVoice.voiceProfile.voicePitch, 1.25, 0.000001,
+    "voice pitch persistence")
+T.truthy(persistedVoice.voiceProfile.complete,
+    "complete voice profile marker")
 
 -- Exercise the real Hoomans -> Core virtual inventory bridge.  Custom names
 -- are a first-class item field; portable modData remains itemState data.

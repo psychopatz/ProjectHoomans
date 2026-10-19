@@ -44,6 +44,12 @@ function Types.NormalizeDefinition(definition)
         ownerOnlineID = def.ownerOnlineID,
         identitySeed = tonumber(def.identitySeed) or nil,
         identity = Internal.NormalizeIdentity(def.identity),
+        appearance = type(def.appearance) == "table"
+            and PNC.Core.DeepCopy(def.appearance) or nil,
+        appearanceAuthored = def.appearanceAuthored == true
+            or type(def.appearance) == "table",
+        appearanceProvenance = type(def.appearanceProvenance) == "table"
+            and PNC.Core.DeepCopy(def.appearanceProvenance) or nil,
         uniqueDefinitionId = Internal.NormalizeString(
             def.uniqueDefinitionId
         ),

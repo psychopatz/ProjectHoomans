@@ -15,6 +15,7 @@ end
 function Fields.Identity(source, raw, decisions)
     local identity = source and source.identity
     local survivor = identity and identity.survivor
+    local voiceProfile = survivor and survivor.voiceProfile
     local seed = identity and identity.seed
         or source and source.identitySeed or raw and raw.identitySeed
     local displayName = identity and identity.displayName
@@ -22,12 +23,7 @@ function Fields.Identity(source, raw, decisions)
         or raw and (raw.displayName or raw.name)
     local archetypeID = identity and identity.archetypeID
         or source and source.archetypeID or raw and raw.archetypeID
-    local voiceFields = {
-        { "voice", "identity.survivor.voice" },
-        { "voicePrefix", "identity.survivor.voicePrefix" },
-        { "voiceType", "identity.survivor.voiceType" },
-        { "voicePitch", "identity.survivor.voicePitch" },
-    }
+    local voiceFields
     local missing = false
     local i
     if type(identity) ~= "table" then
@@ -51,8 +47,31 @@ function Fields.Identity(source, raw, decisions)
             "identity.survivor", "survivor_profile_missing")
         return nil
     end
+    if type(voiceProfile) == "table"
+        and tonumber(voiceProfile.schemaVersion) == 1
+    then
+        voiceFields = {
+            { "voice", "identity.survivor.voice", voiceProfile.voice },
+            { "voicePrefix", "identity.survivor.voicePrefix",
+                voiceProfile.voicePrefix },
+            { "voiceType", "identity.survivor.voiceType",
+                voiceProfile.voiceType },
+            { "voicePitch", "identity.survivor.voicePitch",
+                voiceProfile.voicePitch },
+        }
+    else
+        voiceFields = {
+            { "voice", "identity.survivor.voice", survivor.voice },
+            { "voicePrefix", "identity.survivor.voicePrefix",
+                survivor.voicePrefix },
+            { "voiceType", "identity.survivor.voiceType",
+                survivor.voiceType },
+            { "voicePitch", "identity.survivor.voicePitch",
+                survivor.voicePitch },
+        }
+    end
     for i = 1, #voiceFields do
-        if survivor[voiceFields[i][1]] == nil then
+        if voiceFields[i][3] == nil then
             missing = true
             add(decisions, "identity.voice", "quarantined",
                 voiceFields[i][2], "voice_profile_incomplete")
@@ -73,13 +92,23 @@ function Fields.Identity(source, raw, decisions)
         seed = seed,
         displayName = displayName,
         archetypeID = archetypeID,
-        survivor = survivor,
+        survivor = Utils.Copy(survivor),
     }
 end
 
 function Fields.Appearance(source, decisions)
     local value = source and source.appearance
+    local contract = source and source.appearanceContract
     if type(value) ~= "table" then
+        if type(contract) ~= "table" or contract.authored ~= true then
+            add(decisions, "appearance.policy", "verified",
+                "appearanceContract", "generated_default")
+            return {
+                schemaVersion = APPEARANCE_SCHEMA,
+                mode = "GENERATED_DEFAULT",
+                authored = false,
+            }
+        end
         add(decisions, "appearance.policy", "quarantined", "appearance",
             "authored_appearance_policy_missing")
         return nil
