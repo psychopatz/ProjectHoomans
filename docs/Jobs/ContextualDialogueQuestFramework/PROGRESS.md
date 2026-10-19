@@ -10,7 +10,9 @@ Upstream: `origin/docs/contextual-dialogue-quest-framework-20261018`
 
 Base HEAD before this implementation: `3b5004889ddceace8d6d95ca2dca6260b1175919`
 
-R5 implementation commit: `25f7bd38`
+R5 implementation commit: `25f7bd38785f89454876514d5e79fbd31d0ab824`
+
+Evidence-record commit: `4226f62282271f29d961cf8d8845592746b90c19`
 
 Core dependency: `/home/psychopatz/Zomboid/Workshop/psychopatzCore` at `50022acf90d5a39995be552b7a1e1de21b59168b`
 
