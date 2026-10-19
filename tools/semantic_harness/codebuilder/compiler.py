@@ -63,6 +63,7 @@ DIALOGUE_MAX_POOLS = 32
 DIALOGUE_MAX_VARIANTS_PER_POOL = 6
 DIALOGUE_MAX_VARIANTS = 16
 DIALOGUE_MAX_PATTERN_TOKENS = 16
+DIALOGUE_MATCH_CONCEPTS = frozenset({"WEATHER"})
 DIALOGUE_LUA_CHUNK_MAX_CHARS = 14000
 SEMANTIC_SCHEMA = "pnc.semantic_authoring.v1"
 SEMANTIC_FRAME_FIELDS = frozenset({
@@ -541,6 +542,44 @@ def _validate_source_refs(
     return normalized
 
 
+def _compile_dialogue_match(value: Any, pattern_id: str) -> list[dict[str, str]]:
+    if not isinstance(value, list) or not value:
+        raise CompileError(
+            f"dialogue pattern {pattern_id} match must be a non-empty list"
+        )
+    if len(value) > DIALOGUE_MAX_PATTERN_TOKENS:
+        raise CompileError(
+            f"dialogue pattern {pattern_id} match exceeds the token limit"
+        )
+    compiled: list[dict[str, str]] = []
+    for rule in value:
+        if not isinstance(rule, dict) or set(rule) - {"kind", "value", "id"}:
+            raise CompileError(
+                f"dialogue pattern {pattern_id} match contains an invalid rule"
+            )
+        kind = rule.get("kind")
+        if kind == "literal":
+            normalized, tokens = _normalize_dialogue_utterance(rule.get("value"))
+            if len(tokens) != 1:
+                raise CompileError(
+                    f"dialogue pattern {pattern_id} literal match rules must contain one token"
+                )
+            compiled.append({"kind": "literal", "value": normalized})
+            continue
+        if kind == "concept":
+            concept_id = rule.get("id")
+            if concept_id not in DIALOGUE_MATCH_CONCEPTS:
+                raise CompileError(
+                    f"dialogue pattern {pattern_id} references an unsupported match concept"
+                )
+            compiled.append({"kind": "concept", "id": concept_id})
+            continue
+        raise CompileError(
+            f"dialogue pattern {pattern_id} match kind must be literal or concept"
+        )
+    return compiled
+
+
 def _compile_dialogue_pattern(
     value: Any,
     source_names: set[str],
@@ -549,7 +588,7 @@ def _compile_dialogue_pattern(
         raise CompileError("dialogue patterns must be objects")
     allowed_fields = {
         "id", "utterance", "emit", "confidence", "priority", "negatives",
-        "reviewed", "sourceRefs", "mapping",
+        "reviewed", "sourceRefs", "mapping", "match",
     }
     if set(value) - allowed_fields:
         raise CompileError("dialogue pattern contains unsupported fields")
@@ -557,6 +596,11 @@ def _compile_dialogue_pattern(
     if not isinstance(pattern_id, str) or not DIALOGUE_ID.fullmatch(pattern_id):
         raise CompileError(f"invalid dialogue pattern id: {pattern_id!r}")
     _normalized, tokens = _normalize_dialogue_utterance(value.get("utterance"))
+    compiled_match = _compile_dialogue_match(
+        value["match"], pattern_id
+    ) if "match" in value else [
+        {"kind": "literal", "value": token} for token in tokens
+    ]
 
     emit = value.get("emit")
     if not isinstance(emit, dict):
@@ -719,7 +763,7 @@ def _compile_dialogue_pattern(
 
     compiled = {
         "id": pattern_id,
-        "match": [{"kind": "literal", "value": token} for token in tokens],
+        "match": compiled_match,
         "emit": normalized_emit,
         "confidence": float(confidence),
         "priority": priority,
@@ -997,8 +1041,9 @@ def compile_dialogue_dataset(document: dict[str, Any]) -> dict[str, Any]:
         if compiled["id"] in seen_pattern_ids:
             raise CompileError(f"duplicate dialogue pattern id {compiled['id']}")
         seen_pattern_ids.add(compiled["id"])
-        normalized_utterance = " ".join(
-            rule["value"] for rule in compiled["match"])
+        normalized_utterance, _ = _normalize_dialogue_utterance(
+            pattern.get("utterance")
+        )
         previous = seen_utterances.get(normalized_utterance)
         if previous is not None:
             raise CompileError(

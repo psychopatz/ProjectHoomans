@@ -2,6 +2,114 @@
 -- Dialogue patterns shard 02; keep this file data-only.
 return {
     {
+            ["confidence"] = 0.98,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "ACTIVITY",
+            },
+            ["id"] = "pnc.dataset.question.activity.what_have_you_been_doing_today",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "what",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "have",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "you",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "been",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "doing",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "today",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
+            ["confidence"] = 0.98,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "ACTIVITY",
+            },
+            ["id"] = "pnc.dataset.question.activity.what_have_you_been_up_to_lately",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "what",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "have",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "you",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "been",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "up",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "to",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "lately",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "IDENTITY",
+            },
+            ["id"] = "pnc.dataset.question.identity.can_i_ask_your_name",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "can",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "i",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "ask",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "your",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "name",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
             ["confidence"] = 0.99,
             ["emit"] = {
                 ["intent"] = "QUESTION",
@@ -343,93 +451,5 @@ return {
                 },
             },
             ["priority"] = 165,
-        },
-    {
-            ["confidence"] = 0.99,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "WELLBEING",
-            },
-            ["id"] = "pnc.dataset.question.wellbeing.are_you_holding_up_okay",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "are",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "you",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "holding",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "up",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "okay",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.98,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "WELLBEING",
-            },
-            ["id"] = "pnc.dataset.question.wellbeing.how_are_things_going",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "how",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "are",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "things",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "going",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.99,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "WELLBEING",
-            },
-            ["id"] = "pnc.dataset.question.wellbeing.how_are_you_doing",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "how",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "are",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "you",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "doing",
-                },
-            },
-            ["priority"] = 120,
         },
 }

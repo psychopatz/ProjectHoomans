@@ -28,7 +28,7 @@ class DatasetReviewTests(unittest.TestCase):
         self.assertTrue(first["previewOnly"])
         self.assertTrue(first["effectFree"])
         self.assertEqual(first["writes"], [])
-        self.assertEqual(first["patternCount"], 33)
+        self.assertEqual(first["patternCount"], 36)
         self.assertEqual(first["responseVariantCount"], 31)
         self.assertEqual(
             first["candidateReview"]["summary"],
