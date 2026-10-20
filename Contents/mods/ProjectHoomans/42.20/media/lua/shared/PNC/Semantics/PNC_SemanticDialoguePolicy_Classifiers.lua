@@ -107,6 +107,50 @@ local function isLocalFactQuestion(ir)
         and subjects[ir.subject] == true
 end
 
+local function isBackstoryContextQuestion(ir, context)
+    if type(ir) ~= "table"
+        or ir.intent ~= "QUESTION"
+        or ir.subject ~= "CONTEXT_REFERENCE"
+    then
+        return false
+    end
+    local extensions = type(ir.extensions) == "table"
+        and ir.extensions or {}
+    local questionKind = extensions.contextQuestion
+    if questionKind ~= "BACKSTORY_LOCATION"
+        and questionKind ~= "BACKSTORY_MISS"
+    then
+        return false
+    end
+
+    -- A generated context-reference pattern may intentionally leave a
+    -- short target such as "where" unresolved.  It is safe to route that
+    -- question to the bounded backstory responder only when this same
+    -- conversation has a recent NPC backstory answer.  This preserves the
+    -- normal clarification gate for every other unresolved reference.
+    local dialogue = type(context) == "table" and (
+        context.semanticContextState or context.semanticDialogueContext
+    ) or nil
+    if type(dialogue) ~= "table" then return false end
+    if dialogue.lastBackstoryKind ~= nil then return true end
+
+    local turns = dialogue.recentTurns
+    if type(turns) ~= "table" then return false end
+    local index
+    local turn
+    for index = 1, #turns do
+        turn = turns[index]
+        if type(turn) == "table"
+            and turn.speaker == "npc"
+            and turn.speechAct == "ANSWER"
+            and turn.subject == "NPC_BACKSTORY"
+        then
+            return true
+        end
+    end
+    return false
+end
+
 local function unresolvedWorldTargetRequest(ir)
     local target = ir and ir.target
     return type(ir) == "table"
@@ -204,6 +248,7 @@ Internal.UnresolvedOffer = unresolvedOffer
 Internal.ClassifyGiftOffer = classifyGiftOffer
 Internal.IsInventoryQuery = isInventoryQuery
 Internal.IsLocalFactQuestion = isLocalFactQuestion
+Internal.IsBackstoryContextQuestion = isBackstoryContextQuestion
 Internal.UnresolvedWorldTargetRequest = unresolvedWorldTargetRequest
 Internal.IsIdentityClaim = isIdentityClaim
 Internal.IsIdentityEvasion = isIdentityEvasion

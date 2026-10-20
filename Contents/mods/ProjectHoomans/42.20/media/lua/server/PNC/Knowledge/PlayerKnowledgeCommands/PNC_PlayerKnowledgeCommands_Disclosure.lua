@@ -142,6 +142,11 @@ function Commands.HandleDisclosure(player, args)
                         and H.IntroductionText(npcID)
                         or string.sub(topicID, 1, 10) == "backstory."
                         and H.BackstoryDisclosureText(npcID, topicID) or nil,
+                    -- The snapshot is already filtered by the authoritative
+                    -- API for this player character. Deliver it with the
+                    -- result so the client can update its private dossier
+                    -- without projecting NPC truth locally.
+                    snapshot = disclosure.snapshot,
                     giftPreference = disclosure.giftPreference,
                     revealedFacts = disclosure.revealed or {},
                     presentation = presentation,

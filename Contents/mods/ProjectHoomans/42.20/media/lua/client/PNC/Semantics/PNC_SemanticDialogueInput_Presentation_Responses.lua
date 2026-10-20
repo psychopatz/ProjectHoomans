@@ -443,6 +443,13 @@ function ResponseAdapter.Payload(decision)
     return ResponseAdapter.Payloads(decision)[1]
 end
 
+-- Authoritative conversation receipts (knowledge disclosure, identity, and
+-- similar server results) use the same typed translation-argument binding as
+-- ordinary deterministic turns. Keep the adapter private by default while
+-- exposing this narrow production hook to the existing conversation
+-- lifecycle receiver.
+Internal.ResponsePayload = ResponseAdapter.Payload
+
 function ResponseAdapter.IdentityExchangeUnavailable()
     return ResponseAdapter.Payload({
         response = {

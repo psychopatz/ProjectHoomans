@@ -45,6 +45,7 @@ function Provider.configure(context, SemanticAdapters)
 
     PNC = PNC or {}
     PNC.Core = PNC.Core or {}
+    PNC.Core.SemanticHarness = true
     PNC.Core.Now = function() return Runtime.now end
     PNC.Core.DeepCopy = function(value) return Values.copy(value) end
     PNC.Const = PNC.Const or {}
@@ -61,6 +62,9 @@ function Provider.configure(context, SemanticAdapters)
     PNC.Semantics = PNC.Semantics or {}
     PNC.Conversation = PNC.Conversation or {}
     PNC.Conversation.Registry = PNC.Conversation.Registry or {}
+    PNC.Conversation.Audience = PNC.Conversation.Audience or {
+        IsPlayerHostile = function() return false end,
+    }
     PNC.Conversation.Relationship = {
         ReceivePresentation = function() return true end,
     }
@@ -193,6 +197,7 @@ function Provider.configure(context, SemanticAdapters)
     end
 
     PNC.NPCKnowledgeAPI = PNC.NPCKnowledgeAPI or {}
+    if type(PNC.NPCKnowledgeAPI.DiscloseForPlayer) ~= "function" then
     PNC.NPCKnowledgeAPI.DiscloseForPlayer = function(_, options)
         npcData.identityState = "known"
         PNC.Network.ClientState.npcPresentations =
@@ -209,6 +214,7 @@ function Provider.configure(context, SemanticAdapters)
         Runtime.disclosures = number(Runtime.disclosures, 0) + 1
         Runtime.knowledge = options
         return { accepted = true, revealed = { "identity.name" } }
+    end
     end
     PNC.PlayerKnowledgeCommands = PNC.PlayerKnowledgeCommands or {}
     PNC.PlayerKnowledgeCommands.Internal =

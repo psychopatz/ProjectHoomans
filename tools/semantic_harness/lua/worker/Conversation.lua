@@ -162,6 +162,11 @@ function Conversation.contextSnapshot(harnessContext, view)
         and PNC.Semantics.WorldContext.Get
         and PNC.Semantics.WorldContext.Get({ player = harnessContext.player })
         or nil
+    local npcID = view and view.spec and view.spec.npcID
+    local knowledge = PNC.Network and PNC.Network.ClientState
+        and PNC.Network.ClientState.npcKnowledge
+        and PNC.Network.ClientState.npcKnowledge[tostring(npcID or "")]
+        or nil
     local engineFacts = {}
     local factCatalog = harnessContext.EngineFacts
         and harnessContext.EngineFacts.List
@@ -178,6 +183,11 @@ function Conversation.contextSnapshot(harnessContext, view)
         engineFacts[factID] = Values.copy(record)
     end
     return {
+        -- This is the filtered player-character projection, suitable for the
+        -- Inspector and Dossier preview. It is never reconstructed from the
+        -- NPC record or the identity-seeded backstory generator.
+        knowledge = Values.copy(knowledge),
+        dossier = Values.copy(knowledge),
         dialogue = dialogueContext and dialogueContext.ToContext
             and dialogueContext:ToContext() or null,
         state = semanticState and semanticState.Snapshot
@@ -267,6 +277,19 @@ function Conversation.turn(context, text)
         loadedModules = Runtime.loadedModules,
     }
     response.observation = context.OutputProjection.observation(context, response)
+    -- Authoritative receipts can arrive synchronously through the worker's
+    -- dual-role transport after the ordinary semantic result is planned.
+    -- Preserve their exact final NPC payload in the Inspector trace even
+    -- when no native UI composer is present to build a plan envelope.
+    response.observation.authoritativeMessages = {}
+    for _, message in ipairs(newMessages) do
+        if type(message) == "table" and message.speaker == "npc" then
+            response.observation.authoritativeMessages[#response.observation.authoritativeMessages + 1] =
+                Values.copy(message.payload)
+        end
+    end
+    response.observation.authoritativeMessageCount =
+        #response.observation.authoritativeMessages
     return response
 end
 

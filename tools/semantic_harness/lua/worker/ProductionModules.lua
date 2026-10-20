@@ -246,9 +246,28 @@ function ProductionModules.load(context)
         "PNC/Knowledge/PNC_NPCKnowledgeAPI.lua",
         "knowledge_authority"
     )
+    PNC.PlayerKnowledgeCommands = PNC.PlayerKnowledgeCommands or {}
+    PNC.PlayerKnowledgeCommands.Internal =
+        PNC.PlayerKnowledgeCommands.Internal or {}
+    PNC.PlayerKnowledgeCommands.Processed =
+        PNC.PlayerKnowledgeCommands.Processed or {}
+    PNC.PlayerKnowledgeCommands.Uncommitted =
+        PNC.PlayerKnowledgeCommands.Uncommitted or {}
+    PNC.PlayerKnowledgeCommands.Diagnostics =
+        PNC.PlayerKnowledgeCommands.Diagnostics or {}
     load(
         "ProjectHoomans", "server",
         "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Core.lua",
+        "authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Presentation.lua",
+        "authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Disclosure.lua",
         "authority"
     )
     load("ProjectHoomans", "server", "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Identity.lua", "authority")
@@ -291,6 +310,11 @@ function ProductionModules.load(context)
         "conversation_memory"
     )
     load(
+        "ProjectHoomans", "client",
+        "PNC/Conversation/Definition/PNC_ConversationDefinition_Lifecycle.lua",
+        "conversation_lifecycle"
+    )
+    load(
         "ProjectHoomans", "shared",
         "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Cognition.lua",
         "network"
@@ -300,8 +324,31 @@ function ProductionModules.load(context)
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Registry.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Semantics.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua", "network")
+    load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Knowledge.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Internal.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_SemanticCognition.lua", "network")
+    load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Knowledge.lua", "network")
+    local productionKnowledgeRequest = PNC.Client
+        and PNC.Client.RequestNPCKnowledgeTopic or nil
+    if type(productionKnowledgeRequest) == "function" then
+        -- Keep the worker's transport trace while delegating admission,
+        -- request IDs, pending state and server delivery to the production
+        -- client request and server command contracts.
+        PNC.Client.RequestNPCKnowledgeTopic = function(npcID, topicID, options)
+            Runtime.transport[#Runtime.transport + 1] = {
+                direction = "client_to_server",
+                mode = (Runtime.scenario and Runtime.scenario.runtime or {}).mode,
+                command = "KnowledgeDisclosureRequest",
+                payload = {
+                    npcID = npcID,
+                    topicID = topicID,
+                    options = context.Values.copy(options),
+                },
+            }
+            return productionKnowledgeRequest(npcID, topicID, options)
+        end
+        Runtime.productionKnowledgeRequest = productionKnowledgeRequest
+    end
     local semanticClient = load(
         "ProjectHoomans", "client",
         "PNC/Networking/ClientRequests/PNC_ClientRequests_Semantic.lua",

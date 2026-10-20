@@ -5,6 +5,7 @@ local Const = PNC.Const
 local Memory = Internal.KnowledgeMemory
 
 local function logDisclosure(args, result, reason)
+    if PNC.Core and PNC.Core.SemanticHarness == true then return end
     if not print then return end
     local success = args and (args.success == true
         or tostring(args.success or "") == "true") or false
@@ -32,6 +33,14 @@ Internal.RegisterServerCommand(Const.CMD_KNOWLEDGE_DISCLOSURE, function(args)
     end
     local disclosureSuccess = args.success == true
         or tostring(args.success or "") == "true"
+    if disclosureSuccess and args.snapshot
+        and type(Internal.ApplyNPCKnowledgeSnapshot) == "function"
+    then
+        -- This is the same player-scoped snapshot used by the normal
+        -- knowledge command. Never rebuild it from the local NPC record or
+        -- from an identity-seeded backstory profile.
+        Internal.ApplyNPCKnowledgeSnapshot(args.snapshot, "disclosure")
+    end
     local topicID = tostring(args.topicID or args.topicId or "")
     local memoryQueued = nil
     local memoryReason = nil

@@ -469,6 +469,35 @@ local function recentReferenceAnswer(context)
     return responseTurn
 end
 
+local function recentBackstoryAnswer(context, responseTurn)
+    if type(responseTurn) == "table"
+        and responseTurn.subject == "NPC_BACKSTORY"
+    then
+        return responseTurn
+    end
+    local dialogue = context and (
+        context.semanticDialogueContext or context.semanticContextState
+    ) or nil
+    local turns = type(dialogue) == "table" and dialogue.recentTurns or nil
+    if type(turns) ~= "table" and type(dialogue) == "table"
+        and type(dialogue.RecentTurns) == "function"
+    then
+        turns = dialogue:RecentTurns(6, true)
+    end
+    for index = 1, math.min(type(turns) == "table" and #turns or 0, 6) do
+        local turn = turns[index]
+        if type(turn) == "table"
+            and turn.speaker == "npc"
+            and turn.speechAct == "ANSWER"
+            and turn.branch == "QUESTION_RECEIVED"
+            and turn.subject == "NPC_BACKSTORY"
+        then
+            return turn
+        end
+    end
+    return nil
+end
+
 local function derivedQuestion(ir, subject, state, context)
     if not IR or type(IR.Clone) ~= "function" then return nil end
     if not Facts or type(Facts.Annotate) ~= "function" then return nil end
@@ -504,8 +533,18 @@ end
 
 local function resolveContextReferenceQuestion(ir, state, context)
     local target = ir and ir.target
-    if type(target) ~= "table" or target.unresolved == true
-        or target.resolvedReference == nil
+    local answer = recentBackstoryAnswer(
+        context, recentReferenceAnswer(context)
+    )
+    local subject = answer and answer.subject or nil
+    local extensions = type(ir.extensions) == "table" and ir.extensions or {}
+    local questionKind = extensions.contextQuestion
+    local backstoryFollowUp = subject == "NPC_BACKSTORY"
+        and (questionKind == "BACKSTORY_LOCATION"
+            or questionKind == "BACKSTORY_MISS")
+    if type(target) ~= "table"
+        or ((target.unresolved == true or target.resolvedReference == nil)
+            and not backstoryFollowUp)
     then
         return contextReferenceResponse(
             "semantic.conversation.context_reference.unknown",
@@ -514,11 +553,6 @@ local function resolveContextReferenceQuestion(ir, state, context)
             "unknown"
         )
     end
-
-    local answer = recentReferenceAnswer(context)
-    local subject = answer and answer.subject or nil
-    local extensions = type(ir.extensions) == "table" and ir.extensions or {}
-    local questionKind = extensions.contextQuestion
 
     if questionKind == "SAFETY" then
         local response = contextReferenceResponse(
@@ -632,6 +666,23 @@ local function resolveContextReferenceQuestion(ir, state, context)
     end
 
     if subject == "NPC_BACKSTORY" then
+        if questionKind == "BACKSTORY_LOCATION"
+            or questionKind == "BACKSTORY_MISS"
+        then
+            local poolID = questionKind == "BACKSTORY_LOCATION"
+                and "semantic.question.backstory.follow_up.location"
+                or "semantic.question.backstory.follow_up.miss"
+            local response = catalogResponse(
+                poolID, ir, state, context
+            )
+            if response then
+                response.selectionSource = "conversation_reference"
+                response.referenceResolution = "dialogue_context"
+                response.referenceSubject = subject
+                response.topic = "NPC_BACKSTORY"
+                return response
+            end
+        end
         local dialogue = context and (
             context.semanticContextState or context.semanticDialogueContext
         ) or nil

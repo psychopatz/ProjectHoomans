@@ -70,6 +70,7 @@ function Provider.configure(deps)
     if type(PNC.Tasking.Events.Emit) ~= "function" then
         PNC.Tasking.Events.Emit = function() return true end
     end
+    local productionKnowledgeRequest = Runtime.productionKnowledgeRequest
     PNC.Client.RequestNPCKnowledgeTopic = function(npcID, topicID, options)
         Runtime.transport[#Runtime.transport + 1] = {
             direction = "client_to_server",
@@ -81,6 +82,9 @@ function Provider.configure(deps)
                 options = Values.copy(options),
             },
         }
+        if type(productionKnowledgeRequest) == "function" then
+            return productionKnowledgeRequest(npcID, topicID, options)
+        end
         return true
     end
     local Commands = PNC.PlayerKnowledgeCommands

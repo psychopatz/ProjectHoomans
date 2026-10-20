@@ -68,6 +68,12 @@ function ScenarioSession.reset(context, scenario)
         context, context.Translations.scenarioLanguage(context)
     )
     Runtime.view = context.Conversation.buildView(context)
+    if PsychopatzCore and PsychopatzCore.Conversation then
+        -- The production disclosure receiver owns the live conversation
+        -- lifecycle. Point Core at the harness view so its normal result and
+        -- context-recording path remains observable in headless tests.
+        PsychopatzCore.Conversation.instance = Runtime.view
+    end
     PNC.Network.ClientState.conversationRelationships = {}
     PNC.Network.ClientState.pendingSemanticIdentity = {}
     PNC.Network.ClientState.identityTrust = {}
@@ -75,6 +81,8 @@ function ScenarioSession.reset(context, scenario)
     PNC.Network.ClientState.semanticQuestResults = {}
     PNC.Network.ClientState.semanticQuestResultOrder = {}
     PNC.Network.ClientState.npcPresentations = {}
+    PNC.Network.ClientState.pendingDisclosure = {}
+    PNC.Network.ClientState.npcKnowledge = {}
     local npc = scenario.npc or {}
     PNC.Network.ClientState.conversationRelationships[npc.npcID] =
         context.Conversation.relationshipSnapshot(context)

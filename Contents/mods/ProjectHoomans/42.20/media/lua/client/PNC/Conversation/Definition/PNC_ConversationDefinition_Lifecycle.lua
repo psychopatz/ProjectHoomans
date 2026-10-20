@@ -149,6 +149,12 @@ local function refreshForNPC(npcID)
     end
     local context = view.spec and view.spec.context or {}
     if not context.entry then return false end
+    -- Headless Semantic Lab sessions provide the same live session contract
+    -- but intentionally omit the native UI definition builder. The receipt
+    -- still records the authoritative disclosure and knowledge snapshot;
+    -- refreshing a missing UI definition must not turn that receipt into a
+    -- client error.
+    if type(Conversation.BuildDefinition) ~= "function" then return false end
     local updated = Conversation.BuildDefinition(
         context.entry, context.player, context.conversationTimeID
     )
@@ -208,6 +214,49 @@ function Conversation.ReceiveIdentityPresentation(presentation)
     return presentation and refreshForNPC(presentation.npcID) or false
 end
 
+local function disclosureResponsePayload(result)
+    local topicID = tostring(result and result.topicID or "")
+    if string.sub(topicID, 1, 10) ~= "backstory." then return nil end
+    local input = PNC.Semantics and PNC.Semantics.DialogueInput
+    local internal = input and input.Internal or nil
+    local responsePayload = internal
+        and internal.ResponsePayload or nil
+    local catalog = PNC.Semantics and PNC.Semantics.ResponseCatalog or nil
+    if type(responsePayload) ~= "function"
+        or type(catalog) ~= "table"
+        or type(catalog.Select) ~= "function"
+    then
+        return nil
+    end
+    local kind = string.sub(topicID, 11)
+    local poolID
+    if result.success == true then
+        poolID = "semantic.question.backstory.known." .. kind
+    else
+        poolID = "semantic.question.backstory.refusal"
+    end
+    local variant = catalog.Select(poolID, {
+        npcID = result.npcID,
+        topic = "NPC_BACKSTORY",
+        subject = "NPC_BACKSTORY",
+    }, result.requestID)
+    if type(variant) ~= "table" then return nil end
+    local response = {
+        templateID = variant.templateID,
+        fallback = variant.fallback,
+        args = result.success == true and {
+            kind = kind,
+            content = result.responseText,
+        } or {},
+        dialogueAct = variant.dialogueAct or "FACT_ANSWER",
+        topic = "NPC_BACKSTORY",
+        uncertainty = result.success == true and "known" or "refused",
+        tone = result.success == true and "direct" or "guarded",
+        groundedFactRefs = { "backstory." .. kind },
+    }
+    return responsePayload({ response = response })
+end
+
 function Conversation.ReceiveDisclosureResult(result)
     local view = PsychopatzCore and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.instance or nil
@@ -239,7 +288,16 @@ function Conversation.ReceiveDisclosureResult(result)
     if not view or not result
         or tostring(result.npcID) ~= tostring(view.spec and view.spec.npcID)
     then return false end
-    if result.responseText
+    local translatedPayload = disclosureResponsePayload(result)
+    if translatedPayload
+        and view.session and view.session.append
+    then
+        local responseText = translatedPayload.text
+            or translatedPayload.fallback
+            or result.responseText
+        view.session:append("npc", translatedPayload)
+        recordBackstoryResponse(responseText)
+    elseif result.responseText
         and view.session and view.session.append
     then
         local responseText = tostring(result.responseText)

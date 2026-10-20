@@ -23,6 +23,8 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
         "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected",
         "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous",
         "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal",
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation",
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss",
     }
 
     @staticmethod

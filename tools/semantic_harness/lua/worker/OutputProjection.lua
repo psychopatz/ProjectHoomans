@@ -180,6 +180,7 @@ function OutputProjection.observation(context, record)
         fallback = response.fallback,
         text = response.fallback,
         key = response.templateID,
+        args = Values.copy(response.args),
         dialogueAct = response.dialogueAct
             or response.plan and response.plan.dialogueAct,
         topic = response.topic or response.plan and response.plan.topic,
@@ -211,6 +212,7 @@ function OutputProjection.observation(context, record)
                 text = text,
                 fallback = fallback,
                 key = payload.key or payload.translationKey,
+                args = Values.copy(payload.args),
                 plan = Values.copy(payload.plan),
                 dialogueAct = payload.plan and payload.plan.dialogueAct,
                 topic = payload.plan and payload.plan.topic,

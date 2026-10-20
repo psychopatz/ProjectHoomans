@@ -20,6 +20,7 @@ local unresolvedItemRequest = Internal.UnresolvedItemRequest
 local unresolvedOffer = Internal.UnresolvedOffer
 local isInventoryQuery = Internal.IsInventoryQuery
 local isLocalFactQuestion = Internal.IsLocalFactQuestion
+local isBackstoryContextQuestion = Internal.IsBackstoryContextQuestion
 local unresolvedWorldTargetRequest = Internal.UnresolvedWorldTargetRequest
 local isIdentityClaim = Internal.IsIdentityClaim
 local flowKernel = Internal.FlowKernel
@@ -79,6 +80,7 @@ function Policy.Decide(ir, state, context, options)
             and not unresolvedOffer(ir)
             and not isInventoryQuery(ir)
             and not isLocalFactQuestion(ir)
+            and not isBackstoryContextQuestion(ir, context)
             and not unresolvedWorldTargetRequest(ir)
             and not isIdentityClaim(ir))
         or (confidence < limits.high and not giftOffer)

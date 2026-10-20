@@ -129,10 +129,13 @@ local function projectedFact(ir, context, kind)
     then
         return nil
     end
-    local record = context and context.npcRecord or nil
-    local fact = record and Memory.GetBackstory
-        and Memory.GetBackstory(record, kind) or nil
     local content = descriptor.content
+    -- A suspected descriptor is the player's observation, not permission to
+    -- replace it with canonical NPC truth. Canonical rendering is allowed
+    -- only after the authoritative Knowledge service has confirmed the fact.
+    local record = context and context.npcRecord or nil
+    local fact = status ~= "suspected" and record and Memory.GetBackstory
+        and Memory.GetBackstory(record, kind) or nil
     if fact then content = renderFact(fact, languageOf(context)) end
     content = content or descriptor.value
     if type(content) ~= "string" or content == "" then return nil end

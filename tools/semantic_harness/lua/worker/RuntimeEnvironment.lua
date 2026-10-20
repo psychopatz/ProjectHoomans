@@ -146,6 +146,13 @@ function RuntimeEnvironment.configure(context)
     }
     player.characterUUID = playerData.characterUUID
     context.player = player
+    -- Project Zomboid supplies ZombRand to Core ID generation. Keep the
+    -- worker deterministic while preserving that production API boundary.
+    ZombRand = function(maximum)
+        maximum = tonumber(maximum) or 1
+        if maximum <= 1 then return 0 end
+        return math.floor((tonumber(Runtime.now) or 0) % maximum)
+    end
 
     local gameTime = {
         getWorldAgeHours = function()
