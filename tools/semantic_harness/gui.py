@@ -8,18 +8,18 @@ from concurrent.futures import Future
 from pathlib import Path
 from typing import Any, Callable
 
-from .conversation_inspector import build_conversation_inspector
+from .inspection.conversation_inspector import build_conversation_inspector
 from .codebuilder.service import SemanticLabAuthoringService
 from .studio.block_registry import SemanticBlockRegistryPane
 from .studio.dataset_library import DatasetLibraryPane
 from .flow_editor import FlowEditorPane
 from .studio.interaction_explorer_pane import InteractionExplorerPane
 from .studio.interaction_spec_pane import InteractionSpecPane
-from .rendering import conversation_first, pretty
+from .inspection.rendering import conversation_first, pretty
 from .runtime.config import ConfigurationError
 from .runtime.scenario import load_scenario, save_scenario
 from .settings_dialog import open_runtime_settings as show_runtime_settings
-from .transcript import TranscriptBuffer
+from .inspection.transcript import TranscriptBuffer
 from .runtime.worker import HarnessError, LuaSemanticWorker
 from .runtime.worker_session import WorkerReady, WorkerResult, WorkerSession
 from .studio.workflow import SemanticLabWorkflowPane

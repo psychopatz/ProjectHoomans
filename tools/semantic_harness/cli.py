@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 
 from .codebuilder.service import SemanticLabAuthoringService
-from .rendering import print_result as _print_result
+from .inspection.rendering import print_result as _print_result
 from .runner import ConflictLedger, load_case, run_case
 from .runtime.config import ConfigurationError
 from .runtime.scenario import load_scenario
