@@ -27,7 +27,7 @@ timeouts, crash detection, and bounded stderr diagnostics.
   registration back through the same Lua worker (`Registry.Validate` and
   `Registry.Register`). It is an authoring surface, not a second Python flow
   engine.
-- `workflow.py` owns the **Build workflow** tab inside the same Semantic Lab.
+- `studio/workflow.py` owns the **Build workflow** tab inside the same Semantic Lab.
   It selects an existing canonical dataset, composes reusable block contracts,
   validates the selection, previews the existing CodeBuilder artifacts, and
   requires explicit approval before generation. Generation delegates to the
@@ -38,6 +38,10 @@ timeouts, crash detection, and bounded stderr diagnostics.
   lifecycle, the worker adapter, and serialized worker sessions. The old
   top-level runtime module paths remain compatibility facades while callers
   migrate.
+- `studio/` owns the Semantic Lab authoring surface: canonical dataset and
+  reusable-block panes, typed interaction composition, workflow orchestration,
+  and the searchable production interaction catalog. It delegates compilation
+  and generation to the existing CodeBuilder service.
 - `settings_dialog.py` owns the runtime settings form and converts its draft
   into a validated scenario before the live worker is configured.
 - `runner.py` owns case replay and its streaming conflict ledger; `suite.py`

@@ -42,10 +42,31 @@ Evidence:
   `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all
   required checks true, including worker syntax and `READY/PING/CAPABILITIES`.
 
-Next mandatory slice: move the Semantic Lab authoring/workflow and dataset
-orchestration into a `studio/` package while keeping
-`SemanticLabAuthoringService` and the existing CodeBuilder service facade as
-the single authoring API.
+### Post-V5 Python package layout — studio slice
+
+**Status:** slice 2 implemented on existing `main`; commit `c4e57bdf`.
+
+The Semantic Lab authoring surface now lives under
+`tools/semantic_harness/studio/`: canonical authoring/report operations,
+workflow composition, dataset and block registry panes, typed interaction
+composition, and the searchable production interaction catalog. The existing
+`SemanticLabAuthoringService` and CodeBuilder service facade remain the single
+authoring API. Former top-level modules are compatibility facades, so legacy
+imports and direct test callers remain valid. No compiler, worker protocol,
+generated asset path, or Lua runtime behavior changed.
+
+Evidence:
+
+- Affected authoring, interaction-spec, Flow Editor, dataset, app, and runtime
+  checks: `49/49` passed.
+- Full Semantic Harness Python discovery after the move: `276/276` passed in
+  `168.964s`, exit `0`.
+- Production imports now point to `studio/`; old top-level authoring modules
+  are compatibility-only facades.
+
+Next mandatory slice: move inspection and presentation projections into an
+`inspection/` package while keeping the Conversation Inspector's bounded
+worker observation contract unchanged.
 
 ## V1 — reusable visual CodeBlocks graph
 
