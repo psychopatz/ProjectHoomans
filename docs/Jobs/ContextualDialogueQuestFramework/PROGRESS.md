@@ -61,6 +61,7 @@ The existing Studio, CodeBuilder writer, real Core+Hoomans Lua worker, Knowledge
 
 Fresh developer evidence from this checkout:
 
+- Acceptance code/test SHA: `c4bed07c1a7b8dac7b791069799731f8242afdae`; paired PsychopatzCore dependency SHA: `2179ee19307a993e186e6da661ad4212e984e0b4`.
 - Focused V1–V5 Python command: 50 tests passed, exit 0. Full Semantic Lab Python discovery: 274 tests passed in 168.354s, exit 0. Full embedded compiler suite: 16 tests passed, exit 0.
 - Full Lua regression: `python3 tests/run_tests.py --jobs 1 --harness-report /tmp/projecthoomans-v5-lua-harness.json` — 853/853 passed in 16.00s, exit 0.
 - Doctor: `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all required checks true, including Tk/display, sibling Core, Lua 5.3, worker syntax, READY/PING/CAPABILITIES, exit 0.
