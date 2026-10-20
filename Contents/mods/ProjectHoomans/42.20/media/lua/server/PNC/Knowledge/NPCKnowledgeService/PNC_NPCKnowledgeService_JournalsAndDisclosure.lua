@@ -27,6 +27,65 @@ local MAX_JOURNAL = Internal.MAX_JOURNAL
 local MAX_MANUAL_NOTES = Internal.MAX_MANUAL_NOTES
 local MAX_MANUAL_LENGTH = Internal.MAX_MANUAL_LENGTH
 
+local function normalizedTopic(value)
+    value = tostring(value or "")
+    value = string.lower(value)
+    value = string.gsub(value, "[^%w%.%-]+", "_")
+    value = string.gsub(value, "^_+", "")
+    value = string.gsub(value, "_+$", "")
+    return value ~= "" and value or nil
+end
+
+local function npcSocialStyle(npcID)
+    local record = Registry and Registry.Get and Registry.Get(npcID) or nil
+    local social = record and record.social or nil
+    local personality = social and social.personality
+        or record and record.personality or nil
+    local style = personality and (
+        personality.socialStyle or personality.social_style
+    ) or social and social.socialStyle or record and record.socialStyle
+    style = string.lower(tostring(style or "neutral"))
+    if style ~= "friendly" and style ~= "withdrawn"
+        and style ~= "reserved" and style ~= "guarded"
+    then
+        return "neutral"
+    end
+    return style
+end
+
+local function disclosureWillingness(characterUUID, npcID, descriptor,
+    familiarityValue, approval, context)
+    local presentation = descriptor.presentation or {}
+    local requestedTopic = normalizedTopic(context and (
+        context.topicID or context.conversationTopic
+    ))
+    local descriptorTopic = normalizedTopic(presentation.topicID)
+    if requestedTopic and descriptorTopic and requestedTopic ~= descriptorTopic then
+        return false, "topic_mismatch"
+    end
+
+    -- Eligibility remains the first gate. Personality can make a private fact
+    -- harder to volunteer, but it never grants access below the descriptor's
+    -- familiarity threshold and never creates evidence by itself.
+    if descriptor.privacy ~= "private"
+        and presentation.disclosureTier ~= "personal"
+        and presentation.disclosureTier ~= "sensitive"
+    then
+        return true
+    end
+
+    local style = npcSocialStyle(npcID)
+    if style == "friendly" then return true end
+    if style == "withdrawn" or style == "reserved" or style == "guarded" then
+        local minimum = tonumber(descriptor.discovery.minimumFamiliarity) or 0
+        local guardedMinimum = math.min(100, minimum + 25)
+        if familiarityValue < guardedMinimum and approval < 10 then
+            return false, "personality_guarded"
+        end
+    end
+    return true
+end
+
 function Knowledge.RecordJournal(characterUUID, npcID, entry)
     local at = now(entry and entry.createdAt)
     local note, reason = mutableNote(characterUUID, npcID, true, at)
@@ -69,23 +128,29 @@ function Knowledge.AddManualNote(characterUUID, npcID, text, at)
     return true
 end
 
-function Knowledge.CanDisclose(characterUUID, npcID, descriptorID)
+function Knowledge.CanDisclose(characterUUID, npcID, descriptorID, context)
     local descriptor = Definitions.Get(descriptorID)
     if not descriptor then return false, "unknown_descriptor" end
     if descriptor.discovery.allowDisclosure ~= true then return false, "not_disclosable" end
     local familiarityValue, approval = familiarity(characterUUID, npcID)
     if familiarityValue < descriptor.discovery.minimumFamiliarity then return false, "insufficient_familiarity" end
     if descriptor.discovery.minimumApproval and approval < descriptor.discovery.minimumApproval then return false, "insufficient_approval" end
-    return true
+    return disclosureWillingness(
+        characterUUID, npcID, descriptor, familiarityValue, approval, context
+    )
 end
 
-function Knowledge.PreviewDisclosure(characterUUID, npcID, descriptorID)
-    local allowed, reason = Knowledge.CanDisclose(characterUUID, npcID, descriptorID)
+function Knowledge.PreviewDisclosure(characterUUID, npcID, descriptorID, context)
+    local allowed, reason = Knowledge.CanDisclose(
+        characterUUID, npcID, descriptorID, context
+    )
     return { allowed = allowed, reason = reason, descriptorID = descriptorID }
 end
 
 function Knowledge.Disclose(characterUUID, npcID, descriptorID, context)
-    local allowed, reason = Knowledge.CanDisclose(characterUUID, npcID, descriptorID)
+    local allowed, reason = Knowledge.CanDisclose(
+        characterUUID, npcID, descriptorID, context
+    )
     local descriptor = Definitions.Get(descriptorID)
     local record = Registry and Registry.Get and Registry.Get(tostring(npcID or "")) or nil
     if not allowed then return nil, reason end

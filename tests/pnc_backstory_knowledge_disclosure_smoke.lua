@@ -145,6 +145,32 @@ T.truthy(Knowledge.PreviewBackstory(
     "char_a", npc.id, "fear"
 ).allowed, "sensitive fear becomes eligible at familiarity 75")
 
+familiarityByCharacter.char_c = 40
+npc.social = { personality = { socialStyle = "friendly" } }
+T.truthy(Knowledge.PreviewBackstory(
+    "char_c", npc.id, "former_job",
+    { topicID = "backstory.former_job" }
+).allowed, "friendly personality did not permit an eligible topic")
+npc.social.personality.socialStyle = "withdrawn"
+local guardedPreview = Knowledge.PreviewBackstory(
+    "char_c", npc.id, "former_job",
+    { topicID = "backstory.former_job" }
+)
+T.equal(guardedPreview.allowed, false,
+    "withdrawn personality disclosed a private fact at the friendly threshold")
+T.equal(guardedPreview.reason, "personality_guarded",
+    "withdrawn personality did not report its disclosure gate")
+familiarityByCharacter.char_c = 80
+local wrongTopicPreview = Knowledge.PreviewBackstory(
+    "char_c", npc.id, "former_job",
+    { topicID = "backstory.hobby" }
+)
+T.equal(wrongTopicPreview.allowed, false,
+    "private disclosure ignored the conversation topic")
+T.equal(wrongTopicPreview.reason, "topic_mismatch",
+    "private disclosure returned the wrong topic gate reason")
+npc.social = nil
+
 familiarityByCharacter.char_a = 80
 local disclosure = Knowledge.DiscloseBackstory(
     "char_a", npc.id, "job", { sourceEventID = "smoke:direct" }

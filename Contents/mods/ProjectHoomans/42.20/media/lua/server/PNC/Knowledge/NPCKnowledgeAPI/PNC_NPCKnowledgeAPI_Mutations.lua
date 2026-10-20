@@ -198,6 +198,7 @@ function API.DiscloseForPlayer(player, options)
                 sourceEventID = options.requestID or topicID,
                 worldAgeHours = options.worldAgeHours,
                 sourceType = sourceType,
+                topicID = topicID,
             }
         )
         if not disclosure then return nil, reason end

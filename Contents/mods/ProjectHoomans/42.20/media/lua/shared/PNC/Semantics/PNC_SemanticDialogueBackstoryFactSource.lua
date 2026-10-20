@@ -136,6 +136,28 @@ local function authorizedRecord(context)
     return nil
 end
 
+local function disclosureAllowed(context, kind)
+    local knowledge = PNC.NPCKnowledge
+    local record = context and context.npcRecord or nil
+    local npcID = context and context.npcID or record and record.id
+    local characterUUID = context and context.characterUUID
+    if type(knowledge) ~= "table"
+        or type(knowledge.CanDisclose) ~= "function"
+        or characterUUID == nil or npcID == nil
+    then
+        return true, nil
+    end
+    return knowledge.CanDisclose(
+        characterUUID,
+        npcID,
+        "history.backstory." .. tostring(kind or ""),
+        {
+            topicID = "backstory." .. tostring(kind or ""),
+            sourceType = "direct_disclosure",
+        }
+    )
+end
+
 local function projectedFact(ir, context, kind)
     local snapshot = context and (
         context.npcKnowledge or context.knowledgeSnapshot
@@ -194,6 +216,15 @@ Facts.RegisterProvider("npc_backstory", {
                 kind = kind,
                 topicID = "backstory." .. kind,
                 reason = "backstory_not_disclosed",
+            }
+        end
+        local disclosureOK, disclosureReason = disclosureAllowed(context, kind)
+        if disclosureOK ~= true then
+            return {
+                status = "unknown",
+                kind = kind,
+                topicID = "backstory." .. kind,
+                reason = disclosureReason or "backstory_disclosure_denied",
             }
         end
         if type(record) ~= "table" then

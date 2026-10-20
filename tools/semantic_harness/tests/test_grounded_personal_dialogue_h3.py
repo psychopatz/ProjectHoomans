@@ -11,7 +11,11 @@ from tools.semantic_harness.worker import LuaSemanticWorker
 
 class GroundedPersonalDialogueH3Tests(unittest.TestCase):
     @staticmethod
-    def scenario(familiarity: int = 80, language: str = "EN") -> dict:
+    def scenario(
+        familiarity: int = 80,
+        language: str = "EN",
+        social_style: str | None = None,
+    ) -> dict:
         return merge(
             DEFAULT_SCENARIO,
             {
@@ -21,6 +25,11 @@ class GroundedPersonalDialogueH3Tests(unittest.TestCase):
                     "identity": {"seed": 90210},
                     "tacticalClass": "colonist",
                     "relationship": {"familiarity": familiarity},
+                    "personality": (
+                        {"socialStyle": social_style}
+                        if social_style is not None
+                        else {}
+                    ),
                 },
                 "runtime": {"language": language},
             },
@@ -158,6 +167,31 @@ class GroundedPersonalDialogueH3Tests(unittest.TestCase):
         self.assertEqual(reloaded["characterUUID"], "char_h3_a")
         self.assertEqual(reloaded["npcID"], "npc-h3-grounded")
         self.assertEqual(reloaded["categories"], knowledge_a["categories"])
+
+    def test_personality_changes_willingness_without_bypassing_knowledge(self) -> None:
+        with LuaSemanticWorker(
+            self.scenario(familiarity=40, social_style="friendly")
+        ) as friendly_worker:
+            friendly = friendly_worker.input("what was your old job")
+        with LuaSemanticWorker(
+            self.scenario(familiarity=40, social_style="withdrawn")
+        ) as guarded_worker:
+            guarded = guarded_worker.input("what was your old job")
+
+        self.assertEqual(
+            self.final_text(friendly), "I worked as farmer before all this."
+        )
+        self.assertEqual(
+            friendly["contextAfter"]["knowledge"]["npcID"], "npc-h3-grounded"
+        )
+        self.assertEqual(
+            self.final_text(guarded), "I'm not ready to talk about that yet."
+        )
+        self.assertIsNone(guarded["contextAfter"].get("knowledge"))
+        self.assertEqual(
+            guarded["result"]["ir"]["diagnostics"].get("factStatus"),
+            "unknown",
+        )
 
 
 if __name__ == "__main__":

@@ -54,14 +54,14 @@ function Knowledge.BackstoryKindForTopic(topicID)
     return normalizeKind(string.sub(topic, #prefix + 1))
 end
 
-function Knowledge.PreviewBackstory(characterUUID, npcID, kind)
+function Knowledge.PreviewBackstory(characterUUID, npcID, kind, context)
     kind = normalizeKind(kind)
     local descriptorID = Knowledge.BackstoryDescriptorID(kind)
     if not descriptorID then
         return { allowed = false, reason = "unknown_backstory_kind", kind = kind }
     end
     local result = Knowledge.PreviewDisclosure(
-        characterUUID, npcID, descriptorID
+        characterUUID, npcID, descriptorID, context
     )
     result.kind = kind
     result.topicID = "backstory." .. kind

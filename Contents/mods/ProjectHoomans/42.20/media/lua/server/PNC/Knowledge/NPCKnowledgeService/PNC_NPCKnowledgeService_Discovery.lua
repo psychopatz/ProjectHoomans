@@ -83,7 +83,8 @@ function Knowledge.DiscoverTopicForPlayer(
             local allowed, reason = true, nil
             if source == "direct_disclosure" then
                 allowed, reason = Knowledge.CanDisclose(
-                    characterUUID, npcID, descriptor.id
+                    characterUUID, npcID, descriptor.id,
+                    { topicID = topic, sourceType = source }
                 )
             end
             local result

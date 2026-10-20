@@ -1,68 +1,48 @@
-# Contextual Dialogue & Quest Framework — CURRENT Progress
+# Contextual Dialogue & Quest Framework — Current Progress
 
-**Updated:** 2026-10-20
-
-**Parent goal:** IN PROGRESS — complete V1–V5 on the existing `main` branch.
-
-**Documentation baseline:** `556bdd7a57a7` (`main`). Core and other dependency
-SHAs are recorded at the time of each acceptance chunk; native Project Zomboid
-SP/MP, live servers, installation and Workshop publishing remain user-owned.
+**Updated:** 2026-10-21
+**Parent goal:** IN PROGRESS — complete V1–V5 on the existing `main` branch
+**Documentation baseline:** `556bdd7a57a7`
+**Repository rule:** no branch was created; native Project Zomboid SP/MP, live servers, installation, and Workshop publishing remain user-owned.
 
 ## Preserved foundation
 
-B0–B6, H0–H4 and F1–F4 remain the preserved implementation baseline: identity-
-seeded NPC backstories, sparse Knowledge/Dossier/PBrainZ projections, the typed
-`semantic.interaction_spec.v1` compiler and writer, generated EN/TL catalogs,
-the existing Core/Hoomans Lua worker, and the existing Semantic Lab GUI.
-
-Historical F1–F4 acceptance evidence remains historical; it is not being
-repeated as a substitute for the V1–V5 requirements.
+B0–B6, H0–H4, and F1–F4 remain the preserved implementation baseline. The work continues through the existing Semantic Lab, `semantic.interaction_spec.v1`, CodeBuilder, Core-backed translation path, server-authoritative Knowledge/Dossier services, Lua worker, and Conversation Inspector. The historical F1–F4 ledger is evidence, not a replacement for the V1–V5 requirements.
 
 ## V1 — reusable visual CodeBlocks graph
 
-**Status: IMPLEMENTED and developer-verified; next chunk: V2 localization.**
+**Status:** implemented and developer-verified. Commit: `c1913c9c`.
 
-Implemented in the existing Semantic Lab and CodeBuilder:
+The existing Studio workflow now supports typed graph add/remove/configure/connect/disconnect operations for both backstory and registered capability interactions. It retains legacy `semantic.codeblocks.v1` action-flow compatibility, validates ports/cycles/orphans, keeps preview effect-free, requires explicit generation approval, and attaches deterministic graph metadata to the existing compiler output.
 
-- declarative typed ports and connection contracts for registered blocks;
-- add, remove, configure, connect and disconnect graph operations over the
-  canonical `semantic.interaction_spec.v1` source;
-- deterministic graph normalization/fingerprinting attached to existing
-  generated definitions, without a second compiler or executable Lua path;
-- cycle, orphan, invalid-port and unsafe capability wiring rejection;
-- effect-free preview and explicit-approval-only generation;
-- one Studio workflow for both NPC backstory and registered capability graphs;
-- legacy `semantic.codeblocks.v1` action-flow compatibility preserved.
+Evidence:
 
-Developer evidence from baseline `556bdd7a57a7`:
+- Focused Python suite: 33 tests passed.
+- Real Core+Hoomans Lua worker proof: the same visual service generated distinct backstory and registered `FOLLOW` assets; the worker returned `I worked as farmer before all this.` and `Okay, I will follow you for V1.`.
+- GUI construction under Xvfb: exit 0; graph edit smoke: exit 0, 4 blocks and 3 connections.
+- Generated EN/TL assets were deterministic and written only to the established mod asset directories.
 
-- `python3 -m unittest tools.semantic_harness.tests.test_interaction_spec tools.semantic_harness.tests.test_v1_visual_authoring tools.semantic_harness.tests.test_codeblocks tools.semantic_harness.tests.test_semantic_blocks tools.semantic_harness.tests.test_conversation_inspector tools.semantic_harness.tests.test_flow_editor` — **33 passed**;
-- V1 worker proof — **1 passed**: previewed both graph kinds with zero writes,
-  generated distinct Lua/EN/TL assets after approval, restarted an isolated
-  real Core+Hoomans Lua worker, received `I worked as farmer before all this.`
-  for the backstory, and received `Okay, I will follow you for V1.` for the
-  authored registered `FOLLOW` response with the existing action dispatch;
-- Xvfb/Tk GUI construction smoke — **exit 0**, `workflow_gui_constructed 15`;
-- Xvfb/Tk graph-edit smoke — **exit 0**, `workflow_gui_graph True 4 3`;
-- `git diff --check` — **exit 0**.
+## V2 — Core-backed localization
 
-The V1 production/test changes are ready for the bounded V1 commit. After that
-commit, continue immediately with V2: consolidate authored fact-value
-localization through PsychopatzCore `PsychopatzCustomTranslationManager`,
-Project Hoomans `PNC.Translation`, and the existing catalogs/manifests while
-preserving legacy TextLoader consumers.
+**Status:** existing implementation verified; final authored EN/TL acceptance evidence remains part of V5.
+
+The existing `PsychopatzCustomTranslationManager`, `PNC.Translation`, registered catalogs/manifests, and legacy TextLoader compatibility remain the only localization path. Existing worker tests cover complete EN/TL sentences, dynamic `farmer` → `magsasaka` substitution, fallback diagnostics, language switching, and player-scoped privacy.
+
+## V3 — personality-aware Knowledge disclosure
+
+**Status:** implementation complete for this chunk; focused verification passed, commit pending this progress update.
+
+The existing Knowledge owner now evaluates topic alignment and private/personal disclosure willingness using the registered NPC personality/social style plus existing familiarity and approval. Familiarity remains eligibility only; guarded styles do not reveal facts without the stronger relationship context. Discovery, backstory preview/disclosure, and the semantic backstory fact provider pass the same topic context. No duplicate Knowledge service or per-NPC ModData was introduced.
+
+Evidence:
+
+- Real worker H3 suite: 5 tests passed. At familiarity 40, friendly disclosure produces the canonical English sentence and player dossier; withdrawn disclosure produces the refusal and no dossier.
+- Lua smoke: `pnc_backstory_knowledge_disclosure_smoke`, 1/1 passed for friendly, guarded, and topic-mismatch cases.
+- PZ Kahlua verification: 0 errors across the changed Knowledge directory and backstory fact-source file.
 
 ## Remaining mandatory chunks
 
-- **V2:** Core-backed localization, EN/TL switching, dynamic fact substitution,
-  fallback and privacy diagnostics in the real worker.
-- **V3:** personality-, relationship-, privacy- and context-aware disclosure
-  through the existing server-authoritative Knowledge/Dossier services.
-- **V4:** production-serializer actor/Knowledge/combined persistence metrics,
-  synthetic 100/1,000 population measurements, and readable graph-to-effect
-  Conversation Inspector projection.
-- **V5:** end-to-end Semantic Lab Studio → approved generation → worker restart
-  → conversation → Knowledge/Dossier/multiplayer privacy → graph regeneration
-  behavior-change proof, plus focused/full developer checks.
+- V4: measure complete serialized actor, player Knowledge, and combined records at 0/1/10 discoveries and synthetic 100/1,000 populations; extend the existing readable Conversation Inspector with graph-to-effect provenance.
+- V5: run the complete Studio approval → generated assets → worker restart → conversation → Knowledge/Dossier/multiplayer privacy → regeneration behavior-change acceptance, then run focused/full developer checks and record exact SHAs, commands, exit codes, generated paths, responses, effects, and persistence measurements.
 
-No `GOAL_PROMPT.md` has been created or modified.
+`GOAL_PROMPT.md` was not created or modified.
