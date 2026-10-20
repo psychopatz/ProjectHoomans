@@ -94,3 +94,13 @@ Next mandatory chunk: run the complete Python harness, relevant full Lua suite, 
 - GUI limitation remains unchanged: CUA exposed no native app surface (`apps=[]`, `browsers=[]`), so graphical interaction evidence is still open and not claimed.
 
 **Next mandatory chunk:** F3 graduated backstory disclosure thresholds using the existing Knowledge/Relationships/Dossier systems, with eligibility separated from discovery and no new persistence store.
+## F3 evidence — graduated personal disclosure (2026-10-20)
+
+- Source baseline: `354dcba9`.
+- Reused the existing `PNC_KnowledgeDescriptors`, `PNC_NPCKnowledge.CanDisclose`, relationship familiarity scale, and dossier persistence. No second Knowledge store or new NPC biography persistence was added.
+- Backstory disclosure tiers are aligned to existing relationship milestones: public `former_job`/`hometown` at familiarity `25`; personal education/hobby/family/value/date-of-birth at `50`; sensitive survival origin/fear/tragedy at `75`.
+- All backstory descriptors remain `private`, `allowInference=false`, and `allowObservation=false`; eligibility does not create evidence or automatically reveal a dossier value.
+- `python3 tests/run_tests.py pnc_backstory_knowledge_disclosure --jobs 1` — `PASS 1/1`, exit `0`. This covers threshold eligibility, refusal below threshold, no automatic discovery, two-player isolation, confirmed/suspected dossier states, and canonical-truth protection.
+- `luac5.3 -p Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Knowledge/PNC_KnowledgeBuiltins.lua` passed; `git diff --check` passed.
+
+**Next mandatory chunk:** F4 end-to-end Semantic Lab generation, real-worker reload, changed-block behavior proof, translation inspection, privacy/context assertions, and persistence measurements.

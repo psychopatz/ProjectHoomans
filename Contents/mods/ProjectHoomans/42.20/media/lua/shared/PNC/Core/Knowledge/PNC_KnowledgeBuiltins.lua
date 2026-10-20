@@ -279,17 +279,20 @@ Descriptors.Register({
     presentation = { topicID = "faction" },
 })
 
+-- These tiers use the relationship model's existing 25/50/75 familiarity
+-- milestones. They control disclosure eligibility only; they do not create
+-- evidence or reveal a fact without a server-authorized disclosure.
 local backstoryKinds = {
-    { kind = "former_job", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryFormerJob", topicID = "backstory.former_job" },
-    { kind = "hometown", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryHometown", topicID = "backstory.hometown" },
-    { kind = "education", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryEducation", topicID = "backstory.education" },
-    { kind = "hobby", category = "preferences", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryHobby", topicID = "backstory.hobby" },
-    { kind = "family_background", category = "social", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryFamily", topicID = "backstory.family_background" },
-    { kind = "value", category = "personality", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryValue", topicID = "backstory.value" },
-    { kind = "survival_origin", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstorySurvival", topicID = "backstory.survival_origin" },
-    { kind = "fear", category = "personality", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryFear", topicID = "backstory.fear" },
-    { kind = "tragedy", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryTragedy", topicID = "backstory.tragedy" },
-    { kind = "date_of_birth", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryDateOfBirth", topicID = "backstory.date_of_birth" },
+    { kind = "former_job", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryFormerJob", topicID = "backstory.former_job", disclosureTier = "public", minimumFamiliarity = 25 },
+    { kind = "hometown", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryHometown", topicID = "backstory.hometown", disclosureTier = "public", minimumFamiliarity = 25 },
+    { kind = "education", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryEducation", topicID = "backstory.education", disclosureTier = "personal", minimumFamiliarity = 50 },
+    { kind = "hobby", category = "preferences", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryHobby", topicID = "backstory.hobby", disclosureTier = "personal", minimumFamiliarity = 50 },
+    { kind = "family_background", category = "social", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryFamily", topicID = "backstory.family_background", disclosureTier = "personal", minimumFamiliarity = 50 },
+    { kind = "value", category = "personality", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryValue", topicID = "backstory.value", disclosureTier = "personal", minimumFamiliarity = 50 },
+    { kind = "survival_origin", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstorySurvival", topicID = "backstory.survival_origin", disclosureTier = "sensitive", minimumFamiliarity = 75 },
+    { kind = "fear", category = "personality", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryFear", topicID = "backstory.fear", disclosureTier = "sensitive", minimumFamiliarity = 75 },
+    { kind = "tragedy", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryTragedy", topicID = "backstory.tragedy", disclosureTier = "sensitive", minimumFamiliarity = 75 },
+    { kind = "date_of_birth", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryDateOfBirth", topicID = "backstory.date_of_birth", disclosureTier = "personal", minimumFamiliarity = 50 },
 }
 
 for _, backstory in ipairs(backstoryKinds) do
@@ -305,7 +308,7 @@ for _, backstory in ipairs(backstoryKinds) do
             allowInference = false,
             allowObservation = false,
             allowDisclosure = true,
-            minimumFamiliarity = 50,
+            minimumFamiliarity = backstory.minimumFamiliarity,
             suspectedThreshold = .30,
             knownThreshold = .70,
         },
@@ -314,6 +317,7 @@ for _, backstory in ipairs(backstoryKinds) do
             topicID = backstory.topicID,
             backstoryKind = backstory.kind,
             labelKey = backstory.labelKey,
+            disclosureTier = backstory.disclosureTier,
             immutable = true,
         },
     })

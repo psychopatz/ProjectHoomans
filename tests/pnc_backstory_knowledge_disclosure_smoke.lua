@@ -86,6 +86,33 @@ PNC.Relationships = {
 T.load(SERVER .. "Knowledge/PNC_NPCKnowledgeService.lua")
 local Knowledge = PNC.NPCKnowledge
 
+local formerJobDescriptor = PNC.KnowledgeDescriptors.Get(
+    "history.backstory.former_job"
+)
+local hometownDescriptor = PNC.KnowledgeDescriptors.Get(
+    "history.backstory.hometown"
+)
+local hobbyDescriptor = PNC.KnowledgeDescriptors.Get(
+    "history.backstory.hobby"
+)
+local fearDescriptor = PNC.KnowledgeDescriptors.Get(
+    "history.backstory.fear"
+)
+T.equal(formerJobDescriptor.discovery.minimumFamiliarity, 25,
+    "public former work uses the established familiarity milestone")
+T.equal(hometownDescriptor.discovery.minimumFamiliarity, 25,
+    "public hometown uses the established familiarity milestone")
+T.equal(hobbyDescriptor.discovery.minimumFamiliarity, 50,
+    "personal hobby uses the established familiarity milestone")
+T.equal(fearDescriptor.discovery.minimumFamiliarity, 75,
+    "sensitive fear uses the established familiarity milestone")
+T.equal(fearDescriptor.privacy, "private",
+    "sensitive backstory remains private")
+T.equal(fearDescriptor.discovery.allowInference, false,
+    "sensitive backstory cannot be inferred")
+T.equal(fearDescriptor.discovery.allowObservation, false,
+    "sensitive backstory cannot be observed")
+
 local preview = Knowledge.PreviewBackstory(
     "char_a", npc.id, "former_job"
 )
@@ -96,6 +123,27 @@ T.equal(preview.reason, "insufficient_familiarity",
 T.equal(Knowledge.GetDescriptor(
     "char_a", npc.id, "history.backstory.former_job"
 ), nil, "familiarity did not auto-reveal former work")
+
+familiarityByCharacter.char_a = 25
+T.truthy(Knowledge.PreviewBackstory(
+    "char_a", npc.id, "former_job"
+).allowed, "public former work becomes eligible at familiarity 25")
+T.equal(Knowledge.GetDescriptor(
+    "char_a", npc.id, "history.backstory.former_job"
+), nil, "eligibility did not automatically discover former work")
+
+familiarityByCharacter.char_a = 50
+T.truthy(Knowledge.PreviewBackstory(
+    "char_a", npc.id, "hobby"
+).allowed, "personal hobby becomes eligible at familiarity 50")
+T.equal(Knowledge.PreviewBackstory(
+    "char_a", npc.id, "fear"
+).allowed, false, "sensitive fear is not eligible at familiarity 50")
+
+familiarityByCharacter.char_a = 75
+T.truthy(Knowledge.PreviewBackstory(
+    "char_a", npc.id, "fear"
+).allowed, "sensitive fear becomes eligible at familiarity 75")
 
 familiarityByCharacter.char_a = 80
 local disclosure = Knowledge.DiscloseBackstory(
