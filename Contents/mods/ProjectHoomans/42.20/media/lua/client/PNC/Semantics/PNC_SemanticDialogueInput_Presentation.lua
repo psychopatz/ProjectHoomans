@@ -103,19 +103,54 @@ local function recordNPCResponseTurn(
     local branch = decision and decision.branch or nil
     local responseSpeechAct = branch == "COMPLIMENT_RECEIVED"
         and "COMPLIMENT_RESPONSE" or "ANSWER"
-    local topic = inputIR and inputIR.extensions
+    local topic = response and response.topic or nil
+    topic = topic or inputIR and inputIR.extensions
         and inputIR.extensions.topic or nil
     if type(topic) == "table" then topic = topic.id or topic.key end
+    if inputIR and (inputIR.intent == "ACCEPT"
+            or inputIR.intent == "ACKNOWLEDGE"
+            or inputIR.intent == "AGREE"
+            or inputIR.intent == "THANK")
+    then
+        topic = context.currentTopic or context.previousTopic or topic
+    end
     topic = topic or inputIR and (inputIR.subject or inputIR.action)
     if topic == nil then
         -- An acknowledgment gets its own topic in the turn state. Preserve
         -- the question topic that its response is continuing.
         topic = context.previousTopic or context.currentTopic
     end
+    local responseSubject = response and response.referenceSubject
+        or inputIR and inputIR.subject
+
+    -- Keep one compact, participant-scoped discourse focus for the existing
+    -- reference resolver.  This is a topic mention, not a fabricated world
+    -- entity or fact; authoritative providers still answer the follow-up.
+    local mentions
+    -- Gameplay-action responses must not add a competing conversational topic
+    -- candidate.  Existing command/task target resolution relies on the
+    -- authoritative world target remaining the only candidate for "there".
+    if inputIR and inputIR.action == nil
+        and topic ~= nil and tostring(topic) ~= ""
+    then
+        local referenceTopic = response and response.referenceTopic or topic
+        mentions = {
+            {
+                entityType = "topic",
+                kind = "topic",
+                concept = responseSubject
+                    or "CONVERSATION_TOPIC",
+                text = tostring(referenceTopic),
+                value = tostring(referenceTopic),
+                topic = tostring(topic),
+                source = "semantic_response",
+            },
+        }
+    end
     return context:RecordNPCResponse({
         intent = "RESPONSE",
         speechAct = responseSpeechAct,
-        subject = inputIR and inputIR.subject,
+        subject = responseSubject,
         rawText = responseText,
         extensions = {
             topic = topic,
@@ -126,6 +161,7 @@ local function recordNPCResponseTurn(
         source = "semantic_response",
         branch = branch,
         topic = topic,
+        mentions = mentions,
     })
 end
 
@@ -184,6 +220,72 @@ function Internal.QueueDeterministicResponse(
         responses = { actionResult.response }
         response = responses[1]
     end
+    local generatedFlowResponse = false
+    local localResponse = PNC.Semantics and PNC.Semantics.LocalResponse
+    local taskResponses = Internal.TaskResponses
+    local questResponses = Internal.QuestResponses
+    local preserveQuestResponse = questResponses
+        and type(questResponses.UseExistingResultResponse) == "function"
+        and questResponses.UseExistingResultResponse(
+            actionResult, actionResult and actionResult.action)
+    if preserveQuestResponse then
+        -- The authoritative quest-result spoke owns both accepted and rejected
+        -- wording. Never leak the generated admission line or add a second
+        -- generic ActionRejected line while its result is pending.
+        return true
+    end
+    local preserveTaskResponse = taskResponses
+        and type(taskResponses.UseExistingResultResponse) == "function"
+        and taskResponses.UseExistingResultResponse(
+            actionResult, nil, actionResult and actionResult.action)
+    local flowResultApplied = result.flow
+        and result.flow.generated == true
+        and (result.flow.resultNodeId ~= nil
+            or result.flow.gate
+            and result.flow.gate.status == "FAIL")
+        and actionResult
+        and (actionResult.status ~= "semantic_dispatch_blocked"
+            or result.flow.resultNodeId == "rejected"
+            or result.flow.resultNodeId == "failed"
+            or result.flow.gate
+            and result.flow.gate.status == "FAIL")
+    local actionAccepted = not (ir and ir.action)
+        or actionResult and actionResult.accepted == true
+        or flowResultApplied
+    if not (actionResult and type(actionResult.response) == "table")
+        and result.flow and result.flow.matched == true
+        and ir and ir.action ~= nil
+        and actionAccepted
+        and preserveTaskResponse ~= true
+        and type(result.flow.responsePool) == "string"
+        and localResponse
+        and type(localResponse.ResolveFlow) == "function"
+    then
+        local flowResponse = localResponse.ResolveFlow(
+            ir,
+            session and session.semanticDialogueState,
+            type(Internal.ShallowContext) == "function"
+                and Internal.ShallowContext(view) or {},
+            result.flow
+        )
+        if type(flowResponse) == "table" then
+            responses = { ResponseAdapter.Payload({ response = flowResponse }) }
+            response = responses[1]
+            generatedFlowResponse = true
+        end
+    end
+    local rejectedResponse
+    if not generatedFlowResponse
+        and not (actionResult and type(actionResult.response) == "table")
+    then
+        rejectedResponse = ResponseAdapter.ActionRejected(
+            result, actionResult
+        )
+    end
+    if rejectedResponse then
+        responses = { rejectedResponse }
+        response = rejectedResponse
+    end
     local campResponse = ResponseAdapter.CampAcknowledgement(
         result, actionResult)
     if campResponse then
@@ -198,14 +300,25 @@ function Internal.QueueDeterministicResponse(
         -- in front of it.
         return true
     end
+    if decision.branch == "INVENTORY_QUERY_RECEIVED"
+        and actionResult
+        and actionResult.accepted == false
+        and actionResult.reason == "inventory_query_pending_limit"
+    then
+        -- The bounded pending map already prevents another request. Do not
+        -- add a generic action failure beside the next authoritative result.
+        return true
+    end
     if actionResult and actionResult.accepted == false
         and actionResult.status ~= "unmapped"
         and actionResult.status ~= "skipped"
         and type(actionResult.response) ~= "table"
     then
-        -- DispatchAction has already converted the authoritative rejection
-        -- into a task-result message. Do not append a misleading "Okay."
-        return true
+        -- The existing dispatcher rejected the request. The explicit
+        -- ActionRejected response above keeps the NPC wording truthful and
+        -- prevents the policy's pre-dispatch acknowledgement from leaking.
+        -- A task/gift adapter may still own a more specific response.
+        if not rejectedResponse and not generatedFlowResponse then return true end
     end
     if decision.branch == "INVENTORY_QUERY_RECEIVED"
         and actionResult and actionResult.result

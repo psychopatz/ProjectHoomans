@@ -197,11 +197,13 @@ end
 local function topicFrom(context)
     local situation = context and context.dialogueSituation
     local conversation = situation and situation.conversation or nil
+    local dialogue = context and context.semanticDialogueContext or nil
+    local pending = dialogue and dialogue.pendingFollowUp or nil
     local candidates = {
+        pending and pending.topic,
         context and context.currentTopic,
         conversation and conversation.currentTopic,
-        context and context.semanticDialogueContext
-            and context.semanticDialogueContext.currentTopic,
+        dialogue and dialogue.currentTopic,
         context and context.semanticContextState
             and context.semanticContextState.currentTopic,
         topicFromRecentTurns(context),
@@ -291,7 +293,7 @@ local function recoverQuestion(ir, topic, evidence)
 
     local extensions = {
         recovery = "CONTEXTUAL_FUZZY",
-        topic = topic,
+        topic = string.lower(topic),
     }
     if topic == "WELLBEING" then
         extensions.dialogueFollowUp = "WELLBEING"

@@ -52,6 +52,45 @@ function RuntimeEnvironment.configure(context)
     context.npcData = npcData
     context.world = world
     context.runtime = runtime
+    context.semanticFactValues = {}
+    ModData = {
+        get = function(key)
+            return Runtime.modData[tostring(key or "")]
+        end,
+        getOrCreate = function(key)
+            key = tostring(key or "")
+            Runtime.modData[key] = Runtime.modData[key] or {}
+            return Runtime.modData[key]
+        end,
+    }
+    if world.zombieKills ~= nil then
+        context.semanticFactValues["player.stats.zombie_kills"] = {
+            status = "known",
+            value = Values.number(world.zombieKills, 0),
+            type = "number",
+            unit = "count",
+            authority = "harness",
+        }
+    end
+    if world.weatherTransition ~= nil then
+        context.semanticFactValues["world.weather.transition"] = {
+            status = "known",
+            value = tostring(world.weatherTransition),
+            type = "string",
+            unit = "transition",
+            authority = "harness",
+        }
+    end
+    if PNC.Semantics and PNC.Semantics.WorldContext
+        and type(PNC.Semantics.WorldContext.Clear) == "function"
+    then
+        PNC.Semantics.WorldContext.Clear()
+    end
+    if PNC.Semantics and PNC.Semantics.EngineEvents
+        and type(PNC.Semantics.EngineEvents.Reset) == "function"
+    then
+        PNC.Semantics.EngineEvents.Reset()
+    end
 
     Translator = {
         getLanguage = function()
@@ -96,12 +135,16 @@ function RuntimeEnvironment.configure(context)
         getHoursSurvived = function()
             return Values.number(world.worldAgeHours, 0)
         end,
+        getZombieKills = function()
+            return world.zombieKills
+        end,
         getInventory = function()
             return context.InventoryFixtures.nativeInventory(
                 context.playerInventory
             )
         end,
     }
+    player.characterUUID = playerData.characterUUID
     context.player = player
 
     local gameTime = {
@@ -116,6 +159,12 @@ function RuntimeEnvironment.configure(context)
             local time = Values.number(world.timeOfDay, 12)
             return math.floor((time - math.floor(time)) * 60 + 0.5)
         end,
+        -- Build 42's Identity resolver reads the zero-based calendar day;
+        -- keep the headless engine seam explicit instead of special-casing
+        -- backstory reconstruction in the worker command.
+        getDay = function()
+            return math.floor(Values.number(world.worldAgeHours, 0) / 24) % 28
+        end,
         getDayPlusOne = function()
             return math.floor(Values.number(world.worldAgeHours, 0) / 24) + 1
         end,
@@ -124,13 +173,59 @@ function RuntimeEnvironment.configure(context)
     }
     local climate = {
         getPrecipitationIntensity = function()
-            return world.weather == "rain" and 0.8 or 0
+            if world.weather == "rain" then return 0.8 end
+            if world.weather == "clear" or world.weather == "fog"
+                or world.weather == "snow"
+            then
+                return 0
+            end
+            return nil
         end,
-        isRaining = function() return world.weather == "rain" end,
+        isRaining = function()
+            if world.weather == "rain" then return true end
+            if world.weather == "clear" or world.weather == "fog"
+                or world.weather == "snow"
+            then
+                return false
+            end
+            return nil
+        end,
         getFogIntensity = function()
-            return world.weather == "fog" and 0.8 or 0
+            if world.weather == "fog" then return 0.8 end
+            if world.weather == "clear" or world.weather == "rain"
+                or world.weather == "snow"
+            then
+                return 0
+            end
+            return nil
         end,
-        isFoggy = function() return world.weather == "fog" end,
+        getSnowIntensity = function()
+            if world.weather == "snow" then return 0.8 end
+            if world.weather == "clear" or world.weather == "rain"
+                or world.weather == "fog"
+            then
+                return 0
+            end
+            return nil
+        end,
+        isSnowing = function()
+            if world.weather == "snow" then return true end
+            if world.weather == "clear" or world.weather == "rain"
+                or world.weather == "fog"
+            then
+                return false
+            end
+            return nil
+        end,
+        isFoggy = function()
+            if world.weather == "fog" then return true end
+            if world.weather == "clear" or world.weather == "rain"
+                or world.weather == "snow"
+            then
+                return false
+            end
+            return nil
+        end,
         getTemperature = function() return 20 end,
     }
 
@@ -163,6 +258,7 @@ function RuntimeEnvironment.configure(context)
     end
     PsychopatzCore.RuntimeRole = {
         AllowsServerCode = function() return true end,
+        IsPureClient = function() return runtime.mode == "multiplayer" end,
     }
     PsychopatzCore.DebugTrace = {
         IsEnabled = function() return true end,

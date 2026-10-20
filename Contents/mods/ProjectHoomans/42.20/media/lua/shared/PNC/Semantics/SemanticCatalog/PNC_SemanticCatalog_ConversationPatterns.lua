@@ -322,6 +322,66 @@ function Internal.RegisterSocialSignals()
     -- when a conversational news term follows a stock possession question.
     registerNewsQuestions()
 
+    local continuation = {
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "CONVERSATION",
+        extensions = { dialogueFollowUp = "CONVERSATION_CONTINUATION" },
+    }
+    registerPattern(
+        "pnc.social.continuation.tell_me_more",
+        {
+            { kind = "literal", value = "tell" },
+            { kind = "literal", value = "me" },
+            { kind = "concept", id = "MORE" },
+        },
+        continuation,
+        0.99,
+        145
+    )
+    registerPattern(
+        "pnc.social.continuation.more",
+        { "@MORE" },
+        continuation,
+        0.98,
+        144
+    )
+    registerPattern(
+        "pnc.social.continuation.say_more",
+        {
+            { kind = "literal", value = "can" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "say" },
+            { kind = "concept", id = "MORE" },
+        },
+        continuation,
+        0.98,
+        144
+    )
+    registerPattern(
+        "pnc.social.continuation.say_more_short",
+        {
+            { kind = "literal", value = "say" },
+            { kind = "concept", id = "MORE" },
+        },
+        continuation,
+        0.98,
+        144
+    )
+    registerPattern(
+        "pnc.social.continuation.tell_me_more_question",
+        {
+            { kind = "literal", value = "can" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "tell" },
+            { kind = "literal", value = "me" },
+            { kind = "concept", id = "MORE" },
+        },
+        continuation,
+        0.98,
+        144
+    )
+
     registerPattern(
         "pnc.social.thank",
         { "@THANK" },

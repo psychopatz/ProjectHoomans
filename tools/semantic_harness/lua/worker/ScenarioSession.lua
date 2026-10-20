@@ -21,7 +21,14 @@ ScenarioSession.initialScenario = {
         traits = { "reserved" },
         relationship = { approval = 0, respect = 0, familiarity = 0, revision = 1 },
     },
-    world = { hunger = 0.2, thirst = 0.4, fatigue = 0.1, timeOfDay = 13.5, worldAgeHours = 49.5 },
+    world = {
+        hunger = 0.2,
+        thirst = 0.4,
+        fatigue = 0.1,
+        timeOfDay = 13.5,
+        worldAgeHours = 49.5,
+        zombieKills = 0,
+    },
     conversation = { topic = "greeting", token = "harness-lease" },
     runtime = { mode = "singleplayer", language = "EN", llmEnabled = false, providerAvailable = false },
 }
@@ -38,6 +45,25 @@ function ScenarioSession.reset(context, scenario)
     Runtime.scenario = scenario
     context.RuntimeState.resetContainers(Runtime)
     ScenarioSession.configureRuntime(context)
+    PNC.Client = PNC.Client or {}
+    Runtime.productionSocialRequest = Runtime.productionSocialRequest
+        or PNC.Client.RequestSemanticSocialInteraction
+    if Runtime.productionSocialRequest then
+        local runtime = scenario.runtime or {}
+        if runtime.socialTransportAvailable == false then
+            -- Harness-only boundary control: exercise the real production
+            -- response path without inventing a server event or effect.
+            PNC.Client.RequestSemanticSocialInteraction = nil
+        else
+            PNC.Client.RequestSemanticSocialInteraction =
+                Runtime.productionSocialRequest
+        end
+    end
+    if scenario.runtime and scenario.runtime.mode == "multiplayer"
+        and type(Runtime.questProductionWrapper) == "function"
+    then
+        PNC.Client.RequestSemanticQuest = Runtime.questProductionWrapper
+    end
     context.Translations.setLanguage(
         context, context.Translations.scenarioLanguage(context)
     )
@@ -46,6 +72,8 @@ function ScenarioSession.reset(context, scenario)
     PNC.Network.ClientState.pendingSemanticIdentity = {}
     PNC.Network.ClientState.identityTrust = {}
     PNC.Network.ClientState.semanticIdentityResults = {}
+    PNC.Network.ClientState.semanticQuestResults = {}
+    PNC.Network.ClientState.semanticQuestResultOrder = {}
     PNC.Network.ClientState.npcPresentations = {}
     local npc = scenario.npc or {}
     PNC.Network.ClientState.conversationRelationships[npc.npcID] =
@@ -62,6 +90,7 @@ function ScenarioSession.reset(context, scenario)
         loadedModules = Runtime.loadedModules,
         moduleManifest = Values.copy(Runtime.moduleManifest),
         headlessRequires = Values.copy(Runtime.headlessRequires),
+        questBoundary = Runtime.questBoundary,
         translation = context.OutputProjection.translationSnapshot(context),
     }
 end
@@ -84,6 +113,7 @@ function ScenarioSession.snapshot(context)
         loadedModules = Runtime.loadedModules,
         moduleManifest = Values.copy(Runtime.moduleManifest),
         headlessRequires = Values.copy(Runtime.headlessRequires),
+        questBoundary = Runtime.questBoundary,
     }
 end
 

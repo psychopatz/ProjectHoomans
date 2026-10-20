@@ -100,5 +100,15 @@
     "UI_PNC_Research_TableReady": "HANDA NA ANG TALAAN NG PANANALIKSIK",
     "UI_PNC_Research_Unassigned": "HINDI NAKATALAGA",
     "UI_PNC_Research_WindowTitle": "PANANALIKSIK SA KOLONYA",
-    "UI_PNC_Research_Work": "KINAKAILANGANG TRABAHO"
+    "UI_PNC_Research_Work": "KINAKAILANGANG TRABAHO",
+    "UI_PNC_KnowledgeFact_BackstoryFormerJob": "Dating trabaho",
+    "UI_PNC_KnowledgeFact_BackstoryHometown": "Pinagmulan",
+    "UI_PNC_KnowledgeFact_BackstoryEducation": "Edukasyon",
+    "UI_PNC_KnowledgeFact_BackstoryHobby": "Libangan",
+    "UI_PNC_KnowledgeFact_BackstoryFamily": "Pamilya",
+    "UI_PNC_KnowledgeFact_BackstoryValue": "Mga pagpapahalaga",
+    "UI_PNC_KnowledgeFact_BackstorySurvival": "Pinagmulan ng pagligtas",
+    "UI_PNC_KnowledgeFact_BackstoryFear": "Takot",
+    "UI_PNC_KnowledgeFact_BackstoryTragedy": "Personal na pagkawala",
+    "UI_PNC_KnowledgeFact_BackstoryDateOfBirth": "Araw ng kapanganakan"
 }

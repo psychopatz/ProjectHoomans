@@ -70,17 +70,25 @@ function Conversation.buildContext(context)
         relationship = copy(relationship),
         npcTraits = copy(npc.traits or {}),
         npcPersonality = copy(npc.personality or {}),
+        semanticFactValues = copy(context.semanticFactValues or {}),
         player = nil,
         playerNameKnown = true,
         playerName = context.SemanticAdapters.playerName(context, player),
         characterUUID = player.characterUUID,
         conversationTopic = conversation.topic or "greeting",
         conversationLifecycleState = { token = conversation.token or "harness-lease" },
+        semanticAuthorization = copy(
+            conversation.semanticAuthorization
+                or npc.semanticAuthorization
+        ),
         entry = {
             snapshot = {
                 activeBehavior = npc.activeBehavior,
                 healthState = npc.healthState,
                 bodyHealth = bodyHealth,
+                residence = copy(npc.residence),
+                knowledge = copy(npc.knowledge),
+                inventorySummary = copy(npc.inventorySummary),
                 hpCurrent = hpCurrent,
                 hpMax = hpMax,
                 needs = snapshotNeeds,
@@ -145,15 +153,39 @@ function Conversation.relationshipSnapshot(context)
 end
 
 function Conversation.contextSnapshot(harnessContext, view)
+    local Values = harnessContext.Values
     local session = view and view.session
     local dialogueContext = session and session.semanticDialogueContext
     local semanticState = session and session.semanticDialogueState
     local null = harnessContext.Protocol.NULL
+    local worldContext = PNC.Semantics.WorldContext
+        and PNC.Semantics.WorldContext.Get
+        and PNC.Semantics.WorldContext.Get({ player = harnessContext.player })
+        or nil
+    local engineFacts = {}
+    local factCatalog = harnessContext.EngineFacts
+        and harnessContext.EngineFacts.List
+        and harnessContext.EngineFacts.List() or {}
+    local factIndex
+    for factIndex = 1, #factCatalog do
+        local factID = factCatalog[factIndex].id
+        local record = harnessContext.EngineFacts.Resolve(factID, {
+            worldContext = worldContext,
+            semanticFactValues = harnessContext.semanticFactValues,
+            engineFacts = harnessContext.engineFacts,
+            player = harnessContext.player,
+        })
+        engineFacts[factID] = Values.copy(record)
+    end
     return {
         dialogue = dialogueContext and dialogueContext.ToContext
             and dialogueContext:ToContext() or null,
         state = semanticState and semanticState.Snapshot
             and semanticState:Snapshot() or null,
+        engineFacts = engineFacts,
+        engineEvents = harnessContext.EngineEvents
+            and harnessContext.EngineEvents.Recent
+            and Values.copy(harnessContext.EngineEvents.Recent()) or {},
     }
 end
 
@@ -213,6 +245,7 @@ function Conversation.turn(context, text)
             sequence = result.sequence,
             ir = Values.copy(result.ir),
             decision = Values.copy(result.decision),
+            flow = Values.copy(result.flow),
             actionResult = Values.copy(actionResult),
             candidates = Values.copy(result.candidates),
             candidateDiagnostics = Values.copy(result.candidateDiagnostics),
@@ -279,6 +312,16 @@ function Conversation.preview(context, text)
         timestamp = type(Internal.Now) == "function" and Internal.Now() or 0,
     }
     local result = router:Preview(value, projection, options)
+    if result and result.accepted == true
+        and result.ir and type(router.Decide) == "function"
+    then
+        -- Router:Preview intentionally does not commit a turn. Ask the same
+        -- production policy for its pure flow preview so the lab can inspect
+        -- generated gates/bindings without recording or dispatching anything.
+        local decision = router:Decide(result.ir, projection, options)
+        result.decision = decision
+        result.flow = decision and decision.flow
+    end
     local newTrace = {}
     local newTransport = {}
     local newTranslations = {}
@@ -307,6 +350,7 @@ function Conversation.preview(context, text)
             sequence = result.sequence,
             ir = Values.copy(result.ir),
             decision = Values.copy(result.decision),
+            flow = Values.copy(result.flow),
             candidates = Values.copy(result.candidates),
             candidateDiagnostics = Values.copy(result.candidateDiagnostics),
         } or nil,

@@ -18,6 +18,104 @@ local actionContext = Internal.ActionContext
 local giftResponse = Internal.GiftResponse
 local openGiftSelector = Internal.OpenGiftSelector
 
+-- Public metadata for the existing multi-stage gift route. The lifecycle,
+-- inventory selector, and authoritative transfer remain the owners; this is
+-- discovery/trace data, not a second gift dispatcher.
+local GiftCapability = {
+    capabilityID = "pnc:gift.offer",
+    owner = "PNC.Semantics.GiftLifecycle",
+    route = "existing_inventory_transfer",
+    workflowKind = "multi_stage_gift",
+    templateVersion = 1,
+    contractVersion = 1,
+    targetScope = "single_recipient",
+    handlerID = "PNC.Client.SendInventoryTransfer",
+    arguments = {
+        npcID = "recipient_target",
+        itemIDs = "resolved_inventory_selection",
+        quantity = "bounded",
+        inventoryRevision = "target_revision",
+        conversationToken = "authority_lease",
+    },
+    requires = {
+        "conversation_or_gift_authority",
+        "resolved_inventory_selection",
+        "target_inventory_revision",
+    },
+    result = {
+        "requested",
+        "pending",
+        "rejected",
+        "applied",
+        "completed",
+    },
+    triggerFrames = {
+        { intent = "OFFER", speechAct = "OFFER", action = "GIFT" },
+        { intent = "OFFER", action = "GIFT" },
+    },
+    requiredSlots = {
+        npcID = {
+            type = "entity",
+            source = "npcID",
+            owner = "dialogue_context",
+        },
+        object = {
+            type = "item",
+            source = "object",
+            owner = "semantic_ir",
+        },
+    },
+    permissionGate = {
+        type = "pnc:semantic_context",
+        capabilityID = "pnc:gift.offer",
+        requiresAuthority = true,
+    },
+    outcomeMapping = {
+        requested = "pending",
+        pending = "pending",
+        gift_transfer_pending = "pending",
+        gift_selector_open = "selection_required",
+        gift_selector_unavailable = "selection_required",
+        selection_required = "selection_required",
+        gift_item_not_found = "rejected",
+        gift_transfer_unavailable = "failed",
+        rejected = "rejected",
+        applied = "completed",
+        completed = "completed",
+        gift_transferred = "completed",
+        failed = "failed",
+    },
+    responsePools = {
+        selection_required = {
+            key = "UI_PNC_Conversation_Semantic_GeneratedGiftSelectionRequired",
+            en = "I need to see what you brought me first.",
+            tl = "Kailangan ko munang makita ang dala mo.",
+        },
+        pending = {
+            key = "UI_PNC_Conversation_Semantic_GeneratedGiftPending",
+            en = "I'll take a look at that gift.",
+            tl = "Titingnan ko ang regalong iyan.",
+        },
+        completed = {
+            key = "UI_PNC_Conversation_Semantic_GeneratedGiftCompleted",
+            en = "Thank you for the gift.",
+            tl = "Salamat sa regalo.",
+        },
+        rejected = {
+            key = "UI_PNC_Conversation_Semantic_GeneratedGiftRejected",
+            en = "I can't accept that gift right now.",
+            tl = "Hindi ko matanggap ang regalong iyan ngayon.",
+        },
+        failed = {
+            key = "UI_PNC_Conversation_Semantic_GeneratedGiftFailed",
+            en = "I couldn't accept that gift.",
+            tl = "Hindi ko matanggap ang regalong iyan.",
+        },
+    },
+    translationOwner = "ProjectHoomans",
+}
+PNC.Semantics.GiftCapability = GiftCapability
+
 local function targetInventoryRevision(npcID)
     local state = PNC.Network and PNC.Network.ClientState or nil
     local payload = state and state.characterPayloads
@@ -99,6 +197,7 @@ local function beginGiftRequest(session, value, context, selection, requestID)
             selection = selection,
             npcID = context.npcID,
             conversationID = context.conversationID,
+            generatedFlow = context.generatedFlow,
         })
     else
         begun, beginReason = false, "gift_lifecycle_unavailable"
@@ -127,22 +226,23 @@ local function sendGiftTransfer(
     session, context, selection, requestID, medicalSupplyRequest
 )
     local client = PNC.Client
+    local transferRequest = {
+        id = context.npcID,
+        direction = "player_to_npc",
+        itemIDs = selection.itemIDs,
+        quantity = selection.quantity,
+        inventoryRevision = targetInventoryRevision(context.npcID),
+        npcContainer = "root",
+        gift = true,
+        conversationToken = context.conversationToken,
+        requestId = requestID,
+        medicalSupplyTaskID = medicalSupplyRequest
+            and medicalSupplyRequest.taskID or nil,
+        medicalSupplyRequestID = medicalSupplyRequest
+            and medicalSupplyRequest.requestID or nil,
+    }
     local sent = client and type(client.SendInventoryTransfer) == "function"
-        and client.SendInventoryTransfer({
-            id = context.npcID,
-            direction = "player_to_npc",
-            itemIDs = selection.itemIDs,
-            quantity = selection.quantity,
-            inventoryRevision = targetInventoryRevision(context.npcID),
-            npcContainer = "root",
-            gift = true,
-            conversationToken = context.conversationToken,
-            requestId = requestID,
-            medicalSupplyTaskID = medicalSupplyRequest
-                and medicalSupplyRequest.taskID or nil,
-            medicalSupplyRequestID = medicalSupplyRequest
-                and medicalSupplyRequest.requestID or nil,
-        }) == true
+        and client.SendInventoryTransfer(transferRequest) == true
     if not sent then
         if session and GiftLifecycle and GiftLifecycle.Clear then
             GiftLifecycle.Clear(session, requestID)
@@ -172,6 +272,11 @@ local function sendGiftTransfer(
         accepted = true,
         pending = true,
         requestID = requestID,
+        action = "GIFT",
+        binding = GiftCapability,
+        capabilityID = GiftCapability.capabilityID,
+        handlerID = GiftCapability.handlerID,
+        request = transferRequest,
         selection = selection,
     }
 end
@@ -184,6 +289,7 @@ function Internal.DispatchGiftOffer(view, result, value)
         return nil
     end
     local context = actionContext(view, result, value)
+    context.generatedFlow = result and result.flow or nil
     if offer.marker
         and offer.marker.requiresActiveMedicalSupply == true
     then

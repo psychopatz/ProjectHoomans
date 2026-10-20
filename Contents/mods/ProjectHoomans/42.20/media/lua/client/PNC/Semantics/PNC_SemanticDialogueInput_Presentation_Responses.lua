@@ -14,6 +14,9 @@ local ResponseAdapter = {}
 
 local function semanticTranslationKey(response)
     local templateID = tostring(response and response.templateID or "")
+    if string.sub(templateID, 1, 7) == "UI_PNC_" then
+        return templateID
+    end
     if templateID == "semantic.question.identity" then
         local fallback = tostring(response and response.fallback or "")
         if string.find(string.lower(fallback), "liars", 1, true) then
@@ -29,6 +32,16 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_IdentityExchange",
         ["semantic.identity.exchange.unavailable"] =
             "UI_PNC_Conversation_Semantic_IdentityExchangeUnavailable",
+        ["semantic.action.follow.unavailable"] =
+            "UI_PNC_Conversation_Semantic_ActionFollowUnavailable",
+        ["semantic.action.stay.unavailable"] =
+            "UI_PNC_Conversation_Semantic_ActionStayUnavailable",
+        ["semantic.action.stop.unavailable"] =
+            "UI_PNC_Conversation_Semantic_ActionStopUnavailable",
+        ["semantic.social.interaction.unavailable"] =
+            "UI_PNC_Conversation_Semantic_SocialInteractionUnavailable",
+        ["semantic.social.interaction.rejected"] =
+            "UI_PNC_Conversation_Semantic_SocialInteractionRejected",
         ["semantic.question.identity.stranger_alt_1"] =
             "UI_PNC_Conversation_Semantic_QuestionIdentityStrangerAlt1",
         ["semantic.question.identity.stranger_alt_2"] =
@@ -57,6 +70,8 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_IdentityEvasionDefault",
         ["semantic.flow.greeting.opening.friendly"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly",
+        ["semantic.flow.greeting.opening.rain"] =
+            "UI_PNC_Conversation_Semantic_FlowGreetingOpeningRain",
         ["semantic.flow.greeting.opening.default"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingOpening",
         ["semantic.flow.greeting.opening.question.friendly"] =
@@ -67,6 +82,12 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly",
         ["semantic.flow.greeting.followup.default"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingFollowup",
+        ["semantic.flow.weather.raining.default"] =
+            "UI_PNC_Conversation_Semantic_FlowWeatherRaining",
+        ["semantic.flow.weather.clear.default"] =
+            "UI_PNC_Conversation_Semantic_FlowWeatherClear",
+        ["semantic.flow.weather.unknown.default"] =
+            "UI_PNC_Conversation_Semantic_FlowWeatherUnknown",
         ["semantic.social.compliment.default"] =
             "UI_PNC_Conversation_Semantic_ComplimentDefault",
         ["semantic.social.compliment.alternate"] =
@@ -119,6 +140,14 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_QuestionWellbeingFatigueAlt",
         ["semantic.question.wellbeing.injured"] =
             "UI_PNC_Conversation_Semantic_QuestionWellbeingInjured",
+        ["semantic.question.wellbeing.grounded.friendly.fact"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedFriendlyFact",
+        ["semantic.question.wellbeing.grounded.friendly.tone"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedFriendlyTone",
+        ["semantic.question.wellbeing.grounded.withdrawn.fact"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedWithdrawnFact",
+        ["semantic.question.wellbeing.grounded.withdrawn.tone"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedWithdrawnTone",
         ["semantic.question.wellbeing.default"] =
             "UI_PNC_Conversation_Semantic_QuestionWellbeingDefault",
         ["semantic.question.wellbeing.dataset.hanging_in"] =
@@ -149,6 +178,84 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpUnknown",
         ["semantic.question.wellbeing.follow_up.default"] =
             "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpDefault",
+        ["semantic.question.medical_bite.positive"] =
+            "UI_PNC_Conversation_Semantic_QuestionMedicalBitePositive",
+        ["semantic.question.medical_bite.negative"] =
+            "UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative",
+        ["semantic.question.medical_bite.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionMedicalBiteUnknown",
+        ["semantic.question.residence.known"] =
+            "UI_PNC_Conversation_Semantic_QuestionResidenceKnown",
+        ["semantic.question.residence.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionResidenceUnknown",
+        ["semantic.question.health_state.injured"] =
+            "UI_PNC_Conversation_Semantic_QuestionHealthStateInjured",
+        ["semantic.question.health_state.healthy"] =
+            "UI_PNC_Conversation_Semantic_QuestionHealthStateHealthy",
+        ["semantic.question.health_state.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionHealthStateUnknown",
+        ["semantic.question.knowledge.known"] =
+            "UI_PNC_Conversation_Semantic_QuestionKnowledgeKnown",
+        ["semantic.question.knowledge.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionKnowledgeUnknown",
+        ["semantic.conversation.acknowledged.default"] =
+            "UI_PNC_Conversation_Semantic_ConversationAcknowledged",
+        ["semantic.conversation.acknowledged.friendly"] =
+            "UI_PNC_Conversation_Semantic_ConversationAcknowledgedFriendly",
+        ["semantic.conversation.acknowledged.withdrawn"] =
+            "UI_PNC_Conversation_Semantic_ConversationAcknowledgedWithdrawn",
+        ["semantic.conversation.continuation.gossip_memory"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationGossipMemory",
+        ["semantic.conversation.continuation.gossip_unknown"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationGossipUnknown",
+        ["semantic.conversation.continuation.residence"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationResidence",
+        ["semantic.conversation.continuation.medical"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationMedical",
+        ["semantic.conversation.continuation.medical_known"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationMedicalKnown",
+        ["semantic.conversation.continuation.medical_unknown"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationMedicalUnknown",
+        ["semantic.conversation.continuation.knowledge"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationKnowledge",
+        ["semantic.conversation.continuation.default"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationDefault",
+        ["semantic.conversation.context_reference.unknown"] =
+
+            "UI_PNC_Conversation_Semantic_ContextReferenceUnknown",
+
+        ["semantic.conversation.context_reference.location_safety_unknown"] =
+
+            "UI_PNC_Conversation_Semantic_ContextReferenceLocationSafetyUnknown",
+
+        ["semantic.conversation.context_reference.description_unknown"] =
+
+            "UI_PNC_Conversation_Semantic_ContextReferenceDescriptionUnknown",
+
+        ["semantic.conversation.context_reference.medical_unknown"] =
+
+            "UI_PNC_Conversation_Semantic_ContextReferenceMedicalUnknown",
+
+        ["semantic.question.needs.offer.hunger"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsOfferHunger",
+        ["semantic.question.needs.offer.thirst"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsOfferThirst",
+        ["semantic.question.needs.offer.fatigue"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsOfferFatigue",
+        ["semantic.question.needs.offer.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsOfferUnknown",
+        ["semantic.question.needs.quantity.hunger"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityHunger",
+        ["semantic.question.needs.quantity.thirst"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityThirst",
+        ["semantic.question.needs.quantity.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityUnknown",
+        ["semantic.question.needs.proposal.hunger"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsProposalHunger",
+        ["semantic.question.needs.proposal.thirst"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsProposalThirst",
+        ["semantic.question.needs.proposal.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsProposalUnknown",
         ["semantic.social.apology.friendly"] =
             "UI_PNC_Conversation_Semantic_ApologyFriendly",
         ["semantic.social.apology.trusted"] =
@@ -203,6 +310,7 @@ local function localizedSegment(templateID, fallback, args)
     end
     args = type(args) == "table" and args or {}
     local firstArg = args.npcName or args.target or args.object
+        or args.location or args.topic
     if type(firstArg) == "table" then firstArg = nil end
     local ok, value = pcall(translation.TrFormat, key, fallback, firstArg)
     if ok and value ~= nil and tostring(value) ~= "" then
@@ -237,6 +345,9 @@ local function payloadForPlanTurn(response, rendered, fallbackRendered)
         planTurn = rendered.index,
         planTurnID = rendered.id,
         planContinuation = rendered.continuation,
+        topic = response.topic,
+        referenceTopic = response.referenceTopic,
+        referenceSubject = response.referenceSubject,
         segments = rendered.segments,
     }
 end
@@ -293,6 +404,9 @@ local function payloadsForResponse(response)
             translationKey = translationKey,
             plan = response.plan,
             planTurn = 1,
+            topic = response.topic,
+            referenceTopic = response.referenceTopic,
+            referenceSubject = response.referenceSubject,
         },
     }
 end
@@ -360,6 +474,107 @@ function ResponseAdapter.CampAcknowledgement(result, actionResult)
         text = text,
         fallback = text,
     }
+end
+
+function ResponseAdapter.ActionRejected(result, actionResult)
+    if type(actionResult) ~= "table"
+        or actionResult.accepted ~= false
+        or actionResult.status == "unmapped"
+        or actionResult.status == "skipped"
+    then
+        return nil
+    end
+    local action = string.upper(tostring(
+        result and result.ir and result.ir.action
+        or actionResult.action or ""
+    ))
+    local speechAct = string.upper(tostring(
+        result and result.ir
+        and (result.ir.speechAct or result.ir.intent) or ""
+    ))
+    local socialAct = speechAct == "INSULT"
+        or speechAct == "HOSTILE_REMARK"
+        or speechAct == "THREATEN"
+    if socialAct then
+        local reason = tostring(actionResult.reason or "")
+        local unavailable = string.find(reason, "unavailable", 1, true)
+            or string.find(reason, "transport", 1, true)
+            or actionResult.status == "semantic_social_dispatch_unavailable"
+        local templateID = unavailable
+            and "semantic.social.interaction.unavailable"
+            or "semantic.social.interaction.rejected"
+        local fallback = unavailable
+            and "I heard you, but I couldn't send that social reaction right now."
+            or "I heard you, but I couldn't apply that social reaction."
+        return ResponseAdapter.Payload({
+            response = {
+                templateID = templateID,
+                fallback = fallback,
+                args = {
+                    reason = reason,
+                    speechAct = speechAct,
+                },
+            },
+        })
+    end
+    local binding = actionResult.binding
+    local bindingPools = type(binding) == "table"
+        and binding.responsePools or nil
+    local bindingFailed = actionResult.status == "failed"
+        or type(actionResult.details) == "table"
+        and actionResult.details.status == "failed"
+    local bindingOutcome = bindingFailed and "failed" or "rejected"
+    local bindingResponse = type(bindingPools) == "table"
+        and bindingPools[bindingOutcome] or nil
+    if type(bindingResponse) == "table"
+        and type(bindingResponse.key) == "string"
+        and bindingResponse.key ~= ""
+    then
+        return ResponseAdapter.Payload({
+            response = {
+                templateID = bindingResponse.key,
+                fallback = bindingResponse.en or bindingResponse.fallback,
+                args = {
+                    action = action,
+                    reason = actionResult.reason,
+                },
+            },
+        })
+    end
+    -- Task admission failures already flow through ReceiveSemanticTaskResult,
+    -- which owns their single authoritative task-result line. Avoid adding a
+    -- second generic action-unavailable line for WAIT_AT.
+    if action == "WAIT_AT" then return nil end
+    local fallback = "I couldn't do that right now."
+    if action == "FOLLOW" or tostring(actionResult.commandID) == "follow" then
+        fallback = "I can't follow you right now."
+    elseif action == "STAY" then
+        fallback = "I can't stay right now."
+    elseif action == "STOP"
+        or tostring(actionResult.commandID) == "stay"
+    then
+        fallback = "I can't stop right now."
+    end
+    local templateID = "semantic.action.unavailable"
+    if action == "FOLLOW" or tostring(actionResult.commandID) == "follow" then
+        templateID = "semantic.action.follow.unavailable"
+    elseif action == "STAY" then
+        templateID = "semantic.action.stay.unavailable"
+    elseif action == "STOP"
+        or tostring(actionResult.commandID) == "stay"
+    then
+        templateID = "semantic.action.stop.unavailable"
+    end
+    return ResponseAdapter.Payload({
+        response = {
+            templateID = templateID,
+            fallback = fallback,
+            args = {
+                action = action,
+                reason = actionResult.reason,
+            },
+        },
+    })
 end
 
 return ResponseAdapter

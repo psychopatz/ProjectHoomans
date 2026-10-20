@@ -45,6 +45,19 @@ if Const.CMD_SEMANTIC_TASK_RESULT then
         end)
 end
 
+if Const.CMD_SEMANTIC_QUEST_RESULT then
+    Internal.RegisterServerCommand(Const.CMD_SEMANTIC_QUEST_RESULT,
+        function(args)
+            local input = PNC.Semantics
+                and PNC.Semantics.DialogueInput
+            if input and type(input.ReceiveSemanticQuestResult)
+                == "function"
+            then
+                input.ReceiveSemanticQuestResult(args or {})
+            end
+        end)
+end
+
 Internal.RegisterServerCommand(
     Const.CMD_SEMANTIC_INVENTORY_QUERY_RESULT,
     function(args)

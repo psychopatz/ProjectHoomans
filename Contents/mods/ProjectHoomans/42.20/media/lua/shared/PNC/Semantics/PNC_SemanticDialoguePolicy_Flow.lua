@@ -42,7 +42,11 @@ function Policy.Decide(ir, state, context, options)
         return applyLocalResponse(result, ir, state, context)
     end
 
-    local flowPreview = flowKernel
+    -- A flow preview is meaningful only when the caller supplied the
+    -- semantic state that CommitFlow will later update. Standalone policy
+    -- decisions remain the pure response path used by callers that do not
+    -- own a conversation session.
+    local flowPreview = state and flowKernel
         and flowKernel.Preview(ir, state, context, options) or nil
     local function finish(result)
         if flowPreview then

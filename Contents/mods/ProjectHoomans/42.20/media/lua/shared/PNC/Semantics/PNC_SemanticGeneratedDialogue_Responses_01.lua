@@ -40,6 +40,52 @@ return {
             },
         },
     {
+            ["id"] = "semantic.flow.weather.raining",
+            ["variants"] = {
+                {
+                    ["fallback"] = "It is raining right now. We can return to that proposal when you are ready.",
+                    ["id"] = "semantic.flow.weather.raining.dataset.contextual_switch",
+                    ["metadata"] = {
+                        ["reviewed"] = true,
+                        ["sourceRefs"] = {
+                            "MASSIVE",
+                            "SGD",
+                        },
+                        ["translationKey"] = "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
+                    },
+                    ["plan"] = {
+                        ["dialogueAct"] = "WEATHER_REPORT",
+                        ["groundedFactRefs"] = {
+                            "world.weather.raining",
+                        },
+                        ["personalityStyle"] = "contextual",
+                        ["sourcePoolID"] = "semantic.flow.weather.raining",
+                        ["tone"] = "conversational",
+                        ["topic"] = "WEATHER",
+                        ["turns"] = {
+                            {
+                                ["continuation"] = "continue",
+                                ["id"] = "dataset_contextual_weather_switch",
+                                ["segments"] = {
+                                    {
+                                        ["fallback"] = "It is raining right now. We can return to that proposal when you are ready.",
+                                        ["kind"] = "translation",
+                                        ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
+                                    },
+                                },
+                            },
+                        },
+                        ["uncertainty"] = "known",
+                    },
+                    ["priority"] = 4,
+                    ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
+                    ["when"] = {
+                        ["pattern"] = "pnc.dataset.question.weather.can_we_talk_about_the_weather",
+                    },
+                },
+            },
+        },
+    {
             ["id"] = "semantic.greeting",
             ["variants"] = {
                 {
@@ -148,43 +194,45 @@ return {
             },
         },
     {
-            ["id"] = "semantic.question.wellbeing",
+            ["id"] = "semantic.question.needs.proposal",
             ["variants"] = {
                 {
-                    ["fallback"] = "I'm hanging in there. Thanks for asking.",
-                    ["id"] = "semantic.question.wellbeing.dataset.hanging_in",
-                    ["templateID"] = "semantic.question.wellbeing.dataset.hanging_in",
-                },
-                {
-                    ["fallback"] = "Doing okay, all things considered.",
-                    ["id"] = "semantic.question.wellbeing.dataset.all_things_considered",
-                    ["templateID"] = "semantic.question.wellbeing.dataset.all_things_considered",
-                },
-                {
-                    ["fallback"] = "I'm getting by, one day at a time. How about you?",
-                    ["id"] = "semantic.question.wellbeing.dataset.getting_by",
-                    ["templateID"] = "semantic.question.wellbeing.dataset.getting_by",
-                },
-                {
-                    ["fallback"] = "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-                    ["id"] = "semantic.question.wellbeing.dataset.hungry",
-                    ["priority"] = 2,
-                    ["templateID"] = "semantic.question.wellbeing.dataset.hungry",
-                    ["when"] = {
-                        ["needType"] = "hunger",
-                        ["needUrgency"] = {
-                            "moderate",
-                            "severe",
-                            "emergency",
-                            "critical",
+                    ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                    ["id"] = "semantic.question.needs.proposal.dataset.thirst",
+                    ["metadata"] = {
+                        ["reviewed"] = true,
+                        ["sourceRefs"] = {
+                            "MASSIVE",
+                            "SGD",
                         },
+                        ["translationKey"] = "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
                     },
-                },
-                {
-                    ["fallback"] = "I'm pretty thirsty. If you have water, could you spare some?",
-                    ["id"] = "semantic.question.wellbeing.dataset.thirsty",
-                    ["priority"] = 3,
-                    ["templateID"] = "semantic.question.wellbeing.dataset.thirsty",
+                    ["plan"] = {
+                        ["dialogueAct"] = "PROMISE_ACKNOWLEDGEMENT",
+                        ["groundedFactRefs"] = {
+                            "npc.needs.thirst",
+                        },
+                        ["personalityStyle"] = nil,
+                        ["sourcePoolID"] = "semantic.question.needs.proposal",
+                        ["tone"] = "direct",
+                        ["topic"] = "NEEDS",
+                        ["turns"] = {
+                            {
+                                ["continuation"] = "continue",
+                                ["id"] = "dataset_proposal_acknowledged",
+                                ["segments"] = {
+                                    {
+                                        ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                                        ["kind"] = "translation",
+                                        ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
+                                    },
+                                },
+                            },
+                        },
+                        ["uncertainty"] = "pending",
+                    },
+                    ["priority"] = 4,
+                    ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
                     ["when"] = {
                         ["needType"] = "thirst",
                         ["needUrgency"] = {
@@ -195,63 +243,52 @@ return {
                         },
                     },
                 },
+            },
+        },
+    {
+            ["id"] = "semantic.question.needs.quantity",
+            ["variants"] = {
                 {
-                    ["fallback"] = "I'm tired, though I can manage for now.",
-                    ["id"] = "semantic.question.wellbeing.dataset.tired",
-                    ["priority"] = 2,
-                    ["templateID"] = "semantic.question.wellbeing.dataset.tired",
-                    ["when"] = {
-                        ["needType"] = "fatigue",
-                        ["needUrgency"] = {
-                            "moderate",
-                            "severe",
-                            "emergency",
-                            "critical",
+                    ["fallback"] = "I can confirm water is a need, but which item do you mean?",
+                    ["id"] = "semantic.question.needs.quantity.dataset.clarify_thirst",
+                    ["metadata"] = {
+                        ["reviewed"] = true,
+                        ["sourceRefs"] = {
+                            "MASSIVE",
+                            "SGD",
                         },
+                        ["translationKey"] = "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
                     },
-                },
-            },
-        },
-    {
-            ["id"] = "semantic.refuse",
-            ["variants"] = {
-                {
-                    ["fallback"] = "I can't take that on right now.",
-                    ["id"] = "semantic.refuse.dataset.pending_unavailable",
-                    ["priority"] = 1,
-                    ["templateID"] = "semantic.refuse.dataset.pending_unavailable",
+                    ["plan"] = {
+                        ["dialogueAct"] = "ASK_CLARIFICATION",
+                        ["groundedFactRefs"] = {
+                            "npc.needs.thirst",
+                        },
+                        ["personalityStyle"] = nil,
+                        ["sourcePoolID"] = "semantic.question.needs.quantity",
+                        ["tone"] = "clarifying",
+                        ["topic"] = "NEEDS",
+                        ["turns"] = {
+                            {
+                                ["continuation"] = "continue",
+                                ["id"] = "dataset_needs_clarification",
+                                ["segments"] = {
+                                    {
+                                        ["fallback"] = "I can confirm water is a need, but which item do you mean?",
+                                        ["kind"] = "translation",
+                                        ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
+                                    },
+                                },
+                            },
+                        },
+                        ["uncertainty"] = "ambiguous",
+                    },
+                    ["priority"] = 4,
+                    ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
                     ["when"] = {
-                        ["hasPendingRequest"] = true,
+                        ["lastIntent"] = "CLARIFY",
+                        ["needType"] = "thirst",
                     },
-                },
-                {
-                    ["fallback"] = "Not this time. I have enough to manage.",
-                    ["id"] = "semantic.refuse.dataset.pending_enough",
-                    ["priority"] = 1,
-                    ["templateID"] = "semantic.refuse.dataset.pending_enough",
-                    ["when"] = {
-                        ["hasPendingRequest"] = true,
-                    },
-                },
-            },
-        },
-    {
-            ["id"] = "semantic.thanks",
-            ["variants"] = {
-                {
-                    ["fallback"] = "No problem at all.",
-                    ["id"] = "semantic.thanks.dataset.no_problem",
-                    ["templateID"] = "semantic.thanks.dataset.no_problem",
-                },
-                {
-                    ["fallback"] = "Anytime.",
-                    ["id"] = "semantic.thanks.dataset.anytime",
-                    ["templateID"] = "semantic.thanks.dataset.anytime",
-                },
-                {
-                    ["fallback"] = "Glad I could help.",
-                    ["id"] = "semantic.thanks.dataset.glady",
-                    ["templateID"] = "semantic.thanks.dataset.glady",
                 },
             },
         },

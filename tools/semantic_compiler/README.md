@@ -91,7 +91,11 @@ WordNet package and license are documented at:
 greetings, identity questions, wellbeing/activity questions, and state-aware
 response variety. Its utterance patterns are exact full-phrase matches that
 emit only existing `GREET` or `QUESTION` semantics. Question subjects use
-existing `IDENTITY`, `WELLBEING`, and `ACTIVITY` response paths. Identity
+existing `IDENTITY`, `WELLBEING`, `ACTIVITY`, and `WEATHER` response paths.
+Reviewed `PROMISE`/`NEEDS`, `CLARIFY`/`NEEDS`, weather topic, and
+causal/wellbeing follow-up mappings reuse
+their existing canonical flow states; supplemental response plans extend the
+existing pools and are localized into EN/TL. Identity
 responses retain the existing name-disclosure trust gate, while supplemental
 lines vary by the NPC's identity-trust state.
 
@@ -115,3 +119,51 @@ Registry, and the existing response catalog appends the bounded variants to
 their current pools. The compiler rejects unsupported intents, fuzzy patterns,
 unknown response conditions, duplicate IDs/utterances, and oversized pools.
 No external corpus or linguistic package is loaded by Lua at runtime.
+
+Dialogue sources record a license and review date for every reference. A
+reviewed contextual mapping may add only an exact, bounded PROMISE/NEEDS or
+CLARIFY/NEEDS pattern when it names an existing canonical concept and needs
+state (`FETCH`/`NEEDS_PROPOSAL` or `ANY_ITEM`/`NEEDS_QUANTITY`).
+Its negative examples are compiler-only collision/false-command checks; they
+are never emitted into Lua. A response may carry a reviewed response plan and
+EN/TL text, which is emitted as a small translation shard beside the Lua
+artifacts. The C4-A sample uses WordNet 3.0 lexical guidance, MASSIVE
+English/Tagalog intent-slot guidance, and SGD dialogue-state guidance without
+shipping any of those datasets.
+
+The dialogue build also writes
+`common/media/translation/<LANG>/Conversation/Semantic/GeneratedDialogue.json`
+and adds both paths to the Conversation translation manifest. Re-running the
+command with unchanged input is byte-stable.
+
+## Canonical semantic definitions
+
+`semantic_definitions.json` is the reviewed `pnc.semantic_authoring.v1` source
+for typed action-bearing definitions. It is compiled through the same offline
+tool into explicit pattern, flow, response-pool, translation, and require
+manifest modules. Capability IDs are resolved against the existing production
+adapter descriptors; the compiler rejects unknown capabilities, executable
+negative/question examples, unreachable flow nodes, duplicate utterances, and
+translation-key collisions.
+
+Build the checked-in modular source with:
+
+```sh
+python3 tools/semantic_compiler/build.py \
+  --semantic-source tools/semantic_compiler/semantic_definitions.json
+```
+
+Generated Lua belongs under `42.20/media/lua/shared/PNC/Semantics/`; EN/TL
+shards belong under `common/media/translation/<LANG>/Conversation/Semantic/`,
+and the existing Conversation translation manifest is updated with explicit
+paths. Re-running the command with unchanged input is byte-stable. Generated
+flow triggers may scope to an authored pattern so an authored flow cannot claim
+an unrelated hand-written route with the same action frame.
+# Compatibility
+
+The compiler implementation and artifact writers are now owned by Semantic
+Lab under `tools/semantic_harness/codebuilder/`. This directory keeps the
+reviewed JSON inputs as the canonical source data and thin Python wrappers for
+legacy direct-script and module entry points. See
+`tools/semantic_harness/codebuilder/README.md` for the unified authoring/build
+commands.

@@ -11,6 +11,7 @@ local targetText = Internal.TargetText
 local socialCounts = Internal.SocialCounts
 local followsRelationshipStatusAnswer =
     Internal.FollowsRelationshipStatusAnswer
+local followsQuestionAnswer = Internal.FollowsQuestionAnswer
 local resolveQuestion = Internal.ResolveQuestion
 
 local function wellbeingFactsUnknown(context)
@@ -28,6 +29,23 @@ local function wellbeingFactsUnknown(context)
         and (type(emotion) ~= "table" or emotion.highest == nil)
 end
 
+local function groundedWellbeingEligible(context)
+    local situation = type(context) == "table"
+        and context.dialogueSituation or nil
+    local npc = type(situation) == "table" and situation.npc or nil
+    local healthState = type(npc) == "table" and npc.healthState or nil
+    local personality = type(context) == "table"
+        and context.npcPersonality or nil
+    local authoredStyle = type(personality) == "table"
+        and personality.socialStyle or nil
+    return (healthState == "injured"
+            or healthState == "wounded"
+            or healthState == "critical")
+        and (authoredStyle == "friendly"
+            or authoredStyle == "protective"
+            or authoredStyle == "withdrawn")
+end
+
 function Response.ResolveFlow(ir, state, context, flow)
     if type(flow) ~= "table" or flow.matched ~= true then
         return nil, "flow_response_not_matched"
@@ -38,17 +56,24 @@ function Response.ResolveFlow(ir, state, context, flow)
     if type(response) ~= "table" then
         return nil, "flow_response_variant_unavailable"
     end
-    -- The wellbeing flow can own the exchange while the response resolver
-    -- still protects the unknown-facts boundary. Do not let its broad normal
-    -- pool turn missing health evidence into an unsupported "I'm okay" claim.
+    -- The wellbeing flow owns the exchange, but its broad pool is only the
+    -- default response source. Let the shared question resolver replace it
+    -- with a more specific grounded/personality pool when the same
+    -- authoritative situation supports one. This keeps flow ownership and
+    -- response planning separate without duplicating a dialogue engine.
     if poolID == "semantic.question.wellbeing"
-        and wellbeingFactsUnknown(context)
         and type(Response.Resolve) == "function"
+        and (wellbeingFactsUnknown(context)
+            or groundedWellbeingEligible(context))
     then
         local contextual = Response.Resolve(
             ir, state, context, "QUESTION_RECEIVED"
         )
-        if type(contextual) == "table" then response = contextual end
+        if type(contextual) == "table"
+            and contextual.sourcePoolID ~= poolID
+        then
+            response = contextual
+        end
     end
     response.selectionSource = "flow"
     response.sourceFlowID = flow.flowId
@@ -212,11 +237,27 @@ function Response.Resolve(ir, state, context, branch)
         if ir.intent == "APOLOGIZE" then
             return catalogResponse("semantic.apology", ir, state, context)
         end
-        if ir.intent == "ACKNOWLEDGE"
+        if (ir.intent == "ACKNOWLEDGE"
+                or ir.intent == "ACCEPT"
+                or ir.intent == "AGREE"
+                or ir.intent == "THANK")
             and followsRelationshipStatusAnswer(context)
         then
             return catalogResponse(
                 "semantic.question.relationship_status.acknowledged",
+                ir,
+                state,
+                context
+            )
+        end
+        if (ir.intent == "ACKNOWLEDGE"
+                or ir.intent == "ACCEPT"
+                or ir.intent == "AGREE")
+            and type(followsQuestionAnswer) == "function"
+            and followsQuestionAnswer(context)
+        then
+            return catalogResponse(
+                "semantic.conversation.acknowledged",
                 ir,
                 state,
                 context

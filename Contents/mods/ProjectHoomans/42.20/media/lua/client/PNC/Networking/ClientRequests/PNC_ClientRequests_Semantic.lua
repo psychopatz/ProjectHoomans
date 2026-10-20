@@ -140,6 +140,70 @@ function Client.RequestSemanticTask(request, context)
     return result.accepted == true, result.reason or result.status, result
 end
 
+-- Quest operations use the same semantic action boundary as companion
+-- commands, but their state transition is owned by the server quest service.
+function Client.RequestSemanticQuest(request, context)
+    context = type(context) == "table" and context or {}
+    if type(request) ~= "table" then
+        return false, "semantic_quest_request_missing"
+    end
+    local player = Internal.GetPlayer()
+    local payload = {}
+    for key, value in pairs(request) do payload[key] = value end
+    payload.requestID = payload.requestID or context.requestID
+        or Internal.RequestID("semantic_quest")
+    payload.npcID = payload.npcID or context.npcID or context.targetID
+    payload.giverNPCID = payload.giverNPCID or payload.npcID
+    payload.questID = payload.questID or "pnc.quest.clinic_supplies"
+    payload.conversationID = payload.conversationID
+        or context.conversationID
+    payload.conversationToken = payload.conversationToken
+        or context.conversationToken or context.token
+    if not payload.npcID or not payload.operation then
+        return false, "semantic_quest_identity_missing"
+    end
+    local clientOnly = PNC.Core and PNC.Core.IsClientOnly
+    if clientOnly and clientOnly() then
+        if not player or not sendClientCommand then
+            return false, "player_unavailable"
+        end
+        sendClientCommand(
+            player,
+            Const.MODULE,
+            Const.CMD_SEMANTIC_QUEST_REQUEST,
+            payload
+        )
+        return true, "network_queued", {
+            accepted = true,
+            status = "pending",
+            requestID = payload.requestID,
+            npcID = payload.npcID,
+            questID = payload.questID,
+            operation = payload.operation,
+        }
+    end
+    local service = PNC.QuestService
+    if not service or type(service.HandleRequest) ~= "function" then
+        return false, "semantic_quest_service_unavailable", {
+            accepted = false,
+            status = "failed",
+            reason = "semantic_quest_service_unavailable",
+            requestID = payload.requestID,
+            npcID = payload.npcID,
+            questID = payload.questID,
+            operation = payload.operation,
+        }
+    end
+    local result = service.HandleRequest(player, payload, {
+        conversationID = payload.conversationID,
+        conversationToken = payload.conversationToken,
+    })
+    if type(result) ~= "table" then
+        return false, "semantic_quest_request_failed"
+    end
+    return result.accepted == true, result.reason or result.status, result
+end
+
 -- Read-only semantic inventory queries use their own transport and response
 -- contract. They must never enter the semantic task/action-plan path.
 function Client.RequestSemanticInventoryQuery(request, context)

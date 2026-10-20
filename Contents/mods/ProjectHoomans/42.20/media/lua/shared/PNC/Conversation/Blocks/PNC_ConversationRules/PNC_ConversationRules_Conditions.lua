@@ -1,6 +1,10 @@
 local Rules = PNC.Conversation.Rules
 local Internal = Rules.Internal
 local Registry = PNC.Conversation.Registry
+local EngineFacts = PNC.Semantics and PNC.Semantics.EngineFacts
+if type(EngineFacts) ~= "table" then
+    EngineFacts = require "PNC/Semantics/PNC_SemanticEngineFacts"
+end
 
 function Internal.Compare(actual, operator, expected)
     operator = operator or ">="
@@ -108,6 +112,47 @@ local function historyMatches(context, gate)
     return true
 end
 
+local function weatherMatches(context, gate)
+    context = type(context) == "table" and context or {}
+    local world = type(context.worldContext) == "table"
+        and context.worldContext or {}
+    local weather = type(world.weather) == "table"
+        and world.weather or {}
+    local field = tostring(gate.field or "raining")
+    local actual = weather[field]
+    if actual == nil then
+        return nil, gate.unknownReasonKey or "weather_unknown"
+    end
+    local matches = Internal.Compare(
+        actual, gate.operator or "==", gate.value
+    )
+    if matches then
+        return true, gate.passReasonKey or "weather_matches"
+    end
+    return false, gate.failReasonKey or "weather_mismatch"
+end
+
+local function engineFactMatches(context, gate)
+    local factID = gate.fact or gate.subject
+    local fact = EngineFacts.Resolve(factID, context)
+    local matches
+    if type(fact) ~= "table" or fact.status ~= "known" then
+        if gate.unknownPolicy == "pass" then
+            return true, gate.unknownReasonKey or "engine_fact_unknown_allowed"
+        end
+        if gate.unknownPolicy == "fail" then
+            return false, gate.unknownReasonKey or "engine_fact_unknown_failed"
+        end
+        return nil, gate.unknownReasonKey or fact.reason
+            or "engine_fact_unknown"
+    end
+    matches = EngineFacts.Compare(fact, gate.operator or "==", gate.value)
+    if matches then
+        return true, gate.passReasonKey or "engine_fact_matches"
+    end
+    return false, gate.failReasonKey or "engine_fact_mismatch"
+end
+
 local BUILTINS = {
     ["pnc:skill"] = function(context, gate)
         return Internal.Compare(
@@ -140,8 +185,45 @@ local BUILTINS = {
                 tostring(gate.value or gate.audience)
             ] == true or false
     end,
+    -- Generated simple-command flows use the existing condition evaluator for
+    -- a bounded conversation/target authorization gate. The final command
+    -- adapter and authoritative server still make the gameplay decision; this
+    -- gate only prevents a malformed or unauthorised local context from
+    -- reaching that adapter.
+    ["pnc:semantic_context"] = function(context, gate)
+        context = type(context) == "table" and context or {}
+        local explicit = context.semanticAuthorization
+        if type(explicit) == "table" then
+            local capabilityID = tostring(gate.capabilityID or "")
+            if explicit[capabilityID] ~= nil then
+                return explicit[capabilityID] == true
+            end
+            if explicit.authorized ~= nil then
+                return explicit.authorized == true
+            end
+        elseif explicit ~= nil then
+            return explicit == true
+        end
+        if gate.requiresTarget == true
+            and (context.npcID == nil or tostring(context.npcID) == "")
+        then
+            return false
+        end
+        if gate.requiresAuthority == true then
+            local lifecycle = context.conversationLifecycleState
+            if type(lifecycle) ~= "table"
+                or lifecycle.token == nil
+                or tostring(lifecycle.token) == ""
+            then
+                return false
+            end
+        end
+        return true
+    end,
     ["pnc:time"] = timeMatches,
     ["pnc:history"] = historyMatches,
+    ["pnc:weather"] = weatherMatches,
+    ["pnc:fact"] = engineFactMatches,
     ["pnc:base_not_established"] = function(context)
         return context.baseEstablished ~= true
     end,

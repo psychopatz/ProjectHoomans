@@ -98,6 +98,8 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "weather": "clear",
         "timeOfDay": 13.5,
         "worldAgeHours": 49.5,
+        "zombieKills": 0,
+        "weatherTransition": None,
     },
     "conversation": {
         "topic": "greeting",
@@ -109,6 +111,7 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "llmEnabled": False,
         "providerAvailable": False,
         "nativeTranslations": {},
+        "semanticCognitionResponses": {},
         "commandResponses": {
             "follow": {"accepted": True, "reason": "network_queued"},
             "stay": {"accepted": True, "reason": "network_queued"},
@@ -120,6 +123,23 @@ DEFAULT_SCENARIO: dict[str, Any] = {
                     "siteScope": "room",
                 },
             },
+        },
+        "taskResponses": {
+            "WAIT_AT": {
+                "accepted": True,
+                "reason": "network_queued",
+                "details": {
+                    "status": "admitted",
+                    "planID": "mock-plan-wait-at",
+                    "targetID": "campfire@mock",
+                },
+            },
+        },
+        "questResponses": {
+            "offer": {"accepted": True, "status": "available", "reason": "available"},
+            "accept": {"accepted": True, "status": "accepted", "reason": "accepted"},
+            "status": {"accepted": True, "status": "active", "reason": "status_returned"},
+            "turn_in": {"accepted": True, "status": "rewarded", "reason": "rewarded"},
         },
     },
 }

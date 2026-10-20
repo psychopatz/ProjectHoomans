@@ -77,6 +77,7 @@ function H.ApplySocialEvent(context)
     local accepted = (tonumber(processed.relationshipsChanged) or 0) > 0
     return {
         accepted = accepted,
+        authority = "server",
         status = accepted and "applied" or "rejected",
         reason = accepted and nil or "relationship_not_changed",
         requestID = requestID,

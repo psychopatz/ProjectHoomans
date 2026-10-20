@@ -92,11 +92,19 @@ local function isInventoryQuery(ir)
 end
 
 local function isLocalFactQuestion(ir)
-    -- Location/seen queries are read-only and have explicit unknown and
-    -- ambiguous responses, so entity resolution is not required to answer.
+    -- Read-only fact questions have explicit unknown responses, so entity
+    -- resolution is not required before a local provider can answer.
+    local subjects = {
+        LOCATION = true,
+        SEEN = true,
+        NPC_RESIDENCE = true,
+        NPC_HEALTH_STATE = true,
+        NPC_KNOWLEDGE = true,
+        RELATIONSHIP_STATUS = true,
+    }
     return type(ir) == "table"
         and ir.intent == "QUESTION"
-        and (ir.subject == "LOCATION" or ir.subject == "SEEN")
+        and subjects[ir.subject] == true
 end
 
 local function unresolvedWorldTargetRequest(ir)

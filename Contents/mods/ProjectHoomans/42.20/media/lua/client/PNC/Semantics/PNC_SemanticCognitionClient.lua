@@ -39,11 +39,22 @@ function Client.Reset()
     ClientState.lastSemanticCognitionFailure = nil
 end
 
-local function pendingMatches(pending, payload)
+local function requestIDMatches(pending, payload)
     return type(pending) == "table"
         and payload and payload.requestID ~= nil
         and pending.requestID ~= nil
         and tostring(payload.requestID) == tostring(pending.requestID)
+end
+
+local function targetMatches(pending, payload)
+    return type(pending) == "table"
+        and tostring(pending.targetID or "")
+            == tostring(payload and payload.targetID or "")
+end
+
+local function pendingMatches(pending, payload)
+    return requestIDMatches(pending, payload)
+        and targetMatches(pending, payload)
 end
 
 local function safeGossipSubject(value)
@@ -119,6 +130,21 @@ local function notifyDialogueGossip(id, payload, pending)
     end
 end
 
+local function rejectPending(id, pending, reason)
+    local payload = {
+        npcID = id,
+        requestID = pending and pending.requestID,
+        targetID = pending and pending.targetID,
+        reason = reason,
+    }
+    ClientState.lastSemanticCognitionFailure = reason
+    if ClientState.pendingSemanticCognition then
+        ClientState.pendingSemanticCognition[id] = nil
+    end
+    notifyDialogueGossip(id, payload, pending)
+    return false, reason
+end
+
 function Client.GetGossipContext(npcID, targetID)
     local id = npcKey(npcID)
     local entry = id and ClientState.semanticMemoryGossip
@@ -192,6 +218,14 @@ function Client.ApplyPayload(payload)
         ClientState.lastSemanticCognitionFailure =
             payload and payload.reason or "npc_id_required"
         return false, ClientState.lastSemanticCognitionFailure
+    end
+    if type(pending) == "table" then
+        if not requestIDMatches(pending, payload) then
+            return rejectPending(id, pending, "stale_cognition_request")
+        end
+        if not targetMatches(pending, payload) then
+            return rejectPending(id, pending, "stale_cognition_target")
+        end
     end
     if not projection then
         ClientState.lastSemanticCognitionFailure =

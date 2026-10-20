@@ -44,7 +44,7 @@ function Provider.configure(deps)
     end
     sendServerCommand = function(_, module, command, payload)
         Runtime.transport[#Runtime.transport + 1] = {
-            direction = "server_command",
+            direction = "server_to_client",
             module = module,
             command = command,
             payload = Values.copy(payload),
@@ -54,6 +54,16 @@ function Provider.configure(deps)
         end
     end
     sendClientCommand = function(_, module, command, payload)
+        local questRequest = module == PNC.Const.MODULE
+            and command == PNC.Const.CMD_SEMANTIC_QUEST_REQUEST
+        if questRequest then
+            Runtime.transport[#Runtime.transport + 1] = {
+                direction = "client_to_server",
+                module = module,
+                command = command,
+                payload = Values.copy(payload),
+            }
+        end
         if module == PNC.Const.MODULE
             and command == PNC.Const.CMD_SEMANTIC_IDENTITY_REQUEST
         then
@@ -64,12 +74,21 @@ function Provider.configure(deps)
                 return true
             end
         end
-        Runtime.transport[#Runtime.transport + 1] = {
-            direction = "client_command",
-            module = module,
-            command = command,
-            payload = Values.copy(payload),
-        }
+        if questRequest and runtime.mode == "multiplayer" then
+            local router = PNC.ServerCommandRouter
+            if router and type(router.Handle) == "function" then
+                return router.Handle(command, player, payload)
+            end
+            return false
+        end
+        if not questRequest then
+            Runtime.transport[#Runtime.transport + 1] = {
+                direction = "client_command",
+                module = module,
+                command = command,
+                payload = Values.copy(payload),
+            }
+        end
         return true
     end
 

@@ -304,7 +304,8 @@ function Service.HandleRequest(player, args)
             projection,
             reason,
             args.requestID,
-            args.npcID
+            args.npcID,
+            args.targetID
         )
     end
     return projection ~= nil, reason, projection

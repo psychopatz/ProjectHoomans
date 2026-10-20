@@ -7,6 +7,22 @@ local MAX_OBSERVATION_LOOKUPS = 32
 local MAX_OBSERVATION_ACTIONS = 16
 local MAX_OBSERVATION_PLAN_TURNS = 4
 
+local function capabilityBinding(context, action)
+    local Values = context.Values
+    local catalog = PNC.Semantics and PNC.Semantics.CapabilityCatalog
+    if not catalog or type(catalog.ListActions) ~= "function" then
+        return nil
+    end
+    action = string.upper(tostring(action or ""))
+    if action == "" then return nil end
+    for _, row in ipairs(catalog.ListActions()) do
+        if type(row) == "table" and tostring(row.id or "") == action then
+            return row.binding and Values.copy(row.binding) or nil
+        end
+    end
+    return nil
+end
+
 local function boundedCandidates(context, result)
     local Values = context.Values
     local bundle = result and result.candidates or {}
@@ -164,6 +180,17 @@ function OutputProjection.observation(context, record)
         fallback = response.fallback,
         text = response.fallback,
         key = response.templateID,
+        dialogueAct = response.dialogueAct
+            or response.plan and response.plan.dialogueAct,
+        topic = response.topic or response.plan and response.plan.topic,
+        groundedFactRefs = Values.copy(response.groundedFactRefs
+            or response.plan and response.plan.groundedFactRefs),
+        uncertainty = response.uncertainty
+            or response.plan and response.plan.uncertainty,
+        tone = response.tone or response.plan and response.plan.tone,
+        personalityStyle = response.personalityStyle
+            or response.plan and response.plan.personalityStyle,
+        selectionID = response.selectionID,
         selectionSource = response.selectionSource,
         sourceFlowID = response.sourceFlowID,
         flowTransition = response.flowTransition,
@@ -184,6 +211,15 @@ function OutputProjection.observation(context, record)
                 text = text,
                 fallback = fallback,
                 key = payload.key or payload.translationKey,
+                plan = Values.copy(payload.plan),
+                dialogueAct = payload.plan and payload.plan.dialogueAct,
+                topic = payload.plan and payload.plan.topic,
+                groundedFactRefs = Values.copy(payload.plan
+                    and payload.plan.groundedFactRefs),
+                uncertainty = payload.plan and payload.plan.uncertainty,
+                tone = payload.plan and payload.plan.tone,
+                personalityStyle = payload.plan
+                    and payload.plan.personalityStyle,
                 translationKey = payload.translationKey,
                 translationKeys = Values.copy(payload.translationKeys),
                 planTurn = payload.planTurn,
@@ -203,11 +239,25 @@ function OutputProjection.observation(context, record)
                 responseObservation.key = queued.key
                 responseObservation.translationKey = queued.translationKey
                 responseObservation.translationKeys = queued.translationKeys
+                responseObservation.templateID = queued.key
+                responseObservation.plan = queued.plan
+                responseObservation.planTurnCount = queued.plan
+                    and math.min(#(queued.plan.turns or {}),
+                        MAX_OBSERVATION_PLAN_TURNS) or 0
                 responseObservation.domain = payload.domain
                 responseObservation.planTurn = queued.planTurn
                 responseObservation.planTurnID = queued.planTurnID
                 responseObservation.planContinuation = queued.planContinuation
                 responseObservation.translated = queued.translated
+                responseObservation.dialogueAct = queued.dialogueAct
+                responseObservation.topic = queued.topic
+                responseObservation.groundedFactRefs = Values.copy(
+                    queued.groundedFactRefs
+                )
+                responseObservation.uncertainty = queued.uncertainty
+                responseObservation.tone = queued.tone
+                responseObservation.personalityStyle =
+                    queued.personalityStyle
             end
         end
     end
@@ -228,16 +278,32 @@ function OutputProjection.observation(context, record)
             normalizedText = ir.normalizedText,
             pattern = ir.provenance and ir.provenance.pattern,
         },
+        capabilityBinding = capabilityBinding(context, ir.action),
+        actionResult = Values.copy(result.actionResult),
         candidates = boundedCandidates(context, result),
         response = responseObservation,
         flow = {
             flowId = flow.flowId,
+            generated = flow.generated == true,
+            workflowKind = flow.workflowKind,
+            capabilityID = flow.capabilityID,
+            binding = Values.copy(flow.binding),
+            matched = flow.matched == true,
+            noFlow = flow.matched ~= true,
             fromNodeId = flow.fromNodeId,
             toNodeId = flow.toNodeId or flow.nodeId,
             transition = flow.transition,
             status = flow.status,
             committed = flow.committed == true,
+            gateStatus = flow.gate and flow.gate.status,
+            gateReason = flow.gate and flow.gate.reason,
+            gate = Values.copy(flow.gate),
             responsePoolID = flow.responsePool,
+            resultOutcome = flow.resultOutcome,
+            resultStatus = flow.resultStatus,
+            resultReason = flow.resultReason,
+            resultNodeId = flow.resultNodeId,
+            dispatchCount = flow.dispatchCount,
             resumedFlowId = flow.resumedFlowId,
             completedFlowId = flow.completedFlowId,
             activeBefore = boundedFlowSessions(record.contextBefore),
@@ -254,6 +320,10 @@ function OutputProjection.observation(context, record)
             pendingIdentityExchange = record.contextAfter
                 and record.contextAfter.dialogue
                 and record.contextAfter.dialogue.pendingIdentityExchange,
+            engineFacts = Values.copy(record.contextAfter
+                and record.contextAfter.engineFacts),
+            engineEvents = Values.copy(record.contextAfter
+                and record.contextAfter.engineEvents),
         },
         selectedCandidate = {
             patternID = selectedCandidate.patternID,
@@ -271,6 +341,8 @@ function OutputProjection.normalizedToolCalls(context, trace, transport, result,
         SemanticInventoryQuery = "query_inventory",
         InventoryTransfer = "transfer_item",
         CompanionCommand = "companion_command",
+        SemanticTaskRequest = "semantic_task_request",
+        SemanticQuestRequest = "semantic_quest_request",
         AdjustRelationship = "adjust_relationship",
     }
     local function add(kind, name, values)
@@ -285,6 +357,14 @@ function OutputProjection.normalizedToolCalls(context, trace, transport, result,
             requestID = values.requestID or values.request_id
                 or result and result.sequence,
             arguments = Values.copy(values.arguments or values.args),
+            commandID = values.commandID,
+            capabilityID = values.capabilityID
+                or values.bindingID
+                or type(values.binding) == "table"
+                and values.binding.id,
+            handlerID = values.handlerID
+                or type(values.binding) == "table"
+                and values.binding.handlerID,
             status = values.status
                 or (values.accepted == true and "accepted" or nil),
             accepted = values.accepted,
@@ -310,8 +390,20 @@ function OutputProjection.normalizedToolCalls(context, trace, transport, result,
     end
 
     if type(actionResult) == "table" then
-        add("action_dispatch", actionResult.action or actionResult.commandID
-            or actionResult.taskID, actionResult)
+        add("action_dispatch", actionResult.commandID or actionResult.action
+            or actionResult.taskID
+            or result and result.ir and result.ir.action, {
+                arguments = actionResult.request,
+                commandID = actionResult.commandID,
+                capabilityID = actionResult.capabilityID,
+                handlerID = actionResult.handlerID,
+                binding = actionResult.binding,
+                status = actionResult.status,
+                accepted = actionResult.accepted,
+                reason = actionResult.reason,
+                authority = actionResult.authority,
+                source = "production_action_result",
+            })
     end
 
     for _, event in ipairs(transport or {}) do
@@ -320,6 +412,7 @@ function OutputProjection.normalizedToolCalls(context, trace, transport, result,
             or command == "KnowledgeDisclosureRequest"
             or command == "SemanticInventoryQuery"
             or command == "InventoryTransfer"
+            or command == "SemanticTaskRequest"
         then
             add("authority_request", command, {
                 arguments = event.payload,

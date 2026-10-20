@@ -40,6 +40,7 @@ local OutputProjection = require "worker/OutputProjection"
 local FlowEditor = require "worker/FlowEditor"
 local ScenarioSession = require "worker/ScenarioSession"
 local CommandRouter = require "worker/CommandRouter"
+local Commitments = require "worker/Commitments"
 
 local Runtime = RuntimeState.new()
 local Context = {
@@ -60,10 +61,15 @@ local Context = {
     OutputProjection = OutputProjection,
     FlowEditor = FlowEditor,
     ScenarioSession = ScenarioSession,
+    Commitments = Commitments,
+    EngineFacts = nil,
+    EngineEvents = nil,
 }
 
 ScenarioSession.configureRuntime(Context)
 ProductionModules.load(Context)
+Context.EngineFacts = PNC.Semantics.EngineFacts
+Context.EngineEvents = PNC.Semantics.EngineEvents
 ScenarioSession.reset(Context, ScenarioSession.initialScenario)
 
 Protocol.emit(CommandRouter.hello(Context), "__hello__")

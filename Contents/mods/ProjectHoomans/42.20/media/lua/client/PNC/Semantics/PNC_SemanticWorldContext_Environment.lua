@@ -38,12 +38,14 @@ function Environment.TimeSnapshot(gameTime, worldAgeHours, resolver, readers)
         day = calendarDay(gameTime, readers),
     }
     local gameDay = math.floor((tonumber(worldAgeHours) or 0) / 24)
+    local week = math.floor(gameDay / 7) + 1
     local timeBand = type(resolver) == "function"
         and resolver(timeOfDay) or nil
     return {
         available = available,
         worldAgeHours = tonumber(worldAgeHours) or 0,
         gameDay = gameDay,
+        week = week,
         timeOfDay = timeOfDay,
         hour = math.floor(hour),
         minute = math.max(0, math.min(59, math.floor(minutes))),
@@ -101,7 +103,19 @@ function Environment.WeatherSnapshot(climate, player, readers)
         "getAirTemperature",
     })
 
+    local state = nil
+    if snowing == true then
+        state = "snow"
+    elseif raining == true then
+        state = "rain"
+    elseif foggy == true then
+        state = "fog"
+    elseif snowing == false and raining == false and foggy == false then
+        state = "clear"
+    end
+
     return {
+        state = state,
         source = climate and "climate_manager" or "unavailable",
         precipitationIntensity = precipitation,
         raining = raining,

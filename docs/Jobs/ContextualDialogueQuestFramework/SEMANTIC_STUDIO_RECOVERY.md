@@ -1,0 +1,39 @@
+# Semantic Studio Recovery — active architecture and acceptance plan
+
+**Status:** NEW PRODUCT GAP, NOT IMPLEMENTED. Read-only remote code audit at 36f0beb2dc8a280094307700d601adc60c93d07b on 2026-10-19; claims below are source-level findings or old test records, not new runtime test passes.
+
+## Confirmed shortcomings
+
+1. codebuilder/service.py validates selected block IDs in validate_workflow_selection, but preview_workflow and generate_workflow subsequently call the original semantic/dialogue dataset source compiler. Selected block IDs do NOT become configured instances/connections in the code that is compiled. This is a selection checker, not functioning modular composition.
+2. flow_editor.py.set_catalog lists only catalog["flows"]. INSULT and THREAT are registered via SocialCatalog, policy branch and social-action request path, rather than FlowRegistry. The current flow graph cannot reveal their actual routing. These legacy routes must be visualized truthfully as policy-driven/read-only, not mislabeled generated flow definitions.
+3. The user's "fuck you" -> "I couldn't do that right now" is consistent with social dispatch unavailable and generic ResponseAdapter.ActionRejected. This is a plausible source path, NOT a freshly proven root cause. Reproduce in actual production Lua worker with explicit authorized, denied and unavailable transport conditions and inspect final displayed reply before fixing.
+4. wordnet_concepts.json is a two-concept FETCH/FOLLOW build-time extraction manifest and provenance record. It is NOT the runtime lexicon. Embedded CodeBuilder reads developer-local WordNet dictionary files to generate PNC_SemanticGeneratedLexicon.lua. PNC_SemanticCatalog.lua loads aliases and verb forms from generated Lua into PsychopatzCore. Kahlua does not read index.verb/data.verb/verb.exc, unpack WordNet ZIP, or fetch URL at runtime. Dataset Library should show actual compiled words, rejected forms, Core registration and worker phrase matches, not just URL/hash JSON.
+5. MASSIVE- and SGD-shaped bounded import adapters and synthetic tests exist; that does not prove expansive real corpora were imported, reviewed, compiled and worker-verified. Every source must show local/imported/mapped/reviewed/compiled/registered/worker-verified status separately.
+6. Existing five-tab UI is a collection of registries, flow-only graphs and JSON panels, not a usable single authoring journey. WordNet coverage and capability-flow count are NOT measures of conversational intelligence.
+7. Previous PROGRESS records 203 Python harness passes, nine unchanged generated artifacts and doctor PASS, alongside four Lua smoke failures from 68 cases. Those are historical agent-recorded results, not fresh acceptance. Preserve, investigate and categorize the four, rather than dismiss as pre-existing.
+
+## Non-negotiable design
+
+ONE Semantic Lab Tk application + headless CLI; one embedded CodeBuilder/artifact writer; one canonical versioned InteractionSpec; one runtime PsychopatzCore parser and Hoomans policy/FlowKernel/ContextState; existing Quest, gift, task, inventory, relationships and server authority retained. Block registry descriptors are TYPES, not instantiable behavior. An InteractionSpec contains typed configured block INSTANCES, parameters, ports, edges/outcome branches, known capability references, response bindings, source mapping and editor-only layout. Editing graph or supported structured code updates the SAME spec. CodeBuilder must compile the actual spec, not the original selected dataset. No arbitrary Lua callback execution or duplicated effects.
+
+Use TWO primary working areas: Studio (search interaction -> browse lexical/capability sources -> compose in an understandable graph or code editor -> preview approved Lua diff) and Simulation (real worker chat + clickable input/IR/context/flow-or-policy/authority/response/side-effect trace). Supporting panes can display block registry, sources and advanced JSON, not additional confusing independent product modes. Never fake an editable FlowRegistry graph for a policy-only interaction.
+
+## Ordered recovery work
+
+**R0A — SINGLE NEXT CHUNK: insult result and trace.** Inspect local worktree/Core before editing. Execute real Lua "fuck you" and record IR/concept, directed target, policy branch, flow-vs-policy status, approved social transport/mock authority result, chosen response pool and final NPC text. Investigate exact ActionRejected fallthrough. Correct the smallest real integration or presentation defect so authorized behavior produces proper social wording and denied/unavailable paths truthfully describe failed social interaction WITHOUT implying a successful server-side social mutation. Expose this path in the existing Simulation trace. Test EN/TL as available, threat/self-blame, preview purity, no double effect and old four Lua failures. No UI redesign or dataset import during R0A.
+
+**R0B — Unified Interaction Explorer.** Index Core concept/pattern, policy-driven social acts (INSULT etc.), registered FlowRegistry flows, capability bindings, response pools, generated Lua and tests. Search INSULT/FOLLOW/NEEDS; show actual production path and truthful read-only/editable status. Link chosen interaction to Simulation. Do not invent new execution paths.
+
+**R1 — Real block composition.** Introduce canonical InteractionSpec and typed instances/edges with declarative, safe nested reuse. Selected blocks and parameters must change the compiled Lua and actual worker behavior; reuse one world-fact block in two different flows. Preview remains pure, output diff approved, correct modular B42 Lua/EN+TL/manifests, byte-stable rebuilding.
+
+**R2 — Simplified usable workspace.** Reorganize current panels as Studio + Simulation, with searchable explorer, meaningful graph auto-layout, typed ports, properties, declarative code editor, trace/source links, persistent layout, undo/redo; JSON is secondary. Real mouse/keyboard X11 test demonstrates authoring, not only widget callback calls.
+
+**R3 — Verifiable data contribution.** Show approved WordNet synset -> alias/verb forms -> generated Lua -> Core registry -> actual parser match. Add genuine versioned/licensed MASSIVE/SGD imports as build-time candidate inputs, with human review, EN/TL and negative-collision checks, accurate imported/compiled/verified counts. Never ship full corpus or require PZ runtime network/ZIP.
+
+**R4 — Grounded multi-turn ability.** Reuse current bounded dialogue context, knowledge, cognition, memory, personality and response plan for generalizable "what happened?", "why?", "how many?", pronouns, topic switching and confirmed commitments; final NPC text correct, ambiguous references clarify, unknown facts not fabricated and no unauthorized gameplay mutation. PBrainZ optional realization only.
+
+**R5 — Product acceptance.** Demonstrate in existing Semantic Lab: search interaction -> compose/reuse blocks -> edit graph/code -> validate -> preview changed source -> approve -> write production Lua/EN+TL/manifests -> restart real worker -> converse/trace actual final reply -> revise. Agent CLI uses identical services. Measure false action dispatch (zero in protected negatives), accuracy, per-NPC isolation, Kahlua/runtime budgets, source reproducibility and focused old Lua regressions. Then developer READY FOR USER LIVE TEST, native PZ/MP/Workshop strictly user-owned.
+
+## Mandatory test classification
+
+Every chunk reports exact commit/branch, generated file owner/path, real worker input -> selected Core IR -> flow OR legacy policy -> handler/admission -> response pool -> visible text, denied/unknown negative cases, side effects, tests run/failed/skipped, and a SINGLE next chunk. UI counts, passing Python units, a screenshot, synthetic datasets, unchanged hashes, or generated JSON alone never establish acceptance.

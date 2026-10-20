@@ -12,6 +12,8 @@ Plan.MAX_TEXT_LENGTH = 256
 Plan.MAX_RENDER_LENGTH = 768
 Plan.MAX_ARGS_FIELDS = 12
 Plan.MAX_ARGS_DEPTH = 3
+Plan.MAX_FACT_REFS = 8
+Plan.MAX_FACT_REF_LENGTH = 128
 
 local function boundedText(value, limit)
     value = tostring(value or "")
@@ -25,6 +27,72 @@ local function validID(value)
     return value ~= ""
         and #value <= Plan.MAX_ID_LENGTH
         and string.find(value, "[^%w_%.%-]") == nil
+end
+
+local function validFactRef(value)
+    value = tostring(value or "")
+    return value ~= ""
+        and #value <= Plan.MAX_FACT_REF_LENGTH
+        and string.find(value, "[^%w_%.:%-]") == nil
+end
+
+local function normalizedFactRefs(value)
+    if value == nil then return {} end
+    if type(value) ~= "table" then return nil, "response_plan_fact_refs_invalid" end
+    local output = {}
+    local seen = {}
+    local index
+    local item
+    for index = 1, math.min(#value, Plan.MAX_FACT_REFS) do
+        item = tostring(value[index] or "")
+        if not validFactRef(item) then
+            return nil, "response_plan_fact_ref_invalid"
+        end
+        if not seen[item] then
+            seen[item] = true
+            output[#output + 1] = item
+        end
+    end
+    return output
+end
+
+local function normalizedMetadata(spec)
+    local topic = spec.topic
+    local uncertainty = spec.uncertainty
+    local tone = spec.tone
+    local personalityStyle = spec.personalityStyle
+    local factRefs, reason
+    if topic ~= nil and not validID(topic) then
+        return nil, "response_plan_topic_invalid"
+    end
+    factRefs, reason = normalizedFactRefs(
+        spec.groundedFactRefs or spec.sourceFactRefs
+    )
+    if not factRefs then return nil, reason end
+    if uncertainty ~= nil then
+        uncertainty = tostring(uncertainty)
+        if uncertainty ~= "known"
+            and uncertainty ~= "unknown"
+            and uncertainty ~= "ambiguous"
+            and uncertainty ~= "pending"
+        then
+            return nil, "response_plan_uncertainty_invalid"
+        end
+    end
+    if tone ~= nil and not validID(tone) then
+        return nil, "response_plan_tone_invalid"
+    end
+    if personalityStyle ~= nil and not validID(personalityStyle) then
+        return nil, "response_plan_personality_style_invalid"
+    end
+    return {
+        topic = topic and tostring(topic) or nil,
+        groundedFactRefs = factRefs,
+        uncertainty = uncertainty,
+        tone = tone and tostring(tone) or nil,
+        personalityStyle = personalityStyle
+            and tostring(personalityStyle) or nil,
+    }
 end
 
 local function copyValue(value, depth)
@@ -135,6 +203,8 @@ function Plan.Validate(value)
     if not normalizedAct(value.dialogueAct) then
         return false, "response_plan_act_invalid"
     end
+    local metadata, metadataReason = normalizedMetadata(value)
+    if not metadata then return false, metadataReason end
     if type(value.turns) ~= "table" or #value.turns == 0 then
         return false, "response_plan_requires_turns"
     end
@@ -186,11 +256,19 @@ function Plan.Build(spec)
         return false, "response_plan_turn_limit"
     end
 
+    local metadata, metadataReason = normalizedMetadata(spec)
+    if not metadata then return false, metadataReason end
+
     local output = {
         schemaVersion = Plan.VERSION,
         kind = "dialogue_act_plan",
         dialogueAct = dialogueAct,
         sourcePoolID = sourcePoolID,
+        topic = metadata.topic,
+        groundedFactRefs = metadata.groundedFactRefs,
+        uncertainty = metadata.uncertainty,
+        tone = metadata.tone,
+        personalityStyle = metadata.personalityStyle,
         turns = {},
     }
     local index
@@ -214,6 +292,12 @@ function Plan.FromResponse(response, dialogueAct, sourcePoolID)
     local ok, value = Plan.Build({
         dialogueAct = dialogueAct or response.dialogueAct or "REPLY",
         sourcePoolID = sourcePoolID or response.sourcePoolID,
+        topic = response.topic,
+        groundedFactRefs = response.groundedFactRefs
+            or response.sourceFactRefs,
+        uncertainty = response.uncertainty,
+        tone = response.tone,
+        personalityStyle = response.personalityStyle,
         segments = {
             {
                 kind = "translation",
@@ -247,7 +331,31 @@ function Plan.Compose(first, second)
     local index
     for index = 1, #first.turns do turns[#turns + 1] = first.turns[index] end
     for index = 1, #second.turns do turns[#turns + 1] = second.turns[index] end
-    return Plan.Build({ dialogueAct = "COMPOSED", turns = turns })
+    local factRefs = {}
+    local seenRefs = {}
+    local source
+    local index
+    for _, source in ipairs({ first, second }) do
+        for index = 1, #(source.groundedFactRefs or {}) do
+            if not seenRefs[source.groundedFactRefs[index]]
+                and #factRefs < Plan.MAX_FACT_REFS
+            then
+                seenRefs[source.groundedFactRefs[index]] = true
+                factRefs[#factRefs + 1] = source.groundedFactRefs[index]
+            end
+        end
+    end
+    return Plan.Build({
+        dialogueAct = "COMPOSED",
+        sourcePoolID = first.sourcePoolID or second.sourcePoolID,
+        topic = first.topic or second.topic,
+        groundedFactRefs = factRefs,
+        uncertainty = first.uncertainty or second.uncertainty,
+        tone = first.tone or second.tone,
+        personalityStyle = first.personalityStyle
+            or second.personalityStyle,
+        turns = turns,
+    })
 end
 
 require "PNC/Semantics/PNC_SemanticDialogueResponsePlan_Render"

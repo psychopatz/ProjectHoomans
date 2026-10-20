@@ -23,6 +23,32 @@ local buildBandageFeedback = H.buildBandageFeedback
 local buildActionInformation = H.buildActionInformation
 local buildStaminaRecoverySummary = H.buildStaminaRecoverySummary
 
+local function buildResidenceProjection(record)
+    local affiliation = type(record) == "table"
+        and type(record.affiliation) == "table"
+        and record.affiliation or nil
+    local communityID = affiliation
+        and (affiliation.communityID or affiliation.communityId) or nil
+    local communities = PNC.Communities
+    local community
+    if communityID == nil or type(communities) ~= "table"
+        or type(communities.Get) ~= "function"
+    then
+        return nil
+    end
+    community = communities.Get(communityID)
+    if type(community) ~= "table" or type(community.name) ~= "string"
+        or community.name == ""
+    then
+        return nil
+    end
+    return {
+        label = community.name,
+        communityID = communityID,
+        authority = "PNC.Communities.Get",
+    }
+end
+
 function Network.BuildSnapshot(record, inventorySummaryOverride)
     if type(buildSnapshotState) ~= "function"
         or type(buildIdentityProjection) ~= "function"
@@ -44,6 +70,7 @@ function Network.BuildSnapshot(record, inventorySummaryOverride)
     local needsSummary = state.needsSummary
     local attackMode = state.attackMode
     local snapshot = buildIdentityProjection(record, state)
+    snapshot.residence = buildResidenceProjection(record)
     snapshot.commandFeedback = buildCommandFeedback(record)
     snapshot.corpseHaulManualDiagnostic = buildCorpseHaulDiagnostic(record)
     snapshot.bandageFeedback = buildBandageFeedback(record)

@@ -4,6 +4,8 @@ PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
 require "PNC/Semantics/PNC_SemanticDialogueInput_Tasks"
+local TaskResponses = require
+    "PNC/Semantics/PNC_SemanticDialogueInput_TaskResponses"
 
 local Input = PNC.Semantics.DialogueInput or {}
 PNC.Semantics.DialogueInput = Input
@@ -79,7 +81,14 @@ function Internal.DispatchTaskAction(view, actionIntent, context, value)
     elseif session and provisionalID then
         session.semanticTaskRequests[tostring(provisionalID)] = nil
     end
+    local preserveTaskResponse = TaskResponses
+        and type(TaskResponses.UseExistingResultResponse) == "function"
+        and TaskResponses.UseExistingResultResponse(
+            taskResult, nil, actionIntent.action)
     if taskResult and taskResult.accepted ~= true
+        and not (context.generatedFlow
+            and context.generatedFlow.generated == true
+            and preserveTaskResponse ~= true)
         and Input.ReceiveSemanticTaskResult
     then
         Input.ReceiveSemanticTaskResult({

@@ -122,6 +122,7 @@ local function resolveField(output, field, state, context, diagnostics)
                 or contextualReason == "low_reference_confidence"
                 or contextualReason == "capability_unknown"
         ) then
+            value.unresolved = true
             diagnostics.contextualResolver = true
             diagnostics.contextualReferenceDetails =
                 diagnostics.contextualReferenceDetails or {}
@@ -159,6 +160,7 @@ local function resolveField(output, field, state, context, diagnostics)
         return true
     end
 
+    value.unresolved = true
     appendBounded(diagnostics.contextUnresolvedReferences, {
         field = field,
         reference = value.reference,
@@ -255,6 +257,20 @@ function Resolver.Resolve(ir, state, context, options)
 
     local output = IR.Clone(ir)
     local diagnostics = output.diagnostics or {}
+    local contextState = type(context) == "table"
+        and (context.semanticContextState or context.semanticDialogueContext)
+        or nil
+    if contextState and ContextResolver
+        and type(ContextResolver.ResolvePendingFollowUp) == "function"
+    then
+        local contextualOutput, _, contextualDetails =
+            ContextResolver.ResolvePendingFollowUp(output, contextState, options)
+        if type(contextualOutput) == "table" then output = contextualOutput end
+        diagnostics = output.diagnostics or diagnostics
+        if contextualDetails then
+            diagnostics.contextualFollowUp = contextualDetails
+        end
+    end
     diagnostics.contextResolvedReferences = {}
     diagnostics.contextUnresolvedReferences = {}
     diagnostics.entityResolvedReferences = {}

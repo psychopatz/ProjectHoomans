@@ -138,6 +138,66 @@ local function currentTurn(store, options)
     return type(store) == "table" and tonumber(store.sequence) or 0
 end
 
+local function topicForIR(ir)
+    if type(ir) ~= "table" then return nil end
+    local extensions = type(ir.extensions) == "table"
+        and ir.extensions or {}
+    local topic = extensions.topic or extensions.dialogueFollowUp
+        or ir.subject or ir.action or ir.intent
+    if type(topic) == "table" then
+        topic = topic.id or topic.key or topic.name
+    end
+    return topic and normalized(topic) or nil
+end
+
+-- Annotate an utterance against the single bounded pending follow-up owned by
+-- DialogueContextState.  This is deliberately a resolution trace, not an
+-- authority decision: an interruption preserves the open item and a matched
+-- topic only tells downstream response planning where to look.
+function Resolver.ResolvePendingFollowUp(ir, store, options)
+    options = type(options) == "table" and options or {}
+    if type(ir) ~= "table" or type(store) ~= "table" then
+        return ir, "context_state_unavailable"
+    end
+    local pending = type(store.GetPendingFollowUp) == "function"
+        and store:GetPendingFollowUp() or store.pendingFollowUp
+    if type(pending) ~= "table" then
+        return ir, "no_pending_follow_up"
+    end
+
+    local pendingTopic = normalized(pending.topic)
+    local inputTopic = topicForIR(ir)
+    local proposalAcceptance = pending.kind == "PROPOSAL"
+        and (ir.intent == "ACCEPT" or ir.intent == "AGREE")
+    if proposalAcceptance then
+        -- Lexical topic hints such as "okay" may point at wellbeing, but an
+        -- acceptance of an open proposal belongs to that proposal's topic.
+        inputTopic = pendingTopic
+    end
+    local matched = inputTopic == nil or inputTopic == pendingTopic
+    local output = copyValue(ir)
+    output.extensions = type(output.extensions) == "table"
+        and output.extensions or {}
+    if proposalAcceptance and pending.topic then
+        output.extensions.topic = pending.topic
+    end
+    output.extensions.contextualFollowUp = {
+        status = matched and "matched" or "interrupted",
+        pendingID = pending.id,
+        kind = pending.kind,
+        topic = pending.topic,
+        inputTopic = inputTopic,
+        source = "dialogue_context_state",
+    }
+    output.diagnostics = type(output.diagnostics) == "table"
+        and output.diagnostics or {}
+    output.diagnostics.contextualFollowUp = copyValue(
+        output.extensions.contextualFollowUp
+    )
+    return output, matched and "follow_up_matched" or "follow_up_preserved",
+        output.diagnostics.contextualFollowUp
+end
+
 local function scoreCandidate(candidate, referenceKind, field, action, store,
     context, options)
     if not compatibleType(candidate, referenceKind) then

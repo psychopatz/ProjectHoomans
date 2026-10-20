@@ -83,6 +83,15 @@ function Projection.Build(view, getProviderStatus)
         output.relationshipState = relationship.relationshipState
             or output.relationshipState
     end
+    local knowledge = PNC.Network and PNC.Network.ClientState
+        and PNC.Network.ClientState.npcKnowledge
+        and PNC.Network.ClientState.npcKnowledge[tostring(output.npcID or "")]
+        or nil
+    if type(knowledge) == "table" then
+        -- This is the already-filtered, player-specific dossier projection.
+        -- Never replace it with the local NPC record or a generated profile.
+        output.npcKnowledge = knowledge
+    end
     output.authoredTopic = source.conversationTopic
         or source.conversationBlockContext
         and source.conversationBlockContext.conversationTopic
@@ -119,6 +128,17 @@ function Projection.Build(view, getProviderStatus)
         output.worldContext = WorldContext.Get({
             player = localPlayer(view, source),
         })
+    end
+    local enginePlayer = localPlayer(view, source)
+    local nativeKills
+    if enginePlayer and type(enginePlayer.getZombieKills) == "function" then
+        local ok, value = pcall(enginePlayer.getZombieKills, enginePlayer)
+        if ok then nativeKills = tonumber(value) end
+    end
+    if nativeKills ~= nil then
+        output.engineFacts = type(output.engineFacts) == "table"
+            and output.engineFacts or {}
+        output.engineFacts["player.stats.zombie_kills"] = nativeKills
     end
     if Situation and type(Situation.Build) == "function" then
         output.dialogueSituation = Situation.Build(output)

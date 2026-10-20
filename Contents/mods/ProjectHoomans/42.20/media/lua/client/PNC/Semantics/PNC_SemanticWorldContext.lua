@@ -16,6 +16,7 @@ World.VERSION = 1
 World.DEFAULT_TTL_MS = 1000
 World.Internal = World.Internal or {}
 local cache = {}
+local previousWeather = {}
 local timeBandResolver = nil
 local DEFAULT_CACHE_KEY = "__default_player__"
 
@@ -171,6 +172,8 @@ local function build(options, sampledAt)
         time = snapshotTime,
         worldAgeHours = snapshotTime.worldAgeHours,
         gameDay = snapshotTime.gameDay,
+        week = snapshotTime.week,
+        hour = snapshotTime.hour,
         timeOfDay = snapshotTime.timeOfDay,
         timeBand = snapshotTime.band,
         calendar = snapshotTime.calendar,
@@ -202,6 +205,13 @@ function World.Get(options)
         return entry.snapshot
     end
     local snapshot = build(options, sampledAt)
+    local weather = snapshot.weather or {}
+    local currentState = weather.state
+    local previousState = previousWeather[key]
+    if previousState and currentState and previousState ~= currentState then
+        weather.transition = previousState .. "->" .. currentState
+    end
+    if currentState then previousWeather[key] = currentState end
     cache[key] = { sampledAt = sampledAt, snapshot = snapshot }
     return snapshot
 end
@@ -214,6 +224,7 @@ end
 
 function World.Clear()
     cache = {}
+    previousWeather = {}
     return true
 end
 

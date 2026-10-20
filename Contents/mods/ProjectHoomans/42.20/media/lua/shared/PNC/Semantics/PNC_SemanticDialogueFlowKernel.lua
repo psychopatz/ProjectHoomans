@@ -5,6 +5,7 @@
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
+local Rules = require "PNC/Conversation/Blocks/PNC_ConversationRules"
 local Registry = require
     "PNC/Semantics/PNC_SemanticDialogueFlowCatalog"
 
@@ -111,10 +112,136 @@ local function nodeFor(flow, nodeID)
     return flow and flow.nodes and flow.nodes[nodeID] or nil
 end
 
+local function topicForIR(ir)
+    if type(ir) ~= "table" then return nil end
+    local extensions = type(ir.extensions) == "table"
+        and ir.extensions or {}
+    local topic = extensions.topic or extensions.dialogueFollowUp
+        or ir.subject or ir.action or ir.intent
+    if type(topic) == "table" then
+        topic = topic.id or topic.key or topic.name
+    end
+    return topic
+end
+
+local function pendingFor(flow, node, topic)
+    if type(flow) ~= "table" or type(node) ~= "table"
+        or type(node.accepts) ~= "table" or #node.accepts == 0
+    then
+        return nil
+    end
+    return {
+        id = "flow:" .. tostring(flow.id) .. ":" .. tostring(node.id),
+        kind = node.pendingKind or "QUESTION",
+        topic = topic or flow.topic or flow.id,
+        owner = "flow",
+        flowID = flow.id,
+        nodeID = node.id,
+        requiredSlots = node.requiredSlots,
+        sourceFactRefs = node.sourceFactRefs,
+    }
+end
+
+local function setPending(storage, preview)
+    if type(storage) ~= "table"
+        or type(preview) ~= "table"
+        or type(preview.pendingFollowUp) ~= "table"
+        or type(storage.SetPendingFollowUp) ~= "function"
+    then
+        return false
+    end
+    local pending = copyValue(preview.pendingFollowUp)
+    pending.openedTurn = pending.openedTurn
+        or sequenceFor(nil, storage)
+    local current = type(storage.GetPendingFollowUp) == "function"
+        and storage:GetPendingFollowUp() or nil
+    if type(current) == "table"
+        and current.id ~= pending.id
+        and tostring(current.flowID or "") == tostring(pending.flowID or "")
+        and type(storage.CompletePendingFollowUp) == "function"
+    then
+        -- Advancing within one flow fulfills the prior obligation before
+        -- opening its next bounded question/proposal.
+        storage:CompletePendingFollowUp("fulfilled", "flow_transition")
+    end
+    return storage:SetPendingFollowUp(pending)
+end
+
+local function completePendingFor(storage, flowID, reason)
+    if type(storage) ~= "table"
+        or type(storage.GetPendingFollowUp) ~= "function"
+        or type(storage.CompletePendingFollowUp) ~= "function"
+    then
+        return false
+    end
+    local pending = storage:GetPendingFollowUp()
+    if type(pending) ~= "table" or tostring(pending.flowID or "")
+        ~= tostring(flowID or "")
+    then
+        return false
+    end
+    return storage:CompletePendingFollowUp("fulfilled", reason)
+end
+
+local function gateResult(flow, node, context)
+    if not node or not node.gate then return nil end
+    local status
+    local reason
+    if type(Rules.EvaluateGateStatus) == "function" then
+        status, reason = Rules.EvaluateGateStatus(node.gate, context)
+    else
+        return {
+            nodeId = node.id,
+            type = node.gate.type,
+            status = "UNKNOWN",
+            reason = "gate_evaluator_unavailable",
+        }
+    end
+    return {
+        nodeId = node.id,
+        type = node.gate.type,
+        status = status,
+        reason = reason,
+    }
+end
+
+local function gatedTarget(flow, nodeID, context)
+    local currentID = nodeID
+    local current = nodeFor(flow, currentID)
+    local lastGate
+    local seen = {}
+    while current and current.gate do
+        if seen[currentID] then
+            return currentID, {
+                nodeId = currentID,
+                type = current.gate.type,
+                status = "UNKNOWN",
+                reason = "gate_cycle",
+            }
+        end
+        seen[currentID] = true
+        lastGate = gateResult(flow, current, context)
+        local field = lastGate.status == "PASS" and "onPass"
+            or lastGate.status == "FAIL" and "onFail" or "onUnknown"
+        local target = current[field]
+        if not target or target == "cancel"
+            or target == "resume" or target == "suspend"
+        then
+            return currentID, lastGate
+        end
+        currentID = target
+        current = nodeFor(flow, currentID)
+    end
+    return currentID, lastGate
+end
+
 local function transitionTarget(node, intent)
     if not node then return nil end
     if intent == "REFUSE" or intent == "DISAGREE" then
         return node.onRefuse or node.onMatch or node.next
+    end
+    if intent == "CLARIFY" or intent == "ASK_FOR_CLARIFICATION" then
+        return node.onClarify or node.onMatch or node.next
     end
     return node.onMatch or node.next
 end
@@ -208,12 +335,14 @@ local function suspendedMatch(session, ir)
 end
 
 local function basePreview(ir, speakerID, addresseeID, key)
+    local topic = topicForIR(ir)
     return {
         schemaVersion = Kernel.VERSION,
         kind = "semantic_dialogue_flow_preview",
         key = key,
         speakerID = speakerID,
         addresseeID = addresseeID,
+        topic = topic,
         matched = false,
         transition = "hold",
         diagnostics = {
@@ -221,9 +350,22 @@ local function basePreview(ir, speakerID, addresseeID, key)
             registryRevision = Registry.GetRevision(),
             key = key,
             candidateFlows = {},
+            topic = topic,
             reason = "no_flow_trigger",
         },
     }
+end
+
+local function attachNodeContract(preview, node)
+    if type(node) ~= "table" or type(node.action) ~= "table" then
+        return
+    end
+    preview.generated = true
+    preview.action = copyValue(node.action)
+    preview.capabilityID = node.action.capabilityID
+    preview.binding = copyValue(node.action.binding)
+    preview.resultTransitions = copyValue(node.action.resultTransitions)
+    preview.dispatchCount = node.action.dispatchCount
 end
 
 local function addMatch(preview, match, transition, fromNodeID, toNodeID)
@@ -234,16 +376,31 @@ local function addMatch(preview, match, transition, fromNodeID, toNodeID)
     preview.matched = true
     preview.transition = transition
     preview.flowId = match.flow.id
+    preview.workflowKind = match.flow.workflowKind
+    preview.generated = match.flow.workflowKind ~= nil
+    preview.capabilityID = match.flow.capabilityID
     preview.fromNodeId = fromNodeID
     preview.toNodeId = toNodeID
     preview.nodeId = toNodeID
     preview.responsePool = responseNode and responseNode.responsePool or nil
     preview.responseTemplate = responseNode and responseNode.responseTemplate or nil
+    attachNodeContract(preview, responseNode)
     preview.slotValues = slotValues(match.flow, match.node, preview.ir)
     preview.diagnostics.reason = transition
     preview.diagnostics.flowId = match.flow.id
     preview.diagnostics.fromNodeId = fromNodeID
     preview.diagnostics.toNodeId = toNodeID
+    preview.pendingFollowUp = pendingFor(
+        match.flow,
+        nodeFor(match.flow, toNodeID),
+        preview.topic
+    )
+end
+
+local function attachGate(preview, gate)
+    if not gate then return end
+    preview.gate = copyValue(gate)
+    preview.diagnostics.gate = copyValue(gate)
 end
 
 local function finalizePreview(preview)
@@ -256,6 +413,12 @@ end
 function Kernel.Preview(ir, state, context, options)
     context = type(context) == "table" and context or {}
     options = type(options) == "table" and options or {}
+    local capabilityCatalog = PNC.Semantics.CapabilityCatalog
+    if capabilityCatalog
+        and type(capabilityCatalog.EnsureAutomaticGeneration) == "function"
+    then
+        capabilityCatalog.EnsureAutomaticGeneration()
+    end
     local storage = contextStateFor(state, context)
     local speakerID, addresseeID = idsFor(context, options)
     local key = keyFor(storage, speakerID, addresseeID)
@@ -271,6 +434,8 @@ function Kernel.Preview(ir, state, context, options)
     local matched = activeMatch(session, ir)
     if matched then
         local target = transitionTarget(matched.node, ir and ir.intent)
+        local gate
+        target, gate = gatedTarget(matched.flow, target, context)
         addMatch(
             preview,
             matched,
@@ -278,6 +443,7 @@ function Kernel.Preview(ir, state, context, options)
             matched.active.nodeId,
             target or "complete"
         )
+        attachGate(preview, gate)
         preview.slotValues = slotValues(matched.flow, matched.node, ir)
         return finalizePreview(preview)
     end
@@ -304,6 +470,8 @@ function Kernel.Preview(ir, state, context, options)
     local resumed = suspendedMatch(session, ir)
     if resumed then
         local target = transitionTarget(resumed.node, ir and ir.intent)
+        local gate
+        target, gate = gatedTarget(resumed.flow, target, context)
         addMatch(
             preview,
             resumed,
@@ -311,6 +479,7 @@ function Kernel.Preview(ir, state, context, options)
             resumed.active.nodeId,
             target or "complete"
         )
+        attachGate(preview, gate)
         preview.suspendedIndex = resumed.index
         preview.slotValues = slotValues(resumed.flow, resumed.node, ir)
         return finalizePreview(preview)
@@ -320,19 +489,29 @@ function Kernel.Preview(ir, state, context, options)
     preview.diagnostics.candidateFlows = triggered
     if triggeredID then
         local flow = Registry.Get(triggeredID)
-        local node = nodeFor(flow, flow.initial)
+        local target
+        local gate
+        target, gate = gatedTarget(flow, flow.initial, context)
+        local node = nodeFor(flow, target)
         preview.matched = true
         preview.transition = active and active.flowId ~= triggeredID
             and "interrupt_start" or "start"
         preview.flowId = flow.id
-        preview.fromNodeId = active and active.nodeId or nil
-        preview.toNodeId = flow.initial
-        preview.nodeId = flow.initial
+        preview.workflowKind = flow.workflowKind
+        preview.generated = flow.workflowKind ~= nil
+        preview.capabilityID = flow.capabilityID
+        preview.fromNodeId = gate and flow.initial
+            or (active and active.nodeId or nil)
+        preview.toNodeId = target
+        preview.nodeId = target
         preview.responsePool = node and node.responsePool or nil
         preview.responseTemplate = node and node.responseTemplate or nil
+        attachNodeContract(preview, node)
+        preview.pendingFollowUp = pendingFor(flow, node, preview.topic)
         preview.diagnostics.reason = preview.transition
         preview.diagnostics.flowId = flow.id
-        preview.diagnostics.toNodeId = flow.initial
+        preview.diagnostics.toNodeId = target
+        attachGate(preview, gate)
         return finalizePreview(preview)
     end
 
@@ -404,6 +583,31 @@ function Kernel.Commit(preview, ir, state, context, options)
     if preview.transition == "start"
         or preview.transition == "interrupt_start"
     then
+        local previewFlow = Registry.Get(preview.flowId)
+        local previewNode = previewFlow
+            and nodeFor(previewFlow, preview.toNodeId) or nil
+        if previewNode and previewNode.terminal then
+            if session and preview.transition == "interrupt_start" then
+                -- A terminal response-only flow still interrupts the active
+                -- conversation topic. Preserve the active flow as suspended
+                -- so the next compatible turn can resume it.
+                pushActive(session, maximum)
+                session.active = nil
+                session.lastTransition = preview.transition
+                session.revision = (tonumber(session.revision) or 0) + 1
+                storeSession(storage, session)
+                result.status = "retired"
+                result.active = nil
+                result.suspended = copyValue(session.suspended)
+                return result
+            end
+            -- A terminal gated branch is a response-only route. It must not
+            -- create or interrupt a longer-lived flow session.
+            result.status = "retired"
+            result.active = session and copyValue(session.active) or nil
+            result.suspended = session and copyValue(session.suspended) or {}
+            return result
+        end
         if not session then
             session = newSession(preview, sequence)
         elseif preview.transition == "interrupt_start" then
@@ -427,6 +631,7 @@ function Kernel.Commit(preview, ir, state, context, options)
             session.active.lastSequence = sequence
         end
         session.lastTransition = preview.transition
+        setPending(storage, preview)
         storeSession(storage, session)
         result.status = "started"
         result.active = copyValue(session.active)
@@ -461,6 +666,7 @@ function Kernel.Commit(preview, ir, state, context, options)
 
     if preview.transition == "cancel" then
         completeActive(session, preview)
+        completePendingFor(storage, preview.flowId, "flow_cancelled")
     elseif session.active then
         session.active.nodeId = preview.toNodeId
         session.active.lastSequence = sequence
@@ -475,8 +681,11 @@ function Kernel.Commit(preview, ir, state, context, options)
             or node and node.terminal == true
         then
             completeActive(session, preview)
+            completePendingFor(storage, preview.flowId, "flow_transition")
         end
     end
+
+    setPending(storage, preview)
 
     session.lastTransition = preview.transition
     if session.active or #session.suspended > 0 then
@@ -487,6 +696,117 @@ function Kernel.Commit(preview, ir, state, context, options)
         result.suspended = copyValue(session.suspended)
     else
         removeSession(storage, preview.key)
+        result.status = "retired"
+        result.active = nil
+        result.suspended = {}
+    end
+    return result
+end
+
+local function resultOutcome(action, actionResult)
+    local mapping = action and action.resultTransitions or {}
+    local status = tostring(actionResult and actionResult.status or "")
+    local reason = tostring(actionResult and actionResult.reason or "")
+    local details = actionResult and actionResult.details
+    local detailStatus = type(details) == "table"
+        and tostring(details.status or "") or ""
+    if actionResult and actionResult.accepted ~= true then
+        if mapping[detailStatus] then
+            return mapping[detailStatus], mapping[detailStatus]
+        end
+        if mapping[status] then
+            return mapping[status], mapping[status]
+        end
+        if mapping[reason] then
+            return mapping[reason], mapping[reason]
+        end
+        if status == "failed" or detailStatus == "failed"
+            or reason == "task_transport_failed"
+        then
+            return "failed", mapping.failed or "failed"
+        end
+        return "rejected", mapping.rejected or "rejected"
+    end
+    if mapping[detailStatus] then
+        return mapping[detailStatus], mapping[detailStatus]
+    end
+    if mapping[status] then
+        return mapping[status], mapping[status]
+    end
+    if mapping[reason] then return mapping[reason], mapping[reason] end
+    if status == "pending" or reason == "network_queued" then
+        local fallback = mapping.queued and "queued" or "admitted"
+        return fallback, mapping.queued or mapping.admitted or fallback
+    end
+    local fallback = mapping.admitted and "admitted" or "queued"
+    return fallback, mapping.accepted or mapping[fallback] or fallback
+end
+
+-- Apply an authoritative result to a generated action node. This is a flow
+-- state mutation only; the existing command/task adapter has already
+-- dispatched once before this function is called.
+function Kernel.ApplyActionResult(flowResult, actionResult, state, context, options)
+    options = type(options) == "table" and options or {}
+    if type(flowResult) ~= "table" or flowResult.generated ~= true
+        or type(flowResult.action) ~= "table"
+    then
+        return nil, "generated_action_flow_unavailable"
+    end
+    context = type(context) == "table" and context or {}
+    local storage = contextStateFor(state, context)
+    local session = storage and readSession(storage, flowResult.key) or nil
+    if not session or not session.active then
+        return nil, "generated_action_session_unavailable"
+    end
+    local active = session.active
+    local flow = Registry.Get(active.flowId or flowResult.flowId)
+    local node = flow and nodeFor(flow, active.nodeId)
+    if not node or type(node.action) ~= "table" then
+        return nil, "generated_action_node_unavailable"
+    end
+    local outcome, target = resultOutcome(node.action, actionResult)
+    if not target or target == "cancel" or target == "suspend"
+        or target == "resume"
+    then
+        return nil, "generated_result_transition_unavailable"
+    end
+    local sequence = sequenceFor(state, storage)
+    local result = copyValue(flowResult)
+    result.resultOutcome = outcome
+    result.resultStatus = actionResult and actionResult.status
+    result.resultReason = actionResult and actionResult.reason
+    result.resultNodeId = target
+    result.toNodeId = target
+    result.nodeId = target
+    local targetNode = nodeFor(flow, target)
+    result.responsePool = targetNode and targetNode.responsePool or nil
+    result.responseTemplate = targetNode and targetNode.responseTemplate or nil
+    result.transition = "result"
+    result.diagnostics = result.diagnostics or {}
+    result.diagnostics.resultOutcome = outcome
+    result.diagnostics.resultNodeId = target
+    result.diagnostics.resultReason = result.resultReason
+    active.lastResult = {
+        outcome = outcome,
+        status = result.resultStatus,
+        reason = result.resultReason,
+        sequence = sequence,
+    }
+    active.nodeId = target
+    active.lastSequence = sequence
+    if targetNode and targetNode.terminal == true then
+        completeActive(session, result)
+    end
+    session.lastTransition = "result"
+    session.lastResult = copyValue(active.lastResult)
+    if session.active or #session.suspended > 0 then
+        session.revision = (tonumber(session.revision) or 0) + 1
+        storeSession(storage, session)
+        result.status = "advanced"
+        result.active = copyValue(session.active)
+        result.suspended = copyValue(session.suspended)
+    else
+        removeSession(storage, flowResult.key)
         result.status = "retired"
         result.active = nil
         result.suspended = {}

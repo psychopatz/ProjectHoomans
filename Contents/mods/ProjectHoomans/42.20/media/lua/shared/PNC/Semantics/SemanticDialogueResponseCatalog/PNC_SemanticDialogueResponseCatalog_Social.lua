@@ -119,6 +119,30 @@ Catalog.Register("semantic.accept", {
     },
 })
 
+Catalog.Register("semantic.conversation.acknowledged", {
+    variants = {
+        {
+            id = "semantic.conversation.acknowledged.friendly",
+            templateID = "semantic.conversation.acknowledged.friendly",
+            fallback = "All right. Ask if you want to talk about it more.",
+            when = { socialStyle = { "friendly", "protective" } },
+            priority = 2,
+        },
+        {
+            id = "semantic.conversation.acknowledged.withdrawn",
+            templateID = "semantic.conversation.acknowledged.withdrawn",
+            fallback = "All right. We can leave it there for now.",
+            when = { socialStyle = "withdrawn" },
+            priority = 2,
+        },
+        {
+            id = "semantic.conversation.acknowledged.default",
+            templateID = "semantic.conversation.acknowledged.default",
+            fallback = "All right. Ask if you want to talk about it more.",
+        },
+    },
+})
+
 Catalog.Register("semantic.refuse", {
     variants = {
         {
@@ -175,6 +199,13 @@ Catalog.Register("semantic.refuse", {
 
 Catalog.Register("semantic.gossip", {
     variants = {
+        {
+            id = "semantic.gossip.memory",
+            templateID = "semantic.gossip.memory",
+            fallback = "I have something I remember about that.",
+            when = { memoryAvailable = true },
+            priority = 2,
+        },
         {
             id = "semantic.gossip.unknown",
             templateID = "semantic.gossip.unknown",

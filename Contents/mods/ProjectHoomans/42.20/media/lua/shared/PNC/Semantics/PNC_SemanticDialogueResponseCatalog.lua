@@ -12,19 +12,26 @@ local Catalog = PNC.Semantics.ResponseCatalog or {}
 PNC.Semantics.ResponseCatalog = Catalog
 local GeneratedDialogue = require
     "PNC/Semantics/PNC_SemanticGeneratedDialogue"
+local GeneratedDefinitions = require
+    "PNC/Semantics/PNC_SemanticGeneratedDefinitions"
 local ResponsePlan = require
     "PNC/Semantics/PNC_SemanticDialogueResponsePlan"
 
 Catalog.VERSION = 1
-Catalog.MAX_POOLS = 64
+-- Automatic capability generation can register one bounded pool per result
+-- outcome. Keep the catalog bounded, but leave room for every compatible
+-- production capability without silently truncating generated flows.
+Catalog.MAX_POOLS = 128
 Catalog.MAX_VARIANTS = 16
 Catalog.POOLS = Catalog.POOLS or {}
 Catalog.LAST_VARIANTS = Catalog.LAST_VARIANTS or {}
 
 local CONDITION_FIELDS = {
-    "topic", "previousTopic", "intent", "action", "subject",
+    "topic", "previousTopic", "previousAction", "lastIntent", "lastAction", "lastSpeaker",
+    "intent", "action", "subject", "pattern",
     "relationshipState", "identityTrust", "timeBand", "raining", "foggy", "snowing",
     "indoors", "hasPendingRequest", "npcID", "activity", "busy",
+    "memoryAvailable",
     "needType", "needUrgency", "relationshipAttitude", "healthState",
     "socialStyle", "emotionType", "emotionUrgency", "hostilityCount",
     "insultCount", "lastSpeechAct",
@@ -103,6 +110,7 @@ local function conditionContext(context)
     local needs = npc.needs or {}
     local emotion = npc.emotion or {}
     local social = situation.social or {}
+    local gossip = context.npcGossip
     local healthState = context.healthState or npc.healthState
     -- Keep missing health evidence distinct from a known healthy state for
     -- response selection. The routed situation remains source-faithful and
@@ -113,9 +121,14 @@ local function conditionContext(context)
     return {
         topic = context.currentTopic or context.topic,
         previousTopic = context.previousTopic,
+        previousAction = context.previousAction,
+        lastIntent = context.lastIntent,
+        lastAction = context.lastAction,
+        lastSpeaker = context.lastSpeaker,
         intent = context.intent,
         action = context.action,
         subject = context.subject,
+        pattern = context.pattern,
         relationshipState = context.relationshipState,
         identityTrust = context.identityTrust,
         timeBand = world.timeBand or time.band or context.timeBand,
@@ -127,6 +140,9 @@ local function conditionContext(context)
         npcID = context.npcID,
         activity = context.activity or activity.id,
         busy = context.busy ~= nil and context.busy or activity.busy,
+        memoryAvailable = type(gossip) == "table"
+            and type(gossip.statements) == "table"
+            and #gossip.statements > 0 or false,
         needType = context.needType or needs.highest,
         needUrgency = context.needUrgency or needs.urgency,
         emotionType = context.emotionType or emotion.highest,
@@ -183,6 +199,14 @@ local function normalizedVariant(poolID, index, value)
         templateID = tostring(value.templateID or id),
         fallback = fallback,
         plan = plan,
+        dialogueAct = value.dialogueAct,
+        topic = value.topic,
+        groundedFactRefs = copy(
+            value.groundedFactRefs or value.sourceFactRefs
+        ),
+        uncertainty = value.uncertainty,
+        tone = value.tone,
+        personalityStyle = value.personalityStyle,
         when = copy(value.when),
         priority = tonumber(value.priority) or 0,
     }
@@ -331,6 +355,12 @@ function Catalog.Select(id, context, salt)
         templateID = variant.templateID,
         fallback = variant.fallback,
         plan = variant.plan,
+        dialogueAct = variant.dialogueAct,
+        topic = variant.topic,
+        groundedFactRefs = copy(variant.groundedFactRefs),
+        uncertainty = variant.uncertainty,
+        tone = variant.tone,
+        personalityStyle = variant.personalityStyle,
     }, selectedIndex
 end
 
@@ -343,6 +373,7 @@ end
 -- catalog mechanics and loads providers before generated extensions.
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Situational"
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_FlowGreeting"
+require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_FlowWeather"
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Questions"
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Social"
 
@@ -362,6 +393,26 @@ for generatedIndex = 1, #generatedPools do
     extended, reason = Catalog.Extend(generatedPool.id, generatedPool)
     if extended ~= true then
         error("generated dialogue responses could not extend "
+            .. tostring(generatedPool.id) .. " (" .. tostring(reason) .. ")")
+    end
+end
+
+local authoredPools = GeneratedDefinitions and GeneratedDefinitions.responsePools
+if type(authoredPools) ~= "table" then
+    error("generated semantic definitions require responsePools")
+end
+for generatedIndex = 1, #authoredPools do
+    generatedPool = authoredPools[generatedIndex]
+    if type(generatedPool) ~= "table" then
+        error("generated semantic definitions contain an invalid response pool")
+    end
+    if Catalog.Get(generatedPool.id) then
+        extended, reason = Catalog.Extend(generatedPool.id, generatedPool)
+    else
+        extended, reason = Catalog.Register(generatedPool.id, generatedPool)
+    end
+    if extended ~= true then
+        error("generated semantic responses could not register "
             .. tostring(generatedPool.id) .. " (" .. tostring(reason) .. ")")
     end
 end

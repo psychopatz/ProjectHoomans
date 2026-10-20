@@ -5,6 +5,7 @@ local Util = require "PsychopatzCore/Inventory/PsychopatzInventoryUtil"
 local ItemAdapter = require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreItemAdapter"
 
 local StateCodec = {}
+local CURRENT_METADATA_SCHEMA = 2
 
 local FOOD_OPTIONAL = {
     dangerousUncooked = 1,
@@ -46,7 +47,19 @@ function StateCodec.metadata(item)
         item.maxWeight, item.weightReduction, item.wearableSlot, item.templateKey,
         item.preferredContainer, item.wornSlot, item.attachedSlot, item.equipSlot,
         item.interactionLocked == true or nil, item.interactionLockReason,
-        item.identityNPCId, item.identityNPCName }
+        item.identityNPCId, item.identityNPCName, item.legacyTemplateKey }
+end
+
+function StateCodec.metadataSchema()
+    return CURRENT_METADATA_SCHEMA
+end
+
+function StateCodec.validateMetadataSchema(value)
+    value = tonumber(value) or 1
+    if value ~= 1 and value ~= CURRENT_METADATA_SCHEMA then
+        return false, "npc_inventory_metadata_schema_mismatch"
+    end
+    return true, value
 end
 
 function StateCodec.validateCoreRecord(coreRecord)
@@ -165,7 +178,9 @@ function StateCodec.readState(coreRecord)
     return spec
 end
 
-function StateCodec.applyMetadata(spec, meta, fullType)
+function StateCodec.applyMetadata(spec, meta, fullType, metadataSchema)
+    local valid, schema = StateCodec.validateMetadataSchema(metadataSchema)
+    if not valid then return false, schema end
     spec.id, spec.stack, spec.type = meta[1], meta[2], fullType
     spec.container, spec.bagContainer = meta[3] or "root", meta[4]
     spec.maxWeight, spec.weightReduction = meta[5], meta[6]
@@ -174,6 +189,10 @@ function StateCodec.applyMetadata(spec, meta, fullType)
     spec.attachedSlot, spec.equipSlot = meta[11], meta[12]
     spec.interactionLocked, spec.interactionLockReason = meta[13] == true, meta[14]
     spec.identityNPCId, spec.identityNPCName = meta[15], meta[16]
+    if schema >= CURRENT_METADATA_SCHEMA then
+        spec.legacyTemplateKey = meta[17]
+    end
+    return true
 end
 
 return StateCodec

@@ -100,5 +100,15 @@
     "UI_PNC_Research_TableReady": "RESEARCH TABLE READY",
     "UI_PNC_Research_Unassigned": "UNASSIGNED",
     "UI_PNC_Research_WindowTitle": "COLONY RESEARCH",
-    "UI_PNC_Research_Work": "WORK REQUIRED"
+    "UI_PNC_Research_Work": "WORK REQUIRED",
+    "UI_PNC_KnowledgeFact_BackstoryFormerJob": "Former work",
+    "UI_PNC_KnowledgeFact_BackstoryHometown": "Hometown",
+    "UI_PNC_KnowledgeFact_BackstoryEducation": "Education",
+    "UI_PNC_KnowledgeFact_BackstoryHobby": "Hobby",
+    "UI_PNC_KnowledgeFact_BackstoryFamily": "Family",
+    "UI_PNC_KnowledgeFact_BackstoryValue": "Personal values",
+    "UI_PNC_KnowledgeFact_BackstorySurvival": "Survival origin",
+    "UI_PNC_KnowledgeFact_BackstoryFear": "Fear",
+    "UI_PNC_KnowledgeFact_BackstoryTragedy": "Personal loss",
+    "UI_PNC_KnowledgeFact_BackstoryDateOfBirth": "Date of birth"
 }

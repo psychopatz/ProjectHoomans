@@ -14,8 +14,12 @@ Context.DEFAULT_MENTION_LIMIT = 32
 Context.DEFAULT_FOCUS_LIMIT = 8
 Context.DEFAULT_FLOW_LIMIT = 8
 Context.DEFAULT_FLOW_STACK_LIMIT = 4
+Context.DEFAULT_AGENDA_LIMIT = 8
+Context.DEFAULT_TOPIC_HISTORY_LIMIT = 4
 Context.MAX_TEXT = 160
 Context.MAX_TOPIC = 64
+Context.MAX_AGENDA_ID = 64
+Context.MAX_AGENDA_KIND = 32
 Context.MAX_FLOW_ID = 64
 Context.MAX_NODE_ID = 64
 Context.MAX_METADATA_DEPTH = 6
@@ -34,11 +38,143 @@ end
 
 Context.Internal.TopicValue = topicValue
 
+local function boundedText(value, maximum)
+    value = tostring(value or "")
+    maximum = tonumber(maximum) or Context.MAX_TEXT
+    if #value > maximum then return string.sub(value, 1, maximum) end
+    return value ~= "" and value or nil
+end
+
+local function copyValue(value)
+    local copy = Context.Internal.CopyValue
+    return type(copy) == "function" and copy(value) or value
+end
+
+local function compactList(values, maximum)
+    if type(values) ~= "table" then return nil end
+    local output = {}
+    for index = 1, math.min(#values, maximum or 4) do
+        local value = boundedText(values[index], Context.MAX_AGENDA_KIND)
+        if value then output[#output + 1] = value end
+    end
+    return #output > 0 and output or nil
+end
+
+local function agendaEntry(spec, sequence)
+    if type(spec) ~= "table" then return nil, "invalid_follow_up" end
+    local kind = string.upper(tostring(spec.kind or "QUESTION"))
+    if #kind == 0 or #kind > Context.MAX_AGENDA_KIND then
+        return nil, "invalid_follow_up_kind"
+    end
+    local topic = topicValue(spec.topic)
+    if not topic then return nil, "invalid_follow_up_topic" end
+    local id = boundedText(spec.id, Context.MAX_AGENDA_ID)
+        or string.sub("follow_up:" .. kind .. ":" .. tostring(sequence), 1,
+            Context.MAX_AGENDA_ID)
+    local output = {
+        id = id,
+        kind = kind,
+        topic = topic,
+        owner = boundedText(spec.owner, Context.MAX_AGENDA_KIND),
+        targetID = boundedText(spec.targetID, Context.MAX_AGENDA_ID),
+        flowID = boundedText(spec.flowID, Context.MAX_FLOW_ID),
+        nodeID = boundedText(spec.nodeID, Context.MAX_NODE_ID),
+        requiredSlots = compactList(spec.requiredSlots, 8),
+        sourceFactRefs = compactList(spec.sourceFactRefs, 8),
+        openedTurn = tonumber(spec.openedTurn) or sequence,
+        status = boundedText(spec.status, Context.MAX_AGENDA_KIND) or "open",
+    }
+    return output
+end
+
+Context.Internal.AgendaEntry = agendaEntry
+
+function Context:GetPendingFollowUp()
+    return self.pendingFollowUp and copyValue(self.pendingFollowUp) or nil
+end
+
+function Context:SetPendingFollowUp(spec)
+    local entry, reason = agendaEntry(spec, self.sequence)
+    if not entry then return false, reason end
+    self.agenda = self.agenda or {}
+    local existing
+    for index = 1, #self.agenda do
+        if self.agenda[index].id == entry.id then
+            existing = index
+            break
+        end
+    end
+    if existing then
+        self.agenda[existing] = entry
+    else
+        self.agenda[#self.agenda + 1] = entry
+    end
+    while #self.agenda > (self.maxAgenda or Context.DEFAULT_AGENDA_LIMIT) do
+        table.remove(self.agenda, 1)
+    end
+    self.pendingFollowUp = copyValue(entry)
+    return true, copyValue(entry)
+end
+
+function Context:CompletePendingFollowUp(status, reason)
+    local pending = self.pendingFollowUp
+    if type(pending) ~= "table" then return false, "no_pending_follow_up" end
+    status = boundedText(status, Context.MAX_AGENDA_KIND) or "fulfilled"
+    pending.status = status
+    pending.closedTurn = self.sequence
+    pending.resolutionReason = boundedText(reason, Context.MAX_TEXT)
+    for index = #self.agenda, 1, -1 do
+        if self.agenda[index].id == pending.id then
+            self.agenda[index] = copyValue(pending)
+            break
+        end
+    end
+    self.lastFollowUp = copyValue(pending)
+    self.pendingFollowUp = nil
+    return true, copyValue(pending)
+end
+
+function Context:AgendaSnapshot(limit)
+    local maximum = math.min(
+        #self.agenda,
+        math.max(0, math.floor(tonumber(limit) or #self.agenda))
+    )
+    local output = {}
+    for index = 1, maximum do
+        output[index] = copyValue(self.agenda[index])
+    end
+    return output
+end
+
+function Context:RememberTopic(topic, reason)
+    topic = topicValue(topic)
+    if not topic then return false, "invalid_topic" end
+    self.priorTopics = self.priorTopics or {}
+    local previous = self.priorTopics[1]
+    if previous and previous.topic == topic then return true, "unchanged" end
+    table.insert(self.priorTopics, 1, {
+        topic = topic,
+        reason = boundedText(reason, Context.MAX_AGENDA_KIND) or "interruption",
+        turn = self.sequence,
+    })
+    while #self.priorTopics > (self.maxTopicHistory
+        or Context.DEFAULT_TOPIC_HISTORY_LIMIT)
+    do
+        table.remove(self.priorTopics)
+    end
+    return true, topic
+end
+
 function Context:SetTopic(topic, preservePrevious)
     topic = topicValue(topic)
     if not topic then return false, "invalid_topic" end
     if self.currentTopic == topic then return true, "unchanged" end
-    if preservePrevious ~= false then self.previousTopic = self.currentTopic end
+    if preservePrevious ~= false then
+        self.previousTopic = self.currentTopic
+        if self.currentTopic then
+            self:RememberTopic(self.currentTopic, "topic_interruption")
+        end
+    end
     self.currentTopic = topic
     return true, topic
 end
@@ -132,12 +268,24 @@ function Context.New(spec)
         maxFlowStack = math.max(1, math.floor(
             tonumber(spec.maxFlowStack) or Context.DEFAULT_FLOW_STACK_LIMIT
         )),
+        maxAgenda = math.max(1, math.floor(
+            tonumber(spec.maxAgenda) or Context.DEFAULT_AGENDA_LIMIT
+        )),
+        maxTopicHistory = math.max(1, math.floor(
+            tonumber(spec.maxTopicHistory)
+                or Context.DEFAULT_TOPIC_HISTORY_LIMIT
+        )),
         currentTopic = topicValue(spec.currentTopic),
         previousTopic = topicValue(spec.previousTopic),
+        priorTopics = copyValue(spec.priorTopics) or {},
         lastIntent = spec.lastIntent,
         lastAction = spec.lastAction,
         lastSpeaker = spec.lastSpeaker,
+        lastBackstoryKind = topicValue(spec.lastBackstoryKind),
         pendingIdentityExchange = spec.pendingIdentityExchange,
+        pendingFollowUp = copyValue(spec.pendingFollowUp),
+        lastFollowUp = copyValue(spec.lastFollowUp),
+        agenda = copyValue(spec.agenda) or {},
         sequence = tonumber(spec.sequence) or 0,
         turns = {},
         mentionOrder = {},
@@ -153,10 +301,15 @@ end
 function Context:Reset()
     self.currentTopic = nil
     self.previousTopic = nil
+    self.priorTopics = {}
     self.lastIntent = nil
     self.lastAction = nil
     self.lastSpeaker = nil
+    self.lastBackstoryKind = nil
     self.pendingIdentityExchange = nil
+    self.pendingFollowUp = nil
+    self.lastFollowUp = nil
+    self.agenda = {}
     self.sequence = 0
     self.turns = {}
     self.mentionOrder = {}

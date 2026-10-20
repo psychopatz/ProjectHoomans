@@ -53,6 +53,28 @@ local takeHold = Parser.Parse("Take hold of some food.")
 T.equal(takeHold.action, "FETCH", "sense-selected phrase maps to FETCH")
 T.equal(takeHold.object.category, "FOOD", "take hold of keeps the object slot")
 
+local assist = Parser.Parse("Can you assist me?")
+T.equal(assist.action, "HELP", "expanded WordNet HELP alias reaches the existing request grammar")
+local assistForm = Catalog.ResolveVerbForm("assisting")
+T.equal(assistForm.concept, "HELP", "expanded WordNet morphology targets HELP")
+T.equal(assistForm.lemma, "assist", "expanded morphology retains its reviewed lemma")
+T.equal(assistForm.form, "PROGRESSIVE", "expanded morphology retains its grammatical form")
+local declinedForm = Catalog.ResolveVerbForm("declined")
+T.equal(declinedForm.concept, "REFUSE", "expanded refusal morphology targets REFUSE")
+
+for _, entry in ipairs({
+    { alias = "locomote", concept = "GO" },
+    { alias = "possess", concept = "HAVE" },
+    { alias = "desire", concept = "WANT" },
+    { alias = "concur", concept = "AGREE" },
+    { alias = "dissent", concept = "DISAGREE" },
+}) do
+    local matches = Semantic.Registry.GetAliasMatches(entry.alias)
+    T.truthy(#matches > 0, "expanded WordNet alias is registered: " .. entry.alias)
+    T.equal(matches[1].id, entry.concept,
+        "expanded WordNet alias keeps its canonical concept: " .. entry.alias)
+end
+
 local followingForm = Catalog.ResolveVerbForm("FOLLOWING")
 T.equal(followingForm.concept, "FOLLOW",
     "WordNet progressive morphology resolves to the reviewed follow concept")

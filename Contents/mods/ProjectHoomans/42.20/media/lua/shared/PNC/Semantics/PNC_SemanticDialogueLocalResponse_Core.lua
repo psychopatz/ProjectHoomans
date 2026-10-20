@@ -71,6 +71,13 @@ local function copyArgs(values)
     return output
 end
 
+local function copyList(values)
+    local output = {}
+    if type(values) ~= "table" then return output end
+    for index = 1, #values do output[index] = values[index] end
+    return output
+end
+
 local function socialCounts(state)
     local hostilityCount = 0
     local insultCount = 0
@@ -106,6 +113,31 @@ local function selectorContext(ir, state, context)
     local emotion = type(npc.emotion) == "table" and npc.emotion or {}
     local social = type(situation.social) == "table" and situation.social or {}
     local hostilityCount, insultCount, lastSpeechAct = socialCounts(state)
+    local previousAction
+    local dialogue = type(context.semanticDialogueContext) == "table"
+        and context.semanticDialogueContext or nil
+    local recentTurns = dialogue and dialogue.recentTurns or nil
+    local currentSequence = dialogue and tonumber(dialogue.sequence) or nil
+    local skippedCurrent = false
+    if type(recentTurns) == "table" then
+        for index = 1, math.min(#recentTurns, 8) do
+            local turn = recentTurns[index]
+            if type(turn) == "table" and turn.speaker == "player"
+                and type(turn.action) == "string"
+            then
+                if currentSequence ~= nil
+                    and tonumber(turn.sequence) == currentSequence
+                then
+                    skippedCurrent = true
+                elseif not skippedCurrent then
+                    skippedCurrent = true
+                else
+                    previousAction = turn.action
+                    break
+                end
+            end
+        end
+    end
     local topic = ir and ir.extensions and ir.extensions.topic or nil
     if type(topic) == "table" then
         topic = topic.id or topic.key
@@ -116,9 +148,14 @@ local function selectorContext(ir, state, context)
             or context.currentTopic,
         previousTopic = state and state.previousTopic
             or context.previousTopic,
+        previousAction = previousAction,
+        lastIntent = state and state.lastIntent or context.lastIntent,
+        lastAction = state and state.lastAction or context.lastAction,
+        lastSpeaker = state and state.lastSpeaker or context.lastSpeaker,
         intent = ir and ir.intent,
         action = ir and ir.action,
         subject = ir and ir.subject,
+        pattern = ir and ir.provenance and ir.provenance.pattern,
         relationshipState = context.relationshipState
             or context.conversationRelationshipID,
         identityTrust = context.identityTrust,
@@ -128,6 +165,9 @@ local function selectorContext(ir, state, context)
         timeBand = world.timeBand or time.band or context.timeBand,
         activity = activity.id,
         busy = activity.busy,
+        memoryAvailable = type(context.npcGossip) == "table"
+            and type(context.npcGossip.statements) == "table"
+            and #context.npcGossip.statements > 0 or false,
         needType = needs.highest,
         needUrgency = needs.urgency,
         emotionType = emotion.highest,
@@ -163,6 +203,14 @@ local function catalogResponse(poolID, ir, state, context, args)
         args = copyArgs(args),
         sourcePoolID = poolID,
         plan = plan,
+        dialogueAct = selected.dialogueAct,
+        topic = selected.topic,
+        groundedFactRefs = copyList(selected.groundedFactRefs),
+        uncertainty = selected.uncertainty,
+        tone = selected.tone,
+        personalityStyle = selected.personalityStyle,
+        selectionSource = "catalog",
+        selectionID = selected.id,
     }
 end
 
@@ -170,6 +218,7 @@ end
 Response.Internal = Response.Internal or {}
 local Internal = Response.Internal
 Internal.CopyArgs = copyArgs
+Internal.CopyList = copyList
 Internal.SocialCounts = socialCounts
 Internal.SelectorContext = selectorContext
 Internal.CatalogResponse = catalogResponse

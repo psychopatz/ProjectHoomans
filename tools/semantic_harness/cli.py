@@ -7,16 +7,152 @@ from pathlib import Path
 import sys
 
 from .config import ConfigurationError
+from .codebuilder.service import SemanticLabAuthoringService
 from .rendering import print_result as _print_result
 from .runner import ConflictLedger, load_case, run_case
 from .scenario import load_scenario
 from .worker import HarnessError, LuaSemanticWorker
 
 PARSER_DESCRIPTION = "Tkinter chat UI and CLI for the real-Lua semantic dialogue harness."
+AUTHORING_OPERATIONS = (
+    "compile_source",
+    "generate_source",
+    "review_dataset",
+    "generate_dataset",
+    "list_datasets",
+    "search_datasets",
+    "show_dataset",
+    "validate_dataset",
+    "list_blocks",
+    "search_blocks",
+    "validate_blocks",
+    "validate_codeblocks",
+    "workflow_preview",
+    "workflow_generate",
+    "adapt_dataset",
+)
+
+
+def _resolve_authoring_source(
+    service: SemanticLabAuthoringService,
+    value: str,
+) -> Path:
+    source = Path(value).expanduser()
+    if not source.is_absolute():
+        source = service.repository / source
+    return source.resolve()
+
+
+def _run_authoring_operation(
+    arguments: argparse.Namespace,
+    service: SemanticLabAuthoringService,
+) -> dict | None:
+    if arguments.list_datasets:
+        return {
+            "ok": True,
+            "type": "dataset_library",
+            "sources": service.list_dataset_sources(),
+        }
+    if arguments.search_datasets is not None:
+        return {
+            "ok": True,
+            "type": "dataset_search",
+            "query": arguments.search_datasets,
+            "results": service.search_dataset(arguments.search_datasets),
+        }
+    if arguments.show_dataset:
+        source_id = arguments.show_dataset
+        source = next(
+            (item for item in service.list_dataset_sources() if item["id"] == source_id),
+            None,
+        )
+        if source is None:
+            raise ValueError(f"unknown canonical dataset source: {source_id}")
+        return {
+            "ok": True,
+            "type": "dataset",
+            "source": source,
+            "entries": service.search_dataset("", source_id=source_id, limit=64),
+        }
+    if arguments.validate_dataset:
+        source_id = arguments.validate_dataset
+        return service.preview_dataset_edit(
+            source_id,
+            service.load_dataset_document(source_id),
+        )
+    if arguments.list_blocks:
+        return service.list_semantic_blocks()
+    if arguments.search_blocks is not None:
+        return {
+            "ok": True,
+            "type": "semantic_block_search",
+            "query": arguments.search_blocks,
+            "results": service.search_semantic_blocks(arguments.search_blocks),
+        }
+    if arguments.validate_blocks is not None:
+        block_ids = [
+            value.strip()
+            for value in arguments.validate_blocks.split(",")
+            if value.strip()
+        ]
+        return service.validate_semantic_blocks(block_ids)
+    if arguments.validate_codeblocks:
+        return service.validate_codeblock_source(
+            _resolve_authoring_source(service, arguments.validate_codeblocks)
+        )
+    if arguments.workflow_preview or arguments.workflow_generate:
+        if not arguments.workflow_blocks:
+            raise ValueError("workflow operations require --workflow-blocks IDS")
+        block_ids = [
+            value.strip()
+            for value in arguments.workflow_blocks.split(",")
+            if value.strip()
+        ]
+        if arguments.workflow_preview:
+            return service.preview_workflow(arguments.workflow_preview, block_ids)
+        return service.generate_workflow(
+            arguments.workflow_generate,
+            block_ids,
+            approved=arguments.approve_workflow,
+        )
+    if arguments.adapt_dataset:
+        if not arguments.dataset_source or not arguments.dataset_manifest:
+            raise ValueError("--adapt-dataset requires --dataset-source and --dataset-manifest")
+        return service.preview_external_dataset(
+            arguments.adapt_dataset,
+            _resolve_authoring_source(service, arguments.dataset_source),
+            _resolve_authoring_source(service, arguments.dataset_manifest),
+        )
+    if arguments.compile_source:
+        return service.preview_semantic_source(
+            _resolve_authoring_source(service, arguments.compile_source)
+        )
+    if arguments.generate_source:
+        return service.generate_semantic_source(
+            _resolve_authoring_source(service, arguments.generate_source)
+        )
+    if arguments.review_dataset:
+        return service.preview_dialogue_source(
+            _resolve_authoring_source(service, arguments.review_dataset)
+        )
+    if arguments.generate_dataset:
+        return service.generate_dialogue_source(
+            _resolve_authoring_source(service, arguments.generate_dataset)
+        )
+    return None
 
 
 def cli(arguments: argparse.Namespace) -> int:
     try:
+        repository = Path(arguments.repository) if arguments.repository else None
+        authoring_service = SemanticLabAuthoringService(
+            repository=repository,
+            runtime_root=repository,
+        )
+        authoring_report = _run_authoring_operation(arguments, authoring_service)
+        if authoring_report is not None:
+            _print_result(authoring_report, arguments.jsonl)
+            return 0 if authoring_report.get("ok") is True else 2
         worker_kwargs = {
             "lua_bin": arguments.lua,
             "repository": Path(arguments.repository) if arguments.repository else None,
@@ -75,6 +211,103 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--interactive", action="store_true", help="read one conversation input per stdin line")
     parser.add_argument("--jsonl", action="store_true", help="emit compact one-record-per-line JSON")
     parser.add_argument("--audit", action="store_true", help="emit a bounded conflict audit after turns")
+    authoring = parser.add_mutually_exclusive_group()
+    authoring.add_argument(
+        "--compile-source",
+        metavar="PATH",
+        help="preview one canonical semantic source through the embedded CodeBuilder",
+    )
+    authoring.add_argument(
+        "--generate-source",
+        metavar="PATH",
+        help="write one approved canonical semantic source through the embedded CodeBuilder",
+    )
+    authoring.add_argument(
+        "--review-dataset",
+        metavar="PATH",
+        help="preview one reviewed dialogue dataset through the embedded CodeBuilder",
+    )
+    authoring.add_argument(
+        "--generate-dataset",
+        metavar="PATH",
+        help="write one approved dialogue dataset through the embedded CodeBuilder",
+    )
+    authoring.add_argument(
+        "--list-datasets",
+        action="store_true",
+        help="list canonical datasets available in the Semantic Lab Dataset Library",
+    )
+    authoring.add_argument(
+        "--search-datasets",
+        metavar="QUERY",
+        help="search canonical dataset entries through the Semantic Lab Dataset Library",
+    )
+    authoring.add_argument(
+        "--show-dataset",
+        metavar="SOURCE_ID",
+        help="show bounded entries for a canonical Dataset Library source",
+    )
+    authoring.add_argument(
+        "--validate-dataset",
+        metavar="SOURCE_ID",
+        help="validate the current canonical Dataset Library source without writing",
+    )
+    authoring.add_argument(
+        "--list-blocks",
+        action="store_true",
+        help="list reusable Semantic Lab blocks and their production contracts",
+    )
+    authoring.add_argument(
+        "--search-blocks",
+        metavar="QUERY",
+        help="search reusable Semantic Lab blocks",
+    )
+    authoring.add_argument(
+        "--validate-blocks",
+        metavar="IDS",
+        help="validate comma-separated reusable block IDs without writing or dispatching",
+    )
+    authoring.add_argument(
+        "--validate-codeblocks",
+        metavar="PATH",
+        help="validate a declarative semantic.codeblocks.v1 file without writing or dispatching",
+    )
+    authoring.add_argument(
+        "--workflow-preview",
+        metavar="SOURCE_ID",
+        help="preview one canonical dataset plus a composed block selection",
+    )
+    authoring.add_argument(
+        "--workflow-generate",
+        metavar="SOURCE_ID",
+        help="generate one approved workflow through the existing CodeBuilder writer",
+    )
+    authoring.add_argument(
+        "--adapt-dataset",
+        choices=("massive", "sgd"),
+        metavar="ADAPTER",
+        help="review one bounded external MASSIVE/SGD-style source through a build-time adapter",
+    )
+    parser.add_argument(
+        "--dataset-source",
+        metavar="PATH",
+        help="external dataset source path for --adapt-dataset; never a runtime media path",
+    )
+    parser.add_argument(
+        "--dataset-manifest",
+        metavar="PATH",
+        help="provenance/license manifest path for --adapt-dataset",
+    )
+    parser.add_argument(
+        "--workflow-blocks",
+        metavar="IDS",
+        help="comma-separated reusable block IDs for a Semantic Lab workflow",
+    )
+    parser.add_argument(
+        "--approve-workflow",
+        action="store_true",
+        help="explicitly approve --workflow-generate after its preview contract",
+    )
     parser.add_argument("--doctor", action="store_true", help="run bounded headless runtime diagnostics")
     parser.add_argument("--doctor-json", action="store_true", help="emit doctor diagnostics as one JSON record")
     parser.add_argument("--snapshot", action="store_true")

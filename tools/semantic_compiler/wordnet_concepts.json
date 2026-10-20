@@ -15,35 +15,75 @@
   "concepts": {
     "FETCH": {
       "synsets": [
-        {
-          "pos": "v",
-          "offset": "01433294",
-          "lemmas": ["bring", "fetch", "get"]
-        },
-        {
-          "pos": "v",
-          "offset": "01433991",
-          "lemmas": ["retrieve"]
-        },
-        {
-          "pos": "v",
-          "offset": "01439190",
-          "lemmas": ["grab", "take_hold_of"]
-        },
-        {
-          "pos": "v",
-          "offset": "02305586",
-          "lemmas": ["pick_up"]
-        }
+        {"pos": "v", "offset": "01433294", "lemmas": ["bring", "fetch", "get"]},
+        {"pos": "v", "offset": "01433991", "lemmas": ["retrieve"]},
+        {"pos": "v", "offset": "01439190", "lemmas": ["grab", "take_hold_of"]},
+        {"pos": "v", "offset": "02305586", "lemmas": ["pick_up"]}
       ]
     },
     "FOLLOW": {
       "synsets": [
-        {
-          "pos": "v",
-          "offset": "01998432",
-          "lemmas": ["follow"]
-        }
+        {"pos": "v", "offset": "01998432", "lemmas": ["follow"]}
+      ]
+    },
+    "STOP": {
+      "synsets": [
+        {"pos": "v", "offset": "02680814", "lemmas": ["discontinue", "cease", "quit"]}
+      ]
+    },
+    "GO": {
+      "synsets": [
+        {"pos": "v", "offset": "01835496", "lemmas": ["move", "locomote"]}
+      ]
+    },
+    "HAVE": {
+      "synsets": [
+        {"pos": "v", "offset": "02204692", "lemmas": ["own", "possess"]}
+      ]
+    },
+    "WANT": {
+      "synsets": [
+        {"pos": "v", "offset": "01825237", "lemmas": ["desire"]}
+      ]
+    },
+    "HELP": {
+      "synsets": [
+        {"pos": "v", "offset": "02547586", "lemmas": ["assist", "aid"]}
+      ]
+    },
+    "TAKE": {
+      "synsets": [
+        {"pos": "v", "offset": "01214265", "lemmas": ["get_hold_of"]}
+      ]
+    },
+    "THANK": {
+      "synsets": [
+        {"pos": "v", "offset": "00892315", "lemmas": ["thank", "give_thanks"]}
+      ]
+    },
+    "ACCEPT": {
+      "synsets": [
+        {"pos": "v", "offset": "00797697", "lemmas": ["consent", "go_for"]}
+      ]
+    },
+    "REFUSE": {
+      "synsets": [
+        {"pos": "v", "offset": "00797430", "lemmas": ["decline"]}
+      ]
+    },
+    "AGREE": {
+      "synsets": [
+        {"pos": "v", "offset": "00805376", "lemmas": ["concur", "concord"]}
+      ]
+    },
+    "ACKNOWLEDGE": {
+      "synsets": [
+        {"pos": "v", "offset": "01059123", "lemmas": ["notice"]}
+      ]
+    },
+    "DISAGREE": {
+      "synsets": [
+        {"pos": "v", "offset": "00804802", "lemmas": ["differ", "dissent"]}
       ]
     }
   },

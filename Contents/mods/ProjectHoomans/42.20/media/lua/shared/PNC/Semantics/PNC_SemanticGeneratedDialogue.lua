@@ -6,14 +6,39 @@ local result = {
         ["name"] = "Project Hoomans Common Interaction Seed",
         ["references"] = {
             {
+                ["license"] = "ACL Anthology terms; metadata-only reference",
                 ["name"] = "DailyDialog",
+                ["reviewedOn"] = "2026-10-19",
                 ["url"] = "https://aclanthology.org/I17-1099/",
                 ["use"] = "Everyday dialogue-act coverage guidance; no corpus turns are copied.",
             },
             {
+                ["license"] = "CC BY 4.0; metadata-only reference",
                 ["name"] = "EmpatheticDialogues",
+                ["reviewedOn"] = "2026-10-19",
                 ["url"] = "https://github.com/facebookresearch/EmpatheticDialogues",
                 ["use"] = "Emotion-aware interaction coverage guidance; no corpus turns are copied.",
+            },
+            {
+                ["license"] = "WordNet 3.0 license",
+                ["name"] = "WordNet 3.0",
+                ["reviewedOn"] = "2026-10-19",
+                ["url"] = "https://wordnet.princeton.edu/",
+                ["use"] = "Reviewed FETCH lexical sense guidance for the pick-up paraphrase; no dictionary files ship at runtime.",
+            },
+            {
+                ["license"] = "CC BY 4.0",
+                ["name"] = "MASSIVE",
+                ["reviewedOn"] = "2026-10-19",
+                ["url"] = "https://github.com/alexa/massive",
+                ["use"] = "Build-time reviewed English intent record imported and mapped to the existing WEATHER route; raw corpus stays outside runtime media.",
+            },
+            {
+                ["license"] = "CC BY-SA 4.0",
+                ["name"] = "SGD",
+                ["reviewedOn"] = "2026-10-19",
+                ["url"] = "https://github.com/google-research-datasets/dstc8-schema-guided-dialogue",
+                ["use"] = "Build-time reviewed Weather_1 user turn imported and mapped to the existing WEATHER route; raw corpus stays outside runtime media.",
             },
         },
         ["version"] = "1",
@@ -28,5 +53,7 @@ local function append(target, shard)
 end
 append(result["patterns"], require "PNC/Semantics/PNC_SemanticGeneratedDialogue_Patterns_01")
 append(result["patterns"], require "PNC/Semantics/PNC_SemanticGeneratedDialogue_Patterns_02")
+append(result["patterns"], require "PNC/Semantics/PNC_SemanticGeneratedDialogue_Patterns_03")
 append(result["responsePools"], require "PNC/Semantics/PNC_SemanticGeneratedDialogue_Responses_01")
+append(result["responsePools"], require "PNC/Semantics/PNC_SemanticGeneratedDialogue_Responses_02")
 return result

@@ -25,11 +25,18 @@ function DialogueFacts.Build(
     local statements = type(gossip) == "table" and gossip.statements or nil
     local index
     local content
-    if Memory and type(Memory.BuildBackstoryFacts) == "function" then
+    local knowledgeSnapshot = type(semanticInputContext) == "table"
+        and semanticInputContext.npcKnowledge or nil
+    if Memory and type(Memory.BuildAuthorizedBackstoryFacts) == "function"
+        and type(knowledgeSnapshot) == "table"
+    then
         ok, backstoryFacts = pcall(
-            Memory.BuildBackstoryFacts,
+            Memory.BuildAuthorizedBackstoryFacts,
             record,
-            10
+            knowledgeSnapshot,
+            10,
+            semanticInputContext.language
+                or semanticInputContext.translationLanguage
         )
         if ok and type(backstoryFacts) == "table" then
             facts = backstoryFacts

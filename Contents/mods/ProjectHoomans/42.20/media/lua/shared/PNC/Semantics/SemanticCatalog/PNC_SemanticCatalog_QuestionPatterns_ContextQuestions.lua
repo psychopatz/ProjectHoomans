@@ -283,6 +283,427 @@ function Internal.RegisterWorldFactQuestions()
         86
     )
 
+    local medicalBiteQuestion = {
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "NPC_BITE_STATUS",
+        target = "SELF",
+        slots = { attribute = "bite_status" },
+        modifiers = { directed = true },
+        socialContext = {
+            directed = true,
+            personalQuestion = true,
+            target = "SELF",
+        },
+        extensions = { topic = "medical" },
+    }
+
+    registerPattern(
+        "pnc.question.medical_bite.have_you_been",
+        {
+            { kind = "literal", value = "have" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "been" },
+            { kind = "concept", id = "BITTEN" },
+        },
+        medicalBiteQuestion,
+        0.99,
+        122
+    )
+
+    registerPattern(
+        "pnc.question.medical_bite.are_you",
+        {
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "you" },
+            { kind = "concept", id = "BITTEN" },
+        },
+        medicalBiteQuestion,
+        0.98,
+        121
+    )
+
+    registerPattern(
+        "pnc.question.medical_bite.did_a_zombie",
+        {
+            { kind = "literal", value = "did" },
+            { kind = "literal", value = "a" },
+            { kind = "literal", value = "zombie" },
+            { kind = "concept", id = "BITE" },
+            { kind = "literal", value = "you" },
+        },
+        medicalBiteQuestion,
+        0.99,
+        123
+    )
+
+    registerPattern(
+        "pnc.question.medical_bite.did_the_zombie",
+        {
+            { kind = "literal", value = "did" },
+            { kind = "literal", value = "the" },
+            { kind = "literal", value = "zombie" },
+            { kind = "concept", id = "BITE" },
+            { kind = "literal", value = "you" },
+        },
+        medicalBiteQuestion,
+        0.99,
+        123
+    )
+
+    registerPattern(
+        "pnc.question.medical_bite.did_zombie",
+        {
+            { kind = "literal", value = "did" },
+            { kind = "literal", value = "zombie" },
+            { kind = "concept", id = "BITE" },
+            { kind = "literal", value = "you" },
+        },
+        medicalBiteQuestion,
+        0.98,
+        122
+    )
+
+    registerPattern(
+        "pnc.question.medical_bite.any",
+        {
+            { kind = "literal", value = "any" },
+            { kind = "concept", id = "BITE" },
+        },
+        medicalBiteQuestion,
+        0.98,
+        120
+    )
+
+    registerPattern(
+        "pnc.question.medical_bite.have_any",
+        {
+            { kind = "literal", value = "have" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "had" },
+            { kind = "literal", value = "any" },
+            { kind = "concept", id = "BITE" },
+        },
+        medicalBiteQuestion,
+        0.98,
+        121
+    )
+
+    local residenceQuestion = {
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "NPC_RESIDENCE",
+        target = "SELF",
+        slots = { attribute = "residence" },
+        modifiers = { directed = true },
+        socialContext = {
+            directed = true,
+            personalQuestion = true,
+            target = "SELF",
+        },
+        extensions = { topic = "residence" },
+    }
+
+    registerPattern(
+        "pnc.question.residence.where_do_you_live",
+        {
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "live" },
+            { kind = "literal", value = "exactly", optional = true },
+        },
+        residenceQuestion,
+        0.99,
+        124
+    )
+
+    registerPattern(
+        "pnc.question.residence.where_is_home",
+        {
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "your" },
+            { kind = "literal", value = "home" },
+        },
+        residenceQuestion,
+        0.98,
+        123
+    )
+
+    registerPattern(
+        "pnc.question.residence.where_do_you_stay",
+        {
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "stay" },
+        },
+        residenceQuestion,
+        0.98,
+        123
+    )
+
+    registerPattern(
+        "pnc.question.residence.where_is_house",
+        {
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "your" },
+            { kind = "literal", value = "house" },
+        },
+        residenceQuestion,
+        0.98,
+        123
+    )
+
+    registerPattern(
+        "pnc.question.residence.what_settlement",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "concept", id = "RESIDENCE" },
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "from" },
+        },
+        residenceQuestion,
+        0.97,
+        122
+    )
+
+    local healthQuestion = {
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "NPC_HEALTH_STATE",
+        target = "SELF",
+        slots = { attribute = "health_state" },
+        modifiers = { directed = true },
+        socialContext = {
+            directed = true,
+            personalQuestion = true,
+            target = "SELF",
+        },
+        extensions = { topic = "medical" },
+    }
+
+    registerPattern(
+        "pnc.question.health.are_you_injured",
+        {
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "injured" },
+        },
+        healthQuestion,
+        0.99,
+        124
+    )
+
+    registerPattern(
+        "pnc.question.health.are_you_hurt",
+        {
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "hurt" },
+        },
+        healthQuestion,
+        0.99,
+        124
+    )
+
+    registerPattern(
+        "pnc.question.health.how_is_your_health",
+        {
+            { kind = "literal", value = "how" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "your" },
+            { kind = "concept", id = "HEALTH_STATUS" },
+        },
+        healthQuestion,
+        0.98,
+        123
+    )
+
+    registerPattern(
+        "pnc.question.health.how_are_your_wounds",
+        {
+            { kind = "literal", value = "how" },
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "your" },
+            { kind = "literal", value = "wounds" },
+        },
+        healthQuestion,
+        0.99,
+        124
+    )
+
+    registerPattern(
+        "pnc.question.health.what_about_your_health",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "about" },
+            { kind = "literal", value = "your" },
+            { kind = "concept", id = "HEALTH_STATUS" },
+        },
+        healthQuestion,
+        0.98,
+        125
+    )
+
+    local knowledgeQuestion = {
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "NPC_KNOWLEDGE",
+        slots = {
+            attribute = "knowledge",
+            topic = "$capture.topic",
+        },
+        modifiers = { directed = true },
+        socialContext = {
+            directed = true,
+            informationalQuestion = true,
+        },
+        extensions = { topic = "knowledge" },
+    }
+
+    registerPattern(
+        "pnc.question.knowledge.do_you_know_about",
+        {
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "concept", id = "KNOW" },
+            { kind = "literal", value = "about" },
+            {
+                kind = "any_phrase",
+                capture = "topic",
+                minTokens = 1,
+                maxTokens = 4,
+            },
+        },
+        knowledgeQuestion,
+        0.96,
+        119,
+        { allowFuzzyCapture = true }
+    )
+
+    registerPattern(
+        "pnc.question.knowledge.have_you_heard_of",
+        {
+            { kind = "literal", value = "have" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "heard" },
+            { kind = "literal", value = "of" },
+            {
+                kind = "any_phrase",
+                capture = "topic",
+                minTokens = 1,
+                maxTokens = 4,
+            },
+        },
+        knowledgeQuestion,
+        0.96,
+        119,
+        { allowFuzzyCapture = true }
+    )
+
+    -- Bounded discourse-reference questions.  The literal pronoun is
+    -- captured by PsychopatzCore so the existing dialogue reference resolver
+    -- can bind it to the current topic/focus; these exact utterance shapes
+    -- never become an open-ended fuzzy parser or a gameplay request.
+    local function contextReferenceQuestion(questionKind)
+        return {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "CONTEXT_REFERENCE",
+            target = "$capture.reference",
+            modifiers = { directed = true },
+            socialContext = {
+                directed = true,
+                informationalQuestion = true,
+                contextReference = true,
+            },
+            extensions = {
+                dialogueFollowUp = "CONTEXT_REFERENCE",
+                topic = "conversation",
+                contextQuestion = questionKind,
+            },
+        }
+    end
+
+    local function referencePattern(id, match, priority, questionKind)
+        registerPattern(
+            id,
+            match,
+            contextReferenceQuestion(questionKind),
+            0.98,
+            priority
+        )
+    end
+
+    referencePattern(
+        "pnc.question.context_reference.what_about_it",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "about" },
+            { kind = "literal", value = "it", capture = "reference" },
+        },
+        128,
+        "ABOUT"
+    )
+    referencePattern(
+        "pnc.question.context_reference.what_about_that",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "about" },
+            { kind = "literal", value = "that", capture = "reference" },
+        },
+        128,
+        "ABOUT"
+    )
+    referencePattern(
+        "pnc.question.context_reference.what_about_this",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "about" },
+            { kind = "literal", value = "this", capture = "reference" },
+        },
+        128,
+        "ABOUT"
+    )
+    referencePattern(
+        "pnc.question.context_reference.safe_there",
+        {
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "it", capture = "reference" },
+            { kind = "literal", value = "safe" },
+            { kind = "literal", value = "there" },
+        },
+        127,
+        "SAFETY"
+    )
+    referencePattern(
+        "pnc.question.context_reference.like_there",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "it", capture = "reference" },
+            { kind = "literal", value = "like" },
+            { kind = "literal", value = "there" },
+        },
+        127,
+        "DESCRIPTION"
+    )
+    referencePattern(
+        "pnc.question.context_reference.still_hurt",
+        {
+            { kind = "literal", value = "does" },
+            { kind = "literal", value = "it", capture = "reference" },
+            { kind = "literal", value = "still" },
+            { kind = "literal", value = "hurt" },
+        },
+        127,
+        "MEDICAL_PAIN"
+    )
+
     registerPattern(
         "pnc.question.wellbeing_follow_up_whats_wrong",
         {
@@ -334,6 +755,110 @@ function Internal.RegisterWorldFactQuestions()
         },
         0.97,
         90
+    )
+
+    registerPattern(
+        "pnc.question.needs_offer",
+        {
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "concept", id = "WANT" },
+            { kind = "concept", id = "ANY_ITEM" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "NEEDS",
+            extensions = {
+                topic = "needs",
+                dialogueFollowUp = "NEEDS_QUANTITY",
+            },
+        },
+        0.98,
+        96
+    )
+
+    registerPattern(
+        "pnc.question.needs_offer_plain",
+        {
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "need" },
+            { kind = "literal", value = "anything" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "NEEDS",
+            extensions = {
+                topic = "needs",
+                dialogueFollowUp = "NEEDS_QUANTITY",
+            },
+        },
+        0.99,
+        97
+    )
+
+    registerPattern(
+        "pnc.question.quantity_follow_up",
+        {
+            { kind = "literal", value = "how" },
+            { kind = "literal", value = "many" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "QUANTITY",
+            extensions = {
+                topic = "needs",
+                dialogueFollowUp = "NEEDS_QUANTITY",
+            },
+        },
+        0.99,
+        98
+    )
+
+    -- Keep a conversational supply promise separate from FETCH.  This is a
+    -- proposal about the active needs exchange, not a gameplay command.
+    registerPattern(
+        "pnc.promise.needs_get_some",
+        {
+            { kind = "literal", value = "i'll" },
+            { kind = "concept", id = "FETCH" },
+            { kind = "literal", value = "some" },
+        },
+        {
+            intent = "PROMISE",
+            speechAct = "PROMISE",
+            subject = "NEEDS",
+            extensions = {
+                topic = "needs",
+                dialogueFollowUp = "NEEDS_PROPOSAL",
+            },
+        },
+        0.99,
+        99
+    )
+
+    registerPattern(
+        "pnc.promise.needs_get_some_plain",
+        {
+            { kind = "literal", value = "i" },
+            { kind = "literal", value = "will" },
+            { kind = "concept", id = "FETCH" },
+            { kind = "literal", value = "some" },
+        },
+        {
+            intent = "PROMISE",
+            speechAct = "PROMISE",
+            subject = "NEEDS",
+            extensions = {
+                topic = "needs",
+                dialogueFollowUp = "NEEDS_PROPOSAL",
+            },
+        },
+        0.99,
+        98
     )
 
     registerPattern(

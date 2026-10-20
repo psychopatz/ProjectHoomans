@@ -17,6 +17,9 @@ function RuntimeState.new()
         loadedModules = {},
         moduleManifest = {},
         headlessRequires = {},
+        modData = {},
+        questBoundary = nil,
+        productionQuestRequest = nil,
     }
 end
 

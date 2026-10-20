@@ -63,6 +63,14 @@ class SemanticCompilerTests(unittest.TestCase):
             encoding="ascii",
         )
         self.allowlist = load_allowlist(PRODUCTION_ALLOWLIST)
+        # The compact fixture models the original FETCH/FOLLOW allowlist;
+        # production coverage is asserted separately below. Keep this unit
+        # fixture intentionally small so its fail-closed parser checks do not
+        # require reproducing the complete WordNet package.
+        self.allowlist["concepts"] = {
+            key: self.allowlist["concepts"][key]
+            for key in ("FETCH", "FOLLOW")
+        }
         self.allowlist["source"]["expected_sha256"] = {
             name: hashlib.sha256((dictionary / name).read_bytes()).hexdigest()
             for name in ("index.verb", "data.verb", "verb.exc")
@@ -109,6 +117,15 @@ class SemanticCompilerTests(unittest.TestCase):
         self.assertEqual(forms["follows"], ("FOLLOW", "follow", "THIRD_PERSON"))
         self.assertNotIn("got", forms)
         self.assertNotIn("gotten", forms)
+
+    def test_production_allowlist_covers_registered_language_concepts(self) -> None:
+        production = load_allowlist(PRODUCTION_ALLOWLIST)
+        self.assertGreaterEqual(len(production["concepts"]), 14)
+        self.assertTrue({
+            "FETCH", "FOLLOW", "STOP", "GO", "HAVE", "WANT", "HELP",
+            "TAKE", "THANK", "ACCEPT", "REFUSE", "AGREE", "ACKNOWLEDGE",
+            "DISAGREE",
+        }.issubset(production["concepts"]))
 
     def test_synset_membership_is_required(self) -> None:
         invalid = copy.deepcopy(self.allowlist)

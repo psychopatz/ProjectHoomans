@@ -84,6 +84,8 @@ class LuaProcess:
             {
                 "PNC_HARNESS_REPOSITORY": str(self.config.repository),
                 "PNC_HARNESS_CORE_REPOSITORY": str(self.config.core_repository),
+                "PZ_TEST_REPOSITORY": str(self.config.repository),
+                "PZ_TEST_CORE_REPOSITORY": str(self.config.core_repository),
                 "PZ_TEST_HOOMANS_RUNTIME": self.config.hoomans_runtime,
                 "PZ_TEST_CORE_RUNTIME": self.config.core_runtime,
             }

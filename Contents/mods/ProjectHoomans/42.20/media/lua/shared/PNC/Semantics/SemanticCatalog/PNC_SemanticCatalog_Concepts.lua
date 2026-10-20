@@ -78,6 +78,45 @@ function Internal.RegisterVocabulary()
         "rumour", "rumours",
     })
     registerConcept("BITTEN", { "bitten", "got bitten", "was bitten" })
+    registerConcept("BITE", { "bite", "bites", "biting" })
+    registerConcept("RESIDENCE", {
+        "house", "residence", "settlement", "where i live",
+    })
+    registerConcept("HEALTH_STATUS", {
+        "health", "hurt", "injured", "wounded", "wounds",
+    })
+    registerConcept("KNOW", { "know", "knows", "aware" })
+    registerConcept("FORMER_JOB", {
+        "job", "work", "occupation", "profession", "career",
+    }, 4)
+    registerConcept("HOMETOWN", {
+        "hometown", "home town", "where i grew up", "where i'm from",
+    }, 4)
+    registerConcept("EDUCATION", {
+        "education", "school", "college", "studies", "studied",
+    }, 4)
+    registerConcept("HOBBY", {
+        "hobby", "hobbies", "pastime", "pastimes", "free time",
+    }, 4)
+    registerConcept("FAMILY", {
+        "family", "relatives", "parents", "siblings",
+    }, 4)
+    registerConcept("PERSONAL_VALUE", {
+        "values", "value", "beliefs", "belief", "principles",
+    }, 4)
+    registerConcept("SURVIVAL_ORIGIN", {
+        "survival", "surviving", "how i survived",
+    }, 4)
+    registerConcept("PERSONAL_FEAR", {
+        "afraid", "fear", "fears", "scared", "frightened",
+    }, 4)
+    registerConcept("PERSONAL_TRAGEDY", {
+        "tragedy", "loss", "what happened", "what i went through",
+        "what did you go through",
+    }, 4)
+    registerConcept("BIRTHDAY", {
+        "birthday", "birth date", "date of birth",
+    }, 4)
     registerConcept("WATER", {
         "water", "drinking water",
     })
@@ -253,6 +292,14 @@ function Internal.RegisterVocabulary()
         "i understand", "i understand what you mean", "i hear you",
         "i see what you mean", "understood",
     }, 3)
+    -- Keep requests for conversational continuation distinct from ACCEPT and
+    -- generic open-ended captures.  The exact continuation patterns require
+    -- a complete utterance, so this vocabulary cannot authorize a gameplay
+    -- action or steal an item phrase such as "give me more food".
+    registerConcept("MORE", {
+        "more", "anything else", "what else", "go on", "continue",
+        "keep going",
+    }, 3)
     registerConcept("DISAGREE", {
         "i disagree", "i don't agree", "i do not agree", "not really",
         "not this time", "that doesn't work", "that does not work",
@@ -275,7 +322,8 @@ function Internal.RegisterVocabulary()
         "what's the date", "what date is it", "today's date",
     }, 5)
     registerConcept("WEATHER", {
-        "weather", "what is the weather", "is it raining", "raining",
+        "weather", "what is the weather", "what's the weather",
+        "is it raining", "raining",
         "rain", "fog", "foggy", "mist", "temperature",
     })
     registerConcept("IDENTITY", {

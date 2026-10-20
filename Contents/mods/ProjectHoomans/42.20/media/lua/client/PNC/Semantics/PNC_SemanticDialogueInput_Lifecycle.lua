@@ -18,6 +18,41 @@ local DialogueInputTrace = PNC.Semantics.DialogueInputTrace
 local audit = DialogueInputTrace.Audit
 local traceTurn = DialogueInputTrace.RecordTurn
 
+local function applyGeneratedFlowResult(view, result, actionResult)
+    local flow = result and result.flow or nil
+    local policy = PNC.Semantics and PNC.Semantics.DialoguePolicy or nil
+    local kernel = policy and policy.Internal and policy.Internal.FlowKernel
+    local state = view and view.session
+        and view.session.semanticDialogueState or nil
+    if type(flow) ~= "table" or flow.generated ~= true
+        or type(actionResult) ~= "table"
+        or not kernel or type(kernel.ApplyActionResult) ~= "function"
+        or not state or type(Internal.ShallowContext) ~= "function"
+    then
+        return false
+    end
+    local updated, reason = kernel.ApplyActionResult(
+        flow,
+        actionResult,
+        state,
+        Internal.ShallowContext(view),
+        { maxFlowStack = 4 }
+    )
+    if type(updated) ~= "table" then
+        audit("semantic.generated_flow.result_unapplied", {
+            flowID = flow.flowId,
+            reason = reason,
+            status = actionResult.status,
+        })
+        return false
+    end
+    result.flow = updated
+    if type(result.decision) == "table" then
+        result.decision.flow = updated
+    end
+    return true
+end
+
 local function groupMemberShouldHandle(view, result, value)
     local group = view and view.groupConversation
     if not group or type(group.MemberForHost) ~= "function"
@@ -51,6 +86,7 @@ local function finishLocalSubmit(view, value, result, options)
     if groupMemberShouldHandle(view, result, value) then
         actionResult = Internal.DispatchAction(view, result, value)
         view.lastSemanticActionResult = actionResult
+        applyGeneratedFlowResult(view, result, actionResult)
         if Internal.ClearPendingGiftConsent then
             Internal.ClearPendingGiftConsent(view)
         end
@@ -237,7 +273,11 @@ function Internal.SubmitSingle(view, value, part)
     local decision = preview.decision or {}
     local isIdentityClaim = identityRequest
         and identityRequest.kind == "identity_claim"
-    if decision.route == "llm_fallback" and not isIdentityClaim then
+    local isBackstoryDisclosure = identityRequest
+        and identityRequest.kind == "backstory_disclosure"
+    if decision.route == "llm_fallback"
+        and not isIdentityClaim and not isBackstoryDisclosure
+    then
         if Internal.ClearPendingGiftConsent then
             Internal.ClearPendingGiftConsent(view)
         end
@@ -289,16 +329,12 @@ function Internal.SubmitSingle(view, value, part)
     recordAcceptedContextTurn(view, result, options)
     recordConversationTopics(view, result, value)
 
-    traceTurn(view, value, result, "semantic_input_local", {
-        providerAvailable = context.llmAvailable == true,
-        providerUsed = false,
-    })
-
     -- Claimed identity and targeted preference disclosures are authoritative
     -- server responses. Do not also queue a local reply for those turns.
     local deferIdentityResponse = identityRequest
         and (identityRequest.kind == "identity_claim"
-            or identityRequest.kind == "gift_preference_disclosure")
+            or identityRequest.kind == "gift_preference_disclosure"
+            or identityRequest.kind == "backstory_disclosure")
     local submitted, submitReason = finishLocalSubmit(
         view,
         value,
@@ -306,6 +342,18 @@ function Internal.SubmitSingle(view, value, part)
         { deferResponse = deferIdentityResponse == true
             or deferGossipResponse == true }
     )
+    traceTurn(view, value, result, "semantic_input_local", {
+        providerAvailable = context.llmAvailable == true,
+        providerUsed = false,
+        actionStatus = view.lastSemanticActionResult
+            and view.lastSemanticActionResult.status,
+        actionAccepted = view.lastSemanticActionResult
+            and view.lastSemanticActionResult.accepted,
+        actionReason = view.lastSemanticActionResult
+            and view.lastSemanticActionResult.reason,
+        responseSubmitted = submitted == true,
+        responseReason = submitReason,
+    })
     if identityRequest then
         local dispatched = false
         local dispatchReason

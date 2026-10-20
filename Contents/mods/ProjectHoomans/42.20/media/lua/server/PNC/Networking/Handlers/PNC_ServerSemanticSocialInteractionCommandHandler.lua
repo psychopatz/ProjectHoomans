@@ -42,6 +42,7 @@ end
 local function rejected(requestID, npcID, speechAct, reason)
     return {
         accepted = false,
+        authority = "server",
         status = "rejected",
         requestID = requestID,
         npcID = npcID,

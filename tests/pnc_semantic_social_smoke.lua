@@ -163,6 +163,43 @@ T.equal(threat.diagnostics.matchedPattern, "pnc.social.threaten",
 local wait = Parser.Parse("stay right here")
 T.equal(wait.action, "STAY", "common wait wording is vocabulary data")
 
+local bareApparelCompliment = Parser.Parse("nice dress")
+T.equal(bareApparelCompliment.intent, "COMPLIMENT",
+    "an adjective plus wearable feature is a social compliment")
+T.equal(bareApparelCompliment.speechAct, "COMPLIMENT",
+    "bare apparel evaluations keep the compliment speech act")
+T.equal(bareApparelCompliment.diagnostics.matchedPattern,
+    "pnc.social.compliment_adjective_feature",
+    "bare apparel evaluations use the compositional social grammar")
+
+local gotApparelCompliment = Parser.Parse("you got nice dress")
+T.equal(gotApparelCompliment.intent, "COMPLIMENT",
+    "colloquial got-possession apparel evaluations are social")
+T.equal(gotApparelCompliment.diagnostics.matchedPattern,
+    "pnc.social.compliment_you_got_feature",
+    "got-possession apparel evaluations use the social grammar")
+
+local gotArticleApparelCompliment = Parser.Parse("you got a nice dress")
+T.equal(gotArticleApparelCompliment.intent, "COMPLIMENT",
+    "article-bearing got-possession apparel evaluations are social")
+T.equal(gotArticleApparelCompliment.diagnostics.matchedPattern,
+    "pnc.social.compliment_you_got_feature_a",
+    "article-bearing got-possession uses the compositional grammar")
+
+local plainGotInventory = Parser.Parse("you got a dress")
+T.equal(plainGotInventory.subject, "INVENTORY",
+    "plain got-possession questions remain inventory queries")
+T.equal(plainGotInventory.diagnostics.matchedPattern,
+    "pnc.question.inventory_you_got",
+    "plain got-possession keeps the existing inventory grammar")
+
+local anyBandagesInventory = Parser.Parse("you got any bandages")
+T.equal(anyBandagesInventory.subject, "INVENTORY",
+    "any-item got questions remain inventory queries")
+T.equal(anyBandagesInventory.diagnostics.matchedPattern,
+    "pnc.question.inventory_you_got",
+    "any-item got questions keep the existing inventory grammar")
+
 local state = Semantic.DialogueState.New({ participants = { "npc:mara" } })
 local decision = Policy.Decide(insult, state, {
     llmEnabled = false,

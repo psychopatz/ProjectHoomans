@@ -101,10 +101,68 @@ class LuaSemanticWorker:
     def snapshot(self) -> dict[str, Any]:
         return self._request("SNAPSHOT")
 
+    def replay_quest_request(self, request: dict[str, Any]) -> dict[str, Any]:
+        """Replay a captured request through the production server router."""
+
+        return self._request("REPLAY_SEMANTIC_QUEST", request)
+
+    def commitment(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Exercise the production NPC Knowledge commitment boundary."""
+
+        return self._request("COMMITMENT", payload)
+
+    def backstory(
+        self,
+        identity_seed: int,
+        tactical_class: str = "colonist",
+        npc_id: str = "harness-backstory-npc",
+    ) -> dict[str, Any]:
+        """Read a bounded seed-derived backstory projection from production Lua."""
+
+        return self._request(
+            "BACKSTORY",
+            {
+                "identitySeed": identity_seed,
+                "tacticalClass": tactical_class,
+                "npcID": npc_id,
+            },
+        )
+
+    def backstory_fact(
+        self,
+        identity_seed: int,
+        kind: str,
+        tactical_class: str = "colonist",
+        language: str = "EN",
+        npc_id: str = "harness-backstory-npc",
+    ) -> dict[str, Any]:
+        """Resolve one authoritative offline backstory fact in production Lua."""
+
+        return self._request(
+            "BACKSTORY_FACT",
+            {
+                "identitySeed": identity_seed,
+                "kind": kind,
+                "tacticalClass": tactical_class,
+                "language": language,
+                "npcID": npc_id,
+            },
+        )
+
     def flow_catalog(self) -> dict[str, Any]:
         """Read normalized production flow definitions from the Lua registry."""
 
         return self._request("FLOW_CATALOG")
+
+    def fact_catalog(self) -> list[dict[str, Any]]:
+        """Read typed engine facts exposed to semantic gates and context."""
+
+        return self._request("FACT_CATALOG").get("facts", [])
+
+    def event_catalog(self) -> list[dict[str, Any]]:
+        """Read bounded engine notification types."""
+
+        return self._request("EVENT_CATALOG").get("events", [])
 
     def validate_flow(self, definition: dict[str, Any]) -> dict[str, Any]:
         """Validate a draft through the production Lua flow registry."""
@@ -116,11 +174,28 @@ class LuaSemanticWorker:
 
         return self._request("FLOW_REGISTER", definition)
 
+    def generate_flows(self) -> dict[str, Any]:
+        """Regenerate registered production flows from live capability metadata."""
+
+        return self._request("FLOW_GENERATE")
+
+    def flow_coverage(self) -> list[dict[str, Any]]:
+        """Return the live capability generation classification report."""
+
+        return self._request("FLOW_COVERAGE").get("capabilityCoverage", [])
+
     def ping(self) -> dict[str, Any]:
         return self._request("PING")
 
     def capabilities(self) -> dict[str, Any]:
-        return self._request("CAPABILITIES")
+        capabilities = self._request("CAPABILITIES")
+        # Keep the capability handshake bounded as the generated production
+        # catalog grows. The catalog remains available through the same
+        # production FlowEditor seam, but is fetched as its own bounded
+        # response instead of being duplicated in CAPABILITIES.
+        if "flowCatalog" not in capabilities:
+            capabilities["flowCatalog"] = self.flow_catalog()
+        return capabilities
 
     def restart(self) -> dict[str, Any]:
         """Restart the isolated worker and restore the current scenario."""

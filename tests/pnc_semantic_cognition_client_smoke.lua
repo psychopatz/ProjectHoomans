@@ -148,6 +148,7 @@ clientState.pendingSemanticCognition.observer = {
 clientState.semanticCognitionDialogueRequests["gossip:1"] = gossipRequest
 accepted = Cognition.ApplyPayload({
     requestID = "gossip:1",
+    targetID = "self",
     projection = {
         npcID = "observer",
         revision = 4,
@@ -180,6 +181,7 @@ clientState.semanticCognitionDialogueRequests["gossip:2"] =
 accepted, reason = Cognition.ApplyPayload({
     npcID = "observer",
     requestID = "gossip:2",
+    targetID = "self",
     reason = "invalid_lease",
 })
 T.equal(accepted, false,
@@ -192,5 +194,68 @@ T.equal(completedPayload.reason, "invalid_lease",
     "rejected gossip completion keeps the server reason")
 T.falsy(Cognition.GetGossipContext("observer", "self"),
     "rejected gossip does not leave stale memory statements")
+
+local staleTargetRequest = { requestID = "gossip:3" }
+clientState.pendingSemanticCognition.observer = {
+    requestID = "gossip:3",
+    targetID = "sarah",
+    subject = "GOSSIP",
+}
+clientState.semanticCognitionDialogueRequests["gossip:3"] =
+    staleTargetRequest
+accepted, reason = Cognition.ApplyPayload({
+    npcID = "observer",
+    requestID = "gossip:3",
+    targetID = "mara",
+    projection = {
+        npcID = "observer",
+        revision = 5,
+        facts = {},
+    },
+    g = { 1001 },
+    gs = "Mara",
+})
+T.equal(accepted, false,
+    "matching request IDs cannot cross cognition target scopes")
+T.equal(reason, "stale_cognition_target",
+    "client reports a stale target response")
+T.equal(completedRequest, staleTargetRequest,
+    "stale target responses complete the matching pending dialogue turn")
+T.equal(completedPayload.reason, "stale_cognition_target",
+    "stale target completion preserves the rejection reason")
+T.falsy(clientState.pendingSemanticCognition.observer,
+    "stale target responses clear the pending cognition request")
+T.falsy(Cognition.GetGossipContext("observer", "sarah"),
+    "stale target gossip cannot populate the requested target context")
+
+local staleRequest = { requestID = "gossip:4" }
+clientState.pendingSemanticCognition.observer = {
+    requestID = "gossip:4",
+    targetID = "sarah",
+    subject = "GOSSIP",
+}
+clientState.semanticCognitionDialogueRequests["gossip:4"] = staleRequest
+accepted, reason = Cognition.ApplyPayload({
+    npcID = "observer",
+    requestID = "gossip:old",
+    targetID = "sarah",
+    projection = {
+        npcID = "observer",
+        revision = 6,
+        facts = {},
+    },
+    g = { 1001 },
+    gs = "Sarah",
+})
+T.equal(accepted, false,
+    "late cognition responses cannot replace a newer pending request")
+T.equal(reason, "stale_cognition_request",
+    "client reports a stale request response")
+T.equal(completedRequest, staleRequest,
+    "stale request responses complete the current pending dialogue turn")
+T.equal(completedPayload.reason, "stale_cognition_request",
+    "stale request completion preserves the rejection reason")
+T.falsy(clientState.pendingSemanticCognition.observer,
+    "stale request responses clear the pending cognition request")
 
 T.finish("pnc_semantic_cognition_client_smoke")

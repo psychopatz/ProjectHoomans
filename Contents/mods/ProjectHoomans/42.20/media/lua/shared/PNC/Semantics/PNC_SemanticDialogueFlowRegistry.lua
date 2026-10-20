@@ -20,7 +20,7 @@ Registry.Revision = tonumber(Registry.Revision) or 0
 
 local FRAME_FIELDS = {
     "intent", "speechAct", "action", "subject", "target", "reference",
-    "identityClaim", "selfDirected", "stateType", "stateValue",
+    "identityClaim", "selfDirected", "stateType", "stateValue", "pattern",
 }
 local FRAME_FIELD_SET = {}
 for index = 1, #FRAME_FIELDS do FRAME_FIELD_SET[FRAME_FIELDS[index]] = true end
@@ -29,6 +29,37 @@ local SPECIAL_TARGETS = {
     cancel = true,
     resume = true,
     suspend = true,
+}
+
+local GATE_FIELDS = {
+    type = true,
+    field = true,
+    operator = true,
+    value = true,
+    reasonKey = true,
+    unknownReasonKey = true,
+    passReasonKey = true,
+    failReasonKey = true,
+    startHour = true,
+    endHour = true,
+    gates = true,
+    gate = true,
+    fact = true,
+    subject = true,
+    unit = true,
+    unknownPolicy = true,
+    capabilityID = true,
+    requiresTarget = true,
+    requiresAuthority = true,
+}
+
+local ACTION_FIELDS = {
+    capabilityID = true,
+    route = true,
+    targetScope = true,
+    binding = true,
+    resultTransitions = true,
+    dispatchCount = true,
 }
 
 local function copyValue(value, depth)
@@ -128,6 +159,108 @@ local function normalizeSlots(slots, label)
     return output
 end
 
+local function normalizeNodeList(values, label)
+    if values == nil then return nil end
+    if type(values) ~= "table" then
+        return nil, label .. "_must_be_array"
+    end
+    local output = {}
+    for index = 1, math.min(#values, 8) do
+        local value = stringValue(values[index])
+        if not value or #value > 64 then
+            return nil, label .. "_item_invalid"
+        end
+        output[#output + 1] = value
+    end
+    return output
+end
+
+local function normalizeAction(action, nodes, label)
+    if action == nil then return nil end
+    if type(action) ~= "table" then
+        return nil, label .. "_must_be_object"
+    end
+    local output = {}
+    local key
+    local value
+    for key, value in pairs(action) do
+        if not ACTION_FIELDS[key] then
+            return nil, label .. "_unsupported_field:" .. tostring(key)
+        end
+        if key == "binding" then
+            if type(value) ~= "table" then
+                return nil, label .. "_binding_must_be_object"
+            end
+            output.binding = copyValue(value)
+        elseif key == "resultTransitions" then
+            if type(value) ~= "table" then
+                return nil, label .. "_result_transitions_must_be_object"
+            end
+            output.resultTransitions = {}
+            for outcome, target in pairs(value) do
+                if type(outcome) ~= "string" or type(target) ~= "string"
+                    or target == ""
+                then
+                    return nil, label .. "_invalid_result_transition"
+                end
+                if not SPECIAL_TARGETS[target] and not nodes[target] then
+                    return nil, label .. "_result_unknown_node:" .. target
+                end
+                output.resultTransitions[outcome] = target
+            end
+        elseif key == "dispatchCount" then
+            if value ~= 1 then
+                return nil, label .. "_dispatch_count_must_be_one"
+            end
+            output.dispatchCount = 1
+        else
+            if type(value) ~= "string" and type(value) ~= "number"
+                and type(value) ~= "boolean"
+            then
+                return nil, label .. "_field_invalid:" .. tostring(key)
+            end
+            output[key] = value
+        end
+    end
+    if not output.capabilityID or not output.route
+        or type(output.binding) ~= "table"
+        or type(output.resultTransitions) ~= "table"
+    then
+        return nil, label .. "_requires_typed_binding_and_results"
+    end
+    output.dispatchCount = output.dispatchCount or 1
+    return output
+end
+
+local function normalizeGate(gate, label)
+    if gate == nil then return nil end
+    if type(gate) ~= "table" then
+        return nil, label .. "_must_be_object"
+    end
+    local gateType = stringValue(gate.type)
+    if not gateType then return nil, label .. "_requires_type" end
+    if gateType == "pnc:fact" and not stringValue(gate.fact or gate.subject) then
+        return nil, label .. "_fact_required"
+    end
+    local output = { type = gateType }
+    local key
+    local value
+    for key, value in pairs(gate) do
+        if not GATE_FIELDS[key] then
+            return nil, label .. "_unsupported_field:" .. tostring(key)
+        end
+        if key ~= "type" and type(value) ~= "string"
+            and type(value) ~= "number"
+            and type(value) ~= "boolean"
+            and type(value) ~= "table"
+        then
+            return nil, label .. "_field_invalid:" .. tostring(key)
+        end
+        output[key] = copyValue(value)
+    end
+    return output
+end
+
 local function normalizeNode(nodeID, node, nodes)
     if type(node) ~= "table" then
         return nil, "node_must_be_object:" .. tostring(nodeID)
@@ -138,9 +271,38 @@ local function normalizeNode(nodeID, node, nodes)
         responsePool = stringValue(node.responsePool),
         responseTemplate = stringValue(node.responseTemplate),
     }
-    local slots, reason = normalizeSlots(node.slots, "node_slots")
+    local requiredSlots, requiredSlotsReason = normalizeNodeList(
+        node.requiredSlots, "node_required_slots"
+    )
+    if node.requiredSlots ~= nil and not requiredSlots then
+        return nil, requiredSlotsReason .. ":" .. tostring(nodeID)
+    end
+    local sourceFactRefs, sourceFactRefsReason = normalizeNodeList(
+        node.sourceFactRefs, "node_source_fact_refs"
+    )
+    if node.sourceFactRefs ~= nil and not sourceFactRefs then
+        return nil, sourceFactRefsReason .. ":" .. tostring(nodeID)
+    end
+    output.requiredSlots = requiredSlots
+    output.sourceFactRefs = sourceFactRefs
+    local pendingKind = stringValue(node.pendingKind)
+    if node.pendingKind ~= nil and (not pendingKind or #pendingKind > 32) then
+        return nil, "node_pending_kind_invalid:" .. tostring(nodeID)
+    end
+    output.pendingKind = pendingKind
+    local gate, reason = normalizeGate(node.gate, "node_gate")
+    if node.gate ~= nil and not gate then return nil, reason end
+    output.gate = gate
+    local slots
+    slots, reason = normalizeSlots(node.slots, "node_slots")
     if not slots then return nil, reason .. ":" .. tostring(nodeID) end
     output.slots = slots
+
+    local action, actionReason = normalizeAction(
+        node.action, nodes, "node_action"
+    )
+    if node.action ~= nil and not action then return nil, actionReason end
+    output.action = action
 
     if node.accepts ~= nil then
         if type(node.accepts) ~= "table" then
@@ -170,7 +332,10 @@ local function normalizeNode(nodeID, node, nodes)
         output.accepts = {}
     end
 
-    local fields = { "next", "onMatch", "onUnrelated", "onRefuse" }
+    local fields = {
+        "next", "onMatch", "onUnrelated", "onRefuse",
+        "onClarify", "onPass", "onFail", "onUnknown",
+    }
     local index
     local field
     local target
@@ -184,12 +349,15 @@ local function normalizeNode(nodeID, node, nodes)
         end
         output[field] = target
     end
-    if not output.terminal and #output.accepts == 0 then
+    if not output.terminal and #output.accepts == 0 and not output.gate then
         return nil, "nonterminal_node_requires_accepts:" .. tostring(nodeID)
     end
     if not output.terminal
         and not output.next and not output.onMatch
         and not output.onUnrelated and not output.onRefuse
+        and not output.onPass and not output.onFail
+        and not output.onUnknown
+        and not output.action
     then
         return nil, "nonterminal_node_requires_transition:" .. tostring(nodeID)
     end
@@ -209,12 +377,26 @@ local function validateReachability(nodes, initial)
             seen[nodeID] = true
             node = nodes[nodeID]
             if node then
-                for _, field in ipairs({ "next", "onMatch", "onRefuse" }) do
+        for _, field in ipairs({
+            "next", "onMatch", "onClarify", "onRefuse",
+            "onPass", "onFail", "onUnknown",
+        }) do
                     target = node[field]
                     if target and not SPECIAL_TARGETS[target]
                         and not seen[target]
                     then
                         pending[#pending + 1] = target
+                    end
+                end
+                if node.action
+                    and type(node.action.resultTransitions) == "table"
+                then
+                    for _, target in pairs(node.action.resultTransitions) do
+                        if target and not SPECIAL_TARGETS[target]
+                            and not seen[target]
+                        then
+                            pending[#pending + 1] = target
+                        end
                     end
                 end
             end
@@ -304,6 +486,9 @@ function Registry.Validate(definition)
         id = flowID,
         version = version,
         owner = stringValue(definition.owner),
+        workflowKind = stringValue(definition.workflowKind),
+        templateVersion = tonumber(definition.templateVersion),
+        capabilityID = stringValue(definition.capabilityID),
         initial = initial,
         triggers = normalizedTriggers,
         nodes = normalizedNodes,
@@ -322,6 +507,27 @@ function Registry.Register(definition)
     end
     Registry.Flows[normalized.id] = normalized
     Registry.FlowOrder[#Registry.FlowOrder + 1] = normalized.id
+    Registry.Revision = Registry.Revision + 1
+    return true, normalized
+end
+
+-- Regeneration may update a flow that was produced by the automatic
+-- generator, but it must never overwrite an authored or otherwise-owned flow
+-- with the same ID. Validation remains the single registry contract.
+function Registry.ReplaceGenerated(definition)
+    local valid, normalized = Registry.Validate(definition)
+    if not valid then return false, normalized end
+    local existing = Registry.Flows[normalized.id]
+    if not existing then
+        return Registry.Register(definition)
+    end
+    if existing.workflowKind == nil
+        or normalized.workflowKind == nil
+        or existing.workflowKind ~= normalized.workflowKind
+    then
+        return false, "generated_replace_requires_matching_workflow_kind"
+    end
+    Registry.Flows[normalized.id] = normalized
     Registry.Revision = Registry.Revision + 1
     return true, normalized
 end
@@ -374,6 +580,12 @@ function Registry.FrameMatches(frame, ir)
         return false
     end
     if frame.stateValue ~= nil and state.value ~= frame.stateValue then
+        return false
+    end
+    if frame.pattern ~= nil
+        and (type(ir.provenance) ~= "table"
+            or ir.provenance.pattern ~= frame.pattern)
+    then
         return false
     end
     return true

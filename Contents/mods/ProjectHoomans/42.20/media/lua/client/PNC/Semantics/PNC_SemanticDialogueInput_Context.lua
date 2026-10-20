@@ -191,11 +191,20 @@ function Internal.RecordContextTurn(view, ir, options)
         return false, "context_state_unavailable"
     end
     options = type(options) == "table" and options or {}
+    local preserveCurrentTopic = false
+    if ir.intent == "ACCEPT"
+        or ir.intent == "ACKNOWLEDGE"
+        or ir.intent == "AGREE"
+        or ir.intent == "THANK"
+    then
+        preserveCurrentTopic = context.pendingFollowUp == nil
+    end
     local recordOptions = {
         timestamp = options.timestamp,
         speaker = options.speaker or "player",
         source = options.source or "player_input",
         mentions = options.mentions,
+        preserveCurrentTopic = preserveCurrentTopic,
     }
     return context:RecordTurn(ir, recordOptions)
 end

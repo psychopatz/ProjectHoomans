@@ -262,7 +262,7 @@ local function registerComplimentPrefix(prefix, priority)
     end
 end
 
-local function registerFeatureCompliment(prefix, priority)
+local function registerFeatureCompliment(prefix, priority, allowArticle)
     local baseID = "pnc.social.compliment_" .. prefix.id
     local match = literalPattern(prefix.words)
     match[#match + 1] = { kind = "concept", id = "COMPLIMENT_ADJECTIVE" }
@@ -287,6 +287,53 @@ local function registerFeatureCompliment(prefix, priority)
             priority - 1
         )
     end
+
+    if allowArticle == true then
+        local articles = { "a", "an" }
+        local articleIndex
+        local article
+        for articleIndex = 1, #articles do
+            article = articles[articleIndex]
+            match = literalPattern(prefix.words)
+            match[#match + 1] = { kind = "literal", value = article }
+            match[#match + 1] = {
+                kind = "concept", id = "COMPLIMENT_ADJECTIVE",
+            }
+            match[#match + 1] = {
+                kind = "concept", id = "COMPLIMENT_FEATURE",
+            }
+            registerPattern(
+                baseID .. "_" .. article,
+                match,
+                complimentEmit(),
+                0.97,
+                priority - 1
+            )
+            for index = 1, #COMPLIMENT_INTENSIFIERS do
+                intensifier = COMPLIMENT_INTENSIFIERS[index]
+                match = literalPattern(prefix.words)
+                match[#match + 1] = {
+                    kind = "literal", value = article,
+                }
+                match[#match + 1] = {
+                    kind = "literal", value = intensifier,
+                }
+                match[#match + 1] = {
+                    kind = "concept", id = "COMPLIMENT_ADJECTIVE",
+                }
+                match[#match + 1] = {
+                    kind = "concept", id = "COMPLIMENT_FEATURE",
+                }
+                registerPattern(
+                    baseID .. "_" .. article .. "_" .. intensifier,
+                    match,
+                    complimentEmit(),
+                    0.97,
+                    priority - 2
+                )
+            end
+        end
+    end
 end
 
 local function registerFeatureOnlyCompliment(prefix, priority)
@@ -294,6 +341,36 @@ local function registerFeatureOnlyCompliment(prefix, priority)
     match[#match + 1] = { kind = "concept", id = "COMPLIMENT_FEATURE" }
     registerPattern(
         "pnc.social.compliment_" .. prefix.id,
+        match,
+        complimentEmit(),
+        0.97,
+        priority
+    )
+end
+
+local function registerAdjectiveFeatureCompliment(id, priority)
+    registerPattern(
+        "pnc.social.compliment_" .. id,
+        {
+            { kind = "concept", id = "COMPLIMENT_ADJECTIVE" },
+            { kind = "concept", id = "COMPLIMENT_FEATURE" },
+        },
+        complimentEmit(),
+        0.97,
+        priority
+    )
+end
+
+local function registerFeatureObjectCompliment(determiner, copula, priority)
+    local match = {
+        { kind = "literal", value = determiner },
+        { kind = "concept", id = "COMPLIMENT_FEATURE" },
+        { kind = "literal", value = copula },
+        { kind = "concept", id = "COMPLIMENT_ADJECTIVE" },
+    }
+    registerPattern(
+        "pnc.social.compliment_" .. determiner .. "_" .. copula
+            .. "_feature",
         match,
         complimentEmit(),
         0.97,
@@ -317,6 +394,8 @@ Internal.LiteralPattern = literalPattern
 Internal.RegisterComplimentPrefix = registerComplimentPrefix
 Internal.RegisterFeatureCompliment = registerFeatureCompliment
 Internal.RegisterFeatureOnlyCompliment = registerFeatureOnlyCompliment
+Internal.RegisterAdjectiveFeatureCompliment = registerAdjectiveFeatureCompliment
+Internal.RegisterFeatureObjectCompliment = registerFeatureObjectCompliment
 Internal.ComplimentIntensifiers = COMPLIMENT_INTENSIFIERS
 Internal.ComplimentPrefixes = COMPLIMENT_PREFIXES
 Internal.RelationshipStatusQuestions = RELATIONSHIP_STATUS_QUESTIONS

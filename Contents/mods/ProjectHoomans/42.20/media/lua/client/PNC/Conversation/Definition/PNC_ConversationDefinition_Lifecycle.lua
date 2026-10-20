@@ -215,13 +215,36 @@ function Conversation.ReceiveDisclosureResult(result)
     local reaction = preference and GIFT_PREFERENCE_RESPONSES[
         tostring(preference.disposition or "")
     ] or nil
+    local function recordBackstoryResponse(text)
+        local topicID = tostring(result and result.topicID or "")
+        local session = view and view.session or nil
+        local context = session and session.semanticDialogueContext or nil
+        if string.sub(topicID, 1, 10) ~= "backstory."
+            or type(text) ~= "string" or text == ""
+            or not context or type(context.RecordNPCResponse) ~= "function"
+        then return end
+        context:RecordNPCResponse({
+            intent = "RESPONSE",
+            speechAct = "ANSWER",
+            subject = "NPC_BACKSTORY",
+            rawText = text,
+            extensions = { topic = topicID },
+        }, {
+            speaker = "npc",
+            source = "knowledge_disclosure",
+            branch = "QUESTION_RECEIVED",
+            topic = topicID,
+        })
+    end
     if not view or not result
         or tostring(result.npcID) ~= tostring(view.spec and view.spec.npcID)
     then return false end
-    if result.success == true and result.responseText
+    if result.responseText
         and view.session and view.session.append
     then
-        view.session:append("npc", { fallback = tostring(result.responseText) })
+        local responseText = tostring(result.responseText)
+        view.session:append("npc", { fallback = responseText })
+        recordBackstoryResponse(responseText)
     elseif result.success == true and reaction
         and view.session and view.session.append
     then

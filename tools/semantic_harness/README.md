@@ -27,6 +27,12 @@ timeouts, crash detection, and bounded stderr diagnostics.
   registration back through the same Lua worker (`Registry.Validate` and
   `Registry.Register`). It is an authoring surface, not a second Python flow
   engine.
+- `workflow.py` owns the **Build workflow** tab inside the same Semantic Lab.
+  It selects an existing canonical dataset, composes reusable block contracts,
+  validates the selection, previews the existing CodeBuilder artifacts, and
+  requires explicit approval before generation. Generation delegates to the
+  existing writer; the GUI then restarts the same Lua worker and returns to
+  the Simulation tab for real-worker inspection.
 - `worker_session.py` serializes worker startup, requests, status reads, and
   cleanup outside the Tk view.
 - `settings_dialog.py` owns the runtime settings form and converts its draft

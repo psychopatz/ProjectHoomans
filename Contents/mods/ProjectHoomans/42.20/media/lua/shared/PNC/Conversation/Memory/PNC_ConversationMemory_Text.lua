@@ -59,6 +59,7 @@ end
 local function loadValues(source, language, requiredKey)
     local cacheKey = sourceLanguageKey(source, language)
     local values = Data.textCache[cacheKey]
+    local requested
     if values then
         return values
     end
@@ -70,6 +71,8 @@ local function loadValues(source, language, requiredKey)
             return nil, result or "translation_source_invalid"
         end
         values = result
+        requested = Loader.Load(source, language)
+        if requested then values = requested end
     elseif Loader and type(Loader.Load) == "function" then
         values = Loader.Load(source, language)
     end

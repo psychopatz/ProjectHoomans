@@ -41,6 +41,9 @@ local COMMAND_ACTIONS = {
     DRINK = true,
     REFILL = true,
     CONSUME = true,
+    QUEST_ACCEPT = true,
+    QUEST_STATUS = true,
+    QUEST_TURN_IN = true,
 }
 
 function Policy.GetCommandActions()
