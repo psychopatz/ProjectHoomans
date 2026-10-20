@@ -12,6 +12,8 @@ local literalPattern = Internal.LiteralPattern
 local registerComplimentPrefix = Internal.RegisterComplimentPrefix
 local registerFeatureCompliment = Internal.RegisterFeatureCompliment
 local registerFeatureOnlyCompliment = Internal.RegisterFeatureOnlyCompliment
+local registerAdjectiveFeatureCompliment =
+    Internal.RegisterAdjectiveFeatureCompliment
 local registerFeatureObjectCompliment = Internal.RegisterFeatureObjectCompliment
 local COMPLIMENT_PREFIXES = Internal.ComplimentPrefixes
 local RELATIONSHIP_STATUS_QUESTIONS = Internal.RelationshipStatusQuestions
@@ -97,6 +99,15 @@ function Social.Register()
         id = "i_really_like_your_feature",
         words = { "i", "really", "like", "your" },
     }, 116)
+
+    -- An adjective followed by a wearable feature is an evaluative social
+    -- fragment, not an inventory request. Keep the grammar compositional so
+    -- new adjective/feature vocabulary participates without sentence lists.
+    registerAdjectiveFeatureCompliment("adjective_feature", 114)
+    registerFeatureCompliment({
+        id = "you_got_feature",
+        words = { "you", "got" },
+    }, 119, true)
 
     local objectDeterminer
     local objectCopula

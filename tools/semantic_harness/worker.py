@@ -111,6 +111,23 @@ class LuaSemanticWorker:
 
         return self._request("COMMITMENT", payload)
 
+    def backstory(
+        self,
+        identity_seed: int,
+        tactical_class: str = "colonist",
+        npc_id: str = "harness-backstory-npc",
+    ) -> dict[str, Any]:
+        """Read a bounded seed-derived backstory projection from production Lua."""
+
+        return self._request(
+            "BACKSTORY",
+            {
+                "identitySeed": identity_seed,
+                "tacticalClass": tactical_class,
+                "npcID": npc_id,
+            },
+        )
+
     def flow_catalog(self) -> dict[str, Any]:
         """Read normalized production flow definitions from the Lua registry."""
 

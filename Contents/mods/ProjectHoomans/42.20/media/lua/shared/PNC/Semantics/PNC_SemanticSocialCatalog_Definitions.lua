@@ -348,6 +348,19 @@ local function registerFeatureOnlyCompliment(prefix, priority)
     )
 end
 
+local function registerAdjectiveFeatureCompliment(id, priority)
+    registerPattern(
+        "pnc.social.compliment_" .. id,
+        {
+            { kind = "concept", id = "COMPLIMENT_ADJECTIVE" },
+            { kind = "concept", id = "COMPLIMENT_FEATURE" },
+        },
+        complimentEmit(),
+        0.97,
+        priority
+    )
+end
+
 local function registerFeatureObjectCompliment(determiner, copula, priority)
     local match = {
         { kind = "literal", value = determiner },
@@ -381,6 +394,7 @@ Internal.LiteralPattern = literalPattern
 Internal.RegisterComplimentPrefix = registerComplimentPrefix
 Internal.RegisterFeatureCompliment = registerFeatureCompliment
 Internal.RegisterFeatureOnlyCompliment = registerFeatureOnlyCompliment
+Internal.RegisterAdjectiveFeatureCompliment = registerAdjectiveFeatureCompliment
 Internal.RegisterFeatureObjectCompliment = registerFeatureObjectCompliment
 Internal.ComplimentIntensifiers = COMPLIMENT_INTENSIFIERS
 Internal.ComplimentPrefixes = COMPLIMENT_PREFIXES

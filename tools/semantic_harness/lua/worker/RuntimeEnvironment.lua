@@ -159,6 +159,12 @@ function RuntimeEnvironment.configure(context)
             local time = Values.number(world.timeOfDay, 12)
             return math.floor((time - math.floor(time)) * 60 + 0.5)
         end,
+        -- Build 42's Identity resolver reads the zero-based calendar day;
+        -- keep the headless engine seam explicit instead of special-casing
+        -- backstory reconstruction in the worker command.
+        getDay = function()
+            return math.floor(Values.number(world.worldAgeHours, 0) / 24) % 28
+        end,
         getDayPlusOne = function()
             return math.floor(Values.number(world.worldAgeHours, 0) / 24) + 1
         end,

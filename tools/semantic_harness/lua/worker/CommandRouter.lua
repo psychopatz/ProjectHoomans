@@ -8,8 +8,48 @@ local capabilities = {
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
     "REPLAY_SEMANTIC_QUEST",
-    "COMMITMENT",
+    "COMMITMENT", "BACKSTORY",
 }
+
+local function backstorySnapshot(payload)
+    local memory = PNC.Conversation and PNC.Conversation.Memory
+    if not memory or type(memory.GetBackstoryProfile) ~= "function" then
+        return nil, "backstory_memory_unavailable"
+    end
+    payload = type(payload) == "table" and payload or {}
+    local record = {
+        id = tostring(payload.npcID or "harness-backstory-npc"),
+        tacticalClass = tostring(payload.tacticalClass or "colonist"),
+        identity = {
+            seed = payload.identitySeed,
+        },
+    }
+    local profile = memory.GetBackstoryProfile(record)
+    if type(profile) ~= "table" then
+        return nil, "backstory_profile_unavailable"
+    end
+    local facts = {}
+    for kind, fact in pairs(profile.facts or {}) do
+        if type(fact) == "table" then
+            facts[kind] = {
+                id = fact.id,
+                kind = fact.kind,
+                class = fact.class,
+                value = fact.value,
+                textKey = fact.textKey,
+            }
+        end
+    end
+    return {
+        ok = true,
+        type = "backstory",
+        profile = {
+            identitySeed = profile.identitySeed,
+            tacticalClass = profile.tacticalClass,
+            facts = facts,
+        },
+    }
+end
 
 function CommandRouter.hello(context)
     local Runtime = context.Runtime
@@ -85,6 +125,8 @@ function CommandRouter.dispatch(context, request)
             return nil, "commitment_request_must_be_object"
         end
         return context.Commitments.dispatch(context, payload)
+    elseif command == "BACKSTORY" then
+        return backstorySnapshot(payload)
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,
