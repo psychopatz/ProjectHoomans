@@ -4,7 +4,7 @@
 
 **Parent status:** **IN PROGRESS — H0–H4 required; not ready for user live test.**
 
-**Current chunk:** H1 — registered Core-backed full-sentence backstory translation.
+**Current chunk:** H2 — extend the existing CodeBuilder contract for typed `NPC_BACKSTORY` authoring.
 
 ## Repository and dependency evidence
 
@@ -46,10 +46,12 @@ The EN/TL trace therefore proves B0 candidate selection and existing Core-backed
 
 ## Accepted chunks
 
+- `2948fb23ffe45eb058f5be7704cb00e7f548d6ee` — H0 Semantic Lab baseline trace, candidate/side-effect evidence, and confirmed authoring/disclosure gaps.
+- `5cd2ec796e488212ca15d095024fb1de277337e9` — H1 Core-backed EN/TL backstory catalogs, manifest registration, template mapping, `content` argument binding, and catalog regression.
 - `6b783d09` — progress ledger for integration, exact baseline reproduction, protocol repair, doctor, and full post-fix Python evidence.
 - `e7a6adb8ffd2a77a7936016d22db95825b637aa` — shared 512 KiB worker protocol/config bound and regression coverage.
 - `a3c5b5a7` — local existing-main integration of prior B0–B6 history and current canonical H0–H4 documentation.
 
 ## Next mandatory chunk
 
-Complete H1 by committing the registered EN/TL Backstory catalog and presentation argument binding, then verify the full authorized sentence through the real worker once the disclosure hook is available. Immediately continue H2: extend the existing CodeBuilder/compiler/Flow Editor contracts for typed `NPC_BACKSTORY` subjects, registered fact providers, disclosure states, response pools, follow-up references, and deterministic generation into actual mod Lua/catalog/manifest assets.
+H2 must extend the existing compiler, `semantic.codeblocks.v1`, Flow Editor, authoring service, worker catalog, and writer for typed `NPC_BACKSTORY` subjects, registered fact providers, disclosure states, response pools, follow-up references, and deterministic generation into actual mod Lua/catalog/manifest assets. Keep the implementation inside the existing authoring/compiler/runtime contracts; do not add a second parser, compiler, policy, or store. Immediately continue H3 after the accepted H2 chunk.
