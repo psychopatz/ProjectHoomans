@@ -175,4 +175,53 @@ T.equal(Knowledge.GetDescriptor(
     "char_a", npc.id, "history.backstory.hometown"
 ), nil, "player B disclosure contaminated player A knowledge")
 
+local translation = {
+    UI_PNC_KnowledgeFact_BackstoryFormerJob = "Former work",
+    UI_PNC_KnowledgeFact_BackstoryHometown = "Dating trabaho",
+}
+getText = function(key)
+    return translation[key] or key
+end
+T.load(
+    "ProjectHoomans", "client", "PNC/UI/Knowledge/PNC_KnowledgePresentation.lua"
+)
+local Presentation = PNC.KnowledgePresentation
+local rows = Presentation.BuildDossierRows(snapshotA)
+local formerRow
+for _, section in ipairs(rows) do
+    for _, row in ipairs(section.rows) do
+        if row.descriptorID == "history.backstory.former_job" then
+            formerRow = row
+        end
+    end
+end
+T.truthy(formerRow, "confirmed backstory fact missing from dossier rows")
+T.equal(formerRow.label, "Former work",
+    "EN backstory dossier label was not translated")
+T.equal(formerRow.value, "Doctor • Confirmed",
+    "confirmed backstory dossier status was not rendered")
+
+local suspectedSnapshot = {
+    categories = {{
+        id = "history",
+        descriptors = {{
+            descriptorID = "history.backstory.hometown",
+            valueType = "text_enum",
+            value = "Rosewood",
+            status = "suspected",
+            confidence = .45,
+            primarySource = "trusted_gossip",
+            presentation = {
+                backstoryKind = "hometown",
+                labelKey = "UI_PNC_KnowledgeFact_BackstoryHometown",
+            },
+        }},
+    }},
+}
+local suspectedRows = Presentation.BuildDossierRows(suspectedSnapshot)
+T.equal(suspectedRows[1].rows[1].label, "Dating trabaho",
+    "TL backstory dossier label was not translated")
+T.equal(suspectedRows[1].rows[1].value, "Possibly Rosewood",
+    "suspected backstory dossier status was not rendered as uncertain")
+
 T.finish("pnc_backstory_knowledge_disclosure_smoke")
