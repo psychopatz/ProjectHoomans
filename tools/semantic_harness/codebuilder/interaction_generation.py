@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from tools.semantic_harness.studio import authoring
+from . import authoring
 
 from .blocks import SemanticBlockRegistry
 from .compiler import CompileError

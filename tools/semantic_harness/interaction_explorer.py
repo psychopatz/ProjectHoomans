@@ -1,9 +1,9 @@
-"""Compatibility facade for :mod:`tools.semantic_harness.studio.interaction_explorer`."""
+"""Compatibility facade for :mod:`tools.semantic_harness.codebuilder.interaction_explorer`."""
 
 from __future__ import annotations
 
-from .studio.interaction_explorer import *  # noqa: F401,F403
-from .studio import interaction_explorer as _implementation
+from .codebuilder.interaction_explorer import *  # noqa: F401,F403
+from .codebuilder import interaction_explorer as _implementation
 
 
 def __getattr__(name: str):

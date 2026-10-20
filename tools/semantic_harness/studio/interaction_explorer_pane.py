@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any, Callable
 
-from .interaction_explorer import search_interactions
+from ..codebuilder.interaction_explorer import search_interactions
 
 
 class InteractionExplorerPane:

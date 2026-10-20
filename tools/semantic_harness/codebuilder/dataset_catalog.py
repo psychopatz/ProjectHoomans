@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from tools.semantic_harness import authoring
+from . import authoring
 
 from .compiler import CompileError
 

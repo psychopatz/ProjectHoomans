@@ -1,9 +1,9 @@
-"""Compatibility facade for :mod:`tools.semantic_harness.studio.authoring`."""
+"""Compatibility facade for :mod:`tools.semantic_harness.codebuilder.authoring`."""
 
 from __future__ import annotations
 
-from .studio.authoring import *  # noqa: F401,F403
-from .studio import authoring as _implementation
+from .codebuilder.authoring import *  # noqa: F401,F403
+from .codebuilder import authoring as _implementation
 
 
 def __getattr__(name: str):
