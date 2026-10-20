@@ -12,7 +12,20 @@ The Semantic Harness is behaviorally healthy but has several real responsibility
 
 The existing `tools/semantic_compiler` package is not a second implementation. Its `compiler.py` and `build.py` are compatibility wrappers around Semantic Lab CodeBuilder. That compatibility surface must remain while the implementation is split.
 
-No production code was changed by this audit.
+The initial audit pass was read-only. The first bounded refactor slice is now complete and is recorded below.
+
+## Refactor progress — slice 1
+
+Commit `5ef6e453` extracted the WordNet lexicon/morphology pipeline into `tools/semantic_harness/codebuilder/lexicon_compiler.py`. The existing `codebuilder/compiler.py` remains the compatibility facade and re-exports the established public functions and legacy private helpers.
+
+Verification for this slice:
+
+- Python compiler, dialogue, semantic-authoring, and consolidation tests: 35 passed.
+- CodeBuilder, interaction-spec, CodeBlocks, visual-authoring, translation, parity, and dataset-adapter tests: 45 passed.
+- Architecture affected-test selection: 4 direct and 8 transitive test targets.
+- Post-scan: no new finding category; the compiler module dropped from 1,874 to 1,514 lines.
+
+The next safe slice is the dialogue pipeline. It should be extracted only after preserving the shared normalization and Lua-rendering contracts used by the typed semantic pipeline.
 
 ## Evidence
 
