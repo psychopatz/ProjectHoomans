@@ -162,15 +162,44 @@ class V1VisualAuthoringTests(unittest.TestCase):
             self.assertEqual(action_turn["result"]["ir"]["action"], "FOLLOW")
             self.assertEqual(
                 action_turn["messages"][0]["payload"]["text"],
-            "Okay, I will follow you for V1.",
+                "Okay, I will follow you for V1.",
             )
-        self.assertTrue(action_turn["observation"]["sideEffects"]["actions"])
-        inspection = build_conversation_inspector(action_turn)
-        self.assertTrue(inspection["acceptanceChain"]["selectedGraph"]["available"])
-        self.assertEqual(
-            inspection["acceptanceChain"]["selectedGraph"]["schema"],
-            "semantic.interaction_spec.v1",
-        )
+            self.assertTrue(action_turn["observation"]["sideEffects"]["actions"])
+            inspection = build_conversation_inspector(action_turn)
+            self.assertTrue(
+                inspection["acceptanceChain"]["selectedGraph"]["available"]
+            )
+            self.assertEqual(
+                inspection["acceptanceChain"]["selectedGraph"]["schema"],
+                "semantic.interaction_spec.v1",
+            )
+
+            changed_action = deepcopy(action)
+            changed_action["blocks"][2]["parameters"]["variants"][0]["en"] = (
+                "I will follow you after this graph edit."
+            )
+            changed_generated = service.generate_workflow(
+                "semantic_definitions",
+                ACTION_BLOCKS,
+                production_catalog=catalog,
+                interaction_spec=changed_action,
+                approved=True,
+            )
+            self.assertTrue(changed_generated["ok"], changed_generated)
+            self.assertNotEqual(
+                generated_action["sourcePreview"]["generatedSourceFingerprint"],
+                changed_generated["sourcePreview"]["generatedSourceFingerprint"],
+            )
+            with LuaSemanticWorker(
+                self.scenario(),
+                repository=root,
+                core_repository=REPOSITORY.parent / "psychopatzCore",
+            ) as worker:
+                changed_turn = worker.input("v1 orchard lantern")
+            self.assertEqual(
+                changed_turn["messages"][0]["payload"]["text"],
+                "I will follow you after this graph edit.",
+            )
 
 
 if __name__ == "__main__":

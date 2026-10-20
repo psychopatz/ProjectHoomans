@@ -42,7 +42,7 @@ Evidence:
 
 ## V4 — persistence and Conversation Inspector
 
-**Status:** implemented and developer-verified in the existing worker/inspector path; commit pending this progress update.
+**Status:** implemented and developer-verified in the existing worker/inspector path. Commit: `920bda32`.
 
 The existing `KNOWLEDGE_METRICS` worker command now serializes the complete canonical NPC record, backstory metadata, player-scoped Knowledge registry, and combined actor/Knowledge payload with the production Core deep-copy behavior. It preserves the legacy Knowledge byte field and reports the persisted ModData snapshot separately. The existing Conversation Inspector now projects a bounded readable acceptance chain: utterance, selected CodeBlock/graph fingerprint and edges, Core meaning, fact provider, Knowledge permission, translation lookups, actual NPC response, gameplay effects, and dossier delta. Generated semantic patterns now retain the existing graph metadata through the production catalog and worker observation.
 
@@ -53,8 +53,23 @@ Evidence:
 - Conversation Inspector and V1 worker graph-provenance tests passed; graph metadata remains bounded and raw JSON remains an advanced diagnostic rather than the primary chain.
 - Production-copy behavior was aligned with the native Core deep-copy implementation so the worker's diagnostic response bound cannot truncate persistence measurements.
 
+## V5 — end-to-end Semantic Lab acceptance
+
+**Status:** developer acceptance complete; ready for user-owned live Project Zomboid test after the final V5 evidence commit.
+
+The existing Studio, CodeBuilder writer, real Core+Hoomans Lua worker, Knowledge/Dossier path, translation catalogs, and registered capability route now have an end-to-end acceptance proof. Preview remained effect-free, generation required explicit approval, generated Lua/EN/TL/manifest assets were written in an isolated mod tree, a fresh worker loaded them, and a response-block edit regenerated a different fingerprint and changed the final NPC response after restart. The same acceptance also covers a registered non-backstory interaction with existing capability side effects and no replacement authority.
+
+Fresh developer evidence from this checkout:
+
+- Focused V1–V5 Python command: 50 tests passed, exit 0. Full Semantic Lab Python discovery: 274 tests passed in 168.354s, exit 0. Full embedded compiler suite: 16 tests passed, exit 0.
+- Full Lua regression: `python3 tests/run_tests.py --jobs 1 --harness-report /tmp/projecthoomans-v5-lua-harness.json` — 853/853 passed in 16.00s, exit 0.
+- Doctor: `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all required checks true, including Tk/display, sibling Core, Lua 5.3, worker syntax, READY/PING/CAPABILITIES, exit 0.
+- Kahlua: `pz_verify --mod-dir Contents/mods/ProjectHoomans/42.20 --kahlua --severity ERROR --no-snippets` — 2,947 files, 0 errors, exit 0.
+- Actual Semantic Lab Tk pane under Xvfb: backstory graph composed through the GUI methods with 4 typed blocks and 3 connections; validation returned `ok=true`, preview returned `effectFree=true`, exit 0. No native Project Zomboid process or CUA surface was available, so no native gameplay/screenshot claim is made.
+- Actual worker final text included `I worked as farmer before all this.`, `Okay, I will follow you for V1.`, and after the response-block regeneration `I will follow you after this graph edit.`. Tagalog fact-value acceptance returned `Nagtrabaho ako bilang magsasaka bago ang lahat ng ito.` with no fallback.
+
 ## Remaining mandatory chunk
 
-- V5: run the complete Studio approval → generated assets → worker restart → conversation → Knowledge/Dossier/multiplayer privacy → regeneration behavior-change acceptance, then run focused/full developer checks and record exact SHAs, commands, exit codes, generated paths, responses, effects, and persistence measurements.
+No remaining developer-owned implementation chunk. Native Project Zomboid SP/MP gameplay validation remains user-owned.
 
 `GOAL_PROMPT.md` was not created or modified.
