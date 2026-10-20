@@ -93,6 +93,17 @@ definition to this worker so the next conversation turn can exercise it.
 Registration is worker-local and disappears when that worker is restarted; it
 does not write a Workshop package or alter the checked-out Lua source.
 
+## Package entrypoint
+
+The application can be invoked directly without the shell launcher:
+
+```bash
+python3 -m tools.semantic_harness --help
+```
+
+The repository metadata exposes the same existing entrypoint as
+`semantic-lab` in an editable/development installation.
+
 ## Launching
 
 The portable launcher creates and reuses `tools/semantic_harness/.venv`:

@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "project-hoomans-semantic-lab"
+version = "0.1.0"
+description = "Semantic Lab authoring and real-Lua verification harness for Project Hoomans"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+semantic-lab = "tools.semantic_harness.app:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tools.semantic_harness", "tools.semantic_harness.*", "tools.semantic_compiler", "tools.semantic_compiler.*"]
+exclude = ["tools.semantic_harness.tests", "tools.semantic_harness.tests.*", "tools.semantic_compiler.tests", "tools.semantic_compiler.tests.*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"tools.semantic_harness" = [
+    "README.md",
+    "run_harness.sh",
+    "lua/*.lua",
+    "lua/worker/*.lua",
+    "scenarios/*.json",
+]
+"tools.semantic_harness.codebuilder" = ["*.json", "README.md"]
+"tools.semantic_compiler" = ["*.json", "README.md"]
