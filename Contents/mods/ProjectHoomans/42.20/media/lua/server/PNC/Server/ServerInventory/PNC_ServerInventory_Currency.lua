@@ -10,7 +10,7 @@ PNC.ServerInventory.Internal = PNC.ServerInventory.Internal or {}
 
 local Service = PNC.ServerInventory
 local Internal = Service.Internal
-local Const = PNC.Const
+local Const = PNC.Const or {}
 local Registry = PNC.Registry
 local Inventory = PNC.Inventory
 local ItemTransfer = Internal.ItemTransfer

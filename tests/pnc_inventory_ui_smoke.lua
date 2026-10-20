@@ -1,4 +1,5 @@
 local T = require "tests/support/test"
+T.stubClientUI()
 
 local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
 local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")

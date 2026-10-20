@@ -130,6 +130,7 @@ PsychopatzCore = {
         end,
         ButtonCallback = function(callback) return callback end,
         CreateTextEntry = createTextEntry,
+        CreateSearchEntry = createTextEntry,
         CreateList = createList,
         CreateKeyValueList = createDetails,
         CreateButton = createButton,

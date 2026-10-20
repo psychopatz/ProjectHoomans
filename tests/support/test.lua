@@ -218,6 +218,64 @@ function Test.stubClientUI()
     function ui.Window:derive()
         return {}
     end
+    local panel = {}
+    panel.__index = panel
+    function panel:derive(name)
+        local derived = { Type = name }
+        derived.__index = derived
+        setmetatable(derived, { __index = self })
+        return derived
+    end
+    function panel:new(x, y, width, height)
+        local value = {
+            x = x, y = y, width = width, height = height,
+            children = {},
+        }
+        setmetatable(value, { __index = self })
+        return value
+    end
+    function panel:initialise() end
+    function panel:instantiate() end
+    function panel:noBackground() end
+    function panel:setWantMouseEvents() end
+    function panel:addChild(child)
+        self.children[#self.children + 1] = child
+    end
+    function panel:setX(value) self.x = value end
+    function panel:setY(value) self.y = value end
+    function panel:setWidth(value) self.width = value end
+    function panel:setHeight(value) self.height = value end
+    function panel:getWidth() return self.width or 0 end
+    function panel:getHeight() return self.height or 0 end
+    ISPanel = panel
+    local image = panel:derive("ISImage")
+    function image:new(x, y, width, height, texture)
+        local value = panel.new(self, x, y, width, height)
+        value.texture = texture
+        return value
+    end
+    ISImage = image
+    package.preload["ISUI/ISPanel"] = function() return ISPanel end
+    package.preload["ISUI/ISImage"] = function() return ISImage end
+    package.preload["PsychopatzCore/Settings/PsychopatzSettings"] = function()
+        local settings = {
+            Open = function(_, _, options)
+                local values = {}
+                for key, value in pairs(options and options.defaults or {}) do
+                    values[key] = value
+                end
+                return {
+                    loaded = true,
+                    Load = function() end,
+                    Get = function(_, key, fallback)
+                        return values[key] == nil and fallback or values[key]
+                    end,
+                    Set = function(_, key, value) values[key] = value end,
+                }
+            end,
+        }
+        return settings
+    end
     package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
         PsychopatzCore = PsychopatzCore or {}
         PsychopatzCore.UI = ui

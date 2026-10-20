@@ -99,7 +99,11 @@ local function addCandidates(output, seen, values)
     local key
     for index = 1, #values do
         candidate = values[index]
-        if type(candidate) == "table" then
+        if type(candidate) == "table"
+            and string.upper(tostring(
+                candidate.concept or candidate.category or ""
+            )) ~= "CONTEXT_REFERENCE"
+        then
             key = candidateKey(candidate)
             if key and not seen[key] then
                 seen[key] = true

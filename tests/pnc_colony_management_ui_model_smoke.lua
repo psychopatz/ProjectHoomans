@@ -134,6 +134,18 @@ end
 package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
     return PsychopatzCore.UI
 end
+package.preload["PsychopatzCore/Settings/PsychopatzSettings"] = function()
+    return {
+        Open = function()
+            return {
+                loaded = true,
+                Load = function() end,
+                Get = function(_, _, fallback) return fallback end,
+                Set = function() end,
+            }
+        end,
+    }
+end
 local Components = require(
     "PNC/UI/Shared/PNC_ColonyUIComponents"
 )

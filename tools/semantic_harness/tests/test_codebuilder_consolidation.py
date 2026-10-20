@@ -148,7 +148,12 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
         sources = service.list_dataset_sources()
         self.assertEqual(
             [source["id"] for source in sources],
-            ["semantic_definitions", "common_interactions", "wordnet_concepts"],
+            [
+                "semantic_definitions",
+                "common_interactions",
+                "grounded_personal_dialogue",
+                "wordnet_concepts",
+            ],
         )
         self.assertTrue(all(source["exists"] and source["editable"] for source in sources))
 

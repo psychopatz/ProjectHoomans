@@ -223,7 +223,13 @@ local function buildBatch(now)
                     end
                 end
 
-                if not candidates and (npcId or strong)
+                -- A legacy persisted body hint is positive identity evidence
+                -- even when the engine restored the shell without PNC
+                -- ModData. Include naked shells in this bounded candidate
+                -- pass so body_hint/population_id can reconcile them; the
+                -- identity provider still rejects naked position-only
+                -- matches.
+                if not candidates and (npcId or strong or naked)
                     and Internal.GetStartupRecordCandidates
                 then
                     candidates = Internal.GetStartupRecordCandidates(

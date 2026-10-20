@@ -137,7 +137,9 @@ class SemanticLabAuthoringService:
             return []
         specs = [self._dataset_spec(source_id)] if source_id else DATASET_SOURCE_SPECS
         needle = str(query or "").strip().lower()
-        rows: list[dict[str, Any]] = []
+        rows_by_source: dict[str, list[dict[str, Any]]] = {
+            spec["id"]: [] for spec in specs
+        }
         for spec in specs:
             document = self.load_dataset_document(spec["id"])
             entries: list[tuple[str, str, Any]] = []
@@ -172,7 +174,7 @@ class SemanticLabAuthoringService:
                 serialized = json.dumps(entry, ensure_ascii=False, sort_keys=True)
                 if needle and needle not in serialized.lower():
                     continue
-                rows.append({
+                rows_by_source[spec["id"]].append({
                     "sourceID": spec["id"],
                     "sourceLabel": spec["label"],
                     "kind": entry_kind,
@@ -180,8 +182,25 @@ class SemanticLabAuthoringService:
                     "path": str(spec["path"]),
                     "summary": serialized[:512],
                 })
+
+        # Keep the bounded authoring search useful after new canonical
+        # sources are registered: expose one deterministic match per source
+        # before filling the remaining slots in catalog order. A source-
+        # specific search retains its original order and limit semantics.
+        if source_id is not None:
+            return rows_by_source[source_id][:limit]
+        rows: list[dict[str, Any]] = []
+        for spec in specs:
+            candidates = rows_by_source[spec["id"]]
+            if candidates:
+                rows.append(candidates.pop(0))
                 if len(rows) >= limit:
-                    return rows
+                    return rows[:limit]
+        for spec in specs:
+            for candidate in rows_by_source[spec["id"]]:
+                rows.append(candidate)
+                if len(rows) >= limit:
+                    return rows[:limit]
         return rows
 
     def preview_dataset_edit(

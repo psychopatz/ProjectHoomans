@@ -78,6 +78,47 @@ local function copyList(values)
     return output
 end
 
+local FALLBACK_ARGUMENT_ORDER = {
+    "content", "topic", "location", "npcName", "playerName", "activity",
+    "kind", "factStatus", "weather", "needType", "hour", "minute",
+    "gameDay", "state",
+}
+
+local function renderFallback(fallback, args, translationArgs)
+    local values = {}
+    local index
+    local key
+    local value
+    if type(fallback) ~= "string" or type(args) ~= "table" then
+        return fallback
+    end
+    for index = 1, #FALLBACK_ARGUMENT_ORDER do
+        key = FALLBACK_ARGUMENT_ORDER[index]
+        value = args[key]
+        if value ~= nil then values[index] = tostring(value) end
+    end
+    -- Keep generated typed argument bindings useful in a headless/local
+    -- fallback too. The Core translation manager receives the original args
+    -- separately; this only prevents a numbered placeholder from leaking into
+    -- the response plan when a catalog key is not yet registered.
+    if type(translationArgs) == "table" then
+        for key, _ in pairs(translationArgs) do
+            if type(key) == "string" and args[key] ~= nil then
+                for index = 1, #FALLBACK_ARGUMENT_ORDER do
+                    if FALLBACK_ARGUMENT_ORDER[index] == key then
+                        values[index] = tostring(args[key])
+                        break
+                    end
+                end
+            end
+        end
+    end
+    return string.gsub(fallback, "%%([1-9][0-9]*)", function(number)
+        local position = tonumber(number)
+        return values[position] or "%" .. tostring(number)
+    end)
+end
+
 local function socialCounts(state)
     local hostilityCount = 0
     local insultCount = 0
@@ -199,7 +240,9 @@ local function catalogResponse(poolID, ir, state, context, args)
     end
     return {
         templateID = selected.templateID or selected.id,
-        fallback = selected.fallback,
+        fallback = renderFallback(
+            selected.fallback, args, selected.translationArgs
+        ),
         args = copyArgs(args),
         sourcePoolID = poolID,
         plan = plan,
@@ -220,6 +263,7 @@ Response.Internal = Response.Internal or {}
 local Internal = Response.Internal
 Internal.CopyArgs = copyArgs
 Internal.CopyList = copyList
+Internal.RenderFallback = renderFallback
 Internal.SocialCounts = socialCounts
 Internal.SelectorContext = selectorContext
 Internal.CatalogResponse = catalogResponse

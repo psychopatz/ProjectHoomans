@@ -245,21 +245,33 @@ end
 
 function Internal.BuildAppearanceContract(record)
     local identity = record and record.identity or {}
+    local generatorVersion = tonumber(Const.GENERATOR_VERSION)
+    local seed = Identity.NormalizeSeed(
+        identity.seed or record and record.identitySeed,
+        record and record.id
+    )
+    local archetypeID = Internal.normalizeString(
+        identity.archetypeID or record and record.archetypeID
+    )
     local authored = record and (record.appearanceAuthored == true
         or type(record.appearance) == "table") or false
+    -- Do not persist a contract that cannot survive the validator. Older or
+    -- hand-authored records may have appearance data without generator
+    -- provenance; preserving that record is safer than writing a partial
+    -- contract which makes the entire record fail closed on reload.
+    if generatorVersion == nil or seed == nil or archetypeID == nil
+        or archetypeID == ""
+    then
+        return nil
+    end
     local contract = {
         schemaVersion = APPEARANCE_CONTRACT_SCHEMA_VERSION,
         mode = authored and "AUTHORED_POLICY" or "GENERATED_DEFAULT",
         authored = authored,
         generator = {
-            generatorVersion = tonumber(Const.GENERATOR_VERSION),
-            seed = Identity.NormalizeSeed(
-                identity.seed or record and record.identitySeed,
-                record and record.id
-            ),
-            archetypeID = Internal.normalizeString(
-                identity.archetypeID or record and record.archetypeID
-            ),
+            generatorVersion = generatorVersion,
+            seed = seed,
+            archetypeID = archetypeID,
             uniqueDefinitionId = Internal.normalizeString(
                 record and record.uniqueDefinitionId
             ),

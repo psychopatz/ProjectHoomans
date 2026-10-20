@@ -36,6 +36,20 @@ function Provider.configure(context, SemanticAdapters)
     local function identityName(npc)
         return SemanticAdapters.identityName(context, npc)
     end
+
+    -- Scenario fixtures use the compact forename/surname shape, while the
+    -- production registry exposes the normalized identity record consumed by
+    -- Knowledge providers. Normalize that fixture once at the existing
+    -- adapter boundary so the worker exercises the real provider and
+    -- player-scoped disclosure path instead of a harness-only name store.
+    npcData.identity = type(npcData.identity) == "table"
+        and npcData.identity or {}
+    if tostring(npcData.identity.displayName or "") == "" then
+        local normalizedName = identityName(npcData)
+        if normalizedName ~= "" then
+            npcData.identity.displayName = normalizedName
+        end
+    end
     local function relationshipFor(npcID)
         return SemanticAdapters.relationshipFor(context, npcID)
     end

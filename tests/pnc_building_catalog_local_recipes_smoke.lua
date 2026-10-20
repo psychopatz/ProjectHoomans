@@ -6,6 +6,7 @@
 local T = require "tests/support/test"
 
 T.addPackagePaths()
+T.stubClientUI()
 
 package.preload["PNC/UI/Inventory/PNC_InventoryUI_List"] = function()
     return {}

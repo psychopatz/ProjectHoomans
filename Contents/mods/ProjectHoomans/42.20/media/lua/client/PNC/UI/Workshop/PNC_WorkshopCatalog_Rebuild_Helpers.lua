@@ -128,6 +128,7 @@ local function productionSkillId(entry, operation)
     end
     return entry and entry.productionSkillId
         or station and station.productionSkillId
+        or "other"
 end
 
 local function productionSkillLabel(skillId, tr)

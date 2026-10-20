@@ -128,7 +128,7 @@ local function rebuildRecipes(window, recipes)
                 end
             end
     end
-    if #rows == 1 then
+    if #rows == 0 then
         local message = window.buildFavoritesOnly == true
             and "NO FAVORITED RECIPES" or "NO MATCHING RECIPES"
         rows[#rows + 1] = {
@@ -138,7 +138,7 @@ local function rebuildRecipes(window, recipes)
     end
     setCatalogRows(list, rows)
     if not found then
-        window.buildSelectedRecipe = rows[2] and rows[2].recipe or nil
+        window.buildSelectedRecipe = rows[1] and rows[1].recipe or nil
         local fallback = window.buildSelectedRecipe
         state.key = fallback and (fallback.objectInfoName
             or fallback.recipeKey) or nil

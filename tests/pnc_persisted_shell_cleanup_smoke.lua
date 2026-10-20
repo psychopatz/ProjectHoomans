@@ -256,12 +256,13 @@ T.equal(
         earlyNaked,
         "test_early_zombie_update"
     ),
-    true,
-    "early zombie lane removed naked shell"
+    false,
+    "early zombie lane preserves an anonymous naked zombie"
 )
-T.equal(earlyNaked.wasRemoved(), true, "early naked shell removed immediately")
-T.equal(directSafetyApplications, 3,
-    "matched shells made harmless before removal")
+T.equal(earlyNaked.wasRemoved(), false,
+    "anonymous naked zombie was preserved")
+T.equal(directSafetyApplications, 2,
+    "only identified shells made harmless before removal")
 local synchronous = PNC.BodyLifecycle.RunStartupBodyCleanupNow(
     now,
     "test_world_ready",

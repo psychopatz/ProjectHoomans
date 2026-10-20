@@ -195,11 +195,28 @@ function Lifecycle.InterceptLoadedShell(zombie, source)
             end
         end
     end
-    -- Marked PNC bodies remain cheap to recognize throughout play. An
-    -- anonymous body has no deletion proof here; record-local materialization
-    -- preflight may defer a replacement, but it must not turn an ordinary
-    -- zombie into a cleanup candidate.
+    -- Marked PNC bodies remain cheap to recognize throughout play. A naked
+    -- restored shell may still carry a positive persisted body hint even when
+    -- the engine dropped every PNC marker; let the identity provider consume
+    -- that hint while continuing to reject ordinary position-only zombies.
     if not strong then
+        if naked and Internal.ResolveRecordForStartupShell then
+            record, matchReason = Internal.ResolveRecordForStartupShell(
+                reg, zombie, npcId, strong, naked
+            )
+            if record and not (matchReason
+                and string.sub(tostring(matchReason), 1, 10)
+                    == "ambiguous_")
+                and not Internal.IsCanonicalStartupBody(record, zombie)
+            then
+                return Internal.RemoveStartupShell(
+                    record,
+                    zombie,
+                    tostring(source or "early_shell") .. "_"
+                        .. tostring(matchReason or "matched")
+                )
+            end
+        end
         return false
     end
     record, matchReason = Internal.ResolveRecordForStartupShell(reg, zombie, npcId, strong, naked)

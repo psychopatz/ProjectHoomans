@@ -1,5 +1,6 @@
 local T = require "tests/support/test"
 T.addPackagePaths({ { "ProjectHoomans", "client" } })
+T.stubClientUI()
 
 package.preload["ISUI/ISTextEntryBox"] = function()
     return true
@@ -65,11 +66,11 @@ local window = {
 Building.Rebuild(window, { building = { recipes = recipes, queue = queue } })
 
 window.buildCategory = "Carpentry"
-window.buildCategoryList.selected = 3
+window.buildCategoryList.selected = 2
 window.buildSelectedRecipe = recipes[2]
-window.buildRecipeList.selected = 3
+window.buildRecipeList.selected = 2
 window.buildRecipeList.yScroll = 64
-window.buildQueueList.selected = 2
+window.buildQueueList.selected = 1
 window.buildQueueList.yScroll = 32
 
 Building.Rebuild(window, { building = { recipes = recipes, queue = queue } })
@@ -83,7 +84,7 @@ T.equal(window.buildQueueList:selectedRow().order.id, "order-a",
     "queue selection survives snapshot rebuild")
 T.equal(window.buildQueueList.yScroll, 32,
     "queue scroll position survives snapshot rebuild")
-T.equal(window.buildMaterialList.items[2].item.name, "Base.Plank",
+T.equal(window.buildMaterialList.items[1].item.name, "Base.Plank",
     "materials follow the selected queue order after rebuild")
 
 local debugRequest

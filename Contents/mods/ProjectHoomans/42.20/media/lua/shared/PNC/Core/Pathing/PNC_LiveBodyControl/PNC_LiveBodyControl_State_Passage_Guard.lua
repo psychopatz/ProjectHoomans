@@ -46,8 +46,7 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     actionState = LiveBodyControl.GetActionStateName(zombie)
     if not passageMovementState(actionState)
         and not ((climbable and isClientState() and moving)
-            or vaultHazard
-            or fenceHazard)
+            or ((vaultHazard or fenceHazard) and moving))
     then
         return false
     end

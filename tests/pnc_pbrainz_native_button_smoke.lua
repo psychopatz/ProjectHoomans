@@ -179,6 +179,22 @@ function ISTextEntryBox:setClearButton(value) self.clearButton = value end
 function ISTextEntryBox:setOnlyNumbers(value) self.onlyNumbers = value end
 package.preload["ISUI/ISButton"] = function() return true end
 package.preload["ISUI/ISPanel"] = function() return true end
+package.preload["ISUI/ISImage"] = function()
+    ISImage = ISImage or {}
+    function ISImage:new(x, y, width, height, texture)
+        return {
+            x = x, y = y, width = width, height = height, texture = texture,
+            initialise = function() end,
+            instantiate = function() end,
+            setWantMouseEvents = function() end,
+            setX = function(self, value) self.x = value end,
+            setY = function(self, value) self.y = value end,
+            setWidth = function(self, value) self.width = value end,
+            setHeight = function(self, value) self.height = value end,
+        }
+    end
+    return ISImage
+end
 package.preload["ISUI/ISTextEntryBox"] = function() return true end
 package.preload["ISUI/ISScrollingListBox"] = function() return true end
 package.preload["PsychopatzCore/UI/Core/PsychopatzUILayout"] = function()

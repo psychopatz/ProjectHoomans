@@ -1,4 +1,5 @@
 local T = require "tests/support/test"
+T.stubClientUI()
 
 local FILE = T.path("ProjectHoomans", "client", "PNC/")
     .. "UI/Workshop/PNC_WorkshopCatalog.lua"
@@ -8,6 +9,13 @@ PNC = {
     InventoryUIModel = { Probe = function(fullType)
         return { name = fullType, category = "Test", texture = "icon" }
     end },
+    FacilityDefinitions = {
+        Get = function(id)
+            if tostring(id) == "forge" then
+                return { id = "forge", directWorkstation = true }
+            end
+        end,
+    },
 }
 package.preload["PNC/UI/Inventory/PNC_InventoryUI_List"] = function()
     return {}
@@ -28,22 +36,36 @@ package.preload[
 
 local function fakeList()
     return { items = {}, clear = function(self) self.items = {} end,
-        addItem = function(self, _, row) self.items[#self.items + 1] = row end }
+        addItem = function(self, _, row) self.items[#self.items + 1] = row end,
+        setVisible = function() end }
 end
 
 local details = {}
+local function fakeHeader()
+    return {
+        setContent = function(self, title, cells, columns)
+            self.title, self.cells, self.columns = title, cells, columns
+        end,
+        setVisible = function() end,
+    }
+end
 local Workshop = T.load(FILE)
 local window = {
     tab = "workshop", workshopQuantities = {},
     snapshot = nil,
     workshopRecipeList = fakeList(), workshopSalvageList = fakeList(),
     workshopQueueList = fakeList(),
+    workshopQueueHeader = fakeHeader(),
+    workshopRecipeHeader = fakeHeader(),
+    workshopSalvageHeader = fakeHeader(),
+    workshopQueueColumns = {},
+    workshopCatalogColumns = {},
     addDetail = function(_, label, detail)
         details[#details + 1] = { label = label, detail = detail }
     end,
 }
 local snapshot = {
-    settlement = { facilities = {{ definitionId = "workshop",
+    settlement = { facilities = {{ definitionId = "forge",
         constructionState = "BUILT", components = {
             { role = "work.craft" }, { role = "work.disassemble" },
         } }} },
@@ -55,6 +77,7 @@ local snapshot = {
         requiredStation = { id = "forge", facilityId = "forge",
             role = "work.craft" },
         descriptor = { key = "spear", displayName = "Crafted Spear",
+            requiresSpecificWorkstation = true,
             inputs = {{ itemTypes = { "Base.Plank" }, amount = 1 }},
             outputs = {{ itemTypes = { "Base.SpearCrafted" }, amount = 1 }} },
         availability = { 3 } }}, disassemblyCandidates = {
@@ -68,24 +91,24 @@ window.snapshot = snapshot
 
 T.truthy(Workshop.Rebuild(window, snapshot,
     function(_, fallback) return fallback end) == true)
-T.truthy(#window.workshopRecipeList.items == 3,
-    "workshop must show a catalog header, station group, and recipe row")
-T.truthy(window.workshopRecipeList.items[2].stationHeader == true,
-    "crafting items are not grouped by station")
-local recipe = window.workshopRecipeList.items[3]
+T.truthy(#window.workshopRecipeList.items == 2,
+    "workshop must show a skill header and recipe row")
+T.truthy(window.workshopRecipeList.items[1].skillHeader == true,
+    "crafting items are not grouped by production skill")
+local recipe = window.workshopRecipeList.items[2]
 T.truthy(recipe.name == "Crafted Spear"
-    and recipe.catalogCells.quantity == "-  1  +"
+    and recipe.catalogCells.quantity == "1"
     and recipe.catalogCells.availability == "AVAILABLE",
     "recipe row is missing quantity or stock availability")
-T.truthy(#window.workshopSalvageList.items == 3
-    and window.workshopSalvageList.items[3].fullType == "Base.SpearCrafted",
+T.truthy(#window.workshopSalvageList.items == 2
+    and window.workshopSalvageList.items[2].fullType == "Base.SpearCrafted",
     "salvage list should only contain supported grouped specimens")
-T.truthy(window.workshopSalvageList.items[3].catalogCells.availability
+T.truthy(window.workshopSalvageList.items[2].catalogCells.availability
     == "1x Base.Plank", "salvage row should expose its potential yield")
 T.truthy(Workshop.Rebuild(window, snapshot,
     function(_, fallback) return fallback end) == true)
-T.truthy(#window.workshopQueueList.items == 1,
-    "workshop queue refresh must not accumulate headers")
+T.equal(#window.workshopQueueList.items, 0,
+    "completed workshop order is not an active queue row")
 T.truthy(#details == 0,
     "completed construction history leaked into production queue")
 T.truthy(window.workshopLaneAvailability.craft
@@ -104,7 +127,8 @@ T.truthy(missingHeader.stationHeader
 T.equal(missingRecipe.catalogCells.action, "",
     "missing station action was repeated on the recipe row")
 Workshop.OnCatalogControl(window, missingHeader, "action", {
-    internal = "activate",
+    command = "activate",
+    enabled = true,
 })
 T.equal(buildStationCalls[1], "forge",
     "station shortcut did not focus the required direct workstation")

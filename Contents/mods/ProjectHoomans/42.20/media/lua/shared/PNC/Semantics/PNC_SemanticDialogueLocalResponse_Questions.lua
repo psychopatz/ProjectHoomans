@@ -536,7 +536,11 @@ local function resolveContextReferenceQuestion(ir, state, context)
     local answer = recentBackstoryAnswer(
         context, recentReferenceAnswer(context)
     )
-    local subject = answer and answer.subject or nil
+    -- The resolver has already selected a concrete concept for a resolved
+    -- pronoun. Keep that authoritative concept when the serialized context
+    -- does not expose the preceding answer turn to this provider.
+    local subject = answer and answer.subject
+        or target and target.concept or nil
     local extensions = type(ir.extensions) == "table" and ir.extensions or {}
     local questionKind = extensions.contextQuestion
     local backstoryFollowUp = subject == "NPC_BACKSTORY"

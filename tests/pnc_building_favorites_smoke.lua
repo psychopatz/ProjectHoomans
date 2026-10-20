@@ -1,5 +1,6 @@
 local T = require "tests/support/test"
 T.addPackagePaths({ { "ProjectHoomans", "client" } })
+T.stubClientUI()
 
 package.preload["ISUI/ISTextEntryBox"] = function()
     return true
@@ -85,9 +86,9 @@ T.equal(player.transmitted, 1,
 
 window.buildFavoritesOnly = true
 Building.Rebuild(window, { building = { recipes = recipes, queue = {} } })
-T.equal(#window.buildRecipeList.items, 2,
-    "favorites filter keeps the header and only the favorite recipe")
-T.equal(window.buildRecipeList.items[2].item.recipe.objectInfoName, "WallA",
+T.equal(#window.buildRecipeList.items, 1,
+    "favorites filter keeps only the favorite recipe")
+T.equal(window.buildRecipeList.items[1].item.recipe.objectInfoName, "WallA",
     "favorites filter returns the favorite recipe")
 
 T.finish("pnc_building_favorites_smoke")

@@ -59,8 +59,18 @@ end
 
 local function npcName(record)
     local identity = record and record.identity
-    return clean(identity and identity.displayName
+    local name = clean(identity and identity.displayName
         or record and (record.displayName or record.name))
+    if name ~= "" then return name end
+    if record then
+        local forename = clean(record.forename)
+        local surname = clean(record.surname)
+        if forename ~= "" then
+            return forename .. (surname ~= "" and " " or "") .. surname
+        end
+        return surname
+    end
+    return ""
 end
 
 local function firstName(value)
