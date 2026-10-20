@@ -27,6 +27,33 @@ Verification for this slice:
 
 The next safe slice is the dialogue pipeline. It should be extracted only after preserving the shared normalization and Lua-rendering contracts used by the typed semantic pipeline.
 
+## Refactor progress — slices 2–9
+
+The remaining compiler pipelines and authoring/editor boundaries are now split behind compatibility facades. Public imports, legacy private helper imports, deterministic output, worker protocol, and existing GUI callbacks remain unchanged.
+
+- `13264b40`: dialogue dataset pipeline extracted to `dialogue_compiler.py`.
+- `400072d1`: typed `pnc.semantic_authoring.v1` pipeline extracted to `semantic_definition_compiler.py`.
+- `c500602e`: canonical source catalog extracted to `dataset_catalog.py`; `SemanticLabAuthoringService` remains the public facade.
+- `84f179fb`: typed interaction preview/generation/workflow orchestration extracted to `interaction_generation.py`.
+- `6fdf0470`: Flow Editor graph-model and coverage projections extracted to `flow_editor_model.py`.
+- `67e801f6`: bounded undo/redo snapshot state extracted to `flow_editor_state.py`.
+- `c258fd76`: canvas zoom/pan/drag/render controller extracted to `flow_editor_canvas.py`.
+- `e286c3b2`: graph mutation, authoring prompts, validation, registration, and draft actions extracted to `flow_editor_actions.py`.
+- `68919d5c`: dialogue validation, pattern, response, dataset, and rendering stages split into focused modules; `dialogue_compiler.py` is now a 56-line compatibility facade.
+
+Verification for the completed modularization:
+
+- Full Semantic Harness Python discovery: `274` passed, exit `0`, `171.441s`.
+- Full embedded Lua harness: `853/853` passed, exit `0`, `16.23s`.
+- Full embedded compiler suite: `16` passed, exit `0`.
+- Final worker doctor: all required checks true, including worker syntax and `READY/PING/CAPABILITIES`, exit `0`.
+- Final Kahlua verification: `2,947` Lua files scanned (`19` excluded), `0` Kahlua findings at `ERROR+`, exit `0`.
+- Final token scan (`o200k_base`, threshold `2000`): `140` files scanned, `54` over threshold. Remaining over-threshold files are known UI/action/rendering or semantic-definition functions; the compiler facade itself is `630` tokens and the dialogue facade is `430` tokens.
+
+## Final architecture comparison
+
+The saved scoped baseline was `116` files / `53` production / `63` tests / `15,500` LOC, health `86.4`, coverage `68.1`, confidence `54.9`, and `43` findings. The final scoped scan is `130` files / `67` production / `63` tests / `16,148` LOC, health `90.2`, coverage `69.3`, confidence `55.8`, and `41` findings. CodeBuilder pressure fell from `20.3` to `18.9`; Flow Editor pressure fell from `28.8` to `13.4`. The final scan has no `LARGE_MODULE` finding; the remaining findings are 24 large functions, 6 silent-error paths, 6 unbounded loops, 4 coupling findings, and 1 global mutable-state finding outside these completed slices.
+
 ## Evidence
 
 Architecture scan of the complete repository:
