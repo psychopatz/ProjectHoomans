@@ -62,3 +62,15 @@ C7A–C7G previously marked READY FOR USER LIVE TEST after the archived agent-re
 4. Add focused server/Lua and worker tests for low/high familiarity, privacy refusal, legitimate NPC disclosure, evidence confirmation, uncertainty, server/client authority, and per-player divergence; commit, record exact SHA/results, then continue to B4.
 
 **Authoritative design:** `GROUNDED_PERSONAL_DIALOGUE_B.md`. Continue using existing identity, persistence, Knowledge, relationship, dossier, ContextState, response-plan and PBrainZ boundaries. No parallel backstory store, player-knowledge root, per-tick profile scan, fake memory or client truth leak.
+
+## B3 — ACCEPTED: gated disclosure, uncertainty, and player-private backstory projections
+
+- Source commit: `2ae41e8ac770c3ab89f6bbddabd7fbfac56638cd` on the existing `codex/contextual-dialogue-quest-framework-0a` checkout. Paired source SHAs: PsychopatzCore `2179ee19307a993e186e6da661ad4212e984e0b4` (clean `main`), DynamicTrading `2d1ee62a227062457e8b233e37a7e288c6351a66` (clean); neither dependency changed.
+- Added ten immutable `history.backstory.*` Knowledge descriptors with private disclosure gates, familiarity threshold 50, translated dossier labels, and the existing `pnc_backstory` truth provider. Direct disclosure enters the ordinary `direct_disclosure` evidence path and resolves to confirmed facts; familiarity only makes a fact eligible and never auto-reveals it.
+- Added `PreviewBackstory`/`DiscloseBackstory` service seams and an API topic boundary (`backstory.<kind>`). The existing sparse per-character Knowledge persistence and dossier snapshot remain the only learned-fact store; snapshots contain no identity seed or generated biography. Two player-character fixtures demonstrate divergent knowledge for one NPC.
+- Added compositional semantic question patterns for former work, hometown, education, hobbies, family, values, fears, tragedy, survival origin, and birthday. Undisclosed questions resolve to `unknown / backstory_not_disclosed`; authorized snapshot projections resolve to the requested fact. Optional PBrainZ context now receives only `BuildAuthorizedBackstoryFacts` from the local player dossier.
+- Evidence: focused Lua suite **10/10** (`pnc_backstory_knowledge_disclosure_smoke`, persistence, semantic fact, Knowledge, PBrainZ, dialogue safety and regression tests); real Core+Hoomans worker B0+B2+B3 **7/7**; production Kahlua verifier **0 errors** across 30 server Knowledge files and 103 shared Semantic files; Python `compileall` passed; translation JSON parsed with `jq`.
+
+## Next mandatory chunk: B4 — NPC Dossier acceptance
+
+Exercise the existing dossier presentation with confirmed/suspected backstory evidence, EN/TL labels, per-player snapshots, and unauthorized-snapshot assertions. Verify no raw backstory truth or undisclosed descriptor crosses the client command boundary, then commit and record the exact source SHA before continuing to B5.
