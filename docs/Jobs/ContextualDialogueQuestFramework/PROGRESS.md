@@ -43,13 +43,22 @@ C7A–C7G previously marked READY FOR USER LIVE TEST after the archived agent-re
 - Paired PsychopatzCore SHA remains `2179ee19307a993e186e6da661ad4212e984e0b4`; no Core or DynamicTrading source change was required for this bounded Hoomans persistence slice.
 - Evidence: `python3 tests/run_tests.py pnc_backstory_persistence_stability_smoke pnc_npc_foundation_normal_persistence_smoke pnc_persistence_v5_smoke` **3/3**; B0 worker suite **5/5**; focused B0 plus C7A suite **9/9**; production Kahlua verification for the four changed persistence/backstory files **0 errors**. The previously recorded full Lua baseline remains **835/849**, with the same 14 unrelated failures.
 
+## B2 — ACCEPTED: authoritative offline backstory fact-provider bridge
+
+- Source commit: `ffff2107fab6310381f3c2f4008029a5e2548c08`.
+- Added the server-composed `npc_backstory` provider to the existing `PNC.Semantics.DialogueFacts` registry. It resolves one requested former profession, hometown, education, hobby, family, value, fear, tragedy, survival-origin, or birth fact from the authoritative NPC record and existing Memory definitions. Results carry stable fact ID, localized content, immutable marker, confidence, and provenance; unavailable authority or unspecified kinds remain unknown/ambiguous.
+- Mutable residence, medical state, inventory, roster projections, and live events remain separate providers and are not accepted as immutable backstory. The existing text loader now honors an explicit EN/TL lookup while preserving English-key validation, so stable IDs survive language changes while labels localize.
+- The real semantic worker now exercises the same production provider through a bounded `BACKSTORY_FACT` command. No second biography store or client truth channel was added.
+- Paired PsychopatzCore SHA remains `2179ee19307a993e186e6da661ad4212e984e0b4`; DynamicTrading remains untouched.
+- Evidence: real Core+Hoomans B2 worker **1/1**; combined B0+B2+C7A worker **10/10**; focused Lua fact/translation/conversation regressions **5/5**; B2 provider and server composition Kahlua checks **0 errors**; B1 persistence regressions remain **3/3**.
+
 ## EXACTLY ONE CURRENT EXECUTION CHUNK
 
-**B2 — authoritative offline backstory fact-provider bridge.**
+**B3 — gradual Knowledge-backed disclosure and evidence authorization.**
 
-1. Audit the existing `PNC_Conversation_Memory_BackstoryContext`, Semantic Dialogue fact providers, and current B2 conversation consumers with graph traces plus direct source checks.
-2. Expose former profession, hometown, hobby, family, fear, and established-event facts through the existing offline provider contract using stable IDs and localized text resolution; keep immutable background separate from current residence, medical state, inventory, and live events.
-3. Add deterministic provider tests for identity seed/reload, missing definitions, resolver-backed facts, EN/TL labels, and no fabricated facts. Preserve the B1 metadata/persistence contract and avoid a second profile or fact database.
-4. Verify with the real Core+Hoomans worker, focused/full relevant Lua suites, Kahlua checks, and source coverage; commit the coherent B2 slice, record exact SHA/results, then continue to B3.
+1. Audit the existing `PNC_NPCKnowledge` normalization, persistence, familiarity/approval/privacy resolution, evidence, disclosure authorization, and player snapshot paths with graph traces and direct source checks; preserve their sparse per-player-character ownership.
+2. Add a backstory-fact disclosure adapter that uses stable fact IDs and the existing Knowledge record, relationship familiarity, approval/privacy thresholds, evidence confirmation, refusal/uncertainty, and server authority. Threshold eligibility must never itself reveal a hidden fact.
+3. Ensure authoritative semantic answers and optional PBrainZ context receive only an authorized disclosure projection, never the full NPC backstory profile or raw identity seed on an unauthorized client path. Keep current residence/medical/live facts on their existing providers.
+4. Add focused server/Lua and worker tests for low/high familiarity, privacy refusal, legitimate NPC disclosure, evidence confirmation, uncertainty, server/client authority, and per-player divergence; commit, record exact SHA/results, then continue to B4.
 
 **Authoritative design:** `GROUNDED_PERSONAL_DIALOGUE_B.md`. Continue using existing identity, persistence, Knowledge, relationship, dossier, ContextState, response-plan and PBrainZ boundaries. No parallel backstory store, player-knowledge root, per-tick profile scan, fake memory or client truth leak.
