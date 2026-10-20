@@ -64,9 +64,27 @@ Evidence:
 - Production imports now point to `studio/`; old top-level authoring modules
   are compatibility-only facades.
 
-Next mandatory slice: move inspection and presentation projections into an
-`inspection/` package while keeping the Conversation Inspector's bounded
-worker observation contract unchanged.
+The inspection and presentation migration is recorded below.
+
+### Post-V5 Python package layout — inspection slice
+
+**Status:** slice 3 implemented on existing `main`; commit `1a914543`.
+
+Bounded Conversation Inspector projections, JSON/CLI rendering, and transcript
+storage now live under `tools/semantic_harness/inspection/`. The projection
+still consumes the real worker observation and remains presentation-only; no
+second semantic policy, response generator, or gameplay dispatcher was added.
+Former top-level modules remain compatibility facades.
+
+Evidence:
+
+- Conversation Inspector, transcript, app, harness, and runtime checks:
+  `43/43` passed.
+- Existing worker response and inspection contracts remain unchanged.
+
+Next mandatory slice: move the Flow Editor family and Tk shell into `ui/`
+subpackages while keeping GUI composition thin and preserving the existing
+graph model, canvas behavior, and worker callbacks.
 
 ## V1 — reusable visual CodeBlocks graph
 

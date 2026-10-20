@@ -42,6 +42,9 @@ timeouts, crash detection, and bounded stderr diagnostics.
   reusable-block panes, typed interaction composition, workflow orchestration,
   and the searchable production interaction catalog. It delegates compilation
   and generation to the existing CodeBuilder service.
+- `inspection/` owns bounded worker-result projections, the Conversation
+  Inspector chain, CLI/JSON presentation, and the visible transcript buffer.
+  It does not interpret dialogue or dispatch gameplay effects.
 - `settings_dialog.py` owns the runtime settings form and converts its draft
   into a validated scenario before the live worker is configured.
 - `runner.py` owns case replay and its streaming conflict ledger; `suite.py`
