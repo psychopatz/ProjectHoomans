@@ -15,13 +15,13 @@ timeouts, crash detection, and bounded stderr diagnostics.
 - `app.py` is the stable module and direct-script entry point. It routes doctor,
   CLI, and GUI startup without importing Tk for headless use.
 - `cli.py` owns argument parsing, replay, interactive input, and JSONL output.
-- `gui.py` owns the asynchronous Tk conversation and future polling. Its
+- `ui/shell.py` owns the asynchronous Tk conversation and future polling. Its
   **Turn facts** tab shows the worker's bounded production observation
   (selected candidate, rendered NPC response, active/suspended flow nodes,
   translation lookups, and observed side effects); **Raw worker record** keeps
   the complete bounded response for deeper inspection. **Preview** calls the
   production router without recording a turn or dispatching an action.
-- `flow_editor.py` owns the **Flow editor** tab's graph model and visual form.
+- `ui/flow_editor/` owns the **Flow editor** tab's graph model and visual form.
   It reads normalized definitions from the production Lua registry, draws
   nodes/edges and selected response pools, and sends draft validation and
   registration back through the same Lua worker (`Registry.Validate` and
@@ -45,7 +45,7 @@ timeouts, crash detection, and bounded stderr diagnostics.
 - `inspection/` owns bounded worker-result projections, the Conversation
   Inspector chain, CLI/JSON presentation, and the visible transcript buffer.
   It does not interpret dialogue or dispatch gameplay effects.
-- `settings_dialog.py` owns the runtime settings form and converts its draft
+- `ui/dialogs/settings.py` owns the runtime settings form and converts its draft
   into a validated scenario before the live worker is configured.
 - `runner.py` owns case replay and its streaming conflict ledger; `suite.py`
   owns isolated Lua smoke-test subprocesses. `rendering.py` and `transcript.py`

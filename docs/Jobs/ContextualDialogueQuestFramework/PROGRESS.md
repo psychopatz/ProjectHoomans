@@ -82,9 +82,32 @@ Evidence:
   `43/43` passed.
 - Existing worker response and inspection contracts remain unchanged.
 
-Next mandatory slice: move the Flow Editor family and Tk shell into `ui/`
-subpackages while keeping GUI composition thin and preserving the existing
-graph model, canvas behavior, and worker callbacks.
+The UI migration is recorded below.
+
+### Post-V5 Python package layout — UI slice
+
+**Status:** slice 4 implemented on existing `main`; commit `cdf84b1f`.
+
+The Tk application shell now lives under `tools/semantic_harness/ui/`, with
+the Flow Editor's pane, graph model, actions, canvas, and history grouped under
+`ui/flow_editor/`. Runtime settings are under `ui/dialogs/`. The shell remains
+a composition layer; graph state, compiler behavior, worker protocol, and
+authoring service ownership did not change. Former top-level GUI and Flow
+Editor modules remain compatibility facades.
+
+Evidence:
+
+- Flow Editor, worker session, app, inspector, and runtime checks: `28/28`
+  passed.
+- Full Semantic Harness Python discovery after the move: `276/276` passed in
+  `170.048s`, exit `0`.
+- Worker doctor after the move: all required checks true, including Lua syntax
+  and `READY/PING/CAPABILITIES`.
+
+Next mandatory slice: move the remaining harness orchestration tools into a
+`testing/` package, then add the application entrypoint/package metadata and
+perform the final architecture/token rescan before removing only proven-dead
+compatibility shims.
 
 ## V1 — reusable visual CodeBlocks graph
 
