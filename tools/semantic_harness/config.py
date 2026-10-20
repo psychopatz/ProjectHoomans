@@ -8,6 +8,8 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from .protocol import DEFAULT_MAX_MESSAGE_BYTES
+
 
 class ConfigurationError(RuntimeError):
     """Raised when a required harness runtime cannot be discovered."""
@@ -106,7 +108,7 @@ class HarnessConfig:
     startup_timeout: float = 8.0
     request_timeout: float = 5.0
     shutdown_timeout: float = 1.0
-    max_message_bytes: int = 256 * 1024
+    max_message_bytes: int = DEFAULT_MAX_MESSAGE_BYTES
 
     @classmethod
     def discover(

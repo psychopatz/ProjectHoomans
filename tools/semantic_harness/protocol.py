@@ -7,7 +7,10 @@ from typing import Any
 
 
 PROTOCOL_VERSION = 1
-DEFAULT_MAX_MESSAGE_BYTES = 256 * 1024
+# The generated production flow catalog is currently about 270 KiB. Keep the
+# JSON-lines envelope bounded while leaving room for one catalog response and
+# its registered-flow metadata.
+DEFAULT_MAX_MESSAGE_BYTES = 512 * 1024
 
 
 class ProtocolError(ValueError):
@@ -61,4 +64,3 @@ def decode_message(line: bytes | str, *, max_bytes: int = DEFAULT_MAX_MESSAGE_BY
     if version is not None and version != PROTOCOL_VERSION:
         raise ProtocolError(f"unsupported worker protocol version: {version!r}")
     return value
-
