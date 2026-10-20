@@ -1,9 +1,9 @@
 # Contextual Dialogue & Quest Framework — CURRENT B-phase Progress
 
-**Updated:** 2026-10-20 after B5 implementation. **B0–B5 ACCEPTED; B6 IN PROGRESS.**
-**Working checkout:** `codex/contextual-dialogue-quest-framework-0a`, implementation commit `e0b7a47c653dc5c95fab97823d38725b4e862670`.
+**Updated:** 2026-10-20 after B6 acceptance. **B0–B6 DEVELOPER-ACCEPTED; READY FOR USER LIVE TEST.**
+**Working checkout:** `codex/contextual-dialogue-quest-framework-0a`, implementation commit `1a10ac0a9f6d868e1a84dcde1710ca4bb99928e0` (B6 acceptance).
 **Paired PsychopatzCore:** `2179ee19307a993e186e6da661ad4212e984e0b4` on clean `main`.
-**Parent completion contract:** B0–B6 remain mandatory. This ledger records the current safe chunk only; after each accepted chunk continue immediately to the next unaccepted chunk in the same goal. The parent goal is not complete until integrated developer acceptance passes B6.
+**Parent completion contract:** B0–B6 developer acceptance is complete. Native Project Zomboid SP/MP/live validation remains user-owned and is explicitly not claimed here.
 
 ## Historic acceptance (preserve unchanged)
 
@@ -88,8 +88,16 @@ Exercise the existing dossier presentation with confirmed/suspected backstory ev
 - Disclosure-result text from the existing client command route is recorded into the same ContextState as an NPC answer, so a server refusal or successful disclosure remains honest and available to a subsequent follow-up. No raw identity seed, full profile, or unauthorized fact enters the context.
 - Evidence: focused Lua `python3 tests/run_tests.py pnc_semantic_local_response_questions_smoke pnc_semantic_fact_smoke pnc_semantic_dialogue_input_smoke pnc_semantic_local_route_smoke pnc_conversation_smoke pnc_backstory_knowledge_disclosure_smoke pnc_semantic_backstory_fact_smoke` **7/7**; real Core+Hoomans worker B0+B2+B3 **7/7**; production Kahlua verifier **0 errors** across 103 shared Semantic files and the changed client lifecycle file. The worker’s existing optional-provider warning remains non-fatal and no B5 test entered the provider route.
 
-## EXACTLY ONE CURRENT EXECUTION CHUNK
+## B6 — ACCEPTED: persistence, scaling, compatibility and complete developer acceptance
 
-**B6 — performance, persistence, compatibility and complete acceptance.**
+- Source commit: `1a10ac0a9f6d868e1a84dcde1710ca4bb99928e0`. Added a bounded acceptance smoke around the production `PNC.Persistence.SaveAll` collection serializer and the same deterministic worker encoder used to inspect serialized payload bytes. The test creates 100 persistent NPC records and a 1,000-NPC synthetic population, verifies stable identity-seeded selection IDs, confirms no `value`, `textKey`, `facts`, or generated biography is serialized, and checks approximately linear growth.
+- Measured headless serialized payload: **2,664 bytes** for one record, **587 bytes** for the sparse backstory metadata, **269,760 bytes** for 100 records, and **2,706,037 bytes** for 1,000 records. The 1,000-record probe completed in **0.59 seconds** in the bounded Lua test runner. Save pinning invoked `EnsureBackstoryMetadata` without invoking `GetBackstoryProfile`; a profile is reconstructed only on the explicit dialogue/provider read.
+- B1 save/reload, catalog-version growth, stable-ID override, legacy reconstruction, and language/reload worker checks remain green; B2 authoritative former job/hometown/hobby/family/fear/tragedy/survival/birthday coverage remains green; B3/B4 verify server authorization, refusal/uncertainty, Knowledge evidence, per-player divergence, dossier labels/status, and no identity-seed/full-biography snapshot leak; B5 verifies grounded response-plan/context continuity and authorized follow-ups. Optional PBrainZ receives only the authorized player snapshot projection.
+- Focused integrated Lua suite: **17/17** (`pnc_semantic_social_smoke`, inventory/NLU arbitration, B1 persistence, B2 fact provider, B3 Knowledge/PBrainZ/safety, B4 dossier, B5 continuity, and B6 scaling). Real Core+Hoomans worker B0+B2+B3: **7/7**. Full semantic-harness Python discovery: **passed**. Production Kahlua verification: **0 errors** across 30 server Knowledge files and 24 shared Persistence files; the existing 103-file shared Semantic check also remains **0 errors**.
+- Full Lua regression runner: **839/853 passed; 14 known baseline failures**, limited to existing building/colony UI, constants/presence mock, Kahlua persistence, held-items, MP guard, PBrainZ native-button, persisted-shell, Puppet Opera, and server-inventory presence tests. No B0–B6-focused test failed.
+- Dependency SHAs remain PsychopatzCore `2179ee19307a993e186e6da661ad4212e984e0b4` on clean `main` and DynamicTrading `2d1ee62a227062457e8b233e37a7e288c6351a66` on clean `main`; neither dependency changed. No new Git branch was created.
+- Native Project Zomboid save/load, SP/MP authority, Workshop installation/publication, and live-game dialogue remain user-owned validation. This developer acceptance does not claim those native checks passed.
 
-Measure the actual serialized ModData footprint and stable identity/backstory behavior across save/reload, catalog-version changes, and language changes; exercise lazy generation without per-tick scanning; verify existing Knowledge persistence, per-player privacy, EN/TL and optional PBrainZ boundaries; add/execute bounded 100-persistent-NPC and larger synthetic scaling probes; run the relevant integrated Lua and real-worker regressions; document native SP/MP/live testing as user-owned. Commit production/test changes and this ledger with exact SHAs/results, and only then evaluate the parent B0–B6 completion contract.
+## Parent goal — DEVELOPER IMPLEMENTATION COMPLETE; READY FOR USER LIVE TEST
+
+B0–B6 developer-implementable requirements are implemented and accepted on the existing checkout above. The parent goal is complete for the developer/test boundary and is ready for the user-owned native Project Zomboid SP/MP live test. It is not claimed to be integrated into `main` or published to Workshop.
