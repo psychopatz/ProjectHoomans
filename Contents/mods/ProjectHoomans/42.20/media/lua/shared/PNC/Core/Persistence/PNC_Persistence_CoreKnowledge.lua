@@ -125,4 +125,22 @@ function Adapter.BuildForNPC(core, npcID)
     return normalized
 end
 
+-- The import is explicit and server-authorized. It is used at a provider
+-- handoff or save migration boundary; ordinary dossier reads remain served
+-- by Hoomans' existing player-scoped ModData service.
+function Adapter.CommitForPlayer(
+    core, registry, actorID, characterUUID, npcID, authority, expectedRevision
+)
+    if authority ~= "server" then return nil, "server_authority_required" end
+    if type(registry) ~= "table"
+        or type(registry.Get) ~= "function"
+        or type(registry.Commit) ~= "function"
+    then return nil, "core_registry_unavailable" end
+    local actor = registry:Get(actorID)
+    if not actor then return nil, "actor_not_found" end
+    local state, reason = Adapter.BuildForPlayer(core, characterUUID, npcID)
+    if not state then return nil, reason end
+    return registry:Commit(actorID, { knowledge = state }, expectedRevision)
+end
+
 return Adapter

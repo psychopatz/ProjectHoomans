@@ -113,6 +113,32 @@ T.equal(actor.knowledge.byPlayer["player:char:alice"].facts
 T.falsy(actor.knowledge.biography,
     "portable bridge stored a biography paragraph")
 
+local unauthorized, unauthorizedReason = CoreKnowledge.CommitForPlayer(
+    PsychopatzCore, registry, actor.actorId, "char:alice",
+    "npc:portable:one", "client", actor.revision)
+T.equal(unauthorized, nil, "client Core Knowledge import rejected")
+T.equal(unauthorizedReason, "server_authority_required",
+    "Core Knowledge import authority")
+
+local imported, importReason = CoreKnowledge.CommitForPlayer(
+    PsychopatzCore, registry, actor.actorId, "char:alice",
+    "npc:portable:one", "server", actor.revision)
+T.truthy(imported, importReason)
+T.truthy(imported.knowledge.byPlayer["player:char:alice"],
+    "server Core Knowledge import missing player")
+T.falsy(imported.knowledge.byPlayer["player:char:bob"],
+    "single-player Core Knowledge import leaked another player")
+
+local saved = registry:Save()
+T.truthy(saved, "Core Knowledge import save")
+local fresh = Actors.NewRegistry()
+T.truthy(fresh:Load(saved), "Core Knowledge import reload")
+local restored = fresh:Get(actor.actorId)
+T.equal(restored.knowledge.byPlayer["player:char:alice"].facts
+    ["history.backstory.hometown"].value,
+    "backstory.shared.hometown.rosewood",
+    "server-imported Core Knowledge value did not reload")
+
 local valid, validReason = Actors.Knowledge.Validate(actor.knowledge)
 T.truthy(valid, validReason)
 T.finish("pnc_npc_foundation_core_knowledge_adapter_smoke")
