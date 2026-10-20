@@ -145,6 +145,11 @@ function Adapter.Materialize(actor, core, spec)
     spec = type(spec) == "table" and spec or {}
     record, projection = Adapter.BuildRecord(actor, core, spec.record)
     if not record then return nil, projection end
+    if projection.providerLease
+        and projection.providerLease.state == "materialized"
+    then
+        return nil, "body_lease_active"
+    end
     record.runtime.bodyLease = projection.providerLease.leaseID
     lifecycle = spec.lifecycle or PNC.BodyLifecycle
     factory = spec.bodyFactory or spec.spawn

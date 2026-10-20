@@ -75,6 +75,25 @@ T.truthy(stamped, "Hoomans body receives Core lease")
 T.equal(materialized.record.runtime.bodyLease,
     materialized.leaseID, "body and Core lease identity")
 
+local duplicateSpawnAttempts = 0
+local duplicateBody, duplicateReason = Adapter.Materialize(
+    materialized.actor, PsychopatzCore, {
+        owner = "ProjectHoomans:presence",
+        lifecycle = {
+            SpawnLiveBody = function()
+                duplicateSpawnAttempts = duplicateSpawnAttempts + 1
+                return { bodyID = "body:p8:duplicate" }
+            end,
+        },
+        now = 2,
+    }
+)
+T.equal(duplicateBody, nil, "duplicate Hoomans body rejected")
+T.equal(duplicateReason, "body_lease_active",
+    "duplicate Hoomans body reason")
+T.equal(duplicateSpawnAttempts, 0,
+    "duplicate Hoomans body is not spawned")
+
 local dematerialized, dematerializeReason = Adapter.Dematerialize(
     materialized.actor, PsychopatzCore, {
         owner = "ProjectHoomans:presence",
