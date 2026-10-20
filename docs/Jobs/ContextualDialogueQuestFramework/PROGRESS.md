@@ -2,9 +2,9 @@
 
 **Updated:** 2026-10-20
 
-**Parent status:** **IN PROGRESS — H0–H4 required; not ready for user live test.**
+**Parent status:** **IN PROGRESS — final local-main commit and handoff audit pending.**
 
-**Current chunk:** H3 — connect ordinary disclosure results, player-scoped dossier state, and personal conversation continuity.
+**Current chunk:** H4 — final integrated regression reconciliation and acceptance audit.
 
 ## Repository and dependency evidence
 
@@ -62,3 +62,16 @@ Real-worker evidence for commit `7ec2e79a` with identity seed `90210` and famili
 - `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all required checks OK, exit 0.
 
 Next mandatory chunk: run the complete Python harness, relevant full Lua suite, deterministic CodeBuilder/translation generation checks, and final integrated authoring-to-worker audit. Reconcile any remaining baseline failures with exact evidence before deciding whether H4 is complete. Keep all work inside the existing Core, Knowledge, persistence, translation, Semantic Lab, and dialogue contracts; do not add a second parser, policy, profile store, or dossier database.
+
+## H4 final integrated acceptance evidence
+
+- Implementation commit: `17adf765`; changes are bounded to production compatibility fixes, Semantic Lab worker normalization, fallback argument rendering, and regression fixtures. The pre-commit audit source was `cbda04ae`.
+- Full Semantic Lab Python suite: `python3 -m unittest discover -s tools/semantic_harness/tests -q` — `Ran 264 tests in 173.380s`, `OK`, exit 0.
+- Focused H0–H4 suite: `python3 -m unittest tools.semantic_harness.tests.test_grounded_personal_dialogue_b0 tools.semantic_harness.tests.test_grounded_personal_dialogue_b2 tools.semantic_harness.tests.test_grounded_personal_dialogue_b3 tools.semantic_harness.tests.test_grounded_personal_dialogue_h2 tools.semantic_harness.tests.test_grounded_personal_dialogue_h3 tools.semantic_harness.tests.test_grounded_personal_dialogue_h4 tools.semantic_harness.tests.test_semantic_translation_integration tools.semantic_harness.tests.test_dataset_review tools.semantic_harness.tests.test_semantic_authoring_compiler -q` — `Ran 31 tests in 17.176s`, `OK`, exit 0.
+- Full Lua regression suite through the real harness: `python3 tests/run_tests.py --jobs 1` — `PASS 853/853 in 17.53s`, exit 0. The previously observed 15 direct broad-suite failures are resolved; the historical `251 tests / 30 errors` worker-limit failure is now reconciled by the `264/0` Python result.
+- Direct target regressions: 15/15 passed, including UI fixture loading, persistence provenance, live-body passage behavior, inventory boundary loading, stale-shell safety, generated fallback `content`, and Semantic Lab adapter identity normalization.
+- Worker health: `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — required Python, Tk/display, sibling Core, Lua syntax, worker `READY`, `PING`, and `CAPABILITIES` checks all `true`, exit 0.
+- Static/regression checks: changed Lua `luac5.3 -p`, changed Python `python3 -m py_compile`, production changed-file `pz_verify.py --kahlua --severity ERROR --no-snippets`, and `git diff --check` all exit 0.
+- Acceptance behavior remains verified through the existing worker: EN/TL full NPC sentences, Core-backed translation keys and typed arguments, disclosure/refusal, player-scoped Knowledge/Dossier, follow-up context, suspected-evidence preservation, sparse persistence metrics, and optional PBrainZ filtering. Native Project Zomboid SP/MP and Workshop testing remain user-owned.
+
+**Next mandatory chunk:** record this completed implementation and acceptance evidence in the progress commit, rerun post-commit status verification, and hand off as ready for user-owned live testing only if the local-main audit remains clean. No remote integration or push is claimed.
