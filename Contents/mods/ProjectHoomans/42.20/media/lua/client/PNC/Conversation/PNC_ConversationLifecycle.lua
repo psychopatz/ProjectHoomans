@@ -132,6 +132,7 @@ local function clearWorkingContext(view, spec, preserveSafetyFeedback)
         session.conversationMemoryClosed = true
         session.semanticDialoguePending = nil
         session.semanticDialogueRouter = nil
+        session.semanticActorConversationService = nil
         if session.semanticDialogueContext
             and type(session.semanticDialogueContext.Reset) == "function"
         then

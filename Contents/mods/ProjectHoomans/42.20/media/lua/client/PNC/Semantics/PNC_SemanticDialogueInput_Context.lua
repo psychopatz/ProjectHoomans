@@ -57,13 +57,16 @@ local ContextProjection = require
 local Requests = require "PNC/Semantics/PNC_SemanticDialogueInput_Requests"
 local RouterLifecycle = require
     "PNC/Semantics/PNC_SemanticDialogueInput_RouterLifecycle"
+local ActorConversationService = require
+    "PNC/Semantics/PNC_SemanticActorConversationService"
 ContextProjection.Configure(WorldContext, EntityResolver, Situation)
 RouterLifecycle.Configure(
     State,
     DialogueContextState,
     DialogueRouter,
     Policy,
-    Internal
+    Internal,
+    ActorConversationService
 )
 pcall(require, "PNC/Semantics/PNC_SemanticDialogueFactSources")
 
@@ -141,7 +144,12 @@ end
 
 -- Core owns the bounded clause split; this adapter keeps candidate parsing and
 -- vocabulary ownership in the existing Hoomans/Core parser path.
-function Internal.ParseTurn(value, options)
+function Internal.ParseTurn(value, options, view)
+    local service = view and Internal.ActorConversationService
+        and Internal.ActorConversationService(view) or nil
+    if service and type(service.ParseTurn) == "function" then
+        return service:ParseTurn(value, options)
+    end
     local turn = Semantic.DialogueTurn
     if not turn or type(turn.Parse) ~= "function" then
         return nil, "dialogue_turn_unavailable"
@@ -220,5 +228,14 @@ function Internal.RecordContextTurn(view, ir, options)
 end
 
 Internal.RouterFor = RouterLifecycle.For
+Internal.ActorConversationService = function(view)
+    local session = view and view.session
+    if not session then return nil end
+    if session.semanticActorConversationService then
+        return session.semanticActorConversationService
+    end
+    RouterLifecycle.For(view)
+    return session.semanticActorConversationService
+end
 
 return Input

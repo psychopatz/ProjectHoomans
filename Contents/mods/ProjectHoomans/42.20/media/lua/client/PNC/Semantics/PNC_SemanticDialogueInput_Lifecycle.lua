@@ -245,7 +245,7 @@ function Internal.SubmitSingle(view, value, part)
     if not (type(part) == "table" and part.compoundPart == true)
         and type(Internal.ParseTurn) == "function"
     then
-        local turn = Internal.ParseTurn(value)
+        local turn = Internal.ParseTurn(value, nil, view)
         if type(turn) == "table" and turn.compound == true then
             return Internal.SubmitCompound(view, value, turn.parts, part)
         end
@@ -267,6 +267,8 @@ function Internal.SubmitSingle(view, value, part)
         })
         return false, routerReason
     end
+    local service = Internal.ActorConversationService
+        and Internal.ActorConversationService(view) or nil
     local context = Internal.ShallowContext(view)
     local options = {
         timestamp = Internal.Now(),
@@ -276,7 +278,9 @@ function Internal.SubmitSingle(view, value, part)
     local cognitionRequestID
     local cognitionPending
     local clearSemanticMemoryTarget = false
-    if type(router.Preview) == "function" then
+    if service and type(service.Preview) == "function" then
+        preview = service:Preview(value, context, options)
+    elseif type(router.Preview) == "function" then
         preview = router:Preview(value, context, options)
     else
         preview = router:Process(value, context, options)
@@ -349,6 +353,9 @@ function Internal.SubmitSingle(view, value, part)
                 view, value, part, preview, decision, context, options
             )
             if submitted then
+                if service and type(service.ObserveResult) == "function" then
+                    service:ObserveResult(preview)
+                end
                 recordConversationTopics(view, preview, value)
                 if clearSemanticMemoryTarget and view.session then
                     view.session.semanticMemoryTargetID = nil
@@ -359,7 +366,9 @@ function Internal.SubmitSingle(view, value, part)
     end
 
     local result = preview
-    if type(router.Preview) == "function" then
+    if service and type(service.ProcessIR) == "function" then
+        result = service:ProcessIR(preview.ir, context, options)
+    elseif type(router.Preview) == "function" then
         result = router:ProcessIR(preview.ir, context, options)
     end
     if clearSemanticMemoryTarget and view.session then
@@ -416,6 +425,11 @@ function Internal.SubmitSingle(view, value, part)
             inputValue = compoundPart and compoundIndex == 1
                 and part.compoundRoot or value }
     )
+    if submitted == true and service
+        and type(service.ObserveResult) == "function"
+    then
+        service:ObserveResult(result)
+    end
     traceTurn(view, value, result, "semantic_input_local", {
         providerAvailable = context.llmAvailable == true,
         providerUsed = false,

@@ -9,19 +9,22 @@ local DialogueContextState
 local DialogueRouter
 local Policy
 local Internal
+local ActorConversationService
 
 function RouterLifecycle.Configure(
     state,
     dialogueContextState,
     dialogueRouter,
     policy,
-    internal
+    internal,
+    actorConversationService
 )
     State = state
     DialogueContextState = dialogueContextState
     DialogueRouter = dialogueRouter
     Policy = policy
     Internal = internal
+    ActorConversationService = actorConversationService
 end
 
 function RouterLifecycle.For(view)
@@ -112,6 +115,26 @@ function RouterLifecycle.For(view)
         end
         session.semanticDialogueRouter:SetContext(Internal.ShallowContext(view))
         session.semanticDialogueRouter:SetPolicy(Policy)
+    end
+    if ActorConversationService
+        and type(ActorConversationService.Attach) == "function"
+    then
+        local service = ActorConversationService.Attach(
+            view,
+            session.semanticDialogueRouter,
+            {
+                state = session.semanticDialogueState,
+                policy = Policy,
+                parser = Internal.Parse,
+                candidateParser = Internal.ParseCandidates,
+                candidateSelector = Policy.SelectCandidate,
+                contextResolver = Internal.ResolveReferences,
+                context = Internal.ShallowContext(view),
+            }
+        )
+        if service then
+            session.semanticActorConversationService = service
+        end
     end
     return session.semanticDialogueRouter
 end

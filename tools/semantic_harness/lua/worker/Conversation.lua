@@ -242,6 +242,8 @@ function Conversation.turn(context, text)
     local router = view.session and view.session.semanticDialogueRouter
     local routedContext = router and router.context
     local routedSituation = routedContext and routedContext.dialogueSituation
+    local actorService = view.session
+        and view.session.semanticActorConversationService
     local newMessages = {}
     local newTrace = {}
     local newTransport = {}
@@ -297,6 +299,8 @@ function Conversation.turn(context, text)
         contextBefore = contextBefore,
         contextAfter = Conversation.contextSnapshot(context, view),
         routedSituation = Values.copy(routedSituation),
+        actorConversation = actorService
+            and actorService.Snapshot and actorService:Snapshot() or nil,
         llmCalls = Runtime.llmCalls,
         loadedModules = Runtime.loadedModules,
     }
