@@ -12,6 +12,16 @@ local ResponsePlan = require
 
 local ResponseAdapter = {}
 
+local BACKSTORY_KINDS = {
+    former_job = "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob",
+    hometown = "UI_PNC_Conversation_Semantic_QuestionBackstoryHometown",
+    education = "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation",
+    hobby = "UI_PNC_Conversation_Semantic_QuestionBackstoryHobby",
+    family_background = "UI_PNC_Conversation_Semantic_QuestionBackstoryFamily",
+    fear = "UI_PNC_Conversation_Semantic_QuestionBackstoryFear",
+    tragedy = "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy",
+}
+
 local function semanticTranslationKey(response)
     local templateID = tostring(response and response.templateID or "")
     if string.sub(templateID, 1, 7) == "UI_PNC_" then
@@ -26,6 +36,20 @@ local function semanticTranslationKey(response)
             return "UI_PNC_Conversation_Semantic_QuestionIdentityKnown"
         end
         return "UI_PNC_Conversation_Semantic_QuestionIdentity"
+    end
+    if templateID == "semantic.question.backstory.known" then
+        local args = response and response.args
+        return BACKSTORY_KINDS[args and args.kind]
+            or "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown"
+    end
+    if templateID == "semantic.question.backstory.suspected" then
+        return "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected"
+    end
+    if templateID == "semantic.question.backstory.ambiguous" then
+        return "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous"
+    end
+    if templateID == "semantic.question.backstory.refusal" then
+        return "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal"
     end
     local keys = {
         ["semantic.identity.exchange"] =
@@ -310,7 +334,7 @@ local function localizedSegment(templateID, fallback, args)
     end
     args = type(args) == "table" and args or {}
     local firstArg = args.npcName or args.target or args.object
-        or args.location or args.topic
+        or args.location or args.topic or args.content or args.value
     if type(firstArg) == "table" then firstArg = nil end
     local ok, value = pcall(translation.TrFormat, key, fallback, firstArg)
     if ok and value ~= nil and tostring(value) ~= "" then

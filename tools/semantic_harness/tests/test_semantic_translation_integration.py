@@ -3,12 +3,28 @@
 from __future__ import annotations
 
 import unittest
+import json
+from pathlib import Path
 
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.worker import LuaSemanticWorker
 
 
 class SemanticTranslationIntegrationTests(unittest.TestCase):
+    BACKSTORY_KEYS = {
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown",
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob",
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryHometown",
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation",
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryHobby",
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryFamily",
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryFear",
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy",
+        "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected",
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous",
+        "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal",
+    }
+
     @staticmethod
     def assert_resolved_lookups(test: unittest.TestCase, lookups: list[dict]) -> None:
         test.assertTrue(lookups)
@@ -103,6 +119,28 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                     self.assertEqual(turn["transport"], [])
                     self.assertEqual(turn["toolCalls"], [])
 
+
+    def test_backstory_catalog_is_manifest_registered_in_both_languages(self) -> None:
+        repository = Path(__file__).resolve().parents[3]
+        manifest = json.loads(
+            (repository / "Contents/mods/ProjectHoomans/common/media/translation/"
+             "manifests/Conversation.json").read_text(encoding="utf-8")
+        )
+        for language in ("EN", "TL"):
+            with self.subTest(language=language):
+                relative = f"{language}/Conversation/Semantic/Backstory.json"
+                self.assertIn(relative, manifest["languages"][language])
+                catalog = json.loads(
+                    (repository / "Contents/mods/ProjectHoomans/common/media/translation"
+                     / relative).read_text(encoding="utf-8")
+                )
+                self.assertEqual(set(catalog), self.BACKSTORY_KEYS)
+                self.assertTrue(all(catalog.values()))
+                if language == "TL":
+                    self.assertNotEqual(
+                        catalog["UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal"],
+                        "I'm not ready to talk about that yet.",
+                    )
 
 if __name__ == "__main__":
     unittest.main()
