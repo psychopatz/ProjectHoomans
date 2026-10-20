@@ -74,3 +74,13 @@ C7A–C7G previously marked READY FOR USER LIVE TEST after the archived agent-re
 ## Next mandatory chunk: B4 — NPC Dossier acceptance
 
 Exercise the existing dossier presentation with confirmed/suspected backstory evidence, EN/TL labels, per-player snapshots, and unauthorized-snapshot assertions. Verify no raw backstory truth or undisclosed descriptor crosses the client command boundary, then commit and record the exact source SHA before continuing to B5.
+
+## B4 — ACCEPTED: dossier rendering and client privacy acceptance
+
+- Source commit: `d9ef8f09eb517870d47993502a620b7de956748b` (test-only acceptance extension on top of B3 `2ae41e8ac770c3ab89f6bbddabd7fbfac56638cd`). The existing dossier and snapshot production seams were sufficient; no duplicate UI or truth store was introduced.
+- The acceptance smoke verifies confirmed backstory rows render in the existing descriptor-driven dossier, suspected rows retain uncertainty (`Possibly ...`), EN/TL `labelKey` translation is used, per-player snapshots diverge, and snapshot descriptors contain no identity seed or biography table. Existing client/server presentation code remains snapshot-only.
+- Evidence: `python3 tests/run_tests.py pnc_backstory_knowledge_disclosure_smoke pnc_knowledge_smoke` **2/2**; the complete B3 focused set remains **10/10** and the real worker B0+B2+B3 remains **7/7**.
+
+## Next mandatory chunk: B5 — personal conversation continuity
+
+Exercise ContextState and ResponsePlan continuity across follow-up backstory questions, remembered topics/events, refusal/uncertainty responses, and optional PBrainZ fallback. Verify no fabricated fact or unauthorized raw profile reaches either path; commit and record the exact source SHA before continuing to B6.
