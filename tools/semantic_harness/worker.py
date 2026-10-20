@@ -128,6 +128,27 @@ class LuaSemanticWorker:
             },
         )
 
+    def backstory_fact(
+        self,
+        identity_seed: int,
+        kind: str,
+        tactical_class: str = "colonist",
+        language: str = "EN",
+        npc_id: str = "harness-backstory-npc",
+    ) -> dict[str, Any]:
+        """Resolve one authoritative offline backstory fact in production Lua."""
+
+        return self._request(
+            "BACKSTORY_FACT",
+            {
+                "identitySeed": identity_seed,
+                "kind": kind,
+                "tacticalClass": tactical_class,
+                "language": language,
+                "npcID": npc_id,
+            },
+        )
+
     def flow_catalog(self) -> dict[str, Any]:
         """Read normalized production flow definitions from the Lua registry."""
 

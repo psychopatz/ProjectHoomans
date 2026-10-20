@@ -8,7 +8,7 @@ local capabilities = {
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
     "REPLAY_SEMANTIC_QUEST",
-    "COMMITMENT", "BACKSTORY",
+    "COMMITMENT", "BACKSTORY", "BACKSTORY_FACT",
 }
 
 local function backstorySnapshot(payload)
@@ -48,6 +48,32 @@ local function backstorySnapshot(payload)
             tacticalClass = profile.tacticalClass,
             facts = facts,
         },
+    }
+end
+
+local function backstoryFact(payload)
+    local facts = PNC.Semantics and PNC.Semantics.DialogueFacts
+    local result
+    payload = type(payload) == "table" and payload or {}
+    if not facts or type(facts.Resolve) ~= "function" then
+        return nil, "dialogue_fact_registry_unavailable"
+    end
+    result = facts.Resolve({
+        subject = "NPC_BACKSTORY",
+        slots = { kind = payload.kind or payload.topic },
+    }, nil, {
+        npcRecord = {
+            id = tostring(payload.npcID or "harness-backstory-npc"),
+            tacticalClass = tostring(payload.tacticalClass or "colonist"),
+            identitySeed = payload.identitySeed,
+            identity = { seed = payload.identitySeed },
+        },
+        language = payload.language,
+    })
+    return {
+        ok = true,
+        type = "backstory_fact",
+        fact = result,
     }
 end
 
@@ -127,6 +153,8 @@ function CommandRouter.dispatch(context, request)
         return context.Commitments.dispatch(context, payload)
     elseif command == "BACKSTORY" then
         return backstorySnapshot(payload)
+    elseif command == "BACKSTORY_FACT" then
+        return backstoryFact(payload)
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,

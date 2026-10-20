@@ -287,6 +287,11 @@ function ProductionModules.load(context)
     )
     load(
         "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua",
+        "conversation_memory"
+    )
+    load(
+        "ProjectHoomans", "shared",
         "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Cognition.lua",
         "network"
     )
