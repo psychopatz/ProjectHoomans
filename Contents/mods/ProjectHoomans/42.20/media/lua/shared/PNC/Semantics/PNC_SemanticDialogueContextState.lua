@@ -281,6 +281,7 @@ function Context.New(spec)
         lastIntent = spec.lastIntent,
         lastAction = spec.lastAction,
         lastSpeaker = spec.lastSpeaker,
+        lastBackstoryKind = topicValue(spec.lastBackstoryKind),
         pendingIdentityExchange = spec.pendingIdentityExchange,
         pendingFollowUp = copyValue(spec.pendingFollowUp),
         lastFollowUp = copyValue(spec.lastFollowUp),
@@ -304,6 +305,7 @@ function Context:Reset()
     self.lastIntent = nil
     self.lastAction = nil
     self.lastSpeaker = nil
+    self.lastBackstoryKind = nil
     self.pendingIdentityExchange = nil
     self.pendingFollowUp = nil
     self.lastFollowUp = nil

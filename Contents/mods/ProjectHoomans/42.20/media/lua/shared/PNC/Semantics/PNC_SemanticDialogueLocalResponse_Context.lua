@@ -82,6 +82,7 @@ local function followsQuestionAnswer(context)
             or subject == "NPC_HEALTH_STATE"
             or subject == "NPC_BITE_STATUS"
             or subject == "NPC_KNOWLEDGE"
+            or subject == "NPC_BACKSTORY"
             or topic == "medical"
             or topic == "location"
             or topic == "residence"

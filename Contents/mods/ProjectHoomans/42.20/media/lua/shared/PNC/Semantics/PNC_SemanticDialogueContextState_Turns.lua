@@ -71,6 +71,12 @@ function Context:RecordTurn(ir, options)
         self.lastIntent = ir.intent or ir.speechAct
         self.lastAction = ir.action
         self.lastSpeaker = speaker
+        if ir.subject == "NPC_BACKSTORY" then
+            local slots = type(ir.slots) == "table" and ir.slots or {}
+            self.lastBackstoryKind = Internal.TopicValue(
+                slots.backstoryKind or slots.backstory_kind
+            )
+        end
     elseif speaker ~= nil then
         self.lastSpeaker = speaker
     end

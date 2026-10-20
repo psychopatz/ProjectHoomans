@@ -304,6 +304,80 @@ local function resolveKnowledgeQuestion(ir, state, context)
     return response
 end
 
+local function resolveBackstoryQuestion(ir, state, context)
+    local fact = factFor(ir)
+    local content = fact and (fact.content or fact.value) or nil
+    local kind = fact and fact.kind
+        or ir and ir.slots and ir.slots.backstoryKind or "backstory"
+    local refs = fact and fact.factID and { fact.factID } or {}
+    local response
+    local knownFallback = "Before all this, I was "
+        .. tostring(content or "someone else") .. "."
+    if kind == "hometown" then
+        knownFallback = "I grew up in " .. tostring(content or "there") .. "."
+    elseif kind == "former_job" then
+        knownFallback = "I worked as a "
+            .. tostring(content or "something else") .. " before all this."
+    elseif kind == "education" then
+        knownFallback = "I studied " .. tostring(content or "that") .. "."
+    elseif kind == "hobby" then
+        knownFallback = "I used to enjoy " .. tostring(content or "that") .. "."
+    elseif kind == "family_background" then
+        knownFallback = "My family was " .. tostring(content or "like that") .. "."
+    elseif kind == "fear" then
+        knownFallback = "I have always been afraid of "
+            .. tostring(content or "that") .. "."
+    elseif kind == "tragedy" then
+        knownFallback = "Something happened: "
+            .. tostring(content or "I lost people") .. "."
+    end
+    if fact and fact.status == "known"
+        and type(content) == "string" and content ~= ""
+    then
+        response = factResponse(
+            "semantic.question.backstory.known",
+            knownFallback,
+            "semantic.question.backstory",
+            fact,
+            "NPC_BACKSTORY",
+            refs
+        )
+        response.args = copyArgs({ kind = kind, content = content })
+        return response
+    end
+    if fact and fact.status == "suspected"
+        and type(content) == "string" and content ~= ""
+    then
+        response = factResponse(
+            "semantic.question.backstory.suspected",
+            "I think it was " .. content .. ", but I could be mistaken.",
+            "semantic.question.backstory",
+            fact,
+            "NPC_BACKSTORY",
+            refs
+        )
+        response.uncertainty = "suspected"
+        response.args = copyArgs({ kind = kind, content = content })
+        return response
+    end
+    if fact and fact.status == "ambiguous" then
+        return factResponse(
+            "semantic.question.backstory.ambiguous",
+            "Which part of my past do you mean?",
+            "semantic.question.backstory",
+            fact,
+            "NPC_BACKSTORY"
+        )
+    end
+    return factResponse(
+        "semantic.question.backstory.refusal",
+        "I'm not ready to talk about that yet.",
+        "semantic.question.backstory",
+        fact,
+        "NPC_BACKSTORY"
+    )
+end
+
 local function contextReferenceResponse(
     templateID,
     fallback,
@@ -494,6 +568,38 @@ local function resolveContextReferenceQuestion(ir, state, context)
         )
         fallback.referenceSubject = subject
         return fallback
+    end
+
+    if subject == "NPC_BACKSTORY" then
+        local dialogue = context and (
+            context.semanticContextState or context.semanticDialogueContext
+        ) or nil
+        local kind = dialogue and dialogue.lastBackstoryKind or nil
+        if kind then
+            local derived = derivedQuestion(
+                ir, "NPC_BACKSTORY", state, context
+            )
+            if derived then
+                derived.slots = { backstoryKind = kind }
+                derived.extensions.facts = nil
+                Facts.Annotate(derived, state, context)
+                local response = resolveBackstoryQuestion(
+                    derived, state, context
+                )
+                if response then
+                    response.selectionSource = "conversation_reference"
+                    response.referenceResolution = "dialogue_context"
+                    response.referenceSubject = subject
+                    return response
+                end
+            end
+        end
+        return contextReferenceResponse(
+            "semantic.conversation.context_reference.backstory_unknown",
+            "I'm not sure which part of my past you mean.",
+            "NPC_BACKSTORY",
+            "unknown"
+        )
     end
 
     return contextReferenceResponse(
@@ -772,6 +878,9 @@ return function(ir, state, context)
     end
     if ir.subject == "NPC_KNOWLEDGE" then
         return resolveKnowledgeQuestion(ir, state, context)
+    end
+    if ir.subject == "NPC_BACKSTORY" then
+        return resolveBackstoryQuestion(ir, state, context)
     end
     if ir.subject == "CONTEXT_REFERENCE" then
         return resolveContextReferenceQuestion(ir, state, context)

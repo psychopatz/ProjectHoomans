@@ -70,6 +70,7 @@ function Context:ToContext()
         lastIntent = self.lastIntent,
         lastAction = self.lastAction,
         lastSpeaker = self.lastSpeaker,
+        lastBackstoryKind = self.lastBackstoryKind,
         pendingIdentityExchange = self.pendingIdentityExchange,
         pendingFollowUp = self:GetPendingFollowUp(),
         lastFollowUp = copyValue(self.lastFollowUp),

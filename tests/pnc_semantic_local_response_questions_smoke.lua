@@ -145,6 +145,97 @@ T.truthy(string.find(comfortable.response.templateID,
 T.equal(LocalResponse.Resolve(nil, nil, nil, "QUESTION_RECEIVED"), nil,
     "the public resolver rejects missing IR safely")
 
+local backstoryIR = Semantic.IR.New({
+    rawText = "Where are you from?",
+    normalizedText = "where are you from",
+    intent = "QUESTION",
+    speechAct = "QUESTION",
+    subject = "NPC_BACKSTORY",
+    slots = { backstoryKind = "hometown" },
+    extensions = { facts = { NPC_BACKSTORY = {
+        status = "known",
+        kind = "hometown",
+        factID = "backstory.colonist.hometown.smoke_rosewood",
+        content = "Rosewood",
+        immutable = true,
+    } } },
+    confidence = 0.95,
+})
+local backstoryDecision = Policy.Decide(backstoryIR, nil, {
+    llmEnabled = false,
+})
+T.equal(backstoryDecision.branch, "QUESTION_RECEIVED",
+    "backstory question remains a read-only deterministic response")
+T.truthy(string.find(backstoryDecision.response.fallback,
+    "Rosewood", 1, true),
+    "known backstory fact was not used in the NPC response")
+T.equal(backstoryDecision.response.dialogueAct, "FACT_ANSWER",
+    "known backstory answer did not retain its grounded dialogue act")
+
+local contextState = T.load(
+    "ProjectHoomans", "shared",
+    "PNC/Semantics/PNC_SemanticDialogueContextState.lua"
+)
+local continuity = contextState.New()
+continuity:RecordTurn(backstoryIR, { speaker = "player", timestamp = 1 })
+continuity:RecordNPCResponse({
+    intent = "RESPONSE", speechAct = "ANSWER", subject = "NPC_BACKSTORY",
+    rawText = backstoryDecision.response.fallback,
+    extensions = { topic = "backstory.hometown" },
+}, {
+    speaker = "npc", branch = "QUESTION_RECEIVED",
+    topic = "backstory.hometown", timestamp = 2,
+})
+T.equal(continuity.lastBackstoryKind, "hometown",
+    "context state forgot the last backstory kind")
+
+T.load(
+    "ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticDialogueFacts.lua"
+)
+T.load(
+    "ProjectHoomans", "shared",
+    "PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua"
+)
+local followUp = Semantic.IR.New({
+    rawText = "What about it?",
+    normalizedText = "what about it",
+    intent = "QUESTION",
+    speechAct = "QUESTION",
+    subject = "CONTEXT_REFERENCE",
+    target = { reference = "IT", resolvedReference = "topic" },
+    extensions = {
+        dialogueFollowUp = "CONTEXT_REFERENCE",
+        contextQuestion = "ABOUT",
+    },
+    confidence = 0.95,
+})
+local followResponse = LocalResponse.Resolve(
+    followUp,
+    nil,
+    {
+        semanticContextState = continuity:ToContext(),
+        npcRecord = {},
+        npcKnowledge = {
+            categories = {{
+                id = "history",
+                descriptors = {{
+                    descriptorID = "history.backstory.hometown",
+                    value = "Rosewood",
+                    status = "confirmed",
+                    confidence = 1,
+                    presentation = { backstoryKind = "hometown" },
+                }},
+            }},
+        },
+    },
+    "QUESTION_RECEIVED"
+)
+T.truthy(followResponse, "backstory follow-up response was not produced")
+T.truthy(string.find(followResponse.fallback, "Rosewood", 1, true),
+    "backstory follow-up did not reuse the authorized topic")
+T.equal(followResponse.selectionSource, "conversation_reference",
+    "backstory follow-up bypassed conversation continuity")
+
 PNC = originalPNC
 PsychopatzCore = originalPsychopatzCore
 T.finish("pnc_semantic_local_response_questions_smoke")
