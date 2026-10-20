@@ -6,19 +6,34 @@ import copy
 import re
 from typing import Any
 
-from .compiler import CompileError, compile_semantic_definitions
+from .compiler import (
+    CompileError,
+    DIALOGUE_BACKSTORY_KINDS,
+    DIALOGUE_ID,
+    compile_dialogue_dataset,
+    compile_semantic_definitions,
+)
 
 
 SCHEMA = "semantic.interaction_spec.v1"
 COLLECTION_SCHEMA = "semantic.interaction_collection.v1"
 BLOCK_TYPES = frozenset({
     "language.trigger",
+    "language.backstory_subject",
     "gameplay_actions.capability",
     "dialogue_responses.response_pool",
     "world_facts.engine_fact",
     "conditions.gate",
+    "context.conversation_state",
+    "memory.knowledge",
+    "memory.backstory_fact",
 })
-CONNECTION_TYPES = frozenset({"semantic", "capability", "response", "fact", "gate"})
+CONNECTION_TYPES = frozenset({
+    "semantic", "capability", "response", "fact", "gate", "context", "knowledge",
+})
+BACKSTORY_DISCLOSURES = frozenset({
+    "server_authorized", "confirmed", "suspected", "refused",
+})
 
 
 def _text(value: Any, label: str) -> str:
@@ -102,6 +117,65 @@ def validate_interaction_spec(
                 _text(parameters.get("negativeUtterance"), f"trigger {block_id} negativeUtterance")
             except CompileError as error:
                 diagnostics.append({"severity": "error", "blockID": block_id, "message": str(error)})
+        elif block_type == "language.backstory_subject":
+            kind = parameters.get("backstoryKind")
+            if kind not in DIALOGUE_BACKSTORY_KINDS:
+                diagnostics.append({
+                    "severity": "error", "blockID": block_id,
+                    "message": "backstory subject requires a registered backstoryKind",
+                })
+            if parameters.get("factProvider") != "npc_backstory":
+                diagnostics.append({
+                    "severity": "error", "blockID": block_id,
+                    "message": "backstory subject requires factProvider npc_backstory",
+                })
+            if parameters.get("topicID") != f"backstory.{kind}":
+                diagnostics.append({
+                    "severity": "error", "blockID": block_id,
+                    "message": "backstory subject topicID must match backstoryKind",
+                })
+            if parameters.get("disclosure") not in BACKSTORY_DISCLOSURES:
+                diagnostics.append({
+                    "severity": "error", "blockID": block_id,
+                    "message": "backstory subject requires a supported disclosure state",
+                })
+            follow_up = parameters.get("dialogueFollowUp")
+            if follow_up is not None and follow_up != "CONTEXT_REFERENCE":
+                diagnostics.append({
+                    "severity": "error", "blockID": block_id,
+                    "message": "backstory subject has an unsupported follow-up contract",
+                })
+        elif block_type == "memory.backstory_fact":
+            if parameters.get("providerID") != "npc_backstory":
+                diagnostics.append({
+                    "severity": "error", "blockID": block_id,
+                    "message": "backstory fact requires providerID npc_backstory",
+                })
+            if parameters.get("subject") != "NPC_BACKSTORY":
+                diagnostics.append({
+                    "severity": "error", "blockID": block_id,
+                    "message": "backstory fact requires subject NPC_BACKSTORY",
+                })
+            if parameters.get("authority") not in {"server", "server_authorized"}:
+                diagnostics.append({
+                    "severity": "error", "blockID": block_id,
+                    "message": "backstory fact requires server authority",
+                })
+            if parameters.get("immutable") is not True:
+                diagnostics.append({
+                    "severity": "error", "blockID": block_id,
+                    "message": "backstory fact must be immutable",
+                })
+            if parameters.get("privacy") != "private":
+                diagnostics.append({
+                    "severity": "error", "blockID": block_id,
+                    "message": "backstory fact must use private privacy",
+                })
+        elif block_type in {"context.conversation_state", "memory.knowledge"}:
+            # These are explicit, reusable edges when an authored interaction
+            # opts into follow-up or dossier context.  The production runtime
+            # owns their contents; the spec only records their presence.
+            pass
         elif block_type == "gameplay_actions.capability":
             capability_id = parameters.get("capabilityID")
             action = parameters.get("action")
@@ -146,14 +220,27 @@ def validate_interaction_spec(
     typed = {block_type: 0 for block_type in BLOCK_TYPES}
     for block in block_map.values():
         typed[block["type"]] += 1
-    required = {
-        "language.trigger": "a trigger block",
-        "gameplay_actions.capability": "a capability block",
-        "dialogue_responses.response_pool": "a response-pool block",
-    }
-    for block_type, label in required.items():
-        if typed[block_type] != 1:
-            diagnostics.append({"severity": "error", "message": f"spec requires exactly one {label}"})
+    if typed["language.trigger"] != 1:
+        diagnostics.append({"severity": "error", "message": "spec requires exactly one a trigger block"})
+    if typed["dialogue_responses.response_pool"] != 1:
+        diagnostics.append({"severity": "error", "message": "spec requires exactly one a response-pool block"})
+    has_backstory = typed["language.backstory_subject"] or typed["memory.backstory_fact"]
+    has_action = typed["gameplay_actions.capability"]
+    if has_backstory and has_action:
+        diagnostics.append({
+            "severity": "error",
+            "message": "action and NPC backstory blocks cannot share one interaction spec",
+        })
+    elif has_backstory:
+        if typed["language.backstory_subject"] != 1:
+            diagnostics.append({"severity": "error", "message": "backstory spec requires exactly one backstory subject block"})
+        if typed["memory.backstory_fact"] != 1:
+            diagnostics.append({"severity": "error", "message": "backstory spec requires exactly one backstory fact block"})
+    elif has_action:
+        if has_action != 1:
+            diagnostics.append({"severity": "error", "message": "spec requires exactly one capability block"})
+    else:
+        diagnostics.append({"severity": "error", "message": "spec requires a capability or NPC backstory block"})
     if typed["conditions.gate"] > 1 or typed["world_facts.engine_fact"] > 1:
         diagnostics.append({"severity": "error", "message": "spec supports at most one gate and one engine-fact block"})
     if typed["conditions.gate"] != typed["world_facts.engine_fact"]:
@@ -183,6 +270,11 @@ def validate_interaction_spec(
             expected_type = {
                 ("language.trigger", "gameplay_actions.capability"): "semantic",
                 ("gameplay_actions.capability", "dialogue_responses.response_pool"): "response",
+                ("language.trigger", "language.backstory_subject"): "semantic",
+                ("language.backstory_subject", "memory.backstory_fact"): "fact",
+                ("memory.backstory_fact", "dialogue_responses.response_pool"): "response",
+                ("language.backstory_subject", "context.conversation_state"): "context",
+                ("language.backstory_subject", "memory.knowledge"): "knowledge",
                 ("world_facts.engine_fact", "conditions.gate"): "fact",
                 ("conditions.gate", "gameplay_actions.capability"): "gate",
             }.get((block_map[source]["type"], block_map[target]["type"]))
@@ -190,6 +282,52 @@ def validate_interaction_spec(
                 diagnostics.append({
                     "severity": "error",
                     "message": f"typed connection requires {expected_type}: {source} -> {target}",
+                })
+
+    if has_backstory and all(
+        typed[block_type] == 1
+        for block_type in (
+            "language.trigger", "language.backstory_subject",
+            "memory.backstory_fact", "dialogue_responses.response_pool",
+        )
+    ):
+        required_edges = {
+            (next(block["id"] for block in blocks if block.get("type") == "language.trigger"),
+             next(block["id"] for block in blocks if block.get("type") == "language.backstory_subject"),
+             "semantic"),
+            (next(block["id"] for block in blocks if block.get("type") == "language.backstory_subject"),
+             next(block["id"] for block in blocks if block.get("type") == "memory.backstory_fact"),
+             "fact"),
+            (next(block["id"] for block in blocks if block.get("type") == "memory.backstory_fact"),
+             next(block["id"] for block in blocks if block.get("type") == "dialogue_responses.response_pool"),
+             "response"),
+        }
+        for edge in required_edges:
+            if edge not in seen_connections:
+                diagnostics.append({
+                    "severity": "error",
+                    "message": f"backstory composition is missing typed connection: {edge[0]} -> {edge[1]} ({edge[2]})",
+                })
+    elif not has_backstory and has_action and all(
+        typed[block_type] == 1
+        for block_type in (
+            "language.trigger", "gameplay_actions.capability",
+            "dialogue_responses.response_pool",
+        )
+    ):
+        required_edges = {
+            (next(block["id"] for block in blocks if block.get("type") == "language.trigger"),
+             next(block["id"] for block in blocks if block.get("type") == "gameplay_actions.capability"),
+             "semantic"),
+            (next(block["id"] for block in blocks if block.get("type") == "gameplay_actions.capability"),
+             next(block["id"] for block in blocks if block.get("type") == "dialogue_responses.response_pool"),
+             "response"),
+        }
+        for edge in required_edges:
+            if edge not in seen_connections:
+                diagnostics.append({
+                    "severity": "error",
+                    "message": f"action composition is missing typed connection: {edge[0]} -> {edge[1]} ({edge[2]})",
                 })
 
     return {
@@ -220,8 +358,18 @@ def compile_interaction_spec(
     if not validation["valid"]:
         return {**validation, "compiled": None, "sourceDocument": None}
     trigger = next(block for block in spec["blocks"] if block["type"] == "language.trigger")
-    capability = next(block for block in spec["blocks"] if block["type"] == "gameplay_actions.capability")
     response = next(block for block in spec["blocks"] if block["type"] == "dialogue_responses.response_pool")
+    backstory = next(
+        (block for block in spec["blocks"] if block["type"] == "language.backstory_subject"),
+        None,
+    )
+    backstory_fact = next(
+        (block for block in spec["blocks"] if block["type"] == "memory.backstory_fact"),
+        None,
+    )
+    if backstory is not None and backstory_fact is not None:
+        return _compile_backstory_interaction(spec, base_document, trigger, backstory, backstory_fact, response)
+    capability = next(block for block in spec["blocks"] if block["type"] == "gameplay_actions.capability")
     fact_block = next(
         (block for block in spec["blocks"] if block["type"] == "world_facts.engine_fact"),
         None,
@@ -306,6 +454,126 @@ def compile_interaction_spec(
         "patternID": pattern_id,
         "flowID": f"{definition_id}.flow",
         "responsePoolID": pool_id,
+        "writes": [],
+    }
+
+
+def _compile_backstory_interaction(
+    spec: dict[str, Any],
+    base_document: dict[str, Any],
+    trigger: dict[str, Any],
+    subject: dict[str, Any],
+    fact_block: dict[str, Any],
+    response: dict[str, Any],
+) -> dict[str, Any]:
+    """Compile typed backstory blocks into the existing dialogue dataset."""
+
+    trigger_parameters = _parameters(trigger)
+    subject_parameters = _parameters(subject)
+    fact_parameters = _parameters(fact_block)
+    response_parameters = _parameters(response)
+    definition_id = _text(spec["id"], "spec id")
+    utterance = _text(trigger_parameters["utterance"], "utterance")
+    slug = re.sub(r"[^a-z0-9]+", "_", utterance.lower()).strip("_") or "utterance"
+    pattern_id = f"{definition_id}.{slug}"
+    pool_id = _text(response_parameters["poolID"], "response poolID")
+    kind = subject_parameters["backstoryKind"]
+    frame = {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "NPC_BACKSTORY",
+        "slots": {"backstoryKind": kind},
+        "extensions": {
+            "disclosure": subject_parameters["disclosure"],
+            "factProvider": fact_parameters["providerID"],
+            "topicID": subject_parameters["topicID"],
+        },
+    }
+    follow_up = subject_parameters.get("dialogueFollowUp")
+    if follow_up:
+        frame["extensions"]["dialogueFollowUp"] = follow_up
+
+    source_document = copy.deepcopy(base_document)
+
+    variants: list[dict[str, Any]] = []
+    for raw_variant in response_parameters["variants"]:
+        variant_id = _text(raw_variant.get("id"), "response variant id")
+        safe_variant_id = re.sub(r"[^a-z0-9_.-]+", "_", variant_id.lower()).strip("_.-") or "response"
+        canonical_variant_id = (
+            safe_variant_id if safe_variant_id.startswith(pool_id + ".")
+            else f"{pool_id}.{safe_variant_id}"
+        )
+        template_id = _text(
+            raw_variant.get("key") or raw_variant.get("templateID"),
+            "response variant key",
+        )
+        english = _text(raw_variant.get("en"), "response variant en")
+        tagalog = _text(raw_variant.get("tl"), "response variant tl")
+        translation_args = raw_variant.get("translationArgs")
+        if translation_args is None:
+            translation_args = {"content": "fact_content"}
+        variants.append({
+            "id": canonical_variant_id,
+            "templateID": template_id,
+            "fallback": english,
+            "en": english,
+            "tl": tagalog,
+            "translationArgs": copy.deepcopy(translation_args),
+        })
+
+    source_name = str(
+        ((source_document.get("source") or {}).get("references") or [{}])[0].get(
+            "name", "Semantic Lab Authoring"
+        )
+    )
+    pattern = {
+        "id": pattern_id,
+        "utterance": utterance,
+        "emit": frame,
+        "reviewed": True,
+        "sourceRefs": [source_name],
+        "confidence": spec.get("confidence", 0.99),
+        "priority": spec.get("priority", 150),
+        "mapping": {
+            "canonicalConcept": "NPC_BACKSTORY",
+            "dialogueState": "BACKSTORY_QUESTION",
+            "sourceRefs": [source_name],
+        },
+        "negatives": [_text(trigger_parameters["negativeUtterance"], "negativeUtterance")],
+    }
+    patterns = [
+        item for item in source_document.get("patterns", [])
+        if isinstance(item, dict) and item.get("id") != pattern_id
+    ]
+    patterns.append(pattern)
+    pools = [
+        item for item in source_document.get("responsePools", [])
+        if isinstance(item, dict) and item.get("id") != pool_id
+    ]
+    pools.append({"id": pool_id, "variants": variants})
+    source_document["patterns"] = patterns
+    source_document["responsePools"] = pools
+    try:
+        compiled = compile_dialogue_dataset(source_document)
+    except CompileError as error:
+        return {
+            "ok": False,
+            "valid": False,
+            "compiled": None,
+            "sourceDocument": source_document,
+            "diagnostics": [{"severity": "error", "message": str(error)}],
+            "writes": [],
+        }
+    return {
+        "ok": True,
+        "valid": True,
+        "compiled": compiled,
+        "sourceDocument": source_document,
+        "definitionID": definition_id,
+        "patternID": pattern_id,
+        "responsePoolID": pool_id,
+        "typedSubject": kind,
+        "factProvider": fact_parameters["providerID"],
         "writes": [],
     }
 

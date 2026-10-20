@@ -651,13 +651,19 @@ class SemanticHarnessApp:
         )
         self.restart()
 
-    def generate_workflow(self, source_id: str, block_ids: list[str]) -> None:
+    def generate_workflow(
+        self,
+        source_id: str,
+        block_ids: list[str],
+        interaction_spec: dict[str, Any] | None = None,
+    ) -> None:
         """Generate the approved in-app workflow through the shared service."""
         report = self.authoring_service.generate_workflow(
             source_id,
             block_ids,
             approved=True,
             production_catalog=self._production_catalog,
+            interaction_spec=interaction_spec,
         )
         self.workflow_pane.show_generation(report)
         self._set_text(self.inspector, pretty(report))

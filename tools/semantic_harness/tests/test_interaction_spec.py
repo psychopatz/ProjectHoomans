@@ -66,6 +66,74 @@ def stay_spec() -> dict:
     }
 
 
+def backstory_spec(
+    *,
+    spec_id: str = "pnc.lab.former_job",
+    utterance: str = "what was your profession",
+    kind: str = "former_job",
+    pool_id: str = "semantic.lab.former_job",
+    key: str = "UI_PNC_Conversation_Semantic_LabFormerJob",
+    english: str = "I worked as %1 before all this.",
+    tagalog: str = "Nagtrabaho ako bilang %1 bago ang lahat ng ito.",
+) -> dict:
+    return {
+        "schema": "semantic.interaction_spec.v1",
+        "id": spec_id,
+        "owner": "SemanticLab",
+        "blocks": [
+            {
+                "id": "trigger",
+                "type": "language.trigger",
+                "parameters": {
+                    "utterance": utterance,
+                    "negativeUtterance": "do not ask about my past",
+                    "frame": {"intent": "QUESTION", "speechAct": "QUESTION"},
+                },
+            },
+            {
+                "id": "backstory",
+                "type": "language.backstory_subject",
+                "parameters": {
+                    "backstoryKind": kind,
+                    "factProvider": "npc_backstory",
+                    "topicID": f"backstory.{kind}",
+                    "disclosure": "server_authorized",
+                },
+            },
+            {
+                "id": "fact",
+                "type": "memory.backstory_fact",
+                "parameters": {
+                    "providerID": "npc_backstory",
+                    "subject": "NPC_BACKSTORY",
+                    "authority": "server",
+                    "immutable": True,
+                    "privacy": "private",
+                },
+            },
+            {
+                "id": "response",
+                "type": "dialogue_responses.response_pool",
+                "parameters": {
+                    "poolID": pool_id,
+                    "variants": [{
+                        "id": "answer",
+                        "key": key,
+                        "en": english,
+                        "tl": tagalog,
+                        "translationArgs": {"content": "fact_content"},
+                    }],
+                },
+            },
+        ],
+        "connections": [
+            {"from": "trigger", "to": "backstory", "type": "semantic"},
+            {"from": "backstory", "to": "fact", "type": "fact"},
+            {"from": "fact", "to": "response", "type": "response"},
+        ],
+    }
+
+
 class InteractionSpecTests(unittest.TestCase):
     @staticmethod
     def gated_collection() -> dict:
@@ -218,6 +286,97 @@ class InteractionSpecTests(unittest.TestCase):
         self.assertFalse(report["ok"])
         self.assertFalse(report["generationApproved"])
         self.assertEqual(report["writes"], [])
+
+    def test_backstory_blocks_control_grounded_dialogue_dataset(self) -> None:
+        service = SemanticLabAuthoringService(repository=REPOSITORY)
+        former_job = service.preview_interaction_spec(
+            backstory_spec(), source_id="grounded_personal_dialogue",
+        )
+        hometown = service.preview_interaction_spec(
+            backstory_spec(
+                spec_id="pnc.lab.hometown",
+                utterance="where did you live before",
+                kind="hometown",
+                pool_id="semantic.lab.hometown",
+                key="UI_PNC_Conversation_Semantic_LabHometown",
+                english="I grew up in %1.",
+                tagalog="Lumaki ako sa %1.",
+            ),
+            source_id="grounded_personal_dialogue",
+        )
+        self.assertTrue(former_job["ok"], former_job)
+        self.assertTrue(hometown["ok"], hometown)
+        self.assertNotEqual(
+            former_job["generatedSourceFingerprint"],
+            hometown["generatedSourceFingerprint"],
+        )
+        self.assertNotEqual(
+            former_job["sourceDocument"]["patterns"][-1]["emit"],
+            hometown["sourceDocument"]["patterns"][-1]["emit"],
+        )
+        self.assertTrue(any(
+            "UI_PNC_Conversation_Semantic_LabFormerJob" in item["source"]
+            for item in former_job["generatedLua"]
+        ))
+        self.assertTrue(any(
+            "UI_PNC_Conversation_Semantic_LabHometown" in item["source"]
+            for item in hometown["generatedLua"]
+        ))
+
+    def test_backstory_workflow_rejects_missing_typed_edge(self) -> None:
+        service = SemanticLabAuthoringService(repository=REPOSITORY)
+        spec = backstory_spec()
+        spec["connections"].pop()
+        report = service.preview_interaction_spec(
+            spec, source_id="grounded_personal_dialogue",
+        )
+        self.assertFalse(report["ok"])
+        self.assertEqual(report["writes"], [])
+        self.assertTrue(any("missing typed connection" in item["message"]
+                            for item in report["diagnostics"]))
+
+    def test_backstory_generation_writes_real_lua_and_en_tl_assets(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            source_path = repository / "tools/semantic_compiler/grounded_personal_dialogue.json"
+            source_path.parent.mkdir(parents=True)
+            source_path.write_text(
+                (REPOSITORY / "tools/semantic_compiler/grounded_personal_dialogue.json")
+                .read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            service = SemanticLabAuthoringService(repository=repository, runtime_root=REPOSITORY)
+            spec = backstory_spec()
+            preview = service.preview_interaction_spec(
+                spec, source_id="grounded_personal_dialogue",
+            )
+            self.assertTrue(preview["ok"], preview)
+            self.assertTrue(preview["previewOnly"])
+            self.assertEqual(preview["writes"], [])
+            generated = service.generate_interaction_spec(
+                spec, approved=True, source_id="grounded_personal_dialogue",
+            )
+            self.assertTrue(generated["ok"], generated)
+            self.assertTrue(generated["generationApproved"])
+            self.assertTrue(any(path.endswith("PNC_SemanticGroundedPersonalDialogue.lua")
+                                for path in generated["writes"]))
+            self.assertTrue(any(path.endswith("EN/Conversation/Semantic/GroundedPersonalDialogue.json")
+                                for path in generated["writes"]))
+            self.assertTrue(any(path.endswith("TL/Conversation/Semantic/GroundedPersonalDialogue.json")
+                                for path in generated["writes"]))
+            first_bytes = {
+                Path(path).relative_to(repository): Path(path).read_bytes()
+                for path in generated["writes"]
+            }
+            second = service.generate_interaction_spec(
+                spec, approved=True, source_id="grounded_personal_dialogue",
+            )
+            self.assertTrue(second["ok"], second)
+            self.assertEqual(
+                first_bytes,
+                {Path(path).relative_to(repository): Path(path).read_bytes()
+                 for path in second["writes"]},
+            )
 
 
 if __name__ == "__main__":

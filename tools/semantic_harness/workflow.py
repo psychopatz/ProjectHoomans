@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import Any, Callable
 
 from .codebuilder.service import SemanticLabAuthoringService
@@ -20,7 +21,7 @@ class SemanticLabWorkflowPane:
         messagebox: Any,
         service: SemanticLabAuthoringService,
         *,
-        on_generate: Callable[[str, list[str]], Any],
+        on_generate: Callable[[str, list[str], dict[str, Any] | None], Any],
         on_inspect: Callable[[], Any],
     ) -> None:
         self._tk = tk
@@ -35,6 +36,7 @@ class SemanticLabWorkflowPane:
         self._last_preview: dict[str, Any] | None = None
         self._preview_key: str | None = None
         self._approved_key: str | None = None
+        self._last_spec: dict[str, Any] | None = None
 
         self.frame = ttk.Frame(parent, padding=8)
         self.frame.grid(row=0, column=0, sticky="nsew")
@@ -44,6 +46,13 @@ class SemanticLabWorkflowPane:
 
         self._source_var = tk.StringVar()
         self._query_var = tk.StringVar()
+        self._spec_id_var = tk.StringVar(value="pnc.lab.former_job")
+        self._utterance_var = tk.StringVar(value="what was your old job")
+        self._negative_var = tk.StringVar(value="do not ask about my old job")
+        self._kind_var = tk.StringVar(value="former_job")
+        self._pool_var = tk.StringVar(value="semantic.lab.former_job")
+        self._english_var = tk.StringVar(value="I worked as %1 before all this.")
+        self._tagalog_var = tk.StringVar(value="Nagtrabaho ako bilang %1 bago ang lahat ng ito.")
         self._status_var = tk.StringVar(value="Select a canonical dataset to begin.")
 
         toolbar = ttk.Frame(self.frame)
@@ -82,6 +91,24 @@ class SemanticLabWorkflowPane:
         block_scroll = ttk.Scrollbar(left, orient="vertical", command=self._block_list.yview)
         block_scroll.grid(row=0, column=1, sticky="ns")
         self._block_list.configure(yscrollcommand=block_scroll.set)
+
+        parameters = ttk.LabelFrame(left, text="Grounded interaction parameters")
+        parameters.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(6, 0))
+        parameters.columnconfigure(1, weight=1)
+        self._add_entry(parameters, 0, "Spec ID", self._spec_id_var)
+        self._add_entry(parameters, 1, "Utterance", self._utterance_var)
+        self._add_entry(parameters, 2, "Negative utterance", self._negative_var)
+        ttk.Label(parameters, text="Backstory kind").grid(row=3, column=0, sticky="w", padx=6, pady=2)
+        self._kind_box = ttk.Combobox(
+            parameters,
+            textvariable=self._kind_var,
+            state="readonly",
+            values=("former_job", "hometown", "education", "hobby", "family_background", "value", "survival_origin", "fear", "tragedy", "date_of_birth"),
+        )
+        self._kind_box.grid(row=3, column=1, sticky="ew", padx=(0, 6), pady=2)
+        self._add_entry(parameters, 4, "Response pool", self._pool_var)
+        self._add_entry(parameters, 5, "EN response", self._english_var)
+        self._add_entry(parameters, 6, "TL response", self._tagalog_var)
 
         right = ttk.LabelFrame(self.frame, text="Workflow contract and generated-source preview")
         right.grid(row=2, column=1, sticky="nsew")
@@ -135,6 +162,7 @@ class SemanticLabWorkflowPane:
             {
                 "datasetID": self._source_var.get().strip(),
                 "blockIDs": self._selected_block_ids(),
+                "spec": self._compose_spec(raise_errors=False),
             },
             sort_keys=True,
         )
@@ -142,10 +170,83 @@ class SemanticLabWorkflowPane:
     def _selected_block_ids(self) -> list[str]:
         return [self._blocks[index]["id"] for index in self._block_list.curselection()]
 
+    def _compose_spec(self, *, raise_errors: bool = True) -> dict[str, Any] | None:
+        """Materialize the selected block graph into the existing spec contract."""
+
+        source_id = self._source_var.get().strip()
+        selected = [self._blocks[index] for index in self._block_list.curselection()]
+        selected_types = [str(block.get("id")) for block in selected]
+        required = {
+            "language.trigger": "trigger",
+            "language.backstory_subject": "backstory subject",
+            "memory.backstory_fact": "backstory fact",
+            "dialogue_responses.response_pool": "response pool",
+        }
+        if source_id == "grounded_personal_dialogue":
+            missing = [label for block_id, label in required.items() if selected_types.count(block_id) != 1]
+            if missing:
+                if raise_errors:
+                    raise ValueError(
+                        "grounded dialogue requires exactly one selected " + ", ".join(missing)
+                    )
+                return None
+            kind = self._kind_var.get().strip()
+            slug = re.sub(r"[^a-z0-9]+", "_", self._spec_id_var.get().strip().lower()).strip("_")
+            if not slug:
+                if raise_errors:
+                    raise ValueError("Spec ID is required")
+                return None
+            return {
+                "schema": "semantic.interaction_spec.v1",
+                "id": self._spec_id_var.get().strip(),
+                "owner": "SemanticLab",
+                "blocks": [
+                    {"id": "trigger", "type": "language.trigger", "parameters": {
+                        "utterance": self._utterance_var.get().strip(),
+                        "negativeUtterance": self._negative_var.get().strip(),
+                        "frame": {"intent": "QUESTION", "speechAct": "QUESTION"},
+                    }},
+                    {"id": "backstory", "type": "language.backstory_subject", "parameters": {
+                        "backstoryKind": kind,
+                        "factProvider": "npc_backstory",
+                        "topicID": f"backstory.{kind}",
+                        "disclosure": "server_authorized",
+                    }},
+                    {"id": "fact", "type": "memory.backstory_fact", "parameters": {
+                        "providerID": "npc_backstory",
+                        "subject": "NPC_BACKSTORY",
+                        "authority": "server",
+                        "immutable": True,
+                        "privacy": "private",
+                    }},
+                    {"id": "response", "type": "dialogue_responses.response_pool", "parameters": {
+                        "poolID": self._pool_var.get().strip(),
+                        "variants": [{
+                            "id": "answer",
+                            "key": "UI_PNC_Conversation_Semantic_Lab" + "".join(word.title() for word in slug.split("_")),
+                            "en": self._english_var.get().strip(),
+                            "tl": self._tagalog_var.get().strip(),
+                            "translationArgs": {"content": "fact_content"},
+                        }],
+                    }},
+                ],
+                "connections": [
+                    {"from": "trigger", "to": "backstory", "type": "semantic"},
+                    {"from": "backstory", "to": "fact", "type": "fact"},
+                    {"from": "fact", "to": "response", "type": "response"},
+                ],
+            }
+        if raise_errors:
+            raise ValueError(
+                "select Grounded personal dialogue and its trigger, backstory subject, backstory fact, and response-pool blocks"
+            )
+        return None
+
     def _selection_changed(self) -> None:
         self._last_preview = None
         self._preview_key = None
         self._approved_key = None
+        self._last_spec = None
         self._status_var.set(f"Selected {self._source_var.get().strip()}; compose blocks and validate.")
 
     def refresh(self) -> None:
@@ -189,6 +290,20 @@ class SemanticLabWorkflowPane:
             self._selected_block_ids(),
             production_catalog=self._production_catalog,
         )
+        try:
+            spec = self._compose_spec()
+            composition = self.service.validate_interaction_spec(
+                spec,
+                production_catalog=self._production_catalog,
+            )
+            report["composition"] = composition
+            report["ok"] = report.get("ok") is True and composition.get("ok") is True
+            report.setdefault("diagnostics", []).extend(composition.get("diagnostics", []))
+            self._last_spec = spec
+        except ValueError as error:
+            report["ok"] = False
+            report.setdefault("diagnostics", []).append({"severity": "error", "message": str(error)})
+            self._last_spec = None
         self._set_report(report)
         self._last_preview = None
         self._preview_key = None
@@ -204,11 +319,27 @@ class SemanticLabWorkflowPane:
         if not source_id:
             self._status_var.set("Select a generation-ready dataset first")
             return None
-        report = self.service.preview_workflow(
-            source_id,
-            self._selected_block_ids(),
-            production_catalog=self._production_catalog,
-        )
+        try:
+            spec = self._compose_spec()
+        except ValueError as error:
+            report = {
+                "ok": False,
+                "type": "semantic_lab_workflow_preview",
+                "workflow": {"datasetID": source_id, "blockIDs": self._selected_block_ids()},
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "previewOnly": True,
+                "effectFree": True,
+                "writes": [],
+            }
+            spec = None
+        else:
+            report = self.service.preview_workflow(
+                source_id,
+                self._selected_block_ids(),
+                production_catalog=self._production_catalog,
+                interaction_spec=spec,
+            )
+        self._last_spec = spec
         self._set_report(report)
         self._last_preview = report
         self._preview_key = self._selection_key()
@@ -242,7 +373,11 @@ class SemanticLabWorkflowPane:
         if self._approved_key != self._selection_key():
             self._status_var.set("Approve the current generated-source preview first")
             return
-        self._on_generate(self._source_var.get().strip(), self._selected_block_ids())
+        self._on_generate(
+            self._source_var.get().strip(),
+            self._selected_block_ids(),
+            self._last_spec,
+        )
 
     def show_generation(self, report: dict[str, Any]) -> None:
         self._set_report(report)

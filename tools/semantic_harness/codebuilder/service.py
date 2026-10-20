@@ -19,6 +19,8 @@ from .codeblocks import validate_codeblock_document
 from .compiler import CompileError
 from .compiler import (
     discover_registered_capability_ids,
+    render_dialogue_lua,
+    render_dialogue_lua_shards,
     render_semantic_lua_shards,
     render_semantic_manifest,
 )
@@ -459,6 +461,51 @@ class SemanticLabAuthoringService:
             "generatedPaths": list(expected_sources),
         }
 
+    def _dialogue_preview_artifacts(
+        self,
+        compiled: dict[str, Any],
+        source_document: dict[str, Any],
+        source_path: Path,
+    ) -> dict[str, Any]:
+        """Expose grounded-dialogue source and real asset diffs effect-free."""
+
+        source_relative = str(source_path.resolve().relative_to(self.repository))
+        source_text = json.dumps(source_document, ensure_ascii=False, indent=2) + "\n"
+        generated_paths, artifacts, artifact_diffs = authoring._dialogue_preview_paths(
+            compiled,
+            self.repository,
+            source_path,
+        )
+        asset_stem = authoring._dialogue_asset_stem(source_path)
+        module_prefix = "PNC/Semantics/PNC_Semantic" + asset_stem
+        rendered = render_dialogue_lua_shards(compiled, module_prefix)
+        pattern_modules = [module for module, _source in rendered if "_Patterns_" in module]
+        response_modules = [module for module, _source in rendered if "_Responses_" in module]
+        entry_module = module_prefix
+        generated_lua = [{
+            "module": entry_module,
+            "sha256": hashlib.sha256(
+                render_dialogue_lua(compiled, pattern_modules, response_modules).encode("utf-8")
+            ).hexdigest(),
+            "source": render_dialogue_lua(compiled, pattern_modules, response_modules),
+        }]
+        generated_lua.extend({
+            "module": module,
+            "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
+            "source": source,
+        } for module, source in rendered)
+        return {
+            "canonicalSourceDiff": authoring._artifact_diff(
+                self.repository,
+                source_relative,
+                source_text,
+            ),
+            "generatedArtifactDiffs": artifact_diffs,
+            "generatedArtifacts": artifacts,
+            "generatedPaths": generated_paths,
+            "generatedLua": generated_lua,
+        }
+
     def preview_interaction_spec(
         self,
         spec: dict[str, Any],
@@ -469,7 +516,7 @@ class SemanticLabAuthoringService:
         """Compile one canonical typed spec without writing or reloading Lua."""
 
         source_spec = self._dataset_spec(source_id)
-        if source_spec["kind"] != "semantic":
+        if source_spec["kind"] not in {"semantic", "dialogue"}:
             return {
                 "ok": False,
                 "valid": False,
@@ -477,7 +524,7 @@ class SemanticLabAuthoringService:
                 "sourceID": source_id,
                 "diagnostics": [{
                     "severity": "error",
-                    "message": f"interaction specs require a semantic source, not {source_id}",
+                    "message": f"interaction specs require a generated semantic/dialogue source, not {source_id}",
                 }],
                 "previewOnly": True,
                 "effectFree": True,
@@ -492,7 +539,11 @@ class SemanticLabAuthoringService:
             registered_capability_ids=registered,
         )
         report.update({
-            "type": "semantic_interaction_spec_preview",
+            "type": (
+                "semantic_interaction_spec_preview"
+                if source_spec["kind"] == "semantic"
+                else "dialogue_interaction_spec_preview"
+            ),
             "sourceID": source_id,
             "sourcePath": str(source_spec["path"]),
             "previewOnly": True,
@@ -502,33 +553,44 @@ class SemanticLabAuthoringService:
         compiled = report.get("compiled")
         if not isinstance(compiled, dict):
             return report
-        rendered = render_semantic_lua_shards(
-            compiled,
-            "PNC/Semantics/PNC_SemanticGeneratedDefinitions",
-        )
-        report["generatedLua"] = [
-            {
-                "module": module,
-                "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
-                "source": source,
-            }
-            for module, source in rendered
-        ]
-        report["generatedSourceFingerprint"] = hashlib.sha256(
-            "\n".join(source for _module, source in rendered).encode("utf-8")
-        ).hexdigest()
-        report["compiledSummary"] = {
-            "patternIDs": [item["id"] for item in compiled["patterns"]],
-            "flowIDs": [item["id"] for item in compiled["flows"]],
-            "responsePoolIDs": [item["id"] for item in compiled["responsePools"]],
-        }
-        report.update(
-            self._semantic_preview_artifacts(
+        if source_spec["kind"] == "semantic":
+            rendered = render_semantic_lua_shards(
+                compiled,
+                "PNC/Semantics/PNC_SemanticGeneratedDefinitions",
+            )
+            report["generatedLua"] = [
+                {
+                    "module": module,
+                    "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
+                    "source": source,
+                }
+                for module, source in rendered
+            ]
+            report["generatedSourceFingerprint"] = hashlib.sha256(
+                "\n".join(source for _module, source in rendered).encode("utf-8")
+            ).hexdigest()
+            report.update(
+                self._semantic_preview_artifacts(
+                    compiled,
+                    report["sourceDocument"],
+                    self._dataset_path(source_id),
+                )
+            )
+        else:
+            artifact_report = self._dialogue_preview_artifacts(
                 compiled,
                 report["sourceDocument"],
                 self._dataset_path(source_id),
             )
-        )
+            report.update(artifact_report)
+            report["generatedSourceFingerprint"] = hashlib.sha256(
+                "\n".join(item["source"] for item in artifact_report["generatedLua"]).encode("utf-8")
+            ).hexdigest()
+        report["compiledSummary"] = {
+            "patternIDs": [item["id"] for item in compiled["patterns"]],
+            "flowIDs": [item["id"] for item in compiled.get("flows", [])],
+            "responsePoolIDs": [item["id"] for item in compiled["responsePools"]],
+        }
         return report
 
     def generate_interaction_spec(
@@ -566,7 +628,7 @@ class SemanticLabAuthoringService:
                 "type": "semantic_interaction_spec_generation",
                 "generationApproved": False,
             }
-        from .build import write_semantic_output
+        from .build import write_dialogue_output, write_semantic_output
 
         canonical = self.write_dataset_document(source_id, preview["sourceDocument"])
         if canonical.get("ok") is not True:
@@ -579,7 +641,15 @@ class SemanticLabAuthoringService:
                 "writes": [],
             }
         writes = [Path(path) for path in canonical.get("writes", [])]
-        writes.extend(write_semantic_output(self.repository, preview["compiled"]))
+        if self._dataset_spec(source_id)["kind"] == "semantic":
+            writes.extend(write_semantic_output(self.repository, preview["compiled"]))
+        else:
+            output = authoring._dialogue_output_path(
+                self._dataset_path(source_id),
+                self.repository,
+            )
+            output.parent.mkdir(parents=True, exist_ok=True)
+            writes.extend(write_dialogue_output(output, preview["compiled"]))
         post_write = self.preview_interaction_spec(
             spec,
             source_id=source_id,

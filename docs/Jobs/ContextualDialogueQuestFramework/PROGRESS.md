@@ -2,9 +2,9 @@
 
 **Updated:** 2026-10-20
 
-**Parent status:** **READY FOR USER LIVE TEST — H0–H4 developer implementation and integrated acceptance complete on local `main`.**
+**Parent status:** **IN PROGRESS — F1–F4 product acceptance remains open. H0–H4 is preserved as historical implementation evidence.**
 
-**Current chunk:** H4 complete — final integrated regression reconciliation and acceptance audit passed.
+**Current chunk:** F1 CodeBuilder/Workflow composition wiring — accepted locally; next chunk is F2 authorized fact localization and worker trace correction.
 
 ## Repository and dependency evidence
 
@@ -74,4 +74,12 @@ Next mandatory chunk: run the complete Python harness, relevant full Lua suite, 
 - Static/regression checks: changed Lua `luac5.3 -p`, changed Python `python3 -m py_compile`, production changed-file `pz_verify.py --kahlua --severity ERROR --no-snippets`, and `git diff --check` all exit 0.
 - Acceptance behavior remains verified through the existing worker: EN/TL full NPC sentences, Core-backed translation keys and typed arguments, disclosure/refusal, player-scoped Knowledge/Dossier, follow-up context, suspected-evidence preservation, sparse persistence metrics, and optional PBrainZ filtering. Native Project Zomboid SP/MP and Workshop testing remain user-owned.
 
-**Next mandatory chunk:** none for developer implementation. User-owned native Project Zomboid SP/MP, Workshop installation, and live gameplay validation remain outside this agent's scope. No remote integration or push is claimed.
+**F1 bounded chunk accepted (2026-10-20):**
+
+- Extended the existing `semantic.interaction_spec.v1` contract with typed NPC backstory subject/fact/provider blocks, private server authority, localized typed response arguments, and required semantic/fact/response edges. Existing action specs remain compatible.
+- Updated the existing `SemanticLabAuthoringService` and workflow pane so selected backstory blocks materialize a canonical `grounded_personal_dialogue` definition. Preview remains effect-free; approved generation uses the existing dialogue compiler/writer and actual Project Zomboid Lua, EN/TL, and manifest paths.
+- Added regression proof that former-job and hometown block compositions produce different canonical definitions, fingerprints, Lua/translation artifacts, and rejection of incomplete typed graphs. Temp-repository generation was byte-stable across regeneration.
+- Source SHA before chunk: `4b4fcd675a6a41d729d53b05a646bd3b3625a5f6`. Tests: `python3 -m unittest tools.semantic_harness.tests.test_interaction_spec tools.semantic_harness.tests.test_codebuilder_consolidation tools.semantic_harness.tests.test_grounded_personal_dialogue_h2 tools.semantic_harness.tests.test_grounded_personal_dialogue_h3 -q` — `30 tests OK`; changed Python compiled; `git diff --check` — all exit 0.
+- Native Tk/X11 GUI surface is not exposed to the available CUA session (`getState` reported no apps), so graphical interaction evidence remains open; the GUI code path is covered by compilation and service contracts only.
+
+**Next mandatory chunk:** F2 authorized fact localization — pass the bounded authorized NPC record through the existing worker/semantic context without exposing generator truth, format localized fact content through `Memory.GetBackstoryText`/Core translation, and update the real-worker TL acceptance from `farmer` to `magsasaka`.
