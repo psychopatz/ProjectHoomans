@@ -15,6 +15,32 @@ return {
             },
         },
     {
+            ["id"] = "semantic.question.backstory.follow_up.location",
+            ["variants"] = {
+                {
+                    ["fallback"] = "I remember that part of my life, but I don't have more detail about where it was.",
+                    ["id"] = "semantic.question.backstory.follow_up.location.generated",
+                    ["metadata"] = {
+                        ["translationKey"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation",
+                    },
+                    ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation",
+                },
+            },
+        },
+    {
+            ["id"] = "semantic.question.backstory.follow_up.miss",
+            ["variants"] = {
+                {
+                    ["fallback"] = "Sometimes. I still think about that part of my life.",
+                    ["id"] = "semantic.question.backstory.follow_up.miss.generated",
+                    ["metadata"] = {
+                        ["translationKey"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss",
+                    },
+                    ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss",
+                },
+            },
+        },
+    {
             ["id"] = "semantic.question.backstory.known",
             ["variants"] = {
                 {

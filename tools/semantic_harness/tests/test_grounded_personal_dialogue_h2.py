@@ -28,12 +28,12 @@ class GroundedPersonalDialogueH2Tests(unittest.TestCase):
         self.assertTrue(report["previewOnly"])
         self.assertTrue(report["effectFree"])
         self.assertEqual(report["writes"], [])
-        self.assertEqual(report["patternCount"], 5)
-        self.assertEqual(report["responsePoolCount"], 11)
-        self.assertEqual(report["translationCounts"], {"EN": 11, "TL": 11})
+        self.assertEqual(report["patternCount"], 7)
+        self.assertEqual(report["responsePoolCount"], 13)
+        self.assertEqual(report["translationCounts"], {"EN": 13, "TL": 13})
         self.assertEqual(
             report["candidateReview"]["summary"],
-            {"approved": 5, "rejected": 0, "not_candidate": 11},
+            {"approved": 7, "rejected": 0, "not_candidate": 13},
         )
         self.assertIn(
             "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/"
