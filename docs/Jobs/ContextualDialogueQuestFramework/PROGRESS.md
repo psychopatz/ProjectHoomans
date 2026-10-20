@@ -1,46 +1,55 @@
 # Contextual Dialogue & Quest Framework — Current Progress
 
-**Updated:** 2026-10-20. **Documentation-only planning update on existing `main`; NO production code changes or new tests performed in this update.**
-**PARENT STATUS:** **IN PROGRESS — H0–H4 REQUIRED. NOT READY FOR USER LIVE TEST under the full authoring/translation/Knowledge/Dossier contract.**
-**EXACTLY ONE CURRENT EXECUTION CHUNK:** **H0 — complete real-worker conversation and authoring baseline trace.** The worker-envelope repair below is accepted, but H0 remains open until the required grounded EN/TL, disclosure, dossier, follow-up and refusal observations are captured through the existing Semantic Lab.
+**Updated:** 2026-10-20
 
-## Verified remote source baseline
+**Parent status:** **IN PROGRESS — H0–H4 required; not ready for user live test.**
 
-- Hoomans `main` before these docs: `baec079e9718606f8510f72fb129f4cd82ae24db`; no `docs/Jobs/ContextualDialogueQuestFramework/` directory at that checkpoint.
-- EXISTING old development branch `docs/contextual-dialogue-quest-framework-20261018` at `4755622022f244f9cd890039b705c0badf0cf57a`; code has B0–B6 and the previous ledger. PR #4 OPEN, unmerged, GitHub mergeable=false at inspection. The agent's local worktree state and `codex/contextual-dialogue-quest-framework-0a` were not independently inspected.
-- Paired PsychopatzCore remote main `2179ee19307a993e186e6da661ad4212e984e0b4`, which already contains Core-backed `PsychopatzCustomTranslationManager`. No need for a new translator.
-- Core Foundation P1–P9 is separately agent-reported developer accepted; this does not implement semantic CodeBuilder/translation recovery.
+**Current chunk:** H1 — registered Core-backed full-sentence backstory translation.
 
-## What actually exists in old branch
+## Repository and dependency evidence
 
-- Real B0–B3 Lua/worker tests, plus B4 dossier and B5 continuity Lua tests and B6 synthetic persistence measurements; agent ledger says B0–B6 accepted. Production backstory provider and Knowledge/Dossier/PBrainZ adapters exist there.
-- Existing `tools/semantic_harness` includes working GUI/CLI/shared `SemanticLabAuthoringService`, `semantic.codeblocks.v1`, compiler/writer, persistent real Lua worker and translation instrumentation; new B0–B6 authoring was not end-to-end generated through CodeBuilder.
-- New backstory response IDs are not mapped in semantic client translation-key resolver; EN/TL response sentence catalogs have no such entries; `content` is not picked up by current response argument mapping. Older `conversation/backstory/shared/EN|TL/facts.json` localizes nouns via legacy TextLoader; e.g. B2 smoke asserts TL `doktor`, not a whole TL sentence through Core's custom catalog manager.
-- B2/B3 worker `BACKSTORY_FACT` diagnostic uses privileged `authoritativeBackstoryAccess=true`; not gameplay-equivalent ordinary player conversation. `suspected` fact projection may substitute canonical seed truth where only unconfirmed player observation was allowed.
-- Progress claim "full Python semantic harness passed" contradicts supplied terminal `251 tests in 164.991s; FAILED(errors=30)` (exit 1). Full Lua ledger `839/853`, 14 failures agent-classed preexisting, not independently confirmed. Reported B6 synthetic serialized payload `2664 bytes/one NPC; 269760 bytes/100; 2706037 bytes/1000` is not real native ModData proof. No new full run in this docs turn.
+- Work is on the existing local `main` only. No new branch or worktree was created.
+- The prior B0–B6 history was merged locally in `a3c5b5a7` (`Merge grounded personal dialogue implementation into main`) after read-only divergence and `git merge-tree` review. The eight canonical current-main documents were retained; the forbidden checked-in `GOAL_PROMPT.md` was excluded.
+- Matching PsychopatzCore `main`: `2179ee19307a993e186e6da661ad4212e984e0b4`.
+- Matching DynamicTrading `main`: `950b4f887e6f3cb3e311c659b852cbf3ec6f3883`.
+- The local Hoomans `main` has not been pushed; remote integration must not be claimed until confirmed.
 
-## H0 — ONE NEXT CHUNK, exact acceptance
+## H0 baseline and worker envelope
 
-1. Verify local/main/old branch divergence and matched Core/DT source, working tree, concurrent files and watched-media safety; NO new branch or further new commits on old dev branch. Find safe existing-main integration path; report concrete conflicts if unsafe rather than reset/rebase/force-push or invent a replacement branch.
-2. Run **the existing Semantic Lab**: inspect GUI CodeBuilder/Flow/Simulation where feasible, existing `SemanticLabAuthoringService`, production compiler, generated assets and persistent Lua worker. Document `NPC_BACKSTORY` unsupported authoring fields, absent backstory translation key/arg bindings, missing person-scoped disclosure and dossier visual trace.
-3. Reproduce a minimal EN/TL player-conversation scenario using real worker input and visible rendered NPC replies, not only `BACKSTORY_FACT` or internal fact IDs. Record parser candidates, backstory fact provenance, player permission/Knowledge state, translation lookups and actual output/transport. If hooks are missing, mark explicit untested/evidence gap; do not fake server permission through Python.
-4. Re-run actual `python3 -m unittest discover -s tools/semantic_harness/tests -v` at exact source/paired Core state; preserve 30-error traceback classification and terminal exit code. Compare known 14 failing Lua modules to the earlier baseline with precise evidence; keep valid B0–B6 focused passes in historical context, no false green. Do not trigger native Project Zomboid or Workshop.
-5. Make necessary bounded harness/inspection correction only if needed to establish a usable baseline, then commit source/tests/docs to safely authorized EXISTING `main`, update this ledger with exact SHAs/results and set H1 next; immediately continue H1–H4 in same assignment.
+- Untouched `origin/main` with paired Core: Python `105 tests, OK`, exit 0; broad Lua exit 1 with exactly `pnc_semantic_local_route_smoke.lua` and `pnc_server_inventory_presence_boundary_smoke.lua` failing. An archived checkout without sibling Core produced setup-only `105 tests / 112 errors` and is not a product baseline.
+- The merged B0–B6 tree reproduced the reported Python failure: `python3 -m unittest discover -s tools/semantic_harness/tests -q` returned `251 tests in 153.627s`, exit 1, `FAILED (errors=30)`. All 30 errors shared `Lua worker response exceeds the message limit` while fetching the generated flow catalog.
+- Direct Lua measurements were handshake `22,646` bytes and `FLOW_CATALOG` `269,763` bytes against the previous `262,144`-byte bound. The bounded protocol repair is `e7a6adb8ffd2a77a7936016d22db95825b637aa`, raising the shared default to `512 KiB` and adding catalog-sized decode/rejection tests.
+- Post-repair focused tests: `17/17`, exit 0. Doctor: `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json`, exit 0. Full Python: `253 tests`, exit 0. The GUI command was launched with a bounded `timeout 8s`; it remained open as expected and returned 124. Tk/display checks were positive. No native Project Zomboid process was launched.
+- The merged broad Lua suite remains `839/853`, exit 1, with the 14 known modules recorded in the preceding history; these are not being reported as fixed by the worker-envelope change.
 
-**Stop rule:** developer-ready requires all H0–H4 acceptance gates, actual generated + translated NPC conversations, factual privacy, Dossier and full testing/integration on existing main. If integration unsafe, report proven blocker while completing independent safe work; do NOT report `COMPLETED` because a partial chunk passed.
+## H0 real Semantic Lab trace
 
-See `HARNESS_FIRST_CODEBUILDER_TRANSLATION_RECOVERY.md` and `GIT_INTEGRATION_AND_NO_NEW_BRANCHES.md`. The user receives the actual `/goal` **only in chat**, not in a repository MD file.
+The trace used the existing Tk/Build Workflow/Conversation Inspector seams and fresh `LuaSemanticWorker` processes, with ordinary `INPUT` turns rather than the privileged `BACKSTORY_FACT` command.
 
-## H0 bounded chunk accepted — restore the real worker envelope
+| Input | Selected production candidate | Final worker observation | Side effect |
+|---|---|---|---|
+| `nice dress` | `pnc.social.compliment_adjective_feature`, COMPLIMENT, 1.0 | EN `Oh. Thank you, that's kind of you.`; Core-backed key `UI_PNC_Conversation_Semantic_ComplimentWithdrawn`, fallback false. TL resolved `Ay. Salamat, mabait mong sabihin iyan.` | none |
+| `you got nice dress` | `pnc.social.compliment_you_got_feature`, COMPLIMENT, 1.0; inventory candidate `pnc.question.inventory_you_got` also present at 0.88 but not selected | same compliment response and no inventory request | none |
+| `you got any bandages?` | `pnc.question.inventory_you_got`, QUESTION, 0.96 | inventory branch; no personal-dialogue response | `SemanticInventoryQuery` and `SemanticInventoryQueryResult`; `query_inventory` |
+| `where are you from?` | `pnc.question.backstory.hometown`, QUESTION, 0.99; fact provider `npc_backstory`, status unknown, reason `backstory_not_disclosed` | client defers the local line pending authority; no final NPC message or translation lookup | `KnowledgeDisclosureRequest(topicID=backstory.hometown)` |
+| `what are you afraid of?` | `pnc.question.backstory.fear`, QUESTION, 0.97; same fail-closed provider state | same deferred result; no final NPC message | `KnowledgeDisclosureRequest(topicID=backstory.fear)` |
+| `what was your old job?` | no candidate | `I'm not sure what you mean.` | none |
+| `where?` / `do you miss it?` | no candidate in the fresh default context | `I'm not sure what you mean.` | none |
 
-- Integration source commit: `a3c5b5a7` (`Merge grounded personal dialogue implementation into main`), with current canonical H0–H4 documents retained and the legacy checked-in `GOAL_PROMPT.md` excluded. The merge was performed on existing local `main`; it has not been remote-published.
-- H0 baseline was run against the untouched `origin/main` snapshot with paired Core `2179ee19307a993e186e6da661ad4212e984e0b4`: `python3 -m unittest discover -s tools/semantic_harness/tests -q` returned **105 tests, OK, exit 0**; `python3 tests/run_tests.py` returned **exit 1** with two failures (`pnc_semantic_local_route_smoke.lua`, `pnc_server_inventory_presence_boundary_smoke.lua`). An archived `/tmp` checkout without a sibling Core was also reproduced as a setup-only **105 tests / 112 errors** and is not counted as a product baseline.
-- The merged B0–B6 tree reproduced the supplied discrepancy exactly: `python3 -m unittest discover -s tools/semantic_harness/tests -q` returned **251 tests in 153.627s, FAILED (errors=30), exit 1**. The 30 errors shared the bounded worker failure `Lua worker response exceeds the message limit` while fetching the generated flow catalog. Direct Lua measurement was **269,763 bytes** for `FLOW_CATALOG` against the previous 262,144-byte limit; the handshake itself was **22,646 bytes**.
-- `python3 tests/run_tests.py` on the merged tree returned **839/853, exit 1, 14 failures**: `pnc_building_catalog_local_recipes_smoke.lua`, `pnc_building_favorites_smoke.lua`, `pnc_building_tab_selection_smoke.lua`, `pnc_colony_management_ui_model_smoke.lua`, `pnc_colony_management_workshop_catalog_smoke.lua`, `pnc_constants_presence_boundary_smoke.lua`, `pnc_inventory_ui_smoke.lua`, `pnc_kahlua_persistence_smoke.lua`, `pnc_live_body_heavy_held_items_smoke.lua`, `pnc_mp_server_file_guard_smoke.lua`, `pnc_pbrainz_native_button_smoke.lua`, `pnc_persisted_shell_cleanup_smoke.lua`, `pnc_puppet_opera_animation_tab_modules_smoke.lua`, and `pnc_server_inventory_presence_boundary_smoke.lua`.
-- Fix commit: `e7a6adb8` (`fix(harness): fit generated flow catalogs in bounded protocol`). The shared protocol/config bound is now **512 KiB**, still finite, and `test_protocol.py` covers both a 270 KiB catalog-sized decode and rejection above the bound. Focused worker regressions returned **17/17, exit 0**; `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` returned **exit 0** with Tk/display, paired Core, Lua, syntax and `READY/PING/CAPABILITIES` all healthy; `bash tools/semantic_harness/run_harness.sh --no-gui --jsonl --input 'nice dress'` returned **exit 0** with a real compliment response, selected parser candidate, Core-backed translation lookup and zero transport/action side effects.
-- Full post-fix discovery: `python3 -m unittest discover -s tools/semantic_harness/tests -q` returned **253 tests in 167.559s, OK, exit 0**. This resolves the 30 harness errors without weakening the production parser, Knowledge owner or action dispatcher.
-- GUI evidence: `timeout 8s bash tools/semantic_harness/run_harness.sh` returned **124** because the actual Tk process remained open until the bounded timeout; doctor confirmed Tkinter and display availability. No native Project Zomboid process was launched.
+The EN/TL trace therefore proves B0 candidate selection and existing Core-backed social localization, but also proves the H0 gaps: old-job and follow-up authoring coverage is absent; the normal worker has no disclosure completion/result hook or player-scoped dossier fixture; and refusal/known backstory sentences cannot be accepted through a deferred request alone. Familiarity eligibility is not being treated as disclosure. The existing Context Projection reads only the filtered `PNC.Network.ClientState.npcKnowledge` projection, not the local NPC record.
+
+## CodeBuilder gap confirmed by source and compile contracts
+
+- `tools/semantic_harness/codebuilder/compiler.py` currently limits exact dialogue question subjects to `ACTIVITY`, `IDENTITY`, `WELLBEING`, and `WEATHER`; `NPC_BACKSTORY` is not an authorable subject.
+- The existing Flow Editor and `semantic.codeblocks.v1` expose registered facts, response pools, and context blocks, but no typed backstory provider/disclosure/evidence block or backstory-specific translation argument binding.
+- The production response resolver already has stable backstory kinds and `content` arguments for authorized known/suspected facts, but the presentation map had no backstory response keys. That is the bounded H1 implementation target.
+
+## Accepted chunks
+
+- `6b783d09` — progress ledger for integration, exact baseline reproduction, protocol repair, doctor, and full post-fix Python evidence.
+- `e7a6adb8ffd2a77a7936016d22db95825b637aa` — shared 512 KiB worker protocol/config bound and regression coverage.
+- `a3c5b5a7` — local existing-main integration of prior B0–B6 history and current canonical H0–H4 documentation.
 
 ## Next mandatory chunk
 
-**H0 — complete Semantic Lab conversation trace and CodeBuilder gap report.** Use the real worker and existing Simulation/Conversation Inspector/Build Workflow seams to capture `nice dress`, `you got nice dress`, `you got any bandages?`, former job, hometown, `where?`, `do you miss it?`, and a refused private question in EN/TL. Record parser candidates, selected meaning, fact provider, Knowledge/disclosure state, translation key/args/resolution/fallback, actual final NPC text, side effects, dossier scope and follow-up context. Then immediately continue to H1 registered Core-backed full-sentence translation.
+Complete H1 by committing the registered EN/TL Backstory catalog and presentation argument binding, then verify the full authorized sentence through the real worker once the disclosure hook is available. Immediately continue H2: extend the existing CodeBuilder/compiler/Flow Editor contracts for typed `NPC_BACKSTORY` subjects, registered fact providers, disclosure states, response pools, follow-up references, and deterministic generation into actual mod Lua/catalog/manifest assets.
