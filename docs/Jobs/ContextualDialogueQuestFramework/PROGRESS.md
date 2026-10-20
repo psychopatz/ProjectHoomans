@@ -31,6 +31,7 @@
 - `a3c5b5a7` — local existing-main integration of prior B0–B6 history with current canonical H0–H4 documentation.
 - `98b54dc0` — H2 typed `NPC_BACKSTORY` CodeBuilder contract, deterministic supplemental Lua/EN/TL generation, production catalog registration, and fresh-worker load regression.
 - `cf5b34c9` — H2 authored `CONTEXT_REFERENCE` backstory follow-ups (`where?`, `do you miss it?`), typed authoring mappings, deterministic generated Lua/EN/TL assets, and updated compiler counts.
+- `7ec2e79a` — H3 production disclosure result/snapshot seam, filtered Knowledge/Dossier worker projections, suspected-fact truth-preserving projection, bounded backstory follow-ups, and real-worker regression coverage.
 
 ## H1/H2 evidence
 
@@ -40,16 +41,17 @@
 - H2 regression command: `python3 -m unittest tools.semantic_harness.tests.test_grounded_personal_dialogue_h2 tools.semantic_harness.tests.test_semantic_translation_integration tools.semantic_harness.tests.test_dataset_review tools.semantic_harness.tests.test_semantic_authoring_compiler -q` — 18 tests OK, exit 0 before the new H3 regression file; `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — required checks OK, exit 0.
 - Changed Lua passed `/usr/bin/luac5.3 -p`; changed Python passed `py_compile`; `git diff --check` passed for the accepted H2 chunk.
 
-## Current H3 work and next required chunk
+## H3 evidence and next required chunk
 
-The uncommitted H3 chunk connects the production server disclosure result to the existing client Knowledge snapshot and lifecycle response seam, projects suspected observations without replacing them with canonical private truth, and exposes bounded player-filtered Knowledge/Dossier state to the worker inspector. The shared policy now permits an authored unresolved `CONTEXT_REFERENCE` only when recent bounded context contains an NPC backstory answer; unrelated unresolved references still route to clarification.
+The accepted H3 chunk connects the production server disclosure result to the existing client Knowledge snapshot and lifecycle response seam, projects suspected observations without replacing them with canonical private truth, and exposes bounded player-filtered Knowledge/Dossier state to the worker inspector. The shared policy permits an authored unresolved `CONTEXT_REFERENCE` only when recent bounded context contains an NPC backstory answer; unrelated unresolved references still route to clarification.
 
-Real-worker evidence already observed for the H3 chunk with identity seed `90210` and familiarity `80`:
+Real-worker evidence for commit `7ec2e79a` with identity seed `90210` and familiarity `80`:
 
 - `what was your old job` selected `pnc.backstory.question.former_job.old_job`, requested the authoritative disclosure, and produced the complete EN sentence `I worked as farmer before all this.` with `UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob` and typed `content`.
 - The same conversation then answered `where?` with the authored follow-up key `UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation` and `do you miss it?` with `UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss`.
 - Familiarity `0` produced the translated refusal `I'm not ready to talk about that yet.` without a player Knowledge snapshot.
 - TL produced `Nagtrabaho ako bilang farmer bago ang lahat ng ito.` with all translation lookups reporting `fallbackUsed=false`.
-- `python3 -m unittest tools.semantic_harness.tests.test_grounded_personal_dialogue_h3 -v` — 3 tests OK, exit 0.
+- `python3 -m unittest tools.semantic_harness.tests.test_grounded_personal_dialogue_b0 tools.semantic_harness.tests.test_grounded_personal_dialogue_b2 tools.semantic_harness.tests.test_grounded_personal_dialogue_b3 tools.semantic_harness.tests.test_grounded_personal_dialogue_h2 tools.semantic_harness.tests.test_grounded_personal_dialogue_h3 tools.semantic_harness.tests.test_semantic_translation_integration tools.semantic_harness.tests.test_dataset_review tools.semantic_harness.tests.test_semantic_authoring_compiler -q` — 28 tests OK, exit 0.
+- `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all required checks OK, exit 0; changed Lua passed `luac5.3 -p`, changed Python passed `py_compile`, and `git diff --check` passed.
 
-Next mandatory chunk: commit this H3 disclosure/follow-up seam with its real-worker regression, then continue with suspected-evidence projection, two player identities against one NPC, dossier isolation, persistence/ModData measurements, optional PBrainZ filtered context, and final H4 integrated acceptance. Keep all work inside the existing Core, Knowledge, persistence, translation, Semantic Lab, and dialogue contracts; do not add a second parser, policy, profile store, or dossier database.
+Next mandatory chunk: exercise the existing Knowledge evidence API with a suspected player observation and two player identities against one NPC, verify dossier isolation and persistence, then continue with ModData measurements, optional PBrainZ filtered context, and final H4 integrated acceptance. Keep all work inside the existing Core, Knowledge, persistence, translation, Semantic Lab, and dialogue contracts; do not add a second parser, policy, profile store, or dossier database.
