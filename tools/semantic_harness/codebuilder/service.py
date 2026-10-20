@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from tools.semantic_harness import authoring
+from tools.semantic_harness.studio import authoring
 from .dataset_catalog import (
     DATASET_SOURCE_SPECS,
     WORKFLOW_DATASET_KINDS,
@@ -22,7 +22,7 @@ from .interaction_generation import SemanticInteractionAuthoring
 from .blocks import SemanticBlockRegistry
 from .codeblocks import validate_codeblock_document
 from .dataset_adapters import preview_dataset_adapter, promote_reviewed_candidates
-from ..interaction_explorer import build_interaction_rows, search_interactions
+from ..studio.interaction_explorer import build_interaction_rows, search_interactions
 
 
 class SemanticLabAuthoringService:
