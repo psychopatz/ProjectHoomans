@@ -1,7 +1,7 @@
 # Contextual Dialogue & Quest Framework — CURRENT B-phase Progress
 
-**Updated:** 2026-10-20 after B0 implementation. **B0 ACCEPTED; B PHASE IN PROGRESS.**
-**Working checkout:** `codex/contextual-dialogue-quest-framework-0a`, implementation commit `3f263757bc07cfa25b4d3e3dd16ca4c5d4d20890`.
+**Updated:** 2026-10-20 after B5 implementation. **B0–B5 ACCEPTED; B6 IN PROGRESS.**
+**Working checkout:** `codex/contextual-dialogue-quest-framework-0a`, implementation commit `e0b7a47c653dc5c95fab97823d38725b4e862670`.
 **Paired PsychopatzCore:** `2179ee19307a993e186e6da661ad4212e984e0b4` on clean `main`.
 **Parent completion contract:** B0–B6 remain mandatory. This ledger records the current safe chunk only; after each accepted chunk continue immediately to the next unaccepted chunk in the same goal. The parent goal is not complete until integrated developer acceptance passes B6.
 
@@ -81,6 +81,15 @@ Exercise the existing dossier presentation with confirmed/suspected backstory ev
 - The acceptance smoke verifies confirmed backstory rows render in the existing descriptor-driven dossier, suspected rows retain uncertainty (`Possibly ...`), EN/TL `labelKey` translation is used, per-player snapshots diverge, and snapshot descriptors contain no identity seed or biography table. Existing client/server presentation code remains snapshot-only.
 - Evidence: `python3 tests/run_tests.py pnc_backstory_knowledge_disclosure_smoke pnc_knowledge_smoke` **2/2**; the complete B3 focused set remains **10/10** and the real worker B0+B2+B3 remains **7/7**.
 
-## Next mandatory chunk: B5 — personal conversation continuity
+## B5 — ACCEPTED: personal conversation continuity
 
-Exercise ContextState and ResponsePlan continuity across follow-up backstory questions, remembered topics/events, refusal/uncertainty responses, and optional PBrainZ fallback. Verify no fabricated fact or unauthorized raw profile reaches either path; commit and record the exact source SHA before continuing to B6.
+- Source commit: `e0b7a47c653dc5c95fab97823d38725b4e862670`. ContextState now retains the last backstory kind as a bounded conversational pointer, including snapshot/reload and reset behavior; it stores no fact value or biography.
+- Grounded local responses now answer known, suspected, ambiguous, and undisclosed backstory questions with kind-specific actual NPC text, fact references, uncertainty and deterministic `FACT_ANSWER` metadata. Hometown follow-ups no longer fall through to generic “what do you mean?” clarification: a context reference reuses the last authorized subject and re-runs the existing fact provider against the player-specific snapshot.
+- Disclosure-result text from the existing client command route is recorded into the same ContextState as an NPC answer, so a server refusal or successful disclosure remains honest and available to a subsequent follow-up. No raw identity seed, full profile, or unauthorized fact enters the context.
+- Evidence: focused Lua `python3 tests/run_tests.py pnc_semantic_local_response_questions_smoke pnc_semantic_fact_smoke pnc_semantic_dialogue_input_smoke pnc_semantic_local_route_smoke pnc_conversation_smoke pnc_backstory_knowledge_disclosure_smoke pnc_semantic_backstory_fact_smoke` **7/7**; real Core+Hoomans worker B0+B2+B3 **7/7**; production Kahlua verifier **0 errors** across 103 shared Semantic files and the changed client lifecycle file. The worker’s existing optional-provider warning remains non-fatal and no B5 test entered the provider route.
+
+## EXACTLY ONE CURRENT EXECUTION CHUNK
+
+**B6 — performance, persistence, compatibility and complete acceptance.**
+
+Measure the actual serialized ModData footprint and stable identity/backstory behavior across save/reload, catalog-version changes, and language changes; exercise lazy generation without per-tick scanning; verify existing Knowledge persistence, per-player privacy, EN/TL and optional PBrainZ boundaries; add/execute bounded 100-persistent-NPC and larger synthetic scaling probes; run the relevant integrated Lua and real-worker regressions; document native SP/MP/live testing as user-owned. Commit production/test changes and this ledger with exact SHAs/results, and only then evaluate the parent B0–B6 completion contract.
