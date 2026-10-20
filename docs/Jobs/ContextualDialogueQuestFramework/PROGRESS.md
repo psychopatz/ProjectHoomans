@@ -104,10 +104,30 @@ Evidence:
 - Worker doctor after the move: all required checks true, including Lua syntax
   and `READY/PING/CAPABILITIES`.
 
-Next mandatory slice: move the remaining harness orchestration tools into a
-`testing/` package, then add the application entrypoint/package metadata and
-perform the final architecture/token rescan before removing only proven-dead
-compatibility shims.
+The testing migration is recorded below.
+
+### Post-V5 Python package layout — testing slice
+
+**Status:** slice 5 implemented on existing `main`; commit `60e1a0bc`.
+
+Case replay, conflict-ledger diagnostics, Lua smoke-suite execution, worker
+doctor checks, and Phase 6 performance evidence now live under
+`tools/semantic_harness/testing/`. The old top-level testing modules remain
+compatibility facades. The legacy runner facade is a module alias so existing
+module-level bound-limit patches continue to affect the canonical ledger.
+
+Evidence:
+
+- Runner, suite, app, harness, and performance checks: `45/45` passed.
+- Full Semantic Harness Python discovery after the move: `276/276` passed in
+  `170.970s`, exit `0`.
+- `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all
+  required checks true, including worker syntax and `READY/PING/CAPABILITIES`.
+
+Next mandatory slice: add `__main__.py` and local Python package metadata,
+verify the stable launcher/module entrypoints, then run the final architecture
+and token scans before deciding whether any compatibility facade has a proven
+removal gate.
 
 ## V1 — reusable visual CodeBlocks graph
 

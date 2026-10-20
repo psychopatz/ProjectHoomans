@@ -47,9 +47,11 @@ timeouts, crash detection, and bounded stderr diagnostics.
   It does not interpret dialogue or dispatch gameplay effects.
 - `ui/dialogs/settings.py` owns the runtime settings form and converts its draft
   into a validated scenario before the live worker is configured.
-- `runner.py` owns case replay and its streaming conflict ledger; `suite.py`
-  owns isolated Lua smoke-test subprocesses. `rendering.py` and `transcript.py`
-  provide shared JSON presentation and bounded visible conversation history.
+- `testing/runner.py` owns case replay and its streaming conflict ledger;
+  `testing/suite.py` owns isolated Lua smoke-test subprocesses;
+  `testing/doctor.py` owns bounded environment/worker diagnostics; and
+  `testing/performance.py` owns protocol evidence. The old top-level testing
+  module paths remain compatibility facades.
 
 Python owns the editable scenario and child-process lifecycle. The isolated Lua
 worker owns only its current in-memory production-module state. Native action
