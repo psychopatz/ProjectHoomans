@@ -118,6 +118,24 @@ local function authorizedDescriptor(snapshot, kind)
     return nil
 end
 
+local function authorizedRecord(context)
+    local record = context and context.npcRecord or nil
+    if type(record) == "table" then return record end
+    -- The live registry is the existing authoritative record boundary.  A
+    -- record is consulted only after the player-scoped snapshot has already
+    -- passed the known/confirmed gate below; it is never used to enumerate
+    -- undisclosed generated backstory.
+    local registry = PNC.Registry
+    local npcID = context and context.npcID or nil
+    if type(registry) == "table" and type(registry.Get) == "function"
+        and npcID ~= nil
+    then
+        local resolved = registry.Get(npcID)
+        if type(resolved) == "table" then return resolved end
+    end
+    return nil
+end
+
 local function projectedFact(ir, context, kind)
     local snapshot = context and (
         context.npcKnowledge or context.knowledgeSnapshot
@@ -133,7 +151,7 @@ local function projectedFact(ir, context, kind)
     -- A suspected descriptor is the player's observation, not permission to
     -- replace it with canonical NPC truth. Canonical rendering is allowed
     -- only after the authoritative Knowledge service has confirmed the fact.
-    local record = context and context.npcRecord or nil
+    local record = authorizedRecord(context)
     local fact = status ~= "suspected" and record and Memory.GetBackstory
         and Memory.GetBackstory(record, kind) or nil
     if fact then content = renderFact(fact, languageOf(context)) end

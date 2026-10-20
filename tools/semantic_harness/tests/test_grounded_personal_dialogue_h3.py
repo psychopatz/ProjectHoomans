@@ -112,9 +112,17 @@ class GroundedPersonalDialogueH3Tests(unittest.TestCase):
 
         self.assertEqual(
             self.final_text(turn),
-            "Nagtrabaho ako bilang farmer bago ang lahat ng ito.",
+            "Nagtrabaho ako bilang magsasaka bago ang lahat ng ito.",
         )
         self.assertEqual(turn["translation"]["language"], "TL")
+        self.assertIn(
+            "magsasaka",
+            turn["translation"]["lookups"][-1]["args"],
+        )
+        self.assertNotIn(
+            "farmer",
+            turn["translation"]["lookups"][-1]["args"],
+        )
         self.assertTrue(
             all(
                 not lookup.get("fallbackUsed", False)

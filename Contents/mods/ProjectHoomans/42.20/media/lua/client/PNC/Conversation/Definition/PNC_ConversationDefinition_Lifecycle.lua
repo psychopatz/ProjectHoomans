@@ -214,6 +214,33 @@ function Conversation.ReceiveIdentityPresentation(presentation)
     return presentation and refreshForNPC(presentation.npcID) or false
 end
 
+local function localizedBackstoryContent(result, kind)
+    local registry = PNC.Registry
+    local memory = PNC.Conversation and PNC.Conversation.Memory or nil
+    local record = registry and type(registry.Get) == "function"
+        and registry.Get(result.npcID) or nil
+    if type(record) ~= "table" or type(memory) ~= "table"
+        or type(memory.GetBackstory) ~= "function"
+        or type(memory.GetBackstoryText) ~= "function"
+    then
+        return nil
+    end
+    local fact = memory.GetBackstory(record, kind)
+    if type(fact) ~= "table" then return nil end
+    local language = "EN"
+    if Translator and type(Translator.getLanguage) == "function" then
+        local languageValue = Translator.getLanguage()
+        if languageValue and type(languageValue.toString) == "function" then
+            language = tostring(languageValue:toString())
+        end
+    end
+    local content = memory.GetBackstoryText(fact, language) or fact.value
+    if type(memory.RenderText) == "function" then
+        content = memory.RenderText(content, fact)
+    end
+    return type(content) == "string" and content ~= "" and content or nil
+end
+
 local function disclosureResponsePayload(result)
     local topicID = tostring(result and result.topicID or "")
     if string.sub(topicID, 1, 10) ~= "backstory." then return nil end
@@ -241,12 +268,14 @@ local function disclosureResponsePayload(result)
         subject = "NPC_BACKSTORY",
     }, result.requestID)
     if type(variant) ~= "table" then return nil end
+    local content = result.success == true
+        and localizedBackstoryContent(result, kind) or result.responseText
     local response = {
         templateID = variant.templateID,
         fallback = variant.fallback,
         args = result.success == true and {
             kind = kind,
-            content = result.responseText,
+            content = content,
         } or {},
         dialogueAct = variant.dialogueAct or "FACT_ANSWER",
         topic = "NPC_BACKSTORY",

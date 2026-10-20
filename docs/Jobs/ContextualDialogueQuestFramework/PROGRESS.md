@@ -83,3 +83,14 @@ Next mandatory chunk: run the complete Python harness, relevant full Lua suite, 
 - Native Tk/X11 GUI surface is not exposed to the available CUA session (`getState` reported no apps), so graphical interaction evidence remains open; the GUI code path is covered by compilation and service contracts only.
 
 **Next mandatory chunk:** F2 authorized fact localization — pass the bounded authorized NPC record through the existing worker/semantic context without exposing generator truth, format localized fact content through `Memory.GetBackstoryText`/Core translation, and update the real-worker TL acceptance from `farmer` to `magsasaka`.
+## F2 evidence — authorized fact localization (2026-10-20)
+
+- Source baseline: `007d3fba`; F2 changes are the current uncommitted worker/localization patch and will be committed as the next coherent chunk.
+- The existing production path remains authoritative: the server retains the stable fact value (`farmer`) for the authorized disclosure result, while the client lifecycle resolves the current language through `Memory.GetBackstoryText` and the existing Core-backed `PNC.Translation` path.
+- The semantic fact source now uses the authorized NPC record only after the existing Knowledge status gate. Suspected observations remain player evidence and are never replaced by canonical private truth.
+- Real Lua-worker acceptance for identity seed `90210`, authorized former-job disclosure, TL: final NPC sentence `Nagtrabaho ako bilang magsasaka bago ang lahat ng ito.`; response argument `content=magsasaka`; translation lookups reported `fallbackUsed=false`. EN remains `I worked as farmer before all this.`.
+- `python3 -m unittest tools.semantic_harness.tests.test_grounded_personal_dialogue_h3 tools.semantic_harness.tests.test_grounded_personal_dialogue_h2 tools.semantic_harness.tests.test_interaction_spec tools.semantic_harness.tests.test_codebuilder_consolidation -q` — `30` OK, exit `0`.
+- Changed Lua files passed `luac5.3 -p`; `git diff --check` passed.
+- GUI limitation remains unchanged: CUA exposed no native app surface (`apps=[]`, `browsers=[]`), so graphical interaction evidence is still open and not claimed.
+
+**Next mandatory chunk:** F3 graduated backstory disclosure thresholds using the existing Knowledge/Relationships/Dossier systems, with eligibility separated from discovery and no new persistence store.
