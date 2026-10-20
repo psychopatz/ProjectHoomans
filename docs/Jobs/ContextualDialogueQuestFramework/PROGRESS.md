@@ -33,6 +33,7 @@
 - `cf5b34c9` — H2 authored `CONTEXT_REFERENCE` backstory follow-ups (`where?`, `do you miss it?`), typed authoring mappings, deterministic generated Lua/EN/TL assets, and updated compiler counts.
 - `7ec2e79a` — H3 production disclosure result/snapshot seam, filtered Knowledge/Dossier worker projections, suspected-fact truth-preserving projection, bounded backstory follow-ups, and real-worker regression coverage.
 - `eac26ff2` — H3 existing production player-bootstrap hook, two-player Knowledge/Dossier isolation after reload, and suspected observation regression against canonical truth.
+- `c5bdd06d` — H4 actual worker ModData-size metrics, bounded synthetic scaling, and optional PBrainZ-context projection regression.
 
 ## H1/H2 evidence
 
@@ -56,5 +57,8 @@ Real-worker evidence for commit `7ec2e79a` with identity seed `90210` and famili
 - `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all required checks OK, exit 0; changed Lua passed `luac5.3 -p`, changed Python passed `py_compile`, and `git diff --check` passed.
 
 - `python3 tests/run_tests.py pnc_backstory_knowledge_disclosure --jobs 1` — `PASS 1/1`, exit 0; the smoke now asserts a suspected observation remains distinct from canonical NPC truth.
+- H4 worker metrics: unchanged `PNC_NPCKnowledge` persisted bytes `0`; one disclosed backstory evidence entry `746` bytes; `100` synthetic NPC notes with `2` evidence entries each `72,145` bytes. The metric reports the production table key and `worker_protocol_json_of_production_moddata_table` measurement encoding without serializing generated biographies.
+- `python3 -m unittest tools.semantic_harness.tests.test_grounded_personal_dialogue_b0 tools.semantic_harness.tests.test_grounded_personal_dialogue_b2 tools.semantic_harness.tests.test_grounded_personal_dialogue_b3 tools.semantic_harness.tests.test_grounded_personal_dialogue_h2 tools.semantic_harness.tests.test_grounded_personal_dialogue_h3 tools.semantic_harness.tests.test_grounded_personal_dialogue_h4 tools.semantic_harness.tests.test_semantic_translation_integration tools.semantic_harness.tests.test_dataset_review tools.semantic_harness.tests.test_semantic_authoring_compiler -q` — 31 tests OK, exit 0.
+- `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all required checks OK, exit 0.
 
-Next mandatory chunk: measure serialized ModData for unchanged and discovered NPCs, exercise optional PBrainZ with the same filtered context, and complete H4 authoring-to-worker integrated acceptance and scale checks. Keep all work inside the existing Core, Knowledge, persistence, translation, Semantic Lab, and dialogue contracts; do not add a second parser, policy, profile store, or dossier database.
+Next mandatory chunk: run the complete Python harness, relevant full Lua suite, deterministic CodeBuilder/translation generation checks, and final integrated authoring-to-worker audit. Reconcile any remaining baseline failures with exact evidence before deciding whether H4 is complete. Keep all work inside the existing Core, Knowledge, persistence, translation, Semantic Lab, and dialogue contracts; do not add a second parser, policy, profile store, or dossier database.
