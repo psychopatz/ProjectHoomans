@@ -91,7 +91,7 @@ Next mandatory chunk: run the complete Python harness, relevant full Lua suite, 
 **Next mandatory chunk:** F2 authorized fact localization — pass the bounded authorized NPC record through the existing worker/semantic context without exposing generator truth, format localized fact content through `Memory.GetBackstoryText`/Core translation, and update the real-worker TL acceptance from `farmer` to `magsasaka`.
 ## F2 evidence — authorized fact localization (2026-10-20)
 
-- Source baseline: `007d3fba`; F2 changes are the current uncommitted worker/localization patch and will be committed as the next coherent chunk.
+- Source baseline: `007d3fba`; F2 implementation commit: `354dcba9`.
 - The existing production path remains authoritative: the server retains the stable fact value (`farmer`) for the authorized disclosure result, while the client lifecycle resolves the current language through `Memory.GetBackstoryText` and the existing Core-backed `PNC.Translation` path.
 - The semantic fact source now uses the authorized NPC record only after the existing Knowledge status gate. Suspected observations remain player evidence and are never replaced by canonical private truth.
 - Real Lua-worker acceptance for identity seed `90210`, authorized former-job disclosure, TL: final NPC sentence `Nagtrabaho ako bilang magsasaka bago ang lahat ng ito.`; response argument `content=magsasaka`; translation lookups reported `fallbackUsed=false`. EN remains `I worked as farmer before all this.`.
@@ -109,5 +109,16 @@ Next mandatory chunk: run the complete Python harness, relevant full Lua suite, 
 - `python3 tests/run_tests.py pnc_backstory_knowledge_disclosure --jobs 1` — `PASS 1/1`, exit `0`. This covers threshold eligibility, refusal below threshold, no automatic discovery, two-player isolation, confirmed/suspected dossier states, and canonical-truth protection.
 - `luac5.3 -p Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Knowledge/PNC_KnowledgeBuiltins.lua` passed; `git diff --check` passed.
 
-**Developer/native boundary:** all developer-owned GUI/worker/service tests are in scope. Native Project Zomboid SP/MP live gameplay, Workshop install/hosting/publication remain user-owned and are never prerequisite actions performed by Codex.
+## F4 evidence — generated CodeBlocks through the real worker (2026-10-20)
 
+- Existing-main merge of canonical documentation baseline `861eed35c4883314a43f5182477534474323474a` completed as `3caafa9f`; F4 implementation commit is `6bccf1ae`.
+- The existing CodeBuilder/compiler now carries the authored `responsePoolID` through the typed `NPC_BACKSTORY` frame. The existing client/server Knowledge disclosure transport carries only bounded presentation metadata; authoritative Knowledge still controls eligibility, evidence, snapshots, and player scope.
+- `tools/semantic_harness/tests/test_f4_semantic_lab_acceptance.py` composes former-job and hometown interactions through the existing workflow service, proves effect-free preview and approval-gated generation, writes the actual Project Zomboid Lua/EN/TL asset paths in an isolated mod tree, restarts the real Lua worker, and verifies different parser patterns, generated fingerprints, translation keys, final EN/TL sentences, follow-up context, Dossier isolation, reload persistence, suspected-fact filtering, and optional PBrainZ filtering.
+- Custom generated response pools now survive the authorized disclosure callback instead of being replaced by the built-in canonical pool. Missing generated variants fall back to the existing canonical known pool; no second dialogue engine or translation manager was added.
+- Focused acceptance: `python3 -m unittest tools.semantic_harness.tests.test_f4_semantic_lab_acceptance tools.semantic_harness.tests.test_interaction_spec tools.semantic_harness.tests.test_codebuilder_consolidation tools.semantic_harness.tests.test_grounded_personal_dialogue_h2 tools.semantic_harness.tests.test_grounded_personal_dialogue_h3 tools.semantic_harness.tests.test_grounded_personal_dialogue_h4 -q` — `Ran 33 tests`, `OK`, exit `0`.
+- Persistence measurements through the production Knowledge worker hook: unchanged seed-only ModData `0` bytes; one authorized fact has one evidence record and larger serialized state; synthetic `1 NPC × 10 facts` records `10` evidence entries and grows beyond the one-fact state. The worker metric hook accepts up to `32` bounded evidence entries per synthetic NPC for larger scaling checks.
+- Changed Lua files passed `luac5.3 -p`; changed Python files passed `python3 -m py_compile`. The real CUA session still reports no native apps or browsers, so graphical Tk/X11 interaction evidence remains unverified and is not claimed.
+
+**Current mandatory chunk:** F4 graphical Semantic Lab acceptance remains open because no native GUI surface is exposed in this session. Continue developer-owned non-graphical verification and do not report READY FOR USER LIVE TEST until graphical evidence is available or the user explicitly accepts that boundary.
+
+**Developer/native boundary:** all developer-owned GUI/worker/service tests are in scope. Native Project Zomboid SP/MP live gameplay, Workshop install/hosting/publication remain user-owned and are never prerequisite actions performed by Codex.
