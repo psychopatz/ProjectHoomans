@@ -34,14 +34,22 @@ C7A–C7G previously marked READY FOR USER LIVE TEST after the archived agent-re
 - Full Lua suite: **835/849 passed; 14 baseline failures** in unrelated building/colony UI, constants/presence mock, Kahlua persistence, held-items, MP guard, PBrainZ native-button, persisted-shell, Puppet Opera, and server-inventory presence tests. No B0-focused test failed.
 - Native Project Zomboid SP/MP, Workshop installation/publication and live-game acceptance remain user-owned.
 
+## B1 — ACCEPTED: identity-seeded backstory stability and sparse persistence
+
+- Source commit: `9049a464cd5dcdc52d58dc1a793e4fb6c2285acc`.
+- `GetBackstoryProfile()` now pins a compact identity metadata delta containing only catalog version, selection class, stable fact IDs, and optional authored stable-ID overrides. Definitions remain authoritative for values, tags, resolvers, and localized text; no biography, `facts`, `value`, or `textKey` payload is serialized.
+- Existing selections remain stable when definitions are added, reordered, reweighted, or the catalog epoch advances. Removed/unavailable IDs are not silently replaced. Legacy records without metadata still reconstruct from seed/catalog and become pinned on the next profile read or durable save. Mutable residence/medical fields remain outside immutable identity metadata.
+- Save/reload sanitizes the metadata contract and preserves stable IDs. Save-time pinning also covers NPCs whose backstory has not yet been queried. Client-side profile reads do not create a new truth store; server-authoritative dirty marking uses the existing registry.
+- Paired PsychopatzCore SHA remains `2179ee19307a993e186e6da661ad4212e984e0b4`; no Core or DynamicTrading source change was required for this bounded Hoomans persistence slice.
+- Evidence: `python3 tests/run_tests.py pnc_backstory_persistence_stability_smoke pnc_npc_foundation_normal_persistence_smoke pnc_persistence_v5_smoke` **3/3**; B0 worker suite **5/5**; focused B0 plus C7A suite **9/9**; production Kahlua verification for the four changed persistence/backstory files **0 errors**. The previously recorded full Lua baseline remains **835/849**, with the same 14 unrelated failures.
+
 ## EXACTLY ONE CURRENT EXECUTION CHUNK
 
-**B1 — identity-seeded backstory stability, catalog epoch/replay and sparse deltas.**
+**B2 — authoritative offline backstory fact-provider bridge.**
 
-1. Audit the existing identity/persistence owner and backstory registry/load order for a suitable generation revision field; do not invent a second NPC profile store.
-2. Add the smallest version-pinned selection mechanism that prevents catalog edits, save/reload or language changes from rerolling established facts. Prefer immutable legacy selection tables or stable definition IDs; use a bounded per-record epoch/ID delta only where replay cannot be guaranteed.
-3. Preserve authored/canonical historical overrides as sparse stable IDs only. Never serialize complete generated profiles, prose, localized text, current residence, medical state or a transcript.
-4. Add focused worker/Lua tests for same seed/class across reload, catalog growth/revision, language, old/new epoch, authored override, missing legacy definition and mutable current residence separation. Measure ModData before/after and keep ordinary unaccessed NPCs at zero added payload where possible.
-5. Run the relevant persistence/identity/backstory tests, actual Core+Hoomans worker, EN/TL, pz_verify, and the existing regression suite; commit coherent code/tests and update this ledger with exact SHAs/results before immediately advancing to B2.
+1. Audit the existing `PNC_Conversation_Memory_BackstoryContext`, Semantic Dialogue fact providers, and current B2 conversation consumers with graph traces plus direct source checks.
+2. Expose former profession, hometown, hobby, family, fear, and established-event facts through the existing offline provider contract using stable IDs and localized text resolution; keep immutable background separate from current residence, medical state, inventory, and live events.
+3. Add deterministic provider tests for identity seed/reload, missing definitions, resolver-backed facts, EN/TL labels, and no fabricated facts. Preserve the B1 metadata/persistence contract and avoid a second profile or fact database.
+4. Verify with the real Core+Hoomans worker, focused/full relevant Lua suites, Kahlua checks, and source coverage; commit the coherent B2 slice, record exact SHA/results, then continue to B3.
 
 **Authoritative design:** `GROUNDED_PERSONAL_DIALOGUE_B.md`. Continue using existing identity, persistence, Knowledge, relationship, dossier, ContextState, response-plan and PBrainZ boundaries. No parallel backstory store, player-knowledge root, per-tick profile scan, fake memory or client truth leak.
