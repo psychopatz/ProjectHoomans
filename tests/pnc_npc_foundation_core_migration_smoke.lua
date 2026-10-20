@@ -1,6 +1,11 @@
 local T = require "tests/support/test"
 
 T.load("tests/pnc_npc_foundation_parity_baseline_smoke.lua")
+T.load(
+    "ProjectHoomans",
+    "common_lua",
+    "PNC/Conversation/Definitions/Memory/00_PNC_ConversationMemoryDefinitions.lua"
+)
 local Fixtures = require
     "tests/support/pnc_npc_foundation_import_plan_fixtures"
 local ImportPlan = PNC.Persistence.ImportPlan
@@ -38,6 +43,12 @@ T.equal(actor.source.sourceRecordHash, imported.sourceHash,
     "source hash mapping")
 T.equal(actor.identity.identitySeed, sourceRecord.identitySeed,
     "source identity seed")
+T.truthy(actor.persona and actor.persona.backstory,
+    "portable backstory persona missing")
+T.truthy(actor.persona.backstory.selections.hometown,
+    "portable hometown selection missing")
+T.falsy(actor.persona.backstory.biography,
+    "portable backstory stored resolved prose")
 T.truthy(actor.personalInventory, "imported personal inventory")
 T.truthy(actor.social, "imported social state")
 T.truthy(actor.world, "imported location state")

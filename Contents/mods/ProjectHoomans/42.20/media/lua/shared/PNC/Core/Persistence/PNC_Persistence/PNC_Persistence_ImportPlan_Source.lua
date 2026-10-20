@@ -15,6 +15,19 @@ local Opaque = require
 
 local Source = {}
 
+local function backstoryPersona(identity)
+    local raw = identity and identity.raw and identity.raw.backstory
+    if type(raw) ~= "table" then return nil end
+    return {
+        backstory = {
+            catalogVersion = raw.catalogVersion,
+            selectionClass = raw.selectionClass,
+            selections = Utils.Copy(raw.selections),
+            overrides = Utils.Copy(raw.overrides),
+        },
+    }
+end
+
 local function add(decisions, ...)
     return Utils.AddDecision(decisions, ...)
 end
@@ -76,6 +89,7 @@ function Source.Build(raw, source, options, decisions)
             isFemale = identity.raw.isFemale,
             survivor = survivor,
         },
+        persona = backstoryPersona(identity),
         appearance = {
             policySchemaVersion = 2,
             policy = policy,
