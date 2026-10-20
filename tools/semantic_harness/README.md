@@ -33,13 +33,13 @@ timeouts, crash detection, and bounded stderr diagnostics.
   requires explicit approval before generation. Generation delegates to the
   existing writer; the GUI then restarts the same Lua worker and returns to
   the Simulation tab for real-worker inspection.
-- `worker_session.py` serializes worker startup, requests, status reads, and
-  cleanup outside the Tk view.
+- `runtime/` owns the Python/Lua boundary: configuration discovery, the
+  editable scenario document, the versioned JSON-lines protocol, child-process
+  lifecycle, the worker adapter, and serialized worker sessions. The old
+  top-level runtime module paths remain compatibility facades while callers
+  migrate.
 - `settings_dialog.py` owns the runtime settings form and converts its draft
   into a validated scenario before the live worker is configured.
-- `scenario.py` owns the editable scenario document; `worker.py` owns the
-  session adapter; `process.py` and `protocol.py` own child-process lifecycle
-  and the versioned JSON-lines contract.
 - `runner.py` owns case replay and its streaming conflict ledger; `suite.py`
   owns isolated Lua smoke-test subprocesses. `rendering.py` and `transcript.py`
   provide shared JSON presentation and bounded visible conversation history.

@@ -15,6 +15,38 @@ B0–B6, H0–H4, and F1–F4 remain the preserved implementation baseline. The 
 
 The final architecture scan improved scoped harness health from `86.4` to `90.2`, reduced findings from `43` to `41`, removed the `LARGE_MODULE` finding, reduced CodeBuilder pressure from `20.3` to `18.9`, and reduced Flow Editor pressure from `28.8` to `13.4`. Full Python discovery passed `274/274` in `171.441s`; full Lua passed `853/853` in `16.23s`; compiler tests passed `16/16`; doctor and Kahlua checks passed with all required worker checks true and `0` Kahlua ERROR+ findings.
 
+### Post-V5 Python package layout — runtime slice
+
+**Status:** slice 1 implemented on existing `main`; commit `3045ac94`.
+
+The Semantic Harness runtime boundary now lives under
+`tools/semantic_harness/runtime/`: configuration discovery, scenarios, the
+bounded JSON-lines protocol, Lua process lifecycle, the worker adapter, and
+serialized worker sessions. The former top-level runtime modules are explicit
+compatibility facades, so existing tests and callers retain their imports while
+the implementation has one canonical package location. The Lua worker asset
+remains at `tools/semantic_harness/lua/worker.lua`; no generated paths or
+compiler behavior changed. The ignored `runtime/` directory rule was removed
+from the harness `.gitignore` so the Python package is tracked.
+
+Evidence:
+
+- Focused runtime, protocol, worker-session, app, and runner checks: `21/21`
+  passed before the final full-suite run.
+- Full Semantic Harness Python discovery after the move: `276/276` passed in
+  `169.613s`, exit `0`.
+- Full embedded Lua regression:
+  `python3 tests/run_tests.py --jobs 1 --harness-report /tmp/semantic-harness-runtime-slice-lua.json`
+  — `853/853` passed in `15.99s`, exit `0`.
+- Real worker doctor:
+  `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all
+  required checks true, including worker syntax and `READY/PING/CAPABILITIES`.
+
+Next mandatory slice: move the Semantic Lab authoring/workflow and dataset
+orchestration into a `studio/` package while keeping
+`SemanticLabAuthoringService` and the existing CodeBuilder service facade as
+the single authoring API.
+
 ## V1 — reusable visual CodeBlocks graph
 
 **Status:** implemented and developer-verified. Commit: `c1913c9c`.
