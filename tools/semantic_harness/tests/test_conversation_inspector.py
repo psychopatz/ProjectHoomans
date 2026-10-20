@@ -166,6 +166,76 @@ class ConversationInspectorTests(unittest.TestCase):
             rendered.index("COMMAND AUTHORITY (SEPARATE)"),
         )
 
+    def test_acceptance_chain_projects_graph_provider_permission_and_dossier_delta(self) -> None:
+        descriptor = {
+            "descriptorID": "history.backstory.former_job",
+            "status": "confirmed",
+            "value": "farmer",
+            "evidenceCount": 1,
+            "category": "history",
+        }
+        record = {
+            "input": "what was your old job",
+            "result": {
+                "ir": {
+                    "intent": "QUESTION",
+                    "speechAct": "QUESTION",
+                    "provenance": {"pattern": "pnc.lab.former_job"},
+                    "diagnostics": {
+                        "factStatus": "known",
+                        "factProvider": "npc_backstory",
+                    },
+                },
+                "decision": {"branch": "QUESTION_RECEIVED"},
+            },
+            "observation": {
+                "selectedCandidate": {
+                    "patternID": "pnc.lab.former_job",
+                    "metadata": {
+                        "semanticLabGraph": {
+                            "schema": "semantic.interaction_spec.v1",
+                            "fingerprint": "abc123",
+                            "graph": {
+                                "blocks": [
+                                    {"id": "trigger", "type": "language.trigger"},
+                                    {"id": "response", "type": "dialogue_responses.response_pool"},
+                                ],
+                                "connections": [
+                                    {"from": "trigger", "to": "response", "type": "response"},
+                                ],
+                            },
+                        },
+                    },
+                },
+                "response": {"text": "I worked as farmer before all this."},
+                "sideEffects": {"actions": []},
+            },
+            "translation": {
+                "language": "EN",
+                "lookups": [{"key": "UI_PNC_LabFormerJob", "fallbackUsed": False}],
+            },
+            "contextBefore": {"knowledge": None},
+            "contextAfter": {
+                "knowledge": {
+                    "revision": 3,
+                    "categories": [{"id": "history", "descriptors": [descriptor]}],
+                },
+            },
+        }
+
+        view = build_conversation_inspector(record)
+        chain = view["acceptanceChain"]
+        self.assertEqual(chain["utterance"], "what was your old job")
+        self.assertEqual(chain["selectedCodeBlock"]["graphFingerprint"], "abc123")
+        self.assertEqual(chain["selectedGraph"]["connections"][0]["type"], "response")
+        self.assertEqual(chain["factProvider"], ["npc_backstory"])
+        self.assertEqual(chain["knowledgePermission"]["status"], "known")
+        self.assertEqual(chain["actualNPCResponse"]["text"], "I worked as farmer before all this.")
+        self.assertEqual(
+            chain["dossierChanges"]["addedDescriptorIDs"],
+            ["history.backstory.former_job"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

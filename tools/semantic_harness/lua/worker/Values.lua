@@ -30,6 +30,32 @@ function Values.copy(value, depth, seen)
     return output
 end
 
+-- Production modules use Core.DeepCopy for persistence and canonical records.
+-- Keep the bounded copy above for worker responses, but do not let its
+-- diagnostic cap alter the serialized data that the real Core path stores.
+function Values.productionCopy(value, seen)
+    if type(value) ~= "table" then return value end
+    seen = seen or {}
+    if seen[value] then return "<cycle>" end
+    seen[value] = true
+    local output = {}
+    for key, item in pairs(value) do
+        if type(key) == "string" or type(key) == "number" then
+            local itemType = type(item)
+            if itemType == "table" then
+                output[key] = Values.productionCopy(item, seen)
+            elseif itemType ~= "function"
+                and itemType ~= "userdata"
+                and itemType ~= "thread"
+            then
+                output[key] = item
+            end
+        end
+    end
+    seen[value] = nil
+    return output
+end
+
 function Values.clearTable(value)
     for key in pairs(value) do value[key] = nil end
     return value

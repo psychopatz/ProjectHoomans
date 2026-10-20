@@ -9,6 +9,7 @@ import tempfile
 import unittest
 
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.conversation_inspector import build_conversation_inspector
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.tests.test_interaction_spec import backstory_spec, stay_spec
 from tools.semantic_harness.worker import LuaSemanticWorker
@@ -163,7 +164,13 @@ class V1VisualAuthoringTests(unittest.TestCase):
                 action_turn["messages"][0]["payload"]["text"],
             "Okay, I will follow you for V1.",
             )
-            self.assertTrue(action_turn["observation"]["sideEffects"]["actions"])
+        self.assertTrue(action_turn["observation"]["sideEffects"]["actions"])
+        inspection = build_conversation_inspector(action_turn)
+        self.assertTrue(inspection["acceptanceChain"]["selectedGraph"]["available"])
+        self.assertEqual(
+            inspection["acceptanceChain"]["selectedGraph"]["schema"],
+            "semantic.interaction_spec.v1",
+        )
 
 
 if __name__ == "__main__":

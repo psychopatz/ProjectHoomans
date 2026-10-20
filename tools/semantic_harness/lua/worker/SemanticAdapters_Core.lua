@@ -61,7 +61,7 @@ function Provider.configure(context, SemanticAdapters)
     PNC.Core = PNC.Core or {}
     PNC.Core.SemanticHarness = true
     PNC.Core.Now = function() return Runtime.now end
-    PNC.Core.DeepCopy = function(value) return Values.copy(value) end
+    PNC.Core.DeepCopy = function(value) return Values.productionCopy(value) end
     PNC.Const = PNC.Const or {}
     PNC.Const.MODULE = "ProjectHoomans"
     PNC.Const.CMD_SEMANTIC_IDENTITY_REQUEST = "SemanticIdentityRequest"

@@ -42,6 +42,7 @@ local function boundedCandidates(context, result)
                 pass = candidate.pass,
                 fuzzy = candidate.fuzzy == true,
                 selected = candidate.selected == true,
+                metadata = Values.copy(candidate.metadata),
             }
         end
     end
@@ -330,6 +331,7 @@ function OutputProjection.observation(context, record)
         selectedCandidate = {
             patternID = selectedCandidate.patternID,
             score = selectedCandidate.score or selectedCandidate.confidence,
+            metadata = Values.copy(selectedCandidate.metadata),
         },
     }
 end

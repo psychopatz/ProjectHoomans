@@ -231,7 +231,8 @@ function Catalog.Internal.RegisterGeneratedSemanticPatterns()
             pattern.match,
             pattern.emit,
             pattern.confidence,
-            pattern.priority
+            pattern.priority,
+            { metadata = pattern.metadata }
         )
         if registered ~= true then
             error("generated semantic pattern could not be registered: "

@@ -113,13 +113,26 @@ class LuaSemanticWorker:
     def knowledge_metrics(
         self, synthetic_npcs: int = 0, facts_per_npc: int = 1
     ) -> dict[str, Any]:
-        """Measure the production Knowledge ModData table at bounded scale."""
+        """Measure serialized production NPC and player Knowledge records."""
 
         return self._request(
             "KNOWLEDGE_METRICS",
             {
                 "syntheticNPCs": int(synthetic_npcs),
                 "factsPerNPC": int(facts_per_npc),
+            },
+        )
+
+    def knowledge_discover(
+        self, topic_id: str, npc_id: str | None = None
+    ) -> dict[str, Any]:
+        """Use the production direct-disclosure Knowledge path for a topic."""
+
+        return self._request(
+            "KNOWLEDGE_DISCOVER",
+            {
+                "topicID": str(topic_id),
+                "npcID": str(npc_id) if npc_id is not None else None,
             },
         )
 

@@ -108,6 +108,98 @@ def _fact_providers(facts: dict[str, Any]) -> list[str]:
     return sorted(providers)
 
 
+def _graph_projection(selected: dict[str, Any]) -> dict[str, Any]:
+    metadata = selected.get("metadata")
+    metadata = metadata if isinstance(metadata, dict) else {}
+    graph_metadata = metadata.get("semanticLabGraph")
+    graph_metadata = graph_metadata if isinstance(graph_metadata, dict) else {}
+    graph = graph_metadata.get("graph")
+    graph = graph if isinstance(graph, dict) else {}
+    blocks = graph.get("blocks", [])
+    blocks = blocks if isinstance(blocks, list) else []
+    connections = graph.get("connections", [])
+    connections = connections if isinstance(connections, list) else []
+    compact_blocks = [
+        {
+            "id": block.get("id"),
+            "type": block.get("type"),
+        }
+        for block in blocks
+        if isinstance(block, dict)
+    ]
+    compact_connections = [
+        {
+            "from": connection.get("from"),
+            "to": connection.get("to"),
+            "type": connection.get("type"),
+        }
+        for connection in connections
+        if isinstance(connection, dict)
+    ]
+    return {
+        "available": bool(graph_metadata),
+        "schema": graph_metadata.get("schema"),
+        "fingerprint": graph_metadata.get("fingerprint"),
+        "blocks": _bounded(compact_blocks, limit=16),
+        "connections": _bounded(compact_connections, limit=24),
+    }
+
+
+def _dossier_entries(snapshot: Any) -> dict[str, dict[str, Any]]:
+    if not isinstance(snapshot, dict):
+        return {}
+    knowledge = snapshot.get("knowledge") or snapshot.get("dossier")
+    if not isinstance(knowledge, dict):
+        return {}
+    entries: dict[str, dict[str, Any]] = {}
+    categories = knowledge.get("categories", [])
+    if not isinstance(categories, list):
+        return entries
+    for category in categories:
+        if not isinstance(category, dict):
+            continue
+        descriptors = category.get("descriptors", [])
+        if not isinstance(descriptors, list):
+            continue
+        for descriptor in descriptors:
+            if not isinstance(descriptor, dict):
+                continue
+            descriptor_id = str(descriptor.get("descriptorID") or "")
+            if descriptor_id:
+                entries[descriptor_id] = {
+                    "status": descriptor.get("status"),
+                    "value": descriptor.get("value"),
+                    "evidenceCount": descriptor.get("evidenceCount"),
+                    "category": descriptor.get("category") or category.get("id"),
+                }
+    return entries
+
+
+def _dossier_changes(before: Any, after: Any) -> dict[str, Any]:
+    before_entries = _dossier_entries(before)
+    after_entries = _dossier_entries(after)
+    added = sorted(set(after_entries) - set(before_entries))
+    removed = sorted(set(before_entries) - set(after_entries))
+    changed = sorted(
+        key for key in set(before_entries) & set(after_entries)
+        if before_entries[key] != after_entries[key]
+    )
+    after_knowledge = after.get("knowledge") if isinstance(after, dict) else None
+    return {
+        "scope": "player_scoped_npc_dossier",
+        "beforeCount": len(before_entries),
+        "afterCount": len(after_entries),
+        "addedDescriptorIDs": added,
+        "removedDescriptorIDs": removed,
+        "changedDescriptorIDs": changed,
+        "afterRevision": (
+            after_knowledge.get("revision")
+            if isinstance(after_knowledge, dict)
+            else None
+        ),
+    }
+
+
 def _visible_text(record: dict[str, Any], response: dict[str, Any]) -> dict[str, Any]:
     messages = record.get("messages", [])
     npc_message = next(
@@ -224,6 +316,50 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
         "entries": _bounded(facts, limit=32),
         "planFactRefs": _bounded(plan_refs),
     }
+    graph_view = _graph_projection(selected)
+    codeblock_view = {
+        "patternID": selected.get("patternID"),
+        "graphFingerprint": graph_view.get("fingerprint"),
+        "blockIDs": [
+            block.get("id")
+            for block in graph_view.get("blocks", [])
+            if isinstance(block, dict) and block.get("id")
+        ],
+        "blockTypes": [
+            block.get("type")
+            for block in graph_view.get("blocks", [])
+            if isinstance(block, dict) and block.get("type")
+        ],
+    }
+    knowledge_permission = {
+        "status": fact_status,
+        "reason": diagnostics.get("factReason") or diagnostics.get("reason"),
+        "provider": diagnostics.get("factProvider") or facts_view["providers"],
+        "scope": "player_scoped_npc_knowledge",
+        "dossierPresent": bool(_dossier_entries(context)),
+    }
+    fact_provider = diagnostics.get("factProvider") or facts_view["providers"]
+    if isinstance(fact_provider, str):
+        fact_provider = [fact_provider]
+    translation_view = record.get("translation", {})
+    translation_view = (
+        translation_view if isinstance(translation_view, dict) else {}
+    )
+    acceptance_chain = {
+        "utterance": record.get("input"),
+        "selectedCodeBlock": _bounded(codeblock_view, limit=16),
+        "selectedGraph": _bounded(graph_view, limit=24),
+        "coreMeaning": _bounded(understanding, limit=16),
+        "factProvider": fact_provider,
+        "knowledgePermission": _bounded(knowledge_permission, limit=16),
+        "translation": _bounded(translation_view, limit=24),
+        "actualNPCResponse": _bounded(visible_response, limit=16),
+        "gameplayEffects": _bounded(effects, limit=24),
+        "dossierChanges": _bounded(
+            _dossier_changes(record.get("contextBefore"), context),
+            limit=24,
+        ),
+    }
     dialogue_planning = {
         "topic": (plan or {}).get("topic") or response.get("topic"),
         "dialogueAct": (plan or {}).get("dialogueAct")
@@ -287,6 +423,7 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
         },
         "understanding": _bounded(understanding, limit=16),
         "facts": _bounded(facts_view, limit=32),
+        "acceptanceChain": acceptance_chain,
         "dialoguePlanning": _bounded(dialogue_planning, limit=24),
         "finalResponse": _bounded({
             **visible_response,

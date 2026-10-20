@@ -9,7 +9,7 @@ local capabilities = {
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
     "REPLAY_SEMANTIC_QUEST",
     "COMMITMENT", "BACKSTORY", "BACKSTORY_FACT",
-    "KNOWLEDGE_BOOTSTRAP", "KNOWLEDGE_METRICS",
+    "KNOWLEDGE_BOOTSTRAP", "KNOWLEDGE_DISCOVER", "KNOWLEDGE_METRICS",
 }
 
 local function backstorySnapshot(payload)
@@ -140,13 +140,34 @@ local function knowledgeMetrics(context, payload)
 
     local raw = ModData and type(ModData.get) == "function"
         and ModData.get("PNC_NPCKnowledge") or nil
-    local serialized = raw and context.Protocol.encode(raw) or ""
+    local canonicalKnowledge = type(knowledge.Registry) == "table"
+        and knowledge.Registry or raw
+    local hasKnowledge = canonicalKnowledge
+        and type(canonicalKnowledge.byCharacter) == "table"
+        and next(canonicalKnowledge.byCharacter) ~= nil
+    local knowledgeSerialized = hasKnowledge
+        and context.Protocol.encode(canonicalKnowledge) or ""
+    local modDataSerialized = raw and context.Protocol.encode(raw) or ""
+    local registry = PNC.Registry
+    local actor = registry and type(registry.Get) == "function"
+        and registry.Get(context.npcData and context.npcData.npcID) or nil
+    actor = type(actor) == "table" and actor or context.npcData or {}
+    local backstoryMetadata = type(actor.identity) == "table"
+        and actor.identity.backstory or nil
+    local actorSerialized = context.Protocol.encode(actor)
+    local backstorySerialized = backstoryMetadata
+        and context.Protocol.encode(backstoryMetadata) or ""
+    local combinedSerialized = context.Protocol.encode({
+        npc = actor,
+        playerKnowledge = hasKnowledge and canonicalKnowledge or nil,
+    })
     local characterCount = 0
     local npcCount = 0
     local evidenceCount = 0
-    local registry = raw and raw.byCharacter or {}
-    for _ in pairs(registry) do characterCount = characterCount + 1 end
-    for _, character in pairs(registry) do
+    local knowledgeRegistry = hasKnowledge
+        and canonicalKnowledge.byCharacter or {}
+    for _ in pairs(knowledgeRegistry) do characterCount = characterCount + 1 end
+    for _, character in pairs(knowledgeRegistry) do
         for _, note in pairs(character.byNPC or {}) do
             npcCount = npcCount + 1
             evidenceCount = evidenceCount + #(note.evidence or {})
@@ -156,15 +177,47 @@ local function knowledgeMetrics(context, payload)
         ok = true,
         type = "knowledge_metrics",
         modDataKey = "PNC_NPCKnowledge",
-        serializedBytes = #serialized,
+        serializedBytes = #knowledgeSerialized,
+        actorStorageBytes = #actorSerialized,
+        backstoryMetadataBytes = #backstorySerialized,
+        knowledgeStorageBytes = #knowledgeSerialized,
+        combinedStorageBytes = #combinedSerialized,
+        modDataSnapshotBytes = #modDataSerialized,
+        actorRecordPresent = next(actor) ~= nil,
+        backstoryMetadataPresent = backstoryMetadata ~= nil,
         persisted = raw ~= nil,
         characterCount = characterCount,
         npcCount = npcCount,
         evidenceCount = evidenceCount,
         syntheticNPCsRequested = syntheticNPCs,
         syntheticEvidenceRecorded = recorded,
-        encoding = "worker_protocol_json_of_production_moddata_table",
+        encoding = "worker_protocol_json_of_production_npc_and_moddata_tables",
         registryRevision = raw and raw.revision or 0,
+    }
+end
+
+local function knowledgeDiscover(context, payload)
+    local knowledge = PNC.NPCKnowledge
+    payload = type(payload) == "table" and payload or {}
+    if not knowledge or type(knowledge.DiscoverTopicForPlayer) ~= "function" then
+        return nil, "knowledge_discovery_unavailable"
+    end
+    local topicID = tostring(payload.topicID or "")
+    if topicID == "" then return nil, "knowledge_topic_required" end
+    local result, reason = knowledge.DiscoverTopicForPlayer(
+        context.player,
+        tostring(payload.npcID or context.npcData.npcID),
+        topicID,
+        tonumber(payload.worldAgeHours or context.world.worldAgeHours) or 0,
+        "direct_disclosure",
+        false
+    )
+    if not result then return nil, reason end
+    return {
+        ok = true,
+        type = "knowledge_discovery",
+        topicID = topicID,
+        result = result,
     }
 end
 
@@ -262,6 +315,8 @@ function CommandRouter.dispatch(context, request)
             type = "knowledge_bootstrap",
             result = Values.copy(result),
         }
+    elseif command == "KNOWLEDGE_DISCOVER" then
+        return knowledgeDiscover(context, payload)
     elseif command == "KNOWLEDGE_METRICS" then
         return knowledgeMetrics(context, payload)
     elseif command == "FACT_CATALOG" then

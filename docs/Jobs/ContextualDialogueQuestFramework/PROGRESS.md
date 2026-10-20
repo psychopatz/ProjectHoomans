@@ -30,7 +30,7 @@ The existing `PsychopatzCustomTranslationManager`, `PNC.Translation`, registered
 
 ## V3 — personality-aware Knowledge disclosure
 
-**Status:** implementation complete for this chunk; focused verification passed, commit pending this progress update.
+**Status:** implemented and developer-verified. Commit: `8adfe968`.
 
 The existing Knowledge owner now evaluates topic alignment and private/personal disclosure willingness using the registered NPC personality/social style plus existing familiarity and approval. Familiarity remains eligibility only; guarded styles do not reveal facts without the stronger relationship context. Discovery, backstory preview/disclosure, and the semantic backstory fact provider pass the same topic context. No duplicate Knowledge service or per-NPC ModData was introduced.
 
@@ -40,9 +40,21 @@ Evidence:
 - Lua smoke: `pnc_backstory_knowledge_disclosure_smoke`, 1/1 passed for friendly, guarded, and topic-mismatch cases.
 - PZ Kahlua verification: 0 errors across the changed Knowledge directory and backstory fact-source file.
 
-## Remaining mandatory chunks
+## V4 — persistence and Conversation Inspector
 
-- V4: measure complete serialized actor, player Knowledge, and combined records at 0/1/10 discoveries and synthetic 100/1,000 populations; extend the existing readable Conversation Inspector with graph-to-effect provenance.
+**Status:** implemented and developer-verified in the existing worker/inspector path; commit pending this progress update.
+
+The existing `KNOWLEDGE_METRICS` worker command now serializes the complete canonical NPC record, backstory metadata, player-scoped Knowledge registry, and combined actor/Knowledge payload with the production Core deep-copy behavior. It preserves the legacy Knowledge byte field and reports the persisted ModData snapshot separately. The existing Conversation Inspector now projects a bounded readable acceptance chain: utterance, selected CodeBlock/graph fingerprint and edges, Core meaning, fact provider, Knowledge permission, translation lookups, actual NPC response, gameplay effects, and dossier delta. Generated semantic patterns now retain the existing graph metadata through the production catalog and worker observation.
+
+Evidence:
+
+- H4 worker suite: 3 tests passed, including legitimate 0/1/10 discovery comparisons and synthetic 100/1,000 NPC populations.
+- Measured canonical worker records: 0 discoveries `actor=1002`, `backstory=0`, `knowledge=0`, `combined=1010` bytes; 1 discovery `actor=1608`, `backstory=593`, `knowledge=751`, `combined=2386`; 10 discoveries `actor=1623`, `backstory=593`, `knowledge=4887`, `combined=6537`; synthetic 1000/1 `knowledge=467754`, `combined=468783`, `npcCount=1000`.
+- Conversation Inspector and V1 worker graph-provenance tests passed; graph metadata remains bounded and raw JSON remains an advanced diagnostic rather than the primary chain.
+- Production-copy behavior was aligned with the native Core deep-copy implementation so the worker's diagnostic response bound cannot truncate persistence measurements.
+
+## Remaining mandatory chunk
+
 - V5: run the complete Studio approval → generated assets → worker restart → conversation → Knowledge/Dossier/multiplayer privacy → regeneration behavior-change acceptance, then run focused/full developer checks and record exact SHAs, commands, exit codes, generated paths, responses, effects, and persistence measurements.
 
 `GOAL_PROMPT.md` was not created or modified.
