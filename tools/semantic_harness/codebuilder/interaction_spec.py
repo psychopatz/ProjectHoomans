@@ -487,6 +487,7 @@ def _compile_backstory_interaction(
             "disclosure": subject_parameters["disclosure"],
             "factProvider": fact_parameters["providerID"],
             "topicID": subject_parameters["topicID"],
+            "responsePoolID": pool_id,
         },
     }
     follow_up = subject_parameters.get("dialogueFollowUp")

@@ -88,13 +88,20 @@ local function knowledgeMetrics(context, payload)
         ) or 0))
     )
     local factsPerNPC = math.min(
-        3,
+        32,
         math.max(1, math.floor(tonumber(
             type(payload) == "table" and payload.factsPerNPC or 1
         ) or 1))
     )
     local descriptorIDs = {
         "personality.social_style",
+        "personality.compassion",
+        "personality.sociability",
+        "personality.forgiveness",
+        "personality.bravery",
+        "personality.materialism",
+        "personality.aggression",
+        "personality.loyalty",
         "personality.compassion",
         "personality.sociability",
     }
@@ -109,10 +116,13 @@ local function knowledgeMetrics(context, payload)
     knowledge.EnsureLoaded()
     for index = 1, syntheticNPCs do
         for factIndex = 1, factsPerNPC do
+            local descriptorID = descriptorIDs[
+                ((factIndex - 1) % #descriptorIDs) + 1
+            ]
             local result = knowledge.RecordEvidence({
                 characterUUID = context.playerData.characterUUID,
                 npcID = "harness-synthetic-npc-" .. tostring(index),
-                descriptorID = descriptorIDs[factIndex],
+                descriptorID = descriptorID,
                 sourceType = "observed_behavior",
                 direction = 1,
                 strength = 0.5,

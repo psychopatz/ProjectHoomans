@@ -41,6 +41,7 @@ DIALOGUE_BACKSTORY_KINDS = frozenset({
 })
 DIALOGUE_BACKSTORY_EXTENSIONS = frozenset({
     "factProvider", "topicID", "disclosure", "dialogueFollowUp",
+    "responsePoolID",
 })
 DIALOGUE_BACKSTORY_DISCLOSURES = frozenset({
     "server_authorized", "confirmed", "suspected", "refused",

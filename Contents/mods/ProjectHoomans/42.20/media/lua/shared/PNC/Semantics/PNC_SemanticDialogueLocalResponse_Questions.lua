@@ -334,19 +334,30 @@ local function resolveBackstoryQuestion(ir, state, context)
     if fact and fact.status == "known"
         and type(content) == "string" and content ~= ""
     then
+        local extensions = ir and type(ir.extensions) == "table"
+            and ir.extensions or {}
+        local authoredPool = extensions.responsePoolID
+        local responseArgs = {
+            kind = kind,
+            content = content,
+        }
+        -- A generated interaction may supply its reviewed response pool. Use
+        -- it only after the fact provider has returned an authorized known
+        -- value; refusal and suspected branches retain their safe catalog
+        -- responses and cannot turn an authored template into disclosure.
+        if type(authoredPool) == "string" and authoredPool ~= "" then
+            response = catalogResponse(
+                authoredPool, ir, state, context, responseArgs
+            )
+        end
         local generatedPool = "semantic.question.backstory.known." .. tostring(kind)
-        response = catalogResponse(
-            generatedPool, ir, state, context, {
-                kind = kind,
-                content = content,
-            }
-        )
+        if not response then response = catalogResponse(
+            generatedPool, ir, state, context, responseArgs
+        ) end
         if not response then
             response = catalogResponse(
-                "semantic.question.backstory.known", ir, state, context, {
-                    kind = kind,
-                    content = content,
-                }
+                "semantic.question.backstory.known", ir, state, context,
+                responseArgs
             )
         end
         if response then

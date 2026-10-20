@@ -258,7 +258,12 @@ local function disclosureResponsePayload(result)
     local kind = string.sub(topicID, 11)
     local poolID
     if result.success == true then
-        poolID = "semantic.question.backstory.known." .. kind
+        if type(result.responsePoolID) == "string"
+            and result.responsePoolID ~= "" then
+            poolID = result.responsePoolID
+        else
+            poolID = "semantic.question.backstory.known." .. kind
+        end
     else
         poolID = "semantic.question.backstory.refusal"
     end
@@ -267,6 +272,16 @@ local function disclosureResponsePayload(result)
         topic = "NPC_BACKSTORY",
         subject = "NPC_BACKSTORY",
     }, result.requestID)
+    if type(variant) ~= "table"
+        and result.success == true
+        and poolID ~= "semantic.question.backstory.known." .. kind then
+        poolID = "semantic.question.backstory.known." .. kind
+        variant = catalog.Select(poolID, {
+            npcID = result.npcID,
+            topic = "NPC_BACKSTORY",
+            subject = "NPC_BACKSTORY",
+        }, result.requestID)
+    end
     if type(variant) ~= "table" then return nil end
     local content = result.success == true
         and localizedBackstoryContent(result, kind) or result.responseText

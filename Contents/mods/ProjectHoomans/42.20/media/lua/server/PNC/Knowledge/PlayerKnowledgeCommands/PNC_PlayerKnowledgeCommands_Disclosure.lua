@@ -56,6 +56,9 @@ function Commands.HandleDisclosure(player, args)
     local npcID = H.SafeID(args.npcID)
     local topicID = H.SafeID(args.topicID)
     local preferenceItemType = H.SafeID(args.preferenceItemType)
+    -- Presentation metadata only: authoritative Knowledge still decides
+    -- disclosure and returns the player-filtered snapshot.
+    local responsePoolID = H.SafeID(args.responsePoolID)
     local context, reason = H.ContextFor(player, "knowledge_disclosure")
     local payload
     if not requestID or not npcID or not topicID or not context then
@@ -138,6 +141,7 @@ function Commands.HandleDisclosure(player, args)
                 payload = {
                     requestID = requestID, npcID = npcID, topicID = topicID,
                     success = true, reason = "committed",
+                    responsePoolID = responsePoolID,
                     responseText = topicID == "identity_name"
                         and H.IntroductionText(npcID)
                         or string.sub(topicID, 1, 10) == "backstory."
@@ -168,6 +172,7 @@ function Commands.HandleDisclosure(player, args)
                 payload = {
                     requestID = requestID, npcID = npcID, topicID = topicID,
                     success = false, reason = commitReason or "commit_failed",
+                    responsePoolID = responsePoolID,
                     responseText = string.sub(topicID, 1, 10) == "backstory."
                         and H.BackstoryRefusalText(commitReason) or nil,
                     presentation = { npcID = npcID, state = "error",

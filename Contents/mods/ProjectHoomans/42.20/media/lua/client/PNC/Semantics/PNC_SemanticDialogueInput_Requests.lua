@@ -267,12 +267,15 @@ function Requests.PrepareIdentityRequest(view, ir, context)
     if ir.intent == "QUESTION" and ir.subject == "NPC_BACKSTORY" then
         local kind = backstoryKind(ir)
         if not kind then return nil end
+        local extensions = type(ir.extensions) == "table" and ir.extensions or {}
         return {
             kind = "backstory_disclosure",
             npcID = npcID,
             backstoryKind = kind,
             topicID = "backstory." .. kind,
             conversationToken = lifecycle and lifecycle.token,
+            responsePoolID = type(extensions.responsePoolID) == "string"
+                and extensions.responsePoolID or nil,
         }
     end
 
@@ -344,6 +347,7 @@ function Requests.DispatchIdentityRequest(request)
             request.npcID, request.topicID, {
                 conversationToken = request.conversationToken,
                 origin = "semantic_dialogue",
+                responsePoolID = request.responsePoolID,
             }
         )
     end
