@@ -110,6 +110,19 @@ class LuaSemanticWorker:
             "KNOWLEDGE_BOOTSTRAP", {"requestID": str(request_id)}
         )
 
+    def knowledge_metrics(
+        self, synthetic_npcs: int = 0, facts_per_npc: int = 1
+    ) -> dict[str, Any]:
+        """Measure the production Knowledge ModData table at bounded scale."""
+
+        return self._request(
+            "KNOWLEDGE_METRICS",
+            {
+                "syntheticNPCs": int(synthetic_npcs),
+                "factsPerNPC": int(facts_per_npc),
+            },
+        )
+
     def replay_quest_request(self, request: dict[str, Any]) -> dict[str, Any]:
         """Replay a captured request through the production server router."""
 

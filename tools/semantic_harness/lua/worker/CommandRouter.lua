@@ -9,7 +9,7 @@ local capabilities = {
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
     "REPLAY_SEMANTIC_QUEST",
     "COMMITMENT", "BACKSTORY", "BACKSTORY_FACT",
-    "KNOWLEDGE_BOOTSTRAP",
+    "KNOWLEDGE_BOOTSTRAP", "KNOWLEDGE_METRICS",
 }
 
 local function backstorySnapshot(payload)
@@ -76,6 +76,85 @@ local function backstoryFact(payload)
         ok = true,
         type = "backstory_fact",
         fact = result,
+    }
+end
+
+local function knowledgeMetrics(context, payload)
+    local knowledge = PNC.NPCKnowledge
+    local syntheticNPCs = math.min(
+        1000,
+        math.max(0, math.floor(tonumber(
+            type(payload) == "table" and payload.syntheticNPCs or 0
+        ) or 0))
+    )
+    local factsPerNPC = math.min(
+        3,
+        math.max(1, math.floor(tonumber(
+            type(payload) == "table" and payload.factsPerNPC or 1
+        ) or 1))
+    )
+    local descriptorIDs = {
+        "personality.social_style",
+        "personality.compassion",
+        "personality.sociability",
+    }
+    local recorded = 0
+    local index
+    local factIndex
+    if not knowledge or type(knowledge.EnsureLoaded) ~= "function"
+        or type(knowledge.RecordEvidence) ~= "function"
+    then
+        return nil, "knowledge_metrics_unavailable"
+    end
+    knowledge.EnsureLoaded()
+    for index = 1, syntheticNPCs do
+        for factIndex = 1, factsPerNPC do
+            local result = knowledge.RecordEvidence({
+                characterUUID = context.playerData.characterUUID,
+                npcID = "harness-synthetic-npc-" .. tostring(index),
+                descriptorID = descriptorIDs[factIndex],
+                sourceType = "observed_behavior",
+                direction = 1,
+                strength = 0.5,
+                reliability = 0.75,
+                sourceEventID = "harness-metrics-"
+                    .. tostring(index) .. "-" .. tostring(factIndex),
+                payload = { observedValue = "synthetic" },
+            })
+            if result then recorded = recorded + 1 end
+        end
+    end
+    if recorded > 0 and type(knowledge.Save) == "function" then
+        knowledge.Save(false)
+    end
+
+    local raw = ModData and type(ModData.get) == "function"
+        and ModData.get("PNC_NPCKnowledge") or nil
+    local serialized = raw and context.Protocol.encode(raw) or ""
+    local characterCount = 0
+    local npcCount = 0
+    local evidenceCount = 0
+    local registry = raw and raw.byCharacter or {}
+    for _ in pairs(registry) do characterCount = characterCount + 1 end
+    for _, character in pairs(registry) do
+        for _, note in pairs(character.byNPC or {}) do
+            npcCount = npcCount + 1
+            evidenceCount = evidenceCount + #(note.evidence or {})
+        end
+    end
+    return {
+        ok = true,
+        type = "knowledge_metrics",
+        modDataKey = "PNC_NPCKnowledge",
+        serializedBytes = #serialized,
+        persisted = raw ~= nil,
+        characterCount = characterCount,
+        npcCount = npcCount,
+        evidenceCount = evidenceCount,
+        syntheticNPCsRequested = syntheticNPCs,
+        syntheticEvidenceRecorded = recorded,
+        encoding = "worker_protocol_json_of_production_moddata_table",
+        registryRevision = raw and raw.revision or 0,
     }
 end
 
@@ -173,6 +252,8 @@ function CommandRouter.dispatch(context, request)
             type = "knowledge_bootstrap",
             result = Values.copy(result),
         }
+    elseif command == "KNOWLEDGE_METRICS" then
+        return knowledgeMetrics(context, payload)
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,

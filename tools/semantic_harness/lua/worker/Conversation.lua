@@ -167,6 +167,23 @@ function Conversation.contextSnapshot(harnessContext, view)
         and PNC.Network.ClientState.npcKnowledge
         and PNC.Network.ClientState.npcKnowledge[tostring(npcID or "")]
         or nil
+    local memory = PNC.Conversation and PNC.Conversation.Memory
+    local pbrainzFacts
+    local npcRecord = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(npcID) or nil
+    if type(knowledge) == "table"
+        and type(memory) == "table"
+        and type(memory.BuildAuthorizedBackstoryFacts) == "function"
+    then
+        local ok, facts = pcall(
+            memory.BuildAuthorizedBackstoryFacts,
+            npcRecord,
+            knowledge,
+            10,
+            harnessContext.Translations.scenarioLanguage(harnessContext)
+        )
+        if ok and type(facts) == "table" then pbrainzFacts = facts end
+    end
     local engineFacts = {}
     local factCatalog = harnessContext.EngineFacts
         and harnessContext.EngineFacts.List
@@ -188,6 +205,12 @@ function Conversation.contextSnapshot(harnessContext, view)
         -- NPC record or the identity-seeded backstory generator.
         knowledge = Values.copy(knowledge),
         dossier = Values.copy(knowledge),
+        pbrainz = {
+            enabled = harnessContext.runtime.llmEnabled == true,
+            providerAvailable = harnessContext.runtime.providerAvailable == true,
+            disclosureFiltered = true,
+            backstoryFacts = Values.copy(pbrainzFacts),
+        },
         dialogue = dialogueContext and dialogueContext.ToContext
             and dialogueContext:ToContext() or null,
         state = semanticState and semanticState.Snapshot
