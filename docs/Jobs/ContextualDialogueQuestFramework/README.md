@@ -1,5 +1,8 @@
 # Contextual Dialogue & Quest Framework — Project Hoomans
 
+**Branch policy:** NO NEW GIT BRANCHES. User requires existing `main` as the eventual destination; preserve and reconcile the preexisting PR #4 safely without new branches, force/rebase/reset or overwriting concurrent work. See `GIT_INTEGRATION_AND_NO_NEW_BRANCHES.md`.
+
+
 **CURRENT goal (2026-10-20): B phase — Grounded Personal Dialogue, Sparse Backstory, Knowledge & Dossier.** The previously implemented Semantic Lab R/C7 work remains accepted at its *recorded* developer gates; it is not a substitute for the user's newer real conversation example. User observed `nice dress` → generic misunderstanding and `you got nice dress` → wrong inventory question/query. The immediate objective is to fix that semantic collision, then reuse EXISTING identity-seeded NPC backstory, Knowledge disclosure and dossier systems rather than creating competing modules.
 
 The authoritative new phase design/low-ModData contract is `GROUNDED_PERSONAL_DIALOGUE_B.md`; `ROADMAP.md` has phase order; **`PROGRESS.md` defines exactly ONE current Next Chunk: B0**. Prior C7 ledger is archived verbatim in `HISTORY_C7_20261020.md`, preserving recorded 244/244 harness, 68/68 Lua smoke and 16/16 compiler results. It has NOT been rerun for B. Older ledgers are not active instructions.
