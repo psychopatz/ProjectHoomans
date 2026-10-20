@@ -151,6 +151,16 @@ class SemanticLabWorkflowPane:
         self._enabled = True
         self.refresh()
 
+    def _add_entry(self, parent: Any, row: int, label: str, variable: Any) -> None:
+        """Add one editable parameter row to the workflow composer."""
+
+        self._ttk.Label(parent, text=label).grid(
+            row=row, column=0, sticky="w", padx=6, pady=2
+        )
+        self._ttk.Entry(parent, textvariable=variable).grid(
+            row=row, column=1, sticky="ew", padx=(0, 6), pady=2
+        )
+
     def _set_report(self, value: Any) -> None:
         self._report.configure(state="normal")
         self._report.delete("1.0", "end")
