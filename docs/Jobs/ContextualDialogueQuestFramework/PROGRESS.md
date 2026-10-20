@@ -4,7 +4,7 @@
 
 **Parent status:** **IN PROGRESS — H0–H4 required; not ready for user live test.**
 
-**Current chunk:** H2 — extend the existing CodeBuilder contract for typed `NPC_BACKSTORY` authoring.
+**Current chunk:** H3 — connect ordinary disclosure results, player-scoped dossier state, and personal conversation continuity.
 
 ## Repository and dependency evidence
 
@@ -51,7 +51,18 @@ The EN/TL trace therefore proves B0 candidate selection and existing Core-backed
 - `6b783d09` — progress ledger for integration, exact baseline reproduction, protocol repair, doctor, and full post-fix Python evidence.
 - `e7a6adb8ffd2a77a7936016d22db95825b637aa` — shared 512 KiB worker protocol/config bound and regression coverage.
 - `a3c5b5a7` — local existing-main integration of prior B0–B6 history and current canonical H0–H4 documentation.
+- `98b54dc0` — H2 typed `NPC_BACKSTORY` CodeBuilder contract, deterministic supplemental Lua/EN/TL generation, production catalog registration, and fresh-worker load regression.
+
+## H2 evidence
+
+- Canonical source: `tools/semantic_compiler/grounded_personal_dialogue.json` contains five reviewed backstory patterns and eleven localized response pools with typed `fact_content` arguments.
+- Existing Semantic Lab preview returned `True` with 5 patterns, 11 pools, 11 EN and 11 TL bindings, and no writes.
+- Explicit generation through the existing writer produced and then byte-stably re-produced `PNC_SemanticGroundedPersonalDialogue.lua`, its pattern/response shards, `GroundedPersonalDialogue.json` EN/TL catalogs, and the existing manifest reference.
+- `python3 -m unittest tools.semantic_harness.tests.test_grounded_personal_dialogue_h2 tools.semantic_harness.tests.test_semantic_translation_integration tools.semantic_harness.tests.test_dataset_review tools.semantic_harness.tests.test_semantic_authoring_compiler -q` — 18 tests OK, exit 0.
+- `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all required checks OK, including worker boot, exit 0.
+- Fresh `LuaSemanticWorker` preview/restart recognized `what was your old job` as generated pattern `pnc.backstory.question.former_job.old_job`, subject `NPC_BACKSTORY`, provider `npc_backstory`, topic `backstory.former_job`, with no side effects.
+- Changed Lua files passed `/usr/bin/luac5.3 -p`; Python authoring/compiler/test files passed `py_compile`; `git diff --check` passed.
 
 ## Next mandatory chunk
 
-H2 must extend the existing compiler, `semantic.codeblocks.v1`, Flow Editor, authoring service, worker catalog, and writer for typed `NPC_BACKSTORY` subjects, registered fact providers, disclosure states, response pools, follow-up references, and deterministic generation into actual mod Lua/catalog/manifest assets. Keep the implementation inside the existing authoring/compiler/runtime contracts; do not add a second parser, compiler, policy, or store. Immediately continue H3 after the accepted H2 chunk.
+H3 must add the ordinary server-authorized disclosure result/snapshot seam to the existing worker and Knowledge/Dossier owners, fix suspected-fact projection so observations never canonicalize to private truth, and exercise two player identities plus multi-turn follow-up through the existing Conversation Inspector. Keep implementation inside the existing authority, Knowledge, persistence, translation, and dialogue contracts; do not add a second parser, policy, profile store, or dossier database. Continue immediately after the accepted H3 chunk.
