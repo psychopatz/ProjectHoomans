@@ -129,6 +129,30 @@ T.truthy(imported.knowledge.byPlayer["player:char:alice"],
 T.falsy(imported.knowledge.byPlayer["player:char:bob"],
     "single-player Core Knowledge import leaked another player")
 
+local previousDescriptors = PNC.KnowledgeDescriptors
+PNC.KnowledgeDescriptors = {
+    Get = function(id)
+        if id == "history.backstory.hometown" then
+            return {
+                category = "history",
+                valueType = "text_enum",
+                presentation = { backstoryKind = "hometown" },
+            }
+        end
+        return nil
+    end,
+}
+local dossier, dossierReason = CoreKnowledge.BuildDossierSnapshot(
+    PsychopatzCore, imported, "char:alice")
+T.truthy(dossier, dossierReason)
+T.equal(dossier.npcID, actor.actorId, "Core dossier actor identity")
+T.equal(dossier.categories[1].id, "history", "Core dossier category")
+T.equal(dossier.categories[1].descriptors[1].value,
+    "backstory.shared.hometown.rosewood", "Core dossier value")
+T.equal(dossier.categories[1].descriptors[1].evidenceCount, 1,
+    "Core dossier evidence count")
+PNC.KnowledgeDescriptors = previousDescriptors
+
 local saved = registry:Save()
 T.truthy(saved, "Core Knowledge import save")
 local fresh = Actors.NewRegistry()

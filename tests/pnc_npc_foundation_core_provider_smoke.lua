@@ -7,6 +7,9 @@ local registry = Core.NewRegistry()
 local actor, actorReason = registry:Create({
     actorId = "npc:p8:hoomans-provider",
     identitySeed = "p8-hoomans-provider-seed",
+    persona = { backstory = { selections = {
+        hometown = { id = "hometown.rosewood", version = 1 },
+    } } },
     social = {
         relationships = {
             ["player:user:alice"] = {
@@ -21,6 +24,8 @@ local actor, actorReason = registry:Create({
 })
 T.truthy(actor, actorReason)
 T.truthy(Adapter, "Core provider adapter missing")
+T.truthy(actor.persona and actor.persona.backstory,
+    "provider source persona")
 
 local leased, leaseReason = Adapter.Acquire(actor, PsychopatzCore, {
     owner = "ProjectHoomans:presence",
@@ -62,6 +67,10 @@ local materialized, materializeReason = Adapter.Materialize(
 )
 T.truthy(materialized, materializeReason)
 T.truthy(applied, "Core appearance, inventory, and social projection")
+T.equal(materialized.projection.persona.backstory.selections.hometown.id,
+    "hometown.rosewood", "Core persona provider projection")
+T.equal(materialized.projection.knowledge.schemaVersion, 1,
+    "Core Knowledge provider projection")
 T.truthy(stamped, "Hoomans body receives Core lease")
 T.equal(materialized.record.runtime.bodyLease,
     materialized.leaseID, "body and Core lease identity")
