@@ -8,6 +8,8 @@ local GeneratedLexicon = require
     "PNC/Semantics/PNC_SemanticGeneratedLexicon"
 local GeneratedDialogue = require
     "PNC/Semantics/PNC_SemanticGeneratedDialogue"
+local GeneratedPersonalDialogue = require
+    "PNC/Semantics/PNC_SemanticGroundedPersonalDialogue"
 local GeneratedDefinitions = require
     "PNC/Semantics/PNC_SemanticGeneratedDefinitions"
 local CampSite = PNC.Semantics.CampSite
@@ -174,33 +176,40 @@ Catalog.Internal.RegisterPattern = registerPattern
 Catalog.Internal.RegisterConcept = registerConcept
 
 function Catalog.Internal.RegisterGeneratedDialoguePatterns()
-    local patterns = GeneratedDialogue and GeneratedDialogue.patterns
-    if type(patterns) ~= "table" then
-        error("generated dialogue dataset requires exact patterns")
-    end
-
+    local sources = { GeneratedDialogue, GeneratedPersonalDialogue }
+    local sourceIndex
+    local patterns
     local index
     local pattern
     local registered
     local reason
-    for index = 1, #patterns do
-        pattern = patterns[index]
-        if type(pattern) ~= "table" then
-            error("generated dialogue dataset contains an invalid pattern")
+    local count = 0
+    for sourceIndex = 1, #sources do
+        patterns = sources[sourceIndex] and sources[sourceIndex].patterns
+        if type(patterns) ~= "table" then
+            error("generated dialogue dataset requires exact patterns")
         end
-        registered, reason = registerPattern(
-            pattern.id,
-            pattern.match,
-            pattern.emit,
-            pattern.confidence,
-            pattern.priority
-        )
-        if registered ~= true then
-            error("generated dialogue pattern could not be registered: "
-                .. tostring(pattern.id) .. " (" .. tostring(reason) .. ")")
+        for index = 1, #patterns do
+            pattern = patterns[index]
+            if type(pattern) ~= "table" then
+                error("generated dialogue dataset contains an invalid pattern")
+            end
+            registered, reason = registerPattern(
+                pattern.id,
+                pattern.match,
+                pattern.emit,
+                pattern.confidence,
+                pattern.priority,
+                { metadata = pattern.metadata }
+            )
+            if registered ~= true then
+                error("generated dialogue pattern could not be registered: "
+                    .. tostring(pattern.id) .. " (" .. tostring(reason) .. ")")
+            end
+            count = count + 1
         end
     end
-    return #patterns
+    return count
 end
 
 function Catalog.Internal.RegisterGeneratedSemanticPatterns()

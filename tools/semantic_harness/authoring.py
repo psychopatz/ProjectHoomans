@@ -44,6 +44,20 @@ DIALOGUE_TRANSLATION_RELATIVE_ROOT = Path(
 DIALOGUE_OUTPUT_RELATIVE_PATH = (
     DIALOGUE_RELATIVE_ROOT / "PNC_SemanticGeneratedDialogue.lua"
 )
+
+
+def _dialogue_asset_stem(source_path: Path) -> str:
+    """Map a canonical source name to a stable production asset stem."""
+    if source_path.name == "common_interactions.json":
+        return "GeneratedDialogue"
+    words = [word for word in source_path.stem.split("_") if word]
+    return "".join(word[:1].upper() + word[1:] for word in words)
+
+
+def _dialogue_output_path(source_path: Path, repository: Path) -> Path:
+    return repository / DIALOGUE_RELATIVE_ROOT / (
+        "PNC_Semantic" + _dialogue_asset_stem(source_path) + ".lua"
+    )
 MAX_DATASET_REVIEW_ROWS = 64
 MAX_DATASET_COLLISIONS = 16
 MAX_ARTIFACT_DIFF_LINES = 96
@@ -421,20 +435,28 @@ def _artifact_diff(
 def _dialogue_preview_paths(
     compiled: dict[str, Any],
     repository: Path,
+    source_path: Path,
 ) -> tuple[list[str], list[dict[str, Any]], list[dict[str, Any]]]:
-    module_prefix = "PNC/Semantics/PNC_SemanticGeneratedDialogue"
+    asset_stem = _dialogue_asset_stem(source_path)
+    module_stem = "PNC_Semantic" + asset_stem
+    module_prefix = "PNC/Semantics/" + module_stem
     rendered = render_dialogue_lua_shards(compiled, module_prefix)
     pattern_modules = [module for module, _source in rendered if "_Patterns_" in module]
     response_modules = [module for module, _source in rendered if "_Responses_" in module]
     entry = render_dialogue_lua(compiled, pattern_modules, response_modules)
-    entry_path = DIALOGUE_RELATIVE_ROOT / "PNC_SemanticGeneratedDialogue.lua"
+    entry_path = DIALOGUE_RELATIVE_ROOT / (module_stem + ".lua")
     expected_sources: dict[str, str] = {str(entry_path): entry}
     expected_sources.update({
         str(DIALOGUE_RELATIVE_ROOT / (Path(module).name + ".lua")): source
         for module, source in rendered
     })
     expected_sources.update({
-        str(DIALOGUE_TRANSLATION_RELATIVE_ROOT / language / "Conversation/Semantic/GeneratedDialogue.json"):
+        str(
+            DIALOGUE_TRANSLATION_RELATIVE_ROOT
+            / language
+            / "Conversation/Semantic"
+            / (asset_stem + ".json")
+        ):
         render_dialogue_translation(compiled, language)
         for language in ("EN", "TL")
     })
@@ -448,7 +470,7 @@ def _dialogue_preview_paths(
     except (OSError, UnicodeError, json.JSONDecodeError):
         manifest = {"version": 1, "languages": {}}
     for language in ("EN", "TL"):
-        relative_path = f"{language}/Conversation/Semantic/GeneratedDialogue.json"
+        relative_path = f"{language}/Conversation/Semantic/{asset_stem}.json"
         entries = manifest.setdefault("languages", {}).setdefault(language, [])
         if relative_path not in entries:
             entries.append(relative_path)
@@ -569,7 +591,9 @@ def preview_dialogue_source(
         base["diagnostics"] = [{"severity": "error", "message": str(error)}]
         return base
 
-    generated_paths, artifacts, artifact_diffs = _dialogue_preview_paths(compiled, repository)
+    generated_paths, artifacts, artifact_diffs = _dialogue_preview_paths(
+        compiled, repository, source_path
+    )
     variant_count = sum(len(pool["variants"]) for pool in compiled["responsePools"])
     base.update({
         "ok": True,
@@ -616,7 +640,7 @@ def generate_dialogue_source(
     try:
         source = load_dialogue_dataset(source_path)
         compiled = compile_dialogue_dataset(source)
-        output = repository / DIALOGUE_OUTPUT_RELATIVE_PATH
+        output = _dialogue_output_path(source_path, repository)
         output.parent.mkdir(parents=True, exist_ok=True)
         written = write_dialogue_output(
             output,

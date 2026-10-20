@@ -65,6 +65,18 @@ _BLOCK_TYPE_SPECS = (
         "fields": ["triggerID", "intent", "speechAct"],
     },
     {
+        "id": "language.backstory_subject",
+        "category": "language",
+        "label": "NPC backstory subject",
+        "owner": "Project Hoomans Semantic Dialogue",
+        "source": "PNC.Semantics.DialogueFacts",
+        "contract": "typed immutable fact kind, provider, disclosure state, and context follow-up",
+        "fields": [
+            "backstoryKind", "factProvider", "topicID", "disclosure",
+            "dialogueFollowUp", "referenceSubject",
+        ],
+    },
+    {
         "id": "conditions.gate",
         "category": "conditions",
         "label": "Tri-state condition gate",
@@ -128,6 +140,17 @@ _BLOCK_TYPE_SPECS = (
         "fields": ["knowledgeID", "targetID", "freshness", "provenance"],
     },
     {
+        "id": "memory.backstory_fact",
+        "category": "memory",
+        "label": "Registered personal fact provider",
+        "owner": "Project Hoomans NPCKnowledgeService",
+        "source": "PNC.Semantics.DialogueFacts.RegisterProvider",
+        "contract": "server-authoritative immutable fact with known/suspected/refused projection",
+        "fields": [
+            "providerID", "subject", "authority", "immutable", "privacy",
+        ],
+    },
+    {
         "id": "memory.gossip",
         "category": "memory",
         "label": "Gossip memory reference",
@@ -144,6 +167,9 @@ _BLOCK_TYPE_SPECS = (
         "source": "canonical JSON responsePools",
         "contract": "reviewed EN/TL fallback and response-plan variants",
         "fields": ["poolID", "variantID", "when", "priority"],
+        "typedArguments": [
+            "string", "number", "boolean", "identifier", "fact_content",
+        ],
     },
     {
         "id": "gameplay_actions.capability",

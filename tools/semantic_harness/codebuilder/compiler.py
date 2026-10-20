@@ -32,6 +32,21 @@ DIALOGUE_TEMPLATE_ID = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,95}$")
 DIALOGUE_UTTERANCE = re.compile(r"^[a-z0-9']+(?: [a-z0-9']+)*$")
 DIALOGUE_PATTERN_SUBJECTS = frozenset({
     "ACTIVITY", "IDENTITY", "WELLBEING", "WEATHER",
+    "NPC_BACKSTORY", "CONTEXT_REFERENCE",
+})
+DIALOGUE_BACKSTORY_KINDS = frozenset({
+    "former_job", "hometown", "education", "hobby",
+    "family_background", "value", "survival_origin", "fear",
+    "tragedy", "date_of_birth",
+})
+DIALOGUE_BACKSTORY_EXTENSIONS = frozenset({
+    "factProvider", "topicID", "disclosure", "dialogueFollowUp",
+})
+DIALOGUE_BACKSTORY_DISCLOSURES = frozenset({
+    "server_authorized", "confirmed", "suspected", "refused",
+})
+DIALOGUE_CONTEXT_REFERENCE_EXTENSIONS = frozenset({
+    "dialogueFollowUp", "topic", "contextQuestion",
 })
 DIALOGUE_PROMISE_SUBJECTS = frozenset({"NEEDS"})
 DIALOGUE_PROMISE_EXTENSIONS = frozenset({"topic", "dialogueFollowUp"})
@@ -39,11 +54,14 @@ DIALOGUE_MAPPING_FIELDS = frozenset({
     "canonicalConcept", "dialogueState", "sourceRefs",
 })
 DIALOGUE_MAPPING_CONCEPTS = frozenset({
-    "ANY_ITEM", "FETCH", "WEATHER", "WELLBEING",
+    "ANY_ITEM", "FETCH", "WEATHER", "WELLBEING", "NPC_BACKSTORY",
 })
 DIALOGUE_MAPPING_STATES = frozenset({
     "NEEDS_PROPOSAL", "NEEDS_QUANTITY", "WEATHER_TOPIC",
-    "WELLBEING_FOLLOW_UP",
+    "WELLBEING_FOLLOW_UP", "BACKSTORY_QUESTION",
+})
+DIALOGUE_TRANSLATION_ARG_TYPES = frozenset({
+    "string", "number", "boolean", "identifier", "fact_content",
 })
 DIALOGUE_PLAN_UNCERTAINTIES = frozenset({
     "known", "unknown", "ambiguous", "pending",
@@ -553,7 +571,9 @@ def _compile_dialogue_match(value: Any, pattern_id: str) -> list[dict[str, str]]
         )
     compiled: list[dict[str, str]] = []
     for rule in value:
-        if not isinstance(rule, dict) or set(rule) - {"kind", "value", "id"}:
+        if not isinstance(rule, dict) or set(rule) - {
+            "kind", "value", "id", "capture", "minTokens", "maxTokens",
+        }:
             raise CompileError(
                 f"dialogue pattern {pattern_id} match contains an invalid rule"
             )
@@ -564,7 +584,19 @@ def _compile_dialogue_match(value: Any, pattern_id: str) -> list[dict[str, str]]
                 raise CompileError(
                     f"dialogue pattern {pattern_id} literal match rules must contain one token"
                 )
-            compiled.append({"kind": "literal", "value": normalized})
+            compiled_rule: dict[str, Any] = {
+                "kind": "literal", "value": normalized,
+            }
+            if "capture" in rule:
+                capture = rule.get("capture")
+                if (not isinstance(capture, str) or not re.fullmatch(
+                    r"[a-z][a-zA-Z0-9_]{0,31}", capture
+                )):
+                    raise CompileError(
+                        f"dialogue pattern {pattern_id} literal capture is invalid"
+                    )
+                compiled_rule["capture"] = capture
+            compiled.append(compiled_rule)
             continue
         if kind == "concept":
             concept_id = rule.get("id")
@@ -572,10 +604,40 @@ def _compile_dialogue_match(value: Any, pattern_id: str) -> list[dict[str, str]]
                 raise CompileError(
                     f"dialogue pattern {pattern_id} references an unsupported match concept"
                 )
-            compiled.append({"kind": "concept", "id": concept_id})
+            compiled_rule = {"kind": "concept", "id": concept_id}
+            if "capture" in rule:
+                capture = rule.get("capture")
+                if (not isinstance(capture, str) or not re.fullmatch(
+                    r"[a-z][a-zA-Z0-9_]{0,31}", capture
+                )):
+                    raise CompileError(
+                        f"dialogue pattern {pattern_id} concept capture is invalid"
+                    )
+                compiled_rule["capture"] = capture
+            compiled.append(compiled_rule)
+            continue
+        if kind == "any_phrase":
+            capture = rule.get("capture")
+            minimum = rule.get("minTokens", 1)
+            maximum = rule.get("maxTokens", 4)
+            if (not isinstance(capture, str) or not re.fullmatch(
+                r"[a-z][a-zA-Z0-9_]{0,31}", capture
+            ) or isinstance(minimum, bool) or not isinstance(minimum, int)
+                    or isinstance(maximum, bool) or not isinstance(maximum, int)
+                    or minimum < 1 or maximum < minimum
+                    or maximum > DIALOGUE_MAX_PATTERN_TOKENS):
+                raise CompileError(
+                    f"dialogue pattern {pattern_id} any_phrase capture bounds are invalid"
+                )
+            compiled.append({
+                "kind": "any_phrase",
+                "capture": capture,
+                "minTokens": minimum,
+                "maxTokens": maximum,
+            })
             continue
         raise CompileError(
-            f"dialogue pattern {pattern_id} match kind must be literal or concept"
+            f"dialogue pattern {pattern_id} match kind must be literal, concept, or any_phrase"
         )
     return compiled
 
@@ -612,7 +674,7 @@ def _compile_dialogue_pattern(
         if (speech_act != "QUESTION" or not isinstance(subject, str)):
             raise CompileError(
                 f"dialogue pattern {pattern_id} must target an existing safe question subject")
-        if subject in DIALOGUE_PATTERN_SUBJECTS:
+        if subject in {"ACTIVITY", "IDENTITY", "WELLBEING", "WEATHER"}:
             if set(emit) != {"intent", "speechAct", "subject"}:
                 raise CompileError(
                     f"dialogue question pattern {pattern_id} contains unsupported semantic fields")
@@ -620,6 +682,62 @@ def _compile_dialogue_pattern(
                 "intent": "QUESTION",
                 "speechAct": "QUESTION",
                 "subject": subject,
+            }
+        elif subject == "NPC_BACKSTORY":
+            slots = emit.get("slots")
+            extensions = emit.get("extensions")
+            if (set(emit) != {
+                    "intent", "speechAct", "subject", "slots", "extensions",
+                }
+                    or not isinstance(slots, dict)
+                    or set(slots) != {"backstoryKind"}
+                    or slots.get("backstoryKind") not in DIALOGUE_BACKSTORY_KINDS
+                    or not isinstance(extensions, dict)
+                    or set(extensions) - DIALOGUE_BACKSTORY_EXTENSIONS
+                    or extensions.get("factProvider") != "npc_backstory"
+                    or extensions.get("topicID") != (
+                        "backstory." + str(slots.get("backstoryKind"))
+                    )
+                    or extensions.get("disclosure")
+                    not in DIALOGUE_BACKSTORY_DISCLOSURES):
+                raise CompileError(
+                    f"dialogue backstory pattern {pattern_id} requires a typed fact provider, kind, topic, and disclosure"
+                )
+            if ("dialogueFollowUp" in extensions
+                    and extensions["dialogueFollowUp"] != "CONTEXT_REFERENCE"):
+                raise CompileError(
+                    f"dialogue backstory pattern {pattern_id} has an unsupported follow-up contract"
+                )
+            normalized_emit = {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "NPC_BACKSTORY",
+                "slots": {"backstoryKind": slots["backstoryKind"]},
+                "extensions": {
+                    key: extensions[key] for key in sorted(extensions)
+                },
+            }
+        elif subject == "CONTEXT_REFERENCE":
+            extensions = emit.get("extensions")
+            if (set(emit) - {
+                    "intent", "speechAct", "subject", "target", "extensions",
+                }
+                    or not isinstance(extensions, dict)
+                    or set(extensions) != DIALOGUE_CONTEXT_REFERENCE_EXTENSIONS
+                    or extensions.get("dialogueFollowUp") != "CONTEXT_REFERENCE"
+                    or not isinstance(emit.get("target"), str)
+                    or not emit["target"].startswith("$capture.")):
+                raise CompileError(
+                    f"dialogue context-reference pattern {pattern_id} requires a capture target and follow-up metadata"
+                )
+            normalized_emit = {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "CONTEXT_REFERENCE",
+                "target": emit["target"],
+                "extensions": {
+                    key: extensions[key] for key in sorted(extensions)
+                },
             }
         elif subject == "QUANTITY":
             extensions = emit.get("extensions")
@@ -809,6 +927,24 @@ def _validate_response_condition(value: Any, pool_id: str, variant_id: str) -> d
     return output
 
 
+def _validate_translation_args(value: Any, label: str) -> dict[str, str]:
+    """Validate typed argument declarations without evaluating them."""
+    if value is None:
+        return {}
+    if not isinstance(value, dict) or len(value) > 8:
+        raise CompileError(f"{label} must contain at most 8 typed arguments")
+    output: dict[str, str] = {}
+    for name, argument_type in value.items():
+        if (not isinstance(name, str)
+                or not re.fullmatch(r"[a-z][a-zA-Z0-9_]{0,31}", name)
+                or argument_type not in DIALOGUE_TRANSLATION_ARG_TYPES):
+            raise CompileError(
+                f"{label} contains an invalid typed argument {name!r}"
+            )
+        output[name] = argument_type
+    return {name: output[name] for name in sorted(output)}
+
+
 def _validate_dialogue_plan(
     value: Any,
     pool_id: str,
@@ -820,7 +956,8 @@ def _validate_dialogue_plan(
         raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} must be an object")
     allowed = {
         "dialogueAct", "sourcePoolID", "topic", "groundedFactRefs",
-        "uncertainty", "tone", "personalityStyle", "turns",
+        "uncertainty", "tone", "personalityStyle", "referenceTopic",
+        "referenceSubject", "turns",
     }
     if set(value) - allowed:
         raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has unsupported fields")
@@ -833,6 +970,16 @@ def _validate_dialogue_plan(
     topic = value.get("topic")
     if topic is not None and (not isinstance(topic, str) or not topic.strip()):
         raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid topic")
+    reference_topic = value.get("referenceTopic")
+    reference_subject = value.get("referenceSubject")
+    for field, item in (("referenceTopic", reference_topic),
+                        ("referenceSubject", reference_subject)):
+        if item is not None and (
+            not isinstance(item, str) or not DIALOGUE_TEMPLATE_ID.fullmatch(item)
+        ):
+            raise CompileError(
+                f"dialogue response plan for {pool_id}:{variant_id} has invalid {field}"
+            )
     refs = value.get("groundedFactRefs", value.get("sourceFactRefs", []))
     if not isinstance(refs, list) or len(refs) > 8:
         raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid fact refs")
@@ -851,6 +998,8 @@ def _validate_dialogue_plan(
         "dialogueAct": dialogue_act.strip(),
         "sourcePoolID": source_pool,
         "topic": topic.strip() if isinstance(topic, str) else None,
+        "referenceTopic": reference_topic,
+        "referenceSubject": reference_subject,
         "groundedFactRefs": normalized_refs,
         "uncertainty": uncertainty,
         "tone": value.get("tone"),
@@ -890,6 +1039,10 @@ def _validate_dialogue_plan(
                     "kind": "translation",
                     "templateID": segment_template,
                     "fallback": segment_fallback.strip(),
+                    "translationArgs": _validate_translation_args(
+                        segment.get("translationArgs"),
+                        f"dialogue response plan for {pool_id}:{variant_id} translationArgs",
+                    ),
                 })
             elif kind == "literal":
                 segment_text = segment.get("text")
@@ -950,7 +1103,7 @@ def _compile_dialogue_response_pool(
                 f"response priority for {pool_id}:{variant_id} must be from -10 to 10")
         allowed_keys = {
             "id", "templateID", "fallback", "when", "priority", "en", "tl",
-            "plan", "reviewed", "sourceRefs",
+            "plan", "reviewed", "sourceRefs", "translationArgs",
         }
         if set(variant) - allowed_keys:
             raise CompileError(
@@ -977,11 +1130,17 @@ def _compile_dialogue_response_pool(
         if "plan" in variant and (not reviewed or not source_refs):
             raise CompileError(
                 f"dialogue response {pool_id}:{variant_id} plan requires reviewed source metadata")
+        translation_args = _validate_translation_args(
+            variant.get("translationArgs"),
+            f"dialogue response {pool_id}:{variant_id} translationArgs",
+        )
         compiled_variant = {
             "id": variant_id,
             "templateID": template_id,
             "fallback": fallback.strip(),
         }
+        if translation_args:
+            compiled_variant["translationArgs"] = translation_args
         condition = _validate_response_condition(variant.get("when"), pool_id, variant_id)
         if condition:
             compiled_variant["when"] = condition

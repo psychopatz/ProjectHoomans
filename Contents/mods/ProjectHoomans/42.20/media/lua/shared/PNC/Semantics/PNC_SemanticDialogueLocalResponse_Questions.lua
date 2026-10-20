@@ -334,6 +334,30 @@ local function resolveBackstoryQuestion(ir, state, context)
     if fact and fact.status == "known"
         and type(content) == "string" and content ~= ""
     then
+        local generatedPool = "semantic.question.backstory.known." .. tostring(kind)
+        response = catalogResponse(
+            generatedPool, ir, state, context, {
+                kind = kind,
+                content = content,
+            }
+        )
+        if not response then
+            response = catalogResponse(
+                "semantic.question.backstory.known", ir, state, context, {
+                    kind = kind,
+                    content = content,
+                }
+            )
+        end
+        if response then
+            response.dialogueAct = "FACT_ANSWER"
+            response.topic = "NPC_BACKSTORY"
+            response.groundedFactRefs = refs
+            response.uncertainty = "known"
+            response.tone = "direct"
+            response.selectionSource = "fact_provider_catalog"
+            return response
+        end
         response = factResponse(
             "semantic.question.backstory.known",
             knownFallback,
@@ -348,6 +372,21 @@ local function resolveBackstoryQuestion(ir, state, context)
     if fact and fact.status == "suspected"
         and type(content) == "string" and content ~= ""
     then
+        response = catalogResponse(
+            "semantic.question.backstory.suspected", ir, state, context, {
+                kind = kind,
+                content = content,
+            }
+        )
+        if response then
+            response.dialogueAct = "FACT_ANSWER"
+            response.topic = "NPC_BACKSTORY"
+            response.groundedFactRefs = refs
+            response.uncertainty = "suspected"
+            response.tone = "direct"
+            response.selectionSource = "fact_provider_catalog"
+            return response
+        end
         response = factResponse(
             "semantic.question.backstory.suspected",
             "I think it was " .. content .. ", but I could be mistaken.",
@@ -361,6 +400,17 @@ local function resolveBackstoryQuestion(ir, state, context)
         return response
     end
     if fact and fact.status == "ambiguous" then
+        response = catalogResponse(
+            "semantic.question.backstory.ambiguous", ir, state, context
+        )
+        if response then
+            response.dialogueAct = "FACT_ANSWER"
+            response.topic = "NPC_BACKSTORY"
+            response.uncertainty = "ambiguous"
+            response.tone = "cautious"
+            response.selectionSource = "fact_provider_catalog"
+            return response
+        end
         return factResponse(
             "semantic.question.backstory.ambiguous",
             "Which part of my past do you mean?",
@@ -368,6 +418,17 @@ local function resolveBackstoryQuestion(ir, state, context)
             fact,
             "NPC_BACKSTORY"
         )
+    end
+    response = catalogResponse(
+        "semantic.question.backstory.refusal", ir, state, context
+    )
+    if response then
+        response.dialogueAct = "FACT_ANSWER"
+        response.topic = "NPC_BACKSTORY"
+        response.uncertainty = "pending"
+        response.tone = "guarded"
+        response.selectionSource = "fact_provider_catalog"
+        return response
     end
     return factResponse(
         "semantic.question.backstory.refusal",

@@ -209,6 +209,7 @@ local function catalogResponse(poolID, ir, state, context, args)
         uncertainty = selected.uncertainty,
         tone = selected.tone,
         personalityStyle = selected.personalityStyle,
+        translationArgs = copyArgs(selected.translationArgs),
         selectionSource = "catalog",
         selectionID = selected.id,
     }

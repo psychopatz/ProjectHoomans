@@ -12,6 +12,8 @@ local Catalog = PNC.Semantics.ResponseCatalog or {}
 PNC.Semantics.ResponseCatalog = Catalog
 local GeneratedDialogue = require
     "PNC/Semantics/PNC_SemanticGeneratedDialogue"
+local GeneratedPersonalDialogue = require
+    "PNC/Semantics/PNC_SemanticGroundedPersonalDialogue"
 local GeneratedDefinitions = require
     "PNC/Semantics/PNC_SemanticGeneratedDefinitions"
 local ResponsePlan = require
@@ -207,6 +209,7 @@ local function normalizedVariant(poolID, index, value)
         uncertainty = value.uncertainty,
         tone = value.tone,
         personalityStyle = value.personalityStyle,
+        translationArgs = copy(value.translationArgs),
         when = copy(value.when),
         priority = tonumber(value.priority) or 0,
     }
@@ -361,6 +364,7 @@ function Catalog.Select(id, context, salt)
         uncertainty = variant.uncertainty,
         tone = variant.tone,
         personalityStyle = variant.personalityStyle,
+        translationArgs = copy(variant.translationArgs),
     }, selectedIndex
 end
 
@@ -377,23 +381,33 @@ require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueRespo
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Questions"
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Social"
 
-local generatedPools = GeneratedDialogue and GeneratedDialogue.responsePools
-if type(generatedPools) ~= "table" then
-    error("generated dialogue dataset requires responsePools")
-end
+local generatedSources = { GeneratedDialogue, GeneratedPersonalDialogue }
+local generatedSourceIndex
+local generatedPools
 local generatedIndex
 local generatedPool
 local extended
 local reason
-for generatedIndex = 1, #generatedPools do
-    generatedPool = generatedPools[generatedIndex]
-    if type(generatedPool) ~= "table" then
-        error("generated dialogue dataset contains an invalid response pool")
+for generatedSourceIndex = 1, #generatedSources do
+    generatedPools = generatedSources[generatedSourceIndex]
+        and generatedSources[generatedSourceIndex].responsePools
+    if type(generatedPools) ~= "table" then
+        error("generated dialogue dataset requires responsePools")
     end
-    extended, reason = Catalog.Extend(generatedPool.id, generatedPool)
-    if extended ~= true then
-        error("generated dialogue responses could not extend "
-            .. tostring(generatedPool.id) .. " (" .. tostring(reason) .. ")")
+    for generatedIndex = 1, #generatedPools do
+        generatedPool = generatedPools[generatedIndex]
+        if type(generatedPool) ~= "table" then
+            error("generated dialogue dataset contains an invalid response pool")
+        end
+        if Catalog.Get(generatedPool.id) then
+            extended, reason = Catalog.Extend(generatedPool.id, generatedPool)
+        else
+            extended, reason = Catalog.Register(generatedPool.id, generatedPool)
+        end
+        if extended ~= true then
+            error("generated dialogue responses could not register "
+                .. tostring(generatedPool.id) .. " (" .. tostring(reason) .. ")")
+        end
     end
 end
 

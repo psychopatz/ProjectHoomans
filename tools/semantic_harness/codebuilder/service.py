@@ -45,6 +45,12 @@ DATASET_SOURCE_SPECS = (
         "path": Path("tools/semantic_compiler/common_interactions.json"),
     },
     {
+        "id": "grounded_personal_dialogue",
+        "label": "Grounded personal dialogue",
+        "kind": "dialogue",
+        "path": Path("tools/semantic_compiler/grounded_personal_dialogue.json"),
+    },
+    {
         "id": "wordnet_concepts",
         "label": "Reviewed WordNet concepts",
         "kind": "lexicon",

@@ -164,6 +164,15 @@ def _dialogue_translation_root(output: Path) -> Path | None:
     return None
 
 
+def _dialogue_translation_stem(output: Path) -> str:
+    """Return the stable translation shard name for one dialogue asset."""
+    stem = output.stem
+    prefix = "PNC_Semantic"
+    if stem.startswith(prefix):
+        stem = stem[len(prefix):]
+    return stem or "GeneratedDialogue"
+
+
 def write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
     module_prefix = _dialogue_module_prefix(output)
     shards = render_dialogue_lua_shards(compiled, module_prefix)
@@ -187,11 +196,14 @@ def write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
         paths.append(shard_path)
     translation_root = _dialogue_translation_root(output)
     if translation_root is not None:
+        translation_stem = _dialogue_translation_stem(output)
         manifest_path = translation_root / "manifests/Conversation.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8")) \
             if manifest_path.is_file() else {"version": 1, "languages": {}}
         for language in ("EN", "TL"):
-            relative_path = f"{language}/Conversation/Semantic/GeneratedDialogue.json"
+            relative_path = (
+                f"{language}/Conversation/Semantic/{translation_stem}.json"
+            )
             translation_path = translation_root / relative_path
             translation_path.parent.mkdir(parents=True, exist_ok=True)
             translation_path.write_text(
