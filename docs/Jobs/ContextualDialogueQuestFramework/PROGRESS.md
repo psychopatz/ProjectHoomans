@@ -1,7 +1,7 @@
 # Contextual Dialogue & Quest Framework — Current Progress
 
 **Updated:** 2026-10-21
-**Parent goal:** IN PROGRESS — complete V1–V5 on the existing `main` branch
+**Parent goal:** DEVELOPER COMPLETE — V1–V5 verified on the existing `main` branch; READY FOR USER LIVE TEST
 **Documentation baseline:** `556bdd7a57a7`
 **Repository rule:** no branch was created; native Project Zomboid SP/MP, live servers, installation, and Workshop publishing remain user-owned.
 
@@ -67,7 +67,7 @@ Fresh developer evidence from this checkout:
 - Doctor: `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all required checks true, including Tk/display, sibling Core, Lua 5.3, worker syntax, READY/PING/CAPABILITIES, exit 0.
 - Kahlua: `pz_verify --mod-dir Contents/mods/ProjectHoomans/42.20 --kahlua --severity ERROR --no-snippets` — 2,947 files, 0 errors, exit 0.
 - Actual Semantic Lab Tk pane under Xvfb: backstory graph composed through the GUI methods with 4 typed blocks and 3 connections; validation returned `ok=true`, preview returned `effectFree=true`, exit 0. No native Project Zomboid process or CUA surface was available, so no native gameplay/screenshot claim is made.
-- Actual worker final text included `I worked as farmer before all this.`, `Okay, I will follow you for V1.`, and after the response-block regeneration `I will follow you after this graph edit.`. Tagalog fact-value acceptance returned `Nagtrabaho ako bilang magsasaka bago ang lahat ng ito.` with no fallback.
+- Actual worker final text included `I worked as farmer before all this.`, `Okay, I will follow you for V1.`, and after the response-block regeneration `I will follow you after this graph edit.`. Tagalog fact-value acceptance returned `Nagtrabaho ako bilang magsasaka bago ang lahat ng ito.` with no fallback. Generated outputs were written to `Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticGroundedPersonalDialogue.lua`, `Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/GroundedPersonalDialogue.json`, and `Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/GroundedPersonalDialogue.json`; the established translation manifest remains `Contents/mods/ProjectHoomans/common/media/translation/manifests/Conversation.json`.
 
 ## Remaining mandatory chunk
 
