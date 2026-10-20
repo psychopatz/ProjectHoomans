@@ -6,8 +6,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
 
-from .scenario import DEFAULT_SCENARIO, load_scenario, merge
-from .worker import LuaSemanticWorker
+from .runtime.scenario import DEFAULT_SCENARIO, load_scenario, merge
+from .runtime.worker import LuaSemanticWorker
 
 MAX_TRACKED_EVENT_IDS = 4096
 MAX_REPORTED_CONFLICTS = 256

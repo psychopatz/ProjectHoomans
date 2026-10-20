@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Protocol
 
 from .rendering import pretty
-from .scenario import save_scenario, validate_scenario
+from .runtime.scenario import save_scenario, validate_scenario
 
 
 class SettingsDialogHost(Protocol):

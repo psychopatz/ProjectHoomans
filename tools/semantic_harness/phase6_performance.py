@@ -21,8 +21,8 @@ from typing import Any, Iterable
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 CASES: tuple[tuple[str, str], ...] = (

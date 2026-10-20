@@ -6,12 +6,12 @@ import argparse
 from pathlib import Path
 import sys
 
-from .config import ConfigurationError
 from .codebuilder.service import SemanticLabAuthoringService
 from .rendering import print_result as _print_result
 from .runner import ConflictLedger, load_case, run_case
-from .scenario import load_scenario
-from .worker import HarnessError, LuaSemanticWorker
+from .runtime.config import ConfigurationError
+from .runtime.scenario import load_scenario
+from .runtime.worker import HarnessError, LuaSemanticWorker
 
 PARSER_DESCRIPTION = "Tkinter chat UI and CLI for the real-Lua semantic dialogue harness."
 AUTHORING_OPERATIONS = (

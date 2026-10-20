@@ -8,7 +8,6 @@ from concurrent.futures import Future
 from pathlib import Path
 from typing import Any, Callable
 
-from .config import ConfigurationError
 from .conversation_inspector import build_conversation_inspector
 from .codebuilder.service import SemanticLabAuthoringService
 from .block_registry import SemanticBlockRegistryPane
@@ -17,11 +16,12 @@ from .flow_editor import FlowEditorPane
 from .interaction_explorer_pane import InteractionExplorerPane
 from .interaction_spec_pane import InteractionSpecPane
 from .rendering import conversation_first, pretty
-from .scenario import load_scenario, save_scenario
+from .runtime.config import ConfigurationError
+from .runtime.scenario import load_scenario, save_scenario
 from .settings_dialog import open_runtime_settings as show_runtime_settings
 from .transcript import TranscriptBuffer
-from .worker import HarnessError, LuaSemanticWorker
-from .worker_session import WorkerReady, WorkerResult, WorkerSession
+from .runtime.worker import HarnessError, LuaSemanticWorker
+from .runtime.worker_session import WorkerReady, WorkerResult, WorkerSession
 from .workflow import SemanticLabWorkflowPane
 
 

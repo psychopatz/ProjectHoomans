@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from .config import (
+from .runtime.config import (
     ConfigurationError,
     HarnessConfig,
     discover_core,
@@ -18,8 +18,8 @@ from .config import (
     discover_repository,
     probe_lua,
 )
-from .scenario import DEFAULT_SCENARIO, merge
-from .worker import HarnessError, LuaSemanticWorker
+from .runtime.scenario import DEFAULT_SCENARIO, merge
+from .runtime.worker import HarnessError, LuaSemanticWorker
 
 
 def _check(name: str, ok: bool, detail: str, *, required: bool = True) -> dict[str, Any]:
@@ -149,4 +149,3 @@ def run_doctor(
             print(f"[{label}] {check['name']}: {check['detail']}")
         print("Doctor result: " + ("PASS" if report["ok"] else "FAIL"))
     return 0 if report["ok"] else 1
-
