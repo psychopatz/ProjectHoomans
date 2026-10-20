@@ -38,10 +38,15 @@ timeouts, crash detection, and bounded stderr diagnostics.
   lifecycle, the worker adapter, and serialized worker sessions. The old
   top-level runtime module paths remain compatibility facades while callers
   migrate.
+- `codebuilder/` owns the canonical typed interaction source, reusable
+  CodeBlocks, compiler/build adapters, approved artifact authoring operations,
+  and the pure production interaction-catalog projection used by the service.
+  The historical `compiler.py` and top-level authoring/explorer paths remain
+  compatibility facades; there is still one compiler and one artifact writer.
 - `studio/` owns the Semantic Lab authoring surface: canonical dataset and
-  reusable-block panes, typed interaction composition, workflow orchestration,
-  and the searchable production interaction catalog. It delegates compilation
-  and generation to the existing CodeBuilder service.
+  reusable-block panes, typed interaction composition, and workflow
+  orchestration. It delegates compilation, generation, and catalog projection
+  to CodeBuilder rather than owning a second compiler or authoring service.
 - `inspection/` owns bounded worker-result projections, the Conversation
   Inspector chain, CLI/JSON presentation, and the visible transcript buffer.
   It does not interpret dialogue or dispatch gameplay effects.

@@ -124,10 +124,63 @@ Evidence:
 - `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all
   required checks true, including worker syntax and `READY/PING/CAPABILITIES`.
 
-Next mandatory slice: add `__main__.py` and local Python package metadata,
-verify the stable launcher/module entrypoints, then run the final architecture
-and token scans before deciding whether any compatibility facade has a proven
-removal gate.
+The package-entrypoint migration is recorded below. The remaining compatibility
+facades are intentionally retained until downstream callers have a proven
+removal gate; they are not duplicate implementations.
+
+### Post-V5 Python package layout — package entrypoint slice
+
+**Status:** slice 6 implemented on existing `main`; commit `618ed599`.
+
+The harness now has local package metadata in the repository-root
+`pyproject.toml`, a stable `python3 -m tools.semantic_harness` entrypoint, and
+the existing CLI exposed as the `semantic-lab` project script. Package data
+declarations include the existing worker/scenario assets and compiler JSON
+sources without changing their paths.
+
+Evidence:
+
+- Package metadata parsed successfully with Python `tomllib`.
+- `python3 -m tools.semantic_harness --help` exited `0` and loaded CLI help
+  without starting Tk.
+- Package-entrypoint focused checks passed `12/12`.
+
+### Post-V5 Python package layout — dependency-boundary correction
+
+**Status:** corrective slice implemented on existing `main`; commit `94368ed0`.
+
+The architecture audit caught and the refactor removed a temporary
+`codebuilder -> studio -> codebuilder` cycle. Canonical artifact authoring and
+the pure interaction-catalog projection now live in `codebuilder/`. The former
+root and Studio authoring/explorer paths are compatibility facades, while UI
+and workflow modules depend downward on CodeBuilder. This preserves existing
+imports without leaving a compiler-owned module dependent on the GUI package.
+
+Evidence:
+
+- Affected compatibility, authoring, interaction-spec, dataset, inspector, and
+  package-entrypoint checks passed `42/42`.
+- Final architecture scan: `169` source files (`103` production), `27,323` LOC,
+  health `87.5`, coverage `67.0`, confidence `54.3`; no
+  `DEPENDENCY_CYCLE` findings. Remaining findings are bounded-loop,
+  large-function/module, known exception-handling, and one app coupling item.
+- Final token scan: `179` files, `53` over the `2,000`-token review threshold
+  when the ignored architecture-audit cache is excluded. The largest
+  candidates are `codebuilder/interaction_spec.py`, Flow Editor/UI files,
+  `studio/workflow.py`, and `codebuilder/authoring.py`; no behavior change was
+  bundled into this folder migration to address those separate refactor seams.
+- Full Semantic Lab Python discovery: `279/279` passed in `170.528s`, exit `0`.
+- Full embedded Lua regression:
+  `python3 tests/run_tests.py --jobs 1 --harness-report /tmp/semantic-harness-final-lua-boundary.json`
+  — `853/853` passed in `16.09s`, exit `0`.
+- Worker doctor:
+  `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all
+  required checks true, including worker syntax and `READY/PING/CAPABILITIES`,
+  exit `0`.
+
+No remaining developer-owned package-layout slice is required. Native Project
+Zomboid SP/MP gameplay validation, live-server operation, installation, and
+Workshop publishing remain user-owned as documented above.
 
 ## V1 — reusable visual CodeBlocks graph
 
