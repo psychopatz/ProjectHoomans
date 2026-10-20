@@ -1,3 +1,5 @@
+> **NEW CROSS-REPOSITORY GOAL (2026-10-21):** Portable actor identity, seed-derived backstory, player Knowledge and shared contextual offline dialogue C1–C6 are now specified in **PsychopatzCore `Docs/portable_npc_conversation/`**. This Hoomans goal's V1–V5 developer work is an existing foundation, not completion of new cross-mod work. See this job's `CORE_CONVERSATION_ADOPTION.md`; Core's `PROGRESS.md` is the ONE current chunk. No new branches, no prompt MD, no native PZ/Workshop action by agent. Older `Current V1` instructions in historical Hoomans sections are not current authority for C1–C6.
+
 # Contextual Dialogue & Quest Framework — Semantic Lab
 
 **CURRENT APPROVED PRODUCT OBJECTIVE (2026-10-20): V1–V5 — turn the existing structured grounded-NPC-dialogue CodeBuilder into a reusable VISUAL typed CodeBlocks authoring environment, consolidate registered semantic fact localization, personalize gradual disclosure, measure complete storage and verify through the real Semantic Lab GUI and Core+Hoomans worker. PARENT GOAL IN PROGRESS.**
