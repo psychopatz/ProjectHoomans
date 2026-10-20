@@ -24,6 +24,7 @@ from .flow_editor_model import (
     coverage_lines,
     _json_text,
 )
+from .flow_editor_state import FlowEditorHistory
 
 class FlowEditorPane:
     """Visual graph plus bounded form editor backed by worker callbacks."""
@@ -68,8 +69,7 @@ class FlowEditorPane:
         self._action_catalog: list[dict[str, Any]] = []
         self._trigger_catalog: list[dict[str, Any]] = []
         self._coverage: list[dict[str, Any]] = []
-        self._history: list[dict[str, Any]] = []
-        self._history_index = -1
+        self._history = FlowEditorHistory()
         self._nested_flows: list[dict[str, Any]] = []
         self._zoom = 1.0
         self._pan = (24.0, 42.0)
@@ -567,8 +567,7 @@ class FlowEditorPane:
             and isinstance(authoring_metadata.get("nestedFlows"), list)
             else []
         )
-        self._history = [flow_draft(self._draft)]
-        self._history_index = 0
+        self._history.reset(flow_draft(self._draft))
         self._node_positions = {}
         self._selected_node = self._draft.get("initial")
         if self._selected_node not in (self._draft.get("nodes") or {}):
@@ -692,39 +691,35 @@ class FlowEditorPane:
         self.gate_unknown_policy_var.set(str(gate.get("unknownPolicy") or "tri_state"))
 
     def _record_history(self, before: dict[str, Any] | None = None) -> None:
-        snapshot = flow_draft(before if before is not None else self._draft or {})
-        if self._history_index >= 0 and self._history[self._history_index] == snapshot:
-            return
-        self._history = self._history[: self._history_index + 1]
-        self._history.append(snapshot)
-        self._history_index = len(self._history) - 1
+        self._history.record(before if before is not None else self._draft or {})
 
     def _restore_history(self, index: int) -> None:
-        if index < 0 or index >= len(self._history):
+        snapshot = self._history.snapshot(index)
+        if snapshot is None:
             return
-        self._draft = flow_draft(self._history[index])
+        self._draft = flow_draft(snapshot)
         nodes = self._draft.get("nodes", {})
         if self._selected_node not in nodes:
             self._selected_node = self._draft.get("initial")
         if self._selected_node not in nodes:
             self._selected_node = next(iter(nodes), None)
-        self._history_index = index
+        self._history.move_to(index)
         self._populate_flow_fields()
         self._populate_node_fields()
         self._draw_graph()
 
     def undo(self) -> None:
-        if self._history_index <= 0:
+        if self._history.index <= 0:
             self.set_status("Nothing to undo")
             return
-        self._restore_history(self._history_index - 1)
+        self._restore_history(self._history.index - 1)
         self.set_status("Undo")
 
     def redo(self) -> None:
-        if self._history_index + 1 >= len(self._history):
+        if self._history.index + 1 >= len(self._history):
             self.set_status("Nothing to redo")
             return
-        self._restore_history(self._history_index + 1)
+        self._restore_history(self._history.index + 1)
         self.set_status("Redo")
 
     def _select_node(self, node_id: str | None = None) -> None:
@@ -792,9 +787,7 @@ class FlowEditorPane:
 
     def _commit_history_change(self, before: dict[str, Any]) -> None:
         self._record_history(before)
-        self._history = self._history[: self._history_index + 1]
-        self._history.append(flow_draft(self._draft or {}))
-        self._history_index = len(self._history) - 1
+        self._history.append(self._draft or {})
 
     def add_node(self) -> None:
         if not self._draft:
@@ -1260,8 +1253,7 @@ class FlowEditorPane:
             normalized = response.get("definition")
             if isinstance(normalized, dict):
                 self._draft = flow_draft(normalized)
-                self._history = [flow_draft(self._draft)]
-                self._history_index = 0
+                self._history.reset(flow_draft(self._draft))
                 self._populate_flow_fields()
                 self._populate_node_fields()
                 self._draw_graph()
@@ -1330,8 +1322,7 @@ class FlowEditorPane:
             and isinstance(authoring_metadata.get("nestedFlows"), list)
             else []
         )
-        self._history = [flow_draft(self._draft)]
-        self._history_index = 0
+        self._history.reset(flow_draft(self._draft))
         self._node_positions = {}
         self.flow_var.set(str(loaded.get("id", "draft")))
         self.flow_list.selection_clear(0, "end")
