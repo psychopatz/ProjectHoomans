@@ -50,3 +50,11 @@ For new authorized work use **existing `main`**, after checking local and remote
 
 Root `AGENTS.md` is durable policy, not authority to publish Steam Workshop content or launch native Project Zomboid. For the ongoing personal NPC dialogue/backstory goal, detailed documentation currently lives on the **preexisting** Hoomans PR #4 branch at `docs/Jobs/ContextualDialogueQuestFramework/`. Full developer B0–B6 acceptance, not a passing B0 subphase, determines the parent goal handoff. Review that goal's `GIT_INTEGRATION_AND_NO_NEW_BRANCHES.md` before any integration.
 
+## Active Semantic Lab goal and chat-only /goal policy (2026-10-20)
+
+For `docs/Jobs/ContextualDialogueQuestFramework/`, the current canonical goal documentation is on **existing main**. The prior B0–B6 implementation history remains on an already-existing divergent development branch and is NOT yet integrated into main. Preserve all code. Review the job's `PROGRESS.md`, `ROADMAP.md`, `AGENT_RUNBOOK.md`, `HARNESS_FIRST_CODEBUILDER_TRANSLATION_RECOVERY.md`, and `GIT_INTEGRATION_AND_NO_NEW_BRANCHES.md`. No new Git branches; do not continue writing new feature commits to the old branch as a workaround. If safe in-place reconciliation cannot be proven, report exact conflicts rather than force/pull/rebase/reset.
+
+**Do not create or update a checked-in `GOAL_PROMPT.md` or store the full assistant-provided `/goal` invocation in any repository document.** User wants goal prompts delivered in ChatGPT only. Durable docs contain architecture, acceptance, next chunk, rules and source evidence; bootstrap prompt is conversational only.
+
+The current product assignment is **complete harness-first grounded personal dialogue**: existing CodeBuilder emits production Lua and EN/TL catalog assets, real Semantic Lab Lua worker runs meaningful end-to-end conversation scenarios, all NPC fact/disclosure/dossier/PBrainZ outputs remain server-authorized, and translations use existing PsychopatzCore CustomTranslationManager and ProjectHoomans registrations. B0–B6 ledger acceptance is historical developer evidence, not acceptance of this new full tool/translation/integration gate. Work one safe chunk at a time but continue automatically through all mandatory corrective phases before reporting developer READY FOR USER LIVE TEST.
+
