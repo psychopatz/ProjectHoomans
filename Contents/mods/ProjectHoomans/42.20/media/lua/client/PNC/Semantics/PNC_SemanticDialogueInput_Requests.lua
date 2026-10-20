@@ -51,6 +51,7 @@ function Requests.RequestCognitionForIR(view, ir)
             or subject == "WEATHER"
             or subject == "IDENTITY"
             or subject == "GIFT_PREFERENCE"
+            or subject == "NPC_BACKSTORY"
         then
             return false, "local_world_fact"
         end
@@ -226,6 +227,33 @@ local function isIdentityEvasion(ir)
     return ir and (ir.intent == "REFUSE" or ir.intent == "DISAGREE")
 end
 
+local function backstoryKind(ir)
+    local slots = ir and ir.slots or nil
+    local value = slots and (
+        slots.backstoryKind or slots.backstory_kind or slots.kind
+            or slots.topic
+    ) or nil
+    if value == nil and ir then
+        value = ir.backstoryKind or ir.backstory_kind
+    end
+    if type(value) == "table" then
+        value = value.kind or value.id or value.key or value.value
+    end
+    value = string.lower(tostring(value or ""))
+    value = string.gsub(value, "[^%w]+", "_")
+    value = string.gsub(value, "^_+", "")
+    value = string.gsub(value, "_+$", "")
+    local aliases = {
+        job = "former_job", jobs = "former_job", occupation = "former_job",
+        profession = "former_job", home_town = "hometown",
+        hobbies = "hobby", family = "family_background",
+        values = "value", fears = "fear", event = "tragedy",
+        personal_event = "tragedy", survival = "survival_origin",
+        birthday = "date_of_birth",
+    }
+    return value ~= "" and (aliases[value] or value) or nil
+end
+
 -- Identity questions are answered locally and leave a conversation-local
 -- obligation for the player to state their name. Interruptions remain
 -- harmless; only the server-validated claim below may disclose identity.
@@ -234,6 +262,18 @@ function Requests.PrepareIdentityRequest(view, ir, context)
     local lifecycle = context and context.conversationLifecycleState or nil
     if type(ir) ~= "table" or not npcID then
         return nil
+    end
+
+    if ir.intent == "QUESTION" and ir.subject == "NPC_BACKSTORY" then
+        local kind = backstoryKind(ir)
+        if not kind then return nil end
+        return {
+            kind = "backstory_disclosure",
+            npcID = npcID,
+            backstoryKind = kind,
+            topicID = "backstory." .. kind,
+            conversationToken = lifecycle and lifecycle.token,
+        }
     end
 
     if ir.intent == "QUESTION" and ir.subject == "GIFT_PREFERENCE" then
@@ -287,6 +327,23 @@ function Requests.DispatchIdentityRequest(request)
                 conversationToken = request.conversationToken,
                 origin = "semantic_dialogue",
                 preferenceItemType = request.preferenceItemType,
+            }
+        )
+    end
+    if request.kind == "backstory_disclosure" then
+        if type(client.RequestNPCKnowledgeTopic) ~= "function" then
+            return false, "backstory_disclosure_unavailable"
+        end
+        local pending = PNC.Network and PNC.Network.ClientState
+            and PNC.Network.ClientState.pendingDisclosure
+            and PNC.Network.ClientState.pendingDisclosure[
+                tostring(request.npcID)
+            ]
+        if pending then return false, "identity_request_pending" end
+        return client.RequestNPCKnowledgeTopic(
+            request.npcID, request.topicID, {
+                conversationToken = request.conversationToken,
+                origin = "semantic_dialogue",
             }
         )
     end

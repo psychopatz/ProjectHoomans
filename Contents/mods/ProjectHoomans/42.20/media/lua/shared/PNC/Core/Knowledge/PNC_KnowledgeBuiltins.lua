@@ -194,6 +194,34 @@ Providers.Register("pnc_starting_relationship", {
     end,
 })
 
+-- Backstory truth is immutable, but its disclosure is not.  The knowledge
+-- service uses this provider only after its familiarity/privacy gate has
+-- accepted a direct disclosure.  Keeping the provider separate from the
+-- live residence/medical providers prevents a generated biography from
+-- being mistaken for mutable gameplay state.
+Providers.Register("pnc_backstory", {
+    GetValue = function(record, descriptor)
+        local memory = PNC.Conversation and PNC.Conversation.Memory or nil
+        local kind = descriptor and descriptor.presentation
+            and descriptor.presentation.backstoryKind or nil
+        if not memory or type(memory.GetBackstory) ~= "function" then
+            return nil, "backstory_memory_unavailable"
+        end
+        if type(record) ~= "table" or not kind then
+            return nil, "backstory_record_unavailable"
+        end
+        local fact = memory.GetBackstory(record, kind)
+        if not fact then return nil, "backstory_fact_unavailable" end
+        if kind == "date_of_birth" then
+            return string.format("%04d-%02d-%02d",
+                tonumber(fact.year) or 0,
+                tonumber(fact.month) or 0,
+                tonumber(fact.day) or 0)
+        end
+        return fact.value
+    end,
+})
+
 local function descriptor(id, category, field, valueType, resolverID, privacy, discovery, presentation)
     presentation = presentation or {}
     presentation.truthField = field
@@ -250,6 +278,46 @@ Descriptors.Register({
     discovery = personal, capabilities = { disclosable = true, decayable = false },
     presentation = { topicID = "faction" },
 })
+
+local backstoryKinds = {
+    { kind = "former_job", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryFormerJob", topicID = "backstory.former_job" },
+    { kind = "hometown", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryHometown", topicID = "backstory.hometown" },
+    { kind = "education", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryEducation", topicID = "backstory.education" },
+    { kind = "hobby", category = "preferences", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryHobby", topicID = "backstory.hobby" },
+    { kind = "family_background", category = "social", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryFamily", topicID = "backstory.family_background" },
+    { kind = "value", category = "personality", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryValue", topicID = "backstory.value" },
+    { kind = "survival_origin", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstorySurvival", topicID = "backstory.survival_origin" },
+    { kind = "fear", category = "personality", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryFear", topicID = "backstory.fear" },
+    { kind = "tragedy", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryTragedy", topicID = "backstory.tragedy" },
+    { kind = "date_of_birth", category = "history", valueType = "text_enum", labelKey = "UI_PNC_KnowledgeFact_BackstoryDateOfBirth", topicID = "backstory.date_of_birth" },
+}
+
+for _, backstory in ipairs(backstoryKinds) do
+    Descriptors.Register({
+        id = "history.backstory." .. backstory.kind,
+        version = 1,
+        category = backstory.category,
+        providerID = "pnc_backstory",
+        resolverID = "direct_fact",
+        valueType = backstory.valueType,
+        privacy = "private",
+        discovery = {
+            allowInference = false,
+            allowObservation = false,
+            allowDisclosure = true,
+            minimumFamiliarity = 50,
+            suspectedThreshold = .30,
+            knownThreshold = .70,
+        },
+        capabilities = { disclosable = true, decayable = false },
+        presentation = {
+            topicID = backstory.topicID,
+            backstoryKind = backstory.kind,
+            labelKey = backstory.labelKey,
+            immutable = true,
+        },
+    })
+end
 
 local function registerTraitDescriptors(definitions, sourceKind)
     for _, trait in ipairs(definitions or {}) do

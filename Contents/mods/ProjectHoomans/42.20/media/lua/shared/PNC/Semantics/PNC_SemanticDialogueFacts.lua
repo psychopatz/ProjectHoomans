@@ -19,6 +19,7 @@ Facts.PROVIDERS_BY_ID = Facts.PROVIDERS_BY_ID or {}
 
 local VALID_STATUS = {
     known = true,
+    suspected = true,
     unknown = true,
     ambiguous = true,
 }
@@ -124,7 +125,8 @@ local function normalizeFact(result, subject, providerID)
         subject = subject,
         status = status,
         provider = providerID,
-        confidence = status == "known" and .90 or 0,
+        confidence = status == "known" and .90
+            or status == "suspected" and .45 or 0,
     }
     for key, value in pairs(result) do
         if key ~= "provider" and key ~= "schemaVersion"

@@ -266,6 +266,7 @@ function Catalog.Register()
     Catalog.Internal.RegisterRequests()
     Catalog.Internal.RegisterOtherCommands()
     Catalog.Internal.RegisterLocationQuestions()
+    Catalog.Internal.RegisterBackstoryQuestions()
     Catalog.Internal.RegisterSocialSignals()
     Catalog.Internal.RegisterWorldFactQuestions()
     Catalog.registered = true

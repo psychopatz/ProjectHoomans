@@ -291,7 +291,7 @@ for npcIndex = 1, 100 do
     end
 end
 T.equal(learned, 2000, "sparse scale evidence count")
-T.equal(#PNC.KnowledgeDescriptors.List(), 67, "scale descriptors registered without schema migration")
+T.equal(#PNC.KnowledgeDescriptors.List(), 77, "scale descriptors registered without schema migration")
 safe(Knowledge.Registry)
 
 -- Learned facts are world ModData, keyed by persistent character UUID. A

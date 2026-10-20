@@ -83,6 +83,15 @@ function Projection.Build(view, getProviderStatus)
         output.relationshipState = relationship.relationshipState
             or output.relationshipState
     end
+    local knowledge = PNC.Network and PNC.Network.ClientState
+        and PNC.Network.ClientState.npcKnowledge
+        and PNC.Network.ClientState.npcKnowledge[tostring(output.npcID or "")]
+        or nil
+    if type(knowledge) == "table" then
+        -- This is the already-filtered, player-specific dossier projection.
+        -- Never replace it with the local NPC record or a generated profile.
+        output.npcKnowledge = knowledge
+    end
     output.authoredTopic = source.conversationTopic
         or source.conversationBlockContext
         and source.conversationBlockContext.conversationTopic

@@ -101,6 +101,53 @@ local function renderFact(fact, language)
     return type(content) == "string" and content ~= "" and content or nil
 end
 
+local function authorizedDescriptor(snapshot, kind)
+    local categories = snapshot and snapshot.categories
+    local descriptorID = "history.backstory." .. tostring(kind or "")
+    if type(categories) ~= "table" then return nil end
+    for _, category in ipairs(categories) do
+        for _, descriptor in ipairs(category.descriptors or {}) do
+            local presentation = descriptor.presentation or {}
+            if presentation.backstoryKind == kind
+                or descriptor.descriptorID == descriptorID
+            then
+                return descriptor
+            end
+        end
+    end
+    return nil
+end
+
+local function projectedFact(ir, context, kind)
+    local snapshot = context and (
+        context.npcKnowledge or context.knowledgeSnapshot
+    ) or nil
+    local descriptor = authorizedDescriptor(snapshot, kind)
+    local status = descriptor and tostring(descriptor.status or "") or ""
+    if not descriptor or (status ~= "known" and status ~= "confirmed"
+        and status ~= "suspected")
+    then
+        return nil
+    end
+    local record = context and context.npcRecord or nil
+    local fact = record and Memory.GetBackstory
+        and Memory.GetBackstory(record, kind) or nil
+    local content = descriptor.content
+    if fact then content = renderFact(fact, languageOf(context)) end
+    content = content or descriptor.value
+    if type(content) ~= "string" or content == "" then return nil end
+    return {
+        status = status == "suspected" and "suspected" or "known",
+        kind = kind,
+        factID = descriptor.descriptorID,
+        value = descriptor.value,
+        content = content,
+        immutable = true,
+        provenance = "PNC.NPCKnowledge.player_snapshot",
+        confidence = descriptor.confidence,
+    }
+end
+
 Facts.RegisterProvider("npc_backstory", {
     priority = 220,
     subjects = { NPC_BACKSTORY = true },
@@ -109,16 +156,30 @@ Facts.RegisterProvider("npc_backstory", {
         local kind = requestedKind(ir)
         local fact
         local content
-        if type(record) ~= "table" then
-            return {
-                status = "unknown",
-                reason = "authoritative_npc_record_unavailable",
-            }
-        end
         if not kind then
             return {
                 status = "ambiguous",
                 reason = "backstory_kind_required",
+            }
+        end
+        fact = projectedFact(ir, context, kind)
+        if fact then return fact end
+        -- Only the server-authoritative harness and the server disclosure
+        -- boundary may ask for raw generated truth. Normal dialogue and
+        -- optional PBrainZ contexts must use the player-specific snapshot.
+        if not (context and context.authoritativeBackstoryAccess == true) then
+            return {
+                status = "unknown",
+                kind = kind,
+                topicID = "backstory." .. kind,
+                reason = "backstory_not_disclosed",
+            }
+        end
+        if type(record) ~= "table" then
+            return {
+                status = "unknown",
+                kind = kind,
+                reason = "authoritative_npc_record_unavailable",
             }
         end
         if type(Memory.GetBackstory) ~= "function" then

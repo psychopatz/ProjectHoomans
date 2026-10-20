@@ -218,7 +218,7 @@ function Conversation.ReceiveDisclosureResult(result)
     if not view or not result
         or tostring(result.npcID) ~= tostring(view.spec and view.spec.npcID)
     then return false end
-    if result.success == true and result.responseText
+    if result.responseText
         and view.session and view.session.append
     then
         view.session:append("npc", { fallback = tostring(result.responseText) })

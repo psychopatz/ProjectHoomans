@@ -184,6 +184,51 @@ function API.DiscloseForPlayer(player, options)
             player, context, record, npcID, options, lease
         )
     end
+    local backstoryKind = type(Knowledge.BackstoryKindForTopic) == "function"
+        and Knowledge.BackstoryKindForTopic(topicID) or nil
+    if backstoryKind then
+        local sourceType = options.origin == "debug" and "debug"
+            or "direct_disclosure"
+        local disclosure
+        disclosure, reason = Knowledge.DiscloseBackstory(
+            context.characterUUID,
+            npcID,
+            backstoryKind,
+            {
+                sourceEventID = options.requestID or topicID,
+                worldAgeHours = options.worldAgeHours,
+                sourceType = sourceType,
+            }
+        )
+        if not disclosure then return nil, reason end
+        local committed = true
+        if disclosure.changed ~= false then
+            committed, reason = commit(
+                player, options.requestID or topicID, "knowledge_disclosure"
+            )
+            if committed ~= true then
+                return nil, reason or "knowledge_save_failed"
+            end
+        end
+        local snapshot
+        snapshot, reason = API.GetForPlayer(player, npcID)
+        if not snapshot then return nil, reason end
+        return {
+            accepted = true,
+            committed = committed,
+            requestID = options.requestID,
+            npcID = npcID,
+            topicID = topicID,
+            kind = backstoryKind,
+            revealed = disclosure.alreadyKnown and {}
+                or { disclosure.descriptorID },
+            failures = {},
+            snapshot = snapshot,
+            characterUUID = context.characterUUID,
+            bindingRevision = context.bindingRevision,
+            lease = lease and { token = lease.token } or nil,
+        }
+    end
     -- Semantic origins preserve caller provenance above. They still enter
     -- the knowledge service through direct_disclosure so its disclosure
     -- eligibility checks remain active.

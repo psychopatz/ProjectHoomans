@@ -69,6 +69,7 @@ local function backstoryFact(payload)
             identity = { seed = payload.identitySeed },
         },
         language = payload.language,
+        authoritativeBackstoryAccess = true,
     })
     return {
         ok = true,

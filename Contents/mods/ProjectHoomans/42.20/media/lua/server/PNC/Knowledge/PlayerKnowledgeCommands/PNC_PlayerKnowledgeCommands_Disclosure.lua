@@ -16,6 +16,40 @@ function H.IntroductionText(npcID)
     return "I'm " .. tostring(name) .. "."
 end
 
+function H.BackstoryDisclosureText(npcID, topicID)
+    local memory = PNC.Conversation and PNC.Conversation.Memory or nil
+    local kind = PNC.NPCKnowledge
+        and PNC.NPCKnowledge.BackstoryKindForTopic
+        and PNC.NPCKnowledge.BackstoryKindForTopic(topicID) or nil
+    local record = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(npcID) or nil
+    if not memory or not kind or not record
+        or type(memory.GetBackstory) ~= "function"
+    then return nil end
+    local fact = memory.GetBackstory(record, kind)
+    if not fact then return nil end
+    if kind == "date_of_birth" then
+        return string.format("%04d-%02d-%02d",
+            tonumber(fact.year) or 0,
+            tonumber(fact.month) or 0,
+            tonumber(fact.day) or 0)
+    end
+    local content = memory.GetBackstoryText
+        and memory.GetBackstoryText(fact, "EN") or fact.value
+    if memory.RenderText then content = memory.RenderText(content, fact) end
+    return type(content) == "string" and content ~= "" and content or nil
+end
+
+function H.BackstoryRefusalText(reason)
+    if reason == "insufficient_familiarity" then
+        return "I don't know you well enough to talk about that."
+    end
+    if reason == "not_disclosable" then
+        return "I'd rather keep that private."
+    end
+    return "I'm not ready to talk about that yet."
+end
+
 function Commands.HandleDisclosure(player, args)
     args = type(args) == "table" and args or {}
     local requestID = H.SafeID(args.requestID)
@@ -105,7 +139,9 @@ function Commands.HandleDisclosure(player, args)
                     requestID = requestID, npcID = npcID, topicID = topicID,
                     success = true, reason = "committed",
                     responseText = topicID == "identity_name"
-                        and H.IntroductionText(npcID) or nil,
+                        and H.IntroductionText(npcID)
+                        or string.sub(topicID, 1, 10) == "backstory."
+                        and H.BackstoryDisclosureText(npcID, topicID) or nil,
                     giftPreference = disclosure.giftPreference,
                     revealedFacts = disclosure.revealed or {},
                     presentation = presentation,
@@ -127,6 +163,8 @@ function Commands.HandleDisclosure(player, args)
                 payload = {
                     requestID = requestID, npcID = npcID, topicID = topicID,
                     success = false, reason = commitReason or "commit_failed",
+                    responseText = string.sub(topicID, 1, 10) == "backstory."
+                        and H.BackstoryRefusalText(commitReason) or nil,
                     presentation = { npcID = npcID, state = "error",
                         reason = commitReason or "commit_failed" },
                 }

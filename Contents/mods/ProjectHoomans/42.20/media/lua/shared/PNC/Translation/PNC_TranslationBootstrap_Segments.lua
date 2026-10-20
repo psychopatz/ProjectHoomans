@@ -294,6 +294,7 @@ Translation.Internal.SegmentSystems = {
     Interaction = "Character",
     InteractionHistoryHint = "Character",
     KnowledgeCategory = "Research",
+    KnowledgeFact = "Research",
     KnowledgeJournal = "Research",
     Inventory = "Inventory",
     Job = "Tasks",

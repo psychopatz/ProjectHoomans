@@ -273,7 +273,11 @@ function Internal.SubmitSingle(view, value, part)
     local decision = preview.decision or {}
     local isIdentityClaim = identityRequest
         and identityRequest.kind == "identity_claim"
-    if decision.route == "llm_fallback" and not isIdentityClaim then
+    local isBackstoryDisclosure = identityRequest
+        and identityRequest.kind == "backstory_disclosure"
+    if decision.route == "llm_fallback"
+        and not isIdentityClaim and not isBackstoryDisclosure
+    then
         if Internal.ClearPendingGiftConsent then
             Internal.ClearPendingGiftConsent(view)
         end
@@ -329,7 +333,8 @@ function Internal.SubmitSingle(view, value, part)
     -- server responses. Do not also queue a local reply for those turns.
     local deferIdentityResponse = identityRequest
         and (identityRequest.kind == "identity_claim"
-            or identityRequest.kind == "gift_preference_disclosure")
+            or identityRequest.kind == "gift_preference_disclosure"
+            or identityRequest.kind == "backstory_disclosure")
     local submitted, submitReason = finishLocalSubmit(
         view,
         value,

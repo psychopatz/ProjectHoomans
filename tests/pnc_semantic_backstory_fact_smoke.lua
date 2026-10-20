@@ -64,6 +64,7 @@ local english = Facts.Resolve({
 }, nil, {
     npcRecord = record,
     language = "EN",
+    authoritativeBackstoryAccess = true,
 })
 T.equal(english.status, "known", "English backstory fact is not known")
 T.equal(english.factID, "backstory.colonist.former_job.doctor",
@@ -80,6 +81,7 @@ local tagalog = Facts.Resolve({
 }, nil, {
     npcRecord = record,
     language = "TL",
+    authoritativeBackstoryAccess = true,
 })
 T.equal(tagalog.status, "known", "TL backstory fact is not known")
 T.equal(tagalog.factID, english.factID,
@@ -92,6 +94,7 @@ local hometown = Facts.Resolve({
 }, nil, {
     npcRecord = record,
     language = "EN",
+    authoritativeBackstoryAccess = true,
 })
 T.equal(hometown.status, "known", "hometown backstory fact is not known")
 T.equal(hometown.content, "Rosewood", "hometown label changed")
@@ -108,13 +111,14 @@ local missing = Facts.Resolve({
 }, nil, { language = "EN" })
 T.equal(missing.status, "unknown",
     "backstory provider exposed facts without an authoritative record")
-T.equal(missing.reason, "authoritative_npc_record_unavailable",
-    "missing authoritative record reason changed")
+T.equal(missing.reason, "backstory_not_disclosed",
+    "missing unauthorized record reason changed")
 
 local unsupported = Facts.Resolve({
     subject = "NPC_BACKSTORY",
     slots = { kind = "current_residence" },
-}, nil, { npcRecord = record, language = "EN" })
+}, nil, { npcRecord = record, language = "EN",
+    authoritativeBackstoryAccess = true })
 T.equal(unsupported.status, "unknown",
     "mutable residence was treated as immutable backstory")
 
