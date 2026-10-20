@@ -41,3 +41,11 @@ the game is restarted.
 - If a staging directory is required, keep it outside `media/`, or stop
   Project Zomboid first. Restarting the game is the only way to re-arm the
   watcher.
+
+## Git branch policy — permanent user instruction (2026-10-20)
+
+**DO NOT CREATE ANY NEW GIT BRANCHES.** This includes feature/docs/test branches, temporary staging branches, Codex-generated work branches, `git checkout -b`, `git switch -c`, `git branch <name>`, and any automated PR branch-creation path. The user has explicitly prohibited new branches for this repository and its Core/DynamicTrading dependencies.
+
+Use the existing `main` branch for future implementation, documentation and integration only after verifying local changes, current remote HEAD/upstreams, ownership and safe compatibility. **Legacy already-existing branches are not permission to create more.** The existing `docs/contextual-dialogue-quest-framework-20261018` branch and PR #4 hold 144 commits ahead of and one behind `main` as observed on 2026-10-20. Preserve this history. Before moving work to `main`, inspect `git fetch`, `git merge-base`, `git log --left-right`, `git diff`, test a merge without changing working tree using `git merge-tree`, and validate actual source/conflicts and dependencies. Integrate/merge into the EXISTING `main` branch only when safe; no rewrite, rebase/reset of uncertain user work, force push, blind `git pull`, or replacement branch. If unsafe, report the exact blocking files/dependencies and continue only work safely allowed on the already-existing checked-out branch until safe reconciliation is possible. Do not claim work on an unmerged branch is published to main.
+
+For any direct push, require explicit durable authorization to the destination and a checked clean/safely-owned tree, fast-forward-compatible remote and matching expected HEAD; never infer a clean local checkout from GitHub remote state. This documentation rule does NOT authorize Workshop publication or native Project Zomboid launching.

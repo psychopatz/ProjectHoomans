@@ -1,5 +1,8 @@
 # Roadmap — Grounded NPC Personal Dialogue, Seed/Deltas, Knowledge and Dossier
 
+**Repository integration gate (cross-cutting; not a substitute for B0–B6):** Existing divergent Hoomans history on PR #4 must be safely reconciled to the existing main branch for final delivery. Create no new branches. Full developer acceptance also requires source-backed evidence for all B0–B6 in the properly integrated target, not only narrow Core Foundation P1–P9 harnesses. See `GIT_INTEGRATION_AND_NO_NEW_BRANCHES.md`.
+
+
 **PARENT GOAL STATUS: IN PROGRESS until the entire B0–B6 implementation/integration is complete; one chunk at a time is a safety protocol, not a stopping condition. Immediately continue after each accepted chunk without requesting another /goal.**
 
 **Phase opened 2026-10-20 from audited remote `263c132ea87678024cd81f8310bb85608dec28df`.** The previous C7A–C7G implementation is **recorded developer accepted** (244/244 harness, 68/68 Lua smoke, 16/16 compiler, per historic ledger). No new worker/GUI/backend tests were executed by this docs-only commit. User-observed out-of-sample compliment/inventory bug and desired protected personal-knowledge gameplay open a NEW product gate; do NOT rerun C7/earlier work unnecessarily. The ONE active chunk is in `PROGRESS.md`.

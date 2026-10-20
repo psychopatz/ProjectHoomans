@@ -1,5 +1,8 @@
 # Agent Runbook — Contextual Dialogue & Quest Framework
 
+> **Mandatory Git policy (2026-10-20):** Never create a new branch under ANY circumstance for this goal or its Core/DT dependencies. Read root `AGENTS.md` and `GIT_INTEGRATION_AND_NO_NEW_BRANCHES.md`. Use existing main after safe source/merge validation; current unmerged development history must be preserved. No force-push/reset/rebase of uncertain work or speculative PR branch. A branch name in historical instructions is only a legacy locator, NOT authorization to create/switch-create it.
+
+
 **Active approved phase (2026-10-20): B — Grounded Personal Dialogue / Identity Seed / Sparse Knowledge.** This runbook replaces stale S0A/R0A/C7A Next Chunk instructions; all previous achievements live in archival ledgers, not as current commands. `PROGRESS.md` is the ONLY authoritative current one Next Chunk, currently B0 at transition.
 
 ## Parent goal versus execution chunk (mandatory, 2026-10-20)

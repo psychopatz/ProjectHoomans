@@ -1,5 +1,12 @@
 # Contextual Dialogue & Quest Framework — CURRENT B-phase Progress
 
+**AUDIT REFRESH 2026-10-20 (GitHub read-only):** ProjectHoomans existing goal branch `9b123bd352b0` / main `bc9c64d0fbf6`, Core main `298df66381b7`, DynamicTrading main `2d1ee62a2270`. **Core Foundation P1–P9 code/adapter commits exist and are developer-accepted per Core ledger, but native game integration remains unverified.** Hoomans B0–B6 is NOT implemented/accepted on audited remote HEAD and remains the entire mandatory parent goal. Do not conflate Foundation acceptance with personal-dialogue acceptance. The previous snapshot below is historical evidence, not the current repository HEAD.
+
+**NO-NEW-BRANCHES POLICY:** Follow root AGENTS and `GIT_INTEGRATION_AND_NO_NEW_BRANCHES.md`. PR #4 remains open; existing goal branch is 144 ahead/1 behind main. No new branches for sync, code, tests or docs. Safely review/converge existing history onto existing main before claiming main integration; don't skip product implementation while awaiting a safe integration window.
+
+**ONE CURRENT CHUNK: B0. FULL PARENT ASSIGNMENT: B0–B6 WITHOUT STOPPING BETWEEN CHUNKS.** Finish the compliment-vs-inventory false dispatch and read-only identity-seed replay, then automatically continue B1–B6. The developer goal is NOT READY until offline semantic backstory facts, Knowledge disclosure, dossier, conversations, PBrainZ privacy and ModData/MP gates are satisfied.
+
+
 **Updated:** 2026-10-20. Documentation-only approved phase transition; NO new source implementation or runtime test passes.
 **Audited remote:** `263c132ea87678024cd81f8310bb85608dec28df`, branch `docs/contextual-dialogue-quest-framework-20261018`, PR #4 OPEN/unmerged at inspection. Local Codex checkout/Core state/parallel changes unknown: verify before edits.
 **Status:** **B PHASE — IN PROGRESS, NOT READY FOR USER LIVE TEST FOR THE EXPANDED PERSONAL-KNOWLEDGE GOAL.**
