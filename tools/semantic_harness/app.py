@@ -11,13 +11,13 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from tools.semantic_harness.cli import AUTHORING_OPERATIONS, _parser, cli
     from tools.semantic_harness.doctor import run_doctor
-    from tools.semantic_harness.gui import SemanticHarnessApp, run_gui
+    from tools.semantic_harness.ui.shell import SemanticHarnessApp, run_gui
     from tools.semantic_harness.runtime.process import install_shutdown_handler
     from tools.semantic_harness.inspection.rendering import pretty, print_result as _print_result
 else:
     from .cli import AUTHORING_OPERATIONS, _parser, cli
     from .doctor import run_doctor
-    from .gui import SemanticHarnessApp, run_gui
+    from .ui.shell import SemanticHarnessApp, run_gui
     from .runtime.process import install_shutdown_handler
     from .inspection.rendering import pretty, print_result as _print_result
 
