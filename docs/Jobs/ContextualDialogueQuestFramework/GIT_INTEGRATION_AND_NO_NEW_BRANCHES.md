@@ -1,3 +1,5 @@
+> **CURRENT GIT STATUS (2026-10-20, audited remote before V docs):** Hoomans PR #4 was CLOSED/MERGED and the pre-existing B/H/F code is ALREADY on `main` at `5fa019e072893fe0c9c37ae98f8db8363b5fb2a1`. The unmerged-branch/PR-divergence procedure below is obsolete historical guidance, NOT an instruction to replay the merge or create a branch. The binding rule remains **NO NEW BRANCHES; existing main ONLY, safely synchronize actual local changes before any writes.**
+
 # Existing-main-only Git integration policy
 
 **User instruction:** Absolutely NO new Git branches and no continuing new implementation commits on the legacy development branch. Target the already-existing `main` for authorized development; do not use new PR, test, merge, scratch, worktree or automatic agent branches. Do not run an ambiguous `git pull` (especially `git pull --tags origin docs/contextual-dialogue-quest-framework-20261018`). No blind rebase, reset, force push, stash/discard or overwrite of user/other-agent work.

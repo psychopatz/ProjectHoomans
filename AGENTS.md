@@ -1,3 +1,5 @@
+> **Current active Semantic Lab job override (2026-10-20):** ProjectHoomans `main` already contains the former B0–B6/H0–H4/F1–F4 implementation and prior PR #4 is MERGED. Any older paragraphs below claiming that PR #4 is unmerged/CodeBuilder source lives only on an old branch are OBSOLETE and must not trigger a merge/rebase/pull. Approved new product goal is `docs/Jobs/ContextualDialogueQuestFramework/V1_V5_VISUAL_AUTHORING_AND_RUNTIME_CONSOLIDATION.md`; `PROGRESS.md` current V1 execution chunk, then autonomously through V5. **No new Git branches**, new work on safely-checked existing `main` only, **no checked-in GOAL_PROMPT.md**, no native PZ/Workshop action by Codex.
+
 # Project Hoomans working rules
 
 ## Project Zomboid mod layout
@@ -57,4 +59,3 @@ For `docs/Jobs/ContextualDialogueQuestFramework/`, the current canonical goal do
 **Do not create or update a checked-in `GOAL_PROMPT.md` or store the full assistant-provided `/goal` invocation in any repository document.** User wants goal prompts delivered in ChatGPT only. Durable docs contain architecture, acceptance, next chunk, rules and source evidence; bootstrap prompt is conversational only.
 
 The current product assignment is **complete harness-first grounded personal dialogue**: existing CodeBuilder emits production Lua and EN/TL catalog assets, real Semantic Lab Lua worker runs meaningful end-to-end conversation scenarios, all NPC fact/disclosure/dossier/PBrainZ outputs remain server-authorized, and translations use existing PsychopatzCore CustomTranslationManager and ProjectHoomans registrations. B0–B6 ledger acceptance is historical developer evidence, not acceptance of this new full tool/translation/integration gate. Work one safe chunk at a time but continue automatically through all mandatory corrective phases before reporting developer READY FOR USER LIVE TEST.
-

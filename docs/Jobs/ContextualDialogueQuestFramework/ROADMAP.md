@@ -1,16 +1,16 @@
-# Roadmap — Grounded Personal Dialogue: final developer acceptance
+# Roadmap — Semantic Lab reusable visual authoring & NPC conversation
 
-**Current parent status: IN PROGRESS — final acceptance correction F1–F4.** Previous B0–B6 and H0–H4 production implementation is present on existing `main`. Agent-reported prior acceptance: Python 264/264, focused 31/31, Lua 853/853, doctor and changed-file Kahlua passed; historic ledger archived verbatim in `HISTORY_H0_H4_ACCEPTANCE_20261020.md`. Do not reimplement accepted systems. Those passing test reports did not demonstrate *selected GUI CodeBlocks composing generated behavior*, localized TL fact content, differentiated personal-privacy thresholds or the complete requested byte comparisons.
+**ACTIVE PARENT: V1–V5 IN PROGRESS.** Opened 2026-10-20 from published existing ProjectHoomans `main` `5fa019e072893fe0c9c37ae98f8db8363b5fb2a1`. Previous B0–B6, H0–H4 and F1–F4 modules are implemented; agent-reported F4 developer regression evidence includes 268 Python, 33 focused, 853 Lua, zero Kahlua errors and a Tk/X11 GUI probe. Those were not rerun by this docs-only update. They are **preserved accepted foundation for the previous bounded implementation**, not proof that the expanded reusable visual graph composer, unified semantic fact-value localization, personality-aware disclosure and complete record measurements already exist.
 
-| Phase | Status | Non-negotiable result |
+| Phase | Status | Required developer result |
 | --- | --- | --- |
-| B0–B6 | IMPLEMENTED / historically accepted, retained on main | Seed-based history, Knowledge/Dossier/PBrainZ, personal dialogue and prior performance work preserved |
-| H0–H4 | IMPLEMENTED / developer test results recorded, acceptance narrowed | Generated Lua/EN/TL, production worker, full reported regression pass and single 50-familiarity backstory gate |
-| **F1 — Real CodeBlocks composition** | **CURRENT / NOT ACCEPTED** | GUI/service selected, parameterized blocks change canonical InteractionSpec and generated Lua/TL/EN, not merely validate selection; actual worker effect and no-preview-writes |
-| F2 — Complete Core-backed localization | PLANNED | Authorized TL fact IDs resolve localized values in *complete final response*, not only localized sentence + English `farmer` |
-| F3 — Graduated disclosure/privacy | PLANNED | Distinct public/sensitive thresholds, refusal, server evidence and two-player scoped Knowledge/Dossier/PBrainZ |
-| F4 — Integrated GUI and storage verification | PLANNED | Real visual composition→approved generated mod assets→fresh worker→localized dialogue→Dossier/MP privacy; full regressions, comparable ModData measurements and accurate ledger |
+| B0–B6 / H0–H4 / F1–F4 | HISTORICAL IMPLEMENTATION + AGENT-REPORTED ACCEPTANCE, preserved | Seeded backstory, Knowledge/Dossier, existing CodeBuilder and typed InteractionSpec, 4-block structured backstory composer, Core-backed full-sentence EN/TL responses, distinct familiarity tiers, real worker/harness |
+| **V1 — reusable typed visual composer** | **CURRENT / NOT ACCEPTED** | Editable/reconnectable typed nodes and edges through existing Studio, canonical InteractionSpec, generated real Lua/EN/TL, altered NPC behavior; at least backstory + another registered semantic interaction |
+| V2 — Core-backed semantic fact values | PLANNED | Newly authored fact-content translations resolve via existing registered `PNC.Translation`/Core manager, keeping older legacy consumers and player privacy intact |
+| V3 — individual willingness to disclose | PLANNED | Existing familiarity tiers enhanced with properly owned approval/personality/context, legitimate disclosure/evidence/refusal and two-player isolation, no extra large ModData |
+| V4 — complete footprint and inspector | PLANNED | Same-codec actor and sparse Knowledge footprint for 0/1/10 learned facts, synthetic scale, legible inspector linking CodeBlocks→actual spoken text/dossier/effects |
+| V5 — full real tool acceptance | PLANNED | Real Tk Studio composition→approved correct mod files→fresh Core+Hoomans worker→EN/TL and scoped Knowledge/Dossier, changed graph changes final response, full regressions, true developer handoff |
 
-**Full /goal assignment:** implement one safe bounded chunk at a time and immediately continue F1→F4 until every developer-owned original product acceptance gate is met. Do not stop after F1 or merely update docs. **No Git branch creation; use existing `main` only. No checked-in GOAL_PROMPT.md.**
+**CONTINUOUS /goal:** one coherent implementation chunk at a time; after acceptance immediately continue through all V1–V5. The parent cannot finish at V1 or because tests/commit passed. **No new Git branches, use existing main only; never create/update `GOAL_PROMPT.md`**. Native Project Zomboid SP/MP and Workshop work remain user-owned.
 
-Complete implementation details and exact acceptance: `FINAL_ACCEPTANCE_CLOSEOUT.md`; current implementation truth and ONE Next Chunk: `PROGRESS.md`.
+Canonical detailed phase design: `V1_V5_VISUAL_AUTHORING_AND_RUNTIME_CONSOLIDATION.md`. Exact one CURRENT execution chunk: `PROGRESS.md`. Former ledger archived in `HISTORY_F1_F4_20261020.md`.
