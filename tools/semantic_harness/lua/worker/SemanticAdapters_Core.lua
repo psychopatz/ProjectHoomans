@@ -146,6 +146,9 @@ function Provider.configure(context, SemanticAdapters)
             surname = playerData.surname,
         }
     end
+    PNC.PlayerCharacters.Registry = PNC.PlayerCharacters.Registry or {
+        uuidAliases = {},
+    }
     PNC.PlayerCharacters.ApplyConductRecord = function(_, conduct)
         Runtime.playerConduct = Values.copy(conduct)
         return true, "updated"

@@ -207,7 +207,8 @@ local suspectedSnapshot = {
         descriptors = {{
             descriptorID = "history.backstory.hometown",
             valueType = "text_enum",
-            value = "Rosewood",
+            value = "Muldraugh",
+            content = "Muldraugh",
             status = "suspected",
             confidence = .45,
             primarySource = "trusted_gossip",
@@ -218,10 +219,21 @@ local suspectedSnapshot = {
         }},
     }},
 }
+local suspectedFact = Facts.Resolve({
+    subject = "NPC_BACKSTORY", slots = { kind = "hometown" },
+}, nil, {
+    npcRecord = npc,
+    npcKnowledge = suspectedSnapshot,
+    language = "EN",
+})
+T.equal(suspectedFact.status, "suspected",
+    "suspected backstory evidence did not remain uncertain")
+T.equal(suspectedFact.content, "Muldraugh",
+    "suspected player observation was replaced by canonical private truth")
 local suspectedRows = Presentation.BuildDossierRows(suspectedSnapshot)
 T.equal(suspectedRows[1].rows[1].label, "Dating trabaho",
     "TL backstory dossier label was not translated")
-T.equal(suspectedRows[1].rows[1].value, "Possibly Rosewood",
+T.equal(suspectedRows[1].rows[1].value, "Possibly Muldraugh",
     "suspected backstory dossier status was not rendered as uncertain")
 
 T.finish("pnc_backstory_knowledge_disclosure_smoke")

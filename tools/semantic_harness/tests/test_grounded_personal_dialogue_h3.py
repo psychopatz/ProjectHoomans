@@ -122,6 +122,35 @@ class GroundedPersonalDialogueH3Tests(unittest.TestCase):
             )
         )
 
+    def test_player_scoped_knowledge_bootstrap_survives_reload(self) -> None:
+        player_a = self.scenario()
+        player_a["player"]["characterUUID"] = "char_h3_a"
+        player_a["player"]["displayName"] = "Player A"
+        player_b = self.scenario()
+        player_b["player"]["characterUUID"] = "char_h3_b"
+        player_b["player"]["displayName"] = "Player B"
+
+        with LuaSemanticWorker(player_a) as worker:
+            disclosed = worker.input("what was your old job")
+            knowledge_a = disclosed["contextAfter"]["knowledge"]
+            self.assertEqual(knowledge_a["npcID"], "npc-h3-grounded")
+
+            worker.configure(player_b)
+            worker.knowledge_bootstrap("bootstrap-player-b")
+            self.assertIsNone(
+                worker.snapshot()["context"].get("knowledge"),
+                "player B received player A's private dossier fact",
+            )
+
+            worker.configure(player_a)
+            worker.knowledge_bootstrap("bootstrap-player-a-reload")
+            reloaded = worker.snapshot()["context"].get("knowledge")
+
+        self.assertIsNotNone(reloaded)
+        self.assertEqual(reloaded["characterUUID"], "char_h3_a")
+        self.assertEqual(reloaded["npcID"], "npc-h3-grounded")
+        self.assertEqual(reloaded["categories"], knowledge_a["categories"])
+
 
 if __name__ == "__main__":
     unittest.main()

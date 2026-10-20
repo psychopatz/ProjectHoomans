@@ -101,6 +101,15 @@ class LuaSemanticWorker:
     def snapshot(self) -> dict[str, Any]:
         return self._request("SNAPSHOT")
 
+    def knowledge_bootstrap(
+        self, request_id: str = "harness-knowledge-bootstrap"
+    ) -> dict[str, Any]:
+        """Hydrate the real player-scoped Knowledge projection after reload."""
+
+        return self._request(
+            "KNOWLEDGE_BOOTSTRAP", {"requestID": str(request_id)}
+        )
+
     def replay_quest_request(self, request: dict[str, Any]) -> dict[str, Any]:
         """Replay a captured request through the production server router."""
 

@@ -57,6 +57,8 @@ function Provider.configure(deps)
             and command == PNC.Const.CMD_SEMANTIC_QUEST_REQUEST
         local knowledgeRequest = module == PNC.Const.MODULE
             and command == PNC.Const.CMD_KNOWLEDGE_DISCLOSURE_REQUEST
+        local bootstrapRequest = module == PNC.Const.MODULE
+            and command == PNC.Const.CMD_PLAYER_BOOTSTRAP_REQUEST
         if questRequest then
             Runtime.transport[#Runtime.transport + 1] = {
                 direction = "client_to_server",
@@ -84,6 +86,21 @@ function Provider.configure(deps)
             }
             local callback = PNC.PlayerKnowledgeCommands
                 and PNC.PlayerKnowledgeCommands.HandleDisclosure
+            if type(callback) == "function" then
+                callback(player, payload)
+                return true
+            end
+            return false
+        end
+        if bootstrapRequest then
+            Runtime.transport[#Runtime.transport + 1] = {
+                direction = "client_to_server",
+                mode = runtime.mode,
+                command = command,
+                payload = Values.copy(payload),
+            }
+            local callback = PNC.PlayerKnowledgeCommands
+                and PNC.PlayerKnowledgeCommands.HandleBootstrap
             if type(callback) == "function" then
                 callback(player, payload)
                 return true

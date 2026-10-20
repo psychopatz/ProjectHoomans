@@ -255,6 +255,7 @@ function ProductionModules.load(context)
         PNC.PlayerKnowledgeCommands.Uncommitted or {}
     PNC.PlayerKnowledgeCommands.Diagnostics =
         PNC.PlayerKnowledgeCommands.Diagnostics or {}
+    PNC.PlayerKnowledgeCommands.Internal.BootstrapChunkSize = 32
     load(
         "ProjectHoomans", "server",
         "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Core.lua",
@@ -263,6 +264,11 @@ function ProductionModules.load(context)
     load(
         "ProjectHoomans", "server",
         "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Presentation.lua",
+        "authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Bootstrap.lua",
         "authority"
     )
     load(

@@ -9,6 +9,7 @@ local capabilities = {
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
     "REPLAY_SEMANTIC_QUEST",
     "COMMITMENT", "BACKSTORY", "BACKSTORY_FACT",
+    "KNOWLEDGE_BOOTSTRAP",
 }
 
 local function backstorySnapshot(payload)
@@ -156,6 +157,22 @@ function CommandRouter.dispatch(context, request)
         return backstorySnapshot(payload)
     elseif command == "BACKSTORY_FACT" then
         return backstoryFact(payload)
+    elseif command == "KNOWLEDGE_BOOTSTRAP" then
+        local callback = PNC.PlayerKnowledgeCommands
+            and PNC.PlayerKnowledgeCommands.HandleBootstrap
+        if type(callback) ~= "function" then
+            return nil, "knowledge_bootstrap_unavailable"
+        end
+        local args = Values.copy(type(payload) == "table" and payload or {})
+        args.requestID = args.requestID
+            or "harness-bootstrap-" .. tostring(Runtime.now)
+        args.scope = "all"
+        local result = callback(context.player, args)
+        return {
+            ok = true,
+            type = "knowledge_bootstrap",
+            result = Values.copy(result),
+        }
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,
