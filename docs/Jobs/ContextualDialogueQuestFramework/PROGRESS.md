@@ -32,6 +32,7 @@
 - `98b54dc0` — H2 typed `NPC_BACKSTORY` CodeBuilder contract, deterministic supplemental Lua/EN/TL generation, production catalog registration, and fresh-worker load regression.
 - `cf5b34c9` — H2 authored `CONTEXT_REFERENCE` backstory follow-ups (`where?`, `do you miss it?`), typed authoring mappings, deterministic generated Lua/EN/TL assets, and updated compiler counts.
 - `7ec2e79a` — H3 production disclosure result/snapshot seam, filtered Knowledge/Dossier worker projections, suspected-fact truth-preserving projection, bounded backstory follow-ups, and real-worker regression coverage.
+- `eac26ff2` — H3 existing production player-bootstrap hook, two-player Knowledge/Dossier isolation after reload, and suspected observation regression against canonical truth.
 
 ## H1/H2 evidence
 
@@ -54,4 +55,6 @@ Real-worker evidence for commit `7ec2e79a` with identity seed `90210` and famili
 - `python3 -m unittest tools.semantic_harness.tests.test_grounded_personal_dialogue_b0 tools.semantic_harness.tests.test_grounded_personal_dialogue_b2 tools.semantic_harness.tests.test_grounded_personal_dialogue_b3 tools.semantic_harness.tests.test_grounded_personal_dialogue_h2 tools.semantic_harness.tests.test_grounded_personal_dialogue_h3 tools.semantic_harness.tests.test_semantic_translation_integration tools.semantic_harness.tests.test_dataset_review tools.semantic_harness.tests.test_semantic_authoring_compiler -q` — 28 tests OK, exit 0.
 - `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all required checks OK, exit 0; changed Lua passed `luac5.3 -p`, changed Python passed `py_compile`, and `git diff --check` passed.
 
-Next mandatory chunk: exercise the existing Knowledge evidence API with a suspected player observation and two player identities against one NPC, verify dossier isolation and persistence, then continue with ModData measurements, optional PBrainZ filtered context, and final H4 integrated acceptance. Keep all work inside the existing Core, Knowledge, persistence, translation, Semantic Lab, and dialogue contracts; do not add a second parser, policy, profile store, or dossier database.
+- `python3 tests/run_tests.py pnc_backstory_knowledge_disclosure --jobs 1` — `PASS 1/1`, exit 0; the smoke now asserts a suspected observation remains distinct from canonical NPC truth.
+
+Next mandatory chunk: measure serialized ModData for unchanged and discovered NPCs, exercise optional PBrainZ with the same filtered context, and complete H4 authoring-to-worker integrated acceptance and scale checks. Keep all work inside the existing Core, Knowledge, persistence, translation, Semantic Lab, and dialogue contracts; do not add a second parser, policy, profile store, or dossier database.
