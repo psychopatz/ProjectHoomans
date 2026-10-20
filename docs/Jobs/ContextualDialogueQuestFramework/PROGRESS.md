@@ -2,9 +2,9 @@
 
 **Updated:** 2026-10-20
 
-**Parent status:** **IN PROGRESS — final local-main commit and handoff audit pending.**
+**Parent status:** **READY FOR USER LIVE TEST — H0–H4 developer implementation and integrated acceptance complete on local `main`.**
 
-**Current chunk:** H4 — final integrated regression reconciliation and acceptance audit.
+**Current chunk:** H4 complete — final integrated regression reconciliation and acceptance audit passed.
 
 ## Repository and dependency evidence
 
@@ -74,4 +74,4 @@ Next mandatory chunk: run the complete Python harness, relevant full Lua suite, 
 - Static/regression checks: changed Lua `luac5.3 -p`, changed Python `python3 -m py_compile`, production changed-file `pz_verify.py --kahlua --severity ERROR --no-snippets`, and `git diff --check` all exit 0.
 - Acceptance behavior remains verified through the existing worker: EN/TL full NPC sentences, Core-backed translation keys and typed arguments, disclosure/refusal, player-scoped Knowledge/Dossier, follow-up context, suspected-evidence preservation, sparse persistence metrics, and optional PBrainZ filtering. Native Project Zomboid SP/MP and Workshop testing remain user-owned.
 
-**Next mandatory chunk:** record this completed implementation and acceptance evidence in the progress commit, rerun post-commit status verification, and hand off as ready for user-owned live testing only if the local-main audit remains clean. No remote integration or push is claimed.
+**Next mandatory chunk:** none for developer implementation. User-owned native Project Zomboid SP/MP, Workshop installation, and live gameplay validation remain outside this agent's scope. No remote integration or push is claimed.
