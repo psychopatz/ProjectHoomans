@@ -41,3 +41,12 @@ the game is restarted.
 - If a staging directory is required, keep it outside `media/`, or stop
   Project Zomboid first. Restarting the game is the only way to re-arm the
   watcher.
+
+## No-new-branches and safe main integration (user rule, 2026-10-20)
+
+**NEVER CREATE A NEW GIT BRANCH** for implementation, test, audit, documentation, agent work or pull request. Do not use `git checkout -b`, `git switch -c`, `git branch <new>`, a scratch worktree branch, or agent automatic branch creation. This rule also applies when coordinating PsychopatzCore and DynamicTrading.
+
+For new authorized work use **existing `main`**, after checking local and remote HEAD/upstream and concurrent changes. Do not assume existing PR history is present in main. As of 2026-10-20, existing `docs/contextual-dialogue-quest-framework-20261018` branch / PR #4 is 144 commits ahead and 1 behind main; preserve it and reconcile safely using `fetch`/`merge-base`/`merge-tree`/source diff, then merge onto existing main only when conflicts, dependencies and tests are resolved. No new integration branch, blind pull, force push, destructive reset/rebase/stash or overwritten agent/user work. If safe integration cannot be proven, report the precise conflict and continue independent work on an already existing checked-out ref; do NOT create another branch.
+
+Root `AGENTS.md` is durable policy, not authority to publish Steam Workshop content or launch native Project Zomboid. For the ongoing personal NPC dialogue/backstory goal, detailed documentation currently lives on the **preexisting** Hoomans PR #4 branch at `docs/Jobs/ContextualDialogueQuestFramework/`. Full developer B0–B6 acceptance, not a passing B0 subphase, determines the parent goal handoff. Review that goal's `GIT_INTEGRATION_AND_NO_NEW_BRANCHES.md` before any integration.
+
