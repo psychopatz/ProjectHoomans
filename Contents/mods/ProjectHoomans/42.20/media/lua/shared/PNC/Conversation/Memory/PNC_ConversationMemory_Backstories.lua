@@ -1,10 +1,13 @@
--- Seed-selected facts stay computed; only the packed birth date is persisted.
+-- Seed-selected facts stay computed; only a small stable-ID selection delta is
+-- persisted.  Definitions remain the authoritative source for every fact.
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local Memory = PNC.Conversation.Memory
 local Data = Memory._registry
 local PROFILE_CACHE_LIMIT = 256
+local BACKSTORY_METADATA_SCHEMA_VERSION = 1
+local BACKSTORY_SELECTION_LIMIT = 64
 local CLASSES = { "shared", "colonist", "neutral", "hostile" }
 local CLASS_SET = {
     shared = true,
@@ -12,6 +15,10 @@ local CLASS_SET = {
     neutral = true,
     hostile = true,
 }
+
+Memory.BACKSTORY_CATALOG_VERSION = tonumber(
+    Memory.BACKSTORY_CATALOG_VERSION
+) or 1
 
 local function normalizeTags(raw)
     local tags = {}
@@ -51,6 +58,64 @@ local function clearProfileCache()
     Data.profileOrder = {}
     Data.profileCount = 0
     Data.profileNext = 1
+end
+
+local function normalizeStableID(value)
+    if value == nil or value == "" then
+        return nil
+    end
+    local result = tostring(value)
+    if result == "" or #result > 160 then
+        return nil
+    end
+    return result
+end
+
+local function copyStableIDMap(raw)
+    local output = {}
+    local count = 0
+    local key
+    local value
+    if type(raw) ~= "table" then
+        return output
+    end
+    for key, value in pairs(raw) do
+        if count >= BACKSTORY_SELECTION_LIMIT then
+            break
+        end
+        key = normalizeStableID(key)
+        value = normalizeStableID(value)
+        if key and value then
+            output[key] = value
+            count = count + 1
+        end
+    end
+    return output
+end
+
+local function hasEntries(value)
+    local _
+    for _, _ in pairs(value or {}) do
+        return true
+    end
+    return false
+end
+
+local function isClass(value)
+    value = string.lower(tostring(value or ""))
+    return CLASS_SET[value] and value or nil
+end
+
+local function markMetadataDirty(record, changed)
+    local core = PNC.Core
+    if not changed or not core or type(core.IsAuthority) ~= "function"
+        or not core.IsAuthority()
+        or not PNC.Registry
+        or type(PNC.Registry.MarkDirty) ~= "function"
+    then
+        return
+    end
+    PNC.Registry.MarkDirty(record, "backstory_metadata")
 end
 
 function Memory.RegisterBackstory(definition)
@@ -174,6 +239,103 @@ local function chooseBackstory(seed, class, kind)
     return bucket.entries[low]
 end
 
+local function selectedEntry(kind, id)
+    local entry
+    id = normalizeStableID(id)
+    if not id then
+        return nil
+    end
+    entry = Data.backstoryByID[id]
+    if not entry or entry.kind ~= kind then
+        return nil
+    end
+    return entry
+end
+
+local function ensureSelectionMetadata(record, seed, class)
+    local identity
+    local raw
+    local metadata
+    local selectionClass
+    local generated
+    local overrideID
+    local kind
+    local changed = false
+    if type(record) ~= "table" then
+        return nil, false
+    end
+    identity = type(record.identity) == "table" and record.identity or nil
+    if not identity then
+        return nil, false
+    end
+    raw = type(identity.backstory) == "table"
+        and identity.backstory or nil
+    metadata = {
+        schemaVersion = BACKSTORY_METADATA_SCHEMA_VERSION,
+        catalogVersion = tonumber(raw and raw.catalogVersion)
+            and math.max(1, math.floor(tonumber(raw.catalogVersion)))
+            or Memory.BACKSTORY_CATALOG_VERSION,
+        selectionClass = isClass(raw and raw.selectionClass) or class,
+        selections = copyStableIDMap(raw and raw.selections),
+        overrides = copyStableIDMap(raw and raw.overrides),
+    }
+    if not raw
+        or tonumber(raw.schemaVersion) ~= BACKSTORY_METADATA_SCHEMA_VERSION
+        or tonumber(raw.catalogVersion) ~= metadata.catalogVersion
+        or isClass(raw.selectionClass) ~= metadata.selectionClass
+    then
+        changed = true
+    end
+    selectionClass = metadata.selectionClass
+    for i = 1, #Data.backstoryKinds do
+        kind = Data.backstoryKinds[i]
+        overrideID = metadata.overrides[kind]
+        if overrideID then
+            if metadata.selections[kind] ~= overrideID then
+                metadata.selections[kind] = overrideID
+                changed = true
+            end
+        elseif not metadata.selections[kind] then
+            generated = chooseBackstory(seed, selectionClass, kind)
+            if generated then
+                metadata.selections[kind] = generated.id
+                changed = true
+            end
+        end
+    end
+    if not hasEntries(metadata.overrides) then
+        metadata.overrides = nil
+    end
+    if not hasEntries(metadata.selections) then
+        if raw then
+            identity.backstory = nil
+            return nil, true
+        end
+        return nil, false
+    end
+    if raw and type(raw.overrides) == "table"
+        and hasEntries(metadata.overrides) == false
+    then
+        changed = true
+    end
+    identity.backstory = metadata
+    return metadata, changed
+end
+
+function Memory.EnsureBackstoryMetadata(record)
+    local seed
+    local class
+    local metadata
+    local changed
+    if type(record) ~= "table" then
+        return nil, false
+    end
+    seed, class = recordContext(record)
+    metadata, changed = ensureSelectionMetadata(record, seed, class)
+    markMetadataDirty(record, changed)
+    return metadata, changed
+end
+
 local function resolveBackstory(entry, record)
     if not entry then
         return nil
@@ -196,10 +358,19 @@ function Memory.GetBackstoryDefinition(id)
 end
 
 function Memory.GetBackstory(record, kind)
+    local metadata
+    local seed
+    local class
+    local entry
     if type(record) ~= "table" or type(kind) ~= "string" then
         return nil
     end
-    local seed, class = recordContext(record)
+    seed, class = recordContext(record)
+    metadata = Memory.EnsureBackstoryMetadata(record)
+    if metadata then
+        entry = selectedEntry(kind, metadata.selections[kind])
+        return resolveBackstory(entry, record)
+    end
     return resolveBackstory(chooseBackstory(seed, class, kind), record)
 end
 
@@ -231,15 +402,23 @@ local function getCachedSelection(seed, class)
 end
 
 function Memory.GetBackstoryProfile(record)
+    local metadata
     if type(record) ~= "table" then
         return nil
     end
     local seed, class = recordContext(record)
-    local selection = getCachedSelection(seed, class)
+    metadata = Memory.EnsureBackstoryMetadata(record)
+    local selection = getCachedSelection(
+        seed,
+        metadata and metadata.selectionClass or class
+    )
     local facts = {}
     for i = 1, #Data.backstoryKinds do
         local kind = Data.backstoryKinds[i]
-        local fact = resolveBackstory(selection.definitions[kind], record)
+        local definition = metadata
+            and selectedEntry(kind, metadata.selections[kind])
+            or selection.definitions[kind]
+        local fact = resolveBackstory(definition, record)
         if fact then
             facts[kind] = fact
         end

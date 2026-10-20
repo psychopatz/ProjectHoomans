@@ -13,6 +13,8 @@ local Inventory = PNC.Inventory
 local RelationshipTypes = PNC.RelationshipTypes
 local RelationshipMath = PNC.RelationshipMath
 local FactionTypes = PNC.FactionTypes
+local Memory = PNC.Conversation
+    and PNC.Conversation.Memory or nil
 local MemoryEvents = PNC.Conversation
     and PNC.Conversation.Memory
     and PNC.Conversation.Memory.Events or nil
@@ -195,6 +197,9 @@ function Persistence.SerializeRecord(record)
                 and not PNC.Identity.Appearance.Validate(record.appearance))
     then
         return nil
+    end
+    if Memory and type(Memory.EnsureBackstoryMetadata) == "function" then
+        Memory.EnsureBackstoryMetadata(record)
     end
     identity = Internal.sanitizeIdentity(record.identity, record)
     appearance = type(record.appearance) == "table"

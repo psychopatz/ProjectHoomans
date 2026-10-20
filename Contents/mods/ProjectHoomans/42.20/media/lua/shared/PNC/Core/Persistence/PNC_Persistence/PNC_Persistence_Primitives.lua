@@ -16,6 +16,14 @@ local FactionTypes = PNC.FactionTypes
 local VOICE_PROFILE_SCHEMA_VERSION = 1
 local APPEARANCE_CONTRACT_SCHEMA_VERSION = 1
 local APPEARANCE_POLICY_SCHEMA_VERSION = 2
+local BACKSTORY_METADATA_SCHEMA_VERSION = 1
+local BACKSTORY_SELECTION_LIMIT = 64
+local BACKSTORY_CLASSES = {
+    shared = true,
+    colonist = true,
+    neutral = true,
+    hostile = true,
+}
 Internal.HEALTH_PART_IDS = {
     "Head", "Neck", "Torso_Upper", "Torso_Lower", "Groin",
     "UpperArm_L", "UpperArm_R", "ForeArm_L", "ForeArm_R",
@@ -167,6 +175,63 @@ function Internal.RestoreVoiceProfile(rawIdentity)
     return identity
 end
 
+local function sanitizeStableIDMap(raw)
+    local output = {}
+    local count = 0
+    local key
+    local value
+    if type(raw) ~= "table" then
+        return output
+    end
+    for key, value in pairs(raw) do
+        if count >= BACKSTORY_SELECTION_LIMIT then
+            break
+        end
+        if key ~= nil and key ~= "" and value ~= nil and value ~= "" then
+            key = tostring(key)
+            value = tostring(value)
+            if #key <= 160 and #value <= 160 then
+                output[key] = value
+                count = count + 1
+            end
+        end
+    end
+    return output
+end
+
+function Internal.sanitizeBackstoryMetadata(raw)
+    local selections
+    local overrides
+    local selectionClass
+    local catalogVersion
+    if type(raw) ~= "table" then
+        return nil
+    end
+    selections = sanitizeStableIDMap(raw.selections)
+    overrides = sanitizeStableIDMap(raw.overrides)
+    selectionClass = string.lower(tostring(raw.selectionClass or ""))
+    if not BACKSTORY_CLASSES[selectionClass] then
+        selectionClass = nil
+    end
+    catalogVersion = tonumber(raw.catalogVersion)
+    if catalogVersion == nil or catalogVersion < 1 then
+        catalogVersion = 1
+    end
+    if not Internal.hasTableEntries(selections)
+        and not Internal.hasTableEntries(overrides)
+    then
+        return nil
+    end
+    return {
+        schemaVersion = BACKSTORY_METADATA_SCHEMA_VERSION,
+        catalogVersion = math.floor(catalogVersion),
+        selectionClass = selectionClass,
+        selections = selections,
+        overrides = Internal.hasTableEntries(overrides)
+            and overrides or nil,
+    }
+end
+
 local function appearancePolicyHash(policy)
     local appearance = Identity and Identity.Appearance
     if type(policy) ~= "table" or not appearance
@@ -310,6 +375,7 @@ function Internal.sanitizeIdentity(rawIdentity, record)
         seed = Identity.NormalizeSeed(identity.seed or record.identitySeed, record.id),
         birth = Identity and type(Identity.NormalizeBirthDate) == "function"
             and Identity.NormalizeBirthDate(identity.birth) or nil,
+        backstory = Internal.sanitizeBackstoryMetadata(identity.backstory),
         archetypeID = archetypeID,
         displayName = Internal.normalizeString(identity.displayName or record.name),
         isFemale = identity.isFemale == true or record.isFemale == true,

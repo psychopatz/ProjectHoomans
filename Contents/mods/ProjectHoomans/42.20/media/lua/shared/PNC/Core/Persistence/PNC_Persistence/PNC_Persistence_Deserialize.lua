@@ -134,6 +134,11 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         and Core.DeepCopy(raw.identity) or nil
     identity = Internal.RestoreVoiceProfile
         and Internal.RestoreVoiceProfile(identity) or identity
+    if identity and Internal.sanitizeBackstoryMetadata then
+        identity.backstory = Internal.sanitizeBackstoryMetadata(
+            identity.backstory
+        )
+    end
     identityBirthBefore = identity and identity.birth or nil
     inventoryData = type(raw.inventory) == "table"
         and Core.DeepCopy(raw.inventory) or nil
