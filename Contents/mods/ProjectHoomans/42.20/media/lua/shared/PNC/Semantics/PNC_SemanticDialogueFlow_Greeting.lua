@@ -13,6 +13,13 @@ return {
             responsePool = "semantic.flow.greeting.opening",
             accepts = {
                 { intent = "THANK", speechAct = "THANK" },
+                {
+                    intent = "INFORM",
+                    speechAct = "INFORM",
+                    selfDirected = true,
+                    target = "SELF",
+                    stateType = "WELLBEING",
+                },
             },
             onMatch = "complete",
             onRefuse = "cancel",

@@ -289,6 +289,57 @@ function Internal.RegisterSelfStatePatterns()
             end
         end
     end
+
+    -- A reciprocal wellbeing question is distinct from the player's own
+    -- state claim. Keeping its subject separate prevents the NPC wellbeing
+    -- flow from opening a second pending question while the same local
+    -- resolver still supplies the personality-grounded answer.
+    local reciprocalPatterns = {
+        {
+            id = "pnc.question.wellbeing_reciprocal_how_about_you",
+            match = {
+                { kind = "literal", value = "how" },
+                { kind = "literal", value = "about" },
+                { kind = "literal", value = "you" },
+            },
+        },
+        {
+            id = "pnc.question.wellbeing_reciprocal_what_about_yourself",
+            match = {
+                { kind = "literal", value = "what" },
+                { kind = "literal", value = "about" },
+                { kind = "literal", value = "yourself" },
+            },
+        },
+    }
+    local reciprocalIndex
+    local reciprocal
+    for reciprocalIndex = 1, #reciprocalPatterns do
+        reciprocal = reciprocalPatterns[reciprocalIndex]
+        registerPattern(
+            reciprocal.id,
+            reciprocal.match,
+            {
+                intent = "QUESTION",
+                speechAct = "QUESTION",
+                subject = "WELLBEING_RECIPROCAL",
+                target = "SELF",
+                socialContext = {
+                    directed = true,
+                    informationalQuestion = true,
+                    target = "SELF",
+                    reciprocal = true,
+                },
+                extensions = {
+                    dialogueFollowUp = "WELLBEING",
+                    topic = "wellbeing",
+                    reciprocal = true,
+                },
+            },
+            0.99,
+            191
+        )
+    end
 end
 
 function Internal.RegisterSocialSignals()

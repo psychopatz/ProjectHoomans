@@ -609,12 +609,11 @@ function Internal.RegisterWorldFactQuestions()
     -- captured by PsychopatzCore so the existing dialogue reference resolver
     -- can bind it to the current topic/focus; these exact utterance shapes
     -- never become an open-ended fuzzy parser or a gameplay request.
-    local function contextReferenceQuestion(questionKind)
-        return {
+    local function contextReferenceQuestion(questionKind, hasReference)
+        local output = {
             intent = "QUESTION",
             speechAct = "QUESTION",
             subject = "CONTEXT_REFERENCE",
-            target = "$capture.reference",
             modifiers = { directed = true },
             socialContext = {
                 directed = true,
@@ -627,6 +626,10 @@ function Internal.RegisterWorldFactQuestions()
                 contextQuestion = questionKind,
             },
         }
+        if hasReference ~= false then
+            output.target = "$capture.reference"
+        end
+        return output
     end
 
     local function referencePattern(id, match, priority, questionKind)
@@ -702,6 +705,44 @@ function Internal.RegisterWorldFactQuestions()
         },
         127,
         "MEDICAL_PAIN"
+    )
+
+    -- Causal follow-ups use the same bounded discourse-reference mechanism
+    -- as the existing ABOUT/SAFETY/DESCRIPTION questions. The resolver must
+    -- answer from the preceding authoritative fact, or state that it cannot
+    -- establish a cause; it must not invent one.
+    registerPattern(
+        "pnc.question.context_reference.why_is_it_so",
+        {
+            { kind = "literal", value = "why" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "it", capture = "reference" },
+            { kind = "literal", value = "so" },
+        },
+        contextReferenceQuestion("CAUSE"),
+        0.98,
+        129
+    )
+    registerPattern(
+        "pnc.question.context_reference.why_is_that",
+        {
+            { kind = "literal", value = "why" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "that", capture = "reference" },
+        },
+        contextReferenceQuestion("CAUSE"),
+        0.98,
+        129
+    )
+    registerPattern(
+        "pnc.question.context_reference.how_come",
+        {
+            { kind = "literal", value = "how" },
+            { kind = "literal", value = "come" },
+        },
+        contextReferenceQuestion("CAUSE", false),
+        0.97,
+        128
     )
 
     registerPattern(

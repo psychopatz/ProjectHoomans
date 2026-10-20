@@ -130,5 +130,6 @@
   "UI_PNC_Conversation_Semantic_ContextReferenceUnknown": "Hindi ko tiyak kung ano ang tinutukoy mo.",
   "UI_PNC_Conversation_Semantic_ContextReferenceLocationSafetyUnknown": "Wala akong mapagkakatiwalaang impormasyon kung ligtas ba roon.",
   "UI_PNC_Conversation_Semantic_ContextReferenceDescriptionUnknown": "Wala akong sapat na alam tungkol sa lugar na iyon para mailarawan ito.",
-  "UI_PNC_Conversation_Semantic_ContextReferenceMedicalUnknown": "Hindi ko makumpirma ang anumang sakit na iyon sa ngayon."
+  "UI_PNC_Conversation_Semantic_ContextReferenceMedicalUnknown": "Hindi ko makumpirma ang anumang sakit na iyon sa ngayon.",
+  "UI_PNC_Conversation_Semantic_ContextReferenceCauseUnknown": "Hindi ko alam kung bakit ganoon; ang masasabi ko lang ay ang mga bagay na kumpirmado ko."
 }

@@ -130,5 +130,6 @@
   "UI_PNC_Conversation_Semantic_ContextReferenceUnknown": "I'm not sure what you're referring to.",
   "UI_PNC_Conversation_Semantic_ContextReferenceLocationSafetyUnknown": "I don't have reliable information about whether it's safe there.",
   "UI_PNC_Conversation_Semantic_ContextReferenceDescriptionUnknown": "I don't know enough about that place to describe it.",
-  "UI_PNC_Conversation_Semantic_ContextReferenceMedicalUnknown": "I can't confirm anything about that pain right now."
+  "UI_PNC_Conversation_Semantic_ContextReferenceMedicalUnknown": "I can't confirm anything about that pain right now.",
+  "UI_PNC_Conversation_Semantic_ContextReferenceCauseUnknown": "I don't know why that is; I only know what I can confirm."
 }

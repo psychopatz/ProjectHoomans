@@ -280,6 +280,7 @@ function Conversation.turn(context, text)
             decision = Values.copy(result.decision),
             flow = Values.copy(result.flow),
             actionResult = Values.copy(actionResult),
+            compound = Values.copy(view.lastSemanticCompound),
             candidates = Values.copy(result.candidates),
             candidateDiagnostics = Values.copy(result.candidateDiagnostics),
         } or nil,

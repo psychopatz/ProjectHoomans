@@ -139,6 +139,16 @@ function Internal.ParseCandidates(value, options)
     return bundle, reason
 end
 
+-- Core owns the bounded clause split; this adapter keeps candidate parsing and
+-- vocabulary ownership in the existing Hoomans/Core parser path.
+function Internal.ParseTurn(value, options)
+    local turn = Semantic.DialogueTurn
+    if not turn or type(turn.Parse) ~= "function" then
+        return nil, "dialogue_turn_unavailable"
+    end
+    return turn.Parse(value, Internal.ParseCandidates, options)
+end
+
 function Internal.ResolveReferences(ir, state, context, options)
     local output = ir
     if ReferenceResolver

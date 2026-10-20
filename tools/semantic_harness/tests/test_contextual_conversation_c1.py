@@ -9,6 +9,75 @@ from tools.semantic_harness.worker import LuaSemanticWorker
 
 
 class ContextualConversationC1Tests(unittest.TestCase):
+    @staticmethod
+    def message_text(turn: dict) -> str:
+        messages = turn.get("messages", [])
+        if not messages:
+            return ""
+        payload = messages[-1].get("payload", {})
+        return payload.get("text") or payload.get("fallback") or ""
+
+    def test_screenshot_sequence_supports_causal_and_reciprocal_compound_turns(
+        self,
+    ) -> None:
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            residence = worker.input("where do you live")
+            cause = worker.input("why is it so?")
+            greeting = worker.input("hello")
+            compound = worker.input("im fine, how about you")
+
+        self.assertEqual(residence["result"]["ir"]["subject"], "NPC_RESIDENCE")
+        self.assertEqual(
+            cause["result"]["ir"]["provenance"]["pattern"],
+            "pnc.question.context_reference.why_is_it_so",
+        )
+        self.assertEqual(cause["result"]["ir"]["subject"], "CONTEXT_REFERENCE")
+        self.assertIn("why", self.message_text(cause).lower())
+        self.assertNotIn("not sure what you mean", self.message_text(cause).lower())
+
+        self.assertEqual(len(greeting["messages"]), 2)
+        compound_result = compound["result"]
+        self.assertEqual(
+            compound_result["compound"]["parts"][0]["pattern"],
+            "pnc.state.self_wellbeing_im_plain_fine",
+        )
+        self.assertEqual(
+            compound_result["compound"]["parts"][1]["pattern"],
+            "pnc.question.wellbeing_reciprocal_how_about_you",
+        )
+        self.assertTrue(compound_result["compound"]["parts"][0]["accepted"])
+        self.assertEqual(
+            compound_result["ir"]["subject"], "WELLBEING_RECIPROCAL"
+        )
+        self.assertEqual(len(compound["messages"]), 1)
+        self.assertTrue(self.message_text(compound))
+        self.assertNotIn(
+            "not sure what you mean", self.message_text(compound).lower()
+        )
+        self.assertIsNone(
+            compound["contextAfter"]["dialogue"].get("pendingFollowUp")
+        )
+        for turn in (residence, cause, greeting, compound):
+            self.assertEqual(turn["llmCalls"], 0)
+            self.assertEqual(turn["transport"], [])
+            self.assertEqual(turn["toolCalls"], [])
+
+    def test_compound_reciprocal_turn_localizes_in_tagalog(self) -> None:
+        scenario = merge(DEFAULT_SCENARIO, {"runtime": {"language": "TL"}})
+        with LuaSemanticWorker(scenario) as worker:
+            turn = worker.input("im fine, how about you")
+
+        self.assertEqual(turn["translation"]["language"], "TL")
+        self.assertEqual(
+            turn["result"]["compound"]["parts"][1]["pattern"],
+            "pnc.question.wellbeing_reciprocal_how_about_you",
+        )
+        self.assertNotEqual(
+            turn["messages"][0]["payload"]["text"],
+            turn["messages"][0]["payload"]["fallback"],
+        )
+        self.assertEqual(turn["observation"]["translation"]["fallbackCount"], 0)
+
     def test_pending_follow_up_survives_weather_and_resumes_wellbeing(self) -> None:
         scenario = merge(
             DEFAULT_SCENARIO,

@@ -78,7 +78,10 @@ end
 
 local function finishLocalSubmit(view, value, result, options)
     options = type(options) == "table" and options or {}
-    local inputMessage = Internal.AppendPlayerInput(view, value, result)
+    local inputMessage = options.skipInputPresentation == true
+        and true or Internal.AppendPlayerInput(
+            view, options.inputValue or value, result
+        )
     if not inputMessage then return false, "input_presentation_failed" end
     local actionResult
     local queued = false
@@ -165,6 +168,54 @@ local function recordConversationTopics(view, result, rawText)
     return ok and recorded == true
 end
 
+function Internal.SubmitCompound(view, value, parts, sourcePart)
+    if type(parts) ~= "table" or #parts < 2 then
+        return false, "compound_turn_invalid"
+    end
+    local index
+    local part
+    local submitted = true
+    local reason
+    local receipts = {}
+    view.lastSemanticCompound = {
+        schemaVersion = 1,
+        rawText = value,
+        parts = receipts,
+    }
+    for index = 1, #parts do
+        part = parts[index]
+        submitted, reason = Internal.SubmitSingle(view, part.text, {
+            compoundPart = true,
+            compoundRoot = value,
+            compoundIndex = index,
+            compoundCount = #parts,
+            sourcePart = sourcePart,
+        })
+        receipts[index] = {
+            index = index,
+            text = part.text,
+            accepted = submitted == true,
+            reason = reason,
+            pattern = view.lastSemanticDialogueResult
+                and view.lastSemanticDialogueResult.ir
+                and view.lastSemanticDialogueResult.ir.provenance
+                and view.lastSemanticDialogueResult.ir.provenance.pattern,
+            intent = view.lastSemanticDialogueResult
+                and view.lastSemanticDialogueResult.ir
+                and view.lastSemanticDialogueResult.ir.intent,
+            subject = view.lastSemanticDialogueResult
+                and view.lastSemanticDialogueResult.ir
+                and view.lastSemanticDialogueResult.ir.subject,
+            flow = view.lastSemanticDialogueResult
+                and view.lastSemanticDialogueResult.decision
+                and view.lastSemanticDialogueResult.decision.flow
+                and view.lastSemanticDialogueResult.decision.flow.transition,
+        }
+        if not submitted then return false, reason end
+    end
+    return true
+end
+
 function Internal.SubmitSingle(view, value, part)
     if not view or not view.session then
         return false, "conversation_unavailable"
@@ -173,6 +224,9 @@ function Internal.SubmitSingle(view, value, part)
         or view.session.semanticDialoguePending
     then
         return false, "conversation_busy"
+    end
+    if not (type(part) == "table" and part.compoundPart == true) then
+        view.lastSemanticCompound = nil
     end
     -- Keep the submitting host available to asynchronous local projections.
     -- Full-screen conversations are discoverable through Core's singleton,
@@ -187,6 +241,15 @@ function Internal.SubmitSingle(view, value, part)
     value = string.gsub(value, "%s+$", "")
     if value == "" then return false, "empty_message" end
     value = string.sub(value, 1, Input.MAX_INPUT_LENGTH)
+
+    if not (type(part) == "table" and part.compoundPart == true)
+        and type(Internal.ParseTurn) == "function"
+    then
+        local turn = Internal.ParseTurn(value)
+        if type(turn) == "table" and turn.compound == true then
+            return Internal.SubmitCompound(view, value, turn.parts, part)
+        end
+    end
 
     audit("semantic.input.received", {
         npcID = view.spec and view.spec.npcID,
@@ -335,12 +398,23 @@ function Internal.SubmitSingle(view, value, part)
         and (identityRequest.kind == "identity_claim"
             or identityRequest.kind == "gift_preference_disclosure"
             or identityRequest.kind == "backstory_disclosure")
+    local compoundPart = type(part) == "table"
+        and part.compoundPart == true
+    local compoundIndex = compoundPart and tonumber(part.compoundIndex) or nil
+    local compoundCount = compoundPart and tonumber(part.compoundCount) or nil
+    local deferCompoundResponse = compoundPart
+        and compoundIndex ~= nil and compoundCount ~= nil
+        and compoundIndex < compoundCount
     local submitted, submitReason = finishLocalSubmit(
         view,
         value,
         result,
         { deferResponse = deferIdentityResponse == true
-            or deferGossipResponse == true }
+            or deferGossipResponse == true
+            or deferCompoundResponse == true,
+            skipInputPresentation = compoundPart and compoundIndex ~= 1,
+            inputValue = compoundPart and compoundIndex == 1
+                and part.compoundRoot or value }
     )
     traceTurn(view, value, result, "semantic_input_local", {
         providerAvailable = context.llmAvailable == true,
@@ -353,6 +427,9 @@ function Internal.SubmitSingle(view, value, part)
             and view.lastSemanticActionResult.reason,
         responseSubmitted = submitted == true,
         responseReason = submitReason,
+        compoundRoot = compoundPart and part.compoundRoot or nil,
+        compoundIndex = compoundIndex,
+        compoundCount = compoundCount,
     })
     if identityRequest then
         local dispatched = false

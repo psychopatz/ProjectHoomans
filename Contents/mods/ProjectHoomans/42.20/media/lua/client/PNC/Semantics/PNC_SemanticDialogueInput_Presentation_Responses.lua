@@ -248,6 +248,10 @@ local function semanticTranslationKey(response)
 
             "UI_PNC_Conversation_Semantic_ContextReferenceUnknown",
 
+        ["semantic.conversation.context_reference.cause_unknown"] =
+
+            "UI_PNC_Conversation_Semantic_ContextReferenceCauseUnknown",
+
         ["semantic.conversation.context_reference.location_safety_unknown"] =
 
             "UI_PNC_Conversation_Semantic_ContextReferenceLocationSafetyUnknown",

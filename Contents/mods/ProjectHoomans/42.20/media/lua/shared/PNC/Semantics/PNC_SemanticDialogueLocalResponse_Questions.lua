@@ -557,6 +557,24 @@ local function resolveContextReferenceQuestion(ir, state, context)
     local backstoryFollowUp = subject == "NPC_BACKSTORY"
         and (questionKind == "BACKSTORY_LOCATION"
             or questionKind == "BACKSTORY_MISS")
+
+    if questionKind == "CAUSE" then
+        local causeTopic = answer and answer.topic
+            or subject
+            or "CONVERSATION"
+        local response = contextReferenceResponse(
+            "semantic.conversation.context_reference.cause_unknown",
+            answer
+                and "I can confirm what happened, but I don't know why it is that way."
+                or "I don't know why that is; I can't confirm the cause.",
+            causeTopic,
+            "unknown"
+        )
+        response.referenceSubject = subject
+        response.causeResolution = "unavailable"
+        return response
+    end
+
     if type(target) ~= "table"
         or ((target.unresolved == true or target.resolvedReference == nil)
             and not backstoryFollowUp)
@@ -992,6 +1010,15 @@ return function(ir, state, context)
         return resolveActivity(ir, state, context)
     end
     if ir.subject == "WELLBEING" then
+        return resolveWellbeing(ir, state, context)
+    end
+    if ir.subject == "WELLBEING_RECIPROCAL" then
+        local wellbeing = IR and type(IR.Clone) == "function"
+            and IR.Clone(ir) or nil
+        if wellbeing then
+            wellbeing.subject = "WELLBEING"
+            return resolveWellbeing(wellbeing, state, context)
+        end
         return resolveWellbeing(ir, state, context)
     end
     if ir.subject == "NPC_BITE_STATUS" then
