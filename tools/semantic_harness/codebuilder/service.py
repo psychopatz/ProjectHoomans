@@ -29,6 +29,7 @@ from ..interaction_explorer import build_interaction_rows, search_interactions
 from .interaction_spec import (
     compile_interaction_collection,
     compile_interaction_spec,
+    edit_interaction_graph,
     validate_interaction_spec,
 )
 
@@ -396,6 +397,47 @@ class SemanticLabAuthoringService:
         production_catalog: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         return validate_interaction_spec(spec, production_catalog=production_catalog)
+
+    def edit_interaction_graph(
+        self,
+        spec: dict[str, Any],
+        operation: str,
+        *,
+        production_catalog: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Apply one declarative graph edit through the shared authoring API."""
+
+        try:
+            edited = edit_interaction_graph(spec, operation, **kwargs)
+        except (TypeError, ValueError) as error:
+            return {
+                "ok": False,
+                "valid": False,
+                "type": "semantic_interaction_graph_edit",
+                "operation": operation,
+                "spec": None,
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "previewOnly": True,
+                "effectFree": True,
+                "writes": [],
+            }
+        validation = self.validate_interaction_spec(
+            edited,
+            production_catalog=production_catalog,
+        )
+        return {
+            "ok": validation.get("ok") is True,
+            "valid": validation.get("valid") is True,
+            "type": "semantic_interaction_graph_edit",
+            "operation": operation,
+            "spec": edited,
+            "validation": validation,
+            "diagnostics": validation.get("diagnostics", []),
+            "previewOnly": True,
+            "effectFree": True,
+            "writes": [],
+        }
 
     def _semantic_preview_artifacts(
         self,

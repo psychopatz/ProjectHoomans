@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import copy
+import hashlib
+import json
 import re
 from typing import Any
 
@@ -13,20 +15,28 @@ from .compiler import (
     compile_dialogue_dataset,
     compile_semantic_definitions,
 )
+from .blocks import block_port_contract
 
 
 SCHEMA = "semantic.interaction_spec.v1"
 COLLECTION_SCHEMA = "semantic.interaction_collection.v1"
 BLOCK_TYPES = frozenset({
+    "language.speech_act",
+    "language.concept",
     "language.trigger",
     "language.backstory_subject",
     "gameplay_actions.capability",
+    "quests.command",
     "dialogue_responses.response_pool",
     "world_facts.engine_fact",
+    "world_facts.engine_event",
     "conditions.gate",
+    "conditions.fact_match",
     "context.conversation_state",
+    "context.participant_scope",
     "memory.knowledge",
     "memory.backstory_fact",
+    "memory.gossip",
 })
 CONNECTION_TYPES = frozenset({
     "semantic", "capability", "response", "fact", "gate", "context", "knowledge",
@@ -34,6 +44,179 @@ CONNECTION_TYPES = frozenset({
 BACKSTORY_DISCLOSURES = frozenset({
     "server_authorized", "confirmed", "suspected", "refused",
 })
+
+# A connection is valid only when both registered block contracts agree on
+# the port type.  This table is deliberately narrow: adding a gameplay
+# capability still requires an existing production binding and compiler path.
+CONNECTION_CONTRACTS: dict[tuple[str, str], tuple[str, str, str]] = {
+    ("language.trigger", "language.backstory_subject"): ("semantic", "semantic", "semantic"),
+    ("language.trigger", "gameplay_actions.capability"): ("semantic", "semantic", "semantic"),
+    ("language.trigger", "quests.command"): ("semantic", "semantic", "semantic"),
+    ("language.trigger", "context.conversation_state"): ("context", "semantic", "context"),
+    ("language.backstory_subject", "memory.backstory_fact"): ("fact", "fact", "fact"),
+    ("language.backstory_subject", "context.conversation_state"): ("context", "context", "context"),
+    ("language.backstory_subject", "memory.knowledge"): ("knowledge", "knowledge", "knowledge"),
+    ("memory.backstory_fact", "dialogue_responses.response_pool"): ("response", "response", "response"),
+    ("memory.gossip", "dialogue_responses.response_pool"): ("response", "response", "response"),
+    ("gameplay_actions.capability", "dialogue_responses.response_pool"): ("response", "response", "response"),
+    ("quests.command", "dialogue_responses.response_pool"): ("response", "response", "response"),
+    ("world_facts.engine_fact", "conditions.gate"): ("fact", "fact", "fact"),
+    ("conditions.fact_match", "gameplay_actions.capability"): ("gate", "gate", "gate"),
+    ("conditions.fact_match", "quests.command"): ("gate", "gate", "gate"),
+    ("conditions.gate", "gameplay_actions.capability"): ("gate", "gate", "gate"),
+    ("conditions.gate", "quests.command"): ("gate", "gate", "gate"),
+}
+
+
+def graph_block(
+    block_id: str,
+    block_type: str,
+    parameters: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Create one editable typed block instance without side effects."""
+
+    if not isinstance(block_id, str) or not block_id.strip():
+        raise ValueError("block id must be a non-empty string")
+    if block_type not in BLOCK_TYPES:
+        raise ValueError(f"unsupported block type: {block_type}")
+    return {
+        "id": block_id.strip(),
+        "type": block_type,
+        "parameters": copy.deepcopy(parameters or {}),
+        "ports": block_port_contract(block_type),
+    }
+
+
+def graph_connection(
+    source_id: str,
+    target_id: str,
+    connection_type: str | None = None,
+) -> dict[str, str]:
+    """Create a typed edge; block compatibility is checked during validation."""
+
+    if not isinstance(source_id, str) or not source_id.strip():
+        raise ValueError("connection source is required")
+    if not isinstance(target_id, str) or not target_id.strip():
+        raise ValueError("connection target is required")
+    edge_type = str(connection_type or "").strip()
+    return {"from": source_id.strip(), "to": target_id.strip(), "type": edge_type}
+
+
+def normalize_interaction_spec(spec: dict[str, Any]) -> dict[str, Any]:
+    """Return a deterministic source representation for the typed graph."""
+
+    if not isinstance(spec, dict):
+        raise ValueError("interaction spec must be an object")
+    normalized = copy.deepcopy(spec)
+    blocks = normalized.get("blocks")
+    if isinstance(blocks, list):
+        normalized["blocks"] = sorted(
+            (copy.deepcopy(block) for block in blocks if isinstance(block, dict)),
+            key=lambda block: str(block.get("id", "")),
+        )
+    connections = normalized.get("connections")
+    if isinstance(connections, list):
+        normalized["connections"] = sorted(
+            (copy.deepcopy(connection) for connection in connections if isinstance(connection, dict)),
+            key=lambda connection: (
+                str(connection.get("from", "")),
+                str(connection.get("to", "")),
+                str(connection.get("type", "")),
+            ),
+        )
+    return normalized
+
+
+def edit_interaction_graph(
+    spec: dict[str, Any],
+    operation: str,
+    *,
+    block: dict[str, Any] | None = None,
+    block_id: str | None = None,
+    parameters: dict[str, Any] | None = None,
+    source_id: str | None = None,
+    target_id: str | None = None,
+    connection_type: str | None = None,
+) -> dict[str, Any]:
+    """Apply one bounded graph edit and return a canonical typed spec.
+
+    This is the shared model behind the GUI and headless authoring paths.  It
+    only changes declarative source; validation/compilation remains separate.
+    """
+
+    edited = normalize_interaction_spec(spec)
+    edited.setdefault("blocks", [])
+    edited.setdefault("connections", [])
+    if operation == "add_block":
+        if not isinstance(block, dict):
+            raise ValueError("add_block requires a block object")
+        candidate = graph_block(
+            str(block.get("id", "")),
+            str(block.get("type", "")),
+            block.get("parameters") if isinstance(block.get("parameters"), dict) else {},
+        )
+        if any(item.get("id") == candidate["id"] for item in edited["blocks"]):
+            raise ValueError(f"duplicate block id: {candidate['id']}")
+        edited["blocks"].append(candidate)
+    elif operation == "remove_block":
+        wanted = str(block_id or "")
+        if not wanted:
+            raise ValueError("remove_block requires block_id")
+        edited["blocks"] = [item for item in edited["blocks"] if item.get("id") != wanted]
+        edited["connections"] = [
+            edge for edge in edited["connections"]
+            if edge.get("from") != wanted and edge.get("to") != wanted
+        ]
+    elif operation == "configure_block":
+        wanted = str(block_id or "")
+        matches = [item for item in edited["blocks"] if item.get("id") == wanted]
+        if len(matches) != 1:
+            raise ValueError(f"unknown block id: {wanted}")
+        if parameters is not None:
+            if not isinstance(parameters, dict):
+                raise ValueError("block parameters must be an object")
+            matches[0]["parameters"] = copy.deepcopy(parameters)
+    elif operation == "connect":
+        edge = graph_connection(source_id or "", target_id or "", connection_type)
+        edited["connections"].append(edge)
+    elif operation == "disconnect":
+        source = str(source_id or "")
+        target = str(target_id or "")
+        edited["connections"] = [
+            edge for edge in edited["connections"]
+            if not (
+                edge.get("from") == source
+                and edge.get("to") == target
+                and (connection_type is None or edge.get("type") == connection_type)
+            )
+        ]
+    else:
+        raise ValueError(f"unsupported graph operation: {operation}")
+    return normalize_interaction_spec(edited)
+
+
+def _connection_contract(source_type: str, target_type: str) -> tuple[str, str, str] | None:
+    return CONNECTION_CONTRACTS.get((source_type, target_type))
+
+
+def _attach_graph_metadata(compiled: dict[str, Any], spec: dict[str, Any]) -> dict[str, Any]:
+    """Make approved graph edits visible in generated data without execution."""
+
+    graph = normalize_interaction_spec({
+        "schema": SCHEMA,
+        "blocks": spec.get("blocks", []),
+        "connections": spec.get("connections", []),
+    })
+    digest = hashlib.sha256(
+        json.dumps(graph, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    metadata = {"schema": SCHEMA, "fingerprint": digest, "graph": graph}
+    for key in ("patterns", "flows", "responsePools"):
+        for record in compiled.get(key, []):
+            if isinstance(record, dict):
+                record.setdefault("metadata", {})["semanticLabGraph"] = copy.deepcopy(metadata)
+    compiled["semanticLabGraph"] = metadata
+    return compiled
 
 
 def _text(value: Any, label: str) -> str:
@@ -266,23 +449,99 @@ def validate_interaction_spec(
             diagnostics.append({"severity": "error", "message": f"connection references unknown block: {source} -> {target}"})
         if connection_type not in CONNECTION_TYPES:
             diagnostics.append({"severity": "error", "message": f"unsupported connection type: {connection_type}"})
+        if source == target:
+            diagnostics.append({"severity": "error", "message": "self-connections are not allowed"})
         if source in block_map and target in block_map:
-            expected_type = {
-                ("language.trigger", "gameplay_actions.capability"): "semantic",
-                ("gameplay_actions.capability", "dialogue_responses.response_pool"): "response",
-                ("language.trigger", "language.backstory_subject"): "semantic",
-                ("language.backstory_subject", "memory.backstory_fact"): "fact",
-                ("memory.backstory_fact", "dialogue_responses.response_pool"): "response",
-                ("language.backstory_subject", "context.conversation_state"): "context",
-                ("language.backstory_subject", "memory.knowledge"): "knowledge",
-                ("world_facts.engine_fact", "conditions.gate"): "fact",
-                ("conditions.gate", "gameplay_actions.capability"): "gate",
-            }.get((block_map[source]["type"], block_map[target]["type"]))
-            if expected_type and connection_type != expected_type:
+            source_type = str(block_map[source]["type"])
+            target_type = str(block_map[target]["type"])
+            contract = _connection_contract(source_type, target_type)
+            if contract is None:
                 diagnostics.append({
                     "severity": "error",
-                    "message": f"typed connection requires {expected_type}: {source} -> {target}",
+                    "message": f"connection is not registered for {source_type} -> {target_type}",
                 })
+            else:
+                expected_type, source_port, target_port = contract
+                if connection_type != expected_type:
+                    diagnostics.append({
+                        "severity": "error",
+                        "message": f"typed connection requires {expected_type}: {source} -> {target}",
+                    })
+                if connection.get("sourcePort", source_port) != source_port:
+                    diagnostics.append({
+                        "severity": "error",
+                        "message": f"source port must be {source_port}: {source}",
+                    })
+                if connection.get("targetPort", target_port) != target_port:
+                    diagnostics.append({
+                        "severity": "error",
+                        "message": f"target port must be {target_port}: {target}",
+                    })
+                source_ports = block_port_contract(source_type).get("outputs", [])
+                target_ports = block_port_contract(target_type).get("inputs", [])
+                if source_port not in source_ports or target_port not in target_ports:
+                    diagnostics.append({
+                        "severity": "error",
+                        "message": f"registered port contract rejects {source} -> {target}",
+                    })
+
+    # A typed InteractionSpec is a directed acyclic authoring graph.  This
+    # rejects cycles and disconnected blocks before any compiler/writer call.
+    adjacency: dict[str, list[str]] = {block_id: [] for block_id in block_map}
+    for connection in connections:
+        source = connection.get("from")
+        target = connection.get("to")
+        if source in adjacency and target in block_map:
+            adjacency[source].append(target)
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(node: str) -> None:
+        if node in visiting:
+            diagnostics.append({"severity": "error", "message": f"interaction graph contains a cycle at {node}"})
+            return
+        if node in visited:
+            return
+        visiting.add(node)
+        for child in adjacency.get(node, []):
+            visit(child)
+        visiting.remove(node)
+        visited.add(node)
+
+    for node in sorted(adjacency):
+        visit(node)
+    trigger_ids = [block_id for block_id, block in block_map.items() if block.get("type") == "language.trigger"]
+    if trigger_ids:
+        reverse: dict[str, list[str]] = {block_id: [] for block_id in block_map}
+        for source, targets in adjacency.items():
+            for target in targets:
+                reverse.setdefault(target, []).append(source)
+        response_ids = [
+            block_id for block_id, block in block_map.items()
+            if block.get("type") == "dialogue_responses.response_pool"
+        ]
+        can_reach_response: set[str] = set()
+        response_stack = list(response_ids)
+        while response_stack:
+            node = response_stack.pop()
+            if node in can_reach_response:
+                continue
+            can_reach_response.add(node)
+            response_stack.extend(reverse.get(node, []))
+        roots = [
+            block_id for block_id in can_reach_response
+            if not reverse.get(block_id)
+        ]
+        reachable: set[str] = set()
+        stack = trigger_ids + roots
+        while stack:
+            node = stack.pop()
+            if node in reachable:
+                continue
+            reachable.add(node)
+            stack.extend(adjacency.get(node, []))
+        for block_id in sorted(set(block_map) - reachable):
+            diagnostics.append({"severity": "error", "blockID": block_id, "message": "unreachable graph block"})
 
     if has_backstory and all(
         typed[block_type] == 1
@@ -330,6 +589,21 @@ def validate_interaction_spec(
                     "message": f"action composition is missing typed connection: {edge[0]} -> {edge[1]} ({edge[2]})",
                 })
 
+    if typed["conditions.gate"] == 1:
+        gate_id = next(block["id"] for block in blocks if block.get("type") == "conditions.gate")
+        fact_id = next(
+            (block["id"] for block in blocks if block.get("type") in {"world_facts.engine_fact", "conditions.fact_match"}),
+            None,
+        )
+        capability_id = next(
+            (block["id"] for block in blocks if block.get("type") in {"gameplay_actions.capability", "quests.command"}),
+            None,
+        )
+        if fact_id and (fact_id, gate_id, "fact") not in seen_connections:
+            diagnostics.append({"severity": "error", "message": f"gate is missing typed connection: {fact_id} -> {gate_id} (fact)"})
+        if capability_id and (gate_id, capability_id, "gate") not in seen_connections:
+            diagnostics.append({"severity": "error", "message": f"gate is missing typed connection: {gate_id} -> {capability_id} (gate)"})
+
     return {
         "ok": not diagnostics,
         "valid": not diagnostics,
@@ -342,6 +616,11 @@ def validate_interaction_spec(
         "previewOnly": True,
         "effectFree": True,
         "writes": [],
+        "canonicalGraph": normalize_interaction_spec({
+            "schema": SCHEMA,
+            "blocks": blocks,
+            "connections": connections,
+        }),
     }
 
 
@@ -444,6 +723,7 @@ def compile_interaction_spec(
             "sourceDocument": source_document,
             "diagnostics": [{"severity": "error", "message": str(error)}],
         }
+    _attach_graph_metadata(compiled, spec)
     return {
         **validation,
         "ok": True,
@@ -565,6 +845,7 @@ def _compile_backstory_interaction(
             "diagnostics": [{"severity": "error", "message": str(error)}],
             "writes": [],
         }
+    _attach_graph_metadata(compiled, spec)
     return {
         "ok": True,
         "valid": True,

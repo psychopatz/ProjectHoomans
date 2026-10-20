@@ -25,6 +25,40 @@ TRANSITION_FIELDS = (
     "onPass", "onFail", "onUnknown",
 )
 
+# Declarative authoring contracts.  These ports constrain Studio composition;
+# they never evaluate conditions or execute gameplay actions.
+BLOCK_PORTS: dict[str, dict[str, tuple[str, ...]]] = {
+    "language.speech_act": {"inputs": (), "outputs": ("semantic",)},
+    "language.concept": {"inputs": ("semantic",), "outputs": ("semantic",)},
+    "language.trigger": {"inputs": (), "outputs": ("semantic",)},
+    "language.backstory_subject": {
+        "inputs": ("semantic",),
+        "outputs": ("fact", "context", "knowledge"),
+    },
+    "conditions.gate": {"inputs": ("fact",), "outputs": ("gate",)},
+    "conditions.fact_match": {"inputs": ("fact",), "outputs": ("gate",)},
+    "world_facts.engine_fact": {"inputs": (), "outputs": ("fact",)},
+    "world_facts.engine_event": {"inputs": (), "outputs": ("context",)},
+    "context.conversation_state": {"inputs": ("context",), "outputs": ()},
+    "context.participant_scope": {"inputs": ("context",), "outputs": ()},
+    "memory.knowledge": {"inputs": ("knowledge",), "outputs": ()},
+    "memory.backstory_fact": {"inputs": ("fact",), "outputs": ("response",)},
+    "memory.gossip": {"inputs": ("context",), "outputs": ("response",)},
+    "dialogue_responses.response_pool": {"inputs": ("response",), "outputs": ()},
+    "gameplay_actions.capability": {
+        "inputs": ("semantic", "gate"),
+        "outputs": ("response",),
+    },
+    "quests.command": {"inputs": ("semantic", "gate"), "outputs": ("response",)},
+}
+
+
+def block_port_contract(block_type: str) -> dict[str, list[str]]:
+    """Return a JSON-safe copy of one registered block's typed ports."""
+
+    ports = BLOCK_PORTS.get(str(block_type), {"inputs": (), "outputs": ()})
+    return {key: list(values) for key, values in ports.items()}
+
 CATEGORY_SPECS = (
     ("language", "Language", "Registered speech acts, concepts, and trigger frames."),
     ("conditions", "Conditions", "Typed gates evaluated by the production Conversation Blocks bridge."),
@@ -316,6 +350,7 @@ class SemanticBlockRegistry:
             },
         }
         block["values"] = self._values_for_type(spec["id"], production_catalog)
+        block["ports"] = block_port_contract(spec["id"])
         return block
 
     def _values_for_type(self, block_type: str, catalog: dict[str, Any]) -> list[Any]:
@@ -385,6 +420,7 @@ class SemanticBlockRegistry:
                 "reusable": True,
                 "available": action.get("dispatchable") is not False,
                 "definition": copy.deepcopy(action),
+                "ports": block_port_contract("gameplay_actions.capability"),
             })
         for fact in catalog.get("factCatalog", []):
             if isinstance(fact, dict) and fact.get("id"):
@@ -399,6 +435,7 @@ class SemanticBlockRegistry:
                     "reusable": True,
                     "available": True,
                     "definition": copy.deepcopy(fact),
+                    "ports": block_port_contract("world_facts.engine_fact"),
                 })
         for event in catalog.get("eventCatalog", []):
             if isinstance(event, dict) and event.get("type"):
@@ -413,6 +450,7 @@ class SemanticBlockRegistry:
                     "reusable": True,
                     "available": True,
                     "definition": copy.deepcopy(event),
+                    "ports": block_port_contract("world_facts.engine_event"),
                 })
         blocks.extend(self._response_blocks())
         return blocks
@@ -452,5 +490,6 @@ class SemanticBlockRegistry:
                     "available": True,
                     "variantCount": len(variants) if isinstance(variants, list) else 0,
                     "definition": {"poolID": pool_id},
+                    "ports": block_port_contract("dialogue_responses.response_pool"),
                 })
         return blocks

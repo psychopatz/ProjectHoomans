@@ -9,6 +9,12 @@ import tempfile
 import unittest
 
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.interaction_spec import (
+    edit_interaction_graph,
+    graph_block,
+    graph_connection,
+    validate_interaction_spec,
+)
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.worker import LuaSemanticWorker
 
@@ -377,6 +383,74 @@ class InteractionSpecTests(unittest.TestCase):
                 {Path(path).relative_to(repository): Path(path).read_bytes()
                  for path in second["writes"]},
             )
+
+    def test_editable_graph_operations_are_canonical_and_effect_free(self) -> None:
+        spec = {
+            "schema": "semantic.interaction_spec.v1",
+            "id": "pnc.lab.graph",
+            "owner": "SemanticLab",
+            "blocks": [],
+            "connections": [],
+        }
+        spec = edit_interaction_graph(
+            spec,
+            "add_block",
+            block=graph_block("response", "dialogue_responses.response_pool", {
+                "poolID": "semantic.lab.graph",
+                "variants": [{"id": "answer", "key": "UI_PNC_Graph", "en": "Graph", "tl": "Grap"}],
+            }),
+        )
+        spec = edit_interaction_graph(
+            spec,
+            "add_block",
+            block=graph_block("trigger", "language.trigger", {
+                "utterance": "graph this",
+                "negativeUtterance": "do not graph this",
+                "frame": {"intent": "REQUEST", "speechAct": "REQUEST", "action": "STAY"},
+            }),
+        )
+        spec = edit_interaction_graph(
+            spec,
+            "add_block",
+            block=graph_block("capability", "gameplay_actions.capability", {
+                "capabilityID": "pnc:companion.stay", "action": "STAY",
+            }),
+        )
+        spec = edit_interaction_graph(spec, "connect", source_id="trigger", target_id="capability", connection_type="semantic")
+        spec = edit_interaction_graph(spec, "connect", source_id="capability", target_id="response", connection_type="response")
+        validation = validate_interaction_spec(spec)
+        self.assertTrue(validation["ok"], validation)
+        self.assertEqual([block["id"] for block in spec["blocks"]], ["capability", "response", "trigger"])
+        self.assertEqual(spec["connections"][0]["from"], "capability")
+        self.assertEqual(spec["connections"][0]["type"], "response")
+        spec = edit_interaction_graph(
+            spec,
+            "configure_block",
+            block_id="response",
+            parameters={
+                "poolID": "semantic.lab.graph.changed",
+                "variants": [{"id": "answer", "key": "UI_PNC_GraphChanged", "en": "Changed", "tl": "Nagbago"}],
+            },
+        )
+        self.assertEqual(spec["blocks"][1]["parameters"]["poolID"], "semantic.lab.graph.changed")
+        spec = edit_interaction_graph(spec, "disconnect", source_id="capability", target_id="response")
+        disconnected = validate_interaction_spec(spec)
+        self.assertFalse(disconnected["ok"])
+        self.assertTrue(any("missing typed connection" in item["message"] for item in disconnected["diagnostics"]))
+        spec = edit_interaction_graph(spec, "remove_block", block_id="response")
+        self.assertTrue(all(edge["to"] != "response" for edge in spec["connections"]))
+
+    def test_invalid_cycle_and_unregistered_edge_fail_closed(self) -> None:
+        spec = stay_spec()
+        spec["connections"].append({"from": "capability", "to": "trigger", "type": "semantic"})
+        report = validate_interaction_spec(spec)
+        self.assertFalse(report["ok"])
+        self.assertTrue(any("not registered" in item["message"] or "cycle" in item["message"] for item in report["diagnostics"]))
+        spec = stay_spec()
+        spec["connections"][0] = {"from": "trigger", "to": "response", "type": "semantic"}
+        report = validate_interaction_spec(spec)
+        self.assertFalse(report["ok"])
+        self.assertTrue(any("not registered" in item["message"] for item in report["diagnostics"]))
 
 
 if __name__ == "__main__":
