@@ -1,14 +1,16 @@
-# Roadmap — Finish Harness-First Personal NPC Conversation
+# Roadmap — Grounded Personal Dialogue: final developer acceptance
 
-**PARENT GOAL IN PROGRESS.** Work one bounded chunk at a time but automatically continue until the **entire H0–H4** developer implementable outcome is accepted. Do not mark the parent complete from a single phase or report native PZ acceptance. The legacy B0–B6 code and agent-reported progress are preserved on the existing divergent history; that old accepted ledger is not proof of CodeBuilder-generated EN/TL dialogues or integrated main.
+**Current parent status: IN PROGRESS — final acceptance correction F1–F4.** Previous B0–B6 and H0–H4 production implementation is present on existing `main`. Agent-reported prior acceptance: Python 264/264, focused 31/31, Lua 853/853, doctor and changed-file Kahlua passed; historic ledger archived verbatim in `HISTORY_H0_H4_ACCEPTANCE_20261020.md`. Do not reimplement accepted systems. Those passing test reports did not demonstrate *selected GUI CodeBlocks composing generated behavior*, localized TL fact content, differentiated personal-privacy thresholds or the complete requested byte comparisons.
 
-| Phase | Current status (2026-10-20) | Required acceptance |
+| Phase | Status | Non-negotiable result |
 | --- | --- | --- |
-| Prior B0–B6 | **IMPLEMENTED ON PREEXISTING BRANCH / previously agent-reported accepted; acceptance reopened for full product** | Real recognition, seed/delta facts, Knowledge/Dossier/continuity/payload code already exist; preserve and verify rather than reimplement |
-| **H0 — real Semantic Lab baseline** | **CURRENT / NOT ACCEPTED** | Real worker and GUI/service baseline + 251/30 Python errors + source/translation/hook gap trace; exact SHAs |
-| H1 — Core-backed full sentence translation | PLANNED | Complete registered EN/TL backstory responses, typed interpolation, actual final text/translation audit, no added TL Lua dictionary |
-| H2 — CodeBuilder generated interactions | PLANNED | First-class backstory/knowledge/localization blocks; approved canonical-source → generated Lua/EN/TL asset files → fresh worker; byte-stable regen |
-| H3 — Knowledge/Dossier/PBrainZ conversation parity | PLANNED | Real authorized disclosure simulation, suspected not canonically upgraded, multi-turn two-player privacy and gradual relationship tiers; inspector and GUI hooks |
-| H4 — integrated full acceptance | PLANNED | Real GUI/service/worker acceptance, reconciliation of suites, memory measurements, source and docs on existing main, safe Core pairing; READY FOR USER LIVE TEST only when all developer gates pass |
+| B0–B6 | IMPLEMENTED / historically accepted, retained on main | Seed-based history, Knowledge/Dossier/PBrainZ, personal dialogue and prior performance work preserved |
+| H0–H4 | IMPLEMENTED / developer test results recorded, acceptance narrowed | Generated Lua/EN/TL, production worker, full reported regression pass and single 50-familiarity backstory gate |
+| **F1 — Real CodeBlocks composition** | **CURRENT / NOT ACCEPTED** | GUI/service selected, parameterized blocks change canonical InteractionSpec and generated Lua/TL/EN, not merely validate selection; actual worker effect and no-preview-writes |
+| F2 — Complete Core-backed localization | PLANNED | Authorized TL fact IDs resolve localized values in *complete final response*, not only localized sentence + English `farmer` |
+| F3 — Graduated disclosure/privacy | PLANNED | Distinct public/sensitive thresholds, refusal, server evidence and two-player scoped Knowledge/Dossier/PBrainZ |
+| F4 — Integrated GUI and storage verification | PLANNED | Real visual composition→approved generated mod assets→fresh worker→localized dialogue→Dossier/MP privacy; full regressions, comparable ModData measurements and accurate ledger |
 
-No new Git branches; no checked-in `GOAL_PROMPT.md`. The detailed implementation rules and acceptance tests are in `HARNESS_FIRST_CODEBUILDER_TRANSLATION_RECOVERY.md`. `PROGRESS.md` provides exactly one currently executable chunk. Preserve B0–B6 source evidence/old ledger in the already-existing branch and do not conflate Core Foundation P1–P9 acceptance with this personal-dialogue goal.
+**Full /goal assignment:** implement one safe bounded chunk at a time and immediately continue F1→F4 until every developer-owned original product acceptance gate is met. Do not stop after F1 or merely update docs. **No Git branch creation; use existing `main` only. No checked-in GOAL_PROMPT.md.**
+
+Complete implementation details and exact acceptance: `FINAL_ACCEPTANCE_CLOSEOUT.md`; current implementation truth and ONE Next Chunk: `PROGRESS.md`.

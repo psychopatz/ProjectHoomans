@@ -1,5 +1,8 @@
 # Agent Runbook — Full Semantic Lab Grounded Personal Dialogue
 
+> **Current closeout override (2026-10-20):** H0–H4 production code, prior worker suites, and old-branch merge are already present on published existing `main` (pre-update SHA `4b4fcd675a6a41d729d53b05a646bd3b3625a5f6`), not stranded on an unmerged branch. Read `FINAL_ACCEPTANCE_CLOSEOUT.md` and the rewritten `PROGRESS.md` for F1→F4 final acceptance. Old "integrate branch"/"H0 first" directives below are historical and do NOT authorize restarting or remerging completed work. F1 selected CodeBlocks MUST alter compiled source and rendered behavior; F2 actual TL noun localization; F3 differentiated privacy; F4 true GUI acceptance/bytes. Continue automatically through ALL phases, never stop at a successful subphase. No new branches and NO `GOAL_PROMPT.md`.
+
+
 ## Binding user execution policy
 
 1. **NEVER create a Git branch** in Hoomans, Core or DynamicTrading. No temporary branch, PR branch, new worktree branch, `checkout -b` or `switch -c`. New authorized implementation/docs target **existing `main` only**, after safe synchronization. The preexisting divergent source branch is a preservation/reference source, NOT the normal place to continue new work. Read `GIT_INTEGRATION_AND_NO_NEW_BRANCHES.md`; no plain `git pull`, destructive reset, force push, speculative rebase, stash/discard of unknown work, or Workshop publication.

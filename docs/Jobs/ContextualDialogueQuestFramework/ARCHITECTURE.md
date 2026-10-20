@@ -31,3 +31,11 @@ Semantic Lab visual CodeBlocks / InteractionSpec
 ## Safety and integration
 
 Protect existing STAY, inventory, compliments, gift, quest and companion gameplay admission: generated dialogue never directly executes unregistered effects. Preserve native SP/MP and Workshop for user-owned live testing. No new Git branches; new changes target existing main after safe in-place integration review. Existing B0–B6 code is still on the preexisting divergent branch at audited source HEAD `47556220`, not on main. No full prompt in checked-in docs.
+
+## Final codeblock composition and localization closure (2026-10-20)
+
+The generated static grounded-dialogue catalog now exists and is loaded by the production Lua catalog. The **remaining architectural seam** is the path from selected *parameterized and connected* CodeBlocks in the existing Tk `SemanticLabWorkflowPane` to the typed canonical `InteractionSpec`/authored dialogue source actually passed into `SemanticLabAuthoringService.generate_workflow`. Merely validating `block_ids` and subsequently compiling an unchanged dataset is not genuine composition. Reuse the current `InteractionSpec` compiler, existing flow graph schema and registered typed provider references; no second DSL, translator, parser or gameplay dispatcher.
+
+Translation is two typed stages: authorized stable personal fact ID → properly localized displayed value (Core-backed existing registered translation seam; proper nouns remain intact) → existing `PNC.Translation.TrFormat` response template with typed `content`. Current H3 TL output showed `farmer` although existing TL lexicon has `occupation.farmer=magsasaka`; fix the source-to-presentation translation gap without rewriting persisted canonical identity or upgrading suspected private observations.
+
+Knowledge descriptor disclosure policy needs configurable graduated familiarity/approval/privacy classes on the **server**; thresholds permit disclosure but never create discovered evidence. Dossier and optional PBrainZ project only existing per-character Knowledge; no per-player matrix/whole-profile ModData bloat. The final full-goal acceptance includes the real Tk GUI→approved generated files→fresh Lua worker path and comparable bytes for 0/1/10 actual player discoveries; the older synthetic metrics remain historical evidence.
