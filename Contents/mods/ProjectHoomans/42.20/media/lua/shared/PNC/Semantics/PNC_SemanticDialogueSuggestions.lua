@@ -144,6 +144,30 @@ local DEFINITIONS = {
     },
 }
 
+local CAPABILITY_DEFINITIONS = {
+    FOLLOW = {
+        id = "action.follow",
+        labelKey = "UI_PNC_Conversation_Suggestion_Follow_Label",
+        labelFallback = "Ask them to follow",
+        utteranceKey = "UI_PNC_Conversation_Suggestion_Follow_Utterance",
+        utteranceFallback = "Follow me.",
+    },
+    STAY = {
+        id = "action.stay",
+        labelKey = "UI_PNC_Conversation_Suggestion_Stay_Label",
+        labelFallback = "Ask them to stay",
+        utteranceKey = "UI_PNC_Conversation_Suggestion_Stay_Utterance",
+        utteranceFallback = "Stay here.",
+    },
+    WAIT_AT = {
+        id = "action.wait_at",
+        labelKey = "UI_PNC_Conversation_Suggestion_WaitAt_Label",
+        labelFallback = "Ask them to wait there",
+        utteranceKey = "UI_PNC_Conversation_Suggestion_WaitAt_Utterance",
+        utteranceFallback = "Wait there.",
+    },
+}
+
 local function revisionFor(result)
     result = type(result) == "table" and result or {}
     local state = type(result.state) == "table" and result.state or {}
@@ -275,6 +299,85 @@ local function sourceRecord(kind, revision, reason)
     }
 end
 
+local function capabilityFrame(action, definition, revision)
+    return {
+        schemaVersion = Suggestions.VERSION,
+        kind = "semantic_click_frame",
+        candidateID = definition.id,
+        intent = "REQUEST",
+        speechAct = "REQUEST",
+        action = action,
+        target = { kind = "conversation_actor", ref = "npc" },
+        slots = {
+            npcID = { kind = "conversation_actor", ref = "npc" },
+        },
+        requestRevision = revision,
+    }
+end
+
+local function capabilityRows(revision, currentAction)
+    local catalog = PNC.Semantics and PNC.Semantics.CapabilityCatalog
+    if not catalog or type(catalog.ListActions) ~= "function" then
+        return {}, sourceRecord(
+            "permitted_capability", revision, "catalog_unavailable"
+        )
+    end
+
+    local rows = {}
+    local allowed = 0
+    for _, row in ipairs(catalog.ListActions()) do
+        local action = normalized(row and row.id)
+        local definition = CAPABILITY_DEFINITIONS[action]
+        if definition and row.dispatchable == true then
+            local binding = type(row.binding) == "table" and row.binding or {}
+            local bindingView = {
+                id = row.bindingID or binding.id,
+                owner = binding.owner or row.owner,
+                route = binding.route or row.route,
+                handlerID = binding.handlerID or row.handlerID,
+                targetScope = row.targetScope,
+                status = row.bindingStatus,
+            }
+            local status = action == currentAction
+                and "selected_for_preflight" or "registered"
+            if action == "WAIT_AT" then
+                status = action == currentAction
+                    and "selected_requires_destination"
+                    or "requires_destination"
+            end
+            rows[#rows + 1] = {
+                id = definition.id,
+                action = action,
+                source = sourceRecord(
+                    "permitted_capability", revision, status
+                ),
+                status = status,
+                binding = bindingView,
+                frame = capabilityFrame(action, definition, revision),
+                display = {
+                    labelKey = definition.labelKey,
+                    labelFallback = definition.labelFallback,
+                    label = resolvedText(
+                        definition.labelKey, definition.labelFallback
+                    ),
+                    utteranceKey = definition.utteranceKey,
+                    utteranceFallback = definition.utteranceFallback,
+                    utterance = resolvedText(
+                        definition.utteranceKey,
+                        definition.utteranceFallback
+                    ),
+                },
+                visibility = "player",
+            }
+            allowed = allowed + 1
+        end
+    end
+    return rows, sourceRecord(
+        "permitted_capability", revision,
+        allowed > 0 and "registered_dispatchable" or "none_registered"
+    )
+end
+
 local function addCandidate(output, seen, definition, kind, revision, reason)
     if not definition then return end
     local candidate = seen[definition.id]
@@ -343,6 +446,10 @@ function Suggestions.Build(result, context, messages)
     local seen = {}
     local trace = {}
     local ir = type(result.ir) == "table" and result.ir or {}
+    local currentAction = normalized(ir.action)
+    local capabilities, capabilitySource = capabilityRows(
+        revision, currentAction
+    )
 
     if privateResult(result) then
         appendTrace(trace, "typed_input", "hidden", "private_or_secret", 0)
@@ -354,6 +461,7 @@ function Suggestions.Build(result, context, messages)
             turnID = turnID,
             candidates = {},
             sources = {},
+            permittedCapabilities = {},
             trace = trace,
         }
     end
@@ -407,6 +515,42 @@ function Suggestions.Build(result, context, messages)
         appendTrace(trace, "npc_response_plan", "skipped", "topic_unknown", #candidates)
     end
 
+    local flow = type(result.decision) == "table"
+        and type(result.decision.flow) == "table"
+        and result.decision.flow or {}
+    local flowActive = flow.flowId ~= nil
+        and (flow.committed == true or flow.matched == true)
+    local flowSource = sourceRecord(
+        "active_flow", revision,
+        flowActive and "active_flow" or "no_active_flow"
+    )
+    local flowTopic = responseTopic({ decision = { flow = flow } })
+    if flowActive and flowTopic then
+        addCandidate(
+            candidates, seen, definitionForSubject(flowTopic, false),
+            "active_flow", revision, "active_flow_response_pool"
+        )
+        appendTrace(trace, "active_flow", "allowed", "active_flow", #candidates)
+    else
+        appendTrace(
+            trace, "active_flow", "skipped",
+            flow.flowId and "flow_topic_unknown" or "no_active_flow",
+            #candidates
+        )
+    end
+
+    if #capabilities > 0 then
+        appendTrace(
+            trace, "permitted_capability", "allowed",
+            "registered_dispatchable", #candidates
+        )
+    else
+        appendTrace(
+            trace, "permitted_capability", "skipped",
+            "none_registered", #candidates
+        )
+    end
+
     return {
         schemaVersion = Suggestions.VERSION,
         kind = "semantic_dialogue_suggestions",
@@ -416,7 +560,16 @@ function Suggestions.Build(result, context, messages)
         sources = {
             typedSource,
             planSource,
+            flowSource,
+            capabilitySource,
         },
+        activeFlow = flowActive and {
+            flowID = flow.flowId,
+            nodeID = flow.toNodeId or flow.nodeId,
+            revision = revision,
+            responsePoolID = flow.responsePool,
+        } or nil,
+        permittedCapabilities = capabilities,
         trace = trace,
         privacy = {
             playerVisible = true,

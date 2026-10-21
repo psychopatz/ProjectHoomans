@@ -56,6 +56,21 @@ class ContextualSuggestionsS1Tests(unittest.TestCase):
             suggestions["trace"][1]["source"],
             "npc_response_plan",
         )
+        self.assertEqual(
+            suggestions["activeFlow"]["flowID"],
+            "wellbeing",
+        )
+        self.assertEqual(
+            {source["kind"] for source in suggestions["sources"]},
+            {"typed_input", "npc_response_plan", "active_flow", "permitted_capability"},
+        )
+        capabilities = {
+            item["action"]: item
+            for item in suggestions["permittedCapabilities"]
+        }
+        self.assertEqual(capabilities["FOLLOW"]["binding"]["id"], "pnc:companion.follow")
+        self.assertEqual(capabilities["STAY"]["binding"]["id"], "pnc:companion.stay")
+        self.assertEqual(capabilities["WAIT_AT"]["status"], "requires_destination")
         wellbeing_detail = next(
             item
             for item in suggestions["candidates"]

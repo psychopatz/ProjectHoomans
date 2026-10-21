@@ -8,5 +8,11 @@
   "UI_PNC_Conversation_Suggestion_Health_Label": "Ask about injuries",
   "UI_PNC_Conversation_Suggestion_Health_Utterance": "Are you hurt?",
   "UI_PNC_Conversation_Suggestion_Identity_Label": "Ask who they are",
-  "UI_PNC_Conversation_Suggestion_Identity_Utterance": "Who are you?"
+  "UI_PNC_Conversation_Suggestion_Identity_Utterance": "Who are you?",
+  "UI_PNC_Conversation_Suggestion_Follow_Label": "Ask them to follow",
+  "UI_PNC_Conversation_Suggestion_Follow_Utterance": "Follow me.",
+  "UI_PNC_Conversation_Suggestion_Stay_Label": "Ask them to stay",
+  "UI_PNC_Conversation_Suggestion_Stay_Utterance": "Stay here.",
+  "UI_PNC_Conversation_Suggestion_WaitAt_Label": "Ask them to wait there",
+  "UI_PNC_Conversation_Suggestion_WaitAt_Utterance": "Wait there."
 }
