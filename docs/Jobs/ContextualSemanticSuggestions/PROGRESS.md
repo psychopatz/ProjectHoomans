@@ -181,3 +181,12 @@ Source/evidence commit: 163a7226 (163a72269c29ba67b93fa72a8044dd6ba09a59cb).
 - Unrelated user work remains uncommitted and untouched in the worktree: Core Presence Lua edits and tests/pnc_restored_body_identity_smoke.lua. No Workshop, release, publish, or push action was taken.
 
 Final handoff: developer-side gates pass. Native Project Zomboid SP/MP, actual in-game installation, multiplayer authority, and Workshop publication remain UNTESTED and reserved for the user. READY FOR USER LIVE TEST.
+
+## Post-S6 follow-up: responsive Semantic Lab Simulation layout
+
+- Source/evidence commit: `0ee7d533fec71c3527edc0e72086ea16590a9667` (`Make Semantic Lab simulation layout responsive`). Existing `main` retained; no push, release, or Workshop action.
+- Reworked only the existing Tk presentation layer: screen-aware initial geometry, resizable two-pane minimums, content-sized suggestion panel, organized action toolbar rows, and a separate runtime/profile/status row. Production Lua, worker protocol, semantic frames, translation manager, and click/effect ownership are unchanged.
+- Exact validation: `python3 -m py_compile tools/semantic_harness/ui/shell.py tools/semantic_harness/tests/test_contextual_suggestions_s4.py`; focused Xvfb GUI/worker acceptance `test_contextual_suggestions_s4` — **4 passed**; contextual suggestion regression discovery — **31 passed**; related app/harness/profile tests — **35 passed**; `git diff --check` passed.
+- Direct Xvfb geometry evidence at 1080x700: all seven action buttons mapped and inside the conversation pane; language, NPC profile, status, input, and send controls mapped; blank suggestion panel measured 50px and expanded to 87px only after the live `conversation.whats_up` branch produced a choice. The existing GUI test also verifies production suggestion rendering and real click transitions.
+- Full discovery run reached 319 tests with one worker-timeout error in the existing `test_specific_routes_remain_distinct_from_root`; rerunning that exact test alone passed. The failure was not in the edited UI path and is recorded as a suite-level teardown/flakiness observation rather than hidden.
+- Native Project Zomboid SP/MP, actual in-game installation, multiplayer authority, and Workshop publication remain **UNTESTED** and reserved for the user. Handoff remains **READY FOR USER LIVE TEST**.
