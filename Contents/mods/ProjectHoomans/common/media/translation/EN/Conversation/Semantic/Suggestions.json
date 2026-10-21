@@ -1,4 +1,7 @@
 {
+  "UI_PNC_Conversation_SemanticSuggestions_Title": "CONTEXTUAL SUGGESTIONS",
+  "UI_PNC_Conversation_Suggestion_Unavailable_Tooltip": "Unavailable in the current situation.",
+  "UI_PNC_Conversation_Suggestion_NeedsDestination_Tooltip": "Choose a destination first.",
   "UI_PNC_Conversation_Suggestion_Wellbeing_Label": "Ask about wellbeing",
   "UI_PNC_Conversation_Suggestion_Wellbeing_Utterance": "How are you feeling?",
   "UI_PNC_Conversation_Suggestion_WellbeingDetail_Label": "Ask what is wrong",

@@ -32,6 +32,54 @@ def npc_message_text(message: dict[str, Any]) -> str:
     return str(payload.get("text") or payload.get("fallback") or "")
 
 
+def semantic_suggestion_rows(suggestions: dict[str, Any]) -> list[dict[str, Any]]:
+    """Build the bounded visual slice from the production projection."""
+
+    candidates = suggestions.get("candidates") or []
+    capabilities = suggestions.get("permittedCapabilities") or []
+    rows: list[dict[str, Any]] = []
+    candidate_limit = max(0, 6 - len(capabilities)) if capabilities else 6
+    for candidate in candidates[:candidate_limit]:
+        rows.append(
+            {
+                "id": candidate.get("id"),
+                "frame": candidate.get("frame"),
+                "display": candidate.get("display") or {},
+                "status": "eligible",
+                "enabled": True,
+                "source": candidate.get("source"),
+            }
+        )
+    for capability in capabilities[: max(0, 6 - len(rows))]:
+        status = capability.get("status") or "unavailable_unknown"
+        rows.append(
+            {
+                "id": capability.get("id"),
+                "action": capability.get("action"),
+                "frame": capability.get("frame"),
+                "display": capability.get("display") or {},
+                "status": status,
+                "enabled": status in {"eligible", "selected_for_preflight"},
+                "source": capability.get("source"),
+                "eligibility": capability.get("eligibility"),
+            }
+        )
+    return rows
+
+
+def semantic_suggestion_title(row: dict[str, Any]) -> str:
+    display = row.get("display") or {}
+    return str(
+        display.get("label")
+        or display.get("labelFallback")
+        or display.get("utterance")
+        or display.get("utteranceFallback")
+        or row.get("id")
+        or row.get("action")
+        or "Suggestion"
+    )
+
+
 class SemanticHarnessApp:
     """Nonblocking Tk adapter over the same session API used by the CLI."""
 
@@ -114,12 +162,46 @@ class SemanticHarnessApp:
         transcript_frame.columnconfigure(0, weight=1)
         self.transcript = ScrolledText(transcript_frame, wrap="word", state="disabled")
         self.transcript.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
+
+        suggestion_frame = ttk.LabelFrame(
+            transcript_frame, text="Contextual semantic suggestions"
+        )
+        suggestion_frame.grid(row=1, column=0, sticky="ew", padx=6, pady=(0, 6))
+        suggestion_frame.grid_propagate(False)
+        suggestion_frame.configure(height=112)
+        for column in range(3):
+            suggestion_frame.columnconfigure(column, weight=1)
+        self.suggestion_buttons: list[Any] = []
+        self.suggestion_rows: list[dict[str, Any]] = []
+        self.suggestion_interactive = False
+        for index in range(6):
+            button = ttk.Button(
+                suggestion_frame,
+                text="",
+                command=lambda index=index: self.click_suggestion(index),
+            )
+            button.grid(
+                row=index // 3,
+                column=index % 3,
+                sticky="ew",
+                padx=3,
+                pady=3,
+            )
+            self.suggestion_buttons.append(button)
+        self.suggestion_status = ttk.Label(
+            suggestion_frame,
+            text="Run a production preview or turn to inspect suggestions.",
+        )
+        self.suggestion_status.grid(
+            row=2, column=0, columnspan=3, sticky="w", padx=4, pady=(0, 2)
+        )
+
         self.input_var = self._tk.StringVar()
         input_box = ttk.Entry(transcript_frame, textvariable=self.input_var)
-        input_box.grid(row=1, column=0, sticky="ew", padx=6, pady=(0, 6))
+        input_box.grid(row=2, column=0, sticky="ew", padx=6, pady=(0, 6))
         input_box.bind("<Return>", lambda _: self.submit())
         self.send_button = ttk.Button(transcript_frame, text="Send", command=self.submit)
-        self.send_button.grid(row=2, column=0, sticky="e", padx=6, pady=(0, 6))
+        self.send_button.grid(row=3, column=0, sticky="e", padx=6, pady=(0, 6))
 
         controls = ttk.Frame(container)
         controls.grid(row=1, column=0, sticky="ew", padx=(0, 8), pady=(8, 0))
@@ -183,6 +265,15 @@ class SemanticHarnessApp:
         self.trace = ScrolledText(raw_frame, wrap="none", state="disabled")
         self.trace.grid(row=0, column=0, sticky="nsew")
         self.trace_tabs.add(raw_frame, text="Raw worker record")
+
+        suggestion_trace_frame = ttk.Frame(self.trace_tabs)
+        suggestion_trace_frame.rowconfigure(0, weight=1)
+        suggestion_trace_frame.columnconfigure(0, weight=1)
+        self.suggestion_inspector = ScrolledText(
+            suggestion_trace_frame, wrap="none", state="disabled"
+        )
+        self.suggestion_inspector.grid(row=0, column=0, sticky="nsew")
+        self.trace_tabs.add(suggestion_trace_frame, text="Suggestions + predicates")
 
         editor_notebook = ttk.Notebook(editor_tab)
         editor_notebook.grid(row=0, column=0, sticky="nsew")
@@ -278,6 +369,21 @@ class SemanticHarnessApp:
         self.interaction_explorer.set_enabled(enabled and not self.busy)
         self.interaction_composer.set_enabled(enabled and not self.busy)
         self.workflow_pane.set_enabled(enabled and not self.busy)
+        self._refresh_suggestion_controls(enabled and not self.busy)
+
+    def _refresh_suggestion_controls(self, enabled: bool) -> None:
+        for index, button in enumerate(self.suggestion_buttons):
+            row = self.suggestion_rows[index] if index < len(self.suggestion_rows) else None
+            button.configure(
+                state=(
+                    "normal"
+                    if enabled
+                    and self.suggestion_interactive
+                    and row
+                    and row.get("enabled") is True
+                    else "disabled"
+                )
+            )
 
     @property
     def worker_ready(self) -> bool:
@@ -397,6 +503,52 @@ class SemanticHarnessApp:
         self._set_text(self.inspector, conversation_first(view))
         self._set_text(self.authority, pretty(view.get("commandAuthority", {})))
         self._set_text(self.trace, pretty(response))
+        observation = response.get("observation") or {}
+        suggestions = observation.get("suggestions") or {}
+        self._render_suggestions(response, suggestions)
+
+    def _render_suggestions(
+        self, response: dict[str, Any], suggestions: dict[str, Any]
+    ) -> None:
+        self.suggestion_rows = semantic_suggestion_rows(suggestions)
+        self.suggestion_interactive = (
+            response.get("type") == "turn" and response.get("accepted") is True
+        )
+        for index, button in enumerate(self.suggestion_buttons):
+            row = self.suggestion_rows[index] if index < len(self.suggestion_rows) else None
+            if row:
+                button.configure(text=semantic_suggestion_title(row))
+            else:
+                button.configure(text="")
+        revision = suggestions.get("revision", "—")
+        trace_count = len(suggestions.get("predicateTrace") or [])
+        self.suggestion_status.configure(
+            text=(
+                f"Revision {revision} · {len(self.suggestion_rows)} visible · "
+                f"{trace_count} bounded predicate trace rows"
+            )
+        )
+        self._set_text(
+            self.suggestion_inspector,
+            pretty(
+                {
+                    "projection": suggestions,
+                    "visualRows": [
+                        {
+                            "id": row.get("id"),
+                            "action": row.get("action"),
+                            "label": semantic_suggestion_title(row),
+                            "status": row.get("status"),
+                            "enabled": row.get("enabled"),
+                            "source": row.get("source"),
+                            "eligibility": row.get("eligibility"),
+                        }
+                        for row in self.suggestion_rows
+                    ],
+                }
+            ),
+        )
+        self._refresh_suggestion_controls(self.session.ready and not self.busy)
 
     def submit(self) -> None:
         value = self.input_var.get().strip()
@@ -420,6 +572,41 @@ class SemanticHarnessApp:
 
         self._start_operation(lambda worker: worker.input(value), finish)
 
+    def click_suggestion(self, index: int) -> None:
+        if not self.session.ready or self.busy or not self.suggestion_interactive:
+            return
+        if index < 0 or index >= len(self.suggestion_rows):
+            return
+        row = self.suggestion_rows[index]
+        frame = row.get("frame")
+        if not isinstance(frame, dict) or row.get("enabled") is not True:
+            return
+        label = semantic_suggestion_title(row)
+
+        def finish(response: dict[str, Any]) -> None:
+            if response.get("accepted") is True:
+                utterance = (row.get("display") or {}).get("utterance") or label
+                self._append("PLAYER", str(utterance))
+                for message in response.get("messages", []):
+                    if message.get("speaker") == "npc":
+                        self._append("NPC", npc_message_text(message))
+                for call in response.get("toolCalls", []):
+                    self._append(
+                        "TOOL/ACTION",
+                        f"{call.get('label') or call.get('name')}"
+                        f" [{call.get('name')}] · "
+                        f"{call.get('status') or call.get('reason') or 'observed'}",
+                    )
+                self._append("SYSTEM", f"Clicked semantic suggestion: {label}")
+            else:
+                self._append(
+                    "SYSTEM",
+                    f"Suggestion rejected: {response.get('reason') or 'unknown'}",
+                )
+            self._show_response(response)
+
+        self._start_operation(lambda worker: worker.suggestion_click(frame), finish)
+
     def preview(self) -> None:
         """Inspect a production decision without recording or dispatching it."""
 
@@ -442,6 +629,10 @@ class SemanticHarnessApp:
             self._set_text(self.inspector, "")
             self._set_text(self.authority, "")
             self._set_text(self.trace, "")
+            self._set_text(self.suggestion_inspector, "")
+            self.suggestion_rows = []
+            self.suggestion_interactive = False
+            self._render_suggestions({}, {})
             self._append("SYSTEM", "Scenario reset.")
 
         self._start_operation(lambda worker: worker.reset(), finish)

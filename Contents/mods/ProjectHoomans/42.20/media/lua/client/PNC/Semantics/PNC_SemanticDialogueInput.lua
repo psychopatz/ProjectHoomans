@@ -98,6 +98,11 @@ function Input.SubmitSemanticFrame(view, frame)
     if type(Suggestions.ResolveFrameText) ~= "function" then
         return false, "suggestion_frame_unavailable"
     end
+    if group and type(group.Submit) == "function" then
+        return group:Submit(Suggestions.ResolveFrameText(frame), {
+            semanticFrame = frame,
+        })
+    end
     return Internal.SubmitSingle(
         view,
         Suggestions.ResolveFrameText(frame),

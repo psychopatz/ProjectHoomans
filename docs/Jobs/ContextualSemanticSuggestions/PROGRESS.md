@@ -54,4 +54,17 @@ Exact S2/S3 checks:
 - `python3 .../pz_verify.py --file .../PNC_SemanticDialogueSuggestionPredicates.lua --kahlua --severity ERROR --no-snippets` — zero Kahlua errors/warnings; direct Lua worker syntax/load checks passed.
 - Coverage check was rerun for every S1–S3 source/test/translation path. The graph reported no recorded issue, but new paths were `not_tracked` and modified worker paths `metadata_changed`; source was read directly as required.
 
-Open gates: S4 in-game Core UI buttons, S5 real Tk Semantic Lab visual interaction, S6 full regressions/perf/doctor/Kahlua, and user-owned native PZ SP/MP live test. Final handoff must remain `READY FOR USER LIVE TEST`; no Workshop release.
+## S4 evidence — existing Core UI and Semantic Lab interaction
+
+- Added one Hoomans-owned `semanticSuggestions` extension part to the existing Core conversation view. It uses Core layout persistence, opacity/debug controls, and native Core-themed buttons; it submits only canonical frames through `DialogueInput.SubmitSemanticFrame` and reuses the existing group `Submit` path.
+- Added EN/TL panel title and safe unavailable/destination tooltip keys to the existing Suggestions translation shards. No second translation manager, parser, response generator, or UI application was introduced.
+- Existing Semantic Lab Simulation now renders the production projection as six bounded buttons, disables fail-closed capabilities, and exposes the full bounded suggestion/predicate projection in a dedicated inspector tab. Button clicks call the real Lua worker `SUGGESTION_CLICK` command and refresh the existing transcript/authority/raw views.
+
+Exact S4 checks and observed results:
+
+- `xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_contextual_suggestions_s4 -v` — 1 passed. Existing Tk app rendered six buttons; WAIT_AT was disabled; predicate trace was visible; clicking a question produced a new turn and `semantic_click_frame` in the inspector.
+- Captured `/tmp/semantic-lab-s4-simulation.png` from the real existing app: Simulation tab visibly showed three dialogue buttons, FOLLOW, STAY, disabled WAIT_AT, revision/trace status, transcript, and inspector tabs. The image is validation evidence only, not a repository artifact.
+- `python3 -m py_compile tools/semantic_harness/ui/shell.py tools/semantic_harness/tests/test_contextual_suggestions_s4.py`; `git diff --check`; S1–S3 focused worker suite — all passed.
+- Coverage check was rerun for every S1–S4 source/test/translation path. The graph reported no recorded issue; new paths were `not_tracked` and modified paths `metadata_changed`, so each was read directly as required.
+
+Open gates: S5 full Semantic Lab scenario editing/inspection coverage, S6 full regressions/perf/doctor/Kahlua and final review, and user-owned native PZ SP/MP live test. Final handoff must remain `READY FOR USER LIVE TEST`; no Workshop release.

@@ -6,6 +6,10 @@ local Conversation = PNC.Conversation
 local Relationship = Conversation.Relationship
 local ExtensionParts = {}
 
+-- The suggestion panel is an ordinary Hoomans extension part on the existing
+-- Core view; it does not introduce a second conversation surface.
+pcall(require, "PNC/Conversation/PNC_ConversationSemanticSuggestions")
+
 function ExtensionParts.Build(npcID, semanticFactory)
     return {
         {
@@ -20,6 +24,16 @@ function ExtensionParts.Build(npcID, semanticFactory)
             editLabel = {
                 key = "panel.current_relation_edit",
                 domain = "pnc.system.shared.categories",
+            },
+        },
+        {
+            partID = "semanticSuggestions",
+            factory = Conversation.CreateSemanticSuggestionsPart,
+            visible = type(Conversation.CreateSemanticSuggestionsPart)
+                == "function",
+            title = {
+                key = "UI_PNC_Conversation_SemanticSuggestions_Title",
+                fallback = "CONTEXTUAL SUGGESTIONS",
             },
         },
         {
