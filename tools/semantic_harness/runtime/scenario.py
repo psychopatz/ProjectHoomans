@@ -57,6 +57,12 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "identityState": "unknown",
         "healthState": "healthy",
         "activeBehavior": "idle",
+        "followState": {"mode": "idle"},
+        "actorAuthority": {
+            "companion": True,
+            "owned": True,
+            "eligible": True,
+        },
         "traits": ["reserved"],
         "relationship": {
             "approval": 0,
@@ -113,8 +119,26 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "nativeTranslations": {},
         "semanticCognitionResponses": {},
         "commandResponses": {
-            "follow": {"accepted": True, "reason": "network_queued"},
-            "stay": {"accepted": True, "reason": "network_queued"},
+            "follow": {
+                "accepted": True,
+                "reason": "network_queued",
+                "state": {
+                    "npc": {
+                        "activeBehavior": "following",
+                        "followState": {"mode": "following"},
+                    }
+                },
+            },
+            "stay": {
+                "accepted": True,
+                "reason": "network_queued",
+                "state": {
+                    "npc": {
+                        "activeBehavior": "idle",
+                        "followState": {"mode": "staying"},
+                    }
+                },
+            },
             "camp": {
                 "accepted": True,
                 "reason": "network_queued",

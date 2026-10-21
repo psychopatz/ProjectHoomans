@@ -186,6 +186,18 @@ function Provider.configure(deps)
             targets = Values.copy(configured.targets or targets)
             details = Values.copy(configured.details or {})
         end
+        if accepted and type(configured) == "table"
+            and type(configured.state) == "table"
+        then
+            local patch = configured.state
+            local scenario = Runtime.scenario or {}
+            local npcState = type(patch.npc) == "table" and patch.npc or nil
+            if npcState and type(scenario.npc) == "table" then
+                for key, value in pairs(npcState) do
+                    scenario.npc[key] = Values.copy(value)
+                end
+            end
+        end
         Runtime.transport[#Runtime.transport + 1] = {
             direction = "client_to_server",
             mode = runtime.mode,

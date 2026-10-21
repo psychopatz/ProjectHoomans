@@ -32,12 +32,30 @@ def npc_message_text(message: dict[str, Any]) -> str:
     return str(payload.get("text") or payload.get("fallback") or "")
 
 
-def semantic_suggestion_rows(suggestions: dict[str, Any]) -> list[dict[str, Any]]:
+def semantic_suggestion_rows(
+    suggestions: dict[str, Any], group_id: str | None = None
+) -> list[dict[str, Any]]:
     """Build the bounded visual slice from the production projection."""
 
     max_buttons = 5
-    candidates = suggestions.get("candidates") or []
-    capabilities = suggestions.get("permittedCapabilities") or []
+    groups = suggestions.get("groups") or []
+    selected = None
+    if groups:
+        requested = group_id or suggestions.get("currentGroupID")
+        selected = next(
+            (group for group in groups if group.get("id") == requested),
+            None,
+        )
+        if selected is None:
+            selected = groups[0]
+    candidates = (
+        selected.get("candidates") if selected is not None
+        else suggestions.get("candidates")
+    ) or []
+    capabilities = (
+        selected.get("capabilities") if selected is not None
+        else suggestions.get("permittedCapabilities")
+    ) or []
     rows: list[dict[str, Any]] = []
     candidate_limit = (
         max(0, max_buttons - len(capabilities))
@@ -53,6 +71,7 @@ def semantic_suggestion_rows(suggestions: dict[str, Any]) -> list[dict[str, Any]
                 "status": "eligible",
                 "enabled": True,
                 "source": candidate.get("source"),
+                "groupID": selected.get("id") if selected else candidate.get("groupID"),
             }
         )
     for capability in capabilities[: max(0, max_buttons - len(rows))]:
@@ -67,6 +86,7 @@ def semantic_suggestion_rows(suggestions: dict[str, Any]) -> list[dict[str, Any]
                 "enabled": status in {"eligible", "selected_for_preflight"},
                 "source": capability.get("source"),
                 "eligibility": capability.get("eligibility"),
+                "groupID": selected.get("id") if selected else capability.get("groupID"),
             }
         )
     return rows
@@ -173,12 +193,15 @@ class SemanticHarnessApp:
         )
         suggestion_frame.grid(row=1, column=0, sticky="ew", padx=6, pady=(0, 6))
         suggestion_frame.grid_propagate(False)
-        suggestion_frame.configure(height=112)
+        suggestion_frame.configure(height=140)
         for column in range(3):
             suggestion_frame.columnconfigure(column, weight=1)
         self.suggestion_buttons: list[Any] = []
         self.suggestion_rows: list[dict[str, Any]] = []
         self.suggestion_interactive = False
+        self.suggestion_projection: dict[str, Any] = {}
+        self.suggestion_response: dict[str, Any] = {}
+        self.suggestion_revision: Any = None
         for index in range(5):
             button = ttk.Button(
                 suggestion_frame,
@@ -198,7 +221,18 @@ class SemanticHarnessApp:
             text="Run a production preview or turn to inspect suggestions.",
         )
         self.suggestion_status.grid(
-            row=2, column=0, columnspan=3, sticky="w", padx=4, pady=(0, 2)
+            row=2, column=0, columnspan=2, sticky="w", padx=4, pady=(0, 2)
+        )
+        self.suggestion_group_box = self._ttk.Combobox(
+            suggestion_frame,
+            state="readonly",
+            width=24,
+        )
+        self.suggestion_group_box.grid(
+            row=2, column=2, sticky="e", padx=3, pady=(0, 2)
+        )
+        self.suggestion_group_box.bind(
+            "<<ComboboxSelected>>", lambda _: self._on_suggestion_group()
         )
 
         self.input_var = self._tk.StringVar()
@@ -512,10 +546,35 @@ class SemanticHarnessApp:
         suggestions = observation.get("suggestions") or {}
         self._render_suggestions(response, suggestions)
 
+    def _on_suggestion_group(self) -> None:
+        if self.suggestion_projection:
+            self._render_suggestions(
+                self.suggestion_response, self.suggestion_projection
+            )
+
     def _render_suggestions(
         self, response: dict[str, Any], suggestions: dict[str, Any]
     ) -> None:
-        self.suggestion_rows = semantic_suggestion_rows(suggestions)
+        self.suggestion_projection = suggestions
+        self.suggestion_response = response
+        groups = suggestions.get("groups") or []
+        group_ids = [str(group.get("id")) for group in groups]
+        self.suggestion_group_box.configure(values=group_ids)
+        revision = suggestions.get("revision")
+        selected_group = (
+            suggestions.get("currentGroupID")
+            if self.suggestion_revision != revision
+            else self.suggestion_group_box.get()
+        )
+        if selected_group not in group_ids:
+            selected_group = suggestions.get("currentGroupID") or (
+                group_ids[0] if group_ids else ""
+            )
+            self.suggestion_group_box.set(selected_group)
+        self.suggestion_revision = revision
+        self.suggestion_rows = semantic_suggestion_rows(
+            suggestions, selected_group or None
+        )
         self.suggestion_interactive = (
             response.get("type") == "turn" and response.get("accepted") is True
         )
@@ -529,6 +588,7 @@ class SemanticHarnessApp:
         trace_count = len(suggestions.get("predicateTrace") or [])
         self.suggestion_status.configure(
             text=(
+                f"{self.suggestion_group_box.get() or 'Suggestions'} · "
                 f"Revision {revision} · {len(self.suggestion_rows)} visible · "
                 f"{trace_count} bounded predicate trace rows"
             )

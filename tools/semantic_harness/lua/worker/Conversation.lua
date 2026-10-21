@@ -48,6 +48,20 @@ function Conversation.buildContext(context)
         local key = CONDITION_KEYS[index]
         snapshotNeeds[key] = conditions[key]
     end
+    local configuredAuthority = type(npc.actorAuthority) == "table"
+        and npc.actorAuthority or {}
+    local companion = configuredAuthority.companion
+    if companion == nil then companion = npc.companion == true end
+    local owned = configuredAuthority.owned
+    if owned == nil then owned = npc.ownedByPlayer == true end
+    local authorityEligible = configuredAuthority.eligible
+    if authorityEligible == nil then
+        authorityEligible = companion == true and owned == true
+    end
+    local authorityStatus = configuredAuthority.status
+        or (authorityEligible and "eligible"
+            or (companion == false and "not_companion"
+                or owned == false and "not_owned" or "authority_unknown"))
     return {
         identityState = npc.identityState or "unknown",
         npcName = npcName,
@@ -58,6 +72,7 @@ function Conversation.buildContext(context)
             identityState = npc.identityState or "unknown",
             healthState = npc.healthState,
             activeBehavior = npc.activeBehavior,
+            followState = copy(npc.followState or { mode = "idle" }),
             bodyHealth = bodyHealth,
             hpCurrent = hpCurrent,
             hpMax = hpMax,
@@ -68,6 +83,12 @@ function Conversation.buildContext(context)
             or npc.relationshipState or "unknown",
         identityTrust = relationship.identityTrust,
         relationship = copy(relationship),
+        actorAuthority = {
+            eligible = authorityEligible == true,
+            companion = companion,
+            owned = owned,
+            status = authorityStatus,
+        },
         npcTraits = copy(npc.traits or {}),
         npcPersonality = copy(npc.personality or {}),
         semanticFactValues = copy(context.semanticFactValues or {}),
@@ -84,6 +105,7 @@ function Conversation.buildContext(context)
         entry = {
             snapshot = {
                 activeBehavior = npc.activeBehavior,
+                followState = copy(npc.followState or { mode = "idle" }),
                 healthState = npc.healthState,
                 bodyHealth = bodyHealth,
                 residence = copy(npc.residence),
@@ -96,6 +118,13 @@ function Conversation.buildContext(context)
             },
         },
     }
+end
+
+function Conversation.refreshViewContext(context)
+    local Runtime = context.Runtime
+    if Runtime.view and Runtime.view.spec then
+        Runtime.view.spec.context = Conversation.buildContext(context)
+    end
 end
 
 function Conversation.buildView(context)
@@ -246,6 +275,10 @@ function Conversation.turn(context, text)
     else
         accepted, reason = PNC.Semantics.DialogueInput.Submit(view, text)
     end
+    -- The harness transport is an authoritative fixture. Refresh the same
+    -- production context projection after a command so the next suggestion
+    -- set reflects follow/stay state rather than replaying stale affordances.
+    Conversation.refreshViewContext(context)
     local result = view.lastSemanticDialogueResult
     -- Inspect the exact situation built by the production input router, not
     -- a separately re-created approximation in the Python test harness.

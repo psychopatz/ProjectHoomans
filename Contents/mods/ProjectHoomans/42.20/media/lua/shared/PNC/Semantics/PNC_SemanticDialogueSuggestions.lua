@@ -116,6 +116,7 @@ end
 local DEFINITIONS = {
     {
         id = "question.wellbeing",
+        topic = "wellbeing",
         order = 10,
         patternID = "pnc.question.wellbeing_feeling",
         labelKey = "UI_PNC_Conversation_Suggestion_Wellbeing_Label",
@@ -128,6 +129,7 @@ local DEFINITIONS = {
     },
     {
         id = "question.wellbeing_detail",
+        topic = "wellbeing",
         order = 20,
         patternID = "pnc.question.wellbeing_follow_up_what_is_wrong",
         labelKey = "UI_PNC_Conversation_Suggestion_WellbeingDetail_Label",
@@ -142,6 +144,7 @@ local DEFINITIONS = {
     },
     {
         id = "question.needs",
+        topic = "needs",
         order = 30,
         patternID = "pnc.question.needs_offer_plain",
         labelKey = "UI_PNC_Conversation_Suggestion_Needs_Label",
@@ -158,6 +161,7 @@ local DEFINITIONS = {
     },
     {
         id = "question.health",
+        topic = "medical",
         order = 40,
         patternID = "pnc.question.health.are_you_hurt",
         labelKey = "UI_PNC_Conversation_Suggestion_Health_Label",
@@ -179,6 +183,7 @@ local DEFINITIONS = {
     },
     {
         id = "question.identity",
+        topic = "identity",
         order = 50,
         patternID = "pnc.question.identity",
         labelKey = "UI_PNC_Conversation_Suggestion_Identity_Label",
@@ -189,11 +194,55 @@ local DEFINITIONS = {
         speechAct = "QUESTION",
         subject = "IDENTITY",
     },
+    {
+        id = "question.time",
+        topic = "time",
+        order = 60,
+        patternID = "pnc.question.time",
+        labelKey = "UI_PNC_Conversation_Suggestion_Time_Label",
+        labelFallback = "Ask about the time",
+        utteranceKey = "UI_PNC_Conversation_Suggestion_Time_Utterance",
+        utteranceFallback = "What time is it?",
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "TIME",
+        extensions = { topic = "time" },
+    },
+    {
+        id = "question.date",
+        topic = "date",
+        order = 70,
+        patternID = "pnc.question.date",
+        labelKey = "UI_PNC_Conversation_Suggestion_Date_Label",
+        labelFallback = "Ask about the date",
+        utteranceKey = "UI_PNC_Conversation_Suggestion_Date_Utterance",
+        utteranceFallback = "What's today's date?",
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "DATE",
+        extensions = { topic = "date" },
+    },
+    {
+        id = "question.weather",
+        topic = "weather",
+        order = 80,
+        patternID = "pnc.question.weather",
+        labelKey = "UI_PNC_Conversation_Suggestion_Weather_Label",
+        labelFallback = "Ask about the weather",
+        utteranceKey = "UI_PNC_Conversation_Suggestion_Weather_Utterance",
+        utteranceFallback = "How is the weather?",
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "WEATHER",
+        extensions = { topic = "weather" },
+    },
 }
 
 local CAPABILITY_DEFINITIONS = {
     FOLLOW = {
         id = "action.follow",
+        topic = "movement",
+        requiresOwnedCompanion = true,
         labelKey = "UI_PNC_Conversation_Suggestion_Follow_Label",
         labelFallback = "Ask them to follow",
         utteranceKey = "UI_PNC_Conversation_Suggestion_Follow_Utterance",
@@ -201,9 +250,24 @@ local CAPABILITY_DEFINITIONS = {
         constraints = {
             all = {
                 {
+                    path = "actorAuthority.owned",
+                    op = "eq",
+                    value = true,
+                },
+                {
+                    path = "actorAuthority.companion",
+                    op = "eq",
+                    value = true,
+                },
+                {
                     path = "npcState.activeBehavior",
                     op = "not_in",
                     values = { "hostile", "combat", "busy", "dead" },
+                },
+                {
+                    path = "npcState.followState.mode",
+                    op = "not_in",
+                    values = { "following", "follow" },
                 },
                 {
                     path = "npcState.healthState",
@@ -215,6 +279,8 @@ local CAPABILITY_DEFINITIONS = {
     },
     STAY = {
         id = "action.stay",
+        topic = "movement",
+        requiresOwnedCompanion = true,
         labelKey = "UI_PNC_Conversation_Suggestion_Stay_Label",
         labelFallback = "Ask them to stay",
         utteranceKey = "UI_PNC_Conversation_Suggestion_Stay_Utterance",
@@ -222,9 +288,24 @@ local CAPABILITY_DEFINITIONS = {
         constraints = {
             all = {
                 {
+                    path = "actorAuthority.owned",
+                    op = "eq",
+                    value = true,
+                },
+                {
+                    path = "actorAuthority.companion",
+                    op = "eq",
+                    value = true,
+                },
+                {
                     path = "npcState.activeBehavior",
                     op = "not_in",
                     values = { "hostile", "combat", "busy", "dead" },
+                },
+                {
+                    path = "npcState.followState.mode",
+                    op = "not_in",
+                    values = { "staying", "stay" },
                 },
                 {
                     path = "npcState.healthState",
@@ -236,12 +317,24 @@ local CAPABILITY_DEFINITIONS = {
     },
     WAIT_AT = {
         id = "action.wait_at",
+        topic = "movement",
+        requiresOwnedCompanion = true,
         labelKey = "UI_PNC_Conversation_Suggestion_WaitAt_Label",
         labelFallback = "Ask them to wait there",
         utteranceKey = "UI_PNC_Conversation_Suggestion_WaitAt_Utterance",
         utteranceFallback = "Wait there.",
         constraints = {
             all = {
+                {
+                    path = "actorAuthority.owned",
+                    op = "eq",
+                    value = true,
+                },
+                {
+                    path = "actorAuthority.companion",
+                    op = "eq",
+                    value = true,
+                },
                 {
                     path = "npcState.activeBehavior",
                     op = "not_in",
@@ -321,6 +414,17 @@ local function responseTopic(result, messages)
         then
             return "NPC_HEALTH_STATE"
         end
+        if string.find(value, "weather", 1, true) then
+            return "WEATHER"
+        end
+        if string.find(value, "date", 1, true)
+            or string.find(value, "calendar", 1, true)
+        then
+            return "DATE"
+        end
+        if string.find(value, "time", 1, true) then
+            return "TIME"
+        end
     end
     for index = 1, #(type(messages) == "table" and messages or {}) do
         local message = messages[index]
@@ -355,10 +459,90 @@ local function responseTopic(result, messages)
                 then
                     return "NPC_HEALTH_STATE"
                 end
+                if string.find(messageValue, "weather", 1, true) then
+                    return "WEATHER"
+                end
+                if string.find(messageValue, "date", 1, true)
+                    or string.find(messageValue, "calendar", 1, true)
+                then
+                    return "DATE"
+                end
+                if string.find(messageValue, "time", 1, true) then
+                    return "TIME"
+                end
             end
         end
     end
     return nil
+end
+
+local function canonicalTopic(value)
+    value = string.lower(tostring(value or ""))
+    if value == "npc_health_state" or value == "medical"
+        or string.find(value, "health", 1, true)
+        or string.find(value, "medical", 1, true)
+    then
+        return "medical"
+    end
+    if value == "wellbeing" or string.find(value, "wellbeing", 1, true) then
+        return "wellbeing"
+    end
+    if value == "needs" or string.find(value, "need", 1, true) then
+        return "needs"
+    end
+    if value == "identity" or string.find(value, "identity", 1, true) then
+        return "identity"
+    end
+    if value == "weather" or string.find(value, "weather", 1, true) then
+        return "weather"
+    end
+    if value == "date" or string.find(value, "date", 1, true)
+        or string.find(value, "calendar", 1, true)
+    then
+        return "date"
+    end
+    if value == "time" or string.find(value, "time", 1, true) then
+        return "time"
+    end
+    if value == "greeting" or string.find(value, "greet", 1, true) then
+        return "greeting"
+    end
+    if value == "movement" then return "movement" end
+    return nil
+end
+
+local function topicFromIR(ir, context)
+    local extensions = type(ir) == "table" and ir.extensions or nil
+    local topic = type(extensions) == "table" and extensions.topic or nil
+    if type(topic) == "table" then topic = topic.id or topic.topic end
+    local canonical = canonicalTopic(topic)
+    if canonical then return canonical end
+    canonical = canonicalTopic(ir and ir.subject)
+    if canonical then return canonical end
+    return canonicalTopic(context and context.currentTopic)
+end
+
+local RELATED_TOPICS = {
+    wellbeing = { wellbeing = true, needs = true, medical = true },
+    needs = { wellbeing = true, needs = true, medical = true },
+    medical = { wellbeing = true, needs = true, medical = true },
+    time = { time = true, date = true },
+    date = { time = true, date = true },
+    weather = { weather = true },
+}
+
+local function topicMatches(definition, topic)
+    if not topic then return false end
+    local related = RELATED_TOPICS[topic]
+    if related then return related[definition.topic] == true end
+    return definition.topic == topic
+end
+
+local function topicGroupID(topic)
+    topic = canonicalTopic(topic)
+    if topic == "date" then topic = "time" end
+    if topic == "needs" or topic == "medical" then topic = "wellbeing" end
+    return topic and "topic:" .. topic or nil
 end
 
 local function definitionFor(id)
@@ -386,6 +570,9 @@ local function definitionForSubject(subject, followUp)
     if subject == "NEEDS" then return definitionFor("question.needs") end
     if subject == "IDENTITY" then return definitionFor("question.identity") end
     if subject == "NPC_HEALTH_STATE" then return definitionFor("question.health") end
+    if subject == "TIME" then return definitionFor("question.time") end
+    if subject == "DATE" then return definitionFor("question.date") end
+    if subject == "WEATHER" then return definitionFor("question.weather") end
     return nil
 end
 
@@ -402,6 +589,7 @@ local function capabilityFrame(action, definition, revision)
         schemaVersion = Suggestions.VERSION,
         kind = "semantic_click_frame",
         candidateID = definition.id,
+        topic = definition.topic,
         intent = "REQUEST",
         speechAct = "REQUEST",
         action = action,
@@ -452,66 +640,87 @@ local function capabilityRows(revision, currentAction, context, ir)
                     }
                 end
             end
-            local destinationPending = false
-            for _, traceRow in ipairs(eligibility.trace or {}) do
-                if traceRow.path == "suggestion.destination"
-                    and traceRow.status == "unknown"
-                then
-                    destinationPending = true
+            local authorityEligible = not definition.requiresOwnedCompanion
+                or type(context.actorAuthority) == "table"
+                and context.actorAuthority.eligible == true
+            if definition.requiresOwnedCompanion and not authorityEligible then
+                if #predicateTrace < Predicates.MAX_TRACE then
+                    predicateTrace[#predicateTrace + 1] = {
+                        capability = action,
+                        path = "actorAuthority",
+                        status = "hidden",
+                        reason = type(context.actorAuthority) == "table"
+                            and (context.actorAuthority.status or "not_commandable")
+                            or "authority_unknown",
+                    }
                 end
+                -- A non-owned or unknown NPC is not an unavailable button.
+                -- It is outside the player's discoverable command surface.
             end
-            if eligibility.status ~= "private" then
-            local binding = type(row.binding) == "table" and row.binding or {}
-            local bindingView = {
-                id = row.bindingID or binding.id,
-                owner = binding.owner or row.owner,
-                route = binding.route or row.route,
-                handlerID = binding.handlerID or row.handlerID,
-                targetScope = row.targetScope,
-                status = row.bindingStatus,
-            }
-            local status
-            if eligibility.allowed == true then
-                status = action == currentAction
-                    and "selected_for_preflight" or "eligible"
-            elseif action == "WAIT_AT" and destinationPending
-            then
-                status = action == currentAction
-                    and "selected_requires_destination"
-                    or "requires_destination"
-            else
-                status = "unavailable_" .. tostring(eligibility.status)
-            end
-            rows[#rows + 1] = {
-                id = definition.id,
-                action = action,
-                source = sourceRecord(
-                    "permitted_capability", revision, status
-                ),
-                status = status,
-                eligibility = {
-                    status = eligibility.status,
-                    reason = eligibility.reason,
-                    trace = eligibility.trace,
-                },
-                binding = bindingView,
-                frame = capabilityFrame(action, definition, revision),
-                display = {
-                    labelKey = definition.labelKey,
-                    labelFallback = definition.labelFallback,
-                    label = resolvedText(
-                        definition.labelKey, definition.labelFallback
-                    ),
-                    utteranceKey = definition.utteranceKey,
-                    utteranceFallback = definition.utteranceFallback,
-                    utterance = resolvedText(
-                        definition.utteranceKey,
-                        definition.utteranceFallback
-                    ),
-                },
-                visibility = "player",
-            }
-            allowed = allowed + 1
+            if not (definition.requiresOwnedCompanion and not authorityEligible) then
+                local destinationPending = false
+                for _, traceRow in ipairs(eligibility.trace or {}) do
+                    if traceRow.path == "suggestion.destination"
+                        and traceRow.status == "unknown"
+                    then
+                        destinationPending = true
+                    end
+                end
+                if eligibility.status ~= "private" then
+                    local binding = type(row.binding) == "table" and row.binding or {}
+                    local bindingView = {
+                        id = row.bindingID or binding.id,
+                        owner = binding.owner or row.owner,
+                        route = binding.route or row.route,
+                        handlerID = binding.handlerID or row.handlerID,
+                        targetScope = row.targetScope,
+                        status = row.bindingStatus,
+                    }
+                    local status
+                    if eligibility.allowed == true then
+                        status = action == currentAction
+                            and "selected_for_preflight" or "eligible"
+                    elseif action == "WAIT_AT" and destinationPending
+                    then
+                        status = action == currentAction
+                            and "selected_requires_destination"
+                            or "requires_destination"
+                    else
+                        status = "unavailable_" .. tostring(eligibility.status)
+                    end
+                    rows[#rows + 1] = {
+                        id = definition.id,
+                        action = action,
+                        source = sourceRecord(
+                            "permitted_capability", revision, status
+                        ),
+                        status = status,
+                        eligibility = {
+                            status = eligibility.status,
+                            reason = eligibility.reason,
+                            trace = eligibility.trace,
+                        },
+                        binding = bindingView,
+                        topic = definition.topic,
+                        groupID = "owned_actions",
+                        frame = capabilityFrame(action, definition, revision),
+                        display = {
+                            labelKey = definition.labelKey,
+                            labelFallback = definition.labelFallback,
+                            label = resolvedText(
+                                definition.labelKey, definition.labelFallback
+                            ),
+                            utteranceKey = definition.utteranceKey,
+                            utteranceFallback = definition.utteranceFallback,
+                            utterance = resolvedText(
+                                definition.utteranceKey,
+                                definition.utteranceFallback
+                            ),
+                        },
+                        visibility = "player",
+                    }
+                    allowed = allowed + 1
+                end
             end
         end
     end
@@ -537,6 +746,7 @@ local function addCandidate(output, seen, definition, kind, revision, reason)
         schemaVersion = Suggestions.VERSION,
         kind = "semantic_click_frame",
         candidateID = definition.id,
+        topic = definition.topic,
         patternID = definition.patternID,
         intent = definition.intent,
         speechAct = definition.speechAct,
@@ -553,6 +763,9 @@ local function addCandidate(output, seen, definition, kind, revision, reason)
     }
     candidate = {
         id = definition.id,
+        topic = definition.topic,
+        groupID = topicGroupID(definition.topic)
+            or "topic:other",
         rank = #output + 1,
         source = sourceRecord(kind, revision, reason),
         sources = { sourceRecord(kind, revision, reason) },
@@ -653,6 +866,8 @@ local function addBranchOfferCandidate(
     local source = sourceRecord(kind, revision, reason)
     local candidate = {
         id = offer.id,
+        topic = canonicalTopic(origin and origin.topic),
+        groupID = "conversation_branch",
         rank = #output + 1,
         source = source,
         sources = { source },
@@ -975,6 +1190,128 @@ local function appendBranchOffers(
     end
 end
 
+local GROUP_LABELS = {
+    wellbeing = {
+        key = "UI_PNC_Conversation_Suggestion_Group_Wellbeing_Label",
+        fallback = "Wellbeing",
+    },
+    needs = {
+        key = "UI_PNC_Conversation_Suggestion_Group_Needs_Label",
+        fallback = "Needs",
+    },
+    medical = {
+        key = "UI_PNC_Conversation_Suggestion_Group_Medical_Label",
+        fallback = "Medical",
+    },
+    identity = {
+        key = "UI_PNC_Conversation_Suggestion_Group_Identity_Label",
+        fallback = "Identity",
+    },
+    time = {
+        key = "UI_PNC_Conversation_Suggestion_Group_Time_Label",
+        fallback = "Time and date",
+    },
+    date = {
+        key = "UI_PNC_Conversation_Suggestion_Group_Time_Label",
+        fallback = "Time and date",
+    },
+    weather = {
+        key = "UI_PNC_Conversation_Suggestion_Group_Weather_Label",
+        fallback = "Weather",
+    },
+    movement = {
+        key = "UI_PNC_Conversation_Suggestion_Group_Movement_Label",
+        fallback = "Owned companion actions",
+    },
+}
+
+local function groupPresentation(id, topic)
+    local label = GROUP_LABELS[topic]
+    if label then
+        return {
+            id = id,
+            topic = topic,
+            label = resolvedText(label.key, label.fallback),
+            labelKey = label.key,
+        }
+    end
+    if id == "active_flow" then
+        return {
+            id = id,
+            label = resolvedText(
+                "UI_PNC_Conversation_Suggestion_Group_Flow_Label",
+                "Current conversation branch"
+            ),
+            labelKey = "UI_PNC_Conversation_Suggestion_Group_Flow_Label",
+        }
+    end
+    if id == "conversation_branch" then
+        return {
+            id = id,
+            label = resolvedText(
+                "UI_PNC_Conversation_Suggestion_Group_Flow_Label",
+                "Current conversation branch"
+            ),
+            labelKey = "UI_PNC_Conversation_Suggestion_Group_Flow_Label",
+        }
+    end
+    if id == "npc_response_plan" then
+        return {
+            id = id,
+            label = resolvedText(
+                "UI_PNC_Conversation_Suggestion_Group_Response_Label",
+                "NPC reply"
+            ),
+            labelKey = "UI_PNC_Conversation_Suggestion_Group_Response_Label",
+        }
+    end
+    return { id = id, label = id }
+end
+
+local function buildGroups(candidates, capabilities, currentTopic)
+    local groups = {}
+    local byID = {}
+    local function ensure(id, topic)
+        if not id then return nil end
+        if not byID[id] then
+            local group = groupPresentation(id, topic)
+            group.candidates = {}
+            group.capabilities = {}
+            group.count = 0
+            byID[id] = group
+            groups[#groups + 1] = group
+        end
+        return byID[id]
+    end
+    for _, candidate in ipairs(candidates or {}) do
+        local group = ensure(
+            candidate.groupID or candidate.topic and "topic:" .. candidate.topic
+                or candidate.source and candidate.source.kind,
+            candidate.topic
+        )
+        if group then
+            group.candidates[#group.candidates + 1] = candidate
+            group.count = group.count + 1
+        end
+    end
+    for _, capability in ipairs(capabilities or {}) do
+        local group = ensure(capability.groupID or "owned_actions", "movement")
+        if group then
+            group.capabilities[#group.capabilities + 1] = capability
+            group.count = group.count + 1
+        end
+    end
+    local currentGroupID = topicGroupID(currentTopic)
+    if not byID[currentGroupID] then
+        currentGroupID = byID.conversation_branch and "conversation_branch"
+            or byID.active_flow and "active_flow"
+            or byID.npc_response_plan and "npc_response_plan"
+            or byID.owned_actions and "owned_actions"
+            or groups[1] and groups[1].id
+    end
+    return groups, currentGroupID
+end
+
 function Suggestions.Build(result, context, messages)
     result = type(result) == "table" and result or {}
     context = type(context) == "table" and context or {}
@@ -999,6 +1336,9 @@ function Suggestions.Build(result, context, messages)
             candidates = {},
             sources = {},
             permittedCapabilities = {},
+            groups = {},
+            currentTopic = nil,
+            currentGroupID = nil,
             predicateTrace = {},
             trace = trace,
         }
@@ -1050,38 +1390,34 @@ function Suggestions.Build(result, context, messages)
     )
 
     local subject = normalized(ir.subject)
+    local typedTopic = topicFromIR(ir, nil)
+    local currentTopic = typedTopic or canonicalTopic(context.currentTopic)
     local typedReason = subject ~= "" and "interpreted_frame" or "no_subject"
     local typedSource = sourceRecord("typed_input", revision, typedReason)
     local typedEligible = result.accepted == true and subject ~= ""
-    if typedEligible then
+    if typedEligible and currentTopic then
         if subject == "WELLBEING" then
             addCandidate(
                 candidates, seen, definitionFor("question.wellbeing_detail"),
                 "typed_input", revision, "wellbeing_follow_up"
             )
         end
-        addCandidate(
-            candidates, seen, definitionFor("question.wellbeing"),
-            "typed_input", revision, "safe_question"
-        )
-        addCandidate(
-            candidates, seen, definitionFor("question.needs"),
-            "typed_input", revision, "safe_question"
-        )
-        addCandidate(
-            candidates, seen, definitionFor("question.health"),
-            "typed_input", revision, "safe_question"
-        )
-        addCandidate(
-            candidates, seen, definitionFor("question.identity"),
-            "typed_input", revision, "safe_question"
-        )
+        for _, definition in ipairs(DEFINITIONS) do
+            if topicMatches(definition, currentTopic) then
+                addCandidate(
+                    candidates, seen, definition,
+                    "typed_input", revision, "topic_branch"
+                )
+            end
+        end
         appendTrace(trace, "typed_input", "allowed", typedReason, #candidates)
     else
         appendTrace(trace, "typed_input", "skipped", typedReason, #candidates)
     end
 
     local topic = responseTopic(result, messages)
+    local responseTopicID = canonicalTopic(topic)
+    if not typedTopic then currentTopic = responseTopicID or currentTopic end
     local planSource = sourceRecord(
         "npc_response_plan", revision,
         topic and "known_safe_topic" or "topic_unknown"
@@ -1129,6 +1465,10 @@ function Suggestions.Build(result, context, messages)
         )
     end
 
+    local groups, currentGroupID = buildGroups(
+        candidates, capabilities, currentTopic
+    )
+
     return {
         schemaVersion = Suggestions.VERSION,
         kind = "semantic_dialogue_suggestions",
@@ -1148,6 +1488,9 @@ function Suggestions.Build(result, context, messages)
             responsePoolID = flow.responsePool,
         } or nil,
         permittedCapabilities = capabilities,
+        groups = groups,
+        currentTopic = currentTopic,
+        currentGroupID = currentGroupID,
         predicateTrace = predicateTrace,
         trace = trace,
         privacy = {

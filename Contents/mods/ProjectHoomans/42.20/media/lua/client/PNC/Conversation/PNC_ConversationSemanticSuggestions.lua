@@ -103,6 +103,12 @@ function Part:layoutButtons()
     local available = math.max(1, self.width - padding * 2)
     local width = math.floor((available - GAP * (COLUMNS - 1)) / COLUMNS)
     local y = (self.headerHeight or 24) + HEADER_GAP
+    if self.groupButton then
+        self.groupButton:setX(math.max(0, self.width - 170))
+        self.groupButton:setY(3)
+        self.groupButton:setWidth(162)
+        self.groupButton:setHeight(22)
+    end
     for index = 1, #self.buttons do
         local entry = self.buttons[index]
         local column = (index - 1) % COLUMNS
@@ -115,12 +121,45 @@ function Part:layoutButtons()
     end
 end
 
+function Part:cycleSuggestionGroup()
+    local groups = self.projection and self.projection.groups or {}
+    if #groups < 2 then return false end
+    local current = self.selectedGroupID or self.projection.currentGroupID
+    local index
+    for position, group in ipairs(groups) do
+        if group.id == current then index = position break end
+    end
+    index = index and index % #groups + 1 or 1
+    self.selectedGroupID = groups[index].id
+    self:setSuggestions(self.projection)
+    return true
+end
+
 function Part:setSuggestions(projection)
     projection = type(projection) == "table" and projection or {}
     self.projection = projection
     local rows = {}
-    local candidates = projection.candidates or {}
-    local capabilities = projection.permittedCapabilities or {}
+    local selectedGroup
+    local revision = projection.revision
+    local requestedGroup = self.selectedGroupID or projection.currentGroupID
+    if self.selectedGroupRevision ~= revision then
+        requestedGroup = projection.currentGroupID
+        self.selectedGroupRevision = revision
+    end
+    for _, group in ipairs(projection.groups or {}) do
+        if group.id == requestedGroup then
+            selectedGroup = group
+            break
+        end
+    end
+    if not selectedGroup and #(projection.groups or {}) > 0 then
+        selectedGroup = projection.groups[1]
+    end
+    self.selectedGroupID = selectedGroup and selectedGroup.id or nil
+    local candidates = selectedGroup and selectedGroup.candidates
+        or projection.candidates or {}
+    local capabilities = selectedGroup and selectedGroup.capabilities
+        or projection.permittedCapabilities or {}
     local candidateLimit = #capabilities > 0
         and math.max(0, MAX_BUTTONS - #capabilities)
         or MAX_BUTTONS
@@ -132,6 +171,8 @@ function Part:setSuggestions(projection)
             status = "eligible",
             enabled = true,
             source = candidates[index].source,
+            groupID = selectedGroup and selectedGroup.id
+                or candidates[index].groupID,
         }
     end
     for index = 1, math.min(#capabilities, MAX_BUTTONS - #rows) do
@@ -146,6 +187,8 @@ function Part:setSuggestions(projection)
                 or capability.status == "selected_for_preflight",
             source = capability.source,
             eligibility = capability.eligibility,
+            groupID = selectedGroup and selectedGroup.id
+                or capability.groupID,
         }
     end
     self.rows = rows
@@ -162,6 +205,10 @@ function Part:setSuggestions(projection)
         end
     end
     self:setVisible(#rows > 0)
+    if self.groupButton then
+        self.groupButton:setTitle(selectedGroup and selectedGroup.label or "")
+        self.groupButton:setVisible(#(projection.groups or {}) > 1)
+    end
     self:refreshControls()
     return rows
 end
@@ -169,6 +216,16 @@ end
 function Part:createChildren()
     PsychopatzConversationPart.createChildren(self)
     self.buttons = {}
+    self.groupButton = UI.CreateButton(self, {
+        id = "semantic-suggestion-group",
+        title = "",
+        target = self,
+        onclick = function(target)
+            return target:cycleSuggestionGroup()
+        end,
+        variant = "quiet",
+    })
+    self.groupButton:setVisible(false)
     for index = 1, MAX_BUTTONS do
         local button = UI.CreateButton(self, {
             id = "semantic-suggestion-" .. tostring(index),
@@ -211,6 +268,9 @@ function Part:new(x, y, width, height, options)
     )
     object.rows = {}
     object.buttons = {}
+    object.groupButton = nil
+    object.selectedGroupID = nil
+    object.selectedGroupRevision = nil
     object.projection = nil
     return object
 end

@@ -21,5 +21,20 @@
   "UI_PNC_Conversation_Suggestion_GreetingThank_Label": "Pasalamatan siya",
   "UI_PNC_Conversation_Suggestion_GreetingThank_Utterance": "Salamat.",
   "UI_PNC_Conversation_Suggestion_GreetingReportFine_Label": "Sabihing ayos ka lang",
-  "UI_PNC_Conversation_Suggestion_GreetingReportFine_Utterance": "Ayos lang ako, salamat."
+  "UI_PNC_Conversation_Suggestion_GreetingReportFine_Utterance": "Ayos lang ako, salamat.",
+  "UI_PNC_Conversation_Suggestion_Time_Label": "Itanong ang oras",
+  "UI_PNC_Conversation_Suggestion_Time_Utterance": "Anong oras na?",
+  "UI_PNC_Conversation_Suggestion_Date_Label": "Itanong ang petsa",
+  "UI_PNC_Conversation_Suggestion_Date_Utterance": "Ano ang petsa ngayon?",
+  "UI_PNC_Conversation_Suggestion_Weather_Label": "Itanong ang panahon",
+  "UI_PNC_Conversation_Suggestion_Weather_Utterance": "Kumusta ang panahon?",
+  "UI_PNC_Conversation_Suggestion_Group_Wellbeing_Label": "Kalagayan",
+  "UI_PNC_Conversation_Suggestion_Group_Needs_Label": "Pangangailangan",
+  "UI_PNC_Conversation_Suggestion_Group_Medical_Label": "Medikal",
+  "UI_PNC_Conversation_Suggestion_Group_Identity_Label": "Pagkakakilanlan",
+  "UI_PNC_Conversation_Suggestion_Group_Time_Label": "Oras at petsa",
+  "UI_PNC_Conversation_Suggestion_Group_Weather_Label": "Panahon",
+  "UI_PNC_Conversation_Suggestion_Group_Movement_Label": "Mga utos sa kasamang pag-aari",
+  "UI_PNC_Conversation_Suggestion_Group_Flow_Label": "Kasalukuyang sangay ng usapan",
+  "UI_PNC_Conversation_Suggestion_Group_Response_Label": "Sagot ng NPC"
 }

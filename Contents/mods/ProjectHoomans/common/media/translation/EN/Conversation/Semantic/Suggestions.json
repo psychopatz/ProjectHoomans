@@ -21,5 +21,20 @@
   "UI_PNC_Conversation_Suggestion_GreetingThank_Label": "Thank them",
   "UI_PNC_Conversation_Suggestion_GreetingThank_Utterance": "Thanks.",
   "UI_PNC_Conversation_Suggestion_GreetingReportFine_Label": "Say you're doing fine",
-  "UI_PNC_Conversation_Suggestion_GreetingReportFine_Utterance": "I'm fine, thank you."
+  "UI_PNC_Conversation_Suggestion_GreetingReportFine_Utterance": "I'm fine, thank you.",
+  "UI_PNC_Conversation_Suggestion_Time_Label": "Ask about the time",
+  "UI_PNC_Conversation_Suggestion_Time_Utterance": "What time is it?",
+  "UI_PNC_Conversation_Suggestion_Date_Label": "Ask about the date",
+  "UI_PNC_Conversation_Suggestion_Date_Utterance": "What's today's date?",
+  "UI_PNC_Conversation_Suggestion_Weather_Label": "Ask about the weather",
+  "UI_PNC_Conversation_Suggestion_Weather_Utterance": "How is the weather?",
+  "UI_PNC_Conversation_Suggestion_Group_Wellbeing_Label": "Wellbeing",
+  "UI_PNC_Conversation_Suggestion_Group_Needs_Label": "Needs",
+  "UI_PNC_Conversation_Suggestion_Group_Medical_Label": "Medical",
+  "UI_PNC_Conversation_Suggestion_Group_Identity_Label": "Identity",
+  "UI_PNC_Conversation_Suggestion_Group_Time_Label": "Time and date",
+  "UI_PNC_Conversation_Suggestion_Group_Weather_Label": "Weather",
+  "UI_PNC_Conversation_Suggestion_Group_Movement_Label": "Owned companion actions",
+  "UI_PNC_Conversation_Suggestion_Group_Flow_Label": "Current conversation branch",
+  "UI_PNC_Conversation_Suggestion_Group_Response_Label": "NPC reply"
 }

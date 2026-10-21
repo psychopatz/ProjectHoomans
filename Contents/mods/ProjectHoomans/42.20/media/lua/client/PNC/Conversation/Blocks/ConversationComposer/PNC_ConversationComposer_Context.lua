@@ -10,6 +10,43 @@ local Registry = Conversation.Registry
 local Loader = Conversation.TextLoader
 local Audience = Conversation.Audience
 
+local function actorAuthority(entry, record, player)
+    local authority = PNC.ClientCompanionAuthority
+    if type(record) ~= "table" then
+        return {
+            eligible = false,
+            companion = nil,
+            owned = nil,
+            status = "authority_unknown",
+        }
+    end
+    local companion
+    local owned
+    if authority and type(authority.IsCompanion) == "function" then
+        local ok, value = pcall(authority.IsCompanion, record)
+        if ok then companion = value == true end
+    end
+    if authority and type(authority.IsOwnedByPlayer) == "function" then
+        local ok, value = pcall(authority.IsOwnedByPlayer, record, player)
+        if ok then owned = value == true end
+    end
+    if companion == nil or owned == nil then
+        return {
+            eligible = false,
+            companion = companion,
+            owned = owned,
+            status = "authority_unknown",
+        }
+    end
+    return {
+        eligible = companion and owned,
+        companion = companion,
+        owned = owned,
+        status = companion and owned and "eligible"
+            or (not companion and "not_companion" or "not_owned"),
+    }
+end
+
 local TIME_HOURS = {
     dawn = 5.5,
     sunrise = 8,
@@ -45,6 +82,7 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
         entry = entry,
         player = player,
         npcRecord = record,
+        actorAuthority = actorAuthority(entry, record, player),
         identity = PNC.Identity and PNC.Identity.Verifier
             and PNC.Identity.Verifier.BuildView(entry)
             or nil,
