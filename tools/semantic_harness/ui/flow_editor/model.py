@@ -111,6 +111,7 @@ def flow_graph_model(flow: dict[str, Any]) -> dict[str, Any]:
             "responsePool": node.get("responsePool"),
             "responseTemplate": node.get("responseTemplate"),
             "accepts": copy.deepcopy(node.get("accepts", [])),
+            "branchOffers": copy.deepcopy(node.get("branchOffers", [])),
             "slots": copy.deepcopy(node.get("slots", {})),
             "gate": copy.deepcopy(node.get("gate")),
             "transitions": transitions,

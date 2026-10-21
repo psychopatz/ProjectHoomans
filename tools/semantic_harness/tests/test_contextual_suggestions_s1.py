@@ -111,6 +111,30 @@ class ContextualSuggestionsS1Tests(unittest.TestCase):
             "How have you been?",
         )
 
+    def test_current_flow_and_response_plan_branch_offers_are_projected(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            result = worker.input("hello")
+
+        candidates = {
+            candidate["id"]: candidate
+            for candidate in result["observation"]["suggestions"]["candidates"]
+        }
+        flow_offer = candidates["greeting.thanks"]
+        self.assertEqual(flow_offer["source"]["kind"], "active_flow")
+        self.assertEqual(flow_offer["branch"]["flowID"], "greeting")
+        self.assertEqual(flow_offer["frame"]["kind"], "semantic_click_frame")
+        self.assertEqual(flow_offer["frame"]["origin"]["nodeID"], "await_thanks")
+        self.assertNotIn("callback", flow_offer["frame"])
+
+        response_offer = candidates["greeting.check_in.report_wellbeing"]
+        self.assertEqual(response_offer["source"]["kind"], "npc_response_plan")
+        self.assertEqual(response_offer["branch"]["kind"], "response_plan")
+        self.assertEqual(response_offer["frame"]["stateValue"], "fine")
+        self.assertEqual(
+            response_offer["display"]["label"],
+            "Say you're doing fine",
+        )
+
     def test_suggestion_catalog_resolves_en_and_tl(self) -> None:
         for language, expected in (
             ("EN", "Ask about wellbeing"),
@@ -128,6 +152,23 @@ class ContextualSuggestionsS1Tests(unittest.TestCase):
                 }
                 self.assertIn(expected, labels)
                 self.assertEqual(result["translation"]["language"], language)
+
+    def test_branch_offer_localization_resolves_en_and_tl(self) -> None:
+        for language, expected in (
+            ("EN", "Say you're doing fine"),
+            ("TL", "Sabihing ayos ka lang"),
+        ):
+            with self.subTest(language=language):
+                scenario = deepcopy(DEFAULT_SCENARIO)
+                scenario["runtime"]["language"] = language
+                with LuaSemanticWorker(scenario) as worker:
+                    result = worker.input("hello")
+
+                labels = {
+                    item["display"]["label"]
+                    for item in result["observation"]["suggestions"]["candidates"]
+                }
+                self.assertIn(expected, labels)
 
 
 if __name__ == "__main__":

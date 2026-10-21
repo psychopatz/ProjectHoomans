@@ -78,7 +78,11 @@ require "PNC/Semantics/PNC_SemanticDialogueInput_Trace"
 require "PNC/Semantics/PNC_SemanticDialogueInput_ProviderFallback"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle"
 local Suggestions = PNC.Semantics.DialogueSuggestions
-    or require "PNC/Semantics/PNC_SemanticDialogueSuggestions"
+if type(Suggestions) ~= "table" then
+    require "PNC/Semantics/PNC_SemanticDialogueSuggestions"
+    Suggestions = PNC.Semantics.DialogueSuggestions
+end
+Suggestions = type(Suggestions) == "table" and Suggestions or {}
 
 local Internal = Input.Internal
 

@@ -13,6 +13,8 @@ local Predicates = PNC.Semantics.SuggestionPredicates
     or require "PNC/Semantics/PNC_SemanticDialogueSuggestionPredicates"
 local IR = PsychopatzCore.Semantics and PsychopatzCore.Semantics.IR
     or require "PsychopatzCore/Semantics/PsychopatzSemanticIR"
+local BranchOffers = PNC.Semantics.DialogueBranchOffers
+    or require "PNC/Semantics/PNC_SemanticDialogueBranchOffers"
 
 Suggestions.VERSION = 1
 Suggestions.MAX_CANDIDATES = 5
@@ -44,6 +46,22 @@ local function copyValue(value, depth)
                 count = count + 1
             end
         end
+    end
+    return output
+end
+
+local PREDICATE_IR_FIELDS = {
+    "intent", "speechAct", "action", "subject", "target", "reference",
+    "identityClaim", "selfDirected", "stateType", "stateValue", "pattern",
+    "normalizedText", "confidence",
+}
+
+local function predicateIR(value)
+    local output = {}
+    if type(value) ~= "table" then return output end
+    for index = 1, #PREDICATE_IR_FIELDS do
+        local key = PREDICATE_IR_FIELDS[index]
+        if value[key] ~= nil then output[key] = copyValue(value[key]) end
     end
     return output
 end
@@ -413,7 +431,7 @@ local function capabilityRows(revision, currentAction, context, ir)
     for key, value in pairs(type(context) == "table" and context or {}) do
         predicateContext[key] = value
     end
-    predicateContext.ir = copyValue(ir) or {}
+    predicateContext.ir = predicateIR(ir)
     predicateContext.suggestion = {
         destination = context.suggestionDestination,
     }
@@ -556,12 +574,260 @@ local function addCandidate(output, seen, definition, kind, revision, reason)
     seen[definition.id] = candidate
 end
 
+local function predicateContextFor(context, ir, offer)
+    local predicateContext = {}
+    for key, value in pairs(type(context) == "table" and context or {}) do
+        predicateContext[key] = value
+    end
+    predicateContext.ir = predicateIR(ir)
+    predicateContext.suggestion = {
+        candidateID = offer and offer.id or nil,
+        destination = context and context.suggestionDestination or nil,
+    }
+    return predicateContext
+end
+
+local function branchOfferFrame(offer, revision, origin)
+    local semantic = offer.frame or {}
+    local frame = copyValue(semantic) or {}
+    frame.schemaVersion = Suggestions.VERSION
+    frame.kind = "semantic_click_frame"
+    frame.candidateID = offer.id
+    frame.textKey = offer.utteranceKey
+    frame.textFallback = offer.utteranceFallback
+    frame.labelKey = offer.labelKey
+    frame.requestRevision = revision
+    frame.origin = copyValue(origin) or {}
+    return frame
+end
+
+local function addBranchOfferCandidate(
+    output,
+    seen,
+    offer,
+    kind,
+    revision,
+    reason,
+    origin,
+    context,
+    ir,
+    predicateTrace
+)
+    if type(offer) ~= "table" or offer.visibility == "private" then
+        return nil, nil
+    end
+    local existing = seen[offer.id]
+    if existing then
+        if #existing.sources < Suggestions.MAX_SOURCES then
+            existing.sources[#existing.sources + 1] = sourceRecord(
+                kind, revision, reason
+            )
+        end
+        return existing, nil
+    end
+    if #output >= Suggestions.MAX_CANDIDATES then return nil, nil end
+
+    local eligibility = { status = "allowed", allowed = true, trace = {} }
+    if type(offer.constraints) == "table" then
+        eligibility = Predicates.Evaluate(
+            offer.constraints,
+            predicateContextFor(context, ir, offer)
+        )
+        for _, traceRow in ipairs(eligibility.trace or {}) do
+            if #predicateTrace < Predicates.MAX_TRACE then
+                predicateTrace[#predicateTrace + 1] = {
+                    candidateID = offer.id,
+                    source = kind,
+                    path = traceRow.path,
+                    status = traceRow.status,
+                    reason = traceRow.reason,
+                }
+            end
+        end
+        if eligibility.status ~= "allowed" then
+            return nil, eligibility
+        end
+    end
+
+    local frame = branchOfferFrame(offer, revision, origin)
+    local source = sourceRecord(kind, revision, reason)
+    local candidate = {
+        id = offer.id,
+        rank = #output + 1,
+        source = source,
+        sources = { source },
+        frame = frame,
+        display = {
+            labelKey = offer.labelKey,
+            labelFallback = offer.labelFallback,
+            label = resolvedText(offer.labelKey, offer.labelFallback),
+            utteranceKey = offer.utteranceKey,
+            utteranceFallback = offer.utteranceFallback,
+            utterance = resolvedText(
+                offer.utteranceKey, offer.utteranceFallback
+            ),
+        },
+        visibility = "player",
+        eligibility = eligibility,
+        branch = copyValue(origin),
+    }
+    output[#output + 1] = candidate
+    seen[offer.id] = candidate
+    return candidate, eligibility
+end
+
+local function offersFromPlan(plan)
+    if type(plan) ~= "table" or type(plan.turns) ~= "table" then
+        return {}
+    end
+    local output = {}
+    for turnIndex = 1, #plan.turns do
+        local turn = plan.turns[turnIndex]
+        for offerIndex = 1, #(turn.offers or {}) do
+            output[#output + 1] = {
+                offer = turn.offers[offerIndex],
+                origin = {
+                    kind = "response_plan",
+                    sourcePoolID = plan.sourcePoolID,
+                    turnID = turn.id,
+                    turnIndex = turnIndex,
+                    offerIndex = offerIndex,
+                },
+            }
+        end
+    end
+    return output
+end
+
+local function offersFromMessages(messages)
+    local output = {}
+    for messageIndex = 1, #(type(messages) == "table" and messages or {}) do
+        local message = messages[messageIndex]
+        local payload = type(message) == "table"
+            and type(message.payload) == "table" and message.payload or nil
+        local plan = payload and payload.plan or nil
+        for _, item in ipairs(offersFromPlan(plan)) do
+            item.origin.messageIndex = messageIndex
+            output[#output + 1] = item
+        end
+    end
+    return output
+end
+
 function Suggestions.ResolveFrameText(frame)
     frame = type(frame) == "table" and frame or {}
     return resolvedText(
         frame.textKey,
         frame.textFallback or frame.utteranceFallback or frame.utterance
     )
+end
+
+local function sameBranchOrigin(frame, origin)
+    local requested = type(frame.origin) == "table" and frame.origin or {}
+    if requested.kind ~= nil and requested.kind ~= origin.kind then
+        return false
+    end
+    for _, key in ipairs({ "flowID", "nodeID", "turnID", "sourcePoolID" }) do
+        if requested[key] ~= nil
+            and tostring(requested[key]) ~= tostring(origin[key] or "")
+        then
+            return false
+        end
+    end
+    return true
+end
+
+local function branchOfferForFrame(frame, view)
+    local result = view and view.lastSemanticDialogueResult or nil
+    local decision = type(result) == "table"
+        and type(result.decision) == "table" and result.decision or {}
+    local flow = type(decision.flow) == "table" and decision.flow or {}
+    local flowOrigin = {
+        kind = "active_flow",
+        flowID = flow.flowId,
+        nodeID = flow.toNodeId or flow.nodeId,
+    }
+    for _, offer in ipairs(flow.branchOffers or {}) do
+        if type(offer) == "table"
+            and offer.id == frame.candidateID
+            and sameBranchOrigin(frame, flowOrigin)
+        then
+            return offer, flowOrigin
+        end
+    end
+
+    local response = type(decision.response) == "table"
+        and decision.response or {}
+    for _, item in ipairs(offersFromPlan(response.plan)) do
+        if item.offer and item.offer.id == frame.candidateID
+            and sameBranchOrigin(frame, item.origin)
+        then
+            return item.offer, item.origin
+        end
+    end
+
+    -- A live view may only expose the most recent queued payload. Inspect
+    -- that bounded payload as a compatibility fallback without reparsing.
+    for _, item in ipairs(offersFromMessages(result and result.messages)) do
+        if item.offer and item.offer.id == frame.candidateID
+            and sameBranchOrigin(frame, item.origin)
+        then
+            return item.offer, item.origin
+        end
+    end
+    return nil, nil
+end
+
+local function branchOfferIR(offer, origin, frame, view)
+    local source = offer.frame or {}
+    local actorID = view and view.spec and view.spec.npcID or nil
+    local slots = {}
+    if source.stateType ~= nil or source.stateValue ~= nil then
+        slots.state = {
+            type = source.stateType,
+            value = source.stateValue,
+        }
+    end
+    local socialContext = {}
+    if source.selfDirected ~= nil then
+        socialContext.selfDirected = source.selfDirected
+    end
+    if source.target ~= nil then socialContext.target = source.target end
+    if source.identityClaim ~= nil then
+        socialContext.identityClaim = source.identityClaim
+    end
+    local target = source.target and {
+        kind = "conversation_actor",
+        ref = source.target,
+    } or nil
+    local ir = IR.New({
+        kind = "semantic_suggestion_frame",
+        rawText = resolvedText(
+            offer.utteranceKey, offer.utteranceFallback
+        ),
+        normalizedText = normalizedText(offer.utteranceFallback),
+        intent = source.intent,
+        speechAct = source.speechAct,
+        action = source.action,
+        subject = source.subject,
+        target = target,
+        slots = slots,
+        socialContext = socialContext,
+        confidence = 1,
+        provenance = {
+            provider = "suggestion",
+            parser = "semantic_click_frame",
+            pattern = source.pattern or "semantic_branch_offer",
+            candidateID = frame.candidateID,
+            origin = copyValue(origin),
+            branchOfferID = offer.id,
+            branchOfferConstraints = copyValue(offer.constraints),
+        },
+    })
+    if actorID ~= nil and ir.target == nil and source.target == "SELF" then
+        ir.target = { kind = "actor", id = actorID, source = "conversation" }
+    end
+    return ir
 end
 
 function Suggestions.FrameToIR(frame, view)
@@ -571,6 +837,11 @@ function Suggestions.FrameToIR(frame, view)
     then
         return nil, "suggestion_frame_invalid"
     end
+    local branchOffer, branchOrigin = branchOfferForFrame(frame, view)
+    if branchOffer then
+        return branchOfferIR(branchOffer, branchOrigin, frame, view)
+    end
+
     local definition = definitionFor(frame.candidateID)
     local action
     if not definition then
@@ -622,6 +893,27 @@ function Suggestions.FrameToIR(frame, view)
 end
 
 function Suggestions.CheckFrame(frame, context, ir)
+    local provenance = type(ir) == "table"
+        and type(ir.provenance) == "table" and ir.provenance or {}
+    if provenance.branchOfferID == frame.candidateID then
+        local branchOffer = {
+            id = provenance.branchOfferID,
+            constraints = provenance.branchOfferConstraints,
+        }
+        local predicateContext = predicateContextFor(context, ir, branchOffer)
+        if type(branchOffer.constraints) == "table" then
+            local result = Predicates.Evaluate(
+                branchOffer.constraints, predicateContext
+            )
+            if result.allowed ~= true then
+                return false, "suggestion_click_ineligible_"
+                    .. tostring(result.status), result
+            end
+            return true, "eligible", result
+        end
+        return true, "eligible", { status = "allowed", trace = {} }
+    end
+
     local action, definition = capabilityDefinitionFor(
         type(frame) == "table" and frame.candidateID or nil
     )
@@ -653,6 +945,36 @@ local function appendTrace(trace, kind, status, reason, count)
     }
 end
 
+local function appendBranchOffers(
+    candidates,
+    seen,
+    offers,
+    kind,
+    revision,
+    context,
+    ir,
+    predicateTrace,
+    defaultOrigin
+)
+    for _, item in ipairs(offers or {}) do
+        local offer = item.offer or item
+        local origin = item.origin or copyValue(defaultOrigin)
+            or { kind = kind }
+        addBranchOfferCandidate(
+            candidates,
+            seen,
+            offer,
+            kind,
+            revision,
+            "branch_offer",
+            origin,
+            context,
+            ir,
+            predicateTrace
+        )
+    end
+end
+
 function Suggestions.Build(result, context, messages)
     result = type(result) == "table" and result or {}
     context = type(context) == "table" and context or {}
@@ -681,6 +1003,51 @@ function Suggestions.Build(result, context, messages)
             trace = trace,
         }
     end
+
+    local decision = type(result.decision) == "table"
+        and result.decision or {}
+    local flow = type(decision.flow) == "table" and decision.flow or {}
+    local flowActive = flow.flowId ~= nil
+        and (flow.committed == true or flow.matched == true)
+    if flowActive then
+        appendBranchOffers(
+            candidates,
+            seen,
+            flow.branchOffers,
+            "active_flow",
+            revision,
+            context,
+            ir,
+            predicateTrace,
+            {
+                kind = "active_flow",
+                flowID = flow.flowId,
+                nodeID = flow.toNodeId or flow.nodeId,
+            }
+        )
+    end
+    local response = type(decision.response) == "table"
+        and decision.response or {}
+    appendBranchOffers(
+        candidates,
+        seen,
+        offersFromPlan(response.plan),
+        "npc_response_plan",
+        revision,
+        context,
+        ir,
+        predicateTrace
+    )
+    appendBranchOffers(
+        candidates,
+        seen,
+        offersFromMessages(messages),
+        "npc_response_plan",
+        revision,
+        context,
+        ir,
+        predicateTrace
+    )
 
     local subject = normalized(ir.subject)
     local typedReason = subject ~= "" and "interpreted_frame" or "no_subject"
@@ -731,11 +1098,6 @@ function Suggestions.Build(result, context, messages)
         appendTrace(trace, "npc_response_plan", "skipped", "topic_unknown", #candidates)
     end
 
-    local flow = type(result.decision) == "table"
-        and type(result.decision.flow) == "table"
-        and result.decision.flow or {}
-    local flowActive = flow.flowId ~= nil
-        and (flow.committed == true or flow.matched == true)
     local flowSource = sourceRecord(
         "active_flow", revision,
         flowActive and "active_flow" or "no_active_flow"

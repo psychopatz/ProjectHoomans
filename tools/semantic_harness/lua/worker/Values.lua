@@ -2,10 +2,15 @@
 
 local Values = {}
 
+-- The production response-plan envelope now carries bounded branch-offer
+-- predicates. Keep the worker projection bounded, but leave enough depth for
+-- the declared all/any/not AST to remain inspectable in the existing Lab.
+Values.MAX_DEPTH = 12
+
 function Values.copy(value, depth, seen)
     if type(value) ~= "table" then return value end
     depth = depth or 0
-    if depth > 8 then return "<depth_limit>" end
+    if depth > Values.MAX_DEPTH then return "<depth_limit>" end
     seen = seen or {}
     if seen[value] then return "<cycle>" end
     seen[value] = true

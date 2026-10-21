@@ -17,5 +17,9 @@
   "UI_PNC_Conversation_Suggestion_Stay_Label": "Ask them to stay",
   "UI_PNC_Conversation_Suggestion_Stay_Utterance": "Stay here.",
   "UI_PNC_Conversation_Suggestion_WaitAt_Label": "Ask them to wait there",
-  "UI_PNC_Conversation_Suggestion_WaitAt_Utterance": "Wait there."
+  "UI_PNC_Conversation_Suggestion_WaitAt_Utterance": "Wait there.",
+  "UI_PNC_Conversation_Suggestion_GreetingThank_Label": "Thank them",
+  "UI_PNC_Conversation_Suggestion_GreetingThank_Utterance": "Thanks.",
+  "UI_PNC_Conversation_Suggestion_GreetingReportFine_Label": "Say you're doing fine",
+  "UI_PNC_Conversation_Suggestion_GreetingReportFine_Utterance": "I'm fine, thank you."
 }

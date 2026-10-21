@@ -18,7 +18,11 @@ local DialogueInputTrace = PNC.Semantics.DialogueInputTrace
 local audit = DialogueInputTrace.Audit
 local traceTurn = DialogueInputTrace.RecordTurn
 local Suggestions = PNC.Semantics.DialogueSuggestions
-    or require "PNC/Semantics/PNC_SemanticDialogueSuggestions"
+if type(Suggestions) ~= "table" then
+    require "PNC/Semantics/PNC_SemanticDialogueSuggestions"
+    Suggestions = PNC.Semantics.DialogueSuggestions
+end
+Suggestions = type(Suggestions) == "table" and Suggestions or {}
 
 function Internal.RefreshSuggestions(view, result)
     if not view or type(result) ~= "table"

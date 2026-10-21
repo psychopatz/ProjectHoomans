@@ -17,5 +17,9 @@
   "UI_PNC_Conversation_Suggestion_Stay_Label": "Sabihing manatili siya",
   "UI_PNC_Conversation_Suggestion_Stay_Utterance": "Manatili ka rito.",
   "UI_PNC_Conversation_Suggestion_WaitAt_Label": "Sabihing maghintay siya roon",
-  "UI_PNC_Conversation_Suggestion_WaitAt_Utterance": "Maghintay ka roon."
+  "UI_PNC_Conversation_Suggestion_WaitAt_Utterance": "Maghintay ka roon.",
+  "UI_PNC_Conversation_Suggestion_GreetingThank_Label": "Pasalamatan siya",
+  "UI_PNC_Conversation_Suggestion_GreetingThank_Utterance": "Salamat.",
+  "UI_PNC_Conversation_Suggestion_GreetingReportFine_Label": "Sabihing ayos ka lang",
+  "UI_PNC_Conversation_Suggestion_GreetingReportFine_Utterance": "Ayos lang ako, salamat."
 }

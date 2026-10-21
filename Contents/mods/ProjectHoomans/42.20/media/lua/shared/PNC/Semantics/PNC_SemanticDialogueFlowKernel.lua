@@ -368,6 +368,12 @@ local function attachNodeContract(preview, node)
     preview.dispatchCount = node.action.dispatchCount
 end
 
+local function attachBranchOffers(preview, node)
+    if type(node) ~= "table" then return end
+    preview.branchOffers = copyValue(node.branchOffers or {})
+    preview.diagnostics.branchOfferCount = #preview.branchOffers
+end
+
 local function addMatch(preview, match, transition, fromNodeID, toNodeID)
     local responseNode = match.node
     if transition == "match" or transition == "resume_match" then
@@ -385,6 +391,7 @@ local function addMatch(preview, match, transition, fromNodeID, toNodeID)
     preview.responsePool = responseNode and responseNode.responsePool or nil
     preview.responseTemplate = responseNode and responseNode.responseTemplate or nil
     attachNodeContract(preview, responseNode)
+    attachBranchOffers(preview, responseNode)
     preview.slotValues = slotValues(match.flow, match.node, preview.ir)
     preview.diagnostics.reason = transition
     preview.diagnostics.flowId = match.flow.id
@@ -507,6 +514,7 @@ function Kernel.Preview(ir, state, context, options)
         preview.responsePool = node and node.responsePool or nil
         preview.responseTemplate = node and node.responseTemplate or nil
         attachNodeContract(preview, node)
+        attachBranchOffers(preview, node)
         preview.pendingFollowUp = pendingFor(flow, node, preview.topic)
         preview.diagnostics.reason = preview.transition
         preview.diagnostics.flowId = flow.id

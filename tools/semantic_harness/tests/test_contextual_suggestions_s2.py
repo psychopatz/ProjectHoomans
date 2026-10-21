@@ -142,6 +142,31 @@ class ContextualSuggestionsS2Tests(unittest.TestCase):
             any("romance" in candidate["id"] for candidate in suggestions["candidates"])
         )
 
+    def test_dynamic_dialogue_branches_fail_closed_for_busy_hostile_or_unknown_npc(self) -> None:
+        for behavior in ("busy", "hostile"):
+            scenario = deepcopy(DEFAULT_SCENARIO)
+            scenario["npc"]["activeBehavior"] = behavior
+            with self.subTest(behavior=behavior):
+                with LuaSemanticWorker(scenario) as worker:
+                    result = worker.input("hello")
+                ids = {
+                    candidate["id"]
+                    for candidate in result["observation"]["suggestions"]["candidates"]
+                }
+                self.assertNotIn("greeting.thanks", ids)
+                self.assertNotIn("greeting.check_in.report_wellbeing", ids)
+
+        unknown_scenario = deepcopy(DEFAULT_SCENARIO)
+        unknown_scenario["npc"].pop("activeBehavior")
+        with LuaSemanticWorker(unknown_scenario) as worker:
+            result = worker.input("hello")
+        ids = {
+            candidate["id"]
+            for candidate in result["observation"]["suggestions"]["candidates"]
+        }
+        self.assertNotIn("greeting.thanks", ids)
+        self.assertNotIn("greeting.check_in.report_wellbeing", ids)
+
     def test_relationship_boundaries_traits_and_unsupported_social_provider_fail_closed(self) -> None:
         for approval, expected in ((-1, "rejected"), (0, "allowed"), (1, "allowed")):
             scenario = deepcopy(DEFAULT_SCENARIO)

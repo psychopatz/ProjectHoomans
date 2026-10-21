@@ -28,6 +28,58 @@ class ContextualSuggestionsS3Tests(unittest.TestCase):
         self.assertIsNone(click["result"].get("actionResult"))
         self.assertEqual(click["toolCalls"], [])
 
+    def test_dynamic_response_branch_click_uses_canonical_ir_and_replays_safely(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            result = worker.input("hello")
+            candidate = next(
+                item
+                for item in result["observation"]["suggestions"]["candidates"]
+                if item["id"] == "greeting.check_in.report_wellbeing"
+            )
+            click = worker.suggestion_click(candidate["frame"])
+            before_duplicate = worker.snapshot()
+            duplicate = worker.suggestion_click(candidate["frame"])
+            after_duplicate = worker.snapshot()
+
+        self.assertTrue(click["accepted"])
+        ir = click["result"]["ir"]
+        self.assertEqual(ir["kind"], "semantic_suggestion_frame")
+        self.assertEqual(ir["intent"], "INFORM")
+        self.assertEqual(ir["subject"], "WELLBEING")
+        self.assertEqual(ir["slots"]["state"]["value"], "fine")
+        self.assertEqual(ir["provenance"]["parser"], "semantic_click_frame")
+        self.assertEqual(
+            ir["provenance"]["branchOfferID"],
+            "greeting.check_in.report_wellbeing",
+        )
+        self.assertIsNone(click["result"].get("actionResult"))
+        self.assertEqual(click["toolCalls"], [])
+        self.assertEqual(click["transport"], [])
+        self.assertIn(
+            "You're welcome. Take care.",
+            [message["payload"]["text"] for message in click["messages"]],
+        )
+        self.assertFalse(duplicate["accepted"])
+        self.assertEqual(duplicate["reason"], "duplicate_suggestion")
+        self.assertEqual(before_duplicate["transcript"], after_duplicate["transcript"])
+        self.assertEqual(before_duplicate["trace"], after_duplicate["trace"])
+
+    def test_dynamic_flow_branch_click_transitions_existing_flow(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            result = worker.input("hello")
+            candidate = next(
+                item
+                for item in result["observation"]["suggestions"]["candidates"]
+                if item["id"] == "greeting.thanks"
+            )
+            click = worker.suggestion_click(candidate["frame"])
+
+        self.assertTrue(click["accepted"])
+        self.assertEqual(click["result"]["ir"]["intent"], "THANK")
+        self.assertEqual(click["result"]["flow"]["toNodeId"], "complete")
+        self.assertEqual(click["toolCalls"], [])
+        self.assertEqual(click["transport"], [])
+
     def test_stale_click_is_rejected_without_mutation(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             first = worker.input("Are you okay?")

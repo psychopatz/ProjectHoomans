@@ -75,6 +75,13 @@ class FlowEditorTests(unittest.TestCase):
                 ("await_thanks", "onUnrelated", "suspend"),
             },
         )
+        await_thanks = next(
+            node for node in graph["nodes"] if node["id"] == "await_thanks"
+        )
+        self.assertEqual(
+            await_thanks["branchOffers"][0]["id"],
+            "greeting.thanks",
+        )
 
     def test_generated_graph_exposes_typed_action_and_result_edges(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
@@ -256,6 +263,35 @@ class FlowEditorTests(unittest.TestCase):
             draft["triggers"] = [
                 {"intent": "COMPLIMENT", "speechAct": "COMPLIMENT"},
             ]
+            draft["nodes"]["await_thanks"]["branchOffers"] = [
+                {
+                    "id": "lab.compliment.thanks",
+                    "labelKey": "UI_Lab_Compliment_Thanks_Label",
+                    "labelFallback": "Thank them",
+                    "utteranceKey": "UI_Lab_Compliment_Thanks_Utterance",
+                    "utteranceFallback": "Thanks.",
+                    "frame": {
+                        "intent": "THANK",
+                        "speechAct": "THANK",
+                    },
+                    "constraints": {
+                        "all": [
+                            {
+                                "path": "ir.intent",
+                                "op": "eq",
+                                "value": "COMPLIMENT",
+                            },
+                            {
+                                "not": {
+                                    "path": "npcState.activeBehavior",
+                                    "op": "eq",
+                                    "value": "busy",
+                                },
+                            },
+                        ],
+                    },
+                },
+            ]
             draft["nodes"]["await_thanks"]["responsePool"] = "semantic.compliment"
             draft["nodes"]["complete"]["responsePool"] = "semantic.thanks"
             valid = worker.validate_flow(draft)
@@ -276,6 +312,20 @@ class FlowEditorTests(unittest.TestCase):
             self.assertEqual(
                 opening["observation"]["response"]["sourcePoolID"],
                 "semantic.compliment",
+            )
+            offer = next(
+                item
+                for item in opening["observation"]["suggestions"]["candidates"]
+                if item["id"] == "lab.compliment.thanks"
+            )
+            self.assertEqual(offer["source"]["kind"], "active_flow")
+            self.assertEqual(offer["eligibility"]["status"], "allowed")
+            self.assertTrue(
+                any(
+                    row.get("candidateID") == "lab.compliment.thanks"
+                    and row.get("status") == "allowed"
+                    for row in opening["observation"]["suggestions"]["predicateTrace"]
+                )
             )
 
             followup = worker.input("thanks")

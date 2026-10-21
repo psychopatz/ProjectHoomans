@@ -3,6 +3,8 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Plan = PNC.Semantics.ResponsePlan or {}
 PNC.Semantics.ResponsePlan = Plan
+local BranchOffers = PNC.Semantics.DialogueBranchOffers
+    or require "PNC/Semantics/PNC_SemanticDialogueBranchOffers"
 
 Plan.VERSION = 1
 Plan.MAX_TURNS = 4
@@ -172,7 +174,13 @@ local function normalizedTurn(value, index)
         separator = boundedText(value.separator or " ", 8),
         continuation = boundedText(value.continuation or "end", 32),
         segments = {},
+        offers = {},
     }
+    local offers, offersReason = BranchOffers.NormalizeList(
+        value.offers, "response_plan_turn_offers"
+    )
+    if not offers then return nil, offersReason end
+    output.offers = offers
     local segment
     local reason
     local segmentIndex
@@ -229,6 +237,10 @@ function Plan.Validate(value)
             normalized, reason = normalizedSegment(turn.segments[segment])
             if reason then return false, reason end
         end
+        local offers, offersReason = BranchOffers.NormalizeList(
+            turn.offers, "response_plan_turn_offers"
+        )
+        if not offers then return false, offersReason end
     end
     return true, value
 end

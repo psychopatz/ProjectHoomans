@@ -20,6 +20,7 @@ from .dialogue_contract import (
     DIALOGUE_PLAN_UNCERTAINTIES,
     DIALOGUE_RESPONSE_CONDITIONS,
     DIALOGUE_MAX_VARIANTS_PER_POOL,
+    validate_branch_offers,
     _validate_source_refs,
 )
 
@@ -143,7 +144,9 @@ def _validate_dialogue_plan(
     if not isinstance(turns, list) or not turns or len(turns) > 4:
         raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} requires 1 to 4 turns")
     for turn in turns:
-        if not isinstance(turn, dict) or set(turn) - {"id", "continuation", "segments"}:
+        if not isinstance(turn, dict) or set(turn) - {
+            "id", "continuation", "segments", "offers"
+        }:
             raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid turn")
         segments = turn.get("segments")
         if not isinstance(segments, list) or not segments or len(segments) > 6:
@@ -178,11 +181,18 @@ def _validate_dialogue_plan(
                 normalized_segments.append({"kind": "literal", "text": segment_text.strip()})
             else:
                 raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has unsupported segment kind")
-        normalized["turns"].append({
+        normalized_offers = validate_branch_offers(
+            turn.get("offers"),
+            f"dialogue response plan for {pool_id}:{variant_id} turn offers",
+        )
+        normalized_turn = {
             "id": str(turn.get("id", len(normalized["turns"]) + 1)),
             "continuation": str(turn.get("continuation", "end")),
             "segments": normalized_segments,
-        })
+        }
+        if "offers" in turn:
+            normalized_turn["offers"] = normalized_offers
+        normalized["turns"].append(normalized_turn)
     return normalized
 
 

@@ -343,6 +343,9 @@ class FlowEditorActions:
         try:
             triggers = self._parse_array(self.triggers_text, "Triggers")
             accepts = self._parse_array(self.accepts_text, "Accepted frames")
+            branch_offers = self._parse_array(
+                self.branch_offers_text, "Branch offers"
+            )
         except ValueError as error:
             self.set_status(str(error))
             return None
@@ -365,6 +368,7 @@ class FlowEditorActions:
             else:
                 node.pop(field, None)
         node["accepts"] = accepts
+        node["branchOffers"] = branch_offers
         gate_type = self.gate_type_var.get().strip() or "none"
         if gate_type == "none":
             node.pop("gate", None)

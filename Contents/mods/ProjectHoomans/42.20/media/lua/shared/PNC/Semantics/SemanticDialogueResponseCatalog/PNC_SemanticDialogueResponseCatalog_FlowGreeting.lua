@@ -8,6 +8,39 @@ if type(Catalog) ~= "table" or type(Catalog.Register) ~= "function" then
     return false
 end
 
+local GREETING_CHECK_IN_OFFERS = {
+    {
+        id = "greeting.check_in.report_wellbeing",
+        labelKey = "UI_PNC_Conversation_Suggestion_GreetingReportFine_Label",
+        labelFallback = "Say you're doing fine",
+        utteranceKey = "UI_PNC_Conversation_Suggestion_GreetingReportFine_Utterance",
+        utteranceFallback = "I'm fine, thank you.",
+        frame = {
+            intent = "INFORM",
+            speechAct = "INFORM",
+            subject = "WELLBEING",
+            selfDirected = true,
+            target = "SELF",
+            stateType = "WELLBEING",
+            stateValue = "fine",
+        },
+        constraints = {
+            all = {
+                {
+                    path = "npcState.activeBehavior",
+                    op = "not_in",
+                    values = { "hostile", "combat", "busy", "dead" },
+                },
+                {
+                    path = "npcState.healthState",
+                    op = "not_in",
+                    values = { "dead", "incapacitated" },
+                },
+            },
+        },
+    },
+}
+
 Catalog.Register("semantic.flow.greeting.opening", {
     variants = {
         {
@@ -35,6 +68,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
                     {
                         id = "check_in",
                         continuation = "await_player",
+                        offers = GREETING_CHECK_IN_OFFERS,
                         segments = {
                             {
                                 kind = "translation",
@@ -72,6 +106,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
                     {
                         id = "check_in",
                         continuation = "await_player",
+                        offers = GREETING_CHECK_IN_OFFERS,
                         segments = {
                             {
                                 kind = "translation",
@@ -108,6 +143,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
                     {
                         id = "check_in",
                         continuation = "await_player",
+                        offers = GREETING_CHECK_IN_OFFERS,
                         segments = {
                             {
                                 kind = "translation",

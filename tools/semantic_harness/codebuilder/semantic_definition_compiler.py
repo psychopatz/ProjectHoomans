@@ -18,6 +18,7 @@ from .dialogue_compiler import (
     _normalize_dialogue_utterance,
 )
 from .lexicon_compiler import CompileError, _lua_string
+from .dialogue_contract import validate_branch_offers
 
 SEMANTIC_SCHEMA = "pnc.semantic_authoring.v1"
 SEMANTIC_FRAME_FIELDS = frozenset({
@@ -143,7 +144,7 @@ def _semantic_flow(
             raise CompileError(f"flow {flow_id} node {node_id} must be an object")
         allowed = {
             "terminal", "responsePool", "responseTemplate", "gate", "slots",
-            "accepts", *transition_fields,
+            "accepts", "branchOffers", *transition_fields,
         }
         unsupported = set(node) - allowed
         if unsupported:
@@ -177,6 +178,11 @@ def _semantic_flow(
             _semantic_frame(frame, f"flow {flow_id} node {node_id} accept")
             for frame in accepts
         ]
+        if "branchOffers" in node:
+            normalized["branchOffers"] = validate_branch_offers(
+                node.get("branchOffers"),
+                f"flow {flow_id} node {node_id} branchOffers",
+            )
         for field in transition_fields:
             if field not in node:
                 continue

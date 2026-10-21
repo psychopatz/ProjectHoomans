@@ -7,12 +7,15 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Registry = PNC.Semantics.DialogueFlowRegistry or {}
 PNC.Semantics.DialogueFlowRegistry = Registry
+local BranchOffers = PNC.Semantics.DialogueBranchOffers
+    or require "PNC/Semantics/PNC_SemanticDialogueBranchOffers"
 
 Registry.VERSION = 1
 Registry.DEFAULT_MAX_FLOWS = 32
 Registry.MAX_NODES = 32
 Registry.MAX_TRIGGERS = 8
 Registry.MAX_ACCEPTS = 16
+Registry.MAX_OFFERS = BranchOffers.MAX_OFFERS
 Registry.MAX_TRANSITIONS = 64
 Registry.Flows = Registry.Flows or {}
 Registry.FlowOrder = Registry.FlowOrder or {}
@@ -297,6 +300,14 @@ local function normalizeNode(nodeID, node, nodes)
     slots, reason = normalizeSlots(node.slots, "node_slots")
     if not slots then return nil, reason .. ":" .. tostring(nodeID) end
     output.slots = slots
+
+    local offers, offersReason = BranchOffers.NormalizeList(
+        node.branchOffers, "node_branch_offers", Registry.MAX_OFFERS
+    )
+    if node.branchOffers ~= nil and not offers then
+        return nil, offersReason .. ":" .. tostring(nodeID)
+    end
+    output.branchOffers = offers
 
     local action, actionReason = normalizeAction(
         node.action, nodes, "node_action"

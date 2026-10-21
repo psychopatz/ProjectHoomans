@@ -33,6 +33,10 @@ from tools.semantic_harness.codebuilder.build import (
     write_semantic_output,
 )
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.dialogue_contract import (
+    validate_branch_offers,
+)
+from tools.semantic_harness.codebuilder.lexicon_compiler import CompileError
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
@@ -62,6 +66,44 @@ def _seed_translation_manifest(root: Path) -> None:
 
 
 class CodeBuilderConsolidationTests(unittest.TestCase):
+    def test_branch_offer_contract_is_typed_bounded_and_player_safe(self) -> None:
+        offer = {
+            "id": "lab.branch.offer",
+            "labelKey": "UI_Lab_Branch_Label",
+            "labelFallback": "Choose this",
+            "utteranceKey": "UI_Lab_Branch_Utterance",
+            "utteranceFallback": "Choose this.",
+            "frame": {"intent": "THANK", "speechAct": "THANK"},
+            "constraints": {
+                "all": [
+                    {"path": "ir.intent", "op": "eq", "value": "GREET"},
+                    {
+                        "any": [
+                            {"path": "npcState.activeBehavior", "op": "eq", "value": "idle"},
+                            {"not": {"path": "npcState.healthState", "op": "eq", "value": "dead"}},
+                        ],
+                    },
+                ],
+            },
+        }
+        normalized = validate_branch_offers([offer], "lab.offers")
+        self.assertEqual(normalized[0]["id"], "lab.branch.offer")
+        self.assertEqual(normalized[0]["frame"]["intent"], "THANK")
+
+        with self.assertRaises(CompileError):
+            validate_branch_offers(
+                [{**offer, "visibility": "private"}],
+                "lab.private",
+            )
+        with self.assertRaises(CompileError):
+            validate_branch_offers(
+                [{
+                    **offer,
+                    "constraints": {"mystery": True},
+                }],
+                "lab.unknown",
+            )
+
     def test_legacy_modules_are_thin_identity_wrappers(self) -> None:
         self.assertIs(legacy_compile_dialogue, compile_dialogue_dataset)
         self.assertIs(legacy_compile_semantic, compile_semantic_definitions)

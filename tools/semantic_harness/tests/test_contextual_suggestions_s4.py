@@ -38,7 +38,14 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 str(app.suggestion_buttons[0].cget("state")), "normal"
             )
             self.assertIn(
-                "Ask what is wrong",
+                "Thank them",
+                [
+                    str(button.cget("text"))
+                    for button in app.suggestion_buttons
+                ],
+            )
+            self.assertIn(
+                "Say you're doing fine",
                 [
                     str(button.cget("text"))
                     for button in app.suggestion_buttons

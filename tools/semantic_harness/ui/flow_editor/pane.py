@@ -372,12 +372,23 @@ class FlowEditorPane:
         self.accepts_text = self._ScrolledText(accepts_frame, height=7, width=38, wrap="none")
         self.accepts_text.grid(row=0, column=0, sticky="nsew")
 
+        branch_offers_frame = ttk.LabelFrame(form_frame, text="Branch offers (JSON)")
+        branch_offers_frame.grid(
+            row=12, column=0, columnspan=2, sticky="nsew", padx=6, pady=6
+        )
+        branch_offers_frame.rowconfigure(0, weight=1)
+        branch_offers_frame.columnconfigure(0, weight=1)
+        self.branch_offers_text = self._ScrolledText(
+            branch_offers_frame, height=7, width=38, wrap="none"
+        )
+        self.branch_offers_text.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
+
         self.apply_button = ttk.Button(
             form_frame, text="Apply node fields", command=self.apply_node_fields
         )
-        self.apply_button.grid(row=12, column=1, sticky="e", padx=6, pady=(0, 6))
+        self.apply_button.grid(row=13, column=1, sticky="e", padx=6, pady=(0, 6))
         codeblocks_frame = ttk.LabelFrame(form_frame, text="Declarative codeblocks · typed round trip")
-        codeblocks_frame.grid(row=13, column=0, columnspan=2, sticky="nsew", padx=6, pady=6)
+        codeblocks_frame.grid(row=14, column=0, columnspan=2, sticky="nsew", padx=6, pady=6)
         codeblocks_frame.rowconfigure(0, weight=1)
         codeblocks_frame.columnconfigure(0, weight=1)
         self.codeblocks_text = self._ScrolledText(
@@ -684,6 +695,10 @@ class FlowEditorPane:
         for field, variable in self.transition_vars.items():
             variable.set(str(node.get(field) or ""))
         self._write_text(self.accepts_text, _json_text(node.get("accepts", [])))
+        self._write_text(
+            self.branch_offers_text,
+            _json_text(node.get("branchOffers", [])),
+        )
         gate = node.get("gate") if isinstance(node.get("gate"), dict) else {}
         self.gate_type_var.set(str(gate.get("type") or "none"))
         self.gate_fact_var.set(str(gate.get("fact") or gate.get("subject") or ""))
