@@ -6,7 +6,7 @@ Status: S0 COMPLETE / S1 COMPLETE / S2 COMPLETE / S3 COMPLETE / S4 COMPLETE / S5
 
 ## Repository and authority state
 
-- ProjectHoomans is the verified checkout at `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`, branch `main`; final implementation source SHA is `4037f057` (the prior acceptance slice is `6b39d640c35101946115922ba4ba91d001c7ca02`).
+- ProjectHoomans is the verified checkout at `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`, branch `main`; final implementation source SHA is `4037f057759c1d76ba1a3f93a8813bb88ea9a028` (the prior acceptance slice is `6b39d640c35101946115922ba4ba91d001c7ca02`).
 - `origin/main` remains unchanged at `2bcefd74d3c46df0f707467a7e9b8a6ba42cb185`; local commits are not pushed.
 - psychopatzCore is the verified checkout at `/home/psychopatz/Zomboid/Workshop/psychopatzCore`, branch `main`, unchanged SHA `159df9e2f12cb4a3911f50d6c27dcc1d48a861fc`.
 - Core owns the existing generic actor/relationship/public-query, capability-binding, IR, translation, UI-layout, and dispatch mechanisms. ProjectHoomans owns suggestion policy, privacy projection, predicates, frames, and gameplay eligibility. No Workshop upload, release, republish, or branch creation occurred.
@@ -89,7 +89,7 @@ Next: S6 final gates and handoff.
 
 ## S6 — regression, performance, and handoff
 
-Final implementation source SHA: `4037f057`.
+Final implementation source SHA: `4037f057759c1d76ba1a3f93a8813bb88ea9a028`.
 
 - Full worker suite: `env -u DISPLAY -u WAYLAND_DISPLAY python3 -m unittest discover -s tools/semantic_harness/tests -p 'test*.py' -v` — 297 passed, 2 expected GUI tests skipped without a display.
 - Doctor: `bash tools/semantic_harness/run_harness.sh --doctor --doctor-json` — all 9 checks passed, including Python 3.12.3, repository/Core paths, Tk/display, Lua 5.3.6, worker syntax, and `READY/PING/CAPABILITIES` boot.
@@ -102,7 +102,7 @@ Final handoff: READY FOR USER LIVE TEST. Native Project Zomboid SP/MP, actual in
 
 ## Post-acceptance follow-up — greeting reply suggestions
 
-Source/evidence commit: `4037f057`.
+Source/evidence commit: `4037f057759c1d76ba1a3f93a8813bb88ea9a028`.
 
 - The user-provided Simulation screenshot exposed a real contextual gap: the greeting response plan already emitted the canonical NPC `check_in` turn (`How have you been?`), but the plan did not declare its existing `WELLBEING` topic. The Simulation had the suggestion UI, but that reply produced only capability rows.
 - Added `topic = "WELLBEING"` to all three existing greeting-opening response plans. This reuses the response-plan source; it does not parse the NPC prose a second time.
