@@ -133,7 +133,15 @@ class SemanticHarnessApp:
             runtime_root=repository,
         )
         self.root.title("Project Hoomans Semantic Lab")
-        self.root.geometry("1320x860")
+        self.root.minsize(1080, 700)
+        # Keep the initial window inside a typical desktop work area.  Users
+        # can still enlarge it, but a fixed 860px height starts below the
+        # fold on common 768px-tall displays.
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        initial_width = min(1320, max(1080, screen_width - 48))
+        initial_height = min(860, max(700, screen_height - 96))
+        self.root.geometry(f"{initial_width}x{initial_height}")
         self.scenario_path = Path(arguments.scenario) if arguments.scenario else None
         self.scenario = load_scenario(self.scenario_path)
         if arguments.language:
@@ -184,8 +192,8 @@ class SemanticHarnessApp:
 
         container = ttk.Frame(simulation_tab)
         container.pack(fill="both", expand=True)
-        container.columnconfigure(0, weight=3)
-        container.columnconfigure(1, weight=2)
+        container.columnconfigure(0, weight=3, minsize=620)
+        container.columnconfigure(1, weight=2, minsize=360)
         container.rowconfigure(0, weight=1)
 
         transcript_frame = ttk.LabelFrame(container, text="Conversation")
@@ -199,8 +207,11 @@ class SemanticHarnessApp:
             transcript_frame, text="Contextual semantic suggestions"
         )
         suggestion_frame.grid(row=1, column=0, sticky="ew", padx=6, pady=(0, 6))
-        suggestion_frame.grid_propagate(False)
-        suggestion_frame.configure(height=140)
+        # Let the panel size itself to the visible rows.  The old fixed
+        # height reserved five button slots even when a topic had one choice,
+        # pushing the input and toolbar below the fold at normal window sizes.
+        suggestion_frame.grid_propagate(True)
+        self.suggestion_frame = suggestion_frame
         for column in range(3):
             suggestion_frame.columnconfigure(column, weight=1)
         self.suggestion_buttons: list[Any] = []
@@ -252,44 +263,68 @@ class SemanticHarnessApp:
 
         controls = ttk.Frame(container)
         controls.grid(row=1, column=0, sticky="ew", padx=(0, 8), pady=(8, 0))
-        self.reset_button = ttk.Button(controls, text="Reset", command=self.reset)
-        self.reset_button.pack(side="left")
-        self.load_button = ttk.Button(controls, text="Load scenario", command=self.load)
-        self.load_button.pack(side="left", padx=6)
+        controls.columnconfigure(0, weight=1)
+        controls.columnconfigure(1, weight=0)
+        action_controls = ttk.Frame(controls)
+        action_controls.grid(row=0, column=0, columnspan=2, sticky="ew")
+        primary_actions = ttk.Frame(action_controls)
+        primary_actions.grid(row=0, column=0, sticky="ew")
+        primary_actions.columnconfigure(0, weight=1)
+        primary_actions.columnconfigure(1, weight=1)
+        primary_actions.columnconfigure(2, weight=1)
+        primary_actions.columnconfigure(3, weight=1)
+        primary_actions.columnconfigure(4, weight=1)
+        secondary_actions = ttk.Frame(action_controls)
+        secondary_actions.grid(row=1, column=0, sticky="ew", pady=(4, 0))
+        runtime_controls = ttk.Frame(controls)
+        runtime_controls.grid(row=1, column=0, sticky="ew", pady=(4, 0))
+        status_controls = ttk.Frame(controls)
+        status_controls.grid(row=1, column=1, sticky="e", padx=(8, 0), pady=(4, 0))
+        self.reset_button = ttk.Button(primary_actions, text="Reset", command=self.reset)
+        self.reset_button.grid(row=0, column=0, sticky="ew", padx=(0, 3))
+        self.load_button = ttk.Button(primary_actions, text="Load scenario", command=self.load)
+        self.load_button.grid(row=0, column=1, sticky="ew", padx=3)
         self.settings_button = ttk.Button(
-            controls, text="Mock runtime…", command=self.open_runtime_settings
+            primary_actions, text="Mock runtime…", command=self.open_runtime_settings
         )
-        self.settings_button.pack(side="left")
-        self.preview_button = ttk.Button(controls, text="Preview", command=self.preview)
-        self.preview_button.pack(side="left", padx=6)
-        self.save_button = ttk.Button(controls, text="Save scenario", command=self.save)
-        self.save_button.pack(side="left", padx=6)
-        self.snapshot_button = ttk.Button(controls, text="Snapshot", command=self.show_snapshot)
+        self.settings_button.grid(row=0, column=2, sticky="ew", padx=3)
+        self.preview_button = ttk.Button(primary_actions, text="Preview", command=self.preview)
+        self.preview_button.grid(row=0, column=3, sticky="ew", padx=3)
+        self.save_button = ttk.Button(primary_actions, text="Save scenario", command=self.save)
+        self.save_button.grid(row=0, column=4, sticky="ew", padx=(3, 0))
+        self.snapshot_button = ttk.Button(
+            secondary_actions, text="Snapshot", command=self.show_snapshot
+        )
         self.snapshot_button.pack(side="left")
-        self.restart_button = ttk.Button(controls, text="Restart worker", command=self.restart)
+        self.restart_button = ttk.Button(
+            secondary_actions, text="Restart worker", command=self.restart
+        )
         self.restart_button.pack(side="left", padx=6)
         self.language_var = self._tk.StringVar(value=self.scenario.get("runtime", {}).get("language", "EN"))
+        ttk.Label(runtime_controls, text="Language").pack(side="left")
         self.language_box = ttk.Combobox(
-            controls,
+            runtime_controls,
             textvariable=self.language_var,
             values=("EN", "TL"),
             width=6,
             state="readonly",
         )
-        self.language_box.pack(side="left", padx=(12, 6))
+        self.language_box.pack(side="left", padx=(4, 12))
         self.language_box.bind("<<ComboboxSelected>>", lambda _: self.set_language())
         self.npc_profile_var = self._tk.StringVar(value=profile_label(profile_id(self.scenario)))
+        ttk.Label(runtime_controls, text="NPC profile").pack(side="left")
         self.npc_profile_box = ttk.Combobox(
-            controls,
+            runtime_controls,
             textvariable=self.npc_profile_var,
             values=tuple(profile_label(value) for value in PROFILE_IDS),
             width=22,
             state="readonly",
         )
-        self.npc_profile_box.pack(side="left", padx=(8, 6))
+        self.npc_profile_box.pack(side="left", padx=(4, 6))
         self.npc_profile_box.bind("<<ComboboxSelected>>", lambda _: self._on_npc_profile())
         self.status_var = self._tk.StringVar(value="Starting…")
-        ttk.Label(controls, textvariable=self.status_var).pack(side="right")
+        self.status_label = ttk.Label(status_controls, textvariable=self.status_var)
+        self.status_label.pack(anchor="e")
 
         right = ttk.LabelFrame(container, text="Semantic trace")
         right.grid(row=0, column=1, rowspan=2, sticky="nsew")

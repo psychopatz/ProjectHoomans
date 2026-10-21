@@ -208,6 +208,70 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             app.close()
             root.update()
 
+    def test_simulation_layout_keeps_runtime_controls_visible_without_maximizing(self) -> None:
+        if not os.environ.get("DISPLAY"):
+            self.skipTest("Tk display is unavailable")
+
+        root = tk.Tk()
+        app = SemanticHarnessApp(root, _parser().parse_args([]))
+
+        def wait_until(predicate: object, timeout: float = 10.0) -> None:
+            deadline = time.monotonic() + timeout
+            while not predicate() and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertTrue(predicate())
+
+        try:
+            root.geometry("1080x700")
+            app.main_tabs.select(app.simulation_tab)
+            wait_until(lambda: app.worker_ready)
+            root.update_idletasks()
+
+            for widget in (
+                app.language_box,
+                app.npc_profile_box,
+                app.send_button,
+                app.status_label,
+            ):
+                self.assertTrue(widget.winfo_ismapped())
+
+            blank_panel_height = app.suggestion_frame.winfo_height()
+            app.input_var.set("whats up")
+            app.submit()
+            wait_until(
+                lambda: not app.busy
+                and any(
+                    row.get("id") == "conversation.whats_up"
+                    for row in app.suggestion_rows
+                )
+            )
+            root.update_idletasks()
+
+            self.assertGreater(app.suggestion_frame.winfo_height(), blank_panel_height)
+            self.assertGreater(app.send_button.winfo_y(), app.suggestion_frame.winfo_y())
+            pane_right = app.transcript.winfo_rootx() + app.transcript.winfo_width()
+            for button in (
+                app.reset_button,
+                app.load_button,
+                app.settings_button,
+                app.preview_button,
+                app.save_button,
+                app.snapshot_button,
+                app.restart_button,
+            ):
+                self.assertLessEqual(
+                    button.winfo_rootx() + button.winfo_width(),
+                    pane_right,
+                )
+            self.assertLess(
+                app.npc_profile_box.winfo_x() + app.npc_profile_box.winfo_width(),
+                app.transcript.winfo_rootx() + app.transcript.winfo_width() + 80,
+            )
+        finally:
+            app.close()
+            root.update()
+
 
 if __name__ == "__main__":
     unittest.main()
