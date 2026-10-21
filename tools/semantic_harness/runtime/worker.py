@@ -79,6 +79,16 @@ class LuaSemanticWorker:
 
         return self._request("PREVIEW", str(text))
 
+    def suggestion_predicate(self, predicate: dict[str, Any]) -> dict[str, Any]:
+        """Evaluate one production suggestion predicate against the public scenario projection."""
+
+        return self._request("SUGGESTION_PREDICATE", {"predicate": predicate})
+
+    def suggestion_click(self, frame: dict[str, Any]) -> dict[str, Any]:
+        """Submit one canonical suggestion frame through the production input path."""
+
+        return self._request("SUGGESTION_CLICK", {"frame": frame})
+
     def set_language(self, language: str) -> dict[str, Any]:
         """Change the production translation manager language in this session."""
 

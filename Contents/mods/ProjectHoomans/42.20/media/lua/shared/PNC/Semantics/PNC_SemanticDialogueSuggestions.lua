@@ -9,6 +9,10 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Suggestions = PNC.Semantics.DialogueSuggestions or {}
 PNC.Semantics.DialogueSuggestions = Suggestions
+local Predicates = PNC.Semantics.SuggestionPredicates
+    or require "PNC/Semantics/PNC_SemanticDialogueSuggestionPredicates"
+local IR = PsychopatzCore.Semantics and PsychopatzCore.Semantics.IR
+    or require "PsychopatzCore/Semantics/PsychopatzSemanticIR"
 
 Suggestions.VERSION = 1
 Suggestions.MAX_CANDIDATES = 5
@@ -44,6 +48,14 @@ end
 
 local function normalized(value)
     return string.upper(tostring(value or ""))
+end
+
+local function normalizedText(value)
+    value = string.lower(tostring(value or ""))
+    value = string.gsub(value, "[^%w]+", " ")
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    return value
 end
 
 local function resolvedText(key, fallback)
@@ -151,6 +163,20 @@ local CAPABILITY_DEFINITIONS = {
         labelFallback = "Ask them to follow",
         utteranceKey = "UI_PNC_Conversation_Suggestion_Follow_Utterance",
         utteranceFallback = "Follow me.",
+        constraints = {
+            all = {
+                {
+                    path = "npcState.activeBehavior",
+                    op = "not_in",
+                    values = { "hostile", "combat", "busy", "dead" },
+                },
+                {
+                    path = "npcState.healthState",
+                    op = "not_in",
+                    values = { "dead", "incapacitated" },
+                },
+            },
+        },
     },
     STAY = {
         id = "action.stay",
@@ -158,6 +184,20 @@ local CAPABILITY_DEFINITIONS = {
         labelFallback = "Ask them to stay",
         utteranceKey = "UI_PNC_Conversation_Suggestion_Stay_Utterance",
         utteranceFallback = "Stay here.",
+        constraints = {
+            all = {
+                {
+                    path = "npcState.activeBehavior",
+                    op = "not_in",
+                    values = { "hostile", "combat", "busy", "dead" },
+                },
+                {
+                    path = "npcState.healthState",
+                    op = "not_in",
+                    values = { "dead", "incapacitated" },
+                },
+            },
+        },
     },
     WAIT_AT = {
         id = "action.wait_at",
@@ -165,6 +205,21 @@ local CAPABILITY_DEFINITIONS = {
         labelFallback = "Ask them to wait there",
         utteranceKey = "UI_PNC_Conversation_Suggestion_WaitAt_Utterance",
         utteranceFallback = "Wait there.",
+        constraints = {
+            all = {
+                {
+                    path = "npcState.activeBehavior",
+                    op = "not_in",
+                    values = { "hostile", "combat", "busy", "dead" },
+                },
+                {
+                    path = "npcState.healthState",
+                    op = "not_in",
+                    values = { "dead", "incapacitated" },
+                },
+                { path = "suggestion.destination", op = "exists" },
+            },
+        },
     },
 }
 
@@ -279,6 +334,14 @@ local function definitionFor(id)
     return nil
 end
 
+local function capabilityDefinitionFor(id)
+    local action
+    for action, definition in pairs(CAPABILITY_DEFINITIONS) do
+        if definition.id == id then return action, definition end
+    end
+    return nil, nil
+end
+
 local function definitionForSubject(subject, followUp)
     subject = normalized(subject)
     if followUp == true and subject == "WELLBEING" then
@@ -307,6 +370,9 @@ local function capabilityFrame(action, definition, revision)
         intent = "REQUEST",
         speechAct = "REQUEST",
         action = action,
+        textKey = definition.utteranceKey,
+        textFallback = definition.utteranceFallback,
+        labelKey = definition.labelKey,
         target = { kind = "conversation_actor", ref = "npc" },
         slots = {
             npcID = { kind = "conversation_actor", ref = "npc" },
@@ -315,20 +381,51 @@ local function capabilityFrame(action, definition, revision)
     }
 end
 
-local function capabilityRows(revision, currentAction)
+local function capabilityRows(revision, currentAction, context, ir)
     local catalog = PNC.Semantics and PNC.Semantics.CapabilityCatalog
     if not catalog or type(catalog.ListActions) ~= "function" then
         return {}, sourceRecord(
             "permitted_capability", revision, "catalog_unavailable"
-        )
+        ), {}
     end
 
     local rows = {}
     local allowed = 0
+    local predicateTrace = {}
+    local predicateContext = {}
+    for key, value in pairs(type(context) == "table" and context or {}) do
+        predicateContext[key] = value
+    end
+    predicateContext.ir = copyValue(ir) or {}
+    predicateContext.suggestion = {
+        destination = context.suggestionDestination,
+    }
     for _, row in ipairs(catalog.ListActions()) do
         local action = normalized(row and row.id)
         local definition = CAPABILITY_DEFINITIONS[action]
         if definition and row.dispatchable == true then
+            local eligibility = Predicates.Evaluate(
+                definition.constraints, predicateContext
+            )
+            for _, traceRow in ipairs(eligibility.trace or {}) do
+                if #predicateTrace < Predicates.MAX_TRACE then
+                    predicateTrace[#predicateTrace + 1] = {
+                        capability = action,
+                        path = traceRow.path,
+                        status = traceRow.status,
+                        reason = traceRow.reason,
+                    }
+                end
+            end
+            local destinationPending = false
+            for _, traceRow in ipairs(eligibility.trace or {}) do
+                if traceRow.path == "suggestion.destination"
+                    and traceRow.status == "unknown"
+                then
+                    destinationPending = true
+                end
+            end
+            if eligibility.status ~= "private" then
             local binding = type(row.binding) == "table" and row.binding or {}
             local bindingView = {
                 id = row.bindingID or binding.id,
@@ -338,12 +435,17 @@ local function capabilityRows(revision, currentAction)
                 targetScope = row.targetScope,
                 status = row.bindingStatus,
             }
-            local status = action == currentAction
-                and "selected_for_preflight" or "registered"
-            if action == "WAIT_AT" then
+            local status
+            if eligibility.allowed == true then
+                status = action == currentAction
+                    and "selected_for_preflight" or "eligible"
+            elseif action == "WAIT_AT" and destinationPending
+            then
                 status = action == currentAction
                     and "selected_requires_destination"
                     or "requires_destination"
+            else
+                status = "unavailable_" .. tostring(eligibility.status)
             end
             rows[#rows + 1] = {
                 id = definition.id,
@@ -352,6 +454,11 @@ local function capabilityRows(revision, currentAction)
                     "permitted_capability", revision, status
                 ),
                 status = status,
+                eligibility = {
+                    status = eligibility.status,
+                    reason = eligibility.reason,
+                    trace = eligibility.trace,
+                },
                 binding = bindingView,
                 frame = capabilityFrame(action, definition, revision),
                 display = {
@@ -370,12 +477,13 @@ local function capabilityRows(revision, currentAction)
                 visibility = "player",
             }
             allowed = allowed + 1
+            end
         end
     end
     return rows, sourceRecord(
         "permitted_capability", revision,
         allowed > 0 and "registered_dispatchable" or "none_registered"
-    )
+    ), predicateTrace
 end
 
 local function addCandidate(output, seen, definition, kind, revision, reason)
@@ -403,6 +511,9 @@ local function addCandidate(output, seen, definition, kind, revision, reason)
         modifiers = copyValue(definition.modifiers) or {},
         socialContext = copyValue(definition.socialContext) or {},
         extensions = copyValue(definition.extensions) or {},
+        textKey = definition.utteranceKey,
+        textFallback = definition.utteranceFallback,
+        labelKey = definition.labelKey,
         requestRevision = revision,
     }
     candidate = {
@@ -428,6 +539,93 @@ local function addCandidate(output, seen, definition, kind, revision, reason)
     seen[definition.id] = candidate
 end
 
+function Suggestions.ResolveFrameText(frame)
+    frame = type(frame) == "table" and frame or {}
+    return resolvedText(
+        frame.textKey,
+        frame.textFallback or frame.utteranceFallback or frame.utterance
+    )
+end
+
+function Suggestions.FrameToIR(frame, view)
+    if type(frame) ~= "table"
+        or tonumber(frame.schemaVersion) ~= Suggestions.VERSION
+        or frame.kind ~= "semantic_click_frame"
+    then
+        return nil, "suggestion_frame_invalid"
+    end
+    local definition = definitionFor(frame.candidateID)
+    local action
+    if not definition then
+        action, definition = capabilityDefinitionFor(frame.candidateID)
+    end
+    if not definition then return nil, "suggestion_candidate_unknown" end
+
+    local actorID = view and view.spec and view.spec.npcID or nil
+    local isCapability = action ~= nil
+    if isCapability and normalized(frame.action) ~= normalized(action) then
+        return nil, "suggestion_action_mismatch"
+    end
+    if not isCapability and frame.action ~= nil then
+        return nil, "suggestion_unexpected_action"
+    end
+
+    local rawText = resolvedText(
+        definition.utteranceKey,
+        definition.utteranceFallback
+    )
+    local slots = copyValue(definition.slots) or {}
+    local target = copyValue(definition.target)
+    if isCapability then
+        target = { kind = "actor", id = actorID, source = "conversation" }
+        slots.npcID = actorID
+    end
+    local ir = IR.New({
+        kind = "semantic_suggestion_frame",
+        rawText = rawText,
+        normalizedText = normalizedText(definition.utteranceFallback),
+        intent = isCapability and "REQUEST" or definition.intent,
+        speechAct = isCapability and "REQUEST" or definition.speechAct,
+        action = isCapability and action or nil,
+        subject = isCapability and nil or definition.subject,
+        target = target,
+        slots = slots,
+        modifiers = copyValue(definition.modifiers) or {},
+        socialContext = copyValue(definition.socialContext) or {},
+        extensions = copyValue(definition.extensions) or {},
+        confidence = 1,
+        provenance = {
+            provider = "suggestion",
+            parser = "semantic_click_frame",
+            pattern = definition.patternID,
+            candidateID = definition.id,
+        },
+    })
+    return ir
+end
+
+function Suggestions.CheckFrame(frame, context, ir)
+    local action, definition = capabilityDefinitionFor(
+        type(frame) == "table" and frame.candidateID or nil
+    )
+    if not action or type(definition.constraints) ~= "table" then
+        return true, "eligible", { status = "allowed", trace = {} }
+    end
+    local predicateContext = {}
+    for key, value in pairs(type(context) == "table" and context or {}) do
+        predicateContext[key] = value
+    end
+    predicateContext.ir = copyValue(ir) or {}
+    predicateContext.suggestion = {
+        destination = type(frame) == "table" and frame.destination or nil,
+    }
+    local result = Predicates.Evaluate(definition.constraints, predicateContext)
+    if result.allowed ~= true then
+        return false, "suggestion_click_ineligible_" .. tostring(result.status), result
+    end
+    return true, "eligible", result
+end
+
 local function appendTrace(trace, kind, status, reason, count)
     if #trace >= Suggestions.MAX_TRACE then return end
     trace[#trace + 1] = {
@@ -447,8 +645,8 @@ function Suggestions.Build(result, context, messages)
     local trace = {}
     local ir = type(result.ir) == "table" and result.ir or {}
     local currentAction = normalized(ir.action)
-    local capabilities, capabilitySource = capabilityRows(
-        revision, currentAction
+    local capabilities, capabilitySource, predicateTrace = capabilityRows(
+        revision, currentAction, context, ir
     )
 
     if privateResult(result) then
@@ -462,6 +660,7 @@ function Suggestions.Build(result, context, messages)
             candidates = {},
             sources = {},
             permittedCapabilities = {},
+            predicateTrace = {},
             trace = trace,
         }
     end
@@ -570,6 +769,7 @@ function Suggestions.Build(result, context, messages)
             responsePoolID = flow.responsePool,
         } or nil,
         permittedCapabilities = capabilities,
+        predicateTrace = predicateTrace,
         trace = trace,
         privacy = {
             playerVisible = true,

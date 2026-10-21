@@ -235,7 +235,17 @@ function Conversation.turn(context, text)
     local translationBefore = #Runtime.translationLookups
     local relationshipBefore = Conversation.relationshipSnapshot(context)
     local contextBefore = Conversation.contextSnapshot(context, view)
-    local accepted, reason = PNC.Semantics.DialogueInput.Submit(view, text)
+    local semanticClickFrame = Runtime.semanticClickFrame
+    Runtime.semanticClickFrame = nil
+    local accepted
+    local reason
+    if semanticClickFrame then
+        accepted, reason = PNC.Semantics.DialogueInput.SubmitSemanticFrame(
+            view, semanticClickFrame
+        )
+    else
+        accepted, reason = PNC.Semantics.DialogueInput.Submit(view, text)
+    end
     local result = view.lastSemanticDialogueResult
     -- Inspect the exact situation built by the production input router, not
     -- a separately re-created approximation in the Python test harness.
@@ -304,7 +314,9 @@ function Conversation.turn(context, text)
         llmCalls = Runtime.llmCalls,
         loadedModules = Runtime.loadedModules,
     }
-    response.observation = context.OutputProjection.observation(context, response)
+    response.observation = context.OutputProjection.observation(
+        context, response, view.spec and view.spec.context
+    )
     -- Authoritative receipts can arrive synchronously through the worker's
     -- dual-role transport after the ordinary semantic result is planned.
     -- Preserve their exact final NPC payload in the Inspector trace even
@@ -421,7 +433,9 @@ function Conversation.preview(context, text)
         llmCalls = Runtime.llmCalls,
         loadedModules = Runtime.loadedModules,
     }
-    response.observation = context.OutputProjection.observation(context, response)
+    response.observation = context.OutputProjection.observation(
+        context, response, view.spec and view.spec.context
+    )
     return response
 end
 

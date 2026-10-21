@@ -163,7 +163,7 @@ local function boundedSideEffects(context, transport, toolCalls)
     }
 end
 
-function OutputProjection.observation(context, record)
+function OutputProjection.observation(context, record, semanticContext)
     local Values = context.Values
     record = type(record) == "table" and record or {}
     local result = type(record.result) == "table" and record.result or {}
@@ -272,7 +272,11 @@ function OutputProjection.observation(context, record)
         and PNC.Semantics.DialogueSuggestions
     local suggestions = suggestionsModule
         and type(suggestionsModule.Build) == "function"
-        and suggestionsModule.Build(result, record.contextAfter, record.messages)
+        and suggestionsModule.Build(
+            result,
+            semanticContext or record.contextAfter,
+            record.messages
+        )
         or {
             schemaVersion = 1,
             kind = "semantic_dialogue_suggestions",

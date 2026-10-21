@@ -5,6 +5,7 @@ local CommandRouter = {}
 local capabilities = {
     "CONFIG", "RESET", "INPUT", "LANGUAGE", "TOOL_REPLY",
     "PREVIEW", "SNAPSHOT", "FLOW_CATALOG", "FLOW_VALIDATE",
+    "SUGGESTION_PREDICATE", "SUGGESTION_CLICK",
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
     "REPLAY_SEMANTIC_QUEST",
@@ -256,6 +257,37 @@ function CommandRouter.dispatch(context, request)
     elseif command == "PREVIEW" then
         if payload == nil then return nil, "input_required" end
         return context.Conversation.preview(context, tostring(payload))
+    elseif command == "SUGGESTION_PREDICATE" then
+        local predicates = PNC.Semantics
+            and PNC.Semantics.SuggestionPredicates or nil
+        local view = context.Runtime and context.Runtime.view or nil
+        if not predicates or type(predicates.Evaluate) ~= "function" then
+            return nil, "suggestion_predicates_unavailable"
+        end
+        if type(payload) ~= "table" or type(payload.predicate) ~= "table" then
+            return nil, "suggestion_predicate_required"
+        end
+        return {
+            ok = true,
+            type = "suggestion_predicate",
+            result = predicates.Evaluate(
+                payload.predicate,
+                view and view.spec and view.spec.context or {}
+            ),
+        }
+    elseif command == "SUGGESTION_CLICK" then
+        local view = context.Runtime and context.Runtime.view or nil
+        if type(payload) ~= "table" or type(payload.frame) ~= "table" then
+            return nil, "suggestion_frame_required"
+        end
+        if not view or not view.session then
+            return nil, "conversation_unavailable"
+        end
+        context.Runtime.semanticClickFrame = Values.copy(payload.frame)
+        return context.Conversation.turn(
+            context,
+            tostring(payload.frame.textFallback or payload.frame.candidateID or "")
+        )
     elseif command == "LANGUAGE" then
         if payload == nil then return nil, "language_required" end
         return context.Translations.setLanguage(context,

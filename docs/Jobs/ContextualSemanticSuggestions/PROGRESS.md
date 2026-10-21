@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22
 
-Status: S0 COMPLETE / S1 COMPLETE / S2 IN PROGRESS. This is an implementation checkpoint, not final acceptance.
+Status: S0 COMPLETE / S1 COMPLETE / S2 COMPLETE / S3 COMPLETE / S4 IN PROGRESS. This is an implementation checkpoint, not final acceptance.
 
 ## Repository and authority state
 
@@ -36,8 +36,22 @@ Exact S1 checks and observations:
 - `python3 .../pz_verify.py --file .../PNC_SemanticDialogueSuggestions.lua --kahlua --severity ERROR --no-snippets` — zero Kahlua errors/warnings; direct Lua 5.3 syntax load passed; JSON manifest/shards parsed; `git diff --check` passed.
 - Coverage check was run for every new/modified S1 path. The graph reported no recorded issue, but new files were `not_tracked` and modified worker files were `metadata_changed`; source was read directly as required. Core `common/media` remains graph-excluded by design.
 
-## Current S2 / next coherent chunk
+## S2 evidence — constraints, privacy, and fail-closed policy
 
-Implement the constraint layer using declarative typed all/any/not predicates and existing public actor, relationship, knowledge, world, inventory, flow, and capability providers. Keep preflight eligibility separate from click-time recheck; fail closed on unknown/private fields; redact private knowledge and do not infer romance compatibility or consent from a single orientation trait. Add predicate traces and boundary/privacy tests before any click execution work.
+- Added typed declarative `all` / `any` / `not` predicates with strict comparisons, bounded traces, unknown/private results, and redacted private paths. Capability policy remains in ProjectHoomans; existing Core catalog bindings remain the discovery source.
+- FOLLOW/STAY reject hostile, combat, busy, dead, or incapacitated NPCs. WAIT_AT remains visible only as a safe `requires_destination` state until a destination is known. Unknown and private values never become eligible, and private/secret/undiscovered values are not copied into player-facing suggestions.
+- No romance or consent candidate is synthesized from orientation or another single trait; unsupported/private social facts fail closed. Existing relationship/knowledge/identity providers remain the only sources for future policy.
 
-Open gates: S2–S6, in-game Core UI buttons, click transport/replay safety, real Tk Semantic Lab visual interaction, full regressions/perf, and user-owned native PZ SP/MP live test. Final handoff must remain `READY FOR USER LIVE TEST`; no Workshop release.
+## S3 evidence — typed click frames and replay-safe execution
+
+- Canonical suggestion frames are converted directly through `PsychopatzCore.Semantics.IR.New`; click text is never reparsed. `SUGGESTION_CLICK` reuses the existing production `Conversation.turn`, `ProcessIR`, presentation, and action dispatch owners.
+- Preflight projection and click-time recheck are separate. Revision checks reject stale frames, per-conversation receipts reject duplicates, and ineligible frames produce no transport or action side effect.
+- Real worker observations: question click produced `provenance.parser=semantic_click_frame`; FOLLOW produced one existing `CompanionCommand` transport/action result; WAIT_AT rejected with `suggestion_click_ineligible_unknown`; replay returned `duplicate_suggestion`; stale frame returned `stale_suggestion` without transcript/trace/transport mutation.
+
+Exact S2/S3 checks:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_suggestions_s1 tools.semantic_harness.tests.test_contextual_suggestions_s2 tools.semantic_harness.tests.test_contextual_suggestions_s3 -v` — 10 passed.
+- `python3 .../pz_verify.py --file .../PNC_SemanticDialogueSuggestionPredicates.lua --kahlua --severity ERROR --no-snippets` — zero Kahlua errors/warnings; direct Lua worker syntax/load checks passed.
+- Coverage check was rerun for every S1–S3 source/test/translation path. The graph reported no recorded issue, but new paths were `not_tracked` and modified worker paths `metadata_changed`; source was read directly as required.
+
+Open gates: S4 in-game Core UI buttons, S5 real Tk Semantic Lab visual interaction, S6 full regressions/perf/doctor/Kahlua, and user-owned native PZ SP/MP live test. Final handoff must remain `READY FOR USER LIVE TEST`; no Workshop release.

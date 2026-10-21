@@ -17,6 +17,29 @@ Input.Internal = Internal
 local DialogueInputTrace = PNC.Semantics.DialogueInputTrace
 local audit = DialogueInputTrace.Audit
 local traceTurn = DialogueInputTrace.RecordTurn
+local Suggestions = PNC.Semantics.DialogueSuggestions
+    or require "PNC/Semantics/PNC_SemanticDialogueSuggestions"
+
+function Internal.RefreshSuggestions(view, result)
+    if not view or type(result) ~= "table"
+        or type(Suggestions.Build) ~= "function"
+    then
+        return nil
+    end
+    local projection = Suggestions.Build(
+        result,
+        type(Internal.ShallowContext) == "function"
+            and Internal.ShallowContext(view) or {},
+        nil
+    )
+    view.semanticSuggestions = projection
+    local part = view.extensionParts
+        and view.extensionParts.semanticSuggestions or nil
+    if part and type(part.setSuggestions) == "function" then
+        part:setSuggestions(projection)
+    end
+    return projection
+end
 
 local function applyGeneratedFlowResult(view, result, actionResult)
     local flow = result and result.flow or nil
@@ -228,6 +251,8 @@ function Internal.SubmitSingle(view, value, part)
     if not (type(part) == "table" and part.compoundPart == true) then
         view.lastSemanticCompound = nil
     end
+    local semanticFrame = type(part) == "table"
+        and part.semanticFrame or nil
     -- Keep the submitting host available to asynchronous local projections.
     -- Full-screen conversations are discoverable through Core's singleton,
     -- while compact/headless conversations are deliberately not global.  The
@@ -242,7 +267,8 @@ function Internal.SubmitSingle(view, value, part)
     if value == "" then return false, "empty_message" end
     value = string.sub(value, 1, Input.MAX_INPUT_LENGTH)
 
-    if not (type(part) == "table" and part.compoundPart == true)
+    if not semanticFrame
+        and not (type(part) == "table" and part.compoundPart == true)
         and type(Internal.ParseTurn) == "function"
     then
         local turn = Internal.ParseTurn(value, nil, view)
@@ -278,7 +304,38 @@ function Internal.SubmitSingle(view, value, part)
     local cognitionRequestID
     local cognitionPending
     local clearSemanticMemoryTarget = false
-    if service and type(service.Preview) == "function" then
+    local frameIR
+    if semanticFrame then
+        local frameReason
+        local expectedRevision = tonumber(semanticFrame.requestRevision)
+        local receiptKey = tostring(view.session.conversationID or "")
+            .. ":" .. tostring(expectedRevision)
+            .. ":" .. tostring(semanticFrame.candidateID or "")
+        view.session.semanticSuggestionReceipts =
+            view.session.semanticSuggestionReceipts or {}
+        if view.session.semanticSuggestionReceipts[receiptKey] then
+            return false, "duplicate_suggestion"
+        end
+        local currentRevision = tonumber(router.state and router.state.sequence) or 0
+        if expectedRevision == nil or expectedRevision ~= currentRevision then
+            return false, "stale_suggestion"
+        end
+        frameIR, frameReason = Suggestions.FrameToIR(semanticFrame, view)
+        if not frameIR then return false, frameReason end
+        local eligible, eligibilityReason = Suggestions.CheckFrame(
+            semanticFrame, context, frameIR
+        )
+        if eligible ~= true then return false, eligibilityReason end
+        preview = {
+            schemaVersion = 1,
+            kind = "semantic_dialogue_preview",
+            accepted = true,
+            ir = frameIR,
+            decision = router:Decide(frameIR, context, options),
+            state = router.state,
+            sequence = router.state and router.state.sequence,
+        }
+    elseif service and type(service.Preview) == "function" then
         preview = service:Preview(value, context, options)
     elseif type(router.Preview) == "function" then
         preview = router:Preview(value, context, options)
@@ -299,7 +356,9 @@ function Internal.SubmitSingle(view, value, part)
     -- conversation supplies a single safe topic. The recovered IR is then
     -- routed through the same production policy and ProcessIR path as an
     -- authored pattern; actions still cannot be created by this spoke.
-    if preview.ir and type(Internal.Recover) == "function" then
+    if not semanticFrame
+        and preview.ir and type(Internal.Recover) == "function"
+    then
         local recovered = Internal.Recover(preview.ir, context, options)
         if recovered then
             preview.ir = recovered
@@ -429,6 +488,21 @@ function Internal.SubmitSingle(view, value, part)
         and type(service.ObserveResult) == "function"
     then
         service:ObserveResult(result)
+    end
+    if submitted == true and semanticFrame then
+        local revision = tonumber(semanticFrame.requestRevision) or 0
+        local receiptKey = tostring(view.session.conversationID or "")
+            .. ":" .. tostring(revision)
+            .. ":" .. tostring(semanticFrame.candidateID or "")
+        view.session.semanticSuggestionReceipts =
+            view.session.semanticSuggestionReceipts or {}
+        view.session.semanticSuggestionReceipts[receiptKey] = {
+            status = "accepted",
+            sequence = result and result.sequence,
+        }
+    end
+    if submitted == true then
+        Internal.RefreshSuggestions(view, result)
     end
     traceTurn(view, value, result, "semantic_input_local", {
         providerAvailable = context.llmAvailable == true,

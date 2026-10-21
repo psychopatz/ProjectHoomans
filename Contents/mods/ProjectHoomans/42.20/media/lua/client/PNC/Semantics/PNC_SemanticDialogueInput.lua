@@ -77,6 +77,8 @@ require "PNC/Semantics/PNC_SemanticDialogueInput_Tasks"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Trace"
 require "PNC/Semantics/PNC_SemanticDialogueInput_ProviderFallback"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle"
+local Suggestions = PNC.Semantics.DialogueSuggestions
+    or require "PNC/Semantics/PNC_SemanticDialogueSuggestions"
 
 local Internal = Input.Internal
 
@@ -86,6 +88,21 @@ function Input.Submit(view, value, part)
         return group:Submit(value, part)
     end
     return Internal.SubmitSingle(view, value, part)
+end
+
+function Input.SubmitSemanticFrame(view, frame)
+    local group = view and view.groupConversation
+    if group and type(group.SubmitSemanticFrame) == "function" then
+        return group:SubmitSemanticFrame(frame)
+    end
+    if type(Suggestions.ResolveFrameText) ~= "function" then
+        return false, "suggestion_frame_unavailable"
+    end
+    return Internal.SubmitSingle(
+        view,
+        Suggestions.ResolveFrameText(frame),
+        { semanticFrame = frame }
+    )
 end
 
 function Input.GetState(view)
