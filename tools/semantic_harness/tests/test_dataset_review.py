@@ -28,15 +28,15 @@ class DatasetReviewTests(unittest.TestCase):
         self.assertTrue(first["previewOnly"])
         self.assertTrue(first["effectFree"])
         self.assertEqual(first["writes"], [])
-        self.assertEqual(first["patternCount"], 45)
+        self.assertEqual(first["patternCount"], 47)
         self.assertEqual(first["responseVariantCount"], 31)
         self.assertEqual(
             first["candidateReview"]["summary"],
-            {"approved": 18, "rejected": 0, "not_candidate": 46},
+            {"approved": 20, "rejected": 0, "not_candidate": 44},
         )
         self.assertEqual(
             first["candidateReview"]["provenance"]["approvedWithProvenance"],
-            18,
+            20,
         )
         self.assertEqual(
             first["sourceMetadata"]["integrationStatus"],

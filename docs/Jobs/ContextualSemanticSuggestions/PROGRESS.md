@@ -155,3 +155,16 @@ Exact validation and observed results:
 Failures found and fixed in this slice: the generated-artifact review first detected translation-manifest indentation drift; the shared composer projection first exposed a load-order/global-registry issue and was corrected with dynamic registry lookup plus the worker’s compatibility fallback. The final gates above are green.
 
 Next: developer-side S0–S6 gates are complete for this slice. Native Project Zomboid SP/MP, actual in-game installation, multiplayer authority, and Workshop publication remain `UNTESTED` and user-owned. Handoff is `READY FOR USER LIVE TEST`; no release or Workshop action was taken.
+
+## Corrective follow-up — Semantic Lab root matching and NPC profile controls
+
+Source/evidence commit: c040e520 (c040e520302e5301798f9e370fe2a7e651fa53a3).
+
+- Re-audited the real worker before-state after the user-reported gaps: compact whatsup was previously unrecognized; typo-level whaat up had no bounded fuzzy route; the Simulation exposed five fixed visual slots and discarded production group labels; the worker did not project category preflight diagnostics; and the mock runtime had no safe profile switch.
+- Added the reviewed dataset forms whatsup and what up, retained the production generated-artifact path, and added the Hoomans-owned WHATS_UP concept route. Core's existing bounded fuzzy matcher now recognizes whaat up through the canonical conversation concept; mutating actions remain ineligible for fuzzy execution. No second parser or response generator was added.
+- Added the Semantic Lab NPC profile combobox: Companion (owned), Neutral NPC, Enemy, Trader (Dynamic Trading), and Custom scenario. Presets mutate only the existing scenario/configure boundary. Trader toggles the existing compatibility seam for DTHoomans; it does not execute trading. Switching away from Trader clears the prior role/mod simulation.
+- Exposed existing production category diagnostics in the worker context inspector. Real worker evidence: companion exposes owned_actions; neutral has no FOLLOW capability; enemy hides the whats_up root; Trader reports projecthoomans:trade visible only with the simulated mod seam.
+- Group labels now come from the production projection and empty button slots are hidden; disabled rows remain only for real ineligible choices such as unresolved WAIT_AT. EN/TL translation manager and typed click frames remain unchanged.
+- Exact validation: worker fuzzy/profile/dataset slice — 8 passed; Xvfb Semantic Lab GUI/worker/profile slice — 3 passed; combined focused contextual/follow-up slice — 12 passed; Python compile and git diff --check passed. Native PZ SP/MP remains UNTESTED, reserved for the user. No release or Workshop action.
+
+Next: run the repository-wide Python/Lua/doctor/Kahlua/translation checks, inspect the final production projection and GUI evidence, then commit the progress record and hand off only after all developer-side gates pass.

@@ -46,7 +46,7 @@ class C7FDatasetPrecisionTests(unittest.TestCase):
         )
         report = preview_dialogue_source(CANONICAL_DIALOGUE)
         self.assertTrue(report["ok"], report)
-        self.assertEqual(report["patternCount"], 45)
+        self.assertEqual(report["patternCount"], 47)
         self.assertEqual(
             (report["candidateReview"] or {})["summary"]["rejected"],
             0,
