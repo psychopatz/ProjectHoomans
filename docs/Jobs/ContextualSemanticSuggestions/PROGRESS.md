@@ -1,0 +1,8 @@
+# Current progress — Contextual Semantic Suggestions
+Updated: 2026-10-22. Source reviewed: remote psychopatz/ProjectHoomans main d8d2011ed2f6167a39870289068ee851bf43bf0c. Current status: PLANNED / NOT IMPLEMENTED OR TESTED BY THIS JOB.
+Known reused foundation: docs/Jobs/ContextualDialogueQuestFramework/PROGRESS.md records Semantic Lab CodeBlocks authoring, Lua worker, Core-backed EN/TL, conversation inspection and developer acceptance for its own earlier V1–V5 objective. These do not prove that this new suggestion system exists. The existing capability bindings distinguish recognized, eligible, admitted and completed and prohibit duplicate side effects.
+Current phase: S0 — source ownership and integration audit.
+Next chunk: Identify exact current semantic dialogue widget, typed-submit and reply-render handlers, response-plan contract, active-flow transition API, Core parser candidate adapter, action dispatch owner, Core identity/relationship query boundary and existing Lab worker/studio inspector bridge. Capture baseline through real Lua worker and record file references/capability matrix before implementation.
+Gate: documented concrete module/function callsites and reproduced baseline transcript with current UI state; distinguish current availability from desired suggestion controls. No claims of new feature success until worker click-through and GUI tests execute.
+Evidence: GitHub remote README/progress/contracts inspected for planning. No local worktree, native PZ or new tests executed here. Remote-only evidence does not prove local checkout state.
+Remaining: S1–S6, all mandatory. Next gate after S0: S1 canonical proposal/candidate source integration.
