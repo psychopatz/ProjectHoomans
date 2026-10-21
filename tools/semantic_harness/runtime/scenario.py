@@ -116,6 +116,8 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "language": "EN",
         "llmEnabled": False,
         "providerAvailable": False,
+        "semanticLabProfile": "companion",
+        "availableMods": {},
         "nativeTranslations": {},
         "semanticCognitionResponses": {},
         "commandResponses": {
@@ -232,6 +234,20 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
         value = npc.get(field)
         if value is not None and not isinstance(value, dict):
             raise ValueError(f"npc.{field} must be an object or null")
+    actor_authority = npc.get("actorAuthority")
+    if actor_authority is not None and not isinstance(actor_authority, dict):
+        raise ValueError("npc.actorAuthority must be an object or null")
+    runtime = scenario["runtime"]
+    profile = runtime.get("semanticLabProfile")
+    if profile is not None and not isinstance(profile, str):
+        raise ValueError("runtime.semanticLabProfile must be a string or null")
+    available_mods = runtime.get("availableMods")
+    if available_mods is not None and not isinstance(available_mods, dict):
+        raise ValueError("runtime.availableMods must be an object or null")
+    if isinstance(available_mods, dict):
+        for mod_id, enabled in available_mods.items():
+            if not isinstance(mod_id, str) or not isinstance(enabled, bool):
+                raise ValueError("runtime.availableMods must map strings to booleans")
     for owner in (player, npc):
         inventory = owner.get("inventory")
         if inventory is not None and not isinstance(inventory, dict):

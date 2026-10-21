@@ -77,6 +77,13 @@ function Internal.RegisterVocabulary()
         "news", "gossip", "gossips", "rumor", "rumors",
         "rumour", "rumours",
     })
+    -- This is a safe, non-mutating conversation root.  The exact dataset
+    -- patterns remain authoritative; the concept alias only lets Core's
+    -- bounded fuzzy pass recover compact/typo-level variants such as
+    -- "whaat up" without making any action command fuzzy.
+    registerConcept("WHATS_UP", {
+        "what's up", "whats up", "whatsup", "what up",
+    }, 6)
     registerConcept("BITTEN", { "bitten", "got bitten", "was bitten" })
     registerConcept("BITE", { "bite", "bites", "biting" })
     registerConcept("RESIDENCE", {

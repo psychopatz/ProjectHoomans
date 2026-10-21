@@ -15,6 +15,8 @@ class WhatsUpConversationTests(unittest.TestCase):
             "what's up",
             "whats up",
             "what is up",
+            "what up",
+            "whatsup",
             "what's new",
             "whats new",
             "anything new",
@@ -42,13 +44,36 @@ class WhatsUpConversationTests(unittest.TestCase):
                     candidate["frame"]["extensions"]["route"],
                     "conversation_category",
                 )
-                self.assertEqual(
-                    result["candidates"]["selected"]["metadata"]["mapping"][
-                        "canonicalConcept"
-                    ],
-                    "WHATS_UP",
+                mapping = result["candidates"]["selected"]["metadata"].get(
+                    "mapping",
+                    result["candidates"]["selected"]["metadata"],
                 )
+                self.assertEqual(mapping["canonicalConcept"], "WHATS_UP")
                 worker.reset()
+        finally:
+            worker.close()
+
+    def test_bounded_fuzzy_typo_uses_the_same_root_without_action_side_effects(self) -> None:
+        worker = LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO))
+        try:
+            response = worker.input("whaat up")
+            result = response["result"]
+            self.assertTrue(response["accepted"])
+            self.assertEqual(result["ir"]["subject"], "CONVERSATION_TOPIC")
+            self.assertTrue(result["ir"]["diagnostics"]["fuzzyMatch"])
+            self.assertEqual(
+                result["candidateDiagnostics"]["selectedPattern"],
+                "pnc.question.whats_up.concept",
+            )
+            self.assertEqual(result["candidateDiagnostics"]["selectedPass"], "fuzzy")
+            self.assertEqual(response["transport"], [])
+            self.assertIn(
+                "conversation.whats_up",
+                [
+                    item["id"]
+                    for item in response["observation"]["suggestions"]["candidates"]
+                ],
+            )
         finally:
             worker.close()
 

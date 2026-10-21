@@ -111,6 +111,25 @@ function RuntimeEnvironment.configure(context)
     getModFileReader = function(modID, relativePath)
         return packagedReader(context, modID, relativePath)
     end
+    -- Native compatibility queries remain the production API surface.  The
+    -- worker supplies only the engine-backed activated-mod observation, from
+    -- the current scenario runtime projection, so optional integrations can
+    -- be preflighted without loading or executing the integration itself.
+    getModInfoByID = function()
+        return nil
+    end
+    getActivatedMods = function()
+        return {
+            contains = function(_, modID)
+                local available = context.runtime
+                    and context.runtime.availableMods or {}
+                return available[tostring(modID or "")] == true
+            end,
+        }
+    end
+    PNC = PNC or {}
+    PNC.Compatibility = PNC.Compatibility or {}
+    PNC.Compatibility.ModCache = {}
 
     local descriptor = {
         getForename = function() return playerData.forename end,

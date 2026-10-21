@@ -17,6 +17,12 @@ from ..studio.interaction_explorer_pane import InteractionExplorerPane
 from ..studio.interaction_spec_pane import InteractionSpecPane
 from ..inspection.rendering import conversation_first, pretty
 from ..runtime.config import ConfigurationError
+from ..runtime.npc_profiles import (
+    PROFILE_IDS,
+    apply_npc_profile,
+    profile_id,
+    profile_label,
+)
 from ..runtime.scenario import load_scenario, save_scenario
 from .dialogs.settings import open_runtime_settings as show_runtime_settings
 from ..inspection.transcript import TranscriptBuffer
@@ -203,6 +209,7 @@ class SemanticHarnessApp:
         self.suggestion_projection: dict[str, Any] = {}
         self.suggestion_response: dict[str, Any] = {}
         self.suggestion_revision: Any = None
+        self.suggestion_group_ids_by_display: dict[str, str] = {}
         for index in range(5):
             button = ttk.Button(
                 suggestion_frame,
@@ -271,6 +278,16 @@ class SemanticHarnessApp:
         )
         self.language_box.pack(side="left", padx=(12, 6))
         self.language_box.bind("<<ComboboxSelected>>", lambda _: self.set_language())
+        self.npc_profile_var = self._tk.StringVar(value=profile_label(profile_id(self.scenario)))
+        self.npc_profile_box = ttk.Combobox(
+            controls,
+            textvariable=self.npc_profile_var,
+            values=tuple(profile_label(value) for value in PROFILE_IDS),
+            width=22,
+            state="readonly",
+        )
+        self.npc_profile_box.pack(side="left", padx=(8, 6))
+        self.npc_profile_box.bind("<<ComboboxSelected>>", lambda _: self._on_npc_profile())
         self.status_var = self._tk.StringVar(value="Starting…")
         ttk.Label(controls, textvariable=self.status_var).pack(side="right")
 
@@ -402,6 +419,9 @@ class SemanticHarnessApp:
         ):
             button.configure(state=state)
         self.language_box.configure(state="readonly" if enabled and not self.busy else "disabled")
+        self.npc_profile_box.configure(
+            state="readonly" if enabled and not self.busy else "disabled"
+        )
         self.restart_button.configure(
             state="normal" if self.session.ready and not self.busy else "disabled"
         )
@@ -414,6 +434,13 @@ class SemanticHarnessApp:
     def _refresh_suggestion_controls(self, enabled: bool) -> None:
         for index, button in enumerate(self.suggestion_buttons):
             row = self.suggestion_rows[index] if index < len(self.suggestion_rows) else None
+            if row:
+                button.grid()
+            else:
+                # The production projection is bounded, but empty capacity is
+                # not a player-facing choice.  Hide unused slots rather than
+                # presenting a wall of disabled blank buttons.
+                button.grid_remove()
             button.configure(
                 state=(
                     "normal"
@@ -553,28 +580,74 @@ class SemanticHarnessApp:
                 self.suggestion_response, self.suggestion_projection
             )
 
+    def _on_npc_profile(self) -> None:
+        """Apply a profile through the existing scenario/configure boundary."""
+
+        if not self.session.ready or self.busy:
+            return
+        selected_label = self.npc_profile_var.get()
+        selected = next(
+            (
+                value
+                for value in PROFILE_IDS
+                if profile_label(value) == selected_label
+            ),
+            "custom",
+        )
+        try:
+            updated = apply_npc_profile(self.scenario, selected)
+        except ValueError as error:
+            self._messagebox.showerror("NPC profile", str(error))
+            self.npc_profile_var.set(profile_label(profile_id(self.scenario)))
+            return
+
+        def finish(response: dict[str, Any]) -> None:
+            self.scenario = updated
+            self.npc_profile_var.set(profile_label(selected))
+            self._set_text(self.transcript, "")
+            self._show_response(response)
+            self._append("SYSTEM", f"Applied NPC profile: {profile_label(selected)}")
+
+        self._start_operation(lambda worker: worker.configure(updated), finish)
+
     def _render_suggestions(
         self, response: dict[str, Any], suggestions: dict[str, Any]
     ) -> None:
         self.suggestion_projection = suggestions
         self.suggestion_response = response
         groups = suggestions.get("groups") or []
-        group_ids = [str(group.get("id")) for group in groups]
-        self.suggestion_group_box.configure(values=group_ids)
+        group_ids: list[str] = []
+        group_display_by_id: dict[str, str] = {}
+        self.suggestion_group_ids_by_display = {}
+        for group in groups:
+            group_id = str(group.get("id") or "")
+            if not group_id:
+                continue
+            display = str(group.get("label") or group_id)
+            if display in self.suggestion_group_ids_by_display:
+                display = f"{display} [{group_id}]"
+            group_ids.append(group_id)
+            group_display_by_id[group_id] = display
+            self.suggestion_group_ids_by_display[display] = group_id
+        group_displays = [group_display_by_id[group_id] for group_id in group_ids]
+        self.suggestion_group_box.configure(values=group_displays)
         revision = suggestions.get("revision")
-        selected_group = (
+        selected_group_id = (
             suggestions.get("currentGroupID")
             if self.suggestion_revision != revision
-            else self.suggestion_group_box.get()
+            else self.suggestion_group_ids_by_display.get(
+                self.suggestion_group_box.get(),
+                suggestions.get("currentGroupID"),
+            )
         )
-        if selected_group not in group_ids:
-            selected_group = suggestions.get("currentGroupID") or (
+        if selected_group_id not in group_ids:
+            selected_group_id = suggestions.get("currentGroupID") or (
                 group_ids[0] if group_ids else ""
             )
-            self.suggestion_group_box.set(selected_group)
+        self.suggestion_group_box.set(group_display_by_id.get(selected_group_id, ""))
         self.suggestion_revision = revision
         self.suggestion_rows = semantic_suggestion_rows(
-            suggestions, selected_group or None
+            suggestions, selected_group_id or None
         )
         self.suggestion_interactive = (
             response.get("type") in {"turn", "semantic_click"}
@@ -584,8 +657,10 @@ class SemanticHarnessApp:
             row = self.suggestion_rows[index] if index < len(self.suggestion_rows) else None
             if row:
                 button.configure(text=semantic_suggestion_title(row))
+                button.grid()
             else:
                 button.configure(text="")
+                button.grid_remove()
         revision = suggestions.get("revision", "—")
         trace_count = len(suggestions.get("predicateTrace") or [])
         self.suggestion_status.configure(
@@ -721,6 +796,7 @@ class SemanticHarnessApp:
             self.scenario = scenario
             self.scenario_path = Path(filename)
             self.language_var.set(scenario.get("runtime", {}).get("language", "EN"))
+            self.npc_profile_var.set(profile_label(profile_id(scenario)))
             self._set_text(self.transcript, "")
             self._show_response(response)
             self._append("SYSTEM", f"Loaded {filename}")

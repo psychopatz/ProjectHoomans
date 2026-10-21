@@ -2,6 +2,46 @@
 -- Dialogue patterns shard 04; keep this file data-only.
 return {
     {
+            ["confidence"] = 0.97,
+            ["emit"] = {
+                ["extensions"] = {
+                    ["categoryID"] = "projecthoomans:whats_up",
+                    ["route"] = "conversation_category",
+                    ["topic"] = "whats_up",
+                },
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "CONVERSATION_TOPIC",
+            },
+            ["id"] = "pnc.dataset.question.whats_up.what_up",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "what",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "up",
+                },
+            },
+            ["metadata"] = {
+                ["mapping"] = {
+                    ["canonicalConcept"] = "WHATS_UP",
+                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["sourceRefs"] = {
+                        "DailyDialog",
+                        "EmpatheticDialogues",
+                    },
+                },
+                ["reviewed"] = true,
+                ["sourceRefs"] = {
+                    "DailyDialog",
+                    "EmpatheticDialogues",
+                },
+            },
+            ["priority"] = 155,
+        },
+    {
             ["confidence"] = 0.99,
             ["emit"] = {
                 ["extensions"] = {
@@ -222,6 +262,42 @@ return {
                 {
                     ["kind"] = "literal",
                     ["value"] = "up",
+                },
+            },
+            ["metadata"] = {
+                ["mapping"] = {
+                    ["canonicalConcept"] = "WHATS_UP",
+                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["sourceRefs"] = {
+                        "DailyDialog",
+                        "EmpatheticDialogues",
+                    },
+                },
+                ["reviewed"] = true,
+                ["sourceRefs"] = {
+                    "DailyDialog",
+                    "EmpatheticDialogues",
+                },
+            },
+            ["priority"] = 155,
+        },
+    {
+            ["confidence"] = 0.98,
+            ["emit"] = {
+                ["extensions"] = {
+                    ["categoryID"] = "projecthoomans:whats_up",
+                    ["route"] = "conversation_category",
+                    ["topic"] = "whats_up",
+                },
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "CONVERSATION_TOPIC",
+            },
+            ["id"] = "pnc.dataset.question.whats_up.whatsup_compact",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "whatsup",
                 },
             },
             ["metadata"] = {

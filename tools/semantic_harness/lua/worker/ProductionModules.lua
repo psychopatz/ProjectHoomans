@@ -101,6 +101,11 @@ function ProductionModules.load(context)
     PNC.Relationships = PNC.Relationships or {}
     load(
         "ProjectHoomans", "shared",
+        "PNC/Core/Compatibility/PNC_Compatibility_API.lua",
+        "compatibility"
+    )
+    load(
+        "ProjectHoomans", "shared",
         "PNC/Core/Knowledge/PNC_KnowledgeRegistry.lua",
         "knowledge_authority"
     )

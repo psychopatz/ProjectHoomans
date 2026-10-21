@@ -75,6 +75,8 @@ function Conversation.buildContext(context)
             healthState = npc.healthState,
             activeBehavior = npc.activeBehavior,
             followState = copy(npc.followState or { mode = "idle" }),
+            hostility = copy(npc.hostility),
+            role = npc.role,
             bodyHealth = bodyHealth,
             hpCurrent = hpCurrent,
             hpMax = hpMax,
@@ -110,6 +112,8 @@ function Conversation.buildContext(context)
             snapshot = {
                 activeBehavior = npc.activeBehavior,
                 followState = copy(npc.followState or { mode = "idle" }),
+                hostility = copy(npc.hostility),
+                role = npc.role,
                 healthState = npc.healthState,
                 bodyHealth = bodyHealth,
                 residence = copy(npc.residence),
@@ -133,6 +137,9 @@ function Conversation.buildContext(context)
         output.conversationBlock = Values.copy(priorContext.conversationBlock)
         output.conversationCategoryPreflight = Values.copy(
             priorContext.conversationCategoryPreflight
+        )
+        output.categoryDiagnostics = Values.copy(
+            priorContext.categoryDiagnostics
         )
     end
     output.currentTopic = output.conversationTopic
@@ -159,6 +166,18 @@ function Conversation.refreshViewContext(context)
             Conversation.categoryPreflight(
                 Runtime.view.spec.context.conversationBlockContext
             )
+        local composer = PNC.Conversation and PNC.Conversation.Composer
+        if composer and type(composer.BuildCategoryDiagnostics) == "function"
+            and type(Runtime.view.spec.context.conversationBlockContext) == "table"
+        then
+            local ok, diagnostics = pcall(
+                composer.BuildCategoryDiagnostics,
+                Runtime.view.spec.context.conversationBlockContext
+            )
+            if ok and type(diagnostics) == "table" then
+                Runtime.view.spec.context.categoryDiagnostics = diagnostics
+            end
+        end
     end
 end
 
@@ -380,6 +399,18 @@ function Conversation.buildView(context)
     spec.context.conversationCategoryPreflight = Conversation.categoryPreflight(
         spec.context.conversationBlockContext
     )
+    local composer = PNC.Conversation and PNC.Conversation.Composer
+    if composer and type(composer.BuildCategoryDiagnostics) == "function"
+        and type(spec.context.conversationBlockContext) == "table"
+    then
+        local ok, diagnostics = pcall(
+            composer.BuildCategoryDiagnostics,
+            spec.context.conversationBlockContext
+        )
+        if ok and type(diagnostics) == "table" then
+            spec.context.categoryDiagnostics = diagnostics
+        end
+    end
     local view = {
         headless = true,
         lifecycleFinished = false,
@@ -466,6 +497,10 @@ function Conversation.contextSnapshot(harnessContext, view)
         engineEvents = harnessContext.EngineEvents
             and harnessContext.EngineEvents.Recent
             and Values.copy(harnessContext.EngineEvents.Recent()) or {},
+        categoryDiagnostics = Values.copy(
+            view and view.spec and view.spec.context
+                and view.spec.context.categoryDiagnostics
+        ),
     }
 end
 

@@ -13,6 +13,37 @@ if type(registerPattern) ~= "function" then
     error("semantic catalog pattern module requires RegisterPattern")
 end
 
+local function registerWhatsUpConceptPattern()
+    registerPattern(
+        "pnc.question.whats_up.concept",
+        { { kind = "concept", id = "WHATS_UP" } },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "CONVERSATION_TOPIC",
+            extensions = {
+                topic = "whats_up",
+                categoryID = "projecthoomans:whats_up",
+                route = "conversation_category",
+            },
+        },
+        0.94,
+        154,
+        {
+            metadata = {
+                owner = "ProjectHoomans",
+                fuzzySafe = true,
+                canonicalConcept = "WHATS_UP",
+                mapping = {
+                    canonicalConcept = "WHATS_UP",
+                    dialogueState = "WHATS_UP_ROOT",
+                    sourceRefs = { "DailyDialog", "EmpatheticDialogues" },
+                },
+            },
+        }
+    )
+end
+
 local SELF_STATE_PREFIXES = {
     { id = "im", tokens = { "i'm" } },
     { id = "i_am", tokens = { "i", "am" } },
@@ -343,6 +374,7 @@ function Internal.RegisterSelfStatePatterns()
 end
 
 function Internal.RegisterSocialSignals()
+    registerWhatsUpConceptPattern()
     registerPattern(
         "pnc.social.gossip_event",
         {

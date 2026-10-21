@@ -54,6 +54,8 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.assertEqual(
                 str(app.suggestion_buttons[4].cget("state")), "disabled"
             )
+            self.assertFalse(app.suggestion_buttons[4].winfo_ismapped())
+            self.assertEqual(app.suggestion_group_box.get(), "Current conversation branch")
             self.assertIn(
                 "predicateTrace",
                 app.suggestion_inspector.get("1.0", "end"),
@@ -160,6 +162,48 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 )
             )
             self.assertIn("Mostly tracks", app.transcript.get("1.0", "end"))
+        finally:
+            app.close()
+            root.update()
+
+    def test_npc_profile_combobox_reconfigures_worker_capabilities(self) -> None:
+        if not os.environ.get("DISPLAY"):
+            self.skipTest("Tk display is unavailable")
+
+        root = tk.Tk()
+        app = SemanticHarnessApp(root, _parser().parse_args([]))
+
+        def wait_until(predicate: object, timeout: float = 10.0) -> None:
+            deadline = time.monotonic() + timeout
+            while not predicate() and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertTrue(predicate())
+
+        try:
+            wait_until(lambda: app.worker_ready)
+            app.npc_profile_var.set("Neutral NPC")
+            app._on_npc_profile()
+            wait_until(
+                lambda: not app.busy
+                and app.scenario["npc"]["actorAuthority"]["eligible"] is False
+            )
+            self.assertEqual(app.scenario["runtime"]["semanticLabProfile"], "neutral")
+            self.assertEqual(
+                app.npc_profile_box.get(),
+                "Neutral NPC",
+            )
+
+            app.input_var.set("hello")
+            app.submit()
+            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
+            self.assertNotIn(
+                "Owned companion actions",
+                [str(value) for value in app.suggestion_group_box["values"]],
+            )
+            self.assertFalse(
+                any(row.get("action") == "FOLLOW" for row in app.suggestion_rows)
+            )
         finally:
             app.close()
             root.update()

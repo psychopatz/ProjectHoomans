@@ -26,6 +26,7 @@ class SettingsDialogHost(Protocol):
     busy: bool
     settings_window: Any | None
     language_var: Any
+    npc_profile_var: Any
     trace: Any
 
     def _start_operation(self, operation: Callable[[Any], Any], callback: Callable[[Any], None]) -> bool: ...
@@ -352,6 +353,13 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
         def finish(response: dict[str, Any]) -> None:
             host.scenario = updated
             host.language_var.set(updated["runtime"]["language"])
+            # Keep the main Simulation profile selector in sync with settings
+            # edits without introducing another scenario/state owner.
+            from ...runtime.npc_profiles import profile_id, profile_label
+
+            host.npc_profile_var.set(
+                profile_label(profile_id(updated))
+            )
             host._set_text(host.trace, pretty(response))
             host._append("SYSTEM", "Applied mock runtime settings to the Lua worker.")
             if save_after and destination is not None:
