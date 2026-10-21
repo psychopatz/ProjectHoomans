@@ -127,6 +127,34 @@ class DialogueDatasetCompilerTests(unittest.TestCase):
         self.assertIn(variant["templateID"], compiled["translations"]["EN"])
         self.assertIn(variant["templateID"], compiled["translations"]["TL"])
 
+    def test_whats_up_is_a_typed_root_category_route(self) -> None:
+        compiled = compile_dialogue_dataset(self.source)
+        pattern = next(
+            item for item in compiled["patterns"]
+            if item["id"] == "pnc.dataset.question.whats_up.whats_up"
+        )
+        self.assertEqual(pattern["emit"]["subject"], "CONVERSATION_TOPIC")
+        self.assertEqual(pattern["emit"]["extensions"], {
+            "categoryID": "projecthoomans:whats_up",
+            "route": "conversation_category",
+            "topic": "whats_up",
+        })
+        self.assertEqual(pattern["metadata"]["mapping"], {
+            "canonicalConcept": "WHATS_UP",
+            "dialogueState": "WHATS_UP_ROOT",
+            "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
+        })
+
+    def test_whats_up_route_rejects_unowned_category_metadata(self) -> None:
+        invalid = copy.deepcopy(self.source)
+        root = next(
+            item for item in invalid["patterns"]
+            if item["id"] == "pnc.dataset.question.whats_up.whats_up"
+        )
+        root["emit"]["extensions"]["categoryID"] = "projecthoomans:private"
+        with self.assertRaisesRegex(CompileError, "reviewed whats_up category route"):
+            compile_dialogue_dataset(invalid)
+
     def test_negative_examples_cannot_become_runtime_patterns(self) -> None:
         invalid = copy.deepcopy(self.source)
         invalid["patterns"][0]["negatives"] = [

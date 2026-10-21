@@ -322,6 +322,7 @@ function OutputProjection.observation(context, record, semanticContext)
         candidates = boundedCandidates(context, result),
         response = responseObservation,
         suggestions = suggestions,
+        conversationBlock = Values.copy(record.conversationBlock),
         flow = {
             flowId = flow.flowId,
             generated = flow.generated == true,

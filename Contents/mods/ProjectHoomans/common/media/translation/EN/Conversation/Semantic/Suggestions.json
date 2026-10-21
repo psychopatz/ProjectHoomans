@@ -35,6 +35,9 @@
   "UI_PNC_Conversation_Suggestion_Group_Time_Label": "Time and date",
   "UI_PNC_Conversation_Suggestion_Group_Weather_Label": "Weather",
   "UI_PNC_Conversation_Suggestion_Group_Movement_Label": "Owned companion actions",
+  "UI_PNC_Conversation_Suggestion_WhatsUp_Label": "Ask what's up",
+  "UI_PNC_Conversation_Suggestion_WhatsUp_Utterance": "What's up?",
+  "UI_PNC_Conversation_Suggestion_Group_WhatsUp_Label": "What's up",
   "UI_PNC_Conversation_Suggestion_Group_Flow_Label": "Current conversation branch",
   "UI_PNC_Conversation_Suggestion_Group_Response_Label": "NPC reply"
 }

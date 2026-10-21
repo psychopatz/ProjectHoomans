@@ -283,6 +283,19 @@ function CommandRouter.dispatch(context, request)
         if not view or not view.session then
             return nil, "conversation_unavailable"
         end
+        local suggestions = PNC.Semantics
+            and PNC.Semantics.DialogueSuggestions or nil
+        if suggestions
+            and ((type(suggestions.IsConversationCategoryFrame) == "function"
+                and suggestions.IsConversationCategoryFrame(payload.frame))
+                or (type(suggestions.IsConversationChoiceFrame) == "function"
+                and suggestions.IsConversationChoiceFrame(payload.frame)))
+        then
+            return context.Conversation.semanticClick(
+                context,
+                Values.copy(payload.frame)
+            )
+        end
         context.Runtime.semanticClickFrame = Values.copy(payload.frame)
         return context.Conversation.turn(
             context,

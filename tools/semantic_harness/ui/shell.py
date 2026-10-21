@@ -69,7 +69,8 @@ def semantic_suggestion_rows(
                 "frame": candidate.get("frame"),
                 "display": candidate.get("display") or {},
                 "status": "eligible",
-                "enabled": True,
+                "enabled": candidate.get("enabled", True) is not False,
+                "eligibility": candidate.get("eligibility"),
                 "source": candidate.get("source"),
                 "groupID": selected.get("id") if selected else candidate.get("groupID"),
             }
@@ -576,7 +577,8 @@ class SemanticHarnessApp:
             suggestions, selected_group or None
         )
         self.suggestion_interactive = (
-            response.get("type") == "turn" and response.get("accepted") is True
+            response.get("type") in {"turn", "semantic_click"}
+            and response.get("accepted") is True
         )
         for index, button in enumerate(self.suggestion_buttons):
             row = self.suggestion_rows[index] if index < len(self.suggestion_rows) else None

@@ -56,6 +56,213 @@
   },
   "patterns": [
     {
+      "id": "pnc.dataset.question.whats_up.whats_up",
+      "utterance": "what's up",
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC",
+        "extensions": {
+          "topic": "whats_up",
+          "categoryID": "projecthoomans:whats_up",
+          "route": "conversation_category"
+        }
+      },
+      "reviewed": true,
+      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
+      "mapping": {
+        "canonicalConcept": "WHATS_UP",
+        "dialogueState": "WHATS_UP_ROOT",
+        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+      },
+      "confidence": 0.99,
+      "priority": 155
+    },
+    {
+      "id": "pnc.dataset.question.whats_up.whats_up_ascii",
+      "utterance": "whats up",
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC",
+        "extensions": {
+          "topic": "whats_up",
+          "categoryID": "projecthoomans:whats_up",
+          "route": "conversation_category"
+        }
+      },
+      "reviewed": true,
+      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
+      "mapping": {
+        "canonicalConcept": "WHATS_UP",
+        "dialogueState": "WHATS_UP_ROOT",
+        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+      },
+      "confidence": 0.99,
+      "priority": 155
+    },
+    {
+      "id": "pnc.dataset.question.whats_up.what_is_up",
+      "utterance": "what is up",
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC",
+        "extensions": {
+          "topic": "whats_up",
+          "categoryID": "projecthoomans:whats_up",
+          "route": "conversation_category"
+        }
+      },
+      "reviewed": true,
+      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
+      "mapping": {
+        "canonicalConcept": "WHATS_UP",
+        "dialogueState": "WHATS_UP_ROOT",
+        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+      },
+      "confidence": 0.99,
+      "priority": 155
+    },
+    {
+      "id": "pnc.dataset.question.whats_up.whats_new",
+      "utterance": "what's new",
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC",
+        "extensions": {
+          "topic": "whats_up",
+          "categoryID": "projecthoomans:whats_up",
+          "route": "conversation_category"
+        }
+      },
+      "reviewed": true,
+      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
+      "mapping": {
+        "canonicalConcept": "WHATS_UP",
+        "dialogueState": "WHATS_UP_ROOT",
+        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+      },
+      "confidence": 0.99,
+      "priority": 155
+    },
+    {
+      "id": "pnc.dataset.question.whats_up.whats_new_ascii",
+      "utterance": "whats new",
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC",
+        "extensions": {
+          "topic": "whats_up",
+          "categoryID": "projecthoomans:whats_up",
+          "route": "conversation_category"
+        }
+      },
+      "reviewed": true,
+      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
+      "mapping": {
+        "canonicalConcept": "WHATS_UP",
+        "dialogueState": "WHATS_UP_ROOT",
+        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+      },
+      "confidence": 0.99,
+      "priority": 155
+    },
+    {
+      "id": "pnc.dataset.question.whats_up.anything_new",
+      "utterance": "anything new",
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC",
+        "extensions": {
+          "topic": "whats_up",
+          "categoryID": "projecthoomans:whats_up",
+          "route": "conversation_category"
+        }
+      },
+      "reviewed": true,
+      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
+      "mapping": {
+        "canonicalConcept": "WHATS_UP",
+        "dialogueState": "WHATS_UP_ROOT",
+        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+      },
+      "confidence": 0.99,
+      "priority": 155
+    },
+    {
+      "id": "pnc.dataset.question.whats_up.whats_happening",
+      "utterance": "what's happening",
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC",
+        "extensions": {
+          "topic": "whats_up",
+          "categoryID": "projecthoomans:whats_up",
+          "route": "conversation_category"
+        }
+      },
+      "reviewed": true,
+      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
+      "mapping": {
+        "canonicalConcept": "WHATS_UP",
+        "dialogueState": "WHATS_UP_ROOT",
+        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+      },
+      "confidence": 0.99,
+      "priority": 155
+    },
+    {
+      "id": "pnc.dataset.question.whats_up.whats_happening_ascii",
+      "utterance": "whats happening",
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC",
+        "extensions": {
+          "topic": "whats_up",
+          "categoryID": "projecthoomans:whats_up",
+          "route": "conversation_category"
+        }
+      },
+      "reviewed": true,
+      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
+      "mapping": {
+        "canonicalConcept": "WHATS_UP",
+        "dialogueState": "WHATS_UP_ROOT",
+        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+      },
+      "confidence": 0.99,
+      "priority": 155
+    },
+    {
+      "id": "pnc.dataset.question.whats_up.anything_going_on",
+      "utterance": "anything going on",
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC",
+        "extensions": {
+          "topic": "whats_up",
+          "categoryID": "projecthoomans:whats_up",
+          "route": "conversation_category"
+        }
+      },
+      "reviewed": true,
+      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
+      "mapping": {
+        "canonicalConcept": "WHATS_UP",
+        "dialogueState": "WHATS_UP_ROOT",
+        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+      },
+      "confidence": 0.99,
+      "priority": 155
+    },
+    {
       "id": "pnc.dataset.question.weather.can_we_talk_about_the_weather",
       "utterance": "can we talk about the weather",
       "emit": {

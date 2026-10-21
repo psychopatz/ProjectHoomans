@@ -14,6 +14,8 @@ function RuntimeState.new()
         llmCalls = 0,
         now = 1000,
         turn = 0,
+        lastSuggestionRevision = nil,
+        semanticClickReceipts = {},
         loadedModules = {},
         moduleManifest = {},
         headlessRequires = {},
@@ -32,6 +34,8 @@ function RuntimeState.resetContainers(runtime)
     runtime.llmCalls = 0
     runtime.now = 1000
     runtime.turn = 0
+    runtime.lastSuggestionRevision = nil
+    runtime.semanticClickReceipts = {}
     runtime.relationships = {}
 end
 

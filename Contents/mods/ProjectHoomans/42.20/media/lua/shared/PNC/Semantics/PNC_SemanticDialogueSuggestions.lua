@@ -115,6 +115,24 @@ end
 -- provenance for the later click adapter; it is never used to reparse text.
 local DEFINITIONS = {
     {
+        id = "conversation.whats_up",
+        topic = "whats_up",
+        order = 5,
+        patternID = "pnc.dataset.question.whats_up.whats_up",
+        labelKey = "UI_PNC_Conversation_Suggestion_WhatsUp_Label",
+        labelFallback = "Ask what's up",
+        utteranceKey = "UI_PNC_Conversation_Suggestion_WhatsUp_Utterance",
+        utteranceFallback = "What's up?",
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "CONVERSATION_TOPIC",
+        extensions = {
+            topic = "whats_up",
+            categoryID = "projecthoomans:whats_up",
+            route = "conversation_category",
+        },
+    },
+    {
         id = "question.wellbeing",
         topic = "wellbeing",
         order = 10,
@@ -504,6 +522,9 @@ local function canonicalTopic(value)
     if value == "time" or string.find(value, "time", 1, true) then
         return "time"
     end
+    if value == "whats_up" or string.find(value, "whats_up", 1, true) then
+        return "whats_up"
+    end
     if value == "greeting" or string.find(value, "greet", 1, true) then
         return "greeting"
     end
@@ -573,7 +594,32 @@ local function definitionForSubject(subject, followUp)
     if subject == "TIME" then return definitionFor("question.time") end
     if subject == "DATE" then return definitionFor("question.date") end
     if subject == "WEATHER" then return definitionFor("question.weather") end
+    if subject == "CONVERSATION_TOPIC" then
+        return definitionFor("conversation.whats_up")
+    end
     return nil
+end
+
+local function conversationCategoryVisible(context, categoryID)
+    local preflight = type(context) == "table"
+        and context.conversationCategoryPreflight or nil
+    if type(preflight) == "table"
+        and tostring(preflight.categoryID or categoryID) == categoryID
+    then
+        return preflight.visible == true, preflight.reason
+            or "category_preflight"
+    end
+    for _, diagnostic in ipairs(
+        type(context) == "table" and context.categoryDiagnostics or {}
+    ) do
+        if type(diagnostic) == "table"
+            and tostring(diagnostic.id or "") == categoryID
+        then
+            return diagnostic.visible == true,
+                diagnostic.reason or "category_diagnostic"
+        end
+    end
+    return false, "category_preflight_unknown"
 end
 
 local function sourceRecord(kind, revision, reason)
@@ -1190,7 +1236,91 @@ local function appendBranchOffers(
     end
 end
 
+local function appendConversationChoices(
+    output, seen, context, revision, predicateTrace
+)
+    local block = type(context) == "table"
+        and type(context.conversationBlock) == "table"
+        and context.conversationBlock or nil
+    if not block or type(block.choices) ~= "table" then return end
+    for _, choice in ipairs(block.choices) do
+        if type(choice) == "table" and tostring(choice.id or "") ~= "" then
+            local candidateID = table.concat({
+                "conversation.choice", tostring(block.blockID),
+                tostring(block.nodeID), tostring(choice.id),
+            }, ":")
+            if not seen[candidateID] and #output < Suggestions.MAX_CANDIDATES then
+                local text = tostring(choice.text or choice.id)
+                local enabled = choice.enabled == true
+                local status = enabled and "allowed" or "disabled"
+                local reason = enabled and "production_choice_eligible"
+                    or choice.lockedReasonKey or "production_choice_ineligible"
+                predicateTrace[#predicateTrace + 1] = {
+                    candidateID = candidateID,
+                    source = "conversation_registry",
+                    path = "conversationBlock.choices." .. tostring(choice.id),
+                    status = enabled and "allowed" or "hidden",
+                    reason = reason,
+                }
+                local frame = {
+                    schemaVersion = Suggestions.VERSION,
+                    kind = "semantic_click_frame",
+                    candidateID = candidateID,
+                    topic = canonicalTopic(block.topic) or "whats_up",
+                    intent = "REQUEST",
+                    speechAct = "REQUEST",
+                    subject = "CONVERSATION_TOPIC",
+                    extensions = {
+                        route = "conversation_choice",
+                        categoryID = block.categoryID,
+                        blockID = block.blockID,
+                        nodeID = block.nodeID,
+                        choiceID = choice.id,
+                    },
+                    textKey = choice.textKey,
+                    textFallback = text,
+                    labelKey = choice.textKey,
+                    requestRevision = revision,
+                }
+                local source = sourceRecord(
+                    "conversation_registry", revision, reason
+                )
+                local candidate = {
+                    id = candidateID,
+                    topic = canonicalTopic(block.topic) or "whats_up",
+                    groupID = "conversation_branch",
+                    rank = #output + 1,
+                    source = source,
+                    sources = { source },
+                    frame = frame,
+                    enabled = enabled,
+                    display = {
+                        labelKey = choice.textKey,
+                        labelFallback = text,
+                        label = text,
+                        utteranceKey = choice.textKey,
+                        utteranceFallback = text,
+                        utterance = text,
+                    },
+                    visibility = "player",
+                    eligibility = {
+                        status = enabled and "allowed" or "unavailable",
+                        allowed = enabled,
+                        reason = reason,
+                    },
+                }
+                output[#output + 1] = candidate
+                seen[candidateID] = candidate
+            end
+        end
+    end
+end
+
 local GROUP_LABELS = {
+    whats_up = {
+        key = "UI_PNC_Conversation_Suggestion_Group_WhatsUp_Label",
+        fallback = "What's up",
+    },
     wellbeing = {
         key = "UI_PNC_Conversation_Suggestion_Group_Wellbeing_Label",
         fallback = "Wellbeing",
@@ -1312,6 +1442,31 @@ local function buildGroups(candidates, capabilities, currentTopic)
     return groups, currentGroupID
 end
 
+function Suggestions.IsConversationCategoryFrame(frame)
+    if type(frame) ~= "table" or frame.kind ~= "semantic_click_frame" then
+        return false
+    end
+    local extensions = type(frame.extensions) == "table"
+        and frame.extensions or {}
+    return extensions.route == "conversation_category"
+        and extensions.categoryID == "projecthoomans:whats_up"
+        and extensions.topic == "whats_up"
+end
+
+function Suggestions.IsConversationChoiceFrame(frame)
+    if type(frame) ~= "table" or frame.kind ~= "semantic_click_frame" then
+        return false
+    end
+    local extensions = type(frame.extensions) == "table"
+        and frame.extensions or {}
+    return extensions.route == "conversation_choice"
+        and tostring(extensions.categoryID or "")
+            == "projecthoomans:whats_up"
+        and tostring(extensions.blockID or "") ~= ""
+        and tostring(extensions.nodeID or "") ~= ""
+        and tostring(extensions.choiceID or "") ~= ""
+end
+
 function Suggestions.Build(result, context, messages)
     result = type(result) == "table" and result or {}
     context = type(context) == "table" and context or {}
@@ -1349,6 +1504,9 @@ function Suggestions.Build(result, context, messages)
     local flow = type(decision.flow) == "table" and decision.flow or {}
     local flowActive = flow.flowId ~= nil
         and (flow.committed == true or flow.matched == true)
+    appendConversationChoices(
+        candidates, seen, context, revision, predicateTrace
+    )
     if flowActive then
         appendBranchOffers(
             candidates,
@@ -1394,7 +1552,9 @@ function Suggestions.Build(result, context, messages)
     local currentTopic = typedTopic or canonicalTopic(context.currentTopic)
     local typedReason = subject ~= "" and "interpreted_frame" or "no_subject"
     local typedSource = sourceRecord("typed_input", revision, typedReason)
-    local typedEligible = result.accepted == true and subject ~= ""
+    local typedEligible = result.accepted == true
+        and subject ~= ""
+        and ir.kind ~= "semantic_click_frame"
     if typedEligible and currentTopic then
         if subject == "WELLBEING" then
             addCandidate(
@@ -1404,10 +1564,27 @@ function Suggestions.Build(result, context, messages)
         end
         for _, definition in ipairs(DEFINITIONS) do
             if topicMatches(definition, currentTopic) then
-                addCandidate(
-                    candidates, seen, definition,
-                    "typed_input", revision, "topic_branch"
-                )
+                local visible = true
+                local visibilityReason = "topic_branch"
+                if definition.id == "conversation.whats_up" then
+                    visible, visibilityReason = conversationCategoryVisible(
+                        context, "projecthoomans:whats_up"
+                    )
+                end
+                if visible then
+                    addCandidate(
+                        candidates, seen, definition,
+                        "typed_input", revision, visibilityReason
+                    )
+                else
+                    appendTrace(
+                        trace,
+                        "typed_input",
+                        "hidden",
+                        visibilityReason,
+                        #candidates
+                    )
+                end
             end
         end
         appendTrace(trace, "typed_input", "allowed", typedReason, #candidates)

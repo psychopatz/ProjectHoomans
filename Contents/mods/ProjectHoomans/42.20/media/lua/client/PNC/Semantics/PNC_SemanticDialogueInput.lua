@@ -95,6 +95,42 @@ function Input.Submit(view, value, part)
 end
 
 function Input.SubmitSemanticFrame(view, frame)
+    if type(Suggestions.IsConversationCategoryFrame) == "function"
+        and Suggestions.IsConversationCategoryFrame(frame)
+    then
+        -- Category suggestions are already typed by the production semantic
+        -- layer. Route the canonical frame to the existing conversation
+        -- composer/authority boundary; never reparse its display text.
+        Input.ActiveView = view
+        local composer = PNC.Conversation
+            and PNC.Conversation.Composer or nil
+        if not composer or type(composer.RequestCategory) ~= "function" then
+            return false, "conversation_category_unavailable"
+        end
+        local npcID = view and view.spec and view.spec.npcID or nil
+        return composer.RequestCategory(
+            npcID,
+            frame.extensions.categoryID
+        )
+    end
+    if type(Suggestions.IsConversationChoiceFrame) == "function"
+        and Suggestions.IsConversationChoiceFrame(frame)
+    then
+        Input.ActiveView = view
+        local composer = PNC.Conversation
+            and PNC.Conversation.Composer or nil
+        if not composer or type(composer.RequestChoice) ~= "function" then
+            return false, "conversation_choice_unavailable"
+        end
+        local npcID = view and view.spec and view.spec.npcID or nil
+        local extensions = frame.extensions
+        return composer.RequestChoice(
+            npcID,
+            extensions.blockID,
+            extensions.nodeID,
+            extensions.choiceID
+        )
+    end
     local group = view and view.groupConversation
     if group and type(group.SubmitSemanticFrame) == "function" then
         return group:SubmitSemanticFrame(frame)

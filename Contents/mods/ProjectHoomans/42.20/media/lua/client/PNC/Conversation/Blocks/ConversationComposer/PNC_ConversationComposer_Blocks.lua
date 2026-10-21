@@ -58,6 +58,7 @@ function Composer.BuildBlockNode(block, nodeID, context)
             local selectedChoice = choice
             choices[#choices + 1] = {
                 id = selectedChoice.id,
+                textKey = selectedChoice.textKey,
                 text = passed
                     and dialoguePayload(
                         block.textSource,
@@ -66,6 +67,7 @@ function Composer.BuildBlockNode(block, nodeID, context)
                     )
                     or lockedText(block, selectedChoice, reason, context),
                 enabled = passed,
+                lockedReasonKey = selectedChoice.lockedReasonKey,
                 action = passed and function()
                     Composer.RequestChoice(
                         context.npcID,
@@ -110,6 +112,87 @@ function Composer.AttachBlock(spec, block, context)
         )
     end
     return true, "block:" .. block.entryNode
+end
+
+local function resolveProjectionText(value)
+    if type(value) == "table" then
+        local text = PsychopatzCore
+            and PsychopatzCore.Conversation
+            and PsychopatzCore.Conversation.Text
+        if text and type(text.Resolve) == "function" then
+            local ok, resolved = pcall(text.Resolve, value)
+            if ok and resolved ~= nil then return tostring(resolved) end
+        end
+        return tostring(value.text or value.fallback or "")
+    end
+    return tostring(value or "")
+end
+
+-- Read-only semantic projection of the same authored block/node that the
+-- native composer currently presents. The semantic suggestion layer consumes
+-- this projection; it does not maintain a second block or choice state.
+function Composer.BuildSemanticBlockProjection(view)
+    local spec = view and view.spec or nil
+    local context = spec and spec.context or nil
+    local session = view and view.session or nil
+    local blockID = context and context.activeConversationBlockID or nil
+    local registry = PNC.Conversation and PNC.Conversation.Registry
+        or Registry
+    local block = blockID
+        and registry
+        and type(registry.GetBlock) == "function"
+        and registry.GetBlock(blockID) or nil
+    if not block or not session then return nil end
+    local nodeID = tostring(session.currentNodeID or "")
+    if string.sub(nodeID, 1, 6) == "block:" then
+        nodeID = string.sub(nodeID, 7)
+    end
+    if nodeID == "" or type(block.nodes) ~= "table"
+        or type(block.nodes[nodeID]) ~= "table"
+    then
+        return nil
+    end
+    local builtNode = spec.nodes
+        and spec.nodes["block:" .. nodeID]
+        or Composer.BuildBlockNode(block, nodeID, context)
+    if type(builtNode) ~= "table" then return nil end
+    local topicCatalog = PNC.Semantics and PNC.Semantics.TopicCatalog
+        or TopicCatalog
+    local authoredTopic = topicCatalog
+        and type(topicCatalog.AuthoredTopic) == "function"
+        and topicCatalog.AuthoredTopic(block) or block.topic
+    local choices = {}
+    for _, entry in ipairs(builtNode.choices or {}) do
+        if type(entry) == "table" and tostring(entry.id or "") ~= "" then
+            local authoredChoice
+            for _, candidate in ipairs(
+                block.nodes[nodeID].choices or {}
+            ) do
+                if type(candidate) == "table"
+                    and candidate.id == entry.id
+                then
+                    authoredChoice = candidate
+                    break
+                end
+            end
+            choices[#choices + 1] = {
+                id = entry.id,
+                textKey = entry.textKey,
+                text = resolveProjectionText(entry.text),
+                enabled = entry.enabled == true,
+                lockedReasonKey = authoredChoice
+                    and authoredChoice.lockedReasonKey or nil,
+            }
+        end
+    end
+    return {
+        categoryID = block.category,
+        blockID = block.id,
+        topic = authoredTopic,
+        nodeID = nodeID,
+        npcText = resolveProjectionText(builtNode.npc),
+        choices = choices,
+    }
 end
 
 

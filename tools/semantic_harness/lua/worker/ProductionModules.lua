@@ -200,6 +200,33 @@ function ProductionModules.load(context)
         "social_authority"
     )
     load("ProjectHoomans", "shared", "PNC/Translation/PNC_TranslationBootstrap.lua", "translation")
+    -- The Semantic Lab must exercise the same authored category/block registry
+    -- as the game composer. This is read-only for semantic suggestion builds;
+    -- category clicks still enter through the existing authority path.
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Conversation/Composition/PNC_ConversationSharedComposition.lua",
+        "conversation_registry"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticTopicCatalog.lua",
+        "semantic_topic_catalog"
+    )
+    -- Keep category clicks on the production authority/composer seam. The
+    -- worker does not load the full native conversation window, but it does
+    -- load the same registry, authority, composer and inbound block handler
+    -- used by the game path.
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Conversation/PNC_ConversationAuthority.lua",
+        "conversation_authority"
+    )
+    load(
+        "ProjectHoomans", "client",
+        "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer.lua",
+        "conversation_composer"
+    )
     load("PsychopatzCore", "common_client", "PsychopatzCore/UI/Conversation/PsychopatzConversationText.lua", "conversation_text")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticMarketSenseAdapter.lua", "inventory")
     load("ProjectHoomans", "shared", "PNC/Gifts/PNC_GiftMarketSenseAdapter.lua", "inventory")
@@ -338,6 +365,7 @@ function ProductionModules.load(context)
     require = originalRequire
 
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Registry.lua", "network")
+    load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_InteractionResults.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Semantics.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Knowledge.lua", "network")
@@ -376,6 +404,21 @@ function ProductionModules.load(context)
 
     PsychopatzConversationLLMInput = originalInputClass
     context.Translations.installInstrumentation(context)
+    -- Production Core logging is intentionally kept inside the worker
+    -- record; raw print output would corrupt the JSON-lines protocol.
+    Runtime.productionLogs = {}
+    if PNC.Core then
+        PNC.Core.LogInfo = function(message)
+            Runtime.productionLogs[#Runtime.productionLogs + 1] = {
+                level = "INFO", message = tostring(message or ""),
+            }
+        end
+        PNC.Core.LogWarn = function(message)
+            Runtime.productionLogs[#Runtime.productionLogs + 1] = {
+                level = "WARN", message = tostring(message or ""),
+            }
+        end
+    end
     if type(Semantic) ~= "table" then error("semantic core failed to load") end
 end
 

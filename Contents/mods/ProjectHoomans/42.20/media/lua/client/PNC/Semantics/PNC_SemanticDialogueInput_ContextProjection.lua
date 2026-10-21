@@ -124,6 +124,10 @@ function Projection.Build(view, getProviderStatus)
         output.currentTopic = session.semanticDialogueContext.currentTopic
             or output.currentTopic
     end
+    local composer = PNC.Conversation and PNC.Conversation.Composer
+    if composer and type(composer.BuildSemanticBlockProjection) == "function" then
+        output.conversationBlock = composer.BuildSemanticBlockProjection(view)
+    end
     if WorldContext and type(WorldContext.Get) == "function" then
         output.worldContext = WorldContext.Get({
             player = localPlayer(view, source),

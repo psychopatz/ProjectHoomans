@@ -62,7 +62,9 @@ function Conversation.buildContext(context)
         or (authorityEligible and "eligible"
             or (companion == false and "not_companion"
                 or owned == false and "not_owned" or "authority_unknown"))
-    return {
+    local priorContext = Runtime.view and Runtime.view.spec
+        and Runtime.view.spec.context or nil
+    local output = {
         identityState = npc.identityState or "unknown",
         npcName = npcName,
         npcFullName = npcName,
@@ -96,7 +98,9 @@ function Conversation.buildContext(context)
         playerNameKnown = true,
         playerName = context.SemanticAdapters.playerName(context, player),
         characterUUID = player.characterUUID,
-        conversationTopic = conversation.topic or "greeting",
+        conversationTopic = conversation.topic
+            or priorContext and priorContext.conversationTopic
+            or "greeting",
         conversationLifecycleState = { token = conversation.token or "harness-lease" },
         semanticAuthorization = copy(
             conversation.semanticAuthorization
@@ -118,13 +122,147 @@ function Conversation.buildContext(context)
             },
         },
     }
+    -- Preserve the production composer projection across a worker context
+    -- refresh. The registry/authority remains the state owner; this is only
+    -- the public view projection consumed by semantic suggestions.
+    if type(priorContext) == "table" then
+        output.activeConversationBlockID =
+            priorContext.activeConversationBlockID
+        output.conversationBlockContext =
+            priorContext.conversationBlockContext
+        output.conversationBlock = Values.copy(priorContext.conversationBlock)
+        output.conversationCategoryPreflight = Values.copy(
+            priorContext.conversationCategoryPreflight
+        )
+    end
+    output.currentTopic = output.conversationTopic
+    return output
 end
 
 function Conversation.refreshViewContext(context)
     local Runtime = context.Runtime
     if Runtime.view and Runtime.view.spec then
         Runtime.view.spec.context = Conversation.buildContext(context)
+        local block = Conversation.blockProjection(Runtime.view)
+        Runtime.view.spec.context.conversationBlock = block
+        if block then
+            Runtime.view.spec.context.conversationTopic = block.topic
+            Runtime.view.spec.context.currentTopic = block.topic
+            if type(Runtime.view.spec.context.conversationBlockContext)
+                == "table"
+            then
+                Runtime.view.spec.context.conversationBlockContext.conversationTopic =
+                    block.topic
+            end
+        end
+        Runtime.view.spec.context.conversationCategoryPreflight =
+            Conversation.categoryPreflight(
+                Runtime.view.spec.context.conversationBlockContext
+            )
     end
+end
+
+local function resolvedPayload(value)
+    if type(value) ~= "table" then return tostring(value or "") end
+    local text = PsychopatzCore and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.Text
+    if text and type(text.Resolve) == "function" then
+        local ok, resolved = pcall(text.Resolve, value)
+        if ok and type(resolved) == "string" and resolved ~= "" then
+            return resolved
+        end
+    end
+    return tostring(value.text or value.fallback or "")
+end
+
+function Conversation.blockProjection(view)
+    local composer = PNC.Conversation and PNC.Conversation.Composer
+    if composer and type(composer.BuildSemanticBlockProjection) == "function" then
+        local projection = composer.BuildSemanticBlockProjection(view)
+        if projection then return projection end
+    end
+    local spec = view and view.spec or nil
+    local root = spec and spec.context or nil
+    local nodes = spec and spec.nodes or nil
+    local blockID = root and root.activeConversationBlockID or nil
+    if not blockID or type(nodes) ~= "table" then return nil end
+    local nodeID = view.session and view.session.currentNodeID or nil
+    if not nodeID or string.sub(tostring(nodeID), 1, 6) == "block:" then
+        nodeID = string.sub(tostring(nodeID or ""), 7)
+    end
+    if nodeID == "" then return nil end
+    local node = nodes["block:" .. tostring(nodeID)]
+    if type(node) ~= "table" then return nil end
+    local block = PNC.Conversation and PNC.Conversation.Registry
+        and PNC.Conversation.Registry.GetBlock
+        and PNC.Conversation.Registry.GetBlock(blockID) or nil
+    local topic = block and block.topic or nil
+    if not topic and block
+        and PNC.Semantics and PNC.Semantics.TopicCatalog
+        and type(PNC.Semantics.TopicCatalog.AuthoredTopic) == "function"
+    then
+        topic = PNC.Semantics.TopicCatalog.AuthoredTopic(block)
+    end
+    if not topic and block and PNC.Semantics
+        and PNC.Semantics.TopicCatalog
+        and type(PNC.Semantics.TopicCatalog.AUTHORED_CATEGORY_TOPICS) == "table"
+    then
+        topic = PNC.Semantics.TopicCatalog.AUTHORED_CATEGORY_TOPICS[
+            block.category
+        ]
+    end
+    local choices = {}
+    for _, choice in ipairs(node.choices or {}) do
+        if type(choice) == "table" then
+            choices[#choices + 1] = {
+                id = choice.id,
+                textKey = choice.textKey,
+                text = resolvedPayload(choice.text),
+                enabled = choice.enabled == true,
+                lockedReasonKey = choice.lockedReasonKey,
+            }
+        end
+    end
+    return {
+        categoryID = "projecthoomans:whats_up",
+        blockID = blockID,
+        nodeID = nodeID,
+        topic = topic or root.conversationTopic,
+        npcText = resolvedPayload(node.npc),
+        choices = choices,
+    }
+end
+
+function Conversation.categoryPreflight(blockContext)
+    local categoryID = "projecthoomans:whats_up"
+    if type(blockContext) ~= "table" then
+        return { visible = false, reason = "context_unknown" }
+    end
+    local conversation = PNC.Conversation
+    local registry = conversation and conversation.Registry or nil
+    local selector = conversation and conversation.Selector or nil
+    if not registry or not selector
+        or type(registry.GetCategory) ~= "function"
+        or type(selector.IsCategoryEligible) ~= "function"
+        or type(selector.SelectBlock) ~= "function"
+    then
+        return { visible = false, reason = "registry_unavailable" }
+    end
+    local category = registry.GetCategory(categoryID)
+    if not category then return { visible = false, reason = "category_not_found" } end
+    local eligible, eligibilityReason = selector.IsCategoryEligible(
+        categoryID, blockContext, false
+    )
+    local selected, selection = selector.SelectBlock(categoryID, blockContext)
+    return {
+        categoryID = categoryID,
+        visible = eligible == true and selected ~= nil,
+        eligible = eligible == true,
+        reason = eligible ~= true and eligibilityReason
+            or selected and "visible" or "no_eligible_block",
+        selectedBlockID = selected and selected.id or nil,
+        eligibleBlockCount = selection and selection.eligibleCount or 0,
+    }
 end
 
 function Conversation.buildView(context)
@@ -136,6 +274,10 @@ function Conversation.buildView(context)
     local session = {
         characterUUID = player.characterUUID,
         conversationID = "harness-conversation",
+        queue = {},
+        currentNodeID = "menu",
+        currentNode = nil,
+        spec = nil,
         append = function(self, speaker, value, metadata)
             local message = {
                 speaker = speaker,
@@ -154,25 +296,101 @@ function Conversation.buildView(context)
             return { messageID = "harness-message-" .. tostring(#Runtime.transcript) }
         end,
         queueMessage = function(self, speaker, payload, metadata)
+            local storedPayload = Values.copy(payload)
+            if type(storedPayload) == "table"
+                and storedPayload.text == nil
+                and storedPayload.fallback == nil
+            then
+                local resolved = resolvedPayload(storedPayload)
+                if resolved ~= "" then
+                    storedPayload.text = resolved
+                    storedPayload.fallback = resolved
+                end
+            end
             local message = {
                 speaker = speaker,
-                payload = Values.copy(payload),
+                payload = storedPayload,
                 metadata = Values.copy(metadata),
             }
             self.lastQueued = message
             Runtime.queued[#Runtime.queued + 1] = message
             Runtime.transcript[#Runtime.transcript + 1] = message
         end,
+        setChoices = function(self, choices)
+            self.choices = choices or {}
+        end,
+        enterNode = function(self, nodeID)
+            self.currentNodeID = tostring(nodeID or "")
+            self.currentNode = self.spec
+                and self.spec.nodes
+                and self.spec.nodes[self.currentNodeID] or nil
+            self:setChoices(self.currentNode and self.currentNode.choices or {})
+            local node = self.currentNode
+            if node and node.npc then
+                local text = resolvedPayload(node.npc)
+                self:append("npc", {
+                    key = "conversation.node." .. self.currentNodeID,
+                    text = text,
+                    fallback = text,
+                    nodeID = self.currentNodeID,
+                }, { conversationNode = true })
+            end
+            return self.currentNode ~= nil
+        end,
+        finishPending = function(self)
+            self.pendingFinished = true
+            if self.pendingClose == true then
+                self.lifecycleFinished = true
+                self.pendingClose = nil
+                self.pendingNext = nil
+                self.pendingChoices = nil
+                return true
+            end
+            if self.pendingNext then
+                local nextNode = self.pendingNext
+                self.pendingNext = nil
+                self:enterNode(nextNode)
+                return true
+            end
+            if self.pendingChoices then
+                local choices = self.pendingChoices
+                self.pendingChoices = nil
+                self:setChoices(choices)
+            end
+            return true
+        end,
     }
-    return {
+    local spec = {
+        npcID = npc.npcID,
+        context = Conversation.buildContext(context),
+        nodes = { menu = { choices = {} } },
+    }
+    local authority = PNC.Conversation and PNC.Conversation.Authority
+    if authority and type(authority.BuildContext) == "function" then
+        local ok, blockContext = pcall(
+            authority.BuildContext,
+            context.player,
+            npc,
+            scenario.conversation and scenario.conversation.token
+        )
+        if ok and type(blockContext) == "table" then
+            spec.context.conversationBlockContext = blockContext
+        end
+    end
+    spec.context.conversationCategoryPreflight = Conversation.categoryPreflight(
+        spec.context.conversationBlockContext
+    )
+    local view = {
         headless = true,
         lifecycleFinished = false,
-        spec = {
-            npcID = npc.npcID,
-            context = Conversation.buildContext(context),
-        },
+        spec = spec,
         session = session,
     }
+    session.spec = spec
+    session.currentNode = spec.nodes.menu
+    session:setChoices(session.currentNode.choices)
+    view.spec.context.conversationBlock = Conversation.blockProjection(view)
+    return view
 end
 
 function Conversation.relationshipSnapshot(context)
@@ -363,6 +581,209 @@ function Conversation.turn(context, text)
     end
     response.observation.authoritativeMessageCount =
         #response.observation.authoritativeMessages
+    if response.observation.suggestions then
+        Runtime.lastSuggestionRevision = tonumber(
+            response.observation.suggestions.revision
+        )
+    end
+    return response
+end
+
+local function sliced(values, startIndex)
+    local output = {}
+    local start = tonumber(startIndex) or 1
+    for index = start, #(values or {}) do
+        output[#output + 1] = values[index]
+    end
+    return output
+end
+
+function Conversation.semanticClick(context, frame)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local Input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local Suggestions = PNC.Semantics and PNC.Semantics.DialogueSuggestions
+    local view = Runtime.view
+    if not view or not view.session or not Input
+        or type(Input.SubmitSemanticFrame) ~= "function"
+    then
+        return nil, "conversation_unavailable"
+    end
+    if type(frame) ~= "table" then return nil, "suggestion_frame_required" end
+    local isCategory = Suggestions
+        and Suggestions.IsConversationCategoryFrame
+        and Suggestions.IsConversationCategoryFrame(frame)
+    local isChoice = Suggestions
+        and Suggestions.IsConversationChoiceFrame
+        and Suggestions.IsConversationChoiceFrame(frame)
+    if not isCategory and not isChoice then
+        return nil, "unsupported_conversation_frame"
+    end
+
+    local revision = tonumber(frame.requestRevision)
+    local currentRevision = tonumber(Runtime.lastSuggestionRevision)
+    if revision == nil or currentRevision == nil
+        or revision ~= currentRevision
+    then
+        return {
+            ok = true,
+            type = "semantic_click",
+            input = tostring(frame.textFallback or frame.candidateID or ""),
+            accepted = false,
+            reason = "suggestion_click_stale",
+            messages = {},
+            trace = {},
+            transport = {},
+            toolCalls = {},
+            observation = {
+                suggestions = {
+                    schemaVersion = 1,
+                    kind = "semantic_dialogue_suggestions",
+                    revision = currentRevision or 0,
+                    candidates = {},
+                    groups = {},
+                    trace = {{
+                        source = "suggestion_click",
+                        status = "rejected",
+                        reason = "suggestion_click_stale",
+                        candidateCount = 0,
+                    }},
+                },
+            },
+        }
+    end
+
+    local receiptKey = table.concat({
+        tostring(frame.candidateID or ""), tostring(revision),
+    }, ":")
+    Runtime.semanticClickReceipts = Runtime.semanticClickReceipts or {}
+    if Runtime.semanticClickReceipts[receiptKey] then
+        return {
+            ok = true,
+            type = "semantic_click",
+            input = tostring(frame.textFallback or frame.candidateID or ""),
+            accepted = false,
+            reason = "suggestion_click_replayed",
+            messages = {},
+            trace = {},
+            transport = {},
+            toolCalls = {},
+            observation = {
+                suggestions = {
+                    schemaVersion = 1,
+                    kind = "semantic_dialogue_suggestions",
+                    revision = currentRevision,
+                    candidates = {},
+                    groups = {},
+                    trace = {{
+                        source = "suggestion_click",
+                        status = "rejected",
+                        reason = "suggestion_click_replayed",
+                        candidateCount = 0,
+                    }},
+                },
+            },
+        }
+    end
+
+    Runtime.turn = Runtime.turn + 1
+    Runtime.now = Runtime.now + 1
+    local transcriptBefore = #Runtime.transcript
+    local queuedBefore = #Runtime.queued
+    local traceBefore = #Runtime.trace
+    local transportBefore = #Runtime.transport
+    local translationBefore = #Runtime.translationLookups
+    local blockBefore = view.spec.context.activeConversationBlockID
+    local contextBefore = context.Conversation.contextSnapshot(
+        context, view
+    )
+    local accepted, reason = Input.SubmitSemanticFrame(view, frame)
+    local composer = PNC.Conversation and PNC.Conversation.Composer
+    local mode = Runtime.scenario and Runtime.scenario.runtime
+        and Runtime.scenario.runtime.mode or "singleplayer"
+    if accepted == true and mode ~= "multiplayer"
+        and composer and type(composer.PumpLocalRequests) == "function"
+    then
+        composer.PumpLocalRequests()
+    end
+    Conversation.refreshViewContext(context)
+    local projection = Conversation.blockProjection(view)
+    local blockAfter = view.spec.context.activeConversationBlockID
+    local applied = accepted == true
+    if isCategory then
+        applied = applied and blockAfter ~= nil and blockAfter ~= blockBefore
+    end
+    if not applied and accepted == true then
+        accepted = false
+        reason = view.spec.context.lastConversationError
+            or (isCategory and "conversation_block_unavailable"
+                or "conversation_outcome_unavailable")
+    end
+    if accepted == true then
+        Runtime.semanticClickReceipts[receiptKey] = true
+    end
+
+    local allMessages = sliced(Runtime.queued, queuedBefore + 1)
+    local newTrace = sliced(Runtime.trace, traceBefore + 1)
+    local newTransport = sliced(Runtime.transport, transportBefore + 1)
+    local newTranslations = sliced(Runtime.translationLookups, translationBefore + 1)
+    local response = {
+        ok = true,
+        type = "semantic_click",
+        input = tostring(frame.textFallback or frame.candidateID or ""),
+        accepted = accepted == true,
+        reason = reason,
+        -- This is a worker response envelope revision, not a parsed turn.
+        -- The click has already crossed the typed-frame boundary above.
+        result = {
+            accepted = accepted == true,
+            reason = reason,
+            sequence = revision,
+            ir = {
+                kind = "semantic_click_frame",
+                intent = "REQUEST",
+                speechAct = "REQUEST",
+                subject = "CONVERSATION_TOPIC",
+            },
+        },
+        messages = allMessages,
+        trace = newTrace,
+        transport = newTransport,
+        toolCalls = context.OutputProjection.normalizedToolCalls(
+            context, newTrace, newTransport, nil, nil
+        ),
+        translation = {
+            language = context.Translations.currentLanguage(context),
+            lookups = newTranslations,
+        },
+        contextBefore = contextBefore,
+        contextAfter = context.Conversation.contextSnapshot(
+            context, view
+        ),
+        loadedModules = Runtime.loadedModules,
+        conversationBlock = Values.copy(projection),
+    }
+    response.transcriptMessages = sliced(Runtime.transcript, transcriptBefore + 1)
+    response.observation = context.OutputProjection.observation(
+        context,
+        response,
+        view.spec and view.spec.context
+    )
+    response.observation.conversationBlock = Values.copy(projection)
+    response.observation.authoritativeMessages = {}
+    for _, message in ipairs(allMessages) do
+        if type(message) == "table" and message.speaker == "npc" then
+            response.observation.authoritativeMessages[#response.observation.authoritativeMessages + 1] =
+                Values.copy(message.payload)
+        end
+    end
+    response.observation.authoritativeMessageCount =
+        #response.observation.authoritativeMessages
+    if response.observation.suggestions then
+        Runtime.lastSuggestionRevision = tonumber(
+            response.observation.suggestions.revision
+        ) or Runtime.lastSuggestionRevision
+    end
     return response
 end
 

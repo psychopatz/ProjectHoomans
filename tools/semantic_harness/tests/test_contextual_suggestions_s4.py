@@ -95,6 +95,75 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             app.close()
             root.update()
 
+    def test_whats_up_gui_click_enters_real_registry_branch(self) -> None:
+        if not os.environ.get("DISPLAY"):
+            self.skipTest("Tk display is unavailable")
+
+        root = tk.Tk()
+        app = SemanticHarnessApp(root, _parser().parse_args([]))
+
+        def wait_until(predicate: object, timeout: float = 10.0) -> None:
+            deadline = time.monotonic() + timeout
+            while not predicate() and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertTrue(predicate())
+
+        try:
+            wait_until(lambda: app.worker_ready)
+            app.input_var.set("whats up")
+            app.submit()
+            wait_until(
+                lambda: not app.busy
+                and any(
+                    row.get("id") == "conversation.whats_up"
+                    for row in app.suggestion_rows
+                )
+            )
+            self.assertIn(
+                "Ask what's up",
+                [str(button.cget("text")) for button in app.suggestion_buttons],
+            )
+
+            root_index = next(
+                index
+                for index, row in enumerate(app.suggestion_rows)
+                if row.get("id") == "conversation.whats_up"
+            )
+            app.click_suggestion(root_index)
+            wait_until(
+                lambda: not app.busy
+                and any(
+                    "What kind of movement?" in str(button.cget("text"))
+                    for button in app.suggestion_buttons
+                )
+            )
+            self.assertIn(
+                "There's been movement around the neighborhood today.",
+                app.transcript.get("1.0", "end"),
+            )
+            self.assertIn(
+                "conversationBlock",
+                app.suggestion_inspector.get("1.0", "end"),
+            )
+            detail_index = next(
+                index
+                for index, row in enumerate(app.suggestion_rows)
+                if row.get("id", "").endswith(":detail")
+            )
+            app.click_suggestion(detail_index)
+            wait_until(
+                lambda: not app.busy
+                and any(
+                    "I can help check the area" in str(button.cget("text"))
+                    for button in app.suggestion_buttons
+                )
+            )
+            self.assertIn("Mostly tracks", app.transcript.get("1.0", "end"))
+        finally:
+            app.close()
+            root.update()
+
 
 if __name__ == "__main__":
     unittest.main()

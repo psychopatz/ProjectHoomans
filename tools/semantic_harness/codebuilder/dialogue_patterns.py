@@ -14,6 +14,7 @@ from .dialogue_contract import (
     DIALOGUE_BACKSTORY_EXTENSIONS,
     DIALOGUE_BACKSTORY_DISCLOSURES,
     DIALOGUE_CONTEXT_REFERENCE_EXTENSIONS,
+    DIALOGUE_CONVERSATION_TOPIC_EXTENSIONS,
     DIALOGUE_PROMISE_SUBJECTS,
     DIALOGUE_PROMISE_EXTENSIONS,
     DIALOGUE_MAPPING_FIELDS,
@@ -119,6 +120,28 @@ def _compile_dialogue_pattern(
                 "target": emit["target"],
                 "extensions": {
                     key: extensions[key] for key in sorted(extensions)
+                },
+            }
+        elif subject == "CONVERSATION_TOPIC":
+            extensions = emit.get("extensions")
+            if (set(emit) != {
+                    "intent", "speechAct", "subject", "extensions",
+                }
+                    or not isinstance(extensions, dict)
+                    or set(extensions) != DIALOGUE_CONVERSATION_TOPIC_EXTENSIONS
+                    or extensions.get("topic") != "whats_up"
+                    or extensions.get("categoryID") != "projecthoomans:whats_up"
+                    or extensions.get("route") != "conversation_category"):
+                raise CompileError(
+                    f"dialogue conversation-topic pattern {pattern_id} requires the reviewed whats_up category route"
+                )
+            normalized_emit = {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "CONVERSATION_TOPIC",
+                "extensions": {
+                    key: extensions[key]
+                    for key in sorted(extensions)
                 },
             }
         elif subject == "QUANTITY":

@@ -315,15 +315,104 @@ return {
     {
             ["confidence"] = 0.99,
             ["emit"] = {
+                ["extensions"] = {
+                    ["categoryID"] = "projecthoomans:whats_up",
+                    ["route"] = "conversation_category",
+                    ["topic"] = "whats_up",
+                },
                 ["intent"] = "QUESTION",
                 ["speechAct"] = "QUESTION",
-                ["subject"] = "WEATHER",
+                ["subject"] = "CONVERSATION_TOPIC",
             },
-            ["id"] = "pnc.dataset.sgd.weather.how_is_the_weather_on_9th_of_march",
+            ["id"] = "pnc.dataset.question.whats_up.anything_going_on",
             ["match"] = {
                 {
                     ["kind"] = "literal",
-                    ["value"] = "how",
+                    ["value"] = "anything",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "going",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "on",
+                },
+            },
+            ["metadata"] = {
+                ["mapping"] = {
+                    ["canonicalConcept"] = "WHATS_UP",
+                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["sourceRefs"] = {
+                        "DailyDialog",
+                        "EmpatheticDialogues",
+                    },
+                },
+                ["reviewed"] = true,
+                ["sourceRefs"] = {
+                    "DailyDialog",
+                    "EmpatheticDialogues",
+                },
+            },
+            ["priority"] = 155,
+        },
+    {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["extensions"] = {
+                    ["categoryID"] = "projecthoomans:whats_up",
+                    ["route"] = "conversation_category",
+                    ["topic"] = "whats_up",
+                },
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "CONVERSATION_TOPIC",
+            },
+            ["id"] = "pnc.dataset.question.whats_up.anything_new",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "anything",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "new",
+                },
+            },
+            ["metadata"] = {
+                ["mapping"] = {
+                    ["canonicalConcept"] = "WHATS_UP",
+                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["sourceRefs"] = {
+                        "DailyDialog",
+                        "EmpatheticDialogues",
+                    },
+                },
+                ["reviewed"] = true,
+                ["sourceRefs"] = {
+                    "DailyDialog",
+                    "EmpatheticDialogues",
+                },
+            },
+            ["priority"] = 155,
+        },
+    {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["extensions"] = {
+                    ["categoryID"] = "projecthoomans:whats_up",
+                    ["route"] = "conversation_category",
+                    ["topic"] = "whats_up",
+                },
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "CONVERSATION_TOPIC",
+            },
+            ["id"] = "pnc.dataset.question.whats_up.what_is_up",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "what",
                 },
                 {
                     ["kind"] = "literal",
@@ -331,42 +420,24 @@ return {
                 },
                 {
                     ["kind"] = "literal",
-                    ["value"] = "the",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "weather",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "on",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "9th",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "of",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "march",
+                    ["value"] = "up",
                 },
             },
             ["metadata"] = {
                 ["mapping"] = {
-                    ["canonicalConcept"] = "WEATHER",
-                    ["dialogueState"] = "WEATHER_TOPIC",
+                    ["canonicalConcept"] = "WHATS_UP",
+                    ["dialogueState"] = "WHATS_UP_ROOT",
                     ["sourceRefs"] = {
-                        "SGD",
+                        "DailyDialog",
+                        "EmpatheticDialogues",
                     },
                 },
                 ["reviewed"] = true,
                 ["sourceRefs"] = {
-                    "SGD",
+                    "DailyDialog",
+                    "EmpatheticDialogues",
                 },
             },
-            ["priority"] = 166,
+            ["priority"] = 155,
         },
 }

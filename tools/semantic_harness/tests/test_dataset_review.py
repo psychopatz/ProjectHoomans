@@ -28,15 +28,15 @@ class DatasetReviewTests(unittest.TestCase):
         self.assertTrue(first["previewOnly"])
         self.assertTrue(first["effectFree"])
         self.assertEqual(first["writes"], [])
-        self.assertEqual(first["patternCount"], 36)
+        self.assertEqual(first["patternCount"], 45)
         self.assertEqual(first["responseVariantCount"], 31)
         self.assertEqual(
             first["candidateReview"]["summary"],
-            {"approved": 10, "rejected": 0, "not_candidate": 54},
+            {"approved": 18, "rejected": 0, "not_candidate": 46},
         )
         self.assertEqual(
             first["candidateReview"]["provenance"]["approvedWithProvenance"],
-            10,
+            18,
         )
         self.assertEqual(
             first["sourceMetadata"]["integrationStatus"],
@@ -115,7 +115,7 @@ class DatasetReviewTests(unittest.TestCase):
 
         self.assertTrue(first["ok"])
         self.assertTrue(first["generationApproved"])
-        self.assertEqual(len(first["writes"]), 9)
+        self.assertEqual(len(first["writes"]), 10)
         self.assertEqual(first_hashes, second_hashes)
         self.assertTrue(all(row["status"] == "unchanged" for row in second["artifactDiffs"]))
         self.assertEqual(second["reloadedBy"], "caller_restart_required")

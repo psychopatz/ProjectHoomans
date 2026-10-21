@@ -14,7 +14,7 @@ DIALOGUE_TEMPLATE_ID = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,95}$")
 DIALOGUE_UTTERANCE = re.compile(r"^[a-z0-9']+(?: [a-z0-9']+)*$")
 DIALOGUE_PATTERN_SUBJECTS = frozenset({
     "ACTIVITY", "IDENTITY", "WELLBEING", "WEATHER",
-    "NPC_BACKSTORY", "CONTEXT_REFERENCE",
+    "NPC_BACKSTORY", "CONTEXT_REFERENCE", "CONVERSATION_TOPIC",
 })
 DIALOGUE_BACKSTORY_KINDS = frozenset({
     "former_job", "hometown", "education", "hobby",
@@ -31,6 +31,9 @@ DIALOGUE_BACKSTORY_DISCLOSURES = frozenset({
 DIALOGUE_CONTEXT_REFERENCE_EXTENSIONS = frozenset({
     "dialogueFollowUp", "topic", "contextQuestion",
 })
+DIALOGUE_CONVERSATION_TOPIC_EXTENSIONS = frozenset({
+    "topic", "categoryID", "route",
+})
 DIALOGUE_PROMISE_SUBJECTS = frozenset({"NEEDS"})
 DIALOGUE_PROMISE_EXTENSIONS = frozenset({"topic", "dialogueFollowUp"})
 DIALOGUE_MAPPING_FIELDS = frozenset({
@@ -38,11 +41,12 @@ DIALOGUE_MAPPING_FIELDS = frozenset({
 })
 DIALOGUE_MAPPING_CONCEPTS = frozenset({
     "ANY_ITEM", "FETCH", "WEATHER", "WELLBEING", "NPC_BACKSTORY",
-    "CONTEXT_REFERENCE",
+    "CONTEXT_REFERENCE", "WHATS_UP",
 })
 DIALOGUE_MAPPING_STATES = frozenset({
     "NEEDS_PROPOSAL", "NEEDS_QUANTITY", "WEATHER_TOPIC",
     "WELLBEING_FOLLOW_UP", "BACKSTORY_QUESTION", "BACKSTORY_FOLLOW_UP",
+    "WHATS_UP_ROOT",
 })
 DIALOGUE_TRANSLATION_ARG_TYPES = frozenset({
     "string", "number", "boolean", "identifier", "fact_content",
