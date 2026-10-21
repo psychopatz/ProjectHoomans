@@ -87,6 +87,30 @@ class ContextualSuggestionsS1Tests(unittest.TestCase):
         )
         self.assertTrue(result["observation"]["sideEffects"]["none"])
 
+    def test_greeting_response_plan_exposes_wellbeing_follow_up(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            result = worker.input("hello")
+
+        suggestions = result["observation"]["suggestions"]
+        wellbeing = next(
+            candidate
+            for candidate in suggestions["candidates"]
+            if candidate["id"] == "question.wellbeing_detail"
+        )
+        self.assertEqual(wellbeing["source"]["kind"], "npc_response_plan")
+        self.assertEqual(
+            {source["kind"] for source in wellbeing["sources"]},
+            {"npc_response_plan"},
+        )
+        self.assertEqual(
+            suggestions["trace"][1]["reason"],
+            "WELLBEING",
+        )
+        self.assertEqual(
+            result["messages"][-1]["payload"]["text"],
+            "How have you been?",
+        )
+
     def test_suggestion_catalog_resolves_en_and_tl(self) -> None:
         for language, expected in (
             ("EN", "Ask about wellbeing"),

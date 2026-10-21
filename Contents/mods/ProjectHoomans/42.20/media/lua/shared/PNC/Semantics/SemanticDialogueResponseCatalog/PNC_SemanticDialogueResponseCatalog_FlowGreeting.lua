@@ -19,6 +19,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
             plan = {
                 dialogueAct = "GREETING_OPENING",
                 sourcePoolID = "semantic.flow.greeting.opening",
+                topic = "WELLBEING",
                 turns = {
                     {
                         id = "greeting",
@@ -54,6 +55,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
             plan = {
                 dialogueAct = "GREETING_OPENING",
                 sourcePoolID = "semantic.flow.greeting.opening",
+                topic = "WELLBEING",
                 turns = {
                     {
                         id = "greeting",
@@ -89,6 +91,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
             plan = {
                 dialogueAct = "GREETING_OPENING",
                 sourcePoolID = "semantic.flow.greeting.opening",
+                topic = "WELLBEING",
                 turns = {
                     {
                         id = "greeting",

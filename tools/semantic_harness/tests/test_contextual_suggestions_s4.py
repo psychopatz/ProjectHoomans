@@ -29,13 +29,20 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
         try:
             wait_until(lambda: app.worker_ready)
             app.main_tabs.select(app.simulation_tab)
-            app.input_var.set("Are you okay?")
+            app.input_var.set("hello")
             app.submit()
             wait_until(lambda: not app.busy and bool(app.suggestion_rows))
 
             self.assertEqual(len(app.suggestion_buttons), 5)
             self.assertEqual(
                 str(app.suggestion_buttons[0].cget("state")), "normal"
+            )
+            self.assertIn(
+                "Ask what is wrong",
+                [
+                    str(button.cget("text"))
+                    for button in app.suggestion_buttons
+                ],
             )
             self.assertEqual(
                 str(app.suggestion_buttons[4].cget("state")), "disabled"
