@@ -1,5 +1,5 @@
 # Roadmap — one complete implementation objective
-Status: ALL PHASES PLANNED; acceptance not yet claimed. Phase milestones are progress checkpoints, not permission to declare the goal finished.
+Status: DEVELOPER-SIDE S0–S6 COMPLETE for the dataset-backed contextual suggestions slice; native Project Zomboid SP/MP live acceptance remains UNTESTED and user-owned. Phase milestones remain evidence checkpoints, not release authorization.
 ## S0 — source ownership & actual UI/worker baseline
 Audit current Hoomans/Core APIs, dialogue input widget/reply presentation, FlowKernel, candidate parser, action dispatcher, Core actor/relationships, EN/TL catalogs, and Semantic Lab scenario projection/inspector. Capture one real-worker before-state for typed and reply turns and document integration points. Avoid duplicating available systems.
 Gate: source paths, current actual message/button UI semantics, authority route and real Lua worker reproduced; remaining deltas explicit.
