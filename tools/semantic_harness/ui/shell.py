@@ -35,10 +35,15 @@ def npc_message_text(message: dict[str, Any]) -> str:
 def semantic_suggestion_rows(suggestions: dict[str, Any]) -> list[dict[str, Any]]:
     """Build the bounded visual slice from the production projection."""
 
+    max_buttons = 5
     candidates = suggestions.get("candidates") or []
     capabilities = suggestions.get("permittedCapabilities") or []
     rows: list[dict[str, Any]] = []
-    candidate_limit = max(0, 6 - len(capabilities)) if capabilities else 6
+    candidate_limit = (
+        max(0, max_buttons - len(capabilities))
+        if capabilities
+        else max_buttons
+    )
     for candidate in candidates[:candidate_limit]:
         rows.append(
             {
@@ -50,7 +55,7 @@ def semantic_suggestion_rows(suggestions: dict[str, Any]) -> list[dict[str, Any]
                 "source": candidate.get("source"),
             }
         )
-    for capability in capabilities[: max(0, 6 - len(rows))]:
+    for capability in capabilities[: max(0, max_buttons - len(rows))]:
         status = capability.get("status") or "unavailable_unknown"
         rows.append(
             {
@@ -174,7 +179,7 @@ class SemanticHarnessApp:
         self.suggestion_buttons: list[Any] = []
         self.suggestion_rows: list[dict[str, Any]] = []
         self.suggestion_interactive = False
-        for index in range(6):
+        for index in range(5):
             button = ttk.Button(
                 suggestion_frame,
                 text="",

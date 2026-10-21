@@ -49,6 +49,7 @@ end
 
 function Translations.record(context, kind, key, fallback, value, args)
     local Runtime = context.Runtime
+    if Runtime.suppressTranslationInstrumentation == true then return end
     local keyText = tostring(key or "")
     if keyText == "" then return end
     local fallbackText = fallback ~= nil and tostring(fallback) or nil

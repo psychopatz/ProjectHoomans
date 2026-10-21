@@ -33,12 +33,12 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             app.submit()
             wait_until(lambda: not app.busy and bool(app.suggestion_rows))
 
-            self.assertEqual(len(app.suggestion_buttons), 6)
+            self.assertEqual(len(app.suggestion_buttons), 5)
             self.assertEqual(
                 str(app.suggestion_buttons[0].cget("state")), "normal"
             )
             self.assertEqual(
-                str(app.suggestion_buttons[5].cget("state")), "disabled"
+                str(app.suggestion_buttons[4].cget("state")), "disabled"
             )
             self.assertIn(
                 "predicateTrace",
@@ -52,6 +52,30 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.assertIn(
                 "semantic_click_frame",
                 app.suggestion_inspector.get("1.0", "end"),
+            )
+
+            follow_index = next(
+                index
+                for index, row in enumerate(app.suggestion_rows)
+                if row.get("action") == "FOLLOW"
+            )
+            app.click_suggestion(follow_index)
+            wait_until(lambda: not app.busy)
+            self.assertIn("TOOL/ACTION:", app.transcript.get("1.0", "end"))
+            self.assertIn("follow", app.transcript.get("1.0", "end").lower())
+
+            app.language_var.set("TL")
+            app.set_language()
+            wait_until(lambda: not app.busy)
+            app.input_var.set("Are you okay?")
+            app.submit()
+            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
+            self.assertIn(
+                "Itanong ang kalagayan",
+                [
+                    str(button.cget("text"))
+                    for button in app.suggestion_buttons
+                ],
             )
         finally:
             app.close()

@@ -270,14 +270,24 @@ function OutputProjection.observation(context, record, semanticContext)
     local suggestionsModule = PNC
         and PNC.Semantics
         and PNC.Semantics.DialogueSuggestions
-    local suggestions = suggestionsModule
-        and type(suggestionsModule.Build) == "function"
-        and suggestionsModule.Build(
+    local runtime = context.Runtime
+    local suppressInstrumentation = record.type == "preview"
+    local previousSuppression = runtime.suppressTranslationInstrumentation
+    if suppressInstrumentation then
+        runtime.suppressTranslationInstrumentation = true
+    end
+    local suggestions
+    if suggestionsModule and type(suggestionsModule.Build) == "function" then
+        local ok, value = pcall(
+            suggestionsModule.Build,
             result,
             semanticContext or record.contextAfter,
             record.messages
         )
-        or {
+        suggestions = ok and value or nil
+    end
+    runtime.suppressTranslationInstrumentation = previousSuppression
+    suggestions = suggestions or {
             schemaVersion = 1,
             kind = "semantic_dialogue_suggestions",
             revision = tonumber(result.sequence) or 0,

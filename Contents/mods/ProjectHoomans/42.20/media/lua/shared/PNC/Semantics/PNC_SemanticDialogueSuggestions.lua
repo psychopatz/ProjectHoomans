@@ -19,6 +19,8 @@ Suggestions.MAX_CANDIDATES = 5
 Suggestions.MAX_TRACE = 12
 Suggestions.MAX_SOURCES = 4
 
+local TEXT_CACHE = {}
+
 local function boundedText(value, limit)
     value = tostring(value or "")
     limit = tonumber(limit) or 128
@@ -59,10 +61,23 @@ local function normalizedText(value)
 end
 
 local function resolvedText(key, fallback)
+    key = tostring(key or "")
+    fallback = fallback or key
+    local language = "EN"
+    local manager = CustomTranslationManager
+    if manager and type(manager.getLanguage) == "function" then
+        local ok, value = pcall(manager.getLanguage)
+        if ok and value then language = tostring(value) end
+    end
+    TEXT_CACHE[language] = TEXT_CACHE[language] or {}
+    if TEXT_CACHE[language][key] ~= nil then
+        return TEXT_CACHE[language][key]
+    end
     local translation = PNC.Translation
     if translation and type(translation.GetKey) == "function" then
         local ok, value = pcall(translation.GetKey, key, fallback)
         if ok and type(value) == "string" and value ~= "" then
+            TEXT_CACHE[language][key] = value
             return value
         end
     end
@@ -70,10 +85,12 @@ local function resolvedText(key, fallback)
     if core and type(core.GetKey) == "function" then
         local ok, value = pcall(core.GetKey, key, fallback)
         if ok and type(value) == "string" and value ~= "" then
+            TEXT_CACHE[language][key] = value
             return value
         end
     end
-    return fallback or key or ""
+    TEXT_CACHE[language][key] = fallback
+    return fallback
 end
 
 -- These are semantic frames, not parser inputs.  patternID is retained as

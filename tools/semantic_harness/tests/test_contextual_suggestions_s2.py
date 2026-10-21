@@ -142,6 +142,41 @@ class ContextualSuggestionsS2Tests(unittest.TestCase):
             any("romance" in candidate["id"] for candidate in suggestions["candidates"])
         )
 
+    def test_relationship_boundaries_traits_and_unsupported_social_provider_fail_closed(self) -> None:
+        for approval, expected in ((-1, "rejected"), (0, "allowed"), (1, "allowed")):
+            scenario = deepcopy(DEFAULT_SCENARIO)
+            scenario["npc"]["relationship"]["approval"] = approval
+            with self.subTest(approval=approval):
+                with LuaSemanticWorker(scenario) as worker:
+                    result = worker.suggestion_predicate(
+                        {
+                            "path": "relationship.approval",
+                            "op": "gte",
+                            "value": 0,
+                        }
+                    )
+                self.assertEqual(result["result"]["status"], expected)
+
+        trait_scenario = deepcopy(DEFAULT_SCENARIO)
+        trait_scenario["npc"]["traits"] = {"friendly": True}
+        with LuaSemanticWorker(trait_scenario) as worker:
+            trait_true = worker.suggestion_predicate(
+                {"path": "npcState.traits.friendly", "op": "truthy"}
+            )
+            unsupported = worker.suggestion_predicate(
+                {"path": "romance.compatibility", "op": "truthy"}
+            )
+            projection = worker.preview("Are you okay?")
+
+        self.assertEqual(trait_true["result"]["status"], "allowed")
+        self.assertEqual(unsupported["result"]["status"], "unknown")
+        self.assertFalse(
+            any(
+                token in str(projection["observation"]["suggestions"])
+                for token in ("romance", "consent", "orientation")
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

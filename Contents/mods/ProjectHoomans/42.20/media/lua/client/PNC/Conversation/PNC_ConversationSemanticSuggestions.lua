@@ -22,7 +22,7 @@ Layout.defaults.semanticSuggestions = Layout.defaults.semanticSuggestions or {
     h = 0.16,
 }
 
-local MAX_BUTTONS = 6
+local MAX_BUTTONS = 5
 local COLUMNS = 3
 local GAP = 6
 local BUTTON_HEIGHT = 32
