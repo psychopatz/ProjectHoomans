@@ -124,12 +124,18 @@ end
 
 function Lifecycle.StampLiveBody(record, zombie)
     local modData
+    local runtime
+    local restoredBodyRebind
+    local startupBodyHint
     if not record or not zombie or not zombie.getModData then
         return nil
     end
-    record.runtime = record.runtime or {}
-    if not record.runtime.bodyLease or tostring(record.runtime.bodyLease) == "" then
-        record.runtime.bodyLease = Core.GenerateID("body")
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    restoredBodyRebind = runtime.restoredBodyRebindPending == true
+    startupBodyHint = restoredBodyRebind and runtime.startupBodyHint or nil
+    if not runtime.bodyLease or tostring(runtime.bodyLease) == "" then
+        runtime.bodyLease = Core.GenerateID("body")
     end
     modData = zombie:getModData()
     modData.PNC_Owner = "ProjectHoomans"
@@ -141,7 +147,7 @@ function Lifecycle.StampLiveBody(record, zombie)
         and type(PNC.Factions.GetFactionID) == "function"
         and PNC.Factions.GetFactionID(record) or nil
     modData.PNC_FactionID = factionID and tostring(factionID) or nil
-    modData.PNC_BodyLease = tostring(record.runtime.bodyLease)
+    modData.PNC_BodyLease = tostring(runtime.bodyLease)
     modData.PNC_CorpseToken = nil
     modData.PNC_TagVersion = Const.BODY_TAG_VERSION
     modData.PNC_PersistedShell = true
@@ -160,6 +166,32 @@ function Lifecycle.StampLiveBody(record, zombie)
     record.runtime.lastIdentityPopulationID = nil
     record.runtime.identityUnavailableFor = nil
     Lifecycle.RefreshLiveBodyIdentity(record, zombie, "body_stamp")
+    if restoredBodyRebind and startupBodyHint then
+        -- A population-restored body may expose outfit/persistent ids one or
+        -- more ticks after the rebind. Keep only the fields that the engine
+        -- did not provide; a conflicting live engine value always wins.
+        if record.liveBodyInstanceID == nil
+            and validEngineIdentity(startupBodyHint.instanceID)
+        then
+            record.liveBodyInstanceID = tostring(startupBodyHint.instanceID)
+        end
+        if record.liveBodyPopulationID == nil
+            and validEngineIdentity(startupBodyHint.populationId)
+        then
+            record.liveBodyPopulationID = tostring(startupBodyHint.populationId)
+        end
+        if record.liveBodyInstanceID ~= nil
+            or record.liveBodyPopulationID ~= nil
+        then
+            runtime.lastIdentitySource = "restored_body_hint"
+            runtime.lastIdentityOutfitID = record.liveBodyInstanceID
+            runtime.lastIdentityPopulationID = record.liveBodyPopulationID
+            runtime.lastLiveBodyInstanceID = record.liveBodyInstanceID
+            runtime.lastLiveBodyPopulationID = record.liveBodyPopulationID
+            runtime.lastLiveBodyOnlineID = record.liveBodyOnlineID
+            runtime.lastLiveBodyLease = runtime.bodyLease
+        end
+    end
     if Lifecycle.IdentityAudit and Lifecycle.IdentityAudit.Capture then
         Lifecycle.IdentityAudit.Capture(
             zombie,
@@ -173,7 +205,7 @@ function Lifecycle.StampLiveBody(record, zombie)
         registry.MarkDirty(record, "live_body_hint")
     end
     Internal.mark(record, "live", "bound", "body_stamped")
-    return record.runtime.bodyLease
+    return runtime.bodyLease
 end
 
 local function captureDetachedBodyHint(record)
@@ -241,6 +273,10 @@ function Internal.detachLiveBody(record, reason)
         -- serializer to persist it. PZ may restore the removed shell after a
         -- relog even when removeZombie() reported a successful detach.
         captureDetachedBodyHint(record)
+        record.runtime.bodyReleasePending = nil
+        record.runtime.bodyReleaseAttempts = nil
+        record.runtime.bodyReleaseLastAt = nil
+        record.runtime.bodyReleaseLastReason = nil
         record.runtime.bodyLease = nil
         if reg and reg.LiveByID then
             reg.LiveByID[record.id] = nil
@@ -334,6 +370,7 @@ end
 function Lifecycle.RemoveLiveBody(record, zombie, reason)
     local attached
     local verified
+    local runtime
     if zombie and Internal.matchesRecordBody
         and Internal.matchesRecordBody(record, zombie)
     then
@@ -347,6 +384,33 @@ function Lifecycle.RemoveLiveBody(record, zombie, reason)
                 reason,
                 verified
             )
+        end
+        -- An attached body that failed engine removal is still owned by this
+        -- record. Do not clear its lease and turn it into an abstract record:
+        -- the loaded-body audit would then see a marked, ownerless zombie and
+        -- the husk reaper would intentionally skip it. Keep the lease and
+        -- retry the direct removal on a later audit/reconcile pass instead.
+        if attached and not verified then
+            runtime = record and (record.runtime or {}) or nil
+            if record then record.runtime = runtime end
+            if runtime then
+                runtime.bodyReleasePending = true
+                runtime.bodyReleaseAttempts =
+                    (tonumber(runtime.bodyReleaseAttempts) or 0) + 1
+                runtime.bodyReleaseLastAt = Core and Core.Now
+                    and Core.Now() or 0
+                runtime.bodyReleaseLastReason = tostring(
+                    reason or "removal_unverified")
+            end
+            if Internal.mark then
+                Internal.mark(
+                    record,
+                    "live",
+                    "release_pending",
+                    "body_removal_unverified"
+                )
+            end
+            return false
         end
         if (not attached or not verified) and Lifecycle.NoteLostBody then
             Lifecycle.NoteLostBody(

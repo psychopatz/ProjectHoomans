@@ -17,7 +17,14 @@ function Lifecycle.AuditLoadedBodies(now, force)
     local zombieArray
     local zombieCount
     local accepted = {}
-    local stats = { scanned = 0, removed = 0, rebound = 0, duplicates = 0, corpses = 0 }
+    local stats = {
+        scanned = 0,
+        removed = 0,
+        deferred = 0,
+        rebound = 0,
+        duplicates = 0,
+        corpses = 0,
+    }
     local i
     local zombie
     local modData
@@ -154,13 +161,29 @@ function Lifecycle.AuditLoadedBodies(now, force)
                             record.liveBodyOnlineID = Internal.normalizeOnlineID(zombie)
                             stats.rebound = stats.rebound + 1
                         end
-                        if Lifecycle.RefreshLiveBodyIdentity then
+                        if record.runtime
+                            and record.runtime.bodyReleasePending == true
+                        then
+                            if Lifecycle.RemoveLiveBody(
+                                record,
+                                zombie,
+                                "audit_release_retry"
+                            ) then
+                                stats.removed = stats.removed + 1
+                            else
+                                stats.deferred = stats.deferred + 1
+                            end
+                        elseif Lifecycle.RefreshLiveBodyIdentity then
                             Lifecycle.RefreshLiveBodyIdentity(
                                 record, zombie, "body_audit"
                             )
                         end
-                        Internal.ensureRuntime(record).lastAuditAt = now
-                        Internal.mark(record, "live", "bound", "body_audit_valid")
+                        if record.presenceState == Const.PRESENCE_LIVE
+                            and not record.runtime.bodyReleasePending
+                        then
+                            Internal.ensureRuntime(record).lastAuditAt = now
+                            Internal.mark(record, "live", "bound", "body_audit_valid")
+                        end
                     else
                         stats.duplicates = stats.duplicates + 1
                         stats.removed = stats.removed + 1
@@ -183,51 +206,18 @@ function Lifecycle.AuditLoadedBodies(now, force)
             local id = tostring(candidate.id)
             local registered = reg.LiveByID and reg.LiveByID[id] or nil
             if candidate.presenceState == Const.PRESENCE_LIVE and not accepted[id] then
-                if registered then
-                    if Internal.matchesRecordBody(candidate, registered) then
-                        local attached = Internal.isBodyAttached(registered)
-                        local verified = Internal.removeZombie(registered) == true
-                        if (not attached or not verified)
-                            and Lifecycle.NoteLostBody
-                        then
-                            -- The shell left the loaded world before this pass,
-                            -- so the engine holds an anonymous copy of it now.
-                            Lifecycle.NoteLostBody(
-                                candidate,
-                                registered,
-                                verified and "audit_after_virtualization"
-                                    or "audit_removal_unverified"
-                            )
-                        end
-                    elseif Lifecycle.NoteLostBody then
-                        Lifecycle.NoteLostBody(
-                            candidate, registered, "audit_stale_handle")
-                    end
-                elseif Lifecycle.NoteLostBody then
-                    -- The body was never seen on this authority, yet the record
-                    -- leases a shell: the population manager can still hand an
-                    -- unmarked copy back, so the loss must be remembered.
-                    Lifecycle.NoteLostBody(
-                        candidate, nil, "audit_body_missing")
+                -- Use the same verified release lane as explicit abstraction.
+                -- If the body is still attached and engine removal fails, the
+                -- helper keeps the lease and this audit will retry it later.
+                if Lifecycle.RemoveLiveBody(
+                    candidate,
+                    registered,
+                    registered and "audit_body_invalid" or "audit_body_missing"
+                ) then
+                    stats.removed = stats.removed + 1
+                else
+                    stats.deferred = stats.deferred + 1
                 end
-                reg.LiveByID[id] = nil
-                candidate.runtime = candidate.runtime or {}
-                if Internal.CaptureDetachedBodyHint then
-                    Internal.CaptureDetachedBodyHint(candidate)
-                end
-                candidate.runtime.lastLiveBodyInstanceID =
-                    candidate.liveBodyInstanceID
-                        or candidate.runtime.lastLiveBodyInstanceID
-                candidate.runtime.lastLiveBodyPopulationID =
-                    candidate.liveBodyPopulationID
-                        or candidate.runtime.lastLiveBodyPopulationID
-                candidate.runtime.bodyLease = nil
-                candidate.liveBodyInstanceID = nil
-                candidate.liveBodyPopulationID = nil
-                candidate.liveBodyOnlineID = nil
-                candidate.presenceState = Const.PRESENCE_ABSTRACT
-                candidate.presenceRevision = (tonumber(candidate.presenceRevision) or 0) + 1
-                Internal.mark(candidate, "abstract", "missing", registered and "body_invalid" or "body_pruned")
             end
         end)
     end

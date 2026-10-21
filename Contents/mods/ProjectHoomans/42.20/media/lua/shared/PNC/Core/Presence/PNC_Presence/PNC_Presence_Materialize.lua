@@ -415,6 +415,7 @@ function Presence.RebindRestoredBody(record, zombie, reason)
     local position
     local configured
     local configureError
+    local result
     if not Core.IsAuthority() or not record or not zombie then
         return false
     end
@@ -451,7 +452,8 @@ function Presence.RebindRestoredBody(record, zombie, reason)
             .. tostring(record.id))
         return false
     end
-    finishMaterialization(
+    record.runtime.restoredBodyRebindPending = true
+    result = finishMaterialization(
         record,
         zombie,
         position,
@@ -459,13 +461,14 @@ function Presence.RebindRestoredBody(record, zombie, reason)
         Internal.ResolveNetwork(),
         reason or "startup_population_rebind"
     )
+    record.runtime.restoredBodyRebindPending = nil
     if Core.LogInfo then
         Core.LogInfo("PNC restored body rebound npc=" .. tostring(record.id)
             .. " populationId="
             .. tostring(PNC.BodyLifecycle.GetBodyPopulationID
                 and PNC.BodyLifecycle.GetBodyPopulationID(zombie) or "nil"))
     end
-    return true
+    return result ~= nil
 end
 
 function Presence.Materialize(record, reason, nearest)

@@ -142,12 +142,13 @@ local function removeLiveBody(record, zombie, reason)
     if ZombieAggro and ZombieAggro.ClearForNPCBody then
         ZombieAggro.ClearForNPCBody(zombie)
     end
-    PNC.BodyLifecycle.RemoveLiveBody(record, zombie, reason or "abstract")
+    return PNC.BodyLifecycle.RemoveLiveBody(record, zombie, reason or "abstract")
 end
 
 function Presence.Abstract(record, reason)
     local zombie = Registry.GetLiveZombie(record.id)
     local net = Internal.ResolveNetwork()
+    local released = true
     if not Core.IsAuthority()
         or record.presenceState ~= Const.PRESENCE_LIVE
     then
@@ -173,17 +174,9 @@ function Presence.Abstract(record, reason)
             worldAgeHours()
         )
     end
-    if Internal.LogTraversal then
-        Internal.LogTraversal(record, "presence_transition", zombie, {
-            "from=live",
-            "to=abstract",
-            "reason=" .. tostring(reason or "abstract"),
-        })
-    end
-    notifyAbstraction(record, reason)
     clearLiveRuntime(record)
     if zombie then
-        removeLiveBody(record, zombie, reason)
+        released = removeLiveBody(record, zombie, reason)
     else
         -- There is no safe body handle to pass to the engine cleanup API in
         -- this branch. Drop only the record-owned navigation state; a stale
@@ -194,12 +187,30 @@ function Presence.Abstract(record, reason)
         if PNC.Travel and PNC.Travel.Service then
             PNC.Travel.Service.OnAbstracted(record, nil)
         end
-        PNC.BodyLifecycle.RemoveLiveBody(
+        released = PNC.BodyLifecycle.RemoveLiveBody(
             record,
             nil,
             reason or "abstract_missing"
         )
     end
+    if not released then
+        record.runtime = record.runtime or {}
+        record.runtime.lifecycle = record.runtime.lifecycle or {}
+        record.runtime.lifecycle.phase = "releasing"
+        record.runtime.lifecycle.lastReason = reason or "abstract"
+        record.runtime.lifecycle.lastError = "body_removal_unverified"
+        record.runtime.lifecycle.lastTransitionAt = Core.Now()
+        record.runtime.forcePresenceCheck = true
+        return false
+    end
+    if Internal.LogTraversal then
+        Internal.LogTraversal(record, "presence_transition", zombie, {
+            "from=live",
+            "to=abstract",
+            "reason=" .. tostring(reason or "abstract"),
+        })
+    end
+    notifyAbstraction(record, reason)
     record.presenceState = Const.PRESENCE_ABSTRACT
     logFollowerTransition(
         record,
