@@ -218,6 +218,11 @@ function ProductionModules.load(context)
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticCapabilityCatalog.lua", "semantic")
     load(
         "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticDialogueSuggestions.lua",
+        "semantic_suggestions"
+    )
+    load(
+        "ProjectHoomans", "shared",
         "PNC/Semantics/PNC_SemanticAutomaticFlowManifest.lua",
         "semantic_generation_manifest"
     )

@@ -19,7 +19,8 @@
       "EN/Conversation/ToolReplies/Commands.json",
       "EN/Conversation/WorldEvents/Events.json",
       "EN/Conversation/Semantic/GeneratedDialogue.json",
-      "EN/Conversation/Semantic/GroundedPersonalDialogue.json"
+      "EN/Conversation/Semantic/GroundedPersonalDialogue.json",
+      "EN/Conversation/Semantic/Suggestions.json"
     ],
     "TL": [
       "TL/Conversation/Flavor/Address.json",
@@ -39,7 +40,8 @@
       "TL/Conversation/ToolReplies/Commands.json",
       "TL/Conversation/WorldEvents/Events.json",
       "TL/Conversation/Semantic/GeneratedDialogue.json",
-      "TL/Conversation/Semantic/GroundedPersonalDialogue.json"
+      "TL/Conversation/Semantic/GroundedPersonalDialogue.json",
+      "TL/Conversation/Semantic/Suggestions.json"
     ]
   }
 }

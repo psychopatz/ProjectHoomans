@@ -267,6 +267,28 @@ function OutputProjection.observation(context, record)
     responseObservation.queueCount = #responseObservation.queued
     responseObservation.composed = responseObservation.queueCount > 1
     responseObservation.flowResponsePoolID = flow.responsePool
+    local suggestionsModule = PNC
+        and PNC.Semantics
+        and PNC.Semantics.DialogueSuggestions
+    local suggestions = suggestionsModule
+        and type(suggestionsModule.Build) == "function"
+        and suggestionsModule.Build(result, record.contextAfter, record.messages)
+        or {
+            schemaVersion = 1,
+            kind = "semantic_dialogue_suggestions",
+            revision = tonumber(result.sequence) or 0,
+            turnID = "turn-" .. tostring(tonumber(result.sequence) or 0),
+            candidates = {},
+            sources = {},
+            trace = {
+                {
+                    source = "suggestions",
+                    status = "unavailable",
+                    reason = "production_module_unavailable",
+                    candidateCount = 0,
+                },
+            },
+        }
     return {
         schemaVersion = 1,
         input = tostring(record.input or ""),
@@ -285,6 +307,7 @@ function OutputProjection.observation(context, record)
         actionResult = Values.copy(result.actionResult),
         candidates = boundedCandidates(context, result),
         response = responseObservation,
+        suggestions = suggestions,
         flow = {
             flowId = flow.flowId,
             generated = flow.generated == true,

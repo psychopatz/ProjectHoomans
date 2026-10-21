@@ -1,0 +1,12 @@
+{
+  "UI_PNC_Conversation_Suggestion_Wellbeing_Label": "Itanong ang kalagayan",
+  "UI_PNC_Conversation_Suggestion_Wellbeing_Utterance": "Kumusta ang pakiramdam mo?",
+  "UI_PNC_Conversation_Suggestion_WellbeingDetail_Label": "Itanong kung ano ang problema",
+  "UI_PNC_Conversation_Suggestion_WellbeingDetail_Utterance": "Ano ang problema?",
+  "UI_PNC_Conversation_Suggestion_Needs_Label": "Itanong ang pangangailangan",
+  "UI_PNC_Conversation_Suggestion_Needs_Utterance": "May kailangan ka ba?",
+  "UI_PNC_Conversation_Suggestion_Health_Label": "Itanong ang mga sugat",
+  "UI_PNC_Conversation_Suggestion_Health_Utterance": "Nasaktan ka ba?",
+  "UI_PNC_Conversation_Suggestion_Identity_Label": "Itanong kung sino siya",
+  "UI_PNC_Conversation_Suggestion_Identity_Utterance": "Sino ka?"
+}
