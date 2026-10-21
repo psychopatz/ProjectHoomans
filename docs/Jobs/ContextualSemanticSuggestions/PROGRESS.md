@@ -168,3 +168,16 @@ Source/evidence commit: c040e520 (c040e520302e5301798f9e370fe2a7e651fa53a3).
 - Exact validation: worker fuzzy/profile/dataset slice — 8 passed; Xvfb Semantic Lab GUI/worker/profile slice — 3 passed; combined focused contextual/follow-up slice — 12 passed; Python compile and git diff --check passed. Native PZ SP/MP remains UNTESTED, reserved for the user. No release or Workshop action.
 
 Next: run the repository-wide Python/Lua/doctor/Kahlua/translation checks, inspect the final production projection and GUI evidence, then commit the progress record and hand off only after all developer-side gates pass.
+
+## Corrective follow-up — final developer-side gates
+
+Source/evidence commit: 163a7226 (163a72269c29ba67b93fa72a8044dd6ba09a59cb).
+
+- Full headless Semantic Lab regression: 318 passed, 4 expected no-display skips. Xvfb app and Simulation acceptance: 12 passed, including visible topic group labels, hidden empty slots, TL labels, real NPC-reply and action clicks, and the NPC profile combobox. Semantic compiler suite: 18 passed.
+- Semantic Lua regression: 73/73. Doctor: all required checks passed, including actual worker boot and READY/PING/CAPABILITIES. Full-mod pz-verify Kahlua scan: 2,954 files, zero findings. Changed Lua parsed with luac5.3; Python compile and git diff --check passed.
+- Reviewed dataset preview now reports 47 exact patterns, 31 response variants, 20 approved with provenance, 0 rejected, and 44 not-candidate. Existing EN/TL catalogs remain parity-safe; no new player-facing translation backend or catalog was introduced for the harness-only profile labels.
+- Bounded real-worker performance completed with 3 samples, 1 warmup, and 8 serial turns. Observed maximum turn p95 was approximately 138.8 ms in this run; the measurement is worker-protocol evidence only and not native Project Zomboid tick/SP/MP evidence.
+- Final real-worker checks confirm: whatsup and what up route to CONVERSATION_TOPIC; whaat up selects the fuzzy WHATS_UP concept at edit distance 1; hostile profiles hide the root; neutral profiles do not expose owned actions; Trader alone exposes the existing trade category preflight; canonical root/detail clicks produce ConversationBlock/ConversationOutcome; stale/duplicate clicks remain rejected without duplicate transport.
+- Unrelated user work remains uncommitted and untouched in the worktree: Core Presence Lua edits and tests/pnc_restored_body_identity_smoke.lua. No Workshop, release, publish, or push action was taken.
+
+Final handoff: developer-side gates pass. Native Project Zomboid SP/MP, actual in-game installation, multiplayer authority, and Workshop publication remain UNTESTED and reserved for the user. READY FOR USER LIVE TEST.
