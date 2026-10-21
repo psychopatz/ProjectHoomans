@@ -1,0 +1,6 @@
+# Contextual Semantic Suggestions
+Status: PLANNED — implementation not yet accepted. Baseline: ProjectHoomans main d8d2011ed2f6167a39870289068ee851bf43bf0c (2026-10-22).
+## Goal
+After typed player input and after NPC dialogue, provide helpful, localized contextual suggestion buttons. Buttons carry canonical semantic frames, obey declarative eligibility/visibility rules, and enter the **existing** authoritative conversation/action pipeline. The same behavior must be inspectable and clickable in the **existing** Semantic Lab against real production Lua.
+Read: AGENT_RUNBOOK.md, PROGRESS.md, ARCHITECTURE.md, ROADMAP.md, HARNESS_ACCEPTANCE.md, GOAL_PROMPT.md.
+Related existing owners: ../ContextualDialogueQuestFramework/ (authoring, flows, CodeBuilder, harness), ../SemanticDialogueDecoupling/ (parser/policy and EN/TL), ../CoreNPCFoundationMigration/ (Core actor state), ../ContextualSemanticIntelligence/ (wellbeing and context). Existing job scopes remain intact; do not create parallel implementations.
