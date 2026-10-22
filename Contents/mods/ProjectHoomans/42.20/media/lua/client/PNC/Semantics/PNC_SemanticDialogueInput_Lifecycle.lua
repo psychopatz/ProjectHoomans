@@ -772,6 +772,34 @@ function Input.CompleteGossipRequest(request)
         return false, "gossip_response_unavailable"
     end
     context = Internal.ShallowContext(view)
+    local groundedGossip = context and context.npcGossip or nil
+    if not groundedGossip
+        or groundedGossip.source ~= "world_knowledge"
+    then
+        local clientState = PNC.Network and PNC.Network.ClientState or nil
+        local clientGossip = clientState
+            and clientState.semanticWorldKnowledgeGossip or nil
+        local npcID = view.spec and tostring(view.spec.npcID or "") or ""
+        groundedGossip = clientGossip and clientGossip[npcID] or nil
+    end
+    if groundedGossip and groundedGossip.source == "world_knowledge"
+        and type(groundedGossip.factRefs) == "table"
+        and #groundedGossip.factRefs > 0
+    then
+        local response = result.decision.response
+        if type(response) == "table" then
+            response.groundedFactRefs = {}
+            for index = 1, math.min(#groundedGossip.factRefs, 4) do
+                response.groundedFactRefs[#response.groundedFactRefs + 1] =
+                    groundedGossip.factRefs[index]
+            end
+            response.selectionSource = "world_knowledge"
+            if type(response.plan) == "table" then
+                response.plan.groundedFactRefs = response.groundedFactRefs
+                response.plan.sourcePoolID = "world_knowledge"
+            end
+        end
+    end
     localResponse = PNC.Semantics and PNC.Semantics.LocalResponse or nil
     if localResponse and type(localResponse.Resolve) == "function" then
         decision.response = localResponse.Resolve(
@@ -780,6 +808,23 @@ function Input.CompleteGossipRequest(request)
             context,
             decision.branch
         ) or decision.response
+    end
+    if groundedGossip and groundedGossip.source == "world_knowledge"
+        and type(groundedGossip.factRefs) == "table"
+        and #groundedGossip.factRefs > 0
+        and type(decision.response) == "table"
+    then
+        decision.response.groundedFactRefs = {}
+        for index = 1, math.min(#groundedGossip.factRefs, 4) do
+            decision.response.groundedFactRefs[#decision.response.groundedFactRefs + 1] =
+                groundedGossip.factRefs[index]
+        end
+        decision.response.selectionSource = "world_knowledge"
+        if type(decision.response.plan) == "table" then
+            decision.response.plan.groundedFactRefs =
+                decision.response.groundedFactRefs
+            decision.response.plan.sourcePoolID = "world_knowledge"
+        end
     end
     session.semanticMemoryTargetID = nil
     session.semanticGossipRequestID = nil

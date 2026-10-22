@@ -134,6 +134,39 @@ class LuaSemanticWorker:
             },
         )
 
+    def world_knowledge_inspect(
+        self, actor_id: str | None = None, fact_id: str | None = None,
+        max_facts: int = 32,
+    ) -> dict[str, Any]:
+        """Inspect the production World Knowledge ledger and actor explanations."""
+
+        return self._request(
+            "WORLD_KNOWLEDGE_INSPECT",
+            {
+                "actorID": actor_id,
+                "factID": fact_id,
+                "maxFacts": int(max_facts),
+            },
+        )
+
+    def world_knowledge_propagate(
+        self, from_actor_id: str, to_actor_id: str,
+        channel: str = "conversation", authorized: bool = True,
+        now: float = 1000,
+    ) -> dict[str, Any]:
+        """Exercise one authorized production propagation opportunity."""
+
+        return self._request(
+            "WORLD_KNOWLEDGE_PROPAGATE",
+            {
+                "fromActorID": str(from_actor_id),
+                "toActorID": str(to_actor_id),
+                "channel": str(channel),
+                "authorized": bool(authorized),
+                "now": float(now),
+            },
+        )
+
     def knowledge_discover(
         self, topic_id: str, npc_id: str | None = None
     ) -> dict[str, Any]:

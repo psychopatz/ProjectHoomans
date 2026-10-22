@@ -23,8 +23,13 @@ function DialogueFacts.Build(
     local gossip = type(semanticInputContext) == "table"
         and semanticInputContext.npcGossip or nil
     local statements = type(gossip) == "table" and gossip.statements or nil
+    local factRefs = type(gossip) == "table" and gossip.factRefs or nil
+    local candidates = type(gossip) == "table" and gossip.candidates or nil
     local index
     local content
+    local factID
+    local candidate
+    local candidateIndex
     local knowledgeSnapshot = type(semanticInputContext) == "table"
         and semanticInputContext.npcKnowledge or nil
     if Memory and type(Memory.BuildAuthorizedBackstoryFacts) == "function"
@@ -79,10 +84,26 @@ function DialogueFacts.Build(
         ) do
             content = statements[index]
             if type(content) == "string" and content ~= "" then
+                factID = type(factRefs) == "table" and factRefs[index] or nil
+                candidate = nil
+                if type(candidates) == "table" and factID ~= nil then
+                    for candidateIndex = 1, math.min(#candidates, MAX_GOSSIP) do
+                        if tostring(candidates[candidateIndex].factID or "")
+                            == tostring(factID)
+                        then
+                            candidate = candidates[candidateIndex]
+                            break
+                        end
+                    end
+                end
                 facts[#facts + 1] = {
                     kind = "gossip",
                     truth_status = "reported",
                     content = content,
+                    factID = factID,
+                    provenance = candidate and candidate.provenance or nil,
+                    confidence = candidate and candidate.confidence or nil,
+                    source = gossip.source or "conversation_gossip",
                 }
             end
         end

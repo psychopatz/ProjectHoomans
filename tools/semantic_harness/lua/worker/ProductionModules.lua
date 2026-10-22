@@ -98,6 +98,39 @@ function ProductionModules.load(context)
     PNC.Registry = PNC.Registry or {}
     PNC.PlayerCharacters = PNC.PlayerCharacters or {}
     PNC.PlayerContext = PNC.PlayerContext or {}
+    -- World Knowledge is loaded through the same production module loader so
+    -- worker scenarios exercise the portable Core ledger and Hoomans owner
+    -- adapter, rather than a JSON-only substitute.
+    load(
+        "PsychopatzCore", "common",
+        "PsychopatzCore/WorldKnowledge/PsychopatzWorldFact.lua",
+        "world_knowledge"
+    )
+    load(
+        "PsychopatzCore", "common",
+        "PsychopatzCore/WorldKnowledge/PsychopatzWorldFactLedger.lua",
+        "world_knowledge"
+    )
+    load(
+        "PsychopatzCore", "common",
+        "PsychopatzCore/WorldKnowledge/PsychopatzActorWorldKnowledge.lua",
+        "world_knowledge"
+    )
+    load(
+        "PsychopatzCore", "common",
+        "PsychopatzCore/WorldKnowledge/PsychopatzWorldKnowledge.lua",
+        "world_knowledge"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/WorldKnowledge/PNC_WorldKnowledge.lua",
+        "world_knowledge"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/WorldKnowledge/PNC_WorldKnowledge_PZ.lua",
+        "world_knowledge"
+    )
     PNC.Relationships = PNC.Relationships or {}
     load(
         "ProjectHoomans", "shared",
@@ -347,6 +380,11 @@ function ProductionModules.load(context)
             .. ": " .. reason)
     end
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticDialogueInput.lua", "semantic_entry")
+    load(
+        "ProjectHoomans", "client",
+        "PNC/Semantics/PNC_SemanticCognitionClient.lua",
+        "semantic_cognition"
+    )
     load(
         "ProjectHoomans", "common_lua",
         "PNC/Conversation/Definitions/Memory/00_PNC_ConversationMemoryDefinitions.lua",

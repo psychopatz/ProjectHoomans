@@ -11,6 +11,7 @@ local capabilities = {
     "REPLAY_SEMANTIC_QUEST",
     "COMMITMENT", "BACKSTORY", "BACKSTORY_FACT",
     "KNOWLEDGE_BOOTSTRAP", "KNOWLEDGE_DISCOVER", "KNOWLEDGE_METRICS",
+    "WORLD_KNOWLEDGE_INSPECT", "WORLD_KNOWLEDGE_PROPAGATE",
 }
 
 local function backstorySnapshot(payload)
@@ -222,6 +223,116 @@ local function knowledgeDiscover(context, payload)
     }
 end
 
+local function worldKnowledgeInspect(context, payload)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local adapter = PNC.WorldKnowledge
+    local core = adapter and adapter.Core or nil
+    local ledger
+    local knowledge
+    local facts
+    local actors = {}
+    local actorID
+    local actorRecord
+    local worldContext
+    payload = type(payload) == "table" and payload or {}
+    if not core or not core.LedgerState or not core.KnowledgeState then
+        return nil, "world_knowledge_unavailable"
+    end
+    ledger = core.Ledger
+    knowledge = core.ActorKnowledge
+    facts = ledger.Query(core.LedgerState, {
+        max = math.min(64, math.max(1, math.floor(
+            tonumber(payload.maxFacts) or 32))),
+    })
+    for id, entry in pairs(core.KnowledgeState.byActor or {}) do
+        local row = { actorID = id, references = {}, explanations = {} }
+        for index = 1, math.min(#(entry.order or {}), 64) do
+            local factID = entry.order[index]
+            local reference = knowledge.Get(core.KnowledgeState,
+                id, factID)
+            if reference then
+                row.references[#row.references + 1] = reference
+                local explanation = core.Explain(id, factID, Runtime.now)
+                if explanation then
+                    row.explanations[#row.explanations + 1] = explanation
+                end
+            end
+        end
+        actors[#actors + 1] = row
+        if tostring(payload.actorID or "") ~= ""
+            and tostring(payload.actorID) == tostring(id)
+        then
+            actorID = id
+        end
+    end
+    table.sort(actors, function(left, right)
+        return tostring(left.actorID) < tostring(right.actorID)
+    end)
+    if actorID then
+        actorRecord = PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(actorID) or nil
+        if actorRecord and type(adapter.BuildConversationContext) == "function" then
+            worldContext = adapter.BuildConversationContext(actorRecord, {
+                language = (Runtime.scenario and Runtime.scenario.runtime
+                    and Runtime.scenario.runtime.language) or "EN",
+                now = Runtime.now,
+                max = 4,
+            })
+        end
+    end
+    return {
+        ok = true,
+        type = "world_knowledge_inspection",
+        scenarioOwned = Runtime.worldKnowledgeScenario ~= nil,
+        ledger = {
+            facts = facts,
+            metrics = Values.copy(core.LedgerState.metrics),
+            maxFacts = core.LedgerState.maxFacts,
+            revision = core.LedgerState.revision,
+        },
+        actorKnowledge = actors,
+        propagationTrace = Values.copy(adapter.PropagationTrace),
+        corePropagationTrace = Values.copy(core.Trace),
+        candidates = worldContext and worldContext.worldKnowledge
+            and worldContext.worldKnowledge.candidates or {},
+        finalRealization = worldContext and worldContext.npcGossip or {
+            statements = {}, factRefs = {},
+        },
+        explanation = actorID and payload.factID
+            and core.Explain(actorID, payload.factID, Runtime.now) or nil,
+    }
+end
+
+local function worldKnowledgePropagate(context, payload)
+    local Values = context.Values
+    local adapter = PNC.WorldKnowledge
+    local registry = PNC.Registry
+    local from = registry and registry.Get
+        and registry.Get(payload and payload.fromActorID) or nil
+    local to = registry and registry.Get
+        and registry.Get(payload and payload.toActorID) or nil
+    local transferred
+    local reason
+    if adapter and type(adapter.PropagateConversation) == "function" then
+        transferred, reason = adapter.PropagateConversation(from, to, {
+            authorized = payload and payload.authorized == true,
+            channel = payload and payload.channel or "conversation",
+            now = payload and payload.now or context.Runtime.now,
+            max = payload and payload.max or 3,
+        })
+    else
+        reason = "world_knowledge_unavailable"
+    end
+    return {
+        ok = transferred ~= nil,
+        type = "world_knowledge_propagation",
+        transferred = Values.copy(transferred or {}),
+        reason = reason,
+        trace = Values.copy(adapter and adapter.PropagationTrace or {}),
+    }
+end
+
 function CommandRouter.hello(context)
     local Runtime = context.Runtime
     return {
@@ -390,6 +501,10 @@ function CommandRouter.dispatch(context, request)
         return knowledgeDiscover(context, payload)
     elseif command == "KNOWLEDGE_METRICS" then
         return knowledgeMetrics(context, payload)
+    elseif command == "WORLD_KNOWLEDGE_INSPECT" then
+        return worldKnowledgeInspect(context, payload)
+    elseif command == "WORLD_KNOWLEDGE_PROPAGATE" then
+        return worldKnowledgePropagate(context, payload)
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,

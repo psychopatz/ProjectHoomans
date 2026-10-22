@@ -99,6 +99,27 @@ function ScenarioSession.reset(context, scenario)
         moduleManifest = Values.copy(Runtime.moduleManifest),
         headlessRequires = Values.copy(Runtime.headlessRequires),
         questBoundary = Runtime.questBoundary,
+        worldKnowledge = Values.copy(Runtime.worldKnowledgeScenario),
+        worldKnowledgeLastContext = Values.copy(Runtime.worldKnowledgeLastContext),
+        worldKnowledgeClient = Values.copy(
+            PNC.Network and PNC.Network.ClientState
+                and PNC.Network.ClientState.semanticWorldKnowledgeGossip
+                or nil
+        ),
+        worldKnowledgeClientDebug = Values.copy(
+            PNC.Network and PNC.Network.ClientState
+                and PNC.Network.ClientState.semanticWorldKnowledgeDebug
+                or nil
+        ),
+        worldKnowledgeRoute = {
+            clientApply = PNC.Semantics and PNC.Semantics.CognitionClient
+                and type(PNC.Semantics.CognitionClient.ApplyPayload) or nil,
+            handler = PNC.Client and PNC.Client.Internal
+                and PNC.Client.Internal.ServerCommandHandlers
+                and PNC.Client.Internal.ServerCommandHandlers[
+                    PNC.Const and PNC.Const.CMD_SEMANTIC_COGNITION or ""
+                ] ~= nil,
+        },
         suggestions = Values.copy(
             Runtime.view and Runtime.view.semanticSuggestions
         ),
@@ -125,6 +146,27 @@ function ScenarioSession.snapshot(context)
         moduleManifest = Values.copy(Runtime.moduleManifest),
         headlessRequires = Values.copy(Runtime.headlessRequires),
         questBoundary = Runtime.questBoundary,
+        worldKnowledge = Values.copy(Runtime.worldKnowledgeScenario),
+        worldKnowledgeLastContext = Values.copy(Runtime.worldKnowledgeLastContext),
+        worldKnowledgeClient = Values.copy(
+            PNC.Network and PNC.Network.ClientState
+                and PNC.Network.ClientState.semanticWorldKnowledgeGossip
+                or nil
+        ),
+        worldKnowledgeClientDebug = Values.copy(
+            PNC.Network and PNC.Network.ClientState
+                and PNC.Network.ClientState.semanticWorldKnowledgeDebug
+                or nil
+        ),
+        worldKnowledgeRoute = {
+            clientApply = PNC.Semantics and PNC.Semantics.CognitionClient
+                and type(PNC.Semantics.CognitionClient.ApplyPayload) or nil,
+            handler = PNC.Client and PNC.Client.Internal
+                and PNC.Client.Internal.ServerCommandHandlers
+                and PNC.Client.Internal.ServerCommandHandlers[
+                    PNC.Const and PNC.Const.CMD_SEMANTIC_COGNITION or ""
+                ] ~= nil,
+        },
         suggestions = Values.copy(
             Runtime.view and Runtime.view.semanticSuggestions
         ),

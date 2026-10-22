@@ -61,7 +61,18 @@ end
 local function applyWorldKnowledgeGossip(id, payload, pending)
     local value = payload and payload.wk
     local output = {}
-    if not pendingMatches(pending, payload) then return false end
+    local matches = pendingMatches(pending, payload)
+    ClientState.semanticWorldKnowledgeDebug = {
+        id = id,
+        matched = matches,
+        pendingRequestID = pending and pending.requestID,
+        pendingTargetID = pending and pending.targetID,
+        payloadRequestID = payload and payload.requestID,
+        payloadTargetID = payload and payload.targetID,
+        statementCount = value and type(value.statements) == "table"
+            and #value.statements or 0,
+    }
+    if not matches then return false end
     ClientState.semanticWorldKnowledgeGossip = ClientState.semanticWorldKnowledgeGossip or {}
     ClientState.semanticWorldKnowledgeGossip[id] = nil
     if type(value) ~= "table" or type(value.statements) ~= "table" then return true end
@@ -75,10 +86,13 @@ local function applyWorldKnowledgeGossip(id, payload, pending)
             requestID = tostring(payload.requestID),
             targetID = tostring(pending.targetID),
             subject = value.subject or "world",
+            source = "world_knowledge",
             statements = output,
             factRefs = value.factRefs,
             candidates = value.candidates,
         }
+        ClientState.semanticWorldKnowledgeDebug.stored =
+            ClientState.semanticWorldKnowledgeGossip[id] ~= nil
     end
     return true
 end
@@ -241,6 +255,11 @@ function Client.GetFact(npcID, factSubject, targetID, worldAgeHours)
 end
 
 function Client.ApplyPayload(payload)
+    ClientState.semanticWorldKnowledgeDebug = {
+        entered = true,
+        payloadCommand = payload and payload.command,
+        payloadHasWorldKnowledge = payload and type(payload.wk) == "table",
+    }
     local projection = type(payload) == "table"
         and payload.projection or nil
     local id = projection and npcKey(projection.npcID or projection.n)
