@@ -209,3 +209,63 @@ The user should receive a usable contextual hub and intuitive common sliders/com
 P10C/P10D/P10E require actual Tk/Xvfb interaction evidence.
 
 Do not declare success from schema/unit tests alone.
+
+
+## P11 execution rules — actors, dynamic bonds, and runtime-parity UX
+
+The P10 READY FOR USER LIVE TEST handoff is superseded.
+
+Do not report the parent ready until P11A-P11H pass.
+
+### No manual normal-mode bond fabrication
+
+Normal Semantic Lab must not allow arbitrary bond promotion through a plain bond dropdown.
+
+- family comes from actual authored/pre-existing relationship data;
+- friend is earned by production relationship progression;
+- lover comes from proposal + acceptance;
+- direct bond mutation is permitted only in clearly labeled Advanced/Malformed fixture mode.
+
+### No hypothetical production kinds
+
+Do not expose cousin/grandmother/partner/spouse/etc. as normal selectable kinds unless a current production owner can actually produce them.
+
+Extensible registry APIs are fine. User-facing production catalogs must remain truthful.
+
+### Relationship milestone mutations are server-owned
+
+Friend promotion and lover proposal outcomes must use the existing server relationship service/commit/persistence boundary.
+
+Do not mutate durable bond solely in Tk, client dialogue presentation, or parser code.
+
+### Romance uses existing compatibility
+
+Do not introduce a separate romance compatibility database.
+
+Use existing gender + player/NPC social-profile orientation/trait compatibility APIs.
+
+Compatibility alone does not create lover state.
+
+### Generated personality is default
+
+Normal NPC simulation uses production-generated personality from seed/archetype/traits.
+
+Manual numeric personality values are explicit override/debug state.
+
+### Both actors are first-class
+
+Player and NPC Target each need proper needs + Personality & Traits surfaces where production supports those fields.
+
+Do not keep player state as an afterthought under generic World fields.
+
+### UI cleanup is product work
+
+Preview, Snapshot, Restart worker, World Knowledge refresh, Sweep, Persona Matrix and Capture Baseline may remain as capabilities, but not as unexplained primary workflow controls.
+
+Move them to Diagnostics, relevant inspector tabs, or the Compare surface.
+
+### Graph acceptance
+
+A blank graph for a live semantic Flow or hub is not acceptable merely because ConversationBlock graph tests pass.
+
+P11F requires real runtime Flow, Hub, and ConversationBlock adapters.
