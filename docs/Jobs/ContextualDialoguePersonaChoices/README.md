@@ -1,6 +1,6 @@
 # Contextual Dialogue Persona & Choices
 
-**Status:** REOPENED — behavioral completion required.  
+**Status:** REOPENED — P8 foundation complete; P9 conversation visualization/direct-routing work required.  
 **Current source-audit baseline:** ProjectHoomans remote main at 849f1951ed1d3fd4b6f78aedc2525b25368a157e (2026-10-22).  
 **Dynamic Trading provider baseline:** psychopatz/DynamicTrading at 5db64cbcc764f035146f044fdc34e930ce47d7c8.  
 **Native Project Zomboid SP/MP:** untested; user-owned acceptance.
@@ -18,7 +18,9 @@ The existing P0-P7 implementation is retained as foundation, but the 2026-10-22 
 - persona-aware ranking is narrow;
 - the Semantic Lab persona matrix is fixed around a few hello scenarios rather than being a flexible tuning surface.
 
-The current goal is therefore **behavioral completion**, not another architecture rewrite.
+The P8 behavioral foundation is now implemented, but the 2026-10-22 UI/routing audit found a new product gap: Semantic Lab still hides real conversation branching, and typed authored-category utterances such as `whatsup` redundantly produce an `Ask what's up` button instead of entering the already-recognized category directly.
+
+The current mandatory goal is therefore **P9 — Semantic Lab Conversation Visualization & Direct Routing**. Preserve P8 persona/bond/provider work and fix the runtime/testability surface rather than redesigning those systems.
 
 ## Companion bond requirement
 
@@ -84,8 +86,9 @@ This job builds on and must not duplicate:
 4. AUDIT.md
 5. ARCHITECTURE.md
 6. BEHAVIORAL_COMPLETION.md
-7. ROADMAP.md
-8. HARNESS_ACCEPTANCE.md
-9. PROGRESS.md **last** for current truth and the exact Next Chunk
+7. SEMANTIC_LAB_CONVERSATION_VISUALIZATION.md
+8. ROADMAP.md
+9. HARNESS_ACCEPTANCE.md
+10. PROGRESS.md **last** for current truth and the exact Next Chunk
 
 No checked-in GOAL_PROMPT.md is allowed. The executable /goal remains chat-only.
