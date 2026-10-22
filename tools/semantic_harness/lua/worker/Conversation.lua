@@ -77,6 +77,7 @@ function Conversation.buildContext(context)
         npcFirstName = npc.forename,
         npcState = {
             traits = copy(npc.traits or {}),
+            startingRelationship = copy(npc.startingRelationship),
             identityState = npc.identityState or "unknown",
             healthState = npc.healthState,
             activeBehavior = npc.activeBehavior,
@@ -93,6 +94,7 @@ function Conversation.buildContext(context)
             or npc.relationshipState or "unknown",
         identityTrust = relationship.identityTrust,
         relationship = copy(relationship),
+        startingRelationship = copy(npc.startingRelationship),
         actorAuthority = {
             eligible = authorityEligible == true,
             companion = companion,

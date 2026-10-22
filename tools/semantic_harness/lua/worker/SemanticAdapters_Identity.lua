@@ -23,8 +23,22 @@ function Provider.install(SemanticAdapters)
         local npc = scenario.npc or {}
         local relationship = npc.relationship or {}
         Runtime.relationships = Runtime.relationships or {}
-        Runtime.relationships[npcID] = Runtime.relationships[npcID]
-            or context.Values.copy(relationship)
+        if not Runtime.relationships[npcID] then
+            local resolved = context.Values.copy(relationship)
+            local current = resolved.state or resolved.relationshipState
+            local states = PNC.RelationshipStates
+            if states and type(states.ResolveState) == "function" then
+                local state = states.ResolveState({
+                    approval = resolved.approval,
+                    respect = resolved.respect,
+                    familiarity = resolved.familiarity,
+                    state = current,
+                })
+                resolved.state = state
+                resolved.relationshipState = state
+            end
+            Runtime.relationships[npcID] = resolved
+        end
         return Runtime.relationships[npcID]
     end
 

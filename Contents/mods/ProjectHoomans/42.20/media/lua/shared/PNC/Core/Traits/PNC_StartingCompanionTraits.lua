@@ -6,6 +6,8 @@ PNC = PNC or {}
 PNC.StartingCompanionTraits = PNC.StartingCompanionTraits or {}
 
 local StartingTraits = PNC.StartingCompanionTraits
+local RelationshipKinds = PNC.RelationshipKinds
+    or require "PNC/Core/Relationships/PNC_RelationshipKindRegistry"
 
 StartingTraits.OWNER = "ProjectHoomans.StartingCompanions"
 StartingTraits.IDS = {
@@ -60,6 +62,13 @@ end
 
 function StartingTraits.GetDefinition(id)
     return byID[id]
+end
+
+-- Starting Companion definitions keep the canonical detailed kind. Dialogue
+-- resolves its speech-facing class/terms through the shared metadata registry.
+function StartingTraits.GetRelationshipKindDefinition(value)
+    local kind = type(value) == "table" and value.relationshipKind or value
+    return RelationshipKinds.GetDefinition(kind)
 end
 
 function StartingTraits.ResolveSelections(player)

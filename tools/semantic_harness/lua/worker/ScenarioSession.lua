@@ -136,6 +136,9 @@ function ScenarioSession.reset(context, scenario)
         suggestions = Values.copy(
             Runtime.view and Runtime.view.semanticSuggestions
         ),
+        context = context.Conversation.contextSnapshot(
+            context, Runtime.view
+        ),
         choiceSurface = Values.copy(
             Runtime.view and Runtime.view.session
                 and Runtime.view.session.choicePresentationState

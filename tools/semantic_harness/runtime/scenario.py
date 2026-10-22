@@ -237,6 +237,15 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
     actor_authority = npc.get("actorAuthority")
     if actor_authority is not None and not isinstance(actor_authority, dict):
         raise ValueError("npc.actorAuthority must be an object or null")
+    starting_relationship = npc.get("startingRelationship")
+    if starting_relationship is not None and not isinstance(
+        starting_relationship, dict
+    ):
+        raise ValueError("npc.startingRelationship must be an object or null")
+    if isinstance(starting_relationship, dict):
+        kind = starting_relationship.get("kind")
+        if kind is not None and not isinstance(kind, str):
+            raise ValueError("npc.startingRelationship.kind must be a string")
     runtime = scenario["runtime"]
     profile = runtime.get("semanticLabProfile")
     if profile is not None and not isinstance(profile, str):

@@ -112,10 +112,15 @@ class LuaSemanticWorker:
     def snapshot(self) -> dict[str, Any]:
         return self._request("SNAPSHOT")
 
-    def persona_catalog(self) -> dict[str, Any]:
+    def persona_catalog(
+        self, register_relationship_kind: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Return the bounded catalog owned by the production Lua registries."""
 
-        return self._request("PERSONA_CATALOG")
+        payload = None
+        if register_relationship_kind is not None:
+            payload = {"registerRelationshipKind": register_relationship_kind}
+        return self._request("PERSONA_CATALOG", payload)
 
     def context_matrix(
         self,

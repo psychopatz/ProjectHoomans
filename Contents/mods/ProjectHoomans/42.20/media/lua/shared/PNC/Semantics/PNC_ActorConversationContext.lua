@@ -5,6 +5,13 @@ PNC.Semantics = PNC.Semantics or {}
 local Context = PNC.Semantics.ActorConversationContext or {}
 PNC.Semantics.ActorConversationContext = Context
 
+local RelationshipConstants = PNC.RelationshipConstants
+    or require "PNC/Core/Relationships/PNC_RelationshipConstants"
+local RelationshipStates = PNC.RelationshipStates
+    or require "PNC/Core/Relationships/PNC_RelationshipStates"
+local RelationshipKinds = PNC.RelationshipKinds
+    or require "PNC/Core/Relationships/PNC_RelationshipKindRegistry"
+
 Context.VERSION = 1
 Context.SCHEMA = "actor.conversation.context.v1"
 Context.MAX_TRAITS = 32
@@ -139,16 +146,71 @@ end
 local function relationshipProjection(context)
     local source = type(context.relationship) == "table"
         and context.relationship or {}
+    local approval = boundedNumber(source.approval, -100, 100)
+    local respect = boundedNumber(source.respect, -100, 100)
+    local familiarity = boundedNumber(source.familiarity, 0, 100)
+    local current = source.state or source.relationshipState
+        or context.relationshipState
+    local state = RelationshipConstants.STATE_UNKNOWN
+    if RelationshipStates and type(RelationshipStates.ResolveState) == "function" then
+        state = RelationshipStates.ResolveState({
+            approval = approval,
+            respect = respect,
+            familiarity = familiarity,
+            state = current,
+        })
+    elseif current ~= nil then
+        state = text(current, RelationshipConstants.STATE_UNKNOWN)
+    end
     return {
-        approval = boundedNumber(source.approval, -100, 100),
-        respect = boundedNumber(source.respect, -100, 100),
-        familiarity = boundedNumber(source.familiarity, 0, 100),
-        state = text(
-            source.relationshipState or source.state or context.relationshipState,
-            "unknown"
-        ),
+        approval = approval,
+        respect = respect,
+        familiarity = familiarity,
+        state = state,
         identityTrust = text(source.identityTrust or context.identityTrust),
         revision = math.max(0, math.floor(finite(source.revision) or 0)),
+    }
+end
+
+local function startingRelationshipSource(context)
+    local direct = sourceValue(context, "startingRelationship")
+    if type(direct) == "table" then return direct end
+    local state = type(context) == "table" and context.npcState or nil
+    if type(state) == "table" then
+        if type(state.startingRelationship) == "table" then
+            return state.startingRelationship
+        end
+        if type(state.generation) == "table" then
+            return state.generation
+        end
+    end
+    local record = type(context) == "table" and context.npcRecord or nil
+    if type(record) == "table" then
+        if type(record.startingRelationship) == "table" then
+            return record.startingRelationship
+        end
+        if type(record.generation) == "table" then
+            return record.generation
+        end
+    end
+    return nil
+end
+
+local function bondProjection(context)
+    local source = startingRelationshipSource(context)
+    if type(source) ~= "table" then return nil end
+    local kind = source.kind or source.relationshipKind
+    local definition = RelationshipKinds
+        and RelationshipKinds.GetDefinition(kind) or nil
+    if not definition then return nil end
+    return {
+        class = definition.class,
+        kind = definition.kind,
+        source = text(source.source, "starting_companion_trait"),
+        term = {
+            referenceKey = definition.termKeys.reference,
+            addressKey = definition.termKeys.address,
+        },
     }
 end
 
@@ -254,6 +316,7 @@ function Context.Build(source)
     local situation = situationProjection(context)
     local identity = identityProjection(context)
     local traits = sortedIDs(context.npcTraits, Context.MAX_TRAITS)
+    local bond = bondProjection(context)
     return {
         schemaVersion = Context.VERSION,
         schema = Context.SCHEMA,
@@ -262,6 +325,7 @@ function Context.Build(source)
         traits = traits,
         personality = personality,
         relationship = relationship,
+        bond = bond,
         roles = roles,
         situation = situation,
         revisions = revisions(context, relationship, personality, roles, situation),
@@ -273,6 +337,8 @@ function Context.Build(source)
             personality = context.npcPersonality and "social_profile_projection"
                 or "personality_unavailable",
             relationship = context.relationship and "directed_relationship",
+            bond = bond and "starting_companion_relationship_kind" or
+                "bond_unavailable",
             roles = context.actorAuthority and "actor_authority",
             situation = context.dialogueSituation and "dialogue_situation"
                 or "actor_state_projection",
@@ -292,6 +358,7 @@ function Context.PublicView(value)
     local identity = type(value.identity) == "table" and value.identity or {}
     local roles = type(value.roles) == "table" and value.roles or {}
     local situation = type(value.situation) == "table" and value.situation or {}
+    local bond = type(value.bond) == "table" and value.bond or nil
     return {
         schemaVersion = value.schemaVersion,
         actorID = value.actorID,
@@ -304,6 +371,10 @@ function Context.PublicView(value)
             hostile = roles.hostile == true,
             trader = roles.trader == true,
         },
+        bond = bond and {
+            class = bond.class,
+            kind = bond.kind,
+        } or nil,
         situation = {
             healthState = situation.healthState,
             activeBehavior = situation.activeBehavior,

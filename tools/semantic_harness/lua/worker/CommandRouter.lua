@@ -47,7 +47,52 @@ local function catalogValues(source, fallback)
     return values
 end
 
-local function personaCatalog(context)
+local function relationshipKindCatalog(context, payload)
+    local registry = PNC.RelationshipKinds
+    if not registry or type(registry.GetDefinitions) ~= "function" then
+        return { schema = "pnc.relationship.kind.catalog.v1", kinds = {} }
+    end
+    local registration
+    if type(payload) == "table"
+        and type(payload.registerRelationshipKind) == "table"
+        and type(registry.Register) == "function"
+    then
+        local registered, reason = registry.Register(
+            payload.registerRelationshipKind
+        )
+        registration = { registered = registered == true, reason = reason }
+    end
+    local translation = PNC.Translation
+    local kinds = {}
+    local definitions = registry.GetDefinitions()
+    for index = 1, math.min(#definitions, 64) do
+        local definition = definitions[index]
+        local terms = definition.termKeys or {}
+        local reference = terms.reference or definition.kind
+        local address = terms.address or definition.kind
+        if translation and type(translation.GetKey) == "function" then
+            reference = translation.GetKey(terms.reference, definition.kind)
+            address = translation.GetKey(terms.address, definition.kind)
+        end
+        kinds[#kinds + 1] = {
+            kind = definition.kind,
+            class = definition.class,
+            termKeys = context.Values.copy(terms),
+            terms = {
+                reference = reference,
+                address = address,
+            },
+        }
+    end
+    return {
+        schema = "pnc.relationship.kind.catalog.v1",
+        schemaVersion = 1,
+        kinds = kinds,
+        registration = registration,
+    }
+end
+
+local function personaCatalog(context, payload)
     local definitions = PNC.NPCTraits
         and type(PNC.NPCTraits.GetDefinitions) == "function"
         and PNC.NPCTraits.GetDefinitions() or {}
@@ -69,6 +114,7 @@ local function personaCatalog(context)
     table.sort(traits, function(left, right)
         return tostring(left.id or "") < tostring(right.id or "")
     end)
+    local relationshipKinds = relationshipKindCatalog(context, payload)
     return {
         schema = "semantic.persona.catalog.v1",
         schemaVersion = 1,
@@ -88,6 +134,8 @@ local function personaCatalog(context)
         },
         roles = { "none", "trader", "guard", "leader" },
         integrations = { "DTHoomans" },
+        relationshipKinds = relationshipKinds.kinds,
+        relationshipKindRegistration = relationshipKinds.registration,
     }
 end
 
@@ -591,7 +639,7 @@ function CommandRouter.dispatch(context, request)
     elseif command == "WORLD_KNOWLEDGE_PROPAGATE" then
         return worldKnowledgePropagate(context, payload)
     elseif command == "PERSONA_CATALOG" then
-        return personaCatalog(context)
+        return personaCatalog(context, payload)
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,

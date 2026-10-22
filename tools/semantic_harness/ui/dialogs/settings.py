@@ -59,6 +59,9 @@ def collect_scenario_settings(draft: dict[str, Any], values: Mapping[str, Any]) 
     updated_world = updated.setdefault("world", {})
     updated_player = updated.setdefault("player", {})
     updated_npc = updated.setdefault("npc", {})
+    # Relationship state is a production-derived view of the editable scores;
+    # never preserve a normal-mode override from an older scenario draft.
+    updated_npc.pop("relationshipState", None)
     updated_relationship = updated_npc.setdefault("relationship", {})
     updated_identity = updated_npc.setdefault("identity", {})
     updated_conversation = updated.setdefault("conversation", {})
@@ -74,7 +77,7 @@ def collect_scenario_settings(draft: dict[str, Any], values: Mapping[str, Any]) 
         updated_world["weatherTransition"] = str(read_value("world.weatherTransition")).strip() or None
     for key in ("characterUUID", "forename", "surname", "displayName"):
         updated_player[key] = str(read_value(f"player.{key}")).strip()
-    for key in ("npcID", "forename", "surname", "identityState", "relationshipState"):
+    for key in ("npcID", "forename", "surname", "identityState"):
         updated_npc[key] = str(read_value(f"npc.{key}")).strip()
     if "npc.gender" in values:
         updated_identity["gender"] = str(read_value("npc.gender")).strip()
@@ -84,6 +87,23 @@ def collect_scenario_settings(draft: dict[str, Any], values: Mapping[str, Any]) 
             updated_npc.pop("role", None)
         else:
             updated_npc["role"] = role
+    if "persona.bondKind" in values:
+        bond_kind = str(read_value("persona.bondKind")).strip().lower()
+        if bond_kind in {"", "none"}:
+            updated_npc.pop("startingRelationship", None)
+        else:
+            existing_bond = updated_npc.get("startingRelationship")
+            existing_bond = existing_bond if isinstance(existing_bond, dict) else {}
+            updated_npc["startingRelationship"] = {
+                "kind": bond_kind,
+                "source": existing_bond.get(
+                    "source", "starting_companion_trait"
+                ),
+            }
+            if existing_bond.get("since") is not None:
+                updated_npc["startingRelationship"]["since"] = existing_bond[
+                    "since"
+                ]
     for key in ("healthState", "activeBehavior"):
         if f"npc.{key}" in values:
             updated_npc[key] = str(read_value(f"npc.{key}")).strip()
@@ -277,7 +297,7 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
     ttk.Label(actors_page, text="NPC", font=("TkDefaultFont", 10, "bold")).grid(
         row=npc_start, column=0, columnspan=2, sticky="w", pady=(12, 4)
     )
-    for offset, key in enumerate(("npcID", "forename", "surname", "identityState", "relationshipState"), start=1):
+    for offset, key in enumerate(("npcID", "forename", "surname", "identityState"), start=1):
         text_field(actors_page, npc_start + offset, f"npc.{key}", key, npc.get(key))
     combo_field(
         actors_page,
@@ -300,6 +320,7 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
 
     persona_page = page("Persona & choices")
     persona_page.columnconfigure(1, weight=1)
+    persona_page.columnconfigure(2, weight=0)
     identity = npc.get("identity") if isinstance(npc.get("identity"), dict) else {}
     personality = npc.get("personality") if isinstance(npc.get("personality"), dict) else {}
     authority = npc.get("actorAuthority") if isinstance(npc.get("actorAuthority"), dict) else {}
@@ -317,24 +338,54 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
         npc.get("role", "none"),
         tuple(host.persona_catalog.get("roles", ["none", "trader", "guard", "leader"])),
     )
-    check_field(persona_page, 2, "persona.authority.companion", "companion", authority.get("companion"))
-    check_field(persona_page, 3, "persona.authority.owned", "owned by player", authority.get("owned"))
-    check_field(persona_page, 4, "persona.authority.eligible", "authority eligible", authority.get("eligible"))
+    bond = npc.get("startingRelationship") if isinstance(npc.get("startingRelationship"), dict) else {}
+    bond_kind = str(bond.get("kind") or "none")
+    bond_catalog = host.persona_catalog.get("relationshipKinds", [])
+    bond_ids = [str(item.get("kind")) for item in bond_catalog if item.get("kind")]
+    bond_values = tuple(["none"] + [value for value in bond_ids if value != "none"])
+    combo_field(persona_page, 2, "persona.bondKind", "companion bond kind", bond_kind, bond_values)
+    bond_details = ttk.Label(persona_page, text="Bond class: none", wraplength=460)
+    bond_details.grid(row=3, column=1, sticky="w", pady=4)
+
+    def update_bond_details(*_args: Any) -> None:
+        selected = str(variables["persona.bondKind"].get()).strip().lower()
+        entry = next(
+            (item for item in bond_catalog if str(item.get("kind")) == selected),
+            None,
+        )
+        if not entry:
+            bond_details.configure(text="Bond class: none")
+            return
+        terms = entry.get("terms", {})
+        bond_details.configure(
+            text=(
+                f"Bond kind: {entry.get('kind')}  ·  class: {entry.get('class')}\n"
+                f"Reference: {terms.get('reference', '—')}  ·  "
+                f"Address: {terms.get('address', '—')}"
+            )
+        )
+
+    variables["persona.bondKind"].trace_add("write", update_bond_details)
+    update_bond_details()
+
+    check_field(persona_page, 4, "persona.authority.companion", "companion", authority.get("companion"))
+    check_field(persona_page, 5, "persona.authority.owned", "owned by player", authority.get("owned"))
+    check_field(persona_page, 6, "persona.authority.eligible", "authority eligible", authority.get("eligible"))
     check_field(
-        persona_page, 5, "runtime.DTHoomans", "Dynamic Trading adapter enabled",
+        persona_page, 7, "runtime.DTHoomans", "Dynamic Trading adapter enabled",
         runtime.get("availableMods", {}).get("DTHoomans", False),
     )
 
     ttk.Label(persona_page, text="Registered NPC traits", font=("TkDefaultFont", 10, "bold")).grid(
-        row=6, column=0, columnspan=2, sticky="w", pady=(12, 4)
+        row=8, column=0, columnspan=2, sticky="w", pady=(12, 4)
     )
     trait_catalog = host.persona_catalog.get("traits", [])
     trait_ids = [str(item.get("id")) for item in trait_catalog if item.get("id")]
     if not trait_ids:
         trait_ids = [str(value) for value in npc.get("traits", [])]
     trait_list = tk.Listbox(persona_page, selectmode="multiple", height=8, exportselection=False)
-    trait_list.grid(row=7, column=0, columnspan=2, sticky="nsew", pady=4)
-    persona_page.rowconfigure(7, weight=1)
+    trait_list.grid(row=9, column=0, columnspan=2, sticky="nsew", pady=4)
+    persona_page.rowconfigure(9, weight=1)
     selected_traits = {str(value).lower() for value in npc.get("traits", [])}
     for index, trait_id in enumerate(trait_ids):
         trait_list.insert("end", trait_id)
@@ -343,10 +394,10 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
     variables["persona.traits"] = trait_list
 
     ttk.Label(persona_page, text="Social Profile personality", font=("TkDefaultFont", 10, "bold")).grid(
-        row=8, column=0, columnspan=2, sticky="w", pady=(12, 4)
+        row=10, column=0, columnspan=2, sticky="w", pady=(12, 4)
     )
     combo_field(
-        persona_page, 9, "persona.socialStyle", "social style",
+        persona_page, 11, "persona.socialStyle", "social style",
         personality.get("socialStyle", "neutral"),
         tuple(host.persona_catalog.get("personality", {}).get("enums", {}).get(
             "socialStyle", ["neutral", "friendly", "withdrawn"]
@@ -363,22 +414,36 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
         ttk.Scale(parent, from_=minimum, to=maximum, variable=variables[key], orient="horizontal").grid(
             row=row, column=1, sticky="ew", pady=3
         )
+        value_label = ttk.Label(parent, width=8, anchor="e")
+        value_label.grid(row=row, column=2, sticky="e", padx=(8, 0), pady=3)
 
-    scale_field(persona_page, 10, "relationship.approval", "approval", relationship.get("approval", 0), -100, 100)
-    scale_field(persona_page, 11, "relationship.respect", "respect", relationship.get("respect", 0), -100, 100)
-    scale_field(persona_page, 12, "relationship.familiarity", "familiarity", relationship.get("familiarity", 0), 0, 100)
+        def update_value(*_args: Any) -> None:
+            current = float(variables[key].get())
+            if minimum < 0:
+                value_label.configure(text=f"{current:.0f}")
+            else:
+                value_label.configure(text=f"{current:.2f}")
+
+        variables[key].trace_add("write", update_value)
+        update_value()
+
+    scale_field(persona_page, 12, "relationship.approval", "approval", relationship.get("approval", 0), -100, 100)
+    scale_field(persona_page, 13, "relationship.respect", "respect", relationship.get("respect", 0), -100, 100)
+    scale_field(persona_page, 14, "relationship.familiarity", "familiarity", relationship.get("familiarity", 0), 0, 100)
     for offset, key in enumerate(
-        host.persona_catalog.get("personality", {}).get("dimensions", []), start=13
+        host.persona_catalog.get("personality", {}).get("dimensions", []), start=15
     ):
         scale_field(persona_page, offset, f"persona.personality.{key}", key, personality.get(key, 0.5), 0, 1)
     ttk.Label(persona_page, text="Derived relationship state (production read-only)").grid(
-        row=21, column=0, sticky="w", pady=(12, 4)
+        row=22, column=0, sticky="w", pady=(12, 4)
     )
-    derived_context = host.last_response.get("contextAfter", {}) if isinstance(host.last_response, dict) else {}
+    derived_context = {}
+    if isinstance(host.last_response, dict):
+        derived_context = host.last_response.get("contextAfter") or host.last_response.get("context") or {}
     derived_actor = derived_context.get("actorConversationContext", {}) if isinstance(derived_context, dict) else {}
     derived_relationship = derived_actor.get("relationship", {}) if isinstance(derived_actor, dict) else {}
     ttk.Label(persona_page, text=str(derived_relationship.get("state", "unknown"))).grid(
-        row=21, column=1, sticky="w", pady=(12, 4)
+        row=22, column=1, sticky="w", pady=(12, 4)
     )
 
     inventory_page = page("Inventories")
