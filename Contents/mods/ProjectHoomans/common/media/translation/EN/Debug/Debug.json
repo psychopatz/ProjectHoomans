@@ -627,5 +627,10 @@
     "UI_PNC_WKG_Debug_Refresh": "REFRESH",
     "UI_PNC_WKG_Debug_Actors": "ACTORS",
     "UI_PNC_WKG_Debug_Rows": "INSPECTION",
-    "UI_PNC_WKG_Debug_Details": "DETAILS"
+    "UI_PNC_WKG_Debug_Details": "DETAILS",
+    "UI_PNC_WKG_Debug_Facts": "FACTS",
+    "UI_PNC_WKG_Debug_Knowledge": "KNOWLEDGE",
+    "UI_PNC_WKG_Debug_Context": "CONTEXT",
+    "UI_PNC_WKG_Debug_Why": "WHY",
+    "UI_PNC_WKG_Debug_Trace": "TRACE"
 }

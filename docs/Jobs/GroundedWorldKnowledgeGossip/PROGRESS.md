@@ -125,3 +125,26 @@ luac -p <changed Lua files>; translation JSON validation; git diff --check
 The native PZ window itself has not been launched by the agent. SP/MP live-game behavior and visual confirmation remain reserved for user validation.
 
 The authoritative-domain smoke now also covers `zombie`, `hostile_npc`, `player`, and unknown death attribution; war, peace, truce, alliance and alliance-break incident publication; faction destruction; and authorized public acquisition. Commit: `ba9f32b8`.
+
+## Native inspector usability and persisted-save audit (2026-10-22)
+
+The first user-visible inspector pass exposed a presentation defect: the generic debug roster was merged before the WKG actor snapshot, so a known Core actor could remain displayed as `references: 0`. The inspector now overlays snapshot reference counts onto the roster, sorts actors with knowledge first, shows explicit empty-state rows for facts/knowledge/context/trace, displays bounded ledger/knowledge/kind/propagation summaries, identifies the `PNC.WorldKnowledge`/`Events.OnSave` storage contract, and uses translated view labels. No new debug gate, ledger, or persistence store was added.
+
+The selected saved world was resolved explicitly as `/home/psychopatz/Zomboid/Saves/Sandbox/2026-10-22_08-59-28`. The read-only Build 42.20 profiler reader returned `source=persisted_global_mod_data`, `worldVersion=249`, `formatCompatibility=verified_42.20`, `PNC.WorldKnowledge` size `4693` bytes, ledger revision `4`, four historical `npc.death` facts, and four actor references. The records contain compact IDs/enums/primitives and no localized gossip prose or transcript. This proves the persistence path is usable and storeable for the facts that were actually produced.
+
+The same saved table contains no zombie-pressure, faction-status/incident, treaty, helicopter, power, water, or season facts. A source audit also found no production caller of `ObserveDefaultAuthority`; the guarded PZ reader remains an explicit adapter seam, not evidence that those domains were observed in this live save. The inspector reports this as `no authority observation in this runtime` instead of showing a blank panel or fabricating facts. The profiler process was connected, but live ModData capture was disabled; the table result is saved-on-disk evidence only, not an in-memory runtime claim.
+
+Focused evidence after the inspector correction:
+
+```text
+python3 tests/run_tests.py --jobs 2 --timeout 30 --verbose world_knowledge
+  PASS 4/4 (Core WKG, PBrainZ, debug snapshot, debug model)
+python3 -m unittest -v tools.semantic_harness.tests.test_world_knowledge_inspector tools.semantic_harness.tests.test_grounded_world_knowledge_gossip
+  PASS 3 tests; real production Lua worker, EN/TL, same-fact provenance and no-news
+pz_verify.py --file <debug service/model/window> --kahlua --severity ERROR --no-snippets
+  0 errors on each touched Lua file
+luac -p <touched Lua files>; translation JSON; git diff --check
+  PASS
+```
+
+The native window was not relaunched or hot-reloaded by the agent. The user must reopen/reload the existing game session to see this correction; native SP/MP behavior and save/reload remain user-owned validation.

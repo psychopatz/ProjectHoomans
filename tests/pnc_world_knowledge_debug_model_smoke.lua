@@ -32,10 +32,11 @@ local snapshot = {
         toActorID = "bob", provenance = "told", reason = "opportunistic_share" } },
 }
 
-T.equal(Model.ActorItems(snapshot, {
+local actorItems = Model.ActorItems(snapshot, {
     { id = "runtime-alice", coreActorID = "alice" },
-})[1].actorID, "alice",
-    "actor model row")
+})
+T.equal(actorItems[1].actorID, "alice", "actor model row")
+T.equal(actorItems[1].referenceCount, 1, "snapshot references overlay roster")
 T.equal(Model.Rows(snapshot, "facts")[1].factID, "fact-1",
     "fact model row")
 T.equal(Model.Rows(snapshot, "knowledge")[1].reference.provenance, "told",
@@ -46,6 +47,10 @@ T.equal(Model.Rows(snapshot, "why")[1].factID, "fact-1",
     "explanation model row")
 T.equal(Model.Rows(snapshot, "trace")[1].trace.toActorID, "bob",
     "propagation trace model row")
-T.equal(Model.DetailRows(snapshot, Model.Rows(snapshot, "facts")[1], "facts")[4].value,
-    "faction.status", "fact detail projection")
+local detailRows = Model.DetailRows(snapshot, Model.Rows(snapshot, "facts")[1], "facts")
+local kindDetail
+for _, detail in ipairs(detailRows) do
+    if detail.label == "Kind" then kindDetail = detail.value end
+end
+T.equal(kindDetail, "faction.status", "fact detail projection")
 T.finish("pnc_world_knowledge_debug_model_smoke")

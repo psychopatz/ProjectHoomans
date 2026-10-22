@@ -141,6 +141,46 @@ local function buildContext(actorID, now, maximum, language)
     })
 end
 
+local function buildMetrics(ledgerState, knowledgeState, factModule, now,
+    trace, facts, context)
+    local factKinds = {}
+    local factCount = 0
+    for _, factID in ipairs(ledgerState.order or {}) do
+        local fact = ledgerState.facts and ledgerState.facts[factID] or nil
+        if fact and not factModule.IsExpired(fact, now) then
+            factCount = factCount + 1
+            local kind = tostring(fact.kind or "unknown")
+            factKinds[kind] = (factKinds[kind] or 0) + 1
+        end
+    end
+
+    local knownActorCount = 0
+    local referenceCount = 0
+    for _, entry in pairs(knowledgeState.byActor or {}) do
+        local count = entry and entry.order and #entry.order or 0
+        referenceCount = referenceCount + count
+        if count > 0 then knownActorCount = knownActorCount + 1 end
+    end
+
+    local candidates = context and context.worldKnowledge
+        and context.worldKnowledge.candidates or {}
+    local statements = context and context.npcGossip
+        and context.npcGossip.statements or {}
+    return {
+        ledger = ledgerState.metrics,
+        knowledge = knowledgeState.metrics,
+        ledgerRevision = ledgerState.revision,
+        factCount = factCount,
+        returnedFactCount = #(facts or {}),
+        factKinds = factKinds,
+        knownActorCount = knownActorCount,
+        referenceCount = referenceCount,
+        contextCandidateCount = #candidates,
+        statementCount = #statements,
+        traceCount = #trace,
+    }
+end
+
 function Debug.BuildSnapshotForPlayer(_, request)
     request = type(request) == "table" and request or {}
     local worldKnowledge = Adapter and Adapter.Core or nil
@@ -206,9 +246,20 @@ function Debug.BuildSnapshotForPlayer(_, request)
         },
         explanation = explanation, explanationReason = explanationReason,
         trace = trace,
-        metrics = {
-            ledger = ledgerState.metrics, knowledge = knowledgeState.metrics,
-            ledgerRevision = ledgerState.revision,
+        metrics = buildMetrics(ledgerState, knowledgeState, worldKnowledge.Fact,
+            now, trace, facts, context),
+        persistence = {
+            owner = "ProjectHoomans",
+            modDataKey = "PNC.WorldKnowledge",
+            saveEvent = "Events.OnSave",
+            storesHistoricalFacts = true,
+            storesActorReferences = true,
+            storesLocalizedProse = false,
+            storesTranscripts = false,
+        },
+        worldState = {
+            observed = Adapter and Adapter.WorldState
+                and Adapter.WorldState.last ~= nil or false,
         },
         limits = {
             facts = Debug.MAX_FACTS, actors = Debug.MAX_ACTORS,

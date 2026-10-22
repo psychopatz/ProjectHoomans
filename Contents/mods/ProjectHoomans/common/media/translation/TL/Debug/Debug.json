@@ -627,5 +627,10 @@
     "UI_PNC_WKG_Debug_Refresh": "I-REFRESH",
     "UI_PNC_WKG_Debug_Actors": "MGA ACTOR",
     "UI_PNC_WKG_Debug_Rows": "INSPEKSYON",
-    "UI_PNC_WKG_Debug_Details": "MGA DETALYE"
+    "UI_PNC_WKG_Debug_Details": "MGA DETALYE",
+    "UI_PNC_WKG_Debug_Facts": "MGA FACT",
+    "UI_PNC_WKG_Debug_Knowledge": "KAALAMAN",
+    "UI_PNC_WKG_Debug_Context": "KONTEKSTO",
+    "UI_PNC_WKG_Debug_Why": "BAKIT",
+    "UI_PNC_WKG_Debug_Trace": "TRACE"
 }

@@ -20,6 +20,14 @@ local function text(key, fallback)
     return fallback or key
 end
 
+local VIEW_LABELS = {
+    facts = { "UI_PNC_WKG_Debug_Facts", "FACTS" },
+    knowledge = { "UI_PNC_WKG_Debug_Knowledge", "KNOWLEDGE" },
+    context = { "UI_PNC_WKG_Debug_Context", "CONTEXT" },
+    why = { "UI_PNC_WKG_Debug_Why", "WHY" },
+    trace = { "UI_PNC_WKG_Debug_Trace", "TRACE" },
+}
+
 local function selected(list)
     local item = list and list:getItem()
     return item and item.item or nil
@@ -64,7 +72,8 @@ function ISPNCWorldKnowledgeDebugWindow:createChildren()
     self.viewCombo:initialise(); self.viewCombo:instantiate()
     self:addChild(self.viewCombo)
     for _, view in ipairs({ "facts", "knowledge", "context", "why", "trace" }) do
-        self.viewCombo:addOptionWithData(view, view)
+        local label = VIEW_LABELS[view]
+        self.viewCombo:addOptionWithData(text(label[1], label[2]), view)
     end
     self.viewCombo:selectData("facts")
     self.refreshButton = UI.CreateButton(self, {

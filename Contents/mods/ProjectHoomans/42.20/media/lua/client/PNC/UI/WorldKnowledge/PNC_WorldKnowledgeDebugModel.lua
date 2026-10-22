@@ -20,28 +20,46 @@ local function row(label, detail, item)
     return item
 end
 
-local function appendActor(rows, seen, item)
+local function appendActor(actors, item, fromSnapshot)
     local actorID = item and (item.actorID or item.coreActorID
         or item.id or item.npcID)
     if not actorID then return end
     actorID = tostring(actorID)
-    if seen[actorID] then return end
-    seen[actorID] = true
-    rows[#rows + 1] = row(actorID,
-        "references: " .. tostring(item.referenceCount or 0), {
-            actorID = actorID,
-            referenceCount = item.referenceCount or 0,
-        })
+    local existing = actors[actorID]
+    if not existing then
+        existing = { actorID = actorID, referenceCount = 0 }
+        actors[actorID] = existing
+    end
+    if fromSnapshot then
+        existing.referenceCount = tonumber(item.referenceCount) or 0
+    elseif not existing.referenceCount then
+        existing.referenceCount = tonumber(item.referenceCount) or 0
+    end
+    existing.label = actorID
+    existing.detail = "references: " .. tostring(existing.referenceCount or 0)
 end
 
 function Model.ActorItems(snapshot, roster)
-    local rows, seen = {}, {}
-    for _, item in ipairs(roster or {}) do appendActor(rows, seen, item) end
+    local actors = {}
+    for _, item in ipairs(roster or {}) do appendActor(actors, item, false) end
     for _, item in ipairs(snapshot and snapshot.actors or {}) do
-        appendActor(rows, seen, item)
+        appendActor(actors, item, true)
     end
-    table.sort(rows, function(left, right) return left.label < right.label end)
+    local rows = {}
+    for _, item in pairs(actors) do
+        rows[#rows + 1] = row(item.label, item.detail, item)
+    end
+    table.sort(rows, function(left, right)
+        local leftKnown = (tonumber(left.referenceCount) or 0) > 0
+        local rightKnown = (tonumber(right.referenceCount) or 0) > 0
+        if leftKnown ~= rightKnown then return leftKnown end
+        return left.label < right.label
+    end)
     return rows
+end
+
+local function emptyRow(label, detail, reason)
+    return row(label, detail, { empty = true, reason = reason })
 end
 
 function Model.FactRows(snapshot)
@@ -51,6 +69,10 @@ function Model.FactRows(snapshot)
             value(fact.kind) .. " / " .. value(fact.producer), {
                 factID = fact.factID, fact = fact,
             })
+    end
+    if #rows == 0 then
+        rows[1] = emptyRow("No facts published",
+            "The current bounded ledger has no non-expired facts.", "no_facts")
     end
     return rows
 end
@@ -64,6 +86,12 @@ function Model.KnowledgeRows(snapshot)
                 .. string.format("%.2f", tonumber(reference.confidence) or 0), {
                 factID = reference.factID, reference = reference,
             })
+    end
+    if #rows == 0 then
+        local actorID = snapshot and snapshot.actorID or "no actor selected"
+        rows[1] = emptyRow("No known facts",
+            "Selected actor has no authorized fact references: " .. tostring(actorID),
+            "no_actor_knowledge")
     end
     return rows
 end
@@ -87,6 +115,11 @@ function Model.ContextRows(snapshot)
             factID = snapshot.context.npcGossip.factRefs
                 and snapshot.context.npcGossip.factRefs[index],
         })
+    end
+    if #rows == 0 then
+        rows[1] = emptyRow("No grounded context",
+            "No authorized candidate or localized statement for this actor.",
+            "no_grounded_context")
     end
     return rows
 end
@@ -123,6 +156,11 @@ function Model.TraceRows(snapshot)
             value(entry.factID) .. " " .. value(entry.fromActorID)
                 .. " -> " .. value(entry.toActorID), { trace = entry })
     end
+    if #rows == 0 then
+        rows[1] = emptyRow("No propagation trace",
+            "No bounded fact transfer has been recorded in this runtime.",
+            "no_propagation_trace")
+    end
     return rows
 end
 
@@ -138,8 +176,53 @@ local function addDetail(rows, label, item)
     rows[#rows + 1] = { label = label, value = value(item) }
 end
 
+local function formatFactKinds(kinds)
+    local names = {}
+    for kind in pairs(kinds or {}) do names[#names + 1] = tostring(kind) end
+    table.sort(names)
+    local values = {}
+    for _, kind in ipairs(names) do
+        values[#values + 1] = kind .. "=" .. tostring(kinds[kind])
+    end
+    return #values > 0 and table.concat(values, ", ") or "none"
+end
+
+function Model.SummaryRows(snapshot)
+    local metrics = snapshot and snapshot.metrics or {}
+    local actor = snapshot and snapshot.actor or nil
+    local context = snapshot and snapshot.context or {}
+    local candidates = context.worldKnowledge
+        and context.worldKnowledge.candidates or {}
+    local statements = context.npcGossip
+        and context.npcGossip.statements or {}
+    return {
+        { label = "Ledger", detail = tostring(metrics.factCount or 0)
+            .. " facts / revision " .. tostring(metrics.ledgerRevision or 0) },
+        { label = "Fact kinds", detail = formatFactKinds(metrics.factKinds) },
+        { label = "Knowledge", detail = tostring(metrics.knownActorCount or 0)
+            .. " actors / " .. tostring(metrics.referenceCount or 0) .. " references" },
+        { label = "Selected actor", detail = tostring(snapshot and snapshot.actorID
+            or "none") .. " / " .. tostring(actor and actor.referenceCount or 0)
+            .. " references" },
+        { label = "Context", detail = tostring(#candidates) .. " candidates / "
+            .. tostring(#statements) .. " statements" },
+        { label = "Propagation", detail = tostring(metrics.traceCount or 0)
+            .. " trace entries" },
+        { label = "Store contract", detail = tostring(snapshot and snapshot.persistence
+            and snapshot.persistence.modDataKey or "unknown") .. " via "
+            .. tostring(snapshot and snapshot.persistence
+                and snapshot.persistence.saveEvent or "unknown") },
+        { label = "World state", detail = snapshot and snapshot.worldState
+            and snapshot.worldState.observed and "authority observed"
+            or "no authority observation in this runtime" },
+    }
+end
+
 function Model.DetailRows(snapshot, item, view)
     local rows = {}
+    for _, summary in ipairs(Model.SummaryRows(snapshot)) do
+        addDetail(rows, summary.label, summary.detail)
+    end
     if not item then return rows end
     addDetail(rows, "Selection", item.label)
     addDetail(rows, "Detail", item.detail)
