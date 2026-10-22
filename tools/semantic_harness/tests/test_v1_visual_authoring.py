@@ -9,10 +9,10 @@ import tempfile
 import unittest
 
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
-from tools.semantic_harness.conversation_inspector import build_conversation_inspector
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.inspection.conversation_inspector import build_conversation_inspector
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.tests.test_interaction_spec import backstory_spec, stay_spec
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
@@ -53,13 +53,22 @@ class V1VisualAuthoringTests(unittest.TestCase):
             REPOSITORY / "Contents" / "mods" / "ProjectHoomans",
             root / "Contents" / "mods" / "ProjectHoomans",
         )
-        (root / "tools" / "semantic_compiler").mkdir(parents=True)
+        (root / "tools" / "semantic_harness" / "codebuilder" / "sources").mkdir(
+            parents=True
+        )
         shutil.copy2(
             REPOSITORY
             / "tools"
-            / "semantic_compiler"
+            / "semantic_harness"
+            / "codebuilder"
+            / "sources"
             / "grounded_personal_dialogue.json",
-            root / "tools" / "semantic_compiler" / "grounded_personal_dialogue.json",
+            root
+            / "tools"
+            / "semantic_harness"
+            / "codebuilder"
+            / "sources"
+            / "grounded_personal_dialogue.json",
         )
         shutil.copytree(
             REPOSITORY / "tools" / "semantic_harness" / "lua",
@@ -74,8 +83,12 @@ class V1VisualAuthoringTests(unittest.TestCase):
             REPOSITORY / "tests" / "test_config.lua",
             root / "tests" / "test_config.lua",
         )
-        source = REPOSITORY / "tools/semantic_compiler/semantic_definitions.json"
-        target = root / "tools/semantic_compiler/semantic_definitions.json"
+        source = REPOSITORY / (
+            "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
+        )
+        target = root / (
+            "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
+        )
         target.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
 
     def test_backstory_and_registered_action_share_preview_approval_generation_and_worker(self) -> None:

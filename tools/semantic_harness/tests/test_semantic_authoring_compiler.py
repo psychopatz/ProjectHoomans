@@ -8,12 +8,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.semantic_harness.authoring import (
+from tools.semantic_harness.codebuilder.authoring import (
     generate_semantic_source,
     preview_semantic_source,
 )
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
@@ -22,7 +22,8 @@ REPOSITORY = Path(__file__).resolve().parents[3]
 class SemanticAuthoringCompilerWorkerTests(unittest.TestCase):
     def test_lab_source_preview_is_effect_free_and_reports_mod_paths(self) -> None:
         report = preview_semantic_source(
-            REPOSITORY / "tools/semantic_compiler/semantic_definitions.json"
+            REPOSITORY
+            / "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
         )
         self.assertTrue(report["ok"])
         self.assertTrue(report["previewOnly"])
@@ -56,7 +57,10 @@ class SemanticAuthoringCompilerWorkerTests(unittest.TestCase):
 
     def test_lab_source_preview_returns_diagnostic_without_writing(self) -> None:
         source = json.loads(
-            (REPOSITORY / "tools/semantic_compiler/semantic_definitions.json")
+            (
+                REPOSITORY
+                / "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
+            )
             .read_text(encoding="utf-8")
         )
         source["definitions"][0]["capability"] = "pnc:missing.action"
@@ -72,7 +76,9 @@ class SemanticAuthoringCompilerWorkerTests(unittest.TestCase):
         self.assertIn("unregistered capability", report["diagnostics"][0]["message"])
 
     def test_approved_generation_writes_modular_artifacts_byte_stably(self) -> None:
-        source = REPOSITORY / "tools/semantic_compiler/semantic_definitions.json"
+        source = REPOSITORY / (
+            "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
+        )
         with tempfile.TemporaryDirectory() as directory:
             output_root = Path(directory)
             first = generate_semantic_source(

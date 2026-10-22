@@ -1,6 +1,6 @@
 # Dataset-assisted contextual language Code Builder — proposed pipeline
 
-**Status:** PLANNED. Datasets are **offline development-time sources for linguistic and dialogue-state candidate generation**, not a runtime LLM, executable capability authority, or megabyte-scale in-game corpus. Preserve the existing parser/compiler algorithms, reviewed WordNet/common-interaction/semantic-definition sources and automatic capability/flow generator **while relocating compiler implementation and canonical sources into `tools/semantic_harness/codebuilder/`** during the S0 migration. The old `tools/semantic_compiler` paths are historical entrypoints and may remain only as temporary delegated shims; no dual editable copies.
+**Status:** PLANNED. Datasets are **offline development-time sources for linguistic and dialogue-state candidate generation**, not a runtime LLM, executable capability authority, or megabyte-scale in-game corpus. Preserve the existing parser/compiler algorithms, reviewed WordNet/common-interaction/semantic-definition sources and automatic capability/flow generator **under `tools/semantic_harness/codebuilder/`**. The old `tools/semantic_compiler` package and forwarding entrypoints were removed during the S0 migration; there are no dual editable copies or compatibility shims.
 
 ## Evidence and candidate sources
 
@@ -28,7 +28,7 @@ Licensed dataset snapshot
  -> map to existing Core IR / flow / registered fact & capability
  -> collision, ambiguity, authority and license validator
  -> reviewed canonical semantic authoring spec (one source of truth)
- -> existing tools/semantic_compiler/build.py
+ -> existing tools/semantic_harness/codebuilder/build.py
  -> modular Lua patterns + contextual flow/agenda rules + response pools + EN/TL + manifests
  -> new production Lua worker and decision trace
  -> report precision, abstentions, false execution and regression delta

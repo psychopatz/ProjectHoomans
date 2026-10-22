@@ -10,8 +10,8 @@ from __future__ import annotations
 from copy import deepcopy
 import unittest
 
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class ConversationalCompetenceC7ATests(unittest.TestCase):

@@ -8,32 +8,40 @@ from typing import Any
 
 from . import authoring
 
-from .compiler import CompileError
+from .lexicon_compiler import CompileError
 
 DATASET_SOURCE_SPECS = (
     {
         "id": "semantic_definitions",
         "label": "Semantic definitions",
         "kind": "semantic",
-        "path": Path("tools/semantic_compiler/semantic_definitions.json"),
+        "path": Path(
+            "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
+        ),
     },
     {
         "id": "common_interactions",
         "label": "Conversation interactions",
         "kind": "dialogue",
-        "path": Path("tools/semantic_compiler/common_interactions.json"),
+        "path": Path(
+            "tools/semantic_harness/codebuilder/sources/common_interactions.json"
+        ),
     },
     {
         "id": "grounded_personal_dialogue",
         "label": "Grounded personal dialogue",
         "kind": "dialogue",
-        "path": Path("tools/semantic_compiler/grounded_personal_dialogue.json"),
+        "path": Path(
+            "tools/semantic_harness/codebuilder/sources/grounded_personal_dialogue.json"
+        ),
     },
     {
         "id": "wordnet_concepts",
         "label": "Reviewed WordNet concepts",
         "kind": "lexicon",
-        "path": Path("tools/semantic_compiler/wordnet_concepts.json"),
+        "path": Path(
+            "tools/semantic_harness/codebuilder/sources/wordnet_concepts.json"
+        ),
     },
 )
 

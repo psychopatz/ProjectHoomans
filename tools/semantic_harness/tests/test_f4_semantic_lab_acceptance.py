@@ -9,9 +9,9 @@ import tempfile
 import unittest
 
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.tests.test_interaction_spec import backstory_spec
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
@@ -68,13 +68,22 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             REPOSITORY / "Contents" / "mods" / "ProjectHoomans",
             root / "Contents" / "mods" / "ProjectHoomans",
         )
-        (root / "tools" / "semantic_compiler").mkdir(parents=True)
+        (root / "tools" / "semantic_harness" / "codebuilder" / "sources").mkdir(
+            parents=True
+        )
         shutil.copy2(
             REPOSITORY
             / "tools"
-            / "semantic_compiler"
+            / "semantic_harness"
+            / "codebuilder"
+            / "sources"
             / "grounded_personal_dialogue.json",
-            root / "tools" / "semantic_compiler" / "grounded_personal_dialogue.json",
+            root
+            / "tools"
+            / "semantic_harness"
+            / "codebuilder"
+            / "sources"
+            / "grounded_personal_dialogue.json",
         )
         shutil.copytree(
             REPOSITORY / "tools" / "semantic_harness" / "lua",

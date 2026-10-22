@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import unittest
 
-from tools.semantic_harness.runner import HarnessCase, run_case
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.testing.runner import HarnessCase, run_case
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class ContextualBaselineMatrixTests(unittest.TestCase):

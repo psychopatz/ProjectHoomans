@@ -7,8 +7,8 @@ from threading import Event, Lock
 import unittest
 from unittest.mock import Mock
 
-from tools.semantic_harness.gui import SemanticHarnessApp
-from tools.semantic_harness.worker_session import SessionClosedError, WorkerSession
+from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.runtime.worker_session import SessionClosedError, WorkerSession
 
 
 class FakeWorker:

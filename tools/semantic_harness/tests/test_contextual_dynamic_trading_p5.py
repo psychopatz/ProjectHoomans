@@ -7,7 +7,7 @@ import unittest
 
 from tools.semantic_harness.runtime.npc_profiles import apply_npc_profile
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class ContextualDynamicTradingP5Tests(unittest.TestCase):

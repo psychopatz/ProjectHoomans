@@ -6,10 +6,10 @@ from copy import deepcopy
 import json
 import unittest
 
-from tools.semantic_harness.conversation_inspector import build_conversation_inspector
+from tools.semantic_harness.inspection.conversation_inspector import build_conversation_inspector
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
-from tools.semantic_harness.settings_dialog import collect_scenario_settings
+from tools.semantic_harness.ui.dialogs.settings import collect_scenario_settings
 
 
 class ContextualSemanticLabPersonaP6Tests(unittest.TestCase):

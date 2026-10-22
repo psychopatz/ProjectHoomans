@@ -1,13 +1,13 @@
 # Semantic Studio Consolidation — one application, embedded CodeBuilder
 
-**Status:** NEW REQUIRED PRODUCTIZATION PHASE, PLANNED (source audit 2026-10-19). **Code baseline:** remote `71162cb4f78cc4cd408a4a145486d5ebadc943c1`; not a local worktree/test run. Goal is to make `tools/semantic_harness` the sole developer-facing application for dataset import/review, reusable semantic blocks, flow/graph/code editing, compiler generation, production Lua simulation and regression verification. Do not build another GUI or keep an independent competing compiler workflow.
+**Status:** S0 consolidation completed in the local worktree on 2026-10-23; the larger S1–S6 productization roadmap remains planned. Goal is to make `tools/semantic_harness` the sole developer-facing application for dataset import/review, reusable semantic blocks, flow/graph/code editing, compiler generation, production Lua simulation and regression verification. Do not build another GUI or keep an independent competing compiler workflow.
 
 ## Verified current fragmentation
 
-- `tools/semantic_harness/`: `app.py`, Tk `gui.py`, `flow_editor.py`, `authoring.py`, worker, scenarios, tests and `run_harness.sh`.
-- `tools/semantic_compiler/`: `compiler.py` (WordNet / dialogue / semantic definition parsing/renderers), `build.py` (separate CLI + generated artifact writer), `common_interactions.json`, `semantic_definitions.json`, `wordnet_concepts.json`, tests. **This is a separate Python package/CLI, not a separate graphical app.**
-- `tools/semantic_harness/authoring.py` imports `tools.semantic_compiler.compiler` and `tools.semantic_compiler.build`, while also maintaining overlapping `*_RELATIVE_ROOT`, planned path logic, reports and orchestration.
-- `flow_editor.py`'s Compile/Generate/Review dataset actions choose external JSON via file dialogs and return predominantly bounded status reports; not a fully browseable shared dataset/block/code editing workspace.
+- `tools/semantic_harness/`: the sole harness application, with `app.py`, `cli.py`, `ui/`, `studio/`, `runtime/`, `inspection/`, `testing/`, `codebuilder/`, tests and `run_harness.sh`.
+- `tools/semantic_harness/codebuilder/`: the concrete CodeBuilder modules (`lexicon_compiler.py`, `dialogue_dataset.py`, `semantic_definition_compiler.py`, renderers, service and build entrypoint) plus the canonical reviewed inputs under `sources/*.json`. It is an internal headless subsystem, not a second package or application.
+- All Python callers import those concrete modules directly. The old `tools/semantic_compiler` package and the former top-level forwarding modules have been removed; there are no compatibility shims or dual editable source copies.
+- The remaining productization gap is inside the existing harness UI: Compile/Generate/Review dataset actions still need to become a fully browseable shared dataset/block/code editing workspace.
 - Source `AGENTS.md` requires Build 42.20 executable Lua inside the versioned mod's `media` tree and portable assets and translations in approved `common/media` structure; existing compiler writes some translations under `common/media/translation`. **Audit actual production loading/translation conventions and reconcile this discrepancy in a separately measured packaging slice. Do not opportunistically change output paths during no-behavior-change consolidation.**
 
 ## Target dependency / ownership graph
@@ -38,24 +38,24 @@ This is a **target layout**, not an instruction to create empty files or restruc
 1. Only **one canonical authored model**: dataset-reviewed samples, semantic definitions, flow/action binding/gates, translated responses and graph layout metadata belong to a versioned editable specification. Lua/manifest/EN+TL files are deterministic derived artifacts. Graph and supported code editing operate on the same model.
 2. Only **one compilation/rendering/writing authority** under Semantic Lab CodeBuilder. Tk, CLI and agent APIs call the same headless service; UI must not reimplement source writers/path generation, dialog validation or semantic routing.
 3. CodeBuilder remains callable headlessly through Semantic Lab CLI for Codex/CI; no separate long-lived process or second graphical/compiler application.
-4. Keep temporary `tools/semantic_compiler` compatibility **shims only if real callers exist**. Shim delegates to embedded CodeBuilder, warns/deprecates appropriately, has no source definitions, renderer or artifact writer ownership, and has a documented removal gate. Check repo and external scripts before deleting legacy entrypoints.
+4. There is no legacy compiler package or forwarding compatibility layer. All repository callers use the canonical Semantic Harness modules and source paths; external scripts must adopt those paths directly.
 5. Never write staging directories inside a loaded PZ `media/` tree. Keep unapproved/temporary outputs external; approved generation uses safe atomic file replace, explicit manifests and source path review.
 6. No duplicate parser or runtime interpreter: PsychopatzCore owns generic NLU/IR, Hoomans Lua owns flow/response and server gameplay. Build-time corpus examples are NOT bundled at runtime. Preview remains side-effect-free.
 7. No arbitrary Lua callback in blocks, implicit gameplay handler inference, altered permission semantics, or action completion claimed from parser recognition. Preserve offline, EN/TL, multi-NPC/MP authority and optional PBrainZ contracts.
 
 ## Migration strategy — SMALL, AUDITABLE, REVERSIBLE
 
-### S0A — Exact Next Chunk: freeze behavior and embed compiler core
+### S0A — Completed: freeze behavior and embed compiler core
 
-1. Inspect current local working tree, remote/upstream, concurrent branch owners, `AGENTS.md`, callers of `tools.semantic_compiler`, build flags, literal/default paths, tests, and generated artifact manifests. Do not assume this planning branch matches local.
+1. Inspect the local working tree, `AGENTS.md`, callers of the old compiler package, build flags, literal/default paths, tests, and generated artifact manifests.
 2. Capture a *read-only baseline* of all current compiler modes: `--wordnet-home`, `--dialogue-source`, `--semantic-source`, default flags and supported overrides. Where external WordNet is unavailable, report that lane SKIPPED, not false PASS. Record byte-level SHA-256 of tracked generated Lua/JSON/manifests and typical outputs/worker observations. Never silently regenerate tracked files just to "freeze" evidence.
 3. Move/copy **existing compiler algorithms and build services** under `tools/semantic_harness/codebuilder/` with minimal import/path adjustments, then route current Semantic Lab `authoring.py` and CLI via embedded modules. Move the three canonical reviewed source JSON inputs to `codebuilder/sources/` only when callsites/tests/defaults support it; no dual editable copies.
-4. Provide a thin legacy import/build command compatibility shim ONLY for verified dependent callers, with clear deprecation/removal criteria. The shim cannot own additional implementation or output path logic. No new standalone GUI.
+4. Migrate verified callers directly to the embedded modules and remove the legacy package. No compatibility shim or standalone GUI is retained.
 5. Validate equality: old vs new compile outputs for same inputs, including source/module names, EN/TL, translation manifests, shard order, hashes and flow IDs; deterministic repeated run and clean git diff; unaffected PZ worker real Lua conversations (FOLLOW/STAY/GIFT/needs/quest plus one EN/TL case), no double dispatch.
 6. Run focused old+new Python codebuilder/harness tests, doctor/worker boot, syntax / Kahlua and translation checks; GUI startup/X11 regression if available. Provide exact SHA, counts and proofs; keep user-owned native PZ/Workshop untouched.
 7. Update only this job's PROGRESS with evidence and ONE next chunk **S0B** if accepted, otherwise keep S0A with concrete defect. Commit narrow coherent code/tests/docs after verifying Git ownership.
 
-**S0A is not accepted** for just renaming folders, changing import strings, green unit tests with changed production artifacts, or a second copy of the compiler still writing independently.
+The completed S0A migration moved the concrete implementation and canonical JSON sources under CodeBuilder, updated repository imports/package data/generated provenance comments, removed the legacy package and forwarding facades, and preserved generated artifact tests. S0B remains the next work item.
 
 ### S0B — Unified authoring and artifact service
 

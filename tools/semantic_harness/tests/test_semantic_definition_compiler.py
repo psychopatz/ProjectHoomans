@@ -3,8 +3,8 @@ from __future__ import annotations
 import copy
 import unittest
 
-from tools.semantic_compiler.compiler import (
-    CompileError,
+from tools.semantic_harness.codebuilder.lexicon_compiler import CompileError
+from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
     compile_semantic_definitions,
     render_semantic_lua_shards,
     render_semantic_manifest,

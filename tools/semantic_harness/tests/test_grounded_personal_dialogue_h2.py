@@ -8,16 +8,18 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.semantic_harness.authoring import (
+from tools.semantic_harness.codebuilder.authoring import (
     generate_dialogue_source,
     preview_dialogue_source,
 )
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
-SOURCE = REPOSITORY / "tools/semantic_compiler/grounded_personal_dialogue.json"
+SOURCE = REPOSITORY / (
+    "tools/semantic_harness/codebuilder/sources/grounded_personal_dialogue.json"
+)
 
 
 class GroundedPersonalDialogueH2Tests(unittest.TestCase):

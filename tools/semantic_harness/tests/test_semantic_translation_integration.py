@@ -6,8 +6,8 @@ import unittest
 import json
 from pathlib import Path
 
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class SemanticTranslationIntegrationTests(unittest.TestCase):

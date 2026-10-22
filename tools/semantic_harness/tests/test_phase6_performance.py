@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from tools.semantic_harness.phase6_performance import _distribution, _percentile
+from tools.semantic_harness.testing.performance import _distribution, _percentile
 
 
 class Phase6PerformanceHelperTests(unittest.TestCase):

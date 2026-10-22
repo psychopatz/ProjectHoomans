@@ -15,11 +15,11 @@ from unittest.mock import patch
 from tools.semantic_harness import app
 import tools.semantic_harness.cli as cli_module
 from tools.semantic_harness.cli import _parser, cli
-from tools.semantic_harness.gui import npc_message_text
-from tools.semantic_harness.rendering import pretty
-from tools.semantic_harness.runner import HarnessRun
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
-from tools.semantic_harness.settings_dialog import collect_scenario_settings
+from tools.semantic_harness.ui.shell import npc_message_text
+from tools.semantic_harness.inspection.rendering import pretty
+from tools.semantic_harness.testing.runner import HarnessRun
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.ui.dialogs.settings import collect_scenario_settings
 
 
 def settings_values() -> dict[str, object]:
@@ -157,7 +157,7 @@ class AppEntryTests(unittest.TestCase):
         probe = (
             "import tkinter as tk; "
             "from tools.semantic_harness.cli import _parser; "
-            "from tools.semantic_harness.gui import SemanticHarnessApp; "
+            "from tools.semantic_harness.ui.shell import SemanticHarnessApp; "
             "root = tk.Tk(); "
             "instance = SemanticHarnessApp(root, _parser().parse_args([])); "
             "root.after(1, instance.close); "

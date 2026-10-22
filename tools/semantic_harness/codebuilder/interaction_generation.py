@@ -10,11 +10,13 @@ from typing import Any
 from . import authoring
 
 from .blocks import SemanticBlockRegistry
-from .compiler import CompileError
-from .compiler import (
-    discover_registered_capability_ids,
+from .lexicon_compiler import CompileError
+from .dialogue_rendering import (
     render_dialogue_lua,
     render_dialogue_lua_shards,
+)
+from .semantic_definition_compiler import (
+    discover_registered_capability_ids,
     render_semantic_lua_shards,
     render_semantic_manifest,
 )

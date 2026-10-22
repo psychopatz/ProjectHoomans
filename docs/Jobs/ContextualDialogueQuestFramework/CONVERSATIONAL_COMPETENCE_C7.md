@@ -14,7 +14,7 @@ User's Semantic Lab Simulation screenshot (not an independently rerun worker tra
 - `i like your dress` -> same generic fallback: `PNC_SemanticSocialCatalog_Register.lua` includes `COMPLIMENT_FEATURE` eyes/hair/outfit/smile/voice, not dress; response catalog already has socially appropriate compliment responses. Avoid one-off literal additions as the sole solution.
 - Simulation trace defaults to raw JSON with agenda/engineFacts and the "Flow graph" visualizes quest `authorize → request → admitted/rejected/failed` execution, not conversational intent/knowledge/initiative. Preserve this view for command authority, but don't confuse it with an editable dialogue-understanding graph.
 
-Source files/owners to inspect first: `PNC_SemanticCatalog_ConversationPatterns.lua`, `PNC_SemanticCatalog_Concepts.lua`, `PNC_SemanticSocialCatalog_Register.lua`, `PNC_SemanticSocialCatalog_Definitions.lua`, `PNC_SemanticDialogueLocalResponse_Questions.lua`, `PNC_SemanticDialogueLocalResponse_Resolve.lua`, `PNC_SemanticDialogueResponsePlan.lua`, `PNC_SemanticDialogueContextState.lua`, `PNC_SemanticDialogueInput_ContextProjection.lua`, `tools/semantic_harness/gui.py` and the relevant real-worker tests.
+Source files/owners to inspect first: `PNC_SemanticCatalog_ConversationPatterns.lua`, `PNC_SemanticCatalog_Concepts.lua`, `PNC_SemanticSocialCatalog_Register.lua`, `PNC_SemanticSocialCatalog_Definitions.lua`, `PNC_SemanticDialogueLocalResponse_Questions.lua`, `PNC_SemanticDialogueLocalResponse_Resolve.lua`, `PNC_SemanticDialogueResponsePlan.lua`, `PNC_SemanticDialogueContextState.lua`, `PNC_SemanticDialogueInput_ContextProjection.lua`, `tools/semantic_harness/ui/shell.py` and the relevant real-worker tests.
 
 ## Product contract
 

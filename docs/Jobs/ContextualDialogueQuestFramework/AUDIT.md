@@ -4,25 +4,25 @@
 
 | Concern | Source evidence | Result |
 | --- | --- | --- |
-| GUI application | `tools/semantic_harness/app.py`, `gui.py`, `flow_editor.py`, `run_harness.sh` | One actual Tk application, persistent production Lua worker; compiler is NOT a second GUI |
-| Standalone compiler | `tools/semantic_compiler/compiler.py`, `build.py`, JSON reviewed sources, tests, README with independent `python3 tools/semantic_compiler/build.py` commands | A second peer-level Python package and CLI/build pipeline |
-| Cross-import | `semantic_harness/authoring.py` imports compiler parsing/rendering and `build.py` writer from `tools.semantic_compiler` | Compiler is used as library today, but authoring/report/path ownership split |
-| Duplicated orchestration | `semantic_harness/authoring.py` defines `SEMANTIC_RELATIVE_ROOT`, `TRANSLATION_RELATIVE_ROOT`, `DIALOGUE_OUTPUT_RELATIVE_PATH`, `_planned_paths`; compiler `build.py` owns `DEFAULT_OUTPUT`, `DEFAULT_DIALOGUE_OUTPUT`, `write_*_output`, manifest writing | Overlapping configuration/orchestration; NOT proof that NLP compiler algorithms are duplicated |
-| UI authoring | Flow Editor `compile_source()`, `generate_source()`, `review_dataset()`, `generate_dataset()` call Tk file picker and show report summary | Real helper workflows, not integrated dataset/block/code studio |
+| GUI application | `tools/semantic_harness/app.py`, `ui/shell.py`, `ui/flow_editor/`, `run_harness.sh` | One actual Tk application, persistent production Lua worker; compiler is NOT a second GUI |
+| Embedded CodeBuilder | `tools/semantic_harness/codebuilder/{lexicon_compiler,dialogue_dataset,semantic_definition_compiler}.py`, `build.py`, `sources/*.json`, tests, README | One internal headless compiler/build subsystem under Semantic Harness; no peer-level package |
+| Canonical imports | Harness callers import concrete CodeBuilder modules directly | No legacy compiler package or forwarding import layer remains |
+| Duplicated orchestration | `codebuilder/authoring.py` and `codebuilder/build.py` own distinct authoring/build contracts; the Semantic Lab service routes callers to them | Remaining service consolidation opportunity; NOT proof that NLP compiler algorithms are duplicated |
+| UI authoring | `ui/flow_editor/` and `studio/` expose compile/generate/review workflows and bounded reports | Real helper workflows, not yet an integrated dataset/block/code studio |
 | Accepted runtime | Prior `PROGRESS.md` at this SHA reports G0–G3/C0–C6 Lua + compiler + X11 gates and READY FOR USER LIVE TEST | Preserve as historical previous-scope success, don't claim new UI requirements met |
 | Asset layout | Root AGENTS.md: `42.20/media/` runtime Lua, portable content under common and translations under `common/media/lua/shared/Translate/<LANG>/*.json`; compiler `build.py` currently targets `common/media/translation/<LANG>/Conversation/Semantic/` | Verify actual bootstrap/installed layout and migrate only under a separate approved packaging fix, not during artifact-parity S0A |
 
 ## Findings and work classification
 
-**Confirmed architecture gap:** two peer-level tool directories and build ownership split. User's desired CodeBuilder is an internal reusable subsystem in Semantic Lab. **Confirmed usability gap:** dataset/definition selection by external JSON picker rather than searchable in-app dataset library and synchronized reusable block/code authoring. **Not established:** duplicate parsing engines or a separately launched compiler GUI; do not claim those exist.
+**Resolved architecture gap:** the former peer-level compiler directory and build-ownership split were consolidated. CodeBuilder is now an internal reusable subsystem in Semantic Lab. **Remaining usability gap:** dataset/definition selection still needs to become a searchable in-app dataset library with synchronized reusable block/code authoring. **Not established:** duplicate parsing engines or a separately launched compiler GUI; do not claim those exist.
 
-**Not yet implemented:** embedded CodeBuilder, one canonical writer/configuration/authoring source-of-truth, dataset browse/edit GUI, typed semantic block composition, synchronized code editor and fully end-to-end in-app generation.
+**Not yet implemented:** the full dataset browse/edit GUI, typed semantic block composition, synchronized code editor and fully end-to-end in-app generation. The embedded CodeBuilder and direct canonical writer/module ownership are implemented.
 
-**Historical acceptance:** prior `PROGRESS.md` archived verbatim in `HISTORY_C0_C6_20261019.md`; current goal opens an additional productization phase. **New phase test state:** no new source edits, compiler artifact parity tests, GUI clickthrough or worker regressions executed by this docs change.
+**Historical acceptance:** prior `PROGRESS.md` archived verbatim in `HISTORY_C0_C6_20261019.md`; current goal opens an additional productization phase. **New phase test state:** the S0 migration-focused Python suite and build entry points were run locally; full byte-parity and GUI clickthrough worker regressions remain separate acceptance work.
 
 ## Required developer approach
 
-Read `SEMANTIC_STUDIO_CONSOLIDATION.md`. Start with S0A no-behavior-change migration; avoid a bulk folder move that reflows translations/normalization, breaks CLI consumers or overwrites manually authored definitions. Then unify authoring service before designing actual dataset explorer/semantic block composition. No native PZ or Workshop work by Codex.
+Read `SEMANTIC_STUDIO_CONSOLIDATION.md`. S0A is complete; continue with the authoring service before designing the actual dataset explorer/semantic block composition. No native PZ or Workshop work by Codex.
 
 ## Source-backed product audit — 2026-10-19
 

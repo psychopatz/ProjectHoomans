@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import unittest
 
-from tools.semantic_harness.protocol import (
+from tools.semantic_harness.runtime.protocol import (
     DEFAULT_MAX_MESSAGE_BYTES,
     ProtocolError,
     decode_message,

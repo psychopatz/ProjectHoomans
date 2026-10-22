@@ -15,8 +15,8 @@ from tools.semantic_harness.codebuilder.interaction_spec import (
     graph_connection,
     validate_interaction_spec,
 )
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
@@ -216,10 +216,15 @@ class InteractionSpecTests(unittest.TestCase):
     def test_approved_spec_persists_canonical_source_and_reports_artifact_diffs(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
-            source_path = repository / "tools/semantic_compiler/semantic_definitions.json"
+            source_path = repository / (
+                "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
+            )
             source_path.parent.mkdir(parents=True)
             source_path.write_text(
-                (REPOSITORY / "tools/semantic_compiler/semantic_definitions.json")
+                (
+                    REPOSITORY
+                    / "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
+                )
                 .read_text(encoding="utf-8"),
                 encoding="utf-8",
             )
@@ -344,10 +349,15 @@ class InteractionSpecTests(unittest.TestCase):
     def test_backstory_generation_writes_real_lua_and_en_tl_assets(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
-            source_path = repository / "tools/semantic_compiler/grounded_personal_dialogue.json"
+            source_path = repository / (
+                "tools/semantic_harness/codebuilder/sources/grounded_personal_dialogue.json"
+            )
             source_path.parent.mkdir(parents=True)
             source_path.write_text(
-                (REPOSITORY / "tools/semantic_compiler/grounded_personal_dialogue.json")
+                (
+                    REPOSITORY
+                    / "tools/semantic_harness/codebuilder/sources/grounded_personal_dialogue.json"
+                )
                 .read_text(encoding="utf-8"),
                 encoding="utf-8",
             )

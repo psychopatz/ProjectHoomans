@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.semantic_compiler.compiler import (
+from tools.semantic_harness.codebuilder.lexicon_compiler import (
     CompileError,
     compile_wordnet,
     load_allowlist,
@@ -16,7 +16,9 @@ from tools.semantic_compiler.compiler import (
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
-PRODUCTION_ALLOWLIST = REPOSITORY / "tools/semantic_compiler/wordnet_concepts.json"
+PRODUCTION_ALLOWLIST = REPOSITORY / (
+    "tools/semantic_harness/codebuilder/sources/wordnet_concepts.json"
+)
 
 
 def index_row(lemma: str, offsets: list[str]) -> str:

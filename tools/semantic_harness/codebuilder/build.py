@@ -14,40 +14,52 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 if __package__ in {None, ""}:
-    from tools.semantic_harness.codebuilder.compiler import (  # noqa: E402
+    from tools.semantic_harness.codebuilder.lexicon_compiler import (  # noqa: E402
         CompileError,
         DEFAULT_ALLOWLIST,
-        compile_dialogue_dataset,
-        compile_semantic_definitions,
         compile_wordnet,
-        load_dialogue_dataset,
         load_allowlist,
-        load_semantic_source,
-        discover_registered_capability_ids,
-        render_dialogue_lua,
-        render_dialogue_lua_shards,
-        render_dialogue_translation,
-        render_semantic_lua_shards,
-        render_semantic_manifest,
         render_lua,
     )
-else:
-    from .compiler import (  # noqa: E402
-        CompileError,
-        DEFAULT_ALLOWLIST,
-        compile_dialogue_dataset,
-        compile_semantic_definitions,
-        compile_wordnet,
+    from tools.semantic_harness.codebuilder.dialogue_contract import (
         load_dialogue_dataset,
-        load_allowlist,
-        load_semantic_source,
-        discover_registered_capability_ids,
+    )
+    from tools.semantic_harness.codebuilder.dialogue_dataset import (
+        compile_dialogue_dataset,
+    )
+    from tools.semantic_harness.codebuilder.dialogue_rendering import (
         render_dialogue_lua,
         render_dialogue_lua_shards,
         render_dialogue_translation,
+    )
+    from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
+        compile_semantic_definitions,
+        load_semantic_source,
+        discover_registered_capability_ids,
         render_semantic_lua_shards,
         render_semantic_manifest,
+    )
+else:
+    from .lexicon_compiler import (  # noqa: E402
+        CompileError,
+        DEFAULT_ALLOWLIST,
+        compile_wordnet,
+        load_allowlist,
         render_lua,
+    )
+    from .dialogue_contract import load_dialogue_dataset
+    from .dialogue_dataset import compile_dialogue_dataset
+    from .dialogue_rendering import (
+        render_dialogue_lua,
+        render_dialogue_lua_shards,
+        render_dialogue_translation,
+    )
+    from .semantic_definition_compiler import (
+        compile_semantic_definitions,
+        load_semantic_source,
+        discover_registered_capability_ids,
+        render_semantic_lua_shards,
+        render_semantic_manifest,
     )
 
 
@@ -61,7 +73,9 @@ DEFAULT_DIALOGUE_OUTPUT = (
     / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/"
     / "PNC_SemanticGeneratedDialogue.lua"
 )
-CANONICAL_SOURCE_ROOT = ROOT / "tools" / "semantic_compiler"
+CANONICAL_SOURCE_ROOT = (
+    ROOT / "tools" / "semantic_harness" / "codebuilder" / "sources"
+)
 DEFAULT_SEMANTIC_SOURCE = CANONICAL_SOURCE_ROOT / "semantic_definitions.json"
 DEFAULT_SEMANTIC_OUTPUT_ROOT = ROOT
 

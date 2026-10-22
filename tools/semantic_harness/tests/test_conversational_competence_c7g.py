@@ -7,8 +7,8 @@ import statistics
 import time
 import unittest
 
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 def grounded_scenario(*, language: str = "EN", provider: bool = False) -> dict:

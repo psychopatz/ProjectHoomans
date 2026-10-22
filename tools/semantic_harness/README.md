@@ -35,14 +35,13 @@ timeouts, crash detection, and bounded stderr diagnostics.
   the Simulation tab for real-worker inspection.
 - `runtime/` owns the Python/Lua boundary: configuration discovery, the
   editable scenario document, the versioned JSON-lines protocol, child-process
-  lifecycle, the worker adapter, and serialized worker sessions. The old
-  top-level runtime module paths remain compatibility facades while callers
-  migrate.
+  lifecycle, the worker adapter, and serialized worker sessions. Runtime
+  modules are imported from their owning `runtime/` subpackage.
 - `codebuilder/` owns the canonical typed interaction source, reusable
   CodeBlocks, compiler/build adapters, approved artifact authoring operations,
   and the pure production interaction-catalog projection used by the service.
-  The historical `compiler.py` and top-level authoring/explorer paths remain
-  compatibility facades; there is still one compiler and one artifact writer.
+  CodeBuilder modules are imported directly from their owning subpackages;
+  there is one compiler and one artifact writer.
 - `studio/` owns the Semantic Lab authoring surface: canonical dataset and
   reusable-block panes, typed interaction composition, and workflow
   orchestration. It delegates compilation, generation, and catalog projection
@@ -56,8 +55,8 @@ timeouts, crash detection, and bounded stderr diagnostics.
 - `testing/runner.py` owns case replay and its streaming conflict ledger;
   `testing/suite.py` owns isolated Lua smoke-test subprocesses;
   `testing/doctor.py` owns bounded environment/worker diagnostics; and
-  `testing/performance.py` owns protocol evidence. The old top-level testing
-  module paths remain compatibility facades.
+  `testing/performance.py` owns protocol evidence. Testing modules are
+  imported from their owning `testing/` subpackage.
 
 Python owns the editable scenario and child-process lifecycle. The isolated Lua
 worker owns only its current in-memory production-module state. Native action

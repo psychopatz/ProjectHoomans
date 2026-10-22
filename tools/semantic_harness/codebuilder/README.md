@@ -5,24 +5,24 @@ semantic compiler and deterministic artifact writer. The shared
 `SemanticLabAuthoringService` binds repository/runtime configuration for
 Semantic Lab's GUI, headless authoring commands, and Codex-facing Python API.
 
-The reviewed canonical JSON inputs remain in `tools/semantic_compiler/`:
+The reviewed canonical JSON inputs live in `tools/semantic_harness/codebuilder/sources/`:
 
 - `semantic_definitions.json`
 - `common_interactions.json`
+- `grounded_personal_dialogue.json`
 - `wordnet_concepts.json`
 
-The `tools/semantic_compiler` Python modules are compatibility wrappers only;
-they re-export this package and preserve direct-script and `python -m` entry
-points. Generated Lua, EN/TL translations, and manifests retain their existing
-Project Zomboid paths and byte-stable rendering.
+This package owns the compiler, build entry point, canonical reviewed sources,
+and deterministic artifact generation. Generated Lua, EN/TL translations, and
+manifests retain their existing Project Zomboid paths and byte-stable rendering.
 
 Headless Semantic Lab authoring uses the same service as the Tk editor:
 
 ```sh
 tools/semantic_harness/run_harness.sh --no-gui --jsonl \
-  --compile-source tools/semantic_compiler/semantic_definitions.json
+  --compile-source tools/semantic_harness/codebuilder/sources/semantic_definitions.json
 tools/semantic_harness/run_harness.sh --no-gui --jsonl \
-  --review-dataset tools/semantic_compiler/common_interactions.json
+  --review-dataset tools/semantic_harness/codebuilder/sources/common_interactions.json
 ```
 
 `--generate-source` and `--generate-dataset` are explicit write operations;

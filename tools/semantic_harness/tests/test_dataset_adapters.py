@@ -10,7 +10,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.semantic_harness.codebuilder.compiler import compile_dialogue_dataset, load_dialogue_dataset
+from tools.semantic_harness.codebuilder.dialogue_contract import load_dialogue_dataset
+from tools.semantic_harness.codebuilder.dialogue_dataset import compile_dialogue_dataset
 from tools.semantic_harness.codebuilder.dataset_adapters import (
     preview_dataset_adapter,
     promote_reviewed_candidates,
@@ -19,7 +20,9 @@ from tools.semantic_harness.cli import _parser, cli
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
-CANONICAL_DIALOGUE = REPOSITORY / "tools/semantic_compiler/common_interactions.json"
+CANONICAL_DIALOGUE = REPOSITORY / (
+    "tools/semantic_harness/codebuilder/sources/common_interactions.json"
+)
 
 
 def _write_manifest(

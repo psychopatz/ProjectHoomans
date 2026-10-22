@@ -13,7 +13,7 @@ Source inspected via connected GitHub for `psychopatz/ProjectHoomans` main at `c
 - `PNC_SemanticDialogueSituation_Core.lua` and `_State.lua` derive bounded NPC activity, needs, health, emotions and social state. Project Hoomans' `PNC_SemanticDialogueReferenceResolver.lua` handles bounded mentions and pronouns.
 - `PNC_SemanticDialogueResponseCatalog.lua` already matches scalar contextual conditions (needType, needUrgency, healthState, socialStyle, emotionType, relationshipState, hostilityCount, etc.), scores variants by priority/specificity and avoids consecutive repeated variants. Do **not** add another text-variant selector.
 - `PNC_SemanticDialogueContextState.lua` and `_Turns.lua` preserve bounded turns, mentions, current/previous topic, last intent and a pending identity obligation. Core DialogueState already has pending-request behavior. Do **not** add a parallel transcript store.
-- `tools/semantic_compiler/` already compiles *reviewed* WordNet 3.0 verb senses/forms offline and compiled authored interactions; avoids copying unreviewed text or shipping WordNet data into runtime.
+- `tools/semantic_harness/codebuilder/sources/` already compiles *reviewed* WordNet 3.0 verb senses/forms offline and compiled authored interactions; avoids copying unreviewed text or shipping WordNet data into runtime.
 - `tests/pnc_semantic_state_response_smoke.lua`, `pnc_semantic_social_chat_smoke.lua`, `pnc_semantic_gift_followup_smoke.lua`, `pnc_semantic_situation_smoke.lua` and `pnc_semantic_local_route_smoke.lua` already exercise useful aspects of continuity, context and authority.
 - PBrainZ has optional provider orchestration, bounded retrieval and semantic tool-call normalization; it is not required for the deterministic branch.
 

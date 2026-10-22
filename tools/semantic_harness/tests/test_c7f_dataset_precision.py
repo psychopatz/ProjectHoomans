@@ -10,17 +10,21 @@ from tools.semantic_harness.codebuilder.c7f_holdout import (
     load_c7f_holdout,
     score_c7f_holdout,
 )
-from tools.semantic_harness.codebuilder.compiler import (
-    compile_dialogue_dataset,
+from tools.semantic_harness.codebuilder.dialogue_contract import (
     load_dialogue_dataset,
 )
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO
-from tools.semantic_harness.worker import LuaSemanticWorker
-from tools.semantic_harness.authoring import preview_dialogue_source
+from tools.semantic_harness.codebuilder.dialogue_dataset import (
+    compile_dialogue_dataset,
+)
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
+from tools.semantic_harness.codebuilder.authoring import preview_dialogue_source
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
-CANONICAL_DIALOGUE = REPOSITORY / "tools/semantic_compiler/common_interactions.json"
+CANONICAL_DIALOGUE = REPOSITORY / (
+    "tools/semantic_harness/codebuilder/sources/common_interactions.json"
+)
 
 
 class C7FDatasetPrecisionTests(unittest.TestCase):

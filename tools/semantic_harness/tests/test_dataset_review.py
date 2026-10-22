@@ -7,16 +7,18 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.semantic_harness.authoring import (
+from tools.semantic_harness.codebuilder.authoring import (
     generate_dialogue_source,
     preview_dialogue_source,
 )
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
-DATASET = REPOSITORY / "tools/semantic_compiler/common_interactions.json"
+DATASET = REPOSITORY / (
+    "tools/semantic_harness/codebuilder/sources/common_interactions.json"
+)
 
 
 class DatasetReviewTests(unittest.TestCase):

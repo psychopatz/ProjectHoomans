@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import unittest
 
-from tools.semantic_harness.process import HarnessError
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.process import HarnessError
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 def acknowledged_scenario() -> dict:

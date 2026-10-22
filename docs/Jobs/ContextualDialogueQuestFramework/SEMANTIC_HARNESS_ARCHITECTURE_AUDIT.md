@@ -3,20 +3,21 @@
 **Date:** 2026-10-21  
 **Repository:** `psychopatz/ProjectHoomans`  
 **Branch:** `main`  
-**Audit scope:** `tools/semantic_harness`, with the surrounding `tools/semantic_compiler` compatibility surface and the existing Lua worker boundary  
+**Audit scope:** `tools/semantic_harness`, with the former `tools/semantic_compiler` surface and the existing Lua worker boundary
 **Baseline:** `8c6a604956c641e83854a8448b7962c950a1efa6`
+**Current-state note:** This document records the pre-consolidation architecture and its historical slice notes. The 2026-10-23 cleanup supersedes its compatibility-facade recommendations: the old package and forwarding modules are removed, and the concrete CodeBuilder modules now live under `tools/semantic_harness/codebuilder/`.
 
 ## Executive result
 
-The Semantic Harness is behaviorally healthy but has several real responsibility-density hotspots. The first refactor target should be `tools/semantic_harness/codebuilder/compiler.py`. It is not one coherent compiler: it contains three independent compilation pipelines and their renderers behind one module-level namespace.
+At the recorded baseline, the Semantic Harness was behaviorally healthy but had several real responsibility-density hotspots. The first refactor target was the then-existing `tools/semantic_harness/codebuilder/compiler.py`, which contained three independent compilation pipelines and their renderers behind one module-level namespace.
 
-The existing `tools/semantic_compiler` package is not a second implementation. Its `compiler.py` and `build.py` are compatibility wrappers around Semantic Lab CodeBuilder. That compatibility surface must remain while the implementation is split.
+The current `tools/semantic_harness/codebuilder` package is the single internal CodeBuilder implementation. The former `tools/semantic_compiler` package and the forwarding facades have been removed; callers use the concrete modules directly.
 
 The initial audit pass was read-only. The first bounded refactor slice is now complete and is recorded below.
 
-## Refactor progress — slice 1
+## Historical refactor progress — slice 1
 
-Commit `5ef6e453` extracted the WordNet lexicon/morphology pipeline into `tools/semantic_harness/codebuilder/lexicon_compiler.py`. The existing `codebuilder/compiler.py` remains the compatibility facade and re-exports the established public functions and legacy private helpers.
+At that historical baseline, commit `5ef6e453` extracted the WordNet lexicon/morphology pipeline into `tools/semantic_harness/codebuilder/lexicon_compiler.py`, while `codebuilder/compiler.py` remained the compatibility facade. That facade has since been retired.
 
 Verification for this slice:
 
@@ -27,9 +28,9 @@ Verification for this slice:
 
 The next safe slice is the dialogue pipeline. It should be extracted only after preserving the shared normalization and Lua-rendering contracts used by the typed semantic pipeline.
 
-## Refactor progress — slices 2–9
+## Historical refactor progress — slices 2–9
 
-The remaining compiler pipelines and authoring/editor boundaries are now split behind compatibility facades. Public imports, legacy private helper imports, deterministic output, worker protocol, and existing GUI callbacks remain unchanged.
+At the historical baseline, the remaining compiler pipelines and authoring/editor boundaries were split behind compatibility facades. The current cleanup completed the migration by removing those facades and updating repository callers to direct concrete modules.
 
 - `13264b40`: dialogue dataset pipeline extracted to `dialogue_compiler.py`.
 - `400072d1`: typed `pnc.semantic_authoring.v1` pipeline extracted to `semantic_definition_compiler.py`.
@@ -111,7 +112,7 @@ The shared concerns are limited to bounded scalar validation, stable Lua value s
 
 The graph confirms that `_compile_dialogue_pattern` is reached through the canonical interaction/service/authoring paths, while `compile_semantic_definitions` is reached by `interaction_spec`, `SemanticLabAuthoringService`, `authoring`, the legacy build wrapper, and dataset-library validation. This makes an import-compatible facade important.
 
-### Recommended compiler split
+### Historical recommended compiler split
 
 Move implementation behind the existing public module surface in this order:
 
@@ -119,9 +120,9 @@ Move implementation behind the existing public module surface in this order:
 2. `codebuilder/lexicon_compiler.py` — WordNet dataclasses, readers, morphology, `compile_wordnet`, and `render_lua`.
 3. `codebuilder/dialogue_compiler.py` — dialogue source validation, compilation, dialogue renderers, and translation rendering.
 4. `codebuilder/semantic_definition_compiler.py` — semantic source loading, typed flow/response validation, compilation, and semantic renderers.
-5. Keep `codebuilder/compiler.py` as a thin compatibility facade that re-exports the established public names. Preserve private-helper access through an intentional compatibility map while existing callers are migrated.
+5. The historical compatibility facade was intentionally retired after all repository callers were migrated. Do not recreate it for this legacy prototype.
 
-Do not create a second compiler or change the canonical source format. `tools/semantic_compiler/compiler.py` must continue to resolve the same public function objects as the harness facade; the existing consolidation identity tests should remain a contract.
+Do not create a second compiler or change the canonical source format. `tools/semantic_harness/codebuilder/{lexicon_compiler,dialogue_dataset,semantic_definition_compiler}.py` are now the direct public implementation modules for repository callers; consolidation tests cover their current contracts.
 
 ## P1 — authoring service and interaction-spec boundary
 
@@ -170,11 +171,11 @@ The Lua worker has independent runtime concerns:
 - `Protocol.lua` has scanner-reported unbounded parser loops. Verify explicit termination on malformed input before refactoring.
 - `process.py` has a deliberate `queue.Full` swallow while reporting a failed response. It should have an explicit bounded diagnostic policy, but that is a behavior change and is outside this audit-only pass.
 
-## Dependency and compatibility hazards
+## Historical dependency and compatibility hazards
 
-- `tools.semantic_compiler.compiler` is a compatibility wrapper over `tools.semantic_harness.codebuilder.compiler`; do not reverse this direction or duplicate implementation.
-- `authoring.py`, `service.py`, `interaction_spec.py`, `codebuilder/build.py`, and the legacy wrapper all import compiler functions directly.
-- Existing callers use both public and private compiler helpers. Inventory private imports before removing or renaming any helper.
+- The former `tools.semantic_compiler.compiler` wrapper and the former `codebuilder/compiler.py` facade were retired after their repository callers were migrated.
+- `codebuilder/build.py`, `codebuilder/authoring.py`, `interaction_spec.py`, and interaction-generation code import concrete compiler functions directly.
+- Private helper imports were audited during migration; do not restore a broad facade just to preserve prototype-only names.
 - Generated Lua, EN/TL assets, manifests, deterministic hashes, explicit-approval behavior, and effect-free previews are compatibility contracts.
 - The worker is a real Core+Hoomans integration boundary. Python module splits must not alter Lua load order, generated module names, worker protocol, or response projection.
 - Avoid introducing a shared “god” utility module while splitting. Shared modules should contain only serialization, bounded validation primitives, or explicit contracts.
@@ -182,8 +183,8 @@ The Lua worker has independent runtime concerns:
 ## Safe migration sequence
 
 1. Freeze the current baseline with the existing focused/full Python and Lua suites; save an architecture-audit baseline.
-2. Add contract tests for public compiler exports, legacy wrapper identity, deterministic artifact bytes, translation manifests, and private-helper compatibility where still required.
-3. Extract the WordNet pipeline behind the facade. Run compiler, consolidation, Kahlua, and artifact-regeneration tests.
+2. Add contract tests for direct compiler exports, deterministic artifact bytes, translation manifests, and any private helper still required by current code.
+3. Extract the WordNet pipeline into its direct module. Run compiler, consolidation, Kahlua, and artifact-regeneration tests.
 4. Extract the dialogue pipeline. Run dialogue dataset, translation, interaction-spec, and worker acceptance tests.
 5. Extract the typed semantic pipeline. Run V1 visual authoring, semantic authoring, non-backstory interaction, and worker tests.
 6. Split service internals behind `SemanticLabAuthoringService`; use affected-test selection after each change.

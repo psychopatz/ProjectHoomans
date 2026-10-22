@@ -10,18 +10,24 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
-from tools.semantic_harness.codebuilder.compiler import (
-    CompileError,
+from tools.semantic_harness.codebuilder.lexicon_compiler import CompileError
+from tools.semantic_harness.codebuilder.dialogue_contract import (
+    load_dialogue_dataset,
+)
+from tools.semantic_harness.codebuilder.dialogue_dataset import (
     compile_dialogue_dataset,
-    compile_semantic_definitions,
-    discover_registered_capability_ids,
+)
+from tools.semantic_harness.codebuilder.dialogue_rendering import (
     render_dialogue_lua,
     render_dialogue_lua_shards,
     render_dialogue_translation,
+)
+from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
+    compile_semantic_definitions,
+    discover_registered_capability_ids,
     load_semantic_source,
     render_semantic_lua_shards,
 )
-from tools.semantic_harness.codebuilder.compiler import load_dialogue_dataset
 from tools.semantic_harness.codebuilder.build import (
     write_dialogue_output,
     write_semantic_output,

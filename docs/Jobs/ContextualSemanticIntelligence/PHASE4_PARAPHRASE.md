@@ -22,7 +22,7 @@ not a reason to add a new parser or reaction arbiter.
 
 The source change adds only
 `pnc.dataset.question.wellbeing.how_are_you_doing` to
-`tools/semantic_compiler/common_interactions.json`, emitting
+`tools/semantic_harness/codebuilder/sources/common_interactions.json`, emitting
 `QUESTION/QUESTION/WELLBEING` with confidence `0.99` and priority `120`.
 The generated `PNC_SemanticGeneratedDialogue_Patterns_02.lua` shard was
 rebuilt by the existing compiler. No WordNet allowlist, fuzzy command rule,
@@ -45,7 +45,7 @@ paraphrase remains recognized.
 
 - `python3 -m unittest tools.semantic_harness.tests.test_semantic_paraphrases -v`:
   **PASS 2/2**.
-- `python3 -m unittest discover -s tools/semantic_compiler/tests -q`:
+- `python3 -m unittest discover -s tools/semantic_harness/tests -q`:
   **PASS 7/7**.
 - `python3 -m unittest discover -s tools/semantic_harness/tests -q`:
   **PASS 67/67** in 38.865s.

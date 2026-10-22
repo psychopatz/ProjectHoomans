@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import unittest
 
-from tools.semantic_harness.conversation_inspector import build_conversation_inspector
-from tools.semantic_harness.rendering import conversation_first
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.inspection.conversation_inspector import build_conversation_inspector
+from tools.semantic_harness.inspection.rendering import conversation_first
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class ConversationInspectorTests(unittest.TestCase):

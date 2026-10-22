@@ -13,8 +13,8 @@ from tools.semantic_harness.codebuilder.codeblocks import (
     validate_codeblock_document,
 )
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]

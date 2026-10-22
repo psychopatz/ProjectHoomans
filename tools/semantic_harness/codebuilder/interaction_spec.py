@@ -8,13 +8,13 @@ import json
 import re
 from typing import Any
 
-from .compiler import (
-    CompileError,
+from .lexicon_compiler import CompileError
+from .dialogue_contract import (
     DIALOGUE_BACKSTORY_KINDS,
     DIALOGUE_ID,
-    compile_dialogue_dataset,
-    compile_semantic_definitions,
 )
+from .dialogue_dataset import compile_dialogue_dataset
+from .semantic_definition_compiler import compile_semantic_definitions
 from .blocks import block_port_contract
 
 

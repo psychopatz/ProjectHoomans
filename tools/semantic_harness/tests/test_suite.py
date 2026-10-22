@@ -10,7 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import unittest
 
-from tools.semantic_harness.suite import BoundedLuaTestRunner, run_lua_suite
+from tools.semantic_harness.testing.suite import BoundedLuaTestRunner, run_lua_suite
 
 
 class BoundedLuaSuiteTests(unittest.TestCase):

@@ -20,7 +20,7 @@
 - `docs/Systems/Semantics.md` — existing Semantics architecture and historical refactor notes; **do not overwrite its historical evidence**.
 - `docs/architecture/PROJECT_HOOMANS_DOMAIN_CONTRACT.md` — ownership and cross-domain authority.
 - `tools/semantic_harness/README.md` — existing Semantic Lab user/worker contract.
-- `tools/semantic_compiler/README.md` — offline WordNet/interaction compilation.
+- `tools/semantic_harness/codebuilder/README.md` — offline WordNet/interaction compilation.
 - PsychopatzCore and PBrainZ are distinct repositories; do not make cross-repository changes without checking a specific acceptance need and ownership.
 
 ## Success criterion

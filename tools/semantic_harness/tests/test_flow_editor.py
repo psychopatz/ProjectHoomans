@@ -5,19 +5,19 @@ from __future__ import annotations
 from copy import deepcopy
 import unittest
 
-from tools.semantic_harness.flow_editor import (
+from tools.semantic_harness.ui.flow_editor.pane import (
     coverage_lines,
     coverage_summary,
     flow_display_name,
     flow_graph_model,
     graph_render_mode,
 )
-from tools.semantic_harness.interaction_explorer import (
+from tools.semantic_harness.codebuilder.interaction_explorer import (
     interaction_summary,
     search_interactions,
 )
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.flow_editor.model import (
     conversation_graph_diagnostics,
     conversation_graph_model,

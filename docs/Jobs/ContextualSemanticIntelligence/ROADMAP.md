@@ -32,7 +32,7 @@ Extend already-authored relationship/emotion/social response conditions to selec
 
 ## Phase 4 — Semantic paraphrase coverage
 
-Use the existing `tools/semantic_compiler` reviewed WordNet and dialogue compilation workflow. Add only paraphrases proven missing by baseline samples; preserve strict verb morphology and fuzzy command safety, and the existing IR/catalog IDs where possible.
+Use the existing `tools/semantic_harness/codebuilder` reviewed WordNet and dialogue compilation workflow. Add only paraphrases proven missing by baseline samples; preserve strict verb morphology and fuzzy command safety, and the existing IR/catalog IDs where possible.
 
 **Gate:** Held-out paraphrase success improves against measured baseline; no new false-positive task/command routing; compiler tests and Semantic Lab production traces pass.
 

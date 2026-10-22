@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from tools.semantic_harness.transcript import TranscriptBuffer
+from tools.semantic_harness.inspection.transcript import TranscriptBuffer
 
 
 class TranscriptBufferTests(unittest.TestCase):

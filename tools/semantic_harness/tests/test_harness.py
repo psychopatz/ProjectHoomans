@@ -11,11 +11,11 @@ import time
 from pathlib import Path
 import unittest
 
-from tools.semantic_harness.config import HarnessConfig
-from tools.semantic_harness.process import HarnessError, LuaProcess
-from tools.semantic_harness.runner import HarnessCase, detect_conflicts, run_case
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO, load_scenario, merge, save_scenario
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.config import HarnessConfig
+from tools.semantic_harness.runtime.process import HarnessError, LuaProcess
+from tools.semantic_harness.testing.runner import HarnessCase, detect_conflicts, run_case
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, load_scenario, merge, save_scenario
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class SemanticHarnessTests(unittest.TestCase):

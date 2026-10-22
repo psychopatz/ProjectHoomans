@@ -6,8 +6,8 @@ from copy import deepcopy
 import json
 import unittest
 
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class ContextualRankingP4Tests(unittest.TestCase):

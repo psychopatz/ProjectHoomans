@@ -10,7 +10,7 @@ from tools.semantic_harness.inspection.world_knowledge import (
 from tools.semantic_harness.tests.test_grounded_world_knowledge_gossip import (
     scenario_for,
 )
-from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class WorldKnowledgeInspectorTests(unittest.TestCase):
