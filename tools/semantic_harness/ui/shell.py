@@ -26,7 +26,13 @@ from ..runtime.npc_profiles import (
     profile_id,
     profile_label,
 )
-from ..runtime.scenario import load_scenario, merge, save_scenario
+from ..runtime.scenario import (
+    derive_actor_identifier,
+    derive_display_name,
+    load_scenario,
+    merge,
+    save_scenario,
+)
 from .dialogs.catalog_control import CatalogControlField
 from .dialogs.settings import (
     collect_scenario_settings,
@@ -286,10 +292,17 @@ class SemanticHarnessApp:
         self.last_test_utterance = ""
         self.workbench_status_var: Any | None = None
         self.relationship_preview_var: Any | None = None
+        self.trait_effects_var: Any | None = None
+        self.trait_effects_widget: Any | None = None
         self.auto_replay_var: Any | None = None
         self._relationship_preview_after: Any | None = None
+        self._personality_preview_after: Any | None = None
         self._auto_replay_after: Any | None = None
         self._relationship_preview_future: Future[Any] | None = None
+        self._personality_preview_future: Future[Any] | None = None
+        self.generated_personality_preview: dict[str, Any] = {}
+        self._workbench_dirty_ids: set[str] = set()
+        self._workbench_profile_pending = False
         self.last_response: dict[str, Any] = {}
         self.settings_window: Any | None = None
         self._future: Future[Any] | None = None
@@ -467,8 +480,10 @@ class SemanticHarnessApp:
         ttk.Label(
             workbench_footer,
             textvariable=self.workbench_status_var,
-            anchor="e",
-        ).grid(row=0, column=3, sticky="e", padx=(8, 0))
+            anchor="w",
+            justify="left",
+            wraplength=330,
+        ).grid(row=0, column=3, sticky="ew", padx=(10, 0))
         workbench_footer.columnconfigure(3, weight=1)
 
         controls = ttk.Frame(container)
@@ -792,6 +807,217 @@ class SemanticHarnessApp:
         self.workflow_pane.set_enabled(enabled and not self.busy)
         self._refresh_suggestion_controls(enabled and not self.busy)
 
+    def _refresh_workbench_feedback(self, message: str | None = None) -> None:
+        """Make staged edits visible before they are sent to the worker."""
+
+        if self.workbench_status_var is None:
+            return
+        pending = len(self._workbench_dirty_ids) + (
+            1 if self._workbench_profile_pending else 0
+        )
+        self.workbench_apply_button.configure(
+            text="Apply" if pending == 0 else f"Apply ({pending} pending)"
+        )
+        self.replay_button.configure(
+            text=(
+                "Apply + replay"
+                if pending == 0
+                else f"Apply + replay ({pending} pending)"
+            )
+        )
+        if message is not None:
+            self.workbench_status_var.set(message)
+        elif pending:
+            self.workbench_status_var.set(
+                f"{pending} unsaved change{'s' if pending != 1 else ''} · Apply to commit"
+            )
+        else:
+            self.workbench_status_var.set(
+                "Common context controls · changes apply through the Lua worker."
+            )
+
+    def _clear_workbench_pending(self) -> None:
+        self._workbench_dirty_ids.clear()
+        self._workbench_profile_pending = False
+        for field in self.workbench_control_fields.values():
+            field.dirty = False
+        self._refresh_workbench_feedback()
+
+    def _on_workbench_field_dirty(self, field: CatalogControlField) -> None:
+        """Track a direct edit and refresh derived actor presentation fields."""
+
+        control_id = str(field.control.get("id") or "")
+        if (
+            not control_id
+            or self.workbench_control_fields.get(control_id) is not field
+        ):
+            return
+        self._workbench_dirty_ids.add(control_id)
+        if control_id in {
+            "player.forename", "player.surname",
+            "npc.forename", "npc.surname",
+        }:
+            self._sync_derived_identity_fields(control_id.split(".", 1)[0])
+        if control_id == "persona.traits":
+            self._render_trait_effects()
+            self._schedule_personality_preview()
+        self._refresh_workbench_feedback()
+
+    def _sync_derived_identity_fields(self, actor: str) -> None:
+        """Keep IDs and player display text readable while names are edited."""
+
+        prefix = "player" if actor == "player" else "npc"
+        forename_field = self.workbench_control_fields.get(f"{prefix}.forename")
+        surname_field = self.workbench_control_fields.get(f"{prefix}.surname")
+        if forename_field is None or surname_field is None:
+            return
+        forename = forename_field.get_value()
+        surname = surname_field.get_value()
+        if prefix == "player":
+            derived = {
+                "player.characterUUID": derive_actor_identifier(
+                    "char", forename, surname
+                ),
+                "player.displayName": derive_display_name(forename, surname),
+            }
+        else:
+            derived = {
+                "npc.npcID": derive_actor_identifier("npc", forename, surname),
+            }
+        for control_id, value in derived.items():
+            field = self.workbench_control_fields.get(control_id)
+            if field is not None:
+                field.set_value(value)
+                self._workbench_dirty_ids.add(control_id)
+
+    @staticmethod
+    def _format_trait_effect_value(value: Any) -> str:
+        if isinstance(value, bool):
+            return "yes" if value else "no"
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return f"{value:+.2f}"
+        return str(value)
+
+    def _flatten_trait_effects(
+        self, value: Any, prefix: str = ""
+    ) -> list[str]:
+        if not isinstance(value, dict):
+            return [
+                f"{prefix}: {self._format_trait_effect_value(value)}"
+                if prefix
+                else self._format_trait_effect_value(value)
+            ]
+        lines: list[str] = []
+        for key in sorted(value, key=str):
+            label = str(key).replace("_", " ")
+            child_prefix = f"{prefix} · {label}" if prefix else label
+            lines.extend(self._flatten_trait_effects(value[key], child_prefix))
+        return lines
+
+    def _render_trait_effects(self) -> None:
+        if self.trait_effects_var is None:
+            return
+        field = self.workbench_control_fields.get("persona.traits")
+        selected = field.get_value() if field is not None else []
+        selected = selected if isinstance(selected, list) else []
+        definitions = {
+            str(row.get("id")): row
+            for row in self.persona_catalog.get("traits", [])
+            if isinstance(row, dict) and row.get("id")
+        }
+        for definition in tuple(definitions.values()):
+            for alias in definition.get("aliases") or []:
+                definitions.setdefault(str(alias), definition)
+        lines = ["Production registry effects"]
+        if not selected:
+            lines.append("Select a registered trait to inspect its effects.")
+        for trait_id in selected[:8]:
+            definition = definitions.get(str(trait_id))
+            if not definition:
+                lines.append(f"{trait_id}: definition unavailable")
+                continue
+            label = str(definition.get("label") or trait_id)
+            source = str(definition.get("source") or "production")
+            lines.append(f"{label} · source: {source}")
+            effects = definition.get("effects")
+            effect_lines = self._flatten_trait_effects(effects, "effects")
+            lines.extend(f"  {line}" for line in effect_lines)
+            speech = definition.get("speechStyle")
+            if speech:
+                lines.extend(
+                    f"  {line}"
+                    for line in self._flatten_trait_effects(speech, "speech style")
+                )
+        if self.generated_personality_preview and selected:
+            values = self.generated_personality_preview
+            shown = ("compassion", "sociability", "forgiveness", "bravery", "aggression")
+            preview = " · ".join(
+                f"{key} {self._format_trait_effect_value(values[key])}"
+                for key in shown
+                if key in values
+            )
+            if preview:
+                lines.append(f"Generated profile preview · {preview}")
+        rendered = "\n".join(lines)
+        if self.trait_effects_var is not None:
+            self.trait_effects_var.set(rendered)
+        if self.trait_effects_widget is not None:
+            self.trait_effects_widget.configure(state="normal")
+            self.trait_effects_widget.delete("1.0", "end")
+            self.trait_effects_widget.insert("1.0", rendered)
+            self.trait_effects_widget.configure(state="disabled")
+
+    def _schedule_personality_preview(self) -> None:
+        if self._personality_preview_after is not None:
+            try:
+                self.root.after_cancel(self._personality_preview_after)
+            except self._tk.TclError:
+                pass
+        self._personality_preview_after = self.root.after(
+            120, self._request_personality_preview
+        )
+
+    def _request_personality_preview(self) -> None:
+        self._personality_preview_after = None
+        if self.closed or not self.worker_ready or self.busy:
+            return
+        if self._personality_preview_future is not None:
+            if not self._personality_preview_future.done():
+                self._personality_preview_after = self.root.after(
+                    120, self._request_personality_preview
+                )
+                return
+        try:
+            staged = self._collect_workbench_scenario()
+        except (TypeError, ValueError, self._tk.TclError):
+            return
+        try:
+            future = self.session.submit(
+                lambda worker: worker.persona_preview(staged)
+            )
+        except (HarnessError, RuntimeError):
+            return
+        self._personality_preview_future = future
+        self._poll_personality_preview(future)
+
+    def _poll_personality_preview(self, future: Future[Any]) -> None:
+        if self.closed:
+            return
+        if not future.done():
+            self.root.after(25, self._poll_personality_preview, future)
+            return
+        try:
+            result = future.result()
+            value = result.value if hasattr(result, "value") else result
+        except (HarnessError, ConfigurationError, OSError, ValueError):
+            return
+        preview = value.get("personality") if isinstance(value, dict) else None
+        self.generated_personality_preview = (
+            dict(preview) if isinstance(preview, dict) else {}
+        )
+        self._update_generated_personality_controls()
+        self._render_trait_effects()
+
     def _ensure_suggestion_buttons(self, count: int) -> None:
         while len(self.suggestion_buttons) < count:
             index = len(self.suggestion_buttons)
@@ -898,6 +1124,7 @@ class SemanticHarnessApp:
         self._build_simulation_workbench()
         self._set_status(f"Ready · Lua PID {result.status.get('pid')}")
         self._set_controls(True)
+        self._clear_workbench_pending()
         self._append("SYSTEM", "Lua worker ready. Production semantic modules are loaded.")
         initial_suggestions = result.capabilities.get("suggestions") or {}
         if initial_suggestions:
@@ -1025,6 +1252,8 @@ class SemanticHarnessApp:
         for tab_id in self.workbench_notebook.tabs():
             self.workbench_notebook.forget(tab_id)
         self.workbench_control_fields = {}
+        self.trait_effects_var = None
+        self.trait_effects_widget = None
         catalog_controls = self.simulation_control_catalog.get("controls", [])
         if not isinstance(catalog_controls, list):
             catalog_controls = []
@@ -1072,8 +1301,7 @@ class SemanticHarnessApp:
                     ).grid(row=0, column=0, columnspan=4, sticky="w", pady=3)
             else:
                 page = self._ttk.Frame(panel, padding=(6, 2))
-                for column in (1, 3):
-                    page.columnconfigure(column, weight=1)
+                page.columnconfigure(1, weight=1)
                 page.grid(row=0, column=0, sticky="ew")
                 pages[(panel_name, "Overview")] = page
                 rows_by_page[(panel_name, "Overview")] = 0
@@ -1091,8 +1319,9 @@ class SemanticHarnessApp:
                 continue
             index = rows_by_page[page_key]
             rows_by_page[page_key] = index + 1
-            row = index // 2
-            pair_column = (index % 2) * 2
+            single_column = panel_name == "Relationship"
+            row = index if single_column else index // 2
+            pair_column = 0 if single_column else (index % 2) * 2
             field = CatalogControlField(
                 page,
                 self._tk,
@@ -1111,9 +1340,35 @@ class SemanticHarnessApp:
                 field.widget.configure(textvariable=self.language_var)
                 self.language_box = field.widget
             self.workbench_control_fields[str(control["id"])] = field
+            if control.get("id") == "persona.traits":
+                field.widget.bind(
+                    "<<ListboxSelect>>",
+                    lambda _event, selected_field=field: self._on_workbench_field_dirty(
+                        selected_field
+                    ),
+                    add="+",
+                )
+                self.trait_effects_var = self._tk.StringVar()
+                effects_row = rows_by_page[page_key]
+                effects_widget = self._ScrolledText(
+                    page,
+                    height=5,
+                    width=72,
+                    wrap="word",
+                    state="disabled",
+                )
+                effects_widget.grid(
+                    row=effects_row,
+                    column=0,
+                    columnspan=4,
+                    sticky="ew",
+                    pady=(2, 5),
+                )
+                self.trait_effects_widget = effects_widget
+                rows_by_page[page_key] = effects_row + 1
         relationship_page = pages.get(("Relationship", "Overview"))
         if relationship_page is not None:
-            proposal_row = (rows_by_page[("Relationship", "Overview")] + 1) // 2 + 1
+            proposal_row = rows_by_page[("Relationship", "Overview")] + 1
             self.proposal_button = self._ttk.Button(
                 relationship_page,
                 text="Propose relationship",
@@ -1133,11 +1388,11 @@ class SemanticHarnessApp:
                 relationship_page,
                 textvariable=self.relationship_preview_var,
                 justify="left",
-                wraplength=520,
+                wraplength=560,
             ).grid(
                 row=proposal_row + 1,
                 column=0,
-                columnspan=4,
+                columnspan=2,
                 sticky="w",
                 pady=(2, 6),
             )
@@ -1151,6 +1406,7 @@ class SemanticHarnessApp:
             if field is not None and field.variable is not None:
                 field.variable.trace_add("write", self._on_relationship_slider_changed)
         self._update_generated_personality_controls()
+        self._render_trait_effects()
         if not self.workbench_controls:
             empty = self._ttk.Frame(self.workbench_notebook, padding=8)
             self._ttk.Label(
@@ -1160,6 +1416,7 @@ class SemanticHarnessApp:
             self.workbench_notebook.add(empty, text="Context")
         self._set_relationship_preview_from_projection()
         self._set_controls(self.session.ready)
+        self._clear_workbench_pending()
 
     def _update_generated_personality_controls(self, *_args: Any) -> None:
         override_field = self.workbench_control_fields.get("npc.personalityOverride")
@@ -1170,6 +1427,16 @@ class SemanticHarnessApp:
             field = self.workbench_control_fields.get(str(control.get("id") or ""))
             if field is not None:
                 field.set_enabled(enabled)
+                control_id = str(control.get("id") or "")
+                preview_key = (
+                    "socialStyle"
+                    if control_id == "persona.socialStyle"
+                    else control_id.rsplit(".", 1)[-1]
+                )
+                if not enabled and preview_key in self.generated_personality_preview:
+                    field.set_value(
+                        self.generated_personality_preview[preview_key]
+                    )
 
     def toggle_simulation_workbench(self) -> None:
         self.workbench_expanded = not self.workbench_expanded
@@ -1187,7 +1454,9 @@ class SemanticHarnessApp:
             "custom",
         )
 
-    def _sync_workbench_from_scenario(self, scenario: dict[str, Any]) -> None:
+    def _sync_workbench_from_scenario(
+        self, scenario: dict[str, Any], *, clear_pending: bool = True
+    ) -> None:
         self.npc_profile_var.set(profile_label(profile_id(scenario)))
         self.language_var.set(scenario.get("runtime", {}).get("language", "EN"))
         for control in self.workbench_controls:
@@ -1196,7 +1465,11 @@ class SemanticHarnessApp:
             if field is not None:
                 field.set_value(self._scenario_control_value(control, scenario))
                 field.dirty = False
+        self.generated_personality_preview = {}
         self._update_generated_personality_controls()
+        self._render_trait_effects()
+        if clear_pending:
+            self._clear_workbench_pending()
 
     def _collect_workbench_scenario(self) -> dict[str, Any]:
         selected_profile = self._selected_npc_profile()
@@ -1231,11 +1504,11 @@ class SemanticHarnessApp:
             self._messagebox.showerror("NPC profile", str(error))
             self.npc_profile_var.set(profile_label(profile_id(self.scenario)))
             return
-        self._sync_workbench_from_scenario(staged)
-        if self.workbench_status_var is not None:
-            self.workbench_status_var.set(
-                f"{profile_label(selected)} staged · choose Apply or Apply + Replay."
-            )
+        self._sync_workbench_from_scenario(staged, clear_pending=False)
+        self._workbench_profile_pending = True
+        self._refresh_workbench_feedback(
+            f"{profile_label(selected)} staged · choose Apply or Apply + replay."
+        )
 
     def apply_simulation_settings(self, replay: bool = False) -> None:
         """Apply the catalog-backed draft, optionally replaying a real utterance."""
@@ -1272,13 +1545,18 @@ class SemanticHarnessApp:
                 response = result.get("turn") or {}
                 self._show_response(response)
                 self._append("SYSTEM", f"Applied simulation context and replayed: {value}")
-                self.workbench_status_var.set("Applied and replayed through the Lua worker.")
+                self._refresh_workbench_feedback(
+                    "Applied and replayed through the Lua worker."
+                )
             else:
                 response = configured
                 self._show_response(response)
                 self._append("SYSTEM", "Applied simulation workbench settings to the Lua worker.")
-                self.workbench_status_var.set("Applied to the Lua worker.")
+                self._refresh_workbench_feedback("Applied to the Lua worker.")
 
+        self._refresh_workbench_feedback(
+            "Applying staged changes through the Lua worker…"
+        )
         self._start_operation(operation, finish)
 
     def _start_operation(

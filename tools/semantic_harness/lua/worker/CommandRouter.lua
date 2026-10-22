@@ -19,7 +19,7 @@ local capabilities = {
     "COMMITMENT", "BACKSTORY", "BACKSTORY_FACT",
     "KNOWLEDGE_BOOTSTRAP", "KNOWLEDGE_DISCOVER", "KNOWLEDGE_METRICS",
     "WORLD_KNOWLEDGE_INSPECT", "WORLD_KNOWLEDGE_PROPAGATE",
-    "PERSONA_CATALOG",
+    "PERSONA_CATALOG", "PERSONA_PREVIEW",
     "SIMULATION_CONTROL_CATALOG",
 }
 
@@ -156,6 +156,11 @@ local function personaCatalog(context, payload)
                 descriptionKey = definition.descriptionKey
                     or definition.uiDescription,
                 excludes = context.Values.copy(definition.excludes),
+                source = definition.source,
+                aliases = context.Values.copy(definition.aliases),
+                generation = context.Values.copy(definition.generation),
+                speechStyle = context.Values.copy(definition.speechStyle),
+                effects = context.Values.copy(definition.effects),
             }
         end
     end
@@ -177,6 +182,9 @@ local function personaCatalog(context, payload)
                 descriptionKey = definition.descriptionKey
                     or definition.uiDescription,
                 excludes = context.Values.copy(definition.excludes),
+                source = definition.source,
+                aliases = context.Values.copy(definition.aliases),
+                effects = context.Values.copy(definition.effects),
             }
         end
     end
@@ -222,6 +230,36 @@ local function personaCatalog(context, payload)
         relationshipKinds = relationshipKinds.kinds,
         relationshipKindRegistration = relationshipKinds.registration,
         speechRealization = speechRealization,
+    }
+end
+
+local function personaPreview(context, payload)
+    local Values = context.Values
+    local scenario = type(payload) == "table" and payload.scenario or nil
+    local npc = type(scenario) == "table" and scenario.npc
+        or context.Runtime.scenario and context.Runtime.scenario.npc or {}
+    local identitySeed = npc.identitySeed
+        or npc.identity and npc.identity.seed
+        or npc.npcID
+    local archetype = npc.archetype or npc.archetypeID or "General"
+    local generator = PNC.SocialProfileGenerator
+    if not generator or type(generator.Generate) ~= "function" then
+        return nil, "npc_personality_generator_unavailable"
+    end
+    local personality = generator.Generate(
+        identitySeed,
+        archetype,
+        nil,
+        { npcTraits = npc.traits or {} }
+    )
+    return {
+        ok = true,
+        type = "persona_preview",
+        schema = "semantic.persona.preview.v1",
+        mode = "generated",
+        personality = Values.copy(personality),
+        traits = Values.copy(npc.traits or {}),
+        persisted = false,
     }
 end
 
@@ -340,6 +378,7 @@ local function simulationControlCatalog(context, payload)
     })
 
     add("player.characterUUID", "player.characterUUID", "Actors", "Player", "Player ID", "text", "text", {
+        derivedFrom = { "player.forename", "player.surname" },
         workbench = true, workbenchPanel = "Player", workbenchTab = "Overview",
         workbenchSection = "Overview",
     })
@@ -352,6 +391,7 @@ local function simulationControlCatalog(context, payload)
         workbenchSection = "Overview",
     })
     add("player.displayName", "player.displayName", "Actors", "Player", "Player display name", "text", "text", {
+        derivedFrom = { "player.forename", "player.surname" },
         workbench = true, workbenchPanel = "Player", workbenchTab = "Overview",
         workbenchSection = "Overview",
     })
@@ -387,6 +427,7 @@ local function simulationControlCatalog(context, payload)
         workbenchSection = "Overview",
     })
     add("npc.npcID", "npc.npcID", "Actors", "NPC", "NPC ID", "text", "text", {
+        derivedFrom = { "npc.forename", "npc.surname" },
         workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
         workbenchSection = "Overview",
     })
@@ -1134,6 +1175,8 @@ function CommandRouter.dispatch(context, request)
         return worldKnowledgePropagate(context, payload)
     elseif command == "PERSONA_CATALOG" then
         return personaCatalog(context, payload)
+    elseif command == "PERSONA_PREVIEW" then
+        return personaPreview(context, payload)
     elseif command == "SIMULATION_CONTROL_CATALOG" then
         return simulationControlCatalog(context, payload)
     elseif command == "FACT_CATALOG" then

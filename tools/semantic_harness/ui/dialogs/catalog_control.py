@@ -62,6 +62,7 @@ class CatalogControlField:
         self.width = width
         self.dirty = False
         self._suppress_dirty = False
+        self.derived = bool(control.get("derivedFrom"))
 
         rows = control_option_rows(control)
         if initial not in (None, "") and all(
@@ -87,9 +88,12 @@ class CatalogControlField:
             )
             return
 
+        label = str(control.get("label") or control.get("id") or "")
+        if self.derived:
+            label += " (derived)"
         ttk.Label(
             parent,
-            text=str(control.get("label") or control.get("id") or ""),
+            text=label,
         ).grid(row=row, column=label_column, sticky="w", padx=(0, 6), pady=3)
 
         if self.kind == "combobox":
@@ -228,6 +232,9 @@ class CatalogControlField:
     def _mark_dirty(self, *_args: Any) -> None:
         if not self._suppress_dirty:
             self.dirty = True
+            callback = getattr(self.host, "_on_workbench_field_dirty", None)
+            if callable(callback):
+                callback(self)
 
     def get_value(self) -> Any:
         if self.kind == "read_only":
@@ -303,6 +310,8 @@ class CatalogControlField:
     def set_enabled(self, enabled: bool) -> None:
         if self.kind == "read_only" or self.widget is None:
             return
+        if self.derived:
+            enabled = False
         if self.kind == "combobox":
             self.widget.configure(state="readonly" if enabled else "disabled")
             return

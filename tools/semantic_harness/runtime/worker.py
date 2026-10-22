@@ -147,6 +147,12 @@ class LuaSemanticWorker:
             payload = {"registerRelationshipKind": register_relationship_kind}
         return self._request("PERSONA_CATALOG", payload)
 
+    def persona_preview(self, scenario: dict[str, Any]) -> dict[str, Any]:
+        """Preview generated NPC personality for a staged scenario."""
+
+        validate_scenario(scenario)
+        return self._request("PERSONA_PREVIEW", {"scenario": scenario})
+
     def simulation_control_catalog(self) -> dict[str, Any]:
         """Return the worker-owned, bounded Semantic Lab control metadata."""
 

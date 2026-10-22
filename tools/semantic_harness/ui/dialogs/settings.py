@@ -9,7 +9,12 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Protocol
 
 from ...inspection.rendering import pretty
-from ...runtime.scenario import save_scenario, validate_scenario
+from ...runtime.scenario import (
+    derive_actor_identifier,
+    derive_display_name,
+    save_scenario,
+    validate_scenario,
+)
 from .catalog_control import CatalogControlField, control_options
 
 
@@ -86,6 +91,17 @@ def _collect_legacy_scenario_settings(
         updated_player[key] = str(read_value(f"player.{key}")).strip()
     for key in ("npcID", "forename", "surname", "identityState"):
         updated_npc[key] = str(read_value(f"npc.{key}")).strip()
+    # These are harness conveniences derived from the editable actor names.
+    # Production identity remains owned by the runtime actor records.
+    updated_player["characterUUID"] = derive_actor_identifier(
+        "char", updated_player["forename"], updated_player["surname"]
+    )
+    updated_player["displayName"] = derive_display_name(
+        updated_player["forename"], updated_player["surname"]
+    )
+    updated_npc["npcID"] = derive_actor_identifier(
+        "npc", updated_npc["forename"], updated_npc["surname"]
+    )
     if "npc.gender" in values:
         updated_identity["gender"] = str(read_value("npc.gender")).strip()
     if "npc.role" in values:

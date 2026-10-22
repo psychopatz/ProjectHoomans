@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from copy import deepcopy
 from pathlib import Path
+import re
 from typing import Any
 
 
@@ -190,6 +191,24 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         },
     },
 }
+
+
+def derive_display_name(forename: Any, surname: Any) -> str:
+    """Return the harness display name owned by the actor's name fields."""
+
+    return " ".join(
+        part.strip()
+        for part in (str(forename or ""), str(surname or ""))
+        if part.strip()
+    )
+
+
+def derive_actor_identifier(prefix: str, forename: Any, surname: Any) -> str:
+    """Build a stable, readable harness identifier from an actor's name."""
+
+    name = derive_display_name(forename, surname).lower()
+    slug = re.sub(r"[^a-z0-9]+", "_", name).strip("_")
+    return f"{prefix}_{slug or 'actor'}"
 
 
 def merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
