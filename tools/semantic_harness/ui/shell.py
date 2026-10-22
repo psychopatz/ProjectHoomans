@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from copy import deepcopy
 from concurrent.futures import Future
 from pathlib import Path
 from typing import Any, Callable
@@ -165,6 +166,7 @@ class SemanticHarnessApp:
         self.settings_window: Any | None = None
         self._future: Future[Any] | None = None
         self._transcript_buffer = TranscriptBuffer()
+        self.baseline_record: dict[str, Any] = {}
         self._build_ui()
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self._set_status("Starting Lua worker…")
@@ -302,6 +304,14 @@ class SemanticHarnessApp:
             secondary_actions, text="Persona matrix", command=self.inspect_persona_matrix
         )
         self.persona_matrix_button.pack(side="left", padx=6)
+        self.capture_baseline_button = ttk.Button(
+            secondary_actions, text="Capture baseline", command=self.capture_baseline
+        )
+        self.capture_baseline_button.pack(side="left", padx=6)
+        self.replay_button = ttk.Button(
+            secondary_actions, text="Apply + replay", command=self.apply_and_replay
+        )
+        self.replay_button.pack(side="left", padx=6)
         self.world_knowledge_button = ttk.Button(
             secondary_actions,
             text="World knowledge",
@@ -334,6 +344,16 @@ class SemanticHarnessApp:
         )
         self.npc_profile_box.pack(side="left", padx=(4, 6))
         self.npc_profile_box.bind("<<ComboboxSelected>>", lambda _: self._on_npc_profile())
+        self.matrix_dimension_var = self._tk.StringVar(value="persona")
+        ttk.Label(runtime_controls, text="Sweep").pack(side="left")
+        self.matrix_dimension_box = ttk.Combobox(
+            runtime_controls,
+            textvariable=self.matrix_dimension_var,
+            values=("persona", "approval", "respect", "familiarity", "bond", "language"),
+            width=12,
+            state="readonly",
+        )
+        self.matrix_dimension_box.pack(side="left", padx=(4, 6))
         self.status_var = self._tk.StringVar(value="Starting…")
         self.status_label = ttk.Label(status_controls, textvariable=self.status_var)
         self.status_label.pack(anchor="e")
@@ -473,11 +493,16 @@ class SemanticHarnessApp:
             self.save_button,
             self.snapshot_button,
             self.persona_matrix_button,
+            self.capture_baseline_button,
+            self.replay_button,
             self.world_knowledge_button,
         ):
             button.configure(state=state)
         self.language_box.configure(state="readonly" if enabled and not self.busy else "disabled")
         self.npc_profile_box.configure(
+            state="readonly" if enabled and not self.busy else "disabled"
+        )
+        self.matrix_dimension_box.configure(
             state="readonly" if enabled and not self.busy else "disabled"
         )
         self.restart_button.configure(
@@ -649,7 +674,9 @@ class SemanticHarnessApp:
 
     def _show_response(self, response: dict[str, Any]) -> None:
         self.last_response = response if isinstance(response, dict) else {}
-        view = build_conversation_inspector(response)
+        inspector_record = dict(self.last_response)
+        inspector_record["personaCatalog"] = self.persona_catalog
+        view = build_conversation_inspector(inspector_record)
         self._set_text(self.inspector, conversation_first(view))
         self._set_text(self.authority, pretty(view.get("commandAuthority", {})))
         self._set_text(self.trace, pretty(response))
@@ -960,64 +987,144 @@ class SemanticHarnessApp:
             self._show_response,
         )
 
+    def capture_baseline(self) -> None:
+        """Capture the current utterance through the production preview path."""
+
+        value = self.input_var.get().strip()
+        if not value or not self.session.ready or self.busy:
+            return
+
+        def finish(result: dict[str, Any]) -> None:
+            self.baseline_record = result
+            self._show_response(result.get("preview") or {})
+            self._append("SYSTEM", f"Captured production baseline: {value}")
+
+        self._start_operation(lambda worker: worker.capture_baseline(value), finish)
+
+    def apply_and_replay(self) -> None:
+        """Reapply the edited scenario and submit the current utterance."""
+
+        value = self.input_var.get().strip()
+        if not value or not self.session.ready or self.busy:
+            return
+
+        def finish(result: dict[str, Any]) -> None:
+            self._show_response(result.get("turn") or result)
+            self._append("SYSTEM", f"Applied scenario and replayed: {value}")
+
+        self._start_operation(lambda worker: worker.apply_and_replay(value), finish)
+
     def inspect_persona_matrix(self) -> None:
         """Run a small production-backed persona A/B matrix in one worker."""
 
         if not self.session.ready or self.busy:
             return
-        base = self.scenario
+        base = deepcopy(self.scenario)
+        dimension = self.matrix_dimension_var.get() or "persona"
         rows = [
-            merge(base, {"runtime": {"semanticLabMatrixLabel": "baseline"}}),
             merge(
                 base,
-                {
-                    "runtime": {"semanticLabMatrixLabel": "warm / familiar"},
-                    "npc": {
-                        "traits": ["pnc_friendly"],
-                        "personality": {
-                            "socialStyle": "friendly",
-                            "compassion": 0.9,
-                            "sociability": 0.9,
-                        },
-                        "relationship": {
-                            "approval": 80,
-                            "respect": 70,
-                            "familiarity": 80,
-                            "identityTrust": "trusted",
-                        },
-                    },
-                },
-            ),
-            merge(
-                base,
-                {
-                    "runtime": {"semanticLabMatrixLabel": "guarded / hostile"},
-                    "npc": {
-                        "traits": ["pnc_reserved"],
-                        "personality": {
-                            "socialStyle": "withdrawn",
-                            "aggression": 0.9,
-                            "sociability": 0.2,
-                        },
-                        "relationship": {
-                            "approval": -80,
-                            "respect": -60,
-                            "familiarity": 5,
-                            "identityTrust": "untrustworthy",
-                        },
-                        "activeBehavior": "hostile",
-                    },
-                },
-            ),
+                {"runtime": {"semanticLabMatrixLabel": f"A / baseline · {dimension}"}},
+            )
         ]
+
+        def add_relationship_variants(field: str, values: tuple[tuple[str, int], ...]) -> None:
+            rows.extend(
+                merge(
+                    base,
+                    {
+                        "runtime": {
+                            "semanticLabMatrixLabel": f"{label} · {dimension}"
+                        },
+                        "npc": {"relationship": {field: value}},
+                    },
+                )
+                for label, value in values
+            )
+
+        if dimension == "approval":
+            add_relationship_variants("approval", (("B / low", -80), ("C / high", 80)))
+        elif dimension == "respect":
+            add_relationship_variants("respect", (("B / low", -60), ("C / high", 70)))
+        elif dimension == "familiarity":
+            add_relationship_variants("familiarity", (("B / low", 5), ("C / high", 100)))
+        elif dimension == "bond":
+            for label, relationship in (
+                ("B / mother", {"relationshipKind": "mother"}),
+                ("C / lover", {"relationshipKind": "lover"}),
+            ):
+                rows.append(
+                    merge(
+                        base,
+                        {
+                            "runtime": {
+                                "semanticLabMatrixLabel": f"{label} · {dimension}"
+                            },
+                            "npc": {"startingRelationship": relationship},
+                        },
+                    )
+                )
+        elif dimension == "language":
+            for label, language in (("B / EN", "EN"), ("C / TL", "TL")):
+                rows.append(
+                    merge(
+                        base,
+                        {
+                            "runtime": {
+                                "semanticLabMatrixLabel": f"{label} · {dimension}",
+                                "language": language,
+                            }
+                        },
+                    )
+                )
+        else:
+            rows.extend(
+                [
+                    merge(
+                        base,
+                        {
+                            "runtime": {"semanticLabMatrixLabel": "B / warm · persona"},
+                            "npc": {
+                                "traits": ["pnc_friendly"],
+                                "personality": {
+                                    "socialStyle": "friendly",
+                                    "compassion": 0.9,
+                                    "sociability": 0.9,
+                                    "aggression": 0.1,
+                                },
+                            },
+                        },
+                    ),
+                    merge(
+                        base,
+                        {
+                            "runtime": {"semanticLabMatrixLabel": "C / guarded · persona"},
+                            "npc": {
+                                "traits": ["pnc_reserved"],
+                                "personality": {
+                                    "socialStyle": "withdrawn",
+                                    "compassion": 0.1,
+                                    "sociability": 0.2,
+                                    "aggression": 0.9,
+                                },
+                            },
+                        },
+                    ),
+                ]
+            )
+
+        value = self.input_var.get().strip() or "hello"
 
         def finish(result: dict[str, Any]) -> None:
             self._set_text(self.inspector, pretty(result))
             self._set_text(self.trace, pretty(result))
-            self._append("SYSTEM", "Persona matrix completed through the real Lua worker.")
+            self._append(
+                "SYSTEM",
+                f"Persona matrix ({dimension}) completed through the real Lua worker: {value}",
+            )
 
         self._start_operation(
-            lambda worker: worker.context_matrix(rows, text="hello", maximum=3),
+            lambda worker: worker.context_matrix(rows, text=value, maximum=3),
             finish,
         )
 

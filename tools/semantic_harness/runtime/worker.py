@@ -138,7 +138,13 @@ class LuaSemanticWorker:
                 configured = self.configure(scenario)
                 turn = self.input(text)
                 snapshot = self.snapshot()
-                suggestions = turn.get("observation", {}).get("suggestions") or {}
+                observation = turn.get("observation", {})
+                observation = observation if isinstance(observation, dict) else {}
+                response = observation.get("response", {})
+                response = response if isinstance(response, dict) else {}
+                queued = (response.get("queued") or [response])[0]
+                queued = queued if isinstance(queued, dict) else response
+                suggestions = observation.get("suggestions") or {}
                 rows.append(
                     {
                         "index": index,
@@ -152,8 +158,30 @@ class LuaSemanticWorker:
                             ),
                         },
                         "context": snapshot.get("context", {}),
+                        "response": {
+                            "semanticTemplateID": response.get("templateID"),
+                            "renderTemplateID": response.get("renderTemplateID"),
+                            "key": queued.get("key") or response.get("templateID"),
+                            "text": queued.get("text") or response.get("text"),
+                            "fallback": queued.get("fallback") or response.get("fallback"),
+                            "translationKey": queued.get("translationKey"),
+                            "realizationFamily": queued.get("realizationFamily")
+                            or response.get("realizationFamily"),
+                            "realizationVariant": queued.get("realizationVariant")
+                            or response.get("realizationVariant"),
+                            "realizationFallbackReason": queued.get(
+                                "realizationFallbackReason"
+                            ) or response.get("realizationFallbackReason"),
+                            "familyAddress": (queued.get("args") or {}).get(
+                                "familyAddress"
+                            ),
+                        },
                         "suggestions": {
                             "revision": suggestions.get("revision"),
+                            "candidateOrder": [
+                                row.get("id")
+                                for row in (suggestions.get("candidates") or [])[:24]
+                            ],
                             "candidates": [
                                 {
                                     "id": row.get("id"),
@@ -170,6 +198,34 @@ class LuaSemanticWorker:
         finally:
             self.configure(original)
         return {"schema": "semantic.persona.matrix.v1", "rows": rows}
+
+    def capture_baseline(self, text: str) -> dict[str, Any]:
+        """Capture a non-mutating production baseline for the current scenario."""
+
+        value = str(text or "").strip()
+        if not value:
+            raise ValueError("baseline utterance must not be empty")
+        preview = self.preview(value)
+        return {
+            "schema": "semantic.persona.baseline.v1",
+            "utterance": value,
+            "preview": preview,
+        }
+
+    def apply_and_replay(self, text: str) -> dict[str, Any]:
+        """Reapply the current scenario and replay one utterance in production Lua."""
+
+        value = str(text or "").strip()
+        if not value:
+            raise ValueError("replay utterance must not be empty")
+        configured = self.configure(self.scenario)
+        turn = self.input(value)
+        return {
+            "schema": "semantic.persona.apply_replay.v1",
+            "utterance": value,
+            "configured": configured,
+            "turn": turn,
+        }
 
     def knowledge_bootstrap(
         self, request_id: str = "harness-knowledge-bootstrap"

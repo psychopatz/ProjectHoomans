@@ -256,6 +256,11 @@ def _persona_choice_projection(
     result = result if isinstance(result, dict) else {}
     response = observation.get("response")
     response = response if isinstance(response, dict) else {}
+    queued = (response.get("queued") or [response])[0]
+    queued = queued if isinstance(queued, dict) else response
+    args = queued.get("args") if isinstance(queued.get("args"), dict) else {}
+    actor_context = context.get("actorConversationContext", {})
+    actor_context = actor_context if isinstance(actor_context, dict) else {}
     return {
         "actorConversationContext": _bounded(
             context.get("actorConversationContext", {}), limit=32
@@ -271,6 +276,27 @@ def _persona_choice_projection(
         "realizationFamily": response.get("realizationFamily"),
         "realizationVariant": response.get("realizationVariant"),
         "realizationFallbackReason": response.get("realizationFallbackReason"),
+        "responseTrace": {
+            "semanticTemplateID": response.get("templateID"),
+            "renderTemplateID": response.get("renderTemplateID"),
+            "realizationFamily": queued.get("realizationFamily")
+            or response.get("realizationFamily"),
+            "realizationVariant": queued.get("realizationVariant")
+            or response.get("realizationVariant"),
+            "fallbackReason": queued.get("realizationFallbackReason")
+            or response.get("realizationFallbackReason"),
+            "translationKey": queued.get("translationKey")
+            or response.get("translationKey"),
+            "familyAddress": args.get("familyAddress"),
+            "bond": _bounded(actor_context.get("bond", {}), limit=16),
+            "semanticFrame": _bounded(
+                result.get("ir")
+                or response.get("plan")
+                or response.get("args")
+                or {},
+                limit=24,
+            ),
+        },
         "receipt": {
             "accepted": record.get("accepted") is True,
             "reason": record.get("reason") or result.get("reason"),
@@ -296,6 +322,11 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
     dialogue = _dialogue(context)
     observation = _observation(record)
     persona_choices = _persona_choice_projection(record, context, observation)
+    catalog = record.get("personaCatalog")
+    if isinstance(catalog, dict):
+        persona_choices["speechRealizationCoverage"] = _bounded(
+            catalog.get("speechRealization", {}), limit=32
+        )
     response = _response(record, observation)
     plan = _plan(response)
     result = record.get("result", {})
