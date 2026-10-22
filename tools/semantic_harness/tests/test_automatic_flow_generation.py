@@ -212,8 +212,8 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             stay = worker.input("Stay here")
 
         for result, action, response_key in (
-            (follow, "follow", "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedWithdrawn"),
-            (stay, "stay", "UI_PNC_Conversation_Semantic_GeneratedStayQueuedWithdrawn"),
+            (follow, "follow", "UI_PNC_Conversation_Semantic_GeneratedFollowQueued"),
+            (stay, "stay", "UI_PNC_Conversation_Semantic_GeneratedStayQueued"),
         ):
             flow = result["result"]["flow"]
             self.assertTrue(flow["generated"])
@@ -261,7 +261,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
 
         self.assertEqual(
             friendly["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedFriendly",
+            "UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm",
         )
         self.assertEqual(
             trusted["messages"][0]["payload"]["translationKey"],
@@ -269,9 +269,9 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         )
         self.assertEqual(
             tagalog["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedFriendly",
+            "UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm",
         )
-        self.assertEqual(tagalog["messages"][0]["payload"]["text"], "Siyempre, susundan kita.")
+        self.assertEqual(tagalog["messages"][0]["payload"]["text"], "Siyempre, susunod ako sa iyo.")
         for result in (friendly, trusted, tagalog):
             self.assertTrue(result["result"]["flow"]["generated"])
             self.assertEqual(result["result"]["flow"]["resultOutcome"], "queued")
@@ -285,7 +285,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
 
         self.assertEqual(
             first["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedWithdrawn",
+            "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
         )
         self.assertEqual(
             repeated["messages"][0]["payload"]["translationKey"],

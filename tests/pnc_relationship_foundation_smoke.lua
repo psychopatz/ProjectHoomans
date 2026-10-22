@@ -177,7 +177,7 @@ end
 
 -- 1. New social state defaults.
 local defaults = PNC.RelationshipTypes.NewSocialState()
-T.equal(defaults.schemaVersion, 3, "social schema default")
+T.equal(defaults.schemaVersion, 4, "social schema default")
 T.equal(defaults.revision, 0, "social revision default")
 T.equal(defaults.morale, 0, "social morale default")
 T.equal(type(defaults.relationships), "table",

@@ -61,7 +61,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "traits": {"friendly": True},
                 },
                 "semantic.social.apology.friendly",
-                "UI_PNC_Conversation_Semantic_ApologyFriendly",
+                "UI_PNC_Conversation_Semantic_RealizationApologyFriendlyWarm",
                 "friendly",
             ),
             (
@@ -172,12 +172,12 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 self.assertLess(action["relationshipDelta"]["respect"], 0)
                 self.assertEqual(
                     result["result"]["decision"]["response"]["templateID"],
-                    "semantic.social.hostile_withdrawn",
+                    "semantic.social.hostile_boundary",
                 )
                 self.assertEqual(len(result["messages"]), 1)
                 self.assertEqual(
-                    result["messages"][0]["payload"]["key"],
-                    "semantic.social.hostile_withdrawn",
+                    result["messages"][0]["payload"]["realizationFamily"],
+                    "semantic.social.hostile_boundary",
                 )
                 self.assertEqual(result["llmCalls"], 0)
                 self.assertEqual(result["toolCalls"], [])

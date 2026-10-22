@@ -11,6 +11,10 @@ local function projectSocialProfiles(context, playerData, npcData)
     local npcProfile
     local personalityMode
     local personalitySource
+    local identitySeed = npcData.identitySeed
+        or npcData.identity and npcData.identity.seed
+        or npcData.npcID
+    local archetypeID = npcData.archetype or npcData.archetypeID or "General"
 
     if PNC and PNC.SocialTraits
         and type(PNC.SocialTraits.ResolveTraits) == "function"
@@ -36,15 +40,26 @@ local function projectSocialProfiles(context, playerData, npcData)
         personalityMode = "legacy_override"
     end
 
-    if PNC and PNC.SocialProfileGenerator
+    if personalitySource and PNC and PNC.SocialProfileTypes
+        and type(PNC.SocialProfileTypes.NormalizeNPCPersonality) == "function"
+    then
+        -- An explicit/manual profile is authoritative. Normalize it through
+        -- the production schema so numeric dimensions are not replaced by a
+        -- freshly generated profile merely because traits are present.
+        npcProfile = PNC.SocialProfileTypes.NormalizeNPCPersonality(
+            npcData.personality,
+            identitySeed,
+            archetypeID,
+            npcData.personality,
+            { npcTraits = npcTraits }
+        )
+    elseif PNC and PNC.SocialProfileGenerator
         and type(PNC.SocialProfileGenerator.Generate) == "function"
     then
         npcProfile = PNC.SocialProfileGenerator.Generate(
-            npcData.identitySeed
-                or npcData.identity and npcData.identity.seed
-                or npcData.npcID,
-            npcData.archetype or npcData.archetypeID or "General",
-            personalitySource and npcData.personality or nil,
+            identitySeed,
+            archetypeID,
+            nil,
             { npcTraits = npcTraits }
         )
     else

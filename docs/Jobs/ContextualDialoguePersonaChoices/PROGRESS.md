@@ -2,127 +2,99 @@
 
 **Updated:** 2026-10-23
 
-**Parent status:** REOPENED — P10 infrastructure is retained, but P11 runtime parity, relationships, and Semantic Lab UX are mandatory.
+**Parent status:** P11 runtime parity and Semantic Lab UX completed locally.
 
-**Current mandatory phase:** P11H — Final runtime-parity usability and regression gate.
+**Current exact next chunk:** User-owned native Project Zomboid SP/MP live test.
 
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned.
 
-## Accepted foundation to preserve
+## Accepted foundation
 
-The accepted P10 foundation remains in place:
+P10 infrastructure remains preserved: contextual What's Up semantic hub, removal of the legacy authored What's Up category, provider-driven contextual choices, typed Simulation Control Catalog, structured inventory with Advanced JSON, Apply + Replay, ActorConversationContext, SpeechStyleContext, relationship-state resolution, EN/TL realization, graph renderer/history infrastructure, and the Dynamic Trading provider boundary.
 
-- contextual What's Up semantic hub and removal of the legacy authored What's Up category;
-- registered hub choice providers and typed Simulation Control Catalog;
-- structured inventory plus Advanced JSON;
-- Apply and Apply + Replay infrastructure;
-- ActorConversationContext, SpeechStyleContext, relationship-state resolver, and EN/TL realization;
-- graph renderer/history infrastructure and the Dynamic Trading provider boundary;
-- production player/NPC trait and social-profile registries.
+## P11A — actor-centric workbench and truthful catalogs
 
-## P11A completed — actor-centric workbench and truthful catalogs
+Completed on ProjectHoomans `main`.
 
-P11A is complete on the local ProjectHoomans `main` checkout.
+- Main Simulation workbench exposes NPC Target, Player, Relationship, and World ownership with Overview, Needs, and Personality & Traits access.
+- Normal relationship catalogs expose only current production kinds: `friend`, `lover`, `mother`, `father`, `sister`, and `brother`.
+- Preview, Snapshot, Restart worker, World Knowledge, Compare, Apply, Apply + Replay, structured inventory, and Advanced JSON remain available under their intended surfaces.
+- Real Tk/Xvfb workbench coverage passed at the required minimum and normal desktop sizes through the focused P11 suite.
 
-- Simulation now presents `NPC Target`, `Player`, `Relationship`, and `World` in the main lower workbench.
-- NPC Target and Player expose Overview, Needs, and Personality & Traits tabs.
-- Normal relationship catalogs use only current production kinds: friend, lover, mother, father, sister, and brother. Future extensible kinds remain diagnostic-only.
-- Preview is beside Send; Snapshot and Restart worker are in Diagnostics / Worker; World Knowledge refresh is in its inspector; Compare replaces the primary Persona Matrix / Sweep / Capture workflow.
-- Apply, Apply + Replay, structured inventory, and Advanced JSON remain available.
+## P11B — first-class actor needs and production personality
 
-## P11B completed — first-class actor needs and generated personality
+Completed on ProjectHoomans `main`.
 
-P11B is complete.
+- Player and NPC own Hunger, Thirst, Fatigue, Stress, Boredom, and Panic. Legacy world fields remain compatibility fallbacks.
+- Player traits come from `PNC.SocialTraits` and feed the production social-profile resolver.
+- NPC traits come from registered `PNC.NPCTraits`; generated personality is the default read-only source.
+- Manual personality controls require the explicit generated-personality override.
+- P11H compatibility fixed explicit legacy/manual profiles so numeric values survive production normalization, and made explicit empty needs/condition maps clear legacy defaults.
 
-- Player and NPC own Hunger, Thirst, Fatigue, Stress, Boredom, and Panic in the scenario model. Legacy world fields remain compatibility fallbacks.
-- Player trait options come from `PNC.SocialTraits.GetDefinitions()` and feed the production social-trait resolver. Derived orientation and social profile values are read-only.
-- NPC identity seed, archetype, registered traits, and generated personality use the production generator. Manual personality values require the explicit Override generated personality control.
+## P11C — durable friend bond
 
-## P11C completed — durable friend bond
+Completed on ProjectHoomans `main`.
 
-P11C is complete.
+- Durable bond is stored on the existing directed relationship record with schema normalization and migration support.
+- Friend promotion uses approval `80`, respect `50`, familiarity `60`, standing gates, family exclusion, bounded event/memory, revisions, and normal persistence.
+- Bond remains durable after standing deterioration; starting friend, lover, and authored family relationships seed the same record.
+- ActorConversationContext and semantic realization consume the durable bond.
 
-- The durable bond lives on the existing directed relationship record with schema normalization and migration support. No second bond database exists.
-- Server relationship commits evaluate approval 80, respect 50, familiarity 60. Promotion writes a bounded `friendship_established` event/memory and normal relationship revisions.
-- Later standing deterioration can reach enemy while the durable friend bond remains. Starting Companion friend, lover, and current family kinds seed the same record.
-- ActorConversationContext and the Semantic Lab project the durable bond.
+## P11D — romance proposal to lover
 
-## P11D completed — romance proposal and deterministic lover progression
+Completed in commit `685d88a0`.
 
-P11D is complete on the local ProjectHoomans `main` checkout in commit `685d88a0`.
+- One canonical `RELATIONSHIP_PROPOSAL` action uses production gender, player trait/social profile, NPC profile, and mutual orientation compatibility.
+- Eligibility uses friend bond, approval `85`, respect `60`, familiarity `80`, standing/availability/family gates, and cooldown.
+- Acceptance is server-authoritative and deterministic with bounded personality-aware weighting.
+- Acceptance promotes friend to lover and records event, memory, revision, and persistence state. Rejection preserves friend and applies cooldown.
 
-- One canonical `RELATIONSHIP_PROPOSAL` action uses production player traits, NPC social profile, actor genders, and the registered orientation compatibility APIs.
-- Eligibility requires a friend bond, approval 85, respect 60, familiarity 80, non-rival/non-enemy standing, living and available actors, family exclusion, compatibility, and a clear cooldown.
-- Acceptance is server-authoritative and deterministic, with personality-aware weighting. Acceptance promotes friend to lover and records bounded event/memory/revision state. Rejection preserves friend and adds a bounded cooldown.
+## P11E — live relationship preview and Compare
 
-Validation:
+Completed in commit `2296eaf9`.
 
-- `test_contextual_runtime_parity_p11d.py`: 7/7 passed under Xvfb.
-- P11A-C combined regression and Lua/Python syntax checks passed before the P11D commit.
+- Non-persisted `RELATIONSHIP_PREVIEW` uses the production standing resolver and proposal policy while sliders move.
+- Workbench shows standing reason, friend progress, compatibility, proposal thresholds, cooldown, availability, Apply, Apply + Replay, and optional debounced Auto replay.
+- Compare runs the real Lua worker and reports NPC response, semantic choices, SpeechStyleContext, relationship state, durable bond, and runtime graph path.
 
-## P11E completed — live relationship preview and Compare
+## P11F — unified runtime dialogue graph
 
-P11E is complete on the local ProjectHoomans `main` checkout.
+Completed in commit `ada3b647`.
 
-- Added non-persisted `RELATIONSHIP_PREVIEW` through the real Lua worker. It uses the production standing resolver and proposal policy and reports standing, reason, scores, bond, thresholds, compatibility, cooldown, and availability while staged sliders move.
-- Relationship workbench now shows live standing reason text, friend bond progress, romance compatibility, proposal threshold/cooldown/availability, Apply, Apply + Replay, and an optional debounced Auto replay checkbox.
-- Compare is one understandable utterance plus A/B/C surface. It runs through the real Lua worker and displays NPC response, semantic choices, SpeechStyleContext, standing, durable bond, and runtime graph path while retaining the full production evidence payload.
+- `hello` projects the actual greeting semantic Flow with current, visited, completed, and future transitions.
+- What's Up projects the real provider/candidate semantic Hub graph and preserves visited/completed history after route closure.
+- Authored ConversationBlock projections continue through the same graph interaction path.
+- Tk graph adapters share the `semantic_flow`, `semantic_hub`, and `conversation_block` renderer family.
 
-Validation:
+## P11G — modular speech realization packs
 
-- `test_contextual_runtime_parity_p11e.py`: 4/4 passed under Xvfb.
-- P11A-P11E focused regression: 21/21 passed under Xvfb.
-- `luac5.3 -p`, `py_compile`, and `git diff --check` passed for the P11E changes.
+Completed in commit `3499ffc8`.
 
-## P11F completed — unified runtime dialogue graph
+- One SpeechRealization registry, resolver, fallback, and translation path remain in the central module.
+- Built-in phrase content is split into cohesive Status, Social, Knowledge, and Actions packs with shared builders.
+- Catalog validation reports 39 registered families and 15 coverage domains; EN/TL family-address behavior remains covered.
 
-P11F is complete on the local ProjectHoomans `main` checkout.
+## P11H — final runtime-parity usability gate
 
-- `hello` now projects the live greeting Flow with current and transition states.
-- What's Up now projects the real semantic Hub provider/candidate graph. Candidate clicks retain visited and completed history after the hub route closes.
-- Authored ConversationBlock projections continue through the same canvas and graph interaction path.
-- The Python graph model and canvas now share adapters for `semantic_flow`, `semantic_hub`, and `conversation_block`, including current, visited, available, locked, completed, and future states.
+Completed locally on ProjectHoomans `main`.
 
-Validation:
+### Acceptance evidence
 
-- `test_contextual_runtime_graph_p11f.py`: 4/4 passed under Xvfb for greeting Flow, What's Up provider graph/history, authored ConversationBlock, and Tk graph navigation.
-- P11A-P11F focused regression: 25/25 passed under Xvfb.
-- What's Up, semantic hub, Suggestions S4, graph history, and Flow Editor regressions passed after updating the accepted P11F graph contract.
-- `luac5.3 -p`, `py_compile`, and `git diff --check` passed for P11F changes.
-
-Native Project Zomboid SP/MP remains UNTESTED / user-owned.
-
-## P11G completed — modular speech-realization packs
-
-P11G is complete on the local ProjectHoomans `main` checkout.
-
-- The single `SpeechRealization` registry, resolver, fallback, translation path, and registration API remain in `PNC_SpeechRealization.lua`.
-- Built-in content now lives in cohesive Status, Social, Knowledge, and Actions packs with shared family builders. The central registry no longer owns individual phrase content.
-- The production catalog still exposes 39 families and 15 coverage domains. Semantic template identity, style variants, EN/TL translation behavior, and family-address arguments remain intact.
-- Fixed the existing relationship normalization seam to bind `Internal.BoundedString`, preserving social action speech paths after durable bond schema work.
-
-Validation:
-
-- `test_contextual_runtime_speech_p11g.py`: 3/3 passed.
-- Existing speech regressions `test_contextual_speech_style_p3.py` and `test_contextual_speech_behavior_p8b.py`: 8/8 passed.
-- Production catalog check: 39 registered families and 15 coverage domains.
-- `luac5.3 -p`, `py_compile`, and `git diff --check` passed for P11G changes.
-
-Native Project Zomboid SP/MP remains UNTESTED / user-owned.
-
-## Current Exact Next Chunk — P11H
-
-1. Validate the complete runtime-parity usability path at minimum and normal desktop sizes.
-2. Run Python, Tk/Xvfb, embedded Lua, relationship, graph, speech, privacy, stale/replay, gameplay-authority, catalog, translation, and persistence regressions.
-3. Run `luac5.3`, Kahlua verification, doctor, catalog/translation validation, `git diff --check`, and duplicate ModData checks.
-4. Update this ledger with exact evidence, commit P11H gate fixes on existing `main`, and only then assess the handoff condition.
-
-## Ordered remaining milestones
-
-- **P11H:** final runtime-parity usability and regression gate.
+- Full Python/Tk discovery under Xvfb: **412/412 passed**.
+- Focused P11A-G and P10 regression suite under Xvfb: **70/70 passed**.
+- Embedded semantic Lua suite: **73/73 passed**.
+- Relationship, translation, starting-companion, authority, and inventory Lua suites: **54/54 passed**.
+- Doctor: all required checks passed; optional active-venv check is false only because the system interpreter is active.
+- Full-mod Kahlua verification: **3,086 Lua files, zero findings**.
+- Dedicated Kahlua lint: zero findings.
+- Changed-file `luac5.3 -p`, Python compilation, and `git diff --check`: passed.
+- EN/TL catalog validation: **35/35 matching files, zero key mismatches**.
+- Speech catalog validation: **39 families, 15 coverage domains**.
+- Normal relationship catalog validation: `mother`, `father`, `sister`, `brother`, `friend`, `lover`; no hypothetical future kinds.
+- Privacy, stale/replay, gameplay authority, structured inventory, Advanced JSON, persistence/migration, friend promotion, romance compatibility/acceptance/cooldown, family exclusion, starting relationships, graph history, and P10 contextual hub regressions are covered by the full and focused suites.
+- Duplicate-state scan found no bond, personality, or conversation-graph ModData persistence. Existing unrelated knowledge/runtime ModData boundaries remain unchanged.
+- Codebase-memory coverage check for the relationship, trait, speech, runtime, and scenario paths returned no recorded coverage issue; changed paths were read directly because the index records them as metadata-changed or not-tracked.
 
 ## Handoff condition
 
-Do not report **READY FOR USER LIVE TEST** until P11A-P11H all pass.
-
-Native Project Zomboid SP/MP remains user-owned and must remain UNTESTED unless the user performs it.
+P11A-P11H pass locally. **READY FOR USER LIVE TEST** is now valid for the user-owned native Project Zomboid SP/MP validation. The agent did not operate native Project Zomboid and does not claim SP/MP evidence.

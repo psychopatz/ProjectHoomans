@@ -92,13 +92,13 @@ class ConversationalCompetenceC7CTests(unittest.TestCase):
 
         self.assertEqual(
             acknowledged["result"]["decision"]["response"]["templateID"],
-            "semantic.question.relationship_status.acknowledged.withdrawn",
+            "semantic.question.relationship_status.acknowledged.alternate",
         )
         self.assertEqual(
             acknowledged["contextAfter"]["dialogue"]["currentTopic"],
             "RELATIONSHIP_STATUS",
         )
-        self.assertIn("leave it", self.message_text(acknowledged).lower())
+        self.assertIn("appreciate", self.message_text(acknowledged).lower())
         self.assert_no_effects(acknowledged)
         self.assertEqual(relationship["transport"], [])
 
@@ -112,7 +112,7 @@ class ConversationalCompetenceC7CTests(unittest.TestCase):
         self.assertEqual(question["result"]["ir"]["subject"], "NPC_HEALTH_STATE")
         self.assertEqual(
             acknowledged["result"]["decision"]["response"]["templateID"],
-            "semantic.conversation.acknowledged.withdrawn",
+            "semantic.conversation.acknowledged.default",
         )
         self.assertEqual(
             acknowledged["contextAfter"]["dialogue"]["currentTopic"],

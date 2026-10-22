@@ -38,7 +38,7 @@ class GroundedPersonalDialogueB0Tests(unittest.TestCase):
         self.assertEqual(turn["toolCalls"], [])
         self.assertEqual(turn["llmCalls"], 0)
         response = self.response_text(turn).lower()
-        self.assertIn("thank", response)
+        self.assertTrue("thank" in response or "appreciate" in response)
         self.assertNotIn("have any", response)
         return turn
 

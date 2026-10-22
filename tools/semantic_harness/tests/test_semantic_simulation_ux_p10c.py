@@ -95,7 +95,7 @@ class SimulationControlCatalogP10CTests(unittest.TestCase):
         self.assertEqual(updated["world"]["timeOfDay"], 21.5)
         self.assertEqual(updated["npc"]["healthState"], "injured")
         self.assertEqual(updated["npc"]["role"], "trader")
-        self.assertEqual(updated["npc"]["identity"]["gender"], "female")
+        self.assertEqual(updated["npc"]["gender"], "female")
         self.assertEqual(updated["npc"]["startingRelationship"]["kind"], "mother")
         self.assertEqual(
             updated["npc"]["startingRelationship"]["source"],

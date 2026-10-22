@@ -73,7 +73,7 @@ class FollowActionBindingTests(unittest.TestCase):
         self.assertEqual(committed["toolCalls"][0]["authority"], "mock")
         self.assertEqual(
             committed["messages"][0]["payload"]["text"],
-            "I'll follow.",
+            "Okay, I'll follow you.",
         )
 
         # The explicit negated pattern is STOP, so it must never silently

@@ -196,8 +196,13 @@ def merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
     """Recursively merge an authored scenario over the safe defaults."""
 
     output: dict[str, Any] = deepcopy(base)
+    replace_empty_objects = {"needs", "conditionStats", "personality", "identity"}
     for key, value in override.items():
-        if isinstance(value, dict) and isinstance(output.get(key), dict):
+        if (
+            isinstance(value, dict)
+            and not (not value and key in replace_empty_objects)
+            and isinstance(output.get(key), dict)
+        ):
             output[key] = merge(output[key], value)
         else:
             output[key] = deepcopy(value)

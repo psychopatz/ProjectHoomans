@@ -71,7 +71,7 @@ class StayWaitAtBindingTests(unittest.TestCase):
         )
         self.assertEqual(
             stay["messages"][0]["payload"]["text"],
-            "Okay, I'll stay.",
+            "Okay, I'll stay here.",
         )
 
         wait_result = wait_at["result"]

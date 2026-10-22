@@ -373,7 +373,7 @@ class SemanticHarnessTests(unittest.TestCase):
             reserved_result = worker.input("I'm an idiot")
         self.assertIn("matter", self.message_text(friendly_result).lower())
         self.assertIn(
-            "don't make a habit", self.message_text(reserved_result).lower()
+            "mistakes", self.message_text(reserved_result).lower()
         )
 
     def test_first_person_state_is_not_identity_claim(self) -> None:
