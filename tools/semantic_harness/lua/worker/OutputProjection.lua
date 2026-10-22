@@ -177,6 +177,7 @@ function OutputProjection.observation(context, record, semanticContext)
         and result.candidates.selected or {}
     local responseObservation = {
         templateID = response.templateID,
+        renderTemplateID = response.renderTemplateID,
         sourcePoolID = response.sourcePoolID,
         fallback = response.fallback,
         text = response.fallback,
@@ -261,7 +262,10 @@ function OutputProjection.observation(context, record, semanticContext)
                 responseObservation.key = queued.key
                 responseObservation.translationKey = queued.translationKey
                 responseObservation.translationKeys = queued.translationKeys
-                responseObservation.templateID = queued.key
+                -- Keep the semantic response identity canonical. The queued
+                -- key is the presentation realization and remains available
+                -- through responseObservation.key.
+                responseObservation.templateID = response.templateID
                 responseObservation.plan = queued.plan
                 responseObservation.planTurnCount = queued.plan
                     and math.min(#(queued.plan.turns or {}),

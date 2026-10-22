@@ -355,7 +355,7 @@ end
 
 local function payloadForPlanTurn(response, rendered, fallbackRendered)
     local firstSegment = rendered.segments[1] or {}
-    local key = response.templateID or firstSegment.templateID
+    local key = firstSegment.templateID or response.templateID
     if rendered.index > 1 and firstSegment.templateID then
         key = firstSegment.templateID
     end
@@ -384,6 +384,7 @@ local function payloadForPlanTurn(response, rendered, fallbackRendered)
         realizationFamily = response.realizationFamily,
         realizationVariant = response.realizationVariant,
         realizationFallbackReason = response.realizationFallbackReason,
+        renderTemplateID = response.renderTemplateID,
     }
 end
 
@@ -424,8 +425,9 @@ local function payloadsForResponse(response)
     end
 
     local fallback = tostring(response.fallback or "")
+    local renderTemplateID = response.renderTemplateID or response.templateID
     local text, translationKey = localizedSegment(
-        response.templateID,
+        renderTemplateID,
         fallback,
         response.args
     )
@@ -447,6 +449,7 @@ local function payloadsForResponse(response)
             realizationFamily = response.realizationFamily,
             realizationVariant = response.realizationVariant,
             realizationFallbackReason = response.realizationFallbackReason,
+            renderTemplateID = renderTemplateID,
         },
     }
 end

@@ -120,7 +120,7 @@ function Realization.Families()
     return copy(FAMILIES)
 end
 
-function Realization.Resolve(templateID, style)
+function Realization.Resolve(templateID, style, semanticFallback)
     local family = FAMILIES[tostring(templateID or "")]
     if not family then return nil, "realization_family_unavailable" end
     style = type(style) == "table" and style or {}
@@ -133,6 +133,18 @@ function Realization.Resolve(templateID, style)
     end
     if type(value) ~= "table" then
         return nil, "realization_neutral_unavailable"
+    end
+    -- The neutral/base family is the existing semantic catalog entry. Keep
+    -- that canonical translation identity intact so adding presentation
+    -- realization remains behavior-preserving for already-neutral turns.
+    if selected == "neutral" then
+        return {
+            templateID = tostring(templateID),
+            fallback = tostring(semanticFallback or value.fallback or ""),
+            family = tostring(templateID),
+            variant = "neutral",
+            fallbackReason = nil,
+        }
     end
     return {
         templateID = tostring(value.key or templateID),
@@ -147,7 +159,9 @@ local function applySegment(segment, style)
     if type(segment) ~= "table" or segment.kind ~= "translation" then
         return segment, nil
     end
-    local resolved = Realization.Resolve(segment.templateID, style)
+    local resolved = Realization.Resolve(
+        segment.templateID, style, segment.fallback
+    )
     if not resolved then return segment, nil end
     local output = copy(segment)
     output.semanticTemplateID = segment.templateID
@@ -194,10 +208,10 @@ function Realization.Apply(response, context)
         templateID = output.templateID,
         fallback = output.fallback,
         args = output.args,
-    }, style)
+    }, style, output.fallback)
     if resolved then
         output.semanticTemplateID = output.templateID
-        output.templateID = resolved.templateID
+        output.renderTemplateID = resolved.templateID
         output.fallback = resolved.fallback
         output.realizationFamily = resolved.family
         output.realizationVariant = resolved.variant
