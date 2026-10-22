@@ -452,3 +452,127 @@ configure common NPC/world state using structured controls
 ```
 
 A passing backend/provider test without this actual UI proof is insufficient.
+
+
+## P11 acceptance — actor symmetry, relationship progression, and usable diagnostics
+
+### Actor-centric primary workbench
+
+Simulation must expose:
+
+```text
+NPC Target | Player | Relationship | World
+```
+
+with actor sub-surfaces:
+
+```text
+Overview | Needs | Personality & Traits
+```
+
+Both Player and NPC Target must be testable without opening unrelated modal tabs.
+
+### First-class needs
+
+Player and NPC need controls use actor-owned scenario state.
+
+Required common controls:
+
+- hunger;
+- thirst;
+- fatigue;
+- stress;
+- boredom;
+- panic.
+
+Normal new scenarios must not rely on `world.hunger/thirst/fatigue` as the owner of NPC or player needs.
+
+Historical fixture compatibility may remain.
+
+### Production traits and personality
+
+Normal trait lists must come from production registries.
+
+Player traits must feed the actual player social-profile resolver.
+
+NPC traits must feed the actual NPC generated-personality pipeline.
+
+Normal NPC personality values are read-only generated results until explicit override mode is enabled.
+
+### Truthful relationship kinds
+
+Normal UI must show only current production-supported authored family kinds and actual durable bond state.
+
+Future/synthetic kinds belong in diagnostics/tests only.
+
+### Dynamic friend acceptance
+
+Test at least:
+
+- below threshold remains no durable friend bond;
+- crossing configured approval/respect/familiarity gate promotes to friend;
+- promotion is server-authoritative;
+- event/memory/revisions update;
+- persistence round-trip;
+- falling slightly below threshold does not erase friend;
+- friend bond may coexist with rival/enemy standing later.
+
+### Lover proposal acceptance
+
+Test at least:
+
+- orientation/gender compatible pair;
+- incompatible pair;
+- player Gay trait same-gender compatibility;
+- player Bisexual trait compatibility;
+- family exclusion;
+- below relationship threshold proposal hidden;
+- eligible friend proposal visible;
+- Flirty vs Reserved affects acceptance policy;
+- accept -> lover;
+- reject -> friend + cooldown;
+- repeated proposal during cooldown blocked;
+- starting lover remains lover;
+- server-authoritative deterministic/seeded acceptance evidence.
+
+### Live relationship UX
+
+While relationship sliders move, the UI must show production-derived preview standing and a concise reason when important thresholds dominate.
+
+Show friend-promotion progress and romance/proposal eligibility.
+
+Applied worker value and preview value must not be silently confused.
+
+### Compare surface
+
+Replace the user-facing Sweep/Persona Matrix/Baseline workflow with one understandable comparison surface.
+
+A user must be able to choose an utterance and comparison dimension, define/accept comparison values, run the real worker, and see side-by-side outputs.
+
+### Runtime graph
+
+Required real examples:
+
+- `hello` -> semantic Flow graph;
+- `What's up?` -> semantic Hub graph;
+- authored branch -> ConversationBlock graph.
+
+All use the shared renderer/model family.
+
+### Final human-style UX gate
+
+A fresh user must be able to:
+
+1. select Player traits;
+2. select NPC traits;
+3. inspect generated NPC personality;
+4. adjust Player and NPC needs;
+5. change approval/respect/familiarity and understand the preview standing;
+6. see friend promotion;
+7. inspect romance compatibility;
+8. simulate a proposal when eligible;
+9. type `hello` and see its Flow graph;
+10. type `What's up?` and see the Hub graph/choices;
+11. use Compare without knowing what Sweep means.
+
+A passing backend suite without this real Tk/Xvfb interaction proof is insufficient.
