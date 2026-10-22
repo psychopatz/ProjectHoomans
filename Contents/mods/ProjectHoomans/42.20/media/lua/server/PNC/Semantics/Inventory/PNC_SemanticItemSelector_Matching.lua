@@ -46,12 +46,13 @@ local function containsAnyTagGroup(set, groups)
     return false
 end
 
-function Selector.Matches(item, request)
+function Selector.Matches(item, request, identity)
     request = type(request) == "table" and request or {}
     if type(item) ~= "table" then return false, "item_invalid" end
     local fullType = Internal.ItemType(item)
     if fullType == "" then return false, "item_type_missing" end
-    if request.itemID and tostring(request.itemID) ~= tostring(item.id) then
+    identity = identity or item.id
+    if request.itemID and tostring(request.itemID) ~= tostring(identity) then
         return false, "item_id_mismatch"
     end
     if request.fullType and tostring(request.fullType) ~= fullType then
@@ -129,9 +130,10 @@ function Selector.Matches(item, request)
     return true, "matched", details
 end
 
-function Internal.Score(item, request, details)
+function Internal.Score(item, request, details, identity)
     local value = 0
-    if request.itemID and tostring(request.itemID) == tostring(item.id) then
+    identity = identity or item.id
+    if request.itemID and tostring(request.itemID) == tostring(identity) then
         value = value + 1000
     end
     if request.fullType and tostring(request.fullType) == Internal.ItemType(item)

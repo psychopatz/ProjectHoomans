@@ -24,6 +24,132 @@ if type(Suggestions) ~= "table" then
 end
 Suggestions = type(Suggestions) == "table" and Suggestions or {}
 
+local function suggestionText(row)
+    local display = row and row.display or {}
+    return tostring(
+        display.label
+            or display.labelFallback
+            or display.utterance
+            or display.utteranceFallback
+            or row and (row.id or row.action)
+            or ""
+    )
+end
+
+local function suggestionTooltip(row)
+    local status = row and row.status or row and row.eligibility
+        and row.eligibility.status or ""
+    local text = PsychopatzCore and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.Text or nil
+    if status == "requires_destination"
+        or status == "selected_requires_destination"
+    then
+        return text and type(text.Resolve) == "function"
+            and text.Resolve({
+                key = "UI_PNC_Conversation_Suggestion_NeedsDestination_Tooltip",
+                fallback = "Choose a destination first.",
+            }) or "Choose a destination first."
+    end
+    if status ~= "" and string.sub(status, 1, 12) == "unavailable_" then
+        return text and type(text.Resolve) == "function"
+            and text.Resolve({
+                key = "UI_PNC_Conversation_Suggestion_Unavailable_Tooltip",
+                fallback = "Unavailable in the current situation.",
+            }) or "Unavailable in the current situation."
+    end
+    return nil
+end
+
+-- Reuse Core's native choice list for semantic projections. This is a data
+-- adapter only: Core still owns layout, scrolling, hover, click gating, and
+-- session ordering; the canonical semantic input path owns the click frame.
+local function applyCoreChoices(view, projection)
+    local choicesPart = view and view.choicesPart or nil
+    if not choicesPart or type(choicesPart.setChoices) ~= "function" then
+        return false, "core_choices_unavailable"
+    end
+    projection = type(projection) == "table" and projection or {}
+    local selectedGroup
+    local requestedGroup = projection.currentGroupID
+    for _, group in ipairs(projection.groups or {}) do
+        if group.id == requestedGroup then
+            selectedGroup = group
+            break
+        end
+    end
+    if not selectedGroup and #(projection.groups or {}) > 0 then
+        selectedGroup = projection.groups[1]
+    end
+
+    local rows = {}
+    local function append(row, enabled)
+        local frame = row and row.frame or nil
+        if type(frame) ~= "table" then return end
+        rows[#rows + 1] = {
+            id = row.id or row.action or ("semantic:" .. tostring(#rows + 1)),
+            text = suggestionText(row),
+            enabled = enabled == true,
+            tooltip = suggestionTooltip(row),
+            log = true,
+            source = {
+                semanticFrame = frame,
+                source = row.source,
+                groupID = selectedGroup and selectedGroup.id
+                    or row.groupID,
+            },
+            action = function()
+                local input = PNC.Semantics
+                    and PNC.Semantics.DialogueInput or nil
+                if not input or type(input.SubmitSemanticFrame)
+                    ~= "function"
+                then
+                    view.lastSemanticSuggestionReason =
+                        "semantic_input_unavailable"
+                    return false
+                end
+                local accepted, reason = input.SubmitSemanticFrame(
+                    view, frame
+                )
+                view.lastSemanticSuggestionReason = reason
+                return accepted
+            end,
+        }
+    end
+
+    local candidates = selectedGroup and selectedGroup.candidates
+        or projection.candidates or {}
+    for _, candidate in ipairs(candidates) do
+        append(candidate, candidate.enabled ~= false)
+    end
+    local capabilities = selectedGroup and selectedGroup.capabilities
+        or projection.permittedCapabilities or {}
+    for _, capability in ipairs(capabilities) do
+        append(capability,
+            capability.status == "eligible"
+                or capability.status == "selected_for_preflight")
+    end
+    view.semanticSuggestionRows = rows
+    if #rows < 1 then
+        -- A projection can legitimately be empty while a dependency or
+        -- current topic is unavailable. Restore the authored Core choices
+        -- when the session is idle; never expose stale choices during a
+        -- queued response.
+        if view.session and view.session.busy ~= true
+            and type(view.session.setChoices) == "function"
+        then
+            local node = view.session.currentNode or {}
+            view.session:setChoices(node.choices or {})
+        else
+            choicesPart:setChoices({})
+        end
+        return false, "semantic_choices_empty"
+    end
+    choicesPart:setChoices(rows)
+    return true, rows
+end
+
+Internal.ApplySemanticChoices = applyCoreChoices
+
 function Internal.RefreshSuggestions(view, result)
     if not view or type(result) ~= "table"
         or type(Suggestions.Build) ~= "function"
@@ -37,11 +163,7 @@ function Internal.RefreshSuggestions(view, result)
         nil
     )
     view.semanticSuggestions = projection
-    local part = view.extensionParts
-        and view.extensionParts.semanticSuggestions or nil
-    if part and type(part.setSuggestions) == "function" then
-        part:setSuggestions(projection)
-    end
+    applyCoreChoices(view, projection)
     return projection
 end
 
@@ -79,11 +201,7 @@ function Internal.RefreshRootSuggestions(view)
         decision = {},
     }, context, nil)
     view.semanticSuggestions = projection
-    local part = view.extensionParts
-        and view.extensionParts.semanticSuggestions or nil
-    if part and type(part.setSuggestions) == "function" then
-        part:setSuggestions(projection)
-    end
+    applyCoreChoices(view, projection)
     return projection
 end
 

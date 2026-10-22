@@ -158,6 +158,24 @@ T.load(
     "server",
     "PNC/Semantics/Inventory/PNC_SemanticItemSelector.lua"
 )
+local mapKeySelection, mapKeyReason = PNC.Semantics.ItemSelector.Find({
+    inventory = {
+        items = {
+            ["item:map-key"] = {
+                type = "Base.Shoes_Random",
+                stack = 1,
+            },
+        },
+    },
+}, {
+    itemID = "item:map-key",
+    fullType = "Base.Shoes_Random",
+    text = "shoes",
+})
+T.equal(mapKeyReason, "matched",
+    "item selection accepts the compact inventory map key")
+T.equal(mapKeySelection.itemID, "item:map-key",
+    "map-key identity survives selection when item.id is omitted")
 T.load(
     "ProjectHoomans",
     "server",

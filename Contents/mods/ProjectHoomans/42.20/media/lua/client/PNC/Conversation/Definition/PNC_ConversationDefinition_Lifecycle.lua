@@ -105,6 +105,14 @@ function Conversation.Open(entry, player, forcedTime)
     local definition = Conversation.BuildDefinition(entry, player, forcedTime)
     local view = PsychopatzCore.Conversation.Open(definition)
     if view then
+        -- The semantic projection is rendered through Core's native choices
+        -- part. Refresh once after Core has created the session; subsequent
+        -- semantic turns refresh the same part through the input lifecycle.
+        local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+        local internal = input and input.Internal or nil
+        if internal and type(internal.RefreshRootSuggestions) == "function" then
+            internal.RefreshRootSuggestions(view)
+        end
         -- Core's audit panel is created while Core.Open constructs the view,
         -- so publish the route marker on the shared view for its live
         -- component report.  The Hoomans overlay remains the fallback when
@@ -183,6 +191,11 @@ local function refreshForNPC(npcID)
         or view:refreshConversationSpec(updated) ~= true
     then
         return false
+    end
+    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local internal = input and input.Internal or nil
+    if internal and type(internal.RefreshRootSuggestions) == "function" then
+        internal.RefreshRootSuggestions(view)
     end
     -- Core refreshes the session and portrait, while extension parts are
     -- owned by this integration. Keep the live relationship graph in sync

@@ -33,16 +33,25 @@ function Selector.Find(record, request, options)
     local candidates = {}
     local classificationReason
     for index = 1, math.min(#ids, limit) do
-        local item = items[ids[index]]
+        local itemID = ids[index]
+        local item = items[itemID]
         if item and (options.includeLocked == true
             or item.interactionLocked ~= true)
         then
-            local matched, reason, details = Selector.Matches(item, request)
+            -- Compact inventories use the map key as the canonical identity;
+            -- `item.id` is an optional denormalized field. Keep selection
+            -- read-only while passing the key through the matcher.
+            local matched, reason, details = Selector.Matches(
+                item, request, itemID
+            )
             if matched then
                 candidates[#candidates + 1] = {
                     item = item,
+                    itemID = itemID,
                     details = details,
-                    score = Internal.Score(item, request, details),
+                    score = Internal.Score(
+                        item, request, details, itemID
+                    ),
                 }
             elseif reason == "classification_unavailable"
                 or reason == "classification_failed"
@@ -59,14 +68,14 @@ function Selector.Find(record, request, options)
         local leftType = Internal.ItemType(left.item)
         local rightType = Internal.ItemType(right.item)
         if leftType ~= rightType then return leftType < rightType end
-        return tostring(left.item.id) < tostring(right.item.id)
+        return tostring(left.itemID) < tostring(right.itemID)
     end)
     local selected = candidates[1].item
     local available = math.max(1, math.floor(tonumber(selected.stack) or 1))
     local quantity = math.max(1, math.floor(tonumber(
         request.quantity or options.quantity) or 1))
     return {
-        itemID = tostring(selected.id),
+        itemID = tostring(candidates[1].itemID),
         fullType = Internal.ItemType(selected),
         available = available,
         quantity = math.min(quantity, available),

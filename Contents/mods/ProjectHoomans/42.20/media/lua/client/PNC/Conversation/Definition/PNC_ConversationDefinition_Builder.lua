@@ -210,10 +210,11 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         -- Radio and walkie-talkie callers can opt into CRT with their own
         -- explicit conversation screenVariant.
         screenVariant = "subtle",
-        -- The semantic suggestion extension is the player-facing choice
-        -- surface for Hoomans. Core still retains choicesPart internally so
-        -- Session ordering and compatibility handlers remain unchanged.
-        choicePartVisible = false,
+        -- Core owns the single player-facing choice surface. Semantic
+        -- projections are adapted into this existing scrollable part so
+        -- authored branches, contextual actions, and compatibility handlers
+        -- share one interaction path.
+        choicePartVisible = true,
         portrait = Context.PortraitSpec(entry),
         backgroundID = Backgrounds.Get(timeID),
         theme = Palette.BuildConversationTheme(entry),
