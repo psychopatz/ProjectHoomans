@@ -39,11 +39,65 @@ T.equal(context.npcGossip.factRefs[1], pressure.factID, "statement reference")
 local death = Adapter.PublishDeath(alice, { attackerKind = "player",
     attackerID = "player:one" }, "combat", 11)
 T.truthy(death, "death fact")
+T.equal(death.payload.cause, "player", "player cause attribution")
+T.truthy(death.payload.causeKnown, "player cause is authoritative")
 T.truthy(WKG.ActorKnowledge.Get(WKG.KnowledgeState, bob.coreActorID,
     death.factID), "faction dissemination")
 local explanation = Adapter.Explain(bob, death.factID, 12)
 T.truthy(explanation, "explainability")
 T.equal(explanation.provenance, "faction", "faction provenance")
+
+local zombieDeath = Adapter.PublishDeath(alice, {
+    attackerKind = "zombie", attackerZombieID = "zombie:one",
+}, "combat", 12)
+T.equal(zombieDeath.payload.cause, "zombie", "zombie cause attribution")
+T.truthy(zombieDeath.payload.causeKnown, "zombie cause is authoritative")
+local hostileDeath = Adapter.PublishDeath(alice, {
+    attackerKind = "foreign_npc", attackerID = "npc:hostile",
+}, "combat", 13)
+T.equal(hostileDeath.payload.cause, "hostile_npc",
+    "hostile NPC cause attribution")
+T.truthy(hostileDeath.payload.causeKnown,
+    "hostile NPC cause is authoritative")
+local unknownDeath = Adapter.PublishDeath(alice, {
+    attackerKind = "environment", attackerID = "unknown",
+}, "combat", 14)
+T.equal(unknownDeath.payload.cause, "unknown",
+    "unknown cause remains unknown")
+T.falsy(unknownDeath.payload.causeKnown,
+    "unknown cause is not fabricated")
+
+local treatyKinds = {
+    "war_declared", "peace_made", "truce_started",
+    "alliance_formed", "alliance_broken",
+}
+for index, treatyKind in ipairs(treatyKinds) do
+    local treaty = Adapter.PublishIncident(
+        "faction:one", "faction:two", treatyKind,
+        { incident = { id = "incident:" .. treatyKind, severity = 0.6 } },
+        20 + index
+    )
+    T.truthy(treaty, treatyKind .. " fact")
+    T.equal(treaty.payload.incidentType, treatyKind,
+        treatyKind .. " fact kind")
+end
+local destroyed = Adapter.PublishFactionStatus(
+    "faction:one", "destroyed", "members_lost", 30)
+T.truthy(destroyed, "faction destruction fact")
+T.equal(destroyed.payload.status, "destroyed",
+    "faction destruction status")
+
+local publicFact = Adapter.Publish({
+    producer = "hoomans:public", kind = "world.state",
+    subject = { id = "world:bell", kind = "world_state" },
+    eventID = "public:bell", retention = "historical", occurredAt = 31,
+    observedAt = 31,
+})
+T.truthy(publicFact, "public fact")
+T.truthy(Adapter.AcquirePublicFact(bob, publicFact.factID, {
+    authorized = true, source = "public_broadcast", acquisitionPath = "public",
+    learnedAt = 31,
+}), "public acquisition")
 
 WKG.Reset({ maxFacts = 16, maxRefs = 8 })
 Adapter.ResetWorldStateRuntime()
