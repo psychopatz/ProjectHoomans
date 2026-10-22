@@ -307,3 +307,143 @@ Inspector must show:
 - click receipt and existing dialogue/action result.
 
 Add bounded A/B comparison and/or context-matrix execution against the real Lua worker. Matrix generation is diagnostic, not persisted per-NPC state.
+
+
+## 12. Companion bond is a separate conversational axis
+
+Directed relationship standing and pre-outbreak companion bond are different concepts and must remain independent.
+
+Conceptual actor projection:
+
+~~~lua
+actorConversationContext = {
+    relationship = {
+        approval = 70,
+        respect = 60,
+        familiarity = 100,
+        state = "friend",
+    },
+
+    bond = {
+        class = "family",
+        kind = "mother",
+        source = "starting_companion_trait",
+        term = {
+            referenceKey = "...",
+            addressKey = "...",
+        },
+    },
+}
+~~~
+
+### Bond classes
+
+Only three coarse speech classes are required:
+
+- friend
+- family
+- lover
+
+Detailed kinds remain canonical data:
+
+- friend
+- lover / partner / spouse
+- mother / father / sister / brother
+- future cousin / aunt / uncle / grandmother / grandfather / other registered kinship
+
+Do not persist bond.class separately. Derive it from the canonical relationship-kind registry.
+
+### Why both axes matter
+
+Examples:
+
+~~~text
+bond=family:mother + standing=friend
+    warm family vocabulary
+
+bond=family:mother + standing=enemy
+    hostile/guarded tone, but still mother-specific vocabulary
+
+bond=lover + standing=rival
+    intimate history with competitive/strained present tone
+
+no special bond + companion role + standing=friend
+    ordinary friendly companion speech
+~~~
+
+Bond never forces approval/respect/state.
+
+## 13. Relationship-kind vocabulary registry
+
+Use a bounded declarative registry/metadata contract for speech-facing relationship kinds.
+
+Each entry should describe at least:
+
+~~~lua
+{
+    kind = "mother",
+    class = "family",
+    termKeys = {
+        reference = "...",
+        address = "...",
+    },
+}
+~~~
+
+Existing Starting Companion definitions must register or reference their relationship kind through this metadata. Adding cousin/grandmother/etc. later should require one registry row plus translations, not edits to the speech resolver.
+
+The registry is metadata only. It does not own NPC persistence, relationship scores, recruitment, or starting-companion spawning.
+
+## 14. Family term substitution
+
+Family subtype variation belongs in localized terms rather than semantic IDs.
+
+The speech realization layer may select a family realization family and bind:
+
+~~~text
+familyTerm
+familyAddress
+~~~
+
+after resolving the detailed kind's translation term.
+
+Sentence grammar remains a complete translated phrase. Do not concatenate translated sentence fragments.
+
+If a language requires additional morphology, add a term form such as reference/address/possessive rather than multiplying semantic intent IDs.
+
+## 15. Realization coverage contract
+
+SpeechStyleContext is not accepted merely because it calculates numbers.
+
+Maintain a coverage inventory from semantic response family -> supported bond/style variants.
+
+A response family may declare:
+
+~~~text
+neutral only
+neutral + warm
+neutral + warm + terse + guarded
+friend/family/lover variants
+family term substitution
+~~~
+
+Unknown combinations fall back deterministically to the closest semantic-equivalent base phrase.
+
+Acceptance requires representative normal conversation families beyond greeting, as defined in BEHAVIORAL_COMPLETION.md.
+
+## 16. Provider registry as the discovery boundary
+
+The target state is:
+
+~~~text
+Registry.List/Collect registered providers
+    -> normalized candidates
+    -> common eligibility/privacy
+    -> dedupe
+    -> common ranking
+    -> common presentation/click frame
+~~~
+
+The central suggestions module may adapt legacy/root/flow sources, but must not need provider-specific calls for each addon/domain.
+
+Dynamic Trading becomes the reference optional provider rather than a hard-coded special case.
