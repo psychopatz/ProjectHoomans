@@ -280,6 +280,8 @@ class SemanticHarnessApp:
         primary_actions.columnconfigure(4, weight=1)
         secondary_actions = ttk.Frame(action_controls)
         secondary_actions.grid(row=1, column=0, sticky="ew", pady=(4, 0))
+        lab_actions = ttk.Frame(action_controls)
+        lab_actions.grid(row=2, column=0, sticky="ew", pady=(4, 0))
         runtime_controls = ttk.Frame(controls)
         runtime_controls.grid(row=1, column=0, sticky="ew", pady=(4, 0))
         status_controls = ttk.Frame(controls)
@@ -305,11 +307,11 @@ class SemanticHarnessApp:
         )
         self.persona_matrix_button.pack(side="left", padx=6)
         self.capture_baseline_button = ttk.Button(
-            secondary_actions, text="Capture baseline", command=self.capture_baseline
+            lab_actions, text="Capture baseline", command=self.capture_baseline
         )
         self.capture_baseline_button.pack(side="left", padx=6)
         self.replay_button = ttk.Button(
-            secondary_actions, text="Apply + replay", command=self.apply_and_replay
+            lab_actions, text="Apply + replay", command=self.apply_and_replay
         )
         self.replay_button.pack(side="left", padx=6)
         self.world_knowledge_button = ttk.Button(
