@@ -83,3 +83,9 @@ The existing production worker and Semantic Lab UI use the same Hoomans/Core pat
 The existing GUI's new `World Knowledge` trace tab is a read-only bounded projection over the live worker. The GUI test ran under `xvfb` and verified the rendered ledger, actor explanation, ranking and final source/localization fields. Scenario-owned fixture facts are visibly labeled in the projection and are not claims that a native PZ hook fired.
 
 PBrainZ receives only the existing `npcGossip` projection with same-fact metadata; it has no ledger accessor. Save/reload uses the Hoomans-owned `PNC.WorldKnowledge` ModData envelope while Core filters ephemeral and derived-current facts and actor references by retention policy.
+
+## Native Debug Hub inspector (2026-10-22)
+
+The native Project Hoomans client now registers a dedicated `pnc.worldKnowledge` tool in the existing PsychopatzCore Debug Hub. It uses the existing Core/Hoomans debug authorization and the canonical server diagnostic request path. The window is intentionally read-only: it traverses the bounded authoritative ledger projection, selected actor references, `Explain` provenance/ranking, final `npcGossip` realization and propagation trace without publishing facts or directly mutating knowledge.
+
+The implementation is Hoomans-owned and optional for DynamicTrading. DTAbstract/DTHoomans can continue to consume shared Core actor knowledge and provider facts without depending on this Hoomans UI or duplicating trader state.

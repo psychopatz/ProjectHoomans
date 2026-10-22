@@ -43,6 +43,56 @@ function Client.RequestKnowledgeDebug(npcID, showTruth, descriptorID)
     return snapshot ~= nil, reason
 end
 
+function Client.RequestWorldKnowledgeDebug(actorID, factID, options)
+    if not Client.CanUseDebug() then
+        ClientState.worldKnowledgeDebugAuthorized = false
+        ClientState.worldKnowledgeDebug = nil
+        ClientState.worldKnowledgeDebugReason = "not_authorized"
+        return false, "not_authorized"
+    end
+    options = type(options) == "table" and options or {}
+    local player = Internal.GetPlayer()
+    local args = {
+        actorID = actorID and tostring(actorID) or nil,
+        factID = factID and tostring(factID) or nil,
+        kind = options.kind,
+        producer = options.producer,
+        retention = options.retention,
+        subjectID = options.subjectID,
+        locationID = options.locationID,
+        language = options.language,
+        factLimit = options.factLimit,
+        actorLimit = options.actorLimit,
+        referenceLimit = options.referenceLimit,
+        candidateLimit = options.candidateLimit,
+        traceLimit = options.traceLimit,
+    }
+    ClientState.lastWorldKnowledgeDebugRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE,
+                Const.CMD_WORLD_KNOWLEDGE_DEBUG_REQUEST, args)
+            return true, "sent"
+        end
+        return false, "player_unavailable"
+    end
+    local service = PNC.WorldKnowledgeDebug
+    if not service or not service.BuildSnapshotForPlayer then
+        return false, "world_knowledge_debug_unavailable"
+    end
+    local snapshot, reason = service.BuildSnapshotForPlayer(player, args)
+    ClientState.worldKnowledgeDebugAuthorized = snapshot ~= nil
+    ClientState.worldKnowledgeDebug = snapshot
+    ClientState.worldKnowledgeDebugReason = reason
+    ClientState.lastWorldKnowledgeDebugReceiveAt = Core.Now()
+    if PNC.WorldKnowledgeDebugUI
+        and PNC.WorldKnowledgeDebugUI.ReceiveSnapshot
+    then
+        PNC.WorldKnowledgeDebugUI.ReceiveSnapshot(snapshot)
+    end
+    return snapshot ~= nil, reason
+end
+
 function Client.RequestNeedsDebug(groupID, npcID)
     local player = Internal.GetPlayer()
     if not Client.CanUseDebug() then

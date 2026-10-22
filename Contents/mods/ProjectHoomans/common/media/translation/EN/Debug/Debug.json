@@ -620,5 +620,12 @@
     "UI_PNC_UniqueNPCDebug_Version": "Definition version",
     "UI_PNC_Utilities_Tab": "UTILITIES",
     "UI_PNC_Utilities_Weather": "WEATHER",
-    "UI_PNC_WorldSignalScanner": "Contacts"
+    "UI_PNC_WorldSignalScanner": "Contacts",
+    "UI_PNC_DebugHub_WorldKnowledge_Title": "World Knowledge Inspector",
+    "UI_PNC_DebugHub_WorldKnowledge_Description": "Traverse authoritative facts, actor knowledge, gossip ranking, and propagation traces.",
+    "UI_PNC_WKG_Debug_Title": "WORLD KNOWLEDGE INSPECTOR",
+    "UI_PNC_WKG_Debug_Refresh": "REFRESH",
+    "UI_PNC_WKG_Debug_Actors": "ACTORS",
+    "UI_PNC_WKG_Debug_Rows": "INSPECTION",
+    "UI_PNC_WKG_Debug_Details": "DETAILS"
 }

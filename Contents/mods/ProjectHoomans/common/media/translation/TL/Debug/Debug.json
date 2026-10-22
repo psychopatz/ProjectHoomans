@@ -620,5 +620,12 @@
     "UI_PNC_UniqueNPCDebug_Version": "Bersyon ng kahulugan",
     "UI_PNC_Utilities_Tab": "MGA GAMIT",
     "UI_PNC_Utilities_Weather": "PANAHON",
-    "UI_PNC_WorldSignalScanner": "Mga contact"
+    "UI_PNC_WorldSignalScanner": "Mga contact",
+    "UI_PNC_DebugHub_WorldKnowledge_Title": "Inspektor ng Kaalaman sa Mundo",
+    "UI_PNC_DebugHub_WorldKnowledge_Description": "Suriin ang mga awtoritatibong fact, kaalaman ng actor, ranggo ng tsismis, at trace ng pagpapasa.",
+    "UI_PNC_WKG_Debug_Title": "INSPEKTOR NG KAALAMAN SA MUNDO",
+    "UI_PNC_WKG_Debug_Refresh": "I-REFRESH",
+    "UI_PNC_WKG_Debug_Actors": "MGA ACTOR",
+    "UI_PNC_WKG_Debug_Rows": "INSPEKSYON",
+    "UI_PNC_WKG_Debug_Details": "MGA DETALYE"
 }

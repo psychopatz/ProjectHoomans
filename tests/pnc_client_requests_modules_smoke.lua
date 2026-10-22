@@ -17,6 +17,7 @@ PNC = {
         CMD_WORLD_DISCOVERY_REQUEST = "WorldDiscoveryRequest",
         CMD_WORLD_DISCOVERY_ACTION = "WorldDiscoveryAction",
         CMD_REQUEST_CHARACTER = "RequestCharacterPayload",
+        CMD_WORLD_KNOWLEDGE_DEBUG_REQUEST = "RequestWorldKnowledgeDebug",
     },
     Core = {
         Now = function() return now end,
@@ -36,6 +37,10 @@ PNC = {
         CollectNPCIDs = function() return { "npc_interest" } end,
     },
     Semantics = {},
+}
+
+PsychopatzCore = {
+    Debug = { CanUse = function() return true end },
 }
 
 getSpecificPlayer = function() return { id = "player-1" } end
@@ -67,6 +72,7 @@ local required = {
     "RequestConversationRelationship", "RequestKnowledgeDebug",
     "RequestFactionDebug", "RequestFactionMembers", "RequestNeedsDebug",
     "RequestDirectorDebug", "RequestWorldEffectDebug",
+    "RequestWorldKnowledgeDebug",
 }
 for _, name in ipairs(required) do
     T.truthy(type(Client[name]) == "function",
@@ -83,6 +89,18 @@ T.equal(sent[#sent].command, "PlayerBootstrapRequest",
     "bootstrap spoke changed its network command")
 T.equal(sent[#sent].args.npcIDs[1], "npc_interest",
     "bootstrap spoke changed its interest scope payload")
+
+T.truthy(Client.RequestWorldKnowledgeDebug("alice", "fact-1", {
+    factLimit = 999,
+}), "world knowledge debug spoke was not callable")
+T.equal(sent[#sent].command, "RequestWorldKnowledgeDebug",
+    "world knowledge debug used the wrong transport")
+T.equal(sent[#sent].args.actorID, "alice",
+    "world knowledge debug lost actor ID")
+T.equal(sent[#sent].args.factID, "fact-1",
+    "world knowledge debug lost fact ID")
+T.equal(sent[#sent].args.factLimit, 999,
+    "world knowledge debug lost requested limit")
 
 T.truthy(Client.RequestSemanticCognition("npc-1", {
     subject = "identity.name",

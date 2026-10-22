@@ -1,6 +1,6 @@
 # Project Hoomans Adoption — Grounded World Knowledge & Gossip
 
-Status: PLANNED / implementation not yet accepted.
+Status: IMPLEMENTED / W0-W9 developer evidence complete; native PZ SP/MP remains user-owned validation.
 Canonical cross-repository goal: PsychopatzCore Docs/world_knowledge_gossip/.
 Project Hoomans role: authoritative Hoomans/PZ world-fact producers, dissemination policy, semantic realization and Semantic Lab acceptance.
 

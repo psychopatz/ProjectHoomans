@@ -144,3 +144,24 @@ Router.Register(Const.CMD_KNOWLEDGE_DEBUG_REQUEST,
         Network.SendKnowledgeDebug(player, snapshot, true, reason)
     end
 )
+
+Router.Register(Const.CMD_WORLD_KNOWLEDGE_DEBUG_REQUEST,
+    function(player, args, rawArgs)
+        if not Router.CanUseDebug(player) then
+            Network.SendWorldKnowledgeDebug(
+                player, nil, false, "not_authorized")
+            return
+        end
+        local snapshot
+        local reason
+        local service = PNC.WorldKnowledgeDebug
+        if service and service.BuildSnapshotForPlayer then
+            snapshot, reason = service.BuildSnapshotForPlayer(
+                player, rawArgs or args)
+        else
+            reason = "world_knowledge_debug_unavailable"
+        end
+        Network.SendWorldKnowledgeDebug(
+            player, snapshot, snapshot ~= nil, reason)
+    end
+)

@@ -13,9 +13,11 @@ local relationshipCall
 local conversationCall
 local knowledgeCalls = {}
 local knowledgeDebugCall
+local worldKnowledgeDebugCall
 local audited
 local relationshipArgs
 local debugArgs
+local worldKnowledgeDebugArgs
 local discovered
 
 PNC = {
@@ -26,6 +28,7 @@ PNC = {
         CMD_CONVERSATION_RELATIONSHIP_REQUEST = "ConversationRelationshipRequest",
         CMD_NPC_KNOWLEDGE_REQUEST = "NPCKnowledgeRequest",
         CMD_KNOWLEDGE_DEBUG_REQUEST = "KnowledgeDebugRequest",
+        CMD_WORLD_KNOWLEDGE_DEBUG_REQUEST = "WorldKnowledgeDebugRequest",
     },
     Core = { Now = function() return 123 end },
     BodyLifecycle = {
@@ -55,6 +58,9 @@ PNC = {
         end,
         SendKnowledgeDebug = function(...)
             knowledgeDebugCall = { ... }
+        end,
+        SendWorldKnowledgeDebug = function(...)
+            worldKnowledgeDebugCall = { ... }
         end,
     },
     RelationshipDebug = {
@@ -100,6 +106,14 @@ PNC = {
                 descriptorID = descriptorID,
             }
             return { kind = "knowledge_debug" }, "debug_reason"
+        end,
+    },
+    WorldKnowledgeDebug = {
+        BuildSnapshotForPlayer = function(receivedPlayer, args)
+            worldKnowledgeDebugArgs = {
+                player = receivedPlayer, args = args,
+            }
+            return { schema = "PNC.WorldKnowledgeDebug" }, "ok"
         end,
     },
 }
@@ -205,6 +219,29 @@ T.equal(debugArgs.npcID, "npc-4", "knowledge debug NPC")
 T.equal(debugArgs.showTruth, false, "knowledge show-truth flag")
 T.equal(debugArgs.descriptorID, "descriptor-1",
     "knowledge debug descriptor")
+
+player.access = ""
+Router.Handle("WorldKnowledgeDebugRequest", player, { actorID = "alice" })
+T.equal(worldKnowledgeDebugCall[2], nil,
+    "unauthorized world knowledge snapshot")
+T.equal(worldKnowledgeDebugCall[3], false,
+    "unauthorized world knowledge flag")
+T.equal(worldKnowledgeDebugCall[4], "not_authorized",
+    "unauthorized world knowledge reason")
+
+player.access = "admin"
+local worldKnowledgeArgs = { actorID = "alice", factID = "fact-1" }
+Router.Handle("WorldKnowledgeDebugRequest", player, worldKnowledgeArgs)
+T.equal(worldKnowledgeDebugArgs.player, player,
+    "world knowledge debug player")
+T.equal(worldKnowledgeDebugArgs.args, worldKnowledgeArgs,
+    "world knowledge debug request identity")
+T.equal(worldKnowledgeDebugCall[2].schema, "PNC.WorldKnowledgeDebug",
+    "world knowledge debug snapshot")
+T.equal(worldKnowledgeDebugCall[3], true,
+    "world knowledge debug authorized flag")
+T.equal(worldKnowledgeDebugCall[4], "ok",
+    "world knowledge debug reason")
 
 PNC.NPCKnowledge = nil
 knowledgeCalls = {}

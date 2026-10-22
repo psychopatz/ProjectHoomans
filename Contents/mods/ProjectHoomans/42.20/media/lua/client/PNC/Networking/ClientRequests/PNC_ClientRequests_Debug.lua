@@ -49,6 +49,7 @@ function Client.RequestDebugRoster(forceAudit)
     ClientState.debugRoster = diagnostics
     ClientState.debugAuthorized = true
     ClientState.debugAudit = PNC.BodyLifecycle and PNC.BodyLifecycle.LastAudit or {}
+    ClientState.lastDebugRosterReceiveAt = Core.Now()
     return true
 end
 

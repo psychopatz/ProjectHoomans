@@ -308,6 +308,30 @@ PsychopatzCore.DebugHub.RegisterTool({
 })
 
 PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.worldKnowledge",
+    source = "Project Hoomans",
+    order = 211.5,
+    title = translateHubText("UI_PNC_DebugHub_WorldKnowledge_Title",
+        "World Knowledge Inspector"),
+    description = translateHubText(
+        "UI_PNC_DebugHub_WorldKnowledge_Description",
+        "Traverse authoritative facts, actor knowledge, gossip ranking, and propagation traces."),
+    available = function()
+        return PNC and PNC.WorldKnowledgeDebugUI
+            and PNC.WorldKnowledgeDebugUI.Open
+            and PNC.Client and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        if PNC.WorldKnowledgeDebugUI
+            and PNC.WorldKnowledgeDebugUI.Open
+        then
+            PNC.WorldKnowledgeDebugUI.Open()
+        end
+    end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.npcTraits",
     source = "Project Hoomans",
     order = 212,

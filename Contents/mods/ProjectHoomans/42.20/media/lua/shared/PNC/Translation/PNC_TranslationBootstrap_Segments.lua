@@ -151,6 +151,7 @@ Translation.Internal.SegmentSystems = {
     DebugInfectionTerminal = "Debug",
     DebugRevive = "Debug",
     DebugHub = "Debug",
+    WKG = "Debug",
     Discovery = "Discovery",
     DiscoveryCall = "Discovery",
     DiscoveryFoundLooters = "Debug",

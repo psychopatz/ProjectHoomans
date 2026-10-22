@@ -101,4 +101,27 @@ python3 -m tools.semantic_harness.testing.performance --samples 2 --warmup 1 --s
 
 These measurements cover the real production Lua worker protocol only; native Project Zomboid engine tick cost, SP/MP scheduling and server authority remain user-owned and untested.
 
+## Native World Knowledge Inspector slice (2026-10-22)
+
+The existing Core Debug Hub now exposes a dedicated, translated `World Knowledge Inspector` tool. It is gated by the existing `PNC.Client.CanUseDebug()`/Core debug authorization on the client and `PNC.ServerCommandRouter.CanUseDebug()` on the server; no second debug toggle or ad-hoc permission path was added.
+
+The Hoomans-owned diagnostic service returns a bounded, read-only projection of the existing Core ledger and actor-knowledge state: compact facts, actor references, provenance/confidence/acquisition fields, candidate ranking, `npcGossip` statements/fact references, `Explain` ranking, propagation trace, metrics and active limits. The request uses the existing diagnostic command transport in both SP and MP. It does not create facts, grant knowledge, persist prose, enumerate zombies, or maintain a second ledger.
+
+The native window is [`PNC_WorldKnowledgeDebugWindow.lua`](../../Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/WorldKnowledge/PNC_WorldKnowledgeDebugWindow.lua) with an actor selector and bounded Facts, Knowledge, Context, Why, and Trace views. The source-of-truth remains the authoritative server-side Hoomans/Core state; the client cache is only presentation state.
+
+Evidence:
+
+```text
+python3 tests/run_tests.py pnc_world_knowledge_debug_snapshot_smoke pnc_server_diagnostic_query_command_handler_smoke pnc_client_requests_modules_smoke pnc_debug_hub_settings_location_smoke pnc_world_knowledge_smoke --verbose
+  PASS 5/5
+python3 tests/run_tests.py
+  PASS 863/863
+python3 -m unittest -v tools.semantic_harness.tests.test_world_knowledge_inspector tools.semantic_harness.tests.test_grounded_world_knowledge_gossip
+  PASS 3 tests; real production Lua worker, EN/TL and same-fact provenance
+luac -p <changed Lua files>; translation JSON validation; git diff --check
+  PASS
+```
+
+The native PZ window itself has not been launched by the agent. SP/MP live-game behavior and visual confirmation remain reserved for user validation.
+
 The authoritative-domain smoke now also covers `zombie`, `hostile_npc`, `player`, and unknown death attribution; war, peace, truce, alliance and alliance-break incident publication; faction destruction; and authorized public acquisition. Commit: `ba9f32b8`.

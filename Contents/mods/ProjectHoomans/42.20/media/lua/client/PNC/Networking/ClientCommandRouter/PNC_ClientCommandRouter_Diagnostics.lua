@@ -78,4 +78,16 @@ Internal.RegisterServerCommand(Const.CMD_WORLD_EFFECT_DEBUG, function(args)
     ClientState.lastWorldEffectDebugReceiveAt = Core.Now()
 end)
 
+Internal.RegisterServerCommand(Const.CMD_WORLD_KNOWLEDGE_DEBUG, function(args)
+    ClientState.worldKnowledgeDebugAuthorized = args.authorized == true
+    ClientState.worldKnowledgeDebug = args.snapshot
+    ClientState.worldKnowledgeDebugReason = args.reason
+    ClientState.lastWorldKnowledgeDebugReceiveAt = Core.Now()
+    if PNC.WorldKnowledgeDebugUI
+        and PNC.WorldKnowledgeDebugUI.ReceiveSnapshot
+    then
+        PNC.WorldKnowledgeDebugUI.ReceiveSnapshot(args.snapshot)
+    end
+end)
+
 return PNC.Client

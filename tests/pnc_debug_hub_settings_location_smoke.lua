@@ -34,6 +34,7 @@ PNC = {
     WorldEffectDebugUI = { Toggle = function() end },
     RelationshipDebugUI = { Toggle = function() end },
     KnowledgeDebugUI = { Open = function() end },
+    WorldKnowledgeDebugUI = { Open = function() end },
     NPCTraitDebugUI = { Toggle = function() end },
     FactionDebugUI = { Toggle = function() end },
     FactionDebugOverlay = { Toggle = function() end },
@@ -65,6 +66,7 @@ local metadata = {
     { id = "pnc.worldEffects", name = "WorldEffects" },
     { id = "pnc.relationships", name = "RelationshipInspector" },
     { id = "pnc.knowledge", name = "KnowledgeLab" },
+    { id = "pnc.worldKnowledge", name = "WorldKnowledge" },
     { id = "pnc.npcTraits", name = "NPCTraitRegistry" },
     { id = "pnc.factions", name = "FactionInspector" },
 }
