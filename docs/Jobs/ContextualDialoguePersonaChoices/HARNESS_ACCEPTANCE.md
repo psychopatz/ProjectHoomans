@@ -141,3 +141,87 @@ Measure a bounded representative conversation loop. Verify:
 Use the existing application under Xvfb for developer evidence. Show at least one real scenario where moving a relationship/personality control changes the worker's derived context and final localized realization/candidate ordering, then click a candidate through the production path.
 
 This does not substitute for user-owned native Project Zomboid SP/MP acceptance.
+
+
+## Corrective P8 acceptance — companion bonds and real parity
+
+### Relationship standing must be production-derived
+
+Normal mode must edit only approval, respect and familiarity. The displayed state must be produced by PNC.RelationshipStates.ResolveState using the same current/previous-state semantics needed for hysteresis.
+
+An independently editable relationship state is allowed only in a clearly separate malformed-data diagnostic mode.
+
+### Companion bond controls
+
+The Lab must query the production bond-kind metadata/catalog rather than own a Python list.
+
+Required current kinds:
+
+- friend
+- lover
+- mother
+- father
+- sister
+- brother
+
+Required derived classes:
+
+- friend
+- family
+- lover
+
+The UI should display:
+
+~~~text
+Bond kind
+Bond class (read-only)
+Localized reference term
+Localized address term
+~~~
+
+Adding a future cousin or grandmother registry entry must make it available without adding Tk-specific code.
+
+### Bond/standing matrix
+
+Required cases include:
+
+- friend bond + friend standing
+- friend bond + rival/enemy standing
+- mother family bond + friend standing
+- mother family bond + enemy standing
+- father family bond using the same family realization family
+- at least one synthetic future kinship registration such as cousin or grandmother using the same generic family mechanism
+- lover bond + warm standing
+- lover bond + strained/rival standing
+- ordinary companion with no special pre-outbreak bond
+
+The matrix must prove bond remains stable while standing changes.
+
+### Realization coverage view
+
+The Lab inspector should report:
+
+- semantic response family
+- whether a persona realization family exists
+- selected style variant
+- selected bond class
+- detailed bond kind
+- localized term keys and values when used
+- fallback reason when a family/style/bond combination is not authored
+
+The authoring surface should make missing coverage obvious rather than silently looking complete.
+
+### Interactive A/B workflow
+
+The user must be able to compare the current utterance, not only a hard-coded hello.
+
+Minimum workflow:
+
+1. enter or reuse an utterance;
+2. capture baseline;
+3. clone to one or more comparison rows;
+4. modify selected dials/bond/standing;
+5. run all rows through the same Lua worker;
+6. inspect final localized wording and candidate ordering.
+
+Slider controls should show numeric values while editing.
