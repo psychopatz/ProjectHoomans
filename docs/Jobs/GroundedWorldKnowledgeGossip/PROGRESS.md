@@ -1,7 +1,7 @@
 # Progress — Project Hoomans Grounded World Knowledge Adoption
 
 Updated: 2026-10-22
-Status: W0-W8 implementation/evidence complete; W9 cross-repository regression and parent acceptance remain.
+Status: W0-W9 developer implementation/evidence complete; native PZ SP/MP remains reserved for user validation.
 
 Canonical parent progress: PsychopatzCore Docs/world_knowledge_gossip/PROGRESS.md.
 
@@ -87,7 +87,7 @@ python3 skills/pz-verify/scripts/pz_verify.py --file Contents/mods/ProjectHooman
   0 errors; 0 warnings
 ```
 
-W9 remains open only for the final cross-repository regression/performance ledger and native-user handoff; native PZ SP/MP remains explicitly untested.
+W0-W9 Hoomans developer evidence is complete; native PZ SP/MP remains explicitly untested and reserved for the user.
 
 Semantic Lab worker performance evidence (non-native, 2026-10-22):
 
