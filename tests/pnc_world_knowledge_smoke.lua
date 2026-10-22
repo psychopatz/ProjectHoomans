@@ -92,4 +92,50 @@ local told = Adapter.Explain(bob, alicePressure.factID, 32)
 T.equal(told.provenance, "told", "propagation provenance")
 T.equal(told.sourceActorID, alice.coreActorID, "propagation source")
 
+-- The adopter owns only the ModData placement; Core still filters runtime
+-- observations and actor references by retention policy.
+local modData = {}
+ModData = {
+    getOrCreate = function(key)
+        modData[key] = modData[key] or {}
+        return modData[key]
+    end,
+    get = function(key) return modData[key] end,
+}
+WKG.Reset({ maxFacts = 8, maxRefs = 8 })
+local historical = Adapter.Publish({
+    producer = "hoomans:faction", kind = "faction.status",
+    subject = { id = "faction:one", kind = "faction" },
+    eventID = "faction:one:active:40", retention = "historical",
+    occurredAt = 40, observedAt = 40,
+})
+local runtime = Adapter.Publish({
+    producer = "hoomans:zombie", kind = "zombie.pressure",
+    subject = { id = "npc:alice", kind = "npc" },
+    eventID = "runtime:40", retention = "ephemeral",
+    occurredAt = 40, observedAt = 40,
+})
+T.truthy(historical and runtime, "persistence fixture facts")
+T.truthy(WKG.Acquire(alice.coreActorID, historical.factID, {
+    authorized = true, provenance = "faction", confidence = 0.9,
+    source = "faction", acquisitionPath = "faction", learnedAt = 40,
+}), "historical knowledge")
+T.truthy(WKG.Acquire(alice.coreActorID, runtime.factID, {
+    authorized = true, provenance = "experienced", confidence = 0.9,
+    source = "runtime", acquisitionPath = "runtime", learnedAt = 40,
+}), "runtime knowledge")
+T.truthy(Adapter.Save(), "Hoomans WKG save")
+T.equal(#modData["PNC.WorldKnowledge"].ledger.facts, 1,
+    "Hoomans save excludes ephemeral fact")
+WKG.Reset({ maxFacts = 8, maxRefs = 8 })
+T.truthy(Adapter.Load(), "Hoomans WKG load")
+T.truthy(WKG.Ledger.Get(WKG.LedgerState, historical.factID),
+    "historical fact reload")
+T.truthy(WKG.ActorKnowledge.Get(WKG.KnowledgeState, alice.coreActorID,
+    historical.factID), "historical actor reference reload")
+T.falsy(WKG.Ledger.Get(WKG.LedgerState, runtime.factID),
+    "ephemeral fact does not reload")
+T.falsy(WKG.ActorKnowledge.Get(WKG.KnowledgeState, alice.coreActorID,
+    runtime.factID), "ephemeral actor reference does not reload")
+
 print("pnc_world_knowledge_smoke: PASS")

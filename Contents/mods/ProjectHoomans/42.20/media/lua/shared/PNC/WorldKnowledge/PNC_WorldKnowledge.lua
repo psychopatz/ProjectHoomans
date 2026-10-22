@@ -180,7 +180,8 @@ local function localized(key, fallback, language)
         if type(value) == "string" and value ~= key then return value end
     end
     if tostring(language or ""):upper() == "TL" then
-        if key == "UI_PNC_WKG_ZombieHorde" then return "May nakita akong malaking grupo ng mga zombie." end
+        if key == "UI_PNC_WKG_ZombieObserved" then return "Nakakita ako ng malaking grupo ng mga zombie." end
+        if key == "UI_PNC_WKG_ZombieHeard" then return "Narinig kong may malaking grupo ng mga zombie sa paligid." end
         if key == "UI_PNC_WKG_Death" then return "May namatay; hindi ko alam ang buong detalye." end
         if key == "UI_PNC_WKG_Faction" then return "May balita tungkol sa isang pangkat." end
     end
@@ -192,9 +193,9 @@ function Adapter.RenderFact(fact, reference, options)
     local language = options and options.language
     if fact.kind == "zombie.pressure" then
         if provenance == "experienced" or provenance == "witnessed" then
-            return localized("UI_PNC_WKG_ZombieHorde", "I saw a large group of zombies nearby.", language)
+            return localized("UI_PNC_WKG_ZombieObserved", "I saw a large group of zombies nearby.", language)
         end
-        return localized("UI_PNC_WKG_ZombieHorde", "I heard there is heavy zombie pressure nearby.", language)
+        return localized("UI_PNC_WKG_ZombieHeard", "I heard there is heavy zombie pressure nearby.", language)
     end
     if fact.kind == "npc.death" then
         if provenance == "told" or provenance == "radio" then

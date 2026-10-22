@@ -1,7 +1,7 @@
 # Progress — Project Hoomans Grounded World Knowledge Adoption
 
 Updated: 2026-10-22
-Status: IN PROGRESS; W0 complete and W2 producer/conversation adapter implemented, with W3-W6 remaining.
+Status: W0-W8 implementation/evidence complete; W9 cross-repository regression and parent acceptance remain.
 
 Canonical parent progress: PsychopatzCore Docs/world_knowledge_gossip/PROGRESS.md.
 
@@ -45,3 +45,58 @@ python3 -m unittest tools.semantic_harness.tests.test_automatic_flow_generation.
 The same adapter now exposes `AcquirePublicFact` and `PropagateConversation`. Propagation requires an authorized conversation/radio/faction opportunity, transfers at most the Core bound, records told/radio provenance and cooldowns, and keeps a bounded acceptance/rejection trace. The smoke test proves Alice-known/Bob-unknown/no statement, Alice-to-Bob transfer, same fact ID, told provenance, world-state initial/transition facts, unchanged-state dedupe and truthful water unknown.
 
 Completed the bounded source/authority audit without adding production state. Exact local/remote state, the zombie census/cache relationship, faction/death publication points, PZ API limitation, conversation worker before-state, and DT boundary are recorded in `AUDIT.md` and Core `Docs/world_knowledge_gossip/PROGRESS.md`. The current dirty PNC files remain untouched. Next phase is Core W1, then Hoomans W2-W6.
+
+## W5/W6 Semantic Lab, PBrainZ and worker evidence (2026-10-22)
+
+The existing Semantic Lab production worker now loads the production Core World Knowledge and Hoomans adapters. Its existing command router exposes bounded `WORLD_KNOWLEDGE_INSPECT` and `WORLD_KNOWLEDGE_PROPAGATE` commands; the Python worker facade exposes the same operations. The scenario fixture is explicitly marked `scenarioOwned` and uses the production Core ledger, actor references, ranking, rendering, cognition projection and client transport. No JSON-only simulator or second parser was added.
+
+The existing PBrainZ dialogue-facts projection now carries the same bounded `factRefs`, provenance, confidence and source from `npcGossip`; it never reads the global ledger. The existing dialogue input lifecycle carries the authorized fact references/source into the response projection where that path is available.
+
+Real worker evidence:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_grounded_world_knowledge_gossip -v
+  2 tests PASS; EN observed/told/no-news, TL observed realization, zero LLM path
+python3 -m unittest tools.semantic_harness.tests.test_world_knowledge_inspector -v
+  PASS; ledger, actor explanation, ranking, provenance, final source/localization
+python3 tests/run_tests.py pbrainz_world_knowledge_smoke --verbose
+  PASS; PBrainZ receives the same fact ID/provenance/source
+```
+
+The mandatory Alice/Bob scenario is real production Lua worker evidence: Alice can report a witnessed fact, Bob initially receives no statement and selects the existing truthful unknown route, explicit authorized conversation propagation gives Bob the same fact ID with `told` provenance, and Bob then says he heard it.
+
+## W8 Semantic Lab GUI evidence (2026-10-22)
+
+The existing Semantic Lab Simulation trace notebook now includes a first-class `World Knowledge` tab and toolbar action. It renders a bounded projection containing Fact Ledger, Actor Knowledge, Propagation Trace, candidate ranking/why data, authorization/rejection reason, and final realization source/localization. It uses the existing `LuaSemanticWorker` session and does not create a second app.
+
+```text
+xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_world_knowledge_gui -v
+  PASS; existing Tk Semantic Lab pane rendered live worker inspection
+```
+
+The worker router was also Kahlua-checked after the inspection addition; its pre-existing `next()` calls were replaced with a local `pairs()` helper so the touched file has zero Kahlua errors.
+
+## W9 adopter persistence evidence (2026-10-22)
+
+`pnc_world_knowledge_smoke.lua` now stubs the existing `PNC.WorldKnowledge` ModData owner, saves a historical fact and an ephemeral runtime observation, reloads through the production adapter, and verifies only the historical fact/reference survives. This is an owner-boundary fixture, not native PZ save evidence.
+
+```text
+python3 tests/run_tests.py pnc_world_knowledge_smoke --verbose
+  PASS 1/1
+python3 skills/pz-verify/scripts/pz_verify.py --file Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/WorldKnowledge/PNC_WorldKnowledge.lua --kahlua --no-snippets
+  0 errors; 0 warnings
+```
+
+W9 remains open only for the final cross-repository regression/performance ledger and native-user handoff; native PZ SP/MP remains explicitly untested.
+
+Semantic Lab worker performance evidence (non-native, 2026-10-22):
+
+```text
+python3 -m tools.semantic_harness.testing.performance --samples 2 --warmup 1 --serial-turns 8
+  PASS; recognized-follow median 361.68ms/165.86ms (provider disabled/enabled)
+  PASS; wellbeing median 278.28ms/160.55ms
+  PASS; unknown fallback median 340.41ms/164.84ms
+  PASS; serialized worker bounded at maxRecentDialogueTurns=6 and maxRecentSemanticEvents=8
+```
+
+These measurements cover the real production Lua worker protocol only; native Project Zomboid engine tick cost, SP/MP scheduling and server authority remain user-owned and untested.

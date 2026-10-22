@@ -75,3 +75,11 @@ The shared adapter is loaded by the existing Hoomans compositions and the existi
 ## W3/W4 implementation evidence (2026-10-22)
 
 World-state observation is deliberately guarded. The default reader calls only the audited candidate methods when those methods are actually present; any unavailable or errored method becomes an explicit unknown state. An adopter or exact Build 42.20 owner can inject the verified reader without changing the ledger contract. No global zombie enumeration or periodic all-actor scan was added. Propagation is an explicit event API for a real bounded conversation/radio/faction opportunity, with authorization, dedupe and cooldown checks; it is not a polling social simulation.
+
+## W5-W8 implementation evidence (2026-10-22)
+
+The existing production worker and Semantic Lab UI use the same Hoomans/Core path: `PNC.WorldKnowledge.BuildConversationContext` produces bounded candidates and `npcGossip`, `PNC_SemanticCognitionService` projects it through the existing `GOSSIP_RECEIVED` route, and the client/PBrainZ surfaces retain the same fact references. `WORLD_KNOWLEDGE_INSPECT` explains fact ID, producer, learned/acquisition path, source actor, confidence, timing, ranking and final realization. `WORLD_KNOWLEDGE_PROPAGATE` is explicit and authorized.
+
+The existing GUI's new `World Knowledge` trace tab is a read-only bounded projection over the live worker. The GUI test ran under `xvfb` and verified the rendered ledger, actor explanation, ranking and final source/localization fields. Scenario-owned fixture facts are visibly labeled in the projection and are not claims that a native PZ hook fired.
+
+PBrainZ receives only the existing `npcGossip` projection with same-fact metadata; it has no ledger accessor. Save/reload uses the Hoomans-owned `PNC.WorldKnowledge` ModData envelope while Core filters ephemeral and derived-current facts and actor references by retention policy.

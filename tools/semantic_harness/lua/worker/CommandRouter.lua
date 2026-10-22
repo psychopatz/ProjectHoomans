@@ -2,6 +2,12 @@
 
 local CommandRouter = {}
 
+local function hasEntries(value)
+    if type(value) ~= "table" then return false end
+    for _ in pairs(value) do return true end
+    return false
+end
+
 local capabilities = {
     "CONFIG", "RESET", "INPUT", "LANGUAGE", "TOOL_REPLY",
     "PREVIEW", "SNAPSHOT", "FLOW_CATALOG", "FLOW_VALIDATE",
@@ -146,7 +152,7 @@ local function knowledgeMetrics(context, payload)
         and knowledge.Registry or raw
     local hasKnowledge = canonicalKnowledge
         and type(canonicalKnowledge.byCharacter) == "table"
-        and next(canonicalKnowledge.byCharacter) ~= nil
+        and hasEntries(canonicalKnowledge.byCharacter)
     local knowledgeSerialized = hasKnowledge
         and context.Protocol.encode(canonicalKnowledge) or ""
     local modDataSerialized = raw and context.Protocol.encode(raw) or ""
@@ -185,7 +191,7 @@ local function knowledgeMetrics(context, payload)
         knowledgeStorageBytes = #knowledgeSerialized,
         combinedStorageBytes = #combinedSerialized,
         modDataSnapshotBytes = #modDataSerialized,
-        actorRecordPresent = next(actor) ~= nil,
+        actorRecordPresent = hasEntries(actor),
         backstoryMetadataPresent = backstoryMetadata ~= nil,
         persisted = raw ~= nil,
         characterCount = characterCount,
@@ -281,9 +287,16 @@ local function worldKnowledgeInspect(context, payload)
             })
         end
     end
+    local realization = worldContext and worldContext.npcGossip or {
+        statements = {}, factRefs = {},
+    }
+    realization.source = "world_knowledge"
+    realization.language = (Runtime.scenario and Runtime.scenario.runtime
+        and Runtime.scenario.runtime.language) or "EN"
     return {
         ok = true,
         type = "world_knowledge_inspection",
+        actorID = actorID,
         scenarioOwned = Runtime.worldKnowledgeScenario ~= nil,
         ledger = {
             facts = facts,
@@ -296,9 +309,7 @@ local function worldKnowledgeInspect(context, payload)
         corePropagationTrace = Values.copy(core.Trace),
         candidates = worldContext and worldContext.worldKnowledge
             and worldContext.worldKnowledge.candidates or {},
-        finalRealization = worldContext and worldContext.npcGossip or {
-            statements = {}, factRefs = {},
-        },
+        finalRealization = realization,
         explanation = actorID and payload.factID
             and core.Explain(actorID, payload.factID, Runtime.now) or nil,
     }

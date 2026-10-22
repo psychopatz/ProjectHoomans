@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from ..inspection.conversation_inspector import build_conversation_inspector
+from ..inspection.world_knowledge import build_world_knowledge_inspector
 from ..codebuilder.service import SemanticLabAuthoringService
 from ..studio.block_registry import SemanticBlockRegistryPane
 from ..studio.dataset_library import DatasetLibraryPane
@@ -300,6 +301,12 @@ class SemanticHarnessApp:
             secondary_actions, text="Snapshot", command=self.show_snapshot
         )
         self.snapshot_button.pack(side="left")
+        self.world_knowledge_button = ttk.Button(
+            secondary_actions,
+            text="World knowledge",
+            command=self.inspect_world_knowledge,
+        )
+        self.world_knowledge_button.pack(side="left", padx=6)
         self.restart_button = ttk.Button(
             secondary_actions, text="Restart worker", command=self.restart
         )
@@ -370,6 +377,15 @@ class SemanticHarnessApp:
         )
         self.suggestion_inspector.grid(row=0, column=0, sticky="nsew")
         self.trace_tabs.add(suggestion_trace_frame, text="Suggestions + predicates")
+
+        world_knowledge_frame = ttk.Frame(self.trace_tabs)
+        world_knowledge_frame.rowconfigure(0, weight=1)
+        world_knowledge_frame.columnconfigure(0, weight=1)
+        self.world_knowledge_inspector = ScrolledText(
+            world_knowledge_frame, wrap="none", state="disabled"
+        )
+        self.world_knowledge_inspector.grid(row=0, column=0, sticky="nsew")
+        self.trace_tabs.add(world_knowledge_frame, text="World Knowledge")
 
         editor_notebook = ttk.Notebook(editor_tab)
         editor_notebook.grid(row=0, column=0, sticky="nsew")
@@ -455,6 +471,7 @@ class SemanticHarnessApp:
             self.preview_button,
             self.save_button,
             self.snapshot_button,
+            self.world_knowledge_button,
         ):
             button.configure(state=state)
         self.language_box.configure(state="readonly" if enabled and not self.busy else "disabled")
@@ -821,6 +838,7 @@ class SemanticHarnessApp:
             self._set_text(self.authority, "")
             self._set_text(self.trace, "")
             self._set_text(self.suggestion_inspector, "")
+            self._set_text(self.world_knowledge_inspector, "")
             self.suggestion_rows = []
             self.suggestion_interactive = False
             self._render_suggestions(
@@ -888,6 +906,28 @@ class SemanticHarnessApp:
         self._start_operation(
             lambda worker: worker.snapshot(),
             self._show_response,
+        )
+
+    def inspect_world_knowledge(self) -> None:
+        """Render bounded World Knowledge evidence from the live Lua worker."""
+
+        if not self.session.ready or self.busy:
+            return
+        npc = self.scenario.get("npc", {})
+        actor_id = npc.get("coreActorID") or npc.get("actorID")
+
+        def finish(response: dict[str, Any]) -> None:
+            view = build_world_knowledge_inspector(response)
+            self._set_text(self.world_knowledge_inspector, pretty(view))
+            self.trace_tabs.select(4)
+            self._append(
+                "SYSTEM",
+                "World Knowledge inspection refreshed from the production Lua worker.",
+            )
+
+        self._start_operation(
+            lambda worker: worker.world_knowledge_inspect(actor_id=actor_id),
+            finish,
         )
 
     def refresh_flow_catalog(self) -> None:
