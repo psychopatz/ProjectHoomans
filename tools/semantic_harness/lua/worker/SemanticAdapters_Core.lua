@@ -208,6 +208,130 @@ function Provider.configure(context, SemanticAdapters)
             memoryType = effect.memoryType,
         }
     end
+    local function proposalEvaluation(npcID)
+        local relationship = relationshipFor(npcID)
+        local npcProfile = context.npcPersonality or {}
+        local playerProfile = context.playerSocialProfile or {}
+        local npcGender = npcData.gender
+            or npcData.identity and npcData.identity.gender
+        local playerGender = playerData.gender
+        local compatible = false
+        local available = npcData.alive ~= false
+            and npcData.available ~= false
+            and npcData.healthState ~= "dead"
+            and playerData.alive ~= false
+        local targetKey = "player:harness:"
+            .. tostring(playerData.characterUUID or "")
+        if PNC.SocialProfileMath
+            and type(PNC.SocialProfileMath.AreMutuallyOrientationCompatible)
+                == "function"
+        then
+            compatible = PNC.SocialProfileMath
+                .AreMutuallyOrientationCompatible(
+                    npcProfile,
+                    npcGender == "female",
+                    playerProfile,
+                    playerGender == "female"
+                ) == true
+        end
+        local evaluation = PNC.RelationshipProposalPolicy
+            .EvaluateEligibility(
+                relationship,
+                relationship.bond or { class = "none" },
+                compatible,
+                available,
+                tonumber(Runtime.now) or 0
+            )
+        evaluation.action = PNC.RelationshipProposalPolicy.ActionID()
+        evaluation.targetKey = targetKey
+        evaluation.relationship = relationship
+        evaluation.bond = Values.copy(relationship.bond)
+        evaluation.npcProfile = Values.copy(npcProfile)
+        evaluation.playerProfile = Values.copy(playerProfile)
+        evaluation.npcGender = npcGender
+        evaluation.playerGender = playerGender
+        return evaluation
+    end
+    PNC.Relationships.EvaluateProposal = proposalEvaluation
+    PNC.Relationships.Propose = function(npcID)
+        local evaluation = proposalEvaluation(npcID)
+        local relationship = evaluation.relationship
+        local acceptance
+        local accepted
+        local eventType
+        local eventID
+        if not evaluation.eligible then
+            evaluation.accepted = false
+            evaluation.result = "blocked"
+            evaluation.serverAuthoritative = true
+            return false, evaluation.reason, evaluation
+        end
+        acceptance = PNC.RelationshipProposalPolicy.EvaluateAcceptance(
+            npcData.identitySeed or npcData.npcID,
+            evaluation.targetKey .. ":" .. tostring(relationship.revision)
+                .. ":" .. PNC.RelationshipProposalPolicy.ActionID(),
+            relationship,
+            context.npcPersonality
+        )
+        accepted = acceptance.accepted == true
+        eventType = accepted
+            and "relationship_proposal_accepted"
+            or "relationship_proposal_rejected"
+        eventID = "social:" .. eventType .. ":" .. tostring(npcID)
+            .. ":" .. tostring(relationship.revision + 1)
+        relationship.memories = relationship.memories or {}
+        relationship.memories[#relationship.memories + 1] = {
+            id = eventID,
+            type = eventType,
+            aboutKey = evaluation.targetKey,
+            createdAt = tonumber(Runtime.now) or 0,
+            permanent = accepted,
+            strength = accepted and 1 or 0.5,
+        }
+        while #relationship.memories > 20 do
+            table.remove(relationship.memories, 1)
+        end
+        if accepted then
+            relationship.bond = {
+                schemaVersion = 1,
+                class = "lover",
+                kind = nil,
+                establishedAt = tonumber(Runtime.now) or 0,
+                source = "relationship_proposal",
+            }
+        else
+            relationship.cooldowns = relationship.cooldowns or {}
+            relationship.cooldowns[
+                PNC.RelationshipProposalPolicy.CooldownType()
+            ] = (tonumber(Runtime.now) or 0)
+                + PNC.RelationshipProposalPolicy.CooldownHours(
+                    context.npcPersonality.romanceStyle
+                )
+        end
+        relationship.revision = (tonumber(relationship.revision) or 0) + 1
+        npcData.relationship = Values.copy(relationship)
+        Runtime.socialEvents = Runtime.socialEvents or {}
+        Runtime.socialEvents[#Runtime.socialEvents + 1] = {
+            type = eventType,
+            eventID = eventID,
+            action = PNC.RelationshipProposalPolicy.ActionID(),
+            at = tonumber(Runtime.now) or 0,
+        }
+        while #Runtime.socialEvents > 20 do
+            table.remove(Runtime.socialEvents, 1)
+        end
+        evaluation.acceptance = acceptance
+        evaluation.accepted = accepted
+        evaluation.result = accepted and "accepted" or "rejected"
+        evaluation.serverAuthoritative = true
+        evaluation.relationship = Values.copy(relationship)
+        evaluation.bond = Values.copy(relationship.bond)
+        evaluation.cooldownUntil = relationship.cooldowns
+            and relationship.cooldowns[
+                PNC.RelationshipProposalPolicy.CooldownType()
+            ] or nil
+        return true, evaluation.result, evaluation
+    end
     PNC.RelationshipPresentation = PNC.RelationshipPresentation or {}
     PNC.RelationshipPresentation.Summarize = function(value)
         return Values.copy(value)

@@ -113,6 +113,12 @@ class LuaSemanticWorker:
     def snapshot(self) -> dict[str, Any]:
         return self._request("SNAPSHOT")
 
+    def relationship_proposal(self, npc_id: str | None = None) -> dict[str, Any]:
+        """Submit the canonical proposal action to the server-authority seam."""
+
+        payload = {"npcID": npc_id} if npc_id else None
+        return self._request("RELATIONSHIP_PROPOSAL", payload)
+
     def conversation_graph(self) -> dict[str, Any]:
         """Return the developer-only full selected ConversationBlock graph."""
 

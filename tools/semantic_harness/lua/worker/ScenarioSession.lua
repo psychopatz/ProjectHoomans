@@ -6,6 +6,51 @@ local InventoryFixtures = require "worker/InventoryFixtures"
 
 local ScenarioSession = {}
 
+local function relationshipProposalProjection(context)
+    local Values = context.Values
+    local npc = context.Runtime.scenario
+        and context.Runtime.scenario.npc or {}
+    local evaluate = PNC.Relationships
+        and PNC.Relationships.EvaluateProposal
+    if type(evaluate) ~= "function" then
+        return {
+            schema = "semantic.relationship.proposal.v1",
+            action = "RELATIONSHIP_PROPOSAL",
+            eligible = false,
+            reason = "relationship_proposal_unavailable",
+        }
+    end
+    local result = evaluate(npc.npcID)
+    if type(result) ~= "table" then
+        return {
+            schema = "semantic.relationship.proposal.v1",
+            action = "RELATIONSHIP_PROPOSAL",
+            eligible = false,
+            reason = "relationship_proposal_unavailable",
+        }
+    end
+    return {
+        schema = "semantic.relationship.proposal.v1",
+        action = result.action or "RELATIONSHIP_PROPOSAL",
+        eligible = result.eligible == true,
+        compatible = result.compatible == true,
+        available = result.available == true,
+        reason = result.reason,
+        cooldownUntil = result.cooldownUntil,
+        cooldownRemaining = result.cooldownRemaining,
+        thresholds = Values.copy(result.thresholds),
+        bond = Values.copy(result.bond),
+        standing = result.relationship
+            and result.relationship.state or "unknown",
+        approval = result.relationship
+            and result.relationship.approval or 0,
+        respect = result.relationship
+            and result.relationship.respect or 0,
+        familiarity = result.relationship
+            and result.relationship.familiarity or 0,
+    }
+end
+
 local function simulationProjection(context)
     local Values = context.Values
     local scenario = context.Runtime.scenario or {}
@@ -34,6 +79,7 @@ local function simulationProjection(context)
                 or npc.identity and npc.identity.seed or npc.npcID,
             archetype = npc.archetype or npc.archetypeID or "General",
         },
+        relationship = relationshipProposalProjection(context),
     }
 end
 
@@ -43,6 +89,7 @@ ScenarioSession.initialScenario = {
         forename = "Patrick",
         surname = "Patz",
         displayName = "Patrick Patz",
+        gender = "male",
         needs = {
             hunger = 0.2,
             thirst = 0.4,
@@ -58,6 +105,7 @@ ScenarioSession.initialScenario = {
         forename = "Mara",
         surname = "Vale",
         identityState = "unknown",
+        gender = "female",
         identitySeed = "npc_mara",
         archetype = "General",
         needs = {
@@ -253,5 +301,8 @@ function ScenarioSession.snapshot(context)
         simulationProjection = simulationProjection(context),
     }
 end
+
+ScenarioSession.simulationProjection = simulationProjection
+ScenarioSession.relationshipProposalProjection = relationshipProposalProjection
 
 return ScenarioSession

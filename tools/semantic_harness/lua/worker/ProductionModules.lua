@@ -199,9 +199,15 @@ function ProductionModules.load(context)
     )
     load(
         "ProjectHoomans", "shared",
-        "PNC/Core/Relationships/PNC_RelationshipConstants.lua",
-        "social_authority"
-    )
+    "PNC/Core/Relationships/PNC_RelationshipConstants.lua",
+    "social_authority"
+)
+load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Relationships/PNC_RelationshipProposalPolicy.lua",
+    "social_authority"
+)
     load(
         "ProjectHoomans", "shared",
         "PNC/Core/Relationships/PNC_RelationshipKindRegistry.lua",

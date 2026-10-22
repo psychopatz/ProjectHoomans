@@ -744,6 +744,8 @@ class SemanticHarnessApp:
             self.world_knowledge_button,
         ):
             button.configure(state=state)
+        if hasattr(self, "proposal_button"):
+            self.proposal_button.configure(state=state)
         if self.language_box is not None:
             self.language_box.configure(
                 state="readonly" if enabled and not self.busy else "disabled"
@@ -918,6 +920,27 @@ class SemanticHarnessApp:
             if isinstance(bond, dict):
                 return bond.get("kind") or bond.get("class") or "none"
             return control.get("currentValue", "none")
+        if control_id in {
+            "relationship.romanceCompatibility",
+            "relationship.proposalThreshold",
+            "relationship.proposalCooldown",
+            "relationship.proposalAvailable",
+        }:
+            proposal = self.simulation_projection.get("relationship", {})
+            if not isinstance(proposal, dict):
+                proposal = {}
+            if control_id == "relationship.romanceCompatibility":
+                return "compatible" if proposal.get("compatible") is True else "incompatible"
+            if control_id == "relationship.proposalThreshold":
+                thresholds = proposal.get("thresholds") or {}
+                return (
+                    f"Approval {thresholds.get('approval', 85)} · "
+                    f"Respect {thresholds.get('respect', 60)} · "
+                    f"Familiarity {thresholds.get('familiarity', 80)}"
+                )
+            if control_id == "relationship.proposalCooldown":
+                return f"{float(proposal.get('cooldownRemaining') or 0):.1f}h"
+            return "yes" if proposal.get("eligible") is True else "no"
         if control_id == "npc.personalityMode":
             response = self.last_response if isinstance(self.last_response, dict) else {}
             context = response.get("contextAfter") or response.get("context") or {}
@@ -1047,6 +1070,21 @@ class SemanticHarnessApp:
                 field.widget.configure(textvariable=self.language_var)
                 self.language_box = field.widget
             self.workbench_control_fields[str(control["id"])] = field
+        relationship_page = pages.get(("Relationship", "Overview"))
+        if relationship_page is not None:
+            proposal_row = (rows_by_page[("Relationship", "Overview")] + 1) // 2 + 1
+            self.proposal_button = self._ttk.Button(
+                relationship_page,
+                text="Propose relationship",
+                command=self.propose_relationship,
+            )
+            self.proposal_button.grid(
+                row=proposal_row,
+                column=0,
+                columnspan=2,
+                sticky="w",
+                pady=(8, 3),
+            )
         override_field = self.workbench_control_fields.get("npc.personalityOverride")
         if override_field is not None and override_field.variable is not None:
             override_field.variable.trace_add(
@@ -1221,6 +1259,21 @@ class SemanticHarnessApp:
                 self.scenario.setdefault("npc", {}).setdefault("relationship", {})[
                     "bond"
                 ] = deepcopy(bond)
+            for control_id in (
+                "relationship.state",
+                "relationship.bond",
+                "relationship.romanceCompatibility",
+                "relationship.proposalThreshold",
+                "relationship.proposalCooldown",
+                "relationship.proposalAvailable",
+            ):
+                field = self.workbench_control_fields.get(control_id)
+                control = next(
+                    (item for item in self.workbench_controls if item.get("id") == control_id),
+                    None,
+                )
+                if field is not None and control is not None:
+                    field.set_value(self._scenario_control_value(control, self.scenario))
             self._update_generated_personality_controls()
 
     def _show_response(self, response: dict[str, Any]) -> None:
@@ -1593,6 +1646,29 @@ class SemanticHarnessApp:
         self._start_operation(
             lambda worker: worker.snapshot(),
             self._show_response,
+        )
+
+    def propose_relationship(self) -> None:
+        """Submit the one canonical relationship proposal action."""
+
+        if not self.session.ready or self.busy:
+            return
+
+        def finish(response: dict[str, Any]) -> None:
+            self._show_response(response)
+            proposal = response.get("proposal") or {}
+            if response.get("accepted") is True:
+                message = "NPC accepted the relationship proposal."
+            elif response.get("reason"):
+                message = f"Relationship proposal: {response['reason']}"
+            else:
+                message = "NPC rejected the relationship proposal."
+            self._append("SYSTEM", message)
+            self.workbench_status_var.set(message)
+
+        self._start_operation(
+            lambda worker: worker.relationship_proposal(),
+            finish,
         )
 
     def capture_baseline(self) -> None:

@@ -14,6 +14,7 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "forename": "Patrick",
         "surname": "Patz",
         "displayName": "Patrick Patz",
+        "gender": "male",
         "needs": {
             "hunger": 0.2,
             "thirst": 0.4,
@@ -66,6 +67,7 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "identityState": "unknown",
         "healthState": "healthy",
         "activeBehavior": "idle",
+        "gender": "female",
         "identitySeed": "npc_mara",
         "archetype": "General",
         "needs": {
@@ -247,6 +249,9 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
         traits = owner.get("traits")
         if traits is not None and not isinstance(traits, (list, dict)):
             raise ValueError(f"{owner_name}.traits must be an array or object")
+        gender = owner.get("gender")
+        if gender is not None and not isinstance(gender, (str, bool)):
+            raise ValueError(f"{owner_name}.gender must be a string or boolean")
     for field in ("identitySeed", "archetype"):
         value = npc.get(field)
         if value is not None and not isinstance(value, (str, int, float)):

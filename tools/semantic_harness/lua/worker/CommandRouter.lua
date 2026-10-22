@@ -11,6 +11,7 @@ end
 local capabilities = {
     "CONFIG", "RESET", "INPUT", "LANGUAGE", "TOOL_REPLY",
     "PREVIEW", "SNAPSHOT", "CONVERSATION_GRAPH", "FLOW_CATALOG", "FLOW_VALIDATE",
+    "RELATIONSHIP_PROPOSAL",
     "SUGGESTION_PREDICATE", "SUGGESTION_CLICK",
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
@@ -354,6 +355,12 @@ local function simulationControlCatalog(context, payload)
         workbench = true, workbenchPanel = "Player", workbenchTab = "Overview",
         workbenchSection = "Overview",
     })
+    add("player.gender", "player.gender", "Actors", "Player", "Gender", "combobox", "enum", {
+        options = persona.identity.genders,
+        optionsSource = "semantic_lab.harness",
+        workbench = true, workbenchPanel = "Player", workbenchTab = "Overview",
+        workbenchSection = "Overview",
+    })
     add("player.traits", "player.traits", "Actors", "Player", "Registered player traits", "multi_select", "array", {
         options = playerTraitOptions,
         optionsSource = "PsychopatzCore.Traits / PNC.SocialTraits",
@@ -395,7 +402,7 @@ local function simulationControlCatalog(context, payload)
         workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
         workbenchSection = "Overview",
     })
-    add("npc.gender", "npc.identity.gender", "Actors", "NPC", "Gender", "combobox", "enum", {
+    add("npc.gender", "npc.gender", "Actors", "NPC", "Gender", "combobox", "enum", {
         options = persona.identity.genders,
         optionsSource = "semantic_lab.harness",
         workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
@@ -492,11 +499,39 @@ local function simulationControlCatalog(context, payload)
         and context.npcData.relationship.bond or nil
     local durableBondLabel = durableBond
         and (durableBond.kind or durableBond.class) or "none"
+    local proposal = context.ScenarioSession
+        and context.ScenarioSession.relationshipProposalProjection
+        and context.ScenarioSession.relationshipProposalProjection(context)
+        or {}
     add("relationship.bond", nil, "Persona", "Relationship", "Durable bond", "read_only", "text", {
         currentValue = durableBondLabel,
         source = "production.relationship.bond",
         workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
         workbenchSection = "Context",
+    })
+    add("relationship.romanceCompatibility", nil, "Persona", "Relationship", "Romance compatibility", "read_only", "text", {
+        currentValue = proposal.compatible == true and "compatible" or "incompatible",
+        source = "production.social_profile_math",
+        workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
+        workbenchSection = "Romance proposal",
+    })
+    add("relationship.proposalThreshold", nil, "Persona", "Relationship", "Proposal threshold", "read_only", "text", {
+        currentValue = "Approval 85 · Respect 60 · Familiarity 80",
+        source = "PNC.RelationshipConstants",
+        workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
+        workbenchSection = "Romance proposal",
+    })
+    add("relationship.proposalCooldown", nil, "Persona", "Relationship", "Proposal cooldown", "read_only", "text", {
+        currentValue = proposal.cooldownRemaining or 0,
+        source = "production.relationship.bond",
+        workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
+        workbenchSection = "Romance proposal",
+    })
+    add("relationship.proposalAvailable", nil, "Persona", "Relationship", "Proposal available", "read_only", "text", {
+        currentValue = proposal.eligible == true and "yes" or "no",
+        source = "production.relationship.proposal_policy",
+        workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
+        workbenchSection = "Romance proposal",
     })
 
     add("player.inventory", "player.inventory", "Inventories", "Player", "Player inventory", "structured_collection", "object", {
@@ -856,27 +891,8 @@ function CommandRouter.hello(context)
         headlessRequires = Runtime.headlessRequires,
         personaCatalog = personaCatalog(context),
         simulationControlCatalog = simulationControlCatalog(context),
-        simulationProjection = {
-            schema = "semantic.simulation.actor.projection.v1",
-            player = {
-                needs = context.Values.copy(context.playerData
-                    and context.playerData.needs or context.world),
-                traits = context.Values.copy(context.playerData
-                    and context.playerData.traits or {}),
-                socialProfile = context.Values.copy(context.playerSocialProfile),
-            },
-            npc = {
-                needs = context.Values.copy(context.npcData
-                    and context.npcData.needs or context.world),
-                traits = context.Values.copy(context.npcData
-                    and context.npcData.traits or {}),
-                bond = context.Values.copy(context.npcData
-                    and context.npcData.relationship
-                    and context.npcData.relationship.bond),
-                personality = context.Values.copy(context.npcPersonality),
-                personalityMode = context.npcPersonalityMode or "generated",
-            },
-        },
+        simulationProjection = context.ScenarioSession
+            .simulationProjection(context),
         suggestions = context.Values.copy(
             Runtime.view and Runtime.view.semanticSuggestions
         ),
@@ -905,6 +921,29 @@ function CommandRouter.dispatch(context, request)
     elseif command == "PREVIEW" then
         if payload == nil then return nil, "input_required" end
         return context.Conversation.preview(context, tostring(payload))
+    elseif command == "RELATIONSHIP_PROPOSAL" then
+        local npcID = type(payload) == "table" and payload.npcID
+            or context.npcData.npcID
+        local propose = PNC.Relationships
+            and PNC.Relationships.Propose
+        if type(propose) ~= "function" then
+            return nil, "relationship_proposal_unavailable"
+        end
+        local applied, reason, details = propose(npcID)
+        details = type(details) == "table" and details or {}
+        return {
+            ok = true,
+            type = "relationship_proposal",
+            action = PNC.RelationshipProposalPolicy
+                and PNC.RelationshipProposalPolicy.ActionID()
+                or "RELATIONSHIP_PROPOSAL",
+            accepted = details.accepted == true,
+            applied = applied == true,
+            reason = reason,
+            proposal = context.Values.copy(details),
+            simulationProjection = context.ScenarioSession
+                .simulationProjection(context),
+        }
     elseif command == "SUGGESTION_PREDICATE" then
         local predicates = PNC.Semantics
             and PNC.Semantics.SuggestionPredicates or nil
@@ -1085,19 +1124,8 @@ function CommandRouter.dispatch(context, request)
             headlessRequires = Runtime.headlessRequires,
             personaCatalog = personaCatalog(context),
             simulationControlCatalog = simulationControlCatalog(context),
-            simulationProjection = {
-                schema = "semantic.simulation.actor.projection.v1",
-                player = {
-                    socialProfile = context.Values.copy(context.playerSocialProfile),
-                },
-                npc = {
-                    bond = context.Values.copy(context.npcData
-                        and context.npcData.relationship
-                        and context.npcData.relationship.bond),
-                    personality = context.Values.copy(context.npcPersonality),
-                    personalityMode = context.npcPersonalityMode or "generated",
-                },
-            },
+            simulationProjection = context.ScenarioSession
+                .simulationProjection(context),
             suggestions = context.Values.copy(
                 Runtime.view and Runtime.view.semanticSuggestions
             ),

@@ -2,7 +2,7 @@
 
 **Updated:** 2026-10-23
 **Parent status:** REOPENED — P10 infrastructure is retained, but P11 runtime-parity, relationship, and UX acceptance is mandatory.
-**Current mandatory phase:** P11D — Romance proposal, compatibility, and server-authoritative acceptance.
+**Current mandatory phase:** P11E — Live relationship preview and proper Compare surface.
 **Implementation baseline audited:** ProjectHoomans remote `main` at `c412d50c27a423965911e115c0947b65c1eb2b6c`.
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned.
 
@@ -93,24 +93,41 @@ Validation:
 
 Native Project Zomboid SP/MP remains UNTESTED / user-owned.
 
-## Current Exact Next Chunk — P11D
+## P11D completed — romance proposal and deterministic lover progression
+
+P11D is complete on the local ProjectHoomans `main` checkout.
+
+Evidence:
+
+- The existing directed relationship record now has one canonical `RELATIONSHIP_PROPOSAL` action. Production compatibility calls `PNC.SocialProfileMath.AreMutuallyOrientationCompatible` with the real player profile/traits, NPC generated or explicit profile, and actor genders.
+- Proposal eligibility requires durable friend bond, approval 85, respect 60, familiarity 80, non-rival/non-enemy standing, living/available actors, family exclusion, compatibility, and a clear `relationship_proposal` cooldown.
+- Acceptance is server-authoritative and deterministic through the shared proposal policy. Actual romance style affects bounded acceptance probability; no permanent romance chance field was added.
+- Acceptance promotes `friend` to `lover` and records a permanent bounded event/memory with normal revision/persistence updates. Rejection preserves `friend`, records a bounded rejection memory, and sets a personality-aware cooldown.
+- Semantic Lab exposes compatibility, thresholds, cooldown, availability, and a `Propose relationship` action in the Relationship workbench. Starting lover remains preserved and cannot be reproposed.
+
+Validation:
+
+- `test_contextual_runtime_parity_p11d.py` under Xvfb: 7/7 passed, covering incompatible, Gay, Bisexual, straight, family, below-threshold, flirty, reserved, deterministic acceptance, rejection cooldown, starting-lover, persistence round-trip, and Tk workbench controls.
+- P11A-C combined regression: 27/27 passed before the P11D test was added.
+- `luac5.3 -p`, `py_compile`, and `git diff --check` passed for the P11D changes.
+
+Native Project Zomboid SP/MP remains UNTESTED / user-owned.
+
+## Current Exact Next Chunk — P11E
 
 On the actual local checkout:
 
-1. audit the existing production compatibility APIs and player/NPC gender/profile sources;
-2. add one canonical `RELATIONSHIP_PROPOSAL` semantic action through the existing server relationship boundary;
-3. enforce friend bond, standing, family exclusion, thresholds, availability, compatibility, and named cooldown gates;
-4. evaluate NPC acceptance deterministically from actual relationship values and generated/personality override data;
-5. persist acceptance/rejection events, revisions, cooldown, and friend-to-lover promotion on the existing directed record;
-6. expose compatibility, proposal threshold, cooldown, and availability in the Relationship workbench with a proposal action;
-7. add focused tests for incompatible, Gay, Bisexual, straight, family, flirty, reserved, accepted, rejected, cooldown, starting-lover, and persistence cases;
-8. run the focused checks, update this ledger with exact evidence, commit P11D on existing `main`, and continue automatically to P11E.
+1. add production-backed live standing preview and reason text while relationship sliders move;
+2. show friend bond progress and romance eligibility/proposal state in the Relationship workbench;
+3. preserve Apply, Apply + Replay, and optional debounced Auto replay;
+4. make Compare the single understandable surface for utterance A/B/C comparison using the real Lua worker;
+5. add focused tests for live resolver preview, thresholds, cooldown, Compare output, stale/replay behavior, and normal/large Tk layouts;
+6. run the focused checks, update this ledger with exact evidence, commit P11E on existing `main`, and continue automatically to P11F.
 
 ## Ordered remaining milestones
 
-After P11D continue automatically:
+After P11E continue automatically:
 
-- **P11E:** live relationship preview + Compare/toolbar cleanup;
 - **P11F:** unified semantic Flow / Hub / ConversationBlock runtime graph;
 - **P11G:** modular speech-realization content packs;
 - **P11H:** final runtime-parity usability/regression gate.
