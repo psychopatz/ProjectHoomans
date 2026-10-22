@@ -1,6 +1,6 @@
 # Roadmap — Contextual Dialogue Persona & Choices
 
-**Parent status:** IN PROGRESS / implementation not started.  
+**Parent status:** REOPENED — P0-P7 foundation retained; P8 behavioral completion is mandatory.  
 Phases are organization and acceptance checkpoints; completing one phase never completes the parent objective.
 
 ## P0 — Current-path contract baseline
@@ -139,3 +139,87 @@ Required final evidence:
 - native SP/MP review documented as user-owned/unrun if unavailable.
 
 **Gate:** all developer-verifiable requirements green. Status becomes **READY FOR USER LIVE TEST**, never "native verified" unless the user actually supplies that evidence.
+
+
+## P8 — Behavioral Completion
+
+The P0-P7 implementation is accepted as infrastructure/regression foundation, but the user-visible persona/choice goal is not complete. P8 supersedes the previous READY FOR USER LIVE TEST handoff.
+
+Read BEHAVIORAL_COMPLETION.md before P8 implementation.
+
+### P8A — Bond vocabulary + production-faithful Lab baseline
+
+Implement the smallest corrective foundation first.
+
+Required:
+
+- inventory the actual current detailed starting-companion relationship kinds and their persistence/projection path;
+- add a bounded relationship-kind metadata registry or equivalent declarative contract;
+- derive bond.class as friend/family/lover while preserving detailed bond.kind;
+- project bond into ActorConversationContext without new persistence;
+- add EN/TL relationship-term registrations for current kinds;
+- fix Semantic Lab normal relationship state to use production PNC.RelationshipStates.ResolveState;
+- add production-backed bond-kind catalog/selector and read-only derived bond class;
+- add slider value labels;
+- add tests proving family kind survives while relationship state changes independently.
+
+**Gate:** mother/father/sister/brother map to family; friend maps to friend; lover maps to lover; no duplicate persistent bond class; the Lab cannot produce an ordinary impossible relationship-state combination.
+
+### P8B — Speech-dial and realization coverage completion
+
+Required:
+
+- create a machine-readable audit/coverage table of production semantic response families;
+- identify which Persona Lab controls actually influence speech;
+- wire or clearly classify currently inert controls such as socialStyle, forgiveness and bravery;
+- replace ad-hoc trait-name handling with declarative speech metadata where practical;
+- expand realization beyond greetings across the mandatory families in BEHAVIORAL_COMPLETION.md;
+- add bond-aware friend/family/lover realization where it changes wording;
+- family variants use localized term substitution rather than mother/father/cousin-specific semantic IDs;
+- preserve semantic response plan/action identity.
+
+**Gate:** real worker matrices cover multiple non-greeting intents and demonstrate same semantic facts with different friend/family/lover + standing/personality realizations in EN/TL.
+
+### P8C — Generic provider discovery + contextual replies
+
+Required:
+
+- make registry collection the normal optional/domain provider discovery path;
+- remove provider-specific Dynamic Trading collection from the central builder;
+- preserve root/flow/response-plan authored offers;
+- add at least one real contextual social/relationship provider through the generic contract;
+- add gossip/knowledge/quest providers only where production semantic facts already support them;
+- keep visibility/authority/privacy separation exact.
+
+**Gate:** a test provider can register and participate without a central suggestions edit; Dynamic Trading still works through the same generic seam; social/contextual replies are ranked and clickable through the existing typed path.
+
+### P8D — Semantic Lab tuning workflow
+
+Required:
+
+- arbitrary current utterance for A/B/matrix runs;
+- clone current scenario into comparison rows;
+- selectable sweep dimensions including approval/respect/familiarity, bond kind, personality, traits and role;
+- apply-and-replay without reopening a hidden settings workflow for every change;
+- inspect localized bond term, semantic family, style variant, ranking and final response;
+- keep all policy decisions in the real Lua worker.
+
+**Gate:** GUI proof under Xvfb shows the same utterance compared across friend/family/lover and friend/enemy standing, including at least two family subtypes that reuse the same family realization with different localized terms.
+
+### P8E — Corrective regression and handoff
+
+Run focused and impacted full regressions after P8A-D.
+
+Required evidence:
+
+- relationship/bond mapping and no-new-persistence tests;
+- non-greeting realization coverage tests;
+- EN/TL family-term substitution tests;
+- provider generic-discovery tests;
+- Dynamic Trading adoption regression;
+- stale/replay/privacy/action-authority regression;
+- Semantic Lab Tk/Xvfb workflow;
+- Kahlua/luac, doctor, JSON validation, diff checks;
+- bounded performance and ModData checks.
+
+**Gate:** only after P8A-P8E pass may the parent goal return to READY FOR USER LIVE TEST. Native Project Zomboid SP/MP remains user-owned.
