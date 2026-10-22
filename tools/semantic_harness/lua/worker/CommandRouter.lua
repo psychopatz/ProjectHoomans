@@ -11,7 +11,7 @@ end
 local capabilities = {
     "CONFIG", "RESET", "INPUT", "LANGUAGE", "TOOL_REPLY",
     "PREVIEW", "SNAPSHOT", "CONVERSATION_GRAPH", "FLOW_CATALOG", "FLOW_VALIDATE",
-    "RELATIONSHIP_PROPOSAL",
+    "RELATIONSHIP_PROPOSAL", "RELATIONSHIP_PREVIEW",
     "SUGGESTION_PREDICATE", "SUGGESTION_CLICK",
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
@@ -509,6 +509,21 @@ local function simulationControlCatalog(context, payload)
         workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
         workbenchSection = "Context",
     })
+    local approval = context.npcData and context.npcData.relationship
+        and context.npcData.relationship.approval or 0
+    local respect = context.npcData and context.npcData.relationship
+        and context.npcData.relationship.respect or 0
+    local familiarity = context.npcData and context.npcData.relationship
+        and context.npcData.relationship.familiarity or 0
+    add("relationship.friendBondProgress", nil, "Persona", "Relationship", "Friend bond progress", "read_only", "text", {
+        currentValue = string.format(
+            "Approval %s / 80 · Respect %s / 50 · Familiarity %s / 60",
+            tostring(approval), tostring(respect), tostring(familiarity)
+        ),
+        source = "PNC.RelationshipConstants",
+        workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
+        workbenchSection = "Friend bond",
+    })
     add("relationship.romanceCompatibility", nil, "Persona", "Relationship", "Romance compatibility", "read_only", "text", {
         currentValue = proposal.compatible == true and "compatible" or "incompatible",
         source = "production.social_profile_math",
@@ -943,6 +958,35 @@ function CommandRouter.dispatch(context, request)
             proposal = context.Values.copy(details),
             simulationProjection = context.ScenarioSession
                 .simulationProjection(context),
+        }
+    elseif command == "RELATIONSHIP_PREVIEW" then
+        local npcID = type(payload) == "table" and payload.npcID
+            or context.npcData.npcID
+        local values = type(payload) == "table" and payload.relationship
+            or payload
+        local preview = PNC.Relationships
+            and PNC.Relationships.Preview
+        if type(preview) ~= "function" then
+            return nil, "relationship_preview_unavailable"
+        end
+        local result = preview(npcID, values)
+        if type(result) ~= "table" then
+            return nil, "relationship_preview_unavailable"
+        end
+        local relationship = result.relationship or {}
+        return {
+            ok = true,
+            type = "relationship_preview",
+            schema = "semantic.relationship.preview.v1",
+            action = result.action or "RELATIONSHIP_PROPOSAL",
+            standing = result.standing or relationship.state or "unknown",
+            reason = result.standingReason,
+            approval = relationship.approval or 0,
+            respect = relationship.respect or 0,
+            familiarity = relationship.familiarity or 0,
+            bond = context.Values.copy(result.bond or relationship.bond),
+            proposal = context.Values.copy(result),
+            persisted = false,
         }
     elseif command == "SUGGESTION_PREDICATE" then
         local predicates = PNC.Semantics

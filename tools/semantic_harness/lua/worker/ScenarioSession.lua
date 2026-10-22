@@ -29,19 +29,31 @@ local function relationshipProposalProjection(context)
             reason = "relationship_proposal_unavailable",
         }
     end
+    local standingExplanation = PNC.RelationshipStates
+        and type(PNC.RelationshipStates.ExplainState) == "function"
+        and PNC.RelationshipStates.ExplainState(result.relationship)
+        or { state = result.relationship and result.relationship.state or "unknown" }
     return {
         schema = "semantic.relationship.proposal.v1",
         action = result.action or "RELATIONSHIP_PROPOSAL",
         eligible = result.eligible == true,
         compatible = result.compatible == true,
         available = result.available == true,
-        reason = result.reason,
+        reason = standingExplanation.reason or result.reason,
+        proposalReason = result.reason,
         cooldownUntil = result.cooldownUntil,
         cooldownRemaining = result.cooldownRemaining,
         thresholds = Values.copy(result.thresholds),
+        friendBondThresholds = {
+            approval = PNC.RelationshipConstants
+                and PNC.RelationshipConstants.FRIEND_BOND_APPROVAL_ENTER or 80,
+            respect = PNC.RelationshipConstants
+                and PNC.RelationshipConstants.FRIEND_BOND_RESPECT_ENTER or 50,
+            familiarity = PNC.RelationshipConstants
+                and PNC.RelationshipConstants.FRIEND_BOND_FAMILIARITY_ENTER or 60,
+        },
         bond = Values.copy(result.bond),
-        standing = result.relationship
-            and result.relationship.state or "unknown",
+        standing = standingExplanation.state or "unknown",
         approval = result.relationship
             and result.relationship.approval or 0,
         respect = result.relationship

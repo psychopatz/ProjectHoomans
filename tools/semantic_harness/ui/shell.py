@@ -285,6 +285,11 @@ class SemanticHarnessApp:
         self.workbench_expanded = True
         self.last_test_utterance = ""
         self.workbench_status_var: Any | None = None
+        self.relationship_preview_var: Any | None = None
+        self.auto_replay_var: Any | None = None
+        self._relationship_preview_after: Any | None = None
+        self._auto_replay_after: Any | None = None
+        self._relationship_preview_future: Future[Any] | None = None
         self.last_response: dict[str, Any] = {}
         self.settings_window: Any | None = None
         self._future: Future[Any] | None = None
@@ -439,7 +444,7 @@ class SemanticHarnessApp:
         )
         workbench_footer = ttk.Frame(self.workbench_content)
         workbench_footer.grid(row=1, column=0, sticky="ew", pady=(3, 0))
-        workbench_footer.columnconfigure(2, weight=1)
+        workbench_footer.columnconfigure(3, weight=1)
         self.workbench_apply_button = ttk.Button(
             workbench_footer,
             text="Apply",
@@ -452,11 +457,19 @@ class SemanticHarnessApp:
             command=self.apply_and_replay,
         )
         self.replay_button.grid(row=0, column=1, sticky="w", padx=(6, 0))
+        self.auto_replay_var = self._tk.BooleanVar(value=False)
+        self.auto_replay_checkbutton = ttk.Checkbutton(
+            workbench_footer,
+            text="Auto replay (debounced)",
+            variable=self.auto_replay_var,
+        )
+        self.auto_replay_checkbutton.grid(row=0, column=2, sticky="w", padx=(10, 0))
         ttk.Label(
             workbench_footer,
             textvariable=self.workbench_status_var,
             anchor="e",
-        ).grid(row=0, column=2, sticky="e", padx=(8, 0))
+        ).grid(row=0, column=3, sticky="e", padx=(8, 0))
+        workbench_footer.columnconfigure(3, weight=1)
 
         controls = ttk.Frame(container)
         controls.grid(row=2, column=0, sticky="ew", padx=(0, 8), pady=(4, 0))
@@ -546,15 +559,19 @@ class SemanticHarnessApp:
         compare_controls = ttk.Frame(compare_frame)
         compare_controls.grid(row=0, column=0, sticky="ew", pady=(0, 6))
         compare_controls.columnconfigure(1, weight=1)
+        ttk.Label(
+            compare_controls,
+            text="Run the same utterance through current, low, and high production contexts.",
+        ).grid(row=0, column=0, columnspan=4, sticky="w", pady=(0, 6))
         ttk.Label(compare_controls, text="Utterance").grid(
-            row=0, column=0, sticky="w", padx=(0, 6)
+            row=1, column=0, sticky="w", padx=(0, 6)
         )
         self.compare_utterance_box = ttk.Entry(
             compare_controls, textvariable=self.compare_utterance_var
         )
-        self.compare_utterance_box.grid(row=0, column=1, columnspan=3, sticky="ew")
+        self.compare_utterance_box.grid(row=1, column=1, columnspan=3, sticky="ew")
         ttk.Label(compare_controls, text="Compare by").grid(
-            row=1, column=0, sticky="w", padx=(0, 6), pady=(6, 0)
+            row=2, column=0, sticky="w", padx=(0, 6), pady=(6, 0)
         )
         self.matrix_dimension_box = ttk.Combobox(
             compare_controls,
@@ -563,15 +580,15 @@ class SemanticHarnessApp:
             width=16,
             state="readonly",
         )
-        self.matrix_dimension_box.grid(row=1, column=1, sticky="w", pady=(6, 0))
+        self.matrix_dimension_box.grid(row=2, column=1, sticky="w", pady=(6, 0))
         self.capture_baseline_button = ttk.Button(
             compare_controls, text="Capture baseline", command=self.capture_baseline
         )
-        self.capture_baseline_button.grid(row=1, column=2, sticky="w", padx=(8, 0), pady=(6, 0))
+        self.capture_baseline_button.grid(row=2, column=2, sticky="w", padx=(8, 0), pady=(6, 0))
         self.persona_matrix_button = ttk.Button(
             compare_controls, text="Run comparison", command=self.inspect_persona_matrix
         )
-        self.persona_matrix_button.grid(row=1, column=3, sticky="w", padx=(8, 0), pady=(6, 0))
+        self.persona_matrix_button.grid(row=2, column=3, sticky="w", padx=(8, 0), pady=(6, 0))
         self.compare_output = ScrolledText(compare_frame, wrap="none", state="disabled")
         self.compare_output.grid(row=1, column=0, sticky="nsew")
         self.trace_tabs.add(compare_frame, text="Compare")
@@ -746,6 +763,8 @@ class SemanticHarnessApp:
             button.configure(state=state)
         if hasattr(self, "proposal_button"):
             self.proposal_button.configure(state=state)
+        if hasattr(self, "auto_replay_checkbutton"):
+            self.auto_replay_checkbutton.configure(state=state)
         if self.language_box is not None:
             self.language_box.configure(
                 state="readonly" if enabled and not self.busy else "disabled"
@@ -910,16 +929,38 @@ class SemanticHarnessApp:
     def _scenario_control_value(self, control: dict[str, Any], scenario: dict[str, Any]) -> Any:
         control_id = str(control.get("id") or "")
         if control_id == "relationship.state":
+            projected_relationship = self.simulation_projection.get("relationship", {})
+            if isinstance(projected_relationship, dict) and projected_relationship.get("standing"):
+                return projected_relationship.get("standing")
             response = self.last_response if isinstance(self.last_response, dict) else {}
             context = response.get("contextAfter") or response.get("context") or {}
             actor = context.get("actorConversationContext", {}) if isinstance(context, dict) else {}
             relationship = actor.get("relationship", {}) if isinstance(actor, dict) else {}
             return relationship.get("state", "unknown")
         if control_id == "relationship.bond":
+            relationship_projection = self.simulation_projection.get("relationship", {})
+            if isinstance(relationship_projection, dict):
+                projected_bond = relationship_projection.get("bond")
+                if isinstance(projected_bond, dict):
+                    return projected_bond.get("kind") or projected_bond.get("class") or "none"
             bond = self.simulation_projection.get("npc", {}).get("bond", {})
             if isinstance(bond, dict):
                 return bond.get("kind") or bond.get("class") or "none"
             return control.get("currentValue", "none")
+        if control_id == "relationship.friendBondProgress":
+            relationship = self.simulation_projection.get("relationship", {})
+            if not isinstance(relationship, dict):
+                relationship = {}
+            thresholds = relationship.get("friendBondThresholds") or {
+                "approval": 80,
+                "respect": 50,
+                "familiarity": 60,
+            }
+            return (
+                f"Approval {relationship.get('approval', 0)} / {thresholds.get('approval', 80)} · "
+                f"Respect {relationship.get('respect', 0)} / {thresholds.get('respect', 50)} · "
+                f"Familiarity {relationship.get('familiarity', 0)} / {thresholds.get('familiarity', 60)}"
+            )
         if control_id in {
             "relationship.romanceCompatibility",
             "relationship.proposalThreshold",
@@ -1085,11 +1126,30 @@ class SemanticHarnessApp:
                 sticky="w",
                 pady=(8, 3),
             )
+            self.relationship_preview_var = self._tk.StringVar(
+                value="Live preview: waiting for production resolver"
+            )
+            self._ttk.Label(
+                relationship_page,
+                textvariable=self.relationship_preview_var,
+                justify="left",
+                wraplength=520,
+            ).grid(
+                row=proposal_row + 1,
+                column=0,
+                columnspan=4,
+                sticky="w",
+                pady=(2, 6),
+            )
         override_field = self.workbench_control_fields.get("npc.personalityOverride")
         if override_field is not None and override_field.variable is not None:
             override_field.variable.trace_add(
                 "write", self._update_generated_personality_controls
             )
+        for key in ("approval", "respect", "familiarity"):
+            field = self.workbench_control_fields.get(f"relationship.{key}")
+            if field is not None and field.variable is not None:
+                field.variable.trace_add("write", self._on_relationship_slider_changed)
         self._update_generated_personality_controls()
         if not self.workbench_controls:
             empty = self._ttk.Frame(self.workbench_notebook, padding=8)
@@ -1098,6 +1158,7 @@ class SemanticHarnessApp:
                 text="The Lua worker did not declare any quick simulation controls.",
             ).grid(row=0, column=0, sticky="w")
             self.workbench_notebook.add(empty, text="Context")
+        self._set_relationship_preview_from_projection()
         self._set_controls(self.session.ready)
 
     def _update_generated_personality_controls(self, *_args: Any) -> None:
@@ -1262,6 +1323,7 @@ class SemanticHarnessApp:
             for control_id in (
                 "relationship.state",
                 "relationship.bond",
+                "relationship.friendBondProgress",
                 "relationship.romanceCompatibility",
                 "relationship.proposalThreshold",
                 "relationship.proposalCooldown",
@@ -1274,7 +1336,134 @@ class SemanticHarnessApp:
                 )
                 if field is not None and control is not None:
                     field.set_value(self._scenario_control_value(control, self.scenario))
+            self._set_relationship_preview_from_projection()
             self._update_generated_personality_controls()
+
+    def _set_relationship_preview_from_projection(self) -> None:
+        if self.relationship_preview_var is None:
+            return
+        proposal = self.simulation_projection.get("relationship", {})
+        if not isinstance(proposal, dict):
+            proposal = {}
+        standing = str(proposal.get("standing") or "unknown").upper()
+        reason = str(proposal.get("reason") or "production resolver")
+        bond = proposal.get("bond") or {}
+        bond_class = bond.get("class") if isinstance(bond, dict) else "none"
+        self.relationship_preview_var.set(
+            f"Live preview: {standing} · {reason} · durable bond: {bond_class or 'none'}"
+        )
+
+    def _on_relationship_slider_changed(self, *_args: Any) -> None:
+        if self.closed or not self.worker_ready or self.busy:
+            return
+        if self._relationship_preview_after is not None:
+            try:
+                self.root.after_cancel(self._relationship_preview_after)
+            except self._tk.TclError:
+                pass
+        self._relationship_preview_after = self.root.after(
+            140, self._request_relationship_preview
+        )
+        if self.auto_replay_var is not None and self.auto_replay_var.get():
+            if self._auto_replay_after is not None:
+                try:
+                    self.root.after_cancel(self._auto_replay_after)
+                except self._tk.TclError:
+                    pass
+            self._auto_replay_after = self.root.after(
+                650, self.apply_and_replay
+            )
+
+    def _request_relationship_preview(self) -> None:
+        self._relationship_preview_after = None
+        if self.closed or not self.worker_ready or self.busy:
+            return
+        if self._relationship_preview_future is not None:
+            if not self._relationship_preview_future.done():
+                self._relationship_preview_after = self.root.after(
+                    140, self._request_relationship_preview
+                )
+                return
+        values = {}
+        for key in ("approval", "respect", "familiarity"):
+            field = self.workbench_control_fields.get(f"relationship.{key}")
+            if field is not None:
+                values[key] = field.get_value()
+        try:
+            future = self.session.submit(
+                lambda worker: worker.relationship_preview(values)
+            )
+        except (HarnessError, RuntimeError):
+            return
+        self._relationship_preview_future = future
+        self._poll_relationship_preview(future)
+
+    def _poll_relationship_preview(self, future: Future[Any]) -> None:
+        if self.closed:
+            return
+        if not future.done():
+            self.root.after(25, self._poll_relationship_preview, future)
+            return
+        try:
+            result = future.result()
+            value = result.value if hasattr(result, "value") else result
+        except (HarnessError, ConfigurationError, OSError, ValueError) as error:
+            self._set_text(self.trace, str(error))
+            return
+        preview = value if isinstance(value, dict) else {}
+        if self.relationship_preview_var is not None:
+            standing = str(preview.get("standing") or "unknown").upper()
+            reason = str(preview.get("reason") or "production resolver")
+            bond = preview.get("bond") or {}
+            bond_class = bond.get("class") if isinstance(bond, dict) else "none"
+            self.relationship_preview_var.set(
+                f"Live preview: {standing} · {reason} · durable bond: {bond_class or 'none'}"
+            )
+        self._set_relationship_preview_fields(preview)
+
+    def _set_relationship_preview_fields(self, preview: dict[str, Any]) -> None:
+        relationship = {
+            "approval": preview.get("approval"),
+            "respect": preview.get("respect"),
+            "familiarity": preview.get("familiarity"),
+        }
+        proposal = preview.get("proposal") or {}
+        if isinstance(proposal, dict):
+            proposal = dict(proposal)
+            proposal["compatible"] = proposal.get("compatible")
+            proposal["bond"] = preview.get("bond")
+        projection = dict(self.simulation_projection)
+        projection["relationship"] = {
+            **(projection.get("relationship") or {}),
+            **relationship,
+            "standing": preview.get("standing"),
+            "reason": preview.get("reason"),
+            "bond": preview.get("bond"),
+            "compatible": proposal.get("compatible") if isinstance(proposal, dict) else None,
+            "eligible": proposal.get("eligible") if isinstance(proposal, dict) else None,
+            "cooldownRemaining": proposal.get("cooldownRemaining") if isinstance(proposal, dict) else 0,
+            "thresholds": proposal.get("thresholds") if isinstance(proposal, dict) else {},
+        }
+        self.simulation_projection = projection
+        try:
+            for control_id in (
+                "relationship.state",
+                "relationship.bond",
+                "relationship.friendBondProgress",
+                "relationship.romanceCompatibility",
+                "relationship.proposalThreshold",
+                "relationship.proposalCooldown",
+                "relationship.proposalAvailable",
+            ):
+                field = self.workbench_control_fields.get(control_id)
+                control = next(
+                    (item for item in self.workbench_controls if item.get("id") == control_id),
+                    None,
+                )
+                if field is not None and control is not None:
+                    field.set_value(self._scenario_control_value(control, self.scenario))
+        finally:
+            self.simulation_projection = projection
 
     def _show_response(self, response: dict[str, Any]) -> None:
         self.last_response = response if isinstance(response, dict) else {}
@@ -1804,7 +1993,7 @@ class SemanticHarnessApp:
         self.compare_utterance_var.set(value)
 
         def finish(result: dict[str, Any]) -> None:
-            self._set_text(self.compare_output, pretty(result))
+            self._set_text(self.compare_output, self._format_compare_result(result))
             self.trace_tabs.select(self.compare_frame)
             self._append(
                 "SYSTEM",
@@ -1815,6 +2004,48 @@ class SemanticHarnessApp:
             lambda worker: worker.context_matrix(rows, text=value, maximum=3),
             finish,
         )
+
+    def _format_compare_result(self, result: dict[str, Any]) -> str:
+        """Render the bounded matrix as an understandable A/B/C comparison."""
+
+        rows = result.get("rows") if isinstance(result, dict) else None
+        if not isinstance(rows, list) or not rows:
+            return pretty(result)
+        lines = [
+            f"Compare · {result.get('schema', 'production matrix')}",
+            "",
+            "Case | NPC response | Standing | Durable bond | Speech style | Graph",
+            "-----|---------------|----------|--------------|--------------|------",
+        ]
+        for index, row in enumerate(rows):
+            if not isinstance(row, dict):
+                continue
+            relationship = row.get("relationship") or {}
+            bond = relationship.get("bond") or {}
+            speech = row.get("speechStyleContext") or {}
+            graph = row.get("runtimeGraphPath") or {}
+            label = row.get("label") or chr(ord("A") + index)
+            response = str(row.get("npcResponse") or "").replace("\n", " ")
+            style = str(speech.get("variant") or speech.get("schema") or "—")
+            graph_kind = str(graph.get("kind") or "—")
+            lines.append(
+                " | ".join(
+                    (
+                        str(label),
+                        response[:80],
+                        str(relationship.get("standing") or "unknown"),
+                        str(bond.get("class") or "none"),
+                        style,
+                        graph_kind,
+                    )
+                )
+            )
+            choices = row.get("semanticHubChoices") or []
+            lines.append(
+                f"  choices: {', '.join(str(item.get('label') or item.get('id')) for item in choices[:4] if isinstance(item, dict)) or 'none'}"
+            )
+        lines.extend(("", "Full production evidence:", pretty(result)))
+        return "\n".join(lines)
 
     def inspect_world_knowledge(self) -> None:
         """Render bounded World Knowledge evidence from the live Lua worker."""
@@ -2045,6 +2276,12 @@ class SemanticHarnessApp:
         if self.closed:
             return
         self.closed = True
+        for after_id in (self._relationship_preview_after, self._auto_replay_after):
+            if after_id is not None:
+                try:
+                    self.root.after_cancel(after_id)
+                except self._tk.TclError:
+                    pass
         # Controls are disabled while a request is active. Preserve the
         # session's nonblocking close contract for an explicit close during
         # in-flight work, while draining the idle session before Tk teardown.

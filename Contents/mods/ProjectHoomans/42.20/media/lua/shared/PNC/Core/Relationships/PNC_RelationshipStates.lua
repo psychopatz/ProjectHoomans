@@ -54,4 +54,45 @@ function States.ResolveState(relationship)
     return Constants.STATE_NEUTRAL
 end
 
+function States.ExplainState(relationship)
+    local source = type(relationship) == "table" and relationship or {}
+    local approval = tonumber(source.approval) or 0
+    local respect = tonumber(source.respect) or 0
+    local familiarity = tonumber(source.familiarity) or 0
+    local state = States.ResolveState(source)
+    local reason
+
+    if familiarity < Constants.UNKNOWN_FAMILIARITY_EXIT then
+        reason = "familiarity < " .. tostring(Constants.UNKNOWN_FAMILIARITY_EXIT)
+    elseif state == Constants.STATE_FRIEND then
+        reason = "approval and respect meet friend standing thresholds"
+    elseif state == Constants.STATE_RIVAL then
+        reason = "approval and respect meet rival standing thresholds"
+    elseif state == Constants.STATE_ENEMY then
+        reason = "approval and respect meet enemy standing thresholds"
+    elseif approval >= Constants.FRIEND_APPROVAL_ENTER
+        and respect < Constants.FRIEND_RESPECT_ENTER
+    then
+        reason = "respect < " .. tostring(Constants.FRIEND_RESPECT_ENTER)
+    elseif approval <= Constants.RIVAL_APPROVAL_ENTER
+        and respect < Constants.RIVAL_RESPECT_ENTER
+    then
+        reason = "respect < " .. tostring(Constants.RIVAL_RESPECT_ENTER)
+    elseif approval > Constants.ENEMY_APPROVAL_ENTER
+        and approval < Constants.FRIEND_APPROVAL_ENTER
+    then
+        reason = "approval is between standing thresholds"
+    else
+        reason = "no standing threshold is met"
+    end
+
+    return {
+        state = state,
+        reason = reason,
+        approval = approval,
+        respect = respect,
+        familiarity = familiarity,
+    }
+end
+
 return States

@@ -208,8 +208,8 @@ function Provider.configure(context, SemanticAdapters)
             memoryType = effect.memoryType,
         }
     end
-    local function proposalEvaluation(npcID)
-        local relationship = relationshipFor(npcID)
+    local function proposalEvaluation(npcID, relationshipOverride)
+        local relationship = relationshipOverride or relationshipFor(npcID)
         local npcProfile = context.npcPersonality or {}
         local playerProfile = context.playerSocialProfile or {}
         local npcGender = npcData.gender
@@ -253,6 +253,32 @@ function Provider.configure(context, SemanticAdapters)
         return evaluation
     end
     PNC.Relationships.EvaluateProposal = proposalEvaluation
+    PNC.Relationships.Preview = function(npcID, values)
+        local relationship = Values.copy(relationshipFor(npcID))
+        values = type(values) == "table" and values or {}
+        for _, key in ipairs({ "approval", "respect", "familiarity" }) do
+            if values[key] ~= nil then
+                relationship[key] = number(values[key], relationship[key] or 0)
+            end
+        end
+        if PNC.RelationshipStates
+            and type(PNC.RelationshipStates.ExplainState) == "function"
+        then
+            local explanation = PNC.RelationshipStates.ExplainState(relationship)
+            relationship.state = explanation.state
+            relationship.relationshipState = explanation.state
+        end
+        local evaluation = proposalEvaluation(npcID, relationship)
+        local explanation = PNC.RelationshipStates
+            and type(PNC.RelationshipStates.ExplainState) == "function"
+            and PNC.RelationshipStates.ExplainState(relationship)
+            or { state = relationship.state or "unknown", reason = "unavailable" }
+        evaluation.relationship = Values.copy(relationship)
+        evaluation.standing = explanation.state
+        evaluation.standingReason = explanation.reason
+        evaluation.preview = true
+        return evaluation
+    end
     PNC.Relationships.Propose = function(npcID)
         local evaluation = proposalEvaluation(npcID)
         local relationship = evaluation.relationship

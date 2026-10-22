@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -119,6 +120,18 @@ class LuaSemanticWorker:
         payload = {"npcID": npc_id} if npc_id else None
         return self._request("RELATIONSHIP_PROPOSAL", payload)
 
+    def relationship_preview(
+        self,
+        relationship: dict[str, Any],
+        npc_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Resolve staged relationship scores without mutating the scenario."""
+
+        payload: dict[str, Any] = {"relationship": dict(relationship)}
+        if npc_id:
+            payload["npcID"] = npc_id
+        return self._request("RELATIONSHIP_PREVIEW", payload)
+
     def conversation_graph(self) -> dict[str, Any]:
         """Return the developer-only full selected ConversationBlock graph."""
 
@@ -167,6 +180,15 @@ class LuaSemanticWorker:
                 queued = (response.get("queued") or [response])[0]
                 queued = queued if isinstance(queued, dict) else response
                 suggestions = observation.get("suggestions") or {}
+                context = snapshot.get("context") or {}
+                actor_context = context.get("actorConversationContext") or {}
+                actor_relationship = actor_context.get("relationship") or {}
+                speech_style = (
+                    context.get("speechStyleContext")
+                    or response.get("speechStyleContext")
+                    or {}
+                )
+                flow = observation.get("flow") or {}
                 rows.append(
                     {
                         "index": index,
@@ -180,6 +202,40 @@ class LuaSemanticWorker:
                             ),
                         },
                         "context": snapshot.get("context", {}),
+                        "npcResponse": queued.get("text") or response.get("text"),
+                        "semanticHubChoices": [
+                            {
+                                "id": candidate.get("id"),
+                                "action": candidate.get("action"),
+                                "label": (candidate.get("display") or {}).get("label")
+                                or candidate.get("labelFallback"),
+                                "status": candidate.get("status"),
+                            }
+                            for candidate in (suggestions.get("candidates") or [])[:24]
+                            if isinstance(candidate, dict)
+                        ],
+                        "speechStyleContext": speech_style,
+                        "relationship": {
+                            "standing": actor_relationship.get("state")
+                            or actor_relationship.get("standing")
+                            or "unknown",
+                            "bond": deepcopy(
+                                actor_relationship.get("bond")
+                                or (snapshot.get("simulationProjection") or {})
+                                .get("npc", {})
+                                .get("bond")
+                                or {}
+                            ),
+                            "approval": actor_relationship.get("approval"),
+                            "respect": actor_relationship.get("respect"),
+                            "familiarity": actor_relationship.get("familiarity"),
+                        },
+                        "runtimeGraphPath": {
+                            "kind": "semantic_flow" if flow.get("flowId") else "semantic_hub",
+                            "flow": flow,
+                            "graph": observation.get("conversationGraph")
+                            or response.get("conversationGraph"),
+                        },
                         "response": {
                             "semanticTemplateID": response.get("templateID"),
                             "renderTemplateID": response.get("renderTemplateID"),
