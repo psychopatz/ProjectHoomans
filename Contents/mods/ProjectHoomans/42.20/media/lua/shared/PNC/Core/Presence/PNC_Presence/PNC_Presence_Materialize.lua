@@ -507,7 +507,7 @@ function Presence.Materialize(record, reason, nearest)
             PresenceDiagnostics.LogMaterializeGate(record, "startup_cleanup",
                 "startup_not_ready")
         end
-        return nil
+        return nil, "startup_not_ready"
     end
     prepareRecord(record)
     now = Core.Now()

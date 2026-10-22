@@ -14,6 +14,7 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     local kind
     local behavior
     local fenceHazard
+    local nativeStateSuppressed = false
     if not zombie then return false end
     modData = zombie.getModData and zombie:getModData() or nil
     object, kind = LiveBodyControl.GetVanillaPassageAhead(zombie)
@@ -87,8 +88,21 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
         and LiveBodyControl.ResetNativeMovementState
     then LiveBodyControl.ResetNativeMovementState(zombie) end
     if LiveBodyControl.SuppressZombieState then
-        LiveBodyControl.SuppressZombieState(zombie, lane, now)
-    elseif zombie.changeState
+        nativeStateSuppressed = LiveBodyControl.SuppressZombieState(
+            zombie,
+            lane,
+            now
+        ) == true
+    end
+    -- SuppressZombieState intentionally does nothing for an idle action
+    -- context.  IsoZombie.tryThump() runs after this callback and checks the
+    -- native root state instead, so an idle action context can still leave a
+    -- PathFind/WalkToward root active and enter the player-only
+    -- ClimbOverFenceState.  Force the managed body idle at this boundary when
+    -- no PNC traversal lease owns the passage (the owned-lease case returned
+    -- above).
+    if not nativeStateSuppressed
+        and zombie.changeState
         and ZombieIdleState
         and ZombieIdleState.instance
     then

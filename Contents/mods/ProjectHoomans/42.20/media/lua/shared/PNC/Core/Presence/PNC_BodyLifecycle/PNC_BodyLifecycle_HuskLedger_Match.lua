@@ -303,6 +303,30 @@ function Lifecycle.NoteLostBody(record, zombie, reason)
     local key
     local existing
     local entry
+
+    local function sameLossIdentity(candidate)
+        local candidateOutfit = candidate and candidate.outfitId or nil
+        local candidatePopulation = candidate and candidate.populationId or nil
+        if not candidate or candidate.abandoned == true then
+            return false
+        end
+        -- A new persistent outfit or population id is a different carrier.
+        -- Keep both rows: the engine can hand either virtualized shell back
+        -- after the record has already been materialized again.
+        if validEngineIdentity(candidateOutfit)
+            and validEngineIdentity(hint)
+            and tostring(candidateOutfit) ~= tostring(hint)
+        then
+            return false
+        end
+        if validEngineIdentity(candidatePopulation)
+            and validEngineIdentity(populationId)
+            and tostring(candidatePopulation) ~= tostring(populationId)
+        then
+            return false
+        end
+        return true
+    end
     if not (Core and Core.IsAuthority and Core.IsAuthority() == true) then
         -- Only the authority owns the population records a husk comes from.
         return nil
@@ -326,7 +350,9 @@ function Lifecycle.NoteLostBody(record, zombie, reason)
         local i
         for i = 1, #ledger.entries do
             local candidate = ledger.entries[i]
-            if candidate.npcId == npcId and candidate.chunkKey == key then
+            if candidate.npcId == npcId and candidate.chunkKey == key
+                and sameLossIdentity(candidate)
+            then
                 existing = candidate
                 break
             end
@@ -336,7 +362,7 @@ function Lifecycle.NoteLostBody(record, zombie, reason)
         existing.x = x
         existing.y = y
         existing.z = z
-        existing.outfitId = hint
+        existing.outfitId = hint or existing.outfitId
         existing.populationId = populationId or existing.populationId
         existing.at = worldAgeHours()
         existing.reason = reason ~= nil and tostring(reason) or existing.reason
@@ -408,6 +434,20 @@ local function matchesEntry(entry, zombie, radiusSq, includeAbandoned)
         end
     end
     outfitId = outfitHint(nil, zombie)
+    -- PNCShellCarrier is a positive PNC-owned fingerprint. Once a carrier id
+    -- has been learned from a body PNC created, its exact outfit id remains a
+    -- safe identity match even if the population manager moved the returned
+    -- husk before the next audit/reaper pump. This is intentionally narrower
+    -- than the legacy positional Naked lane.
+    if isUnmarkedBody(zombie)
+        and validEngineIdentity(entry.outfitId)
+        and outfitId ~= nil
+        and tostring(entry.outfitId) == tostring(outfitId)
+        and Lifecycle.IsShellCarrierID
+        and Lifecycle.IsShellCarrierID(outfitId) == true
+    then
+        return true
+    end
     if isLegacyAnonymousHusk(entry, zombie, radiusSq) then
         return true
     end
@@ -458,6 +498,7 @@ function Lifecycle.FindHuskEntry(zombie)
     local i
     local j
     local populationId
+    local outfitId
     if #ledger.entries <= 0 or not zombie or not zombie.getX then
         return nil
     end
@@ -492,6 +533,19 @@ function Lifecycle.FindHuskEntry(zombie)
             end
         end
     end
+    -- A carrier shell may be restored at a new position. Search the bounded
+    -- historical ledger by exact learned carrier id after the cheap spatial
+    -- index, so repeated live/abstract churn cannot become an anonymous reap.
+    outfitId = outfitHint(nil, zombie)
+    if outfitId ~= nil and Lifecycle.IsShellCarrierID
+        and Lifecycle.IsShellCarrierID(outfitId) == true
+    then
+        for i = 1, #ledger.entries do
+            if matchesEntry(ledger.entries[i], zombie, radiusSq) then
+                return ledger.entries[i]
+            end
+        end
+    end
     return nil
 end
 
@@ -519,6 +573,10 @@ function Lifecycle.HuskLedgerRearm(entry)
     end
     for i = 1, #ledger.entries do
         if ledger.entries[i] == entry then
+            -- Queueing no longer consumes an entry before verified removal.
+            -- Persist here so failed-removal attempts and abandonment remain
+            -- durable when the already-armed row is revalidated.
+            persist(ledger)
             return true
         end
     end

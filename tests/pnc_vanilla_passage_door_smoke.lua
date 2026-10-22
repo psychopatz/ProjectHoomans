@@ -162,14 +162,52 @@ LiveBodyControl.ResetNativeMovementState = function()
     nativeResetCount = nativeResetCount + 1
     return true
 end
+LiveBodyControl.IsNativeMoving = function() return true end
 LiveBodyControl.GetVanillaPassageAhead = function()
     return {}, "fence"
 end
+local forcedIdleCount = 0
+local forcedIdleState = {}
+ZombieIdleState = {
+    instance = function() return forcedIdleState end,
+}
+local idleFenceBody = {
+    actionState = "idle",
+    getActionStateName = function(self) return self.actionState end,
+    getModData = function() return {} end,
+    getNextX = function() return 11.0 end,
+    getNextY = function() return 19.5 end,
+    getX = function() return 10.5 end,
+    getY = function() return 19.5 end,
+    getZ = function() return 0 end,
+    setPath2 = function() end,
+    changeState = function(self, state)
+        forcedIdleCount = forcedIdleCount + 1
+        self.actionState = "idle"
+    end,
+}
 local fenceBlocked, fenceKind = LiveBodyControl.BlockVanillaPassage(
-    body, nil, 50000)
+    idleFenceBody, nil, 50000)
 T.equal(fenceBlocked, true, "fence hazard is blocked")
 T.equal(fenceKind, "fence", "fence hazard kind is reported")
 T.equal(nativeResetCount, 1,
     "fence guard resets the legacy native movement state")
+T.equal(forcedIdleCount, 1,
+    "idle action context still resets the native root before tryThump")
+
+-- An actively owned PNC traversal must keep its animation owner and must not
+-- be reset by the generic vanilla-passage guard.
+idleFenceBody.getModData = function()
+    return {
+        PNC_BumpActionLease = true,
+        PNC_BumpRequestedType = "ClimbFenceEnd",
+    }
+end
+local ownedFenceBlocked = LiveBodyControl.BlockVanillaPassage(
+    idleFenceBody, nil, 51000)
+T.equal(ownedFenceBlocked, false,
+    "owned PNC fence traversal bypasses the vanilla guard")
+T.equal(forcedIdleCount, 1,
+    "owned PNC fence traversal is not forced idle")
 
 T.finish("pnc_vanilla_passage_door_smoke")

@@ -36,6 +36,7 @@ Lifecycle.HuskReaper = Lifecycle.HuskReaper or {
     failed = 0,
     abandoned = 0,
     orphanReaps = 0,
+    droppedReasons = {},
     loggedActive = false,
     lastPumpAt = 0,
     lastSweepAt = 0,
@@ -316,8 +317,11 @@ end
 --[[
     Queue a matched husk for removal on the next pump.
 
-    The ledger entry is consumed immediately so the same loss can never be
-    reaped twice; its data travels with the pending record for revalidation.
+    The ledger entry remains armed until removal is verified. The engine can
+    virtualize this body again before the next pump; consuming the row here
+    would lose the NPC association and turn the next return into an unknown
+    anonymous shell. pendingContains() prevents duplicate queueing while the
+    body is pending.
 ]]
 local function queueHuskReap(zombie, entry, reason)
     local reaper = Lifecycle.HuskReaper
@@ -341,9 +345,7 @@ local function queueHuskReap(zombie, entry, reason)
     if Internal.clearBodyCombat then
         pcall(Internal.clearBodyCombat, zombie)
     end
-    if entry then
-        Lifecycle.ConsumeHuskEntry(entry)
-    else
+    if not entry then
         reaper.orphanReaps = (tonumber(reaper.orphanReaps) or 0) + 1
         noteIncrement("HuskReaper.OrphanQueued")
     end
@@ -461,6 +463,14 @@ local function revalidatePending(record)
     if not record.zombie or isDeadBody(record.zombie) then
         return false, "body_gone"
     end
+    -- removeZombie() deliberately returns true for an already-detached body
+    -- so ordinary callers can treat idempotent cleanup as success. That is not
+    -- success for a husk: a detached body may already have crossed back into
+    -- the population manager, and consuming the ledger here would lose the
+    -- only identity that can reclaim its next real-zombie incarnation.
+    if Internal.isBodyDetached and Internal.isBodyDetached(record.zombie) then
+        return false, "body_gone"
+    end
     if isMarkedBody(record.zombie) then
         return false, "body_marked"
     end
@@ -551,14 +561,29 @@ local function processPending(now)
         if not valid then
             table.remove(pending, i)
             reaper.dropped = (tonumber(reaper.dropped) or 0) + 1
+            local dropKey = tostring(invalidReason or "unknown")
+            reaper.droppedReasons[dropKey] =
+                (tonumber(reaper.droppedReasons[dropKey]) or 0) + 1
             noteIncrement("HuskReaper.Dropped")
-            if invalidReason ~= "body_gone" then
-                -- The body changed owner or identity while queued; keep the
-                -- loss so the husk can still be found later.
-                rearmsEntry(record)
+            -- The ledger row stays armed from queue time through every
+            -- revalidation outcome. Rearm is retained for compatibility with
+            -- older in-memory callers and persists attempt/abandon changes.
+            rearmsEntry(record)
+            if Core and Core.LogWarn and invalidReason ~= "body_gone" then
+                pcall(Core.LogWarn, "PNC husk pending dropped npc="
+                    .. tostring(record.entry and record.entry.npcId or "unknown")
+                    .. " reason=" .. dropKey
+                    .. " outfitID=" .. tostring(
+                        record.identity and record.identity.outfitID or "nil")
+                    .. " populationID=" .. tostring(
+                        record.identity and record.identity.populationID or "nil"))
             end
         elseif removeHusk(record) then
             table.remove(pending, i)
+            if record.entry then
+                -- Only a verified detach may consume the historical identity.
+                Lifecycle.ConsumeHuskEntry(record.entry)
+            end
             logReap(record.entry, record.reason, record.identity)
             removed = removed + 1
         else
@@ -666,6 +691,7 @@ function Lifecycle.BuildHuskReaperDiagnostics()
         failed = tonumber(reaper.failed) or 0,
         abandoned = tonumber(reaper.abandoned) or 0,
         orphanReaps = tonumber(reaper.orphanReaps) or 0,
+        droppedReasons = reaper.droppedReasons,
         active = reaper.loggedActive == true,
     }
 end

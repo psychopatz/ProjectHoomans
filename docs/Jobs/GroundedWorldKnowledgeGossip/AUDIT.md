@@ -61,3 +61,17 @@ Hoomans has producers and a gossip consumer, but no verified portable pipeline:
 authoritative event -> compact Core WorldFact -> legitimate actor acquisition -> bounded relevance projection -> existing gossip conversation.
 
 That missing middle layer is the goal.
+
+## W0 evidence freeze (2026-10-22)
+
+The actual local Hoomans worktree is `9d9dc454c6b39c4b0a6c7e6bcb4008a1f3da4fe4`, seven commits ahead of `origin/main` `26cab0dc41864d73dc8db8b386b183c081a373e8`, and has pre-existing staged/unstaged PNC changes. This audit did not touch those changes. Core runtime media and DT runtime media are intentionally excluded from the graph index; exact source was read directly after graph discovery.
+
+The current user-visible lightweight zombie value is not Director “Resolved density”. It is the combat-debug/nameplate projection: `PNC_CombatTactics_ThreatAssessment.AssessThreat` consumes the cached perception/spatial result, `PNC_NetworkSnapshots_CombatDebugState_TacticalPayload` carries visible/nearby/pressure/horde counts, and `PNC_NameplateRenderer_DebugText` renders `THREAT ... horde=visible/total` and `VIEW zombies=visible/nearby`. `PNC_WorldCensus.Refresh` is the single cadence-bounded `getCell():getZombieList()` source; `PNC_SpatialIndex`, `PNC_Perception_Frame`, follower hazards, and combat all consume its cache. No WKG producer may enumerate zombies again.
+
+Faction truth is committed in `FactionIncidentService.AddIncident`, `FactionService_Lifecycle.Destroy`/`OnNPCDeath`, and `FactionService_TreatyCommands` (`war_declared`, `peace_made`, `truce_started`, `alliance_formed`, `alliance_broken`). NPC death is committed by `PNC.Health.Kill`; `PNC_Health_Damage` and zombie wound code carry `attackerKind`/ID. Player and NPC attackers can be attributed through corpse awareness; zombie damage is authoritative at the damage event, but infection death currently loses the original event. WKG must publish `cause=unknown` when the owner cannot prove the cause.
+
+The local Java baseline is Build `42.21`, so it is not accepted as exact Build 42.20 API proof. It found candidate owners `IsoWorld.helicopter:isActive()`, `IsoWorld:isHydroPowerOn()`, `ClimateManager:getSeasonName()`/season ID, and square-local `IsoGridSquare:haveElectricity()`. Current Hoomans has only a client environment season read and no authoritative fact adapters for helicopter, global power, water shutoff, or seasonal transitions. These remain W3 adapter work; no guessed hook was added.
+
+The normal production path is `CognitionService.BuildForConversation` → `_memoryGossip` transport → client `CognitionClient.GetGossipContext` → bounded `npcGossip.statements` → `GOSSIP_RECEIVED`. The existing worker acceptance test and live `LuaSemanticWorker` before-state show supplied memory in EN/TL and truthful no-news with zero LLM calls. This evidence is explicitly pre-WKG and does not establish grounded facts.
+
+Codebase-memory coverage generation `2026-10-07T23:10:40Z` had no recorded issue on the indexed authority paths, but marked current semantic/environment paths missing or metadata-changed; those were read from disk. Coverage is a best-effort signal and not an exhaustive proof.

@@ -118,8 +118,8 @@ T.truthy(entry, "husk loss was not armed")
 local husk = makeHusk(100.4, 200.6, 0, 42)
 Lifecycle.OnZombieCreate(husk)
 T.equal(#Reaper.pending, 1, "matched husk was not queued")
-T.equal(Lifecycle.HuskLedgerCount(), 0,
-    "queued husk loss stayed armed for a second reap")
+T.equal(Lifecycle.HuskLedgerCount(), 1,
+    "queued husk loss was consumed before removal was verified")
 T.truthy(Lifecycle.HasPendingHuskForRecord("npc_reap"),
     "queued husk was invisible to materialization deduplication")
 
@@ -310,5 +310,52 @@ local diagnostics = Lifecycle.BuildHuskReaperDiagnostics()
 T.truthy(diagnostics.reaped >= 2, "reaper diagnostics reap count")
 T.equal(diagnostics.pending, 0, "reaper diagnostics pending count")
 T.equal(diagnostics.abandoned, 1, "reaper diagnostics abandon count")
+
+-- 11. A queued husk can cross the virtualization boundary again before the
+-- deferred removal pump. It must not consume its ledger identity merely
+-- because the Lua object is already detached; the next incarnation must still
+-- map back to the same NPC.
+local vanishedEntry = armLoss("npc_requeue", 1800.4, 1900.6, 0, 45)
+T.truthy(vanishedEntry, "vanishing husk loss was not armed")
+T.truthy(Lifecycle.NoteShellCarrierID(45),
+    "historical carrier id was not learned")
+local vanished = makeHusk(1800.4, 1900.6, 0, 45)
+Lifecycle.OnZombieCreate(vanished)
+T.equal(#Reaper.pending, 1, "vanishing husk was not queued")
+vanished.current = nil
+Lifecycle.PumpHuskReaper(32000, true)
+T.equal(#Reaper.pending, 0, "detached husk stayed queued")
+T.falsy(vanished.removedFromWorld,
+    "already-virtualized husk was reported as removed")
+T.equal(Lifecycle.FindHuskEntry(makeHusk(1800.4, 1900.6, 0, 45)),
+    vanishedEntry,
+    "detached husk identity was consumed before removal")
+local returnedVanished = makeHusk(2200.4, 2300.6, 0, 45)
+censusBodies = { returnedVanished }
+Lifecycle.OnZombieCreate(returnedVanished)
+T.equal(#Reaper.pending, 1,
+    "historical carrier husk at a new position was not associated")
+T.equal(Reaper.pending[1].entry.npcId, "npc_requeue",
+    "historical carrier husk became anonymous")
+Lifecycle.PumpHuskReaper(33000, true)
+T.equal(returnedVanished.removedFromWorld, true,
+    "historical carrier husk was not reaped")
+
+-- 12. Distinct carrier ids from repeated live/abstract churn remain separate
+-- ledger rows instead of overwriting the old shell identity.
+local firstHistory = armLoss("npc_history", 2400.4, 2500.6, 0, 46)
+local secondHistory = armLoss("npc_history", 2401.4, 2501.6, 0, 47)
+T.truthy(firstHistory and secondHistory,
+    "repeated carrier losses were not recorded")
+T.truthy(Lifecycle.NoteShellCarrierID(46),
+    "first repeated carrier id was not learned")
+T.truthy(Lifecycle.NoteShellCarrierID(47),
+    "second repeated carrier id was not learned")
+T.equal(Lifecycle.FindHuskEntry(makeHusk(2400.4, 2500.6, 0, 46)),
+    firstHistory,
+    "old carrier row was overwritten by the newest loss")
+T.equal(Lifecycle.FindHuskEntry(makeHusk(2401.4, 2501.6, 0, 47)),
+    secondHistory,
+    "new carrier row was not retained")
 
 return T.finish("pnc_husk_reaper_smoke")

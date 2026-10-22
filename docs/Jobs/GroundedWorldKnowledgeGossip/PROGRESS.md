@@ -18,3 +18,7 @@ Audit exact current source paths and evidence for:
 Capture one real worker before-state showing GOSSIP with and without provided authoritative statements.
 
 After W0 contract freeze, continue through Core W1 then Hoomans W2-W6, DT W7, Lab W8 and final W9 without requiring another prompt. Parent completion is controlled by the Core roadmap, not this adopter ledger alone.
+
+## W0 durable evidence
+
+Completed the bounded source/authority audit without adding production state. Exact local/remote state, the zombie census/cache relationship, faction/death publication points, PZ API limitation, conversation worker before-state, and DT boundary are recorded in `AUDIT.md` and Core `Docs/world_knowledge_gossip/PROGRESS.md`. The current dirty PNC files remain untouched. Next phase is Core W1, then Hoomans W2-W6.

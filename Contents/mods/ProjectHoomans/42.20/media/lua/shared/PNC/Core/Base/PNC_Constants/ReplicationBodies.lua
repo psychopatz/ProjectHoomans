@@ -80,7 +80,10 @@ Const.HUSK_LEDGER_LAYOUT_VERSION = 2
 -- id, including vanilla Naked, into this set.
 Const.HUSK_LEDGER_CARRIER_POLICY_VERSION = 1
 Const.HUSK_LEDGER_MAX_ENTRIES = 48
-Const.HUSK_LEDGER_MAX_PER_RECORD = 2
+-- Keep a short history of distinct carrier ids. A record may cycle through
+-- several live/abstract transitions before the population manager returns all
+-- of its old shells; retaining only the newest two recreates anonymous husks.
+Const.HUSK_LEDGER_MAX_PER_RECORD = 8
 -- Long enough that a husk in an area the player revisits days later is still reaped.
 Const.HUSK_LEDGER_TTL_HOURS = 168
 Const.HUSK_LEDGER_MATCH_RADIUS = 2.0

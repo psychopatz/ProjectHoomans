@@ -1,5 +1,7 @@
 # Hoomans Adoption Contract
 
+W0 contract freeze (2026-10-22): Hoomans remains the sole owner of faction, NPC health/death, zombie observation, community, and Project Zomboid world authority. Core receives typed facts and actor references only. The full source matrix and unknown/42.20 limitations are in `AUDIT.md`.
+
 ## Hoomans producers
 
 Register adapters over current authoritative owners; do not move their state:
