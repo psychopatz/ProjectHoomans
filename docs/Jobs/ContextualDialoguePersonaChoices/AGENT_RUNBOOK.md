@@ -81,3 +81,35 @@ For every implementation slice:
 Stop only for a genuine safety/authorization blocker, unsafe repository divergence/concurrent ownership conflict, missing required external capability with no valid fallback, or full developer-side completion.
 
 Do not stop because an individual phase passed, documentation was updated, unit tests passed, or native PZ is unavailable.
+
+
+## Corrective behavioral-completion rules
+
+The prior P7 handoff is superseded by the 2026-10-22 corrective audit. Do not report READY FOR USER LIVE TEST until P8 in ROADMAP.md passes.
+
+### Companion bond
+
+- Preserve existing detailed starting relationship kinds; do not migrate them into only three stored values.
+- Derive the coarse speech class friend/family/lover transiently.
+- Family subtypes use localized term metadata and generic family phrase families.
+- Never assume family or lover means current relationship state friend.
+- Never derive gameplay ownership/authority from bond class.
+
+### Harness parity
+
+Normal Semantic Lab relationship state must come from the production RelationshipStates resolver using approval/respect/familiarity plus the previous/current state needed for hysteresis.
+
+Do not keep a normal user-editable independent state field that can contradict the production resolver.
+
+### Visible-behavior acceptance
+
+A style dial is not complete because its value appears in an inspector. It must either:
+
+1. materially influence an authored realization/rank/eligibility rule covered by tests; or
+2. be marked informational/not speech-affecting in the UI and docs.
+
+Do not use hello-only tests as proof that persona affects normal dialogue.
+
+### Provider completion
+
+Do not add more hard-coded provider IDs to the central suggestion builder. New provider work must move toward generic registry collection.
