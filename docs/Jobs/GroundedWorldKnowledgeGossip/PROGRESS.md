@@ -100,3 +100,5 @@ python3 -m tools.semantic_harness.testing.performance --samples 2 --warmup 1 --s
 ```
 
 These measurements cover the real production Lua worker protocol only; native Project Zomboid engine tick cost, SP/MP scheduling and server authority remain user-owned and untested.
+
+The authoritative-domain smoke now also covers `zombie`, `hostile_npc`, `player`, and unknown death attribution; war, peace, truce, alliance and alliance-break incident publication; faction destruction; and authorized public acquisition. Commit: `ba9f32b8`.
