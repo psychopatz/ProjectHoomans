@@ -122,9 +122,17 @@ function Network.BroadcastZombieReaction(targetZombie, attackerZombie, options)
     return sendToInterestedNPC(npcId, Const.CMD_ZOMBIE_REACTION, payload) > 0
 end
 
-function Network.BroadcastZombieBite(attackerZombie, targetNPCBody, npcId, phase, bumpType)
+function Network.BroadcastZombieBite(
+    attackerZombie,
+    targetNPCBody,
+    npcId,
+    phase,
+    bumpType,
+    woundType
+)
     local attackerOnlineID
     local targetOnlineID
+    local phaseName
     if not Core.IsAuthority()
         or not isServer
         or not isServer()
@@ -137,12 +145,16 @@ function Network.BroadcastZombieBite(attackerZombie, targetNPCBody, npcId, phase
         return false
     end
     targetOnlineID = Network.GetZombieOnlineID(targetNPCBody)
+    phaseName = phase == "clear" and "clear"
+        or phase == "impact" and "impact" or "start"
     local payload = {
         attackerOnlineID = attackerOnlineID,
         targetOnlineID = targetOnlineID,
         npcId = npcId and tostring(npcId) or nil,
-        phase = phase == "clear" and "clear" or "start",
+        phase = phaseName,
         bumpType = bumpType and tostring(bumpType) or "Bite",
+        woundType = phaseName == "impact" and woundType
+            and tostring(woundType) or nil,
     }
     return sendToInterestedNPC(npcId, Const.CMD_ZOMBIE_BITE, payload) > 0
 end

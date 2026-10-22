@@ -23,6 +23,10 @@ local function processZombie(zombie, now)
     local hitSettling
     local zombieId
     local biteEntry
+    local nativePlayerOwned
+    local nativePlayerTarget
+    local nativePlayerSource
+    local nativePlayerAction
     if isForeignOwnedBody(zombie) then
         return
     end
@@ -38,6 +42,34 @@ local function processZombie(zombie, now)
         and ZombieReaction.IsEngineHitSettling
         and ZombieReaction.IsEngineHitSettling(zombie, now)
         or false
+
+    -- A vanilla player target must win before Hoomans renews the NPC lease,
+    -- clears the native target, or reapplies NoLungeAttack. This is the
+    -- singleplayer race fix and is also used by the MP server-side authority
+    -- when the native target is visible there.
+    if Internal.ShouldYieldToNativePlayerAttack then
+        nativePlayerOwned, nativePlayerTarget, nativePlayerSource,
+            nativePlayerAction = Internal.ShouldYieldToNativePlayerAttack(
+                zombie, now
+            )
+    end
+    if nativePlayerOwned
+        and ZombieAggro.BiteInternal
+        and ZombieAggro.BiteInternal.GetBiteEntry
+    then
+        zombieId = Internal.ensureZombieID(zombie)
+        biteEntry = ZombieAggro.BiteInternal.GetBiteEntry(zombieId)
+        if biteEntry
+            and biteEntry.phase == "windup"
+            and biteEntry.appliedDamage ~= true
+            and ZombieAggro.BiteInternal.CancelBeforeImpact
+        then
+            ZombieAggro.BiteInternal.CancelBeforeImpact(
+                zombieId, "native_player_handoff", now
+            )
+            biteEntry = nil
+        end
+    end
     -- Keep target selection and path goals current during the brief hit
     -- animation. The animation may pause locomotion; it must not drop aggro.
     if ZombieAggro.UpdateBiteState(zombie, now) then
@@ -58,6 +90,43 @@ local function processZombie(zombie, now)
             now
         )
         return
+    end
+
+    if nativePlayerOwned then
+        Internal.BeginNativePlayerHandoff(
+            zombie,
+            nativePlayerTarget,
+            now,
+            "player_target_" .. tostring(nativePlayerSource or "handoff")
+        )
+        logPursuitDiagnostic(
+            zombie,
+            nil,
+            "compatibility",
+            "native_player_handoff",
+            "action=" .. tostring(nativePlayerAction)
+                .. " source=" .. tostring(nativePlayerSource),
+            now
+        )
+        return
+    end
+
+    -- A foreign provider may own the native target without publishing a
+    -- Hoomans lease. Preserve that provider's target/path/lunge state and let
+    -- its own callback finish the handoff.
+    if Internal.GetNativeTargetOwner then
+        local nativeOwner = Internal.GetNativeTargetOwner(zombie)
+        if nativeOwner and nativeOwner ~= "ProjectHoomans" then
+            logPursuitDiagnostic(
+                zombie,
+                nil,
+                "compatibility",
+                "native_control_yield",
+                "owner=" .. tostring(nativeOwner),
+                now
+            )
+            return
+        end
     end
 
     -- Keep a valid NPC lease through player proximity. Reacquisition below

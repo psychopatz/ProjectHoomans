@@ -11,6 +11,7 @@ local visibilityKind = "blocked"
 local damageCount = 0
 local bumpType = ""
 local zombiesDontAttack
+local playedAnimations = {}
 
 local npcBody = {
     x = 1,
@@ -87,6 +88,12 @@ PNC = {
             return true
         end,
     },
+    Animation = {
+        PlayBump = function(_, _, requestedBumpType)
+            playedAnimations[#playedAnimations + 1] = requestedBumpType
+            return true, "test"
+        end,
+    },
     Sandbox = {
         CanZombieTargetRecord = function() return true end,
     },
@@ -130,14 +137,14 @@ laneReason = "clear"
 visibilityKind = "clear"
 T.truthy(PNC.ZombieAggro.TryStartBite(zombie, npcBody, record) == true,
     "clear adjacent lane did not start a bite")
-T.truthy(bumpType == "Bite", "clear bite did not enter windup")
+T.truthy(bumpType == "", "bite entered the native bump state during windup")
 T.equal(zombiesDontAttack, true,
     "scripted bite reopened native targeting for the shell")
 
 laneClear = false
 laneReason = "wall"
 visibilityKind = "blocked"
-now = 1250
+now = 1100
 T.truthy(PNC.ZombieAggro.UpdateBiteState(zombie, now) == true,
     "blocked in-flight bite was not handled")
 T.truthy(damageCount == 0,
@@ -146,6 +153,57 @@ T.truthy(PNC.ZombieAggro.State.bites.z44.phase == "release",
     "blocked in-flight bite did not enter release")
 T.truthy(PNC.ZombieAggro.State.bites.z44.releaseReason == "bite_lane_wall",
     "blocked in-flight bite lost its wall reason")
+
+now = 1250
+T.truthy(PNC.ZombieAggro.UpdateBiteState(zombie, now) == true,
+    "blocked bite release was not finalized")
+
+laneClear = true
+laneReason = "clear"
+visibilityKind = "clear"
+T.truthy(PNC.ZombieAggro.TryStartBite(zombie, npcBody, record) == true,
+    "second clear bite did not start")
+now = 1500
+T.truthy(PNC.ZombieAggro.UpdateBiteState(zombie, now) == true,
+    "successful bite impact was not resolved")
+T.equal(damageCount, 1, "successful bite did not apply damage")
+T.equal(playedAnimations[1], "Bite",
+    "successful bite did not request the bite animation")
+T.equal(PNC.ZombieAggro.BiteInternal.ResolveVisualBumpType(
+    "scratch", "Bite"
+), "AttackBareHands1", "scratch did not select a claw animation")
+T.equal(PNC.ZombieAggro.BiteInternal.ResolveVisualBumpType(
+    "laceration", "Bite"
+), "AttackKnife", "laceration did not select a slash animation")
+
+now = 2200
+T.truthy(
+    PNC.ZombieAggro.UpdateBiteState(zombie, now) == true,
+    "successful bite release was not finalized before handoff test"
+)
+now = 2250
+T.truthy(
+    PNC.ZombieAggro.UpdateBiteState(zombie, now) == true,
+    "successful bite release did not complete before handoff test"
+)
+now = 2300
+T.truthy(
+    PNC.ZombieAggro.TryStartBite(zombie, npcBody, record) == true,
+    "pre-impact handoff test bite did not start"
+)
+T.equal(PNC.ZombieAggro.State.bites.z44.phase, "windup",
+    "pre-impact handoff test did not leave a windup bite entry")
+now = 2350
+T.truthy(
+    PNC.ZombieAggro.BiteInternal.CancelBeforeImpact(
+        "z44", "native_player_handoff", now
+    ),
+    "native-player handoff did not cancel pre-impact windup"
+)
+T.equal(damageCount, 1,
+    "pre-impact native-player handoff incorrectly applied bite damage")
+T.equal(PNC.ZombieAggro.State.bites.z44, nil,
+    "pre-impact handoff left a stale bite entry")
 T.finish("pnc_zombie_bite_lane_smoke")
 
 T.finish("pnc_zombie_bite_lane_smoke")

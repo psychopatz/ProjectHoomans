@@ -119,11 +119,39 @@ PNC = {
     Const = {
         PRESENCE_LIVE = "live",
         ZOMBIE_AGGRO_RADIUS = 12,
+        ZOMBIE_NPC_AGGRO_LEASE_MS = 1100,
         ZOMBIE_NPC_PATH_REFRESH_MS = 350,
         ZOMBIE_NPC_PATH_REFRESH_DISTANCE = 0.6,
     },
+    Registry = {
+        FindRecordByZombie = function(body)
+            return {
+                id = body == npcBody and "npc" or nil,
+                presenceState = "live",
+                alive = true,
+            }
+        end,
+        Get = function(id)
+            return id == "npc" and {
+                id = "npc",
+                presenceState = "live",
+                alive = true,
+            } or nil
+        end,
+        GetLiveZombie = function(id)
+            return id == "npc"
+                and PNC.ClientPresenceSync
+                and PNC.ClientPresenceSync.BodyByID
+                and PNC.ClientPresenceSync.BodyByID.npc
+                or nil
+        end,
+    },
+    Sandbox = {
+        CanZombieTargetRecord = function() return true end,
+    },
     Core = {
         Now = function() return now end,
+        GenerateID = function(prefix) return tostring(prefix) .. "-zombie" end,
         DistanceSq = function(x1, y1, x2, y2)
             local dx = x1 - x2
             local dy = y1 - y2
@@ -188,6 +216,15 @@ Events = {
         Remove = function() end,
     },
 }
+
+-- Load the shared ownership seam in the client harness as well. This models
+-- both the MP owning-client callback and the SP authority using the same
+-- native-player handoff contract.
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Zombies/PNC_ZombieAggro_State.lua"
+)
 
 ZombieIdleState = {
     instance = function()
@@ -296,6 +333,25 @@ T.equal(pathRequests, 2,
     "multiplayer client ran the singleplayer pursuit fallback")
 T.truthy(target == nil and attackedBy == nil,
     "multiplayer client applied a stale server directive locally")
+
+-- A player target that has not entered an attack state is still eligible for
+-- NPC pursuit. Hoomans must clear the stale native target before applying
+-- the live NPC directive.
+PNC.Network.ClientState.zombiePursuitDirectives["17"].active = true
+PNC.Network.ClientState.zombiePursuitDirectives["17"].expiresAt = 5000
+zombie.actionState = "idle"
+target = player
+attackedBy = nil
+noLunge = true
+npcBody.x = 5
+now = 2700
+registered(zombie)
+T.equal(pathRequests, 3,
+    "idle player target must not block the NPC coordinate path")
+T.equal(target, nil,
+    "NPC pursuit must clear the stale native player target")
+T.equal(noLunge, true,
+    "NPC pursuit must retain native lunge suppression")
 
 zombie.actionState = "attack"
 target = player

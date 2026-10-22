@@ -5,6 +5,66 @@ local Const = PNC.Const
 local Health = PNC.Health
 local Settings = PNC.Sandbox
 local CombatDefense = PNC.CombatDefense
+local ZombieAggro = PNC.ZombieAggro
+
+local VISUAL_BUMP_BY_WOUND = {
+    bite = "Bite",
+    scratch = "AttackBareHands1",
+    laceration = "AttackKnife",
+}
+
+function BiteInternal.ResolveVisualBumpType(woundType, biteBumpType)
+    local normalized = string.lower(tostring(woundType or "bite"))
+    if normalized == "bite" then
+        return biteBumpType == "BiteLow" and "BiteLow" or "Bite"
+    end
+    return VISUAL_BUMP_BY_WOUND[normalized] or "Bite"
+end
+
+local function playImpactAnimation(entry, record, result, zombie, now)
+    local Animation = PNC.Animation
+    local Pursuit = ZombieAggro and ZombieAggro.Pursuit or nil
+    local woundType = result and result.woundType or "bite"
+    local bumpType = BiteInternal.ResolveVisualBumpType(
+        woundType,
+        entry and entry.bumpType or nil
+    )
+    local ok
+    local accepted
+    local reason
+    if Pursuit and type(Pursuit.CanWriteNative) == "function" then
+        local allowed
+        allowed, _, reason = Pursuit.CanWriteNative(
+            zombie, "ProjectHoomans", now, 100
+        )
+        if allowed == false then
+            entry.visualBumpType = bumpType
+            entry.visualAnimation = "owner:" .. tostring(reason or "foreign")
+            return false
+        end
+    end
+    if not Animation or type(Animation.PlayBump) ~= "function" then
+        entry.visualBumpType = bumpType
+        entry.visualAnimation = "unavailable"
+        return false
+    end
+    ok, accepted, reason = pcall(
+        Animation.PlayBump,
+        zombie,
+        record,
+        bumpType,
+        {
+            -- The carrier is a vanilla zombie, not a managed NPC shell. Do
+            -- not let the generic NPC animation helper mark it useless.
+            keepManagedUseless = false,
+            leaseUntil = now + (tonumber(Const.BITE_RELEASE_TIMEOUT_MS) or 650),
+        }
+    )
+    entry.visualBumpType = bumpType
+    entry.visualAnimation = accepted == true and "played"
+        or (ok and tostring(reason or "rejected") or "error")
+    return ok and accepted == true
+end
 
 local function prepareImpact(entry, record, zombie, npcBody, now)
     entry.phase = "impact"
@@ -143,6 +203,19 @@ function BiteInternal.ApplyBiteDamage(entry, record, zombie, npcBody, now)
         entry, record, zombie, npcBody, now
     )
     copyDefenseOutcome(entry, result, defense)
+    if applied then
+        playImpactAnimation(entry, record, result, zombie, now)
+        if PNC.Network and PNC.Network.BroadcastZombieBite then
+            PNC.Network.BroadcastZombieBite(
+                zombie,
+                npcBody,
+                entry.npcId,
+                "impact",
+                entry.visualBumpType,
+                entry.woundType or "bite"
+            )
+        end
+    end
     playImpactSound(zombie, entry, result, applied, avoided)
     if isServer and isServer() then
         record.runtime.forceSyncEvent = "zombie_bite"

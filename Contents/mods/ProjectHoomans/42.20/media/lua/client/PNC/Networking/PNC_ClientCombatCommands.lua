@@ -13,6 +13,8 @@ local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local BiteInternal = PNC.ZombieAggro
+    and PNC.ZombieAggro.BiteInternal or nil
 
 local function logFirearmAudit(eventName, payload, ...)
     local fields
@@ -118,6 +120,59 @@ local function finishBiteReplica(attackerZombie)
     end
 end
 
+local function playReplicatedBiteImpact(attackerZombie, state, now)
+    local Animation = PNC.Animation
+    local Pursuit = PNC.ZombieAggro and PNC.ZombieAggro.Pursuit or nil
+    local snapshot
+    local bumpType
+    local ok
+    local accepted
+    local reason
+    if not attackerZombie or not Animation
+        or type(Animation.PlayBump) ~= "function"
+    then
+        state.visualAnimation = "unavailable"
+        return false
+    end
+    if Pursuit and type(Pursuit.CanWriteNative) == "function" then
+        local allowed
+        allowed, _, reason = Pursuit.CanWriteNative(
+            attackerZombie, "ProjectHoomans", now, 100
+        )
+        if allowed == false then
+            state.visualAnimation = "owner:" .. tostring(reason or "foreign")
+            return false
+        end
+    end
+    snapshot = ClientState.snapshots
+        and ClientState.snapshots[tostring(state.npcId or "")] or nil
+    snapshot = snapshot or {
+        id = state.npcId,
+        runtime = {},
+    }
+    bumpType = BiteInternal
+        and BiteInternal.ResolveVisualBumpType
+        and BiteInternal.ResolveVisualBumpType(
+            state.woundType,
+            state.bumpType
+        )
+        or tostring(state.bumpType or "Bite")
+    ok, accepted, reason = pcall(
+        Animation.PlayBump,
+        attackerZombie,
+        snapshot,
+        bumpType,
+        {
+            keepManagedUseless = false,
+            leaseUntil = now + (tonumber(Const.BITE_RELEASE_TIMEOUT_MS) or 650),
+        }
+    )
+    state.visualBumpType = bumpType
+    state.visualAnimation = accepted == true and "played"
+        or (ok and tostring(reason or "rejected") or "error")
+    return ok and accepted == true
+end
+
 local function applyZombieBite(args)
     local attackerZombie
     local targetNPCBody
@@ -149,8 +204,12 @@ local function applyZombieBite(args)
     state.targetOnlineID = args.targetOnlineID
     state.npcId = args.npcId
     state.bumpType = tostring(args.bumpType or "Bite")
+    state.woundType = args.woundType and tostring(args.woundType) or nil
     state.startedAt = now
-    state.localReleaseAt = now + (tonumber(Const.ZOMBIE_BITE_CLEAR_DELAY_MS) or 700) + 350
+    state.localReleaseAt = now
+        + (tonumber(Const.ZOMBIE_BITE_APPLY_DELAY_MS) or 450)
+        + (tonumber(Const.BITE_RELEASE_TIMEOUT_MS) or 650)
+        + 350
     if not attackerZombie then
         return true
     end
@@ -181,8 +240,16 @@ local function applyZombieBite(args)
         attackerZombie:setVariable("BumpDone", false)
         attackerZombie:setVariable("BumpAnimFinished", false)
     end
-    if attackerZombie.setBumpType then
-        attackerZombie:setBumpType(state.bumpType)
+    if args.phase == "impact" then
+        if state.impactApplied == true then
+            return true
+        end
+        state.impactApplied = true
+        state.phase = "impact"
+        state.localReleaseAt = now
+            + (tonumber(Const.BITE_RELEASE_TIMEOUT_MS) or 650)
+            + 350
+        playReplicatedBiteImpact(attackerZombie, state, now)
     end
     state.applied = true
     return true

@@ -16,6 +16,51 @@ local function clearForcedNPC(modData)
     end
 end
 
+local function releaseCoordinatePursuit(zombie)
+    local behavior
+    if not zombie then return end
+    behavior = zombie.getPathFindBehavior2
+        and zombie:getPathFindBehavior2() or nil
+    if behavior and behavior.cancel then
+        behavior:cancel()
+    end
+    if zombie.setPath2 then
+        zombie:setPath2(nil)
+    end
+    if zombie.setVariable then
+        zombie:setVariable("bPathfind", false)
+        zombie:setVariable("bMoving", false)
+    end
+end
+
+-- Suspend only Hoomans' NPC pursuit lane.  This is intentionally not
+-- clearZombieTarget(): a native player handoff must preserve target and
+-- attackedBy so vanilla AttackState can continue its normal transition.
+function Internal.SuspendNPCPursuit(zombie, now, reason)
+    local modData
+    if not zombie then return false end
+    now = tonumber(now) or Core.Now()
+    modData = Internal.getZombieModData(zombie)
+    clearForcedNPC(modData)
+    Internal.ReleasePursuitLease(zombie, PURSUIT_OWNER)
+    if Internal.clearMPTargetDirective then
+        Internal.clearMPTargetDirective(zombie, now)
+    end
+    -- Dedicated MP server does not own the native movement path. The owning
+    -- client receives the directive clear and releases its local path. SP is
+    -- local authority, so release the coordinate goal immediately.
+    if not (isServer and isServer() == true) then
+        releaseCoordinatePursuit(zombie)
+    end
+    if zombie.setVariable then
+        zombie:setVariable("NoLungeAttack", false)
+    end
+    if modData then
+        modData.PNC_NativeCombatReason = reason
+    end
+    return true
+end
+
 function Internal.isManagedNPCBody(zombie)
     return Core.IsManagedNPCBody(zombie)
 end
@@ -24,6 +69,14 @@ function Internal.clearZombieTarget(zombie)
     local modData
     if not zombie then
         return
+    end
+    if Internal.CanWriteNativeControl then
+        local canWrite = Internal.CanWriteNativeControl(
+            zombie, PURSUIT_OWNER, Core.Now(), 100
+        )
+        if not canWrite then
+            return false
+        end
     end
     modData = Internal.getZombieModData(zombie)
     clearForcedNPC(modData)
@@ -46,6 +99,7 @@ function Internal.clearZombieTarget(zombie)
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", false)
     end
+    return true
 end
 
 function Internal.getForcedNPCBodyTarget(zombie, now)

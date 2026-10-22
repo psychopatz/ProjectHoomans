@@ -72,6 +72,7 @@ end
 
 local function pursueNPCRecord(zombie, record, npcBody, now, hitSettling)
     local lease
+    local pursued
     if not record or not npcBody then
         clearMPTargetDirective(zombie, now)
         return false
@@ -106,7 +107,10 @@ local function pursueNPCRecord(zombie, record, npcBody, now, hitSettling)
         suppressForStealth(zombie, record)
         clearMPTargetDirective(zombie, now)
     else
-        pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
+        pursued = pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
+        if pursued == false then
+            return false
+        end
     end
     return true
 end

@@ -31,6 +31,22 @@ local function isManagedBody(body)
         or false
 end
 
+local function canWriteNativeControl(zombie)
+    local aggro = PNC.ZombieAggro
+    local internal = aggro and aggro.Internal or nil
+    local allowed
+    if internal and type(internal.CanWriteNativeControl) == "function" then
+        allowed = internal.CanWriteNativeControl(
+            zombie,
+            "ProjectHoomans",
+            Core and Core.Now and Core.Now() or 0,
+            100
+        )
+        return allowed ~= false
+    end
+    return true
+end
+
 local function logPursuitDiagnostic(
     zombie, npcId, state, detail, now
 )
@@ -103,10 +119,14 @@ function Effects.ClearNativeCombatTarget(zombie)
     -- attackedBy: Build 42 AttackState casts those native combat slots to
     -- IsoPlayer during animation events. Movement uses coordinate goals while
     -- damage is handled by the abstract server lane.
+    if not canWriteNativeControl(zombie) then
+        return false
+    end
     if zombie.setTarget then zombie:setTarget(nil) end
     if zombie.setAttackedBy then zombie:setAttackedBy(nil) end
     if zombie.setTargetSeenTime then zombie:setTargetSeenTime(0) end
     if zombie.clearAggroList then zombie:clearAggroList() end
+    return true
 end
 
 Internal.IsMultiplayerMode = isMultiplayerMode

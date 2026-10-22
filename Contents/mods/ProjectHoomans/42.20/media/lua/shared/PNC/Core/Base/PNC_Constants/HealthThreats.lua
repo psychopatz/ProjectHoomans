@@ -102,8 +102,10 @@ Const.ZOMBIE_ATTACKER_OBSERVATION_MS = 1500
 Const.TARGET_SWITCH_DISTANCE_RATIO = 0.72
 Const.TARGET_RECENT_ATTACKER_MS = 5000
 Const.ZOMBIE_AGGRO_RADIUS = 14
--- Nearby eligible NPCs can hold attention beyond the immediate-player range.
-Const.ZOMBIE_NPC_COMMIT_RADIUS = 10.0
+-- An eligible NPC anywhere inside the bounded aggro envelope can claim a
+-- zombie even when the player is currently closer. This matches the intended
+-- Bandits-like nearby-NPC attraction without expanding the active-set query.
+Const.ZOMBIE_NPC_COMMIT_RADIUS = 14.0
 -- Only a closer player this near may reclaim a committed NPC pursuit.
 Const.ZOMBIE_NPC_PLAYER_RECLAIM_RADIUS = 2.4
 Const.ZOMBIE_AGGRO_KEEP_RADIUS = 2.4

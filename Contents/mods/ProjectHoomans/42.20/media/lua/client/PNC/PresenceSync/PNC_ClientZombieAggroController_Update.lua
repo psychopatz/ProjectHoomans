@@ -73,6 +73,10 @@ function Internal.UpdateClientZombieAggro(zombie, now)
     local directive
     local hasActiveDirective
     local directiveApplied
+    local nativePlayerOwned
+    local nativePlayerTarget
+    local nativePlayerSource
+    local nativePlayerAction
     now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
     if not zombie or (zombie.isDead and zombie:isDead()) then
         return false
@@ -155,6 +159,43 @@ function Internal.UpdateClientZombieAggro(zombie, now)
         )
         return false
     end
+    if PNC.ZombieAggro
+        and PNC.ZombieAggro.Internal
+        and PNC.ZombieAggro.Internal.ShouldYieldToNativePlayerAttack
+    then
+        nativePlayerOwned, nativePlayerTarget, nativePlayerSource,
+            nativePlayerAction =
+            PNC.ZombieAggro.Internal.ShouldYieldToNativePlayerAttack(
+                zombie, now
+            )
+        if nativePlayerOwned then
+            local handoffTransition = entry.nativePlayerHandoff ~= true
+                or entry.nativePlayerTarget ~= nativePlayerTarget
+            if handoffTransition then
+                Effects.HandoffToNativePlayer(
+                    zombie,
+                    nativePlayerTarget,
+                    now,
+                    hasActiveDirective or entry.directiveActive == true
+                )
+                logPursuitDiagnostic(
+                    zombie,
+                    nil,
+                    "compatibility",
+                    "native_player_handoff",
+                    "action=" .. tostring(nativePlayerAction)
+                        .. " source=" .. tostring(nativePlayerSource),
+                    now
+                )
+            end
+            entry.nativePlayerHandoff = true
+            entry.nativePlayerTarget = nativePlayerTarget
+            entry.directiveActive = false
+            return false
+        end
+        entry.nativePlayerHandoff = false
+        entry.nativePlayerTarget = nil
+    end
     -- The server owns MP target selection. Only the local client applies its
     -- short-lived coordinate directive to the locally simulated zombie.
     if isMultiplayerMode() and not (isClient and isClient() == true) then
@@ -234,6 +275,20 @@ function Internal.UpdateClientZombieAggro(zombie, now)
                 now
             )
             return true
+        end
+        if directive
+            and directive.active == true
+            and (tonumber(directive.expiresAt) or 0) > now
+        then
+            entry.directiveActive = false
+            logPursuitDiagnostic(
+                zombie,
+                directive.npcId,
+                "mp_native_control_denied",
+                "revision=" .. tostring(directive.revision),
+                now
+            )
+            return false
         end
         if entry.directiveActive then
             logPursuitDiagnostic(

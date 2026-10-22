@@ -29,6 +29,8 @@ function BiteInternal.SetBiteDiagnostic(record, entry, reason)
         distSq = distSq,
         phase = entry.phase,
         bumpType = entry.bumpType,
+        visualBumpType = entry.visualBumpType,
+        visualAnimation = entry.visualAnimation,
         startedAt = entry.startedAt,
         impactAt = entry.impactAt,
         releaseAt = entry.releaseAt,

@@ -31,6 +31,22 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
     local approach = true
     local repathClose = false
     local biteStarted
+    local canWriteNative
+    local nativeOwner
+    canWriteNative, nativeOwner = Internal.CanWriteNativeControl(
+        zombie, "ProjectHoomans", now, 100
+    )
+    if not canWriteNative then
+        logPursuitDiagnostic(
+            zombie,
+            record and record.id or nil,
+            "server_target",
+            "native_control_denied",
+            "owner=" .. tostring(nativeOwner),
+            now
+        )
+        return false
+    end
     if not Internal.AcquirePursuitLease(
         zombie,
         "ProjectHoomans",
@@ -93,7 +109,11 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
         if zombie.setTargetSeenTime then zombie:setTargetSeenTime(0) end
         if zombie.clearAggroList then zombie:clearAggroList() end
     end
-    if dist < Const.ZOMBIE_BITE_DISTANCE and zDistance < 0.3 then
+    -- Use the same inclusive contact boundary as the coordinate pursuit lane.
+    -- A zombie commonly settles exactly on the engine's collision distance;
+    -- using a strict comparison here leaves it facing the NPC forever while
+    -- the bite lane never receives ownership.
+    if dist <= Const.ZOMBIE_BITE_DISTANCE and zDistance < 0.3 then
         zombieSquare = zombie.getSquare and zombie:getSquare() or nil
         npcSquare = npcBody.getSquare and npcBody:getSquare() or nil
         if not zombieSquare or not npcSquare then
@@ -132,8 +152,12 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
                     )
                 end
             elseif zombie.faceThisObject then
-                approach = hitSettling == true
-                repathClose = approach
+                -- Keep the pursuit alive while the zombie turns. The old
+                -- branch only faced the NPC and left SP with no movement
+                -- retry when the first arrival was not aligned enough for a
+                -- bite. refreshPursuitPath remains throttled and bounded.
+                approach = true
+                repathClose = true
                 zombie:faceThisObject(npcBody)
                 logPursuitDiagnostic(
                     zombie, record.id, "server_combat", "turning_to_npc",
@@ -188,6 +212,7 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
     if PNC.Perception and PNC.Perception.PublishZombieGroupAlert then
         PNC.Perception.PublishZombieGroupAlert(record, zombie, now)
     end
+    return true
 end
 
 

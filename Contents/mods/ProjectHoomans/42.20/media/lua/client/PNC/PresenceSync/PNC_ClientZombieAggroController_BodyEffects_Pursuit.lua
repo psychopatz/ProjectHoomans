@@ -28,6 +28,21 @@ local PATH_REFRESH_DISTANCE = Internal.PathRefreshDistance
 local PATH_STABLE_RETRY_MS = Internal.PathStableRetryMS
 local BITE_DISTANCE = Internal.BiteDistance
 
+local function canWriteNativeControl(zombie, now, priority, intent)
+    local aggro = PNC.ZombieAggro
+    local internal = aggro and aggro.Internal or nil
+    if internal and type(internal.CanWriteNativeControl) == "function" then
+        return internal.CanWriteNativeControl(
+            zombie,
+            "ProjectHoomans",
+            now,
+            priority or 100,
+            intent
+        )
+    end
+    return true, "ProjectHoomans", nil
+end
+
 function Effects.ShouldRefreshPath(zombie, targetX, targetY, now)
     local modData = zombie.getModData
         and zombie:getModData() or nil
@@ -93,6 +108,33 @@ function Effects.ApplySingleplayerAggro(
     local requested
     local requestReason
     local biteActive
+    local canWrite
+    local nativeOwner
+    local nativePlayerOwned
+    local nativePlayerTarget
+    local aggro = PNC.ZombieAggro
+    local internal = aggro and aggro.Internal or nil
+    if internal and internal.ShouldYieldToNativePlayerAttack then
+        nativePlayerOwned, nativePlayerTarget =
+            internal.ShouldYieldToNativePlayerAttack(zombie, now)
+        if nativePlayerOwned then
+            Effects.HandoffToNativePlayer(
+                zombie, nativePlayerTarget, now, false
+            )
+            return false
+        end
+    end
+    canWrite, nativeOwner = canWriteNativeControl(zombie, now, 100)
+    if not canWrite then
+        logPursuitDiagnostic(
+            zombie,
+            npcId,
+            "sp_native_control_denied",
+            "owner=" .. tostring(nativeOwner),
+            now
+        )
+        return false
+    end
     Effects.ClearHeldItems(zombie)
     -- PNC bodies are IsoZombie shells. Build 42's native attack and window
     -- traversal events assume their target is an IsoPlayer and can dereference
@@ -200,6 +242,7 @@ function Effects.ApplySingleplayerAggro(
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", true)
     end
+    return true
 end
 
 function Effects.ApplyCoordinateDirective(
@@ -217,10 +260,35 @@ function Effects.ApplyCoordinateDirective(
     local refreshed
     local requested
     local requestReason
+    local nativePlayerOwned
+    local nativePlayerTarget
+    local aggro = PNC.ZombieAggro
+    local internal = aggro and aggro.Internal or nil
     if not zombie or x == nil or y == nil or z == nil then
         return false
     end
     now = tonumber(now) or (Core and Core.Now and Core.Now()) or 0
+    if internal and internal.ShouldYieldToNativePlayerAttack then
+        nativePlayerOwned, nativePlayerTarget =
+            internal.ShouldYieldToNativePlayerAttack(zombie, now)
+        if nativePlayerOwned then
+            Effects.HandoffToNativePlayer(
+                zombie, nativePlayerTarget, now, false
+            )
+            return false
+        end
+    end
+    local canWrite, nativeOwner = canWriteNativeControl(zombie, now, priority)
+    if not canWrite then
+        logPursuitDiagnostic(
+            zombie,
+            npcId,
+            "mp_native_control_denied",
+            "owner=" .. tostring(nativeOwner),
+            now
+        )
+        return false
+    end
     if zombie.getModData then
         local modData = zombie:getModData()
         if modData then
@@ -307,9 +375,27 @@ function Effects.ApplyCoordinateDirective(
     return true
 end
 
-function Effects.ReleaseCoordinateDirective(zombie)
+function Effects.ReleaseCoordinateDirective(zombie, intent)
     local modData
+    local canWrite
+    local nativeOwner
     if not zombie then
+        return false
+    end
+    canWrite, nativeOwner = canWriteNativeControl(
+        zombie,
+        Core and Core.Now and Core.Now() or 0,
+        100,
+        intent
+    )
+    if not canWrite then
+        logPursuitDiagnostic(
+            zombie,
+            nil,
+            "native_control_release_denied",
+            "owner=" .. tostring(nativeOwner),
+            Core and Core.Now and Core.Now() or 0
+        )
         return false
     end
     modData = zombie.getModData and zombie:getModData() or nil
@@ -340,11 +426,41 @@ function Effects.ReleaseCoordinateDirective(zombie)
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", false)
     end
+    if intent == "native_player_handoff" and modData then
+        modData.PNC_NativeCombatHandoffApplied = true
+    end
     return true
 end
 
 function Effects.ApplyPlayerTarget(zombie, player)
     local currentTarget = zombie.getTarget and zombie:getTarget() or nil
+    local canWrite, nativeOwner = canWriteNativeControl(
+        zombie,
+        Core and Core.Now and Core.Now() or 0,
+        100,
+        "native_player_handoff"
+    )
+    if not canWrite then
+        logPursuitDiagnostic(
+            zombie,
+            nil,
+            "player_handoff_denied",
+            "owner=" .. tostring(nativeOwner),
+            Core and Core.Now and Core.Now() or 0
+        )
+        return false
+    end
+    if PNC.ZombieAggro
+        and PNC.ZombieAggro.Internal
+        and PNC.ZombieAggro.Internal.GetPursuitLease
+        and PNC.ZombieAggro.Internal.GetPursuitLease(
+            zombie,
+            Core and Core.Now and Core.Now() or 0
+        )
+    then
+        Effects.ReleaseCoordinateDirective(zombie, "native_player_handoff")
+        currentTarget = zombie.getTarget and zombie:getTarget() or nil
+    end
     if isManagedBody(currentTarget) then
         Effects.ReleaseManagedTarget(zombie)
         currentTarget = zombie.getTarget and zombie:getTarget() or nil
@@ -357,10 +473,39 @@ function Effects.ApplyPlayerTarget(zombie, player)
     end
 end
 
+function Effects.HandoffToNativePlayer(zombie, player, now, hasDirective)
+    local aggro = PNC.ZombieAggro
+    local internal = aggro and aggro.Internal or nil
+    if hasDirective then
+        Effects.ReleaseCoordinateDirective(zombie, "native_player_handoff")
+    end
+    if internal and internal.BeginNativePlayerHandoff then
+        return internal.BeginNativePlayerHandoff(
+            zombie, player, now, "player_target_client"
+        )
+    end
+    if player and zombie.getTarget and zombie:getTarget() ~= player
+        and zombie.setTarget
+    then
+        zombie:setTarget(player)
+    end
+    if zombie.setVariable then
+        zombie:setVariable("NoLungeAttack", false)
+    end
+    return true
+end
+
 function Effects.ReleaseManagedTarget(zombie)
     local target = zombie.getTarget and zombie:getTarget() or nil
     local attackedBy = zombie.getAttackedBy
         and zombie:getAttackedBy() or nil
+    if not canWriteNativeControl(
+        zombie,
+        Core and Core.Now and Core.Now() or 0,
+        100
+    ) then
+        return false
+    end
     if isManagedBody(target) and zombie.setTarget then
         zombie:setTarget(nil)
     end

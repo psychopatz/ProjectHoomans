@@ -63,6 +63,35 @@ function BiteInternal.BeginRelease(zombieId, npcBody, reason, now)
     return true
 end
 
+-- A player handoff may interrupt only the pre-impact windup. Once damage has
+-- been resolved, the bite is an atomic combat event and UpdateBiteState keeps
+-- its bounded release path intact.
+function BiteInternal.CancelBeforeImpact(zombieId, reason, now)
+    local entry
+    if not zombieId or not State.bites then return false end
+    entry = State.bites[zombieId]
+    if not entry
+        or entry.phase ~= "windup"
+        or entry.appliedDamage == true
+    then
+        return false
+    end
+    now = tonumber(now) or Core.Now()
+    BiteInternal.BeginRelease(
+        zombieId,
+        entry.npcBody,
+        reason or "native_player_handoff",
+        now
+    )
+    BiteInternal.FinalizeRelease(
+        zombieId,
+        entry,
+        now,
+        reason or "native_player_handoff"
+    )
+    return true
+end
+
 function ZombieAggro.ClearBiteEntryForZombie(zombie, reason)
     local zombieId = AggroInternal.ensureZombieID(zombie)
     return BiteInternal.BeginRelease(

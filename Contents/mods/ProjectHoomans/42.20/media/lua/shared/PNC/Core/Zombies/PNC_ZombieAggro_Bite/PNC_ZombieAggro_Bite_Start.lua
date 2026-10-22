@@ -80,7 +80,10 @@ local function configureAttack(zombie, npcBody, bumpType)
         zombie:setVariable("BumpDone", false)
         zombie:setVariable("BumpAnimFinished", false)
     end
-    if zombie.setBumpType then zombie:setBumpType(bumpType) end
+    -- Do not enter BumpedState during windup.  The damage resolver is the
+    -- authoritative hit gate; the visual bump is armed only after it accepts
+    -- the wound.  Entering the state here made misses look like successful
+    -- attacks and also gave the engine an extra native state transition.
     if zombie.setNoTeeth then
         -- PNC owns the damage roll; suppress native AttackState damage.
         zombie:setNoTeeth(true)
@@ -91,6 +94,8 @@ end
 local function createEntry(
     zombieId, zombie, npcBody, record, bumpType, previousNoTeeth, now
 )
+    local applyDelay = tonumber(Const.ZOMBIE_BITE_APPLY_DELAY_MS) or 450
+    local visualHold = tonumber(Const.BITE_RELEASE_TIMEOUT_MS) or 650
     return {
         zombieId = zombieId,
         npcId = record.id,
@@ -99,8 +104,11 @@ local function createEntry(
         bumpType = bumpType,
         phase = "windup",
         startedAt = now,
-        applyAt = now + Const.ZOMBIE_BITE_APPLY_DELAY_MS,
-        clearAt = now + Const.ZOMBIE_BITE_CLEAR_DELAY_MS,
+        applyAt = now + applyDelay,
+        -- Keep the carrier alive long enough for the impact animation to
+        -- finish.  This delay starts at bite windup, while the visual starts
+        -- at applyAt after the wound RNG succeeds.
+        clearAt = now + applyDelay + visualHold,
         appliedDamage = false,
         broadcastClear = false,
         previousNoTeeth = previousNoTeeth,
