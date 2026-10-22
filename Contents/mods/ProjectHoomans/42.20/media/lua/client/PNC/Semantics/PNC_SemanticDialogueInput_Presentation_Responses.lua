@@ -339,8 +339,9 @@ local function localizedSegment(templateID, fallback, args)
         return fallback, key
     end
     args = type(args) == "table" and args or {}
-    local firstArg = args.npcName or args.target or args.object
-        or args.location or args.topic or args.content or args.value
+    local firstArg = args.familyAddress or args.familyTerm or args.npcName
+        or args.target or args.object or args.location or args.topic
+        or args.content or args.value
     if type(firstArg) == "table" then firstArg = nil end
     local ok, value = pcall(translation.TrFormat, key, fallback, firstArg)
     if ok and value ~= nil and tostring(value) ~= "" then

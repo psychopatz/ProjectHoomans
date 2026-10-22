@@ -14,6 +14,8 @@ Style.SCHEMA = "speech.style.context.v1"
 
 local ActorContext = PNC.Semantics.ActorConversationContext
     or require "PNC/Semantics/PNC_ActorConversationContext"
+local NPCTraits = PNC.NPCTraits
+    or require "PNC/Core/Traits/PNC_NPCTraitRegistry"
 
 local DIMENSIONS = {
     "warmth", "formality", "directness", "verbosity", "hostility",
@@ -48,27 +50,49 @@ local function normalizedSigned(value)
     return math.max(0, math.min(1, (number(value, 0) + 100) / 200))
 end
 
-local function applyTrait(values, trait)
-    trait = string.lower(tostring(trait or ""))
-    if trait == "friendly" or trait == "pnc_friendly"
-        or trait == "kind" or trait == "protective"
-    then
-        add(values, "warmth", 0.16)
-        add(values, "openness", 0.14)
-        add(values, "deference", -0.04)
-    elseif trait == "reserved" or trait == "pnc_reserved"
-        or trait == "withdrawn" or trait == "pnc_withdrawn"
-        or trait == "guarded" or trait == "suspicious"
-    then
-        add(values, "warmth", -0.07)
-        add(values, "verbosity", -0.16)
-        add(values, "openness", -0.20)
-        add(values, "directness", 0.06)
-    elseif trait == "aggressive" or trait == "hostile" then
-        add(values, "hostility", 0.22)
-        add(values, "directness", 0.16)
-        add(values, "openness", -0.10)
-        add(values, "verbosity", -0.08)
+local PERSONALITY_TO_SPEECH = {
+    compassion = { warmth = 0.28 },
+    sociability = { warmth = 0.20, openness = 0.24, verbosity = 0.16 },
+    forgiveness = { warmth = 0.22, openness = 0.18, hostility = -0.10 },
+    bravery = { directness = 0.16, deference = -0.05 },
+    materialism = { formality = 0.16 },
+    aggression = { hostility = 0.22, directness = 0.16, openness = -0.10,
+        verbosity = -0.08 },
+    loyalty = { deference = 0.16, warmth = 0.04 },
+}
+
+local function applyTrait(values, provenance, trait)
+    local definition = NPCTraits
+        and type(NPCTraits.GetDefinition) == "function"
+        and NPCTraits.GetDefinition(trait) or nil
+    if type(definition) ~= "table" then return end
+    local modifiers = definition.speechStyle
+    if type(modifiers) ~= "table" then
+        local personality = definition.effects
+            and definition.effects.personality or nil
+        if type(personality) == "table" then
+            modifiers = {}
+            for personalityField, value in pairs(personality) do
+                local mappings = PERSONALITY_TO_SPEECH[personalityField]
+                if mappings then
+                    for dimension, coefficient in pairs(mappings) do
+                        modifiers[dimension] = (modifiers[dimension] or 0)
+                            + tonumber(value or 0) * coefficient
+                    end
+                end
+            end
+        end
+    end
+    if type(modifiers) ~= "table" then return end
+    local applied = false
+    for dimension, delta in pairs(modifiers) do
+        if values[dimension] ~= nil and tonumber(delta) ~= nil then
+            add(values, dimension, delta)
+            applied = true
+        end
+    end
+    if applied then
+        provenance[#provenance + 1] = tostring(definition.id or trait)
     end
 end
 
@@ -96,6 +120,7 @@ function Style.Resolve(source)
     if type(actor) ~= "table" then actor = ActorContext.Build(context) end
     local personality = actor.personality or {}
     local relationship = actor.relationship or {}
+    local bond = actor.bond or {}
     local roles = actor.roles or {}
     local situation = actor.situation or {}
     local values = {}
@@ -105,18 +130,37 @@ function Style.Resolve(source)
         traits = {},
         roles = {},
         situation = {},
+        bond = {},
     }
     for index = 1, #DIMENSIONS do values[DIMENSIONS[index]] = 0.5 end
 
     add(values, "warmth", (number(personality.compassion, 0.5) - 0.5) * 0.30)
     add(values, "warmth", (number(personality.sociability, 0.5) - 0.5) * 0.22)
     add(values, "openness", (number(personality.sociability, 0.5) - 0.5) * 0.30)
-    add(values, "formality", (number(personality.materialism, 0.5) - 0.5) * 0.04)
+    add(values, "formality", (number(personality.materialism, 0.5) - 0.5) * 0.14)
     add(values, "directness", (number(personality.aggression, 0.5) - 0.5) * 0.18)
     add(values, "hostility", (number(personality.aggression, 0.5) - 0.5) * 0.24)
     add(values, "deference", (number(personality.loyalty, 0.5) - 0.5) * 0.16)
     add(values, "verbosity", (number(personality.sociability, 0.5) - 0.5) * 0.22)
     provenance.personality[#provenance.personality + 1] = "social_profile"
+    add(values, "warmth", (number(personality.forgiveness, 0.5) - 0.5) * 0.22)
+    add(values, "openness", (number(personality.forgiveness, 0.5) - 0.5) * 0.18)
+    add(values, "hostility", (number(personality.forgiveness, 0.5) - 0.5) * -0.10)
+    add(values, "directness", (number(personality.bravery, 0.5) - 0.5) * 0.16)
+    add(values, "deference", (number(personality.bravery, 0.5) - 0.5) * -0.05)
+    local socialStyle = string.lower(tostring(personality.socialStyle or ""))
+    if socialStyle == "friendly" or socialStyle == "protective" then
+        add(values, "warmth", 0.14)
+        add(values, "openness", 0.10)
+        add(values, "verbosity", 0.06)
+        provenance.personality[#provenance.personality + 1] = "social_style_friendly"
+    elseif socialStyle == "withdrawn" or socialStyle == "reserved" then
+        add(values, "warmth", -0.08)
+        add(values, "openness", -0.18)
+        add(values, "verbosity", -0.10)
+        add(values, "directness", 0.04)
+        provenance.personality[#provenance.personality + 1] = "social_style_withdrawn"
+    end
 
     add(values, "warmth", (normalizedSigned(relationship.approval) - 0.5) * 0.28)
     add(values, "deference", (normalizedSigned(relationship.respect) - 0.5) * 0.18)
@@ -145,8 +189,22 @@ function Style.Resolve(source)
     end
 
     for index = 1, #(actor.traits or {}) do
-        applyTrait(values, actor.traits[index])
-        provenance.traits[#provenance.traits + 1] = actor.traits[index]
+        applyTrait(values, provenance.traits, actor.traits[index])
+    end
+
+    if bond.class == "family" then
+        add(values, "warmth", 0.08)
+        add(values, "openness", 0.05)
+        provenance.bond[#provenance.bond + 1] = "family_bond"
+    elseif bond.class == "lover" then
+        add(values, "warmth", 0.10)
+        add(values, "openness", 0.08)
+        add(values, "deference", -0.02)
+        provenance.bond[#provenance.bond + 1] = "lover_bond"
+    elseif bond.class == "friend" then
+        add(values, "warmth", 0.04)
+        add(values, "openness", 0.04)
+        provenance.bond[#provenance.bond + 1] = "friend_bond"
     end
 
     if roles.hostile then
@@ -194,6 +252,11 @@ function Style.Resolve(source)
         schema = Style.SCHEMA,
         variant = variant(values),
         dimensions = values,
+        bond = {
+            class = bond.class,
+            kind = bond.kind,
+            term = bond.term,
+        },
         provenance = provenance,
         revisions = actor.revisions,
         privacy = {
@@ -211,6 +274,11 @@ function Style.PublicView(value)
         schema = value.schema,
         variant = value.variant or "neutral",
         revisions = value.revisions,
+        bond = {
+            class = value.bond and value.bond.class or nil,
+            kind = value.bond and value.bond.kind or nil,
+            term = value.bond and value.bond.term or nil,
+        },
         privacy = {
             genderUsed = false,
             privateProfileFieldsUsed = false,

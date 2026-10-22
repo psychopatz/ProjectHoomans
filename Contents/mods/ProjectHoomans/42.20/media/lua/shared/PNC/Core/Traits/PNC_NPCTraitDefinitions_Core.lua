@@ -10,7 +10,11 @@ register({
     iconPath = "media/ui/Traits/trait_pnc_friendly.png",
     source = "behavior",
     priority = 10,
+    aliases = { "friendly" },
     excludes = { "pnc_withdrawn" },
+    speechStyle = {
+        warmth = 0.16, openness = 0.14, deference = -0.04,
+    },
     effects = {
         personality = { sociability = 0.12, forgiveness = 0.10,
             compassion = 0.06 },
@@ -26,7 +30,12 @@ register({
     iconPath = "media/ui/Traits/trait_pnc_withdrawn.png",
     source = "behavior",
     priority = 10,
+    aliases = { "withdrawn" },
     excludes = { "pnc_friendly" },
+    speechStyle = {
+        warmth = -0.07, verbosity = -0.16, openness = -0.20,
+        directness = 0.06,
+    },
     effects = {
         personality = { sociability = -0.12, forgiveness = -0.03 },
         categoryBiases = { socialStyle = { withdrawn = 1.0 } },
@@ -40,7 +49,9 @@ register({
     descriptionKey = "UI_PNC_Trait_Jealous_Description",
     iconPath = "media/ui/Traits/trait_pnc_jealous.png",
     source = "behavior",
+    aliases = { "jealous" },
     excludes = { "pnc_unpossessive" },
+    speechStyle = { hostility = 0.04, openness = -0.05 },
     effects = {
         personality = { forgiveness = -0.08, aggression = 0.03 },
         categoryBiases = { jealousyStyle = { jealous = 1.0 } },
@@ -54,7 +65,9 @@ register({
     descriptionKey = "UI_PNC_Trait_Unpossessive_Description",
     iconPath = "media/ui/Traits/trait_pnc_unpossessive.png",
     source = "behavior",
+    aliases = { "unpossessive" },
     excludes = { "pnc_jealous" },
+    speechStyle = { warmth = 0.02, openness = 0.05 },
     effects = {
         personality = { forgiveness = 0.08, aggression = -0.03 },
         categoryBiases = { jealousyStyle = { unpossessive = 1.0 } },
@@ -68,7 +81,9 @@ register({
     descriptionKey = "UI_PNC_Trait_Flirty_Description",
     iconPath = "media/ui/Traits/trait_pnc_flirty.png",
     source = "preference",
+    aliases = { "flirty" },
     excludes = { "pnc_reserved" },
+    speechStyle = { warmth = 0.04, openness = 0.06 },
     effects = {
         personality = { sociability = 0.04 },
         categoryBiases = { romanceStyle = { flirty = 1.0 } },
@@ -82,7 +97,12 @@ register({
     descriptionKey = "UI_PNC_Trait_Reserved_Description",
     iconPath = "media/ui/Traits/trait_pnc_reserved.png",
     source = "behavior",
+    aliases = { "reserved" },
     excludes = { "pnc_flirty" },
+    speechStyle = {
+        warmth = -0.04, verbosity = -0.08, openness = -0.08,
+        directness = 0.03,
+    },
     effects = {
         personality = { sociability = -0.04 },
         categoryBiases = { romanceStyle = { reserved = 1.0 } },
@@ -97,6 +117,7 @@ register({
     iconPath = "media/ui/Traits/trait_pnc_ironnerves.png",
     source = "temperament",
     generation = { group = "nerves", weight = 18 },
+    speechStyle = { directness = 0.04, deference = -0.02 },
     excludes = { "pnc_frayednerves" },
     effects = {
         personality = { bravery = 0.10, aggression = -0.03 },
@@ -116,6 +137,7 @@ register({
     iconPath = "media/ui/Traits/trait_pnc_frayednerves.png",
     source = "temperament",
     generation = { group = "nerves", weight = 14 },
+    speechStyle = { hostility = 0.08, openness = -0.05, directness = 0.02 },
     excludes = { "pnc_ironnerves" },
     effects = {
         personality = { bravery = -0.08, aggression = 0.08,
@@ -234,4 +256,3 @@ register({
         behavior = { sleep = -0.10, nightActivity = 0.10 },
     },
 })
-

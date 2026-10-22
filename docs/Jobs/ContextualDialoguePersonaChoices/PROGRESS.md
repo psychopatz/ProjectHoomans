@@ -66,6 +66,38 @@ Additional checks passed:
 
 P8A does not claim behavioral completion. It does not yet expand every semantic response family, complete generic provider discovery, complete arbitrary-utterance Lab comparison, or provide final Dynamic Trading/P8E evidence. Do not report `READY FOR USER LIVE TEST`.
 
-## Next Chunk — P8B behavioral speech completion
+## P8B behavioral speech completion
 
-Audit every exposed persona/relationship/role/situation input against actual `SpeechStyleContext` use. Add real effects or explicitly mark informational controls. Replace central trait-name checks with declarative speech metadata where practical. Build a machine-readable response-family coverage inventory and expand production-backed realization beyond greeting across wellbeing, needs, medical, identity, knowledge/context, acknowledgement, apology, offer/help, dispute/refusal, threat/hostility, event reaction, companion/action acknowledgement, Dynamic Trading entry, and quest/commitment where authoritative families exist. Keep semantic response identity and gameplay authority unchanged, use friend/family/lover as bounded realization classes, and preserve deterministic neutral fallback. Add focused real-worker matrices before continuing to P8C.
+Revision pending: production-backed speech-family completion is implemented locally and validated; commit it before moving to P8C.
+
+Implementation evidence:
+
+- `PNC_SpeechStyleContext` now consumes declarative `speechStyle` metadata from the registered NPC trait definitions, derives previously unused `forgiveness` and `bravery`, applies `socialStyle`, and projects transient friend/family/lover bond detail without using gender or private profile fields.
+- `PNC_SpeechRealization` now exposes a bounded machine-readable coverage inventory and deterministic whole-phrase families for non-greeting wellbeing, health/medical, identity, knowledge, acknowledgement, apology, offer/help, dispute/refusal, hostility/threat, gossip, activity, and companion-action responses. Neutral non-bond turns retain their canonical semantic translation identity; missing non-neutral variants fall back to neutral.
+- Family-bond realization resolves the localized relationship address term first and passes it as a typed phrase argument. EN/TL production-worker evidence is `Mom`/`Nanay` with the same semantic response and click/action identity.
+- The reused refusal `semantic.social.acknowledged` template is explicitly blocked from friendly acknowledgement realization on the authoritative `No.` branch.
+- The existing client response presenter remains the only localization/presentation lane; no parser, planner, choice UI, action dispatcher, or persistent speech/bond state was added.
+
+Focused real-worker validation:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_contextual_speech_behavior_p8b
+Ran 5 tests — OK
+
+python3 -m unittest \
+ tools.semantic_harness.tests.test_contextual_bonds_p8a \
+ tools.semantic_harness.tests.test_contextual_actor_context_p2 \
+ tools.semantic_harness.tests.test_contextual_speech_style_p3 \
+ tools.semantic_harness.tests.test_contextual_speech_behavior_p8b \
+ tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p6 \
+ tools.semantic_harness.tests.test_contextual_acceptance_c6b \
+ tools.semantic_harness.tests.test_contextual_choice_registry_p1 \
+ tools.semantic_harness.tests.test_contextual_dynamic_trading_p5
+Ran 30 tests in 65.466s — OK
+```
+
+Additional P8B checks passed: `luac5.3 -p` on changed realization/style/presenter/worker Lua; `python3 -m json.tool` on EN/TL realization catalogs and the translation manifest; `git diff --check`; and the existing P3 style/gender/TL regression set.
+
+## Next Chunk — P8C choice-provider completion
+
+Audit the current `DialogueChoiceRegistry` collection path and remove remaining central provider-specific discovery calls. Make registered providers discoverable through one bounded generic contract while preserving root/flow/response-plan offers, privacy, deterministic ranking/dedupe, click-frame identity, stale/replay rejection, existing authority/effect ownership, Dynamic Trading isolation, and one existing Core `choicesPart` UI lane. Add one real contextual social/relationship provider and focused real-worker provider-discovery tests before continuing to P8D.

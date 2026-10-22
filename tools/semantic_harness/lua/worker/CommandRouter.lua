@@ -92,6 +92,32 @@ local function relationshipKindCatalog(context, payload)
     }
 end
 
+local function speechRealizationCatalog(context)
+    local realization = PNC.Semantics
+        and PNC.Semantics.SpeechRealization or nil
+    if not realization then
+        local ok, value = pcall(require, "PNC/Semantics/PNC_SpeechRealization")
+        if ok then realization = value end
+    end
+    if type(realization) ~= "table" then
+        return { schema = "pnc.speech.realization.catalog.v1", coverage = {}, families = {} }
+    end
+    local families = {}
+    if type(realization.Families) == "function" then
+        for templateID in pairs(realization.Families() or {}) do
+            families[#families + 1] = tostring(templateID)
+            if #families >= 64 then break end
+        end
+        table.sort(families)
+    end
+    return {
+        schema = "pnc.speech.realization.catalog.v1",
+        coverage = type(realization.Coverage) == "function"
+            and realization.Coverage() or {},
+        families = families,
+    }
+end
+
 local function personaCatalog(context, payload)
     local definitions = PNC.NPCTraits
         and type(PNC.NPCTraits.GetDefinitions) == "function"
@@ -115,6 +141,7 @@ local function personaCatalog(context, payload)
         return tostring(left.id or "") < tostring(right.id or "")
     end)
     local relationshipKinds = relationshipKindCatalog(context, payload)
+    local speechRealization = speechRealizationCatalog(context)
     return {
         schema = "semantic.persona.catalog.v1",
         schemaVersion = 1,
@@ -136,6 +163,7 @@ local function personaCatalog(context, payload)
         integrations = { "DTHoomans" },
         relationshipKinds = relationshipKinds.kinds,
         relationshipKindRegistration = relationshipKinds.registration,
+        speechRealization = speechRealization,
     }
 end
 
