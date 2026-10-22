@@ -447,3 +447,88 @@ Registry.List/Collect registered providers
 The central suggestions module may adapt legacy/root/flow sources, but must not need provider-specific calls for each addon/domain.
 
 Dynamic Trading becomes the reference optional provider rather than a hard-coded special case.
+
+
+## 17. Contextual semantic hubs are navigation, not authored categories
+
+A semantic hub is a bounded contextual candidate-aggregation surface.
+
+It is distinct from an authored Conversation category.
+
+For What's Up:
+
+```text
+reviewed What's Up utterance/root navigation
+ -> canonical semantic hub activation
+ -> registered providers contribute safe candidate avenues
+ -> common eligibility/dedupe/ranking/presentation
+ -> selected candidate enters its existing semantic or authored route
+```
+
+The hub does not generate or own a ConversationBlock by itself.
+
+The obsolete `projecthoomans:whats_up` authored category must not remain as a fallback.
+
+Specific direct user intent remains specific. For example, `Any gossip?` routes directly to GOSSIP semantics rather than activating the general hub.
+
+## 18. Hub membership belongs to providers
+
+Providers should be able to declare or compute participation in a hub without adding provider-specific branches to the central collector.
+
+Conceptually:
+
+```lua
+{
+    id = "projecthoomans.gossip",
+    hubs = { whats_up = true },
+    collect = function(context) ... end,
+}
+```
+
+The existing common registry still owns normalization/order/bounds.
+
+Hub activation supplies the relevant hub ID/current context to collection; it does not copy provider state.
+
+## 19. Simulation control metadata is a UI contract
+
+The Semantic Lab should consume a bounded worker-provided control catalog describing normal editable scenario fields.
+
+This metadata defines:
+
+- control type;
+- value type;
+- range/step;
+- option provider;
+- section/group;
+- label/help;
+- read-only/advanced status.
+
+It does not replace scenario validation or production gameplay state ownership.
+
+Tk renders controls; the existing scenario/configure boundary remains authoritative for harness state.
+
+## 20. Structured and Advanced views share one draft
+
+Structured editors and Advanced JSON must edit one scenario draft.
+
+There must not be separate structured-vs-JSON scenario owners.
+
+The conversion contract is:
+
+```text
+scenario draft
+  -> structured controls
+  -> Advanced JSON view
+  -> validation
+  -> existing worker CONFIG/configure boundary
+```
+
+Unsupported/unknown fields must be preserved when round-tripping whenever safely possible rather than silently deleted by the structured editor.
+
+## 21. Harness history is presentation-only
+
+Completed graph retention and hub inspection history exist only to improve debugging.
+
+They are not NPC memory, conversation memory, ModData, or semantic facts.
+
+Reset/replacement may clear them without gameplay consequences.
