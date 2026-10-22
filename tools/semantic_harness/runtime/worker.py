@@ -10,7 +10,7 @@ from .config import HarnessConfig
 from .item_catalog import search_item_catalog
 from .process import HarnessError, LuaProcess
 from .scenario import validate_scenario
-from .activity import ActivityLog
+from .activity import ActivityLog, default_activity_path
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
@@ -37,7 +37,6 @@ class LuaSemanticWorker:
     ) -> None:
         validate_scenario(scenario)
         self.scenario = scenario
-        self.activity_log = activity_log or ActivityLog()
         self.config = config or HarnessConfig.discover(
             repository=repository or REPOSITORY,
             core_repository=core_repository or CORE_REPOSITORY,
@@ -46,6 +45,10 @@ class LuaSemanticWorker:
             startup_timeout=startup_timeout,
             request_timeout=request_timeout,
             shutdown_timeout=shutdown_timeout,
+        )
+        self.activity_log = activity_log or ActivityLog(
+            path=default_activity_path(self.config.repository),
+            client="api",
         )
         self.runtime = LuaProcess(self.config, activity_log=self.activity_log)
         try:

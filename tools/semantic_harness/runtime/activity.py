@@ -4,15 +4,52 @@ from __future__ import annotations
 
 from collections import deque
 from datetime import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
 from threading import Lock
 from typing import Any
+import uuid
+
+try:
+    import fcntl
+except ImportError:  # pragma: no cover - Windows has no fcntl.
+    fcntl = None
+
+
+MAX_SHARED_BYTES = 2_000_000
+
+
+def default_activity_path(
+    repository: Path,
+    explicit: str | Path | None = None,
+) -> Path:
+    """Return the shared per-repository activity stream location."""
+
+    if explicit:
+        return Path(explicit).expanduser().resolve()
+    state_root = Path(
+        os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state")
+    )
+    identity = str(repository.expanduser().resolve())
+    digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:16]
+    return state_root / "project-hoomans" / f"semantic-lab-{digest}.activity.jsonl"
 
 
 class ActivityLog:
-    """Thread-safe bounded event history for one harness session."""
+    """Thread-safe bounded history with an optional cross-process stream."""
 
-    def __init__(self, capacity: int = 500) -> None:
+    def __init__(
+        self,
+        capacity: int = 500,
+        path: str | Path | None = None,
+        client: str = "harness",
+    ) -> None:
         self.capacity = max(32, int(capacity))
+        self.path = Path(path).expanduser().resolve() if path else None
+        self.client = str(client or "harness")
+        self.session_id = uuid.uuid4().hex[:12]
         self._events: deque[dict[str, Any]] = deque(maxlen=self.capacity)
         self._sequence = 0
         self._lock = Lock()
@@ -22,6 +59,9 @@ class ActivityLog:
             self._sequence += 1
             record = {
                 "sequence": self._sequence,
+                "eventID": f"{self.session_id}-{self._sequence:06d}",
+                "sessionID": self.session_id,
+                "client": self.client,
                 "timestamp": datetime.now().astimezone().isoformat(
                     timespec="milliseconds"
                 ),
@@ -30,6 +70,7 @@ class ActivityLog:
                 "details": details,
             }
             self._events.append(record)
+            self._append_shared(record)
             return dict(record)
 
     def snapshot(self, since: int = 0) -> list[dict[str, Any]]:
@@ -40,6 +81,40 @@ class ActivityLog:
                 if int(record.get("sequence", 0)) > int(since)
             ]
 
+    def shared_snapshot(self) -> list[dict[str, Any]]:
+        """Read the bounded shared timeline, including other processes."""
+
+        if self.path is None:
+            return self.snapshot()
+        records: deque[dict[str, Any]] = deque(maxlen=self.capacity)
+        try:
+            with self.path.open("r", encoding="utf-8") as stream:
+                if fcntl is not None:
+                    fcntl.flock(stream.fileno(), fcntl.LOCK_SH)
+                try:
+                    for line in stream:
+                        try:
+                            value = json.loads(line)
+                        except (TypeError, ValueError):
+                            continue
+                        if isinstance(value, dict) and value.get("eventID"):
+                            records.append(value)
+                finally:
+                    if fcntl is not None:
+                        fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+        except OSError:
+            return self.snapshot()
+        return [dict(record) for record in records]
+
+    def new_shared_events(self, seen_event_ids: set[str]) -> list[dict[str, Any]]:
+        """Return shared events not already rendered by a client."""
+
+        return [
+            record
+            for record in self.shared_snapshot()
+            if str(record.get("eventID") or "") not in seen_event_ids
+        ]
+
     @property
     def latest_sequence(self) -> int:
         with self._lock:
@@ -48,6 +123,36 @@ class ActivityLog:
     def clear(self) -> None:
         with self._lock:
             self._events.clear()
+
+    def _append_shared(self, record: dict[str, Any]) -> None:
+        """Append one compact event without making logging a hard dependency."""
+
+        if self.path is None:
+            return
+        try:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            with self.path.open("a+", encoding="utf-8") as stream:
+                if fcntl is not None:
+                    fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
+                try:
+                    stream.write(json.dumps(record, separators=(",", ":")) + "\n")
+                    stream.flush()
+                    if stream.tell() > MAX_SHARED_BYTES:
+                        stream.seek(0)
+                        retained = deque(
+                            stream,
+                            maxlen=max(self.capacity * 4, self.capacity),
+                        )
+                        stream.seek(0)
+                        stream.truncate()
+                        stream.writelines(retained)
+                        stream.flush()
+                finally:
+                    if fcntl is not None:
+                        fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+        except (OSError, TypeError, ValueError):
+            # Activity tracing must never break the worker or the UI.
+            return
 
 
 def format_activity_event(record: dict[str, Any]) -> str:
@@ -59,6 +164,8 @@ def format_activity_event(record: dict[str, Any]) -> str:
     timestamp = timestamp.rsplit("+", 1)[0].rsplit("-", 1)[0]
     source = str(record.get("source") or "event").upper()
     event = str(record.get("event") or "activity")
+    client = str(record.get("client") or "")
+    session_id = str(record.get("sessionID") or "")
     details = record.get("details") or {}
     if not isinstance(details, dict):
         details = {"detail": details}
@@ -82,5 +189,9 @@ def format_activity_event(record: dict[str, Any]) -> str:
             if len(rendered) > 180:
                 rendered = rendered[:177] + "..."
             parts.append(f"{key}={rendered}")
+    if client:
+        parts.insert(0, f"client={client}")
+    if session_id:
+        parts.insert(1, f"session={session_id}")
     suffix = " · ".join(parts)
     return f"{timestamp}  {source:<8} {event:<16}" + (f" · {suffix}" if suffix else "")

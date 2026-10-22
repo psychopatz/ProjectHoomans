@@ -12,7 +12,11 @@ from .testing.runner import ConflictLedger, load_case, run_case
 from .runtime.config import ConfigurationError
 from .runtime.scenario import load_scenario
 from .runtime.worker import HarnessError, LuaSemanticWorker
-from .runtime.activity import ActivityLog, format_activity_event
+from .runtime.activity import (
+    ActivityLog,
+    default_activity_path,
+    format_activity_event,
+)
 
 PARSER_DESCRIPTION = "Tkinter chat UI and CLI for the real-Lua semantic dialogue harness."
 AUTHORING_OPERATIONS = (
@@ -150,6 +154,27 @@ def cli(arguments: argparse.Namespace) -> int:
             repository=repository,
             runtime_root=repository,
         )
+        activity_log = ActivityLog(
+            path=default_activity_path(
+                authoring_service.repository,
+                getattr(arguments, "activity_log", None),
+            ),
+            client=getattr(arguments, "activity_client", None) or "cli",
+        )
+        activity_log.record(
+            "cli",
+            "command_start",
+            mode=(
+                "case"
+                if arguments.case
+                else "authoring"
+                if any(
+                    getattr(arguments, name, None)
+                    for name in AUTHORING_OPERATIONS
+                )
+                else "semantic"
+            ),
+        )
         authoring_report = _run_authoring_operation(arguments, authoring_service)
         if authoring_report is not None:
             _print_result(authoring_report, arguments.jsonl)
@@ -161,15 +186,9 @@ def cli(arguments: argparse.Namespace) -> int:
             "startup_timeout": arguments.startup_timeout,
             "request_timeout": arguments.timeout,
             "shutdown_timeout": arguments.shutdown_timeout,
+            "activity_log": activity_log,
         }
-        if arguments.case:
-            report = run_case(load_case(Path(arguments.case)), **worker_kwargs)
-            _print_result(report.as_dict(), arguments.jsonl)
-            return 0 if report.conflicts == [] else 3
-        scenario = load_scenario(Path(arguments.scenario) if arguments.scenario else None)
-        if arguments.language:
-            scenario.setdefault("runtime", {})["language"] = arguments.language.upper()
-        activity_log = ActivityLog()
+
         activity_seen = 0
 
         def emit_activity() -> None:
@@ -182,10 +201,17 @@ def cli(arguments: argparse.Namespace) -> int:
             if records:
                 activity_seen = int(records[-1].get("sequence", activity_seen))
 
+        if arguments.case:
+            report = run_case(load_case(Path(arguments.case)), **worker_kwargs)
+            _print_result(report.as_dict(), arguments.jsonl)
+            emit_activity()
+            return 0 if report.conflicts == [] else 3
+        scenario = load_scenario(Path(arguments.scenario) if arguments.scenario else None)
+        if arguments.language:
+            scenario.setdefault("runtime", {})["language"] = arguments.language.upper()
         with LuaSemanticWorker(
             scenario,
             **worker_kwargs,
-            activity_log=activity_log,
         ) as worker:
             emit_activity()
             ledger = ConflictLedger() if arguments.audit else None
@@ -230,6 +256,15 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--ui-state",
         help="override the user-owned Semantic Lab window-state file",
+    )
+    parser.add_argument(
+        "--activity-log",
+        help="override the shared GUI/CLI activity JSONL file",
+    )
+    parser.add_argument(
+        "--activity-client",
+        default="cli",
+        help="client label written to the shared activity timeline (default: cli)",
     )
     parser.add_argument("--no-gui", "--cli", dest="no_gui", action="store_true", help="run inputs and print JSON")
     parser.add_argument("--interactive", action="store_true", help="read one conversation input per stdin line")

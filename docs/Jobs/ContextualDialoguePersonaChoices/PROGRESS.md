@@ -103,6 +103,20 @@ Completed locally on ProjectHoomans `main`.
 - Trait effects are bounded in a scrollable read-only pane so minimum-size Simulation keeps conversation and runtime controls visible.
 - Focused Tk/Xvfb regression suite after the polish: **18/18 passed**.
 
+## Cross-process harness activity observability
+
+Completed locally on ProjectHoomans `main`.
+
+- GUI, CLI, and direct `LuaSemanticWorker` clients now append to one bounded per-repository JSONL activity stream in the user state directory.
+- The Log tab reads events from other live sessions and identifies the client, session, worker PID, request ID, command, and bounded action details.
+- CLI agents can use `--activity-client agent`, and `--activity-log PATH` is available when a shared stream must be explicit.
+- Clear view removes rendered entries without deleting another session's shared history.
+- Real Tk/Xvfb cross-process smoke passed: a separate `agent` event appeared in the open GUI Log tab.
+- CLI shared-stream smoke passed with `--trace`, real Lua worker startup, request/response events, and `hello`.
+- Shared activity writes are lock-protected and rotate after the bounded file size limit; activity failures do not interrupt harness work.
+
+**Current exact next chunk:** user review of the open GUI Log tab while a separate CLI/agent harness session runs, followed by user-owned native Project Zomboid SP/MP validation.
+
 ## Handoff condition
 
 P11A-P11H and the requested Semantic Lab usability polish pass locally. **READY FOR USER LIVE TEST** remains valid for user-owned native Project Zomboid SP/MP validation. The agent did not operate native Project Zomboid and does not claim SP/MP evidence.

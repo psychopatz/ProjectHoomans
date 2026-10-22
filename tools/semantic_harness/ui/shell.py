@@ -41,7 +41,11 @@ from .dialogs.settings import (
 from ..inspection.transcript import TranscriptBuffer
 from ..runtime.worker import HarnessError, LuaSemanticWorker
 from ..runtime.worker_session import WorkerReady, WorkerResult, WorkerSession
-from ..runtime.activity import ActivityLog, format_activity_event
+from ..runtime.activity import (
+    ActivityLog,
+    default_activity_path,
+    format_activity_event,
+)
 from ..studio.workflow import SemanticLabWorkflowPane
 from .state import load as load_ui_state
 from .state import save as save_ui_state
@@ -254,8 +258,14 @@ class SemanticHarnessApp:
             repository=repository,
             runtime_root=repository,
         )
-        self.activity_log = ActivityLog()
-        self._activity_seen = 0
+        self.activity_log = ActivityLog(
+            path=default_activity_path(
+                self.authoring_service.repository,
+                getattr(arguments, "activity_log", None),
+            ),
+            client="gui",
+        )
+        self._activity_seen_ids: set[str] = set()
         self._activity_after: Any | None = None
         self.ui_state_path = ui_state_path(
             self.authoring_service.repository,
@@ -331,6 +341,7 @@ class SemanticHarnessApp:
             "window_start",
             geometry=self.root.geometry(),
             state_path=str(self.ui_state_path),
+            activity_path=str(self.activity_log.path or ""),
         )
         self._build_ui()
         self.root.protocol("WM_DELETE_WINDOW", self.close)
@@ -380,7 +391,7 @@ class SemanticHarnessApp:
         ).pack(side="left", fill="x", expand=True)
         ttk.Button(
             log_toolbar,
-            text="Clear log",
+            text="Clear view",
             command=self.clear_activity_log,
         ).pack(side="right")
         self.activity_log_widget = ScrolledText(
@@ -1334,30 +1345,34 @@ class SemanticHarnessApp:
     def _poll_activity_log(self) -> None:
         if self.closed:
             return
-        records = self.activity_log.snapshot(self._activity_seen)
+        records = self.activity_log.new_shared_events(self._activity_seen_ids)
         if records:
             self.activity_log_widget.configure(state="normal")
             for record in records:
                 self.activity_log_widget.insert(
                     "end", format_activity_event(record) + "\n"
                 )
-                self._activity_seen = max(
-                    self._activity_seen, int(record.get("sequence", 0))
-                )
+                event_id = str(record.get("eventID") or "")
+                if event_id:
+                    self._activity_seen_ids.add(event_id)
             self.activity_log_widget.see("end")
             self.activity_log_widget.configure(state="disabled")
             self.activity_log_status.set(
-                f"{self._activity_seen} events · shared GUI/CLI timeline"
+                f"{len(self._activity_seen_ids)} shown · shared GUI/CLI/agent timeline"
             )
         self._schedule_activity_poll()
 
     def clear_activity_log(self) -> None:
+        self._activity_seen_ids.update(
+            str(record.get("eventID") or "")
+            for record in self.activity_log.shared_snapshot()
+            if record.get("eventID")
+        )
         self.activity_log.clear()
-        self._activity_seen = self.activity_log.latest_sequence
         self.activity_log_widget.configure(state="normal")
         self.activity_log_widget.delete("1.0", "end")
         self.activity_log_widget.configure(state="disabled")
-        self.activity_log_status.set("Activity log cleared")
+        self.activity_log_status.set("Activity view cleared · shared history retained")
 
     def _worker_kwargs(self) -> dict[str, Any]:
         return {
