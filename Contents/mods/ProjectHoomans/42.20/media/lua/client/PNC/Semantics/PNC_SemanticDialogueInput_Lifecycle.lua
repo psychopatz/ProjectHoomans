@@ -60,14 +60,10 @@ local function suggestionTooltip(row)
     return nil
 end
 
--- Reuse Core's native choice list for semantic projections. This is a data
--- adapter only: Core still owns layout, scrolling, hover, click gating, and
--- session ordering; the canonical semantic input path owns the click frame.
-local function applyCoreChoices(view, projection)
-    local choicesPart = view and view.choicesPart or nil
-    if not choicesPart or type(choicesPart.setChoices) ~= "function" then
-        return false, "core_choices_unavailable"
-    end
+-- Build rows for Core's native choice list. This is a data adapter only: Core
+-- still owns layout, scrolling, hover, click gating, and session ordering; the
+-- canonical semantic input path owns the click frame.
+local function buildCoreChoices(view, projection)
     projection = type(projection) == "table" and projection or {}
     local selectedGroup
     local requestedGroup = projection.currentGroupID
@@ -128,7 +124,28 @@ local function applyCoreChoices(view, projection)
             capability.status == "eligible"
                 or capability.status == "selected_for_preflight")
     end
-    view.semanticSuggestionRows = rows
+    if view then view.semanticSuggestionRows = rows end
+    return rows
+end
+
+-- This callback is installed in the Core conversation definition. Core calls
+-- it after every authored choice normalization, including pending-response
+-- completion and in-place spec refresh. Returning nil preserves Core's
+-- normalized authored choices as the safe fallback.
+local function presentSemanticChoices(view, authoredChoices)
+    local projection = view and view.semanticSuggestions or nil
+    if type(projection) ~= "table" then return nil end
+    local rows = buildCoreChoices(view, projection)
+    if #rows > 0 then return rows end
+    return nil
+end
+
+local function applyCoreChoices(view, projection)
+    local choicesPart = view and view.choicesPart or nil
+    if not choicesPart or type(choicesPart.setChoices) ~= "function" then
+        return false, "core_choices_unavailable"
+    end
+    local rows = buildCoreChoices(view, projection)
     if #rows < 1 then
         -- A projection can legitimately be empty while a dependency or
         -- current topic is unavailable. Restore the authored Core choices
@@ -148,6 +165,7 @@ local function applyCoreChoices(view, projection)
     return true, rows
 end
 
+Internal.PresentSemanticChoices = presentSemanticChoices
 Internal.ApplySemanticChoices = applyCoreChoices
 
 function Internal.RefreshSuggestions(view, result)

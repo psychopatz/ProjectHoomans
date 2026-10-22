@@ -215,6 +215,22 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         -- authored branches, contextual actions, and compatibility handlers
         -- share one interaction path.
         choicePartVisible = true,
+        -- Core invokes this generic presentation seam after every normalized
+        -- choice write. Hoomans supplies semantic rows when a valid
+        -- projection exists; Core keeps authored choices as the fallback.
+        choicePresentation = function(view, authoredChoices)
+            local input = PNC.Semantics
+                and PNC.Semantics.DialogueInput or nil
+            local internal = input and input.Internal or nil
+            if internal
+                and type(internal.PresentSemanticChoices) == "function"
+            then
+                return internal.PresentSemanticChoices(
+                    view, authoredChoices
+                )
+            end
+            return nil
+        end,
         portrait = Context.PortraitSpec(entry),
         backgroundID = Backgrounds.Get(timeID),
         theme = Palette.BuildConversationTheme(entry),
