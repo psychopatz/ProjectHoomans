@@ -102,6 +102,12 @@ local function beginDirectFrame(view, frame)
     then
         return false, "conversation_busy"
     end
+    local context = view.spec and view.spec.context or nil
+    if type(context) == "table"
+        and context.pendingConversationRequest ~= nil
+    then
+        return false, "conversation_request_pending"
+    end
     local router = type(Internal.RouterFor) == "function"
         and Internal.RouterFor(view) or nil
     if not router then return false, "semantic_router_unavailable" end
@@ -138,6 +144,20 @@ function Input.Submit(view, value, part)
 end
 
 function Input.SubmitSemanticFrame(view, frame)
+    if type(Suggestions.IsGroupFrame) == "function"
+        and Suggestions.IsGroupFrame(frame)
+    then
+        local allowed, reason = beginDirectFrame(view, frame)
+        if not allowed then return false, reason end
+        if type(Internal.SelectSemanticGroup) ~= "function" then
+            return false, "semantic_group_unavailable"
+        end
+        local accepted, groupReason = Internal.SelectSemanticGroup(view, frame)
+        if accepted == true then
+            finishDirectFrame(view, reason)
+        end
+        return accepted, groupReason
+    end
     local isRootChoice = type(Suggestions.IsConversationRootChoiceFrame)
         == "function" and Suggestions.IsConversationRootChoiceFrame(frame)
     if isRootChoice then

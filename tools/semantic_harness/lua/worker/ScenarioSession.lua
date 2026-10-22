@@ -123,6 +123,10 @@ function ScenarioSession.reset(context, scenario)
         suggestions = Values.copy(
             Runtime.view and Runtime.view.semanticSuggestions
         ),
+        choiceSurface = Values.copy(
+            Runtime.view and Runtime.view.session
+                and Runtime.view.session.choicePresentationState
+        ),
         translation = context.OutputProjection.translationSnapshot(context),
     }
 end
@@ -169,6 +173,10 @@ function ScenarioSession.snapshot(context)
         },
         suggestions = Values.copy(
             Runtime.view and Runtime.view.semanticSuggestions
+        ),
+        choiceSurface = Values.copy(
+            Runtime.view and Runtime.view.session
+                and Runtime.view.session.choicePresentationState
         ),
     }
 end

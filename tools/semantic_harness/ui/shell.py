@@ -44,7 +44,9 @@ def semantic_suggestion_rows(
 ) -> list[dict[str, Any]]:
     """Build the bounded visual slice from the production projection."""
 
-    max_buttons = 5
+    # Production Lua owns the privacy/performance bound. The Tk adapter must
+    # render every row in the selected group, including capability rows, so
+    # the old five-slot prototype cannot silently discard safe choices.
     groups = suggestions.get("groups") or []
     selected = None
     if groups:
@@ -64,12 +66,7 @@ def semantic_suggestion_rows(
         else suggestions.get("permittedCapabilities")
     ) or []
     rows: list[dict[str, Any]] = []
-    candidate_limit = (
-        max(0, max_buttons - len(capabilities))
-        if capabilities
-        else max_buttons
-    )
-    for candidate in candidates[:candidate_limit]:
+    for candidate in candidates:
         rows.append(
             {
                 "id": candidate.get("id"),
@@ -82,7 +79,7 @@ def semantic_suggestion_rows(
                 "groupID": selected.get("id") if selected else candidate.get("groupID"),
             }
         )
-    for capability in capabilities[: max(0, max_buttons - len(rows))]:
+    for capability in capabilities:
         status = capability.get("status") or "unavailable_unknown"
         rows.append(
             {
@@ -147,8 +144,14 @@ class SemanticHarnessApp:
         self.scenario = load_scenario(self.scenario_path)
         if arguments.language:
             self.scenario.setdefault("runtime", {})["language"] = arguments.language.upper()
+        # Keep the executor's startup factory independent of the Tk app. A
+        # bound closure over ``self`` would let the worker thread release the
+        # entire widget tree during shutdown, which is unsafe for Tk
+        # Variables and makes repeated GUI tests nondeterministic.
+        startup_scenario = self.scenario
+        startup_kwargs = self._worker_kwargs()
         self.session = WorkerSession(
-            lambda: LuaSemanticWorker(self.scenario, **self._worker_kwargs())
+            lambda: LuaSemanticWorker(startup_scenario, **startup_kwargs)
         )
         self.closed = False
         self.busy = False
@@ -220,32 +223,24 @@ class SemanticHarnessApp:
         for column in range(3):
             suggestion_frame.columnconfigure(column, weight=1)
         self.suggestion_buttons: list[Any] = []
+        self.suggestion_buttons_frame = ttk.Frame(suggestion_frame)
+        self.suggestion_buttons_frame.grid(
+            row=0, column=0, columnspan=3, sticky="ew", padx=3, pady=3
+        )
+        for column in range(3):
+            self.suggestion_buttons_frame.columnconfigure(column, weight=1)
         self.suggestion_rows: list[dict[str, Any]] = []
         self.suggestion_interactive = False
         self.suggestion_projection: dict[str, Any] = {}
         self.suggestion_response: dict[str, Any] = {}
         self.suggestion_revision: Any = None
         self.suggestion_group_ids_by_display: dict[str, str] = {}
-        for index in range(5):
-            button = ttk.Button(
-                suggestion_frame,
-                text="",
-                command=lambda index=index: self.click_suggestion(index),
-            )
-            button.grid(
-                row=index // 3,
-                column=index % 3,
-                sticky="ew",
-                padx=3,
-                pady=3,
-            )
-            self.suggestion_buttons.append(button)
         self.suggestion_status = ttk.Label(
             suggestion_frame,
             text="Run a production preview or turn to inspect suggestions.",
         )
         self.suggestion_status.grid(
-            row=2, column=0, columnspan=2, sticky="w", padx=4, pady=(0, 2)
+            row=1, column=0, columnspan=2, sticky="w", padx=4, pady=(0, 2)
         )
         self.suggestion_group_box = self._ttk.Combobox(
             suggestion_frame,
@@ -253,7 +248,7 @@ class SemanticHarnessApp:
             width=24,
         )
         self.suggestion_group_box.grid(
-            row=2, column=2, sticky="e", padx=3, pady=(0, 2)
+            row=1, column=2, sticky="e", padx=3, pady=(0, 2)
         )
         self.suggestion_group_box.bind(
             "<<ComboboxSelected>>", lambda _: self._on_suggestion_group()
@@ -487,6 +482,23 @@ class SemanticHarnessApp:
         self.workflow_pane.set_enabled(enabled and not self.busy)
         self._refresh_suggestion_controls(enabled and not self.busy)
 
+    def _ensure_suggestion_buttons(self, count: int) -> None:
+        while len(self.suggestion_buttons) < count:
+            index = len(self.suggestion_buttons)
+            button = self._ttk.Button(
+                self.suggestion_buttons_frame,
+                text="",
+                command=lambda index=index: self.click_suggestion(index),
+            )
+            button.grid(
+                row=index // 3,
+                column=index % 3,
+                sticky="ew",
+                padx=3,
+                pady=3,
+            )
+            self.suggestion_buttons.append(button)
+
     def _refresh_suggestion_controls(self, enabled: bool) -> None:
         for index, button in enumerate(self.suggestion_buttons):
             row = self.suggestion_rows[index] if index < len(self.suggestion_rows) else None
@@ -641,10 +653,40 @@ class SemanticHarnessApp:
         self._render_suggestions(response, suggestions)
 
     def _on_suggestion_group(self) -> None:
-        if self.suggestion_projection:
-            self._render_suggestions(
-                self.suggestion_response, self.suggestion_projection
+        if not self.suggestion_projection:
+            return
+        selected_display = self.suggestion_group_box.get()
+        selected_id = self.suggestion_group_ids_by_display.get(selected_display)
+        group = next(
+            (
+                item
+                for item in self.suggestion_projection.get("groups", [])
+                if item.get("id") == selected_id
+            ),
+            None,
+        )
+        frame = group and group.get("frame")
+        if (
+            isinstance(frame, dict)
+            and self.session.ready
+            and not self.busy
+        ):
+            def finish(response: dict[str, Any]) -> None:
+                if response.get("accepted") is not True:
+                    self._append(
+                        "SYSTEM",
+                        f"Topic selection rejected: "
+                        f"{response.get('reason') or 'unknown'}",
+                    )
+                self._show_response(response)
+
+            self._start_operation(
+                lambda worker: worker.suggestion_click(frame), finish
             )
+            return
+        self._render_suggestions(
+            self.suggestion_response, self.suggestion_projection
+        )
 
     def _on_npc_profile(self) -> None:
         """Apply a profile through the existing scenario/configure boundary."""
@@ -715,6 +757,7 @@ class SemanticHarnessApp:
         self.suggestion_rows = semantic_suggestion_rows(
             suggestions, selected_group_id or None
         )
+        self._ensure_suggestion_buttons(len(self.suggestion_rows))
         self.suggestion_interactive = (
             response.get("type") in {"turn", "semantic_click"}
             and response.get("accepted") is True
@@ -1137,7 +1180,10 @@ class SemanticHarnessApp:
         if self.closed:
             return
         self.closed = True
-        self.session.close()
+        # Controls are disabled while a request is active. Preserve the
+        # session's nonblocking close contract for an explicit close during
+        # in-flight work, while draining the idle session before Tk teardown.
+        self.session.close(wait=not self.busy)
         self.root.destroy()
 
 

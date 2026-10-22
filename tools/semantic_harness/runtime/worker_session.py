@@ -97,8 +97,8 @@ class WorkerSession(Generic[WorkerT]):
         value = operation(worker)
         return WorkerResult(value=value, status=worker.status())
 
-    def close(self) -> None:
-        """Queue cleanup behind in-flight work and let the queue drain safely."""
+    def close(self, *, wait: bool = False) -> None:
+        """Queue cleanup behind in-flight work with an explicit wait policy."""
 
         with self._lock:
             if self._closed:
@@ -107,6 +107,5 @@ class WorkerSession(Generic[WorkerT]):
             worker = self._worker
             if worker is not None:
                 self._executor.submit(worker.close)
-            # Do not cancel queued tasks: operations queued before close will see
-            # the closed flag and finish without touching the worker, then cleanup runs.
-            self._executor.shutdown(wait=False, cancel_futures=False)
+            # Cleanup remains behind any already queued operation.
+        self._executor.shutdown(wait=wait, cancel_futures=False)

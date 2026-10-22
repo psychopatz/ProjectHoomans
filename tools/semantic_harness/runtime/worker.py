@@ -271,9 +271,13 @@ class LuaSemanticWorker:
         # Keep the capability handshake bounded as the generated production
         # catalog grows. The catalog remains available through the same
         # production FlowEditor seam, but is fetched as its own bounded
-        # response instead of being duplicated in CAPABILITIES.
+        # response instead of being duplicated in CAPABILITIES. This is still
+        # part of startup, so use the startup budget rather than the shorter
+        # interactive request budget when the catalog is under load.
         if "flowCatalog" not in capabilities:
-            capabilities["flowCatalog"] = self.flow_catalog()
+            capabilities["flowCatalog"] = self.runtime.request(
+                "FLOW_CATALOG", timeout=self.config.startup_timeout
+            )
         return capabilities
 
     def restart(self) -> dict[str, Any]:

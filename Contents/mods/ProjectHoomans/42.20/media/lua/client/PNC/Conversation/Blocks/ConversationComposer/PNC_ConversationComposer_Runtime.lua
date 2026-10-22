@@ -162,6 +162,13 @@ local function restoreCurrentChoices(view)
     if session and session.currentNode then
         session:setChoices(session.currentNode.choices or {})
     end
+    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local semanticInternal = input and input.Internal or nil
+    if semanticInternal
+        and type(semanticInternal.RefreshRootSuggestions) == "function"
+    then
+        semanticInternal.RefreshRootSuggestions(view)
+    end
 end
 
 local function notifyFailure(view, key, reason)

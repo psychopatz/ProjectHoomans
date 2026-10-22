@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gc
 import os
 import time
 import tkinter as tk
@@ -12,6 +13,51 @@ from tools.semantic_harness.ui.shell import SemanticHarnessApp
 
 
 class ContextualSuggestionsS4Tests(unittest.TestCase):
+    def test_topic_combobox_uses_the_worker_group_click_contract(self) -> None:
+        if not os.environ.get("DISPLAY"):
+            self.skipTest("Tk display is unavailable")
+
+        root = tk.Tk()
+        app = SemanticHarnessApp(root, _parser().parse_args([]))
+
+        def wait_until(predicate: object, timeout: float = 10.0) -> None:
+            deadline = time.monotonic() + timeout
+            while not predicate() and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertTrue(predicate())
+
+        try:
+            wait_until(lambda: app.worker_ready)
+            app.input_var.set("what time is it")
+            app.submit()
+            wait_until(
+                lambda: not app.busy
+                and app.suggestion_group_box.get() == "Time and date"
+            )
+            owned_display = next(
+                value
+                for value in app.suggestion_group_box["values"]
+                if "Owned companion actions" in str(value)
+            )
+            app.suggestion_group_box.set(owned_display)
+            app._on_suggestion_group()
+            wait_until(
+                lambda: not app.busy
+                and any(row.get("action") == "FOLLOW" for row in app.suggestion_rows)
+            )
+            self.assertEqual(app.suggestion_group_box.get(), owned_display)
+            self.assertIn(
+                "semantic_suggestions",
+                app.suggestion_response.get("choiceSurface", {}).get("source", ""),
+            )
+            self.assertEqual(app.suggestion_response.get("transport"), [])
+        finally:
+            app.close()
+            del app
+            del root
+            gc.collect()
+
     def test_existing_lab_renders_inspects_and_clicks_production_suggestions(self) -> None:
         if not os.environ.get("DISPLAY"):
             self.skipTest("Tk display is unavailable")
@@ -33,7 +79,10 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             app.submit()
             wait_until(lambda: not app.busy and bool(app.suggestion_rows))
 
-            self.assertEqual(len(app.suggestion_buttons), 5)
+            self.assertEqual(
+                sum(button.winfo_ismapped() for button in app.suggestion_buttons),
+                len(app.suggestion_rows),
+            )
             self.assertEqual(
                 str(app.suggestion_buttons[0].cget("state")), "normal"
             )
@@ -51,10 +100,12 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                     for button in app.suggestion_buttons
                 ],
             )
-            self.assertEqual(
-                str(app.suggestion_buttons[4].cget("state")), "disabled"
+            self.assertTrue(
+                all(
+                    button.winfo_ismapped()
+                    for button in app.suggestion_buttons[: len(app.suggestion_rows)]
+                )
             )
-            self.assertFalse(app.suggestion_buttons[4].winfo_ismapped())
             self.assertEqual(app.suggestion_group_box.get(), "Current conversation branch")
             self.assertIn(
                 "predicateTrace",
@@ -95,7 +146,9 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             )
         finally:
             app.close()
-            root.update()
+            del app
+            del root
+            gc.collect()
 
     def test_whats_up_gui_click_enters_real_registry_branch(self) -> None:
         if not os.environ.get("DISPLAY"):
@@ -164,7 +217,9 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.assertIn("Mostly tracks", app.transcript.get("1.0", "end"))
         finally:
             app.close()
-            root.update()
+            del app
+            del root
+            gc.collect()
 
     def test_npc_profile_combobox_reconfigures_worker_capabilities(self) -> None:
         if not os.environ.get("DISPLAY"):
@@ -206,7 +261,9 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             )
         finally:
             app.close()
-            root.update()
+            del app
+            del root
+            gc.collect()
 
     def test_simulation_layout_keeps_runtime_controls_visible_without_maximizing(self) -> None:
         if not os.environ.get("DISPLAY"):
@@ -275,7 +332,9 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             )
         finally:
             app.close()
-            root.update()
+            del app
+            del root
+            gc.collect()
 
 
 if __name__ == "__main__":

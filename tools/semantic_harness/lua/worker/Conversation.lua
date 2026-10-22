@@ -363,14 +363,78 @@ function Conversation.buildView(context)
             Runtime.queued[#Runtime.queued + 1] = message
             Runtime.transcript[#Runtime.transcript + 1] = message
         end,
-        setChoices = function(self, choices)
+        setPresentedChoices = function(self, choices, metadata)
             self.choices = choices or {}
+            metadata = type(metadata) == "table" and metadata or {}
+            self.choicePresentationState = {
+                source = metadata.source or "session",
+                revision = metadata.revision,
+                authoredCount = metadata.authoredCount,
+                presentedCount = #self.choices,
+                busy = self.busy == true,
+                pending = self.pendingChoices ~= nil,
+                presentationError = metadata.presentationError,
+            }
+            return true
+        end,
+        clearChoices = function(self, reason)
+            return self:setPresentedChoices({}, { source = reason or "clear" })
+        end,
+        setChoices = function(self, choices)
+            local authored = choices or {}
+            local output = {}
+            for index, choice in ipairs(authored) do
+                local text = choice.text
+                if text == nil and choice.textKey then
+                    text = {
+                        key = choice.textKey,
+                        domain = choice.textDomain,
+                        args = choice.textArgs,
+                    }
+                end
+                output[#output + 1] = {
+                    id = choice.id or tostring(index),
+                    text = text,
+                    response = choice.response,
+                    next = choice.next,
+                    close = choice.close,
+                    closeReason = choice.closeReason,
+                    action = choice.action or choice.onSelect,
+                    log = choice.log ~= false,
+                    enabled = choice.enabled ~= false,
+                    tooltip = choice.tooltip,
+                    source = choice,
+                }
+            end
+            local presenter = self.view and self.view.spec
+                and self.view.spec.choicePresentation or nil
+            local presentedByCallback = false
+            local presentationError
+            if type(presenter) == "function" then
+                local ok, presented = pcall(
+                    presenter, self.view, output, authored, self
+                )
+                if ok and type(presented) == "table" then
+                    output = presented
+                    presentedByCallback = true
+                elseif not ok then
+                    presentationError = tostring(presented)
+                end
+            end
+            return self:setPresentedChoices(output, {
+                source = presentationError and "authored_fallback"
+                    or presentedByCallback and "choice_presentation"
+                    or "session",
+                authoredCount = #output,
+                presentationError = presentationError,
+            })
         end,
         enterNode = function(self, nodeID)
             self.currentNodeID = tostring(nodeID or "")
             self.currentNode = self.spec
                 and self.spec.nodes
                 and self.spec.nodes[self.currentNodeID] or nil
+            self:clearChoices("enter_node")
             self:setChoices(self.currentNode and self.currentNode.choices or {})
             local node = self.currentNode
             if node and node.npc then
@@ -388,7 +452,7 @@ function Conversation.buildView(context)
             if self.busy or not choice or choice.enabled == false then
                 return false
             end
-            self:setChoices({})
+            self:clearChoices("select_choice")
             if choice.log ~= false then
                 self:append("player", resolvedPayload(choice.text))
             end
@@ -433,6 +497,24 @@ function Conversation.buildView(context)
         npcID = npc.npcID,
         context = Conversation.buildContext(context),
         nodes = { menu = { choices = {} } },
+        choicePresentation = function(view, authoredChoices)
+            local input = PNC.Semantics
+                and PNC.Semantics.DialogueInput or nil
+            local internal = input and input.Internal or nil
+            if internal
+                and type(internal.PresentSemanticChoices) == "function"
+            then
+                return internal.PresentSemanticChoices(
+                    view, authoredChoices
+                )
+            end
+            return nil
+        end,
+        choiceInteractionGuard = function(view)
+            local context = view and view.spec and view.spec.context or nil
+            return type(context) ~= "table"
+                or context.pendingConversationRequest == nil
+        end,
     }
     local authority = PNC.Conversation and PNC.Conversation.Authority
     if authority and type(authority.BuildContext) == "function" then
@@ -683,6 +765,9 @@ function Conversation.turn(context, text)
             and actorService.Snapshot and actorService:Snapshot() or nil,
         llmCalls = Runtime.llmCalls,
         loadedModules = Runtime.loadedModules,
+        choiceSurface = Values.copy(
+            view.session and view.session.choicePresentationState
+        ),
     }
     response.observation = context.OutputProjection.observation(
         context, response, view.spec and view.spec.context
@@ -738,7 +823,10 @@ function Conversation.semanticClick(context, frame)
     local isRootChoice = Suggestions
         and Suggestions.IsConversationRootChoiceFrame
         and Suggestions.IsConversationRootChoiceFrame(frame)
-    if not isCategory and not isChoice and not isRootChoice then
+    local isGroup = Suggestions
+        and Suggestions.IsGroupFrame
+        and Suggestions.IsGroupFrame(frame)
+    if not isCategory and not isChoice and not isRootChoice and not isGroup then
         return nil, "unsupported_conversation_frame"
     end
 
@@ -829,6 +917,13 @@ function Conversation.semanticClick(context, frame)
         composer.PumpLocalRequests()
     end
     Conversation.refreshViewContext(context)
+    if isGroup and view.semanticSuggestions then
+        local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+        local internal = input and input.Internal or nil
+        if internal and type(internal.ApplySemanticChoices) == "function" then
+            internal.ApplySemanticChoices(view, view.semanticSuggestions)
+        end
+    end
     local projectedBlock = Conversation.blockProjection(view)
     if isRootChoice then
         local internal = Input.Internal
@@ -914,6 +1009,9 @@ function Conversation.semanticClick(context, frame)
         contextAfter = context.Conversation.contextSnapshot(
             context, view
         ),
+        choiceSurface = Values.copy(
+            view.session and view.session.choicePresentationState
+        ),
         loadedModules = Runtime.loadedModules,
         conversationBlock = Values.copy(projection),
     }
@@ -923,7 +1021,7 @@ function Conversation.semanticClick(context, frame)
         response,
         view.spec and view.spec.context
     )
-    if isRootChoice and view.semanticSuggestions then
+    if (isRootChoice or isGroup) and view.semanticSuggestions then
         response.observation.suggestions = Values.copy(
             view.semanticSuggestions
         )

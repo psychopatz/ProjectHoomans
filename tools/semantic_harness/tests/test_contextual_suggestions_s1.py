@@ -21,8 +21,8 @@ class ContextualSuggestionsS1Tests(unittest.TestCase):
             self.assertTrue(preview["accepted"])
             suggestions = preview["observation"]["suggestions"]
             self.assertEqual(suggestions["schemaVersion"], 1)
-            # The projection is bounded above the five visual rows so the
-            # existing group selector can expose every safe root topic.
+            # Production Lua owns the bound; the native list and group
+            # selector are not limited to the old five visual slots.
             self.assertLessEqual(len(suggestions["candidates"]), 24)
             self.assertTrue(suggestions["candidates"])
             self.assertEqual(preview["messages"], [])

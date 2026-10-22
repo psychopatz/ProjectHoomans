@@ -231,6 +231,14 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             end
             return nil
         end,
+        -- Core owns native click gating. Hoomans supplies only the
+        -- conversation-authority pending check so an async category/choice
+        -- request cannot be clicked twice while the server reply is in flight.
+        choiceInteractionGuard = function(view)
+            local context = view and view.spec and view.spec.context or nil
+            return type(context) ~= "table"
+                or context.pendingConversationRequest == nil
+        end,
         portrait = Context.PortraitSpec(entry),
         backgroundID = Backgrounds.Get(timeID),
         theme = Palette.BuildConversationTheme(entry),

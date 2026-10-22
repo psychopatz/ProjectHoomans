@@ -64,6 +64,13 @@ function Composer.ReceiveBlock(args)
     end
     view.session.spec = view.spec
     view.session:enterNode("block:" .. tostring(args.nodeID or block.entryNode))
+    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local semanticInternal = input and input.Internal or nil
+    if semanticInternal
+        and type(semanticInternal.RefreshRootSuggestions) == "function"
+    then
+        semanticInternal.RefreshRootSuggestions(view)
+    end
     return true
 end
 

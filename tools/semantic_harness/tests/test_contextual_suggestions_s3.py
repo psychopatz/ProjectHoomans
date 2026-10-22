@@ -10,6 +10,58 @@ from tools.semantic_harness.worker import LuaSemanticWorker
 
 
 class ContextualSuggestionsS3Tests(unittest.TestCase):
+    def test_semantic_question_click_appends_one_player_turn(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            typed = worker.input("Are you okay?")
+            frame = next(
+                candidate["frame"]
+                for candidate in typed["observation"]["suggestions"]["candidates"]
+                if candidate["id"] == "question.needs"
+            )
+            before = worker.snapshot()
+            click = worker.suggestion_click(frame)
+            after = worker.snapshot()
+
+        self.assertTrue(click["accepted"])
+        new_player_rows = [
+            row
+            for row in after["transcript"]
+            if row.get("speaker") == "player"
+        ][len([row for row in before["transcript"] if row.get("speaker") == "player"]):]
+        self.assertEqual(len(new_player_rows), 1)
+        self.assertEqual(new_player_rows[0]["value"], "Do you need anything?")
+
+    def test_topic_group_click_reuses_core_surface_without_turn_or_effect(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            result = worker.input("what time is it")
+            group = next(
+                item
+                for item in result["observation"]["suggestions"]["groups"]
+                if item["id"] == "owned_actions"
+            )
+            before = worker.snapshot()
+            clicked = worker.suggestion_click(group["frame"])
+            after = worker.snapshot()
+            duplicate = worker.suggestion_click(group["frame"])
+            after_duplicate = worker.snapshot()
+
+        self.assertTrue(clicked["accepted"])
+        self.assertEqual(clicked["messages"], [])
+        self.assertEqual(clicked["transport"], [])
+        self.assertEqual(before["transcript"], after["transcript"])
+        self.assertEqual(
+            clicked["observation"]["suggestions"]["currentGroupID"],
+            "owned_actions",
+        )
+        self.assertEqual(
+            clicked["choiceSurface"]["source"],
+            "semantic_suggestions",
+        )
+        self.assertFalse(duplicate["accepted"])
+        self.assertEqual(duplicate["reason"], "suggestion_click_replayed")
+        self.assertEqual(after["transcript"], after_duplicate["transcript"])
+        self.assertEqual(after["transport"], after_duplicate["transport"])
+
     def test_question_click_reuses_canonical_ir_without_a_second_parser(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             typed = worker.input("Are you okay?")

@@ -86,7 +86,10 @@ local function buildCoreChoices(view, projection)
             text = suggestionText(row),
             enabled = enabled == true,
             tooltip = suggestionTooltip(row),
-            log = true,
+            -- The Core row is a typed semantic click adapter. Its action
+            -- owns the one canonical submission path, so Core must not also
+            -- append the display text as an authored player turn.
+            log = false,
             source = {
                 semanticFrame = frame,
                 source = row.source,
@@ -110,6 +113,33 @@ local function buildCoreChoices(view, projection)
                 return accepted
             end,
         }
+    end
+
+    -- Core's native list is scrollable, so the projection can expose every
+    -- currently safe topic without a hidden five-row global cap. Navigation
+    -- rows use the same typed click contract and only change the selected
+    -- projection group; they never parse or execute gameplay.
+    for _, group in ipairs(projection.groups or {}) do
+        if not selectedGroup or group.id ~= selectedGroup.id then
+            local frame = Suggestions.BuildGroupFrame
+                and Suggestions.BuildGroupFrame(group, projection.revision)
+                or nil
+            if frame then
+                append({
+                    id = frame.candidateID,
+                    frame = frame,
+                    display = {
+                        label = group.label,
+                        labelFallback = group.label,
+                    },
+                    source = {
+                        kind = "semantic_group_navigation",
+                        revision = projection.revision,
+                        groupID = group.id,
+                    },
+                }, true)
+            end
+        end
     end
 
     local candidates = selectedGroup and selectedGroup.candidates
@@ -141,8 +171,8 @@ local function presentSemanticChoices(view, authoredChoices)
 end
 
 local function applyCoreChoices(view, projection)
-    local choicesPart = view and view.choicesPart or nil
-    if not choicesPart or type(choicesPart.setChoices) ~= "function" then
+    local session = view and view.session or nil
+    if not session or type(session.setPresentedChoices) ~= "function" then
         return false, "core_choices_unavailable"
     end
     local rows = buildCoreChoices(view, projection)
@@ -151,18 +181,26 @@ local function applyCoreChoices(view, projection)
         -- current topic is unavailable. Restore the authored Core choices
         -- when the session is idle; never expose stale choices during a
         -- queued response.
-        if view.session and view.session.busy ~= true
-            and type(view.session.setChoices) == "function"
-        then
-            local node = view.session.currentNode or {}
-            view.session:setChoices(node.choices or {})
-        else
-            choicesPart:setChoices({})
+        if session.busy == true then
+            -- Session:finishPending will call Core's normal setChoices after
+            -- the queued reply; its presentation callback then supplies the
+            -- projection or the authored fallback.
+            view.semanticPresentationPending = projection
+            return false, "semantic_choices_deferred"
+        end
+        local node = session.currentNode or {}
+        if type(session.setChoices) == "function" then
+            session:setChoices(node.choices or {})
         end
         return false, "semantic_choices_empty"
     end
-    choicesPart:setChoices(rows)
-    return true, rows
+    view.semanticPresentationPending = nil
+    local applied = session:setPresentedChoices(rows, {
+        source = "semantic_suggestions",
+        revision = projection and projection.revision,
+        presentedCount = #rows,
+    })
+    return applied == true, rows
 end
 
 Internal.PresentSemanticChoices = presentSemanticChoices
@@ -181,6 +219,8 @@ function Internal.RefreshSuggestions(view, result)
         nil
     )
     view.semanticSuggestions = projection
+    view.semanticSuggestionRevision = projection
+        and projection.revision or nil
     applyCoreChoices(view, projection)
     return projection
 end
@@ -219,8 +259,38 @@ function Internal.RefreshRootSuggestions(view)
         decision = {},
     }, context, nil)
     view.semanticSuggestions = projection
+    view.semanticSuggestionRevision = projection
+        and projection.revision or nil
     applyCoreChoices(view, projection)
     return projection
+end
+
+function Internal.SelectSemanticGroup(view, frame)
+    if not view or not view.session
+        or type(Suggestions.IsGroupFrame) ~= "function"
+        or not Suggestions.IsGroupFrame(frame)
+    then
+        return false, "semantic_group_frame_invalid"
+    end
+    local projection = view.semanticSuggestions
+    if type(projection) ~= "table" then
+        return false, "semantic_suggestions_unavailable"
+    end
+    if tonumber(frame.requestRevision) ~= tonumber(projection.revision) then
+        return false, "stale_suggestion"
+    end
+    local selected
+    for _, group in ipairs(projection.groups or {}) do
+        if tostring(group.id or "") == tostring(frame.groupID) then
+            selected = group
+            break
+        end
+    end
+    if not selected then return false, "semantic_group_unknown" end
+    projection.currentGroupID = selected.id
+    local applied, reason = applyCoreChoices(view, projection)
+    if not applied then return false, reason end
+    return true, "accepted"
 end
 
 local function applyGeneratedFlowResult(view, result, actionResult)

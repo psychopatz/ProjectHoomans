@@ -1534,7 +1534,7 @@ local function groupPresentation(id, topic)
     return { id = id, label = id }
 end
 
-local function buildGroups(candidates, capabilities, currentTopic)
+local function buildGroups(candidates, capabilities, currentTopic, revision)
     local groups = {}
     local byID = {}
     local function ensure(id, topic)
@@ -1544,6 +1544,7 @@ local function buildGroups(candidates, capabilities, currentTopic)
             group.candidates = {}
             group.capabilities = {}
             group.count = 0
+            group.frame = Suggestions.BuildGroupFrame(group, revision)
             byID[id] = group
             groups[#groups + 1] = group
         end
@@ -1588,6 +1589,32 @@ function Suggestions.IsConversationCategoryFrame(frame)
         and string.sub(tostring(extensions.categoryID or ""), 1, 15)
             == "projecthoomans:"
         and tostring(extensions.topic or "") ~= ""
+end
+
+-- Topic navigation is a presentation-only semantic frame. It changes the
+-- selected projection group through the existing Core choice surface; it is
+-- not a parser input and it cannot dispatch a gameplay action.
+function Suggestions.BuildGroupFrame(group, revision)
+    group = type(group) == "table" and group or {}
+    local groupID = tostring(group.id or "")
+    if groupID == "" then return nil end
+    return {
+        schemaVersion = Suggestions.VERSION,
+        kind = "semantic_group_click_frame",
+        candidateID = "semantic.group:" .. groupID,
+        groupID = groupID,
+        topic = group.topic,
+        labelKey = group.labelKey,
+        labelFallback = group.label or groupID,
+        requestRevision = tonumber(revision) or 0,
+    }
+end
+
+function Suggestions.IsGroupFrame(frame)
+    return type(frame) == "table"
+        and frame.kind == "semantic_group_click_frame"
+        and tostring(frame.groupID or "") ~= ""
+        and tonumber(frame.requestRevision) ~= nil
 end
 
 function Suggestions.IsConversationChoiceFrame(frame)
@@ -1805,7 +1832,7 @@ function Suggestions.Build(result, context, messages)
     end
 
     local groups, currentGroupID = buildGroups(
-        candidates, capabilities, currentTopic
+        candidates, capabilities, currentTopic, revision
     )
 
     return {
