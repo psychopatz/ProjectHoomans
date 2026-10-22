@@ -311,3 +311,107 @@ These are content defects and should be surfaced by P9F diagnostics. They are no
 The mandatory sequence is now P9A-P9G as documented in `SEMANTIC_LAB_CONVERSATION_VISUALIZATION.md`.
 
 The first user-visible checkpoint is P9B: direct What's Up routing plus a real full branch graph visible in Simulation.
+
+
+---
+
+# P10 live UI / semantic-hub audit — 2026-10-23
+
+**User evidence:** current Semantic Lab Simulation and Mock runtime screenshots.  
+**Source baseline audited:** ProjectHoomans remote `main` implementation at `86cbfb38bb7aa7d87608d9dd2963255c91244f87`.
+
+## Verdict
+
+P9 mechanics are materially implemented, but the product remains incomplete.
+
+The P9 READY FOR USER LIVE TEST conclusion is superseded.
+
+## Verified UI findings
+
+### Raw JSON is intentionally the default inventory editor
+
+`tools/semantic_harness/ui/dialogs/settings.py` constructs two editable `ScrolledText` inventory panes, labels them as complete JSON projections, and parses them through `json.loads()` on Apply.
+
+This is not an accidental debug surface. It is currently the normal editor.
+
+### Known bounded world values still use free text
+
+The same settings implementation sends:
+
+- hunger;
+- thirst;
+- fatigue;
+- stress;
+- boredom;
+- panic;
+- timeOfDay;
+- worldAgeHours;
+- zombieKills
+
+through the generic text-field helper. The UI text itself acknowledges that the first six are game-style 0–1 values.
+
+Persona/relationship sliders exist, but only inside the modal settings dialog.
+
+### Dynamic catalogs are partial
+
+The worker `PERSONA_CATALOG` exposes traits, relationship kinds, social-style values and numeric personality dimensions, but no general typed scenario-control catalog exists.
+
+The role list is still hard-coded by the worker.
+
+Therefore the current UI is a mixture of production-derived options and Python/manual field definitions, which explains its inconsistent control types and error-prone normal workflow.
+
+## Verified What's Up findings
+
+P9 changed reviewed What's Up aliases from a redundant second-click route into direct entry of the old authored category.
+
+Current tests now explicitly require:
+
+```text
+whatsup
+ -> projecthoomans:whats_up
+ -> old authored ConversationBlock
+```
+
+and explicitly assert that WELLBEING, ACTIVITY and GOSSIP remain distinct from What's Up.
+
+This contradicts the current approved product direction.
+
+The semantic system already has separate authoritative semantics/providers/facts for wellbeing, needs/medical, activity, gossip and other contextual domains. What's Up should aggregate eligible **avenues** from those owners instead of owning one obsolete authored category.
+
+## Legacy removal decision
+
+The user explicitly requires removal of the old What's Up implementation to avoid confusing the codebase.
+
+P10 therefore forbids keeping `projecthoomans:whats_up` as a hidden fallback or compatibility category.
+
+Known live integration points include:
+
+- Conversation category registration;
+- `30_PNC_ConversationWhatsUp.lua`;
+- SemanticTopicCatalog authored-category mapping;
+- reviewed pattern/compiler source and generated artifacts;
+- `conversation.whats_up` static suggestion definition;
+- central suggestion special-cases;
+- worker category/preflight fallback;
+- category translations;
+- authority/conversation/compiler/harness tests using old IDs.
+
+Useful dialogue text can be migrated only under a new correct semantic owner/ID.
+
+## Graph-history finding
+
+P9's graph pane is valid while an authored ConversationBlock is active, but `set_graph(None)` clears the pane after a branch exits to root. This is technically consistent with active runtime state but poor developer UX.
+
+P10F therefore retains the last completed graph snapshot in harness presentation state only.
+
+## Corrective direction
+
+P10 is now the active product phase:
+
+1. remove the legacy What's Up category completely;
+2. replace it with a provider-driven semantic hub;
+3. add a typed Simulation Control Catalog;
+4. make structured editors the default and preserve JSON as Advanced mode;
+5. expose high-frequency simulation dials inline;
+6. retain completed graph history and show hub-provider diagnostics;
+7. validate end-to-end usability before another READY handoff.
