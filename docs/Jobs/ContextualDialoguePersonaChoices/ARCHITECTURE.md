@@ -532,3 +532,179 @@ Completed graph retention and hub inspection history exist only to improve debug
 They are not NPC memory, conversation memory, ModData, or semantic facts.
 
 Reset/replacement may clear them without gameplay consequences.
+
+
+## 22. Runtime-parity actor model
+
+Semantic Lab Simulation treats Player and NPC Target as symmetric first-class actors.
+
+Each actor owns, where production supports it:
+
+- identity/gender;
+- needs/conditions;
+- traits;
+- social profile/personality;
+- role/capability state relevant to dialogue.
+
+Shared conversation context owns:
+
+- directed relationship;
+- world/event context;
+- active semantic flow/block/hub state.
+
+Do not use `world.*` as the normal owner of actor-specific needs. Historical fixture compatibility may read old fields, but new scenario editing must author actor-owned needs.
+
+## 23. Generated personality versus explicit override
+
+NPC personality normally comes from the production path:
+
+```text
+identity seed
++ archetype
++ registered NPC traits
+ -> SocialProfileGenerator
+ -> trait effects
+ -> normalized personality
+```
+
+Normal Semantic Lab presentation should therefore show generated personality as derived/read-only.
+
+Manual personality sliders are an explicit override/debug mode and must use the same production normalization/override contract rather than bypass it.
+
+Player social profile is likewise derived from actual player traits through the existing social-trait resolver wherever production does so.
+
+## 24. Standing and durable bond are separate
+
+Directed relationship standing remains:
+
+```text
+unknown / neutral / friend / rival / enemy
+```
+
+and is recalculated from approval/respect/familiarity using the existing state resolver.
+
+Durable bond is persisted social history on the existing directed relationship record:
+
+```text
+none / friend / lover / family
+```
+
+Standing can change without automatically erasing durable bond.
+
+Examples:
+
+```text
+bond=friend + standing=enemy
+bond=lover + standing=rival
+bond=family:mother + standing=enemy
+```
+
+This permits estranged/history-aware dialogue.
+
+## 25. Family, friend, and lover authority
+
+### Family
+
+Family is authored/pre-existing and uses only kinds actually produced by the current game/mod.
+
+Normal catalogs must not expose hypothetical future kinds merely because the registry can support them.
+
+### Friend
+
+Friend bond is an automatic relationship milestone derived from the existing directed relationship scores.
+
+Initial tunable entry gate:
+
+```text
+approval >= 80
+respect >= 50
+familiarity >= 60
+standing not rival/enemy
+```
+
+Crossing the gate creates a server-authoritative bond event/memory and updates the existing relationship record.
+
+Friend bond does not oscillate with small score changes.
+
+### Lover
+
+Lover is an explicit relationship transition, never a passive score threshold.
+
+Required layers:
+
+```text
+friend bond
++ relationship proposal thresholds
++ gender/orientation compatibility
++ player proposal
++ server-authoritative NPC acceptance
+ -> lover bond
+```
+
+Existing gender/orientation/social-profile compatibility APIs are authoritative.
+
+No separate romance matrix or gender-specific semantic action IDs.
+
+Family is never romance-compatible.
+
+## 26. Proposal acceptance policy
+
+Proposal eligibility and acceptance are different.
+
+Eligibility answers whether the proposal action may appear.
+
+Acceptance is evaluated by the server using bounded production-owned inputs such as:
+
+- approval/respect/familiarity surplus;
+- romanceStyle;
+- actual relevant traits such as Flirty/Reserved;
+- current standing;
+- proposal cooldown.
+
+The acceptance implementation may use deterministic seeded probability, but never client-only uncontrolled randomness.
+
+Acceptance promotes the existing relationship record from friend to lover and records a social event.
+
+Rejection keeps friend and adds cooldown.
+
+## 27. Relationship milestone persistence
+
+Do not create a second bond database.
+
+Extend/normalize the existing directed relationship record and persistence schema as needed.
+
+Migration/versioning rules must be explicit.
+
+Starting authored relationships may seed the milestone:
+
+```text
+starting friend -> friend
+starting lover  -> lover
+mother/father/sister/brother -> family + detailed kind
+```
+
+Relationship milestone mutations go through existing server relationship service/commit/revision boundaries.
+
+## 28. Runtime dialogue graph adapters
+
+Simulation graph uses one shared renderer over one generic view model with adapters for:
+
+```text
+semantic_flow
+conversation_block
+semantic_hub
+```
+
+The adapter reads real runtime state and never mutates semantic state directly.
+
+Graph actions continue through normal semantic frames/click paths.
+
+Hub graphs represent provider/candidate decisions, not invented ConversationBlocks.
+
+## 29. Realization content packs
+
+The speech-realization registry/resolver remains singular.
+
+Built-in content should be registered from a small number of cohesive domain packs rather than accumulated indefinitely in the core resolver module.
+
+The modularity boundary is content ownership, not one-file-per-string fragmentation.
