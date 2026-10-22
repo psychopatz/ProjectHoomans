@@ -1,7 +1,7 @@
 # Contextual Dialogue Persona & Choices
 
 **Status:** REOPENED — P10 hub/control infrastructure retained; P11 runtime-parity actors/dynamic-relationship UX is mandatory.  
-**Current source-audit baseline:** ProjectHoomans remote main at 849f1951ed1d3fd4b6f78aedc2525b25368a157e (2026-10-22).  
+**Current source-audit baseline:** ProjectHoomans remote main at c412d50c27a423965911e115c0947b65c1eb2b6c (2026-10-23).  
 **Dynamic Trading provider baseline:** psychopatz/DynamicTrading at 5db64cbcc764f035146f044fdc34e930ce47d7c8.  
 **Native Project Zomboid SP/MP:** untested; user-owned acceptance.
 
