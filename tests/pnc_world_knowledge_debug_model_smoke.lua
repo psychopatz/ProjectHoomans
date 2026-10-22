@@ -32,7 +32,9 @@ local snapshot = {
         toActorID = "bob", provenance = "told", reason = "opportunistic_share" } },
 }
 
-T.equal(Model.ActorItems(snapshot, {})[1].actorID, "alice",
+T.equal(Model.ActorItems(snapshot, {
+    { id = "runtime-alice", coreActorID = "alice" },
+})[1].actorID, "alice",
     "actor model row")
 T.equal(Model.Rows(snapshot, "facts")[1].factID, "fact-1",
     "fact model row")

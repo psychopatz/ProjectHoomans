@@ -21,7 +21,8 @@ local function row(label, detail, item)
 end
 
 local function appendActor(rows, seen, item)
-    local actorID = item and (item.actorID or item.id or item.npcID)
+    local actorID = item and (item.actorID or item.coreActorID
+        or item.id or item.npcID)
     if not actorID then return end
     actorID = tostring(actorID)
     if seen[actorID] then return end
