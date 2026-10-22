@@ -4,7 +4,7 @@
 
 **Parent status:** REOPENED — P10 infrastructure is retained, but P11 runtime parity, relationships, and Semantic Lab UX are mandatory.
 
-**Current mandatory phase:** P11G — Modular speech-realization content packs.
+**Current mandatory phase:** P11H — Final runtime-parity usability and regression gate.
 
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned.
 
@@ -92,16 +92,33 @@ Validation:
 
 Native Project Zomboid SP/MP remains UNTESTED / user-owned.
 
-## Current Exact Next Chunk — P11G
+## P11G completed — modular speech-realization packs
 
-1. Audit the existing SpeechRealization registry and current built-in content ownership.
-2. Split cohesive domain packs while retaining one registry, resolver, fallback, and translation backend.
-3. Preserve semantic/output behavior across EN/TL and real worker paths.
-4. Run focused checks, update this ledger with exact evidence, commit P11G on existing `main`, and continue automatically to P11H.
+P11G is complete on the local ProjectHoomans `main` checkout.
+
+- The single `SpeechRealization` registry, resolver, fallback, translation path, and registration API remain in `PNC_SpeechRealization.lua`.
+- Built-in content now lives in cohesive Status, Social, Knowledge, and Actions packs with shared family builders. The central registry no longer owns individual phrase content.
+- The production catalog still exposes 39 families and 15 coverage domains. Semantic template identity, style variants, EN/TL translation behavior, and family-address arguments remain intact.
+- Fixed the existing relationship normalization seam to bind `Internal.BoundedString`, preserving social action speech paths after durable bond schema work.
+
+Validation:
+
+- `test_contextual_runtime_speech_p11g.py`: 3/3 passed.
+- Existing speech regressions `test_contextual_speech_style_p3.py` and `test_contextual_speech_behavior_p8b.py`: 8/8 passed.
+- Production catalog check: 39 registered families and 15 coverage domains.
+- `luac5.3 -p`, `py_compile`, and `git diff --check` passed for P11G changes.
+
+Native Project Zomboid SP/MP remains UNTESTED / user-owned.
+
+## Current Exact Next Chunk — P11H
+
+1. Validate the complete runtime-parity usability path at minimum and normal desktop sizes.
+2. Run Python, Tk/Xvfb, embedded Lua, relationship, graph, speech, privacy, stale/replay, gameplay-authority, catalog, translation, and persistence regressions.
+3. Run `luac5.3`, Kahlua verification, doctor, catalog/translation validation, `git diff --check`, and duplicate ModData checks.
+4. Update this ledger with exact evidence, commit P11H gate fixes on existing `main`, and only then assess the handoff condition.
 
 ## Ordered remaining milestones
 
-- **P11G:** modular speech-realization content packs.
 - **P11H:** final runtime-parity usability and regression gate.
 
 ## Handoff condition

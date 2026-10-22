@@ -21,6 +21,7 @@ local memorySignature = Internal.MemorySignature
 local normalizeRelationshipSnapshot = Internal.NormalizeRelationshipSnapshot
 local normalizeInteraction = Internal.NormalizeInteraction
 local normalizeInteractionJournal = Internal.NormalizeInteractionJournal
+local boundedString = Internal.BoundedString
 
 local function normalizeBond(value)
     local source = type(value) == "table" and value or {}
