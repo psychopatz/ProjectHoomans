@@ -212,3 +212,102 @@ P0-P7 should be treated as **accepted foundation with incomplete behavioral acce
 The prior READY FOR USER LIVE TEST statement is superseded.
 
 Current mandatory work is Roadmap P8 — Behavioral Completion.
+
+
+---
+
+# P9 UI / conversation-routing audit — 2026-10-22
+
+**User evidence:** Semantic Lab Simulation and Studio screenshots supplied 2026-10-22.  
+**Remote source baseline inspected:** ProjectHoomans main at `81f4fb982ff5f65024ec9003d1a0a6f08ea7d1f4`.
+
+## Verdict
+
+P8 persona/bond/provider infrastructure is materially implemented, but the Semantic Lab remains hard to use for actual conversation testing and one authored-category path is semantically redundant.
+
+The P8 READY FOR USER LIVE TEST claim is superseded by P9.
+
+## Verified routing defect
+
+Current semantic recognition correctly maps reviewed What's Up aliases to:
+
+```text
+intent     QUESTION
+subject    CONVERSATION_TOPIC
+topic      whats_up
+categoryID projecthoomans:whats_up
+route      conversation_category
+```
+
+The existing `DialogueInput.SubmitSemanticFrame` category branch already routes this canonical frame to `Composer.RequestCategory`.
+
+However, ordinary typed input does not enter that category route immediately. Current tests explicitly expect a second `conversation.whats_up` suggestion after `worker.input("whats up")`, then click that suggestion to enter the authored block.
+
+This matches the user-visible screenshot:
+
+```text
+PLAYER: whatsup
+NPC: Let me think about that.
+[ Ask what's up ]
+```
+
+The nested second step is therefore current intended-by-test behavior, not a screenshot-only rendering artifact.
+
+## Verified authored branch structure
+
+`30_PNC_ConversationWhatsUp.lua` already defines five authored nodes:
+
+- opening
+- details
+- personal
+- followup
+- closing
+
+with gated choices, weighted outcomes, relationship effects, and root exits.
+
+The production block projection deliberately exposes only the current node and choices. This is appropriate for normal player-facing semantics but inadequate for developer branch visualization.
+
+## Verified graph reuse opportunity
+
+Studio already contains a capable Tk graph surface through `FlowEditorPane`, `FlowEditorCanvasController`, and the graph-model helpers.
+
+Existing capabilities include:
+
+- zoom;
+- pan;
+- fit;
+- internal/exit edges;
+- labels;
+- node selection;
+- detail/compact/overview rendering;
+- scroll region;
+- draggable Flow-editor nodes.
+
+The renderer currently consumes normalized semantic Flow definitions, not authored ConversationBlocks.
+
+P9 should refactor/adapt this existing renderer rather than create a parallel graph UI.
+
+## Verified Simulation UX problem
+
+Current Simulation devotes substantial primary space to raw semantic trace JSON while the full authored branch structure is invisible.
+
+The suggestion surface also shows group selection through a combobox even when only one group is relevant. With the current What's Up route this contributes to the visible nested pattern:
+
+```text
+What's up group
+ -> Ask what's up
+```
+
+Branch continuation should become the visually primary surface while a block is active.
+
+## Translation-content finding
+
+Source review also found mixed-language TL strings in existing What's Up authored content. Examples exist in survivor-rumor and supply-pressure bundles.
+
+These are content defects and should be surfaced by P9F diagnostics. They are not the root cause of the semantic routing defect and should not be used to justify another parser or translation backend.
+
+## Corrective direction
+
+The mandatory sequence is now P9A-P9G as documented in `SEMANTIC_LAB_CONVERSATION_VISUALIZATION.md`.
+
+The first user-visible checkpoint is P9B: direct What's Up routing plus a real full branch graph visible in Simulation.
