@@ -50,11 +50,14 @@ end
 
 local function applyTrait(values, trait)
     trait = string.lower(tostring(trait or ""))
-    if trait == "friendly" or trait == "kind" or trait == "protective" then
+    if trait == "friendly" or trait == "pnc_friendly"
+        or trait == "kind" or trait == "protective"
+    then
         add(values, "warmth", 0.16)
         add(values, "openness", 0.14)
         add(values, "deference", -0.04)
-    elseif trait == "reserved" or trait == "withdrawn"
+    elseif trait == "reserved" or trait == "pnc_reserved"
+        or trait == "withdrawn" or trait == "pnc_withdrawn"
         or trait == "guarded" or trait == "suspicious"
     then
         add(values, "warmth", -0.07)

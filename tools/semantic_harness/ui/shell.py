@@ -24,7 +24,7 @@ from ..runtime.npc_profiles import (
     profile_id,
     profile_label,
 )
-from ..runtime.scenario import load_scenario, save_scenario
+from ..runtime.scenario import load_scenario, merge, save_scenario
 from .dialogs.settings import open_runtime_settings as show_runtime_settings
 from ..inspection.transcript import TranscriptBuffer
 from ..runtime.worker import HarnessError, LuaSemanticWorker
@@ -160,6 +160,8 @@ class SemanticHarnessApp:
         # separate so callers cannot submit during that short handoff.
         self._worker_initialized = False
         self._production_catalog: dict[str, Any] | None = None
+        self.persona_catalog: dict[str, Any] = {}
+        self.last_response: dict[str, Any] = {}
         self.settings_window: Any | None = None
         self._future: Future[Any] | None = None
         self._transcript_buffer = TranscriptBuffer()
@@ -296,6 +298,10 @@ class SemanticHarnessApp:
             secondary_actions, text="Snapshot", command=self.show_snapshot
         )
         self.snapshot_button.pack(side="left")
+        self.persona_matrix_button = ttk.Button(
+            secondary_actions, text="Persona matrix", command=self.inspect_persona_matrix
+        )
+        self.persona_matrix_button.pack(side="left", padx=6)
         self.world_knowledge_button = ttk.Button(
             secondary_actions,
             text="World knowledge",
@@ -466,6 +472,7 @@ class SemanticHarnessApp:
             self.preview_button,
             self.save_button,
             self.snapshot_button,
+            self.persona_matrix_button,
             self.world_knowledge_button,
         ):
             button.configure(state=state)
@@ -580,6 +587,7 @@ class SemanticHarnessApp:
 
     def _worker_ready(self, result: WorkerReady) -> None:
         self._worker_initialized = True
+        self.persona_catalog = result.capabilities.get("personaCatalog") or {}
         self._set_status(f"Ready · Lua PID {result.status.get('pid')}")
         self._set_controls(True)
         self._append("SYSTEM", "Lua worker ready. Production semantic modules are loaded.")
@@ -640,6 +648,7 @@ class SemanticHarnessApp:
         self._messagebox.showerror("Harness error", str(error))
 
     def _show_response(self, response: dict[str, Any]) -> None:
+        self.last_response = response if isinstance(response, dict) else {}
         view = build_conversation_inspector(response)
         self._set_text(self.inspector, conversation_first(view))
         self._set_text(self.authority, pretty(view.get("commandAuthority", {})))
@@ -949,6 +958,67 @@ class SemanticHarnessApp:
         self._start_operation(
             lambda worker: worker.snapshot(),
             self._show_response,
+        )
+
+    def inspect_persona_matrix(self) -> None:
+        """Run a small production-backed persona A/B matrix in one worker."""
+
+        if not self.session.ready or self.busy:
+            return
+        base = self.scenario
+        rows = [
+            merge(base, {"runtime": {"semanticLabMatrixLabel": "baseline"}}),
+            merge(
+                base,
+                {
+                    "runtime": {"semanticLabMatrixLabel": "warm / familiar"},
+                    "npc": {
+                        "traits": ["pnc_friendly"],
+                        "personality": {
+                            "socialStyle": "friendly",
+                            "compassion": 0.9,
+                            "sociability": 0.9,
+                        },
+                        "relationship": {
+                            "approval": 80,
+                            "respect": 70,
+                            "familiarity": 80,
+                            "identityTrust": "trusted",
+                        },
+                    },
+                },
+            ),
+            merge(
+                base,
+                {
+                    "runtime": {"semanticLabMatrixLabel": "guarded / hostile"},
+                    "npc": {
+                        "traits": ["pnc_reserved"],
+                        "personality": {
+                            "socialStyle": "withdrawn",
+                            "aggression": 0.9,
+                            "sociability": 0.2,
+                        },
+                        "relationship": {
+                            "approval": -80,
+                            "respect": -60,
+                            "familiarity": 5,
+                            "identityTrust": "untrustworthy",
+                        },
+                        "activeBehavior": "hostile",
+                    },
+                },
+            ),
+        ]
+
+        def finish(result: dict[str, Any]) -> None:
+            self._set_text(self.inspector, pretty(result))
+            self._set_text(self.trace, pretty(result))
+            self._append("SYSTEM", "Persona matrix completed through the real Lua worker.")
+
+        self._start_operation(
+            lambda worker: worker.context_matrix(rows, text="hello", maximum=3),
+            finish,
         )
 
     def inspect_world_knowledge(self) -> None:

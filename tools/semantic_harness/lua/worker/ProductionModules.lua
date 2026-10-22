@@ -91,6 +91,16 @@ function ProductionModules.load(context)
         "PNC/Core/Identity/PNC_Identity.lua",
         "social_authority"
     )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Traits/PNC_NPCTraitRegistry.lua",
+        "persona_catalog"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Traits/PNC_NPCTraitDefinitions.lua",
+        "persona_catalog"
+    )
     -- Keep the production NPC Knowledge service on the worker boundary.
     -- The adapter later fills these same tables with scenario-owned identity
     -- and registry methods; the service never receives a second store.

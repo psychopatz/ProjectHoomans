@@ -112,6 +112,60 @@ class LuaSemanticWorker:
     def snapshot(self) -> dict[str, Any]:
         return self._request("SNAPSHOT")
 
+    def persona_catalog(self) -> dict[str, Any]:
+        """Return the bounded catalog owned by the production Lua registries."""
+
+        return self._request("PERSONA_CATALOG")
+
+    def context_matrix(
+        self,
+        scenarios: list[dict[str, Any]],
+        text: str = "hello",
+        maximum: int = 8,
+    ) -> dict[str, Any]:
+        """Run bounded scenario A/B rows through this same real Lua worker."""
+
+        original = self.scenario
+        rows: list[dict[str, Any]] = []
+        try:
+            for index, scenario in enumerate(scenarios[: max(1, int(maximum))]):
+                validate_scenario(scenario)
+                configured = self.configure(scenario)
+                turn = self.input(text)
+                snapshot = self.snapshot()
+                suggestions = turn.get("observation", {}).get("suggestions") or {}
+                rows.append(
+                    {
+                        "index": index,
+                        "label": scenario.get("runtime", {}).get(
+                            "semanticLabMatrixLabel", f"case-{index + 1}"
+                        ),
+                        "configured": {
+                            "accepted": configured.get("ok") is True,
+                            "dynamicTradingLoad": configured.get(
+                                "dynamicTradingLoad"
+                            ),
+                        },
+                        "context": snapshot.get("context", {}),
+                        "suggestions": {
+                            "revision": suggestions.get("revision"),
+                            "candidates": [
+                                {
+                                    "id": row.get("id"),
+                                    "providerID": row.get("providerID"),
+                                    "source": row.get("source"),
+                                    "ranking": row.get("ranking"),
+                                    "display": row.get("display"),
+                                }
+                                for row in (suggestions.get("candidates") or [])[:24]
+                            ],
+                        },
+                    }
+                )
+        finally:
+            self.configure(original)
+        return {"schema": "semantic.persona.matrix.v1", "rows": rows}
+
     def knowledge_bootstrap(
         self, request_id: str = "harness-knowledge-bootstrap"
     ) -> dict[str, Any]:

@@ -23,14 +23,14 @@ def _bounded(value: Any, depth: int = 0, limit: int = MAX_ITEMS) -> Any:
     if isinstance(value, (int, float, bool)) or value is None:
         return value
     if isinstance(value, list):
-        result = [_bounded(item, depth + 1) for item in value[:limit]]
+        result = [_bounded(item, depth + 1, limit) for item in value[:limit]]
         if len(value) > limit:
             result.append(f"<{len(value) - limit} more>")
         return result
     if isinstance(value, dict):
         keys = sorted(value, key=str)
         result = {
-            str(key): _bounded(value[key], depth + 1)
+            str(key): _bounded(value[key], depth + 1, limit)
             for key in keys[:limit]
         }
         if len(keys) > limit:
@@ -220,6 +220,73 @@ def _visible_text(record: dict[str, Any], response: dict[str, Any]) -> dict[str,
     }
 
 
+def _persona_choice_projection(
+    record: dict[str, Any], context: dict[str, Any], observation: dict[str, Any]
+) -> dict[str, Any]:
+    suggestions = observation.get("suggestions")
+    suggestions = suggestions if isinstance(suggestions, dict) else {}
+    rows = []
+    for source in (
+        suggestions.get("candidates") or [],
+        suggestions.get("permittedCapabilities") or [],
+    ):
+        for candidate in source[:24]:
+            if not isinstance(candidate, dict):
+                continue
+            display = candidate.get("display")
+            display = display if isinstance(display, dict) else {}
+            rows.append(
+                {
+                    "id": candidate.get("id"),
+                    "action": candidate.get("action"),
+                    "providerID": candidate.get("providerID"),
+                    "source": candidate.get("source"),
+                    "sources": candidate.get("sources"),
+                    "eligibility": candidate.get("eligibility"),
+                    "visibility": candidate.get("visibility"),
+                    "ranking": candidate.get("ranking"),
+                    "labelKey": display.get("labelKey"),
+                    "label": display.get("label"),
+                    "utteranceKey": display.get("utteranceKey"),
+                    "utterance": display.get("utterance"),
+                    "frame": candidate.get("frame"),
+                }
+            )
+    result = record.get("result")
+    result = result if isinstance(result, dict) else {}
+    response = observation.get("response")
+    response = response if isinstance(response, dict) else {}
+    return {
+        "actorConversationContext": _bounded(
+            context.get("actorConversationContext", {}), limit=32
+        ),
+        "speechStyleContext": _bounded(
+            context.get("speechStyleContext", {}), limit=24
+        ),
+        "choiceRegistry": _bounded(suggestions.get("choiceRegistry", {}), limit=24),
+        "candidates": _bounded(rows, limit=32),
+        "ranking": _bounded(suggestions.get("ranking", {}), limit=24),
+        "privacy": _bounded(suggestions.get("privacy", {}), limit=16),
+        "realization": _bounded(response.get("realization", {}), limit=24),
+        "realizationFamily": response.get("realizationFamily"),
+        "realizationVariant": response.get("realizationVariant"),
+        "realizationFallbackReason": response.get("realizationFallbackReason"),
+        "receipt": {
+            "accepted": record.get("accepted") is True,
+            "reason": record.get("reason") or result.get("reason"),
+            "requestRevision": result.get("sequence"),
+            "replaySafe": record.get("reason") in {
+                "duplicate_suggestion", "stale_suggestion",
+            },
+        },
+        "dialogueResult": _bounded(result, limit=24),
+        "gameplayAction": _bounded(
+            observation.get("actionResult") or result.get("actionResult") or {},
+            limit=24,
+        ),
+    }
+
+
 def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
     """Return a bounded, read-only state/plan/trace view for the Lab UI."""
 
@@ -228,6 +295,7 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
     context = _context(record)
     dialogue = _dialogue(context)
     observation = _observation(record)
+    persona_choices = _persona_choice_projection(record, context, observation)
     response = _response(record, observation)
     plan = _plan(response)
     result = record.get("result", {})
@@ -432,6 +500,7 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
             "groundedFactRefs": response_refs,
         }, limit=16),
         "commandAuthority": _bounded(command_authority, limit=24),
+        "personaChoices": persona_choices,
         "semantic": {
             "intent": ir.get("intent") or observation.get("ir", {}).get("intent"),
             "speechAct": ir.get("speechAct") or observation.get("ir", {}).get("speechAct"),

@@ -18,7 +18,78 @@ local capabilities = {
     "COMMITMENT", "BACKSTORY", "BACKSTORY_FACT",
     "KNOWLEDGE_BOOTSTRAP", "KNOWLEDGE_DISCOVER", "KNOWLEDGE_METRICS",
     "WORLD_KNOWLEDGE_INSPECT", "WORLD_KNOWLEDGE_PROPAGATE",
+    "PERSONA_CATALOG",
 }
+
+local function catalogValues(source, fallback)
+    local values = {}
+    if type(source) == "table" then
+        if #source > 0 then
+            for index = 1, #source do
+                values[#values + 1] = source[index]
+            end
+        else
+            for key, enabled in pairs(source) do
+                if enabled == true then
+                    values[#values + 1] = key
+                end
+            end
+        end
+    end
+    if #values == 0 then
+        for index = 1, #fallback do
+            values[#values + 1] = fallback[index]
+        end
+    end
+    table.sort(values, function(left, right)
+        return tostring(left) < tostring(right)
+    end)
+    return values
+end
+
+local function personaCatalog(context)
+    local definitions = PNC.NPCTraits
+        and type(PNC.NPCTraits.GetDefinitions) == "function"
+        and PNC.NPCTraits.GetDefinitions() or {}
+    local constants = PNC.SocialProfileConstants or {}
+    local traits = {}
+    local maximum = math.min(#definitions, 64)
+    for index = 1, maximum do
+        local definition = definitions[index]
+        if type(definition) == "table" then
+            traits[#traits + 1] = {
+                id = definition.id,
+                labelKey = definition.labelKey or definition.uiName,
+                descriptionKey = definition.descriptionKey
+                    or definition.uiDescription,
+                excludes = context.Values.copy(definition.excludes),
+            }
+        end
+    end
+    table.sort(traits, function(left, right)
+        return tostring(left.id or "") < tostring(right.id or "")
+    end)
+    return {
+        schema = "semantic.persona.catalog.v1",
+        schemaVersion = 1,
+        identity = { genders = { "unknown", "female", "male" } },
+        traits = traits,
+        personality = {
+            enums = {
+                socialStyle = catalogValues(
+                    constants.VALID_SOCIAL_STYLES,
+                    { "neutral", "friendly", "withdrawn" }
+                ),
+            },
+            dimensions = catalogValues(constants.NUMERIC_DIMENSIONS, {
+                "compassion", "sociability", "forgiveness", "bravery",
+                "materialism", "aggression", "loyalty",
+            }),
+        },
+        roles = { "none", "trader", "guard", "leader" },
+        integrations = { "DTHoomans" },
+    }
+end
 
 local function backstorySnapshot(payload)
     local memory = PNC.Conversation and PNC.Conversation.Memory
@@ -354,6 +425,7 @@ function CommandRouter.hello(context)
         loadedModules = Runtime.loadedModules,
         moduleManifest = Runtime.moduleManifest,
         headlessRequires = Runtime.headlessRequires,
+        personaCatalog = personaCatalog(context),
         suggestions = context.Values.copy(
             Runtime.view and Runtime.view.semanticSuggestions
         ),
@@ -518,6 +590,8 @@ function CommandRouter.dispatch(context, request)
         return worldKnowledgeInspect(context, payload)
     elseif command == "WORLD_KNOWLEDGE_PROPAGATE" then
         return worldKnowledgePropagate(context, payload)
+    elseif command == "PERSONA_CATALOG" then
+        return personaCatalog(context)
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,
@@ -548,6 +622,7 @@ function CommandRouter.dispatch(context, request)
             loadedModules = Runtime.loadedModules,
             moduleManifest = Runtime.moduleManifest,
             headlessRequires = Runtime.headlessRequires,
+            personaCatalog = personaCatalog(context),
             suggestions = context.Values.copy(
                 Runtime.view and Runtime.view.semanticSuggestions
             ),

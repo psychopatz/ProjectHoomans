@@ -28,6 +28,8 @@ class SettingsDialogHost(Protocol):
     language_var: Any
     npc_profile_var: Any
     trace: Any
+    persona_catalog: dict[str, Any]
+    last_response: dict[str, Any]
 
     def _start_operation(self, operation: Callable[[Any], Any], callback: Callable[[Any], None]) -> bool: ...
     def _set_text(self, widget: Any, value: str) -> None: ...
@@ -58,6 +60,7 @@ def collect_scenario_settings(draft: dict[str, Any], values: Mapping[str, Any]) 
     updated_player = updated.setdefault("player", {})
     updated_npc = updated.setdefault("npc", {})
     updated_relationship = updated_npc.setdefault("relationship", {})
+    updated_identity = updated_npc.setdefault("identity", {})
     updated_conversation = updated.setdefault("conversation", {})
     for key in ("mode", "language"):
         updated_runtime[key] = str(read_value(f"runtime.{key}")).strip()
@@ -73,13 +76,56 @@ def collect_scenario_settings(draft: dict[str, Any], values: Mapping[str, Any]) 
         updated_player[key] = str(read_value(f"player.{key}")).strip()
     for key in ("npcID", "forename", "surname", "identityState", "relationshipState"):
         updated_npc[key] = str(read_value(f"npc.{key}")).strip()
+    if "npc.gender" in values:
+        updated_identity["gender"] = str(read_value("npc.gender")).strip()
+    if "npc.role" in values:
+        role = str(read_value("npc.role")).strip().lower()
+        if role in {"", "none"}:
+            updated_npc.pop("role", None)
+        else:
+            updated_npc["role"] = role
+    for key in ("healthState", "activeBehavior"):
+        if f"npc.{key}" in values:
+            updated_npc[key] = str(read_value(f"npc.{key}")).strip()
     for key in ("approval", "respect", "familiarity", "revision"):
         updated_relationship[key] = number_value(f"relationship.{key}")
         if key == "revision":
             updated_relationship[key] = int(updated_relationship[key])
     updated_relationship["identityTrust"] = str(read_value("relationship.identityTrust")).strip()
-    updated_npc["traits"] = json_value("npc.traits")
-    updated_npc["personality"] = json_value("npc.personality")
+    if "npc.traits" in values:
+        updated_npc["traits"] = json_value("npc.traits")
+    else:
+        updated_npc["traits"] = list(updated_npc.get("traits", []))
+    if "npc.personality" in values:
+        updated_npc["personality"] = json_value("npc.personality")
+    else:
+        updated_npc["personality"] = dict(updated_npc.get("personality", {}))
+    if not isinstance(updated_npc["traits"], list):
+        raise ValueError("npc.traits must be a JSON array")
+    if not isinstance(updated_npc["personality"], dict):
+        raise ValueError("npc.personality must be a JSON object")
+    if "persona.traits" in values:
+        selected_traits = read_value("persona.traits")
+        if not isinstance(selected_traits, list):
+            raise ValueError("persona.traits must be a list")
+        updated_npc["traits"] = [str(value).strip() for value in selected_traits]
+    if "persona.socialStyle" in values:
+        updated_npc["personality"]["socialStyle"] = str(
+            read_value("persona.socialStyle")
+        ).strip()
+    for key in (
+        "compassion", "sociability", "forgiveness", "bravery",
+        "materialism", "aggression", "loyalty",
+    ):
+        field = f"persona.personality.{key}"
+        if field in values:
+            updated_npc["personality"][key] = number_value(field)
+    for key in ("companion", "owned", "eligible"):
+        field = f"persona.authority.{key}"
+        if field in values:
+            updated_npc.setdefault("actorAuthority", {})[key] = bool(
+                read_value(field)
+            )
     player_inventory = json_value("player.inventory")
     if not isinstance(player_inventory, dict):
         raise ValueError("player.inventory must be a JSON object")
@@ -98,6 +144,10 @@ def collect_scenario_settings(draft: dict[str, Any], values: Mapping[str, Any]) 
         raise ValueError("runtime.nativeTranslations must be a JSON object")
     updated_runtime["commandResponses"] = command_responses
     updated_runtime["nativeTranslations"] = translations
+    if "runtime.DTHoomans" in values:
+        updated_runtime.setdefault("availableMods", {})["DTHoomans"] = bool(
+            read_value("runtime.DTHoomans")
+        )
     validate_scenario(updated)
     return updated
 
@@ -229,28 +279,107 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
     )
     for offset, key in enumerate(("npcID", "forename", "surname", "identityState", "relationshipState"), start=1):
         text_field(actors_page, npc_start + offset, f"npc.{key}", key, npc.get(key))
-    text_field(actors_page, npc_start + 7, "relationship.approval", "approval", relationship.get("approval", 0))
-    text_field(actors_page, npc_start + 8, "relationship.respect", "respect", relationship.get("respect", 0))
-    text_field(actors_page, npc_start + 9, "relationship.familiarity", "familiarity", relationship.get("familiarity", 0))
-    text_field(actors_page, npc_start + 10, "relationship.revision", "revision", relationship.get("revision", 1))
     combo_field(
         actors_page,
-        npc_start + 11,
+        npc_start + 7,
         "relationship.identityTrust",
         "identity trust",
         relationship.get("identityTrust", "unknown"),
         ("unknown", "trusted", "untrustworthy"),
     )
-    traits = ScrolledText(actors_page, height=4, width=38, wrap="none")
-    traits.grid(row=npc_start + 12, column=1, sticky="ew", pady=4)
-    traits.insert("1.0", pretty(npc.get("traits", [])))
-    variables["npc.traits"] = traits
-    ttk.Label(actors_page, text="traits (JSON)").grid(row=npc_start + 12, column=0, sticky="nw", padx=(0, 10), pady=4)
-    personality = ScrolledText(actors_page, height=4, width=38, wrap="none")
-    personality.grid(row=npc_start + 13, column=1, sticky="ew", pady=4)
-    personality.insert("1.0", pretty(npc.get("personality", {})))
-    variables["npc.personality"] = personality
-    ttk.Label(actors_page, text="personality (JSON)").grid(row=npc_start + 13, column=0, sticky="nw", padx=(0, 10), pady=4)
+    combo_field(
+        actors_page, npc_start + 8, "npc.healthState", "health state",
+        npc.get("healthState", "healthy"),
+        ("unknown", "healthy", "injured", "wounded", "critical", "dead"),
+    )
+    combo_field(
+        actors_page, npc_start + 9, "npc.activeBehavior", "activity",
+        npc.get("activeBehavior", "idle"),
+        ("idle", "busy", "searching", "fleeing", "hostile", "combat"),
+    )
+
+    persona_page = page("Persona & choices")
+    persona_page.columnconfigure(1, weight=1)
+    identity = npc.get("identity") if isinstance(npc.get("identity"), dict) else {}
+    personality = npc.get("personality") if isinstance(npc.get("personality"), dict) else {}
+    authority = npc.get("actorAuthority") if isinstance(npc.get("actorAuthority"), dict) else {}
+    combo_field(
+        persona_page, 0, "npc.gender", "identity / gender",
+        identity.get("gender", "unknown"),
+        tuple(
+            host.persona_catalog.get("identity", {}).get(
+                "genders", ["unknown", "female", "male"]
+            )
+        ),
+    )
+    combo_field(
+        persona_page, 1, "npc.role", "role / capability",
+        npc.get("role", "none"),
+        tuple(host.persona_catalog.get("roles", ["none", "trader", "guard", "leader"])),
+    )
+    check_field(persona_page, 2, "persona.authority.companion", "companion", authority.get("companion"))
+    check_field(persona_page, 3, "persona.authority.owned", "owned by player", authority.get("owned"))
+    check_field(persona_page, 4, "persona.authority.eligible", "authority eligible", authority.get("eligible"))
+    check_field(
+        persona_page, 5, "runtime.DTHoomans", "Dynamic Trading adapter enabled",
+        runtime.get("availableMods", {}).get("DTHoomans", False),
+    )
+
+    ttk.Label(persona_page, text="Registered NPC traits", font=("TkDefaultFont", 10, "bold")).grid(
+        row=6, column=0, columnspan=2, sticky="w", pady=(12, 4)
+    )
+    trait_catalog = host.persona_catalog.get("traits", [])
+    trait_ids = [str(item.get("id")) for item in trait_catalog if item.get("id")]
+    if not trait_ids:
+        trait_ids = [str(value) for value in npc.get("traits", [])]
+    trait_list = tk.Listbox(persona_page, selectmode="multiple", height=8, exportselection=False)
+    trait_list.grid(row=7, column=0, columnspan=2, sticky="nsew", pady=4)
+    persona_page.rowconfigure(7, weight=1)
+    selected_traits = {str(value).lower() for value in npc.get("traits", [])}
+    for index, trait_id in enumerate(trait_ids):
+        trait_list.insert("end", trait_id)
+        if trait_id.lower() in selected_traits:
+            trait_list.selection_set(index)
+    variables["persona.traits"] = trait_list
+
+    ttk.Label(persona_page, text="Social Profile personality", font=("TkDefaultFont", 10, "bold")).grid(
+        row=8, column=0, columnspan=2, sticky="w", pady=(12, 4)
+    )
+    combo_field(
+        persona_page, 9, "persona.socialStyle", "social style",
+        personality.get("socialStyle", "neutral"),
+        tuple(host.persona_catalog.get("personality", {}).get("enums", {}).get(
+            "socialStyle", ["neutral", "friendly", "withdrawn"]
+        )),
+    )
+
+    def scale_field(parent: Any, row: int, key: str, label: str, value: Any, minimum: float, maximum: float) -> None:
+        try:
+            initial = float(value)
+        except (TypeError, ValueError):
+            initial = (minimum + maximum) / 2
+        variables[key] = tk.DoubleVar(value=initial)
+        ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", padx=(0, 10), pady=3)
+        ttk.Scale(parent, from_=minimum, to=maximum, variable=variables[key], orient="horizontal").grid(
+            row=row, column=1, sticky="ew", pady=3
+        )
+
+    scale_field(persona_page, 10, "relationship.approval", "approval", relationship.get("approval", 0), -100, 100)
+    scale_field(persona_page, 11, "relationship.respect", "respect", relationship.get("respect", 0), -100, 100)
+    scale_field(persona_page, 12, "relationship.familiarity", "familiarity", relationship.get("familiarity", 0), 0, 100)
+    for offset, key in enumerate(
+        host.persona_catalog.get("personality", {}).get("dimensions", []), start=13
+    ):
+        scale_field(persona_page, offset, f"persona.personality.{key}", key, personality.get(key, 0.5), 0, 1)
+    ttk.Label(persona_page, text="Derived relationship state (production read-only)").grid(
+        row=21, column=0, sticky="w", pady=(12, 4)
+    )
+    derived_context = host.last_response.get("contextAfter", {}) if isinstance(host.last_response, dict) else {}
+    derived_actor = derived_context.get("actorConversationContext", {}) if isinstance(derived_context, dict) else {}
+    derived_relationship = derived_actor.get("relationship", {}) if isinstance(derived_actor, dict) else {}
+    ttk.Label(persona_page, text=str(derived_relationship.get("state", "unknown"))).grid(
+        row=21, column=1, sticky="w", pady=(12, 4)
+    )
 
     inventory_page = page("Inventories")
     inventory_page.columnconfigure(0, weight=1)
@@ -326,7 +455,12 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
     def collect() -> dict[str, Any]:
         values: dict[str, Any] = {}
         for key, value in variables.items():
-            if hasattr(value, "get") and not isinstance(value, ScrolledText):
+            if key == "persona.traits":
+                values[key] = [
+                    value.get(index)
+                    for index in value.curselection()
+                ]
+            elif hasattr(value, "get") and not isinstance(value, ScrolledText):
                 values[key] = value.get()
             else:
                 values[key] = value.get("1.0", "end").strip()
