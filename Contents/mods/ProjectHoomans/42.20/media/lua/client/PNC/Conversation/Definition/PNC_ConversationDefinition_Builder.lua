@@ -154,6 +154,11 @@ local function buildConversationMenu(contextData, npcID)
     local dossierChoice = {
         id = "view_dossier",
         log = false,
+        semantic = {
+            route = "conversation_root_choice",
+            actionID = "view_dossier",
+            groupID = "conversation_utilities",
+        },
         text = {
             key = "choice.view_dossier",
             domain = "pnc.system.shared.categories",
@@ -205,6 +210,10 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         -- Radio and walkie-talkie callers can opt into CRT with their own
         -- explicit conversation screenVariant.
         screenVariant = "subtle",
+        -- The semantic suggestion extension is the player-facing choice
+        -- surface for Hoomans. Core still retains choicesPart internally so
+        -- Session ordering and compatibility handlers remain unchanged.
+        choicePartVisible = false,
         portrait = Context.PortraitSpec(entry),
         backgroundID = Backgrounds.Get(timeID),
         theme = Palette.BuildConversationTheme(entry),

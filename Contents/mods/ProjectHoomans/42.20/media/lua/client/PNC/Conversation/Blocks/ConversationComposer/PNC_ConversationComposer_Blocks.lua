@@ -128,6 +128,89 @@ local function resolveProjectionText(value)
     return tostring(value or "")
 end
 
+local function semanticProjection(choice)
+    local semantic = type(choice) == "table" and choice.semantic or nil
+    if type(semantic) ~= "table" then return nil end
+    local output = {}
+    for _, key in ipairs({
+        "route", "categoryID", "topic", "choiceID", "actionID", "groupID",
+    }) do
+        if semantic[key] ~= nil then output[key] = semantic[key] end
+    end
+    return output
+end
+
+local function rootNodeFor(view)
+    local spec = view and view.spec or nil
+    local session = view and view.session or nil
+    local nodeID = tostring(session and session.currentNodeID or "")
+    if nodeID ~= "greeting" and nodeID ~= "menu" then return nil, nil end
+    local node = spec and spec.nodes and spec.nodes[nodeID] or nil
+    return node, nodeID
+end
+
+-- Read-only semantic projection of the dynamic production root choices. The
+-- source entries retain their existing action/next/close handlers; this
+-- projection carries only bounded display and route metadata.
+function Composer.BuildSemanticRootProjection(view)
+    local node, nodeID = rootNodeFor(view)
+    if type(node) ~= "table" then return nil end
+    local choices = {}
+    for _, entry in ipairs(node.choices or {}) do
+        local semantic = semanticProjection(entry)
+        if type(entry) == "table"
+            and tostring(entry.id or "") ~= ""
+            and semantic ~= nil
+        then
+            choices[#choices + 1] = {
+                id = entry.id,
+                textKey = entry.textKey,
+                text = resolveProjectionText(entry.text),
+                enabled = entry.enabled ~= false,
+                tooltip = entry.tooltip,
+                semantic = semantic,
+            }
+        end
+    end
+    return { nodeID = nodeID, choices = choices }
+end
+
+-- Resolve a semantic root frame back to the exact production choice entry.
+-- This is deliberately fail-closed and never executes a projected function.
+function Composer.ResolveSemanticRootChoice(view, frame)
+    local extensions = type(frame) == "table"
+        and type(frame.extensions) == "table" and frame.extensions or nil
+    if not extensions or extensions.origin ~= "conversation_root" then
+        return nil, "conversation_root_origin_invalid"
+    end
+    local node, nodeID = rootNodeFor(view)
+    if not node or tostring(extensions.rootNodeID or "") ~= nodeID then
+        return nil, "conversation_root_stale"
+    end
+    local requestedID = tostring(
+        extensions.rootChoiceID or extensions.actionID
+            or extensions.choiceID or ""
+    )
+    if requestedID == "" then return nil, "conversation_root_choice_invalid" end
+    for _, entry in ipairs(node.choices or {}) do
+        local semantic = semanticProjection(entry)
+        if type(entry) == "table" and tostring(entry.id or "") == requestedID
+            and type(semantic) == "table"
+            and semantic.route == extensions.route
+            and (extensions.categoryID == nil
+                or semantic.categoryID == extensions.categoryID)
+            and (extensions.actionID == nil
+                or semantic.actionID == extensions.actionID)
+        then
+            if entry.enabled == false then
+                return nil, "conversation_root_choice_disabled"
+            end
+            return entry
+        end
+    end
+    return nil, "conversation_root_choice_unknown"
+end
+
 -- Read-only semantic projection of the same authored block/node that the
 -- native composer currently presents. The semantic suggestion layer consumes
 -- this projection; it does not maintain a second block or choice state.

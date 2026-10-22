@@ -151,6 +151,10 @@ class SemanticHarnessApp:
         )
         self.closed = False
         self.busy = False
+        # WorkerSession marks its future ready before the Tk callback paints
+        # the initial production surface. Keep the UI-facing readiness bit
+        # separate so callers cannot submit during that short handoff.
+        self._worker_initialized = False
         self._production_catalog: dict[str, Any] | None = None
         self.settings_window: Any | None = None
         self._future: Future[Any] | None = None
@@ -489,7 +493,7 @@ class SemanticHarnessApp:
 
     @property
     def worker_ready(self) -> bool:
-        return self.session.ready
+        return self.session.ready and self._worker_initialized
 
     def _set_status(self, value: str) -> None:
         if hasattr(self, "status_var"):
@@ -546,9 +550,15 @@ class SemanticHarnessApp:
         callback(result)
 
     def _worker_ready(self, result: WorkerReady) -> None:
+        self._worker_initialized = True
         self._set_status(f"Ready · Lua PID {result.status.get('pid')}")
         self._set_controls(True)
         self._append("SYSTEM", "Lua worker ready. Production semantic modules are loaded.")
+        initial_suggestions = result.capabilities.get("suggestions") or {}
+        if initial_suggestions:
+            self._render_suggestions(
+                {"type": "turn", "accepted": True}, initial_suggestions
+            )
         capabilities = result.capabilities or {}
         flow_catalog = capabilities.get("flowCatalog", {})
         self._set_text(
@@ -606,7 +616,11 @@ class SemanticHarnessApp:
         self._set_text(self.authority, pretty(view.get("commandAuthority", {})))
         self._set_text(self.trace, pretty(response))
         observation = response.get("observation") or {}
-        suggestions = observation.get("suggestions") or {}
+        suggestions = (
+            observation.get("suggestions")
+            or response.get("suggestions")
+            or {}
+        )
         self._render_suggestions(response, suggestions)
 
     def _on_suggestion_group(self) -> None:
@@ -801,7 +815,7 @@ class SemanticHarnessApp:
         if not self.session.ready:
             return
 
-        def finish(_: dict[str, Any]) -> None:
+        def finish(response: dict[str, Any]) -> None:
             self._set_text(self.transcript, "")
             self._set_text(self.inspector, "")
             self._set_text(self.authority, "")
@@ -809,7 +823,10 @@ class SemanticHarnessApp:
             self._set_text(self.suggestion_inspector, "")
             self.suggestion_rows = []
             self.suggestion_interactive = False
-            self._render_suggestions({}, {})
+            self._render_suggestions(
+                {"type": "turn", "accepted": True},
+                response.get("suggestions") or {},
+            )
             self._append("SYSTEM", "Scenario reset.")
 
         self._start_operation(lambda worker: worker.reset(), finish)

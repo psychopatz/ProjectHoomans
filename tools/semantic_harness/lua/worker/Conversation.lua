@@ -178,6 +178,33 @@ function Conversation.refreshViewContext(context)
                 Runtime.view.spec.context.categoryDiagnostics = diagnostics
             end
         end
+        if composer and type(composer.BuildRootNode) == "function"
+            and type(Runtime.view.spec.context.conversationBlockContext)
+                == "table"
+        then
+            local ok, root = pcall(
+                composer.BuildRootNode,
+                Runtime.view.spec.context.conversationBlockContext,
+                Runtime.view.spec.context.conversationMenuOptions or {}
+            )
+            if ok and type(root) == "table" then
+                Runtime.view.spec.nodes.menu = { choices = root.choices or {} }
+                if composer
+                    and type(composer.BuildSemanticRootProjection)
+                        == "function"
+                then
+                    Runtime.view.spec.context.conversationRoot =
+                        composer.BuildSemanticRootProjection(Runtime.view)
+                end
+                if Runtime.view.session.currentNodeID == "menu" then
+                    Runtime.view.session.currentNode =
+                        Runtime.view.spec.nodes.menu
+                    Runtime.view.session:setChoices(
+                        Runtime.view.session.currentNode.choices
+                    )
+                end
+            end
+        end
     end
 end
 
@@ -297,6 +324,7 @@ function Conversation.buildView(context)
         currentNodeID = "menu",
         currentNode = nil,
         spec = nil,
+        view = nil,
         append = function(self, speaker, value, metadata)
             local message = {
                 speaker = speaker,
@@ -356,6 +384,28 @@ function Conversation.buildView(context)
             end
             return self.currentNode ~= nil
         end,
+        selectChoice = function(self, choice)
+            if self.busy or not choice or choice.enabled == false then
+                return false
+            end
+            self:setChoices({})
+            if choice.log ~= false then
+                self:append("player", resolvedPayload(choice.text))
+            end
+            if type(choice.action) == "function" then
+                choice.action(self.context, choice, self)
+            end
+            local response = choice.response
+            if type(response) == "function" then
+                response = response(self.context, choice, self)
+            end
+            if response then self:queueMessage("npc", response) end
+            self.pendingNext = choice.next
+            self.pendingClose = choice.close == true
+            self.pendingCloseReason = choice.closeReason
+            if #self.queue == 0 then self:finishPending() end
+            return true
+        end,
         finishPending = function(self)
             self.pendingFinished = true
             if self.pendingClose == true then
@@ -411,16 +461,42 @@ function Conversation.buildView(context)
             spec.context.categoryDiagnostics = diagnostics
         end
     end
+    if composer and type(composer.BuildRootNode) == "function"
+        and type(spec.context.conversationBlockContext) == "table"
+    then
+        local ok, root = pcall(
+            composer.BuildRootNode,
+            spec.context.conversationBlockContext,
+            spec.context.conversationMenuOptions or {}
+        )
+        if ok and type(root) == "table" then
+            spec.nodes.menu = { choices = root.choices or {} }
+        end
+    end
     local view = {
         headless = true,
         lifecycleFinished = false,
         spec = spec,
         session = session,
     }
+    session.view = view
     session.spec = spec
     session.currentNode = spec.nodes.menu
     session:setChoices(session.currentNode.choices)
     view.spec.context.conversationBlock = Conversation.blockProjection(view)
+    if composer and type(composer.BuildSemanticRootProjection) == "function" then
+        view.spec.context.conversationRoot =
+            composer.BuildSemanticRootProjection(view)
+    end
+    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local internal = input and input.Internal or nil
+    if internal and type(internal.RefreshRootSuggestions) == "function" then
+        local projection = internal.RefreshRootSuggestions(view)
+        if projection then
+            Runtime.lastSuggestionRevision = tonumber(projection.revision)
+                or Runtime.lastSuggestionRevision
+        end
+    end
     return view
 end
 
@@ -500,6 +576,14 @@ function Conversation.contextSnapshot(harnessContext, view)
         categoryDiagnostics = Values.copy(
             view and view.spec and view.spec.context
                 and view.spec.context.categoryDiagnostics
+        ),
+        conversationRoot = Values.copy(
+            view and view.spec and view.spec.context
+                and view.spec.context.conversationRoot
+        ),
+        conversationBlock = Values.copy(
+            view and view.spec and view.spec.context
+                and view.spec.context.conversationBlock
         ),
     }
 end
@@ -651,7 +735,10 @@ function Conversation.semanticClick(context, frame)
     local isChoice = Suggestions
         and Suggestions.IsConversationChoiceFrame
         and Suggestions.IsConversationChoiceFrame(frame)
-    if not isCategory and not isChoice then
+    local isRootChoice = Suggestions
+        and Suggestions.IsConversationRootChoiceFrame
+        and Suggestions.IsConversationRootChoiceFrame(frame)
+    if not isCategory and not isChoice and not isRootChoice then
         return nil, "unsupported_conversation_frame"
     end
 
@@ -742,7 +829,39 @@ function Conversation.semanticClick(context, frame)
         composer.PumpLocalRequests()
     end
     Conversation.refreshViewContext(context)
-    local projection = Conversation.blockProjection(view)
+    local projectedBlock = Conversation.blockProjection(view)
+    if isRootChoice then
+        local internal = Input.Internal
+        if isCategory and projectedBlock then
+            -- The category request has crossed into an authored block. Let
+            -- the normal block projection become the next suggestion set.
+            local router = internal and type(internal.RouterFor) == "function"
+                and internal.RouterFor(view) or nil
+            local revision = router and router.state
+                and tonumber(router.state.sequence) or currentRevision or 0
+            if internal and type(internal.ShallowContext) == "function"
+                and Suggestions and type(Suggestions.Build) == "function"
+            then
+                local semanticContext = internal.ShallowContext(view) or {}
+                semanticContext.conversationBlock = projectedBlock
+                view.semanticSuggestions = Suggestions.Build({
+                    accepted = false,
+                    sequence = revision,
+                    state = { sequence = revision },
+                    ir = {},
+                    decision = {},
+                }, semanticContext, nil)
+            else
+                view.semanticSuggestions = nil
+            end
+        else
+            local refreshed = internal
+                and type(internal.RefreshRootSuggestions) == "function"
+                and internal.RefreshRootSuggestions(view) or nil
+            if not refreshed then view.semanticSuggestions = nil end
+        end
+    end
+    local projection = projectedBlock
     local blockAfter = view.spec.context.activeConversationBlockID
     local applied = accepted == true
     if isCategory then
@@ -804,6 +923,14 @@ function Conversation.semanticClick(context, frame)
         response,
         view.spec and view.spec.context
     )
+    if isRootChoice and view.semanticSuggestions then
+        response.observation.suggestions = Values.copy(
+            view.semanticSuggestions
+        )
+        Runtime.lastSuggestionRevision = tonumber(
+            view.semanticSuggestions.revision
+        ) or Runtime.lastSuggestionRevision
+    end
     response.observation.conversationBlock = Values.copy(projection)
     response.observation.authoritativeMessages = {}
     for _, message in ipairs(allMessages) do

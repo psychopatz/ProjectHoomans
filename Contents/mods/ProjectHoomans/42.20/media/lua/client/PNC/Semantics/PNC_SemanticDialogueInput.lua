@@ -86,6 +86,49 @@ Suggestions = type(Suggestions) == "table" and Suggestions or {}
 
 local Internal = Input.Internal
 
+local function semanticFrameKey(view, frame)
+    local session = view and view.session or {}
+    return tostring(session.conversationID or "")
+        .. ":" .. tostring(frame and frame.requestRevision or "")
+        .. ":" .. tostring(frame and frame.candidateID or "")
+end
+
+local function beginDirectFrame(view, frame)
+    if not view or not view.session then
+        return false, "conversation_unavailable"
+    end
+    if type(Internal.Interactive) == "function"
+        and not Internal.Interactive(view)
+    then
+        return false, "conversation_busy"
+    end
+    local router = type(Internal.RouterFor) == "function"
+        and Internal.RouterFor(view) or nil
+    if not router then return false, "semantic_router_unavailable" end
+    local key = semanticFrameKey(view, frame)
+    view.session.semanticSuggestionReceipts =
+        view.session.semanticSuggestionReceipts or {}
+    if view.session.semanticSuggestionReceipts[key] then
+        return false, "duplicate_suggestion"
+    end
+    local expected = tonumber(frame and frame.requestRevision)
+    local current = tonumber(router.state and router.state.sequence) or 0
+    if expected == nil or expected ~= current then
+        return false, "stale_suggestion"
+    end
+    return true, key
+end
+
+local function finishDirectFrame(view, key)
+    if not view or not view.session or not key then return end
+    view.session.semanticSuggestionReceipts =
+        view.session.semanticSuggestionReceipts or {}
+    view.session.semanticSuggestionReceipts[key] = {
+        status = "accepted",
+        sequence = key,
+    }
+end
+
 function Input.Submit(view, value, part)
     local group = view and view.groupConversation
     if group and type(group.Submit) == "function" then
@@ -95,6 +138,46 @@ function Input.Submit(view, value, part)
 end
 
 function Input.SubmitSemanticFrame(view, frame)
+    local isRootChoice = type(Suggestions.IsConversationRootChoiceFrame)
+        == "function" and Suggestions.IsConversationRootChoiceFrame(frame)
+    if isRootChoice then
+        local allowed, receiptOrReason = beginDirectFrame(view, frame)
+        if not allowed then return false, receiptOrReason end
+        Input.ActiveView = view
+        local composer = PNC.Conversation
+            and PNC.Conversation.Composer or nil
+        if not composer then return false, "conversation_root_unavailable" end
+        local choice
+        local resolveReason
+        if type(composer.ResolveSemanticRootChoice) == "function" then
+            choice, resolveReason = composer.ResolveSemanticRootChoice(
+                view, frame
+            )
+        else
+            resolveReason = "conversation_root_resolver_unavailable"
+        end
+        if not choice then return false, resolveReason end
+        local accepted
+        local extensions = frame.extensions or {}
+        if extensions.route == "conversation_category" then
+            if type(composer.RequestCategory) ~= "function" then
+                return false, "conversation_category_unavailable"
+            end
+            local npcID = view.spec and view.spec.npcID or nil
+            accepted = composer.RequestCategory(
+                npcID,
+                extensions.categoryID,
+                extensions.choiceID
+            )
+        elseif view.session and type(view.session.selectChoice) == "function" then
+            accepted = view.session:selectChoice(choice)
+        else
+            return false, "conversation_root_choice_unavailable"
+        end
+        if accepted == true then finishDirectFrame(view, receiptOrReason) end
+        return accepted, accepted == true and "accepted"
+            or "conversation_root_choice_rejected"
+    end
     if type(Suggestions.IsConversationCategoryFrame) == "function"
         and Suggestions.IsConversationCategoryFrame(frame)
     then
@@ -107,11 +190,16 @@ function Input.SubmitSemanticFrame(view, frame)
         if not composer or type(composer.RequestCategory) ~= "function" then
             return false, "conversation_category_unavailable"
         end
+        local allowed, receiptOrReason = beginDirectFrame(view, frame)
+        if not allowed then return false, receiptOrReason end
         local npcID = view and view.spec and view.spec.npcID or nil
-        return composer.RequestCategory(
+        local accepted = composer.RequestCategory(
             npcID,
             frame.extensions.categoryID
         )
+        if accepted == true then finishDirectFrame(view, receiptOrReason) end
+        return accepted, accepted == true and "accepted"
+            or "conversation_category_rejected"
     end
     if type(Suggestions.IsConversationChoiceFrame) == "function"
         and Suggestions.IsConversationChoiceFrame(frame)
@@ -122,14 +210,19 @@ function Input.SubmitSemanticFrame(view, frame)
         if not composer or type(composer.RequestChoice) ~= "function" then
             return false, "conversation_choice_unavailable"
         end
+        local allowed, receiptOrReason = beginDirectFrame(view, frame)
+        if not allowed then return false, receiptOrReason end
         local npcID = view and view.spec and view.spec.npcID or nil
         local extensions = frame.extensions
-        return composer.RequestChoice(
+        local accepted = composer.RequestChoice(
             npcID,
             extensions.blockID,
             extensions.nodeID,
             extensions.choiceID
         )
+        if accepted == true then finishDirectFrame(view, receiptOrReason) end
+        return accepted, accepted == true and "accepted"
+            or "conversation_choice_rejected"
     end
     local group = view and view.groupConversation
     if group and type(group.SubmitSemanticFrame) == "function" then

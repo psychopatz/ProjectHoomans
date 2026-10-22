@@ -45,6 +45,48 @@ function Internal.RefreshSuggestions(view, result)
     return projection
 end
 
+-- Rebuild the semantic surface from the current production root node without
+-- inventing a turn or advancing router state. This is used when a Core choice
+-- transition returns to the menu and on the initial root presentation.
+function Internal.RefreshRootSuggestions(view)
+    if not view or type(Suggestions.Build) ~= "function"
+        or type(Internal.ShallowContext) ~= "function"
+    then
+        return nil
+    end
+    if view.closed == true or view.closing == true
+        or view.lifecycleFinished == true
+        or view.session and view.session.closed == true
+    then
+        view.semanticSuggestions = nil
+        return nil
+    end
+    local context = Internal.ShallowContext(view)
+    if type(context.conversationRoot) ~= "table" then return nil end
+    -- Do not create the semantic router merely to paint the initial menu.
+    -- RouterFor owns turn state initialization, and doing that here changes
+    -- the authoritative contextBefore snapshot before the first input. Reuse
+    -- an existing router when a prior turn already created one; otherwise the
+    -- initial root revision is the canonical zero revision.
+    local router = view.session and view.session.semanticDialogueRouter
+    local revision = router and router.state
+        and tonumber(router.state.sequence) or 0
+    local projection = Suggestions.Build({
+        accepted = false,
+        sequence = revision,
+        state = { sequence = revision },
+        ir = {},
+        decision = {},
+    }, context, nil)
+    view.semanticSuggestions = projection
+    local part = view.extensionParts
+        and view.extensionParts.semanticSuggestions or nil
+    if part and type(part.setSuggestions) == "function" then
+        part:setSuggestions(projection)
+    end
+    return projection
+end
+
 local function applyGeneratedFlowResult(view, result, actionResult)
     local flow = result and result.flow or nil
     local policy = PNC.Semantics and PNC.Semantics.DialoguePolicy or nil

@@ -32,6 +32,11 @@ function IdentityChoice.Build(npcID, projection, identityArguments)
     end
     return {
         id = "ask_name",
+        semantic = {
+            route = "conversation_root_choice",
+            actionID = "ask_name",
+            groupID = "conversation_utilities",
+        },
         text = {
             key = "choice.ask_name",
             domain = "pnc.system.shared.categories",

@@ -17,7 +17,10 @@ local BranchOffers = PNC.Semantics.DialogueBranchOffers
     or require "PNC/Semantics/PNC_SemanticDialogueBranchOffers"
 
 Suggestions.VERSION = 1
-Suggestions.MAX_CANDIDATES = 5
+-- The visual part keeps five rows per selected group. The projection itself
+-- is bounded separately so a dynamic root can expose every safe topic through
+-- the existing group selector without pretending that five is a global cap.
+Suggestions.MAX_CANDIDATES = 24
 Suggestions.MAX_TRACE = 12
 Suggestions.MAX_SOURCES = 4
 
@@ -1316,6 +1319,96 @@ local function appendConversationChoices(
     end
 end
 
+local function appendConversationRootChoices(
+    output, seen, context, revision, predicateTrace
+)
+    local root = type(context) == "table"
+        and type(context.conversationRoot) == "table"
+        and context.conversationRoot or nil
+    if not root or type(root.choices) ~= "table" then return end
+    for _, choice in ipairs(root.choices) do
+        local semantic = type(choice) == "table" and choice.semantic or nil
+        local choiceID = type(choice) == "table"
+            and tostring(choice.id or "") or ""
+        if type(semantic) == "table" and choiceID ~= ""
+            and (semantic.route == "conversation_category"
+                or semantic.route == "conversation_root_choice")
+            and #output < Suggestions.MAX_CANDIDATES
+        then
+            local candidateID = table.concat({
+                "conversation.root", tostring(root.nodeID), choiceID,
+            }, ":")
+            if not seen[candidateID] then
+                local topic = tostring(semantic.topic or "")
+                local groupID = semantic.groupID
+                    or topicGroupID(topic)
+                    or "conversation_utilities"
+                local text = boundedText(choice.text or choiceID, 160)
+                local enabled = choice.enabled == true
+                local reason = enabled and "production_root_choice_eligible"
+                    or choice.tooltip or "production_root_choice_ineligible"
+                if #predicateTrace < Predicates.MAX_TRACE then
+                    predicateTrace[#predicateTrace + 1] = {
+                        candidateID = candidateID,
+                        source = "conversation_root",
+                        path = "conversationRoot.choices." .. choiceID,
+                        status = enabled and "allowed" or "hidden",
+                        reason = reason,
+                    }
+                end
+                local extensions = copyValue(semantic) or {}
+                extensions.origin = "conversation_root"
+                extensions.rootNodeID = root.nodeID
+                extensions.rootChoiceID = choiceID
+                local frame = {
+                    schemaVersion = Suggestions.VERSION,
+                    kind = "semantic_click_frame",
+                    candidateID = candidateID,
+                    topic = topic ~= "" and topic or nil,
+                    intent = "REQUEST",
+                    speechAct = "REQUEST",
+                    subject = semantic.route == "conversation_category"
+                        and "CONVERSATION_TOPIC" or "CONVERSATION_ACTION",
+                    extensions = extensions,
+                    textKey = choice.textKey,
+                    textFallback = text,
+                    labelKey = choice.textKey,
+                    requestRevision = revision,
+                }
+                local source = sourceRecord(
+                    "conversation_root", revision, reason
+                )
+                local candidate = {
+                    id = candidateID,
+                    topic = topic ~= "" and topic or nil,
+                    groupID = groupID,
+                    rank = #output + 1,
+                    source = source,
+                    sources = { source },
+                    frame = frame,
+                    enabled = enabled,
+                    display = {
+                        labelKey = choice.textKey,
+                        labelFallback = text,
+                        label = text,
+                        utteranceKey = choice.textKey,
+                        utteranceFallback = text,
+                        utterance = text,
+                    },
+                    visibility = "player",
+                    eligibility = {
+                        status = enabled and "allowed" or "unavailable",
+                        allowed = enabled,
+                        reason = reason,
+                    },
+                }
+                output[#output + 1] = candidate
+                seen[candidateID] = candidate
+            end
+        end
+    end
+end
+
 local GROUP_LABELS = {
     whats_up = {
         key = "UI_PNC_Conversation_Suggestion_Group_WhatsUp_Label",
@@ -1395,6 +1488,49 @@ local function groupPresentation(id, topic)
             labelKey = "UI_PNC_Conversation_Suggestion_Group_Response_Label",
         }
     end
+    if string.sub(tostring(id or ""), 1, 6) == "topic:" then
+        local topicID = tostring(topic or string.sub(id, 7))
+        local key = "category." .. topicID
+        local categoryLabel = resolvedText(key, topicID)
+        local text = PsychopatzCore and PsychopatzCore.Conversation
+            and PsychopatzCore.Conversation.Text or nil
+        if text and type(text.Resolve) == "function" then
+            local ok, value = pcall(text.Resolve, {
+                key = key,
+                domain = "pnc.system.shared.categories",
+                fallback = categoryLabel,
+            })
+            if ok and type(value) == "string" and value ~= "" then
+                categoryLabel = value
+            end
+        end
+        return {
+            id = id,
+            topic = topicID,
+            label = categoryLabel,
+            labelKey = key,
+        }
+    end
+    if id == "conversation_actions" then
+        return {
+            id = id,
+            label = resolvedText(
+                "UI_PNC_Conversation_Suggestion_Group_Actions_Label",
+                "Conversation actions"
+            ),
+            labelKey = "UI_PNC_Conversation_Suggestion_Group_Actions_Label",
+        }
+    end
+    if id == "conversation_utilities" then
+        return {
+            id = id,
+            label = resolvedText(
+                "UI_PNC_Conversation_Suggestion_Group_Utilities_Label",
+                "Conversation utilities"
+            ),
+            labelKey = "UI_PNC_Conversation_Suggestion_Group_Utilities_Label",
+        }
+    end
     return { id = id, label = id }
 end
 
@@ -1449,8 +1585,9 @@ function Suggestions.IsConversationCategoryFrame(frame)
     local extensions = type(frame.extensions) == "table"
         and frame.extensions or {}
     return extensions.route == "conversation_category"
-        and extensions.categoryID == "projecthoomans:whats_up"
-        and extensions.topic == "whats_up"
+        and string.sub(tostring(extensions.categoryID or ""), 1, 15)
+            == "projecthoomans:"
+        and tostring(extensions.topic or "") ~= ""
 end
 
 function Suggestions.IsConversationChoiceFrame(frame)
@@ -1460,11 +1597,31 @@ function Suggestions.IsConversationChoiceFrame(frame)
     local extensions = type(frame.extensions) == "table"
         and frame.extensions or {}
     return extensions.route == "conversation_choice"
-        and tostring(extensions.categoryID or "")
-            == "projecthoomans:whats_up"
+        and string.sub(tostring(extensions.categoryID or ""), 1, 15)
+            == "projecthoomans:"
         and tostring(extensions.blockID or "") ~= ""
         and tostring(extensions.nodeID or "") ~= ""
         and tostring(extensions.choiceID or "") ~= ""
+end
+
+function Suggestions.IsConversationRootChoiceFrame(frame)
+    if type(frame) ~= "table" or frame.kind ~= "semantic_click_frame" then
+        return false
+    end
+    local extensions = type(frame.extensions) == "table"
+        and frame.extensions or {}
+    if extensions.origin ~= "conversation_root"
+        or (extensions.route ~= "conversation_category"
+            and extensions.route ~= "conversation_root_choice")
+        or tostring(extensions.rootNodeID or "") == ""
+    then
+        return false
+    end
+    if extensions.route == "conversation_category" then
+        return Suggestions.IsConversationCategoryFrame(frame)
+            and tostring(extensions.rootChoiceID or "") ~= ""
+    end
+    return tostring(extensions.actionID or "") ~= ""
 end
 
 function Suggestions.Build(result, context, messages)
@@ -1504,6 +1661,11 @@ function Suggestions.Build(result, context, messages)
     local flow = type(decision.flow) == "table" and decision.flow or {}
     local flowActive = flow.flowId ~= nil
         and (flow.committed == true or flow.matched == true)
+    if result.accepted ~= true then
+        appendConversationRootChoices(
+            candidates, seen, context, revision, predicateTrace
+        )
+    end
     appendConversationChoices(
         candidates, seen, context, revision, predicateTrace
     )

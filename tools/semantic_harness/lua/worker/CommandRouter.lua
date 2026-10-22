@@ -232,6 +232,9 @@ function CommandRouter.hello(context)
         loadedModules = Runtime.loadedModules,
         moduleManifest = Runtime.moduleManifest,
         headlessRequires = Runtime.headlessRequires,
+        suggestions = context.Values.copy(
+            Runtime.view and Runtime.view.semanticSuggestions
+        ),
         -- The full production flow catalog is fetched through FLOW_CATALOG.
         -- Keeping the handshake bounded matters as automatic generation grows.
         translation = context.OutputProjection.translationSnapshot(context),
@@ -286,10 +289,15 @@ function CommandRouter.dispatch(context, request)
         local suggestions = PNC.Semantics
             and PNC.Semantics.DialogueSuggestions or nil
         if suggestions
-            and ((type(suggestions.IsConversationCategoryFrame) == "function"
-                and suggestions.IsConversationCategoryFrame(payload.frame))
+            and (
+                (type(suggestions.IsConversationCategoryFrame) == "function"
+                    and suggestions.IsConversationCategoryFrame(payload.frame))
                 or (type(suggestions.IsConversationChoiceFrame) == "function"
-                and suggestions.IsConversationChoiceFrame(payload.frame)))
+                    and suggestions.IsConversationChoiceFrame(payload.frame))
+                or (type(suggestions.IsConversationRootChoiceFrame)
+                    == "function"
+                    and suggestions.IsConversationRootChoiceFrame(payload.frame))
+            )
         then
             return context.Conversation.semanticClick(
                 context,
@@ -303,8 +311,26 @@ function CommandRouter.dispatch(context, request)
         )
     elseif command == "LANGUAGE" then
         if payload == nil then return nil, "language_required" end
-        return context.Translations.setLanguage(context,
+        local response = context.Translations.setLanguage(context,
             type(payload) == "table" and payload.language or payload)
+        context.Conversation.refreshViewContext(context)
+        local view = context.Runtime.view
+        local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+        local internal = input and input.Internal or nil
+        local suggestions
+        if view and view.lastSemanticDialogueResult
+            and internal and type(internal.RefreshSuggestions) == "function"
+        then
+            suggestions = internal.RefreshSuggestions(
+                view, view.lastSemanticDialogueResult
+            )
+        elseif internal
+            and type(internal.RefreshRootSuggestions) == "function"
+        then
+            suggestions = internal.RefreshRootSuggestions(view)
+        end
+        response.suggestions = context.Values.copy(suggestions)
+        return response
     elseif command == "TOOL_REPLY" then
         return context.OutputProjection.toolReply(context, payload)
     elseif command == "SNAPSHOT" then
@@ -394,6 +420,9 @@ function CommandRouter.dispatch(context, request)
             loadedModules = Runtime.loadedModules,
             moduleManifest = Runtime.moduleManifest,
             headlessRequires = Runtime.headlessRequires,
+            suggestions = context.Values.copy(
+                Runtime.view and Runtime.view.semanticSuggestions
+            ),
             translation = context.OutputProjection.translationSnapshot(context),
         }
     elseif command == "QUIT" then

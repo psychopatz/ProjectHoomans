@@ -39,5 +39,7 @@
   "UI_PNC_Conversation_Suggestion_WhatsUp_Utterance": "Ano ang balita?",
   "UI_PNC_Conversation_Suggestion_Group_WhatsUp_Label": "Ano ang balita",
   "UI_PNC_Conversation_Suggestion_Group_Flow_Label": "Kasalukuyang sangay ng usapan",
-  "UI_PNC_Conversation_Suggestion_Group_Response_Label": "Sagot ng NPC"
+  "UI_PNC_Conversation_Suggestion_Group_Response_Label": "Sagot ng NPC",
+  "UI_PNC_Conversation_Suggestion_Group_Actions_Label": "Mga aksyon sa usapan",
+  "UI_PNC_Conversation_Suggestion_Group_Utilities_Label": "Mga gamit sa usapan"
 }

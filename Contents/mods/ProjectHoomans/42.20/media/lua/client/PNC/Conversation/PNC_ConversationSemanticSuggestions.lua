@@ -17,9 +17,9 @@ local Text = PsychopatzCore.Conversation.Text
 -- Core's layout resolver already persists and applies extension-part bounds.
 Layout.defaults.semanticSuggestions = Layout.defaults.semanticSuggestions or {
     x = 0.26,
-    y = 0.745,
+    y = 0.64,
     w = 0.43,
-    h = 0.16,
+    h = 0.27,
 }
 
 local MAX_BUTTONS = 5
@@ -67,6 +67,25 @@ local function interactive(part)
     return part.owner
         and type(part.owner.isConversationInteractive) == "function"
         and part.owner:isConversationInteractive() == true
+end
+
+local function rootProjectionKey(view)
+    local session = view and view.session or nil
+    local spec = view and view.spec or nil
+    local nodeID = tostring(session and session.currentNodeID or "")
+    local node = spec and spec.nodes and spec.nodes[nodeID] or nil
+    if nodeID ~= "greeting" and nodeID ~= "menu" then return nil end
+    local values = {
+        nodeID,
+        spec and spec.context and spec.context.activeConversationBlockID,
+        spec and spec.context and spec.context.pendingDepartureWarning,
+    }
+    for _, choice in ipairs(node and node.choices or {}) do
+        values[#values + 1] = tostring(choice.id or "")
+            .. ":" .. tostring(choice.enabled ~= false)
+            .. ":" .. tostring(choice.text or "")
+    end
+    return table.concat(values, "|")
 end
 
 function Part:onSuggestionPressed(row)
@@ -164,15 +183,19 @@ function Part:setSuggestions(projection)
         and math.max(0, MAX_BUTTONS - #capabilities)
         or MAX_BUTTONS
     for index = 1, math.min(#candidates, candidateLimit) do
+        local candidate = candidates[index]
         rows[#rows + 1] = {
-            id = candidates[index].id,
-            frame = candidates[index].frame,
-            display = candidates[index].display,
-            status = "eligible",
-            enabled = true,
-            source = candidates[index].source,
+            id = candidate.id,
+            frame = candidate.frame,
+            display = candidate.display,
+            status = candidate.eligibility
+                and candidate.eligibility.status == "unavailable"
+                and "unavailable_root_choice" or "eligible",
+            enabled = candidate.enabled ~= false,
+            source = candidate.source,
+            eligibility = candidate.eligibility,
             groupID = selectedGroup and selectedGroup.id
-                or candidates[index].groupID,
+                or candidate.groupID,
         }
     end
     for index = 1, math.min(#capabilities, MAX_BUTTONS - #rows) do
@@ -246,6 +269,18 @@ end
 
 function Part:prerender()
     PsychopatzConversationPart.prerender(self)
+    local view = self.owner
+    local key = rootProjectionKey(view)
+    if key and key ~= self.rootProjectionKey then
+        self.rootProjectionKey = key
+        local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+        local internal = input and input.Internal or nil
+        if internal and type(internal.RefreshRootSuggestions) == "function" then
+            internal.RefreshRootSuggestions(view)
+        end
+    elseif not key then
+        self.rootProjectionKey = nil
+    end
     self:refreshControls()
 end
 
@@ -271,6 +306,7 @@ function Part:new(x, y, width, height, options)
     object.groupButton = nil
     object.selectedGroupID = nil
     object.selectedGroupRevision = nil
+    object.rootProjectionKey = nil
     object.projection = nil
     return object
 end

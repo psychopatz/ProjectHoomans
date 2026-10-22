@@ -10,6 +10,38 @@ from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class WhatsUpConversationTests(unittest.TestCase):
+    def test_initial_root_projection_uses_production_topic_groups(self) -> None:
+        worker = LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO))
+        try:
+            snapshot = worker.snapshot()
+            suggestions = snapshot["suggestions"]
+            root = next(
+                item
+                for item in suggestions["candidates"]
+                if item["id"]
+                == "conversation.root:menu:projecthoomans:whats_up"
+            )
+            self.assertEqual(
+                root["frame"]["extensions"]["origin"],
+                "conversation_root",
+            )
+            self.assertEqual(
+                root["frame"]["extensions"]["categoryID"],
+                "projecthoomans:whats_up",
+            )
+            self.assertIn(
+                "topic:whats_up",
+                {group["id"] for group in suggestions["groups"]},
+            )
+            clicked = worker.suggestion_click(root["frame"])
+            self.assertTrue(clicked["accepted"])
+            self.assertEqual(
+                clicked["conversationBlock"]["categoryID"],
+                "projecthoomans:whats_up",
+            )
+        finally:
+            worker.close()
+
     def test_reviewed_aliases_use_one_typed_category_route(self) -> None:
         aliases = (
             "what's up",

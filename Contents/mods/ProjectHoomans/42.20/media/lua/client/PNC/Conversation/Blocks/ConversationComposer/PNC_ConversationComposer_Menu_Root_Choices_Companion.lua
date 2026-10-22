@@ -32,6 +32,11 @@ local function appendUnrecruitedChoices(choices, context)
     then
         choices[#choices + 1] = {
             id = "settlement_admission",
+            semantic = {
+                route = "conversation_root_choice",
+                actionID = "settlement_admission",
+                groupID = "conversation_actions",
+            },
             text = dialoguePayload(
                 SYSTEM_SOURCE,
                 "choice.settlement_admission",
@@ -49,6 +54,11 @@ local function appendUnrecruitedChoices(choices, context)
     then
         choices[#choices + 1] = {
             id = "ambient_visit",
+            semantic = {
+                route = "conversation_root_choice",
+                actionID = "ambient_visit",
+                groupID = "conversation_actions",
+            },
             text = dialoguePayload(
                 SYSTEM_SOURCE,
                 "choice.ambient_visit",
@@ -62,6 +72,11 @@ local function appendUnrecruitedChoices(choices, context)
 
     choices[#choices + 1] = {
         id = "recruit",
+        semantic = {
+            route = "conversation_root_choice",
+            actionID = "recruit",
+            groupID = "conversation_actions",
+        },
         text = dialoguePayload(
             SYSTEM_SOURCE, "choice.recruit", context
         ),
@@ -82,6 +97,11 @@ local function appendRecruitedChoices(choices, context)
     if context.pendingDepartureWarning == true then
         choices[#choices + 1] = {
             id = "disband_confirm",
+            semantic = {
+                route = "conversation_root_choice",
+                actionID = "disband_confirm",
+                groupID = "conversation_actions",
+            },
             text = dialoguePayload(
                 SYSTEM_SOURCE, "choice.disband_confirm", context
             ),
@@ -95,6 +115,11 @@ local function appendRecruitedChoices(choices, context)
         }
         choices[#choices + 1] = {
             id = "disband_cancel",
+            semantic = {
+                route = "conversation_root_choice",
+                actionID = "disband_cancel",
+                groupID = "conversation_actions",
+            },
             text = dialoguePayload(
                 SYSTEM_SOURCE, "choice.disband_cancel", context
             ),
@@ -112,6 +137,11 @@ local function appendRecruitedChoices(choices, context)
 
     choices[#choices + 1] = {
         id = "disband",
+        semantic = {
+            route = "conversation_root_choice",
+            actionID = "disband",
+            groupID = "conversation_actions",
+        },
         text = dialoguePayload(
             SYSTEM_SOURCE, "choice.disband", context
         ),

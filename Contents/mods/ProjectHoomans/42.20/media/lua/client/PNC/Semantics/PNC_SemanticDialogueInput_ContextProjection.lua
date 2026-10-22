@@ -126,7 +126,16 @@ function Projection.Build(view, getProviderStatus)
     end
     local composer = PNC.Conversation and PNC.Conversation.Composer
     if composer and type(composer.BuildSemanticBlockProjection) == "function" then
-        output.conversationBlock = composer.BuildSemanticBlockProjection(view)
+        local blockProjection = composer.BuildSemanticBlockProjection(view)
+        if blockProjection ~= nil then
+            output.conversationBlock = blockProjection
+        end
+    end
+    if composer and type(composer.BuildSemanticRootProjection) == "function" then
+        local rootProjection = composer.BuildSemanticRootProjection(view)
+        if rootProjection ~= nil then
+            output.conversationRoot = rootProjection
+        end
     end
     if WorldContext and type(WorldContext.Get) == "function" then
         output.worldContext = WorldContext.Get({

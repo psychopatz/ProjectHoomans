@@ -236,7 +236,10 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             ):
                 self.assertTrue(widget.winfo_ismapped())
 
-            blank_panel_height = app.suggestion_frame.winfo_height()
+            # Root semantic suggestions are intentionally visible before the
+            # first typed turn, so this is a populated baseline rather than a
+            # blank placeholder panel.
+            initial_panel_height = app.suggestion_frame.winfo_height()
             app.input_var.set("whats up")
             app.submit()
             wait_until(
@@ -248,7 +251,9 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             )
             root.update_idletasks()
 
-            self.assertGreater(app.suggestion_frame.winfo_height(), blank_panel_height)
+            self.assertGreaterEqual(
+                app.suggestion_frame.winfo_height(), initial_panel_height
+            )
             self.assertGreater(app.send_button.winfo_y(), app.suggestion_frame.winfo_y())
             pane_right = app.transcript.winfo_rootx() + app.transcript.winfo_width()
             for button in (

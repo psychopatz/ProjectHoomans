@@ -99,6 +99,9 @@ function ScenarioSession.reset(context, scenario)
         moduleManifest = Values.copy(Runtime.moduleManifest),
         headlessRequires = Values.copy(Runtime.headlessRequires),
         questBoundary = Runtime.questBoundary,
+        suggestions = Values.copy(
+            Runtime.view and Runtime.view.semanticSuggestions
+        ),
         translation = context.OutputProjection.translationSnapshot(context),
     }
 end
@@ -122,6 +125,9 @@ function ScenarioSession.snapshot(context)
         moduleManifest = Values.copy(Runtime.moduleManifest),
         headlessRequires = Values.copy(Runtime.headlessRequires),
         questBoundary = Runtime.questBoundary,
+        suggestions = Values.copy(
+            Runtime.view and Runtime.view.semanticSuggestions
+        ),
     }
 end
 

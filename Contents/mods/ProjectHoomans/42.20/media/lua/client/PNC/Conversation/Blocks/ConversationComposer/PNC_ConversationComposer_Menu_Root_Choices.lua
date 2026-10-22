@@ -32,6 +32,20 @@ local function categoryChoices(context)
             local choicesEntry = {
                 id = selectedCategory.id,
                 text = label,
+                semantic = {
+                    route = "conversation_category",
+                    categoryID = selectedCategory.id,
+                    topic = string.gsub(
+                        tostring(selectedCategory.id),
+                        "^projecthoomans:",
+                        ""
+                    ),
+                    groupID = "topic:" .. string.gsub(
+                        tostring(selectedCategory.id),
+                        "^projecthoomans:",
+                        ""
+                    ),
+                },
                 -- Ask About is a topic browser and stays out of the
                 -- transcript; ordinary categories are player lines.
                 log = selectedCategory.id
@@ -61,6 +75,11 @@ local function addDebugChoice(choices, context)
         text = dialoguePayload(
             SYSTEM_SOURCE, "choice.show_debug_text", context
         ),
+        semantic = {
+            route = "conversation_root_choice",
+            actionID = "show_debug_text",
+            groupID = "conversation_utilities",
+        },
         log = false,
         next = "menu",
         action = function()
@@ -84,6 +103,13 @@ function Choices.Build(context, options, greetingBlock)
                 text = dialoguePayload(
                     greetingBlock.textSource, choice.textKey, context
                 ),
+                semantic = {
+                    route = "conversation_category",
+                    categoryID = "projecthoomans:greetings",
+                    topic = "greeting",
+                    choiceID = choice.id,
+                    groupID = "topic:greeting",
+                },
                 action = function()
                     Composer.RequestCategory(
                         context.npcID,
@@ -122,6 +148,11 @@ function Choices.Build(context, options, greetingBlock)
             text = dialoguePayload(
                 GOODBYE_SOURCE, "choice.goodbye", context
             ),
+            semantic = {
+                route = "conversation_root_choice",
+                actionID = "goodbye",
+                groupID = "conversation_utilities",
+            },
             response = dialoguePayload(
                 GOODBYE_SOURCE, "response.goodbye", context
             ),

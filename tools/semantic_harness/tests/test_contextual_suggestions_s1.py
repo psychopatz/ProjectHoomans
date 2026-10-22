@@ -21,7 +21,9 @@ class ContextualSuggestionsS1Tests(unittest.TestCase):
             self.assertTrue(preview["accepted"])
             suggestions = preview["observation"]["suggestions"]
             self.assertEqual(suggestions["schemaVersion"], 1)
-            self.assertLessEqual(len(suggestions["candidates"]), 5)
+            # The projection is bounded above the five visual rows so the
+            # existing group selector can expose every safe root topic.
+            self.assertLessEqual(len(suggestions["candidates"]), 24)
             self.assertTrue(suggestions["candidates"])
             self.assertEqual(preview["messages"], [])
             self.assertEqual(preview["transport"], [])
