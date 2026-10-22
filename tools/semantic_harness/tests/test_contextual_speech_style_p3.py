@@ -97,12 +97,12 @@ class ContextualSpeechStyleP3Tests(unittest.TestCase):
             neutral_response["sourcePoolID"], guarded_response["sourcePoolID"]
         )
         self.assertEqual(
-            [row["id"] for row in neutral["observation"]["suggestions"]["candidates"]],
-            [row["id"] for row in warm["observation"]["suggestions"]["candidates"]],
+            {row["id"] for row in neutral["observation"]["suggestions"]["candidates"]},
+            {row["id"] for row in warm["observation"]["suggestions"]["candidates"]},
         )
         self.assertEqual(
-            [row["id"] for row in neutral["observation"]["suggestions"]["candidates"]],
-            [row["id"] for row in guarded["observation"]["suggestions"]["candidates"]],
+            {row["id"] for row in neutral["observation"]["suggestions"]["candidates"]},
+            {row["id"] for row in guarded["observation"]["suggestions"]["candidates"]},
         )
         self.assertEqual(
             neutral_response["plan"]["kind"], warm_response["plan"]["kind"]

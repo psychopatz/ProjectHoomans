@@ -17,6 +17,8 @@ local BranchOffers = PNC.Semantics.DialogueBranchOffers
     or require "PNC/Semantics/PNC_SemanticDialogueBranchOffers"
 local ActorConversationContext = PNC.Semantics.ActorConversationContext
     or require "PNC/Semantics/PNC_ActorConversationContext"
+local ChoiceRanking = PNC.Semantics.DialogueChoiceRanking
+    or require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_Ranking"
 
 Suggestions.VERSION = 1
 -- The visual part keeps five rows per selected group. The projection itself
@@ -1627,6 +1629,10 @@ function Suggestions.Build(result, context, messages)
         )
     end
 
+    local ranking, orderedCandidates = ChoiceRanking.Apply(
+        candidates, capabilities, context, currentTopic
+    )
+    candidates = orderedCandidates
     local groups, currentGroupID = buildGroups(
         candidates, capabilities, currentTopic, revision
     )
@@ -1664,6 +1670,7 @@ function Suggestions.Build(result, context, messages)
         actorConversationContext = ActorConversationContext.PublicView(
             actorConversationContext
         ),
+        ranking = ranking,
     }
 end
 

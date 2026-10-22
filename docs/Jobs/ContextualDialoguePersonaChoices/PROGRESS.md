@@ -142,3 +142,13 @@ Use the existing canonical actor context and registry candidates to add semantic
 ### Current handoff state
 
 Parent goal remains **IN PROGRESS**. P3 passing does not satisfy P4–P7; do not report **READY FOR USER LIVE TEST** until the complete roadmap and developer-side validation are finished. Native Project Zomboid SP/MP acceptance remains **UNTESTED** unless supplied by the user.
+### P4 evidence — accepted 2026-10-22
+
+- Added reusable `PNC.Semantics.DialogueChoiceRanking` behind the existing suggestion projection. It applies the documented precedence classes (`BRANCH_CONTINUATION`, `DIRECT_RESPONSE`, `CONTEXTUAL_SOCIAL`, `ACTIVE_TOPIC`, `GAMEPLAY_ACTION`, `GENERAL_TOPIC`, `UTILITY`) with deterministic context fit, authored/provider order and stable-ID tie-breaks.
+- Ranking consumes canonical actor context and transient style only after existing eligibility/privacy checks. It emits bounded class/order/privacy diagnostics; it does not inspect private profile fields, alter semantic IDs/frames, authorize effects, or create a second click/action path.
+- Added `tools/semantic_harness/tests/test_contextual_ranking_p4.py`: production-worker tests passed **3/3** for precedence, injured-situation reordering with unchanged semantic IDs and accepted click, and private-field projection/ranking invariance. P0–P4 focused worker contracts passed **43/43** when combined with the accepted P0–P3/S1/S3/S4/C1/C3/C4A slice. `luac5.3`, `pz_verify` Kahlua ERROR, and `git diff --check` passed for the P4 slice.
+- Codebase-memory coverage was checked for the P4 ranking, suggestion, context, style, architecture and test paths. The current checkout is newer than the indexed generation; no recorded gaps were reported and current source was read directly.
+
+### P5 exact Next Chunk
+
+Audit the actual current Dynamic Trading checkout and its provider/role/capability ownership, then add an optional Dynamic Trading choice provider through the shared registry contract. Keep trader orthogonal to companion/ordinary NPC roles; do not copy trade state, inventory, prices or effects into Project Hoomans/Core. Add dependency-present, dependency-absent and disabled-provider worker tests proving ordinary conversations and existing action authority are unchanged. Continue automatically after the bounded P5 slice.
