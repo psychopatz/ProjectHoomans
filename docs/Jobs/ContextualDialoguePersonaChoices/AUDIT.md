@@ -415,3 +415,96 @@ P10 is now the active product phase:
 5. expose high-frequency simulation dials inline;
 6. retain completed graph history and show hub-provider diagnostics;
 7. validate end-to-end usability before another READY handoff.
+
+
+---
+
+# P11 post-P10 runtime-parity / UX audit — 2026-10-23
+
+**User evidence:** current Semantic Lab screenshots after P10 completion claim.  
+**Source baseline audited:** ProjectHoomans remote `main` at `c412d50c27a423965911e115c0947b65c1eb2b6c`.
+
+## Verdict
+
+P10 implemented real hub/control/inventory infrastructure, but the final READY FOR USER LIVE TEST conclusion is premature.
+
+The remaining product gap is no longer the What's Up hub. It is runtime parity and understandable interaction across the two actors, relationship progression, diagnostics, and graph coverage.
+
+## Verified relationship-state behavior
+
+Current production standing thresholds remain intentionally low-level/hysteretic:
+
+- unfamiliar relationships remain `unknown` below familiarity 5;
+- current `friend` standing enters at approval 35 / respect 15 after familiarity threshold;
+- rival/enemy have their own entry/exit rules.
+
+Therefore current `relationship.state=friend` cannot be reused as the requested durable "became a true friend" milestone.
+
+P11 must add a separate durable milestone on the existing relationship record, not a new database.
+
+## Verified personality generation
+
+`PNC_SocialProfileGenerator.lua` deterministically generates socialStyle and numeric personality from identity seed/archetype, then existing trait effects/normalization modify it.
+
+The normal harness should present this generated state by default and reserve direct numeric edits for explicit override mode.
+
+## Verified romance foundations
+
+Project Hoomans already owns:
+
+- gender identity;
+- player/NPC orientation/social-profile concepts;
+- Gay/Bisexual-related player social traits;
+- romanceStyle values including neutral/flirty/reserved;
+- production gender/orientation compatibility math.
+
+P11 should reuse these instead of adding a new romance compatibility system.
+
+## Verified relationship persistence seam
+
+The existing directed relationship record currently persists:
+
+- approval/respect/familiarity;
+- current/previous state;
+- memories;
+- cooldowns;
+- interaction journal;
+- revisions.
+
+This is the correct persistence owner for a durable friend/lover/family milestone extension.
+
+Do not create a separate bond table.
+
+## Verified UI findings
+
+The current Simulation still exposes primary controls whose code purpose is diagnostic/experimental:
+
+- Preview;
+- Snapshot;
+- World Knowledge refresh;
+- Restart worker;
+- Persona Matrix;
+- Capture baseline;
+- Sweep.
+
+`Sweep` is only an input to Persona Matrix's three-scenario comparison and is not self-explanatory.
+
+The current graph projection is centered on ConversationBlocks, which explains blank/irrelevant graph behavior for semantic Flow interactions such as greeting.
+
+## Corrective direction
+
+P11 is now the active product phase.
+
+Core corrections:
+
+1. actor-centric Player/NPC/Relationship/World workbench;
+2. first-class Player and NPC needs;
+3. production trait catalogs for both actors;
+4. generated NPC personality by default;
+5. durable automatic friendship milestone around high relationship values;
+6. romance eligibility from existing gender/orientation/traits;
+7. explicit player proposal and server-authoritative NPC acceptance -> lover;
+8. no hypothetical normal relationship kinds;
+9. replace Sweep/Persona Matrix with Compare;
+10. unified Flow/Hub/ConversationBlock runtime graph;
+11. keep speech realization modular as content grows.
