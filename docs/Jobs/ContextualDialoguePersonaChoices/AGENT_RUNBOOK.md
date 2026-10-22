@@ -113,3 +113,38 @@ Do not use hello-only tests as proof that persona affects normal dialogue.
 ### Provider completion
 
 Do not add more hard-coded provider IDs to the central suggestion builder. New provider work must move toward generic registry collection.
+
+
+## P9 execution rules — UI-first conversation testability
+
+The previous P8E developer handoff is superseded by the user-facing P9 audit.
+
+Do not report READY FOR USER LIVE TEST until P9A-P9G pass.
+
+### Fix semantics before polish
+
+The typed `conversation_category` self-nesting is an actual routing defect, not merely a Tk label/layout problem. Fix and test that route before treating UI cleanup as accepted.
+
+### Deliver a usable graph early
+
+P9B is intentionally an early user-test checkpoint. Once P9A is green, prioritize getting the real selected ConversationBlock visible in Simulation through the existing graph primitives before deeper renderer refactors or cosmetic polish.
+
+### Reuse, do not parallelize
+
+- one Semantic Lab app;
+- one real Lua worker;
+- one Conversation Registry;
+- one semantic click route;
+- one shared graph renderer/model family;
+- one translation manager;
+- one authoritative conversation state.
+
+Do not create a Python conversation simulator, second graph engine, browser viewer, or direct node-transition shortcut.
+
+### Harness-only full graph
+
+The full future conversation tree is developer tooling. Do not broaden the normal in-game semantic projection to expose future branches or private/hidden information.
+
+### User-visible acceptance beats internal claims
+
+A passing graph-model test is not enough. P9B/P9E require real Tk/Xvfb evidence showing the conversation graph and choices in the actual Simulation layout.
