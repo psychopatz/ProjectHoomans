@@ -1,108 +1,71 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
-**Updated:** 2026-10-22  
-**Parent status:** REOPENED — P0-P7 foundation exists, but behavioral acceptance was incomplete.  
-**Current mandatory phase:** P8A — Bond vocabulary + production-faithful Lab baseline.  
-**Corrective source audit baseline:** ProjectHoomans main 849f1951ed1d3fd4b6f78aedc2525b25368a157e.  
-**Dynamic Trading provider baseline:** 5db64cbcc764f035146f044fdc34e930ce47d7c8.  
-**Native Project Zomboid SP/MP:** UNTESTED / user-owned.
+**Updated:** 2026-10-22
 
-## Accepted foundation to preserve
+**Parent status:** IN PROGRESS — corrective P8 sequence
 
-The current source genuinely contains:
+**Completed corrective phase:** P8A — bond vocabulary + production-faithful Semantic Lab baseline
 
-- canonical ActorConversationContext in production conversation and semantic paths;
-- transient SpeechStyleContext;
-- presentation-only speech realization that preserves semantic response identity;
-- EN/TL realization infrastructure;
-- semantic choice ranking classes;
-- bounded DialogueChoiceRegistry/provider metadata;
-- optional Dynamic Trading trader provider with trade state/effects still owned by Dynamic Trading;
-- Semantic Lab persona controls, inspector output, and real Lua worker integration;
-- broad regression evidence from the previous P7 run.
+**Next mandatory phase:** P8B — behavioral speech completion
 
-Do not discard these systems.
+**Native Project Zomboid SP/MP:** UNTESTED / user-owned
 
-## Corrective findings
+## Repository baseline
 
-The previous READY FOR USER LIVE TEST statement is superseded.
+- ProjectHoomans: `main`, P8A implementation revision `bfdf456c` (`feat: add contextual dialogue bond baseline`); no branch was created.
+- psychopatzCore: `main`, clean, `443b3a8`.
+- DynamicTrading: `main`, clean, `5db64cb`.
+- ProjectHoomans had unrelated concurrent combat/zombie edits before P8A. They were preserved unstaged and were not included in `bfdf456c`.
 
-Current source still shows:
+## P8A implementation evidence
 
-1. persona wording realization is effectively greeting-only;
-2. some exposed personality controls are not actually used by SpeechStyleContext;
-3. trait speech effects are hand-coded for only a small subset;
-4. Semantic Lab relationship sliders do not derive state through production hysteresis;
-5. normal UI can still carry an independently inconsistent relationship state;
-6. provider registry is not yet the generic discovery boundary;
-7. contextual/persona ranking rules are narrow;
-8. Persona matrix is fixed around a few hello cases rather than an arbitrary current utterance.
+Revision `bfdf456c` adds the smallest bounded foundation required for detailed companion bond vocabulary:
 
-## Companion-bond evidence
+- `PNC_RelationshipKindRegistry` is a declarative, bounded metadata registry. It maps `friend` to `friend`, `lover` to `lover`, and `mother`, `father`, `sister`, and `brother` to `family`. Future registered kinds can supply the same class and localized reference/address term keys without editing the speech resolver.
+- Existing Starting Companion persistence remains the owner of detailed `relationshipKind`. The registry owns metadata only; no bond class is stored in ModData or scenario persistence.
+- `ActorConversationContext` projects transient `bond.class`, `bond.kind`, source, and term keys. Detailed kind remains intact. Public projection exposes only the known class/kind surface.
+- Directed approval/respect/familiarity remains independent from the special bond. Context state is resolved through production `PNC.RelationshipStates.ResolveState`, including current-state hysteresis.
+- The Semantic Lab settings surface now obtains bond kinds from the production catalog, displays derived class/reference/address terms, shows numeric slider values, and removes the ordinary editable `npc.relationshipState` field. Legacy normal-mode state overrides are discarded by the settings collector.
+- EN/TL relationship reference and address terms use the translation manager's `Conversation/Flavor` namespace and keep semantic kind/term keys language-independent.
+- The existing real Lua worker exposes the production relationship-kind catalog and supports a bounded synthetic registration request used by the Lab test.
 
-Current starting companion definitions already own detailed kinds:
+Focused evidence:
 
-~~~text
-friend
-lover
-mother
-father
-sister
-brother
-~~~
+```text
+python3 -m unittest -v tools.semantic_harness.tests.test_contextual_bonds_p8a
+Ran 6 tests — OK
 
-The existing assignment path stores relationshipKind in starting-companion generation/memory data and applies stronger lifelong relationship baselines. Network detailed/roster projections already expose startingRelationship.kind.
+python3 -m unittest -v \
+  tools.semantic_harness.tests.test_contextual_bonds_p8a \
+  tools.semantic_harness.tests.test_contextual_actor_context_p2 \
+  tools.semantic_harness.tests.test_contextual_speech_style_p3 \
+  tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p6 \
+  tools.semantic_harness.tests.test_contextual_acceptance_c6b \
+  tools.semantic_harness.tests.test_contextual_choice_registry_p1
+Ran 21 tests — OK
+```
 
-This detailed kind is the authoritative source.
+The real worker evidence covers:
 
-Do not replace it with only three persisted values.
+- required friend/lover/family mappings with detailed kind preservation;
+- `mother + friend` and `mother + enemy` retaining `bond.class = family` and `bond.kind = mother` while directed state changes;
+- unknown/friend/rival/enemy thresholds and a hysteresis case through production `ResolveState`;
+- no persisted derived bond class or actor context;
+- EN `Mom` versus TL `Nanay` with identical semantic kind and term keys;
+- synthetic `grandmother -> family` registration and TL `Lola` resolution without resolver changes.
 
-### Target derived speech classes
+Additional checks passed:
 
-~~~text
-friend -> friend
-lover / partner / spouse -> lover
-mother / father / sister / brother / future kinship -> family
-~~~
+- `luac5.3 -p` on all changed Lua worker/context/registry files;
+- `python3 -m py_compile` on changed Semantic Lab/runtime/test Python files;
+- `python3 -m json.tool` on both changed EN/TL address catalogs;
+- `git diff --cached --check` before commit;
+- targeted `pz_verify` Kahlua checks with no reported errors.
 
-Family subtype must remain available for localized term substitution.
+## P8A non-goals retained
 
-## Current Exact Next Chunk — P8A
+P8A does not claim behavioral completion. It does not yet expand every semantic response family, complete generic provider discovery, complete arbitrary-utterance Lab comparison, or provide final Dynamic Trading/P8E evidence. Do not report `READY FOR USER LIVE TEST`.
 
-On the user's actual local checkout:
+## Next Chunk — P8B behavioral speech completion
 
-1. read root AGENTS.md and all current ContextualDialoguePersonaChoices docs in the documented order;
-2. verify local ProjectHoomans/Core/DynamicTrading branch, HEAD, upstream/divergence and concurrent/user changes; existing main only;
-3. inspect the exact current starting-companion relationshipKind storage, network projection, actor-context build, RelationshipStates resolver, Semantic Lab scenario/settings/worker, and translation manager;
-4. introduce the smallest bounded relationship-kind metadata registry or equivalent declarative contract for:
-   - friend -> class friend
-   - lover -> class lover
-   - mother/father/sister/brother -> class family
-   - extensible future registered kinship;
-5. project transient bond.class / bond.kind / term metadata into ActorConversationContext without new persisted fields;
-6. add EN/TL reference/address term translations for current kinds;
-7. fix Semantic Lab normal relationship state so approval/respect/familiarity are resolved through production PNC.RelationshipStates.ResolveState instead of an independently editable ordinary state;
-8. add a production-backed bond-kind catalog/selector and read-only derived class/term display;
-9. add numeric slider value labels;
-10. add focused real-worker and Tk/Xvfb tests proving:
-    - bond kind/class mapping;
-    - mother/father/sister/brother all reuse family class;
-    - bond remains unchanged if directed standing becomes rival/enemy;
-    - no redundant bond class is persisted;
-    - relationship sliders derive production state;
-    - EN/TL term resolution works;
-11. update this ledger with exact evidence and proceed automatically to P8B if the gate passes.
-
-## P8A non-goals
-
-Do not yet expand every response family in the same chunk.
-
-Do not rewrite the choice registry in P8A.
-
-Do not add cousin/grandmother as required production gameplay selections unless useful as a synthetic registry-extension test. The architecture must make those future additions data-only.
-
-## Handoff condition
-
-Do not report READY FOR USER LIVE TEST until P8A-P8E all pass.
-
-Native PZ SP/MP remains user-owned and must remain UNTESTED unless the user supplies evidence.
+Audit every exposed persona/relationship/role/situation input against actual `SpeechStyleContext` use. Add real effects or explicitly mark informational controls. Replace central trait-name checks with declarative speech metadata where practical. Build a machine-readable response-family coverage inventory and expand production-backed realization beyond greeting across wellbeing, needs, medical, identity, knowledge/context, acknowledgement, apology, offer/help, dispute/refusal, threat/hostility, event reaction, companion/action acknowledgement, Dynamic Trading entry, and quest/commitment where authoritative families exist. Keep semantic response identity and gameplay authority unchanged, use friend/family/lover as bounded realization classes, and preserve deterministic neutral fallback. Add focused real-worker matrices before continuing to P8C.
