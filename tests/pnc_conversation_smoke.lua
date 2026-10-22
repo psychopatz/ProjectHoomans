@@ -333,6 +333,8 @@ T.equal(definition.context.npcFullName, "Morgan Hale", "NPC full name")
 T.equal(definition.context.npcFirstName, "Morgan", "NPC first name")
 T.equal(definition.context.npcLastName, "Hale", "NPC last name")
 T.equal(definition.lifecycle.kind, "conversation_lifecycle", "lifecycle")
+T.equal(type(definition.choicePresentation), "function",
+    "conversation definition registers Core choice presentation seam")
 T.truthy(#definition.nodes.greeting.choices >= 8,
     "registered category menu composed")
 T.equal(definition.nodes.greeting.portraitAnimation, "greeting.wavehi",

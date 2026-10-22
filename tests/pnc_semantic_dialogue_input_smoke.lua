@@ -304,6 +304,44 @@ T.truthy(queuedTurnState.enabled,
     "local semantic input remains enabled while an NPC line is queued")
 session.busy = nil
 
+local presentedRows = Input.Internal.PresentSemanticChoices({
+    semanticSuggestions = {
+        currentGroupID = "conversation",
+        groups = {
+            {
+                id = "conversation",
+                candidates = {
+                    {
+                        id = "semantic:wellbeing",
+                        display = { label = "Ask about wellbeing" },
+                        frame = {
+                            candidateID = "semantic:wellbeing",
+                            requestRevision = 1,
+                        },
+                    },
+                },
+                capabilities = {
+                    {
+                        id = "semantic:follow",
+                        display = { label = "Ask them to follow" },
+                        status = "eligible",
+                        frame = {
+                            candidateID = "semantic:follow",
+                            requestRevision = 1,
+                        },
+                    },
+                },
+            },
+        },
+    },
+}, {})
+T.equal(#presentedRows, 2,
+    "semantic projection adapts both candidate and capability rows")
+T.equal(presentedRows[1].id, "semantic:wellbeing",
+    "semantic candidate keeps its stable row id")
+T.equal(presentedRows[2].source.semanticFrame.candidateID,
+    "semantic:follow", "capability row keeps its typed click frame")
+
 PNC = originalPNC
 PsychopatzCore = originalCore
 PsychopatzConversationLLMInput = originalInputClass
