@@ -195,7 +195,7 @@ Toolchain and runtime gates passed:
 - Translation catalog JSON validation and embedded translation smoke tests: 3/3 PASS; EN/TL public translation integration PASS.
 - Bounded real-worker performance: 2 samples plus warmup per case, 6 serialized turns; bounded recent-event/dialogue caps and strictly increasing semantic sequences remained intact. This is non-native worker evidence, not SP/MP evidence.
 - Persistence measurement: friend/mother/lover snapshots retain only detailed `startingRelationship`; derived `bond`, `speechStyleContext`, and `semanticSuggestions` are absent from NPC persistence and worker ModData projection.
-- `git diff --check` passed. ProjectHoomans remains on `main`, 10 commits ahead of `origin/main`; psychopatzCore and DynamicTrading remain clean on their existing `main` branches at `443b3a8` and `5db64cb`.
+- `git diff --check` passed. ProjectHoomans remains on `main` ahead of `origin/main`; psychopatzCore and DynamicTrading remain clean on their existing `main` branches at `443b3a8` and `5db64cb`.
 
 ## Developer-side handoff
 
