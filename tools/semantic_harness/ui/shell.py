@@ -41,7 +41,11 @@ from .dialogs.settings import (
 from ..inspection.transcript import TranscriptBuffer
 from ..runtime.worker import HarnessError, LuaSemanticWorker
 from ..runtime.worker_session import WorkerReady, WorkerResult, WorkerSession
+from ..runtime.activity import ActivityLog, format_activity_event
 from ..studio.workflow import SemanticLabWorkflowPane
+from .state import load as load_ui_state
+from .state import save as save_ui_state
+from .state import state_path as ui_state_path
 
 
 def npc_message_text(message: dict[str, Any]) -> str:
@@ -250,6 +254,15 @@ class SemanticHarnessApp:
             repository=repository,
             runtime_root=repository,
         )
+        self.activity_log = ActivityLog()
+        self._activity_seen = 0
+        self._activity_after: Any | None = None
+        self.ui_state_path = ui_state_path(
+            self.authoring_service.repository,
+            Path(arguments.scenario).expanduser() if arguments.scenario else None,
+            getattr(arguments, "ui_state", None),
+        )
+        self._ui_state = load_ui_state(self.ui_state_path)
         self.root.title("Project Hoomans Semantic Lab")
         self.root.minsize(1080, 700)
         # Keep the initial window inside a typical desktop work area.  Users
@@ -259,7 +272,11 @@ class SemanticHarnessApp:
         screen_height = self.root.winfo_screenheight()
         initial_width = min(1320, max(1080, screen_width - 48))
         initial_height = min(860, max(700, screen_height - 96))
-        self.root.geometry(f"{initial_width}x{initial_height}")
+        saved_geometry = self._ui_state.get("geometry")
+        if isinstance(saved_geometry, str) and saved_geometry:
+            self.root.geometry(saved_geometry)
+        else:
+            self.root.geometry(f"{initial_width}x{initial_height}")
         self.scenario_path = Path(arguments.scenario) if arguments.scenario else None
         self.scenario = load_scenario(self.scenario_path)
         if arguments.language:
@@ -288,6 +305,7 @@ class SemanticHarnessApp:
         self.settings_control_fields: dict[str, Any] = {}
         self.workbench_control_fields: dict[str, CatalogControlField] = {}
         self.workbench_controls: list[dict[str, Any]] = []
+        self.workbench_panel_notebooks: dict[str, Any] = {}
         self.workbench_expanded = True
         self.last_test_utterance = ""
         self.workbench_status_var: Any | None = None
@@ -308,6 +326,12 @@ class SemanticHarnessApp:
         self._future: Future[Any] | None = None
         self._transcript_buffer = TranscriptBuffer()
         self.baseline_record: dict[str, Any] = {}
+        self.activity_log.record(
+            "ui",
+            "window_start",
+            geometry=self.root.geometry(),
+            state_path=str(self.ui_state_path),
+        )
         self._build_ui()
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self._set_status("Starting Lua worker…")
@@ -326,6 +350,7 @@ class SemanticHarnessApp:
         simulation_tab.rowconfigure(0, weight=1)
         simulation_tab.columnconfigure(0, weight=1)
         studio_notebook = ttk.Notebook(studio_tab)
+        self.studio_notebook = studio_notebook
         studio_notebook.grid(row=0, column=0, sticky="nsew")
         workflow_tab = ttk.Frame(studio_notebook, padding=8)
         editor_tab = ttk.Frame(studio_notebook, padding=8)
@@ -340,17 +365,61 @@ class SemanticHarnessApp:
         studio_notebook.add(library_tab, text="Dataset library")
         studio_notebook.add(blocks_tab, text="Block palette")
         studio_notebook.add(composer_tab, text="Interaction composer")
-        self.main_tabs.add(studio_tab, text="Studio")
+        log_tab = ttk.Frame(self.main_tabs, padding=8)
+        log_tab.rowconfigure(1, weight=1)
+        log_tab.columnconfigure(0, weight=1)
+        self.activity_log_status = self._tk.StringVar(
+            value="Shared GUI/CLI activity timeline"
+        )
+        log_toolbar = ttk.Frame(log_tab)
+        log_toolbar.grid(row=0, column=0, sticky="ew", pady=(0, 6))
+        ttk.Label(
+            log_toolbar,
+            textvariable=self.activity_log_status,
+            anchor="w",
+        ).pack(side="left", fill="x", expand=True)
+        ttk.Button(
+            log_toolbar,
+            text="Clear log",
+            command=self.clear_activity_log,
+        ).pack(side="right")
+        self.activity_log_widget = ScrolledText(
+            log_tab,
+            wrap="none",
+            state="disabled",
+        )
+        self.activity_log_widget.grid(row=1, column=0, sticky="nsew")
+
+        # Keep the primary workflow order stable: Simulation, Studio, Log.
         self.main_tabs.add(simulation_tab, text="Simulation")
+        self.main_tabs.add(studio_tab, text="Studio")
+        self.main_tabs.add(log_tab, text="Log")
+        self.studio_tab = studio_tab
+        self.log_tab = log_tab
 
         container = ttk.Frame(simulation_tab)
         container.pack(fill="both", expand=True)
-        container.columnconfigure(0, weight=3, minsize=620)
-        container.columnconfigure(1, weight=2, minsize=360)
         container.rowconfigure(0, weight=1)
+        container.columnconfigure(0, weight=1)
+        self.simulation_panes = ttk.PanedWindow(container, orient="horizontal")
+        self.simulation_panes.grid(row=0, column=0, sticky="nsew")
+        workflow_pane = ttk.Frame(self.simulation_panes)
+        workflow_pane.rowconfigure(0, weight=1)
+        workflow_pane.columnconfigure(0, weight=1)
+        self.workflow_pane_split = ttk.PanedWindow(
+            workflow_pane, orient="vertical"
+        )
+        self.workflow_pane_split.grid(row=0, column=0, sticky="nsew")
+        conversation_pane = ttk.Frame(self.workflow_pane_split)
+        conversation_pane.rowconfigure(0, weight=1)
+        conversation_pane.columnconfigure(0, weight=1)
+        workbench_pane = ttk.Frame(self.workflow_pane_split)
+        workbench_pane.rowconfigure(0, weight=1)
+        workbench_pane.columnconfigure(0, weight=1)
+        self.simulation_panes.add(workflow_pane, weight=3)
 
-        transcript_frame = ttk.LabelFrame(container, text="Conversation")
-        transcript_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
+        transcript_frame = ttk.LabelFrame(conversation_pane, text="Conversation")
+        transcript_frame.grid(row=0, column=0, sticky="nsew")
         transcript_frame.rowconfigure(0, weight=1)
         transcript_frame.columnconfigure(0, weight=1)
         self.transcript = ScrolledText(transcript_frame, wrap="word", state="disabled")
@@ -413,11 +482,12 @@ class SemanticHarnessApp:
         self.send_button = ttk.Button(input_actions, text="Send", command=self.submit)
         self.send_button.grid(row=0, column=2, sticky="e")
 
-        self.simulation_workbench = ttk.Frame(container)
+        self.simulation_workbench = ttk.Frame(workbench_pane)
         self.simulation_workbench.grid(
-            row=1, column=0, sticky="ew", padx=(0, 8), pady=(4, 0)
+            row=0, column=0, sticky="nsew"
         )
         self.simulation_workbench.columnconfigure(0, weight=1)
+        self.simulation_workbench.rowconfigure(1, weight=1)
         workbench_header = ttk.Frame(self.simulation_workbench)
         workbench_header.grid(row=0, column=0, sticky="ew")
         workbench_header.columnconfigure(4, weight=1)
@@ -450,44 +520,47 @@ class SemanticHarnessApp:
         self.workbench_content = ttk.Frame(self.simulation_workbench)
         self.workbench_content.grid(row=1, column=0, sticky="ew", pady=(3, 0))
         self.workbench_content.columnconfigure(0, weight=1)
+        self.workbench_content.rowconfigure(0, weight=1)
         self.workbench_notebook = ttk.Notebook(self.workbench_content)
-        self.workbench_notebook.grid(row=0, column=0, sticky="ew")
+        self.workbench_notebook.grid(row=0, column=0, sticky="nsew")
         self.workbench_status_var = self._tk.StringVar(
             value="Common context controls · changes apply through the Lua worker."
         )
         workbench_footer = ttk.Frame(self.workbench_content)
         workbench_footer.grid(row=1, column=0, sticky="ew", pady=(3, 0))
-        workbench_footer.columnconfigure(3, weight=1)
-        self.workbench_apply_button = ttk.Button(
+        workbench_footer.columnconfigure(0, weight=1)
+        ttk.Label(
             workbench_footer,
+            textvariable=self.workbench_status_var,
+            anchor="w",
+            justify="left",
+            wraplength=620,
+        ).grid(row=0, column=0, sticky="ew", pady=(0, 3))
+        workbench_actions = ttk.Frame(workbench_footer)
+        workbench_actions.grid(row=1, column=0, sticky="ew")
+        self.workbench_apply_button = ttk.Button(
+            workbench_actions,
             text="Apply",
             command=self.apply_simulation_settings,
         )
         self.workbench_apply_button.grid(row=0, column=0, sticky="w")
         self.replay_button = ttk.Button(
-            workbench_footer,
+            workbench_actions,
             text="Apply + replay",
             command=self.apply_and_replay,
         )
         self.replay_button.grid(row=0, column=1, sticky="w", padx=(6, 0))
         self.auto_replay_var = self._tk.BooleanVar(value=False)
         self.auto_replay_checkbutton = ttk.Checkbutton(
-            workbench_footer,
+            workbench_actions,
             text="Auto replay (debounced)",
             variable=self.auto_replay_var,
         )
         self.auto_replay_checkbutton.grid(row=0, column=2, sticky="w", padx=(10, 0))
-        ttk.Label(
-            workbench_footer,
-            textvariable=self.workbench_status_var,
-            anchor="w",
-            justify="left",
-            wraplength=330,
-        ).grid(row=0, column=3, sticky="ew", padx=(10, 0))
-        workbench_footer.columnconfigure(3, weight=1)
+        workbench_actions.columnconfigure(3, weight=1)
 
-        controls = ttk.Frame(container)
-        controls.grid(row=2, column=0, sticky="ew", padx=(0, 8), pady=(4, 0))
+        controls = ttk.Frame(workbench_pane)
+        controls.grid(row=1, column=0, sticky="ew", pady=(4, 0))
         controls.columnconfigure(0, weight=1)
         controls.columnconfigure(1, weight=0)
         action_controls = ttk.Frame(controls)
@@ -528,10 +601,12 @@ class SemanticHarnessApp:
         self.status_label = ttk.Label(status_controls, textvariable=self.status_var)
         self.status_label.pack(anchor="e")
 
-        right = ttk.LabelFrame(container, text="Semantic trace")
-        right.grid(row=0, column=1, rowspan=3, sticky="nsew")
+        right = ttk.LabelFrame(self.simulation_panes, text="Semantic trace")
         right.rowconfigure(0, weight=1)
         right.columnconfigure(0, weight=1)
+        self.simulation_panes.add(right, weight=2)
+        self.workflow_pane_split.add(conversation_pane, weight=3)
+        self.workflow_pane_split.add(workbench_pane, weight=2)
         self.trace_tabs = ttk.Notebook(right)
         self.trace_tabs.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
 
@@ -755,7 +830,12 @@ class SemanticHarnessApp:
             on_inspect=self.inspect_live_worker,
         )
         self.simulation_tab = simulation_tab
-
+        self.main_tabs.bind(
+            "<<NotebookTabChanged>>",
+            lambda _event: self._on_main_tab_changed(),
+        )
+        self._restore_ui_state()
+        self._schedule_activity_poll()
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")
         self._set_controls(False)
 
@@ -815,6 +895,7 @@ class SemanticHarnessApp:
         pending = len(self._workbench_dirty_ids) + (
             1 if self._workbench_profile_pending else 0
         )
+        pending_labels = self._pending_control_labels()
         self.workbench_apply_button.configure(
             text="Apply" if pending == 0 else f"Apply ({pending} pending)"
         )
@@ -828,13 +909,30 @@ class SemanticHarnessApp:
         if message is not None:
             self.workbench_status_var.set(message)
         elif pending:
+            summary = ", ".join(pending_labels[:5])
+            if len(pending_labels) > 5:
+                summary += f", +{len(pending_labels) - 5} more"
             self.workbench_status_var.set(
-                f"{pending} unsaved change{'s' if pending != 1 else ''} · Apply to commit"
+                f"Pending: {summary or 'review draft'} · Apply to commit"
             )
         else:
             self.workbench_status_var.set(
                 "Common context controls · changes apply through the Lua worker."
             )
+
+    def _pending_control_labels(self) -> list[str]:
+        labels: list[str] = []
+        for control in self.workbench_controls:
+            control_id = str(control.get("id") or "")
+            if control_id not in self._workbench_dirty_ids:
+                continue
+            label = str(control.get("label") or control_id)
+            if control.get("derivedFrom"):
+                label = f"{label} (derived)"
+            labels.append(label)
+        if self._workbench_profile_pending:
+            labels.insert(0, "NPC profile")
+        return labels
 
     def _clear_workbench_pending(self) -> None:
         self._workbench_dirty_ids.clear()
@@ -853,6 +951,13 @@ class SemanticHarnessApp:
         ):
             return
         self._workbench_dirty_ids.add(control_id)
+        self.activity_log.record(
+            "ui",
+            "staged_change",
+            controlID=control_id,
+            label=str(field.control.get("label") or control_id),
+            value=str(field.get_value())[:180],
+        )
         if control_id in {
             "player.forename", "player.surname",
             "npc.forename", "npc.surname",
@@ -889,6 +994,13 @@ class SemanticHarnessApp:
             if field is not None:
                 field.set_value(value)
                 self._workbench_dirty_ids.add(control_id)
+                self.activity_log.record(
+                    "ui",
+                    "derived_change",
+                    controlID=control_id,
+                    label=str(field.control.get("label") or control_id),
+                    value=str(value)[:180],
+                )
 
     @staticmethod
     def _format_trait_effect_value(value: Any) -> str:
@@ -1064,7 +1176,140 @@ class SemanticHarnessApp:
         if hasattr(self, "status_var"):
             self.status_var.set(value)
 
+    def _restore_ui_state(self) -> None:
+        """Restore non-scenario UI state after the widget tree exists."""
+
+        def restore() -> None:
+            try:
+                saved_window_state = self._ui_state.get("window_state")
+                if saved_window_state in {"normal", "zoomed"}:
+                    self.root.state(saved_window_state)
+                main_index = int(self._ui_state.get("main_tab", 0))
+                tabs = self.main_tabs.tabs()
+                if tabs:
+                    self.main_tabs.select(tabs[min(max(main_index, 0), len(tabs) - 1)])
+                studio_index = int(self._ui_state.get("studio_tab", 0))
+                studio_tabs = self.studio_notebook.tabs()
+                if studio_tabs:
+                    self.studio_notebook.select(
+                        studio_tabs[min(max(studio_index, 0), len(studio_tabs) - 1)]
+                    )
+                trace_index = int(self._ui_state.get("trace_tab", 0))
+                trace_tabs = self.trace_tabs.tabs()
+                if trace_tabs:
+                    self.trace_tabs.select(
+                        trace_tabs[min(max(trace_index, 0), len(trace_tabs) - 1)]
+                    )
+                self._restore_splitters()
+                workbench_tabs = self.workbench_notebook.tabs()
+                if workbench_tabs:
+                    workbench_index = int(self._ui_state.get("workbench_panel", 0))
+                    self.workbench_notebook.select(
+                        workbench_tabs[
+                            min(max(workbench_index, 0), len(workbench_tabs) - 1)
+                        ]
+                    )
+                self._restore_workbench_tabs()
+            except (self._tk.TclError, TypeError, ValueError):
+                pass
+
+        self.root.after_idle(restore)
+
+    def _restore_splitters(self) -> None:
+        if self.closed or self.main_tabs.select() != str(self.simulation_tab):
+            return
+        simulation_width = max(1, self.simulation_panes.winfo_width())
+        workflow_height = max(1, self.workflow_pane_split.winfo_height())
+        if simulation_width <= 10 or workflow_height <= 10:
+            self.root.after(100, self._restore_splitters)
+            return
+        simulation_value = self._ui_state.get("simulation_sash")
+        if simulation_value is None:
+            simulation_value = min(
+                max(620, int(simulation_width * 0.60)),
+                max(420, simulation_width - 420),
+            )
+        else:
+            simulation_value = min(
+                max(620, int(simulation_value)),
+                max(620, simulation_width - 420),
+            )
+        workflow_value = self._ui_state.get("workflow_sash")
+        if workflow_value is None:
+            workflow_value = min(
+                max(240, int(workflow_height * 0.50)),
+                max(240, workflow_height - 260),
+            )
+        else:
+            workflow_value = min(
+                max(240, int(workflow_value)),
+                max(240, workflow_height - 260),
+            )
+        try:
+            self.workflow_pane_split.sashpos(0, int(workflow_value))
+        except (self._tk.TclError, TypeError, ValueError):
+            pass
+        try:
+            self.simulation_panes.sashpos(0, int(simulation_value))
+        except (self._tk.TclError, TypeError, ValueError):
+            pass
+
+    def _on_main_tab_changed(self) -> None:
+        if self.closed or self.main_tabs.select() != str(self.simulation_tab):
+            return
+        self.root.after_idle(self._restore_splitters)
+        self.root.after(250, self._restore_splitters)
+
+    def _restore_workbench_tabs(self) -> None:
+        selections = self._ui_state.get("workbench_tabs") or {}
+        if not isinstance(selections, dict):
+            return
+        for panel_name, notebook in self.workbench_panel_notebooks.items():
+            selected = selections.get(panel_name)
+            tabs = notebook.tabs()
+            if selected is None or not tabs:
+                continue
+            try:
+                notebook.select(tabs[min(max(int(selected), 0), len(tabs) - 1)])
+            except (TypeError, ValueError, self._tk.TclError):
+                continue
+
+    def _save_ui_state(self) -> None:
+        try:
+            state = dict(self._ui_state)
+            state["geometry"] = self.root.geometry()
+            state["window_state"] = self.root.state()
+            state["main_tab"] = self.main_tabs.index(self.main_tabs.select())
+            state["studio_tab"] = self.studio_notebook.index(
+                self.studio_notebook.select()
+            )
+            state["trace_tab"] = self.trace_tabs.index(self.trace_tabs.select())
+            if self.simulation_panes.winfo_width() > 10:
+                state["simulation_sash"] = self.simulation_panes.sashpos(0)
+            if self.workflow_pane_split.winfo_height() > 10:
+                state["workflow_sash"] = self.workflow_pane_split.sashpos(0)
+            if self.workbench_notebook.tabs():
+                state["workbench_panel"] = self.workbench_notebook.index(
+                    self.workbench_notebook.select()
+                )
+            state["workbench_tabs"] = {
+                panel_name: notebook.index(notebook.select())
+                for panel_name, notebook in self.workbench_panel_notebooks.items()
+                if notebook.tabs()
+            }
+            save_ui_state(self.ui_state_path, state)
+        except (OSError, self._tk.TclError, TypeError, ValueError):
+            self.activity_log.record(
+                "ui", "state_save_error", message="could not save window state"
+            )
+
     def _append(self, speaker: str, text: str) -> None:
+        self.activity_log.record(
+            "ui",
+            "conversation",
+            speaker=str(speaker),
+            message=str(text)[:240],
+        )
         entry, removed_chars = self._transcript_buffer.append(speaker, text)
         self.transcript.configure(state="normal")
         if removed_chars:
@@ -1081,6 +1326,39 @@ class SemanticHarnessApp:
         widget.insert("end", value)
         widget.configure(state="disabled")
 
+    def _schedule_activity_poll(self) -> None:
+        if self.closed:
+            return
+        self._activity_after = self.root.after(150, self._poll_activity_log)
+
+    def _poll_activity_log(self) -> None:
+        if self.closed:
+            return
+        records = self.activity_log.snapshot(self._activity_seen)
+        if records:
+            self.activity_log_widget.configure(state="normal")
+            for record in records:
+                self.activity_log_widget.insert(
+                    "end", format_activity_event(record) + "\n"
+                )
+                self._activity_seen = max(
+                    self._activity_seen, int(record.get("sequence", 0))
+                )
+            self.activity_log_widget.see("end")
+            self.activity_log_widget.configure(state="disabled")
+            self.activity_log_status.set(
+                f"{self._activity_seen} events · shared GUI/CLI timeline"
+            )
+        self._schedule_activity_poll()
+
+    def clear_activity_log(self) -> None:
+        self.activity_log.clear()
+        self._activity_seen = self.activity_log.latest_sequence
+        self.activity_log_widget.configure(state="normal")
+        self.activity_log_widget.delete("1.0", "end")
+        self.activity_log_widget.configure(state="disabled")
+        self.activity_log_status.set("Activity log cleared")
+
     def _worker_kwargs(self) -> dict[str, Any]:
         return {
             "lua_bin": self.arguments.lua,
@@ -1089,6 +1367,7 @@ class SemanticHarnessApp:
             "startup_timeout": self.arguments.startup_timeout,
             "request_timeout": self.arguments.timeout,
             "shutdown_timeout": self.arguments.shutdown_timeout,
+            "activity_log": self.activity_log,
         }
 
     def _start_worker(self) -> None:
@@ -1252,6 +1531,7 @@ class SemanticHarnessApp:
         for tab_id in self.workbench_notebook.tabs():
             self.workbench_notebook.forget(tab_id)
         self.workbench_control_fields = {}
+        self.workbench_panel_notebooks = {}
         self.trait_effects_var = None
         self.trait_effects_widget = None
         catalog_controls = self.simulation_control_catalog.get("controls", [])
@@ -1278,6 +1558,7 @@ class SemanticHarnessApp:
             if panel_name in {"NPC Target", "Player"}:
                 notebook = self._ttk.Notebook(panel)
                 notebook.grid(row=0, column=0, sticky="ew")
+                self.workbench_panel_notebooks[panel_name] = notebook
                 for tab_name in actor_tabs:
                     page = self._ttk.Frame(notebook, padding=(6, 2))
                     for column in (1, 3):
@@ -1417,6 +1698,9 @@ class SemanticHarnessApp:
         self._set_relationship_preview_from_projection()
         self._set_controls(self.session.ready)
         self._clear_workbench_pending()
+        self.root.after_idle(self._restore_workbench_tabs)
+        self.root.after_idle(self._restore_ui_state)
+        self.root.after(250, self._restore_splitters)
 
     def _update_generated_personality_controls(self, *_args: Any) -> None:
         override_field = self.workbench_control_fields.get("npc.personalityOverride")
@@ -1506,6 +1790,11 @@ class SemanticHarnessApp:
             return
         self._sync_workbench_from_scenario(staged, clear_pending=False)
         self._workbench_profile_pending = True
+        self.activity_log.record(
+            "ui",
+            "profile_staged",
+            label=profile_label(selected),
+        )
         self._refresh_workbench_feedback(
             f"{profile_label(selected)} staged · choose Apply or Apply + replay."
         )
@@ -1525,6 +1814,12 @@ class SemanticHarnessApp:
         except (TypeError, ValueError, self._tk.TclError) as error:
             self._messagebox.showerror("Simulation workbench", str(error))
             return
+        self.activity_log.record(
+            "ui",
+            "apply_started",
+            replay=replay,
+            pending=", ".join(self._pending_control_labels()),
+        )
 
         def operation(worker: LuaSemanticWorker) -> dict[str, Any]:
             configured = worker.configure(updated)
@@ -1553,6 +1848,12 @@ class SemanticHarnessApp:
                 self._show_response(response)
                 self._append("SYSTEM", "Applied simulation workbench settings to the Lua worker.")
                 self._refresh_workbench_feedback("Applied to the Lua worker.")
+            self.activity_log.record(
+                "ui",
+                "apply_completed",
+                replay=replay,
+                message="simulation settings applied",
+            )
 
         self._refresh_workbench_feedback(
             "Applying staged changes through the Lua worker…"
@@ -2554,7 +2855,14 @@ class SemanticHarnessApp:
         if self.closed:
             return
         self.closed = True
-        for after_id in (self._relationship_preview_after, self._auto_replay_after):
+        self.activity_log.record("ui", "window_close")
+        self._save_ui_state()
+        for after_id in (
+            self._relationship_preview_after,
+            self._personality_preview_after,
+            self._auto_replay_after,
+            self._activity_after,
+        ):
             if after_id is not None:
                 try:
                     self.root.after_cancel(after_id)

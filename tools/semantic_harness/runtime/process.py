@@ -7,12 +7,14 @@ import queue
 import signal
 import subprocess
 import threading
+import time
 import weakref
 from collections import deque
 from typing import Any
 
 from .config import HarnessConfig
 from .protocol import ProtocolError, decode_message, encode_request
+from .activity import ActivityLog
 
 
 _ACTIVE_PROCESSES: weakref.WeakSet["LuaProcess"] = weakref.WeakSet()
@@ -43,8 +45,11 @@ class HarnessError(RuntimeError):
 class LuaProcess:
     """Own one Lua child process and serialize all requests through it."""
 
-    def __init__(self, config: HarnessConfig) -> None:
+    def __init__(
+        self, config: HarnessConfig, activity_log: ActivityLog | None = None
+    ) -> None:
         self.config = config
+        self.activity_log = activity_log
         self.process: subprocess.Popen[bytes] | None = None
         self._state = "STOPPED"
         self._state_lock = threading.RLock()
@@ -106,6 +111,11 @@ class LuaProcess:
                 bufsize=0,
             )
             _ACTIVE_PROCESSES.add(self)
+            self._record_activity(
+                "start",
+                repository=str(self.config.repository),
+                pid=self.process.pid,
+            )
         except OSError as error:
             self._set_failure(f"could not start Lua worker: {error}")
             raise HarnessError(self._failure or str(error)) from error
@@ -133,6 +143,7 @@ class LuaProcess:
             raise HarnessError(str(detail))
         with self._state_lock:
             self._state = "READY"
+        self._record_activity("ready", pid=self.process.pid if self.process else None)
         return hello
 
     def request(
@@ -150,6 +161,13 @@ class LuaProcess:
                 raise HarnessError("Lua worker pipes are unavailable")
             self._request_sequence += 1
             request_id = f"harness-{self._request_sequence}"
+            started_at = time.perf_counter()
+            self._record_activity(
+                "request",
+                command=command,
+                requestID=request_id,
+                pid=process.pid,
+            )
             try:
                 encoded = encode_request(request_id, command, payload)
             except ProtocolError as error:
@@ -164,18 +182,48 @@ class LuaProcess:
                 process.stdin.flush()
             except (BrokenPipeError, OSError) as error:
                 self._set_failure(f"could not write Lua request: {error}")
+                self._record_activity(
+                    "error",
+                    command=command,
+                    requestID=request_id,
+                    message=str(error),
+                )
                 raise HarnessError(self._diagnostic("Lua worker write failed")) from error
             try:
                 response = response_queue.get(timeout=timeout or self.config.request_timeout)
             except queue.Empty as error:
                 self._set_failure(f"request timeout: {command}")
+                self._record_activity(
+                    "timeout",
+                    command=command,
+                    requestID=request_id,
+                    durationMs=round((time.perf_counter() - started_at) * 1000, 1),
+                )
                 raise HarnessError(self._diagnostic(f"Lua worker timed out on {command}")) from error
             finally:
                 with self._pending_lock:
                     self._pending.pop(request_id, None)
             if response.get("ok") is False:
+                self._record_activity(
+                    "response_error",
+                    command=command,
+                    requestID=request_id,
+                    durationMs=round((time.perf_counter() - started_at) * 1000, 1),
+                    message=str(response.get("error", "Lua worker request failed")),
+                )
                 raise HarnessError(str(response.get("error", "Lua worker request failed")))
+            self._record_activity(
+                "response",
+                command=command,
+                requestID=request_id,
+                durationMs=round((time.perf_counter() - started_at) * 1000, 1),
+                ok=True,
+            )
             return response
+
+    def _record_activity(self, event: str, **details: Any) -> None:
+        if self.activity_log is not None:
+            self.activity_log.record("worker", event, **details)
 
     def _read_stdout(self) -> None:
         process = self.process
@@ -281,6 +329,7 @@ class LuaProcess:
         with self._state_lock:
             self._state = "STOPPED"
         _ACTIVE_PROCESSES.discard(self)
+        self._record_activity("closed")
 
     def __enter__(self) -> "LuaProcess":
         self.start()

@@ -12,6 +12,7 @@ from .testing.runner import ConflictLedger, load_case, run_case
 from .runtime.config import ConfigurationError
 from .runtime.scenario import load_scenario
 from .runtime.worker import HarnessError, LuaSemanticWorker
+from .runtime.activity import ActivityLog, format_activity_event
 
 PARSER_DESCRIPTION = "Tkinter chat UI and CLI for the real-Lua semantic dialogue harness."
 AUTHORING_OPERATIONS = (
@@ -168,18 +169,35 @@ def cli(arguments: argparse.Namespace) -> int:
         scenario = load_scenario(Path(arguments.scenario) if arguments.scenario else None)
         if arguments.language:
             scenario.setdefault("runtime", {})["language"] = arguments.language.upper()
+        activity_log = ActivityLog()
+        activity_seen = 0
+
+        def emit_activity() -> None:
+            nonlocal activity_seen
+            if not arguments.trace:
+                return
+            records = activity_log.snapshot(activity_seen)
+            for record in records:
+                print(format_activity_event(record), file=sys.stderr)
+            if records:
+                activity_seen = int(records[-1].get("sequence", activity_seen))
+
         with LuaSemanticWorker(
             scenario,
             **worker_kwargs,
+            activity_log=activity_log,
         ) as worker:
+            emit_activity()
             ledger = ConflictLedger() if arguments.audit else None
             if arguments.snapshot:
                 _print_result(worker.snapshot(), arguments.jsonl)
+                emit_activity()
             for value in arguments.input:
                 result = worker.input(value)
                 if ledger is not None:
                     ledger.add(result)
                 _print_result(result, arguments.jsonl)
+                emit_activity()
             if arguments.interactive:
                 for line in sys.stdin:
                     value = line.strip()
@@ -188,12 +206,14 @@ def cli(arguments: argparse.Namespace) -> int:
                         if ledger is not None:
                             ledger.add(result)
                         _print_result(result, arguments.jsonl)
+                        emit_activity()
             if arguments.audit:
                 conflicts = ledger.report() if ledger is not None else []
                 _print_result(
                     {"type": "audit", "ok": not conflicts, "conflicts": conflicts},
                     arguments.jsonl,
                 )
+                emit_activity()
     except (HarnessError, ConfigurationError, OSError, ValueError) as error:
         print(f"semantic harness error: {error}", file=sys.stderr)
         return 2
@@ -207,10 +227,19 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--lua", help="Lua executable; defaults to PNC_HARNESS_LUA, lua, or luajit")
     parser.add_argument("--repository", help="Project Hoomans repository")
     parser.add_argument("--core-repository", help="PsychopatzCore repository")
+    parser.add_argument(
+        "--ui-state",
+        help="override the user-owned Semantic Lab window-state file",
+    )
     parser.add_argument("--no-gui", "--cli", dest="no_gui", action="store_true", help="run inputs and print JSON")
     parser.add_argument("--interactive", action="store_true", help="read one conversation input per stdin line")
     parser.add_argument("--jsonl", action="store_true", help="emit compact one-record-per-line JSON")
     parser.add_argument("--audit", action="store_true", help="emit a bounded conflict audit after turns")
+    parser.add_argument(
+        "--trace",
+        action="store_true",
+        help="write the shared harness activity timeline to stderr",
+    )
     authoring = parser.add_mutually_exclusive_group()
     authoring.add_argument(
         "--compile-source",
