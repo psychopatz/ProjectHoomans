@@ -1,6 +1,6 @@
 # Roadmap — Contextual Dialogue Persona & Choices
 
-**Parent status:** REOPENED — P0-P9 foundation retained; P10 semantic simulation UX/contextual-hub replacement is mandatory.  
+**Parent status:** REOPENED — P0-P10 foundation retained; P11 runtime-parity actors/dynamic relationships/UX is mandatory.  
 Phases are organization and acceptance checkpoints; completing one phase never completes the parent objective.
 
 ## P0 — Current-path contract baseline
@@ -346,3 +346,124 @@ Keep the last completed ConversationBlock graph inspectable after root exit, and
 Run legacy-ID absence checks, hub matrices, explicit intent regressions, addon/provider checks, structured/JSON round-trips, Tk/Xvfb interaction, EN/TL, graph history, Lua/Kahlua/doctor/catalog/diff checks, and persistence checks.
 
 **Gate:** only after P10A-P10G pass may the parent return to **READY FOR USER LIVE TEST**. Native Project Zomboid SP/MP remains user-owned.
+
+
+## P11 — Runtime-Parity Actors, Dynamic Relationships, and Semantic Lab UX
+
+The 2026-10-23 post-P10 live UI/source audit supersedes the P10 READY FOR USER LIVE TEST handoff.
+
+P10's contextual hub, typed-control catalog, structured inventory, inline workbench, and diagnostics remain accepted infrastructure. P11 fixes runtime parity and usability around the two actors, relationship progression, and graph/compare surfaces.
+
+Read `RUNTIME_PARITY_ACTORS_RELATIONSHIPS_AND_UX.md` before implementation.
+
+### P11A — Truthful actor/context model and UI cleanup skeleton
+
+- remove hypothetical/future bond kinds from normal catalogs;
+- distinguish current production kinds from aliases/future metadata;
+- reorganize Simulation around:
+  - NPC Target;
+  - Player;
+  - Relationship;
+  - World;
+- actor sub-tabs:
+  - Overview;
+  - Needs;
+  - Personality & Traits;
+- begin moving primary-toolbar diagnostics to contextual tabs/menus.
+
+**Gate:** normal UI no longer advertises non-current relationship kinds and Player/NPC Target are first-class visible simulation actors.
+
+### P11B — First-class Player/NPC needs + production traits/personality
+
+- add proper player needs/condition scenario state;
+- normalize NPC needs onto NPC-owned state;
+- use actual production player and NPC trait catalogs;
+- player traits derive the real player social profile;
+- NPC seed/archetype/traits derive the real NPC personality;
+- generated personality is default/read-only;
+- manual personality sliders require explicit override mode.
+
+**Gate:** both actors can be configured symmetrically and normal personality values are production-derived.
+
+### P11C — Durable dynamic friend bond
+
+- store durable bond milestone in the existing directed relationship record;
+- starting friend relationships seed friend bond;
+- named tunable initial promotion gate:
+  - approval >= 80;
+  - respect >= 50;
+  - familiarity >= 60;
+  - not rival/enemy;
+- server-authoritative automatic promotion;
+- bounded relationship memory/event and revisions;
+- no automatic demotion from threshold jitter.
+
+**Gate:** `none -> friend` survives persistence and may later coexist with enemy/rival standing.
+
+### P11D — Romance compatibility + player proposal -> lover
+
+- reuse existing gender/orientation compatibility math;
+- player orientation derives from actual traits such as Gay/Bisexual/default behavior;
+- family is romance-ineligible;
+- proposal only from eligible friend bond;
+- initial tunable proposal gate:
+  - approval >= 85;
+  - respect >= 60;
+  - familiarity >= 80;
+- server-authoritative acceptance chance/seeded roll influenced by existing romanceStyle/traits and relationship surplus;
+- acceptance promotes friend -> lover;
+- rejection retains friend and adds cooldown;
+- starting lover remains valid.
+
+**Gate:** compatible high-standing friends can propose; incompatible/family actors cannot; accept/reject/cooldown and persistence are proven.
+
+### P11E — Relationship UX + Compare cleanup
+
+- immediate production-derived standing preview/reason while sliders move;
+- show friend-promotion progress;
+- show romance compatibility/proposal availability;
+- optional debounced Auto Replay;
+- replace Persona Matrix/Sweep/Capture Baseline with one understandable Compare surface;
+- move Preview/Snapshot/World Knowledge refresh/Restart worker to appropriate inspector/Diagnostics ownership.
+
+**Gate:** user can understand and compare relationship progression without knowing internal Sweep mechanics.
+
+### P11F — Unified Runtime Dialogue Graph
+
+Add one runtime graph model with adapters for:
+
+- semantic Flow;
+- ConversationBlock;
+- semantic Hub.
+
+Greeting, What's Up hub, and authored blocks must all become visible through the shared renderer.
+
+**Gate:** `hello`, `What's up?`, and a ConversationBlock each render meaningful current/visited/completed runtime graphs.
+
+### P11G — Modular realization packs
+
+Split built-in realization families into a small number of domain packs while keeping one registry/resolver/fallback API.
+
+**Gate:** new response-family content can be added without expanding the core realization resolver into a god file.
+
+### P11H — Final runtime-parity usability gate
+
+Validate:
+
+- both actors' needs/traits/profile editing;
+- generated NPC personality;
+- player orientation from real traits;
+- dynamic friend promotion;
+- proposal eligibility/accept/reject/cooldown;
+- family exclusion;
+- lover context/wording;
+- relationship live preview;
+- Compare workflow;
+- Flow/Hub/ConversationBlock graphs;
+- P10 hub/inventory regressions;
+- EN/TL;
+- privacy/stale/replay/authority;
+- persistence/versioning;
+- Python/Lua/Kahlua/doctor/catalog/diff checks.
+
+**Gate:** only after P11A-P11H pass may the parent return to **READY FOR USER LIVE TEST**. Native SP/MP remains user-owned.
