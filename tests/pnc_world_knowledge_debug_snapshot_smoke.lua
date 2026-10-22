@@ -52,6 +52,13 @@ local alice = service.BuildSnapshotForPlayer(nil, {
 })
 T.equal(alice.schema, "PNC.WorldKnowledgeDebug", "debug schema")
 T.equal(alice.limits.facts, 64, "fact limit contract")
+T.equal(alice.metrics.factCount, 1, "ledger metric fact count")
+T.equal(alice.metrics.knownActorCount, 2, "knowledge metric actor count")
+T.truthy(alice.metrics.consumerEvidenceCount > 0,
+    "consumer evidence was not projected")
+T.equal(alice.persistence.modDataKey, "PNC.WorldKnowledge",
+    "persistence contract key")
+T.falsy(alice.worldState.observed, "unobserved world state was reported")
 T.equal(alice.facts[1].factID, fact.factID, "fact projection")
 T.truthy(alice.actor.known, "Alice knowledge was not reported")
 T.equal(alice.actor.references[1].provenance, "faction",
@@ -62,6 +69,23 @@ T.equal(alice.context.npcGossip.factRefs[1], fact.factID,
     "Alice gossip fact reference")
 T.truthy(alice.context.npcGossip.statements[1],
     "Alice gossip projection was empty")
+local producerEvidence
+local acquiredEvidence
+for _, evidence in ipairs(alice.consumerEvidence or {}) do
+    if evidence.factID == fact.factID
+        and evidence.role == "producer"
+    then
+        producerEvidence = evidence
+    elseif evidence.factID == fact.factID
+        and evidence.role == "actor_knowledge"
+    then
+        acquiredEvidence = evidence
+    end
+end
+T.equal(producerEvidence.status, "published",
+    "producer evidence status")
+T.equal(acquiredEvidence.status, "acquired",
+    "actor knowledge consumer evidence status")
 T.equal(#alice.trace, 1, "propagation trace was not bounded and returned")
 
 local bob = service.BuildSnapshotForPlayer(nil, { actorID = "bob" })

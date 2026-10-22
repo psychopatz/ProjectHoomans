@@ -164,11 +164,32 @@ function Model.TraceRows(snapshot)
     return rows
 end
 
+function Model.ConsumerRows(snapshot)
+    local rows = {}
+    for _, evidence in ipairs(snapshot and snapshot.consumerEvidence or {}) do
+        local actor = evidence.actorID and (" / actor " .. tostring(evidence.actorID)) or ""
+        rows[#rows + 1] = row(
+            tostring(evidence.factID or "unknown") .. " / "
+                .. tostring(evidence.system or "unknown"),
+            tostring(evidence.role or "consumer") .. " / "
+                .. tostring(evidence.status or "unknown") .. actor,
+            { factID = evidence.factID, consumer = evidence }
+        )
+    end
+    if #rows == 0 then
+        rows[1] = emptyRow("No consumer evidence",
+            "No bounded producer, storage, knowledge, preview, or propagation evidence was returned.",
+            "no_consumer_evidence")
+    end
+    return rows
+end
+
 function Model.Rows(snapshot, view)
     if view == "knowledge" then return Model.KnowledgeRows(snapshot) end
     if view == "context" then return Model.ContextRows(snapshot) end
     if view == "why" then return Model.ExplanationRows(snapshot) end
     if view == "trace" then return Model.TraceRows(snapshot) end
+    if view == "consumers" then return Model.ConsumerRows(snapshot) end
     return Model.FactRows(snapshot)
 end
 
@@ -208,6 +229,9 @@ function Model.SummaryRows(snapshot)
             .. tostring(#statements) .. " statements" },
         { label = "Propagation", detail = tostring(metrics.traceCount or 0)
             .. " trace entries" },
+        { label = "Consumer evidence", detail = tostring(
+            metrics.consumerEvidenceCount or 0)
+            .. " bounded entries; preview is not live proof" },
         { label = "Store contract", detail = tostring(snapshot and snapshot.persistence
             and snapshot.persistence.modDataKey or "unknown") .. " via "
             .. tostring(snapshot and snapshot.persistence
@@ -253,6 +277,13 @@ function Model.DetailRows(snapshot, item, view)
         for _, key in ipairs({ "factID", "fromActorID", "toActorID",
             "provenance", "confidence", "reason", "channel", "at" }) do
             addDetail(rows, key, item.trace[key])
+        end
+    elseif item.consumer then
+        for _, key in ipairs({ "factID", "system", "role", "status",
+            "evidence", "detail", "actorID", "sourceActorID", "provenance",
+            "source", "acquisitionPath", "confidence", "score", "learnedAt",
+            "channel" }) do
+            addDetail(rows, key, item.consumer[key])
         end
     elseif item.statement then
         addDetail(rows, "Fact ref", item.factID)

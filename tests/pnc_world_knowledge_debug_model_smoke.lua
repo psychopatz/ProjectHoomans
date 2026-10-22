@@ -30,6 +30,13 @@ local snapshot = {
     },
     trace = { { factID = "fact-1", fromActorID = "alice",
         toActorID = "bob", provenance = "told", reason = "opportunistic_share" } },
+    consumerEvidence = {
+        { factID = "fact-1", system = "PNC.Health.Kill",
+            role = "producer", status = "published", evidence = "fact_record" },
+        { factID = "fact-1", system = "Core.ActorWorldKnowledge.BuildContext",
+            role = "relevance", status = "debug_preview_selected",
+            evidence = "inspector_context_preview" },
+    },
 }
 
 local actorItems = Model.ActorItems(snapshot, {
@@ -47,6 +54,8 @@ T.equal(Model.Rows(snapshot, "why")[1].factID, "fact-1",
     "explanation model row")
 T.equal(Model.Rows(snapshot, "trace")[1].trace.toActorID, "bob",
     "propagation trace model row")
+T.equal(Model.Rows(snapshot, "consumers")[1].consumer.system,
+    "PNC.Health.Kill", "consumer evidence model row")
 local detailRows = Model.DetailRows(snapshot, Model.Rows(snapshot, "facts")[1], "facts")
 local kindDetail
 for _, detail in ipairs(detailRows) do

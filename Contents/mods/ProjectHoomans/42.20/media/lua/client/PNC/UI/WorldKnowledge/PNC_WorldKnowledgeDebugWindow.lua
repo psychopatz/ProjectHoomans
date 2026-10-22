@@ -26,6 +26,7 @@ local VIEW_LABELS = {
     context = { "UI_PNC_WKG_Debug_Context", "CONTEXT" },
     why = { "UI_PNC_WKG_Debug_Why", "WHY" },
     trace = { "UI_PNC_WKG_Debug_Trace", "TRACE" },
+    consumers = { "UI_PNC_WKG_Debug_Consumers", "CONSUMERS" },
 }
 
 local function selected(list)
@@ -71,7 +72,7 @@ function ISPNCWorldKnowledgeDebugWindow:createChildren()
         ISPNCWorldKnowledgeDebugWindow.onView)
     self.viewCombo:initialise(); self.viewCombo:instantiate()
     self:addChild(self.viewCombo)
-    for _, view in ipairs({ "facts", "knowledge", "context", "why", "trace" }) do
+    for _, view in ipairs({ "facts", "knowledge", "context", "why", "trace", "consumers" }) do
         local label = VIEW_LABELS[view]
         self.viewCombo:addOptionWithData(text(label[1], label[2]), view)
     end
@@ -118,7 +119,7 @@ function ISPNCWorldKnowledgeDebugWindow:requestSnapshot()
     self.factID = factID
     PNC.Client.RequestWorldKnowledgeDebug(self.actorID, factID, {
         factLimit = 64, actorLimit = 128, referenceLimit = 64,
-        candidateLimit = 16, traceLimit = 64,
+        candidateLimit = 16, traceLimit = 64, consumerLimit = 256,
     })
     self.lastRequestAt = PNC.Core.Now()
 end

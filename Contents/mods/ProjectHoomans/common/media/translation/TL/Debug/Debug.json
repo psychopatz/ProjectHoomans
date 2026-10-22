@@ -632,5 +632,6 @@
     "UI_PNC_WKG_Debug_Knowledge": "KAALAMAN",
     "UI_PNC_WKG_Debug_Context": "KONTEKSTO",
     "UI_PNC_WKG_Debug_Why": "BAKIT",
-    "UI_PNC_WKG_Debug_Trace": "TRACE"
+    "UI_PNC_WKG_Debug_Trace": "TRACE",
+    "UI_PNC_WKG_Debug_Consumers": "MGA CONSUMER"
 }

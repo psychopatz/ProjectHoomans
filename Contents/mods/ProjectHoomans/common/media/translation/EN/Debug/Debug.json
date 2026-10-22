@@ -632,5 +632,6 @@
     "UI_PNC_WKG_Debug_Knowledge": "KNOWLEDGE",
     "UI_PNC_WKG_Debug_Context": "CONTEXT",
     "UI_PNC_WKG_Debug_Why": "WHY",
-    "UI_PNC_WKG_Debug_Trace": "TRACE"
+    "UI_PNC_WKG_Debug_Trace": "TRACE",
+    "UI_PNC_WKG_Debug_Consumers": "CONSUMERS"
 }

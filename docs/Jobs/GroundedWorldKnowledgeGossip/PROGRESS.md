@@ -148,3 +148,22 @@ luac -p <touched Lua files>; translation JSON; git diff --check
 ```
 
 The native window was not relaunched or hot-reloaded by the agent. The user must reopen/reload the existing game session to see this correction; native SP/MP behavior and save/reload remain user-owned validation.
+
+## Native inspector consumer-flow slice (2026-10-22)
+
+The existing gated Hub inspector now includes a translated `CONSUMERS` view. It distinguishes the authoritative producer path from downstream evidence: ledger storage, authorized actor-reference acquisition, bounded propagation transfer, and inspector-only relevance/conversation previews. Preview rows explicitly say they are not live semantic-consumption proof; no PBrainZ or DynamicTrading usage is claimed unless a corresponding runtime trace exists. The producer mapping for `npc.death` is `PNC.Health.Kill -> WorldKnowledge_Server -> PublishDeath`, so the death trigger is visible as the source rather than incorrectly reported as a consumer.
+
+Evidence:
+
+```text
+python3 tests/run_tests.py --jobs 2 --timeout 30 --verbose world_knowledge
+  PASS 4/4; consumer evidence model and snapshot assertions included
+python3 -m unittest -v tools.semantic_harness.tests.test_world_knowledge_inspector tools.semantic_harness.tests.test_grounded_world_knowledge_gossip
+  PASS 3 tests; real production Lua worker unchanged and still green
+pz_verify.py --file <debug service/model/window> --kahlua --severity ERROR --no-snippets
+  0 errors on each touched Lua file
+luac -p <touched Lua files>; translation JSON validation; git diff --check
+  PASS
+```
+
+The GUI consumer view is a diagnostic projection only; the native window was not relaunched or hot-reloaded by the agent. Native SP/MP runtime consumption remains reserved for user validation.

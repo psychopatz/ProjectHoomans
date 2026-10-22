@@ -10,12 +10,13 @@ local Debug = PNC.WorldKnowledgeDebug
 local Adapter = PNC.WorldKnowledge
 local Core = PNC.Core
 
-Debug.VERSION = 1
+Debug.VERSION = 2
 Debug.MAX_FACTS = 64
 Debug.MAX_ACTORS = 128
 Debug.MAX_REFS = 64
 Debug.MAX_CANDIDATES = 16
 Debug.MAX_TRACE = 64
+Debug.MAX_CONSUMERS = 256
 
 local function limit(value, maximum, fallback)
     value = tonumber(value)
@@ -75,6 +76,150 @@ local function compactTrace(entry)
         confidence = entry.confidence, reason = entry.reason,
         channel = entry.channel, at = entry.at,
     }
+end
+
+local function producerPath(fact)
+    local kind = fact and tostring(fact.kind or "") or ""
+    if kind == "npc.death" then
+        return "PNC.Health.Kill -> WorldKnowledge_Server -> PublishDeath"
+    end
+    if kind == "zombie.pressure" then
+        return "SocialEventHooks.ObserveZombieHorde -> PublishZombiePressure"
+    end
+    if kind == "faction.incident" then
+        return "FactionIncidentService.AddIncident -> PublishIncident"
+    end
+    if kind == "faction.status" then
+        return "Factions.Destroy/status -> PublishFactionStatus"
+    end
+    if kind == "world.state" then
+        return "WorldKnowledge_PZ.ObserveAuthoritativeWorldState"
+    end
+    return tostring(fact and fact.producer or "unknown")
+end
+
+local function addConsumerEvidence(output, maximum, entry)
+    if #output >= maximum or type(entry) ~= "table" then return end
+    output[#output + 1] = entry
+end
+
+local function buildConsumerEvidence(knowledgeState, facts, context, trace, maximum)
+    local output = {}
+    local factIDs = {}
+    local fact
+    local factID
+    local actorID
+    local entry
+    local reference
+    local candidate
+    local statementFactID
+    local index
+
+    for index = 1, #(facts or {}) do
+        fact = facts[index]
+        factID = id(fact and fact.factID)
+        if factID then
+            factIDs[factID] = true
+            addConsumerEvidence(output, maximum, {
+                factID = factID, system = producerPath(fact),
+                role = "producer", status = "published",
+                evidence = "fact_record", detail = "authoritative producer path",
+            })
+            addConsumerEvidence(output, maximum, {
+                factID = factID,
+                system = "PsychopatzCore.WorldKnowledge.Ledger",
+                role = "storage", status = "stored",
+                evidence = "ledger_record", detail = "fact is present in bounded ledger",
+            })
+        end
+    end
+
+    for actorID, entry in pairs(knowledgeState and knowledgeState.byActor or {}) do
+        for factID, reference in pairs(entry and entry.refs or {}) do
+            factID = id(factID)
+            if factID and factIDs[factID] and type(reference) == "table" then
+                addConsumerEvidence(output, maximum, {
+                    factID = factID,
+                    system = "PNC.WorldKnowledge.acquire / CoreWKG.Acquire",
+                    role = "actor_knowledge", status = "acquired",
+                    evidence = "actor_reference", actorID = tostring(actorID),
+                    provenance = reference.provenance,
+                    source = reference.source,
+                    sourceActorID = reference.sourceActorID,
+                    acquisitionPath = reference.acquisitionPath,
+                    confidence = reference.confidence,
+                    learnedAt = reference.learnedAt,
+                    detail = "authorized actor reference exists",
+                })
+            end
+        end
+    end
+
+    for index = 1, #((context and context.worldKnowledge
+        and context.worldKnowledge.candidates) or {}) do
+        candidate = context.worldKnowledge.candidates[index]
+        factID = id(candidate and candidate.factID)
+        if factID and factIDs[factID] then
+            addConsumerEvidence(output, maximum, {
+                factID = factID,
+                system = "Core.ActorWorldKnowledge.BuildContext",
+                role = "relevance", status = "debug_preview_selected",
+                evidence = "inspector_context_preview",
+                actorID = context.worldKnowledge.actorID,
+                provenance = candidate.provenance,
+                confidence = candidate.confidence,
+                score = candidate.score,
+                detail = "selected for the inspector's requested actor",
+            })
+        end
+    end
+
+    for index = 1, #((context and context.npcGossip
+        and context.npcGossip.factRefs) or {}) do
+        statementFactID = id(context.npcGossip.factRefs[index])
+        if statementFactID and factIDs[statementFactID] then
+            addConsumerEvidence(output, maximum, {
+                factID = statementFactID,
+                system = "PNC.SemanticCognitionService",
+                role = "conversation", status = "debug_preview_projected",
+                evidence = "inspector_context_preview",
+                actorID = context.worldKnowledge
+                    and context.worldKnowledge.actorID or nil,
+                detail = "npcGossip projection is available; no live request is implied",
+            })
+        end
+    end
+
+    for index = 1, #(trace or {}) do
+        entry = trace[index]
+        factID = id(entry and entry.factID)
+        if factID and factIDs[factID] then
+            addConsumerEvidence(output, maximum, {
+                factID = factID,
+                system = "CoreWKG.Share / propagation trace",
+                role = "propagation",
+                status = entry.accepted == false and "rejected" or "transferred",
+                evidence = "runtime_trace",
+                actorID = entry.toActorID,
+                sourceActorID = entry.fromActorID,
+                provenance = entry.provenance,
+                confidence = entry.confidence,
+                channel = entry.channel,
+                detail = entry.reason or "bounded opportunistic share",
+            })
+        end
+    end
+
+    table.sort(output, function(left, right)
+        if left.factID ~= right.factID then
+            return tostring(left.factID) < tostring(right.factID)
+        end
+        if left.role ~= right.role then
+            return tostring(left.role) < tostring(right.role)
+        end
+        return tostring(left.system) < tostring(right.system)
+    end)
+    return output
 end
 
 local function buildActorRows(state, selectedID, maximum)
@@ -142,7 +287,7 @@ local function buildContext(actorID, now, maximum, language)
 end
 
 local function buildMetrics(ledgerState, knowledgeState, factModule, now,
-    trace, facts, context)
+    trace, facts, context, consumers)
     local factKinds = {}
     local factCount = 0
     for _, factID in ipairs(ledgerState.order or {}) do
@@ -178,6 +323,7 @@ local function buildMetrics(ledgerState, knowledgeState, factModule, now,
         contextCandidateCount = #candidates,
         statementCount = #statements,
         traceCount = #trace,
+        consumerEvidenceCount = #(consumers or {}),
     }
 end
 
@@ -233,6 +379,10 @@ function Debug.BuildSnapshotForPlayer(_, request)
         local item = compactTrace(sourceTrace[index])
         if item then trace[#trace + 1] = item end
     end
+    local consumerLimit = limit(request.consumerLimit,
+        Debug.MAX_CONSUMERS, Debug.MAX_CONSUMERS)
+    local consumerEvidence = buildConsumerEvidence(
+        knowledgeState, facts, context, trace, consumerLimit)
     return {
         schema = "PNC.WorldKnowledgeDebug", schemaVersion = Debug.VERSION,
         serverTime = now, actorID = actorID, factID = factID, facts = facts,
@@ -246,8 +396,9 @@ function Debug.BuildSnapshotForPlayer(_, request)
         },
         explanation = explanation, explanationReason = explanationReason,
         trace = trace,
+        consumerEvidence = consumerEvidence,
         metrics = buildMetrics(ledgerState, knowledgeState, worldKnowledge.Fact,
-            now, trace, facts, context),
+            now, trace, facts, context, consumerEvidence),
         persistence = {
             owner = "ProjectHoomans",
             modDataKey = "PNC.WorldKnowledge",
@@ -264,7 +415,7 @@ function Debug.BuildSnapshotForPlayer(_, request)
         limits = {
             facts = Debug.MAX_FACTS, actors = Debug.MAX_ACTORS,
             references = Debug.MAX_REFS, candidates = Debug.MAX_CANDIDATES,
-            trace = Debug.MAX_TRACE,
+            trace = Debug.MAX_TRACE, consumers = Debug.MAX_CONSUMERS,
         },
     }, "ok"
 end
