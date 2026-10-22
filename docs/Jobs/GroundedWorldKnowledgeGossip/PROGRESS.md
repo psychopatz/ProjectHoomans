@@ -38,4 +38,10 @@ python3 -m unittest tools.semantic_harness.tests.test_automatic_flow_generation.
 
 `pz_verify.py --kahlua` reports zero errors for the new shared adapter, server wrapper and client cognition changes. The focused worker regression still passes in EN/TL with zero LLM calls. This slice proves the adopter seam and preserves the normal gossip path; it does not yet claim authoritative helicopter/power/water/season adapters, opportunistic NPC propagation, Semantic Lab inspection, DynamicTrading reuse, PBrainZ parity, or native PZ behavior.
 
+## W3/W4 bounded world-state and propagation slice (2026-10-22)
+
+`PNC_WorldKnowledge_PZ.lua` now exposes guarded authority readers for the audited helicopter, hydro-power and climate-season candidates. It accepts injected owner readers for exact 42.20 validation and returns explicit `unknown` for absent/failing readers; water remains unknown because no verified global shutoff owner was found. `ObserveAuthoritativeWorldState` publishes only initial-known or changed domain states, dedupes unchanged observations, uses `derived_current` for initial runtime state and historical retention for transitions, and never scans zombies.
+
+The same adapter now exposes `AcquirePublicFact` and `PropagateConversation`. Propagation requires an authorized conversation/radio/faction opportunity, transfers at most the Core bound, records told/radio provenance and cooldowns, and keeps a bounded acceptance/rejection trace. The smoke test proves Alice-known/Bob-unknown/no statement, Alice-to-Bob transfer, same fact ID, told provenance, world-state initial/transition facts, unchanged-state dedupe and truthful water unknown.
+
 Completed the bounded source/authority audit without adding production state. Exact local/remote state, the zombie census/cache relationship, faction/death publication points, PZ API limitation, conversation worker before-state, and DT boundary are recorded in `AUDIT.md` and Core `Docs/world_knowledge_gossip/PROGRESS.md`. The current dirty PNC files remain untouched. Next phase is Core W1, then Hoomans W2-W6.

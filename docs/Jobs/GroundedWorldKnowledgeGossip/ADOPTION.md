@@ -71,3 +71,7 @@ Native PZ SP/MP remains user-owned final acceptance.
 ## W2 implementation evidence (2026-10-22)
 
 The shared adapter is loaded by the existing Hoomans compositions and the existing semantic cognition transport remains the only gossip route. The new source wrappers publish only after the owning operation reports success; missing death attribution is represented as unknown and never assigned a guessed killer. Zombie pressure is sourced from the existing bounded observation input. The dedicated Hoomans smoke test covers a real authorized pressure statement, player-caused death classification and faction dissemination with explainable faction provenance. The worker regression confirms the pre-existing production Lua semantic path remains intact after the projection change.
+
+## W3/W4 implementation evidence (2026-10-22)
+
+World-state observation is deliberately guarded. The default reader calls only the audited candidate methods when those methods are actually present; any unavailable or errored method becomes an explicit unknown state. An adopter or exact Build 42.20 owner can inject the verified reader without changing the ledger contract. No global zombie enumeration or periodic all-actor scan was added. Propagation is an explicit event API for a real bounded conversation/radio/faction opportunity, with authorization, dedupe and cooldown checks; it is not a polling social simulation.
