@@ -1,6 +1,6 @@
 # Contextual Dialogue Persona & Choices
 
-**Status:** REOPENED — P9 mechanics retained; P10 semantic simulation UX/contextual-hub replacement is mandatory.  
+**Status:** REOPENED — P10 hub/control infrastructure retained; P11 runtime-parity actors/dynamic-relationship UX is mandatory.  
 **Current source-audit baseline:** ProjectHoomans remote main at 849f1951ed1d3fd4b6f78aedc2525b25368a157e (2026-10-22).  
 **Dynamic Trading provider baseline:** psychopatz/DynamicTrading at 5db64cbcc764f035146f044fdc34e930ce47d7c8.  
 **Native Project Zomboid SP/MP:** untested; user-owned acceptance.
@@ -20,50 +20,50 @@ The existing P0-P7 implementation is retained as foundation, but the 2026-10-22 
 
 The P8 behavioral foundation is now implemented, but the 2026-10-22 UI/routing audit found a new product gap: Semantic Lab still hides real conversation branching, and typed authored-category utterances such as `whatsup` redundantly produce an `Ask what's up` button instead of entering the already-recognized category directly.
 
-P9 mechanics are retained, but the 2026-10-23 live UI audit found that the Simulation editor is still developer-internal and that `What's up` is still conceptually bound to the obsolete authored `projecthoomans:whats_up` category. The current mandatory goal is therefore **P10 — Semantic Simulation UX & Contextual Conversation Hub**. P10 removes the legacy What's Up category entirely, replaces it with provider-driven semantic-hub activation, and makes common simulation state editable through structured dynamic controls while preserving Advanced JSON.
+P10 hub/control infrastructure is retained, but the 2026-10-23 live UI/source audit found a new parity gap: Simulation still exposes developer-only controls, player/NPC state is asymmetric, generated personality is presented as manual sliders, the graph does not visualize semantic Flows/hubs, and the relationship bond model is too manual. The current mandatory goal is therefore **P11 — Runtime-Parity Actors, Dynamic Relationships, and Semantic Lab UX**.
 
-## Companion bond requirement
+## Relationship / bond direction
 
-Project Hoomans already persists detailed starting-companion relationship kinds such as:
+Current relationship standing and durable social bond are separate.
 
-- friend
-- lover
-- mother
-- father
-- sister
-- brother
-
-Dialogue must preserve the detailed kind while deriving only three coarse speech classes:
+Standing remains production-derived from approval/respect/familiarity:
 
 ~~~text
+unknown
+neutral
 friend
-family
+rival
+enemy
+~~~
+
+Durable bond is social history:
+
+~~~text
+none
+friend
 lover
+family
 ~~~
 
-Current mapping:
+The approved runtime model is now:
 
 ~~~text
-friend                     -> friend
-lover / partner / spouse   -> lover
-mother / father
-sister / brother
-future cousin / aunt /
-uncle / grandmother /
-grandfather / etc.         -> family
+family
+    authored/pre-existing only
+
+none
+    -> earned friend after high relationship threshold
+
+friend
+    -> lover only after
+       compatibility + player proposal + NPC acceptance
 ~~~
 
-The detailed kind is not replaced. It supplies localized relationship terms such as Mom, Dad, sister, cousin, or future terms. Family speech uses generic family realization templates plus localized term substitution so a new kinship type is data/translation registration rather than a new dialogue engine branch.
+Family uses only currently real supported kinship producers such as mother/father/sister/brother. Do not expose hypothetical future kinds in the normal harness.
 
-Bond is independent of current directed standing. For example:
+Friend is automatically earned from the existing relationship record. Lover is not automatic: romance eligibility uses the existing gender/orientation/trait/social-profile compatibility logic, then a player proposal and server-authoritative acceptance evaluation.
 
-~~~text
-bondClass = family
-bondKind  = mother
-relationship.state = enemy
-~~~
-
-is valid: the NPC is still the player's mother, but currently hostile/estranged. Bond selects intimacy/kinship vocabulary; directed standing/personality/situation selects warmth, hostility, openness, deference, and other tone.
+A durable friend/lover bond may remain while current standing later becomes rival/enemy; this supports estranged-friend/lover dialogue without threshold oscillation.
 
 ## Preserve
 
@@ -88,8 +88,9 @@ This job builds on and must not duplicate:
 6. BEHAVIORAL_COMPLETION.md
 7. SEMANTIC_LAB_CONVERSATION_VISUALIZATION.md
 8. SEMANTIC_SIMULATION_UX_AND_CONTEXTUAL_HUB.md
-9. ROADMAP.md
-10. HARNESS_ACCEPTANCE.md
-11. PROGRESS.md **last** for current truth and the exact Next Chunk
+9. RUNTIME_PARITY_ACTORS_RELATIONSHIPS_AND_UX.md
+10. ROADMAP.md
+11. HARNESS_ACCEPTANCE.md
+12. PROGRESS.md **last** for current truth and the exact Next Chunk
 
 No checked-in GOAL_PROMPT.md is allowed. The executable /goal remains chat-only.
