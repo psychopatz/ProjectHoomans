@@ -2,7 +2,7 @@ local Defense = PNC.CombatDefense
 local Internal = Defense.Internal
 local Core = PNC.Core
 local Const = PNC.Const
-local Spatial = PNC.SpatialIndex
+local Perception = PNC.Perception
 
 function Internal.SettingNumber(name, fallback, minimum, maximum)
     local settings = PNC.Sandbox
@@ -70,8 +70,17 @@ function Defense.CountNearbyZombies(record, npcBody, radius)
     radius = tonumber(radius)
         or tonumber(Const.NPC_ZOMBIE_DEFENSE_RADIUS) or 2.2
     x, y, z = Internal.BodyPosition(record, npcBody)
-    if not Spatial or not Spatial.QueryZombies then return 0 end
-    zombies = Spatial.QueryZombies(x, y, radius)
+    if not Perception or not Perception.GetZombieCandidatesAt then return 0 end
+    zombies = Perception.GetZombieCandidatesAt(
+        x,
+        y,
+        z,
+        radius,
+        "defense:" .. tostring(record and record.id or npcBody),
+        tonumber(Const.NPC_ZOMBIE_DEFENSE_REFRESH_MS) or 200,
+        0,
+        Core.Now()
+    )
     for i = 1, #zombies do
         if isNearbyZombie(zombies[i], x, y, z, radius * radius) then
             count = count + 1

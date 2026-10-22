@@ -3,7 +3,7 @@
 local Internal = PNC.BehaviorCompanion.Internal
 local Core = PNC.Core
 local Const = PNC.Const
-local Spatial = PNC.SpatialIndex
+local Perception = PNC.Perception
 local TraversalQuery = PNC.TraversalQuery
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
@@ -12,9 +12,6 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 -- spatial query for every follower. The pool is deliberately wider than the
 -- exact hazard radius; every follower still applies its own exact-distance
 -- filter below, so sharing cannot make a follower react to a distant zombie.
-local FollowCandidateCache = {}
-local FollowCandidateCacheKeys = {}
-local MAX_FOLLOW_OWNER_CACHES = 32
 local FOLLOW_CANDIDATE_REUSE_DISTANCE = 3.0
 
 local function observeZombieHorde(record, count, threshold, now)
@@ -36,59 +33,30 @@ end
 
 local function getSharedCandidates(record, x, y, z, radius, now)
     local ownerKey = Internal.GetFollowOwnerKey(record)
-    local ownerCache = FollowCandidateCache[ownerKey]
-    local i
-    local entry
-    local dx
-    local dy
     local reuseRadius = FOLLOW_CANDIDATE_REUSE_DISTANCE
-    local queryRadius = radius + reuseRadius
-    if not ownerCache then
-        if #FollowCandidateCacheKeys >= MAX_FOLLOW_OWNER_CACHES then
-            FollowCandidateCache[FollowCandidateCacheKeys[1]] = nil
-            table.remove(FollowCandidateCacheKeys, 1)
-        end
-        ownerCache = {}
-        FollowCandidateCache[ownerKey] = ownerCache
-        FollowCandidateCacheKeys[#FollowCandidateCacheKeys + 1] = ownerKey
+    local candidates
+    local cacheHit
+    if not Perception or not Perception.GetZombieCandidatesAt then
+        return {}
     end
-    for i = 1, #ownerCache do
-        entry = ownerCache[i]
-        if entry
-            and now < (tonumber(entry.expiresAt) or 0)
-            and math.abs((tonumber(entry.z) or z) - z) < 1
-        then
-            dx = x - (tonumber(entry.x) or x)
-            dy = y - (tonumber(entry.y) or y)
-            if (dx * dx) + (dy * dy) <= reuseRadius * reuseRadius then
-                if Diagnostics then
-                    Diagnostics.Increment("Follow.HazardCandidateCacheHits")
-                end
-                return entry.candidates
-            end
-        end
-    end
-    entry = {
-        x = x,
-        y = y,
-        z = z,
-        expiresAt = now + (tonumber(Const.FOLLOW_HORDE_SCAN_MS) or 150),
-        candidates = Spatial and Spatial.QueryZombies
-            and Spatial.QueryZombies(x, y, queryRadius) or {},
-    }
+    candidates, cacheHit = Perception.GetZombieCandidatesAt(
+        x,
+        y,
+        z,
+        radius,
+        "follow:" .. tostring(ownerKey),
+        tonumber(Const.FOLLOW_HORDE_SCAN_MS) or 150,
+        reuseRadius,
+        now
+    )
     if Diagnostics then
-        Diagnostics.Increment("Follow.HazardCandidateQueries")
+        Diagnostics.Increment(
+            cacheHit
+                and "Follow.HazardCandidateCacheHits"
+                or "Follow.HazardCandidateQueries"
+        )
     end
-    -- Keep a bounded per-owner pool. A formation normally needs one entry;
-    -- the second entry covers a group split across nearby map cells without
-    -- allowing movement through a long session to grow this cache forever.
-    if #ownerCache < 2 then
-        ownerCache[#ownerCache + 1] = entry
-    else
-        ownerCache[1] = ownerCache[2]
-        ownerCache[2] = entry
-    end
-    return entry.candidates
+    return candidates or {}
 end
 
 function Internal.AssessFollowHazards(record, zombie, now)

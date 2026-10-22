@@ -7,7 +7,6 @@ PNC.Perception = PNC.Perception or {}
 local Perception = PNC.Perception
 local Core = PNC.Core
 local Const = PNC.Const
-local Spatial = PNC.SpatialIndex
 
 local function frameRadius(requested)
     return math.max(
@@ -31,8 +30,19 @@ local function frameIsReusable(frame, record, radius, now)
 end
 
 local function buildFrame(record, radius, now)
-    local candidates = Spatial and Spatial.QueryZombies
-        and Spatial.QueryZombies(record.x, record.y, radius) or {}
+    local tolerance = tonumber(Const.PERCEPTION_FRAME_MOVE_TOLERANCE) or 0.5
+    local cacheKey = "frame:" .. tostring(record.id or record)
+    local candidates = Perception.GetZombieCandidatesAt
+        and Perception.GetZombieCandidatesAt(
+            record.x,
+            record.y,
+            record.z,
+            radius,
+            cacheKey,
+            tonumber(Const.PERCEPTION_FRAME_MS) or 200,
+            tolerance,
+            now
+        ) or {}
     local entries = {}
     local radiusSq = radius * radius
     local i

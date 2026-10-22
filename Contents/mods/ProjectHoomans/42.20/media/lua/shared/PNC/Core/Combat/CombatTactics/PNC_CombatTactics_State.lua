@@ -202,6 +202,12 @@ function Internal.ClearActiveRetreat(record, state)
         state.lastX = nil
         state.lastY = nil
     end
+    if record
+        and PNC.BehaviorMoveIntent
+        and PNC.BehaviorMoveIntent.ReleaseLock
+    then
+        PNC.BehaviorMoveIntent.ReleaseLock(record, "combat_retreat")
+    end
     if record then
         record.runtime = record.runtime or {}
         record.runtime.retreatMode = false

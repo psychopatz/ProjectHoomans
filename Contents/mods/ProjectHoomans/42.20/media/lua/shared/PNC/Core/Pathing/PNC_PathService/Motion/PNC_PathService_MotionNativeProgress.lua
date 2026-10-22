@@ -15,6 +15,26 @@ local function isFollowOwnerLane(lane)
         == tostring(Const.ORDER_FOLLOW or "follow")
 end
 
+local function followNativeRetryJitterMs(record, lane, retryCount)
+    local spread = math.max(
+        0,
+        tonumber(Const.FOLLOW_NATIVE_REPATH_JITTER_MS) or 0
+    )
+    if spread <= 0 then
+        return 0
+    end
+    if lane.followNativeRecoverySeed == nil then
+        local key = tostring(record and (record.id or record.npcId) or "follow")
+        local hash = 0
+        for index = 1, #key do
+            hash = (hash * 33 + (string.byte(key, index) or 0)) % 100000
+        end
+        lane.followNativeRecoverySeed = hash
+    end
+    return (lane.followNativeRecoverySeed + ((retryCount or 1) * 73))
+        % (spread + 1)
+end
+
 local function isCampAnchorLane(lane)
     if not lane then return false end
     if tostring(lane.intentReason or "") == "camp_anchor" then
@@ -83,6 +103,13 @@ local function scheduleFollowNativeRepath(
     if lane.followNativeRecoveryGoalRevision ~= goalRevision then
         lane.followNativeRecoveryGoalRevision = goalRevision
         lane.followNativeRecoveryCount = 0
+        lane.nativeBackoffUntil = 0
+    end
+    local existingBackoffUntil = tonumber(lane.nativeBackoffUntil) or 0
+    if existingBackoffUntil > now then
+        lane.ownerMode = "native_backoff"
+        lane.lastRecoveryReason = "follow_native_repath_backoff"
+        return true, "native_repath_backoff"
     end
     local retryCount = math.min(
         8,
@@ -94,13 +121,20 @@ local function scheduleFollowNativeRepath(
             or tonumber(Const.ENGINE_PATH_REPLAN_MS)
             or 1000
     )
+    local retryJitter = followNativeRetryJitterMs(
+        record,
+        lane,
+        retryCount
+    )
     local planner = enginePlanner or PNC.EnginePathPlanner
     if planner and planner.Invalidate then
         planner.Invalidate(record, reason or "follow_native_repath", zombie)
     end
     lane.followNativeRecoveryCount = retryCount
     lane.lastNavigationInvalidatedAt = now
-    lane.nativeBackoffUntil = now + retryDelay * math.min(4, retryCount)
+    lane.nativeBackoffUntil = now
+        + retryDelay * math.min(4, retryCount)
+        + retryJitter
     lane.ownerMode = "native_backoff"
     lane.lastRecoveryReason = "follow_native_repath"
     lane.lastRecoverAt = now
@@ -119,6 +153,7 @@ local function scheduleFollowNativeRepath(
     auditTraversal(record, "native_repath", zombie, lane, {
         "reason=" .. tostring(reason or "follow_native_repath"),
         "retry=" .. tostring(retryCount),
+        "jitterMs=" .. tostring(retryJitter),
         "policy=follow_native_provider",
     })
     return true, "native_repath"

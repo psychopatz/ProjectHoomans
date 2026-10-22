@@ -111,14 +111,24 @@ function Internal.CollectEnemyZombies(record, radius)
     local distSq
     local visible
     local visibilityKind
-    if not record or not Spatial or not Spatial.QueryZombies then
+    if not record or not Perception.GetZombieCandidatesAt then
         return results
     end
     radius = tonumber(radius) or Const.ZOMBIE_TARGET_RADIUS
     if Perception.GetVisibleZombieEntries then
         return Perception.GetVisibleZombieEntries(record, radius)
     end
-    zombies = Spatial.QueryZombies(record.x, record.y, radius)
+    zombies = Perception.GetZombieCandidatesAt
+        and Perception.GetZombieCandidatesAt(
+            record.x,
+            record.y,
+            record.z,
+            radius,
+            "visibility:" .. tostring(record.id or record),
+            tonumber(Const.PERCEPTION_CANDIDATE_CACHE_MS) or 100,
+            0,
+            Core.Now()
+        ) or {}
     for i = 1, #zombies do
         zombie = zombies[i]
         if zombie and (not zombie:isDead()) and (not Core.IsManagedNPCBody(zombie)) and math.abs(zombie:getZ() - record.z) < 1 then

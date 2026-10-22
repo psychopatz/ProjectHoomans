@@ -68,6 +68,12 @@ PNC = {
             return zombies
         end,
     },
+    Perception = {
+        GetZombieCandidatesAt = function()
+            refreshZombies()
+            return zombies
+        end,
+    },
     NPCWounds = {
         GetProtection = function(_, _, damageType)
             T.equal(damageType, "scratch", "damage-specific armor")

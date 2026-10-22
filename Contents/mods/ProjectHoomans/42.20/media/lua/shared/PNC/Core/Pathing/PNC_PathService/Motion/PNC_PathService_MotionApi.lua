@@ -51,22 +51,15 @@ function PathService.MoveToward(
     stopDistance,
     reason,
     navigation,
-    owner
+    owner,
+    options
 )
     local runtime = record and record.runtime or nil
     local controlOwner = writeOwner(owner, reason)
+    local moveIntent = PNC.BehaviorMoveIntent
+    local isLive = record
+        and record.presenceState == PNC.Const.PRESENCE_LIVE
     local accepted
-    if ActorControl and ActorControl.CanWrite then
-        accepted = ActorControl.CanWrite(
-            record,
-            controlOwner,
-            "path_move",
-            { reason = reason }
-        )
-        if accepted ~= true then
-            return false, "puppet_opera_writer_blocked:path_move"
-        end
-    end
     local state = runtime and runtime.facilityActivity
         and runtime.facilityActivity.seating == true
         and runtime.facilityActivity
@@ -95,6 +88,44 @@ function PathService.MoveToward(
                 "requestedZ=" .. tostring(targetZ or ""),
             }
         )
+    end
+    if isLive and moveIntent and moveIntent.RequestMove then
+        local requestAccepted
+        local requestReason
+        requestAccepted, requestReason = moveIntent.RequestMove(
+            record,
+            targetX,
+            targetY,
+            targetZ,
+            mode,
+            stopDistance,
+            reason,
+            navigation,
+            owner,
+            options
+        )
+        if requestAccepted ~= true then
+            return false, requestReason or "movement_intent_rejected"
+        end
+        if zombie and Internal.isAtGoal(
+            zombie,
+            Internal.buildGoal(targetX, targetY, targetZ, mode, stopDistance),
+            stopDistance
+        ) then
+            return true, "arrived"
+        end
+        return true, requestReason or "move_intent"
+    end
+    if ActorControl and ActorControl.CanWrite then
+        accepted = ActorControl.CanWrite(
+            record,
+            controlOwner,
+            "path_move",
+            { reason = reason }
+        )
+        if accepted ~= true then
+            return false, "puppet_opera_writer_blocked:path_move"
+        end
     end
     record.runtime = record.runtime or {}
     local intent = record.runtime.moveIntent

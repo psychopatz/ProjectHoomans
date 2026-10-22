@@ -64,6 +64,11 @@ PNC = {
             return output
         end,
     },
+    Perception = {
+        GetZombieCandidatesAt = function(x, y, z, radius)
+            return PNC.SpatialIndex.QueryZombies(x, y, radius)
+        end,
+    },
     Sandbox = {
         NPCZombieDamageModelEnabled = function() return true end,
         NPCZombieDamageStaminaStartRatio = function() return 0.30 end,

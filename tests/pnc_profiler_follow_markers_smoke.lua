@@ -56,6 +56,12 @@ PNC = {
         Pump = callback("path_pump"),
         MoveToward = callback("move_toward"),
     },
+    EnginePathPlanner = {
+        Invalidate = callback("native_invalidate"),
+        Internal = {
+            ClearEngineRequest = callback("native_clear"),
+        },
+    },
     BehaviorRoaming = { Tick = callback("roaming_tick") },
     RoamAmbient = {
         Tick = callback("ambient_tick"),
@@ -117,6 +123,10 @@ local targets = {
         "ProjectHoomans.Server.Update.NPC.Pathing.MoveIntent.Hold" },
     { PNC.PathService, "MoveToward",
         "ProjectHoomans.Server.Update.NPC.Pathing.MoveToward" },
+    { PNC.EnginePathPlanner, "Invalidate",
+        "ProjectHoomans.Server.Update.NPC.Pathing.NativeInvalidate" },
+    { PNC.EnginePathPlanner.Internal, "ClearEngineRequest",
+        "ProjectHoomans.Server.Update.NPC.Pathing.NativeClear" },
     { PNC.BehaviorRoaming, "Tick",
         "ProjectHoomans.Server.Update.NPC.Roaming.Tick" },
     { PNC.RoamAmbient, "Tick",

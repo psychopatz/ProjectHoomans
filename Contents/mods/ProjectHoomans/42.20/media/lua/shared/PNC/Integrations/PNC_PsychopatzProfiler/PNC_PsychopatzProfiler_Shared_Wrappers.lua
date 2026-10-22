@@ -104,6 +104,12 @@ function Internal.InstallSharedPerformanceWrappers()
         "ProjectHoomans.Server.Update.NPC.Pathing.MoveIntent.Hold")
     Internal.Wrap(PNC.PathService, "MoveToward",
         "ProjectHoomans.Server.Update.NPC.Pathing.MoveToward")
+    local enginePlanner = PNC.EnginePathPlanner
+    Internal.Wrap(enginePlanner, "Invalidate",
+        "ProjectHoomans.Server.Update.NPC.Pathing.NativeInvalidate")
+    Internal.Wrap(enginePlanner and enginePlanner.Internal,
+        "ClearEngineRequest",
+        "ProjectHoomans.Server.Update.NPC.Pathing.NativeClear")
 
     -- Follow is evaluated beside transient roaming presentation leases. These
     -- markers make an order/lease conflict visible without changing which

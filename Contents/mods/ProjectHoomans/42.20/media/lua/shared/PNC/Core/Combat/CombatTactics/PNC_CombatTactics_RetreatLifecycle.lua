@@ -10,6 +10,15 @@ local Internal = Tactics.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
+local function combatRetreatIntentOptions(state)
+    return {
+        source = "combat_retreat",
+        priority = 100,
+        lockKey = "combat_retreat",
+        lockUntil = state and state.lockUntil or 0,
+    }
+end
+
 local function isAuthority()
     local ok
     local result
@@ -192,16 +201,21 @@ function Internal.ContinueLockedRetreat(record, zombie, target, state, now)
         return false, "retreat_stalled"
     end
     Internal.SetRetreatState(record, true, state.recoveryMode)
+    if now < (tonumber(state.refreshAt) or 0) then
+        return true, state.reason or "combat_retreat"
+    end
     if not Internal.RequestMove(
         record, zombie, state.goalX, state.goalY, state.goalZ or record.z,
         state.goalMode or "walk", state.goalStopDistance or 0.8,
-        state.reason or "combat_retreat"
+        state.reason or "combat_retreat",
+        combatRetreatIntentOptions(state)
     ) then
         Internal.ClearActiveRetreat(record, state)
         clearHordeSurvivalPending(state)
         state.retryAt = now + retryMs
         return false, "retreat_rejected"
     end
+    state.refreshAt = now + 220
     return true, state.reason or "combat_retreat"
 end
 
@@ -214,6 +228,11 @@ function Internal.StartRetreat(record, zombie, target, distance, mode, stopDista
     if not state then return false, nil end
     if now < (tonumber(state.retryAt) or 0) then
         return false, "retreat_stalled"
+    end
+    if state.phase == "retreat"
+        and now < (tonumber(state.lockUntil) or 0)
+    then
+        return true, state.reason or "retreat_locked"
     end
     wasStaminaRetreat = state.phase == "retreat"
         and state.recoveryMode == "retreat"
@@ -246,7 +265,7 @@ function Internal.StartRetreat(record, zombie, target, distance, mode, stopDista
     Internal.SetRetreatState(record, true, recoveryMode)
     if not Internal.RequestMove(
         record, zombie, retreat.x, retreat.y, retreat.z, mode,
-        stopDistance, reason
+        stopDistance, reason, combatRetreatIntentOptions(state)
     ) then
         Internal.ClearActiveRetreat(record, state)
         state.retryAt = now

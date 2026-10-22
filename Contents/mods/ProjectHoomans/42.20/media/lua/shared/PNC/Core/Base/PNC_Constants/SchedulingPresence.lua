@@ -56,6 +56,11 @@ Const.SCHEDULER_MAX_JOBS_PER_TICK = 1
 Const.PERCEPTION_FRAME_MS = 200
 Const.PERCEPTION_FRAME_MOVE_TOLERANCE = 0.5
 Const.PERCEPTION_LOS_MAX_CANDIDATES = 6
+-- All NPC-facing spatial zombie reads pass through PNC.Perception. Keep the
+-- shared candidate cache short-lived and bounded so it reduces duplicate
+-- scans without becoming a second world-state index.
+Const.PERCEPTION_CANDIDATE_CACHE_MS = 100
+Const.PERCEPTION_CANDIDATE_CACHE_MAX = 128
 Const.COMPANION_OWNER_THREAT_CACHE_MS = 100
 Const.STEALTH_DISCOVERY_CACHE_MS = 200
 Const.STEALTH_INDICATOR_UPDATE_MS = 200

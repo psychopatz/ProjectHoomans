@@ -6,7 +6,6 @@ local Perception = PNC.Perception
 local Internal = Perception.Internal
 local Core = PNC.Core
 local Const = PNC.Const
-local Spatial = PNC.SpatialIndex
 
 function Internal.GetCompanionDefenseRadius()
     return math.max(8, tonumber(Const.ZOMBIE_TARGET_RADIUS) or 12)
@@ -70,7 +69,9 @@ function Internal.FindZombieTargetingOwner(record, owner, radius)
     local now
     local cacheKey
     local cached
-    if not record or not owner or not Spatial or not Spatial.QueryZombies then
+    if not record or not owner
+        or not Perception.GetZombieCandidatesAt
+    then
         return nil
     end
     now = Core.Now()
@@ -91,7 +92,16 @@ function Internal.FindZombieTargetingOwner(record, owner, radius)
     end
     radius = math.max(1, tonumber(radius) or Internal.GetCompanionDefenseRadius())
     radiusSq = radius * radius
-    zombies = Spatial.QueryZombies(owner:getX(), owner:getY(), radius)
+    zombies = Perception.GetZombieCandidatesAt(
+        owner:getX(),
+        owner:getY(),
+        owner:getZ(),
+        radius,
+        "owner-defense:" .. cacheKey,
+        tonumber(Const.COMPANION_OWNER_THREAT_CACHE_MS) or 100,
+        0,
+        now
+    )
     bestOwnerDistSq = math.huge
     for i = 1, #zombies do
         zombie = zombies[i]

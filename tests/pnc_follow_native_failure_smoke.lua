@@ -20,6 +20,8 @@ PNC = {
     Const = {
         ORDER_FOLLOW = "follow",
         ENGINE_PATH_FALLBACK_COOLDOWN_MS = 5000,
+        FOLLOW_PATH_BLOCKED_COOLDOWN_MS = 1200,
+        FOLLOW_NATIVE_REPATH_JITTER_MS = 350,
     },
     NavigationRouter = {
         ActivateFallback = function()
@@ -75,7 +77,7 @@ local body = {
     getZ = function() return 0 end,
 }
 local goal = { x = 4.5, y = 10.5, z = 0 }
-local record = { runtime = {} }
+local record = { id = "follow-retry-a", runtime = {} }
 local lane = {
     goal = goal,
     intentReason = "follow_owner_walk",
@@ -115,6 +117,33 @@ T.truthy(lane.ownerMode == "native_backoff",
     "follow native replan did not retain native lane ownership")
 T.equal(lane.navigationProvider, "engine_path",
     "follow native replan changed the movement provider")
+local firstBackoffUntil = lane.nativeBackoffUntil
+T.truthy(firstBackoffUntil >= now + 1200,
+    "follow native replan did not establish its cooldown")
+T.truthy(firstBackoffUntil <= now + 1550,
+    "follow native replan jitter exceeded its configured bound")
+
+-- A second failure inside the same cooldown must not invalidate the same
+-- Behavior2 request again. The lane remains owned by the native backoff.
+now = now + 100
+local duplicateHandled, duplicateState = Internal.recordNativeMove(
+    record,
+    body,
+    lane,
+    navigation,
+    PNC.EnginePathPlanner,
+    now,
+    "engine_path_failed",
+    body:getX(),
+    body:getY(),
+    body:getZ()
+)
+T.truthy(duplicateHandled and duplicateState == "native_repath_backoff",
+    "duplicate follow native failure escaped its cooldown")
+T.equal(invalidateCalls, 1,
+    "duplicate follow native failure invalidated Behavior2 again")
+T.equal(lane.nativeBackoffUntil, firstBackoffUntil,
+    "duplicate follow native failure changed the active cooldown")
 
 local stalledLane = {
     goal = goal,

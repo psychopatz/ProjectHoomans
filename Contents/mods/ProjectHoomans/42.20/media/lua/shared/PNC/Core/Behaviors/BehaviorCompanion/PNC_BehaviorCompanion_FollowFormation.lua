@@ -184,13 +184,23 @@ function Internal.ResolveSampledFollowSlot(record, owner, ownerMoving, now)
     local dx = ownerX - (tonumber(state.sampledOwnerX) or ownerX)
     local dy = ownerY - (tonumber(state.sampledOwnerY) or ownerY)
     local threshold = tonumber(Const.FOLLOW_RETARGET_OWNER_DISTANCE) or 0.75
+    local ownerMovingChanged = state.sampledOwnerMoving
+        ~= (ownerMoving == true)
     local refresh = not target
-        or state.sampledOwnerMoving ~= (ownerMoving == true)
+        -- Stopping does not invalidate a still-fresh formation target. The
+        -- target was already sampled against the owner's current position;
+        -- recomputing every follower's slot only because the motion flag fell
+        -- false creates a synchronized stop burst. Starting again remains a
+        -- refresh boundary so the formation resumes from the new heading.
+        or ownerMovingChanged and ownerMoving == true
         or math.abs(ownerZ - (tonumber(state.sampledOwnerZ) or ownerZ)) >= 1
         or (dx * dx) + (dy * dy) >= threshold * threshold
         or now >= (tonumber(state.sampledTargetExpiresAt) or 0)
     local resolved
-    if not refresh then return target end
+    if not refresh then
+        state.sampledOwnerMoving = ownerMoving == true
+        return target
+    end
     resolved = Internal.ResolveFollowSlot(record, owner, ownerMoving)
     if not resolved then return nil end
     target = target or {}

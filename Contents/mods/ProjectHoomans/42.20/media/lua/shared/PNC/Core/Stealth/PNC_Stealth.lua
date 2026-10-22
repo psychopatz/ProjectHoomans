@@ -57,30 +57,21 @@ local function logStealthState(record, runtime, reason)
 end
 
 local function getZombieCandidates(owner)
-    local cell
-    local zombieList
-    local values
-    local i
     local radius = tonumber(Const.STEALTH_DISCOVERY_RADIUS) or 12
-    if owner and PNC.SpatialIndex and PNC.SpatialIndex.QueryZombies then
-        return PNC.SpatialIndex.QueryZombies(
+    local perception = PNC.Perception
+    if owner and perception and perception.GetZombieCandidatesAt then
+        return perception.GetZombieCandidatesAt(
             owner:getX(),
             owner:getY(),
-            radius
+            owner:getZ(),
+            radius,
+            "stealth:" .. ownerCacheKey(owner),
+            tonumber(Const.STEALTH_DISCOVERY_CACHE_MS) or 200,
+            0,
+            Core.Now()
         )
     end
-    if not getCell then
-        return {}
-    end
-    cell = getCell()
-    zombieList = cell and cell.getZombieList and cell:getZombieList() or nil
-    values = {}
-    if zombieList then
-        for i = 0, zombieList:size() - 1 do
-            values[#values + 1] = zombieList:get(i)
-        end
-    end
-    return values
+    return {}
 end
 
 local function resolveOwner(record)

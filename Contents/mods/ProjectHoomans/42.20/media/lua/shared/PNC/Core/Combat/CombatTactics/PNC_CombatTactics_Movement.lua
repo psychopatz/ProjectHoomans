@@ -58,18 +58,30 @@ local function ClampToFollowOwner(x, y, ownerX, ownerY, maxDistance)
         ownerY + (dy / distance) * maxDistance
 end
 
-function Internal.RequestMove(record, zombie, x, y, z, mode, stopDistance, reason)
+function Internal.RequestMove(
+    record,
+    zombie,
+    x,
+    y,
+    z,
+    mode,
+    stopDistance,
+    reason,
+    options
+)
     local MoveIntent = PNC.BehaviorMoveIntent
-    if MoveIntent and MoveIntent.RequestMove and record and record.presenceState == Const.PRESENCE_LIVE then
-        MoveIntent.RequestMove(
-            record, x, y, z, mode, stopDistance, reason, COMBAT_NAVIGATION
+    if MoveIntent and MoveIntent.RequestMove
+        and record and record.presenceState == Const.PRESENCE_LIVE
+    then
+        return MoveIntent.RequestMove(
+            record, x, y, z, mode, stopDistance, reason,
+            COMBAT_NAVIGATION, nil, options
         )
-        return true
     end
     if PathService and PathService.MoveToward then
         return PathService.MoveToward(
             record, zombie, x, y, z, mode, stopDistance, reason,
-            COMBAT_NAVIGATION
+            COMBAT_NAVIGATION, nil, options
         )
     end
     return false

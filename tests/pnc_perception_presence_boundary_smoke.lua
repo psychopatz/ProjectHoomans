@@ -18,6 +18,7 @@ local publicFunctions = {
     "FindNearestEnemyNPC", "FindNearestEnemyZombie",
     "FindImmediateEnemyZombie", "FindImmediateZombieThreat",
     "FindBestEnemyZombie", "CountEnemyZombies", "FindZombieByID",
+    "GetZombieCandidatesAt",
     "FindOwnerThreateningZombie", "ResolveCompanionTarget",
     "ResolveCompanionProtectionTarget", "ResolveHostileTarget",
     "ResolveRoamingTarget",

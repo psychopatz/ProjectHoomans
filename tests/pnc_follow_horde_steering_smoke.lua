@@ -152,6 +152,13 @@ PNC = {
         end,
     },
     Perception = {
+        GetZombieCandidatesAt = function()
+            return nearbyZombies or {
+                zombie(1.0, -0.5),
+                zombie(1.0, 0),
+                zombie(1.0, 0.5),
+            }
+        end,
         ResolveRecentAttacker = function()
             return urgentThreat
         end,

@@ -183,6 +183,9 @@ PNC = {
             for i = 1, count do result[i] = {} end
             return result
         end,
+        GetZombieCandidatesAt = function()
+            return targetCrowd
+        end,
         FindImmediateZombieThreat = function(record)
             return record.runtime and record.runtime.forcedZombieThreat or nil
         end,

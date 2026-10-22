@@ -10,7 +10,6 @@ local Internal = Tactics.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 local Perception = PNC.Perception
-local Spatial = PNC.SpatialIndex
 local Stamina = PNC.Stamina
 local Relationships = PNC.Relationships
 
@@ -30,17 +29,26 @@ local function observeZombieHorde(record, count, now)
     end
 end
 
-function Internal.CountZombiesNearPoint(x, y, z, radius)
+function Internal.CountZombiesNearPoint(x, y, z, radius, cacheKey)
     local zombies
     local count = 0
     local i
     local zombie
     local distSq
     local radiusSq = (tonumber(radius) or 0) ^ 2
-    if not Spatial or not Spatial.QueryZombies then
+    if not Perception or not Perception.GetZombieCandidatesAt then
         return 0
     end
-    zombies = Spatial.QueryZombies(x, y, tonumber(radius) or 0)
+    zombies = Perception.GetZombieCandidatesAt(
+        x,
+        y,
+        z,
+        tonumber(radius) or 0,
+        "combat-point:" .. tostring(cacheKey or "default"),
+        tonumber(Const.PERCEPTION_CANDIDATE_CACHE_MS) or 100,
+        0,
+        Core.Now()
+    )
     for i = 1, #zombies do
         zombie = zombies[i]
         if zombie and (not zombie:isDead()) and (not Core.IsManagedNPCBody(zombie)) and math.abs(zombie:getZ() - z) < 1 then
@@ -71,12 +79,13 @@ function Internal.CountWorldZombies(record, radius)
     if Perception and Perception.CountZombiesInFrame then
         return Perception.CountZombiesInFrame(record, radius)
     end
-    if Spatial and Spatial.QueryZombies then
+    if Perception and Perception.GetZombieCandidatesAt then
         return Internal.CountZombiesNearPoint(
             record.x,
             record.y,
             record.z,
-            radius
+            radius,
+            "world:" .. tostring(record.id or record)
         )
     end
     return Perception and Perception.CountEnemyZombies
@@ -129,7 +138,8 @@ function Internal.AssessThreat(record, target)
             target.x,
             target.y,
             target.z or record.z,
-            Const.COMBAT_TARGET_CROWD_RADIUS
+            Const.COMBAT_TARGET_CROWD_RADIUS,
+            target.zombieId or target.id or targetKey
         )
     end
     worldSurroundedCount = Internal.CountWorldZombies(
@@ -184,10 +194,21 @@ function Internal.BuildZombieThreatCentroid(record, radius)
     local sumX = 0
     local sumY = 0
     local i
-    if not record or not Spatial or not Spatial.QueryZombies then
+    if not record or not Perception
+        or not Perception.GetZombieCandidatesAt
+    then
         return nil, nil, 0
     end
-    zombies = Spatial.QueryZombies(record.x, record.y, tonumber(radius) or 0)
+    zombies = Perception.GetZombieCandidatesAt(
+        record.x,
+        record.y,
+        record.z,
+        tonumber(radius) or 0,
+        "combat-centroid:" .. tostring(record.id or record),
+        tonumber(Const.PERCEPTION_CANDIDATE_CACHE_MS) or 100,
+        0,
+        Core.Now()
+    )
     for i = 1, #zombies do
         zombie = zombies[i]
         if zombie

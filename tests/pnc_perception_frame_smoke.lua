@@ -40,6 +40,10 @@ PNC = {
         end,
     },
     Perception = {
+        GetZombieCandidatesAt = function()
+            spatialQueries = spatialQueries + 1
+            return zombies
+        end,
         CanSeeWorldObject = function()
             losChecks = losChecks + 1
             return true, "clear"

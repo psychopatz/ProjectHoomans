@@ -57,6 +57,9 @@ Const.FOLLOW_OWNER_COMBAT_MEMORY_MS = 1400
 -- bounded cadence and does not abandon an active follow order at this count.
 Const.FOLLOW_OWNER_RESOLVE_MAX_ATTEMPTS = 5
 Const.FOLLOW_PATH_BLOCKED_COOLDOWN_MS = 1200
+-- Stagger visible follower native retries so one blocked edge does not make
+-- every member of an owner group invalidate Behavior2 in the same frame.
+Const.FOLLOW_NATIVE_REPATH_JITTER_MS = 350
 Const.NPC_GROUNDED_RECOVERY_MS = 1400
 Const.NPC_GROUNDED_COUNTER_STAGGER_CHANCE = 0.40
 Const.NPC_GROUNDED_COUNTER_STAGGER_RANGE = 2.25

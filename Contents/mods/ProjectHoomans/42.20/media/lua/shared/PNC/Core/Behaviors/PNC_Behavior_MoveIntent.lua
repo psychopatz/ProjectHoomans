@@ -76,6 +76,45 @@ local function sameNumber(left, right)
     return tonumber(left) == tonumber(right)
 end
 
+local function requestSource(options)
+    return options and options.source or "behavior"
+end
+
+local function requestPriority(options)
+    return tonumber(options and options.priority) or 0
+end
+
+local function requestLockKey(options)
+    return options and options.lockKey or nil
+end
+
+local function requestLockUntil(options)
+    return tonumber(options and options.lockUntil) or 0
+end
+
+local function isBlockedByMovementLock(intent, options, now)
+    local activeLockUntil
+    local activeSource
+    local activePriority
+    local incomingSource
+    local incomingPriority
+    local incomingLockKey
+    if not intent or intent.kind ~= "move" then return false end
+    activeLockUntil = tonumber(intent.lockUntil) or 0
+    if activeLockUntil <= (tonumber(now) or 0) then return false end
+    activeSource = intent.source or "behavior"
+    activePriority = tonumber(intent.priority) or 0
+    incomingSource = requestSource(options)
+    incomingPriority = requestPriority(options)
+    incomingLockKey = requestLockKey(options)
+    if activeSource == incomingSource
+        and intent.lockKey == incomingLockKey
+    then
+        return false
+    end
+    return activePriority >= incomingPriority
+end
+
 -- Behavior ticks are more frequent than meaningful movement changes. Keep the
 -- revision stable when the same lane is being described again; PathService
 -- uses the revision to decide whether it must consume a fresh command.
@@ -89,7 +128,8 @@ local function sameMoveIntent(
     stopDistance,
     reason,
     navigation,
-    owner
+    owner,
+    options
 )
     local runtime = record and record.runtime or nil
     local ownerKind, ownerSessionID = ownerParts(owner)
@@ -128,8 +168,21 @@ local function sameMoveIntent(
             and tonumber(navigation.steeringIndex) or nil)
         and intent.steeringKind == (navigation
             and tostring(navigation.steeringKind or "") or nil)
+        and intent.targetKind == (navigation
+            and tostring(navigation.targetKind or "") or nil)
+        and intent.targetValidation == (navigation
+            and tostring(navigation.targetValidation or "") or nil)
+        and sameNumber(intent.targetWaterX, navigation
+            and tonumber(navigation.targetWaterX) or nil)
+        and sameNumber(intent.targetWaterY, navigation
+            and tonumber(navigation.targetWaterY) or nil)
+        and sameNumber(intent.targetWaterZ, navigation
+            and tonumber(navigation.targetWaterZ) or nil)
         and intent.ownerKind == ownerKind
         and intent.ownerSessionId == ownerSessionID
+        and intent.source == requestSource(options)
+        and sameNumber(intent.priority, requestPriority(options))
+        and intent.lockKey == requestLockKey(options)
 end
 
 local function ensureRuntime(record)
@@ -146,7 +199,8 @@ function MoveIntent.RequestMove(
     stopDistance,
     reason,
     navigation,
-    owner
+    owner,
+    options
 )
     local runtime
     local intent
@@ -154,10 +208,12 @@ function MoveIntent.RequestMove(
     local controlOwner
     local ownerKind
     local ownerSessionID
+    local now
     if not record then
         return false
     end
     runtime = ensureRuntime(record)
+    now = Core.Now()
     controlOwner = writeOwner(owner, reason)
     if ActorControl and ActorControl.CanWrite then
         accepted = ActorControl.CanWrite(
@@ -171,6 +227,10 @@ function MoveIntent.RequestMove(
         end
     end
     ownerKind, ownerSessionID = ownerParts(controlOwner)
+    intent = runtime.moveIntent
+    if isBlockedByMovementLock(intent, options, now) then
+        return false, "movement_intent_locked"
+    end
     auditSeatedMove(
         "movement_intent_request",
         record,
@@ -181,7 +241,6 @@ function MoveIntent.RequestMove(
         stopDistance,
         reason
     )
-    intent = runtime.moveIntent
     if not intent or intent.kind ~= "move" then
         intent = {}
         runtime.moveIntent = intent
@@ -196,7 +255,8 @@ function MoveIntent.RequestMove(
         stopDistance,
         reason,
         navigation,
-        controlOwner
+        controlOwner,
+        options
     )
     intent.kind = "move"
     intent.x = tonumber(x) or record.x
@@ -226,11 +286,25 @@ function MoveIntent.RequestMove(
         and tonumber(navigation.steeringIndex) or nil
     intent.steeringKind = navigation
         and tostring(navigation.steeringKind or "") or nil
+    intent.targetKind = navigation
+        and tostring(navigation.targetKind or "") or nil
+    intent.targetValidation = navigation
+        and tostring(navigation.targetValidation or "") or nil
+    intent.targetWaterX = navigation
+        and tonumber(navigation.targetWaterX) or nil
+    intent.targetWaterY = navigation
+        and tonumber(navigation.targetWaterY) or nil
+    intent.targetWaterZ = navigation
+        and tonumber(navigation.targetWaterZ) or nil
     intent.ownerKind = ownerKind
     intent.ownerSessionId = ownerSessionID
     intent.puppetOperaSessionId = ownerKind == "puppet_opera"
         and ownerSessionID or nil
-    intent.updatedAt = Core.Now()
+    intent.source = requestSource(options)
+    intent.priority = requestPriority(options)
+    intent.lockKey = requestLockKey(options)
+    intent.lockUntil = requestLockUntil(options)
+    intent.updatedAt = now
     if not unchanged then
         intent.revision = (tonumber(intent.revision) or 0) + 1
     end
@@ -291,8 +365,24 @@ function MoveIntent.Hold(record, reason, owner)
     intent.ownerSessionId = ownerSessionID
     intent.puppetOperaSessionId = ownerKind == "puppet_opera"
         and ownerSessionID or nil
+    intent.source = nil
+    intent.priority = 0
+    intent.lockKey = nil
+    intent.lockUntil = 0
     intent.updatedAt = Core.Now()
     intent.revision = (tonumber(intent.revision) or 0) + 1
+    return true
+end
+
+function MoveIntent.ReleaseLock(record, source)
+    local intent = record and record.runtime and record.runtime.moveIntent
+        or nil
+    if not intent or intent.kind ~= "move" then return false end
+    if source ~= nil and intent.source ~= source then return false end
+    intent.source = nil
+    intent.priority = 0
+    intent.lockKey = nil
+    intent.lockUntil = 0
     return true
 end
 

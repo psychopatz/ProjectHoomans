@@ -14,6 +14,11 @@ local zombie = {
 PNC = {
     Core = {
         Now = function() return now end,
+        DistanceSq = function(x1, y1, x2, y2)
+            local dx = x2 - x1
+            local dy = y2 - y1
+            return (dx * dx) + (dy * dy)
+        end,
         IsManagedNPCBody = function() return false end,
     },
     Const = {
@@ -30,6 +35,7 @@ PNC = {
             return { zombie }
         end,
     },
+    Perception = {},
     PerformanceScalingDiagnostics = {
         Enabled = true,
         Increment = function() end,
@@ -37,6 +43,8 @@ PNC = {
     BehaviorCompanion = { Internal = {} },
 }
 
+T.load("ProjectHoomans", "shared",
+    "PNC/Core/Perception/PNC_Perception.lua")
 T.load("ProjectHoomans", "shared",
     "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion_Internal.lua")
 T.load("ProjectHoomans", "shared",
