@@ -1,6 +1,6 @@
 # Roadmap — Contextual Dialogue Persona & Choices
 
-**Parent status:** REOPENED — P0-P8 foundation retained; P9 conversation visualization/direct-routing is mandatory.  
+**Parent status:** REOPENED — P0-P9 foundation retained; P10 semantic simulation UX/contextual-hub replacement is mandatory.  
 Phases are organization and acceptance checkpoints; completing one phase never completes the parent objective.
 
 ## P0 — Current-path contract baseline
@@ -274,3 +274,75 @@ Expose translation/source metadata from graph nodes/edges and flag suspicious un
 Run direct-route, graph, Studio regression, graph-click parity, persona/bond, provider, translation, Tk/Xvfb, Lua/Kahlua, doctor, persistence, and diff gates.
 
 **Gate:** only after P9A-P9G pass may the parent return to **READY FOR USER LIVE TEST**. Native SP/MP remains user-owned.
+
+
+## P10 — Semantic Simulation UX & Contextual Conversation Hub
+
+The 2026-10-23 live UI audit supersedes the P9 READY FOR USER LIVE TEST handoff.
+
+P9's direct-routing, graph projection, shared canvas, and click-parity work remain accepted infrastructure. The current product gap is now different:
+
+- ordinary simulation editing still relies on raw text/JSON and modal workflows;
+- only part of the UI is dynamically catalog-driven;
+- the old `projecthoomans:whats_up` authored category is still the semantic meaning of What's Up;
+- tests explicitly preserve that legacy category instead of the desired contextual semantic hub.
+
+Read `SEMANTIC_SIMULATION_UX_AND_CONTEXTUAL_HUB.md` before implementation.
+
+### P10A — Remove legacy What's Up category + hub contract
+
+Delete/retire all live production use of:
+
+```text
+projecthoomans:whats_up
+conversation.whats_up
+projecthoomans:whats_up_*
+```
+
+including category registration, authored block registration, topic mapping, reviewed pattern/compiler routing, static suggestion definition, worker special-cases, translations when orphaned, and tests that encode the old behavior.
+
+Reviewed What's Up aliases must activate a semantic hub, not a ConversationBlock.
+
+**Gate:** production-source/reference audit finds no live legacy route; What's Up yields a canonical `semantic_hub/whats_up` activation.
+
+### P10B — Contextual What's Up hub MVP
+
+Collect appropriate hub avenues through the existing provider registry.
+
+At minimum cover eligible wellbeing, needs, medical, activity, gossip, and grounded context/world avenues, with addon/provider-owned trade/quest contributions where available.
+
+Use ActorConversationContext, health/needs, relationship/bond/persona, safe gossip/world context, and provider availability for deterministic visibility/ranking.
+
+**Gate:** a normal companion gets several relevant choices from What's Up without entering a legacy block; an injured/strained/trader/etc. context changes the set/order deterministically.
+
+### P10C — Simulation Control Catalog + dynamic controls
+
+Add a typed worker-provided schema for normal editable scenario state.
+
+Render bounded numbers as sliders/spin controls, finite choices as readonly comboboxes, booleans as toggles, multi-values as multi-selects, and read-only derived state appropriately.
+
+**Gate:** common world/persona/relationship state can be edited without typing arbitrary text/JSON.
+
+### P10D — Structured inventory editor + Advanced JSON
+
+Replace raw JSON as the default inventory UX with a worker-backed searchable structured editor. Preserve the existing raw projection editor under explicit Advanced JSON mode.
+
+**Gate:** ordinary item/quantity/condition scenarios are editable without JSON, and structured/Advanced JSON round-trip safely.
+
+### P10E — Inline Simulation workbench + Apply & Replay
+
+Expose high-frequency persona/relationship/world controls in a compact/collapsible Simulation workbench. Keep full settings for uncommon/advanced state.
+
+**Gate:** same utterance can be replayed across materially different contexts without reopening the modal repeatedly.
+
+### P10F — Hub diagnostics + completed graph history
+
+Keep the last completed ConversationBlock graph inspectable after root exit, and add hub/provider diagnostics for candidate source, rank, eligibility and hidden reason.
+
+**Gate:** completed branch remains visible; a hub activation explains why choices appeared or were hidden.
+
+### P10G — Final usability/regression gate
+
+Run legacy-ID absence checks, hub matrices, explicit intent regressions, addon/provider checks, structured/JSON round-trips, Tk/Xvfb interaction, EN/TL, graph history, Lua/Kahlua/doctor/catalog/diff checks, and persistence checks.
+
+**Gate:** only after P10A-P10G pass may the parent return to **READY FOR USER LIVE TEST**. Native Project Zomboid SP/MP remains user-owned.
