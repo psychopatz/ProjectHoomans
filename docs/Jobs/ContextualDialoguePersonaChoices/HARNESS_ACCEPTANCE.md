@@ -320,3 +320,135 @@ Do not postpone this usable UI until the final P9 milestone.
 Graph node/edge inspection should expose source/translation keys and resolved values. Suspicious mixed-language or unresolved values should be visible as authoring diagnostics.
 
 Content diagnostics must not alter semantic routing automatically.
+
+
+## P10 acceptance — structured simulation UX and contextual What's Up hub
+
+### No legacy What's Up runtime
+
+P10 acceptance requires the old authored What's Up route to be gone from live production behavior.
+
+The following must not be runtime dependencies:
+
+```text
+projecthoomans:whats_up
+conversation.whats_up
+projecthoomans:whats_up_*
+```
+
+Historical documentation may mention them as superseded evidence.
+
+Reviewed What's Up input must activate a semantic hub and must not create/select a legacy ConversationBlock.
+
+### Contextual hub behavior
+
+The What's Up hub must be provider-driven and context-sensitive.
+
+Required matrix examples include:
+
+- neutral survivor;
+- owned companion;
+- family bond;
+- lover bond;
+- hostile/enemy context;
+- injured NPC;
+- severe needs;
+- trader with Dynamic Trading present;
+- Dynamic Trading absent;
+- safe gossip available;
+- gossip unavailable/private;
+- quest/provider available vs unavailable.
+
+The hub must expose only safe eligible avenues, rank them deterministically, and show bounded diagnostics for hidden/ineligible candidates.
+
+Explicit semantic questions remain direct:
+
+```text
+Are you okay?     -> WELLBEING
+Any gossip?       -> GOSSIP
+Are you hurt?     -> medical/health
+Need anything?    -> NEEDS
+```
+
+They must not require entering the What's Up hub first.
+
+### Typed simulation controls
+
+Normal editing must use appropriate control types:
+
+- game-style 0–1 needs -> sliders;
+- approval/respect/familiarity/personality -> sliders;
+- integer values -> spin/integer controls;
+- finite enums -> readonly comboboxes;
+- booleans -> checkboxes/toggles;
+- multi-values -> multi-select;
+- derived state -> read-only labels;
+- catalog objects -> searchable structured editors.
+
+Validation remains owned by the existing scenario/configure path.
+
+Normal use must not require manually typing JSON or remembering internal enum strings.
+
+### Advanced JSON preservation
+
+Raw JSON must remain available as explicit Advanced mode for:
+
+- malformed fixture testing;
+- unsupported future fields;
+- exact scenario authoring;
+- debugging.
+
+Structured and Advanced JSON views must round-trip supported state without silent data loss.
+
+### Inventory acceptance
+
+Default Player/NPC inventory editing must be structured and searchable.
+
+Minimum workflow:
+
+1. search/select an available item/fullType;
+2. add/remove;
+3. edit stack/quantity;
+4. edit condition/state where applicable;
+5. edit container/equipment fields where supported;
+6. inspect derived metadata;
+7. switch to Advanced JSON and back without losing supported state.
+
+### Inline tuning acceptance
+
+High-frequency semantic dials must be reachable from Simulation without repeated modal reopen cycles.
+
+Required interactive proof:
+
+1. enter one test utterance;
+2. change relationship/persona/world state;
+3. Apply + Replay;
+4. observe changed hub candidate set/order or realization;
+5. repeat without leaving the primary Simulation workflow.
+
+### Hub and graph diagnostics
+
+When the active surface is the What's Up hub, diagnostics must show provider/candidate source, eligibility, rank, hidden reason and final semantic frame.
+
+When a selected hub child enters a real authored flow/block, the shared graph renderer remains available.
+
+After the authored branch returns to root, the last completed graph remains inspectable in harness presentation state until reset/replacement.
+
+No hub/graph-history data may be written to NPC ModData.
+
+### P10 final user-facing gate
+
+A real Tk/Xvfb run at minimum and normal desktop sizes must prove that a non-programmer can:
+
+```text
+configure common NPC/world state using structured controls
+ -> type What's up?
+ -> see context-appropriate semantic avenues
+ -> select a real avenue
+ -> inspect resulting conversation/graph
+ -> change a dial
+ -> Apply + Replay
+ -> observe deterministic contextual differences
+```
+
+A passing backend/provider test without this actual UI proof is insufficient.
