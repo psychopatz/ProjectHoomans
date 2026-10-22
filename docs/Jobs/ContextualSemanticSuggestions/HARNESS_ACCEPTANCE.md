@@ -32,7 +32,7 @@ Record run command, repository SHAs for Hoomans+Core, actual case, raw input, se
 
 ## Corrective lifecycle verification — 2026-10-22
 
-- ProjectHoomans source: `2c80d2f1c1d301b8be22b13161a87cabf4287a77`; psychopatzCore source: `bb99722568782534b1b6822827ffcd6f4d212aab`; both are local commits on existing `main` and were not pushed.
+- ProjectHoomans source: `2c80d2f1c1d301b8be22b13161a87cabf4287a77`; psychopatzCore source: `bb99722568782534b1b6822827ffcd6f4d212aab`; Hoomans regression coverage: `d8bf01b2356cee82264bdf26478c63cea82b6f73`. All are local commits on existing `main` and were not pushed.
 - Root cause verified from production source: Core `Session:finishPending()` restored the authored `pendingChoices` after Hoomans' semantic projection had been rendered. The resulting one-frame semantic menu followed by the old landing menu was not a Tk-only artifact.
 - Corrective contract: one generic Core `choicePresentation` seam adapts normalized authored rows at every native `Session:setChoices()` write; Hoomans supplies current semantic rows through the existing production view projection, and Core's native choices part remains the sole UI/action surface. Presenter failure falls back to authored rows.
 - Core regression: `lua5.3 tests/psychopatz_conversation_smoke.lua` — **PASS**, including normal presentation, `finishPending()` presentation, and failure fallback. Hoomans focused regressions: `python3 tests/run_tests.py --jobs 4 pnc_conversation_smoke pnc_conversation_semantics_adapter_smoke pnc_semantic_dialogue_input_smoke pnc_semantic_dialogue_flow_smoke pnc_semantic_dialogue_response_plan_smoke pnc_semantic_fuzzy_smoke pnc_semantic_topic_smoke psychopatz_conversation_choices_hover_smoke` — **8/8 PASS**.

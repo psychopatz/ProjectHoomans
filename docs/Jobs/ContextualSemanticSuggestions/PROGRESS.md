@@ -215,7 +215,7 @@ Next: **READY FOR USER LIVE TEST**. In native PZ, verify Core choice-list scroll
 
 ## Corrective follow-up — Core choice lifecycle overwrote semantic rows
 
-Implementation source SHAs: ProjectHoomans `2c80d2f1c1d301b8be22b13161a87cabf4287a77`; psychopatzCore `bb99722568782534b1b6822827ffcd6f4d212aab`. Both changes are committed on existing `main`; neither checkout was pushed. The user-owned unrelated body/pathing edits remain unstaged and untouched.
+Implementation source SHAs: ProjectHoomans `2c80d2f1c1d301b8be22b13161a87cabf4287a77`; psychopatzCore `bb99722568782534b1b6822827ffcd6f4d212aab`. Regression coverage was added in Hoomans `d8bf01b2356cee82264bdf26478c63cea82b6f73`. All are committed on existing `main`; neither checkout was pushed. The user-owned unrelated body/pathing edits remain unstaged and untouched.
 
 - The native PZ audit reproduced the reported one-frame behavior. Hoomans rendered semantic rows directly into Core's native `choicesPart`, then Core's queued-message completion called `Session:finishPending()` and `Session:setChoices(session.pendingChoices)`, restoring the authored landing menu. The same generic write path is also used by Core conversation-spec refreshes and Hoomans recovery paths.
 - Core now exposes one generic `choicePresentation(view, normalizedChoices, originalChoices, session)` callback seam immediately after authored-choice normalization and before the native `choicesPart` write. Callback errors or non-table results fail closed to the authored choices; Core remains the owner of session ordering, clearing, scrolling, hover/tooltips, and click gating. The Core smoke covers ordinary writes, queued-response completion, and presenter-failure fallback.
