@@ -77,6 +77,23 @@ behaviorally identical while routing them through one bounded normalization,
 dedupe, and provider-order seam. Add provider-contract tests through the real
 Lua worker before moving persona or realization policy into the path.
 
+## P1 evidence — accepted 2026-10-22
+
+- Added the bounded `DialogueChoiceRegistry` mechanism plus dedicated static-question and capability providers under `Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/SemanticDialogueSuggestions/`.
+- The existing `PNC_SemanticDialogueSuggestions.lua` remains the compatibility entry path, but no longer owns duplicate static/capability definition tables. Root/block, active-flow, response-plan, static, and capability rows now carry `candidateSchema = "semantic.choice.v1"`, stable provider IDs, and normalized source provenance.
+- Provider registration is deterministic and bounded; the existing candidate order, dedupe, translation fields, semantic frames, and click/action route remain unchanged. The registry only contributes declarative normalization and diagnostics; it does not dispatch effects.
+- Real Lua worker P1 tests passed **3/3**; the combined P0 + P1 + S1 + S3 worker suite passed **21/21**; affected Tk/Xvfb/provider-parity tests passed **9/9**; focused embedded Lua smoke tests passed **2/2**.
+- `luac5.3`, Kahlua ERROR checks, Python compilation, and `git diff --check` passed for the changed slice.
+
+## P2 exact Next Chunk
+
+Build the bounded read-only `ActorConversationContext` projection from existing
+identity, traits, Social Profile, directed relationship, role/capability, and
+situation owners. Keep it optional and revision-aware, expose safe provenance
+for the Semantic Lab, and add worker contract tests proving no duplicate
+persistent personality/relationship state is created before deriving any
+speech-style or persona-aware ranking behavior.
+
 ## Handoff condition
 
 Only after P1–P7 developer gates pass: **READY FOR USER LIVE TEST**.

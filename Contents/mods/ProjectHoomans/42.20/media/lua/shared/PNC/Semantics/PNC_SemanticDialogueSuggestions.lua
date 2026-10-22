@@ -116,261 +116,39 @@ end
 
 -- These are semantic frames, not parser inputs.  patternID is retained as
 -- provenance for the later click adapter; it is never used to reparse text.
-local DEFINITIONS = {
-    {
-        id = "conversation.whats_up",
-        topic = "whats_up",
-        order = 5,
-        patternID = "pnc.dataset.question.whats_up.whats_up",
-        labelKey = "UI_PNC_Conversation_Suggestion_WhatsUp_Label",
-        labelFallback = "Ask what's up",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_WhatsUp_Utterance",
-        utteranceFallback = "What's up?",
-        intent = "QUESTION",
-        speechAct = "QUESTION",
-        subject = "CONVERSATION_TOPIC",
-        extensions = {
-            topic = "whats_up",
-            categoryID = "projecthoomans:whats_up",
-            route = "conversation_category",
-        },
-    },
-    {
-        id = "question.wellbeing",
-        topic = "wellbeing",
-        order = 10,
-        patternID = "pnc.question.wellbeing_feeling",
-        labelKey = "UI_PNC_Conversation_Suggestion_Wellbeing_Label",
-        labelFallback = "How are you feeling?",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_Wellbeing_Utterance",
-        utteranceFallback = "How are you feeling?",
-        intent = "QUESTION",
-        speechAct = "QUESTION",
-        subject = "WELLBEING",
-    },
-    {
-        id = "question.wellbeing_detail",
-        topic = "wellbeing",
-        order = 20,
-        patternID = "pnc.question.wellbeing_follow_up_what_is_wrong",
-        labelKey = "UI_PNC_Conversation_Suggestion_WellbeingDetail_Label",
-        labelFallback = "Can you tell me more?",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_WellbeingDetail_Utterance",
-        utteranceFallback = "What's wrong?",
-        intent = "QUESTION",
-        speechAct = "QUESTION",
-        subject = "WELLBEING",
-        extensions = { dialogueFollowUp = "WELLBEING" },
-        slots = { followUp = true },
-    },
-    {
-        id = "question.needs",
-        topic = "needs",
-        order = 30,
-        patternID = "pnc.question.needs_offer_plain",
-        labelKey = "UI_PNC_Conversation_Suggestion_Needs_Label",
-        labelFallback = "Do you need anything?",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_Needs_Utterance",
-        utteranceFallback = "Do you need anything?",
-        intent = "QUESTION",
-        speechAct = "QUESTION",
-        subject = "NEEDS",
-        extensions = {
-            topic = "needs",
-            dialogueFollowUp = "NEEDS_QUANTITY",
-        },
-    },
-    {
-        id = "question.health",
-        topic = "medical",
-        order = 40,
-        patternID = "pnc.question.health.are_you_hurt",
-        labelKey = "UI_PNC_Conversation_Suggestion_Health_Label",
-        labelFallback = "Are you hurt?",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_Health_Utterance",
-        utteranceFallback = "Are you hurt?",
-        intent = "QUESTION",
-        speechAct = "QUESTION",
-        subject = "NPC_HEALTH_STATE",
-        target = "SELF",
-        slots = { attribute = "health_state" },
-        modifiers = { directed = true },
-        socialContext = {
-            directed = true,
-            personalQuestion = true,
-            target = "SELF",
-        },
-        extensions = { topic = "medical" },
-    },
-    {
-        id = "question.identity",
-        topic = "identity",
-        order = 50,
-        patternID = "pnc.question.identity",
-        labelKey = "UI_PNC_Conversation_Suggestion_Identity_Label",
-        labelFallback = "Who are you?",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_Identity_Utterance",
-        utteranceFallback = "Who are you?",
-        intent = "QUESTION",
-        speechAct = "QUESTION",
-        subject = "IDENTITY",
-    },
-    {
-        id = "question.time",
-        topic = "time",
-        order = 60,
-        patternID = "pnc.question.time",
-        labelKey = "UI_PNC_Conversation_Suggestion_Time_Label",
-        labelFallback = "Ask about the time",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_Time_Utterance",
-        utteranceFallback = "What time is it?",
-        intent = "QUESTION",
-        speechAct = "QUESTION",
-        subject = "TIME",
-        extensions = { topic = "time" },
-    },
-    {
-        id = "question.date",
-        topic = "date",
-        order = 70,
-        patternID = "pnc.question.date",
-        labelKey = "UI_PNC_Conversation_Suggestion_Date_Label",
-        labelFallback = "Ask about the date",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_Date_Utterance",
-        utteranceFallback = "What's today's date?",
-        intent = "QUESTION",
-        speechAct = "QUESTION",
-        subject = "DATE",
-        extensions = { topic = "date" },
-    },
-    {
-        id = "question.weather",
-        topic = "weather",
-        order = 80,
-        patternID = "pnc.question.weather",
-        labelKey = "UI_PNC_Conversation_Suggestion_Weather_Label",
-        labelFallback = "Ask about the weather",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_Weather_Utterance",
-        utteranceFallback = "How is the weather?",
-        intent = "QUESTION",
-        speechAct = "QUESTION",
-        subject = "WEATHER",
-        extensions = { topic = "weather" },
-    },
-}
+local ChoiceRegistry = require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_Registry"
+local StaticProvider = require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_StaticProvider"
+local CapabilityProvider = require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_CapabilityProvider"
 
-local CAPABILITY_DEFINITIONS = {
-    FOLLOW = {
-        id = "action.follow",
-        topic = "movement",
-        requiresOwnedCompanion = true,
-        labelKey = "UI_PNC_Conversation_Suggestion_Follow_Label",
-        labelFallback = "Ask them to follow",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_Follow_Utterance",
-        utteranceFallback = "Follow me.",
-        constraints = {
-            all = {
-                {
-                    path = "actorAuthority.owned",
-                    op = "eq",
-                    value = true,
-                },
-                {
-                    path = "actorAuthority.companion",
-                    op = "eq",
-                    value = true,
-                },
-                {
-                    path = "npcState.activeBehavior",
-                    op = "not_in",
-                    values = { "hostile", "combat", "busy", "dead" },
-                },
-                {
-                    path = "npcState.followState.mode",
-                    op = "not_in",
-                    values = { "following", "follow" },
-                },
-                {
-                    path = "npcState.healthState",
-                    op = "not_in",
-                    values = { "dead", "incapacitated" },
-                },
-            },
-        },
-    },
-    STAY = {
-        id = "action.stay",
-        topic = "movement",
-        requiresOwnedCompanion = true,
-        labelKey = "UI_PNC_Conversation_Suggestion_Stay_Label",
-        labelFallback = "Ask them to stay",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_Stay_Utterance",
-        utteranceFallback = "Stay here.",
-        constraints = {
-            all = {
-                {
-                    path = "actorAuthority.owned",
-                    op = "eq",
-                    value = true,
-                },
-                {
-                    path = "actorAuthority.companion",
-                    op = "eq",
-                    value = true,
-                },
-                {
-                    path = "npcState.activeBehavior",
-                    op = "not_in",
-                    values = { "hostile", "combat", "busy", "dead" },
-                },
-                {
-                    path = "npcState.followState.mode",
-                    op = "not_in",
-                    values = { "staying", "stay" },
-                },
-                {
-                    path = "npcState.healthState",
-                    op = "not_in",
-                    values = { "dead", "incapacitated" },
-                },
-            },
-        },
-    },
-    WAIT_AT = {
-        id = "action.wait_at",
-        topic = "movement",
-        requiresOwnedCompanion = true,
-        labelKey = "UI_PNC_Conversation_Suggestion_WaitAt_Label",
-        labelFallback = "Ask them to wait there",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_WaitAt_Utterance",
-        utteranceFallback = "Wait there.",
-        constraints = {
-            all = {
-                {
-                    path = "actorAuthority.owned",
-                    op = "eq",
-                    value = true,
-                },
-                {
-                    path = "actorAuthority.companion",
-                    op = "eq",
-                    value = true,
-                },
-                {
-                    path = "npcState.activeBehavior",
-                    op = "not_in",
-                    values = { "hostile", "combat", "busy", "dead" },
-                },
-                {
-                    path = "npcState.healthState",
-                    op = "not_in",
-                    values = { "dead", "incapacitated" },
-                },
-                { path = "suggestion.destination", op = "exists" },
-            },
-        },
-    },
-}
+ChoiceRegistry.RegisterProvider(StaticProvider)
+ChoiceRegistry.RegisterProvider(CapabilityProvider)
+
+local function registerSourceProvider(id, sourceKind, order)
+    ChoiceRegistry.RegisterProvider({
+        id = id,
+        sourceKind = sourceKind,
+        order = order,
+        collect = function() return {} end,
+    })
+end
+
+registerSourceProvider("projecthoomans.conversation_root", "conversation_root", 10)
+registerSourceProvider("projecthoomans.conversation_registry", "conversation_registry", 20)
+registerSourceProvider("projecthoomans.active_flow", "active_flow", 30)
+registerSourceProvider("projecthoomans.response_plan", "npc_response_plan", 40)
+registerSourceProvider("projecthoomans.flow_topic", "active_flow", 60)
+
+local DEFINITIONS = StaticProvider.Definitions
+local CAPABILITY_DEFINITIONS = CapabilityProvider.Definitions
+
+local function normalizeCandidate(candidate, sourceKind, localOrder)
+    local providerID = ChoiceRegistry.ProviderForSourceKind(sourceKind)
+    if not providerID then return candidate end
+    local normalizedCandidate = ChoiceRegistry.NormalizeCandidate(
+        candidate, providerID, localOrder
+    )
+    return normalizedCandidate or candidate
+end
 
 local function revisionFor(result)
     result = type(result) == "table" and result or {}
@@ -570,16 +348,12 @@ local function topicGroupID(topic)
 end
 
 local function definitionFor(id)
-    local index
-    for index = 1, #DEFINITIONS do
-        if DEFINITIONS[index].id == id then return DEFINITIONS[index] end
-    end
-    return nil
+    return StaticProvider.Find(id)
 end
 
 local function capabilityDefinitionFor(id)
     local action
-    for action, definition in pairs(CAPABILITY_DEFINITIONS) do
+    for action, definition in pairs(CapabilityProvider.Definitions) do
         if definition.id == id then return action, definition end
     end
     return nil, nil
@@ -737,7 +511,7 @@ local function capabilityRows(revision, currentAction, context, ir)
                     else
                         status = "unavailable_" .. tostring(eligibility.status)
                     end
-                    rows[#rows + 1] = {
+                    local capability = {
                         id = definition.id,
                         action = action,
                         source = sourceRecord(
@@ -768,6 +542,10 @@ local function capabilityRows(revision, currentAction, context, ir)
                         },
                         visibility = "player",
                     }
+                    capability = normalizeCandidate(
+                        capability, "permitted_capability", #rows + 1
+                    )
+                    rows[#rows + 1] = capability
                     allowed = allowed + 1
                 end
             end
@@ -832,6 +610,7 @@ local function addCandidate(output, seen, definition, kind, revision, reason)
         },
         visibility = "player",
     }
+    candidate = normalizeCandidate(candidate, kind, #output + 1)
     output[#output + 1] = candidate
     seen[definition.id] = candidate
 end
@@ -935,6 +714,7 @@ local function addBranchOfferCandidate(
         eligibility = eligibility,
         branch = copyValue(origin),
     }
+    candidate = normalizeCandidate(candidate, kind, #output + 1)
     output[#output + 1] = candidate
     seen[offer.id] = candidate
     return candidate, eligibility
@@ -1312,6 +1092,9 @@ local function appendConversationChoices(
                         reason = reason,
                     },
                 }
+                candidate = normalizeCandidate(
+                    candidate, "conversation_registry", #output + 1
+                )
                 output[#output + 1] = candidate
                 seen[candidateID] = candidate
             end
@@ -1402,6 +1185,9 @@ local function appendConversationRootChoices(
                         reason = reason,
                     },
                 }
+                candidate = normalizeCandidate(
+                    candidate, "conversation_root", #output + 1
+                )
                 output[#output + 1] = candidate
                 seen[candidateID] = candidate
             end
@@ -1680,6 +1466,7 @@ function Suggestions.Build(result, context, messages)
             currentGroupID = nil,
             predicateTrace = {},
             trace = trace,
+            choiceRegistry = ChoiceRegistry.Snapshot(),
         }
     end
 
@@ -1864,6 +1651,7 @@ function Suggestions.Build(result, context, messages)
             privateFieldsInspected = false,
             unknownFieldsExposed = false,
         },
+        choiceRegistry = ChoiceRegistry.Snapshot(),
     }
 end
 
