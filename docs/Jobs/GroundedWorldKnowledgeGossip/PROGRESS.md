@@ -167,3 +167,4 @@ luac -p <touched Lua files>; translation JSON validation; git diff --check
 ```
 
 The GUI consumer view is a diagnostic projection only; the native window was not relaunched or hot-reloaded by the agent. Native SP/MP runtime consumption remains reserved for user validation.
+Implementation commit: `7261b7df`.
