@@ -144,3 +144,71 @@ Dynamic Trading already contains NPC-foundation / portable conversation adapter 
 5. realization variants/localization need an explicit family contract rather than multiplying semantic IDs;
 6. Semantic Lab needs first-class persona/social controls and inspector output tied to production Lua;
 7. Dynamic Trading trader choices need to adopt the same provider contract without duplicating semantics or persistent NPC state.
+
+
+---
+
+# Corrective audit — 2026-10-22
+
+**Current ProjectHoomans main audited:** 849f1951ed1d3fd4b6f78aedc2525b25368a157e  
+**Dynamic Trading provider audited:** 5db64cbcc764f035146f044fdc34e930ce47d7c8
+
+The earlier P0-P7 evidence proves a stable foundation, not completion of the user-visible persona goal.
+
+## What is genuinely implemented
+
+- ActorConversationContext reaches production conversation/semantic projection.
+- SpeechStyleContext derives warmth/formality/directness/verbosity/hostility/openness/deference from existing state.
+- presentation-only realization preserves semantic response identity.
+- EN/TL realization infrastructure exists.
+- choice ranking classes exist.
+- Dynamic Trading contributes an optional trader provider without copying trade state.
+- Semantic Lab exposes persona controls and the real worker.
+- the regression suites give strong evidence that these changes did not broadly break existing semantics.
+
+## Product gaps found in current source
+
+### Realization coverage is too narrow
+
+PNC_SpeechRealization currently contains persona variants for greeting-opening template families only. Existing wellbeing, needs, medical, identity, knowledge, social, gossip, quest and trader responses usually calculate SpeechStyleContext but retain their old wording because no realization family exists for them.
+
+The dedicated style test primarily sends hello, so it does not prove broad conversational tailoring.
+
+### Some exposed dials are inert or weak
+
+The current style resolver does not directly consume socialStyle, forgiveness, or bravery. Trait effects are limited to a hand-coded subset of names. The Lab therefore exposes more apparent speech controls than the runtime meaningfully uses.
+
+### Relationship Lab parity is incorrect
+
+The settings UI edits approval/respect/familiarity, but the worker reads relationshipState independently rather than deriving it through PNC.RelationshipStates.ResolveState. This permits impossible ordinary scenarios and violates the documented production-parity acceptance rule.
+
+### Provider discovery is still partly centralized
+
+DialogueChoiceRegistry is real, but PNC_SemanticDialogueSuggestions.Build still manually orchestrates most source families and explicitly calls the Dynamic Trading provider. Registering a new provider alone is not yet sufficient for generic participation.
+
+### Persona-aware ranking is narrow
+
+Context-fit rules currently cover only a small number of topic/situation/persona cases. The ranking architecture exists, but the intended social/relationship/gossip reply ecosystem has not yet been authored.
+
+## Companion bond source found
+
+Starting companion definitions already persist these detailed relationship kinds:
+
+- friend
+- lover
+- mother
+- father
+- sister
+- brother
+
+The detailed kind is stored through the existing starting-companion generation/relationship path and appears in network startingRelationship projections. This is the correct authoritative source for pre-outbreak companion bond semantics.
+
+The corrective design must derive friend/family/lover speech classes from this existing kind rather than adding another persisted relationship field.
+
+## Corrected conclusion
+
+P0-P7 should be treated as **accepted foundation with incomplete behavioral acceptance**.
+
+The prior READY FOR USER LIVE TEST statement is superseded.
+
+Current mandatory work is Roadmap P8 — Behavioral Completion.
