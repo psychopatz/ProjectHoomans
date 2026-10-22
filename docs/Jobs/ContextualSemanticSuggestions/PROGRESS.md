@@ -1,3 +1,5 @@
+> **SUPERSEDED PRODUCT CONTRACT (2026-10-23):** Historical S0-S5 evidence below describes the former `projecthoomans:whats_up` authored category. The active ContextualDialoguePersonaChoices P10 goal removes that category/block route entirely and replaces reviewed What's Up input with a provider-driven semantic hub. Do not restore old category IDs or tests from this ledger. Historical evidence remains for archaeology only.
+
 # Contextual Semantic Suggestions — progress
 
 Updated: 2026-10-22
