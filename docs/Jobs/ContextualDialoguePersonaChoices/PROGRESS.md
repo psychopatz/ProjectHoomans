@@ -4,9 +4,9 @@
 
 **Parent status:** IN PROGRESS — corrective P8 sequence
 
-**Completed corrective phase:** P8A — bond vocabulary + production-faithful Semantic Lab baseline
+**Completed corrective phase:** P8D — Semantic Lab tuning workflow
 
-**Next mandatory phase:** P8B — behavioral speech completion
+**Next mandatory phase:** P8E — corrective final validation
 
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned
 
@@ -102,7 +102,7 @@ Additional P8B checks passed: `luac5.3 -p` on changed realization/style/presente
 
 ## P8C choice-provider completion
 
-Revision pending: generic provider discovery and the contextual social provider are implemented locally and validated; commit them before moving to P8D.
+Revision `1543eab3` (`feat: discover contextual dialogue providers generically`).
 
 Implementation evidence:
 
@@ -127,3 +127,32 @@ The provider matrix proves generic social discovery/click authority, no private 
 ## Next Chunk — P8D Semantic Lab tuning workflow
 
 Extend the existing Semantic Lab only: arbitrary current utterance, apply-and-replay, baseline capture, A/B scenario rows, selectable bounded context dimensions/matrices, final localized wording and candidate-order comparison, semantic-family coverage, realization/bond/fallback inspection, and production Lua-worker traces. Python/Tk may edit scenarios and render results only; all semantic/style/provider policy remains in production Lua. Preserve one existing Tk app, worker, choice UI lane, translation backend, and action dispatcher.
+
+## P8D Semantic Lab tuning workflow
+
+Revision `56596ecb` (`feat: extend semantic lab persona tuning workflow`).
+
+Implementation evidence:
+
+- The existing Semantic Lab now accepts the current utterance for baseline preview, production scenario reapply/replay, and persona/context matrix runs. No second worker, Tk application, parser, translation backend, choice UI, or action dispatcher was added.
+- `LuaSemanticWorker.context_matrix` now reports production response wording, semantic/render template identity, translation key, realization family/variant/fallback, typed family-address argument, bounded candidate order, provider/source/ranking/display data, and the restored original scenario.
+- The existing inspector receives the production persona catalog and exposes a canonical semantic IR trace alongside response realization and machine-readable speech-family coverage.
+- The existing Tk controls provide Capture baseline, Apply + replay, arbitrary-utterance Persona matrix, and bounded sweeps for persona, approval, respect, familiarity, bond, and EN/TL language.
+
+Focused validation:
+
+```text
+python3 -m unittest -v tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p8d
+Ran 3 tests — OK
+
+python3 -m unittest -v \
+ tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p6 \
+ tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p8d
+Ran 7 tests — OK
+```
+
+The P8D tests cover real Lua-worker baseline/replay/matrix traces, candidate ordering, canonical semantic identity, coverage inspection, and the existing Tk surface including bond sweep execution.
+
+## Next Chunk — P8E corrective final validation
+
+Run the complete corrective acceptance matrix and fix remaining gaps: bond mapping and synthetic family extension, no duplicate bond persistence, production relationship derivation/hysteresis, non-greeting realization matrices, friend/family/lover EN/TL term substitution, generic provider discovery, Dynamic Trading ownership, privacy, stale/replay safety, gameplay authority, explicit Tk/Xvfb proof, Kahlua/luac, doctor, translation validation, diff checks, bounded performance, and ModData/persistence measurements. Only after P8E passes may the goal report `READY FOR USER LIVE TEST`.
