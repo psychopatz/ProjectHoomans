@@ -1,6 +1,6 @@
 # Roadmap — Contextual Dialogue Persona & Choices
 
-**Parent status:** REOPENED — P0-P7 foundation retained; P8 behavioral completion is mandatory.  
+**Parent status:** REOPENED — P0-P8 foundation retained; P9 conversation visualization/direct-routing is mandatory.  
 Phases are organization and acceptance checkpoints; completing one phase never completes the parent objective.
 
 ## P0 — Current-path contract baseline
@@ -223,3 +223,54 @@ Required evidence:
 - bounded performance and ModData checks.
 
 **Gate:** only after P8A-P8E pass may the parent goal return to READY FOR USER LIVE TEST. Native Project Zomboid SP/MP remains user-owned.
+
+
+## P9 — Semantic Lab Conversation Visualization & Direct Routing
+
+P8 completed the persona/bond/provider foundation, but the 2026-10-22 user-facing audit found the Semantic Lab still difficult to test and one authored-category route behavior incorrect.
+
+Read `SEMANTIC_LAB_CONVERSATION_VISUALIZATION.md` before implementation.
+
+### P9A — Direct category routing + full-block graph projection
+
+Fix recognized `conversation_category` typed input so it enters the existing Conversation Composer/authority route directly instead of emitting a generic unknown-fact reply and then asking the user to click the same category again.
+
+Add a bounded harness-only full ConversationBlock graph projection.
+
+**Gate:** typing `whatsup` immediately yields the selected authored block, opening NPC text, opening choices, no redundant self-candidate, and a complete graph projection.
+
+### P9B — Simulation live dialogue graph MVP
+
+Embed a read-only live authored-conversation graph into Simulation using existing graph/canvas primitives.
+
+**Gate:** a user can type What's Up and immediately see the full opening/details/personal/followup/closing tree with current node and available choices visually indicated.
+
+### P9C — Shared graph renderer
+
+Refactor Flow Editor graph drawing into reusable view/model primitives. Keep Flow editing behavior; adapt both semantic Flow and ConversationBlock graphs into the same visual renderer.
+
+**Gate:** no duplicated node/edge renderer between Studio and Simulation.
+
+### P9D — Clickable branch testing
+
+Allow currently valid graph branches to execute the same typed semantic click frame used by normal choice buttons. No direct node mutation.
+
+**Gate:** graph clicks and ordinary choice clicks have equivalent authoritative outcomes, including stale/replay checks.
+
+### P9E — Simulation layout simplification
+
+Make transcript, graph, current choices, and input the primary workspace; demote raw JSON to diagnostics; hide pointless single-group navigation; keep persona/runtime controls quickly reachable.
+
+**Gate:** responsive Xvfb geometry + interaction proof at minimum and normal desktop sizes.
+
+### P9F — Conversation content diagnostics
+
+Expose translation/source metadata from graph nodes/edges and flag suspicious unresolved/mixed-language authored content without silently rewriting it.
+
+**Gate:** known malformed TL What's Up content is discoverable as content diagnostics while semantic IDs/branching remain unchanged.
+
+### P9G — Final P9 regression and handoff
+
+Run direct-route, graph, Studio regression, graph-click parity, persona/bond, provider, translation, Tk/Xvfb, Lua/Kahlua, doctor, persistence, and diff gates.
+
+**Gate:** only after P9A-P9G pass may the parent return to **READY FOR USER LIVE TEST**. Native SP/MP remains user-owned.
