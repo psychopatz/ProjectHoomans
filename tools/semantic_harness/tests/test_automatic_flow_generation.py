@@ -228,11 +228,24 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
     def test_generated_simple_command_uses_relationship_and_personality_context(self) -> None:
         friendly_scenario = merge(
             DEFAULT_SCENARIO,
-            {"npc": {"traits": {"friendly": True}, "relationshipState": "unknown"}},
+            {"npc": {"traits": {"friendly": True}}},
         )
         trusted_scenario = merge(
             DEFAULT_SCENARIO,
-            {"npc": {"traits": {"reserved": True}, "relationshipState": "Friend"}},
+            {
+                "npc": {
+                    "traits": {"reserved": True},
+                    "startingRelationship": {
+                        "kind": "friend",
+                        "source": "starting_companion_trait",
+                    },
+                    "relationship": {
+                        "approval": 80,
+                        "respect": 70,
+                        "familiarity": 80,
+                    },
+                }
+            },
         )
         tl_scenario = merge(
             friendly_scenario,
@@ -252,7 +265,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         )
         self.assertEqual(
             trusted["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedTrusted",
+            "UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm",
         )
         self.assertEqual(
             tagalog["messages"][0]["payload"]["translationKey"],

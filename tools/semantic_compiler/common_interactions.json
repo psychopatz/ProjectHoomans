@@ -64,15 +64,15 @@
         "subject": "CONVERSATION_TOPIC",
         "extensions": {
           "topic": "whats_up",
-          "categoryID": "projecthoomans:whats_up",
-          "route": "conversation_category"
+          "hubID": "whats_up",
+          "route": "semantic_hub"
         }
       },
       "reviewed": true,
       "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_ROOT",
+        "dialogueState": "WHATS_UP_HUB",
         "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
       },
       "confidence": 0.99,
@@ -87,15 +87,15 @@
         "subject": "CONVERSATION_TOPIC",
         "extensions": {
           "topic": "whats_up",
-          "categoryID": "projecthoomans:whats_up",
-          "route": "conversation_category"
+          "hubID": "whats_up",
+          "route": "semantic_hub"
         }
       },
       "reviewed": true,
       "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_ROOT",
+        "dialogueState": "WHATS_UP_HUB",
         "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
       },
       "confidence": 0.99,
@@ -110,15 +110,15 @@
         "subject": "CONVERSATION_TOPIC",
         "extensions": {
           "topic": "whats_up",
-          "categoryID": "projecthoomans:whats_up",
-          "route": "conversation_category"
+          "hubID": "whats_up",
+          "route": "semantic_hub"
         }
       },
       "reviewed": true,
       "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_ROOT",
+        "dialogueState": "WHATS_UP_HUB",
         "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
       },
       "confidence": 0.99,
@@ -133,8 +133,8 @@
         "subject": "CONVERSATION_TOPIC",
         "extensions": {
           "topic": "whats_up",
-          "categoryID": "projecthoomans:whats_up",
-          "route": "conversation_category"
+          "hubID": "whats_up",
+          "route": "semantic_hub"
         }
       },
       "reviewed": true,
@@ -144,7 +144,7 @@
       ],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_ROOT",
+        "dialogueState": "WHATS_UP_HUB",
         "sourceRefs": [
           "DailyDialog",
           "EmpatheticDialogues"
@@ -162,8 +162,8 @@
         "subject": "CONVERSATION_TOPIC",
         "extensions": {
           "topic": "whats_up",
-          "categoryID": "projecthoomans:whats_up",
-          "route": "conversation_category"
+          "hubID": "whats_up",
+          "route": "semantic_hub"
         }
       },
       "reviewed": true,
@@ -173,7 +173,7 @@
       ],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_ROOT",
+        "dialogueState": "WHATS_UP_HUB",
         "sourceRefs": [
           "DailyDialog",
           "EmpatheticDialogues"
@@ -191,15 +191,15 @@
         "subject": "CONVERSATION_TOPIC",
         "extensions": {
           "topic": "whats_up",
-          "categoryID": "projecthoomans:whats_up",
-          "route": "conversation_category"
+          "hubID": "whats_up",
+          "route": "semantic_hub"
         }
       },
       "reviewed": true,
       "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_ROOT",
+        "dialogueState": "WHATS_UP_HUB",
         "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
       },
       "confidence": 0.99,
@@ -214,15 +214,15 @@
         "subject": "CONVERSATION_TOPIC",
         "extensions": {
           "topic": "whats_up",
-          "categoryID": "projecthoomans:whats_up",
-          "route": "conversation_category"
+          "hubID": "whats_up",
+          "route": "semantic_hub"
         }
       },
       "reviewed": true,
       "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_ROOT",
+        "dialogueState": "WHATS_UP_HUB",
         "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
       },
       "confidence": 0.99,
@@ -237,15 +237,15 @@
         "subject": "CONVERSATION_TOPIC",
         "extensions": {
           "topic": "whats_up",
-          "categoryID": "projecthoomans:whats_up",
-          "route": "conversation_category"
+          "hubID": "whats_up",
+          "route": "semantic_hub"
         }
       },
       "reviewed": true,
       "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_ROOT",
+        "dialogueState": "WHATS_UP_HUB",
         "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
       },
       "confidence": 0.99,
@@ -260,15 +260,15 @@
         "subject": "CONVERSATION_TOPIC",
         "extensions": {
           "topic": "whats_up",
-          "categoryID": "projecthoomans:whats_up",
-          "route": "conversation_category"
+          "hubID": "whats_up",
+          "route": "semantic_hub"
         }
       },
       "reviewed": true,
       "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_ROOT",
+        "dialogueState": "WHATS_UP_HUB",
         "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
       },
       "confidence": 0.99,
@@ -283,15 +283,15 @@
         "subject": "CONVERSATION_TOPIC",
         "extensions": {
           "topic": "whats_up",
-          "categoryID": "projecthoomans:whats_up",
-          "route": "conversation_category"
+          "hubID": "whats_up",
+          "route": "semantic_hub"
         }
       },
       "reviewed": true,
       "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_ROOT",
+        "dialogueState": "WHATS_UP_HUB",
         "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
       },
       "confidence": 0.99,
@@ -306,15 +306,15 @@
         "subject": "CONVERSATION_TOPIC",
         "extensions": {
           "topic": "whats_up",
-          "categoryID": "projecthoomans:whats_up",
-          "route": "conversation_category"
+          "hubID": "whats_up",
+          "route": "semantic_hub"
         }
       },
       "reviewed": true,
       "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_ROOT",
+        "dialogueState": "WHATS_UP_HUB",
         "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
       },
       "confidence": 0.99,

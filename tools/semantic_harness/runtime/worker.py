@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import HarnessConfig
+from .item_catalog import search_item_catalog
 from .process import HarnessError, LuaProcess
 from .scenario import validate_scenario
 
@@ -126,6 +127,16 @@ class LuaSemanticWorker:
         if register_relationship_kind is not None:
             payload = {"registerRelationshipKind": register_relationship_kind}
         return self._request("PERSONA_CATALOG", payload)
+
+    def simulation_control_catalog(self) -> dict[str, Any]:
+        """Return the worker-owned, bounded Semantic Lab control metadata."""
+
+        return self._request("SIMULATION_CONTROL_CATALOG")
+
+    def item_catalog(self, query: str = "", limit: int = 50) -> dict[str, Any]:
+        """Search installed Project Zomboid item definitions for the Lab editor."""
+
+        return search_item_catalog(query, limit, self.scenario)
 
     def context_matrix(
         self,

@@ -8,8 +8,6 @@ local categorySource = H.Source("system", "shared", "categories")
 -- with the reason instead of silently doing nothing.
 local categories = {
     { "greetings", "category.greetings", -100, true },
-    { "whats_up", "category.whats_up", 100, false,
-        { scope = "pair", oncePerDay = true } },
     { "wellbeing", "category.wellbeing", 200 },
     { "small_talk", "category.small_talk", 300 },
     { "ask_about", "category.ask_about", 400 },

@@ -14,24 +14,6 @@ Provider.order = 50
 
 Provider.Definitions = {
     {
-        id = "conversation.whats_up",
-        topic = "whats_up",
-        order = 5,
-        patternID = "pnc.dataset.question.whats_up.whats_up",
-        labelKey = "UI_PNC_Conversation_Suggestion_WhatsUp_Label",
-        labelFallback = "Ask what's up",
-        utteranceKey = "UI_PNC_Conversation_Suggestion_WhatsUp_Utterance",
-        utteranceFallback = "What's up?",
-        intent = "QUESTION",
-        speechAct = "QUESTION",
-        subject = "CONVERSATION_TOPIC",
-        extensions = {
-            topic = "whats_up",
-            categoryID = "projecthoomans:whats_up",
-            route = "conversation_category",
-        },
-    },
-    {
         id = "question.wellbeing",
         topic = "wellbeing",
         order = 10,
@@ -43,6 +25,7 @@ Provider.Definitions = {
         intent = "QUESTION",
         speechAct = "QUESTION",
         subject = "WELLBEING",
+        hubID = "whats_up",
     },
     {
         id = "question.wellbeing_detail",
@@ -71,6 +54,8 @@ Provider.Definitions = {
         intent = "QUESTION",
         speechAct = "QUESTION",
         subject = "NEEDS",
+        hubID = "whats_up",
+        hubAudience = "owned_companion",
         extensions = {
             topic = "needs",
             dialogueFollowUp = "NEEDS_QUANTITY",
@@ -96,7 +81,42 @@ Provider.Definitions = {
             personalQuestion = true,
             target = "SELF",
         },
+        hubID = "whats_up",
+        hubAudience = "owned_companion",
         extensions = { topic = "medical" },
+    },
+    {
+        id = "question.activity",
+        topic = "activity",
+        order = 60,
+        patternID = "pnc.question.activity",
+        labelKey = "UI_PNC_Conversation_Suggestion_Activity_Label",
+        labelFallback = "Ask what they've been doing",
+        utteranceKey = "UI_PNC_Conversation_Suggestion_Activity_Utterance",
+        utteranceFallback = "What have you been doing?",
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "ACTIVITY",
+        extensions = { topic = "activity" },
+        hubID = "whats_up",
+        hubOnly = true,
+    },
+    {
+        id = "question.gossip",
+        topic = "gossip",
+        order = 70,
+        patternID = "pnc.social.gossip_event",
+        labelKey = "UI_PNC_Conversation_Suggestion_Gossip_Label",
+        labelFallback = "Heard any gossip?",
+        utteranceKey = "UI_PNC_Conversation_Suggestion_Gossip_Utterance",
+        utteranceFallback = "Any gossip?",
+        intent = "GOSSIP",
+        speechAct = "GOSSIP",
+        subject = "GOSSIP",
+        extensions = { topic = "gossip" },
+        hubID = "whats_up",
+        hubOnly = true,
+        hubRequiresSafeGossip = true,
     },
     {
         id = "question.identity",
@@ -152,6 +172,7 @@ Provider.Definitions = {
         speechAct = "QUESTION",
         subject = "WEATHER",
         extensions = { topic = "weather" },
+        hubID = "whats_up",
     },
 }
 
@@ -162,8 +183,149 @@ function Provider.Find(id)
     return nil
 end
 
-function Provider.collect()
-    return Provider.Definitions
+local function hostileActor(actor)
+    local roles = type(actor.roles) == "table" and actor.roles or {}
+    local relationship = type(actor.relationship) == "table"
+        and actor.relationship or {}
+    local state = string.lower(tostring(relationship.state or ""))
+    local role = string.lower(tostring(roles.role or ""))
+    return roles.hostile == true or role == "enemy"
+        or state == "enemy" or state == "rival"
+end
+
+local function ownedCompanion(actor)
+    local roles = type(actor.roles) == "table" and actor.roles or {}
+    return roles.companion == true and roles.owned == true
+        and roles.authorityEligible == true
+end
+
+local function hasSafeGossip(context)
+    local gossip = type(context.npcGossip) == "table"
+        and context.npcGossip or nil
+    if not gossip then
+        local cognitionClient = PNC.Semantics.CognitionClient
+        local npcID = tostring(context.npcID or "")
+        if cognitionClient
+            and type(cognitionClient.GetGossipContext) == "function"
+            and npcID ~= ""
+        then
+            local ok, value = pcall(
+                cognitionClient.GetGossipContext, npcID, "self"
+            )
+            if ok and type(value) == "table" then gossip = value end
+        end
+    end
+    if not gossip or gossip.private == true or gossip.secret == true then
+        return false
+    end
+    local visibility = string.lower(tostring(
+        gossip.visibility or gossip.privacy or ""
+    ))
+    if visibility == "private" or visibility == "secret" then return false end
+    local statements = type(gossip.statements) == "table"
+        and gossip.statements or {}
+    for index = 1, math.min(#statements, 4) do
+        if type(statements[index]) == "string"
+            and statements[index] ~= ""
+        then
+            return true
+        end
+    end
+    return false
+end
+
+local function hubCandidate(definition, contextReason)
+    local extensions = {}
+    for key, value in pairs(type(definition.extensions) == "table"
+        and definition.extensions or {}) do
+        extensions[key] = value
+    end
+    extensions.route = "semantic_provider"
+    extensions.providerID = Provider.id
+    extensions.hubID = "whats_up"
+    extensions.hubAvenue = true
+    return {
+        id = definition.id,
+        topic = definition.topic,
+        groupID = "semantic_hub.whats_up",
+        rank = definition.order,
+        providerID = Provider.id,
+        semanticOwner = definition.semanticOwner
+            or "projecthoomans.semantic." .. tostring(definition.topic),
+        contextReason = contextReason,
+        eligibility = {
+            status = "allowed",
+            allowed = true,
+            reason = contextReason,
+        },
+        source = {
+            kind = Provider.sourceKind,
+            providerID = Provider.id,
+            reason = "semantic_hub_avenue",
+        },
+        frame = {
+            kind = "semantic_click_frame",
+            candidateID = definition.id,
+            topic = definition.topic,
+            pattern = definition.patternID,
+            intent = definition.intent,
+            speechAct = definition.speechAct,
+            action = definition.action,
+            subject = definition.subject,
+            target = definition.target,
+            slots = definition.slots,
+            modifiers = definition.modifiers,
+            socialContext = definition.socialContext,
+            extensions = extensions,
+            textKey = definition.utteranceKey,
+            textFallback = definition.utteranceFallback,
+            labelKey = definition.labelKey,
+        },
+        display = {
+            labelKey = definition.labelKey,
+            labelFallback = definition.labelFallback,
+            utteranceKey = definition.utteranceKey,
+            utteranceFallback = definition.utteranceFallback,
+        },
+        visibility = "player",
+    }
+end
+
+function Provider.collect(context)
+    context = type(context) == "table" and context or {}
+    if context.activeHubID ~= "whats_up" then
+        return Provider.Definitions
+    end
+
+    local actor = type(context.actorConversationContext) == "table"
+        and context.actorConversationContext or {}
+    local hostile = hostileActor(actor)
+    local owned = ownedCompanion(actor)
+    local safeGossip = hasSafeGossip(context)
+    local output = {}
+    for _, definition in ipairs(Provider.Definitions) do
+        if definition.hubID == "whats_up" then
+            local allowed = not hostile
+                or definition.id == "question.weather"
+            local contextReason = hostile
+                and "safe_public_weather_context"
+                or "non_hostile_public_context"
+            if definition.hubAudience == "owned_companion" then
+                allowed = allowed and owned
+                contextReason = owned and "owned_companion_context"
+                    or "owned_companion_required"
+            end
+            if definition.hubRequiresSafeGossip then
+                allowed = allowed and safeGossip
+                contextReason = safeGossip and "player_safe_gossip_available"
+                    or "safe_gossip_unavailable"
+            end
+            if allowed then
+                output[#output + 1] = hubCandidate(definition, contextReason)
+            end
+        end
+    end
+    return output
 end
 
 return Provider

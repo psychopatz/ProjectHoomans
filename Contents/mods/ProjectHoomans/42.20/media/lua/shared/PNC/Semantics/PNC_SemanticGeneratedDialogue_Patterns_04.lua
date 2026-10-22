@@ -5,8 +5,8 @@ return {
             ["confidence"] = 0.97,
             ["emit"] = {
                 ["extensions"] = {
-                    ["categoryID"] = "projecthoomans:whats_up",
-                    ["route"] = "conversation_category",
+                    ["hubID"] = "whats_up",
+                    ["route"] = "semantic_hub",
                     ["topic"] = "whats_up",
                 },
                 ["intent"] = "QUESTION",
@@ -27,7 +27,7 @@ return {
             ["metadata"] = {
                 ["mapping"] = {
                     ["canonicalConcept"] = "WHATS_UP",
-                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["dialogueState"] = "WHATS_UP_HUB",
                     ["sourceRefs"] = {
                         "DailyDialog",
                         "EmpatheticDialogues",
@@ -45,8 +45,8 @@ return {
             ["confidence"] = 0.99,
             ["emit"] = {
                 ["extensions"] = {
-                    ["categoryID"] = "projecthoomans:whats_up",
-                    ["route"] = "conversation_category",
+                    ["hubID"] = "whats_up",
+                    ["route"] = "semantic_hub",
                     ["topic"] = "whats_up",
                 },
                 ["intent"] = "QUESTION",
@@ -67,7 +67,7 @@ return {
             ["metadata"] = {
                 ["mapping"] = {
                     ["canonicalConcept"] = "WHATS_UP",
-                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["dialogueState"] = "WHATS_UP_HUB",
                     ["sourceRefs"] = {
                         "DailyDialog",
                         "EmpatheticDialogues",
@@ -85,8 +85,8 @@ return {
             ["confidence"] = 0.99,
             ["emit"] = {
                 ["extensions"] = {
-                    ["categoryID"] = "projecthoomans:whats_up",
-                    ["route"] = "conversation_category",
+                    ["hubID"] = "whats_up",
+                    ["route"] = "semantic_hub",
                     ["topic"] = "whats_up",
                 },
                 ["intent"] = "QUESTION",
@@ -107,7 +107,7 @@ return {
             ["metadata"] = {
                 ["mapping"] = {
                     ["canonicalConcept"] = "WHATS_UP",
-                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["dialogueState"] = "WHATS_UP_HUB",
                     ["sourceRefs"] = {
                         "DailyDialog",
                         "EmpatheticDialogues",
@@ -125,8 +125,8 @@ return {
             ["confidence"] = 0.99,
             ["emit"] = {
                 ["extensions"] = {
-                    ["categoryID"] = "projecthoomans:whats_up",
-                    ["route"] = "conversation_category",
+                    ["hubID"] = "whats_up",
+                    ["route"] = "semantic_hub",
                     ["topic"] = "whats_up",
                 },
                 ["intent"] = "QUESTION",
@@ -147,7 +147,7 @@ return {
             ["metadata"] = {
                 ["mapping"] = {
                     ["canonicalConcept"] = "WHATS_UP",
-                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["dialogueState"] = "WHATS_UP_HUB",
                     ["sourceRefs"] = {
                         "DailyDialog",
                         "EmpatheticDialogues",
@@ -165,8 +165,8 @@ return {
             ["confidence"] = 0.99,
             ["emit"] = {
                 ["extensions"] = {
-                    ["categoryID"] = "projecthoomans:whats_up",
-                    ["route"] = "conversation_category",
+                    ["hubID"] = "whats_up",
+                    ["route"] = "semantic_hub",
                     ["topic"] = "whats_up",
                 },
                 ["intent"] = "QUESTION",
@@ -187,7 +187,7 @@ return {
             ["metadata"] = {
                 ["mapping"] = {
                     ["canonicalConcept"] = "WHATS_UP",
-                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["dialogueState"] = "WHATS_UP_HUB",
                     ["sourceRefs"] = {
                         "DailyDialog",
                         "EmpatheticDialogues",
@@ -205,8 +205,8 @@ return {
             ["confidence"] = 0.99,
             ["emit"] = {
                 ["extensions"] = {
-                    ["categoryID"] = "projecthoomans:whats_up",
-                    ["route"] = "conversation_category",
+                    ["hubID"] = "whats_up",
+                    ["route"] = "semantic_hub",
                     ["topic"] = "whats_up",
                 },
                 ["intent"] = "QUESTION",
@@ -227,7 +227,7 @@ return {
             ["metadata"] = {
                 ["mapping"] = {
                     ["canonicalConcept"] = "WHATS_UP",
-                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["dialogueState"] = "WHATS_UP_HUB",
                     ["sourceRefs"] = {
                         "DailyDialog",
                         "EmpatheticDialogues",
@@ -245,8 +245,8 @@ return {
             ["confidence"] = 0.99,
             ["emit"] = {
                 ["extensions"] = {
-                    ["categoryID"] = "projecthoomans:whats_up",
-                    ["route"] = "conversation_category",
+                    ["hubID"] = "whats_up",
+                    ["route"] = "semantic_hub",
                     ["topic"] = "whats_up",
                 },
                 ["intent"] = "QUESTION",
@@ -267,7 +267,7 @@ return {
             ["metadata"] = {
                 ["mapping"] = {
                     ["canonicalConcept"] = "WHATS_UP",
-                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["dialogueState"] = "WHATS_UP_HUB",
                     ["sourceRefs"] = {
                         "DailyDialog",
                         "EmpatheticDialogues",
@@ -285,8 +285,8 @@ return {
             ["confidence"] = 0.98,
             ["emit"] = {
                 ["extensions"] = {
-                    ["categoryID"] = "projecthoomans:whats_up",
-                    ["route"] = "conversation_category",
+                    ["hubID"] = "whats_up",
+                    ["route"] = "semantic_hub",
                     ["topic"] = "whats_up",
                 },
                 ["intent"] = "QUESTION",
@@ -303,7 +303,7 @@ return {
             ["metadata"] = {
                 ["mapping"] = {
                     ["canonicalConcept"] = "WHATS_UP",
-                    ["dialogueState"] = "WHATS_UP_ROOT",
+                    ["dialogueState"] = "WHATS_UP_HUB",
                     ["sourceRefs"] = {
                         "DailyDialog",
                         "EmpatheticDialogues",

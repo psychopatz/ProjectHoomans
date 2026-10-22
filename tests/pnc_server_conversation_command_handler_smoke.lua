@@ -60,7 +60,7 @@ T.equal(Router.Handle("conversationEnd", player, nil), true,
     "scene end handled")
 T.equal(type(received.scene.args), "table", "scene nil payload normalized")
 
-local categoryArgs = { categoryID = "projecthoomans:whats_up" }
+local categoryArgs = { categoryID = "projecthoomans:wellbeing" }
 T.equal(Router.Handle(
     "ConversationCategoryRequest",
     player,

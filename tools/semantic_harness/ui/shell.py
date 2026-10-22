@@ -27,7 +27,11 @@ from ..runtime.npc_profiles import (
     profile_label,
 )
 from ..runtime.scenario import load_scenario, merge, save_scenario
-from .dialogs.settings import open_runtime_settings as show_runtime_settings
+from .dialogs.catalog_control import CatalogControlField
+from .dialogs.settings import (
+    collect_scenario_settings,
+    open_runtime_settings as show_runtime_settings,
+)
 from ..inspection.transcript import TranscriptBuffer
 from ..runtime.worker import HarnessError, LuaSemanticWorker
 from ..runtime.worker_session import WorkerReady, WorkerResult, WorkerSession
@@ -112,6 +116,114 @@ def semantic_suggestion_title(row: dict[str, Any]) -> str:
     )
 
 
+def semantic_hub_diagnostic_projection(
+    suggestions: dict[str, Any],
+) -> dict[str, Any]:
+    """Project only player-safe hub candidates into the developer inspector."""
+
+    suggestions = suggestions if isinstance(suggestions, dict) else {}
+    active_hub = suggestions.get("activeHub")
+    if not isinstance(active_hub, dict) or active_hub.get("route") != "semantic_hub":
+        return {"activeHub": None, "candidateCount": 0, "candidates": []}
+    privacy = suggestions.get("privacy")
+    privacy = privacy if isinstance(privacy, dict) else {}
+    if (
+        privacy.get("playerVisible") is not True
+        or privacy.get("privateFieldsInspected") is not False
+        or privacy.get("unknownFieldsExposed") is not False
+    ):
+        return {
+            "activeHub": deepcopy(active_hub),
+            "candidateCount": 0,
+            "candidates": [],
+            "diagnosticsHidden": True,
+            "reason": "player_safe_projection_unavailable",
+        }
+
+    candidates: list[dict[str, Any]] = []
+
+    def public_reason(value: Any) -> str | None:
+        reason = str(value or "")
+        if not reason:
+            return None
+        safe_reasons = {
+            "candidate_not_eligible": "candidate not eligible in current public context",
+            "non_hostile_public_context": "non-hostile public topic",
+            "safe_public_weather_context": "safe public weather topic",
+            "player_safe_gossip_available": "player-safe gossip context available",
+            "safe_gossip_unavailable": "player-safe gossip context unavailable",
+            "owned_companion_context": "eligible companion context",
+            "owned_companion_required": "eligible companion context required",
+            "trusted_close_relationship": "personal avenue permitted by disclosure policy",
+        }
+        return safe_reasons.get(reason, "contextual eligibility policy")
+
+    for candidate in (suggestions.get("candidates") or [])[:32]:
+        if not isinstance(candidate, dict) or candidate.get("visibility") == "private":
+            continue
+        frame = candidate.get("frame")
+        frame = frame if isinstance(frame, dict) else {}
+        extensions = frame.get("extensions")
+        extensions = extensions if isinstance(extensions, dict) else {}
+        display = candidate.get("display")
+        display = display if isinstance(display, dict) else {}
+        eligibility = candidate.get("eligibility")
+        eligibility = eligibility if isinstance(eligibility, dict) else {}
+        ranking = candidate.get("ranking")
+        ranking = ranking if isinstance(ranking, dict) else {}
+        is_eligible = (
+            eligibility.get("allowed") is True
+            and candidate.get("enabled") is not False
+            and eligibility.get("status") not in {"hidden", "denied", "blocked"}
+        )
+        candidates.append(
+            {
+                "candidateID": candidate.get("id"),
+                "providerID": candidate.get("providerID") or frame.get("providerID"),
+                "semanticOwner": candidate.get("semanticOwner"),
+                "rank": candidate.get("rank"),
+                "rankClass": ranking.get("class") or "UNCLASSIFIED",
+                "eligibility": "eligible" if is_eligible else "hidden",
+                "eligibilityStatus": eligibility.get("status") or "unknown",
+                "hiddenReason": (
+                    None
+                    if is_eligible
+                    else public_reason(
+                        candidate.get("hiddenReason")
+                        or eligibility.get("reason")
+                        or "candidate_not_eligible"
+                    )
+                ),
+                "contextReason": public_reason(
+                    candidate.get("contextReason") or eligibility.get("reason")
+                ),
+                "translationKeys": {
+                    "label": display.get("labelKey"),
+                    "utterance": display.get("utteranceKey"),
+                },
+                "resolvedLabel": display.get("label")
+                or display.get("labelFallback")
+                or candidate.get("id"),
+                "resolvedUtterance": display.get("utterance")
+                or display.get("utteranceFallback"),
+                "semanticDestination": {
+                    "route": extensions.get("route"),
+                    "hubID": extensions.get("hubID") or active_hub.get("id"),
+                    "topic": candidate.get("topic") or extensions.get("topic"),
+                    "subject": frame.get("subject"),
+                    "speechAct": frame.get("speechAct"),
+                },
+                "semanticFrame": deepcopy(frame),
+            }
+        )
+    return {
+        "activeHub": deepcopy(active_hub),
+        "candidateCount": len(candidates),
+        "candidates": candidates,
+        "privacySafe": True,
+    }
+
+
 class SemanticHarnessApp:
     """Nonblocking Tk adapter over the same session API used by the CLI."""
 
@@ -163,6 +275,15 @@ class SemanticHarnessApp:
         self._worker_initialized = False
         self._production_catalog: dict[str, Any] | None = None
         self.persona_catalog: dict[str, Any] = {}
+        self.simulation_control_catalog: dict[str, Any] = {}
+        self.settings_variables: dict[str, Any] = {}
+        self.settings_control_widgets: dict[str, Any] = {}
+        self.settings_control_fields: dict[str, Any] = {}
+        self.workbench_control_fields: dict[str, CatalogControlField] = {}
+        self.workbench_controls: list[dict[str, Any]] = []
+        self.workbench_expanded = True
+        self.last_test_utterance = ""
+        self.workbench_status_var: Any | None = None
         self.last_response: dict[str, Any] = {}
         self.settings_window: Any | None = None
         self._future: Future[Any] | None = None
@@ -266,8 +387,71 @@ class SemanticHarnessApp:
         self.send_button = ttk.Button(transcript_frame, text="Send", command=self.submit)
         self.send_button.grid(row=3, column=0, sticky="e", padx=6, pady=(0, 6))
 
+        self.simulation_workbench = ttk.Frame(container)
+        self.simulation_workbench.grid(
+            row=1, column=0, sticky="ew", padx=(0, 8), pady=(4, 0)
+        )
+        self.simulation_workbench.columnconfigure(0, weight=1)
+        workbench_header = ttk.Frame(self.simulation_workbench)
+        workbench_header.grid(row=0, column=0, sticky="ew")
+        workbench_header.columnconfigure(4, weight=1)
+        ttk.Label(
+            workbench_header,
+            text="Simulation workbench",
+            font=("TkDefaultFont", 10, "bold"),
+        ).grid(row=0, column=0, sticky="w", padx=(2, 10))
+        ttk.Label(workbench_header, text="NPC profile").grid(
+            row=0, column=1, sticky="e", padx=(0, 4)
+        )
+        self.npc_profile_var = self._tk.StringVar(
+            value=profile_label(profile_id(self.scenario))
+        )
+        self.npc_profile_box = ttk.Combobox(
+            workbench_header,
+            textvariable=self.npc_profile_var,
+            values=tuple(profile_label(value) for value in PROFILE_IDS),
+            width=22,
+            state="readonly",
+        )
+        self.npc_profile_box.grid(row=0, column=2, sticky="w", padx=(0, 8))
+        self.npc_profile_box.bind("<<ComboboxSelected>>", lambda _: self._on_npc_profile())
+        self.workbench_toggle_button = ttk.Button(
+            workbench_header,
+            text="Hide controls",
+            command=self.toggle_simulation_workbench,
+        )
+        self.workbench_toggle_button.grid(row=0, column=5, sticky="e")
+        self.workbench_content = ttk.Frame(self.simulation_workbench)
+        self.workbench_content.grid(row=1, column=0, sticky="ew", pady=(3, 0))
+        self.workbench_content.columnconfigure(0, weight=1)
+        self.workbench_notebook = ttk.Notebook(self.workbench_content)
+        self.workbench_notebook.grid(row=0, column=0, sticky="ew")
+        self.workbench_status_var = self._tk.StringVar(
+            value="Common context controls · changes apply through the Lua worker."
+        )
+        workbench_footer = ttk.Frame(self.workbench_content)
+        workbench_footer.grid(row=1, column=0, sticky="ew", pady=(3, 0))
+        workbench_footer.columnconfigure(2, weight=1)
+        self.workbench_apply_button = ttk.Button(
+            workbench_footer,
+            text="Apply",
+            command=self.apply_simulation_settings,
+        )
+        self.workbench_apply_button.grid(row=0, column=0, sticky="w")
+        self.replay_button = ttk.Button(
+            workbench_footer,
+            text="Apply + replay",
+            command=self.apply_and_replay,
+        )
+        self.replay_button.grid(row=0, column=1, sticky="w", padx=(6, 0))
+        ttk.Label(
+            workbench_footer,
+            textvariable=self.workbench_status_var,
+            anchor="e",
+        ).grid(row=0, column=2, sticky="e", padx=(8, 0))
+
         controls = ttk.Frame(container)
-        controls.grid(row=1, column=0, sticky="ew", padx=(0, 8), pady=(8, 0))
+        controls.grid(row=2, column=0, sticky="ew", padx=(0, 8), pady=(4, 0))
         controls.columnconfigure(0, weight=1)
         controls.columnconfigure(1, weight=0)
         action_controls = ttk.Frame(controls)
@@ -292,7 +476,7 @@ class SemanticHarnessApp:
         self.load_button = ttk.Button(primary_actions, text="Load scenario", command=self.load)
         self.load_button.grid(row=0, column=1, sticky="ew", padx=3)
         self.settings_button = ttk.Button(
-            primary_actions, text="Mock runtime…", command=self.open_runtime_settings
+            primary_actions, text="Simulation settings…", command=self.open_runtime_settings
         )
         self.settings_button.grid(row=0, column=2, sticky="ew", padx=3)
         self.preview_button = ttk.Button(primary_actions, text="Preview", command=self.preview)
@@ -311,10 +495,6 @@ class SemanticHarnessApp:
             lab_actions, text="Capture baseline", command=self.capture_baseline
         )
         self.capture_baseline_button.pack(side="left", padx=6)
-        self.replay_button = ttk.Button(
-            lab_actions, text="Apply + replay", command=self.apply_and_replay
-        )
-        self.replay_button.pack(side="left", padx=6)
         self.world_knowledge_button = ttk.Button(
             secondary_actions,
             text="World knowledge",
@@ -325,28 +505,10 @@ class SemanticHarnessApp:
             secondary_actions, text="Restart worker", command=self.restart
         )
         self.restart_button.pack(side="left", padx=6)
-        self.language_var = self._tk.StringVar(value=self.scenario.get("runtime", {}).get("language", "EN"))
-        ttk.Label(runtime_controls, text="Language").pack(side="left")
-        self.language_box = ttk.Combobox(
-            runtime_controls,
-            textvariable=self.language_var,
-            values=("EN", "TL"),
-            width=6,
-            state="readonly",
+        self.language_var = self._tk.StringVar(
+            value=self.scenario.get("runtime", {}).get("language", "EN")
         )
-        self.language_box.pack(side="left", padx=(4, 12))
-        self.language_box.bind("<<ComboboxSelected>>", lambda _: self.set_language())
-        self.npc_profile_var = self._tk.StringVar(value=profile_label(profile_id(self.scenario)))
-        ttk.Label(runtime_controls, text="NPC profile").pack(side="left")
-        self.npc_profile_box = ttk.Combobox(
-            runtime_controls,
-            textvariable=self.npc_profile_var,
-            values=tuple(profile_label(value) for value in PROFILE_IDS),
-            width=22,
-            state="readonly",
-        )
-        self.npc_profile_box.pack(side="left", padx=(4, 6))
-        self.npc_profile_box.bind("<<ComboboxSelected>>", lambda _: self._on_npc_profile())
+        self.language_box: Any | None = None
         self.matrix_dimension_var = self._tk.StringVar(value="persona")
         ttk.Label(runtime_controls, text="Sweep").pack(side="left")
         self.matrix_dimension_box = ttk.Combobox(
@@ -362,7 +524,7 @@ class SemanticHarnessApp:
         self.status_label.pack(anchor="e")
 
         right = ttk.LabelFrame(container, text="Semantic trace")
-        right.grid(row=0, column=1, rowspan=2, sticky="nsew")
+        right.grid(row=0, column=1, rowspan=3, sticky="nsew")
         right.rowconfigure(0, weight=1)
         right.columnconfigure(0, weight=1)
         self.trace_tabs = ttk.Notebook(right)
@@ -378,6 +540,16 @@ class SemanticHarnessApp:
         )
         self.trace_tabs.add(dialogue_graph_frame, text="Dialogue graph")
         self.dialogue_graph_frame = dialogue_graph_frame
+
+        hub_diagnostics_frame = ttk.Frame(self.trace_tabs)
+        hub_diagnostics_frame.rowconfigure(0, weight=1)
+        hub_diagnostics_frame.columnconfigure(0, weight=1)
+        self.hub_diagnostics = ScrolledText(
+            hub_diagnostics_frame, wrap="none", state="disabled"
+        )
+        self.hub_diagnostics.grid(row=0, column=0, sticky="nsew")
+        self.trace_tabs.add(hub_diagnostics_frame, text="Hub diagnostics")
+        self.hub_diagnostics_frame = hub_diagnostics_frame
 
         dialogue_diagnostics_frame = ttk.Frame(self.trace_tabs)
         dialogue_diagnostics_frame.rowconfigure(0, weight=1)
@@ -521,14 +693,20 @@ class SemanticHarnessApp:
             self.snapshot_button,
             self.persona_matrix_button,
             self.capture_baseline_button,
+            self.workbench_apply_button,
             self.replay_button,
             self.world_knowledge_button,
         ):
             button.configure(state=state)
-        self.language_box.configure(state="readonly" if enabled and not self.busy else "disabled")
+        if self.language_box is not None:
+            self.language_box.configure(
+                state="readonly" if enabled and not self.busy else "disabled"
+            )
         self.npc_profile_box.configure(
             state="readonly" if enabled and not self.busy else "disabled"
         )
+        for field in self.workbench_control_fields.values():
+            field.set_enabled(enabled and not self.busy)
         self.matrix_dimension_box.configure(
             state="readonly" if enabled and not self.busy else "disabled"
         )
@@ -640,6 +818,10 @@ class SemanticHarnessApp:
     def _worker_ready(self, result: WorkerReady) -> None:
         self._worker_initialized = True
         self.persona_catalog = result.capabilities.get("personaCatalog") or {}
+        self.simulation_control_catalog = (
+            result.capabilities.get("simulationControlCatalog") or {}
+        )
+        self._build_simulation_workbench()
         self._set_status(f"Ready · Lua PID {result.status.get('pid')}")
         self._set_controls(True)
         self._append("SYSTEM", "Lua worker ready. Production semantic modules are loaded.")
@@ -669,6 +851,182 @@ class SemanticHarnessApp:
         self.block_registry.set_catalog(flow_catalog)
         self._production_catalog = flow_catalog
         self.workflow_pane.set_production_catalog(flow_catalog)
+
+    def _scenario_control_value(self, control: dict[str, Any], scenario: dict[str, Any]) -> Any:
+        control_id = str(control.get("id") or "")
+        if control_id == "relationship.state":
+            response = self.last_response if isinstance(self.last_response, dict) else {}
+            context = response.get("contextAfter") or response.get("context") or {}
+            actor = context.get("actorConversationContext", {}) if isinstance(context, dict) else {}
+            relationship = actor.get("relationship", {}) if isinstance(actor, dict) else {}
+            return relationship.get("state", "unknown")
+        value: Any = scenario
+        path = control.get("path")
+        if isinstance(path, str):
+            for segment in path.split("."):
+                if not isinstance(value, dict):
+                    value = None
+                    break
+                value = value.get(segment)
+        if control_id in {"persona.bondKind", "npc.role"}:
+            return value or "none"
+        return value
+
+    def _build_simulation_workbench(self) -> None:
+        for tab_id in self.workbench_notebook.tabs():
+            self.workbench_notebook.forget(tab_id)
+        self.workbench_control_fields = {}
+        catalog_controls = self.simulation_control_catalog.get("controls", [])
+        if not isinstance(catalog_controls, list):
+            catalog_controls = []
+        self.workbench_controls = [
+            control
+            for control in catalog_controls[:64]
+            if isinstance(control, dict) and control.get("workbench") is True
+        ]
+        pages: dict[str, Any] = {}
+        rows_by_page: dict[str, int] = {}
+        for control in self.workbench_controls:
+            section = str(control.get("workbenchSection") or "Context")
+            page = pages.get(section)
+            if page is None:
+                page = self._ttk.Frame(self.workbench_notebook, padding=(6, 2))
+                for column in (1, 3):
+                    page.columnconfigure(column, weight=1)
+                self.workbench_notebook.add(page, text=section)
+                pages[section] = page
+                rows_by_page[section] = 0
+            index = rows_by_page[section]
+            rows_by_page[section] = index + 1
+            row = index // 2
+            pair_column = (index % 2) * 2
+            field = CatalogControlField(
+                page,
+                self._tk,
+                self._ttk,
+                self._ScrolledText,
+                self,
+                control,
+                self._scenario_control_value(control, self.scenario),
+                row=row,
+                label_column=pair_column,
+                value_column=pair_column + 1,
+                width=18,
+            )
+            if control.get("id") == "runtime.language":
+                field.variable = self.language_var
+                field.widget.configure(textvariable=self.language_var)
+                self.language_box = field.widget
+            self.workbench_control_fields[str(control["id"])] = field
+        if not self.workbench_controls:
+            empty = self._ttk.Frame(self.workbench_notebook, padding=8)
+            self._ttk.Label(
+                empty,
+                text="The Lua worker did not declare any quick simulation controls.",
+            ).grid(row=0, column=0, sticky="w")
+            self.workbench_notebook.add(empty, text="Context")
+        self._set_controls(self.session.ready)
+
+    def toggle_simulation_workbench(self) -> None:
+        self.workbench_expanded = not self.workbench_expanded
+        if self.workbench_expanded:
+            self.workbench_content.grid()
+            self.workbench_toggle_button.configure(text="Hide controls")
+        else:
+            self.workbench_content.grid_remove()
+            self.workbench_toggle_button.configure(text="Show controls")
+
+    def _selected_npc_profile(self) -> str:
+        selected_label = self.npc_profile_var.get()
+        return next(
+            (value for value in PROFILE_IDS if profile_label(value) == selected_label),
+            "custom",
+        )
+
+    def _sync_workbench_from_scenario(self, scenario: dict[str, Any]) -> None:
+        self.npc_profile_var.set(profile_label(profile_id(scenario)))
+        self.language_var.set(scenario.get("runtime", {}).get("language", "EN"))
+        for control in self.workbench_controls:
+            control_id = str(control.get("id") or "")
+            field = self.workbench_control_fields.get(control_id)
+            if field is not None:
+                field.set_value(self._scenario_control_value(control, scenario))
+                field.dirty = False
+
+    def _collect_workbench_scenario(self) -> dict[str, Any]:
+        selected_profile = self._selected_npc_profile()
+        draft = deepcopy(self.scenario)
+        if selected_profile != profile_id(draft):
+            draft = apply_npc_profile(draft, selected_profile)
+        values: dict[str, Any] = {}
+        for control in self.workbench_controls:
+            control_id = str(control.get("id") or "")
+            field = self.workbench_control_fields.get(control_id)
+            if field is None or field.kind == "read_only":
+                continue
+            current = self._scenario_control_value(control, draft)
+            if field.initial is None and current is None and not field.dirty:
+                continue
+            values[control_id] = field.get_value()
+        return collect_scenario_settings(draft, values, self.simulation_control_catalog)
+
+    def _on_npc_profile(self) -> None:
+        """Stage a preset in the shared workbench draft; Apply owns the change."""
+
+        selected = self._selected_npc_profile()
+        try:
+            staged = apply_npc_profile(self.scenario, selected)
+        except ValueError as error:
+            self._messagebox.showerror("NPC profile", str(error))
+            self.npc_profile_var.set(profile_label(profile_id(self.scenario)))
+            return
+        self._sync_workbench_from_scenario(staged)
+        if self.workbench_status_var is not None:
+            self.workbench_status_var.set(
+                f"{profile_label(selected)} staged · choose Apply or Apply + Replay."
+            )
+
+    def apply_simulation_settings(self, replay: bool = False) -> None:
+        """Apply the catalog-backed draft, optionally replaying a real utterance."""
+
+        if not self.session.ready or self.busy:
+            return
+        current_text = self.input_var.get().strip()
+        value = current_text or self.last_test_utterance.strip()
+        if replay and not value:
+            self.workbench_status_var.set("Enter or send a test utterance before replaying.")
+            return
+        try:
+            updated = self._collect_workbench_scenario()
+        except (TypeError, ValueError, self._tk.TclError) as error:
+            self._messagebox.showerror("Simulation workbench", str(error))
+            return
+
+        def operation(worker: LuaSemanticWorker) -> dict[str, Any]:
+            configured = worker.configure(updated)
+            if not replay:
+                return {"configured": configured}
+            return {"configured": configured, "turn": worker.input(value)}
+
+        def finish(result: dict[str, Any]) -> None:
+            self.scenario = updated
+            self._sync_workbench_from_scenario(updated)
+            if replay:
+                if current_text:
+                    self.input_var.set("")
+                    self.last_test_utterance = value
+                    self._append("PLAYER", value)
+                response = result.get("turn") or {}
+                self._show_response(response)
+                self._append("SYSTEM", f"Applied simulation context and replayed: {value}")
+                self.workbench_status_var.set("Applied and replayed through the Lua worker.")
+            else:
+                response = result.get("configured") or {}
+                self._show_response(response)
+                self._append("SYSTEM", "Applied simulation workbench settings to the Lua worker.")
+                self.workbench_status_var.set("Applied to the Lua worker.")
+
+        self._start_operation(operation, finish)
 
     def _start_operation(
         self,
@@ -701,6 +1059,19 @@ class SemanticHarnessApp:
 
     def _show_response(self, response: dict[str, Any]) -> None:
         self.last_response = response if isinstance(response, dict) else {}
+        relationship_field = self.workbench_control_fields.get("relationship.state")
+        if relationship_field is not None:
+            relationship_control = next(
+                (
+                    control for control in self.workbench_controls
+                    if control.get("id") == "relationship.state"
+                ),
+                None,
+            )
+            if relationship_control is not None:
+                relationship_field.set_value(
+                    self._scenario_control_value(relationship_control, self.scenario)
+                )
         inspector_record = dict(self.last_response)
         inspector_record["personaCatalog"] = self.persona_catalog
         view = build_conversation_inspector(inspector_record)
@@ -711,7 +1082,8 @@ class SemanticHarnessApp:
         conversation_graph = observation.get("conversationGraph")
         if conversation_graph is None:
             conversation_graph = response.get("conversationGraph")
-        self.dialogue_graph_pane.set_graph(conversation_graph)
+        if isinstance(conversation_graph, dict):
+            self.dialogue_graph_pane.set_graph(conversation_graph)
         self.suggestion_frame.configure(
             text=(
                 "Current player choices"
@@ -720,14 +1092,18 @@ class SemanticHarnessApp:
                 else "Contextual semantic suggestions"
             )
         )
-        if conversation_graph:
-            self.trace_tabs.select(self.dialogue_graph_frame)
         suggestions = (
             observation.get("suggestions")
             or response.get("suggestions")
             or {}
         )
+        hub_diagnostics = semantic_hub_diagnostic_projection(suggestions)
+        self._set_text(self.hub_diagnostics, pretty(hub_diagnostics))
         self._render_suggestions(response, suggestions)
+        if hub_diagnostics.get("activeHub") is not None:
+            self.trace_tabs.select(self.hub_diagnostics_frame)
+        elif isinstance(conversation_graph, dict):
+            self.trace_tabs.select(self.dialogue_graph_frame)
 
     def _on_suggestion_group(self) -> None:
         if not self.suggestion_projection:
@@ -764,36 +1140,6 @@ class SemanticHarnessApp:
         self._render_suggestions(
             self.suggestion_response, self.suggestion_projection
         )
-
-    def _on_npc_profile(self) -> None:
-        """Apply a profile through the existing scenario/configure boundary."""
-
-        if not self.session.ready or self.busy:
-            return
-        selected_label = self.npc_profile_var.get()
-        selected = next(
-            (
-                value
-                for value in PROFILE_IDS
-                if profile_label(value) == selected_label
-            ),
-            "custom",
-        )
-        try:
-            updated = apply_npc_profile(self.scenario, selected)
-        except ValueError as error:
-            self._messagebox.showerror("NPC profile", str(error))
-            self.npc_profile_var.set(profile_label(profile_id(self.scenario)))
-            return
-
-        def finish(response: dict[str, Any]) -> None:
-            self.scenario = updated
-            self.npc_profile_var.set(profile_label(selected))
-            self._set_text(self.transcript, "")
-            self._show_response(response)
-            self._append("SYSTEM", f"Applied NPC profile: {profile_label(selected)}")
-
-        self._start_operation(lambda worker: worker.configure(updated), finish)
 
     def _render_suggestions(
         self, response: dict[str, Any], suggestions: dict[str, Any]
@@ -889,6 +1235,7 @@ class SemanticHarnessApp:
         if not value or not self.session.ready or self.busy:
             return
         self.input_var.set("")
+        self.last_test_utterance = value
 
         def finish(response: dict[str, Any]) -> None:
             self._append("PLAYER", value)
@@ -920,6 +1267,7 @@ class SemanticHarnessApp:
         def finish(response: dict[str, Any]) -> None:
             if response.get("accepted") is True:
                 utterance = (row.get("display") or {}).get("utterance") or label
+                self.last_test_utterance = str(utterance)
                 self._append("PLAYER", str(utterance))
                 for message in response.get("messages", []):
                     if message.get("speaker") == "npc":
@@ -950,6 +1298,7 @@ class SemanticHarnessApp:
 
         def finish(response: dict[str, Any]) -> None:
             if response.get("accepted") is True:
+                self.last_test_utterance = label
                 self._append("PLAYER", label)
                 for message in response.get("messages", []):
                     if message.get("speaker") == "npc":
@@ -1003,7 +1352,11 @@ class SemanticHarnessApp:
             self._set_text(self.suggestion_inspector, "")
             self._set_text(self.world_knowledge_inspector, "")
             self._set_text(self.dialogue_diagnostics, "")
-            self.dialogue_graph_pane.set_graph(None)
+            self.dialogue_graph_pane.clear_graph()
+            self._set_text(
+                self.hub_diagnostics,
+                pretty(semantic_hub_diagnostic_projection({})),
+            )
             self.suggestion_rows = []
             self.suggestion_interactive = False
             self._render_suggestions(
@@ -1030,8 +1383,7 @@ class SemanticHarnessApp:
         def finish(response: dict[str, Any]) -> None:
             self.scenario = scenario
             self.scenario_path = Path(filename)
-            self.language_var.set(scenario.get("runtime", {}).get("language", "EN"))
-            self.npc_profile_var.set(profile_label(profile_id(scenario)))
+            self._sync_workbench_from_scenario(scenario)
             self._set_text(self.transcript, "")
             self._show_response(response)
             self._append("SYSTEM", f"Loaded {filename}")
@@ -1088,17 +1440,9 @@ class SemanticHarnessApp:
         self._start_operation(lambda worker: worker.capture_baseline(value), finish)
 
     def apply_and_replay(self) -> None:
-        """Reapply the edited scenario and submit the current utterance."""
+        """Apply the current workbench draft, then replay the latest utterance."""
 
-        value = self.input_var.get().strip()
-        if not value or not self.session.ready or self.busy:
-            return
-
-        def finish(result: dict[str, Any]) -> None:
-            self._show_response(result.get("turn") or result)
-            self._append("SYSTEM", f"Applied scenario and replayed: {value}")
-
-        self._start_operation(lambda worker: worker.apply_and_replay(value), finish)
+        self.apply_simulation_settings(replay=True)
 
     def inspect_persona_matrix(self) -> None:
         """Run a small production-backed persona A/B matrix in one worker."""

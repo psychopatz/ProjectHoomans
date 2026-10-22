@@ -144,9 +144,6 @@ function Conversation.buildContext(context)
         output.conversationBlockContext =
             priorContext.conversationBlockContext
         output.conversationBlock = Values.copy(priorContext.conversationBlock)
-        output.conversationCategoryPreflight = Values.copy(
-            priorContext.conversationCategoryPreflight
-        )
         output.categoryDiagnostics = Values.copy(
             priorContext.categoryDiagnostics
         )
@@ -182,10 +179,6 @@ function Conversation.refreshViewContext(context)
                     block.topic
             end
         end
-        Runtime.view.spec.context.conversationCategoryPreflight =
-            Conversation.categoryPreflight(
-                Runtime.view.spec.context.conversationBlockContext
-            )
         if composer and type(composer.BuildCategoryDiagnostics) == "function"
             and type(Runtime.view.spec.context.conversationBlockContext) == "table"
         then
@@ -289,7 +282,7 @@ function Conversation.blockProjection(view)
         end
     end
     return {
-        categoryID = "projecthoomans:whats_up",
+        categoryID = block and block.category or root.categoryID,
         blockID = blockID,
         nodeID = nodeID,
         topic = topic or root.conversationTopic,
@@ -307,38 +300,6 @@ function Conversation.graphProjection(view)
         return composer.BuildSemanticConversationGraphProjection(view)
     end
     return nil
-end
-
-function Conversation.categoryPreflight(blockContext)
-    local categoryID = "projecthoomans:whats_up"
-    if type(blockContext) ~= "table" then
-        return { visible = false, reason = "context_unknown" }
-    end
-    local conversation = PNC.Conversation
-    local registry = conversation and conversation.Registry or nil
-    local selector = conversation and conversation.Selector or nil
-    if not registry or not selector
-        or type(registry.GetCategory) ~= "function"
-        or type(selector.IsCategoryEligible) ~= "function"
-        or type(selector.SelectBlock) ~= "function"
-    then
-        return { visible = false, reason = "registry_unavailable" }
-    end
-    local category = registry.GetCategory(categoryID)
-    if not category then return { visible = false, reason = "category_not_found" } end
-    local eligible, eligibilityReason = selector.IsCategoryEligible(
-        categoryID, blockContext, false
-    )
-    local selected, selection = selector.SelectBlock(categoryID, blockContext)
-    return {
-        categoryID = categoryID,
-        visible = eligible == true and selected ~= nil,
-        eligible = eligible == true,
-        reason = eligible ~= true and eligibilityReason
-            or selected and "visible" or "no_eligible_block",
-        selectedBlockID = selected and selected.id or nil,
-        eligibleBlockCount = selection and selection.eligibleCount or 0,
-    }
 end
 
 function Conversation.buildView(context)
@@ -562,9 +523,6 @@ function Conversation.buildView(context)
             spec.context.conversationBlockContext = blockContext
         end
     end
-    spec.context.conversationCategoryPreflight = Conversation.categoryPreflight(
-        spec.context.conversationBlockContext
-    )
     local composer = PNC.Conversation and PNC.Conversation.Composer
     if composer and type(composer.BuildCategoryDiagnostics) == "function"
         and type(spec.context.conversationBlockContext) == "table"

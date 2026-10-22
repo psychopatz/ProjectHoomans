@@ -20,11 +20,11 @@ local function registerWhatsUpConceptPattern()
         {
             intent = "QUESTION",
             speechAct = "QUESTION",
-            subject = "CONVERSATION_TOPIC",
-            extensions = {
-                topic = "whats_up",
-                categoryID = "projecthoomans:whats_up",
-                route = "conversation_category",
+        subject = "CONVERSATION_TOPIC",
+        extensions = {
+            topic = "whats_up",
+            hubID = "whats_up",
+            route = "semantic_hub",
             },
         },
         0.94,
@@ -36,7 +36,7 @@ local function registerWhatsUpConceptPattern()
                 canonicalConcept = "WHATS_UP",
                 mapping = {
                     canonicalConcept = "WHATS_UP",
-                    dialogueState = "WHATS_UP_ROOT",
+                dialogueState = "WHATS_UP_HUB",
                     sourceRefs = { "DailyDialog", "EmpatheticDialogues" },
                 },
             },

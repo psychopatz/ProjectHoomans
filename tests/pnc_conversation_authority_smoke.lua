@@ -155,18 +155,16 @@ T.truthy(Authority.HandleCategory(player, {
     requestID = "category-1",
     npcID = record.id,
     token = "lease-token",
-    categoryID = "projecthoomans:whats_up",
+    categoryID = "projecthoomans:wellbeing",
     registryFingerprint = fingerprint,
 }), "authoritative category accepted")
 local categoryResult = sent[#sent]
 T.equal(categoryResult.command, PNC.Const.CMD_CONVERSATION_BLOCK,
     "block response command")
 T.equal(categoryResult.payload.success, true, "block response success")
-T.truthy(string.find(categoryResult.payload.blockID,
-    "projecthoomans:whats_up_", 1, true) == 1,
-    "eligible randomized neutral topic selected")
-T.truthy(string.sub(categoryResult.payload.blockID, -8) == "_neutral",
-    "selected daily topic matches the neutral audience")
+T.equal(categoryResult.payload.blockID,
+    "projecthoomans:wellbeing_basic_neutral",
+    "eligible neutral wellbeing block selected")
 
 T.truthy(Authority.HandleChoice(player, {
     requestID = "choice-1",
@@ -174,25 +172,24 @@ T.truthy(Authority.HandleChoice(player, {
     token = "lease-token",
     blockID = categoryResult.payload.blockID,
     nodeID = "opening",
-    choiceID = "detail",
+    choiceID = "condition",
     registryFingerprint = fingerprint,
 }), "authoritative choice accepted")
 local outcome = sent[#sent]
 T.equal(outcome.command, PNC.Const.CMD_CONVERSATION_OUTCOME,
     "outcome response command")
 T.equal(outcome.payload.success, true, "outcome success")
-T.truthy(outcome.payload.outcomeID == "open"
-    or outcome.payload.outcomeID == "guarded",
-    "deterministic weighted outcome")
-T.equal(outcome.payload.nextNodeID, "details",
-    "daily topic enters its authored detail branch")
+T.equal(outcome.payload.outcomeID, "reply",
+    "wellbeing choice resolves its authored outcome")
+T.equal(outcome.payload.nextNodeID, "$root",
+    "simple wellbeing choice returns to the conversation root")
 T.equal(outcome.payload.close, false,
     "built-in subtopic does not close the conversation")
 T.equal(outcome.payload.closeReason, nil,
     "non-terminal outcome has no close reason")
 T.equal(relationshipEffects, 1, "effect applied exactly once")
 local categoryHistory = History.Get(
-    "category:projecthoomans:whats_up",
+    "category:projecthoomans:wellbeing",
     { scope = "pair" },
     Authority.BuildContext(player, record, "lease-token")
 )
@@ -266,63 +263,28 @@ T.equal(sent[#sent].payload.npcReaction, nil,
 T.equal(sent[#sent].payload.responseKey, nil,
     "invalid recruit lease has no authored NPC refusal")
 
-T.truthy(Authority.HandleChoice(player, {
-    requestID = "choice-2",
-    npcID = record.id,
-    token = "lease-token",
-    blockID = categoryResult.payload.blockID,
-    nodeID = "details",
-    choiceID = "offer_help",
-    registryFingerprint = fingerprint,
-}), "authoritative branch choice accepted")
-local branchOutcome = sent[#sent]
-T.equal(branchOutcome.payload.nextNodeID, "followup",
-    "daily topic can continue through multiple nodes")
-T.equal(relationshipEffects, 4,
-    "each committed branch applies its relationship outcome once")
-
 local replayed, replayReason = Authority.HandleChoice(player, {
     requestID = "choice-1",
     npcID = record.id,
     token = "lease-token",
     blockID = categoryResult.payload.blockID,
     nodeID = "opening",
-    choiceID = "detail",
+    choiceID = "condition",
     registryFingerprint = fingerprint,
 })
 T.equal(replayed, false, "replay rejected")
 T.equal(replayReason, "replayed_request", "replay rejection reason")
-T.equal(relationshipEffects, 4, "replay does not duplicate effect")
+T.equal(relationshipEffects, 3, "replay does not duplicate effect")
 T.equal(sent[#sent].payload.success, false, "replay response rejected")
 
-T.truthy(History.Save(false), "daily conversation history saves")
+T.truthy(History.Save(false), "conversation history saves")
 History.Load()
-local repeatedDaily, repeatedDailyReason = Authority.HandleCategory(player, {
-    requestID = "category-same-day",
-    npcID = record.id,
-    token = "lease-token",
-    categoryID = "projecthoomans:whats_up",
-    registryFingerprint = fingerprint,
-})
-T.equal(repeatedDaily, false,
-    "What's Up cannot be triggered twice after save-history reload")
-T.equal(repeatedDailyReason, "once_per_day_used",
-    "same-day category rejection explains the daily policy")
-worldHours = 124
-T.truthy(Authority.HandleCategory(player, {
-    requestID = "category-next-day",
-    npcID = record.id,
-    token = "lease-token",
-    categoryID = "projecthoomans:whats_up",
-    registryFingerprint = fingerprint,
-}), "What's Up becomes available after the world day changes")
-worldHours = 100
 
 local accepted, reason = Authority.HandleCategory(player, {
     requestID = "category-forged",
     npcID = record.id,
     token = "wrong-token",
-    categoryID = "projecthoomans:whats_up",
+    categoryID = "projecthoomans:wellbeing",
     registryFingerprint = fingerprint,
 })
 T.equal(accepted, false, "forged lease rejected")
@@ -334,7 +296,7 @@ accepted, reason = Authority.HandleCategory(player, {
     requestID = "category-mismatch",
     npcID = record.id,
     token = "lease-token",
-    categoryID = "projecthoomans:whats_up",
+    categoryID = "projecthoomans:wellbeing",
     registryFingerprint = "wrong",
 })
 T.equal(accepted, false, "registry mismatch rejected")
@@ -349,7 +311,7 @@ local missingState, missingStateReason = Authority.HandleChoice(player, {
     token = "lease-token",
     blockID = categoryResult.payload.blockID,
     nodeID = "opening",
-    choiceID = "detail",
+    choiceID = "condition",
     registryFingerprint = fingerprint,
 })
 T.equal(missingState, false,

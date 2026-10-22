@@ -60,9 +60,28 @@ local function route(candidate)
     return text(extensions.route)
 end
 
-function Ranking.ClassFor(candidate)
+local function injured(actor)
+    local situation = type(actor.situation) == "table"
+        and actor.situation or {}
+    local healthState = text(situation.healthState)
+    return healthState == "injured" or healthState == "wounded"
+        or healthState == "critical"
+end
+
+local function severeNeeds(actor)
+    local situation = type(actor.situation) == "table"
+        and actor.situation or {}
+    local needs = type(situation.needs) == "table" and situation.needs or {}
+    return (tonumber(needs.hunger) or 0) >= 0.75
+        or (tonumber(needs.thirst) or 0) >= 0.75
+        or (tonumber(needs.fatigue) or 0) >= 0.75
+end
+
+function Ranking.ClassFor(candidate, actor, currentTopic)
     local kind = sourceKind(candidate)
     local candidateID = text(candidate and candidate.id)
+    actor = type(actor) == "table" and actor or {}
+    currentTopic = text(currentTopic)
     if kind == "active_flow" or kind == "conversation_registry"
         or route(candidate) == "conversation_choice"
     then
@@ -77,6 +96,16 @@ function Ranking.ClassFor(candidate)
     end
     if kind == "social_context" then return "CONTEXTUAL_SOCIAL" end
     if kind == "typed_input" then
+        if currentTopic == "whats_up"
+            and candidateID == "question.health" and injured(actor)
+        then
+            return "CONTEXTUAL_SOCIAL"
+        end
+        if currentTopic == "whats_up"
+            and candidateID == "question.needs" and severeNeeds(actor)
+        then
+            return "CONTEXTUAL_SOCIAL"
+        end
         if candidateID == "question.wellbeing_detail" then
             return "CONTEXTUAL_SOCIAL"
         end
@@ -102,7 +131,7 @@ local function contextFit(candidate, actor, style, currentTopic)
         and (healthState == "injured" or healthState == "wounded"
             or healthState == "critical")
     then
-        fit = fit + 6
+        fit = fit + (currentTopic == "whats_up" and 12 or 6)
     end
     if topic == "needs"
         and (tonumber(needs.hunger) or 0) >= 0.75
@@ -111,7 +140,7 @@ local function contextFit(candidate, actor, style, currentTopic)
             or topic == "needs"
             and (tonumber(needs.fatigue) or 0) >= 0.75
     then
-        fit = fit + 6
+        fit = fit + (currentTopic == "whats_up" and 8 or 6)
     end
     if roles.companion == true and candidate and candidate.action ~= nil then
         fit = fit + 2
@@ -134,7 +163,7 @@ local function contextFit(candidate, actor, style, currentTopic)
 end
 
 local function annotate(candidate, actor, style, currentTopic, orderHint)
-    local class = Ranking.ClassFor(candidate)
+    local class = Ranking.ClassFor(candidate, actor, currentTopic)
     local classOrder = CLASS_ORDER[class] or CLASS_ORDER.UTILITY
     local id = tostring(candidate and candidate.id or "")
     local fit = contextFit(candidate, actor, style, currentTopic)

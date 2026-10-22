@@ -45,7 +45,9 @@ class ConversationGraphPane:
         toolbar.grid(row=0, column=0, sticky="ew", pady=(0, 4))
         toolbar.columnconfigure(0, weight=1)
         self.graph_hint_var = tk_module.StringVar(
-            value="Type a recognized authored category to inspect its branch."
+            value=(
+                "Actual ConversationBlock paths remain here; What's Up uses Hub diagnostics."
+            )
         )
         ttk.Label(toolbar, textvariable=self.graph_hint_var, anchor="w").grid(
             row=0, column=0, sticky="ew"
@@ -60,6 +62,10 @@ class ConversationGraphPane:
             toolbar, text="Diagnostics", command=self.show_diagnostics
         )
         self.diagnostics_button.grid(row=0, column=3, padx=(4, 0))
+        self.clear_button = ttk.Button(
+            toolbar, text="Clear graph", command=self.clear_graph
+        )
+        self.clear_button.grid(row=0, column=4, padx=(4, 0))
 
         graph_frame = ttk.Frame(self.frame)
         graph_frame.grid(row=1, column=0, sticky="nsew")
@@ -108,10 +114,21 @@ class ConversationGraphPane:
         self._draw_graph()
         if graph is None:
             self._fitted_graph_id = None
+            self.graph_hint_var.set(
+                "No retained ConversationBlock graph. What's Up uses Hub diagnostics."
+            )
             return
+        self.graph_hint_var.set(
+            f"Retained actual ConversationBlock graph · {graph_id or 'active graph'}"
+        )
         if graph is not None and changed:
             self._fitted_graph_id = graph_id
             self.frame.after_idle(self.fit_graph)
+
+    def clear_graph(self) -> None:
+        """Explicitly clear the presentation-only retained graph."""
+
+        self.set_graph(None)
 
     def set_enabled(self, _enabled: bool) -> None:
         """The Simulation graph is intentionally read-only."""

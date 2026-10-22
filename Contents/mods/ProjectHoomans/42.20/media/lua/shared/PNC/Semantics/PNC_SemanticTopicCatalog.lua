@@ -12,7 +12,6 @@ PNC.Semantics.TopicCatalog = Catalog
 Catalog.VERSION = 1
 Catalog.AUTHORED_CATEGORY_TOPICS = Catalog.AUTHORED_CATEGORY_TOPICS or {
     ["projecthoomans:greetings"] = "greeting",
-    ["projecthoomans:whats_up"] = "whats_up",
     ["projecthoomans:wellbeing"] = "wellbeing",
     ["projecthoomans:small_talk"] = "small_talk",
     ["projecthoomans:ask_about"] = "ask_about",

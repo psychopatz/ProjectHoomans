@@ -48,7 +48,11 @@ class SemanticLabNpcProfileTests(unittest.TestCase):
                     for item in worker.snapshot()["context"]["categoryDiagnostics"]
                     if item.get("id") == "projecthoomans:trade"
                 )
-                self.assertEqual("conversation.whats_up" in ids, profile != "enemy")
+                self.assertEqual(
+                    suggestions.get("activeHub"),
+                    {"id": "whats_up", "route": "semantic_hub"},
+                )
+                self.assertNotIn("semantic_hub.whats_up", ids)
                 self.assertEqual("FOLLOW" in action_ids, profile == "companion")
                 self.assertEqual(trade["visible"], profile == "trader")
                 self.assertEqual(

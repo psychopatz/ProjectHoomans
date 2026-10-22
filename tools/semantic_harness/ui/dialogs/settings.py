@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from copy import deepcopy
 import json
+import math
 from pathlib import Path
 from typing import Any, Callable, Mapping, Protocol
 
 from ...inspection.rendering import pretty
 from ...runtime.scenario import save_scenario, validate_scenario
+from .catalog_control import CatalogControlField, control_options
 
 
 class SettingsDialogHost(Protocol):
@@ -29,14 +31,19 @@ class SettingsDialogHost(Protocol):
     npc_profile_var: Any
     trace: Any
     persona_catalog: dict[str, Any]
+    simulation_control_catalog: dict[str, Any]
     last_response: dict[str, Any]
+    settings_control_fields: dict[str, Any]
 
     def _start_operation(self, operation: Callable[[Any], Any], callback: Callable[[Any], None]) -> bool: ...
     def _set_text(self, widget: Any, value: str) -> None: ...
     def _append(self, speaker: str, text: str) -> None: ...
+    def _sync_workbench_from_scenario(self, scenario: dict[str, Any]) -> None: ...
 
 
-def collect_scenario_settings(draft: dict[str, Any], values: Mapping[str, Any]) -> dict[str, Any]:
+def _collect_legacy_scenario_settings(
+    draft: dict[str, Any], values: Mapping[str, Any]
+) -> dict[str, Any]:
     """Build and validate an updated scenario from primitive form values."""
 
     def read_value(key: str) -> Any:
@@ -172,8 +179,171 @@ def collect_scenario_settings(draft: dict[str, Any], values: Mapping[str, Any]) 
     return updated
 
 
+def _path_value(source: Mapping[str, Any], path: str) -> Any:
+    value: Any = source
+    for segment in path.split("."):
+        if not isinstance(value, Mapping):
+            return None
+        value = value.get(segment)
+    return value
+
+
+def _set_path(target: dict[str, Any], path: str, value: Any) -> None:
+    segments = path.split(".")
+    current = target
+    for segment in segments[:-1]:
+        child = current.get(segment)
+        if not isinstance(child, dict):
+            child = {}
+            current[segment] = child
+        current = child
+    current[segments[-1]] = value
+
+
+def _delete_path(target: dict[str, Any], path: str) -> None:
+    segments = path.split(".")
+    current: Any = target
+    for segment in segments[:-1]:
+        if not isinstance(current, dict):
+            return
+        current = current.get(segment)
+    if isinstance(current, dict):
+        current.pop(segments[-1], None)
+
+
+def _typed_value(
+    control: Mapping[str, Any], raw: Any, existing: Any = None
+) -> Any:
+    value_type = str(control.get("valueType") or "text")
+    if value_type == "boolean":
+        if isinstance(raw, bool):
+            return raw
+        if str(raw).lower() in {"true", "1", "yes"}:
+            return True
+        if str(raw).lower() in {"false", "0", "no"}:
+            return False
+        raise ValueError(f"{control.get('id')} must be a boolean")
+    if value_type in {"number", "integer"}:
+        try:
+            number = float(raw)
+        except (TypeError, ValueError) as error:
+            raise ValueError(f"{control.get('id')} must be a number") from error
+        if not math.isfinite(number):
+            raise ValueError(f"{control.get('id')} must be finite")
+        minimum = control.get("min")
+        maximum = control.get("max")
+        if minimum is not None and number < float(minimum):
+            raise ValueError(f"{control.get('id')} must be at least {minimum}")
+        if maximum is not None and number > float(maximum):
+            raise ValueError(f"{control.get('id')} must be at most {maximum}")
+        step = control.get("step")
+        if step is not None and float(step) > 0:
+            origin = float(minimum) if minimum is not None else 0.0
+            units = (number - origin) / float(step)
+            if not math.isclose(units, round(units), rel_tol=0.0, abs_tol=1e-7):
+                raise ValueError(f"{control.get('id')} must use increments of {step}")
+        if value_type == "integer":
+            if not number.is_integer():
+                raise ValueError(f"{control.get('id')} must be a whole number")
+            return int(number)
+        return round(number, 8)
+    if value_type == "enum":
+        value = str(raw)
+        options = control_options(control)
+        if options and value not in options and value != existing:
+            raise ValueError(f"{control.get('id')} is not in the worker catalog")
+        return value
+    if value_type == "array":
+        if not isinstance(raw, list):
+            raise ValueError(f"{control.get('id')} must be a selection list")
+        options = control_options(control)
+        selected = [str(item) for item in raw]
+        existing_values = (
+            {str(item) for item in existing}
+            if isinstance(existing, list)
+            else set()
+        )
+        if options and any(
+            item not in options and item not in existing_values
+            for item in selected
+        ):
+            raise ValueError(f"{control.get('id')} contains an option outside the worker catalog")
+        return selected
+    if value_type == "object":
+        if isinstance(raw, dict):
+            value = deepcopy(raw)
+        else:
+            try:
+                value = json.loads(raw)
+            except (json.JSONDecodeError, TypeError) as error:
+                message = error.msg if isinstance(error, json.JSONDecodeError) else "expected JSON text"
+                raise ValueError(f"{control.get('id')} Advanced JSON is invalid: {message}") from error
+        if not isinstance(value, dict):
+            raise ValueError(f"{control.get('id')} Advanced JSON must be an object")
+        return value
+    value = str(raw).strip()
+    if control.get("emptyToNull") and not value:
+        return None
+    return value
+
+
+def _collect_catalog_scenario_settings(
+    draft: dict[str, Any],
+    values: Mapping[str, Any],
+    control_catalog: Mapping[str, Any],
+) -> dict[str, Any]:
+    updated = deepcopy(draft)
+    controls = control_catalog.get("controls", [])
+    if not isinstance(controls, list) or len(controls) > 64:
+        raise ValueError("worker simulation control catalog is invalid")
+    # Relationship state is computed from the editable standing by production.
+    updated.setdefault("npc", {}).pop("relationshipState", None)
+    for control in controls:
+        if not isinstance(control, Mapping):
+            continue
+        control_type = str(control.get("control") or "")
+        if control_type == "read_only" or control.get("id") not in values:
+            continue
+        field_id = str(control.get("id"))
+        path = control.get("path")
+        if not isinstance(path, str) or not path:
+            continue
+        value = _typed_value(control, values[field_id], _path_value(draft, path))
+        none_value = control.get("noneValue")
+        if none_value is not None and value == none_value:
+            clear_path = control.get("clearPath")
+            _delete_path(updated, str(clear_path or path))
+            continue
+        if field_id == "persona.bondKind":
+            existing = _path_value(updated, "npc.startingRelationship")
+            existing = existing if isinstance(existing, dict) else {}
+            starting_relationship = {
+                "kind": value,
+                "source": existing.get("source", "starting_companion_trait"),
+            }
+            if existing.get("since") is not None:
+                starting_relationship["since"] = existing["since"]
+            _set_path(updated, "npc.startingRelationship", starting_relationship)
+        else:
+            _set_path(updated, path, value)
+    validate_scenario(updated)
+    return updated
+
+
+def collect_scenario_settings(
+    draft: dict[str, Any],
+    values: Mapping[str, Any],
+    control_catalog: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Collect typed worker-catalog values, retaining a legacy test adapter."""
+
+    if control_catalog is None:
+        return _collect_legacy_scenario_settings(draft, values)
+    return _collect_catalog_scenario_settings(draft, values, control_catalog)
+
+
 def open_runtime_settings(host: SettingsDialogHost) -> None:
-    """Open the modal editor for every configurable harness seam."""
+    """Render the bounded worker catalog as ordinary typed simulation controls."""
 
     if not host.worker_ready or host.busy:
         return
@@ -186,10 +356,23 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
     tk = host._tk
     ttk = host._ttk
     ScrolledText = host._ScrolledText
+    catalog = host.simulation_control_catalog
+    controls = catalog.get("controls", []) if isinstance(catalog, dict) else []
+    if not isinstance(controls, list) or not controls:
+        host._messagebox.showerror(
+            "Simulation settings",
+            "The Lua worker did not provide a simulation control catalog.",
+        )
+        return
+    controls = [
+        control for control in controls[:64]
+        if isinstance(control, dict) and control.get("id")
+    ]
+
     dialog = tk.Toplevel(host.root)
     host.settings_window = dialog
-    dialog.title("Mock runtime settings")
-    dialog.geometry("900x700")
+    dialog.title("Simulation settings")
+    dialog.geometry("940x740")
     dialog.minsize(760, 560)
     dialog.transient(host.root)
     dialog.columnconfigure(0, weight=1)
@@ -203,339 +386,151 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
                 pass
             dialog.destroy()
         host.settings_window = None
+        host.settings_variables = {}
+        host.settings_control_widgets = {}
+        host.settings_control_fields = {}
 
     dialog.protocol("WM_DELETE_WINDOW", close_dialog)
-
     draft = deepcopy(host.scenario)
     variables: dict[str, Any] = {}
+    widgets: dict[str, Any] = {}
+    fields: dict[str, CatalogControlField] = {}
+    host.settings_variables = variables
+    host.settings_control_widgets = widgets
+    host.settings_control_fields = fields
 
     notebook = ttk.Notebook(dialog)
     notebook.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+    pages: dict[str, Any] = {}
+    sections: dict[tuple[str, str], Any] = {}
+    section_rows: dict[tuple[str, str], int] = {}
 
     def page(title: str) -> Any:
-        frame = ttk.Frame(notebook, padding=12)
+        existing = pages.get(title)
+        if existing is not None:
+            return existing
+        outer = ttk.Frame(notebook)
+        outer.columnconfigure(0, weight=1)
+        outer.rowconfigure(0, weight=1)
+        canvas = tk.Canvas(outer, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(outer, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.grid(row=0, column=0, sticky="nsew")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+        inner = ttk.Frame(canvas, padding=12)
+        inner.columnconfigure(0, weight=1)
+        window_id = canvas.create_window((0, 0), window=inner, anchor="nw")
+        inner.bind(
+            "<Configure>",
+            lambda _event, current=canvas: current.configure(
+                scrollregion=current.bbox("all")
+            ),
+        )
+        canvas.bind(
+            "<Configure>",
+            lambda event, current=canvas, item=window_id: current.itemconfigure(
+                item, width=event.width
+            ),
+        )
+        notebook.add(outer, text=title)
+        pages[title] = inner
+        return inner
+
+    def section_frame(page_title: str, section_title: str) -> Any:
+        key = (page_title, section_title)
+        existing = sections.get(key)
+        if existing is not None:
+            return existing
+        page_frame = page(page_title)
+        row = sum(1 for page_key, _ in sections if page_key == page_title)
+        frame = ttk.LabelFrame(page_frame, text=section_title, padding=10)
+        frame.grid(row=row, column=0, sticky="ew", pady=(0, 10))
         frame.columnconfigure(1, weight=1)
-        notebook.add(frame, text=title)
+        sections[key] = frame
+        section_rows[key] = 0
         return frame
 
-    def text_field(parent: Any, row: int, key: str, label: str, value: Any) -> None:
-        variables[key] = tk.StringVar(value="" if value is None else str(value))
-        ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", padx=(0, 10), pady=4)
-        ttk.Entry(parent, textvariable=variables[key], width=32).grid(
-            row=row, column=1, sticky="ew", pady=4
-        )
+    def current_value(control: dict[str, Any]) -> Any:
+        control_id = str(control.get("id"))
+        if control_id == "relationship.state":
+            response = host.last_response if isinstance(host.last_response, dict) else {}
+            context = response.get("contextAfter") or response.get("context") or {}
+            actor = context.get("actorConversationContext", {}) if isinstance(context, dict) else {}
+            relationship = actor.get("relationship", {}) if isinstance(actor, dict) else {}
+            return relationship.get("state", "unknown")
+        path = control.get("path")
+        value = _path_value(draft, str(path)) if isinstance(path, str) else None
+        if control_id == "persona.bondKind":
+            return value or "none"
+        if control_id == "npc.role":
+            return value or "none"
+        return value
 
-    def check_field(parent: Any, row: int, key: str, label: str, value: Any) -> None:
-        variables[key] = tk.BooleanVar(value=bool(value))
-        ttk.Checkbutton(parent, text=label, variable=variables[key]).grid(
-            row=row, column=0, columnspan=2, sticky="w", pady=4
-        )
-
-    def combo_field(
-        parent: Any,
-        row: int,
-        key: str,
-        label: str,
-        value: Any,
-        values: tuple[str, ...],
-    ) -> None:
-        variables[key] = tk.StringVar(value=str(value or values[0]))
-        ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", padx=(0, 10), pady=4)
-        ttk.Combobox(
+    for control in controls:
+        control_id = str(control["id"])
+        page_title = str(control.get("page") or "Simulation")
+        section_title = str(control.get("section") or "Scenario")
+        parent = section_frame(page_title, section_title)
+        section_key = (page_title, section_title)
+        row = section_rows[section_key]
+        section_rows[section_key] = row + 1
+        initial = current_value(control)
+        field = CatalogControlField(
             parent,
-            textvariable=variables[key],
-            values=values,
-            state="readonly",
-            width=29,
-        ).grid(row=row, column=1, sticky="ew", pady=4)
-
-    runtime = draft.setdefault("runtime", {})
-    world = draft.setdefault("world", {})
-    player = draft.setdefault("player", {})
-    npc = draft.setdefault("npc", {})
-    relationship = npc.setdefault("relationship", {})
-    conversation = draft.setdefault("conversation", {})
-
-    runtime_page = page("Runtime")
-    combo_field(runtime_page, 0, "runtime.mode", "Network mode", runtime.get("mode"), ("singleplayer", "multiplayer"))
-    combo_field(runtime_page, 1, "runtime.language", "Language", runtime.get("language"), ("EN", "TL"))
-    check_field(runtime_page, 2, "runtime.llmEnabled", "LLM bridge enabled", runtime.get("llmEnabled"))
-    check_field(
-        runtime_page,
-        3,
-        "runtime.providerAvailable",
-        "LLM provider available",
-        runtime.get("providerAvailable"),
-    )
-    ttk.Label(
-        runtime_page,
-        text="These values control the headless engine seams; production semantic modules remain loaded.",
-        wraplength=560,
-    ).grid(row=4, column=0, columnspan=2, sticky="w", pady=(14, 4))
-
-    world_page = page("World")
-    for row, key in enumerate(
-        ("hunger", "thirst", "fatigue", "stress", "boredom", "panic", "timeOfDay", "worldAgeHours", "zombieKills")
-    ):
-        text_field(world_page, row, f"world.{key}", key, world.get(key))
-    combo_field(world_page, 9, "world.weather", "Weather", world.get("weather"), ("clear", "rain", "fog", "snow"))
-    text_field(world_page, 10, "world.weatherTransition", "Weather transition", world.get("weatherTransition"))
-    ttk.Label(
-        world_page,
-        text="Needs use the game-style 0–1 scale. Time and zombie kills are engine facts; an optional transition simulates an observed weather event.",
-        wraplength=560,
-    ).grid(row=11, column=0, columnspan=2, sticky="w", pady=(14, 4))
-
-    actors_page = page("Player / NPC")
-    actors_page.columnconfigure(1, weight=1)
-    ttk.Label(actors_page, text="Player", font=("TkDefaultFont", 10, "bold")).grid(
-        row=0, column=0, columnspan=2, sticky="w", pady=(0, 4)
-    )
-    for row, key in enumerate(("characterUUID", "forename", "surname", "displayName"), start=1):
-        text_field(actors_page, row, f"player.{key}", key, player.get(key))
-    npc_start = 6
-    ttk.Label(actors_page, text="NPC", font=("TkDefaultFont", 10, "bold")).grid(
-        row=npc_start, column=0, columnspan=2, sticky="w", pady=(12, 4)
-    )
-    for offset, key in enumerate(("npcID", "forename", "surname", "identityState"), start=1):
-        text_field(actors_page, npc_start + offset, f"npc.{key}", key, npc.get(key))
-    combo_field(
-        actors_page,
-        npc_start + 7,
-        "relationship.identityTrust",
-        "identity trust",
-        relationship.get("identityTrust", "unknown"),
-        ("unknown", "trusted", "untrustworthy"),
-    )
-    combo_field(
-        actors_page, npc_start + 8, "npc.healthState", "health state",
-        npc.get("healthState", "healthy"),
-        ("unknown", "healthy", "injured", "wounded", "critical", "dead"),
-    )
-    combo_field(
-        actors_page, npc_start + 9, "npc.activeBehavior", "activity",
-        npc.get("activeBehavior", "idle"),
-        ("idle", "busy", "searching", "fleeing", "hostile", "combat"),
-    )
-
-    persona_page = page("Persona & choices")
-    persona_page.columnconfigure(1, weight=1)
-    persona_page.columnconfigure(2, weight=0)
-    identity = npc.get("identity") if isinstance(npc.get("identity"), dict) else {}
-    personality = npc.get("personality") if isinstance(npc.get("personality"), dict) else {}
-    authority = npc.get("actorAuthority") if isinstance(npc.get("actorAuthority"), dict) else {}
-    combo_field(
-        persona_page, 0, "npc.gender", "identity / gender",
-        identity.get("gender", "unknown"),
-        tuple(
-            host.persona_catalog.get("identity", {}).get(
-                "genders", ["unknown", "female", "male"]
-            )
-        ),
-    )
-    combo_field(
-        persona_page, 1, "npc.role", "role / capability",
-        npc.get("role", "none"),
-        tuple(host.persona_catalog.get("roles", ["none", "trader", "guard", "leader"])),
-    )
-    bond = npc.get("startingRelationship") if isinstance(npc.get("startingRelationship"), dict) else {}
-    bond_kind = str(bond.get("kind") or "none")
-    bond_catalog = host.persona_catalog.get("relationshipKinds", [])
-    bond_ids = [str(item.get("kind")) for item in bond_catalog if item.get("kind")]
-    bond_values = tuple(["none"] + [value for value in bond_ids if value != "none"])
-    combo_field(persona_page, 2, "persona.bondKind", "companion bond kind", bond_kind, bond_values)
-    bond_details = ttk.Label(persona_page, text="Bond class: none", wraplength=460)
-    bond_details.grid(row=3, column=1, sticky="w", pady=4)
-
-    def update_bond_details(*_args: Any) -> None:
-        selected = str(variables["persona.bondKind"].get()).strip().lower()
-        entry = next(
-            (item for item in bond_catalog if str(item.get("kind")) == selected),
-            None,
+            tk,
+            ttk,
+            ScrolledText,
+            host,
+            control,
+            initial,
+            row=row,
         )
-        if not entry:
-            bond_details.configure(text="Bond class: none")
-            return
-        terms = entry.get("terms", {})
-        bond_details.configure(
-            text=(
-                f"Bond kind: {entry.get('kind')}  ·  class: {entry.get('class')}\n"
-                f"Reference: {terms.get('reference', '—')}  ·  "
-                f"Address: {terms.get('address', '—')}"
-            )
-        )
+        fields[control_id] = field
+        variables[control_id] = field.variable or field.editor or field.widget
+        widgets[control_id] = field.widget
 
-    variables["persona.bondKind"].trace_add("write", update_bond_details)
-    update_bond_details()
-
-    check_field(persona_page, 4, "persona.authority.companion", "companion", authority.get("companion"))
-    check_field(persona_page, 5, "persona.authority.owned", "owned by player", authority.get("owned"))
-    check_field(persona_page, 6, "persona.authority.eligible", "authority eligible", authority.get("eligible"))
-    check_field(
-        persona_page, 7, "runtime.DTHoomans", "Dynamic Trading adapter enabled",
-        runtime.get("availableMods", {}).get("DTHoomans", False),
-    )
-
-    ttk.Label(persona_page, text="Registered NPC traits", font=("TkDefaultFont", 10, "bold")).grid(
-        row=8, column=0, columnspan=2, sticky="w", pady=(12, 4)
-    )
-    trait_catalog = host.persona_catalog.get("traits", [])
-    trait_ids = [str(item.get("id")) for item in trait_catalog if item.get("id")]
-    if not trait_ids:
-        trait_ids = [str(value) for value in npc.get("traits", [])]
-    trait_list = tk.Listbox(persona_page, selectmode="multiple", height=8, exportselection=False)
-    trait_list.grid(row=9, column=0, columnspan=2, sticky="nsew", pady=4)
-    persona_page.rowconfigure(9, weight=1)
-    selected_traits = {str(value).lower() for value in npc.get("traits", [])}
-    for index, trait_id in enumerate(trait_ids):
-        trait_list.insert("end", trait_id)
-        if trait_id.lower() in selected_traits:
-            trait_list.selection_set(index)
-    variables["persona.traits"] = trait_list
-
-    ttk.Label(persona_page, text="Social Profile personality", font=("TkDefaultFont", 10, "bold")).grid(
-        row=10, column=0, columnspan=2, sticky="w", pady=(12, 4)
-    )
-    combo_field(
-        persona_page, 11, "persona.socialStyle", "social style",
-        personality.get("socialStyle", "neutral"),
-        tuple(host.persona_catalog.get("personality", {}).get("enums", {}).get(
-            "socialStyle", ["neutral", "friendly", "withdrawn"]
-        )),
-    )
-
-    def scale_field(parent: Any, row: int, key: str, label: str, value: Any, minimum: float, maximum: float) -> None:
-        try:
-            initial = float(value)
-        except (TypeError, ValueError):
-            initial = (minimum + maximum) / 2
-        variables[key] = tk.DoubleVar(value=initial)
-        ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", padx=(0, 10), pady=3)
-        ttk.Scale(parent, from_=minimum, to=maximum, variable=variables[key], orient="horizontal").grid(
-            row=row, column=1, sticky="ew", pady=3
-        )
-        value_label = ttk.Label(parent, width=8, anchor="e")
-        value_label.grid(row=row, column=2, sticky="e", padx=(8, 0), pady=3)
-
-        def update_value(*_args: Any) -> None:
-            current = float(variables[key].get())
-            if minimum < 0:
-                value_label.configure(text=f"{current:.0f}")
-            else:
-                value_label.configure(text=f"{current:.2f}")
-
-        variables[key].trace_add("write", update_value)
-        update_value()
-
-    scale_field(persona_page, 12, "relationship.approval", "approval", relationship.get("approval", 0), -100, 100)
-    scale_field(persona_page, 13, "relationship.respect", "respect", relationship.get("respect", 0), -100, 100)
-    scale_field(persona_page, 14, "relationship.familiarity", "familiarity", relationship.get("familiarity", 0), 0, 100)
-    for offset, key in enumerate(
-        host.persona_catalog.get("personality", {}).get("dimensions", []), start=15
-    ):
-        scale_field(persona_page, offset, f"persona.personality.{key}", key, personality.get(key, 0.5), 0, 1)
-    ttk.Label(persona_page, text="Derived relationship state (production read-only)").grid(
-        row=22, column=0, sticky="w", pady=(12, 4)
-    )
-    derived_context = {}
-    if isinstance(host.last_response, dict):
-        derived_context = host.last_response.get("contextAfter") or host.last_response.get("context") or {}
-    derived_actor = derived_context.get("actorConversationContext", {}) if isinstance(derived_context, dict) else {}
-    derived_relationship = derived_actor.get("relationship", {}) if isinstance(derived_actor, dict) else {}
-    ttk.Label(persona_page, text=str(derived_relationship.get("state", "unknown"))).grid(
-        row=22, column=1, sticky="w", pady=(12, 4)
-    )
-
-    inventory_page = page("Inventories")
-    inventory_page.columnconfigure(0, weight=1)
-    inventory_page.columnconfigure(1, weight=1)
-    inventory_page.rowconfigure(1, weight=1)
     ttk.Label(
-        inventory_page,
-        text="Player inventory (native-like projection)",
-        font=("TkDefaultFont", 10, "bold"),
-    ).grid(row=0, column=0, sticky="w", padx=(0, 8), pady=(0, 6))
-    ttk.Label(
-        inventory_page,
-        text="NPC inventory (authoritative compact model)",
-        font=("TkDefaultFont", 10, "bold"),
-    ).grid(row=0, column=1, sticky="w", padx=(8, 0), pady=(0, 6))
-    player_inventory = ScrolledText(inventory_page, height=22, width=42, wrap="none")
-    player_inventory.grid(row=1, column=0, sticky="nsew", padx=(0, 8))
-    player_inventory.insert("1.0", pretty(player.get("inventory", {})))
-    variables["player.inventory"] = player_inventory
-    npc_inventory = ScrolledText(inventory_page, height=22, width=42, wrap="none")
-    npc_inventory.grid(row=1, column=1, sticky="nsew", padx=(8, 0))
-    npc_inventory.insert("1.0", pretty(npc.get("inventory", {})))
-    variables["npc.inventory"] = npc_inventory
-    ttk.Label(
-        inventory_page,
+        page("Runtime"),
         text=(
-            "Edit complete JSON inventory projections here. Items may include itemID, fullType, displayName, "
-            "stack, condition/state, container, equipment flags, and marketSense classification."
+            "These controls edit one scenario draft. The Lua worker validates and applies it; "
+            "the catalog describes the UI and does not grant gameplay authority."
         ),
-        wraplength=760,
-    ).grid(row=2, column=0, columnspan=2, sticky="w", pady=(10, 0))
-
-    conversation_page = page("Conversation")
-    text_field(conversation_page, 0, "conversation.topic", "topic", conversation.get("topic"))
-    text_field(conversation_page, 1, "conversation.token", "token", conversation.get("token"))
-    ttk.Label(
-        conversation_page,
-        text="The token lets tests emulate a conversation lease/lifecycle without opening the game.",
-        wraplength=560,
-    ).grid(row=2, column=0, columnspan=2, sticky="w", pady=(14, 4))
-
-    actions_page = page("Actions / Translations")
-    actions_page.columnconfigure(1, weight=1)
-    ttk.Label(
-        actions_page,
-        text="Command responses (JSON) are the mocked native action boundary. Add future commands here without code changes.",
-        wraplength=600,
-    ).grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 6))
-    commands = ScrolledText(actions_page, height=10, width=70, wrap="none")
-    commands.grid(row=1, column=0, columnspan=2, sticky="nsew", pady=(0, 14))
-    actions_page.rowconfigure(1, weight=1)
-    commands.insert("1.0", pretty(runtime.get("commandResponses", {})))
-    variables["runtime.commandResponses"] = commands
-    ttk.Label(
-        actions_page,
-        text="Native translation overrides (JSON) are optional test-only getText values keyed by translation ID.",
-        wraplength=600,
-    ).grid(row=2, column=0, columnspan=2, sticky="w", pady=(0, 6))
-    translations = ScrolledText(actions_page, height=10, width=70, wrap="none")
-    translations.grid(row=3, column=0, columnspan=2, sticky="nsew")
-    actions_page.rowconfigure(3, weight=1)
-    translations.insert("1.0", pretty(runtime.get("nativeTranslations", {})))
-    variables["runtime.nativeTranslations"] = translations
+        wraplength=720,
+    ).grid(row=100, column=0, sticky="w", pady=(8, 0))
 
     footer = ttk.Frame(dialog)
     footer.grid(row=1, column=0, sticky="ew", padx=10, pady=(0, 10))
     footer.columnconfigure(0, weight=1)
     ttk.Label(
         footer,
-        text="Apply updates the live Lua worker. Save scenario writes the complete editable state to JSON.",
+        text="Apply updates the live Lua worker. Save scenario writes the complete scenario to JSON.",
     ).grid(row=0, column=0, sticky="w")
 
     def collect() -> dict[str, Any]:
         values: dict[str, Any] = {}
-        for key, value in variables.items():
-            if key == "persona.traits":
-                values[key] = [
-                    value.get(index)
-                    for index in value.curselection()
-                ]
-            elif hasattr(value, "get") and not isinstance(value, ScrolledText):
-                values[key] = value.get()
-            else:
-                values[key] = value.get("1.0", "end").strip()
-        return collect_scenario_settings(draft, values)
+        for control in controls:
+            control_id = str(control["id"])
+            widget_kind = str(control.get("control") or "text")
+            field = fields[control_id]
+            if (
+                (field.variable is None and field.editor is None)
+                or widget_kind == "read_only"
+            ):
+                continue
+            if (
+                field.initial is None
+                and not field.dirty
+                and widget_kind != "structured_collection"
+            ):
+                continue
+            values[control_id] = field.get_value()
+        return collect_scenario_settings(draft, values, catalog)
 
     def apply(save_after: bool = False) -> None:
         try:
             updated = collect()
-        except (TypeError, ValueError) as error:
-            host._messagebox.showerror("Mock runtime settings", str(error), parent=dialog)
+        except (TypeError, ValueError, tk.TclError) as error:
+            host._messagebox.showerror("Simulation settings", str(error), parent=dialog)
             return
         destination = host.scenario_path
         if save_after and destination is None:
@@ -552,15 +547,12 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
         def finish(response: dict[str, Any]) -> None:
             host.scenario = updated
             host.language_var.set(updated["runtime"]["language"])
-            # Keep the main Simulation profile selector in sync with settings
-            # edits without introducing another scenario/state owner.
             from ...runtime.npc_profiles import profile_id, profile_label
 
-            host.npc_profile_var.set(
-                profile_label(profile_id(updated))
-            )
+            host.npc_profile_var.set(profile_label(profile_id(updated)))
+            host._sync_workbench_from_scenario(updated)
             host._set_text(host.trace, pretty(response))
-            host._append("SYSTEM", "Applied mock runtime settings to the Lua worker.")
+            host._append("SYSTEM", "Applied simulation settings to the Lua worker.")
             if save_after and destination is not None:
                 try:
                     save_scenario(destination, updated)
@@ -568,14 +560,20 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
                     host._messagebox.showerror("Scenario save error", str(error), parent=dialog)
                     return
                 host.scenario_path = destination
-                host._append("SYSTEM", f"Saved mock runtime scenario to {destination}")
+                host._append("SYSTEM", f"Saved simulation scenario to {destination}")
             close_dialog()
 
         if not host._start_operation(lambda worker: worker.configure(updated), finish):
             return
 
-    ttk.Button(footer, text="Cancel", command=close_dialog).grid(row=0, column=1, padx=6)
-    ttk.Button(footer, text="Apply", command=apply).grid(row=0, column=2, padx=6)
-    ttk.Button(footer, text="Apply & Save", command=lambda: apply(True)).grid(row=0, column=3)
+    ttk.Button(footer, text="Cancel", command=close_dialog).grid(
+        row=0, column=1, padx=6
+    )
+    ttk.Button(footer, text="Apply", command=apply).grid(
+        row=0, column=2, padx=6
+    )
+    ttk.Button(footer, text="Apply & Save", command=lambda: apply(True)).grid(
+        row=0, column=3
+    )
     dialog.grab_set()
     dialog.focus_force()

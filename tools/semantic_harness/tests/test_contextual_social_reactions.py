@@ -59,21 +59,20 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 "friendly",
                 {
                     "traits": {"friendly": True},
-                    "relationshipState": "Friend",
                 },
                 "semantic.social.apology.friendly",
                 "UI_PNC_Conversation_Semantic_ApologyFriendly",
                 "friendly",
             ),
             (
-                "trusted",
+                "manual_state_is_not_authority",
                 {
                     "traits": {"reserved": True},
                     "relationshipState": "Member",
                     "personality": {"socialStyle": "neutral"},
                 },
-                "semantic.social.apology.trusted",
-                "UI_PNC_Conversation_Semantic_ApologyTrusted",
+                "semantic.social.apology.default",
+                "UI_PNC_Conversation_Semantic_ApologyDefault",
                 "neutral",
             ),
             (
@@ -95,7 +94,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "personality": {"socialStyle": "friendly"},
                 },
                 "semantic.social.apology.stressed",
-                "UI_PNC_Conversation_Semantic_ApologyStressed",
+                "UI_PNC_Conversation_Semantic_RealizationApologyStressedWarm",
                 "friendly",
             ),
         )
@@ -114,7 +113,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         cases = (
             (
                 "compliment",
-                {"traits": {"friendly": True}, "relationshipState": "Friend"},
+                {"traits": {"friendly": True}},
                 "you look cute",
                 "COMPLIMENT_RECEIVED",
                 "semantic.social.compliment.friendly",
@@ -266,16 +265,6 @@ class ContextualSocialReactionTests(unittest.TestCase):
     def test_threat_uses_guarded_emotion_relationship_and_precedence(self) -> None:
         cases = (
             (
-                "trusted",
-                {
-                    "traits": {"reserved": True},
-                    "relationshipState": "Member",
-                    "personality": {"socialStyle": "neutral"},
-                },
-                "semantic.social.threat_trusted",
-                "neutral",
-            ),
-            (
                 "withdrawn",
                 {"personality": {"socialStyle": "withdrawn"}},
                 "semantic.social.threat_withdrawn",
@@ -344,16 +333,6 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 "semantic.social.offer_friendly",
                 "UI_PNC_Conversation_Semantic_OfferFriendly",
                 "friendly",
-            ),
-            (
-                "trusted",
-                {
-                    "relationshipState": "Member",
-                    "personality": {"socialStyle": "neutral"},
-                },
-                "semantic.social.offer_trusted",
-                "UI_PNC_Conversation_Semantic_OfferTrusted",
-                "neutral",
             ),
             (
                 "withdrawn",
@@ -432,20 +411,10 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 "friendly",
             ),
             (
-                "trusted",
-                {
-                    "relationshipState": "Member",
-                    "personality": {"socialStyle": "neutral"},
-                },
-                "semantic.social.dispute_trusted",
-                "UI_PNC_Conversation_Semantic_DisputeTrusted",
-                "neutral",
-            ),
-            (
                 "withdrawn",
                 {"personality": {"socialStyle": "withdrawn"}},
                 "semantic.social.dispute_withdrawn",
-                "UI_PNC_Conversation_Semantic_DisputeWithdrawn",
+                "UI_PNC_Conversation_Semantic_RealizationDisputeWithdrawnTerse",
                 "withdrawn",
             ),
             (
@@ -516,7 +485,6 @@ class ContextualSocialReactionTests(unittest.TestCase):
     def test_apology_preview_is_idempotent_without_relationship_effect(self) -> None:
         scenario = self.scenario({
             "traits": {"friendly": True},
-            "relationshipState": "Friend",
         })
         with LuaSemanticWorker(scenario) as worker:
             worker.input("hello")

@@ -127,32 +127,40 @@ class DialogueDatasetCompilerTests(unittest.TestCase):
         self.assertIn(variant["templateID"], compiled["translations"]["EN"])
         self.assertIn(variant["templateID"], compiled["translations"]["TL"])
 
-    def test_whats_up_is_a_typed_root_category_route(self) -> None:
+    def test_whats_up_aliases_compile_to_semantic_hub_activation(self) -> None:
         compiled = compile_dialogue_dataset(self.source)
-        pattern = next(
+        patterns = [
             item for item in compiled["patterns"]
-            if item["id"] == "pnc.dataset.question.whats_up.whats_up"
-        )
-        self.assertEqual(pattern["emit"]["subject"], "CONVERSATION_TOPIC")
-        self.assertEqual(pattern["emit"]["extensions"], {
-            "categoryID": "projecthoomans:whats_up",
-            "route": "conversation_category",
-            "topic": "whats_up",
-        })
+            if item["id"].startswith("pnc.dataset.question.whats_up.")
+        ]
+        self.assertEqual(len(patterns), 11)
+        for pattern in patterns:
+            with self.subTest(pattern=pattern["id"]):
+                self.assertEqual(
+                    pattern["emit"]["subject"], "CONVERSATION_TOPIC"
+                )
+                self.assertEqual(pattern["emit"]["extensions"], {
+                    "hubID": "whats_up",
+                    "route": "semantic_hub",
+                    "topic": "whats_up",
+                })
         self.assertEqual(pattern["metadata"]["mapping"], {
             "canonicalConcept": "WHATS_UP",
-            "dialogueState": "WHATS_UP_ROOT",
+            "dialogueState": "WHATS_UP_HUB",
             "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
         })
 
-    def test_whats_up_route_rejects_unowned_category_metadata(self) -> None:
+    def test_whats_up_route_rejects_legacy_category_metadata(self) -> None:
         invalid = copy.deepcopy(self.source)
         root = next(
             item for item in invalid["patterns"]
             if item["id"] == "pnc.dataset.question.whats_up.whats_up"
         )
-        root["emit"]["extensions"]["categoryID"] = "projecthoomans:private"
-        with self.assertRaisesRegex(CompileError, "reviewed whats_up category route"):
+        root["emit"]["extensions"]["categoryID"] = (
+            "projecthoomans:" + "whats_up"
+        )
+        root["emit"]["extensions"]["route"] = "conversation_category"
+        with self.assertRaisesRegex(CompileError, "semantic-hub route"):
             compile_dialogue_dataset(invalid)
 
     def test_negative_examples_cannot_become_runtime_patterns(self) -> None:

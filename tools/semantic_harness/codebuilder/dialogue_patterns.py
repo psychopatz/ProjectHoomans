@@ -130,10 +130,10 @@ def _compile_dialogue_pattern(
                     or not isinstance(extensions, dict)
                     or set(extensions) != DIALOGUE_CONVERSATION_TOPIC_EXTENSIONS
                     or extensions.get("topic") != "whats_up"
-                    or extensions.get("categoryID") != "projecthoomans:whats_up"
-                    or extensions.get("route") != "conversation_category"):
+                    or extensions.get("hubID") != "whats_up"
+                    or extensions.get("route") != "semantic_hub"):
                 raise CompileError(
-                    f"dialogue conversation-topic pattern {pattern_id} requires the reviewed whats_up category route"
+                    f"dialogue conversation-topic pattern {pattern_id} requires the reviewed whats_up semantic-hub route"
                 )
             normalized_emit = {
                 "intent": "QUESTION",

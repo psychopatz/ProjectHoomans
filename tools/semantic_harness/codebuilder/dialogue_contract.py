@@ -32,7 +32,7 @@ DIALOGUE_CONTEXT_REFERENCE_EXTENSIONS = frozenset({
     "dialogueFollowUp", "topic", "contextQuestion",
 })
 DIALOGUE_CONVERSATION_TOPIC_EXTENSIONS = frozenset({
-    "topic", "categoryID", "route",
+    "topic", "hubID", "route",
 })
 DIALOGUE_PROMISE_SUBJECTS = frozenset({"NEEDS"})
 DIALOGUE_PROMISE_EXTENSIONS = frozenset({"topic", "dialogueFollowUp"})
@@ -46,7 +46,7 @@ DIALOGUE_MAPPING_CONCEPTS = frozenset({
 DIALOGUE_MAPPING_STATES = frozenset({
     "NEEDS_PROPOSAL", "NEEDS_QUANTITY", "WEATHER_TOPIC",
     "WELLBEING_FOLLOW_UP", "BACKSTORY_QUESTION", "BACKSTORY_FOLLOW_UP",
-    "WHATS_UP_ROOT",
+    "WHATS_UP_HUB",
 })
 DIALOGUE_TRANSLATION_ARG_TYPES = frozenset({
     "string", "number", "boolean", "identifier", "fact_content",

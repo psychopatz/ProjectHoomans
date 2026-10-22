@@ -358,21 +358,23 @@ class SemanticHarnessTests(unittest.TestCase):
             "SELF_BLAME",
         )
 
-    def test_self_reflection_response_uses_relationship_and_traits(self) -> None:
+    def test_self_reflection_response_uses_trait_style(self) -> None:
         friendly = merge(
             DEFAULT_SCENARIO,
-            {"npc": {"traits": {"friendly": True}, "relationshipState": "Friend"}},
+            {"npc": {"traits": {"friendly": True}}},
         )
         reserved = merge(
             DEFAULT_SCENARIO,
-            {"npc": {"traits": {"reserved": True}, "relationshipState": "Member"}},
+            {"npc": {"traits": {"reserved": True}}},
         )
         with LuaSemanticWorker(friendly) as worker:
             friendly_result = worker.input("I'm an idiot")
         with LuaSemanticWorker(reserved) as worker:
             reserved_result = worker.input("I'm an idiot")
         self.assertIn("matter", self.message_text(friendly_result).lower())
-        self.assertIn("harder", self.message_text(reserved_result).lower())
+        self.assertIn(
+            "don't make a habit", self.message_text(reserved_result).lower()
+        )
 
     def test_first_person_state_is_not_identity_claim(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:

@@ -50,8 +50,9 @@ timeouts, crash detection, and bounded stderr diagnostics.
 - `inspection/` owns bounded worker-result projections, the Conversation
   Inspector chain, CLI/JSON presentation, and the visible transcript buffer.
   It does not interpret dialogue or dispatch gameplay effects.
-- `ui/dialogs/settings.py` owns the runtime settings form and converts its draft
-  into a validated scenario before the live worker is configured.
+- `ui/dialogs/settings.py` renders the worker-provided simulation control
+  catalog, collects typed edits into one scenario draft, and validates it
+  before the live worker is configured.
 - `testing/runner.py` owns case replay and its streaming conflict ledger;
   `testing/suite.py` owns isolated Lua smoke-test subprocesses;
   `testing/doctor.py` owns bounded environment/worker diagnostics; and
@@ -152,18 +153,20 @@ For ad-hoc inputs, append `--audit` to emit a final bounded conflict record.
 The GUI also exposes a worker restart action that restores the current
 scenario after a timeout or child-process failure.
 
-Runtime mock values can be edited from the GUI's **Mock runtime…** modal and
-saved with **Save scenario** or **Apply & Save**. The **Inventories** tab is the
-player/NPC inventory editor: it accepts the full JSON projection, including
-item IDs, full types, display names, stack counts, condition/state fields,
-containers/equipment, and MarketSense classification. This is the data used by
-semantic inventory queries and gift selection, so adding an Apple or changing
-the NPC's seafood stock immediately changes the conversation result.
-
-The modal also covers the player, NPC, relationship, world, conversation,
-network/runtime flags, mocked native action responses, and translation
-overrides. It edits a draft first, then configures the live Lua worker only
-after validation. Scenario files are the harness's portable JSON data store;
+Common world, NPC, persona, relationship, bond, health/activity, role, language,
+and integration values are edited from typed controls in **Simulation
+settings…** and saved with **Apply & Save** or **Save scenario**. Needs and
+persona dimensions are bounded sliders, finite fields use worker-catalog
+comboboxes, and counters/time use numeric controls. Player and NPC inventories
+default to a structured editor with search over the installed Project Zomboid
+`media/scripts` definitions, add/remove, stack, condition, container/location,
+and equipment controls. Each inventory also has an **Advanced JSON** tab over
+the same draft; unknown fields are preserved across round trips. Item-carried
+MarketSense/classification metadata is displayed read-only when present. The
+dialog also covers player/NPC identity, conversation, network/runtime flags,
+mocked native action responses, and translation overrides. It edits one draft
+and configures the live Lua worker only after validation. Scenario files are
+the harness's portable JSON data store;
 `save_scenario` writes them atomically so the same values can be loaded by the
 GUI, terminal client, and tests.
 
@@ -175,6 +178,10 @@ admission can provide `accepted`, `reason`, and `details.siteLabel` without
 changing production Lua. The engine seam stays configurable while the parser,
 policy, identity authority, translation manager, and tool-reply catalog remain
 real.
+
+## Inline simulation workbench
+
+The Simulation tab exposes a collapsible workbench for the worker-catalog fields most often tuned during dialogue tests: NPC profile/role, bond, directed standing, social style/personality, health/activity, common needs, language, and the Dynamic Trading adapter. These controls and the full **Simulation settings…** dialog edit one scenario draft. **Apply** configures the real Lua worker; **Apply + replay** applies the draft and reruns the current input, or the most recently submitted test utterance, through the normal worker input path. Neither action simulates semantic results in Python.
 
 ## Per-NPC semantic wellbeing scenarios
 

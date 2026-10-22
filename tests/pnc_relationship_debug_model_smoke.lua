@@ -167,7 +167,7 @@ local rows = PNC.RelationshipDebugModel.BuildRows({
 }, true, nil, nil, {
     npcID = "npc:alice",
     source = "conversation",
-    blockID = "projecthoomans:whats_up_local_activity_neutral",
+    blockID = "projecthoomans:wellbeing_basic_neutral",
     delta = { approval = 2, respect = -1, familiarity = 1 },
     effects = { { type = "pnc:relationship" } },
 })
@@ -191,7 +191,7 @@ expectRowContaining(rows, "Last trigger", "treated_wound")
 expectRowContaining(rows, "  approval effect", "+4.00 -> +5.00")
 expectRowContaining(rows, "  modifier compassion", "1.25")
 expectRowContaining(rows, "  changed", "Approval +2.00")
-expectRowContaining(rows, "Last conversation", "whats_up_local_activity")
+expectRowContaining(rows, "Last conversation", "wellbeing_basic_neutral")
 
 local relationshipRows = PNC.RelationshipDebugModel.FilterRows(
     rows,

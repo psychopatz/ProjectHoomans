@@ -330,6 +330,24 @@ local function topicFromIR(ir, context)
     return canonicalTopic(context and context.currentTopic)
 end
 
+local function semanticHubID(ir)
+    if type(ir) ~= "table"
+        or normalized(ir.subject) ~= "CONVERSATION_TOPIC"
+    then
+        return nil
+    end
+    local extensions = type(ir.extensions) == "table"
+        and ir.extensions or {}
+    if extensions.route ~= "semantic_hub" then return nil end
+    local hubID = string.lower(tostring(extensions.hubID or ""))
+    if hubID == "" or #hubID > 48
+        or string.find(hubID, "[^%w_%.%-]") ~= nil
+    then
+        return nil
+    end
+    return hubID
+end
+
 -- A recognized authored category is a presentation boundary, not another
 -- conversational suggestion.  Keep this conversion beside the suggestion
 -- contract so typed input and the existing semantic-click surface share one
@@ -422,32 +440,24 @@ local function definitionForSubject(subject, followUp)
     if subject == "TIME" then return definitionFor("question.time") end
     if subject == "DATE" then return definitionFor("question.date") end
     if subject == "WEATHER" then return definitionFor("question.weather") end
-    if subject == "CONVERSATION_TOPIC" then
-        return definitionFor("conversation.whats_up")
-    end
     return nil
 end
 
-local function conversationCategoryVisible(context, categoryID)
-    local preflight = type(context) == "table"
-        and context.conversationCategoryPreflight or nil
-    if type(preflight) == "table"
-        and tostring(preflight.categoryID or categoryID) == categoryID
-    then
-        return preflight.visible == true, preflight.reason
-            or "category_preflight"
-    end
-    for _, diagnostic in ipairs(
-        type(context) == "table" and context.categoryDiagnostics or {}
-    ) do
-        if type(diagnostic) == "table"
-            and tostring(diagnostic.id or "") == categoryID
-        then
-            return diagnostic.visible == true,
-                diagnostic.reason or "category_diagnostic"
-        end
-    end
-    return false, "category_preflight_unknown"
+local function isActiveHubDefinition(definition, activeHubID)
+    if type(definition) ~= "table" or activeHubID == nil then return false end
+    local extensions = type(definition.extensions) == "table"
+        and definition.extensions or {}
+    return extensions.route == "semantic_hub"
+        and tostring(extensions.hubID or "") == activeHubID
+end
+
+local function isActiveHubCandidate(candidate, activeHubID)
+    if type(candidate) ~= "table" or activeHubID == nil then return false end
+    local frame = type(candidate.frame) == "table" and candidate.frame or {}
+    local extensions = type(frame.extensions) == "table"
+        and frame.extensions or {}
+    return extensions.route == "semantic_hub"
+        and tostring(extensions.hubID or "") == activeHubID
 end
 
 local function sourceRecord(kind, revision, reason)
@@ -1396,6 +1406,15 @@ local GROUP_LABELS = {
 }
 
 local function groupPresentation(id, topic)
+    if id == "semantic_hub.whats_up" then
+        local label = GROUP_LABELS.whats_up
+        return {
+            id = id,
+            topic = "whats_up",
+            label = resolvedText(label.key, label.fallback),
+            labelKey = label.key,
+        }
+    end
     local label = GROUP_LABELS[topic]
     if label then
         return {
@@ -1515,7 +1534,9 @@ local function buildGroups(candidates, capabilities, currentTopic, revision)
             group.count = group.count + 1
         end
     end
-    local currentGroupID = topicGroupID(currentTopic)
+    local currentGroupID = currentTopic == "whats_up"
+        and byID["semantic_hub.whats_up"]
+        and "semantic_hub.whats_up" or topicGroupID(currentTopic)
     if not byID[currentGroupID] then
         currentGroupID = byID.conversation_branch and "conversation_branch"
             or byID.active_flow and "active_flow"
@@ -1632,6 +1653,7 @@ function Suggestions.Build(result, context, messages)
     local seen = {}
     local trace = {}
     local ir = type(result.ir) == "table" and result.ir or {}
+    local activeHubID = semanticHubID(ir)
     local currentAction = normalized(ir.action)
     local capabilities, capabilitySource, predicateTrace = capabilityRows(
         revision, currentAction, context, ir
@@ -1725,22 +1747,44 @@ function Suggestions.Build(result, context, messages)
     local providerTopic = topicFromIR(ir, nil)
         or canonicalTopic(context.currentTopic)
     local providerContext = context
-    if providerTopic ~= nil
-        and tostring(context.currentTopic or "") ~= tostring(providerTopic)
-    then
+    local currentContextTopic = tostring(context.currentTopic or "")
+    local needsProviderContext = activeHubID ~= nil
+        or providerTopic ~= nil
+            and currentContextTopic ~= tostring(providerTopic)
+    if needsProviderContext then
         -- Providers receive the current typed topic without mutating the
         -- read-only projection shared by the remaining suggestion sources.
         providerContext = {}
         for key, value in pairs(context) do
             providerContext[key] = value
         end
+    end
+    if providerTopic ~= nil
+        and currentContextTopic ~= tostring(providerTopic)
+    then
         providerContext.currentTopic = providerTopic
+    end
+    if activeHubID ~= nil then
+        providerContext.activeHubID = activeHubID
     end
     local providerCandidates = ChoiceRegistry.Collect(
         providerContext, Suggestions.MAX_CANDIDATES
     )
     for _, candidate in ipairs(providerCandidates or {}) do
-        addProviderCandidate(candidates, seen, candidate, revision)
+        if isActiveHubCandidate(candidate, activeHubID) then
+            appendTrace(
+                trace, "semantic_hub", "consumed", "hub_already_active",
+                #candidates
+            )
+        else
+            addProviderCandidate(candidates, seen, candidate, revision)
+        end
+    end
+    if activeHubID ~= nil then
+        appendTrace(
+            trace, "semantic_hub", "active", "reviewed_hub_activation",
+            #candidates
+        )
     end
 
     local subject = normalized(ir.subject)
@@ -1759,36 +1803,18 @@ function Suggestions.Build(result, context, messages)
             )
         end
         for _, definition in ipairs(DEFINITIONS) do
-            if topicMatches(definition, currentTopic) then
-                local visible = true
-                local visibilityReason = "topic_branch"
-                if definition.id == "conversation.whats_up" then
-                    visible, visibilityReason = conversationCategoryVisible(
-                        context, "projecthoomans:whats_up"
-                    )
-                end
-                local directCategory = Suggestions.IsConversationCategoryIR(ir)
-                    and definition.id == "conversation.whats_up"
-                if visible and not directCategory then
-                    addCandidate(
-                        candidates, seen, definition,
-                        "typed_input", revision, visibilityReason
-                    )
-                elseif visible and directCategory then
+            if topicMatches(definition, currentTopic)
+                and definition.hubOnly ~= true
+            then
+                if isActiveHubDefinition(definition, activeHubID) then
                     appendTrace(
-                        trace,
-                        "typed_input",
-                        "consumed",
-                        "conversation_category_already_routed",
-                        #candidates
+                        trace, "typed_input", "consumed",
+                        "semantic_hub_already_active", #candidates
                     )
                 else
-                    appendTrace(
-                        trace,
-                        "typed_input",
-                        "hidden",
-                        visibilityReason,
-                        #candidates
+                    addCandidate(
+                        candidates, seen, definition,
+                        "typed_input", revision, "topic_branch"
                     )
                 end
             end
@@ -1859,6 +1885,10 @@ function Suggestions.Build(result, context, messages)
     return {
         schemaVersion = Suggestions.VERSION,
         kind = "semantic_dialogue_suggestions",
+        activeHub = activeHubID and {
+            id = activeHubID,
+            route = "semantic_hub",
+        } or nil,
         revision = revision,
         turnID = turnID,
         candidates = candidates,

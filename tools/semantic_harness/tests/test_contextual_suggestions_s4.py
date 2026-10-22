@@ -7,6 +7,7 @@ import os
 import time
 import tkinter as tk
 import unittest
+from copy import deepcopy
 
 from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
@@ -150,9 +151,9 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             del root
             gc.collect()
 
-    def test_whats_up_gui_click_enters_real_registry_branch(self) -> None:
+    def test_whats_up_gui_activates_hub_without_a_conversation_graph(self) -> None:
         if not os.environ.get("DISPLAY"):
-            self.skipTest("Tk display is unavailable")
+            self.skipTest("Tk display unavailable")
 
         root = tk.Tk()
         app = SemanticHarnessApp(root, _parser().parse_args([]))
@@ -169,88 +170,75 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             app.main_tabs.select(app.simulation_tab)
             app.input_var.set("whats up")
             app.submit()
-            wait_until(
-                lambda: not app.busy
-                and bool(
-                    (app.last_response.get("observation") or {}).get(
-                        "conversationGraph"
-                    )
-                )
+            wait_until(lambda: not app.busy and app.last_response is not None)
+
+            observation = app.last_response.get("observation") or {}
+            suggestions = observation.get("suggestions") or {}
+            self.assertEqual(
+                suggestions.get("activeHub"),
+                {"id": "whats_up", "route": "semantic_hub"},
             )
+            self.assertIsNone(observation.get("conversationBlock"))
+            self.assertIsNone(observation.get("conversationGraph"))
             self.assertNotIn(
-                "conversation.whats_up",
+                "semantic_hub.whats_up",
                 [row.get("id") for row in app.suggestion_rows],
             )
-            wait_until(
-                lambda: not app.busy
-                and any(
-                    "What kind of movement?" in str(button.cget("text"))
-                    for button in app.suggestion_buttons
-                )
+            initial_ids = [row.get("id") for row in app.suggestion_rows]
+            self.assertTrue(
+                {
+                    "question.wellbeing",
+                    "question.activity",
+                    "question.weather",
+                }
+                <= set(initial_ids)
             )
-            self.assertIn(
-                "There's been movement around the neighborhood today.",
-                app.transcript.get("1.0", "end"),
-            )
-            self.assertIn(
-                "conversationBlock",
-                app.suggestion_inspector.get("1.0", "end"),
-            )
-            graph = app.dialogue_graph_pane.graph_model()
-            self.assertEqual(graph["currentNodeID"], "opening")
-            self.assertEqual(
-                {node["id"] for node in graph["nodes"]},
-                {"opening", "details", "personal", "followup", "closing"},
-            )
-            self.assertIn(
-                "There's been movement around the neighborhood today.",
-                " ".join(
-                    str(app.dialogue_graph_pane.canvas.itemcget(item, "text"))
-                    for item in app.dialogue_graph_pane.canvas.find_all()
-                    if app.dialogue_graph_pane.canvas.type(item) == "text"
-                ),
-            )
-            detail_index = next(
-                index
-                for index, row in enumerate(app.suggestion_rows)
-                if row.get("id", "").endswith(":detail")
-            )
-            app.click_suggestion(detail_index)
-            wait_until(
-                lambda: not app.busy
-                and any(
-                    "I can help check the area" in str(button.cget("text"))
-                    for button in app.suggestion_buttons
-                )
-            )
-            self.assertIn("Mostly tracks", app.transcript.get("1.0", "end"))
-            self.assertEqual(
-                app.dialogue_graph_pane.graph_model()["currentNodeID"],
-                "details",
-            )
+            self.assertIn("What's up", app.suggestion_group_box.get())
 
-            # Click the rendered live edge from the new current node. The
-            # pane must submit the same canonical semantic choice frame as
-            # the normal suggestion button.
-            offer_edge = next(
-                edge
-                for edge in app.dialogue_graph_pane._draft["edges"]
-                if edge.get("choiceID") == "offer_help"
+            # Reconfigure the live worker through Tk, then replay the utterance
+            # through the regular input surface. Apply + Replay is P10E work.
+            injured_family = deepcopy(app.scenario)
+            injured_family["npc"]["healthState"] = "injured"
+            injured_family["npc"]["startingRelationship"] = {
+                "kind": "mother",
+                "source": "starting_companion_trait",
+            }
+            injured_family["npc"]["relationship"].update(
+                {"approval": 80, "respect": 70, "familiarity": 80}
             )
-            edge_items = app.dialogue_graph_pane.canvas.find_withtag(
-                f"edge:{offer_edge['id']}"
+            configured = {"done": False}
+
+            def configured_scenario(_: dict) -> None:
+                app.scenario = injured_family
+                configured["done"] = True
+
+            app._start_operation(
+                lambda worker: worker.configure(injured_family),
+                configured_scenario,
             )
-            self.assertTrue(edge_items)
-            edge_coords = app.dialogue_graph_pane.canvas.coords(edge_items[0])
-            app.dialogue_graph_pane.canvas.event_generate(
-                "<Button-1>",
-                x=max(1, int(edge_coords[2])),
-                y=max(1, int(edge_coords[3])),
+            wait_until(lambda: not app.busy and configured["done"])
+            app.input_var.set("What's up?")
+            app.submit()
+            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
+
+            observation = app.last_response.get("observation") or {}
+            injured_suggestions = observation.get("suggestions") or {}
+            injured_ids = [row.get("id") for row in app.suggestion_rows]
+            self.assertEqual(
+                injured_suggestions.get("activeHub", {}).get("id"),
+                "whats_up",
             )
-            wait_until(
-                lambda: not app.busy
-                and app.dialogue_graph_pane.graph_model()["currentNodeID"]
-                == "followup"
+            self.assertNotEqual(initial_ids, injured_ids)
+            self.assertEqual(injured_ids[0], "question.health")
+            self.assertIn("social.personal_check_in", injured_ids)
+            self.assertIsNone(observation.get("conversationGraph"))
+            self.assertIsNone(observation.get("conversationBlock"))
+
+            app.input_var.set("What's up?")
+            app.submit()
+            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
+            self.assertEqual(
+                [row.get("id") for row in app.suggestion_rows], injured_ids
             )
         finally:
             app.close()
@@ -258,12 +246,14 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             del root
             gc.collect()
 
-    def test_npc_profile_combobox_reconfigures_worker_capabilities(self) -> None:
+    def test_npc_profile_selection_is_staged_until_workbench_apply(self) -> None:
         if not os.environ.get("DISPLAY"):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
         app = SemanticHarnessApp(root, _parser().parse_args([]))
+        errors: list[str] = []
+        app._messagebox.showerror = lambda _title, message, **_kwargs: errors.append(str(message))
 
         def wait_until(predicate: object, timeout: float = 10.0) -> None:
             deadline = time.monotonic() + timeout
@@ -276,9 +266,13 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             wait_until(lambda: app.worker_ready)
             app.npc_profile_var.set("Neutral NPC")
             app._on_npc_profile()
-            wait_until(
-                lambda: not app.busy
-                and app.scenario["npc"]["actorAuthority"]["eligible"] is False
+            self.assertEqual(app.scenario["runtime"].get("semanticLabProfile"), "companion")
+            self.assertFalse(app.busy)
+            app.apply_simulation_settings()
+            wait_until(lambda: not app.busy)
+            self.assertEqual(errors, [])
+            self.assertIs(
+                app.scenario["npc"]["actorAuthority"]["eligible"], False
             )
             self.assertEqual(app.scenario["runtime"]["semanticLabProfile"], "neutral")
             self.assertEqual(
@@ -302,7 +296,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             del root
             gc.collect()
 
-    def test_simulation_layout_keeps_runtime_controls_visible_without_maximizing(self) -> None:
+    def test_simulation_layout_at_minimum_size_keeps_runtime_controls_visible(self) -> None:
         if not os.environ.get("DISPLAY"):
             self.skipTest("Tk display is unavailable")
 
@@ -321,10 +315,15 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             app.main_tabs.select(app.simulation_tab)
             wait_until(lambda: app.worker_ready)
             root.update_idletasks()
+            self.assertEqual(root.minsize(), (1080, 700))
+            self.assertGreaterEqual(root.winfo_width(), 1080)
+            self.assertGreaterEqual(root.winfo_height(), 700)
 
             for widget in (
                 app.language_box,
                 app.npc_profile_box,
+                app.workbench_apply_button,
+                app.replay_button,
                 app.send_button,
                 app.status_label,
             ):
@@ -338,16 +337,29 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             app.submit()
             wait_until(
                 lambda: not app.busy
-                and app.dialogue_graph_pane._draft is not None
+                and bool(
+                    (app.last_response.get("observation") or {})
+                    .get("suggestions", {})
+                    .get("activeHub")
+                )
             )
             root.update_idletasks()
 
-            self.assertTrue(app.dialogue_graph_pane.canvas.winfo_ismapped())
+            self.assertEqual(
+                app.trace_tabs.tab(app.trace_tabs.select(), "text"),
+                "Hub diagnostics",
+            )
+            self.assertTrue(app.hub_diagnostics.winfo_ismapped())
+            observation = app.last_response.get("observation") or {}
+            self.assertEqual(
+                observation["suggestions"]["activeHub"]["id"], "whats_up"
+            )
+            self.assertIsNone(observation.get("conversationGraph"))
+            self.assertIsNone(observation.get("conversationBlock"))
             self.assertNotIn(
-                "conversation.whats_up",
+                "semantic_hub.whats_up",
                 [row.get("id") for row in app.suggestion_rows],
             )
-
             self.assertGreaterEqual(
                 app.suggestion_frame.winfo_height(), initial_panel_height
             )
@@ -370,6 +382,55 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 app.npc_profile_box.winfo_x() + app.npc_profile_box.winfo_width(),
                 app.transcript.winfo_rootx() + app.transcript.winfo_width() + 80,
             )
+        finally:
+            app.close()
+            del app
+            del root
+            gc.collect()
+
+    @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
+    def test_simulation_layout_at_normal_desktop_size(self) -> None:
+        root = tk.Tk()
+        app = SemanticHarnessApp(root, _parser().parse_args([]))
+
+        def wait_until(predicate: object, timeout: float = 12.0) -> None:
+            deadline = time.monotonic() + timeout
+            while not predicate() and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertTrue(predicate())
+
+        try:
+            root.geometry("1280x800")
+            app.main_tabs.select(app.simulation_tab)
+            wait_until(lambda: app.worker_ready)
+            root.update_idletasks()
+            self.assertEqual((root.winfo_width(), root.winfo_height()), (1280, 800))
+            for widget in (
+                app.language_box,
+                app.npc_profile_box,
+                app.workbench_apply_button,
+                app.replay_button,
+                app.send_button,
+                app.status_label,
+            ):
+                self.assertTrue(widget.winfo_ismapped())
+
+            app.input_var.set("What's up?")
+            app.submit()
+            wait_until(
+                lambda: not app.busy
+                and (app.last_response.get("observation") or {})
+                .get("suggestions", {})
+                .get("activeHub", {}).get("id") == "whats_up"
+            )
+            root.update_idletasks()
+            self.assertEqual(
+                app.trace_tabs.tab(app.trace_tabs.select(), "text"),
+                "Hub diagnostics",
+            )
+            self.assertTrue(app.hub_diagnostics.winfo_ismapped())
+            self.assertIn("question.wellbeing", app.hub_diagnostics.get("1.0", "end"))
         finally:
             app.close()
             del app

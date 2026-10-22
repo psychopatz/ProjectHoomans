@@ -15,36 +15,28 @@ from tools.semantic_harness.worker import LuaSemanticWorker
 
 
 class ContextualDialoguePersonaChoicesP0Tests(unittest.TestCase):
-    def test_initial_root_and_authored_block_projection_are_production_backed(
+    def test_whats_up_utterance_activates_semantic_hub(
         self,
     ) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            capabilities = worker.capabilities()
-            initial = capabilities["suggestions"]
-            root = next(
-                candidate
-                for candidate in initial["candidates"]
-                if candidate["id"]
-                == "conversation.root:menu:projecthoomans:whats_up"
-            )
-            entered = worker.suggestion_click(root["frame"])
+            entered = worker.input("What's up?")
 
-        self.assertEqual(initial["schemaVersion"], 1)
-        self.assertEqual(root["frame"]["kind"], "semantic_click_frame")
-        self.assertEqual(root["source"]["kind"], "conversation_root")
-        self.assertEqual(root["display"]["label"], "What's up?")
-        self.assertEqual(root["display"]["utterance"], "What's up?")
-        self.assertTrue(entered["accepted"])
-        self.assertEqual(entered["reason"], "accepted")
-        self.assertIn("conversationBlock", entered["observation"])
-        self.assertTrue(
-            any(
-                candidate["id"].startswith("conversation.choice:")
-                for candidate in entered["observation"]["suggestions"][
-                    "candidates"
-                ]
+            self.assertTrue(entered["accepted"])
+            self.assertEqual(
+                entered["result"]["ir"]["extensions"]["route"],
+                "semantic_hub",
             )
-        )
+            self.assertEqual(
+                entered["result"]["ir"]["extensions"]["hubID"],
+                "whats_up",
+            )
+            self.assertEqual(
+                entered["observation"]["suggestions"]["activeHub"]["id"],
+                "whats_up",
+            )
+            self.assertIsNone(
+                entered["observation"].get("conversationBlock")
+            )
 
     def test_active_flow_response_plan_and_capability_rows_keep_one_frame_contract(
         self,

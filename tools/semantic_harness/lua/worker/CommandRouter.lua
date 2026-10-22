@@ -19,6 +19,7 @@ local capabilities = {
     "KNOWLEDGE_BOOTSTRAP", "KNOWLEDGE_DISCOVER", "KNOWLEDGE_METRICS",
     "WORLD_KNOWLEDGE_INSPECT", "WORLD_KNOWLEDGE_PROPAGATE",
     "PERSONA_CATALOG",
+    "SIMULATION_CONTROL_CATALOG",
 }
 
 local function catalogValues(source, fallback)
@@ -128,9 +129,15 @@ local function personaCatalog(context, payload)
     for index = 1, maximum do
         local definition = definitions[index]
         if type(definition) == "table" then
+            local translation = PNC.Translation
             traits[#traits + 1] = {
                 id = definition.id,
                 labelKey = definition.labelKey or definition.uiName,
+                label = translation and type(translation.GetKey) == "function"
+                    and translation.GetKey(
+                        definition.labelKey or definition.uiName,
+                        definition.id
+                    ) or definition.id,
                 descriptionKey = definition.descriptionKey
                     or definition.uiDescription,
                 excludes = context.Values.copy(definition.excludes),
@@ -142,6 +149,11 @@ local function personaCatalog(context, payload)
     end)
     local relationshipKinds = relationshipKindCatalog(context, payload)
     local speechRealization = speechRealizationCatalog(context)
+    local factionConstants = PNC.FactionConstants or {}
+    if type(factionConstants.ROLES) ~= "table" then
+        pcall(require, "PNC/Core/Factions/PNC_FactionConstants")
+        factionConstants = PNC.FactionConstants or {}
+    end
     return {
         schema = "semantic.persona.catalog.v1",
         schemaVersion = 1,
@@ -159,11 +171,192 @@ local function personaCatalog(context, payload)
                 "materialism", "aggression", "loyalty",
             }),
         },
-        roles = { "none", "trader", "guard", "leader" },
+        roles = catalogValues(factionConstants.ROLES, {}),
         integrations = { "DTHoomans" },
         relationshipKinds = relationshipKinds.kinds,
         relationshipKindRegistration = relationshipKinds.registration,
         speechRealization = speechRealization,
+    }
+end
+
+local function simulationControlCatalog(context, payload)
+    local persona = personaCatalog(context, payload)
+    local controls = {}
+
+    local function add(id, path, page, section, label, control, valueType, details)
+        local row = {
+            id = id,
+            path = path,
+            page = page,
+            section = section,
+            label = label,
+            control = control,
+            valueType = valueType,
+        }
+        for key, value in pairs(details or {}) do
+            row[key] = value
+        end
+        controls[#controls + 1] = row
+    end
+
+    local function withNone(values)
+        local result = { "none" }
+        for index = 1, math.min(#(values or {}), 64) do
+            if values[index] ~= "none" then
+                result[#result + 1] = values[index]
+            end
+        end
+        return result
+    end
+
+    local roles = withNone(persona.roles)
+    local bondKinds = {}
+    local traits = {}
+    for index = 1, math.min(#(persona.relationshipKinds or {}), 64) do
+        bondKinds[#bondKinds + 1] = persona.relationshipKinds[index].kind
+    end
+    for index = 1, math.min(#(persona.traits or {}), 64) do
+        traits[#traits + 1] = {
+            value = persona.traits[index].id,
+            label = persona.traits[index].label or persona.traits[index].id,
+        }
+    end
+
+    -- UI metadata for the harness. ScenarioSession.configure remains the
+    -- authority for accepted scenario state; catalogs below only describe
+    -- how Semantic Lab edits that state.
+    add("runtime.mode", "runtime.mode", "Runtime", "Worker", "Network mode", "combobox", "enum", {
+        options = { "singleplayer", "multiplayer" },
+        optionsSource = "semantic_lab.harness",
+    })
+    add("runtime.language", "runtime.language", "Runtime", "Worker", "Language", "combobox", "enum", {
+        options = { "EN", "TL" },
+        optionsSource = "semantic_lab.harness",
+        workbench = true, workbenchSection = "Context",
+    })
+    add("runtime.llmEnabled", "runtime.llmEnabled", "Runtime", "Integrations", "LLM bridge enabled", "boolean", "boolean")
+    add("runtime.providerAvailable", "runtime.providerAvailable", "Runtime", "Integrations", "LLM provider available", "boolean", "boolean")
+    add("runtime.DTHoomans", "runtime.availableMods.DTHoomans", "Runtime", "Integrations", "Dynamic Trading adapter enabled", "boolean", "boolean", {
+        workbench = true, workbenchSection = "Context",
+    })
+
+    for _, key in ipairs({ "hunger", "thirst", "fatigue", "stress", "boredom", "panic" }) do
+        local title = string.upper(string.sub(key, 1, 1)) .. string.sub(key, 2)
+        add("world." .. key, "world." .. key, "World", "Needs", title, "slider", "number", {
+            min = 0, max = 1, step = 0.05, format = "%.2f",
+            workbench = true, workbenchSection = "Needs + personality",
+        })
+    end
+    add("world.timeOfDay", "world.timeOfDay", "World", "Time", "Time of day", "slider", "number", {
+        min = 0, max = 24, step = 0.25, format = "%.2f",
+    })
+    add("world.worldAgeHours", "world.worldAgeHours", "World", "Time", "World age (hours)", "spinbox", "number", {
+        min = 0, max = 1000000, step = 0.5, format = "%.1f",
+    })
+    add("world.zombieKills", "world.zombieKills", "World", "World facts", "Zombie kills", "integer", "integer", {
+        min = 0, max = 1000000, step = 1,
+    })
+    add("world.weather", "world.weather", "World", "World facts", "Weather", "combobox", "enum", {
+        options = { "clear", "rain", "fog", "snow" },
+        optionsSource = "semantic_lab.harness",
+    })
+    add("world.weatherTransition", "world.weatherTransition", "World", "World facts", "Weather transition", "text", "text", {
+        emptyToNull = true,
+    })
+
+    add("player.characterUUID", "player.characterUUID", "Actors", "Player", "Player ID", "text", "text")
+    add("player.forename", "player.forename", "Actors", "Player", "Player first name", "text", "text")
+    add("player.surname", "player.surname", "Actors", "Player", "Player surname", "text", "text")
+    add("player.displayName", "player.displayName", "Actors", "Player", "Player display name", "text", "text")
+    add("npc.npcID", "npc.npcID", "Actors", "NPC", "NPC ID", "text", "text")
+    add("npc.forename", "npc.forename", "Actors", "NPC", "First name", "text", "text")
+    add("npc.surname", "npc.surname", "Actors", "NPC", "Surname", "text", "text")
+    add("npc.identityState", "npc.identityState", "Actors", "NPC", "Identity state", "text", "text")
+    add("npc.gender", "npc.identity.gender", "Actors", "NPC", "Gender", "combobox", "enum", {
+        options = persona.identity.genders,
+        optionsSource = "semantic_lab.harness",
+    })
+    add("npc.role", "npc.role", "Actors", "NPC", "Role / capability", "combobox", "enum", {
+        options = roles,
+        optionsSource = "PNC.FactionConstants.ROLES",
+        noneValue = "none",
+        workbench = true, workbenchSection = "Context",
+    })
+    add("npc.healthState", "npc.healthState", "Actors", "NPC", "Health", "combobox", "enum", {
+        options = { "unknown", "healthy", "injured", "wounded", "critical", "dead" },
+        optionsSource = "semantic_lab.harness",
+        workbench = true, workbenchSection = "Context",
+    })
+    add("npc.activeBehavior", "npc.activeBehavior", "Actors", "NPC", "Activity", "combobox", "enum", {
+        options = { "idle", "following", "staying", "busy", "searching", "fleeing", "hostile", "combat" },
+        optionsSource = "semantic_lab.harness",
+        workbench = true, workbenchSection = "Context",
+    })
+    add("relationship.identityTrust", "npc.relationship.identityTrust", "Persona", "Relationship", "Identity trust", "combobox", "enum", {
+        options = { "unknown", "trusted", "untrustworthy" },
+        optionsSource = "semantic_lab.harness",
+    })
+    add("persona.bondKind", "npc.startingRelationship.kind", "Persona", "Relationship", "Bond kind", "combobox", "enum", {
+        options = withNone(bondKinds),
+        optionsSource = "PNC.RelationshipKinds",
+        noneValue = "none",
+        clearPath = "npc.startingRelationship",
+        workbench = true, workbenchSection = "Context",
+    })
+    add("persona.traits", "npc.traits", "Persona", "Traits", "Registered traits", "multi_select", "array", {
+        options = traits,
+        optionsSource = "PNC.NPCTraits",
+    })
+    add("persona.socialStyle", "npc.personality.socialStyle", "Persona", "Personality", "Social style", "combobox", "enum", {
+        options = persona.personality.enums.socialStyle,
+        optionsSource = "PNC.SocialProfileConstants.VALID_SOCIAL_STYLES",
+        workbench = true, workbenchSection = "Context",
+    })
+    add("relationship.approval", "npc.relationship.approval", "Persona", "Relationship", "Approval", "slider", "number", {
+        min = -100, max = 100, step = 1, format = "%.0f",
+        workbench = true, workbenchSection = "Context",
+    })
+    add("relationship.respect", "npc.relationship.respect", "Persona", "Relationship", "Respect", "slider", "number", {
+        min = -100, max = 100, step = 1, format = "%.0f",
+        workbench = true, workbenchSection = "Context",
+    })
+    add("relationship.familiarity", "npc.relationship.familiarity", "Persona", "Relationship", "Familiarity", "slider", "number", {
+        min = 0, max = 100, step = 1, format = "%.0f",
+        workbench = true, workbenchSection = "Context",
+    })
+    for _, key in ipairs(persona.personality.dimensions or {}) do
+        add("persona.personality." .. key, "npc.personality." .. key, "Persona", "Personality", key, "slider", "number", {
+            min = 0, max = 1, step = 0.05, format = "%.2f",
+            optionsSource = "PNC.SocialProfileConstants.NUMERIC_DIMENSIONS",
+            workbench = true, workbenchSection = "Needs + personality",
+        })
+    end
+    for _, key in ipairs({ "companion", "owned", "eligible" }) do
+        add("persona.authority." .. key, "npc.actorAuthority." .. key, "Persona", "Authority", key, "boolean", "boolean")
+    end
+    add("relationship.state", nil, "Persona", "Relationship", "Derived relationship state", "read_only", "text", {
+        source = "production.relationship.state",
+        workbench = true, workbenchSection = "Context",
+    })
+
+    add("player.inventory", "player.inventory", "Inventories", "Player", "Player inventory", "structured_collection", "object", {
+        collectionType = "inventory",
+        itemCatalogSource = "Project Zomboid media/scripts",
+    })
+    add("npc.inventory", "npc.inventory", "Inventories", "NPC", "NPC inventory", "structured_collection", "object", {
+        collectionType = "inventory",
+        itemCatalogSource = "Project Zomboid media/scripts",
+    })
+    add("conversation.topic", "conversation.topic", "Advanced", "Conversation", "Topic", "text", "text")
+    add("conversation.token", "conversation.token", "Advanced", "Conversation", "Token", "text", "text")
+    add("runtime.commandResponses", "runtime.commandResponses", "Advanced", "Worker seams", "Command responses · Advanced JSON", "advanced_json", "object")
+    add("runtime.nativeTranslations", "runtime.nativeTranslations", "Advanced", "Worker seams", "Native translations · Advanced JSON", "advanced_json", "object")
+
+    return {
+        schema = "semantic.simulation.control.catalog.v1",
+        schemaVersion = 1,
+        maxControls = 64,
+        controls = controls,
     }
 end
 
@@ -502,6 +695,7 @@ function CommandRouter.hello(context)
         moduleManifest = Runtime.moduleManifest,
         headlessRequires = Runtime.headlessRequires,
         personaCatalog = personaCatalog(context),
+        simulationControlCatalog = simulationControlCatalog(context),
         suggestions = context.Values.copy(
             Runtime.view and Runtime.view.semanticSuggestions
         ),
@@ -676,6 +870,8 @@ function CommandRouter.dispatch(context, request)
         return worldKnowledgePropagate(context, payload)
     elseif command == "PERSONA_CATALOG" then
         return personaCatalog(context, payload)
+    elseif command == "SIMULATION_CONTROL_CATALOG" then
+        return simulationControlCatalog(context, payload)
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,
@@ -707,6 +903,7 @@ function CommandRouter.dispatch(context, request)
             moduleManifest = Runtime.moduleManifest,
             headlessRequires = Runtime.headlessRequires,
             personaCatalog = personaCatalog(context),
+            simulationControlCatalog = simulationControlCatalog(context),
             suggestions = context.Values.copy(
                 Runtime.view and Runtime.view.semanticSuggestions
             ),
