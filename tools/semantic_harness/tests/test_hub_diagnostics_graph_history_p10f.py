@@ -122,7 +122,7 @@ class HubDiagnosticsGraphHistoryP10FTests(unittest.TestCase):
         )
 
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
-    def test_tk_separates_hub_diagnostics_and_retains_graph_presentation(self) -> None:
+    def test_tk_unifies_hub_graph_and_retains_authored_history(self) -> None:
         root = tk.Tk()
         app = SemanticHarnessApp(root, _parser().parse_args([]))
         errors: list[str] = []
@@ -148,11 +148,13 @@ class HubDiagnosticsGraphHistoryP10FTests(unittest.TestCase):
             )
             self.assertEqual(
                 app.trace_tabs.tab(app.trace_tabs.select(), "text"),
-                "Hub diagnostics",
+                "Dialogue graph",
             )
             self.assertIn("question.wellbeing", app.hub_diagnostics.get("1.0", "end"))
             self.assertIn("ACTIVE_TOPIC", app.hub_diagnostics.get("1.0", "end"))
-            self.assertIsNone(app.dialogue_graph_pane._draft)
+            self.assertEqual(
+                app.dialogue_graph_pane._draft["graphKind"], "semantic_hub"
+            )
 
             first = _conversation_graph("conversation_block:history-first")
             second = _conversation_graph("conversation_block:history-second")
@@ -164,11 +166,11 @@ class HubDiagnosticsGraphHistoryP10FTests(unittest.TestCase):
             self.assertTrue(visited["visited"])
             app._show_response(app.last_response)
             self.assertEqual(
-                app.dialogue_graph_pane._draft["graphID"], first["graphID"]
+                app.dialogue_graph_pane._draft["graphKind"], "semantic_hub"
             )
             self.assertEqual(
                 app.trace_tabs.tab(app.trace_tabs.select(), "text"),
-                "Hub diagnostics",
+                "Dialogue graph",
             )
 
             app.dialogue_graph_pane.set_graph(second)

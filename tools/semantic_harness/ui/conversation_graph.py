@@ -46,7 +46,7 @@ class ConversationGraphPane:
         toolbar.columnconfigure(0, weight=1)
         self.graph_hint_var = tk_module.StringVar(
             value=(
-                "Actual ConversationBlock paths remain here; What's Up uses Hub diagnostics."
+                "Runtime Flow, Hub, and ConversationBlock paths appear here."
             )
         )
         ttk.Label(toolbar, textvariable=self.graph_hint_var, anchor="w").grid(
@@ -115,11 +115,12 @@ class ConversationGraphPane:
         if graph is None:
             self._fitted_graph_id = None
             self.graph_hint_var.set(
-                "No retained ConversationBlock graph. What's Up uses Hub diagnostics."
+                "No retained runtime dialogue graph."
             )
             return
+        graph_kind = str(graph.get("graphKind") or "runtime")
         self.graph_hint_var.set(
-            f"Retained actual ConversationBlock graph · {graph_id or 'active graph'}"
+            f"Retained {graph_kind} graph · {graph_id or 'active graph'}"
         )
         if graph is not None and changed:
             self._fitted_graph_id = graph_id

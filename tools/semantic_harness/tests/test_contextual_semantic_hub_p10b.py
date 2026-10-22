@@ -47,7 +47,10 @@ class ContextualSemanticHubP10BTests(unittest.TestCase):
             )
             self.assertEqual(group["label"], "What's up")
             self.assertIsNone(response["observation"].get("conversationBlock"))
-            self.assertIsNone(response["observation"].get("conversationGraph"))
+            self.assertEqual(
+                response["observation"]["conversationGraph"]["graphKind"],
+                "semantic_hub",
+            )
             self.assertTrue(
                 {"question.wellbeing", "question.activity", "question.weather"}
                 <= set(candidates)
@@ -114,7 +117,7 @@ class ContextualSemanticHubP10BTests(unittest.TestCase):
             self.assertEqual(injured_candidates["question.health"]["rank"], 1)
 
             needs_severe = deepcopy(companion)
-            needs_severe["world"].update(
+            needs_severe["npc"]["needs"].update(
                 {"hunger": 0.95, "thirst": 0.9, "fatigue": 0.1}
             )
             worker.configure(needs_severe)

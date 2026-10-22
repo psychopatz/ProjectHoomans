@@ -173,10 +173,14 @@ class FlowEditorCanvasController:
             self.canvas.configure(scrollregion=(0, 0, 720, 600))
             return
 
-        is_conversation = model.get("graphKind") == "conversation_block"
+        is_authored_conversation = model.get("graphKind") == "conversation_block"
+        is_runtime_graph = model.get("graphKind") in {
+            "conversation_block", "semantic_flow", "semantic_hub",
+        }
+        is_conversation = is_runtime_graph
         display_name = (
             str(model.get("title") or model.get("blockID") or "ConversationBlock")
-            if is_conversation
+            if is_runtime_graph
             else flow_display_name(model["flowID"], self._draft)
         )
         workflow = (
@@ -185,10 +189,16 @@ class FlowEditorCanvasController:
             and model.get("generated") and model.get("workflowKind")
             else ""
         )
-        if is_conversation:
+        if is_authored_conversation:
             self.graph_hint_var.set(
                 f"{display_name}  ·  {model.get('categoryID') or ''}  ·  "
                 f"{len(model['nodes'])} authored nodes  ·  "
+                f"zoom {round(self._zoom * 100)}%  ·  middle-drag map"
+            )
+        elif is_runtime_graph:
+            self.graph_hint_var.set(
+                f"{display_name}  ·  {model.get('graphKind')}  ·  "
+                f"{len(model['nodes'])} runtime nodes  ·  "
                 f"zoom {round(self._zoom * 100)}%  ·  middle-drag map"
             )
         else:
@@ -226,6 +236,7 @@ class FlowEditorCanvasController:
                     "locked": "#e18d83",
                     "future": "#66727f",
                     "root_exit": "#e7c56d",
+                    "completed": "#b58bd4",
                 }.get(str(edge.get("state") or "future"), "#6fa8dc")
             if field == "onPass":
                 return "#78c091"
@@ -370,6 +381,7 @@ class FlowEditorCanvasController:
                     "available": ("#214d3b", "#78c091"),
                     "locked": ("#542d35", "#e18d83"),
                     "visited": ("#243d58", "#6fa8dc"),
+                    "completed": ("#3b2850", "#b58bd4"),
                     "future": ("#202b36", "#66727f"),
                 }
                 fill, outline = state_colors.get(state, state_colors["future"])

@@ -4,7 +4,7 @@
 
 **Parent status:** REOPENED — P10 infrastructure is retained, but P11 runtime parity, relationships, and Semantic Lab UX are mandatory.
 
-**Current mandatory phase:** P11F — Unified semantic Flow / Hub / ConversationBlock runtime graph.
+**Current mandatory phase:** P11G — Modular speech-realization content packs.
 
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned.
 
@@ -74,16 +74,33 @@ Validation:
 - P11A-P11E focused regression: 21/21 passed under Xvfb.
 - `luac5.3 -p`, `py_compile`, and `git diff --check` passed for the P11E changes.
 
-## Current Exact Next Chunk — P11F
+## P11F completed — unified runtime dialogue graph
 
-1. Unify greeting Flow, contextual Hub, and authored ConversationBlock graph projections through one renderer family.
-2. Preserve current, visited, available, locked, future, and completed history plus real semantic frame/action paths.
-3. Add focused graph tests for `hello`, contextual `What's up?`, and authored branches.
-4. Run focused checks, update this ledger with exact evidence, commit P11F on existing `main`, and continue automatically to P11G.
+P11F is complete on the local ProjectHoomans `main` checkout.
+
+- `hello` now projects the live greeting Flow with current and transition states.
+- What's Up now projects the real semantic Hub provider/candidate graph. Candidate clicks retain visited and completed history after the hub route closes.
+- Authored ConversationBlock projections continue through the same canvas and graph interaction path.
+- The Python graph model and canvas now share adapters for `semantic_flow`, `semantic_hub`, and `conversation_block`, including current, visited, available, locked, completed, and future states.
+
+Validation:
+
+- `test_contextual_runtime_graph_p11f.py`: 4/4 passed under Xvfb for greeting Flow, What's Up provider graph/history, authored ConversationBlock, and Tk graph navigation.
+- P11A-P11F focused regression: 25/25 passed under Xvfb.
+- What's Up, semantic hub, Suggestions S4, graph history, and Flow Editor regressions passed after updating the accepted P11F graph contract.
+- `luac5.3 -p`, `py_compile`, and `git diff --check` passed for P11F changes.
+
+Native Project Zomboid SP/MP remains UNTESTED / user-owned.
+
+## Current Exact Next Chunk — P11G
+
+1. Audit the existing SpeechRealization registry and current built-in content ownership.
+2. Split cohesive domain packs while retaining one registry, resolver, fallback, and translation backend.
+3. Preserve semantic/output behavior across EN/TL and real worker paths.
+4. Run focused checks, update this ledger with exact evidence, commit P11G on existing `main`, and continue automatically to P11H.
 
 ## Ordered remaining milestones
 
-- **P11F:** unified semantic Flow / Hub / ConversationBlock runtime graph.
 - **P11G:** modular speech-realization content packs.
 - **P11H:** final runtime-parity usability and regression gate.
 

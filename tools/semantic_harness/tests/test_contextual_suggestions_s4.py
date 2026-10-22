@@ -179,7 +179,10 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 {"id": "whats_up", "route": "semantic_hub"},
             )
             self.assertIsNone(observation.get("conversationBlock"))
-            self.assertIsNone(observation.get("conversationGraph"))
+            self.assertEqual(
+                observation["conversationGraph"]["graphKind"],
+                "semantic_hub",
+            )
             self.assertNotIn(
                 "semantic_hub.whats_up",
                 [row.get("id") for row in app.suggestion_rows],
@@ -231,7 +234,10 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.assertNotEqual(initial_ids, injured_ids)
             self.assertEqual(injured_ids[0], "question.health")
             self.assertIn("social.personal_check_in", injured_ids)
-            self.assertIsNone(observation.get("conversationGraph"))
+            self.assertEqual(
+                observation["conversationGraph"]["graphKind"],
+                "semantic_hub",
+            )
             self.assertIsNone(observation.get("conversationBlock"))
 
             app.input_var.set("What's up?")
@@ -348,14 +354,17 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
 
             self.assertEqual(
                 app.trace_tabs.tab(app.trace_tabs.select(), "text"),
-                "Hub diagnostics",
+                "Dialogue graph",
             )
-            self.assertTrue(app.hub_diagnostics.winfo_ismapped())
+            self.assertTrue(app.hub_diagnostics.winfo_exists())
             observation = app.last_response.get("observation") or {}
             self.assertEqual(
                 observation["suggestions"]["activeHub"]["id"], "whats_up"
             )
-            self.assertIsNone(observation.get("conversationGraph"))
+            self.assertEqual(
+                observation["conversationGraph"]["graphKind"],
+                "semantic_hub",
+            )
             self.assertIsNone(observation.get("conversationBlock"))
             self.assertNotIn(
                 "semantic_hub.whats_up",
@@ -427,9 +436,9 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             root.update_idletasks()
             self.assertEqual(
                 app.trace_tabs.tab(app.trace_tabs.select(), "text"),
-                "Hub diagnostics",
+                "Dialogue graph",
             )
-            self.assertTrue(app.hub_diagnostics.winfo_ismapped())
+            self.assertTrue(app.hub_diagnostics.winfo_exists())
             self.assertIn("question.wellbeing", app.hub_diagnostics.get("1.0", "end"))
         finally:
             app.close()

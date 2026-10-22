@@ -147,11 +147,91 @@ def flow_graph_model(flow: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def runtime_graph_model(graph: dict[str, Any]) -> dict[str, Any]:
+    """Adapt semantic Flow and Hub projections to the shared canvas model."""
+
+    if not isinstance(graph, dict):
+        raise ValueError("runtime graph must be an object")
+    raw_nodes = graph.get("nodes")
+    if not isinstance(raw_nodes, list) or not raw_nodes:
+        raise ValueError("runtime graph.nodes must be a non-empty list")
+    known_nodes = {
+        str(node.get("id"))
+        for node in raw_nodes
+        if isinstance(node, dict) and node.get("id")
+    }
+    nodes: list[dict[str, Any]] = []
+    for raw in raw_nodes:
+        if not isinstance(raw, dict) or not raw.get("id"):
+            continue
+        node_id = str(raw["id"])
+        nodes.append(
+            {
+                "id": node_id,
+                "title": raw.get("title") or node_id,
+                "npcText": raw.get("npcText") or "",
+                "state": raw.get("state") or "future",
+                "current": raw.get("current") is True,
+                "visited": raw.get("visited") is True,
+                "choices": copy.deepcopy(raw.get("choices") or []),
+                "terminal": raw.get("terminal") is True,
+                "action": copy.deepcopy(raw.get("action")),
+                "accepts": copy.deepcopy(raw.get("accepts") or []),
+                "gate": copy.deepcopy(raw.get("gate")),
+                "responsePool": raw.get("responsePool") or raw.get("npcText") or "",
+                "source": copy.deepcopy(raw.get("source") or {}),
+            }
+        )
+    edges: list[dict[str, Any]] = []
+    for index, raw in enumerate(graph.get("edges") or []):
+        if not isinstance(raw, dict) or not raw.get("fromNodeID"):
+            continue
+        target = str(raw.get("toNodeID") or "$root")
+        edges.append(
+            {
+                "id": raw.get("id") or f"runtime.edge:{index}",
+                "fromNodeID": str(raw["fromNodeID"]),
+                "field": str(raw.get("field") or raw.get("label") or "transition"),
+                "toNodeID": target,
+                "internal": target in known_nodes,
+                "label": raw.get("label") or raw.get("field") or "transition",
+                "choiceID": raw.get("choiceID"),
+                "state": raw.get("state") or "future",
+                "clickable": raw.get("clickable") is True,
+                "lockedReason": raw.get("lockedReason"),
+                "outcomeIDs": copy.deepcopy(raw.get("outcomeIDs") or []),
+                "frame": copy.deepcopy(raw.get("frame")),
+                "source": copy.deepcopy(raw.get("source") or {}),
+            }
+        )
+    graph_kind = str(graph.get("graphKind") or "semantic_flow")
+    return {
+        "schemaVersion": graph.get("schemaVersion", 1),
+        "graphKind": graph_kind,
+        "graphID": graph.get("graphID"),
+        "title": graph.get("title") or graph.get("flowID") or graph_kind,
+        "flowID": graph.get("flowID") or graph.get("graphID"),
+        "workflowKind": graph.get("workflowKind"),
+        "generated": graph.get("generated") is True,
+        "triggers": copy.deepcopy(graph.get("triggers") or []),
+        "initial": graph.get("initial"),
+        "currentNodeID": graph.get("currentNodeID"),
+        "visitedNodeIDs": copy.deepcopy(graph.get("visitedNodeIDs") or []),
+        "revision": graph.get("revision"),
+        "nodes": nodes,
+        "edges": edges,
+        "rootExits": copy.deepcopy(graph.get("rootExits") or []),
+        "source": copy.deepcopy(graph.get("source") or {}),
+    }
+
+
 def conversation_graph_model(graph: dict[str, Any]) -> dict[str, Any]:
     """Adapt a developer ConversationBlock projection to the shared canvas model."""
 
     if not isinstance(graph, dict):
         raise ValueError("conversation graph must be an object")
+    if graph.get("graphKind") in {"semantic_flow", "semantic_hub"}:
+        return runtime_graph_model(graph)
     raw_nodes = graph.get("nodes")
     if not isinstance(raw_nodes, list) or not raw_nodes:
         raise ValueError("conversation graph.nodes must be a non-empty list")

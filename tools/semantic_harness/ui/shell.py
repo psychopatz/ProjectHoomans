@@ -1509,10 +1509,10 @@ class SemanticHarnessApp:
         hub_diagnostics = semantic_hub_diagnostic_projection(suggestions)
         self._set_text(self.hub_diagnostics, pretty(hub_diagnostics))
         self._render_suggestions(response, suggestions)
-        if hub_diagnostics.get("activeHub") is not None:
-            self.trace_tabs.select(self.hub_diagnostics_frame)
-        elif isinstance(conversation_graph, dict):
+        if isinstance(conversation_graph, dict):
             self.trace_tabs.select(self.dialogue_graph_frame)
+        elif hub_diagnostics.get("activeHub") is not None:
+            self.trace_tabs.select(self.hub_diagnostics_frame)
 
     def _on_suggestion_group(self) -> None:
         if not self.suggestion_projection:

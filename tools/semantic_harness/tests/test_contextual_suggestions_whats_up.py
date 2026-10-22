@@ -42,7 +42,10 @@ class WhatsUpSemanticHubTests(unittest.TestCase):
 
                     observation = response["observation"]
                     self.assertIsNone(observation.get("conversationBlock"))
-                    self.assertIsNone(observation.get("conversationGraph"))
+                    self.assertEqual(
+                        observation["conversationGraph"]["graphKind"],
+                        "semantic_hub",
+                    )
                     suggestions = observation["suggestions"]
                     self.assertEqual(
                         suggestions["activeHub"],
@@ -69,7 +72,10 @@ class WhatsUpSemanticHubTests(unittest.TestCase):
                 "whats_up",
             )
             self.assertIsNone(activated["observation"].get("conversationBlock"))
-            self.assertIsNone(activated["observation"].get("conversationGraph"))
+            self.assertEqual(
+                activated["observation"]["conversationGraph"]["graphKind"],
+                "semantic_hub",
+            )
         finally:
             worker.close()
 
