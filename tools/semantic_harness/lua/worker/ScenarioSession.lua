@@ -159,6 +159,9 @@ function ScenarioSession.snapshot(context)
         queued = Values.copy(Runtime.queued),
         relationship = context.Conversation.relationshipSnapshot(context),
         context = context.Conversation.contextSnapshot(context, Runtime.view),
+        conversationGraph = Values.copy(
+            context.Conversation.graphProjection(Runtime.view)
+        ),
         transport = Values.copy(Runtime.transport),
         trace = Values.copy(Runtime.trace),
         translation = context.OutputProjection.translationSnapshot(context),

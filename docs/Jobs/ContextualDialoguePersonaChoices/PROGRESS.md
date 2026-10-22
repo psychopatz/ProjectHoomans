@@ -1,9 +1,9 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
-**Updated:** 2026-10-22  
-**Parent status:** REOPENED — P8 developer foundation passed, but P9 UI/direct-routing acceptance is mandatory.  
-**Current mandatory phase:** P9A — Direct category routing + full-block graph projection.  
-**Current remote main baseline inspected:** `81f4fb982ff5f65024ec9003d1a0a6f08ea7d1f4`.  
+**Updated:** 2026-10-23
+**Parent status:** P9 developer-side gates passed — READY FOR USER LIVE TEST.
+**Current mandatory phase:** P9G — Final regression complete.
+**Current local main baseline inspected:** `07d1ab96c44ff272ccbdc45b4a3b975fea63fa6c`.
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned.
 
 ## Accepted foundation
@@ -92,6 +92,41 @@ PLAYER: what's up?
 
 The developer graph projection for the selected block must include the complete opening/details/personal/followup/closing structure while the ordinary production suggestion surface remains current-node bounded.
 
+## P9A accepted — 2026-10-22
+
+The real Lua worker now proves the required direct route for the reviewed aliases and bounded fuzzy form, including `whatsup`:
+
+```text
+input("whatsup")
+ -> canonical CONVERSATION_TOPIC / conversation_category
+ -> Composer.RequestCategory
+ -> authoritative ConversationBlock
+ -> authored opening NPC response and choices
+ -> no conversation.whats_up self-candidate
+```
+
+The root `Ask what's up` candidate remains available before entry. Hostile category eligibility still fails closed, normal choice clicks retain stale/replay protection, and EN/TL text is resolved through the existing translation manager. The developer-only graph projection contains all five What's Up nodes, authored choices, locked reasons, weighted outcomes, collapsed next-node targets, root exits, current state, and canonical source metadata. The normal player-facing projection remains current-node bounded.
+
+Evidence: `python3 -m unittest tools.semantic_harness.tests.test_contextual_suggestions_whats_up -v` — 7 passed; `luac5.3 -p` passed for all changed Lua files.
+
+## P9B/P9C accepted — 2026-10-22
+
+The existing Simulation tab now embeds a read-only `Dialogue graph` pane using the existing Flow Editor Tk canvas/controller. The real worker response supplies the selected authored ConversationBlock graph; the pane automatically fits the first selected graph, renders localized NPC text and authored choice labels, and highlights `CURRENT`, `AVAILABLE`, `LOCKED`, `FUTURE`, `VISITED`, and `ROOT EXIT` states. A normal current choice refreshes the same pane and advances the current-node highlight.
+
+The Flow graph model now has a ConversationBlock adapter, and the shared canvas/controller owns zoom, pan, fit, edge routing, exit rendering, and node-card rendering for both production Flow graphs and read-only ConversationBlock graphs. Studio Flow Editor behavior remains covered by its existing tests plus the adapter contract.
+
+Evidence: `xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_contextual_suggestions_s4 -v` — 5 passed; Flow Editor and ConversationBlock adapter tests passed; the GUI proof typed `whats up`, observed the real authored opening/full graph, then clicked the normal `detail` choice and observed `currentNodeID == details`.
+
+## P9D/P9E/P9F accepted — 2026-10-22
+
+Available current branch edges in the live graph now carry the exact canonical choice frame used by the normal suggestion buttons. Graph clicks dispatch through `worker.suggestion_click` → `DialogueInput` → `Composer.RequestChoice`; no graph path assigns `currentNodeID`. Locked/future edges remain visible and non-clickable. Worker equivalence coverage confirms the graph frame and normal choice frame are identical and produce the same authoritative `ConversationOutcome` and next node; Xvfb proof clicks a rendered edge and advances the graph.
+
+Simulation now prioritizes the conversation transcript, live graph, and current authored choices. The graph is selected automatically when a ConversationBlock is active, cards show localized NPC text and choice labels, the choices panel is titled `Current player choices`, and single-group navigation is hidden. Runtime controls remain reachable and the existing minimum-window layout test remains green.
+
+The graph `Diagnostics` action exposes bounded node/choice translation keys, resolved text, source bundle and canonical IDs, outcome/target metadata, lock reasons, and suspicious unresolved/mixed-language markers. It reports authored defects without rewriting translations.
+
+Evidence: direct worker graph/button equivalence test passed; `xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_contextual_suggestions_s4 -v` — 5 passed; Flow/model diagnostics tests passed; `luac5.3 -p` passed for the modified production graph Lua.
+
 ## Next milestones
 
 After P9A, continue autonomously:
@@ -123,8 +158,23 @@ launch Simulation
 
 That is the first required visible usability milestone.
 
+## P9G accepted — 2026-10-23
+
+P9A-P9G developer-side gates are complete. The final focused evidence is:
+
+- direct typed What's Up entry, root entry, reviewed aliases, bounded fuzzy routing, hostile fail-closed behavior, stale/replay protection, EN/TL projection, and several authored categories: `test_contextual_suggestions_whats_up` — 9 passed;
+- read-only Simulation graph, actual localized node text, current/available/future/visited/root-exit states, normal choice advancement, graph-edge advancement, minimum-window layout, and single-group navigation suppression: `xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_contextual_suggestions_s4 -v` — 5 passed;
+- shared Flow Graph renderer/model and bounded graph diagnostics: `test_flow_editor` — 11 passed;
+- persona, bond, Dynamic Trading provider, and Semantic Lab regression suites: 20 passed, 1 skipped;
+- embedded Lua conversation/authority/translation tests: 6/6 passed;
+- `luac5.3`, doctor worker boot, client/shared Kahlua verification, translation catalog validation, `compileall`, and `git diff --check`: passed;
+- live worker proof: `input("whatsup")` selected `projecthoomans:whats_up_local_activity_neutral`, returned the authored opening and choices, projected all five authored nodes, and emitted no `conversation.whats_up` self-candidate;
+- no full conversation graph is written to NPC ModData; graph state remains an on-demand Semantic Lab/runtime projection.
+
+The broad Python discovery run still reports six pre-existing `ContextualSocialReactionTests` failures and then a Tk cross-thread cleanup abort; the social failure was reproduced against the detached clean `main` baseline before this P9 work and is unrelated to the changed P9 paths. Focused P9 and relevant P8 regression suites are green.
+
 ## Handoff condition
 
-Do not report **READY FOR USER LIVE TEST** again until P9A-P9G pass.
+**READY FOR USER LIVE TEST** for P9 Semantic Lab developer-side behavior.
 
-Native Project Zomboid SP/MP remains user-owned and must remain UNTESTED unless the user supplies evidence.
+Native Project Zomboid SP/MP remains **UNTESTED / user-owned** and requires the user's live evidence.

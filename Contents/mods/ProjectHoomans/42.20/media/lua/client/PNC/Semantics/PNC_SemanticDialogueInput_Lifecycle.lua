@@ -712,6 +712,65 @@ function Internal.SubmitSingle(view, value, part)
     recordAcceptedContextTurn(view, result, options)
     recordConversationTopics(view, result, value)
 
+    -- A deterministic parser result that already names an authored
+    -- conversation category must use the same category authority lane as a
+    -- typed semantic-click frame.  The parser owns recognition only; the
+    -- composer/server path still owns block selection, node entry, effects,
+    -- and all revalidation.  Do this before the generic semantic response is
+    -- queued so the player never receives a redundant "ask the same thing"
+    -- suggestion or acknowledgement.
+    if not semanticFrame
+        and type(Suggestions.BuildConversationCategoryFrame) == "function"
+    then
+        local categoryFrame = Suggestions.BuildConversationCategoryFrame(
+            result and result.ir or nil,
+            result and result.sequence
+                or router.state and router.state.sequence or 0
+        )
+        if categoryFrame then
+            local categoryVisible = true
+            local categoryReason = "category_preflight"
+            if type(Suggestions.IsConversationCategoryAvailable)
+                == "function"
+            then
+                categoryVisible, categoryReason =
+                    Suggestions.IsConversationCategoryAvailable(
+                        categoryFrame, context
+                    )
+            end
+            if categoryVisible then
+                local accepted, routeReason =
+                    Input.SubmitSemanticFrame(view, categoryFrame)
+                if accepted ~= true then
+                    traceTurn(view, value, result, "semantic_category_route", {
+                        route = "conversation_category",
+                        categoryID = categoryFrame.extensions.categoryID,
+                        responseSubmitted = false,
+                        responseReason = routeReason,
+                    })
+                    return false, routeReason or categoryReason
+                end
+                if service and type(service.ObserveResult) == "function" then
+                    service:ObserveResult(result)
+                end
+                if type(Internal.AppendPlayerInput) == "function" then
+                    Internal.AppendPlayerInput(
+                        view,
+                        Suggestions.ResolveFrameText(categoryFrame),
+                        result
+                    )
+                end
+                traceTurn(view, value, result, "semantic_category_route", {
+                    route = "conversation_category",
+                    categoryID = categoryFrame.extensions.categoryID,
+                    responseSubmitted = true,
+                    responseReason = routeReason,
+                })
+                return true, routeReason or "accepted"
+            end
+        end
+    end
+
     -- Claimed identity and targeted preference disclosures are authoritative
     -- server responses. Do not also queue a local reply for those turns.
     local deferIdentityResponse = identityRequest

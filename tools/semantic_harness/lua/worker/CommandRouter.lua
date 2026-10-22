@@ -10,7 +10,7 @@ end
 
 local capabilities = {
     "CONFIG", "RESET", "INPUT", "LANGUAGE", "TOOL_REPLY",
-    "PREVIEW", "SNAPSHOT", "FLOW_CATALOG", "FLOW_VALIDATE",
+    "PREVIEW", "SNAPSHOT", "CONVERSATION_GRAPH", "FLOW_CATALOG", "FLOW_VALIDATE",
     "SUGGESTION_PREDICATE", "SUGGESTION_CLICK",
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
@@ -607,6 +607,14 @@ function CommandRouter.dispatch(context, request)
         return context.OutputProjection.toolReply(context, payload)
     elseif command == "SNAPSHOT" then
         return context.ScenarioSession.snapshot(context)
+    elseif command == "CONVERSATION_GRAPH" then
+        return {
+            ok = true,
+            type = "conversation_graph",
+            graph = context.Conversation.graphProjection(
+                context.Runtime and context.Runtime.view
+            ),
+        }
     elseif command == "FLOW_CATALOG" then
         return context.FlowEditor.catalog(context)
     elseif command == "FLOW_VALIDATE" then

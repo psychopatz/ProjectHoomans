@@ -15,6 +15,7 @@ from ..codebuilder.service import SemanticLabAuthoringService
 from ..studio.block_registry import SemanticBlockRegistryPane
 from ..studio.dataset_library import DatasetLibraryPane
 from .flow_editor.pane import FlowEditorPane
+from .conversation_graph import ConversationGraphPane
 from ..studio.interaction_explorer_pane import InteractionExplorerPane
 from ..studio.interaction_spec_pane import InteractionSpecPane
 from ..inspection.rendering import conversation_first, pretty
@@ -367,6 +368,29 @@ class SemanticHarnessApp:
         self.trace_tabs = ttk.Notebook(right)
         self.trace_tabs.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
 
+        dialogue_graph_frame = ttk.Frame(self.trace_tabs)
+        dialogue_graph_frame.rowconfigure(0, weight=1)
+        dialogue_graph_frame.columnconfigure(0, weight=1)
+        self.dialogue_graph_pane = ConversationGraphPane(
+            dialogue_graph_frame, self._tk, ttk,
+            on_click=self.click_graph_frame,
+            on_diagnostics=self.show_conversation_graph_diagnostics,
+        )
+        self.trace_tabs.add(dialogue_graph_frame, text="Dialogue graph")
+        self.dialogue_graph_frame = dialogue_graph_frame
+
+        dialogue_diagnostics_frame = ttk.Frame(self.trace_tabs)
+        dialogue_diagnostics_frame.rowconfigure(0, weight=1)
+        dialogue_diagnostics_frame.columnconfigure(0, weight=1)
+        self.dialogue_diagnostics = ScrolledText(
+            dialogue_diagnostics_frame, wrap="none", state="disabled"
+        )
+        self.dialogue_diagnostics.grid(row=0, column=0, sticky="nsew")
+        self.trace_tabs.add(
+            dialogue_diagnostics_frame, text="Dialogue diagnostics"
+        )
+        self.dialogue_diagnostics_frame = dialogue_diagnostics_frame
+
         conversation_frame = ttk.Frame(self.trace_tabs)
         conversation_frame.rowconfigure(0, weight=1)
         conversation_frame.columnconfigure(0, weight=1)
@@ -402,6 +426,7 @@ class SemanticHarnessApp:
         self.trace_tabs.add(suggestion_trace_frame, text="Suggestions + predicates")
 
         world_knowledge_frame = ttk.Frame(self.trace_tabs)
+        self.world_knowledge_frame = world_knowledge_frame
         world_knowledge_frame.rowconfigure(0, weight=1)
         world_knowledge_frame.columnconfigure(0, weight=1)
         self.world_knowledge_inspector = ScrolledText(
@@ -683,6 +708,20 @@ class SemanticHarnessApp:
         self._set_text(self.authority, pretty(view.get("commandAuthority", {})))
         self._set_text(self.trace, pretty(response))
         observation = response.get("observation") or {}
+        conversation_graph = observation.get("conversationGraph")
+        if conversation_graph is None:
+            conversation_graph = response.get("conversationGraph")
+        self.dialogue_graph_pane.set_graph(conversation_graph)
+        self.suggestion_frame.configure(
+            text=(
+                "Current player choices"
+                if observation.get("conversationBlock")
+                or response.get("conversationBlock")
+                else "Contextual semantic suggestions"
+            )
+        )
+        if conversation_graph:
+            self.trace_tabs.select(self.dialogue_graph_frame)
         suggestions = (
             observation.get("suggestions")
             or response.get("suggestions")
@@ -777,6 +816,12 @@ class SemanticHarnessApp:
             self.suggestion_group_ids_by_display[display] = group_id
         group_displays = [group_display_by_id[group_id] for group_id in group_ids]
         self.suggestion_group_box.configure(values=group_displays)
+        if len(group_displays) <= 1:
+            self.suggestion_group_box.grid_remove()
+        else:
+            self.suggestion_group_box.grid(
+                row=1, column=2, sticky="e", padx=3, pady=(0, 2)
+            )
         revision = suggestions.get("revision")
         selected_group_id = (
             suggestions.get("currentGroupID")
@@ -896,6 +941,43 @@ class SemanticHarnessApp:
 
         self._start_operation(lambda worker: worker.suggestion_click(frame), finish)
 
+    def click_graph_frame(self, frame: dict[str, Any]) -> bool:
+        """Submit a live graph edge through the exact suggestion-click lane."""
+
+        if not self.session.ready or self.busy or not isinstance(frame, dict):
+            return False
+        label = str(frame.get("textFallback") or frame.get("candidateID") or "choice")
+
+        def finish(response: dict[str, Any]) -> None:
+            if response.get("accepted") is True:
+                self._append("PLAYER", label)
+                for message in response.get("messages", []):
+                    if message.get("speaker") == "npc":
+                        self._append("NPC", npc_message_text(message))
+                for call in response.get("toolCalls", []):
+                    self._append(
+                        "TOOL/ACTION",
+                        f"{call.get('label') or call.get('name')}"
+                        f" [{call.get('name')}] · "
+                        f"{call.get('status') or call.get('reason') or 'observed'}",
+                    )
+            else:
+                self._append(
+                    "SYSTEM",
+                    f"Graph choice rejected: {response.get('reason') or 'unknown'}",
+                )
+            self._show_response(response)
+
+        return self._start_operation(
+            lambda worker: worker.suggestion_click(frame), finish
+        )
+
+    def show_conversation_graph_diagnostics(
+        self, diagnostics: dict[str, Any]
+    ) -> None:
+        self._set_text(self.dialogue_diagnostics, pretty(diagnostics))
+        self.trace_tabs.select(self.dialogue_diagnostics_frame)
+
     def preview(self) -> None:
         """Inspect a production decision without recording or dispatching it."""
 
@@ -920,6 +1002,8 @@ class SemanticHarnessApp:
             self._set_text(self.trace, "")
             self._set_text(self.suggestion_inspector, "")
             self._set_text(self.world_knowledge_inspector, "")
+            self._set_text(self.dialogue_diagnostics, "")
+            self.dialogue_graph_pane.set_graph(None)
             self.suggestion_rows = []
             self.suggestion_interactive = False
             self._render_suggestions(
@@ -1141,7 +1225,7 @@ class SemanticHarnessApp:
         def finish(response: dict[str, Any]) -> None:
             view = build_world_knowledge_inspector(response)
             self._set_text(self.world_knowledge_inspector, pretty(view))
-            self.trace_tabs.select(4)
+            self.trace_tabs.select(self.world_knowledge_frame)
             self._append(
                 "SYSTEM",
                 "World Knowledge inspection refreshed from the production Lua worker.",

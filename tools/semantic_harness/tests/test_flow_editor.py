@@ -18,6 +18,10 @@ from tools.semantic_harness.interaction_explorer import (
 )
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.worker import LuaSemanticWorker
+from tools.semantic_harness.ui.flow_editor.model import (
+    conversation_graph_diagnostics,
+    conversation_graph_model,
+)
 
 
 class FlowEditorTests(unittest.TestCase):
@@ -50,6 +54,100 @@ class FlowEditorTests(unittest.TestCase):
         self.assertEqual(graph_render_mode(0.39), "overview")
         self.assertEqual(graph_render_mode(0.65), "compact")
         self.assertEqual(graph_render_mode(1.0), "detail")
+
+    def test_conversation_graph_adapter_preserves_runtime_states_and_labels(self) -> None:
+        graph = conversation_graph_model(
+            {
+                "graphID": "conversation_block:test",
+                "blockID": "test",
+                "categoryID": "projecthoomans:test",
+                "entryNodeID": "opening",
+                "currentNodeID": "opening",
+                "nodes": [
+                    {
+                        "id": "opening",
+                        "title": "opening",
+                        "npcText": "Authored opening",
+                        "state": "current",
+                        "choices": [
+                            {"id": "detail", "text": "Ask for details", "enabled": True}
+                        ],
+                    },
+                    {
+                        "id": "details",
+                        "title": "details",
+                        "npcText": "Authored details",
+                        "state": "available",
+                        "choices": [],
+                    },
+                ],
+                "edges": [
+                    {
+                        "fromNodeID": "opening",
+                        "toNodeID": "details",
+                        "choiceID": "detail",
+                        "label": "Ask for details",
+                        "state": "available",
+                        "clickable": True,
+                    },
+                    {
+                        "fromNodeID": "opening",
+                        "toNodeID": "$root",
+                        "choiceID": "leave",
+                        "label": "Leave",
+                        "state": "root_exit",
+                    },
+                ],
+            }
+        )
+        self.assertEqual(graph["graphKind"], "conversation_block")
+        self.assertEqual(graph["initial"], "opening")
+        self.assertEqual(
+            {node["state"] for node in graph["nodes"]},
+            {"current", "available"},
+        )
+        detail_edge = next(edge for edge in graph["edges"] if edge["choiceID"] == "detail")
+        self.assertTrue(detail_edge["internal"])
+        self.assertTrue(detail_edge["clickable"])
+        self.assertEqual(detail_edge["label"], "Ask for details")
+        self.assertFalse(
+            next(edge for edge in graph["edges"] if edge["choiceID"] == "leave")["internal"]
+        )
+
+    def test_conversation_graph_diagnostics_exposes_keys_and_suspicious_content(self) -> None:
+        diagnostics = conversation_graph_diagnostics(
+            {
+                "graphID": "conversation_block:test",
+                "blockID": "test",
+                "categoryID": "projecthoomans:test",
+                "source": {"domain": "pnc.test", "pathPattern": "test/{language}.json"},
+                "sourceIDs": {"nodeID": "opening"},
+                "nodes": [
+                    {
+                        "id": "opening",
+                        "textKey": "node.opening",
+                        "npcText": "May mga tracks around here today.",
+                        "source": {"blockID": "test", "nodeID": "opening"},
+                        "choices": [
+                            {
+                                "id": "detail",
+                                "textKey": "choice.detail",
+                                "text": "Ask for details",
+                                "enabled": True,
+                                "outcomeIDs": ["open", "guarded"],
+                                "nextNodeTargets": ["details"],
+                            }
+                        ],
+                    }
+                ],
+            }
+        )
+        self.assertEqual(diagnostics["source"]["domain"], "pnc.test")
+        self.assertEqual(diagnostics["nodes"][0]["translationKey"], "node.opening")
+        self.assertEqual(diagnostics["choices"][0]["outcomeIDs"], ["open", "guarded"])
+        self.assertTrue(
+            any("mixed_language_markers" in row["reasons"] for row in diagnostics["suspicious"])
+        )
 
     def test_graph_model_exposes_nodes_and_transition_edges(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:

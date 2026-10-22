@@ -162,6 +162,16 @@ function Conversation.refreshViewContext(context)
         Runtime.view.spec.context = Conversation.buildContext(context)
         local block = Conversation.blockProjection(Runtime.view)
         Runtime.view.spec.context.conversationBlock = block
+        local composer = PNC.Conversation and PNC.Conversation.Composer
+        if composer
+            and type(composer.BuildSemanticConversationGraphProjection)
+                == "function"
+        then
+            Runtime.view.spec.context.conversationGraph =
+                composer.BuildSemanticConversationGraphProjection(Runtime.view)
+        else
+            Runtime.view.spec.context.conversationGraph = nil
+        end
         if block then
             Runtime.view.spec.context.conversationTopic = block.topic
             Runtime.view.spec.context.currentTopic = block.topic
@@ -176,7 +186,6 @@ function Conversation.refreshViewContext(context)
             Conversation.categoryPreflight(
                 Runtime.view.spec.context.conversationBlockContext
             )
-        local composer = PNC.Conversation and PNC.Conversation.Composer
         if composer and type(composer.BuildCategoryDiagnostics) == "function"
             and type(Runtime.view.spec.context.conversationBlockContext) == "table"
         then
@@ -289,6 +298,17 @@ function Conversation.blockProjection(view)
     }
 end
 
+function Conversation.graphProjection(view)
+    local composer = PNC.Conversation and PNC.Conversation.Composer
+    if composer
+        and type(composer.BuildSemanticConversationGraphProjection)
+            == "function"
+    then
+        return composer.BuildSemanticConversationGraphProjection(view)
+    end
+    return nil
+end
+
 function Conversation.categoryPreflight(blockContext)
     local categoryID = "projecthoomans:whats_up"
     if type(blockContext) ~= "table" then
@@ -333,6 +353,7 @@ function Conversation.buildView(context)
         queue = {},
         currentNodeID = "menu",
         currentNode = nil,
+        semanticConversationVisitedNodes = {},
         spec = nil,
         view = nil,
         append = function(self, speaker, value, metadata)
@@ -441,6 +462,9 @@ function Conversation.buildView(context)
         end,
         enterNode = function(self, nodeID)
             self.currentNodeID = tostring(nodeID or "")
+            self.semanticConversationVisitedNodes[
+                self.currentNodeID
+            ] = true
             self.currentNode = self.spec
                 and self.spec.nodes
                 and self.spec.nodes[self.currentNodeID] or nil
@@ -576,6 +600,7 @@ function Conversation.buildView(context)
     session.currentNode = spec.nodes.menu
     session:setChoices(session.currentNode.choices)
     view.spec.context.conversationBlock = Conversation.blockProjection(view)
+    view.spec.context.conversationGraph = Conversation.graphProjection(view)
     if composer and type(composer.BuildSemanticRootProjection) == "function" then
         view.spec.context.conversationRoot =
             composer.BuildSemanticRootProjection(view)
@@ -711,6 +736,18 @@ function Conversation.turn(context, text)
     else
         accepted, reason = PNC.Semantics.DialogueInput.Submit(view, text)
     end
+    local composer = PNC.Conversation and PNC.Conversation.Composer
+    local mode = Runtime.scenario and Runtime.scenario.runtime
+        and Runtime.scenario.runtime.mode or "singleplayer"
+    if accepted == true and mode ~= "multiplayer"
+        and view.spec.context.pendingConversationRequest ~= nil
+        and composer and type(composer.PumpLocalRequests) == "function"
+    then
+        -- The real game receives this request through its normal network
+        -- authority.  The harness only supplies the deterministic transport
+        -- boundary, so pump the same composer request after typed input.
+        composer.PumpLocalRequests()
+    end
     -- The harness transport is an authoritative fixture. Refresh the same
     -- production context projection after a command so the next suggestion
     -- set reflects follow/stay state rather than replaying stale affordances.
@@ -785,9 +822,21 @@ function Conversation.turn(context, text)
         choiceSurface = Values.copy(
             view.session and view.session.choicePresentationState
         ),
+        conversationBlock = Values.copy(
+            view.spec and view.spec.context and view.spec.context.conversationBlock
+        ),
+        conversationGraph = Values.copy(
+            Conversation.graphProjection(view)
+        ),
     }
     response.observation = context.OutputProjection.observation(
         context, response, view.spec and view.spec.context
+    )
+    response.observation.conversationBlock = Values.copy(
+        response.conversationBlock
+    )
+    response.observation.conversationGraph = Values.copy(
+        response.conversationGraph
     )
     -- Authoritative receipts can arrive synchronously through the worker's
     -- dual-role transport after the ordinary semantic result is planned.
@@ -1031,6 +1080,7 @@ function Conversation.semanticClick(context, frame)
         ),
         loadedModules = Runtime.loadedModules,
         conversationBlock = Values.copy(projection),
+        conversationGraph = Values.copy(Conversation.graphProjection(view)),
     }
     response.transcriptMessages = sliced(Runtime.transcript, transcriptBefore + 1)
     response.observation = context.OutputProjection.observation(
@@ -1047,6 +1097,9 @@ function Conversation.semanticClick(context, frame)
         ) or Runtime.lastSuggestionRevision
     end
     response.observation.conversationBlock = Values.copy(projection)
+    response.observation.conversationGraph = Values.copy(
+        response.conversationGraph
+    )
     response.observation.authoritativeMessages = {}
     for _, message in ipairs(allMessages) do
         if type(message) == "table" and message.speaker == "npc" then

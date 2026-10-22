@@ -112,6 +112,11 @@ class LuaSemanticWorker:
     def snapshot(self) -> dict[str, Any]:
         return self._request("SNAPSHOT")
 
+    def conversation_graph(self) -> dict[str, Any]:
+        """Return the developer-only full selected ConversationBlock graph."""
+
+        return self._request("CONVERSATION_GRAPH")
+
     def persona_catalog(
         self, register_relationship_kind: dict[str, Any] | None = None
     ) -> dict[str, Any]:

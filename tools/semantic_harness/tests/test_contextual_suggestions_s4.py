@@ -166,26 +166,21 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
 
         try:
             wait_until(lambda: app.worker_ready)
+            app.main_tabs.select(app.simulation_tab)
             app.input_var.set("whats up")
             app.submit()
             wait_until(
                 lambda: not app.busy
-                and any(
-                    row.get("id") == "conversation.whats_up"
-                    for row in app.suggestion_rows
+                and bool(
+                    (app.last_response.get("observation") or {}).get(
+                        "conversationGraph"
+                    )
                 )
             )
-            self.assertIn(
-                "Ask what's up",
-                [str(button.cget("text")) for button in app.suggestion_buttons],
+            self.assertNotIn(
+                "conversation.whats_up",
+                [row.get("id") for row in app.suggestion_rows],
             )
-
-            root_index = next(
-                index
-                for index, row in enumerate(app.suggestion_rows)
-                if row.get("id") == "conversation.whats_up"
-            )
-            app.click_suggestion(root_index)
             wait_until(
                 lambda: not app.busy
                 and any(
@@ -201,6 +196,20 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 "conversationBlock",
                 app.suggestion_inspector.get("1.0", "end"),
             )
+            graph = app.dialogue_graph_pane.graph_model()
+            self.assertEqual(graph["currentNodeID"], "opening")
+            self.assertEqual(
+                {node["id"] for node in graph["nodes"]},
+                {"opening", "details", "personal", "followup", "closing"},
+            )
+            self.assertIn(
+                "There's been movement around the neighborhood today.",
+                " ".join(
+                    str(app.dialogue_graph_pane.canvas.itemcget(item, "text"))
+                    for item in app.dialogue_graph_pane.canvas.find_all()
+                    if app.dialogue_graph_pane.canvas.type(item) == "text"
+                ),
+            )
             detail_index = next(
                 index
                 for index, row in enumerate(app.suggestion_rows)
@@ -215,6 +224,34 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 )
             )
             self.assertIn("Mostly tracks", app.transcript.get("1.0", "end"))
+            self.assertEqual(
+                app.dialogue_graph_pane.graph_model()["currentNodeID"],
+                "details",
+            )
+
+            # Click the rendered live edge from the new current node. The
+            # pane must submit the same canonical semantic choice frame as
+            # the normal suggestion button.
+            offer_edge = next(
+                edge
+                for edge in app.dialogue_graph_pane._draft["edges"]
+                if edge.get("choiceID") == "offer_help"
+            )
+            edge_items = app.dialogue_graph_pane.canvas.find_withtag(
+                f"edge:{offer_edge['id']}"
+            )
+            self.assertTrue(edge_items)
+            edge_coords = app.dialogue_graph_pane.canvas.coords(edge_items[0])
+            app.dialogue_graph_pane.canvas.event_generate(
+                "<Button-1>",
+                x=max(1, int(edge_coords[2])),
+                y=max(1, int(edge_coords[3])),
+            )
+            wait_until(
+                lambda: not app.busy
+                and app.dialogue_graph_pane.graph_model()["currentNodeID"]
+                == "followup"
+            )
         finally:
             app.close()
             del app
@@ -301,12 +338,15 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             app.submit()
             wait_until(
                 lambda: not app.busy
-                and any(
-                    row.get("id") == "conversation.whats_up"
-                    for row in app.suggestion_rows
-                )
+                and app.dialogue_graph_pane._draft is not None
             )
             root.update_idletasks()
+
+            self.assertTrue(app.dialogue_graph_pane.canvas.winfo_ismapped())
+            self.assertNotIn(
+                "conversation.whats_up",
+                [row.get("id") for row in app.suggestion_rows],
+            )
 
             self.assertGreaterEqual(
                 app.suggestion_frame.winfo_height(), initial_panel_height

@@ -10,6 +10,7 @@ from .model import (
     graph_render_mode,
     flow_display_name,
     flow_graph_model,
+    conversation_graph_model,
 )
 
 
@@ -86,7 +87,25 @@ class FlowEditorCanvasController:
                     return tag[5:]
         return None
 
+    def _edge_id_at(self, event: Any) -> str | None:
+        """Resolve a graph edge tag without changing Flow Editor selection."""
+
+        point = self._canvas_point(event)
+        items = self.canvas.find_overlapping(
+            point[0] - 5, point[1] - 5, point[0] + 5, point[1] + 5,
+        )
+        for item_id in reversed(items):
+            for tag in self.canvas.gettags(item_id):
+                if tag.startswith("edge:"):
+                    return tag[5:]
+        return None
+
     def _on_canvas_left_down(self, event: Any) -> None:
+        edge_id = self._edge_id_at(event)
+        handler = getattr(self.pane, "handle_graph_click", None)
+        if edge_id is not None and callable(handler):
+            handler(edge_id)
+            return
         node_id = self._node_id_at(event)
         if node_id is not None:
             self._start_node_drag(event, node_id)
@@ -126,8 +145,9 @@ class FlowEditorCanvasController:
         height = max(1.0, float(self.canvas.winfo_height() or 560))
         min_x = min(point[0] for point in self._node_positions.values())
         min_y = min(point[1] for point in self._node_positions.values())
+        box_height = float(getattr(self, "graph_box_height", 82.0))
         max_x = max(point[0] + 245 for point in self._node_positions.values())
-        max_y = max(point[1] + 82 for point in self._node_positions.values())
+        max_y = max(point[1] + box_height for point in self._node_positions.values())
         self._zoom = max(0.35, min(2.5, min((width - 50) / (max_x - min_x), (height - 70) / (max_y - min_y))))
         self._pan = (
             (width - (max_x - min_x) * self._zoom) / 2 - min_x * self._zoom,
@@ -143,25 +163,42 @@ class FlowEditorCanvasController:
             self.canvas.configure(scrollregion=(0, 0, 720, 600))
             return
         try:
-            model = flow_graph_model(self._draft)
+            model = (
+                self.pane.graph_model()
+                if callable(getattr(self.pane, "graph_model", None))
+                else flow_graph_model(self._draft)
+            )
         except ValueError as error:
             self.graph_hint_var.set(str(error))
             self.canvas.configure(scrollregion=(0, 0, 720, 600))
             return
 
-        display_name = flow_display_name(model["flowID"], self._draft)
+        is_conversation = model.get("graphKind") == "conversation_block"
+        display_name = (
+            str(model.get("title") or model.get("blockID") or "ConversationBlock")
+            if is_conversation
+            else flow_display_name(model["flowID"], self._draft)
+        )
         workflow = (
             f"  ·  {model['workflowKind']}"
-            if model.get("generated") and model.get("workflowKind")
+            if not is_conversation
+            and model.get("generated") and model.get("workflowKind")
             else ""
         )
-        self.graph_hint_var.set(
-            f"{display_name}{workflow}  ·  triggers {len(model['triggers'])}  ·  "
-            f"zoom {round(self._zoom * 100)}%  ·  left-drag nodes · middle-drag map"
-        )
+        if is_conversation:
+            self.graph_hint_var.set(
+                f"{display_name}  ·  {model.get('categoryID') or ''}  ·  "
+                f"{len(model['nodes'])} authored nodes  ·  "
+                f"zoom {round(self._zoom * 100)}%  ·  middle-drag map"
+            )
+        else:
+            self.graph_hint_var.set(
+                f"{display_name}{workflow}  ·  triggers {len(model['triggers'])}  ·  "
+                f"zoom {round(self._zoom * 100)}%  ·  left-drag nodes · middle-drag map"
+            )
         nodes = model["nodes"]
         box_width = 245.0
-        box_height = 82.0
+        box_height = float(getattr(self, "graph_box_height", 150.0 if is_conversation else 82.0))
         render_mode = graph_render_mode(self._zoom)
         # Geometry is zoomed, but text must remain legible and stay inside the
         # now-smaller node rectangle.  At low zoom the graph is intentionally
@@ -182,7 +219,14 @@ class FlowEditorCanvasController:
             "onUnknown": "?",
         }
 
-        def edge_color(field: str) -> str:
+        def edge_color(field: str, edge: dict[str, Any]) -> str:
+            if is_conversation:
+                return {
+                    "available": "#78c091",
+                    "locked": "#e18d83",
+                    "future": "#66727f",
+                    "root_exit": "#e7c56d",
+                }.get(str(edge.get("state") or "future"), "#6fa8dc")
             if field == "onPass":
                 return "#78c091"
             if field == "onFail":
@@ -211,10 +255,32 @@ class FlowEditorCanvasController:
             return max(1, int(max(1.0, width - (padding * 2)) / (size * 0.6)))
 
         positions: dict[str, tuple[float, float]] = {}
+        if is_conversation:
+            levels: dict[str, int] = {str(model.get("initial")): 0}
+            pending = [str(model.get("initial"))]
+            while pending:
+                source = pending.pop(0)
+                for edge in model["edges"]:
+                    if edge["fromNodeID"] != source or not edge.get("internal"):
+                        continue
+                    target = edge["toNodeID"]
+                    if target not in levels:
+                        levels[target] = levels[source] + 1
+                        pending.append(target)
+            grouped: dict[int, list[str]] = {}
+            for node in nodes:
+                node_id = str(node["id"])
+                grouped.setdefault(levels.get(node_id, 0), []).append(node_id)
+            for level, node_ids in grouped.items():
+                for index, node_id in enumerate(sorted(node_ids)):
+                    positions[node_id] = (
+                        500 + (index - (len(node_ids) - 1) / 2) * 330,
+                        42 + level * 190,
+                    )
         for index, node in enumerate(nodes):
             if node["id"] in self._node_positions:
                 positions[node["id"]] = self._node_positions[node["id"]]
-            else:
+            elif node["id"] not in positions:
                 positions[node["id"]] = (70 + (index % 3) * 330, 82 + (index // 3) * 150)
         self._node_positions = positions
 
@@ -224,7 +290,7 @@ class FlowEditorCanvasController:
         for edge_index, edge in enumerate(model["edges"]):
             source = positions.get(edge["fromNodeID"])
             target = positions.get(edge["toNodeID"])
-            color = edge_color(edge["field"])
+            color = edge_color(edge["field"], edge)
             if source and target:
                 if target[0] >= source[0]:
                     start = (source[0] + box_width, source[1] + box_height / 2)
@@ -235,12 +301,22 @@ class FlowEditorCanvasController:
                 sx, sy = screen(start)
                 tx, ty = screen(finish)
                 lane = (edge_index % 3 - 1) * 10 * self._zoom
+                edge_tags = (
+                    (f"edge:{edge['id']}",)
+                    if is_conversation and edge.get("id") else ()
+                )
                 self.canvas.create_line(
                     sx, sy, (sx + tx) / 2 + lane, (sy + ty) / 2 + lane, tx, ty,
                     fill=color, arrow="last", width=max(1, int(2 * self._zoom)),
+                    tags=edge_tags,
                 )
-                if render_mode != "overview":
-                    label = edge["field"] if render_mode == "detail" else edge_aliases.get(edge["field"], "R")
+                if is_conversation or render_mode != "overview":
+                    label = (
+                        edge.get("label") or edge.get("choiceID") or edge["field"]
+                        if is_conversation
+                        else edge["field"] if render_mode == "detail"
+                        else edge_aliases.get(edge["field"], "R")
+                    )
                     self.canvas.create_text(
                         (sx + tx) / 2 + lane, (sy + ty) / 2 + lane,
                         fill=color, text=label, font=("TkDefaultFont", small_font_size),
@@ -263,12 +339,19 @@ class FlowEditorCanvasController:
                 )
                 sx, sy = screen(start)
                 tx, ty = screen(end)
+                edge_tags = (
+                    (f"edge:{edge['id']}",)
+                    if is_conversation and edge.get("id") else ()
+                )
                 self.canvas.create_line(
                     sx, sy, tx, ty, fill="#ffb4ab",
                     arrow="last", width=max(1, int(2 * self._zoom)),
+                    tags=edge_tags,
                 )
-                if render_mode != "overview":
+                if is_conversation or render_mode != "overview":
                     field = edge["field"] if render_mode == "detail" else edge_aliases.get(edge["field"], "R")
+                    if is_conversation:
+                        field = edge.get("label") or edge.get("choiceID") or field
                     target = compact_text(edge["toNodeID"], 12 if render_mode == "compact" else 24)
                     self.canvas.create_text(
                         tx + max(4.0, 8.0 * self._zoom), ty, anchor="w", fill="#ffb4ab",
@@ -280,6 +363,53 @@ class FlowEditorCanvasController:
             width = box_width * self._zoom
             height = box_height * self._zoom
             selected = node["id"] == self._selected_node
+            if is_conversation:
+                state = str(node.get("state") or "future")
+                state_colors = {
+                    "current": ("#604d2a", "#f0c674"),
+                    "available": ("#214d3b", "#78c091"),
+                    "locked": ("#542d35", "#e18d83"),
+                    "visited": ("#243d58", "#6fa8dc"),
+                    "future": ("#202b36", "#66727f"),
+                }
+                fill, outline = state_colors.get(state, state_colors["future"])
+                if selected:
+                    fill, outline = "#604d2a", "#f0c674"
+                tag = f"node:{node['id']}"
+                self.canvas.create_rectangle(
+                    x, y, x + width, y + height,
+                    fill=fill, outline=outline,
+                    width=max(1, int(2 * self._zoom)), tags=(tag,),
+                )
+                title_chars = text_capacity(width, font_size)
+                title = compact_text(node.get("title") or node["id"], title_chars)
+                # Conversation cards prioritize authored dialogue over
+                # canonical IDs. Let Tk wrap the localized NPC text inside
+                # the card instead of replacing it with an ellipsis.
+                text = str(node.get("npcText") or "")
+                choices = []
+                for choice in node.get("choices") or []:
+                    label = str(choice.get("text") or choice.get("id") or "")
+                    choices.append(("[locked] " if choice.get("locked") else "[available] ") + label)
+                choice_text = compact_text("  ".join(choices), title_chars * 2)
+                self.canvas.create_text(
+                    x + padding, y + padding, anchor="nw", fill="#ffffff",
+                    text=title, font=("TkDefaultFont", font_size),
+                    width=max(1, width - padding * 2), tags=(tag,),
+                )
+                self.canvas.create_text(
+                    x + padding, y + title_gap, anchor="nw", fill="#d7e0e8",
+                    text=text, font=("TkDefaultFont", small_font_size),
+                    width=max(1, width - padding * 2), tags=(tag,),
+                )
+                self.canvas.create_text(
+                    x + padding, y + max(74.0, status_gap), anchor="nw",
+                    fill="#9bd3ae", text=compact_text(
+                        f"{state.upper()} · {choice_text}", title_chars * 2
+                    ), font=("TkDefaultFont", small_font_size),
+                    width=max(1, width - padding * 2), tags=(tag,),
+                )
+                continue
             fill = "#604d2a" if selected else "#202b36"
             outline = "#f0c674" if selected else "#6fa8dc"
             if node["terminal"] and not selected:

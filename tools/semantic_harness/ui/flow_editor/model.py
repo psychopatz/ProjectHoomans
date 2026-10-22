@@ -147,6 +147,182 @@ def flow_graph_model(flow: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def conversation_graph_model(graph: dict[str, Any]) -> dict[str, Any]:
+    """Adapt a developer ConversationBlock projection to the shared canvas model."""
+
+    if not isinstance(graph, dict):
+        raise ValueError("conversation graph must be an object")
+    raw_nodes = graph.get("nodes")
+    if not isinstance(raw_nodes, list) or not raw_nodes:
+        raise ValueError("conversation graph.nodes must be a non-empty list")
+
+    node_rows: list[dict[str, Any]] = []
+    known_nodes = {
+        str(node.get("id"))
+        for node in raw_nodes
+        if isinstance(node, dict) and node.get("id")
+    }
+    for raw in raw_nodes:
+        if not isinstance(raw, dict) or not raw.get("id"):
+            continue
+        node_id = str(raw["id"])
+        node_rows.append(
+            {
+                "id": node_id,
+                "title": raw.get("title") or node_id,
+                "npcText": raw.get("npcText") or "",
+                "state": raw.get("state") or "future",
+                "current": raw.get("current") is True,
+                "visited": raw.get("visited") is True,
+                "choices": copy.deepcopy(raw.get("choices") or []),
+                "terminal": False,
+                "action": None,
+                "accepts": [],
+                "gate": None,
+                "responsePool": raw.get("npcText") or "",
+                "source": copy.deepcopy(raw.get("source") or {}),
+            }
+        )
+
+    edges: list[dict[str, Any]] = []
+    for raw in graph.get("edges") or []:
+        if not isinstance(raw, dict) or not raw.get("fromNodeID"):
+            continue
+        target = str(raw.get("toNodeID") or "$root")
+        edges.append(
+            {
+                "id": raw.get("id")
+                or f"conversation.edge:{raw['fromNodeID']}:{target}",
+                "fromNodeID": str(raw["fromNodeID"]),
+                "field": str(raw.get("choiceID") or raw.get("label") or "choice"),
+                "toNodeID": target,
+                "internal": target in known_nodes,
+                "label": raw.get("label") or raw.get("choiceID") or "choice",
+                "choiceID": raw.get("choiceID"),
+                "state": raw.get("state") or "future",
+                "clickable": raw.get("clickable") is True,
+                "lockedReason": raw.get("lockedReason"),
+                "outcomeIDs": copy.deepcopy(raw.get("outcomeIDs") or []),
+                "frame": copy.deepcopy(raw.get("frame")),
+                "source": copy.deepcopy(raw.get("source") or {}),
+            }
+        )
+
+    return {
+        "schemaVersion": graph.get("schemaVersion", 1),
+        "graphKind": "conversation_block",
+        "graphID": graph.get("graphID"),
+        "title": graph.get("title") or graph.get("categoryID") or graph.get("blockID"),
+        "blockID": graph.get("blockID"),
+        "categoryID": graph.get("categoryID"),
+        "topic": graph.get("topic"),
+        "initial": graph.get("entryNodeID"),
+        "currentNodeID": graph.get("currentNodeID"),
+        "source": copy.deepcopy(graph.get("source") or {}),
+        "sourceIDs": copy.deepcopy(graph.get("sourceIDs") or {}),
+        "nodes": node_rows,
+        "edges": edges,
+        "rootExits": copy.deepcopy(graph.get("rootExits") or []),
+    }
+
+
+def conversation_graph_diagnostics(graph: dict[str, Any]) -> dict[str, Any]:
+    """Build a bounded authoring/source view without rewriting authored text."""
+
+    graph = graph if isinstance(graph, dict) else {}
+    source = copy.deepcopy(graph.get("source") or {})
+    nodes: list[dict[str, Any]] = []
+    choices: list[dict[str, Any]] = []
+    suspicious: list[dict[str, Any]] = []
+    english_markers = {"the", "and", "you", "what", "there", "around", "today"}
+    tagalog_markers = {"ang", "mga", "ng", "sa", "ko", "mo", "may"}
+
+    def inspect_text(
+        text: Any,
+        text_key: Any,
+        kind: str,
+        identifier: Any,
+        source_ids: dict[str, Any],
+    ) -> None:
+        resolved = str(text or "")
+        tokens = {
+            token.strip(".,!?;:'\"()[]").lower()
+            for token in resolved.split()
+        }
+        reasons: list[str] = []
+        if not resolved.strip():
+            reasons.append("unresolved_text")
+        if text_key and resolved.strip() == str(text_key).strip():
+            reasons.append("translation_key_rendered_as_text")
+        if english_markers & tokens and tagalog_markers & tokens:
+            reasons.append("mixed_language_markers")
+        if reasons and len(suspicious) < 32:
+            suspicious.append(
+                {
+                    "kind": kind,
+                    "id": identifier,
+                    "textKey": text_key,
+                    "resolvedText": resolved,
+                    "reasons": reasons,
+                    "source": copy.deepcopy(source_ids),
+                }
+            )
+
+    for node in graph.get("nodes") or []:
+        if not isinstance(node, dict):
+            continue
+        node_id = node.get("id")
+        source_ids = copy.deepcopy(node.get("source") or {})
+        row = {
+            "nodeID": node_id,
+            "translationKey": node.get("textKey"),
+            "resolvedText": node.get("npcText") or "",
+            "state": node.get("state"),
+            "source": source_ids,
+        }
+        nodes.append(row)
+        inspect_text(
+            row["resolvedText"], row["translationKey"], "node", node_id, source_ids
+        )
+        for choice in node.get("choices") or []:
+            if not isinstance(choice, dict):
+                continue
+            choice_source = copy.deepcopy(choice.get("source") or source_ids)
+            choice_row = {
+                "nodeID": node_id,
+                "choiceID": choice.get("id"),
+                "translationKey": choice.get("textKey"),
+                "resolvedText": choice.get("text") or "",
+                "enabled": choice.get("enabled") is True,
+                "lockedReason": choice.get("lockedReason"),
+                "outcomeIDs": copy.deepcopy(choice.get("outcomeIDs") or []),
+                "nextNodeTargets": copy.deepcopy(choice.get("nextNodeTargets") or []),
+                "source": choice_source,
+            }
+            choices.append(choice_row)
+            inspect_text(
+                choice_row["resolvedText"],
+                choice_row["translationKey"],
+                "choice",
+                f"{node_id}:{choice_row['choiceID']}",
+                choice_source,
+            )
+
+    return {
+        "schema": "semantic_lab.graph_diagnostics.v1",
+        "graphID": graph.get("graphID"),
+        "blockID": graph.get("blockID"),
+        "categoryID": graph.get("categoryID"),
+        "topic": graph.get("topic"),
+        "source": source,
+        "sourceIDs": copy.deepcopy(graph.get("sourceIDs") or {}),
+        "nodes": nodes,
+        "choices": choices,
+        "suspicious": suspicious,
+        "note": "Diagnostics report authored content; no translation is rewritten.",
+    }
+
+
 def coverage_summary(coverage: list[dict[str, Any]]) -> dict[str, int]:
     """Count live capability classifications shown by Semantic Lab."""
 

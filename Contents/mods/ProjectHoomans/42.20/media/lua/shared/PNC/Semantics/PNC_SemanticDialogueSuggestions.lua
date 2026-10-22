@@ -330,6 +330,51 @@ local function topicFromIR(ir, context)
     return canonicalTopic(context and context.currentTopic)
 end
 
+-- A recognized authored category is a presentation boundary, not another
+-- conversational suggestion.  Keep this conversion beside the suggestion
+-- contract so typed input and the existing semantic-click surface share one
+-- canonical frame without making the parser execute conversation effects.
+function Suggestions.IsConversationCategoryIR(ir)
+    if type(ir) ~= "table"
+        or normalized(ir.subject) ~= "CONVERSATION_TOPIC"
+    then
+        return false
+    end
+    local extensions = type(ir.extensions) == "table"
+        and ir.extensions or {}
+    return extensions.route == "conversation_category"
+        and string.sub(tostring(extensions.categoryID or ""), 1, 15)
+            == "projecthoomans:"
+        and tostring(extensions.topic or "") ~= ""
+end
+
+function Suggestions.BuildConversationCategoryFrame(ir, revision)
+    if not Suggestions.IsConversationCategoryIR(ir) then return nil end
+    local source = ir.extensions or {}
+    local topic = canonicalTopic(source.topic) or tostring(source.topic)
+    local categoryID = tostring(source.categoryID or "")
+    if topic == "" or categoryID == "" then return nil end
+    return {
+        schemaVersion = Suggestions.VERSION,
+        kind = "semantic_click_frame",
+        candidateID = "conversation.typed:" .. categoryID .. ":"
+            .. tostring(tonumber(revision) or 0),
+        topic = topic,
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "CONVERSATION_TOPIC",
+        textKey = "category." .. topic,
+        textFallback = resolvedText("category." .. topic, "What's up?"),
+        labelKey = "category." .. topic,
+        requestRevision = tonumber(revision) or 0,
+        extensions = {
+            route = "conversation_category",
+            categoryID = categoryID,
+            topic = topic,
+        },
+    }
+end
+
 local RELATED_TOPICS = {
     wellbeing = { wellbeing = true, needs = true, medical = true },
     needs = { wellbeing = true, needs = true, medical = true },
@@ -1493,6 +1538,32 @@ function Suggestions.IsConversationCategoryFrame(frame)
         and tostring(extensions.topic or "") ~= ""
 end
 
+function Suggestions.IsConversationCategoryAvailable(frame, context)
+    if not Suggestions.IsConversationCategoryFrame(frame) then
+        return false, "conversation_category_frame_invalid"
+    end
+    local categoryID = frame.extensions.categoryID
+    local preflight = type(context) == "table"
+        and context.conversationCategoryPreflight or nil
+    if type(preflight) == "table"
+        and tostring(preflight.categoryID or categoryID) == categoryID
+    then
+        return preflight.visible == true,
+            preflight.reason or "category_preflight"
+    end
+    for _, diagnostic in ipairs(
+        type(context) == "table" and context.categoryDiagnostics or {}
+    ) do
+        if type(diagnostic) == "table"
+            and tostring(diagnostic.id or "") == categoryID
+        then
+            return diagnostic.visible == true,
+                diagnostic.reason or "category_diagnostic"
+        end
+    end
+    return false, "category_preflight_unknown"
+end
+
 -- Topic navigation is a presentation-only semantic frame. It changes the
 -- selected projection group through the existing Core choice surface; it is
 -- not a parser input and it cannot dispatch a gameplay action.
@@ -1696,10 +1767,20 @@ function Suggestions.Build(result, context, messages)
                         context, "projecthoomans:whats_up"
                     )
                 end
-                if visible then
+                local directCategory = Suggestions.IsConversationCategoryIR(ir)
+                    and definition.id == "conversation.whats_up"
+                if visible and not directCategory then
                     addCandidate(
                         candidates, seen, definition,
                         "typed_input", revision, visibilityReason
+                    )
+                elseif visible and directCategory then
+                    appendTrace(
+                        trace,
+                        "typed_input",
+                        "consumed",
+                        "conversation_category_already_routed",
+                        #candidates
                     )
                 else
                     appendTrace(
