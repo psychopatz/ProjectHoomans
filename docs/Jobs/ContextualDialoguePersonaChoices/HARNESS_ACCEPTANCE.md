@@ -225,3 +225,98 @@ Minimum workflow:
 6. inspect final localized wording and candidate ordering.
 
 Slider controls should show numeric values while editing.
+
+
+## P9 acceptance — live conversation graph and direct semantic routing
+
+### Typed category parity
+
+For a reviewed authored-category utterance such as `whatsup`:
+
+- semantic recognition must preserve the canonical `CONVERSATION_TOPIC` frame;
+- `route=conversation_category` must enter the existing category authority/composer path directly;
+- no generic unknown-fact response may be inserted first;
+- no redundant candidate for the exact same already-entered category may be shown;
+- the root `Ask what's up` option remains valid before the category is entered.
+
+The root button and typed utterance must converge on the same authoritative category path.
+
+### Runtime conversation graph
+
+Simulation must render the full selected authored ConversationBlock through a developer-only read projection while the normal current-choice projection remains bounded.
+
+The graph must expose at least:
+
+- all authored nodes;
+- current node;
+- visited nodes when available;
+- localized NPC node text;
+- localized player choice text;
+- choice eligibility/lock state;
+- possible outcomes and targets;
+- root exits;
+- canonical IDs available through inspector/tooltips.
+
+The graph must not persist into NPC ModData.
+
+### Shared renderer acceptance
+
+Studio Flow Graph and Simulation Dialogue Graph must reuse common graph canvas/model rendering primitives.
+
+Do not accept a second copy of node/edge drawing logic solely for conversation blocks.
+
+### Live interaction acceptance
+
+Currently valid graph branches may be interactive only by reusing the same current semantic click frame as the normal button.
+
+Required equivalence:
+
+```text
+normal current-choice click
+and
+live graph branch click
+```
+
+must reach the same worker/DialogInput/Composer path and produce equivalent transport/results.
+
+No UI code may directly mutate conversation node state.
+
+### UI hierarchy
+
+At normal Simulation use:
+
+1. conversation transcript / NPC response;
+2. live dialogue graph;
+3. current player choices;
+4. player input;
+5. scenario/persona controls;
+6. semantic inspectors;
+7. raw worker JSON.
+
+Raw JSON must remain available but must not occupy the most prominent default space at the expense of branch testing.
+
+If there is only one semantic group, hide the group selector. If multiple groups exist, branch continuation must remain visually primary while a conversation block is active.
+
+### Early user-test milestone
+
+P9B is an explicit early usability checkpoint.
+
+Before P9C-P9G polish is complete, the user must already be able to:
+
+```text
+launch Semantic Lab
+type "what's up"
+see the actual NPC opening
+see the complete branch graph
+see current choices match outgoing graph branches
+click a normal current choice
+watch current-node highlighting advance
+```
+
+Do not postpone this usable UI until the final P9 milestone.
+
+### Conversation-content diagnostics
+
+Graph node/edge inspection should expose source/translation keys and resolved values. Suspicious mixed-language or unresolved values should be visible as authoring diagnostics.
+
+Content diagnostics must not alter semantic routing automatically.
