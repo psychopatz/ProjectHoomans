@@ -123,9 +123,11 @@ end
 local ChoiceRegistry = require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_Registry"
 local StaticProvider = require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_StaticProvider"
 local CapabilityProvider = require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_CapabilityProvider"
+local SocialProvider = require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_SocialProvider"
 
 ChoiceRegistry.RegisterProvider(StaticProvider)
 ChoiceRegistry.RegisterProvider(CapabilityProvider)
+ChoiceRegistry.RegisterProvider(SocialProvider)
 
 local function registerSourceProvider(id, sourceKind, order)
     ChoiceRegistry.RegisterProvider({
@@ -646,6 +648,7 @@ local function addProviderCandidate(output, seen, candidate, revision)
         sourceKind, revision, "provider_eligible"
     ) }
     candidate.sources[1].providerID = providerID
+    frame.providerID = providerID
     local display = type(candidate.display) == "table"
         and candidate.display or {}
     display.label = resolvedText(display.labelKey, display.labelFallback)
@@ -930,6 +933,54 @@ function Suggestions.FrameToIR(frame, view)
         return branchOfferIR(branchOffer, branchOrigin, frame, view)
     end
 
+    -- Generic registered providers resolve through the current bounded
+    -- projection. This keeps click-time identity/revision checks on the
+    -- existing lane instead of allowing a provider to become an action
+    -- dispatcher or a second parser.
+    local providerID = frame.providerID
+    local extensions = type(frame.extensions) == "table"
+        and frame.extensions or {}
+    providerID = providerID or extensions.providerID
+    if providerID ~= nil then
+        local current = view and view.semanticSuggestions or nil
+        for _, candidate in ipairs(
+            type(current) == "table" and current.candidates or {}
+        ) do
+            if tostring(candidate.id or "") == tostring(frame.candidateID or "")
+                and tostring(candidate.providerID or "") == tostring(providerID)
+            then
+                local source = type(candidate.frame) == "table"
+                    and candidate.frame or nil
+                if not source then return nil, "suggestion_provider_frame_missing" end
+                local target = copyValue(source.target)
+                return IR.New({
+                    kind = "semantic_suggestion_frame",
+                    rawText = Suggestions.ResolveFrameText(source),
+                    normalizedText = normalizedText(
+                        source.textFallback or source.utteranceFallback
+                    ),
+                    intent = source.intent,
+                    speechAct = source.speechAct,
+                    action = source.action,
+                    subject = source.subject,
+                    target = target,
+                    slots = copyValue(source.slots) or {},
+                    modifiers = copyValue(source.modifiers) or {},
+                    socialContext = copyValue(source.socialContext) or {},
+                    extensions = copyValue(source.extensions) or {},
+                    confidence = 1,
+                    provenance = {
+                        provider = tostring(providerID),
+                        parser = "semantic_click_frame",
+                        pattern = source.pattern or "semantic_provider",
+                        candidateID = frame.candidateID,
+                    },
+                })
+            end
+        end
+        return nil, "suggestion_provider_candidate_unknown"
+    end
+
     local definition = definitionFor(frame.candidateID)
     local action
     if not definition then
@@ -1000,6 +1051,27 @@ function Suggestions.CheckFrame(frame, context, ir)
             return true, "eligible", result
         end
         return true, "eligible", { status = "allowed", trace = {} }
+    end
+
+    local providerID = type(frame) == "table" and frame.providerID or nil
+    local extensions = type(frame) == "table"
+        and type(frame.extensions) == "table" and frame.extensions or {}
+    providerID = providerID or extensions.providerID
+    if providerID ~= nil then
+        local registry = PNC.Semantics and PNC.Semantics.DialogueChoiceRegistry
+        local provider = registry and type(registry.GetProvider) == "function"
+            and registry.GetProvider(providerID) or nil
+        if not provider or provider.enabled == false then
+            return false, "suggestion_provider_unavailable", {
+                status = "unknown",
+                trace = {},
+            }
+        end
+        return true, "provider_eligible", {
+            status = "allowed",
+            providerID = providerID,
+            trace = {},
+        }
     end
 
     local action, definition = capabilityDefinitionFor(
@@ -1574,10 +1646,15 @@ function Suggestions.Build(result, context, messages)
         predicateTrace
     )
 
-    local optionalCandidates = ChoiceRegistry.CollectProvider(
-        "dynamictrading.trader", context, 4
+    -- All optional/domain providers use the generic registry lane. The
+    -- registry filters raw legacy definitions, so static/capability choices
+    -- still pass through their existing authoritative adapters above while
+    -- canonical Dynamic Trading and contextual social candidates are
+    -- discovered without provider-specific calls here.
+    local providerCandidates = ChoiceRegistry.Collect(
+        context, Suggestions.MAX_CANDIDATES
     )
-    for _, candidate in ipairs(optionalCandidates or {}) do
+    for _, candidate in ipairs(providerCandidates or {}) do
         addProviderCandidate(candidates, seen, candidate, revision)
     end
 

@@ -75,6 +75,7 @@ function Ranking.ClassFor(candidate)
     then
         return "GAMEPLAY_ACTION"
     end
+    if kind == "social_context" then return "CONTEXTUAL_SOCIAL" end
     if kind == "typed_input" then
         if candidateID == "question.wellbeing_detail" then
             return "CONTEXTUAL_SOCIAL"

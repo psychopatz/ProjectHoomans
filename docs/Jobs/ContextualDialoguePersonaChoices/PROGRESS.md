@@ -68,7 +68,7 @@ P8A does not claim behavioral completion. It does not yet expand every semantic 
 
 ## P8B behavioral speech completion
 
-Revision pending: production-backed speech-family completion is implemented locally and validated; commit it before moving to P8C.
+Revision `2aed55ca` (`feat: complete contextual speech realization coverage`) records the completed production-backed speech-family slice.
 
 Implementation evidence:
 
@@ -100,4 +100,30 @@ Additional P8B checks passed: `luac5.3 -p` on changed realization/style/presente
 
 ## Next Chunk — P8C choice-provider completion
 
-Audit the current `DialogueChoiceRegistry` collection path and remove remaining central provider-specific discovery calls. Make registered providers discoverable through one bounded generic contract while preserving root/flow/response-plan offers, privacy, deterministic ranking/dedupe, click-frame identity, stale/replay rejection, existing authority/effect ownership, Dynamic Trading isolation, and one existing Core `choicesPart` UI lane. Add one real contextual social/relationship provider and focused real-worker provider-discovery tests before continuing to P8D.
+## P8C choice-provider completion
+
+Revision pending: generic provider discovery and the contextual social provider are implemented locally and validated; commit them before moving to P8D.
+
+Implementation evidence:
+
+- `DialogueChoiceRegistry.Collect` now consumes only the bounded canonical provider candidate contract (`frame` plus separate `display` label/utterance data), preventing raw legacy definitions from bypassing the existing static/capability authority adapters.
+- The central suggestions builder no longer calls `CollectProvider("dynamictrading.trader")`; one bounded generic collection pass discovers registered canonical providers. Dynamic Trading remains the owner of trade state/content/effects and is unchanged.
+- `projecthoomans.social_context` is a production provider for an owned companion. It contributes an existing WELLBEING semantic frame, exposes no relationship scores/private data, and clicks through the existing `semantic_click_frame` → `DialogueInput` path with no new action lane.
+- Generic provider frames are resolved only against the current suggestion projection and current revision, then checked through the existing click-time authority/policy path. The provider candidate is stale/replay safe.
+- `social_context` is assigned the semantic `CONTEXTUAL_SOCIAL` ranking class; Dynamic Trading remains `GAMEPLAY_ACTION`.
+
+Focused real-worker validation:
+
+```text
+python3 -m unittest -v \
+ tools.semantic_harness.tests.test_contextual_choice_provider_p8c \
+ tools.semantic_harness.tests.test_contextual_choice_registry_p1 \
+ tools.semantic_harness.tests.test_contextual_dynamic_trading_p5
+Ran 10 tests in 13.461s — OK
+```
+
+The provider matrix proves generic social discovery/click authority, no private score leakage, generic Dynamic Trading discovery, unchanged trade ownership, stale rejection, and duplicate-click rejection.
+
+## Next Chunk — P8D Semantic Lab tuning workflow
+
+Extend the existing Semantic Lab only: arbitrary current utterance, apply-and-replay, baseline capture, A/B scenario rows, selectable bounded context dimensions/matrices, final localized wording and candidate-order comparison, semantic-family coverage, realization/bond/fallback inspection, and production Lua-worker traces. Python/Tk may edit scenarios and render results only; all semantic/style/provider policy remains in production Lua. Preserve one existing Tk app, worker, choice UI lane, translation backend, and action dispatcher.

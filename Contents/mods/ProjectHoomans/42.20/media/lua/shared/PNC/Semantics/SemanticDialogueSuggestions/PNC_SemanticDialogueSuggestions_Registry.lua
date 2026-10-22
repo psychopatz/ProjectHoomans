@@ -14,6 +14,16 @@ Registry.CANDIDATE_SCHEMA = "semantic.choice.v1"
 Registry.MAX_PROVIDERS = 32
 Registry.MAX_CANDIDATES = 24
 
+-- Generic collection consumes the already-presented candidate contract. The
+-- legacy Project Hoomans static/capability providers remain registered for
+-- their authoritative eligibility adapters, but raw definitions must not
+-- bypass those adapters merely because they are discoverable in the registry.
+local function isCanonicalCandidate(candidate)
+    return type(candidate) == "table"
+        and type(candidate.frame) == "table"
+        and type(candidate.display) == "table"
+end
+
 local providers = Registry._providers or {}
 Registry._providers = providers
 
@@ -150,7 +160,9 @@ function Registry.Collect(context, maximum)
                 local candidate = Registry.NormalizeCandidate(
                     candidates[index], provider.id, index
                 )
-                if candidate and not seen[candidate.id] then
+                if candidate and isCanonicalCandidate(candidate)
+                    and not seen[candidate.id]
+                then
                     seen[candidate.id] = true
                     output[#output + 1] = candidate
                 end
