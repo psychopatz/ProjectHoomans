@@ -3,6 +3,8 @@
 local Conversation = {}
 local ActorConversationContext = require
     "PNC/Semantics/PNC_ActorConversationContext"
+local SpeechStyleContext = require
+    "PNC/Semantics/PNC_SpeechStyleContext"
 
 local NEED_KEYS = { "hunger", "thirst", "fatigue" }
 local CONDITION_KEYS = { "stress", "boredom", "panic" }
@@ -676,6 +678,9 @@ function Conversation.contextSnapshot(harnessContext, view)
         actorConversationContext = Values.copy(
             view and view.spec and view.spec.context
                 and view.spec.context.actorConversationContext
+        ),
+        speechStyleContext = SpeechStyleContext.Resolve(
+            view and view.spec and view.spec.context or {}
         ),
     }
 end

@@ -9,6 +9,8 @@ local Internal = Input.Internal or {}
 Input.Internal = Internal
 local ResponsePlan = require
     "PNC/Semantics/PNC_SemanticDialogueResponsePlan"
+local SpeechRealization = require
+    "PNC/Semantics/PNC_SpeechRealization"
 
 local ResponseAdapter = {}
 
@@ -377,6 +379,11 @@ local function payloadForPlanTurn(response, rendered, fallbackRendered)
         referenceTopic = response.referenceTopic,
         referenceSubject = response.referenceSubject,
         segments = rendered.segments,
+        speechStyleContext = response.speechStyleContext,
+        realization = response.realization,
+        realizationFamily = response.realizationFamily,
+        realizationVariant = response.realizationVariant,
+        realizationFallbackReason = response.realizationFallbackReason,
     }
 end
 
@@ -435,16 +442,25 @@ local function payloadsForResponse(response)
             topic = response.topic,
             referenceTopic = response.referenceTopic,
             referenceSubject = response.referenceSubject,
+            speechStyleContext = response.speechStyleContext,
+            realization = response.realization,
+            realizationFamily = response.realizationFamily,
+            realizationVariant = response.realizationVariant,
+            realizationFallbackReason = response.realizationFallbackReason,
         },
     }
 end
 
-function ResponseAdapter.Payloads(decision)
-    return payloadsForResponse(decision and decision.response or {})
+function ResponseAdapter.Payloads(decision, context)
+    local response = decision and decision.response or {}
+    -- Realize only a presentation copy. The decision response and its plan
+    -- remain the semantic/action authority for later policy and dispatch.
+    response = SpeechRealization.Apply(response, context)
+    return payloadsForResponse(response)
 end
 
-function ResponseAdapter.Payload(decision)
-    return ResponseAdapter.Payloads(decision)[1]
+function ResponseAdapter.Payload(decision, context)
+    return ResponseAdapter.Payloads(decision, context)[1]
 end
 
 -- Authoritative conversation receipts (knowledge disclosure, identity, and
@@ -481,7 +497,7 @@ function ResponseAdapter.IdentityQuestion(context, state)
             fallback = "I'll tell you my name once we've established some trust. What's your name?",
         }
     end
-    return ResponseAdapter.Payload({ response = response })
+    return ResponseAdapter.Payload({ response = response }, context)
 end
 
 function ResponseAdapter.CampAcknowledgement(result, actionResult)

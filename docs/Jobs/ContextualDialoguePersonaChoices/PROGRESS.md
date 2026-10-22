@@ -127,3 +127,18 @@ until this style contract is frozen.
 Only after P1–P7 developer gates pass: **READY FOR USER LIVE TEST**.
 
 Native PZ SP/MP remains user-owned and must be reported `UNTESTED` unless the user provides evidence.
+### P3 evidence — accepted 2026-10-22
+
+- Added transient `PNC.Semantics.SpeechStyleContext` and bounded whole-phrase `PNC.Semantics.SpeechRealization` families. The resolver uses existing public personality, traits, directed relationship, roles and situation only; gender/private profile fields are explicitly excluded, and the semantic response plan/action frame remains authoritative.
+- Realization is applied at the final presentation adapter to a bounded copy. Decision responses, candidate IDs, plan semantics and gameplay authority are not rewritten. UI labels and spoken utterances remain separate translation keys; EN/TL uses the same semantic family and IDs with deterministic neutral fallback diagnostics.
+- The real worker now exposes bounded speech-style and realization observations. Added `tools/semantic_harness/tests/test_contextual_speech_style_p3.py` covering neutral/warm/terse/guarded variants, gender invariance, semantic-plan preservation and EN/TL family parity.
+- Focused P3 tests passed **3/3**; combined P0–P3 plus S1/S3/S4 and C1/C3/C4A worker contracts passed **40/40**. `luac5.3`, `pz_verify` Kahlua ERROR checks for the new style modules, translation JSON parsing and `git diff --check` passed. Existing S1/C1/C3/C4A behavior regressions introduced by the first integration point were fixed by moving realization to presentation-only rendering and preserving complete response plans.
+- Codebase-memory coverage was checked for all P3 paths. The indexed generation predates these edits/new files, reported no recorded coverage gaps, and all flagged sources were read directly; claims are therefore based on current source and worker evidence rather than stale graph freshness.
+
+### P4 exact Next Chunk
+
+Use the existing canonical actor context and registry candidates to add semantic precedence classes and contextual ranking/presentation at the current candidate projection boundary. Preserve provider eligibility, privacy redaction, stable semantic IDs, click-frame stale/replay validation and existing action ownership. Add production-worker tests proving relationship/personality/role/situation can change rank or realization without changing authority, and that private/undiscovered data never changes candidate existence, disabled labels, ranking, or diagnostics. Continue automatically after the bounded P4 slice.
+
+### Current handoff state
+
+Parent goal remains **IN PROGRESS**. P3 passing does not satisfy P4–P7; do not report **READY FOR USER LIVE TEST** until the complete roadmap and developer-side validation are finished. Native Project Zomboid SP/MP acceptance remains **UNTESTED** unless supplied by the user.

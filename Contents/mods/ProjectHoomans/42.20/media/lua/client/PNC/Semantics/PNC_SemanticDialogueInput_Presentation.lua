@@ -206,13 +206,15 @@ function Internal.QueueDeterministicResponse(
     local pendingChoices = session.currentNode
         and session.currentNode.choices or session.pendingChoices
     local decision = result.decision or {}
+    local presentationContext = type(Internal.ShallowContext) == "function"
+        and Internal.ShallowContext(view) or {}
     local responses
     if type(options.responses) == "table" and #options.responses > 0 then
         responses = options.responses
     elseif type(options.response) == "table" then
         responses = { options.response }
     else
-        responses = ResponseAdapter.Payloads(decision)
+        responses = ResponseAdapter.Payloads(decision, presentationContext)
     end
     local response = responses[1] or {}
     local ir = result.ir or {}
@@ -264,12 +266,15 @@ function Internal.QueueDeterministicResponse(
         local flowResponse = localResponse.ResolveFlow(
             ir,
             session and session.semanticDialogueState,
-            type(Internal.ShallowContext) == "function"
-                and Internal.ShallowContext(view) or {},
+            presentationContext,
             result.flow
         )
         if type(flowResponse) == "table" then
-            responses = { ResponseAdapter.Payload({ response = flowResponse }) }
+            responses = {
+                ResponseAdapter.Payload(
+                    { response = flowResponse }, presentationContext
+                ),
+            }
             response = responses[1]
             generatedFlowResponse = true
         end

@@ -192,6 +192,11 @@ function OutputProjection.observation(context, record, semanticContext)
         tone = response.tone or response.plan and response.plan.tone,
         personalityStyle = response.personalityStyle
             or response.plan and response.plan.personalityStyle,
+        speechStyleContext = Values.copy(response.speechStyleContext),
+        realization = Values.copy(response.realization),
+        realizationFamily = response.realizationFamily,
+        realizationVariant = response.realizationVariant,
+        realizationFallbackReason = response.realizationFallbackReason,
         selectionID = response.selectionID,
         selectionSource = response.selectionSource,
         sourceFlowID = response.sourceFlowID,
@@ -223,6 +228,20 @@ function OutputProjection.observation(context, record, semanticContext)
                 tone = payload.plan and payload.plan.tone,
                 personalityStyle = payload.plan
                     and payload.plan.personalityStyle,
+                speechStyleContext = Values.copy(
+                    payload.speechStyleContext
+                    or response.speechStyleContext
+                ),
+                realization = Values.copy(
+                    payload.realization or response.realization
+                ),
+                realizationFamily = payload.realizationFamily
+                    or response.realizationFamily,
+                realizationVariant = payload.realizationVariant
+                    or response.realizationVariant,
+                realizationFallbackReason =
+                    payload.realizationFallbackReason
+                    or response.realizationFallbackReason,
                 translationKey = payload.translationKey,
                 translationKeys = Values.copy(payload.translationKeys),
                 planTurn = payload.planTurn,
@@ -261,6 +280,18 @@ function OutputProjection.observation(context, record, semanticContext)
                 responseObservation.tone = queued.tone
                 responseObservation.personalityStyle =
                     queued.personalityStyle
+                responseObservation.speechStyleContext = Values.copy(
+                    queued.speechStyleContext
+                )
+                responseObservation.realization = Values.copy(
+                    queued.realization
+                )
+                responseObservation.realizationFamily =
+                    queued.realizationFamily
+                responseObservation.realizationVariant =
+                    queued.realizationVariant
+                responseObservation.realizationFallbackReason =
+                    queued.realizationFallbackReason
             end
         end
     end

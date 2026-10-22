@@ -131,5 +131,13 @@
   "UI_PNC_Conversation_Semantic_ContextReferenceLocationSafetyUnknown": "Wala akong mapagkakatiwalaang impormasyon kung ligtas ba roon.",
   "UI_PNC_Conversation_Semantic_ContextReferenceDescriptionUnknown": "Wala akong sapat na alam tungkol sa lugar na iyon para mailarawan ito.",
   "UI_PNC_Conversation_Semantic_ContextReferenceMedicalUnknown": "Hindi ko makumpirma ang anumang sakit na iyon sa ngayon.",
-  "UI_PNC_Conversation_Semantic_ContextReferenceCauseUnknown": "Hindi ko alam kung bakit ganoon; ang masasabi ko lang ay ang mga bagay na kumpirmado ko."
+  "UI_PNC_Conversation_Semantic_ContextReferenceCauseUnknown": "Hindi ko alam kung bakit ganoon; ang masasabi ko lang ay ang mga bagay na kumpirmado ko.",
+  "UI_PNC_Conversation_Semantic_RealizationGreetingNeutral": "Kumusta. Mabuti at nakita kita.",
+  "UI_PNC_Conversation_Semantic_RealizationGreetingWarm": "Uy! Mabuti at nakita kita.",
+  "UI_PNC_Conversation_Semantic_RealizationGreetingTerse": "Kumusta.",
+  "UI_PNC_Conversation_Semantic_RealizationGreetingGuarded": "Kumusta. Ano iyon?",
+  "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionNeutral": "Kumusta ka?",
+  "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionWarm": "Kumusta ka? Kinakaya mo pa ba?",
+  "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionTerse": "Ayos ka lang?",
+  "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionGuarded": "Kumusta ang lahat?"
 }
