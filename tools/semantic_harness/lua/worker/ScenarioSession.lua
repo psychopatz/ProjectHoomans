@@ -45,6 +45,19 @@ function ScenarioSession.reset(context, scenario)
     Runtime.scenario = scenario
     context.RuntimeState.resetContainers(Runtime)
     ScenarioSession.configureRuntime(context)
+    local runtime = scenario.runtime or {}
+    if context.ProductionModules
+        and type(context.ProductionModules.loadOptional) == "function"
+    then
+        local loaded, reason = context.ProductionModules.loadOptional(context)
+        Runtime.dynamicTradingLoad = {
+            requested = runtime.availableMods
+                and runtime.availableMods.DTHoomans == true or false,
+            loaded = loaded == true,
+            reason = reason,
+            logs = Values.copy(Runtime.productionLogs),
+        }
+    end
     PNC.Client = PNC.Client or {}
     Runtime.productionSocialRequest = Runtime.productionSocialRequest
         or PNC.Client.RequestSemanticSocialInteraction
@@ -59,7 +72,7 @@ function ScenarioSession.reset(context, scenario)
                 Runtime.productionSocialRequest
         end
     end
-    if scenario.runtime and scenario.runtime.mode == "multiplayer"
+    if runtime.mode == "multiplayer"
         and type(Runtime.questProductionWrapper) == "function"
     then
         PNC.Client.RequestSemanticQuest = Runtime.questProductionWrapper
@@ -128,6 +141,7 @@ function ScenarioSession.reset(context, scenario)
                 and Runtime.view.session.choicePresentationState
         ),
         translation = context.OutputProjection.translationSnapshot(context),
+        dynamicTradingLoad = Values.copy(Runtime.dynamicTradingLoad),
     }
 end
 
@@ -145,6 +159,7 @@ function ScenarioSession.snapshot(context)
         transport = Values.copy(Runtime.transport),
         trace = Values.copy(Runtime.trace),
         translation = context.OutputProjection.translationSnapshot(context),
+        dynamicTradingLoad = Values.copy(Runtime.dynamicTradingLoad),
         llmCalls = Runtime.llmCalls,
         loadedModules = Runtime.loadedModules,
         moduleManifest = Values.copy(Runtime.moduleManifest),

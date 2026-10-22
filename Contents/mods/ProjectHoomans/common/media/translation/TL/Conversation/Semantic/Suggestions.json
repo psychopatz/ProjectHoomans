@@ -37,6 +37,8 @@
   "UI_PNC_Conversation_Suggestion_Group_Movement_Label": "Mga utos sa kasamang pag-aari",
   "UI_PNC_Conversation_Suggestion_WhatsUp_Label": "Itanong kung ano ang balita",
   "UI_PNC_Conversation_Suggestion_WhatsUp_Utterance": "Ano ang balita?",
+  "UI_PNC_Conversation_Suggestion_Trade_Label": "Buksan ang kalakalan",
+  "UI_PNC_Conversation_Suggestion_Trade_Utterance": "Magpalitan tayo.",
   "UI_PNC_Conversation_Suggestion_Group_WhatsUp_Label": "Ano ang balita",
   "UI_PNC_Conversation_Suggestion_Group_Flow_Label": "Kasalukuyang sangay ng usapan",
   "UI_PNC_Conversation_Suggestion_Group_Response_Label": "Sagot ng NPC",

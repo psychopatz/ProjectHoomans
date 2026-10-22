@@ -619,6 +619,46 @@ local function addCandidate(output, seen, definition, kind, revision, reason)
     seen[definition.id] = candidate
 end
 
+local function addProviderCandidate(output, seen, candidate, revision)
+    if type(candidate) ~= "table" then return end
+    local id = tostring(candidate.id or "")
+    if id == "" or candidate.visibility == "private" or seen[id] then
+        return
+    end
+    if #output >= Suggestions.MAX_CANDIDATES then return end
+    local frame = copyValue(candidate.frame) or {}
+    local source = type(candidate.source) == "table"
+        and candidate.source or {}
+    frame.schemaVersion = Suggestions.VERSION
+    frame.kind = "semantic_click_frame"
+    frame.candidateID = id
+    frame.requestRevision = revision
+    candidate.frame = frame
+    local providerID = tostring(
+        candidate.providerID or source.providerID or "provider"
+    )
+    local sourceKind = tostring(source.kind or "provider")
+    candidate.source = sourceRecord(
+        sourceKind, revision, "provider_eligible"
+    )
+    candidate.source.providerID = providerID
+    candidate.sources = { sourceRecord(
+        sourceKind, revision, "provider_eligible"
+    ) }
+    candidate.sources[1].providerID = providerID
+    local display = type(candidate.display) == "table"
+        and candidate.display or {}
+    display.label = resolvedText(display.labelKey, display.labelFallback)
+    display.utterance = resolvedText(
+        display.utteranceKey, display.utteranceFallback
+    )
+    candidate.display = display
+    candidate.rank = #output + 1
+    candidate.visibility = "player"
+    output[#output + 1] = candidate
+    seen[id] = candidate
+end
+
 local function predicateContextFor(context, ir, offer)
     local predicateContext = {}
     for key, value in pairs(type(context) == "table" and context or {}) do
@@ -1533,6 +1573,13 @@ function Suggestions.Build(result, context, messages)
         ir,
         predicateTrace
     )
+
+    local optionalCandidates = ChoiceRegistry.CollectProvider(
+        "dynamictrading.trader", context, 4
+    )
+    for _, candidate in ipairs(optionalCandidates or {}) do
+        addProviderCandidate(candidates, seen, candidate, revision)
+    end
 
     local subject = normalized(ir.subject)
     local typedTopic = topicFromIR(ir, nil)

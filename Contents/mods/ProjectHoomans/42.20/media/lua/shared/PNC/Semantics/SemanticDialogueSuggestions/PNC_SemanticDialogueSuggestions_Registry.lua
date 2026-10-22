@@ -160,6 +160,17 @@ function Registry.Collect(context, maximum)
     return output
 end
 
+-- Optional/domain adapters can contribute through the same provider contract
+-- without forcing the central projection to invoke every provider twice.
+function Registry.CollectProvider(providerID, context, maximum)
+    maximum = tonumber(maximum) or Registry.MAX_CANDIDATES
+    local provider = Registry.GetProvider(providerID)
+    if not provider or provider.enabled == false then return {} end
+    local ok, candidates = pcall(provider.collect, context)
+    if not ok or type(candidates) ~= "table" then return {} end
+    return Registry.NormalizeList(candidates, provider.id, maximum)
+end
+
 function Registry.Snapshot()
     return {
         schemaVersion = Registry.VERSION,

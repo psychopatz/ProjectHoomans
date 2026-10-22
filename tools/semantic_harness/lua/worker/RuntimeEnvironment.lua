@@ -9,6 +9,14 @@ local function packagedRoot(context, modID)
     if tostring(modID) == "PsychopatzCore" then
         return context.coreRepository .. "/Contents/mods/PsychopatzCore/common"
     end
+    if tostring(modID) == "DTHoomans" then
+        return context.dynamicTradingRepository
+            .. "/Contents/mods/DTHoomans/42.20"
+    end
+    if tostring(modID) == "DTCommon" then
+        return context.dynamicTradingRepository
+            .. "/Contents/mods/DTCommon/common"
+    end
     return nil
 end
 

@@ -248,6 +248,11 @@ function ProductionModules.load(context)
     )
     load(
         "ProjectHoomans", "shared",
+        "PNC/Core/API/PNC_API.lua",
+        "integration_api"
+    )
+    load(
+        "ProjectHoomans", "shared",
         "PNC/Semantics/PNC_SemanticTopicCatalog.lua",
         "semantic_topic_catalog"
     )
@@ -463,6 +468,81 @@ function ProductionModules.load(context)
         end
     end
     if type(Semantic) ~= "table" then error("semantic core failed to load") end
+end
+
+function ProductionModules.loadOptional(context)
+    local Runtime = context.Runtime
+    local runtime = Runtime.scenario and Runtime.scenario.runtime or {}
+    local mods = runtime.availableMods or {}
+    local repository = context.dynamicTradingRepository
+    local sharedRoot = repository
+        .. "/Contents/mods/DTCommon/42.20/media/lua/shared"
+    local hoomansRoot = repository
+        .. "/Contents/mods/DTHoomans/42.20/media/lua/shared"
+    local files = {
+        sharedRoot .. "/DTCommon/00_DTCommon_Init.lua",
+        hoomansRoot .. "/DTHoomans/00_DTHoomans_Init.lua",
+    }
+    local index
+    local handle
+    local ok
+    local reason
+    local previousPrint
+    local npc
+    local traderService
+    local traderID
+
+    if mods.DTHoomans ~= true then
+        return false, "disabled"
+    end
+    if Runtime.dynamicTradingLoaded then
+        return true, "already_loaded"
+    end
+    for index = 1, #files do
+        handle = io.open(files[index], "rb")
+        if not handle then
+            return false, "missing_dependency_file"
+        end
+        handle:close()
+    end
+
+    previousPrint = print
+    print = function(...)
+        Runtime.productionLogs = Runtime.productionLogs or {}
+        Runtime.productionLogs[#Runtime.productionLogs + 1] = {
+            level = "INFO",
+            message = table.concat({ ... }, " "),
+        }
+    end
+    ok, reason = pcall(function()
+        dofile(files[1])
+        dofile(files[2])
+    end)
+    print = previousPrint
+    if not ok then
+        error("optional Dynamic Trading load failed: " .. tostring(reason))
+    end
+    -- The worker scenario describes the external actor fixture; materialize
+    -- that fixture through Dynamic Trading's own registry so role lookup,
+    -- category revalidation, and later trade ownership use the dependency's
+    -- storage rather than a Hoomans shadow table.
+    npc = Runtime.scenario and Runtime.scenario.npc or {}
+    traderService = DTCommon and DTCommon.TraderService or nil
+    if npc.role == "trader"
+        and traderService
+        and type(traderService.Create) == "function"
+        and type(traderService.BindPhysical) == "function"
+    then
+        traderID = "harness-trader-" .. tostring(npc.npcID or "npc")
+        traderService.Create({
+            traderID = traderID,
+            displayName = npc.displayName or npc.forename or "Trader",
+            traderRole = "merchant",
+        })
+        traderService.BindPhysical(traderID, npc.npcID)
+    end
+    Runtime.dynamicTradingLoaded = true
+    return true, "loaded"
 end
 
 return ProductionModules

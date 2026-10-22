@@ -69,7 +69,8 @@ function Ranking.ClassFor(candidate)
         return "BRANCH_CONTINUATION"
     end
     if kind == "npc_response_plan" then return "DIRECT_RESPONSE" end
-    if kind == "permitted_capability"
+    if kind == "permitted_capability" or kind == "dynamic_trading"
+        or candidate and candidate.providerID == "dynamictrading.trader"
         or candidate and candidate.action ~= nil
     then
         return "GAMEPLAY_ACTION"
