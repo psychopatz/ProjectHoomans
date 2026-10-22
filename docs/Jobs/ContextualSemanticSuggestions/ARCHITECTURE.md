@@ -1,3 +1,5 @@
+> **SUPERSEDED WHAT'S UP ROUTE (2026-10-23):** The historical authored-topic route documented below (`projecthoomans:whats_up`) is no longer the approved product architecture. ContextualDialoguePersonaChoices P10 removes that category/block family and uses provider-driven semantic-hub activation. Preserve this file only as historical design evidence; do not use it to reintroduce the legacy route.
+
 # Architecture and contracts
 ## Single path
 Player typed text -> existing Core NLU candidate interpretation -> active Hoomans dialogue flow / response plan -> suggestion candidate providers; NPC reply -> existing semantic response plan / selected dialogue acts -> same candidate providers. A lightweight input-preview adapter may produce **non-executing** suggestions while typing. Flow transition options and approved registered gameplay capabilities are further candidate sources.
