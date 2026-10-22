@@ -148,3 +148,64 @@ The full future conversation tree is developer tooling. Do not broaden the norma
 ### User-visible acceptance beats internal claims
 
 A passing graph-model test is not enough. P9B/P9E require real Tk/Xvfb evidence showing the conversation graph and choices in the actual Simulation layout.
+
+
+## P10 execution rules — semantic hub replacement and structured UX
+
+The P9 READY FOR USER LIVE TEST handoff is superseded.
+
+Do not report the parent ready again until P10A-P10G pass.
+
+### Legacy What's Up is deletion work, not compatibility work
+
+The user explicitly requires removal of the old authored What's Up implementation.
+
+Do not:
+
+- keep `projecthoomans:whats_up` registered but hidden;
+- add a compatibility alias from the new hub back to the old category;
+- keep `conversation.whats_up` as a deprecated candidate;
+- preserve old block IDs solely to satisfy historical tests;
+- create a second legacy/new switch.
+
+Remove or migrate the live references and rewrite tests to the new contract.
+
+If old prose is still useful, re-author it under the correct semantic/provider owner with new IDs.
+
+### One hub over existing owners
+
+What's Up hub activation is a presentation/choice aggregation boundary.
+
+It may collect from existing semantic/provider owners, but it does not own:
+
+- gossip facts;
+- wellbeing facts;
+- NPC health;
+- needs;
+- world events;
+- Dynamic Trading state;
+- quest state;
+- relationship mutation;
+- gameplay authority.
+
+Do not create a second parser or duplicate those systems.
+
+### Structured-first UI
+
+Normal simulation state must use typed controls derived from worker/runtime metadata where practical.
+
+Raw JSON is Advanced mode, never removed.
+
+Do not solve the usability problem by merely adding validation messages to free-text/JSON fields.
+
+### Early usability priority
+
+After P10A, implement P10B and P10C before broad polish.
+
+The user should receive a usable contextual hub and intuitive common sliders/comboboxes early in P10.
+
+### Real UI acceptance
+
+P10C/P10D/P10E require actual Tk/Xvfb interaction evidence.
+
+Do not declare success from schema/unit tests alone.
