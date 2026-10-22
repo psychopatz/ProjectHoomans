@@ -67,3 +67,7 @@ Mandatory examples include:
 - no additional population-wide zombie enumeration.
 
 Native PZ SP/MP remains user-owned final acceptance.
+
+## W2 implementation evidence (2026-10-22)
+
+The shared adapter is loaded by the existing Hoomans compositions and the existing semantic cognition transport remains the only gossip route. The new source wrappers publish only after the owning operation reports success; missing death attribution is represented as unknown and never assigned a guessed killer. Zombie pressure is sourced from the existing bounded observation input. The dedicated Hoomans smoke test covers a real authorized pressure statement, player-caused death classification and faction dissemination with explainable faction provenance. The worker regression confirms the pre-existing production Lua semantic path remains intact after the projection change.

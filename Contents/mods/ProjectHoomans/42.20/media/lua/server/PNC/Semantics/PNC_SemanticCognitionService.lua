@@ -21,6 +21,7 @@ local Registry = PNC.Registry
 local MemoryEvents = PNC.Conversation
     and PNC.Conversation.Memory
     and PNC.Conversation.Memory.Events or nil
+local WorldKnowledge = PNC.WorldKnowledge
 
 Service.VERSION = 1
 
@@ -115,6 +116,25 @@ local function attachMemoryGossip(projection, speakerRecord, options, player)
     local subjectName
     local codes
     local selfQuery = tostring(targetValue or "") == "self"
+    if WorldKnowledge and type(WorldKnowledge.BuildConversationContext) == "function" then
+        local context = WorldKnowledge.BuildConversationContext(speakerRecord, {
+            language = options.language,
+            max = MemoryEvents and MemoryEvents.MAX_GOSSIP or 4,
+        })
+        if context and context.npcGossip
+            and type(context.npcGossip.statements) == "table"
+            and #context.npcGossip.statements > 0
+        then
+            projection._worldKnowledgeGossip = {
+                subject = "world",
+                statements = context.npcGossip.statements,
+                factRefs = context.npcGossip.factRefs,
+                candidates = context.worldKnowledge
+                    and context.worldKnowledge.candidates or nil,
+            }
+            return
+        end
+    end
     if not projection or not MemoryEvents
         or type(MemoryEvents.ResolveTarget) ~= "function"
         or type(MemoryEvents.BuildGossipCodes) ~= "function"

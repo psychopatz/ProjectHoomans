@@ -15,8 +15,11 @@ function Network.SendSemanticCognition(
         and PNC.Semantics.CognitionProjection or nil
     local memoryGossip = type(projection) == "table"
         and projection._memoryGossip or nil
+    local worldKnowledgeGossip = type(projection) == "table"
+        and projection._worldKnowledgeGossip or nil
     if type(projection) == "table" then
         projection._memoryGossip = nil
+        projection._worldKnowledgeGossip = nil
     end
     if type(projection) == "table" and cognition
         and type(cognition.Compact) == "function"
@@ -36,6 +39,11 @@ function Network.SendSemanticCognition(
     then
         payload.g = memoryGossip.codes
         payload.gs = memoryGossip.subject
+    end
+    if type(worldKnowledgeGossip) == "table"
+        and type(worldKnowledgeGossip.statements) == "table"
+    then
+        payload.wk = worldKnowledgeGossip
     end
     if isServer and isServer() and targetPlayer and sendServerCommand then
         sendServerCommand(

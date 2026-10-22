@@ -34,6 +34,7 @@ function Client.Reset()
     ClientState.pendingSemanticCognition = {}
     ClientState.semanticCognitionDialogueRequests = {}
     ClientState.semanticMemoryGossip = {}
+    ClientState.semanticWorldKnowledgeGossip = {}
     ClientState.lastSemanticCognitionRequestAt = {}
     ClientState.lastSemanticCognitionReceiveAt = 0
     ClientState.lastSemanticCognitionFailure = nil
@@ -55,6 +56,31 @@ end
 local function pendingMatches(pending, payload)
     return requestIDMatches(pending, payload)
         and targetMatches(pending, payload)
+end
+
+local function applyWorldKnowledgeGossip(id, payload, pending)
+    local value = payload and payload.wk
+    local output = {}
+    if not pendingMatches(pending, payload) then return false end
+    ClientState.semanticWorldKnowledgeGossip = ClientState.semanticWorldKnowledgeGossip or {}
+    ClientState.semanticWorldKnowledgeGossip[id] = nil
+    if type(value) ~= "table" or type(value.statements) ~= "table" then return true end
+    for index = 1, math.min(#value.statements, 4) do
+        if type(value.statements[index]) == "string" and value.statements[index] ~= "" then
+            output[#output + 1] = string.sub(value.statements[index], 1, 240)
+        end
+    end
+    if #output > 0 then
+        ClientState.semanticWorldKnowledgeGossip[id] = {
+            requestID = tostring(payload.requestID),
+            targetID = tostring(pending.targetID),
+            subject = value.subject or "world",
+            statements = output,
+            factRefs = value.factRefs,
+            candidates = value.candidates,
+        }
+    end
+    return true
 end
 
 local function safeGossipSubject(value)
@@ -153,6 +179,17 @@ function Client.GetGossipContext(npcID, targetID)
     local index
     local packet
     local text
+    local worldEntry = id and ClientState.semanticWorldKnowledgeGossip
+        and ClientState.semanticWorldKnowledgeGossip[id] or nil
+    if worldEntry and tostring(targetID or "") == tostring(worldEntry.targetID or "") then
+        return {
+            subject = worldEntry.subject,
+            statements = worldEntry.statements,
+            factRefs = worldEntry.factRefs,
+            candidates = worldEntry.candidates,
+            source = "world_knowledge",
+        }
+    end
     if not entry then return nil end
     if targetID == nil or tostring(targetID) == ""
         or tostring(targetID) ~= tostring(entry.targetID or "")
@@ -232,6 +269,7 @@ function Client.ApplyPayload(payload)
             payload.reason or "cognition_projection_unavailable"
         if matchingRequest then
             applyMemoryGossip(id, payload, pending)
+            applyWorldKnowledgeGossip(id, payload, pending)
             ClientState.pendingSemanticCognition[id] = nil
             notifyDialogueGossip(id, payload, pending)
         end
@@ -247,6 +285,7 @@ function Client.ApplyPayload(payload)
         ClientState.lastSemanticCognitionFailure = reason
         if matchingRequest then
             applyMemoryGossip(id, payload, pending)
+            applyWorldKnowledgeGossip(id, payload, pending)
             ClientState.pendingSemanticCognition[id] = nil
             notifyDialogueGossip(id, payload, pending)
         end
@@ -257,6 +296,7 @@ function Client.ApplyPayload(payload)
     ClientState.lastSemanticCognitionFailure = nil
     if matchingRequest then
         applyMemoryGossip(id, payload, pending)
+        applyWorldKnowledgeGossip(id, payload, pending)
         ClientState.pendingSemanticCognition[id] = nil
         notifyDialogueGossip(id, payload, pending)
     end
