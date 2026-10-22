@@ -1,3 +1,5 @@
+> **P11 RELATIONSHIP SUPERSESSION (2026-10-23):** The historical bond section below predates the approved dynamic relationship model. P11 now owns relationship semantics: family remains authored/pre-existing; durable friend is earned automatically from high approval/respect/familiarity; lover requires existing compatibility + player proposal + server-authoritative NPC acceptance. Normal Semantic Lab must not expose arbitrary/hypothetical bond kinds. Use `RUNTIME_PARITY_ACTORS_RELATIONSHIPS_AND_UX.md` as the current contract.
+
 # Behavioral Completion — Persona, Bonds, Realization, and Choices
 
 ## Why this phase exists
