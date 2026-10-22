@@ -5,6 +5,8 @@ PNC.Semantics = PNC.Semantics or {}
 local Projection = {}
 local EntityCandidates = require
     "PNC/Semantics/PNC_SemanticDialogueInput_EntityCandidates"
+local ActorConversationContext = PNC.Semantics.ActorConversationContext
+    or require "PNC/Semantics/PNC_ActorConversationContext"
 
 local WorldContext
 local EntityResolver
@@ -161,6 +163,7 @@ function Projection.Build(view, getProviderStatus)
             EntityCandidates.Build(view, source)
         )
     end
+    output.actorConversationContext = ActorConversationContext.Build(output)
     return output
 end
 

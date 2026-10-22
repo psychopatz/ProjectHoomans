@@ -7,6 +7,9 @@ PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 PNC.Conversation.Authority = PNC.Conversation.Authority or {}
 local Authority = PNC.Conversation.Authority
+local ActorConversationContext = PNC.Semantics
+    and PNC.Semantics.ActorConversationContext
+    or require "PNC/Semantics/PNC_ActorConversationContext"
 local Internal = Authority.Internal
 local Registry = PNC.Conversation.Registry
 local History = PNC.Conversation.History
@@ -111,6 +114,7 @@ function Authority.BuildContext(player, record, token)
             { categoryDefinition.labelKey }
         )
     end
+    context.actorConversationContext = ActorConversationContext.Build(context)
     return context
 end
 

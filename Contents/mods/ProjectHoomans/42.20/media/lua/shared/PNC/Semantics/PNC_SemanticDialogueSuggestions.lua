@@ -15,6 +15,8 @@ local IR = PsychopatzCore.Semantics and PsychopatzCore.Semantics.IR
     or require "PsychopatzCore/Semantics/PsychopatzSemanticIR"
 local BranchOffers = PNC.Semantics.DialogueBranchOffers
     or require "PNC/Semantics/PNC_SemanticDialogueBranchOffers"
+local ActorConversationContext = PNC.Semantics.ActorConversationContext
+    or require "PNC/Semantics/PNC_ActorConversationContext"
 
 Suggestions.VERSION = 1
 -- The visual part keeps five rows per selected group. The projection itself
@@ -1449,6 +1451,10 @@ function Suggestions.Build(result, context, messages)
     local capabilities, capabilitySource, predicateTrace = capabilityRows(
         revision, currentAction, context, ir
     )
+    local actorConversationContext = context.actorConversationContext
+    if type(actorConversationContext) ~= "table" then
+        actorConversationContext = ActorConversationContext.Build(context)
+    end
 
     if privateResult(result) then
         appendTrace(trace, "typed_input", "hidden", "private_or_secret", 0)
@@ -1467,6 +1473,9 @@ function Suggestions.Build(result, context, messages)
             predicateTrace = {},
             trace = trace,
             choiceRegistry = ChoiceRegistry.Snapshot(),
+            actorConversationContext = ActorConversationContext.PublicView(
+                actorConversationContext
+            ),
         }
     end
 
@@ -1652,6 +1661,9 @@ function Suggestions.Build(result, context, messages)
             unknownFieldsExposed = false,
         },
         choiceRegistry = ChoiceRegistry.Snapshot(),
+        actorConversationContext = ActorConversationContext.PublicView(
+            actorConversationContext
+        ),
     }
 end
 

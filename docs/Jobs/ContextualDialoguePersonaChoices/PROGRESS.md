@@ -1,7 +1,7 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
 **Updated:** 2026-10-22  
-**Parent status:** IN PROGRESS — P0 current-path contract baseline accepted; continue P1–P7.
+**Parent status:** IN PROGRESS — P0/P1/P2 accepted; continue P3–P7.
 **Remote source audit baseline:** ProjectHoomans `main` at `765bc4076ab82ec2c1eca6ca52cef1c6bf177597`.  
 **Dynamic Trading source inspected:** `5b97302e39c482682f4fed0c083ad6764b9eee41`.  
 **Local implementation baseline:** ProjectHoomans `main` at `eaaed7767c2d41b2cc4db5df346ebc2c34b6b5be`; PsychopatzCore `main` at `443b3a86d097b8fd17fa10caafa545f959dc913f`; DynamicTrading `main` at `5b97302e39c482682f4fed0c083ad6764b9eee41`. All three local branches matched their configured `origin/main` at audit time.
@@ -85,14 +85,42 @@ Lua worker before moving persona or realization policy into the path.
 - Real Lua worker P1 tests passed **3/3**; the combined P0 + P1 + S1 + S3 worker suite passed **21/21**; affected Tk/Xvfb/provider-parity tests passed **9/9**; focused embedded Lua smoke tests passed **2/2**.
 - `luac5.3`, Kahlua ERROR checks, Python compilation, and `git diff --check` passed for the changed slice.
 
-## P2 exact Next Chunk
+## P2 evidence — accepted 2026-10-22
 
-Build the bounded read-only `ActorConversationContext` projection from existing
-identity, traits, Social Profile, directed relationship, role/capability, and
-situation owners. Keep it optional and revision-aware, expose safe provenance
-for the Semantic Lab, and add worker contract tests proving no duplicate
-persistent personality/relationship state is created before deriving any
-speech-style or persona-aware ranking behavior.
+- Added the bounded shared `PNC.Semantics.ActorConversationContext` projection.
+  It reads existing identity, registered trait, Social Profile, directed
+  relationship, actor-authority/role, and situation fields without calling
+  mutating owner APIs or writing ModData.
+- Wired the projection into the server authority context, Conversation
+  Composer context, client semantic input projection, and the real Lua worker.
+  The existing suggestion route exposes only `PublicView`; detailed scores,
+  trait IDs, personality dials, provenance, and revisions remain in the
+  privileged worker context trace.
+- The projection explicitly omits orientation, romance style, jealousy style,
+  undiscovered facts, and other private profile values. It carries bounded
+  revisions/provenance and a privacy declaration for future safe caching and
+  inspection.
+- Added `tools/semantic_harness/tests/test_contextual_actor_context_p2.py`:
+  production-worker tests passed **3/3**, covering owner-field projection,
+  transient context changes with stable semantic candidate IDs, redacted
+  player-facing summaries, and absence of persisted persona/choice state.
+- P0 + P1 + P2 + S1 + S3 worker suite passed **24/24**; Semantic Lab
+  Xvfb/S4 passed **5/5**; embedded worker smoke passed **2/2**. `luac5.3`,
+  `pz_verify` Kahlua ERROR checks for every changed Lua file, Python
+  compilation, and `git diff --check` passed. Codebase-memory coverage was
+  checked for all P2 paths; modified/new paths were read directly because the
+  indexed generation predates this slice.
+
+## P3 exact Next Chunk
+
+Derive a transient `SpeechStyleContext` from the canonical actor context using
+only the documented bounded dimensions (warmth, formality, directness,
+verbosity, hostility, openness, and deference). Add deterministic clamping,
+neutral fallback, provenance, and tests showing personality/relationship/
+trait/role/situation inputs affect HOW a response is realized while the
+semantic response plan, candidate IDs, click frames, and gameplay authority
+remain unchanged. Do not add localization variants or persona-aware ranking
+until this style contract is frozen.
 
 ## Handoff condition
 

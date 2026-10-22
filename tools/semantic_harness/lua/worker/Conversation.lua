@@ -1,6 +1,8 @@
 -- Per-turn semantic context, view construction, and turn execution.
 
 local Conversation = {}
+local ActorConversationContext = require
+    "PNC/Semantics/PNC_ActorConversationContext"
 
 local NEED_KEYS = { "hunger", "thirst", "fatigue" }
 local CONDITION_KEYS = { "stress", "boredom", "panic" }
@@ -65,7 +67,9 @@ function Conversation.buildContext(context)
     local priorContext = Runtime.view and Runtime.view.spec
         and Runtime.view.spec.context or nil
     local output = {
+        npcID = npc.npcID,
         identityState = npc.identityState or "unknown",
+        identity = copy(npc.identity),
         npcName = npcName,
         npcFullName = npcName,
         npcFirstName = npc.forename,
@@ -94,6 +98,7 @@ function Conversation.buildContext(context)
             status = authorityStatus,
         },
         npcTraits = copy(npc.traits or {}),
+        npcTraitFingerprint = npc.npcTraitFingerprint,
         npcPersonality = copy(npc.personality or {}),
         semanticFactValues = copy(context.semanticFactValues or {}),
         player = nil,
@@ -143,6 +148,7 @@ function Conversation.buildContext(context)
         )
     end
     output.currentTopic = output.conversationTopic
+    output.actorConversationContext = ActorConversationContext.Build(output)
     return output
 end
 
@@ -666,6 +672,10 @@ function Conversation.contextSnapshot(harnessContext, view)
         conversationBlock = Values.copy(
             view and view.spec and view.spec.context
                 and view.spec.context.conversationBlock
+        ),
+        actorConversationContext = Values.copy(
+            view and view.spec and view.spec.context
+                and view.spec.context.actorConversationContext
         ),
     }
 end

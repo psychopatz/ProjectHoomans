@@ -6,6 +6,9 @@ if not Conversation.Audience then
     require "PNC/Conversation/PNC_ConversationAudience"
 end
 local Composer = Conversation.Composer
+local ActorConversationContext = PNC.Semantics
+    and PNC.Semantics.ActorConversationContext
+    or require "PNC/Semantics/PNC_ActorConversationContext"
 local Registry = Conversation.Registry
 local Loader = Conversation.TextLoader
 local Audience = Conversation.Audience
@@ -131,6 +134,7 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
     context.historyLookup = function(subjectID)
         return state.conversationHistory[npcID][tostring(subjectID or "")]
     end
+    context.actorConversationContext = ActorConversationContext.Build(context)
     return context
 end
 
