@@ -1,9 +1,17 @@
 # P9 — Semantic Lab Conversation Visualization & Direct Routing
 
-**Status:** PLANNED / mandatory corrective UI phase  
+**Status:** COMPLETED MECHANICS / SUPERSEDED PRODUCT CONTRACT — P10 is active  
 **Opened:** 2026-10-22  
 **Audit baseline:** ProjectHoomans remote main at `81f4fb982ff5f65024ec9003d1a0a6f08ea7d1f4`.  
 **Native Project Zomboid SP/MP:** user-owned and not required for developer-side P9 acceptance.
+
+## P10 supersession note
+
+P9's graph/direct-routing implementation remains useful infrastructure, but its assumption that reviewed What's Up input should enter `projecthoomans:whats_up` is now obsolete.
+
+P10 explicitly removes that legacy category/block family and replaces What's Up with a provider-driven semantic hub. Do not use the P9 What's Up category acceptance clauses as current product requirements.
+
+See `SEMANTIC_SIMULATION_UX_AND_CONTEXTUAL_HUB.md`.
 
 ## Product outcome
 
