@@ -22,6 +22,30 @@ local normalizeRelationshipSnapshot = Internal.NormalizeRelationshipSnapshot
 local normalizeInteraction = Internal.NormalizeInteraction
 local normalizeInteractionJournal = Internal.NormalizeInteractionJournal
 
+local function normalizeBond(value)
+    local source = type(value) == "table" and value or {}
+    local class = tostring(source.class or "none")
+    local kind = type(source.kind) == "string" and source.kind or nil
+    if not Constants.VALID_BOND_CLASSES[class] then
+        class = "none"
+    end
+    if class == "family" then
+        if not kind or not Constants.VALID_FAMILY_BOND_KINDS[kind] then
+            class = "none"
+            kind = nil
+        end
+    else
+        kind = nil
+    end
+    return {
+        schemaVersion = Constants.DURABLE_BOND_SCHEMA_VERSION,
+        class = class,
+        kind = kind,
+        establishedAt = nonNegative(source.establishedAt, 0),
+        source = boundedString(source.source, 96),
+    }
+end
+
 local function normalizeMemories(value)
     local byID = {}
     local output = {}
@@ -181,6 +205,7 @@ function Types.NewRelationship(targetKey)
         lastInteractionAt = 0,
         lastEvaluatedAt = 0,
         revision = 0,
+        bond = normalizeBond(nil),
     }
 end
 
@@ -245,6 +270,7 @@ function Types.NormalizeRelationship(value, targetKey)
         lastInteractionAt = nonNegative(source.lastInteractionAt, 0),
         lastEvaluatedAt = nonNegative(source.lastEvaluatedAt, 0),
         revision = revision(source.revision),
+        bond = normalizeBond(source.bond),
     }
 end
 
@@ -318,6 +344,7 @@ end
 Types.NormalizeRelationshipSnapshot = normalizeRelationshipSnapshot
 Types.NormalizeInteraction = normalizeInteraction
 Types.NormalizeInteractionJournal = normalizeInteractionJournal
+Types.NormalizeBond = normalizeBond
 
 
 return Types

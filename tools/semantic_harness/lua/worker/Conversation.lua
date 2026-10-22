@@ -30,6 +30,8 @@ function Conversation.buildContext(context)
     local world = scenario.world or {}
     local conversation = scenario.conversation or {}
     local player = scenario.player or {}
+    local playerNeedSource = type(player.needs) == "table"
+        and player.needs or world
     local relationship = context.SemanticAdapters.relationshipFor(
         context, npc.npcID
     )
@@ -103,9 +105,24 @@ function Conversation.buildContext(context)
         },
         npcTraits = copy(npc.traits or {}),
         npcTraitFingerprint = npc.npcTraitFingerprint,
-        npcPersonality = copy(npc.personality or {}),
+        npcPersonality = copy(
+            context.npcPersonality or npc.personality or {}
+        ),
+        npcPersonalityMode = context.npcPersonalityMode or "generated",
+        npcGeneratedPersonality = copy(context.npcGeneratedPersonality),
+        playerSocialProfile = copy(context.playerSocialProfile),
+        playerTraitConflicts = copy(context.playerTraitConflicts),
+        playerTraitFingerprint = context.playerTraitFingerprint,
         semanticFactValues = copy(context.semanticFactValues or {}),
-        player = nil,
+        player = {
+            needs = numbersFor(playerNeedSource,
+                { "hunger", "thirst", "fatigue", "stress", "boredom", "panic" },
+                number),
+            traits = copy(player.traits or player.socialTraits or {}),
+            socialProfile = copy(context.playerSocialProfile),
+            traitConflicts = copy(context.playerTraitConflicts),
+            traitFingerprint = context.playerTraitFingerprint,
+        },
         playerNameKnown = true,
         playerName = context.SemanticAdapters.playerName(context, player),
         characterUUID = player.characterUUID,

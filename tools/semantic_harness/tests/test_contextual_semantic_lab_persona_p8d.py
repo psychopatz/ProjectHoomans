@@ -116,8 +116,8 @@ class ContextualSemanticLabPersonaP8DTests(unittest.TestCase):
 
             app.matrix_dimension_var.set("bond")
             app.inspect_persona_matrix()
-            wait_until(lambda: not app.busy and "semantic.persona.matrix.v1" in app.trace.get("1.0", "end"))
-            trace = app.trace.get("1.0", "end")
+            wait_until(lambda: not app.busy and "semantic.persona.matrix.v1" in app.compare_output.get("1.0", "end"))
+            trace = app.compare_output.get("1.0", "end")
             self.assertIn("mother", trace)
             self.assertIn("lover", trace)
             self.assertIn("candidateOrder", trace)

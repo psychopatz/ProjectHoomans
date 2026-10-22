@@ -1,174 +1,121 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
-**Updated:** 2026-10-23  
-**Parent status:** REOPENED — P10 infrastructure is retained, but P11 runtime-parity/relationship/UX acceptance is mandatory.  
-**Current mandatory phase:** P11A — Truthful actor/context model and UI cleanup skeleton.  
-**Implementation baseline audited:** ProjectHoomans remote `main` at `c412d50c27a423965911e115c0947b65c1eb2b6c`.  
+**Updated:** 2026-10-23
+**Parent status:** REOPENED — P10 infrastructure is retained, but P11 runtime-parity, relationship, and UX acceptance is mandatory.
+**Current mandatory phase:** P11D — Romance proposal, compatibility, and server-authoritative acceptance.
+**Implementation baseline audited:** ProjectHoomans remote `main` at `c412d50c27a423965911e115c0947b65c1eb2b6c`.
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned.
 
 ## Accepted foundation to preserve
 
-Current source materially contains:
+The accepted P10 foundation remains in place:
 
-- contextual What's Up semantic hub;
-- removal of the old authored What's Up category;
-- generic registered hub/choice providers;
+- contextual What's Up semantic hub and removal of the legacy authored What's Up category;
+- registered hub and choice providers;
 - typed Simulation Control Catalog;
-- structured inventory + Advanced JSON;
-- inline Simulation workbench and Apply + Replay;
-- hub diagnostics;
-- ConversationBlock graph projection/history;
+- structured inventory and Advanced JSON;
+- inline Simulation workbench Apply + Replay;
+- hub diagnostics and ConversationBlock graph projection/history;
 - ActorConversationContext and SpeechStyleContext;
 - EN/TL realization infrastructure;
-- relationship-state resolver/hysteresis;
-- production trait registries;
-- production social-profile generator/resolvers;
-- existing gender/orientation compatibility math;
-- server-authoritative directed relationship service/persistence;
-- broad regression coverage from P10.
+- relationship-state resolver and hysteresis;
+- production trait registries, social-profile generator/resolvers, and gender/orientation compatibility math;
+- server-authoritative directed relationship service and persistence;
+- Dynamic Trading provider boundary and P10 regression coverage.
 
-Do not discard these systems.
+## Current audit findings
 
-## 2026-10-23 post-P10 audit findings
+The P10 audit identified the remaining P11 work:
 
-### Main Simulation UX remains developer-centric
+- the Simulation primary workflow was developer-centric and mixed diagnostics with conversation controls;
+- the normal relationship-kind catalog exposed extensible future definitions;
+- relationship sliders lacked a clear live standing and bond explanation;
+- NPC personality was presented as ordinary manual numeric state even though production generates it from identity, archetype, and traits;
+- durable friend and lover progression was not yet automatic and server-authoritative;
+- greeting, contextual hub, and authored ConversationBlock graph paths still need one runtime-parity renderer family.
 
-The primary screen still exposes:
+## P11A completed — truthful actor/context model and UI cleanup skeleton
 
-- Preview;
-- Snapshot;
-- Persona matrix;
-- World knowledge;
-- Restart worker;
-- Capture baseline;
-- Sweep.
+P11A is complete on the local ProjectHoomans `main` checkout.
 
-Several are diagnostics or hidden comparison mechanisms rather than normal conversation-testing controls.
+Evidence:
 
-### Sweep/Persona Matrix is cryptic
+- `RelationshipKindRegistry` now distinguishes production-supported kinds from extensible diagnostic definitions. The normal catalog contains exactly `friend`, `lover`, `mother`, `father`, `sister`, and `brother`.
+- The Simulation workbench now presents `NPC Target`, `Player`, `Relationship`, and `World` panels, with `Overview`, `Needs`, and `Personality & Traits` actor tabs.
+- Preview is beside Send; Snapshot and Restart worker are in `Diagnostics / Worker`; World Knowledge refresh is in the World Knowledge inspector; Persona Matrix/Sweep/Capture baseline now have an explicit Compare surface.
+- Apply, Apply + Replay, structured inventory, and Advanced JSON paths remain present.
+- Added `test_contextual_runtime_parity_p11a.py` with worker catalog assertions and real Tk/Xvfb navigation checks at 1080x700.
 
-`Sweep` selects which field a three-scenario Persona Matrix operation varies. The UI does not explain this relationship and the result is primarily diagnostic/raw output.
+Validation:
 
-This must become one explicit Compare surface.
+- 23 focused Python/Tk tests passed across P11A, P10C, P10E, P8A, P8D, and S4.
+- `py_compile` passed for the changed Python modules and tests.
+- `luac5.3 -p` passed for the changed Lua files.
+- `git diff --check` passed.
 
-### Relationship sliders need immediate explanation
+Native Project Zomboid SP/MP remains UNTESTED / user-owned.
 
-Approval/respect/familiarity apply through the worker, but changing them alone does not replay dialogue and the UI does not clearly explain state thresholds.
+## P11B completed — first-class actor needs and production personality
 
-At familiarity below the production recognition threshold, even approval/respect extremes still resolve to `unknown`; this is correct production logic but poor UX without reason/progress display.
+P11B is complete on the local ProjectHoomans `main` checkout.
 
-### Runtime graph coverage is incomplete
+Evidence:
 
-Current Simulation graph consumes ConversationBlock graph projection.
+- Player and NPC Target now own Hunger, Thirst, Fatigue, Stress, Boredom, and Panic in the scenario model. Legacy `world.*` values remain readable as compatibility fallbacks.
+- Player trait options come from `PNC.SocialTraits.GetDefinitions()` and feed the production `ResolveTraits` path. Derived orientation, romance style, jealousy style, social style, and food preference are read-only projections.
+- NPC traits, identity seed, archetype, and generated personality use the production trait effects and social-profile generator. Generated mode is the default; manual personality values remain locked until `Override generated personality` is enabled.
+- The actor projection, Simulation Control Catalog, and Tk workbench expose the same derived state without creating a second authority.
 
-A greeting handled by production semantic Flow can leave the graph blank.
+Validation:
 
-Semantic Hub activation likewise needs a runtime graph adapter rather than a fake ConversationBlock.
+- `test_contextual_runtime_parity_p11b.py`: 3/3 passed, including production trait resolution, generated NPC defaults, and real Tk override gating.
+- The combined P10/P11 focused checks passed 26 tests before P11C changes; the P11C regression run is recorded below.
+- `py_compile` and `luac5.3 -p` passed for the changed P11B modules.
 
-### Actor symmetry is missing
+Native Project Zomboid SP/MP remains UNTESTED / user-owned.
 
-NPC state has more first-class semantic controls than Player state.
+## P11C completed — durable automatic friend bond
 
-Player needs are not first-class scenario data and Player traits/social profile are not exposed alongside NPC traits/personality in the main workbench.
+P11C is complete on the local ProjectHoomans `main` checkout.
 
-### Personality source is misleading
+Evidence:
 
-Live NPC personality is generated from identity/archetype/traits and then normalized.
+- Durable bond schema version 1 is normalized on the existing directed relationship record. The social schema migrated from version 3 to 4; no second bond database was added.
+- Server relationship commits evaluate the named approval 80, respect 50, and familiarity 60 gate. Promotion writes `bond.class = friend`, a bounded `friendship_established` memory/event, and normal relationship/social revisions.
+- Bond promotion is one-way durable history: later standing deterioration can reach `enemy` while the friend bond remains. Starting Companion friend, lover, mother, father, sister, and brother seeds use the same existing record and current production kinds.
+- ActorConversationContext and the Semantic Lab projection expose the durable bond. Direct arbitrary bond editing remains an Advanced/diagnostic path.
 
-The harness currently presents manual numeric personality sliders as ordinary state rather than explicit override/debug state.
+Validation:
 
-### Normal relationship-kind catalog is not truthful enough
+- `test_contextual_runtime_parity_p11c.py`: 4/4 passed, covering below-gate, promotion, deterioration retention, all starting-bond kinds, persistence round-trip, and real Tk Apply projection.
+- Production relationship Lua files, worker files, and scenario session passed `luac5.3 -p`.
+- The P10 regression set and P11A/P11B suites remain part of the next combined regression run.
 
-The extensible registry includes hypothetical/future/internal kinds that current gameplay does not actually produce.
+Native Project Zomboid SP/MP remains UNTESTED / user-owned.
 
-Normal UI must only expose real current production kinds.
+## Current Exact Next Chunk — P11D
 
-### Dynamic friend/lover progression is missing
+On the actual local checkout:
 
-Current durable bond handling is still too manual.
-
-Approved runtime model is now:
-
-```text
-family = authored/pre-existing
-
-none
- -> automatic friend after high relationship milestone
- -> lover only after compatibility + player proposal + NPC acceptance
-```
-
-Current relationship standing remains separate and may later become rival/enemy without erasing social history.
-
-## Current Exact Next Chunk — P11A
-
-On the user's actual local checkout:
-
-1. read root `AGENTS.md` and the ContextualDialoguePersonaChoices docs in documented order, including `RUNTIME_PARITY_ACTORS_RELATIONSHIPS_AND_UX.md`;
-2. verify ProjectHoomans/Core/DynamicTrading branch, HEAD, upstream/divergence, dirty/concurrent changes; existing `main` only;
-3. inspect:
-   - current Simulation toolbar/workbench ownership;
-   - scenario player/NPC state;
-   - Simulation Control Catalog;
-   - player and NPC trait registries;
-   - RelationshipKindRegistry;
-   - Starting Companion real relationship-kind producers;
-   - relationship record/persistence/normalization;
-   - current graph adapters;
-4. remove hypothetical/future relationship kinds from **normal selectable catalogs** while preserving safe extensibility/aliases internally;
-5. normal production-visible relationship kinds must reflect actual current producers, presently:
-   - friend;
-   - lover;
-   - mother;
-   - father;
-   - sister;
-   - brother;
-6. establish the actor-centric primary workbench shell:
-   ```text
-   NPC Target | Player | Relationship | World
-   ```
-   with actor sub-tabs:
-   ```text
-   Overview | Needs | Personality & Traits
-   ```
-7. preserve existing Apply / Apply + Replay / structured inventory / Advanced JSON;
-8. begin moving low-level controls to their target owners without deleting capabilities:
-   - World Knowledge refresh -> World Knowledge inspector;
-   - Restart worker / Snapshot -> Diagnostics/Worker;
-   - Preview -> Send/Preview control or diagnostics;
-   - Persona Matrix / Sweep / Capture baseline -> future Compare surface;
-9. do not implement friend/lover persistence in the same P11A chunk unless the UI/catalog skeleton requires a small read-only placeholder;
-10. add Tk/Xvfb geometry/navigation tests proving Player and NPC Target surfaces are first-class and normal bond catalogs contain no hypothetical kinds;
-11. run focused Python/Tk/Lua syntax/diff checks;
-12. update this ledger with exact evidence and continue automatically to P11B if P11A passes.
-
-## P11A acceptance
-
-The actual Semantic Lab must visibly provide:
-
-```text
-NPC Target
-Player
-Relationship
-World
-```
-
-and the normal relationship/bond selectors/catalogs must no longer advertise future synthetic kinds such as cousin/grandmother/partner/spouse unless a real current production owner is found during the source audit.
-
-Primary workflow clutter should already begin moving to meaningful destinations.
+1. audit the existing production compatibility APIs and player/NPC gender/profile sources;
+2. add one canonical `RELATIONSHIP_PROPOSAL` semantic action through the existing server relationship boundary;
+3. enforce friend bond, standing, family exclusion, thresholds, availability, compatibility, and named cooldown gates;
+4. evaluate NPC acceptance deterministically from actual relationship values and generated/personality override data;
+5. persist acceptance/rejection events, revisions, cooldown, and friend-to-lover promotion on the existing directed record;
+6. expose compatibility, proposal threshold, cooldown, and availability in the Relationship workbench with a proposal action;
+7. add focused tests for incompatible, Gay, Bisexual, straight, family, flirty, reserved, accepted, rejected, cooldown, starting-lover, and persistence cases;
+8. run the focused checks, update this ledger with exact evidence, commit P11D on existing `main`, and continue automatically to P11E.
 
 ## Ordered remaining milestones
 
-After P11A continue automatically:
+After P11D continue automatically:
 
-- **P11B:** first-class Player/NPC needs + production traits/personality;
-- **P11C:** durable automatic friend promotion on existing relationship records;
-- **P11D:** compatibility + proposal + server-authoritative acceptance -> lover;
 - **P11E:** live relationship preview + Compare/toolbar cleanup;
 - **P11F:** unified semantic Flow / Hub / ConversationBlock runtime graph;
 - **P11G:** modular speech-realization content packs;
 - **P11H:** final runtime-parity usability/regression gate.
 
-See `RUNTIME_PARITY_ACTORS_RELATIONSHIPS_AND_UX.md` for full contracts.
+See `RUNTIME_PARITY_ACTORS_RELATIONSHIPS_AND_UX.md` for the full contracts.
 
 ## Handoff condition
 

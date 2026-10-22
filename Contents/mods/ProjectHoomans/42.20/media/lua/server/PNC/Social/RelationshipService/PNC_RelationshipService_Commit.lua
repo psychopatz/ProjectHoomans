@@ -229,6 +229,9 @@ local function commit(record, social, targetKey, relationship,
             relationship
         )
     end
+    if Internal.EvaluateDurableBond then
+        Internal.EvaluateDurableBond(record, targetKey, worldAgeHours)
+    end
     local parsedTarget = EntityRef.Parse(targetKey)
     if parsedTarget and parsedTarget.kind == "player"
         and PNC.NPCKnowledge

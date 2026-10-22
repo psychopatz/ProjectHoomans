@@ -101,6 +101,11 @@ function ProductionModules.load(context)
         "PNC/Core/Traits/PNC_NPCTraitDefinitions.lua",
         "persona_catalog"
     )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Traits/PNC_NPCTraitEffects.lua",
+        "persona_catalog"
+    )
     -- Keep the production NPC Knowledge service on the worker boundary.
     -- The adapter later fills these same tables with scenario-owned identity
     -- and registry methods; the service never receives a second store.
@@ -175,6 +180,11 @@ function ProductionModules.load(context)
     load(
         "ProjectHoomans", "shared",
         "PNC/Core/Relationships/PNC_SocialProfileTypes.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_SocialTraits.lua",
         "social_authority"
     )
     load(

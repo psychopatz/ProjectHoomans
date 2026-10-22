@@ -14,6 +14,15 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "forename": "Patrick",
         "surname": "Patz",
         "displayName": "Patrick Patz",
+        "needs": {
+            "hunger": 0.2,
+            "thirst": 0.4,
+            "fatigue": 0.1,
+            "stress": 0.0,
+            "boredom": 0.0,
+            "panic": 0.0,
+        },
+        "traits": [],
         "inventory": {
             "revision": 1,
             "items": [
@@ -57,6 +66,16 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "identityState": "unknown",
         "healthState": "healthy",
         "activeBehavior": "idle",
+        "identitySeed": "npc_mara",
+        "archetype": "General",
+        "needs": {
+            "hunger": 0.2,
+            "thirst": 0.4,
+            "fatigue": 0.1,
+            "stress": 0.0,
+            "boredom": 0.0,
+            "panic": 0.0,
+        },
         "followState": {"mode": "idle"},
         "actorAuthority": {
             "companion": True,
@@ -224,6 +243,14 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
         raise ValueError("player.characterUUID is required")
     if not str(npc.get("npcID", "")):
         raise ValueError("npc.npcID is required")
+    for owner_name, owner in (("player", player), ("npc", npc)):
+        traits = owner.get("traits")
+        if traits is not None and not isinstance(traits, (list, dict)):
+            raise ValueError(f"{owner_name}.traits must be an array or object")
+    for field in ("identitySeed", "archetype"):
+        value = npc.get(field)
+        if value is not None and not isinstance(value, (str, int, float)):
+            raise ValueError(f"npc.{field} must be scalar or null")
     # Nullable state fields permit deliberately unknown NPC facts. Legacy
     # scenarios without explicit NPC needs still use world-level values.
     for field in ("healthState", "activeBehavior"):
@@ -234,6 +261,19 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
         value = npc.get(field)
         if value is not None and not isinstance(value, dict):
             raise ValueError(f"npc.{field} must be an object or null")
+    player_needs = player.get("needs")
+    if player_needs is not None and not isinstance(player_needs, dict):
+        raise ValueError("player.needs must be an object or null")
+    for owner_name, owner_needs in (("player", player_needs), ("npc", npc.get("needs"))):
+        if not isinstance(owner_needs, dict):
+            continue
+        for need_name, need_value in owner_needs.items():
+            if not isinstance(need_name, str):
+                raise ValueError(f"{owner_name}.needs keys must be strings")
+            if not isinstance(need_value, (int, float)) or isinstance(need_value, bool):
+                raise ValueError(f"{owner_name}.needs.{need_name} must be numeric")
+            if need_value < 0 or need_value > 1:
+                raise ValueError(f"{owner_name}.needs.{need_name} must be between 0 and 1")
     actor_authority = npc.get("actorAuthority")
     if actor_authority is not None and not isinstance(actor_authority, dict):
         raise ValueError("npc.actorAuthority must be an object or null")
@@ -251,6 +291,8 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
     if profile is not None and not isinstance(profile, str):
         raise ValueError("runtime.semanticLabProfile must be a string or null")
     available_mods = runtime.get("availableMods")
+    if available_mods == []:
+        available_mods = {}
     if available_mods is not None and not isinstance(available_mods, dict):
         raise ValueError("runtime.availableMods must be an object or null")
     if isinstance(available_mods, dict):

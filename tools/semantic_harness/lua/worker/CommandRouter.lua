@@ -65,7 +65,17 @@ local function relationshipKindCatalog(context, payload)
     end
     local translation = PNC.Translation
     local kinds = {}
-    local definitions = registry.GetDefinitions()
+    local definitions
+    if registration and registration.registered == true then
+        -- Explicit registration is the diagnostic fixture path. It may
+        -- inspect an extensible/future kind without making that kind part of
+        -- the normal production catalog.
+        definitions = registry.GetDefinitions()
+    elseif type(registry.GetProductionDefinitions) == "function" then
+        definitions = registry.GetProductionDefinitions()
+    else
+        definitions = registry.GetDefinitions()
+    end
     for index = 1, math.min(#definitions, 64) do
         local definition = definitions[index]
         local terms = definition.termKeys or {}
@@ -123,8 +133,12 @@ local function personaCatalog(context, payload)
     local definitions = PNC.NPCTraits
         and type(PNC.NPCTraits.GetDefinitions) == "function"
         and PNC.NPCTraits.GetDefinitions() or {}
+    local playerDefinitions = PNC.SocialTraits
+        and type(PNC.SocialTraits.GetDefinitions) == "function"
+        and PNC.SocialTraits.GetDefinitions() or {}
     local constants = PNC.SocialProfileConstants or {}
     local traits = {}
+    local playerTraits = {}
     local maximum = math.min(#definitions, 64)
     for index = 1, maximum do
         local definition = definitions[index]
@@ -147,6 +161,32 @@ local function personaCatalog(context, payload)
     table.sort(traits, function(left, right)
         return tostring(left.id or "") < tostring(right.id or "")
     end)
+    for index = 1, math.min(#playerDefinitions, 64) do
+        local definition = playerDefinitions[index]
+        if type(definition) == "table" then
+            local translation = PNC.Translation
+            playerTraits[#playerTraits + 1] = {
+                id = definition.id,
+                labelKey = definition.labelKey or definition.uiName,
+                label = translation and type(translation.GetKey) == "function"
+                    and translation.GetKey(
+                        definition.labelKey or definition.uiName,
+                        definition.id
+                    ) or definition.id,
+                descriptionKey = definition.descriptionKey
+                    or definition.uiDescription,
+                excludes = context.Values.copy(definition.excludes),
+            }
+        end
+    end
+    table.sort(playerTraits, function(left, right)
+        return tostring(left.id or "") < tostring(right.id or "")
+    end)
+    local archetypes = {}
+    for archetypeID in pairs(constants.ARCHETYPE_MODIFIERS or {}) do
+        archetypes[#archetypes + 1] = archetypeID
+    end
+    table.sort(archetypes)
     local relationshipKinds = relationshipKindCatalog(context, payload)
     local speechRealization = speechRealizationCatalog(context)
     local factionConstants = PNC.FactionConstants or {}
@@ -159,6 +199,11 @@ local function personaCatalog(context, payload)
         schemaVersion = 1,
         identity = { genders = { "unknown", "female", "male" } },
         traits = traits,
+        playerTraits = playerTraits,
+        archetypes = archetypes,
+        playerSocialProfile = context.Values.copy(context.playerSocialProfile),
+        npcPersonality = context.Values.copy(context.npcPersonality),
+        npcPersonalityMode = context.npcPersonalityMode or "generated",
         personality = {
             enums = {
                 socialStyle = catalogValues(
@@ -212,6 +257,7 @@ local function simulationControlCatalog(context, payload)
     local roles = withNone(persona.roles)
     local bondKinds = {}
     local traits = {}
+    local playerTraitOptions = {}
     for index = 1, math.min(#(persona.relationshipKinds or {}), 64) do
         bondKinds[#bondKinds + 1] = persona.relationshipKinds[index].kind
     end
@@ -219,6 +265,13 @@ local function simulationControlCatalog(context, payload)
         traits[#traits + 1] = {
             value = persona.traits[index].id,
             label = persona.traits[index].label or persona.traits[index].id,
+        }
+    end
+    for index = 1, math.min(#(persona.playerTraits or {}), 64) do
+        playerTraitOptions[#playerTraitOptions + 1] = {
+            value = persona.playerTraits[index].id,
+            label = persona.playerTraits[index].label
+                or persona.playerTraits[index].id,
         }
     end
 
@@ -232,21 +285,42 @@ local function simulationControlCatalog(context, payload)
     add("runtime.language", "runtime.language", "Runtime", "Worker", "Language", "combobox", "enum", {
         options = { "EN", "TL" },
         optionsSource = "semantic_lab.harness",
-        workbench = true, workbenchSection = "Context",
+        workbench = true, workbenchPanel = "World", workbenchTab = "Overview",
+        workbenchSection = "Context",
     })
     add("runtime.llmEnabled", "runtime.llmEnabled", "Runtime", "Integrations", "LLM bridge enabled", "boolean", "boolean")
     add("runtime.providerAvailable", "runtime.providerAvailable", "Runtime", "Integrations", "LLM provider available", "boolean", "boolean")
     add("runtime.DTHoomans", "runtime.availableMods.DTHoomans", "Runtime", "Integrations", "Dynamic Trading adapter enabled", "boolean", "boolean", {
-        workbench = true, workbenchSection = "Context",
+        workbench = true, workbenchPanel = "World", workbenchTab = "Overview",
+        workbenchSection = "Context",
     })
 
-    for _, key in ipairs({ "hunger", "thirst", "fatigue", "stress", "boredom", "panic" }) do
+    local needKeys = { "hunger", "thirst", "fatigue", "stress", "boredom", "panic" }
+    for _, key in ipairs(needKeys) do
         local title = string.upper(string.sub(key, 1, 1)) .. string.sub(key, 2)
         add("world." .. key, "world." .. key, "World", "Needs", title, "slider", "number", {
             min = 0, max = 1, step = 0.05, format = "%.2f",
-            workbench = true, workbenchSection = "Needs + personality",
+            legacy = true,
+            description = "Legacy world fallback for older scenarios; edit the owning actor field instead.",
         })
     end
+    local function addActorNeeds(prefix, label, panel)
+        local actor = context[prefix .. "Data"] or {}
+        local source = type(actor.needs) == "table"
+            and actor.needs or context.world or {}
+        for _, key in ipairs(needKeys) do
+            local title = string.upper(string.sub(key, 1, 1)) .. string.sub(key, 2)
+            add(prefix .. ".needs." .. key, prefix .. ".needs." .. key,
+                "Actors", label .. " Needs", title, "slider", "number", {
+                    min = 0, max = 1, step = 0.05, format = "%.2f",
+                    currentValue = source[key],
+                    workbench = true, workbenchPanel = panel,
+                    workbenchTab = "Needs", workbenchSection = "Needs",
+                })
+        end
+    end
+    addActorNeeds("player", "Player", "Player")
+    addActorNeeds("npc", "NPC", "NPC Target")
     add("world.timeOfDay", "world.timeOfDay", "World", "Time", "Time of day", "slider", "number", {
         min = 0, max = 24, step = 0.25, format = "%.2f",
     })
@@ -264,33 +338,87 @@ local function simulationControlCatalog(context, payload)
         emptyToNull = true,
     })
 
-    add("player.characterUUID", "player.characterUUID", "Actors", "Player", "Player ID", "text", "text")
-    add("player.forename", "player.forename", "Actors", "Player", "Player first name", "text", "text")
-    add("player.surname", "player.surname", "Actors", "Player", "Player surname", "text", "text")
-    add("player.displayName", "player.displayName", "Actors", "Player", "Player display name", "text", "text")
-    add("npc.npcID", "npc.npcID", "Actors", "NPC", "NPC ID", "text", "text")
-    add("npc.forename", "npc.forename", "Actors", "NPC", "First name", "text", "text")
-    add("npc.surname", "npc.surname", "Actors", "NPC", "Surname", "text", "text")
-    add("npc.identityState", "npc.identityState", "Actors", "NPC", "Identity state", "text", "text")
+    add("player.characterUUID", "player.characterUUID", "Actors", "Player", "Player ID", "text", "text", {
+        workbench = true, workbenchPanel = "Player", workbenchTab = "Overview",
+        workbenchSection = "Overview",
+    })
+    add("player.forename", "player.forename", "Actors", "Player", "Player first name", "text", "text", {
+        workbench = true, workbenchPanel = "Player", workbenchTab = "Overview",
+        workbenchSection = "Overview",
+    })
+    add("player.surname", "player.surname", "Actors", "Player", "Player surname", "text", "text", {
+        workbench = true, workbenchPanel = "Player", workbenchTab = "Overview",
+        workbenchSection = "Overview",
+    })
+    add("player.displayName", "player.displayName", "Actors", "Player", "Player display name", "text", "text", {
+        workbench = true, workbenchPanel = "Player", workbenchTab = "Overview",
+        workbenchSection = "Overview",
+    })
+    add("player.traits", "player.traits", "Actors", "Player", "Registered player traits", "multi_select", "array", {
+        options = playerTraitOptions,
+        optionsSource = "PsychopatzCore.Traits / PNC.SocialTraits",
+        workbench = true, workbenchPanel = "Player", workbenchTab = "Personality & Traits",
+        workbenchSection = "Traits",
+    })
+    for _, key in ipairs({ "orientation", "romanceStyle", "jealousyStyle", "socialStyle", "foodPreference" }) do
+        add("player.socialProfile." .. key, nil, "Actors", "Player", key, "read_only", "text", {
+            currentValue = context.playerSocialProfile
+                and context.playerSocialProfile[key] or "unknown",
+            source = "production.player_social_profile",
+            workbench = true, workbenchPanel = "Player",
+            workbenchTab = "Personality & Traits", workbenchSection = "Derived social profile",
+        })
+    end
+    add("npc.identitySeed", "npc.identitySeed", "Actors", "NPC", "Identity seed", "text", "text", {
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Overview",
+    })
+    add("npc.archetype", "npc.archetype", "Actors", "NPC", "Archetype", "combobox", "enum", {
+        options = persona.archetypes,
+        optionsSource = "PNC.SocialProfileConstants.ARCHETYPE_MODIFIERS",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Overview",
+    })
+    add("npc.npcID", "npc.npcID", "Actors", "NPC", "NPC ID", "text", "text", {
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Overview",
+    })
+    add("npc.forename", "npc.forename", "Actors", "NPC", "First name", "text", "text", {
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Overview",
+    })
+    add("npc.surname", "npc.surname", "Actors", "NPC", "Surname", "text", "text", {
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Overview",
+    })
+    add("npc.identityState", "npc.identityState", "Actors", "NPC", "Identity state", "text", "text", {
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Overview",
+    })
     add("npc.gender", "npc.identity.gender", "Actors", "NPC", "Gender", "combobox", "enum", {
         options = persona.identity.genders,
         optionsSource = "semantic_lab.harness",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Overview",
     })
     add("npc.role", "npc.role", "Actors", "NPC", "Role / capability", "combobox", "enum", {
         options = roles,
         optionsSource = "PNC.FactionConstants.ROLES",
         noneValue = "none",
-        workbench = true, workbenchSection = "Context",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Context",
     })
     add("npc.healthState", "npc.healthState", "Actors", "NPC", "Health", "combobox", "enum", {
         options = { "unknown", "healthy", "injured", "wounded", "critical", "dead" },
         optionsSource = "semantic_lab.harness",
-        workbench = true, workbenchSection = "Context",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Context",
     })
     add("npc.activeBehavior", "npc.activeBehavior", "Actors", "NPC", "Activity", "combobox", "enum", {
         options = { "idle", "following", "staying", "busy", "searching", "fleeing", "hostile", "combat" },
         optionsSource = "semantic_lab.harness",
-        workbench = true, workbenchSection = "Context",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Context",
     })
     add("relationship.identityTrust", "npc.relationship.identityTrust", "Persona", "Relationship", "Identity trust", "combobox", "enum", {
         options = { "unknown", "trusted", "untrustworthy" },
@@ -301,34 +429,55 @@ local function simulationControlCatalog(context, payload)
         optionsSource = "PNC.RelationshipKinds",
         noneValue = "none",
         clearPath = "npc.startingRelationship",
-        workbench = true, workbenchSection = "Context",
+        advanced = true,
     })
     add("persona.traits", "npc.traits", "Persona", "Traits", "Registered traits", "multi_select", "array", {
         options = traits,
         optionsSource = "PNC.NPCTraits",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Personality & Traits",
+        workbenchSection = "Needs + personality",
+    })
+    add("npc.personalityOverride", "npc.personalityOverride", "Persona", "Personality", "Override generated personality", "boolean", "boolean", {
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Personality & Traits",
+        workbenchSection = "Personality source",
+    })
+    add("npc.personalityMode", nil, "Persona", "Personality", "Personality mode", "read_only", "text", {
+        currentValue = context.npcPersonalityMode or "generated",
+        source = "production.social_profile_generator",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Personality & Traits",
+        workbenchSection = "Personality source",
     })
     add("persona.socialStyle", "npc.personality.socialStyle", "Persona", "Personality", "Social style", "combobox", "enum", {
         options = persona.personality.enums.socialStyle,
         optionsSource = "PNC.SocialProfileConstants.VALID_SOCIAL_STYLES",
-        workbench = true, workbenchSection = "Context",
+        currentValue = context.npcPersonality and context.npcPersonality.socialStyle,
+        requiresOverride = "npc.personalityOverride",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Personality & Traits",
+        workbenchSection = "Needs + personality",
     })
     add("relationship.approval", "npc.relationship.approval", "Persona", "Relationship", "Approval", "slider", "number", {
         min = -100, max = 100, step = 1, format = "%.0f",
-        workbench = true, workbenchSection = "Context",
+        workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
+        workbenchSection = "Context",
     })
     add("relationship.respect", "npc.relationship.respect", "Persona", "Relationship", "Respect", "slider", "number", {
         min = -100, max = 100, step = 1, format = "%.0f",
-        workbench = true, workbenchSection = "Context",
+        workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
+        workbenchSection = "Context",
     })
     add("relationship.familiarity", "npc.relationship.familiarity", "Persona", "Relationship", "Familiarity", "slider", "number", {
         min = 0, max = 100, step = 1, format = "%.0f",
-        workbench = true, workbenchSection = "Context",
+        workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
+        workbenchSection = "Context",
     })
     for _, key in ipairs(persona.personality.dimensions or {}) do
         add("persona.personality." .. key, "npc.personality." .. key, "Persona", "Personality", key, "slider", "number", {
             min = 0, max = 1, step = 0.05, format = "%.2f",
             optionsSource = "PNC.SocialProfileConstants.NUMERIC_DIMENSIONS",
-            workbench = true, workbenchSection = "Needs + personality",
+            currentValue = context.npcPersonality and context.npcPersonality[key],
+            requiresOverride = "npc.personalityOverride",
+            workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Personality & Traits",
+            workbenchSection = "Needs + personality",
         })
     end
     for _, key in ipairs({ "companion", "owned", "eligible" }) do
@@ -336,7 +485,18 @@ local function simulationControlCatalog(context, payload)
     end
     add("relationship.state", nil, "Persona", "Relationship", "Derived relationship state", "read_only", "text", {
         source = "production.relationship.state",
-        workbench = true, workbenchSection = "Context",
+        workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
+        workbenchSection = "Context",
+    })
+    local durableBond = context.npcData and context.npcData.relationship
+        and context.npcData.relationship.bond or nil
+    local durableBondLabel = durableBond
+        and (durableBond.kind or durableBond.class) or "none"
+    add("relationship.bond", nil, "Persona", "Relationship", "Durable bond", "read_only", "text", {
+        currentValue = durableBondLabel,
+        source = "production.relationship.bond",
+        workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
+        workbenchSection = "Context",
     })
 
     add("player.inventory", "player.inventory", "Inventories", "Player", "Player inventory", "structured_collection", "object", {
@@ -355,7 +515,7 @@ local function simulationControlCatalog(context, payload)
     return {
         schema = "semantic.simulation.control.catalog.v1",
         schemaVersion = 1,
-        maxControls = 64,
+        maxControls = 96,
         controls = controls,
     }
 end
@@ -696,6 +856,27 @@ function CommandRouter.hello(context)
         headlessRequires = Runtime.headlessRequires,
         personaCatalog = personaCatalog(context),
         simulationControlCatalog = simulationControlCatalog(context),
+        simulationProjection = {
+            schema = "semantic.simulation.actor.projection.v1",
+            player = {
+                needs = context.Values.copy(context.playerData
+                    and context.playerData.needs or context.world),
+                traits = context.Values.copy(context.playerData
+                    and context.playerData.traits or {}),
+                socialProfile = context.Values.copy(context.playerSocialProfile),
+            },
+            npc = {
+                needs = context.Values.copy(context.npcData
+                    and context.npcData.needs or context.world),
+                traits = context.Values.copy(context.npcData
+                    and context.npcData.traits or {}),
+                bond = context.Values.copy(context.npcData
+                    and context.npcData.relationship
+                    and context.npcData.relationship.bond),
+                personality = context.Values.copy(context.npcPersonality),
+                personalityMode = context.npcPersonalityMode or "generated",
+            },
+        },
         suggestions = context.Values.copy(
             Runtime.view and Runtime.view.semanticSuggestions
         ),
@@ -904,6 +1085,19 @@ function CommandRouter.dispatch(context, request)
             headlessRequires = Runtime.headlessRequires,
             personaCatalog = personaCatalog(context),
             simulationControlCatalog = simulationControlCatalog(context),
+            simulationProjection = {
+                schema = "semantic.simulation.actor.projection.v1",
+                player = {
+                    socialProfile = context.Values.copy(context.playerSocialProfile),
+                },
+                npc = {
+                    bond = context.Values.copy(context.npcData
+                        and context.npcData.relationship
+                        and context.npcData.relationship.bond),
+                    personality = context.Values.copy(context.npcPersonality),
+                    personalityMode = context.npcPersonalityMode or "generated",
+                },
+            },
             suggestions = context.Values.copy(
                 Runtime.view and Runtime.view.semanticSuggestions
             ),

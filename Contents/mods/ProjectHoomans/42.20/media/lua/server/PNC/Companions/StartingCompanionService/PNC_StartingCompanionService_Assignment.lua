@@ -128,6 +128,18 @@ function H.ApplyLifelongKnowledge(player, character, npcID, spec, at)
             respect = lover and 75 or friend and 65 or 70,
             familiarity = friend and 90 or 100,
         }, at)
+        if PNC.Relationships.SetDurableBond then
+            local bondClass = lover and "lover"
+                or friend and "friend" or "family"
+            PNC.Relationships.SetDurableBond(
+                npcID,
+                targetKey,
+                { class = bondClass, kind = bondClass == "family"
+                    and spec.relationshipKind or nil },
+                at,
+                "starting_companion"
+            )
+        end
     end
     if PNC.NPCKnowledge and PNC.NPCKnowledge.DiscoverAllForPlayer then
         PNC.NPCKnowledge.DiscoverAllForPlayer(

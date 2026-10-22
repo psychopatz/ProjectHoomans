@@ -2,6 +2,65 @@
 
 local RuntimeEnvironment = {}
 
+local function projectSocialProfiles(context, playerData, npcData)
+    local playerTraits = playerData.traits or playerData.socialTraits or {}
+    local npcTraits = npcData.traits or {}
+    local playerProfile
+    local playerConflicts
+    local playerFingerprint
+    local npcProfile
+    local personalityMode
+    local personalitySource
+
+    if PNC and PNC.SocialTraits
+        and type(PNC.SocialTraits.ResolveTraits) == "function"
+    then
+        playerProfile, playerConflicts, playerFingerprint =
+            PNC.SocialTraits.ResolveTraits(playerTraits)
+    else
+        playerProfile = {}
+        playerConflicts = {}
+        playerFingerprint = ""
+    end
+
+    personalityMode = tostring(npcData.personalityMode or "")
+    personalitySource = npcData.personalityOverride == true
+        or personalityMode == "override"
+    -- Scenarios written before the generated-personality mode existed remain
+    -- readable as explicit legacy fixtures. New scenarios omit personality
+    -- values and therefore use the generated production path by default.
+    if not personalitySource and personalityMode == ""
+        and type(npcData.personality) == "table"
+    then
+        personalitySource = true
+        personalityMode = "legacy_override"
+    end
+
+    if PNC and PNC.SocialProfileGenerator
+        and type(PNC.SocialProfileGenerator.Generate) == "function"
+    then
+        npcProfile = PNC.SocialProfileGenerator.Generate(
+            npcData.identitySeed
+                or npcData.identity and npcData.identity.seed
+                or npcData.npcID,
+            npcData.archetype or npcData.archetypeID or "General",
+            personalitySource and npcData.personality or nil,
+            { npcTraits = npcTraits }
+        )
+    else
+        npcProfile = npcData.personality or {}
+    end
+
+    context.playerSocialProfile = playerProfile
+    context.playerTraitConflicts = playerConflicts
+    context.playerTraitFingerprint = playerFingerprint
+    context.npcGeneratedPersonality = npcProfile
+    context.npcPersonality = npcProfile
+    context.npcPersonalityMode = personalitySource
+        and (personalityMode ~= "" and personalityMode or "override")
+        or "generated"
+end
+
 local function packagedRoot(context, modID)
     if tostring(modID) == "ProjectHoomans" then
         return context.repository .. "/Contents/mods/ProjectHoomans/common"
@@ -61,6 +120,7 @@ function RuntimeEnvironment.configure(context)
     context.world = world
     context.runtime = runtime
     context.semanticFactValues = {}
+    projectSocialProfiles(context, playerData, npcData)
     ModData = {
         get = function(key)
             return Runtime.modData[tostring(key or "")]

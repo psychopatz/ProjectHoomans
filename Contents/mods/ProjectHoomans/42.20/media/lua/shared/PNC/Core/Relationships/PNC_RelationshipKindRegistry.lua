@@ -36,6 +36,7 @@ local function copyDefinition(definition)
     return {
         kind = definition.kind,
         class = definition.class,
+        productionSupported = definition.productionSupported == true,
         termKeys = {
             reference = terms.reference,
             address = terms.address,
@@ -78,6 +79,7 @@ function Registry.Register(definition)
     definitions[kind] = {
         kind = kind,
         class = class,
+        productionSupported = definition.productionSupported == true,
         termKeys = {
             reference = tostring(terms.reference),
             address = tostring(terms.address),
@@ -103,6 +105,24 @@ function Registry.GetDefinitions()
     return output
 end
 
+-- Normal production catalogs must describe kinds that a live producer can
+-- actually create. Keep GetDefinitions extensible for diagnostics and addon
+-- registration, but give consumers a truthful normal-mode projection.
+function Registry.GetProductionDefinitions()
+    local output = {}
+    for kind, definition in pairs(definitions) do
+        if definition.productionSupported == true
+            and #output < Registry.MAX_DEFINITIONS
+        then
+            output[#output + 1] = copyDefinition(definition)
+        end
+    end
+    table.sort(output, function(left, right)
+        return tostring(left.kind) < tostring(right.kind)
+    end)
+    return output
+end
+
 function Registry.Project(kind, source)
     local definition = Registry.GetDefinition(kind)
     if not definition then return nil end
@@ -118,15 +138,15 @@ function Registry.Project(kind, source)
 end
 
 local BUILTINS = {
-    { kind = "friend", class = "friend" },
-    { kind = "lover", class = "lover" },
-    { kind = "partner", class = "lover" },
-    { kind = "spouse", class = "lover" },
-    { kind = "mother", class = "family" },
-    { kind = "father", class = "family" },
-    { kind = "sister", class = "family" },
-    { kind = "brother", class = "family" },
-    { kind = "cousin", class = "family" },
+    { kind = "friend", class = "friend", productionSupported = true },
+    { kind = "lover", class = "lover", productionSupported = true },
+    { kind = "partner", class = "lover", productionSupported = false },
+    { kind = "spouse", class = "lover", productionSupported = false },
+    { kind = "mother", class = "family", productionSupported = true },
+    { kind = "father", class = "family", productionSupported = true },
+    { kind = "sister", class = "family", productionSupported = true },
+    { kind = "brother", class = "family", productionSupported = true },
+    { kind = "cousin", class = "family", productionSupported = false },
 }
 
 for index = 1, #BUILTINS do
@@ -134,6 +154,7 @@ for index = 1, #BUILTINS do
     Registry.Register({
         kind = definition.kind,
         class = definition.class,
+        productionSupported = definition.productionSupported,
         termKeys = {
             reference = "UI_PNC_Flavor_RelationshipTerm_"
                 .. definition.kind:gsub("^%l", string.upper) .. "_Reference",

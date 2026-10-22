@@ -294,7 +294,7 @@ def _collect_catalog_scenario_settings(
 ) -> dict[str, Any]:
     updated = deepcopy(draft)
     controls = control_catalog.get("controls", [])
-    if not isinstance(controls, list) or len(controls) > 64:
+    if not isinstance(controls, list) or len(controls) > 96:
         raise ValueError("worker simulation control catalog is invalid")
     # Relationship state is computed from the editable standing by production.
     updated.setdefault("npc", {}).pop("relationshipState", None)
@@ -365,7 +365,7 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
         )
         return
     controls = [
-        control for control in controls[:64]
+        control for control in controls[:96]
         if isinstance(control, dict) and control.get("id")
     ]
 
@@ -459,6 +459,8 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
             relationship = actor.get("relationship", {}) if isinstance(actor, dict) else {}
             return relationship.get("state", "unknown")
         path = control.get("path")
+        if path is None:
+            return control.get("currentValue")
         value = _path_value(draft, str(path)) if isinstance(path, str) else None
         if control_id == "persona.bondKind":
             return value or "none"
@@ -488,6 +490,21 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
         fields[control_id] = field
         variables[control_id] = field.variable or field.editor or field.widget
         widgets[control_id] = field.widget
+
+    override_field = fields.get("npc.personalityOverride")
+
+    def update_personality_controls(*_args: Any) -> None:
+        enabled = bool(override_field and override_field.get_value())
+        for control in controls:
+            if not control.get("requiresOverride"):
+                continue
+            field = fields.get(str(control.get("id") or ""))
+            if field is not None:
+                field.set_enabled(enabled)
+
+    if override_field is not None and override_field.variable is not None:
+        override_field.variable.trace_add("write", update_personality_controls)
+    update_personality_controls()
 
     ttk.Label(
         page("Runtime"),
@@ -521,6 +538,10 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
                 field.initial is None
                 and not field.dirty
                 and widget_kind != "structured_collection"
+            ):
+                continue
+            if control.get("requiresOverride") and not bool(
+                override_field and override_field.get_value()
             ):
                 continue
             values[control_id] = field.get_value()

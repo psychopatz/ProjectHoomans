@@ -276,6 +276,7 @@ class SemanticHarnessApp:
         self._production_catalog: dict[str, Any] | None = None
         self.persona_catalog: dict[str, Any] = {}
         self.simulation_control_catalog: dict[str, Any] = {}
+        self.simulation_projection: dict[str, Any] = {}
         self.settings_variables: dict[str, Any] = {}
         self.settings_control_widgets: dict[str, Any] = {}
         self.settings_control_fields: dict[str, Any] = {}
@@ -384,8 +385,15 @@ class SemanticHarnessApp:
         input_box = ttk.Entry(transcript_frame, textvariable=self.input_var)
         input_box.grid(row=2, column=0, sticky="ew", padx=6, pady=(0, 6))
         input_box.bind("<Return>", lambda _: self.submit())
-        self.send_button = ttk.Button(transcript_frame, text="Send", command=self.submit)
-        self.send_button.grid(row=3, column=0, sticky="e", padx=6, pady=(0, 6))
+        input_actions = ttk.Frame(transcript_frame)
+        input_actions.grid(row=3, column=0, sticky="ew", padx=6, pady=(0, 6))
+        input_actions.columnconfigure(0, weight=1)
+        self.preview_button = ttk.Button(
+            input_actions, text="Preview", command=self.preview
+        )
+        self.preview_button.grid(row=0, column=1, sticky="e", padx=(0, 4))
+        self.send_button = ttk.Button(input_actions, text="Send", command=self.submit)
+        self.send_button.grid(row=0, column=2, sticky="e")
 
         self.simulation_workbench = ttk.Frame(container)
         self.simulation_workbench.grid(
@@ -462,11 +470,8 @@ class SemanticHarnessApp:
         primary_actions.columnconfigure(1, weight=1)
         primary_actions.columnconfigure(2, weight=1)
         primary_actions.columnconfigure(3, weight=1)
-        primary_actions.columnconfigure(4, weight=1)
         secondary_actions = ttk.Frame(action_controls)
         secondary_actions.grid(row=1, column=0, sticky="ew", pady=(4, 0))
-        lab_actions = ttk.Frame(action_controls)
-        lab_actions.grid(row=2, column=0, sticky="ew", pady=(4, 0))
         runtime_controls = ttk.Frame(controls)
         runtime_controls.grid(row=1, column=0, sticky="ew", pady=(4, 0))
         status_controls = ttk.Frame(controls)
@@ -479,46 +484,18 @@ class SemanticHarnessApp:
             primary_actions, text="Simulation settings…", command=self.open_runtime_settings
         )
         self.settings_button.grid(row=0, column=2, sticky="ew", padx=3)
-        self.preview_button = ttk.Button(primary_actions, text="Preview", command=self.preview)
-        self.preview_button.grid(row=0, column=3, sticky="ew", padx=3)
         self.save_button = ttk.Button(primary_actions, text="Save scenario", command=self.save)
-        self.save_button.grid(row=0, column=4, sticky="ew", padx=(3, 0))
-        self.snapshot_button = ttk.Button(
-            secondary_actions, text="Snapshot", command=self.show_snapshot
-        )
-        self.snapshot_button.pack(side="left")
-        self.persona_matrix_button = ttk.Button(
-            secondary_actions, text="Persona matrix", command=self.inspect_persona_matrix
-        )
-        self.persona_matrix_button.pack(side="left", padx=6)
-        self.capture_baseline_button = ttk.Button(
-            lab_actions, text="Capture baseline", command=self.capture_baseline
-        )
-        self.capture_baseline_button.pack(side="left", padx=6)
-        self.world_knowledge_button = ttk.Button(
+        self.save_button.grid(row=0, column=3, sticky="ew", padx=(3, 0))
+        ttk.Label(
             secondary_actions,
-            text="World knowledge",
-            command=self.inspect_world_knowledge,
-        )
-        self.world_knowledge_button.pack(side="left", padx=6)
-        self.restart_button = ttk.Button(
-            secondary_actions, text="Restart worker", command=self.restart
-        )
-        self.restart_button.pack(side="left", padx=6)
+            text="Use the inspector tabs for Diagnostics, World Knowledge, and Compare.",
+        ).pack(side="left", padx=2)
         self.language_var = self._tk.StringVar(
             value=self.scenario.get("runtime", {}).get("language", "EN")
         )
         self.language_box: Any | None = None
+        self.compare_utterance_var = self._tk.StringVar(value="hello")
         self.matrix_dimension_var = self._tk.StringVar(value="persona")
-        ttk.Label(runtime_controls, text="Sweep").pack(side="left")
-        self.matrix_dimension_box = ttk.Combobox(
-            runtime_controls,
-            textvariable=self.matrix_dimension_var,
-            values=("persona", "approval", "respect", "familiarity", "bond", "language"),
-            width=12,
-            state="readonly",
-        )
-        self.matrix_dimension_box.pack(side="left", padx=(4, 6))
         self.status_var = self._tk.StringVar(value="Starting…")
         self.status_label = ttk.Label(status_controls, textvariable=self.status_var)
         self.status_label.pack(anchor="e")
@@ -563,6 +540,67 @@ class SemanticHarnessApp:
         )
         self.dialogue_diagnostics_frame = dialogue_diagnostics_frame
 
+        compare_frame = ttk.Frame(self.trace_tabs, padding=6)
+        compare_frame.rowconfigure(1, weight=1)
+        compare_frame.columnconfigure(0, weight=1)
+        compare_controls = ttk.Frame(compare_frame)
+        compare_controls.grid(row=0, column=0, sticky="ew", pady=(0, 6))
+        compare_controls.columnconfigure(1, weight=1)
+        ttk.Label(compare_controls, text="Utterance").grid(
+            row=0, column=0, sticky="w", padx=(0, 6)
+        )
+        self.compare_utterance_box = ttk.Entry(
+            compare_controls, textvariable=self.compare_utterance_var
+        )
+        self.compare_utterance_box.grid(row=0, column=1, columnspan=3, sticky="ew")
+        ttk.Label(compare_controls, text="Compare by").grid(
+            row=1, column=0, sticky="w", padx=(0, 6), pady=(6, 0)
+        )
+        self.matrix_dimension_box = ttk.Combobox(
+            compare_controls,
+            textvariable=self.matrix_dimension_var,
+            values=("persona", "approval", "respect", "familiarity", "bond", "language"),
+            width=16,
+            state="readonly",
+        )
+        self.matrix_dimension_box.grid(row=1, column=1, sticky="w", pady=(6, 0))
+        self.capture_baseline_button = ttk.Button(
+            compare_controls, text="Capture baseline", command=self.capture_baseline
+        )
+        self.capture_baseline_button.grid(row=1, column=2, sticky="w", padx=(8, 0), pady=(6, 0))
+        self.persona_matrix_button = ttk.Button(
+            compare_controls, text="Run comparison", command=self.inspect_persona_matrix
+        )
+        self.persona_matrix_button.grid(row=1, column=3, sticky="w", padx=(8, 0), pady=(6, 0))
+        self.compare_output = ScrolledText(compare_frame, wrap="none", state="disabled")
+        self.compare_output.grid(row=1, column=0, sticky="nsew")
+        self.trace_tabs.add(compare_frame, text="Compare")
+        self.compare_frame = compare_frame
+
+        diagnostics_frame = ttk.Frame(self.trace_tabs, padding=6)
+        diagnostics_frame.columnconfigure(0, weight=1)
+        ttk.Label(
+            diagnostics_frame,
+            text="Worker and maintenance diagnostics",
+            font=("TkDefaultFont", 10, "bold"),
+        ).grid(row=0, column=0, sticky="w")
+        diagnostics_actions = ttk.Frame(diagnostics_frame)
+        diagnostics_actions.grid(row=1, column=0, sticky="w", pady=(6, 6))
+        self.snapshot_button = ttk.Button(
+            diagnostics_actions, text="Snapshot", command=self.show_snapshot
+        )
+        self.snapshot_button.pack(side="left")
+        self.restart_button = ttk.Button(
+            diagnostics_actions, text="Restart worker", command=self.restart
+        )
+        self.restart_button.pack(side="left", padx=(6, 0))
+        ttk.Label(
+            diagnostics_frame,
+            text="Raw worker records remain available in the Raw worker record tab.",
+        ).grid(row=2, column=0, sticky="w")
+        self.trace_tabs.add(diagnostics_frame, text="Diagnostics / Worker")
+        self.diagnostics_frame = diagnostics_frame
+
         conversation_frame = ttk.Frame(self.trace_tabs)
         conversation_frame.rowconfigure(0, weight=1)
         conversation_frame.columnconfigure(0, weight=1)
@@ -599,12 +637,20 @@ class SemanticHarnessApp:
 
         world_knowledge_frame = ttk.Frame(self.trace_tabs)
         self.world_knowledge_frame = world_knowledge_frame
-        world_knowledge_frame.rowconfigure(0, weight=1)
+        world_knowledge_frame.rowconfigure(1, weight=1)
         world_knowledge_frame.columnconfigure(0, weight=1)
+        world_knowledge_toolbar = ttk.Frame(world_knowledge_frame)
+        world_knowledge_toolbar.grid(row=0, column=0, sticky="ew", padx=6, pady=(6, 0))
+        self.world_knowledge_button = ttk.Button(
+            world_knowledge_toolbar,
+            text="Refresh world knowledge",
+            command=self.inspect_world_knowledge,
+        )
+        self.world_knowledge_button.pack(side="left")
         self.world_knowledge_inspector = ScrolledText(
             world_knowledge_frame, wrap="none", state="disabled"
         )
-        self.world_knowledge_inspector.grid(row=0, column=0, sticky="nsew")
+        self.world_knowledge_inspector.grid(row=1, column=0, sticky="nsew", padx=6, pady=6)
         self.trace_tabs.add(world_knowledge_frame, text="World Knowledge")
 
         editor_notebook = ttk.Notebook(editor_tab)
@@ -702,11 +748,17 @@ class SemanticHarnessApp:
             self.language_box.configure(
                 state="readonly" if enabled and not self.busy else "disabled"
             )
+        if hasattr(self, "compare_utterance_box"):
+            self.compare_utterance_box.configure(
+                state="normal" if enabled and not self.busy else "disabled"
+            )
         self.npc_profile_box.configure(
             state="readonly" if enabled and not self.busy else "disabled"
         )
         for field in self.workbench_control_fields.values():
             field.set_enabled(enabled and not self.busy)
+        if enabled and not self.busy:
+            self._update_generated_personality_controls()
         self.matrix_dimension_box.configure(
             state="readonly" if enabled and not self.busy else "disabled"
         )
@@ -821,6 +873,7 @@ class SemanticHarnessApp:
         self.simulation_control_catalog = (
             result.capabilities.get("simulationControlCatalog") or {}
         )
+        self._update_simulation_projection(result.capabilities)
         self._build_simulation_workbench()
         self._set_status(f"Ready · Lua PID {result.status.get('pid')}")
         self._set_controls(True)
@@ -860,6 +913,38 @@ class SemanticHarnessApp:
             actor = context.get("actorConversationContext", {}) if isinstance(context, dict) else {}
             relationship = actor.get("relationship", {}) if isinstance(actor, dict) else {}
             return relationship.get("state", "unknown")
+        if control_id == "relationship.bond":
+            bond = self.simulation_projection.get("npc", {}).get("bond", {})
+            if isinstance(bond, dict):
+                return bond.get("kind") or bond.get("class") or "none"
+            return control.get("currentValue", "none")
+        if control_id == "npc.personalityMode":
+            response = self.last_response if isinstance(self.last_response, dict) else {}
+            context = response.get("contextAfter") or response.get("context") or {}
+            if isinstance(context, dict) and context.get("npcPersonalityMode"):
+                return context.get("npcPersonalityMode")
+            return control.get("currentValue", "generated")
+        if control_id.startswith("player.socialProfile."):
+            key = control_id.rsplit(".", 1)[-1]
+            projection = self.simulation_projection.get("player", {})
+            profile = projection.get("socialProfile") or self.persona_catalog.get("playerSocialProfile", {})
+            response = self.last_response if isinstance(self.last_response, dict) else {}
+            context = response.get("contextAfter") or response.get("context") or {}
+            if isinstance(context, dict):
+                profile = context.get("playerSocialProfile") or profile
+            return profile.get(key, control.get("currentValue", "unknown"))
+        if control_id == "persona.socialStyle" or control_id.startswith("persona.personality."):
+            key = "socialStyle" if control_id == "persona.socialStyle" else control_id.rsplit(".", 1)[-1]
+            projection = self.simulation_projection.get("npc", {})
+            profile = projection.get("personality") or self.persona_catalog.get("npcPersonality", {})
+            response = self.last_response if isinstance(self.last_response, dict) else {}
+            context = response.get("contextAfter") or response.get("context") or {}
+            if isinstance(context, dict):
+                profile = context.get("npcPersonality") or profile
+            if key in profile:
+                return profile[key]
+        if control.get("path") is None:
+            return control.get("currentValue")
         value: Any = scenario
         path = control.get("path")
         if isinstance(path, str):
@@ -879,25 +964,69 @@ class SemanticHarnessApp:
         catalog_controls = self.simulation_control_catalog.get("controls", [])
         if not isinstance(catalog_controls, list):
             catalog_controls = []
+        control_limit = min(
+            int(self.simulation_control_catalog.get("maxControls", 64) or 64),
+            96,
+        )
         self.workbench_controls = [
             control
-            for control in catalog_controls[:64]
+            for control in catalog_controls[:control_limit]
             if isinstance(control, dict) and control.get("workbench") is True
         ]
-        pages: dict[str, Any] = {}
-        rows_by_page: dict[str, int] = {}
-        for control in self.workbench_controls:
-            section = str(control.get("workbenchSection") or "Context")
-            page = pages.get(section)
-            if page is None:
-                page = self._ttk.Frame(self.workbench_notebook, padding=(6, 2))
+        panel_names = ("NPC Target", "Player", "Relationship", "World")
+        actor_tabs = ("Overview", "Needs", "Personality & Traits")
+        pages: dict[tuple[str, str], Any] = {}
+        rows_by_page: dict[tuple[str, str], int] = {}
+
+        for panel_name in panel_names:
+            panel = self._ttk.Frame(self.workbench_notebook, padding=(6, 2))
+            panel.columnconfigure(0, weight=1)
+            self.workbench_notebook.add(panel, text=panel_name)
+            if panel_name in {"NPC Target", "Player"}:
+                notebook = self._ttk.Notebook(panel)
+                notebook.grid(row=0, column=0, sticky="ew")
+                for tab_name in actor_tabs:
+                    page = self._ttk.Frame(notebook, padding=(6, 2))
+                    for column in (1, 3):
+                        page.columnconfigure(column, weight=1)
+                    notebook.add(page, text=tab_name)
+                    pages[(panel_name, tab_name)] = page
+                    rows_by_page[(panel_name, tab_name)] = 0
+                if panel_name == "Player":
+                    self._ttk.Label(
+                        pages[(panel_name, "Needs")],
+                        text="Player needs become actor-owned controls in the next runtime-parity slice.",
+                    ).grid(row=0, column=0, columnspan=4, sticky="w", pady=3)
+                    self._ttk.Label(
+                        pages[(panel_name, "Personality & Traits")],
+                        text="Player traits and derived social profile are supplied by production registries.",
+                    ).grid(row=0, column=0, columnspan=4, sticky="w", pady=3)
+                elif panel_name == "NPC Target":
+                    self._ttk.Label(
+                        pages[(panel_name, "Needs")],
+                        text="NPC needs are being moved to actor-owned scenario fields.",
+                    ).grid(row=0, column=0, columnspan=4, sticky="w", pady=3)
+            else:
+                page = self._ttk.Frame(panel, padding=(6, 2))
                 for column in (1, 3):
                     page.columnconfigure(column, weight=1)
-                self.workbench_notebook.add(page, text=section)
-                pages[section] = page
-                rows_by_page[section] = 0
-            index = rows_by_page[section]
-            rows_by_page[section] = index + 1
+                page.grid(row=0, column=0, sticky="ew")
+                pages[(panel_name, "Overview")] = page
+                rows_by_page[(panel_name, "Overview")] = 0
+
+        for control in self.workbench_controls:
+            panel_name = str(control.get("workbenchPanel") or "World")
+            if panel_name not in panel_names:
+                panel_name = "World"
+            tab_name = str(control.get("workbenchTab") or "Overview")
+            if (panel_name, tab_name) not in pages:
+                tab_name = "Overview"
+            page_key = (panel_name, tab_name)
+            page = pages[page_key]
+            if page is None:
+                continue
+            index = rows_by_page[page_key]
+            rows_by_page[page_key] = index + 1
             row = index // 2
             pair_column = (index % 2) * 2
             field = CatalogControlField(
@@ -918,6 +1047,12 @@ class SemanticHarnessApp:
                 field.widget.configure(textvariable=self.language_var)
                 self.language_box = field.widget
             self.workbench_control_fields[str(control["id"])] = field
+        override_field = self.workbench_control_fields.get("npc.personalityOverride")
+        if override_field is not None and override_field.variable is not None:
+            override_field.variable.trace_add(
+                "write", self._update_generated_personality_controls
+            )
+        self._update_generated_personality_controls()
         if not self.workbench_controls:
             empty = self._ttk.Frame(self.workbench_notebook, padding=8)
             self._ttk.Label(
@@ -926,6 +1061,16 @@ class SemanticHarnessApp:
             ).grid(row=0, column=0, sticky="w")
             self.workbench_notebook.add(empty, text="Context")
         self._set_controls(self.session.ready)
+
+    def _update_generated_personality_controls(self, *_args: Any) -> None:
+        override_field = self.workbench_control_fields.get("npc.personalityOverride")
+        enabled = bool(override_field and override_field.get_value())
+        for control in self.workbench_controls:
+            if not control.get("requiresOverride"):
+                continue
+            field = self.workbench_control_fields.get(str(control.get("id") or ""))
+            if field is not None:
+                field.set_enabled(enabled)
 
     def toggle_simulation_workbench(self) -> None:
         self.workbench_expanded = not self.workbench_expanded
@@ -952,6 +1097,7 @@ class SemanticHarnessApp:
             if field is not None:
                 field.set_value(self._scenario_control_value(control, scenario))
                 field.dirty = False
+        self._update_generated_personality_controls()
 
     def _collect_workbench_scenario(self) -> dict[str, Any]:
         selected_profile = self._selected_npc_profile()
@@ -959,10 +1105,16 @@ class SemanticHarnessApp:
         if selected_profile != profile_id(draft):
             draft = apply_npc_profile(draft, selected_profile)
         values: dict[str, Any] = {}
+        override_field = self.workbench_control_fields.get("npc.personalityOverride")
+        personality_override = bool(
+            override_field and override_field.get_value()
+        )
         for control in self.workbench_controls:
             control_id = str(control.get("id") or "")
             field = self.workbench_control_fields.get(control_id)
             if field is None or field.kind == "read_only":
+                continue
+            if control.get("requiresOverride") and not personality_override:
                 continue
             current = self._scenario_control_value(control, draft)
             if field.initial is None and current is None and not field.dirty:
@@ -1010,6 +1162,8 @@ class SemanticHarnessApp:
 
         def finish(result: dict[str, Any]) -> None:
             self.scenario = updated
+            configured = result.get("configured") or {}
+            self._update_simulation_projection(configured)
             self._sync_workbench_from_scenario(updated)
             if replay:
                 if current_text:
@@ -1021,7 +1175,7 @@ class SemanticHarnessApp:
                 self._append("SYSTEM", f"Applied simulation context and replayed: {value}")
                 self.workbench_status_var.set("Applied and replayed through the Lua worker.")
             else:
-                response = result.get("configured") or {}
+                response = configured
                 self._show_response(response)
                 self._append("SYSTEM", "Applied simulation workbench settings to the Lua worker.")
                 self.workbench_status_var.set("Applied to the Lua worker.")
@@ -1057,8 +1211,21 @@ class SemanticHarnessApp:
         self._set_text(self.trace, str(error))
         self._messagebox.showerror("Harness error", str(error))
 
+    def _update_simulation_projection(self, response: dict[str, Any]) -> None:
+        projection = response.get("simulationProjection") if isinstance(response, dict) else None
+        if isinstance(projection, dict):
+            self.simulation_projection = projection
+            npc_projection = projection.get("npc", {})
+            bond = npc_projection.get("bond") if isinstance(npc_projection, dict) else None
+            if isinstance(bond, dict):
+                self.scenario.setdefault("npc", {}).setdefault("relationship", {})[
+                    "bond"
+                ] = deepcopy(bond)
+            self._update_generated_personality_controls()
+
     def _show_response(self, response: dict[str, Any]) -> None:
         self.last_response = response if isinstance(response, dict) else {}
+        self._update_simulation_projection(self.last_response)
         relationship_field = self.workbench_control_fields.get("relationship.state")
         if relationship_field is not None:
             relationship_control = next(
@@ -1236,6 +1403,7 @@ class SemanticHarnessApp:
             return
         self.input_var.set("")
         self.last_test_utterance = value
+        self.compare_utterance_var.set(value)
 
         def finish(response: dict[str, Any]) -> None:
             self._append("PLAYER", value)
@@ -1352,6 +1520,7 @@ class SemanticHarnessApp:
             self._set_text(self.suggestion_inspector, "")
             self._set_text(self.world_knowledge_inspector, "")
             self._set_text(self.dialogue_diagnostics, "")
+            self._set_text(self.compare_output, "")
             self.dialogue_graph_pane.clear_graph()
             self._set_text(
                 self.hub_diagnostics,
@@ -1359,6 +1528,7 @@ class SemanticHarnessApp:
             )
             self.suggestion_rows = []
             self.suggestion_interactive = False
+            self.compare_utterance_var.set("hello")
             self._render_suggestions(
                 {"type": "turn", "accepted": True},
                 response.get("suggestions") or {},
@@ -1428,13 +1598,14 @@ class SemanticHarnessApp:
     def capture_baseline(self) -> None:
         """Capture the current utterance through the production preview path."""
 
-        value = self.input_var.get().strip()
+        value = self._comparison_utterance()
         if not value or not self.session.ready or self.busy:
             return
 
         def finish(result: dict[str, Any]) -> None:
             self.baseline_record = result
             self._show_response(result.get("preview") or {})
+            self._set_text(self.compare_output, pretty(result))
             self._append("SYSTEM", f"Captured production baseline: {value}")
 
         self._start_operation(lambda worker: worker.capture_baseline(value), finish)
@@ -1443,6 +1614,16 @@ class SemanticHarnessApp:
         """Apply the current workbench draft, then replay the latest utterance."""
 
         self.apply_simulation_settings(replay=True)
+
+    def _comparison_utterance(self) -> str:
+        """Return the explicit Compare utterance or the current test input."""
+
+        return (
+            self.input_var.get().strip()
+            or self.compare_utterance_var.get().strip()
+            or self.last_test_utterance.strip()
+            or "hello"
+        )
 
     def inspect_persona_matrix(self) -> None:
         """Run a small production-backed persona A/B matrix in one worker."""
@@ -1543,14 +1724,15 @@ class SemanticHarnessApp:
                 ]
             )
 
-        value = self.input_var.get().strip() or "hello"
+        value = self._comparison_utterance()
+        self.compare_utterance_var.set(value)
 
         def finish(result: dict[str, Any]) -> None:
-            self._set_text(self.inspector, pretty(result))
-            self._set_text(self.trace, pretty(result))
+            self._set_text(self.compare_output, pretty(result))
+            self.trace_tabs.select(self.compare_frame)
             self._append(
                 "SYSTEM",
-                f"Persona matrix ({dimension}) completed through the real Lua worker: {value}",
+                f"Comparison by {dimension} completed through the real Lua worker: {value}",
             )
 
         self._start_operation(

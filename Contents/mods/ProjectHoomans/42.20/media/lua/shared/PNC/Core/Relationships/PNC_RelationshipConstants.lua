@@ -5,7 +5,8 @@ PNC.RelationshipConstants = PNC.RelationshipConstants or {}
 
 local Constants = PNC.RelationshipConstants
 
-Constants.SOCIAL_SCHEMA_VERSION = 3
+Constants.SOCIAL_SCHEMA_VERSION = 4
+Constants.DURABLE_BOND_SCHEMA_VERSION = 1
 Constants.MEMORY_LIMIT = 20
 Constants.RECENT_EVENT_ID_LIMIT = 64
 -- The interaction diary is presentation history attached to the same
@@ -68,5 +69,20 @@ Constants.RIVAL_RESPECT_EXIT = 15
 Constants.ENEMY_APPROVAL_ENTER = -60
 Constants.ENEMY_RESPECT_MAX_ENTER = 10
 Constants.ENEMY_APPROVAL_EXIT = -45
+Constants.FRIEND_BOND_APPROVAL_ENTER = 80
+Constants.FRIEND_BOND_RESPECT_ENTER = 50
+Constants.FRIEND_BOND_FAMILIARITY_ENTER = 60
+Constants.VALID_BOND_CLASSES = {
+    none = true,
+    friend = true,
+    lover = true,
+    family = true,
+}
+Constants.VALID_FAMILY_BOND_KINDS = {
+    mother = true,
+    father = true,
+    sister = true,
+    brother = true,
+}
 
 return Constants

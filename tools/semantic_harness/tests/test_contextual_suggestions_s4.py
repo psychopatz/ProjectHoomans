@@ -320,7 +320,6 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.assertGreaterEqual(root.winfo_height(), 700)
 
             for widget in (
-                app.language_box,
                 app.npc_profile_box,
                 app.workbench_apply_button,
                 app.replay_button,
@@ -328,6 +327,8 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 app.status_label,
             ):
                 self.assertTrue(widget.winfo_ismapped())
+            self.assertIn("Compare", [app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()])
+            self.assertIn("Diagnostics / Worker", [app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()])
 
             # Root semantic suggestions are intentionally visible before the
             # first typed turn, so this is a populated baseline rather than a
@@ -363,16 +364,15 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.assertGreaterEqual(
                 app.suggestion_frame.winfo_height(), initial_panel_height
             )
-            self.assertGreater(app.send_button.winfo_y(), app.suggestion_frame.winfo_y())
+            self.assertGreater(
+                app.send_button.winfo_rooty(), app.suggestion_frame.winfo_rooty()
+            )
             pane_right = app.transcript.winfo_rootx() + app.transcript.winfo_width()
             for button in (
                 app.reset_button,
                 app.load_button,
                 app.settings_button,
-                app.preview_button,
                 app.save_button,
-                app.snapshot_button,
-                app.restart_button,
             ):
                 self.assertLessEqual(
                     button.winfo_rootx() + button.winfo_width(),
@@ -407,7 +407,6 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             root.update_idletasks()
             self.assertEqual((root.winfo_width(), root.winfo_height()), (1280, 800))
             for widget in (
-                app.language_box,
                 app.npc_profile_box,
                 app.workbench_apply_button,
                 app.replay_button,
@@ -415,6 +414,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 app.status_label,
             ):
                 self.assertTrue(widget.winfo_ismapped())
+            self.assertIn("Compare", [app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()])
 
             app.input_var.set("What's up?")
             app.submit()

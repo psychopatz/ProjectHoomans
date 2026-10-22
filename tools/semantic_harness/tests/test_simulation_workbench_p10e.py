@@ -27,14 +27,16 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             "npc.role",
             "npc.healthState",
             "npc.activeBehavior",
-            "persona.bondKind",
+            "relationship.bond",
             "persona.socialStyle",
             "relationship.approval",
             "relationship.respect",
             "relationship.familiarity",
             "relationship.state",
-            "world.hunger",
-            "world.thirst",
+            "player.needs.hunger",
+            "player.needs.thirst",
+            "npc.needs.hunger",
+            "npc.needs.thirst",
             "persona.personality.compassion",
         ):
             self.assertTrue(rows[control_id].get("workbench"), control_id)
@@ -60,7 +62,7 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             app.main_tabs.select(app.simulation_tab)
             fields = app.workbench_control_fields
             self.assertIsInstance(fields["npc.healthState"].widget, ttk.Combobox)
-            self.assertIsInstance(fields["persona.bondKind"].widget, ttk.Combobox)
+            self.assertEqual(fields["relationship.bond"].kind, "read_only")
             self.assertIsInstance(fields["relationship.approval"].widget, tk.Scale)
             self.assertIsInstance(fields["persona.personality.compassion"].widget, tk.Scale)
             self.assertIsInstance(app.language_box, ttk.Combobox)
@@ -74,7 +76,6 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             self.assertEqual(app.last_test_utterance, "What's up?")
 
             fields["npc.healthState"].set_value("injured")
-            fields["persona.bondKind"].set_value("mother")
             fields["relationship.approval"].variable.set(80)
             app.apply_and_replay()
             wait_until(
@@ -86,9 +87,6 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             self.assertNotEqual(initial_ids, replayed_ids)
             self.assertEqual(replayed_ids[0], "question.health")
             self.assertEqual(app.scenario["npc"]["healthState"], "injured")
-            self.assertEqual(
-                app.scenario["npc"]["startingRelationship"]["kind"], "mother"
-            )
             self.assertEqual(app.scenario["npc"]["relationship"]["approval"], 80)
             self.assertEqual(errors, [])
             self.assertIn("Applied simulation context and replayed", app.transcript.get("1.0", "end"))

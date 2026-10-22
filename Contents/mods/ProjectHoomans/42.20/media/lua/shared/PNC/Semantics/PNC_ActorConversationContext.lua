@@ -197,6 +197,25 @@ local function startingRelationshipSource(context)
 end
 
 local function bondProjection(context)
+    local relationship = type(context.relationship) == "table"
+        and context.relationship or {}
+    local durable = type(relationship.bond) == "table"
+        and relationship.bond or nil
+    if durable and durable.class and durable.class ~= "none" then
+        local durableKind = durable.kind or durable.class
+        local durableDefinition = RelationshipKinds
+            and RelationshipKinds.GetDefinition(durableKind) or nil
+        return {
+            class = durable.class,
+            kind = durable.kind,
+            establishedAt = durable.establishedAt,
+            source = text(durable.source, "relationship_record"),
+            term = durableDefinition and {
+                referenceKey = durableDefinition.termKeys.reference,
+                addressKey = durableDefinition.termKeys.address,
+            } or nil,
+        }
+    end
     local source = startingRelationshipSource(context)
     if type(source) ~= "table" then return nil end
     local kind = source.kind or source.relationshipKind

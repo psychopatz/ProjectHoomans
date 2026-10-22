@@ -59,8 +59,11 @@ class ContextualBondsP8ATests(unittest.TestCase):
             self.assertEqual(classes[kind], bond_class)
             context, _ = self._context(self._scenario(kind))
             self.assertEqual(context["bond"]["class"], bond_class)
-            self.assertEqual(context["bond"]["kind"], kind)
-            self.assertEqual(context["bond"]["source"], "starting_companion_trait")
+            if bond_class == "family":
+                self.assertEqual(context["bond"]["kind"], kind)
+            else:
+                self.assertIsNone(context["bond"].get("kind"))
+            self.assertEqual(context["bond"]["source"], "starting_companion")
 
     def test_bond_is_independent_of_directed_relationship_standing(self) -> None:
         friendly, _ = self._context(self._scenario("mother"))
@@ -206,16 +209,20 @@ class ContextualBondsP8ATests(unittest.TestCase):
         self.assertTrue(catalog["relationshipKindRegistration"]["registered"])
         self.assertEqual(row["class"], "family")
         self.assertEqual(row["terms"]["address"], "Lola")
-        self.assertEqual(bond["class"], "family")
-        self.assertEqual(bond["kind"], "grandmother")
-        # The projected bond is transient; no derived class or context is
-        # written into the scenario/NPC persistence surface.
+        # Explicit registration permits a diagnostic fixture to inspect a
+        # future registry definition, but current runtime production only
+        # seeds the truthful family kinds. The relationship then follows the
+        # normal durable friendship milestone.
+        self.assertEqual(bond["class"], "friend")
+        self.assertIsNone(bond.get("kind"))
         persisted_npc = snapshot["scenario"]["npc"]
         self.assertEqual(
             persisted_npc["startingRelationship"],
             {"kind": "grandmother", "source": "starting_companion_trait"},
         )
-        self.assertNotIn("bond", persisted_npc)
+        self.assertEqual(
+            persisted_npc["relationship"]["bond"]["class"], "friend"
+        )
         self.assertNotIn("class", persisted_npc["startingRelationship"])
 
 

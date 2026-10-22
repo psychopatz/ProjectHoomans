@@ -6,18 +6,68 @@ local InventoryFixtures = require "worker/InventoryFixtures"
 
 local ScenarioSession = {}
 
+local function simulationProjection(context)
+    local Values = context.Values
+    local scenario = context.Runtime.scenario or {}
+    local player = scenario.player or {}
+    local npc = scenario.npc or {}
+    local world = scenario.world or {}
+    local playerNeeds = type(player.needs) == "table"
+        and player.needs or world
+    local npcNeeds = type(npc.needs) == "table" and npc.needs or world
+    return {
+        schema = "semantic.simulation.actor.projection.v1",
+        player = {
+            needs = Values.copy(playerNeeds),
+            traits = Values.copy(player.traits or player.socialTraits or {}),
+            socialProfile = Values.copy(context.playerSocialProfile),
+            traitConflicts = Values.copy(context.playerTraitConflicts),
+            traitFingerprint = context.playerTraitFingerprint,
+        },
+        npc = {
+            needs = Values.copy(npcNeeds),
+            traits = Values.copy(npc.traits or {}),
+            bond = Values.copy(npc.relationship and npc.relationship.bond),
+            personality = Values.copy(context.npcPersonality),
+            personalityMode = context.npcPersonalityMode or "generated",
+            identitySeed = npc.identitySeed
+                or npc.identity and npc.identity.seed or npc.npcID,
+            archetype = npc.archetype or npc.archetypeID or "General",
+        },
+    }
+end
+
 ScenarioSession.initialScenario = {
     player = {
         characterUUID = "char_patrick",
         forename = "Patrick",
         surname = "Patz",
         displayName = "Patrick Patz",
+        needs = {
+            hunger = 0.2,
+            thirst = 0.4,
+            fatigue = 0.1,
+            stress = 0.0,
+            boredom = 0.0,
+            panic = 0.0,
+        },
+        traits = {},
     },
     npc = {
         npcID = "npc_mara",
         forename = "Mara",
         surname = "Vale",
         identityState = "unknown",
+        identitySeed = "npc_mara",
+        archetype = "General",
+        needs = {
+            hunger = 0.2,
+            thirst = 0.4,
+            fatigue = 0.1,
+            stress = 0.0,
+            boredom = 0.0,
+            panic = 0.0,
+        },
         traits = { "reserved" },
         relationship = { approval = 0, respect = 0, familiarity = 0, revision = 1 },
     },
@@ -145,6 +195,7 @@ function ScenarioSession.reset(context, scenario)
         ),
         translation = context.OutputProjection.translationSnapshot(context),
         dynamicTradingLoad = Values.copy(Runtime.dynamicTradingLoad),
+        simulationProjection = simulationProjection(context),
     }
 end
 
@@ -199,6 +250,7 @@ function ScenarioSession.snapshot(context)
             Runtime.view and Runtime.view.session
                 and Runtime.view.session.choicePresentationState
         ),
+        simulationProjection = simulationProjection(context),
     }
 end
 
