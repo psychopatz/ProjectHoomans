@@ -4,9 +4,9 @@
 
 **Parent status:** IN PROGRESS — corrective P8 sequence
 
-**Completed corrective phase:** P8D — Semantic Lab tuning workflow
+**Completed corrective phase:** P8E — corrective final validation
 
-**Next mandatory phase:** P8E — corrective final validation
+**Next mandatory phase:** developer-side handoff; native SP/MP remains user-owned
 
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned
 
@@ -130,7 +130,9 @@ Extend the existing Semantic Lab only: arbitrary current utterance, apply-and-re
 
 ## P8D Semantic Lab tuning workflow
 
-Revision `56596ecb` (`feat: extend semantic lab persona tuning workflow`).
+Revisions `56596ecb` (`feat: extend semantic lab persona tuning workflow`),
+`da2f38ed` (`fix: keep semantic lab tuning controls within layout`), and
+`dfe4e3de` (`fix: scope social providers to active dialogue topics`).
 
 Implementation evidence:
 
@@ -153,6 +155,50 @@ Ran 7 tests — OK
 
 The P8D tests cover real Lua-worker baseline/replay/matrix traces, candidate ordering, canonical semantic identity, coverage inspection, and the existing Tk surface including bond sweep execution.
 
-## Next Chunk — P8E corrective final validation
+## P8E corrective final validation
 
-Run the complete corrective acceptance matrix and fix remaining gaps: bond mapping and synthetic family extension, no duplicate bond persistence, production relationship derivation/hysteresis, non-greeting realization matrices, friend/family/lover EN/TL term substitution, generic provider discovery, Dynamic Trading ownership, privacy, stale/replay safety, gameplay authority, explicit Tk/Xvfb proof, Kahlua/luac, doctor, translation validation, diff checks, bounded performance, and ModData/persistence measurements. Only after P8E passes may the goal report `READY FOR USER LIVE TEST`.
+P8E passed on `main`. The corrective acceptance matrix now covers bond mapping and synthetic family extension, no duplicate bond persistence, production relationship derivation/hysteresis, non-greeting realization matrices, friend/family/lover EN/TL term substitution, generic provider discovery, Dynamic Trading ownership, privacy, stale/replay safety, gameplay action authority, and the existing Semantic Lab.
+
+Final evidence:
+
+```text
+python3 -m unittest -q \
+ tools.semantic_harness.tests.test_contextual_bonds_p8a \
+ tools.semantic_harness.tests.test_contextual_actor_context_p2 \
+ tools.semantic_harness.tests.test_contextual_speech_style_p3 \
+ tools.semantic_harness.tests.test_contextual_speech_behavior_p8b \
+ tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p6 \
+ tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p8d \
+ tools.semantic_harness.tests.test_contextual_acceptance_c6b \
+ tools.semantic_harness.tests.test_contextual_choice_registry_p1 \
+ tools.semantic_harness.tests.test_contextual_dynamic_trading_p5 \
+ tools.semantic_harness.tests.test_contextual_choice_provider_p8c \
+ tools.semantic_harness.tests.test_contextual_suggestions_followup \
+ tools.semantic_harness.tests.test_semantic_translation_integration
+Ran 42 tests — OK
+
+python3 -m unittest -q [impacted contextual conversation/suggestion C0–C4 and S1–S3/whats-up/follow-up modules]
+Ran 52 tests — OK
+
+xvfb-run -a python3 -m unittest -q \
+ tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p8d \
+ tools.semantic_harness.tests.test_contextual_suggestions_s4 \
+ tools.semantic_harness.tests.test_app
+Ran 17 tests — OK
+```
+
+Toolchain and runtime gates passed:
+
+- `python3 -m tools.semantic_harness.app --no-gui --doctor --doctor-json`: required checks PASS; Lua 5.3.6, worker syntax and READY/PING/CAPABILITIES PASS. The repository-local venv was not active and is a non-required warning.
+- `pz_verify --dir Contents/mods/ProjectHoomans/42.20/media/lua --kahlua --severity ERROR --no-snippets`: 2,968 files scanned, 0 compatibility errors/warnings.
+- `luac5.3 -p`: all 17 changed tracked Lua files parsed successfully.
+- Translation catalog JSON validation and embedded translation smoke tests: 3/3 PASS; EN/TL public translation integration PASS.
+- Bounded real-worker performance: 2 samples plus warmup per case, 6 serialized turns; bounded recent-event/dialogue caps and strictly increasing semantic sequences remained intact. This is non-native worker evidence, not SP/MP evidence.
+- Persistence measurement: friend/mother/lover snapshots retain only detailed `startingRelationship`; derived `bond`, `speechStyleContext`, and `semanticSuggestions` are absent from NPC persistence and worker ModData projection.
+- `git diff --check` passed. ProjectHoomans remains on `main`, 8 commits ahead of `origin/main`; psychopatzCore and DynamicTrading remain clean on their existing `main` branches at `443b3a8` and `5db64cb`.
+
+## Developer-side handoff
+
+**READY FOR USER LIVE TEST**
+
+Native Project Zomboid SP/MP acceptance remains **UNTESTED / user-owned**. Do not publish or upload Workshop content as part of this handoff.
