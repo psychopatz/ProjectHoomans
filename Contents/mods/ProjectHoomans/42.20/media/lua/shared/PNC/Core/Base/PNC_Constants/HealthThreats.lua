@@ -62,6 +62,10 @@ Const.COMBAT_STANCE_HOLD_MS = 6000
 Const.DEFAULT_HP_MAX = 100
 Const.DEFAULT_ENGINE_BUFFER = 1000
 Const.RECENT_DAMAGE_SHOW_MS = 4000
+-- Vital torso/head damage is terminal. Limb damage below this ratio changes
+-- locomotion without creating a second health or movement state machine.
+Const.LIMP_HEALTH_RATIO = 0.40
+Const.LIMP_WALK_SPEED = 0.44
 Const.PLAYER_HIT_DAMAGE_SCALE = 10
 Const.PLAYER_HIT_DAMAGE_MAX = 50
 Const.PLAYER_HIT_MELEE_RANGE = 3.0

@@ -56,6 +56,9 @@ local function resolveExhaustedProfile(requestedMode, staminaMode, now, runtime)
     if requestedMode == "sneak" then
         return "recovery_sneak"
     end
+    if requestedMode == "limp" then
+        return "recovery_limp"
+    end
     if requestedMode == "run" then
         runtime.sprintSlowUntil = math.max(tonumber(runtime.sprintSlowUntil) or 0, now + Const.STAMINA_SPRINT_BREATHER_MS)
         -- Exhaustion may slow a run, but it must not invent stealth posture.
@@ -84,6 +87,9 @@ local function getDrainPerSecond(profileKey)
     end
     if profileKey == "recovery_sneak" then
         return Const.STAMINA_MOVE_DRAIN_RECOVERY_SNEAK
+    end
+    if profileKey == "limp" or profileKey == "recovery_limp" then
+        return Const.STAMINA_MOVE_DRAIN_RECOVERY_WALK
     end
     return Const.STAMINA_MOVE_DRAIN_WALK
 end

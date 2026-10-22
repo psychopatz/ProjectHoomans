@@ -12,8 +12,19 @@ local AnimationTrace = PNC.AnimationTrace
 function Internal.resolveProfile(record, profileOverride, animState)
     local lane = record and record.runtime and record.runtime.pathing or nil
     local profile = profileOverride or lane and lane.motionProfile or nil
+    local mobility
     if profile then
         return profile
+    end
+    if PNC.NPCWounds
+        and type(PNC.NPCWounds.GetMobilityState) == "function"
+    then
+        mobility = PNC.NPCWounds.GetMobilityState(record)
+        if mobility and mobility.profileKey == "limp"
+            and animState ~= "Crawl"
+        then
+            return LocomotionProfiles.GetBaseProfile("limp")
+        end
     end
     if LocomotionProfiles and LocomotionProfiles.GetBaseProfile then
         if animState == "Run" then

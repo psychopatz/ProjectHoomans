@@ -32,11 +32,20 @@ end
 function Internal.computeResolvedMode(record, lane, zombie, goal)
     local dist
     local previousMode
+    local mobility
     if not lane or not goal then
         return "walk"
     end
     if lane.mode == "crawl" then
         return "crawl"
+    end
+    if PNC.NPCWounds
+        and type(PNC.NPCWounds.GetMobilityState) == "function"
+    then
+        mobility = PNC.NPCWounds.GetMobilityState(record)
+        if mobility and mobility.mode == "limp" then
+            return "limp"
+        end
     end
     if record and record.runtime and record.runtime.target ~= nil then
         if lane.mode == "run" then

@@ -9,6 +9,7 @@ PNC.LocomotionProfiles = PNC.LocomotionProfiles or {}
 
 local LocomotionProfiles = PNC.LocomotionProfiles
 local Stamina = PNC.Stamina
+local Const = PNC.Const or {}
 
 local WALK_SPEED = 0.68
 local WALK_ANIM_SPEED = 0.96
@@ -50,6 +51,15 @@ local BASE_PROFILES = {
         isCrawling = true,
         profileKey = "crawl",
     },
+    limp = {
+        speed = tonumber(Const.LIMP_WALK_SPEED) or 0.44,
+        moveAnim = "Walk",
+        walkType = "Limp",
+        engineWalkType = "Limp",
+        isRunning = false,
+        isCrawling = false,
+        profileKey = "limp",
+    },
     recovery_walk = {
         speed = 0.52,
         moveAnim = "Walk",
@@ -67,6 +77,15 @@ local BASE_PROFILES = {
         isRunning = false,
         isCrawling = false,
         profileKey = "recovery_sneak",
+    },
+    recovery_limp = {
+        speed = (tonumber(Const.LIMP_WALK_SPEED) or 0.44) * 0.90,
+        moveAnim = "Walk",
+        walkType = "Limp",
+        engineWalkType = "Limp",
+        isRunning = false,
+        isCrawling = false,
+        profileKey = "recovery_limp",
     },
 }
 

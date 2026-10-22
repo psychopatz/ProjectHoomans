@@ -105,6 +105,7 @@ function Internal.HoldAndFaceOwner(record, zombie, owner, mode, reason, now)
     local holdRefreshDue
     local facingDue
     local facingApplied
+    local haltAccepted
     now = tonumber(now)
         or PNC.Core and PNC.Core.Now and PNC.Core.Now()
         or 0
@@ -115,6 +116,7 @@ function Internal.HoldAndFaceOwner(record, zombie, owner, mode, reason, now)
     if changed then
         Internal.ResetFollowMoveIssue(record)
         state.holdCombatCleared = false
+        state.holdMovementRepaired = false
         state.holdNextRefreshAt = 0
         state.holdFacingNextAt = 0
     end
@@ -141,6 +143,9 @@ function Internal.HoldAndFaceOwner(record, zombie, owner, mode, reason, now)
         or movementNeedsRepair
         or now >= (tonumber(state.holdNextRefreshAt) or 0)
 
+    if not movementNeedsRepair then
+        state.holdMovementRepaired = false
+    end
     -- Keep the hot path to a few field reads while the follower remains in a
     -- stable formation hold. Owner movement and combat are decided by the
     -- enclosing follow tick before this function, while the route checks
@@ -149,6 +154,10 @@ function Internal.HoldAndFaceOwner(record, zombie, owner, mode, reason, now)
         return true
     end
 
+    -- The first hold tick owns cancellation of the previous route. Until the
+    -- path lane consumes that hold and clears its active/requested phase,
+    -- repeating the same native cancellation only rewrites the intent and can
+    -- re-enter expensive engine cleanup during a group stop transition.
     if combatNeedsClear then
         Common.ClearCombatTarget(record, reason)
         state.holdCombatCleared = true
@@ -156,7 +165,12 @@ function Internal.HoldAndFaceOwner(record, zombie, owner, mode, reason, now)
     if not zombie then return true end
 
     if changed or movementNeedsRepair then
-        Common.HaltMovement(record, zombie, "follow_hold")
+        if state.holdMovementRepaired ~= true then
+            haltAccepted = Common.HaltMovement(record, zombie, "follow_hold")
+            if haltAccepted ~= false then
+                state.holdMovementRepaired = true
+            end
+        end
         if changed and Animation and Animation.Apply then
             Animation.Apply(zombie, record, "Idle")
         end

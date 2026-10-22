@@ -34,6 +34,17 @@ Wounds.PartOrder = {
     "LowerLeg_L", "LowerLeg_R", "Foot_L", "Foot_R",
 }
 
+-- These parts are the health system's only instant-death boundary. All other
+-- body-part depletion remains compatible with the incapacitated flow.
+Wounds.VitalPartOrder = {
+    "Head", "Torso_Upper", "Torso_Lower",
+}
+
+Wounds.LocomotionPartOrder = {
+    left = { "UpperLeg_L", "LowerLeg_L", "Foot_L" },
+    right = { "UpperLeg_R", "LowerLeg_R", "Foot_R" },
+}
+
 Internal.WoundStats = {
     scratch = { priority = 1, damage = 4, bleedingRate = 0.018 },
     laceration = { priority = 2, damage = 8, bleedingRate = 0.055 },

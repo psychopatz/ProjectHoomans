@@ -3,10 +3,15 @@
 ## V1
 - `PNC_Health` owns authoritative HP, incapacitation, wound-healing recovery, and engine-health buffering
 - live NPCs keep engine health as a disposable buffer while custom HP remains the source of truth
-- reaching `0` HP enters `incapacitated` instead of immediate death
+- reaching `0` aggregate HP enters `incapacitated`; zero Head, Upper Torso,
+  or Lower Torso health is a vital-part death and bypasses incapacitation
 - incapacitated NPCs keep a live body and show a pulsing overhead bar; there is no separate instant-revive state
 - bandaged wounds restore HP gradually and the NPC returns to normal locomotion when authoritative HP reaches `INCAPACITATED_RECOVERY_HP` (5 by default)
 - incapacitated bodies continuously enforce crawler, on-floor, and fall-on-front state on both the authority and remote clients; generic locomotion cannot overwrite the downed pose
+- when a leg, shin, thigh, or foot reaches 40% health or less, the same
+  authoritative body-part state selects the shared Limp locomotion profile;
+  recovery releases Limp automatically when all leg parts rise above the
+  threshold
 
 ## Body-Part Treatment
 

@@ -171,6 +171,32 @@ local function handleDepletedHealth(record, zombie, damageEvent)
     )
 end
 
+local function handleVitalPartFailure(record, zombie, health, damageEvent)
+    local failure
+    local partId = damageEvent and damageEvent.partId or nil
+    -- Older damage reports may omit a body part and represent aggregate
+    -- damage. They cannot establish a vital-hit cause, so they retain the
+    -- incapacitation contract instead of turning every legacy hit lethal.
+    if partId == nil or tostring(partId) == "" then
+        return false
+    end
+    if not PNC.NPCWounds
+        or type(PNC.NPCWounds.GetVitalPartFailure) ~= "function"
+    then
+        return false
+    end
+    failure = PNC.NPCWounds.GetVitalPartFailure(record, partId)
+    if not failure then return false end
+    Health.Kill(
+        record,
+        zombie,
+        "vital_part_" .. tostring(failure.id),
+        damageEvent
+    )
+    return record.alive == false
+        or health.state == "dead"
+end
+
 function Health.ApplyDamage(record, zombie, damageEvent)
     local health
     local amount =
@@ -217,6 +243,9 @@ function Health.ApplyDamage(record, zombie, damageEvent)
         )
     end
     applyHealthDamage(record, health, amount, damageEvent)
+    if handleVitalPartFailure(record, zombie, health, damageEvent) then
+        return true, "killed"
+    end
     if health.current <= 0 then
         transitioned = handleDepletedHealth(record, zombie, damageEvent)
         if transitioned then

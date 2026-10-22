@@ -91,4 +91,24 @@ Internal.HoldAndFaceOwner(
 )
 T.equal(haltCalls, 2, "unexpected route did not repair hold ownership")
 
+now = 2300
+Internal.HoldAndFaceOwner(
+    record, body, owner, "idle_near_owner", "test_hold", now
+)
+T.equal(haltCalls, 2,
+    "pending route cancellation was submitted repeatedly")
+
+record.runtime.pathing = nil
+now = 2400
+Internal.HoldAndFaceOwner(
+    record, body, owner, "idle_near_owner", "test_hold", now
+)
+record.runtime.pathing = { phase = "active" }
+now = 2500
+Internal.HoldAndFaceOwner(
+    record, body, owner, "idle_near_owner", "test_hold", now
+)
+T.equal(haltCalls, 3,
+    "new route did not re-arm hold cancellation")
+
 T.finish("pnc_follow_hold_budget_smoke")

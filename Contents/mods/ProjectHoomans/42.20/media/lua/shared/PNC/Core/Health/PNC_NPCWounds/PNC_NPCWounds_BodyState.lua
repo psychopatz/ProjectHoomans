@@ -126,6 +126,121 @@ function Wounds.SetOverallHealth(record, value)
     return Wounds.SyncOverallHealth(record)
 end
 
+function Wounds.GetVitalPartFailure(record, requestedPartId)
+    local body = Wounds.Ensure(record)
+    local partId
+    local partHealth
+    local i
+    if not body then return nil end
+    if requestedPartId ~= nil then
+        partId = tostring(requestedPartId)
+        if not Wounds.Parts[partId]
+            or (partId ~= "Head"
+                and partId ~= "Torso_Upper"
+                and partId ~= "Torso_Lower")
+        then
+            return nil
+        end
+        partHealth = body.parts[partId]
+        if partHealth
+            and (tonumber(partHealth.current) or 0) <= 0
+        then
+            return {
+                id = partId,
+                current = 0,
+                max = tonumber(partHealth.max) or 100,
+            }
+        end
+        return nil
+    end
+    for i = 1, #Wounds.VitalPartOrder do
+        partId = Wounds.VitalPartOrder[i]
+        partHealth = body.parts[partId]
+        if partHealth
+            and (tonumber(partHealth.current) or 0) <= 0
+        then
+            return {
+                id = partId,
+                current = 0,
+                max = tonumber(partHealth.max) or 100,
+            }
+        end
+    end
+    return nil
+end
+
+local function resolveLegFailure(body, side, threshold)
+    local parts = Wounds.LocomotionPartOrder[side]
+    local partId
+    local partHealth
+    local ratio
+    local lowestRatio = 1
+    local lowestPart
+    local i
+    if not parts then return nil end
+    for i = 1, #parts do
+        partId = parts[i]
+        partHealth = body.parts[partId]
+        ratio = partHealth
+            and (tonumber(partHealth.current) or 0)
+                / math.max(1, tonumber(partHealth.max) or 100)
+            or 1
+        if ratio < lowestRatio then
+            lowestRatio = ratio
+            lowestPart = partId
+        end
+    end
+    if lowestRatio <= threshold then
+        return {
+            side = side,
+            partId = lowestPart,
+            ratio = Core.Clamp(lowestRatio, 0, 1),
+        }
+    end
+    return nil
+end
+
+function Wounds.GetMobilityState(record)
+    local health = record and record.health or nil
+    local body
+    local threshold = tonumber(
+        PNC.Const and PNC.Const.LIMP_HEALTH_RATIO
+    ) or 0.40
+    local left
+    local right
+    if not record or record.alive == false
+        or not health or health.state ~= "normal"
+    then
+        return nil
+    end
+    body = Wounds.Ensure(record)
+    left = resolveLegFailure(body, "left", threshold)
+    right = resolveLegFailure(body, "right", threshold)
+    if not left and not right then
+        return nil
+    end
+    if left and right then
+        return {
+            mode = "limp",
+            profileKey = "limp",
+            side = "bilateral",
+            ratio = math.min(left.ratio, right.ratio),
+            leftPartId = left.partId,
+            rightPartId = right.partId,
+            threshold = threshold,
+        }
+    end
+    left = left or right
+    return {
+        mode = "limp",
+        profileKey = "limp",
+        side = left.side,
+        ratio = left.ratio,
+        partId = left.partId,
+        threshold = threshold,
+    }
+end
+
 local function changeBodyHealth(record, amount, partId, healing)
     local body = Wounds.Ensure(record)
     local count = #Wounds.PartOrder
