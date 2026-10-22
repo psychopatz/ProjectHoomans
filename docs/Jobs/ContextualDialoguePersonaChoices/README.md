@@ -1,38 +1,91 @@
 # Contextual Dialogue Persona & Choices
 
-**Status:** PLANNED / IMPLEMENTATION NOT STARTED  
-**Audit baseline:** ProjectHoomans remote `main` at `765bc4076ab82ec2c1eca6ca52cef1c6bf177597` (2026-10-22).  
-**Related Dynamic Trading audit baseline:** `psychopatz/DynamicTrading` at `5b97302e39c482682f4fed0c083ad6764b9eee41`.  
-**Native Project Zomboid SP/MP:** not tested by this documentation task; user-owned acceptance.
+**Status:** REOPENED — behavioral completion required.  
+**Current source-audit baseline:** ProjectHoomans remote main at 849f1951ed1d3fd4b6f78aedc2525b25368a157e (2026-10-22).  
+**Dynamic Trading provider baseline:** psychopatz/DynamicTrading at 5db64cbcc764f035146f044fdc34e930ce47d7c8.  
+**Native Project Zomboid SP/MP:** untested; user-owned acceptance.
 
 ## Goal
 
-Make deterministic NPC dialogue sound contextually different according to the authoritative actor state already owned by Project Hoomans—identity/gender for grammatical and compatibility uses, NPC traits, persistent social personality, directed relationship scores/state, roles/capabilities, and current situation—without allowing style to invent facts or replace gameplay authority.
+Make deterministic NPC dialogue and contextual reply choices visibly reflect the authoritative actor state already owned by Project Hoomans—identity/gender where grammatically relevant, registered traits, persistent social personality, directed approval/respect/familiarity/state, companion bond, roles/capabilities, and current situation—without letting style invent semantic facts or bypass gameplay authority.
 
-At the same time, turn the existing semantic reply/suggestion system into a modular, scalable, localization-safe ecosystem. Static conversation choices, active-flow offers, response-plan offers, authored conversation choices, companion capabilities, trader interactions, gossip, quests, and future domains should normalize into one typed candidate contract and re-enter the existing semantic click/dialogue pipeline.
+The existing P0-P7 implementation is retained as foundation, but the 2026-10-22 corrective audit found the player-facing behavior incomplete:
 
-The existing Semantic Lab must become the production-parity authoring/debug surface for this work: editable actor/persona controls, relationship simulation, language switching, candidate/constraint/rank/realization inspection, and bounded A/B or matrix testing through the real Core+Hoomans Lua worker.
+- speech style is calculated broadly but authored realization variants are effectively greeting-only;
+- several exposed Persona Lab controls have little or no visible speech effect;
+- relationship sliders do not yet derive state through the production hysteresis resolver;
+- the choice registry is a real normalization seam but the central suggestion builder still manually orchestrates most provider discovery;
+- persona-aware ranking is narrow;
+- the Semantic Lab persona matrix is fixed around a few hello scenarios rather than being a flexible tuning surface.
+
+The current goal is therefore **behavioral completion**, not another architecture rewrite.
+
+## Companion bond requirement
+
+Project Hoomans already persists detailed starting-companion relationship kinds such as:
+
+- friend
+- lover
+- mother
+- father
+- sister
+- brother
+
+Dialogue must preserve the detailed kind while deriving only three coarse speech classes:
+
+~~~text
+friend
+family
+lover
+~~~
+
+Current mapping:
+
+~~~text
+friend                     -> friend
+lover / partner / spouse   -> lover
+mother / father
+sister / brother
+future cousin / aunt /
+uncle / grandmother /
+grandfather / etc.         -> family
+~~~
+
+The detailed kind is not replaced. It supplies localized relationship terms such as Mom, Dad, sister, cousin, or future terms. Family speech uses generic family realization templates plus localized term substitution so a new kinship type is data/translation registration rather than a new dialogue engine branch.
+
+Bond is independent of current directed standing. For example:
+
+~~~text
+bondClass = family
+bondKind  = mother
+relationship.state = enemy
+~~~
+
+is valid: the NPC is still the player's mother, but currently hostile/estranged. Bond selects intimacy/kinship vocabulary; directed standing/personality/situation selects warmth, hostility, openness, deference, and other tone.
 
 ## Preserve
 
-This job **builds on** and must not duplicate or replace:
+This job builds on and must not duplicate:
 
-- `docs/Jobs/ContextualSemanticSuggestions/`: typed semantic suggestions, privacy predicates, stale/replay-safe click frames, EN/TL, Core `choicesPart`, real worker integration.
-- `docs/Jobs/ContextualDialogueQuestFramework/`: production dialogue flows, ConversationRules conditions, CodeBuilder/InteractionSpec, Semantic Lab Studio/Simulation and worker.
-- `docs/Jobs/SemanticDialogueDecoupling/`: parser/policy separation and translation/semantic contracts.
-- `docs/Jobs/CoreNPCFoundationMigration/`: shared actor/NPC foundation boundaries.
-- `docs/Systems/SocialProfiles.md`, `Relationships.md`, `NPCTraits.md`, and Identity ownership.
-- Dynamic Trading's existing portable conversation/NPC-foundation adapter direction.
+- docs/Jobs/ContextualSemanticSuggestions/
+- docs/Jobs/ContextualDialogueQuestFramework/
+- docs/Jobs/SemanticDialogueDecoupling/
+- docs/Jobs/CoreNPCFoundationMigration/
+- docs/Systems/SocialProfiles.md
+- docs/Systems/Relationships.md
+- existing Starting Companion relationship-kind persistence
+- Dynamic Trading's existing provider/conversation ownership
 
 ## Read order
 
-1. repository root `AGENTS.md`
-2. this `README.md`
-3. `AGENT_RUNBOOK.md`
-4. `AUDIT.md`
-5. `ARCHITECTURE.md`
-6. `ROADMAP.md`
-7. `HARNESS_ACCEPTANCE.md`
-8. `PROGRESS.md` **last** for current truth and the exact Next Chunk
+1. repository root AGENTS.md
+2. this README.md
+3. AGENT_RUNBOOK.md
+4. AUDIT.md
+5. ARCHITECTURE.md
+6. BEHAVIORAL_COMPLETION.md
+7. ROADMAP.md
+8. HARNESS_ACCEPTANCE.md
+9. PROGRESS.md **last** for current truth and the exact Next Chunk
 
-No checked-in `GOAL_PROMPT.md` is allowed by repository policy. ChatGPT supplies the executable `/goal` in chat only.
+No checked-in GOAL_PROMPT.md is allowed. The executable /goal remains chat-only.
