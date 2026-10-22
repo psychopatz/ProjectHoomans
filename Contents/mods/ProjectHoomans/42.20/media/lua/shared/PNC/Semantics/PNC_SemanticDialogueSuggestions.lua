@@ -1651,8 +1651,22 @@ function Suggestions.Build(result, context, messages)
     -- still pass through their existing authoritative adapters above while
     -- canonical Dynamic Trading and contextual social candidates are
     -- discovered without provider-specific calls here.
+    local providerTopic = topicFromIR(ir, nil)
+        or canonicalTopic(context.currentTopic)
+    local providerContext = context
+    if providerTopic ~= nil
+        and tostring(context.currentTopic or "") ~= tostring(providerTopic)
+    then
+        -- Providers receive the current typed topic without mutating the
+        -- read-only projection shared by the remaining suggestion sources.
+        providerContext = {}
+        for key, value in pairs(context) do
+            providerContext[key] = value
+        end
+        providerContext.currentTopic = providerTopic
+    end
     local providerCandidates = ChoiceRegistry.Collect(
-        context, Suggestions.MAX_CANDIDATES
+        providerContext, Suggestions.MAX_CANDIDATES
     )
     for _, candidate in ipairs(providerCandidates or {}) do
         addProviderCandidate(candidates, seen, candidate, revision)

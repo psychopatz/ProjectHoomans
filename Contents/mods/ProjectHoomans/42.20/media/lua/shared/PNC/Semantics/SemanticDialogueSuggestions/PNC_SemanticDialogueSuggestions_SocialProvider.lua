@@ -18,6 +18,14 @@ function Provider.collect(context)
     local actor = context.actorConversationContext or {}
     local roles = actor.roles or {}
     local authority = context.actorAuthority or {}
+    local topic = tostring(context.currentTopic or "")
+    if topic ~= ""
+        and topic ~= "greeting"
+        and topic ~= "wellbeing"
+        and topic ~= "whats_up"
+    then
+        return {}
+    end
     if roles.companion ~= true or authority.owned ~= true then return {} end
     return {
         {
