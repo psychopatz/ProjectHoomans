@@ -1,9 +1,17 @@
 # P10 — Semantic Simulation UX & Contextual Conversation Hub
 
-**Status:** ACTIVE / mandatory corrective product phase  
+**Status:** COMPLETED INFRASTRUCTURE / SUPERSEDED PRODUCT ACCEPTANCE — P11 is active  
 **Opened:** 2026-10-23  
 **Audit baseline:** ProjectHoomans remote `main` at `86cbfb38bb7aa7d87608d9dd2963255c91244f87`.  
 **Native Project Zomboid SP/MP:** user-owned and not required for developer-side P10 acceptance.
+
+## P11 supersession note
+
+P10's contextual hub, typed-control catalog, structured inventory, inline workbench, and diagnostics remain accepted infrastructure.
+
+The P10 READY FOR USER LIVE TEST handoff is superseded by the 2026-10-23 post-P10 audit. P11 now owns actor symmetry, generated personality, dynamic friend/lover progression, relationship UX, Compare cleanup, and unified runtime graph coverage.
+
+See `RUNTIME_PARITY_ACTORS_RELATIONSHIPS_AND_UX.md`.
 
 ## Why P10 exists
 
