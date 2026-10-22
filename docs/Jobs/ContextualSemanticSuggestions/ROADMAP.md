@@ -1,5 +1,5 @@
 # Roadmap — one complete implementation objective
-Status: DEVELOPER-SIDE S0–S6 COMPLETE for the dataset-backed contextual suggestions slice; native Project Zomboid SP/MP live acceptance remains UNTESTED and user-owned. Phase milestones remain evidence checkpoints, not release authorization.
+Status: DEVELOPER-SIDE S0–S6 COMPLETE, including the semantic-first production root presentation migration; native Project Zomboid SP/MP live acceptance remains UNTESTED and user-owned. Phase milestones remain evidence checkpoints, not release authorization.
 ## S0 — source ownership & actual UI/worker baseline
 Audit current Hoomans/Core APIs, dialogue input widget/reply presentation, FlowKernel, candidate parser, action dispatcher, Core actor/relationships, EN/TL catalogs, and Semantic Lab scenario projection/inspector. Capture one real-worker before-state for typed and reply turns and document integration points. Avoid duplicating available systems.
 Gate: source paths, current actual message/button UI semantics, authority route and real Lua worker reproduced; remaining deltas explicit.
@@ -23,3 +23,9 @@ Full focused + impacted Lua/Python suites, doctor/Kahlua, real-worker EN/TL and 
 Gate: all developer-verifiable gates green with artifacts. Final status READY FOR USER LIVE TEST only; native PZ SP/MP and actual installation are user-owned acceptance and must be marked UNTESTED when not run. Never require Workshop publication.
 ## Operating rule
 Agent must continue S0→S6 autonomously as each gate passes, committing coherent working slices on existing main after safe synchronization; do not stop simply because one phase completed. No speculative feature scope or unauthorized publication.
+
+## Completed migration slice
+
+The final presentation slice makes the existing dynamic production root the default semantic button source. It covers authored topic categories, identity/system choices, owned-companion choices, topic grouping, EN/TL labels, native Core choice-part compatibility, worker root inspection, and real root-to-dialogue transitions. The worker/UI readiness handoff and layout regressions are covered by the existing S4 tests.
+
+Developer-side evidence is recorded in `PROGRESS.md`: full headless Python discovery 320 passed with 5 expected GUI skips, Xvfb GUI acceptance 4/4 passed, relevant Lua regressions 22/22 passed, doctor required checks passed, changed PZ Lua Kahlua lint found no issues, and bounded performance/sequence checks passed. Hoomans `a390bdb0` and Core `ba60095` are local commits on `main`; neither repository was pushed. The only remaining gate is user-run native PZ SP/MP acceptance.
