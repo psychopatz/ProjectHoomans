@@ -48,3 +48,11 @@ The worker mirrors the same production projection in HELLO/CAPABILITIES, SNAPSHO
 ## Inventory identity contract for semantic GIVE
 
 Inventory query records may be compact: the stable inventory map key is authoritative even when the denormalized `item.id` field is absent. The selector therefore carries the map key through match, score, deterministic ordering, and the selected `itemID`. This is a read-only selection repair; lease/revision checks, server authority, and the existing transfer handler remain unchanged. A successful semantic preview or admission is not itself a transfer.
+
+## Current canonical presentation contract — 2026-10-22
+
+The canonical production path is: semantic projection -> Core's generic `choicePresentation` callback -> the existing native, scrollable `choicesPart`. Core is the sole owner of the native choice widget and its interaction mechanics. Hoomans does not add a parallel semantic button part, second parser, response generator, translation backend, or state owner. Core's presenter failure path falls back to authored choices; Hoomans' `choiceInteractionGuard` rejects native choice interaction while a semantic request is pending, keeping visibility/preflight distinct from click-time authority.
+
+Topic groups are typed presentation frames, not effects. A group click validates revision and membership, changes only the selected projection, and re-presents the same Core choice surface. Candidate/action clicks carry typed semantic frames and enter the existing input/response/dispatcher path. Revision, receipt, duplicate, stale, ownership, busy/hostile, relationship-boundary, trait, knowledge/privacy, orientation/consent, inventory, and server-authority gates remain fail-closed in Hoomans policy and existing handlers.
+
+The Semantic Lab worker mirrors this production contract through the existing headless Core session and exposes `choiceSurface`, group frames, predicate traces, EN/TL output, NPC profiles, and click receipts. Its Tk view renders the full bounded production group and relies on Core-style scrolling rather than a hardcoded five-slot layout. This harness evidence does not imply native PZ SP/MP acceptance; that gate remains user-owned.

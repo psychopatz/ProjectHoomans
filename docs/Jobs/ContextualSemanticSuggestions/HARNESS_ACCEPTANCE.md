@@ -40,3 +40,13 @@ Record run command, repository SHAs for Hoomans+Core, actual case, raw input, se
 - Changed-slice syntax/lint: `luac5.3 -p` — **PASS** for the two Hoomans files and Core session; focused `pz_verify --kahlua --severity ERROR --no-snippets` — **0 errors / 0 warnings** for each; `git diff --check` — **PASS**.
 - Bounded worker performance: `python3 -m tools.semantic_harness.phase6_performance --samples 3 --warmup 1 --serial-turns 8` — **PASS**, strictly increasing sequences and bounded recent events; maximum recorded turn p95 was below **213 ms**. A broader `unittest discover` attempt was interrupted after the existing C7A worker `CONFIG` startup wait exceeded roughly three minutes; the required semantic subset remained **73/73 PASS**, and isolated C7A rerun passed **4/4**.
 - Native Project Zomboid SP/MP and post-fix live window verification remain **UNTESTED** and are reserved for the user. This is **READY FOR USER LIVE TEST**, not a Workshop/release action.
+
+## Current reproducible acceptance record — 2026-10-22
+
+The current source revisions are Hoomans `96228bfbd814147d71998416306711395227a9eb` and Core `443b3a86d097b8fd17fa10caafa545f959dc913f`, both on existing `main`. The Semantic Lab continues to use the production Lua worker and the existing Tk application/Core conversation surface; no synthetic JSON-only closure or second UI adapter was introduced.
+
+`python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_contextual_suggestions*.py'` passed **35/35**. Under Xvfb, `test_contextual_suggestions_s4` passed **5/5**. Those tests exercise visual semantic rows, editable scenarios, NPC profile selection, responsive layout, topic-group selection through the canonical typed group frame, predicate/localization inspection, the registered “what's up” dataset branch, duplicate/stale replay safety, and effect-free group navigation. The worker reports the same Core-native choice surface (`source = semantic_suggestions`) that production uses.
+
+The visual contract is dynamic by selected production topic group: all rows returned by the bounded production projection are mapped to Core's scrollable native choice list. There is no five-button Tk slot cap. Companion-only FOLLOW/STAY/WAIT_AT actions remain absent for non-owned profiles, and unknown/private predicates fail closed without player-facing leakage. EN/TL continues through the existing translation manager.
+
+The exact production Lua regression command in `PROGRESS.md` passed **8/8**; Core smoke, changed-file Kahlua/`luac5.3`, doctor, and bounded worker performance checks passed. Native Project Zomboid SP/MP and live `GIVE` transfer remain **UNTESTED**, reserved for the user; this is **READY FOR USER LIVE TEST**, not release authorization.
