@@ -1,6 +1,6 @@
 # Roadmap — Contextual Dialogue Persona & Choices
 
-**Parent status:** REOPENED — P0-P11 foundation retained; P11J native Talk shared-entry parity is mandatory.  
+**Parent status:** REOPENED — P0-P11J foundation retained; P12 save-backed offline Semantic Lab is mandatory.  
 Phases are organization and acceptance checkpoints; completing one phase never completes the parent objective.
 
 ## P0 — Current-path contract baseline
@@ -560,3 +560,164 @@ Run focused and impacted regression suites, then hand off native Project Zomboid
 Native validation must compare real context-menu Talk behavior with Semantic Lab Talk parity results.
 
 **Gate:** developer-side parity green; native SP/MP remains UNTESTED until user evidence is supplied.
+
+
+## P12 — Save-Backed Offline Semantic Runtime
+
+P12 supersedes synthetic scenarios as the **normal Semantic Lab product source**.
+
+Accepted P10/P11/P11J infrastructure remains:
+
+- production semantic worker;
+- contextual hub;
+- Talk-start parity;
+- Player/NPC/Relationship/World workbench;
+- relationship service and durable bond logic;
+- runtime graphs;
+- recruitment authority;
+- structured inventory;
+- Compare/replay/activity logging.
+
+The new architecture is:
+
+```text
+real saved mod state
++ explicit offline engine fixtures
++ optional read-only live profiler enrichment
+        ↓
+immutable imported source snapshot
+        ↓
+isolated mutable harness working world
+        ↓
+production Lua
+```
+
+Source saves and live Project Zomboid are always read-only.
+
+All semantic/gameplay mutations occur only inside the detached harness world.
+
+Read `SAVE_BACKED_OFFLINE_SEMANTIC_RUNTIME.md`.
+
+### P12A — Snapshot/provenance architecture
+
+Create:
+
+- immutable imported source snapshot;
+- mutable harness working world;
+- provenance model:
+  - SAVE;
+  - FIXTURE;
+  - LIVE;
+  - DERIVED;
+  - HARNESS_MUTATION;
+  - MISSING;
+- override patches;
+- reset/reload semantics;
+- explicit synthetic Developer/Test mode.
+
+**Gate:** worker actions can mutate the working world but cannot mutate the imported source snapshot.
+
+### P12B — Core save reader reuse + save catalog
+
+Reuse PsychopatzCore `GlobalModDataReader`.
+
+Discover:
+
+- saves;
+- compatibility/world version;
+- `PNC_PlayerCharacters`;
+- `PNC_Core_Global`;
+- isolated `PNC_npc<ID>` records.
+
+Do not create a second binary decoder.
+
+**Gate:** real saved players/NPCs can be listed while Project Zomboid is closed.
+
+### P12C — Real actor/relationship import
+
+Load selected Player + NPC into the isolated worker.
+
+Use the exact saved directed NPC -> player relationship and full saved social state.
+
+Remove harness-owned relationship/bond/friend policy reconstruction from SemanticAdapters.
+
+**Gate:** imported state matches save, and production RelationshipService mutates only the harness copy.
+
+### P12D — Save-backed World Browser
+
+Expose, when persisted:
+
+- Players;
+- companions/colonists/followers;
+- neutral/hostile NPCs;
+- factions;
+- communities;
+- known trader/provider state.
+
+**Gate:** normal user can select a real saved actor pair and start Talk without constructing a synthetic profile.
+
+### P12E — Dynamic mod-state providers
+
+Introduce adopter-owned state projection providers for:
+
+- PsychopatzCore;
+- Project Hoomans;
+- Dynamic Trading.
+
+Separate raw save inspection from semantic state catalog.
+
+**Gate:** adopters project their own schemas without central per-field Python ownership.
+
+### P12F — Offline engine fixture provider
+
+Keep PZ optional.
+
+Engine/transient values such as needs/time/weather remain explicit editable offline fixtures where no supported offline reader exists.
+
+Never silently replace saved mod-owned state with a fixture.
+
+**Gate:** full normal Semantic Lab operation works with PZ closed.
+
+### P12G — Optional read-only live profiler provider
+
+Add a disabled-by-default external settings-text toggle using the existing debug/settings owner.
+
+Restart PZ to enable export.
+
+No normal in-game toggle.
+
+One-way read-only state only.
+
+**Gate:** live transient values can enrich a copied snapshot, but Semantic Lab cannot mutate the running game.
+
+### P12H — Production mutation runtime
+
+Run production services against the isolated working world:
+
+- relationship changes;
+- durable friend promotion;
+- normal semantic relationship proposal route;
+- recruitment/community/faction ownership;
+- supported faction/knowledge/inventory/quest effects.
+
+The outstanding P11M proposal-route requirement is completed here against the save-backed runtime.
+
+**Gate:** source save remains unchanged after destructive harness simulations.
+
+### P12I — Source-aware UI + relationship parity
+
+Show source provenance, imported/effective values, full production relationship state and RelationshipGraph.
+
+**Gate:** UI reflects actual imported relationship record, not reconstructed fixture state.
+
+### P12J — Save-backed conversation/replay parity
+
+Run Talk, hub, identity, recruitment, proposal, relationship/faction/knowledge/inventory/trading tests from real imported actors.
+
+**Gate:** normal end-to-end Semantic Lab work no longer requires hand-authored synthetic NPC scenarios.
+
+### P12K — Final parity/safety matrix
+
+Validate multiple saves/players/NPCs, corrupt/unsupported saves, provider presence/absence, offline fixtures, optional live enrichment, source-save immutability, and full regression.
+
+**Gate:** Semantic Lab is a read-only save-seeded, isolated, production-Lua semantic runtime.
