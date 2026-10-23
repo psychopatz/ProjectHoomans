@@ -144,6 +144,47 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             del root
             gc.collect()
 
+    @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
+    def test_tk_replay_reexecutes_recorded_semantic_steps_from_clean_view(self) -> None:
+        root = tk.Tk()
+        app = SemanticHarnessApp(root, _parser().parse_args([]))
+
+        def wait_until(predicate: object, timeout: float = 12.0) -> None:
+            deadline = time.monotonic() + timeout
+            while not predicate() and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertTrue(predicate())
+
+        try:
+            wait_until(lambda: app.worker_ready and not app.busy)
+            app.input_var.set("What's up?")
+            app.submit()
+            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
+            self.assertEqual(len(app.replay_steps), 1)
+
+            row = next(
+                row
+                for row in app.suggestion_rows
+                if row.get("status") == "eligible"
+            )
+            app.click_suggestion(app.suggestion_rows.index(row))
+            wait_until(lambda: not app.busy and len(app.replay_steps) == 2)
+
+            app.apply_and_replay()
+            wait_until(
+                lambda: not app.busy
+                and "Replaying 2 recorded dialogue steps." in app.transcript.get("1.0", "end")
+            )
+            transcript = app.transcript.get("1.0", "end")
+            self.assertGreaterEqual(transcript.count("PLAYER:"), 2)
+            self.assertIn("Applied simulation context and replayed 2 steps.", transcript)
+        finally:
+            app.close()
+            del app
+            del root
+            gc.collect()
+
 
 if __name__ == "__main__":
     unittest.main()

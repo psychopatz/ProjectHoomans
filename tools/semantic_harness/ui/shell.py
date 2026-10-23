@@ -351,6 +351,7 @@ class SemanticHarnessApp:
         self._personality_preview_after: Any | None = None
         self._auto_replay_after: Any | None = None
         self._auto_apply_after: Any | None = None
+        self.replay_steps: list[dict[str, Any]] = []
         self._relationship_preview_future: Future[Any] | None = None
         self._personality_preview_future: Future[Any] | None = None
         self.generated_personality_preview: dict[str, Any] = {}
@@ -986,7 +987,9 @@ class SemanticHarnessApp:
         )
         self.replay_button.configure(
             text=(
-                "Apply + replay"
+                f"Replay macro ({len(self.replay_steps)})"
+                if pending == 0 and self.replay_steps
+                else "Apply + replay"
                 if pending == 0
                 else f"Apply + replay ({pending} pending)"
             )
@@ -2291,6 +2294,68 @@ class SemanticHarnessApp:
         )
         self._schedule_workbench_auto_apply()
 
+    def _record_replay_step(self, step: dict[str, Any]) -> None:
+        """Keep a bounded, canonical interaction macro for later replay."""
+
+        if not isinstance(step, dict):
+            return
+        recorded = deepcopy(step)
+        recorded.pop("requestRevision", None)
+        self.replay_steps.append(recorded)
+        self.replay_steps = self.replay_steps[-32:]
+        self.activity_log.record(
+            "ui",
+            "replay_step_recorded",
+            index=len(self.replay_steps),
+            kind=str(recorded.get("kind") or "unknown"),
+            candidateID=str(recorded.get("candidateID") or ""),
+            text=str(recorded.get("text") or "")[:180],
+        )
+        self._refresh_workbench_feedback(
+            f"Recorded replay step {len(self.replay_steps)}."
+        )
+
+    @staticmethod
+    def _replay_projection_frame(
+        worker: LuaSemanticWorker,
+        step: dict[str, Any],
+    ) -> dict[str, Any] | None:
+        """Resolve a recorded choice against the worker's current revision."""
+
+        snapshot = worker.snapshot()
+        suggestions = snapshot.get("suggestions") or {}
+        candidate_id = str(step.get("candidateID") or "")
+        for group in suggestions.get("groups", []) or []:
+            if not isinstance(group, dict):
+                continue
+            for collection_name in ("navigation", "candidates", "capabilities"):
+                for row in group.get(collection_name, []) or []:
+                    if not isinstance(row, dict) or str(row.get("id") or "") != candidate_id:
+                        continue
+                    frame = row.get("frame")
+                    if isinstance(frame, dict):
+                        return deepcopy(frame)
+        frame = step.get("frame")
+        if not isinstance(frame, dict):
+            return None
+        frame = deepcopy(frame)
+        revision = suggestions.get("revision")
+        if revision is not None:
+            frame["requestRevision"] = revision
+        return frame
+
+    @classmethod
+    def _replay_step(
+        cls, worker: LuaSemanticWorker, step: dict[str, Any]
+    ) -> dict[str, Any]:
+        kind = str(step.get("kind") or "input")
+        if kind == "input":
+            return worker.input(str(step.get("text") or ""))
+        frame = cls._replay_projection_frame(worker, step)
+        if frame is not None:
+            return worker.suggestion_click(frame)
+        return worker.input(str(step.get("text") or ""))
+
     def apply_simulation_settings(
         self, replay: bool = False, *, automatic: bool = False
     ) -> None:
@@ -2302,8 +2367,14 @@ class SemanticHarnessApp:
             return
         current_text = self.input_var.get().strip()
         value = current_text or self.last_test_utterance.strip()
-        if replay and not value:
-            self.workbench_status_var.set("Enter or send a test utterance before replaying.")
+        steps = deepcopy(self.replay_steps)
+        if replay and current_text:
+            if not steps or steps[-1].get("text") != current_text:
+                steps.append({"kind": "input", "text": current_text})
+        if replay and not steps and value:
+            steps = [{"kind": "input", "text": value}]
+        if replay and not steps:
+            self.workbench_status_var.set("Record a dialogue step before replaying.")
             return
         try:
             updated = self._collect_workbench_scenario()
@@ -2322,21 +2393,74 @@ class SemanticHarnessApp:
             configured = worker.configure(updated)
             if not replay:
                 return {"configured": configured}
-            return {"configured": configured, "turn": worker.input(value)}
+            step_results: list[dict[str, Any]] = []
+            for step in steps:
+                response = self._replay_step(worker, step)
+                step_results.append({"step": step, "response": response})
+                if response.get("accepted") is not True:
+                    break
+            return {
+                "configured": configured,
+                "steps": step_results,
+                "snapshot": worker.snapshot(),
+            }
 
         def finish(result: dict[str, Any]) -> None:
-            self.scenario = updated
+            final_snapshot = result.get("snapshot") or {}
+            effective_scenario = (
+                final_snapshot.get("scenario")
+                if isinstance(final_snapshot, dict)
+                and isinstance(final_snapshot.get("scenario"), dict)
+                else updated
+            )
+            self.scenario = effective_scenario
             configured = result.get("configured") or {}
             self._update_simulation_projection(configured)
-            self._sync_workbench_from_scenario(updated)
+            self._sync_workbench_from_scenario(effective_scenario)
             if replay:
-                if current_text:
-                    self.input_var.set("")
-                    self.last_test_utterance = value
-                    self._append("PLAYER", value)
-                response = result.get("turn") or {}
+                response = {}
+                self._set_text(self.transcript, "")
+                self._append(
+                    "SYSTEM",
+                    f"Replaying {len(result.get('steps') or [])} recorded dialogue steps.",
+                )
+                for item in result.get("steps") or []:
+                    step = item.get("step") or {}
+                    step_response = item.get("response") or {}
+                    response = step_response
+                    if step_response.get("accepted") is not True:
+                        self._append(
+                            "SYSTEM",
+                            f"Replay step rejected: {step_response.get('reason') or 'unknown'}",
+                        )
+                        break
+                    step_kind = str(step.get("kind") or "input")
+                    frame_kind = str(
+                        (step.get("frame") or {}).get("kind") or ""
+                    )
+                    if step_kind == "input" or frame_kind not in {
+                        "semantic_back_click_frame",
+                        "semantic_group_click_frame",
+                    }:
+                        text = str(
+                            step.get("text")
+                            or step.get("label")
+                            or step.get("candidateID")
+                            or "choice"
+                        )
+                        self.last_test_utterance = text
+                        self._append("PLAYER", text)
+                    for message in step_response.get("messages", []):
+                        if message.get("speaker") == "npc":
+                            self._append("NPC", npc_message_text(message))
+                    for call in step_response.get("toolCalls", []):
+                        self._append("TOOL/ACTION", format_tool_call(call))
+                self.input_var.set("")
                 self._show_response(response)
-                self._append("SYSTEM", f"Applied simulation context and replayed: {value}")
+                self._append(
+                    "SYSTEM",
+                    f"Applied simulation context and replayed {len(result.get('steps') or [])} steps.",
+                )
                 self._refresh_workbench_feedback(
                     "Applied and replayed through the Lua worker."
                 )
@@ -2740,6 +2864,8 @@ class SemanticHarnessApp:
                     self._append("NPC", npc_message_text(message))
             for call in response.get("toolCalls", []):
                 self._append("TOOL/ACTION", format_tool_call(call))
+            if response.get("accepted") is True:
+                self._record_replay_step({"kind": "input", "text": value})
             self._show_response(response)
 
         self._start_operation(lambda worker: worker.input(value), finish)
@@ -2759,13 +2885,26 @@ class SemanticHarnessApp:
             if response.get("accepted") is True:
                 utterance = (row.get("display") or {}).get("utterance") or label
                 self.last_test_utterance = str(utterance)
-                self._append("PLAYER", str(utterance))
+                presentation_only = str(
+                    frame.get("kind") or ""
+                ) in {"semantic_back_click_frame", "semantic_group_click_frame"}
+                if not presentation_only:
+                    self._append("PLAYER", str(utterance))
                 for message in response.get("messages", []):
                     if message.get("speaker") == "npc":
                         self._append("NPC", npc_message_text(message))
                 for call in response.get("toolCalls", []):
                     self._append("TOOL/ACTION", format_tool_call(call))
                 self._append("SYSTEM", f"Clicked semantic suggestion: {label}")
+                self._record_replay_step(
+                    {
+                        "kind": "suggestion_click",
+                        "candidateID": frame.get("candidateID") or row.get("id"),
+                        "label": label,
+                        "text": str(utterance),
+                        "frame": deepcopy(frame),
+                    }
+                )
             else:
                 self._append(
                     "SYSTEM",
@@ -2791,6 +2930,15 @@ class SemanticHarnessApp:
                         self._append("NPC", npc_message_text(message))
                 for call in response.get("toolCalls", []):
                     self._append("TOOL/ACTION", format_tool_call(call))
+                self._record_replay_step(
+                    {
+                        "kind": "suggestion_click",
+                        "candidateID": frame.get("candidateID"),
+                        "label": label,
+                        "text": label,
+                        "frame": deepcopy(frame),
+                    }
+                )
             else:
                 self._append(
                     "SYSTEM",
@@ -2826,6 +2974,7 @@ class SemanticHarnessApp:
             return
 
         def finish(response: dict[str, Any]) -> None:
+            self.replay_steps.clear()
             self._set_text(self.transcript, "")
             self._set_text(self.inspector, "")
             self._set_text(self.authority, "")
@@ -2841,6 +2990,7 @@ class SemanticHarnessApp:
             )
             self.suggestion_rows = []
             self.suggestion_interactive = False
+            self._refresh_workbench_feedback("Scenario reset; replay macro cleared.")
             self.compare_utterance_var.set("hello")
             self._render_suggestions(
                 {"type": "turn", "accepted": True},
@@ -2866,7 +3016,9 @@ class SemanticHarnessApp:
         def finish(response: dict[str, Any]) -> None:
             self.scenario = scenario
             self.scenario_path = Path(filename)
+            self.replay_steps.clear()
             self._sync_workbench_from_scenario(scenario)
+            self._refresh_workbench_feedback("Scenario loaded; replay macro cleared.")
             self._set_text(self.transcript, "")
             self._show_response(response)
             self._append("SYSTEM", f"Loaded {filename}")

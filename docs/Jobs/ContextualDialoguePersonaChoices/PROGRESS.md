@@ -408,3 +408,20 @@ Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
 ## Current Exact Next Chunk — replay as a real macro
 
 Separate Apply + replay from ordinary auto-apply. Make replay clear the current conversation projection, execute a recorded sequence through the same worker operations, and display each step and resulting variation in order. Keep one-step Apply free of replay side effects.
+
+## Replay macro execution
+
+Apply + replay now uses a bounded session macro. Accepted typed inputs, semantic suggestion clicks, graph clicks, and presentation navigation are recorded as canonical steps in the GUI activity stream. Replay configures a clean worker first, resolves stored choice IDs against the fresh production suggestion revision, executes each step in order, stops visibly at a rejected step, and replaces the transcript with the replay run. Presentation-only navigation does not add a player dialogue line. A configure-only Apply remains free of replay side effects; Reset and Load clear the macro.
+
+Evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_simulation_workbench_p10e -v` — **3/3 PASS**, including a real Tk two-step semantic macro replay;
+- affected regression suite `test_simulation_workbench_p10e`, `test_contextual_runtime_parity_p11c`, and `test_contextual_talk_parity_p11j` — **19/19 PASS**;
+- replay starts from a clean visible transcript and shows ordered `PLAYER`, `NPC`, and `TOOL/ACTION` rows;
+- `python3 -m py_compile` and `git diff --check` — PASS.
+
+Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
+
+## Current Exact Next Chunk — user-facing GUI audit and diagnostics polish
+
+Run the complete selected-target Tk/Xvfb surface at compact and normal sizes, verify Simulation/Studio/Log order and saved tab/splitter state, check chat visibility and horizontal pane dragging, and inspect shared activity logging from GUI/CLI/agent worker operations. Fix only evidence-backed layout or logging regressions before the final developer gate.
