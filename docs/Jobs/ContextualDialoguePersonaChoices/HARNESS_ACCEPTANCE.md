@@ -635,3 +635,76 @@ GUI and CLI must call the same worker commands and expose the same versioned sch
 After developer gates pass, user-owned native validation compares the actual context-menu Talk action against Semantic Lab for the same target classes.
 
 Do not convert headless harness parity into a claim of native runtime verification.
+
+
+## P12 acceptance — save-backed offline runtime
+
+### Source immutability
+
+A loaded save/source snapshot is immutable.
+
+Relationship, recruitment, proposal, faction, knowledge, inventory or other semantic mutations must change only the working-world copy.
+
+Tests must compare source before/after and prove no mutation.
+
+### Offline operation
+
+PZ may be closed.
+
+Normal acceptance must work from:
+
+```text
+real saved mod state
++ explicit offline engine fixtures
+```
+
+Optional live profiler data is not required.
+
+### Save catalog
+
+Using Core's reader, the Lab must enumerate compatible saves and real persisted:
+
+- player characters;
+- NPCs;
+- relationships;
+- available faction/community/provider data.
+
+Unsupported/corrupt saves fail closed.
+
+### Relationship fidelity
+
+Selected NPC -> Player relationship must preserve saved:
+
+- baselines;
+- approval/respect/familiarity;
+- state/previousState;
+- durable bond;
+- memories;
+- cooldowns;
+- interaction revisions/journal where persisted.
+
+Production relationship services then mutate the working copy.
+
+### Provenance
+
+Important UI/worker values expose SAVE/FIXTURE/LIVE/DERIVED/HARNESS_MUTATION/MISSING provenance.
+
+A missing persisted value must not silently masquerade as saved truth.
+
+### Optional live adapter
+
+When explicitly enabled through settings text and game restart, live snapshots may enrich transient values.
+
+No write-back endpoint is permitted.
+
+### Production effects
+
+Save-backed acceptance must exercise real production service paths for supported semantic effects, including relationship, friend promotion, proposal, recruitment and faction/community changes.
+
+### Source safety
+
+After a destructive harness test session:
+
+- source save remains unchanged;
+- Reset World restores the imported baseline;
+- Reload Save rereads disk explicitly.
