@@ -10,6 +10,8 @@ local Composer = Conversation.Composer
 local Backgrounds = Conversation.Backgrounds
 local Palette = PNC.NPCTypePalette
 local FlavorAddress = PNC.FlavorAddress
+local TalkStart = Conversation.TalkStart
+    or require "PNC/Conversation/PNC_ConversationTalkStart"
 local Context = require "PNC/Conversation/Definition/PNC_ConversationDefinition_Context"
 local ExtensionParts = require "PNC/Conversation/Definition/PNC_ConversationDefinition_ExtensionParts"
 local IdentityChoice = require "PNC/Conversation/Blocks/PNC_ConversationIdentityChoice"
@@ -69,12 +71,23 @@ local function semanticInputFactory()
     return Conversation.CreateSemanticDialogueInput
 end
 
-local function buildConversationContext(entry, player, timeID, relationshipID, npcID)
+local function buildConversationContext(
+    entry,
+    player,
+    timeID,
+    relationshipID,
+    npcID,
+    talkStartProjection
+)
     local identityState, name, projection, clientState, identityClaimVerified =
         Context.IdentityProjection(entry)
     local faction = Context.FactionPresentation(entry)
     local blockContext = Composer.BuildContext(
-        entry, player, timeID, relationshipID
+        entry,
+        player,
+        timeID,
+        relationshipID,
+        talkStartProjection
     )
     local identityArguments = Context.VisibleIdentityArguments(
         entry,
@@ -109,13 +122,27 @@ local function buildConversationContext(entry, player, timeID, relationshipID, n
         factionName = faction and faction.name or nil,
         factionRole = faction and faction.role or nil,
         factionEmblem = faction and faction.emblem or nil,
-        npcType = Palette.ResolveType(entry),
-        audience = blockContext.audience,
-        conversationAudience = blockContext.conversationAudience,
-        tacticalClass = blockContext.tacticalClass,
-        playerHostile = blockContext.playerHostile,
+        npcType = talkStartProjection
+            and talkStartProjection.targetType
+            or Palette.ResolveType(entry),
+        audience = talkStartProjection
+            and talkStartProjection.audience or blockContext.audience,
+        conversationAudience = talkStartProjection
+            and talkStartProjection.audience
+            or blockContext.conversationAudience,
+        tacticalClass = talkStartProjection
+            and talkStartProjection.tacticalClass
+            or blockContext.tacticalClass,
+        playerHostile = talkStartProjection
+            and talkStartProjection.hostile or blockContext.playerHostile,
         conversationProfile = blockContext.conversationProfile,
-        allowHostileParley = blockContext.playerHostile,
+        allowHostileParley = talkStartProjection
+            and talkStartProjection.hostile or blockContext.playerHostile,
+        talkStartProjection = talkStartProjection,
+        talkStartRoute = talkStartProjection
+            and talkStartProjection.route or nil,
+        talkStartAvailability = talkStartProjection
+            and talkStartProjection.availability or nil,
         settlementVisit = blockContext.settlementVisit,
         ambientVisitPreview = blockContext.ambientVisitPreview,
         conversationBlockContext = blockContext,
@@ -184,13 +211,25 @@ local function buildConversationMenu(contextData, npcID)
     return root
 end
 
-function Conversation.BuildDefinition(entry, player, forcedTime)
+function Conversation.BuildDefinition(
+    entry,
+    player,
+    forcedTime,
+    talkStartProjection
+)
     local timeID = forcedTime or Time.Resolve()
     local semanticFactory = semanticInputFactory()
-    local relationshipID = Relationship.Resolve(entry, player)
+    local projection = talkStartProjection
+        or TalkStart.Project(entry, player, { source = "definition" })
+    local relationshipID = projection.relationshipID
     local npcID = tostring(entry and entry.id or "debug-npc")
     local contextData = buildConversationContext(
-        entry, player, timeID, relationshipID, npcID
+        entry,
+        player,
+        timeID,
+        relationshipID,
+        npcID,
+        projection
     )
     local root = buildConversationMenu(contextData, npcID)
     return {
@@ -243,6 +282,7 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         backgroundID = Backgrounds.Get(timeID),
         theme = Palette.BuildConversationTheme(entry),
         context = contextData.presentationContext,
+        talkStartProjection = projection,
         extensionParts = ExtensionParts.Build(
             npcID, semanticFactory
         ),

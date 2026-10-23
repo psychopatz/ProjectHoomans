@@ -79,9 +79,10 @@ function Provider.configure(context, SemanticAdapters)
     PNC.Conversation.Audience = PNC.Conversation.Audience or {
         IsPlayerHostile = function() return false end,
     }
-    PNC.Conversation.Relationship = {
-        ReceivePresentation = function() return true end,
-    }
+    PNC.Conversation.Relationship = PNC.Conversation.Relationship or {}
+    PNC.Conversation.Relationship.ReceivePresentation = function()
+        return true
+    end
     PNC.ConversationScene = PNC.ConversationScene or {}
 
     local function validateHarnessLease(record, leasePlayer, token)

@@ -6,12 +6,12 @@ PNC.Conversation = PNC.Conversation or {}
 
 local Conversation = PNC.Conversation
 local Relationship = Conversation.Relationship
-local Audience = Conversation.Audience
 local Lifecycle = Conversation.Lifecycle
 local Composer = Conversation.Composer
 local Registry = Conversation.Registry
 local IdentityPresentation = PNC.NPCIdentityPresentation
-local isAggressive = Audience.IsPlayerHostile
+local TalkStart = Conversation.TalkStart
+    or require "PNC/Conversation/PNC_ConversationTalkStart"
 
 local GIFT_PREFERENCE_RESPONSES = {
     like = {
@@ -62,12 +62,15 @@ end
 
 function Conversation.Open(entry, player, forcedTime)
     local npcID = tostring(entry and entry.id or "debug-npc")
+    local talkStart = TalkStart.Project(entry, player, {
+        source = "native",
+    })
     -- Hostile NPCs use the compact nameplate chat route. Opening the full
     -- conversation view first would create a normal scene lease and let the
     -- combat safety gate reject it before the player can type anything.
     -- Keep this handoff targeted to the selected entry so it cannot silently
     -- switch the player to the nearest unrelated NPC.
-    if isAggressive(entry)
+    if talkStart.route == "hostile_inline"
         and PNC.PBrainZ
         and PNC.PBrainZ.OpenInlineForTarget
         and PNC.PBrainZ.OpenInlineForTarget(entry)
@@ -102,7 +105,12 @@ function Conversation.Open(entry, player, forcedTime)
             end
         end
     end
-    local definition = Conversation.BuildDefinition(entry, player, forcedTime)
+    local definition = Conversation.BuildDefinition(
+        entry,
+        player,
+        forcedTime,
+        talkStart
+    )
     local view = PsychopatzCore.Conversation.Open(definition)
     if view then
         -- The semantic projection is rendered through Core's native choices

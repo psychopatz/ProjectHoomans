@@ -11,6 +11,8 @@ PNC.Conversation = PNC.Conversation or {}
 
 local TalkParity = PNC.Conversation.TalkParity or {}
 PNC.Conversation.TalkParity = TalkParity
+local TalkStart = PNC.Conversation.TalkStart
+    or require "PNC/Conversation/PNC_ConversationTalkStart"
 
 TalkParity.VERSION = 1
 TalkParity.SCHEMA = "semantic.talk.parity.v1"
@@ -158,22 +160,6 @@ function TalkParity.ApplyTarget(scenario, value)
     return result, target.id
 end
 
-local function relationshipID(scenario, entry, player)
-    local relationship = PNC.Conversation.Relationship
-    if relationship and type(relationship.Resolve) == "function" then
-        local ok, value = pcall(relationship.Resolve, entry, player)
-        if ok and value then return value end
-    end
-    local bond = scenario and scenario.npc
-        and scenario.npc.relationship
-        and scenario.npc.relationship.bond or {}
-    if bond.class == "lover" then return "Lover" end
-    if bond.class == "friend" or bond.class == "family" then
-        return "Member"
-    end
-    return "FirstMeet"
-end
-
 function TalkParity.BuildEntry(scenario, value)
     local target = targetByID(value)
     if not target then return nil, nil, "unknown_talk_target" end
@@ -185,10 +171,17 @@ function TalkParity.BuildEntry(scenario, value)
         tacticalClass = npc.tacticalClass,
         colonyOwned = npc.colonyOwned == true,
         recruited = npc.recruited == true,
+        companion = npc.companion == true,
+        ownedByPlayer = npc.ownedByPlayer == true,
         orderKind = npc.orderKind,
         orderSpec = copy(npc.orderSpec),
+        followState = copy(npc.followState),
+        activeBehavior = npc.activeBehavior,
+        role = npc.role,
         hostility = copy(npc.hostility),
         alive = npc.alive ~= false,
+        available = npc.available,
+        availabilityReason = npc.availabilityReason,
         record = copy(npc),
         snapshot = copy(npc),
     }
@@ -198,70 +191,25 @@ end
 function TalkParity.Resolve(scenario, value, player)
     local entry, target, reason = TalkParity.BuildEntry(scenario, value)
     if not entry then return nil, reason end
-    local palette = PNC.NPCTypePalette
-    if not palette then
-        local ok, loaded = pcall(require, "PNC/UI/PNC_NPCTypePalette")
-        if ok then palette = loaded end
-    end
-    local audience = PNC.Conversation.Audience
-    if not audience then
-        local ok, loaded = pcall(require, "PNC/Conversation/PNC_ConversationAudience")
-        if ok then audience = loaded end
-    end
-    local typeID = palette and type(palette.ResolveType) == "function"
-        and palette.ResolveType(entry) or target.id
-    local relationID = relationshipID(scenario, entry, player)
-    local audienceProjection = audience
-        and type(audience.Resolve) == "function"
-        and audience.Resolve(entry, relationID)
-        or {
-            audience = entry.hostility and entry.hostility.attackPlayers
-                and "hostile" or "neutral",
-            relationshipID = relationID,
-            tacticalClass = entry.tacticalClass,
-            playerHostile = entry.hostility
-                and entry.hostility.attackPlayers == true or false,
-        }
-    local hostile = audienceProjection.playerHostile == true
-    local alive = entry.alive ~= false
-    local inlineAvailable = PNC.PBrainZ
-        and type(PNC.PBrainZ.OpenInlineForTarget) == "function"
-    local route
-    if not alive then
-        route = "unavailable"
-    elseif hostile and inlineAvailable
-    then
-        route = "hostile_inline"
-    elseif hostile then
-        route = "hostile_full_conversation"
-    else
-        route = "full_conversation"
-    end
-    return {
-        id = target.id,
-        label = target.label,
-        description = target.description,
-        diagnostic = target.diagnostic == true,
-        entryID = entry.id,
-        targetType = typeID,
-        tacticalClass = entry.tacticalClass,
-        hostile = hostile,
-        hostileInlineAvailable = inlineAvailable == true,
-        audience = audienceProjection.audience,
-        relationshipID = audienceProjection.relationshipID or relationID,
-        route = route,
-        routeReason = hostile
-            and (inlineAvailable and "player_hostile_inline"
-                or "player_hostile_inline_unavailable")
-            or "native_talk_target",
-        entryFacts = {
-            colonyOwned = entry.colonyOwned == true,
-            recruited = entry.recruited == true,
-            orderKind = entry.orderKind,
-            alive = alive,
-            hostility = copy(entry.hostility),
-        },
+    local projection, projectionReason = TalkStart.Project(
+        entry,
+        player,
+        { source = "semantic_lab" }
+    )
+    if not projection then return nil, projectionReason end
+    projection.id = target.id
+    projection.label = target.label
+    projection.description = target.description
+    projection.diagnostic = target.diagnostic == true
+    projection.entryFacts = {
+        colonyOwned = projection.ownership.colonyOwned,
+        recruited = projection.ownership.recruited,
+        ownedByPlayer = projection.ownership.ownedByPlayer,
+        orderKind = projection.ownership.orderKind,
+        alive = entry.alive ~= false,
+        hostility = copy(entry.hostility),
     }
+    return projection
 end
 
 local function resolvedText(value)

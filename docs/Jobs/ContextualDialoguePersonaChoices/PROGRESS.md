@@ -2,7 +2,7 @@
 
 **Updated:** 2026-10-23  
 **Parent status:** REOPENED — P11 runtime-parity foundation retained; P11J native Talk shared-entry parity is mandatory.  
-**Current mandatory phase:** P11J2 — Native shared Talk-start projection.  
+**Current mandatory phase:** P11J3 — Route and availability parity matrix.
 **Current remote baseline audited:** ProjectHoomans `main` at `c9385c4f2b1b86feb09ed24144896e473bd6fec8`.  
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned.
 
@@ -26,114 +26,84 @@ Preserve the already-implemented work:
 
 The original Talk audit was correct that a normal semantic turn is not proof of native Talk parity.
 
-P11J1 later implemented:
+P11J1 remains accepted with `PNC.Conversation.TalkParity`, `TALK_CATALOG`,
+`TALK_START`, `TALK_MATRIX`, the GUI/CLI surfaces, and the canonical cases:
 
 ```text
-PNC.Conversation.TalkParity
-TALK_CATALOG
-TALK_START
-TALK_MATRIX
-GUI Talk parity surface
-CLI Talk matrix/start
+current · colonist · follower · neutral · hostile
 ```
 
-with canonical cases:
+Production mapping remains truthful: follower derives from colonist ownership and
+the follow order; hostile is the production tactical type; "Hostile / Enemy" is
+only a display label; and trader remains a Dynamic Trading/provider overlay.
+
+## P11J2 — accepted developer implementation
+
+Added the production-owned `PNC.Conversation.TalkStart` projection at:
 
 ```text
-current
-colonist
-follower
-neutral
-hostile
+Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkStart.lua
 ```
 
-and truthful production mapping:
+The projection consumes a canonical entry and player and returns the target type,
+tactical class, ownership and follow facts, conversation relationship and
+audience, availability, hostile inline/full route, and the canonical greeting
+opening state.
 
-- follower derives from colonist + follow order;
-- hostile is the real tactical type;
-- "Hostile / Enemy" is only a display label;
-- trader remains a Dynamic Trading/provider overlay.
-
-However, source audit at the current baseline shows the native context-menu path still enters:
+Native Talk now follows:
 
 ```text
-PNC_ContextProvider_Conversation
- -> PNC.Conversation.Open(real entry, player)
- -> Conversation.BuildDefinition(real entry, player)
-```
-
-while the harness enters:
-
-```text
-scenario
- -> TalkParity.BuildEntry
- -> TalkParity.Resolve
- -> Conversation.turn
-```
-
-Both reuse production helpers such as NPCTypePalette and Audience, but native `Conversation.Open` does not currently call `TalkParity` or another common Talk-start projection.
-
-Therefore the P11J1 harness matrix is useful and retained, but **P11J is not yet accepted as full native parity**.
-
-## Current Exact Next Chunk — P11J2
-
-On the user's actual local checkout:
-
-1. read root `AGENTS.md` and the ContextualDialoguePersonaChoices docs in documented order, including `NATIVE_TALK_PARITY.md`;
-2. inspect local ProjectHoomans/Core/DynamicTrading branches, HEADs, upstream/divergence, dirty/concurrent work; existing `main` only;
-3. trace side-by-side:
-   - `PNC_ContextProvider_Conversation.lua`;
-   - `PNC_ConversationDefinition_Lifecycle.lua`;
-   - `PNC_ConversationDefinition_Builder.lua`;
-   - Audience/Relationship/Rules/Palette;
-   - hostile/PBrainZ inline/full fallback logic;
-   - `PNC_ConversationTalkParity.lua`;
-   - worker `TALK_START/TALK_MATRIX`;
-4. identify the smallest production-owned reusable Talk-start projection that can accept a canonical entry/player and return:
-   - target type;
-   - tactical class;
-   - ownership/follow facts;
-   - relationship/audience;
-   - availability/safety;
-   - hostile inline/full route;
-   - conversation definition/opening choices;
-5. make native `PNC.Conversation.Open` consume that shared production projection;
-6. make TalkParity consume the same projection;
-7. keep scenario-to-entry conversion harness-only;
-8. remove duplicated target classification/route policy from TalkParity where the shared projection owns it;
-9. preserve native behavior where semantics are unchanged;
-10. keep existing P11J1 worker/GUI/CLI schema stable unless a versioned additive change is required;
-11. add focused source/runtime tests proving native and harness use the same shared projection;
-12. run conversation smoke, P11J focused tests, relevant graph/hub/relationship regressions, Lua syntax/Kahlua and diff checks;
-13. update this ledger with exact evidence and continue automatically to P11J3 if green.
-
-## P11J2 acceptance
-
-Developer evidence must prove:
-
-```text
-REAL NATIVE TALK
 real entry
- -> shared Talk-start projection
+ -> TalkStart.Project
+ -> Conversation.BuildDefinition
  -> Conversation.Open
-
-SEMANTIC LAB
-scenario adapter
- -> canonical entry
- -> SAME shared Talk-start projection
- -> TALK_START / TALK_MATRIX
 ```
 
-A test that merely compares two independently computed route strings is insufficient.
+The builder carries the same projection into the production definition/context.
+The Semantic Lab keeps its scenario-to-entry conversion in `TalkParity`, then
+enters the same `TalkStart.Project` boundary for `TALK_START` and `TALK_MATRIX`.
+Target classification, audience, relationship, availability, and route policy
+were removed from the harness projection.
 
-## Remaining P11J milestones
+The harness relationship adapter now preserves the production conversation
+relationship resolver and adds only its presentation receipt hook. This was
+required because replacing that resolver would have created a second relationship
+policy at scenario reset time.
 
-After P11J2:
+Focused evidence on this checkout:
 
-- **P11J3:** route/availability parity matrix for colonist/follower/neutral/hostile inline/hostile fallback/dead-unavailable/trader overlay/EN-TL;
-- **P11J4:** focused + impacted regression, then user-owned native Project Zomboid validation.
+- `lua5.3 tests/pnc_conversation_talk_start_projection_smoke.lua` — PASS;
+- `lua5.3 tests/pnc_conversation_audience_smoke.lua`,
+  `pnc_npc_type_palette_smoke.lua`, and `pnc_conversation_smoke.lua` — PASS;
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j -v` — **5/5 PASS**;
+- the P11J source/runtime test proves native lifecycle, definition builder, and
+  harness parity callers reference `TalkStart.Project`, and the worker emits the
+  shared projection schema;
+- changed production Lua passed `pz_verify --kahlua --severity ERROR` with zero
+  findings and `luac5.3 -p` passed; `git diff --check` passed.
 
-See `NATIVE_TALK_PARITY.md`.
+The headless worker reports hostile inline unavailable unless the real PBrainZ
+integration reports ready and exposes the inline target route. Native Project
+Zomboid SP/MP remains **UNTESTED / user-owned**.
+
+## Current Exact Next Chunk — P11J3
+
+1. run the colonist, follower, neutral, hostile inline-available, hostile
+   inline-unavailable, dead/unavailable, and trader-overlay cases through the
+   shared Talk-start boundary;
+2. keep follower derived from colonist ownership plus active follow order;
+3. use the real PBrainZ availability check and never fabricate inline support in
+   the headless worker;
+4. expose canonical target ID, production target type, tactical class,
+   ownership/recruitment/follow facts, audience, standing, durable bond,
+   availability, route and reason, greeting opening, first response, semantic
+   choices, SpeechStyleContext, graph path, and provider state in each row;
+5. isolate every row from relationship, conversation, graph, provider, and
+   cooldown mutations and restore the original scenario afterward;
+6. prove Talk start establishes opening state before the first `hello` turn;
+7. run the same `TALK_START` and `TALK_MATRIX` worker operations through GUI and
+   CLI in EN and TL, keeping semantic IDs/routes stable;
+8. update this file with exact evidence and continue to P11J4.
 
 ## Known separate relationship boundary
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 import os
+from pathlib import Path
 import time
 import tkinter as tk
 import unittest
@@ -55,6 +56,37 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
             {choice["id"] for choice in rows["hostile"]["start"]["opening"]["choices"]},
         )
         self.assertNotIn("semanticLabTalkTarget", restored["runtime"])
+
+    def test_native_and_harness_enter_the_shared_talk_start_projection(self) -> None:
+        project = Path(__file__).resolve().parents[3]
+        lifecycle = (
+            project
+            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Lifecycle.lua"
+        ).read_text()
+        builder = (
+            project
+            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Builder.lua"
+        ).read_text()
+        parity = (
+            project
+            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkParity.lua"
+        ).read_text()
+
+        self.assertIn("TalkStart.Project(entry, player", lifecycle)
+        self.assertIn("TalkStart.Project(entry, player", builder)
+        self.assertIn("TalkStart.Project(", parity)
+        self.assertNotIn("palette.ResolveType", parity)
+        self.assertNotIn("audience.Resolve", parity)
+
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            result = worker.talk_start(target_id="hostile", utterance="hello")
+
+        projection = result["start"]["target"]
+        self.assertEqual(projection["schema"], "semantic.talk.start.projection.v1")
+        self.assertEqual(projection["route"], "hostile_full_conversation")
+        self.assertEqual(projection["targetType"], "hostile")
+        self.assertEqual(projection["tacticalClass"], "hostile")
+        self.assertEqual(projection["opening"]["nodeID"], "greeting")
 
     def test_cli_exposes_the_same_talk_operations(self) -> None:
         arguments = _parser().parse_args(["--no-gui", "--talk-matrix"])

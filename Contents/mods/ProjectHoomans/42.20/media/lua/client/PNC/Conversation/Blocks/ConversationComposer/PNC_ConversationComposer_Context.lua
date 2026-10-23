@@ -64,7 +64,13 @@ local function worldAgeHours()
         and math.max(0, tonumber(time:getWorldAgeHours()) or 0) or 0
 end
 
-function Composer.BuildContext(entry, player, timeID, relationshipID)
+function Composer.BuildContext(
+    entry,
+    player,
+    timeID,
+    relationshipID,
+    talkStartProjection
+)
     local state = PNC.Network and PNC.Network.ClientState or {}
     local playerContext = state.playerContext or {}
     local record = entry and entry.record or {}
@@ -73,17 +79,21 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
     local relationship = Conversation.Relationship
         and Conversation.Relationship.GetPresentation(npcID) or {}
     local at = worldAgeHours()
-    local profile = Audience.BuildProfile(
-        entry,
-        player,
-        relationshipID,
-        colonyManagement.settlement ~= nil
-    )
+    local profile = type(talkStartProjection) == "table"
+        and type(talkStartProjection.audienceProfile) == "table"
+        and talkStartProjection.audienceProfile
+        or Audience.BuildProfile(
+            entry,
+            player,
+            relationshipID,
+            colonyManagement.settlement ~= nil
+        )
     local npcPersonality = record.personality or record.socialProfile
         or record.social and record.social.personality or {}
     local context = {
         entry = entry,
         player = player,
+        talkStartProjection = talkStartProjection,
         npcRecord = record,
         actorAuthority = actorAuthority(entry, record, player),
         identity = PNC.Identity and PNC.Identity.Verifier

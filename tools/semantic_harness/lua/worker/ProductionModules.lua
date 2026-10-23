@@ -275,6 +275,11 @@ load(
     )
     load(
         "ProjectHoomans", "client",
+        "PNC/Conversation/PNC_ConversationTalkStart.lua",
+        "conversation_target_projection"
+    )
+    load(
+        "ProjectHoomans", "client",
         "PNC/Conversation/PNC_ConversationTalkParity.lua",
         "conversation_target_projection"
     )
