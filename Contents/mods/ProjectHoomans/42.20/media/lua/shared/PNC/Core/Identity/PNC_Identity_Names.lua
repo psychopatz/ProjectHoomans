@@ -77,15 +77,19 @@ function Names.Generate(seed, isFemale, archetypeID, options)
             version = options.version,
             isFemale = isFemale == true,
             archetypeID = archetypeID or "General",
+            firstName = options.firstName or options.forename,
+            surname = options.surname or options.lastName,
         }, catalog)
     end
     local firstPool = isFemale and FemaleFirst or MaleFirst
-    local first = firstPool[Identity.Index(
-        seed,
-        "name:first:" .. tostring(archetypeID or "General"),
-        #firstPool
-    )]
-    local last = Surnames[Identity.Index(seed, "name:last", #Surnames)]
+    local first = options.firstName or options.forename
+        or firstPool[Identity.Index(
+            seed,
+            "name:first:" .. tostring(archetypeID or "General"),
+            #firstPool
+        )]
+    local last = options.surname or options.lastName
+        or Surnames[Identity.Index(seed, "name:last", #Surnames)]
     return tostring(first or "Alex") .. " " .. tostring(last or "Walker")
 end
 

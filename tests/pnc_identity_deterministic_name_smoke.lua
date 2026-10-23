@@ -36,4 +36,28 @@ T.truthy(string.find(first.displayName, "CoreNative", 1, true) ~= nil,
 T.falsy(string.find(first.displayName, "Factory", 1, true) ~= nil,
     "NPC name does not inherit SurvivorFactory global random name")
 
+local sharedSurname = PNC.Identity.GenerateResolvedIdentity({
+    id = "npc_shared_surname",
+    identitySeed = "identity-seed-shared",
+    saveSeed = "save-seed-a",
+    isFemale = false,
+    surname = "RelativeFamily",
+})
+T.truthy(string.find(sharedSurname.displayName, "RelativeFamily", 1, true)
+    ~= nil, "explicit surname override is retained")
+T.falsy(string.find(sharedSurname.displayName, "FactorySurname", 1, true)
+    ~= nil, "missing first name still comes from deterministic Core")
+
+local sharedForename = PNC.Identity.GenerateResolvedIdentity({
+    id = "npc_shared_forename",
+    identitySeed = "identity-seed-shared",
+    saveSeed = "save-seed-a",
+    isFemale = false,
+    firstName = "RelativeFirst",
+})
+T.truthy(string.find(sharedForename.displayName, "RelativeFirst", 1, true)
+    ~= nil, "explicit first-name override is retained")
+T.falsy(string.find(sharedForename.displayName, "FactorySurname", 1, true)
+    ~= nil, "missing surname still comes from deterministic Core")
+
 T.finish("pnc_identity_deterministic_name_smoke")

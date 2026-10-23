@@ -120,11 +120,17 @@ function Identity.GenerateResolvedIdentity(source)
     if desc and desc.setFemale then
         desc:setFemale(resolvedFemale)
     end
-    local explicitForename = normalizeString(source and source.forename)
-        or normalizeString(survivorOverride.forename)
-    local explicitSurname = normalizeString(source and source.surname)
-        or normalizeString(survivorOverride.surname)
-    if not explicitForename and not explicitSurname
+    local explicitForename = normalizeString(source and (
+        source.forename or source.firstName
+    )) or normalizeString(
+        survivorOverride.forename or survivorOverride.firstName
+    )
+    local explicitSurname = normalizeString(source and (
+        source.surname or source.lastName
+    )) or normalizeString(
+        survivorOverride.surname or survivorOverride.lastName
+    )
+    if (not explicitForename or not explicitSurname)
         and Names and type(Names.Generate) == "function"
     then
         generatedName = Names.Generate(
@@ -134,6 +140,8 @@ function Identity.GenerateResolvedIdentity(source)
             {
                 saveSeed = source and source.saveSeed,
                 namespace = "projecthoomans.identity.npc_name",
+                firstName = explicitForename,
+                surname = explicitSurname,
             }
         )
     end
@@ -143,14 +151,10 @@ function Identity.GenerateResolvedIdentity(source)
     surname = explicitSurname
         or generatedName and string.match(generatedName, "%s+(%S+)%s*$")
         or (desc and desc.getSurname and normalizeString(desc:getSurname()) or nil)
-    if explicitName and not (source and source.forename)
-        and not survivorOverride.forename
-    then
+    if explicitName and not explicitForename then
         forename = string.match(explicitName, "^(%S+)") or forename
     end
-    if explicitName and not (source and source.surname)
-        and not survivorOverride.surname
-    then
+    if explicitName and not explicitSurname then
         surname = string.match(explicitName, "%s+(%S+)%s*$") or surname
     end
     appearance = Identity.GetCharacterAppearance(desc)
@@ -176,7 +180,17 @@ function Identity.GenerateResolvedIdentity(source)
         end
     end
     if not displayName or displayName == "" then
-        displayName = Names and Names.Generate and Names.Generate(seed, resolvedFemale, source and source.archetypeID or nil) or "Survivor"
+        displayName = Names and Names.Generate and Names.Generate(
+            seed,
+            resolvedFemale,
+            source and source.archetypeID or nil,
+            {
+                saveSeed = source and source.saveSeed,
+                namespace = "projecthoomans.identity.npc_name",
+                firstName = forename,
+                surname = surname,
+            }
+        ) or "Survivor"
     end
     return {
         seed = seed,

@@ -146,4 +146,13 @@ First implementation slice completed across `psychopatzCore` and Project Hoomans
 - Focused evidence: Core deterministic content smoke **PASS**; Hoomans identity-choice smoke **PASS**; Python identity/wellbeing suite **10/10 passed**; worker suggestion-click smoke covered all three frames and server identity request dispatch; changed Lua `luac5.3 -p` **PASS**; targeted `pz_verify` Kahlua scans **PASS**; translation JSON and `git diff --check` **PASS**.
 - The repository-wide `tests/run_tests.py` command remains unavailable in this checkout because it imports the missing pre-existing `tools.semantic_harness.suite` module; direct focused tests were used and this runner issue was not changed.
 
+## P11I follow-up — deterministic first-name and surname overrides
+
+Completed locally on ProjectHoomans `main` and psychopatzCore `main`.
+
+- Core `DeterministicContent.GenerateName` now accepts canonical `firstName` and `surname` overrides, plus `forename` and `lastName` aliases for SurvivorDesc-style integrations. An omitted component remains derived from save seed, identity seed, namespace, version, gender, and archetype.
+- Project Hoomans `PNC.Identity.GenerateResolvedIdentity` and `PNC.IdentityNames.Generate` pass partial overrides through the Core boundary instead of falling back to the native factory's unseeded name.
+- Starting Companion family construction passes the authored player's surname into the identity factory for `mother`, `father`, `sister`, and `brother`; the existing persisted-record repair path remains in place.
+- Focused evidence: Core deterministic content smoke **PASS**; Hoomans deterministic identity smoke **PASS** including surname-only and first-name-only overrides; Starting Companion and family appearance smoke **PASS**; changed Lua `luac5.3 -p` **PASS**; targeted Kahlua verification **PASS**.
+
 **Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate identity choices through the real Tk/Xvfb Semantic Lab surface before native Project Zomboid validation.

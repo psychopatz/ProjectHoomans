@@ -136,6 +136,7 @@ end
 
 function H.BuildIdentity(player, npcID, spec, isFemale, seed)
     local appearance
+    local surname = H.SharesSurname(spec) and H.PlayerSurname(player) or nil
     if not Identity.GenerateResolvedIdentity then return nil end
     appearance = H.ResolveSharedAppearance(player, spec)
     local identity = Identity.GenerateResolvedIdentity({
@@ -143,9 +144,9 @@ function H.BuildIdentity(player, npcID, spec, isFemale, seed)
         isFemale = isFemale,
         identitySeed = seed,
         archetypeID = "General",
+        surname = surname,
     })
     H.ApplySharedAppearanceToIdentity(identity, appearance, isFemale == true)
-    local surname = H.SharesSurname(spec) and H.PlayerSurname(player) or nil
     if surname and identity then
         identity.survivor = identity.survivor or {}
         local forename = tostring(identity.survivor.forename or "")
