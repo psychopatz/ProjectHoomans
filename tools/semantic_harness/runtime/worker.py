@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import HarnessConfig
+from .fixture_provider import OfflineEngineFixtureProvider
 from .item_catalog import search_item_catalog
 from .process import HarnessError, LuaProcess
 from .scenario import load_scenario, validate_scenario
@@ -111,14 +112,31 @@ class LuaSemanticWorker:
         """Install a new immutable source and derive a fresh working world."""
 
         validate_scenario(scenario)
+        fixture_provider = OfflineEngineFixtureProvider()
+        effective_payloads = deepcopy(provider_payloads or {})
+        effective_payloads.setdefault(
+            fixture_provider.provider_id,
+            fixture_provider.project(scenario),
+        )
+        effective_provenance = deepcopy(provenance or {})
+        effective_provenance.setdefault("schema", "semantic.provenance.v1")
+        default_source = (
+            source.value if isinstance(source, Provenance) else str(source).upper()
+        )
+        if default_source not in {item.value for item in Provenance}:
+            default_source = Provenance.MISSING.value
+        effective_provenance.setdefault("defaultSource", default_source)
+        effective_paths = effective_provenance.setdefault("paths", {})
+        for path, value in fixture_provider.provenance_paths(scenario).items():
+            effective_paths.setdefault(path, value)
         snapshot = ImportedSourceSnapshot.from_scenario(
             scenario,
             source=source,
             source_id=source_id,
             mode=mode,
             metadata=metadata,
-            provenance=provenance,
-            provider_payloads=provider_payloads,
+            provenance=effective_provenance,
+            provider_payloads=effective_payloads,
         )
         response = self._request(
             "IMPORT_SOURCE",
@@ -326,6 +344,11 @@ class LuaSemanticWorker:
             roots,
             core_repository=self.config.core_repository,
         ).discover()
+
+    def offline_fixture_catalog(self) -> dict[str, Any]:
+        """Describe editable engine-only values and their fixture provenance."""
+
+        return OfflineEngineFixtureProvider().catalog(self.scenario)
 
     def save_browser(self, save_path: Path) -> dict[str, Any]:
         """Return a bounded read-only actor/world projection for one save."""

@@ -2,7 +2,7 @@
 
 **Updated:** 2026-10-24  
 **Parent status:** REOPENED — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is mandatory.  
-**Current mandatory phase:** P12E — Dynamic mod-state providers.
+**Current mandatory phase:** P12F — Offline engine fixture provider.
 **Current local baseline audited:** ProjectHoomans `main` at `b1cb1846`; upstream is synchronized.
 **Normal Semantic Lab runtime requirement:** Project Zomboid CLOSED/OFFLINE is supported and expected.  
 **Source save mutation:** FORBIDDEN.  
@@ -282,9 +282,23 @@ Evidence:
 - local real-save provider smoke exposed Core schema 16, persisted communities as `SAVE`, and 9 Dynamic Trading provider actors;
 - P12B/P12C/P12D suite: 8 tests passed; Xvfb worker/UI regression: 3 tests passed; Python compilation and `git diff --check` passed.
 
-## Current Exact Next Chunk — P12F
+## Completed Chunk — P12F Offline engine fixture provider
 
-Add the explicit offline engine-fixture provider for transient engine-derived values such as needs, time, weather, temperature, season, activity, position, and nearby density. Keep these values editable and visibly `FIXTURE`; never let them silently replace save-owned mod state.
+Added `tools/semantic_harness/runtime/fixture_provider.py` with a versioned offline engine-fixture contract:
+
+- player/NPC needs and engine-derived world values (time, weather, temperature, season, activity, position, nearby density, zombie kills) are cataloged as editable `FIXTURE` fields;
+- fixture values are carried in the immutable source snapshot under `offline_engine_fixtures`; saved ProjectHoomans/Core/DynamicTrading payloads remain separate;
+- fixture provenance is installed during configure/import and survives mutation/reset; working edits report `HARNESS_MUTATION` over the fixture baseline;
+- missing transient fields are explicit `MISSING`, not silently filled with saved mod-owned state; Project Zomboid remains optional.
+
+Evidence:
+
+- `tools/semantic_harness/tests/test_fixture_provider_p12f.py`: 2 tests passed;
+- P12A–P12D focused suites remained green; Python compilation and `git diff --check` passed.
+
+## Current Exact Next Chunk — P12G
+
+Audit and, if needed, add the optional read-only live profiler provider. It must be disabled by default, settings-text/restart controlled, one-way from Project Zomboid to Semantic Lab, and never expose mutation commands.
 
 ## P12A acceptance
 
