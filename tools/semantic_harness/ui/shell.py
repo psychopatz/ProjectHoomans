@@ -19,6 +19,7 @@ from .conversation_graph import ConversationGraphPane
 from ..studio.interaction_explorer_pane import InteractionExplorerPane
 from ..studio.interaction_spec_pane import InteractionSpecPane
 from ..inspection.rendering import conversation_first, pretty
+from ..inspection.tool_calls import format_tool_call
 from ..runtime.config import ConfigurationError
 from ..runtime.npc_profiles import (
     PROFILE_IDS,
@@ -2317,12 +2318,7 @@ class SemanticHarnessApp:
                 if message.get("speaker") == "npc":
                     self._append("NPC", npc_message_text(message))
             for call in response.get("toolCalls", []):
-                self._append(
-                    "TOOL/ACTION",
-                    f"{call.get('label') or call.get('name')}"
-                    f" [{call.get('name')}] · "
-                    f"{call.get('status') or call.get('reason') or 'observed'}",
-                )
+                self._append("TOOL/ACTION", format_tool_call(call))
             self._show_response(response)
 
         self._start_operation(lambda worker: worker.input(value), finish)
@@ -2347,12 +2343,7 @@ class SemanticHarnessApp:
                     if message.get("speaker") == "npc":
                         self._append("NPC", npc_message_text(message))
                 for call in response.get("toolCalls", []):
-                    self._append(
-                        "TOOL/ACTION",
-                        f"{call.get('label') or call.get('name')}"
-                        f" [{call.get('name')}] · "
-                        f"{call.get('status') or call.get('reason') or 'observed'}",
-                    )
+                    self._append("TOOL/ACTION", format_tool_call(call))
                 self._append("SYSTEM", f"Clicked semantic suggestion: {label}")
             else:
                 self._append(
@@ -2378,12 +2369,7 @@ class SemanticHarnessApp:
                     if message.get("speaker") == "npc":
                         self._append("NPC", npc_message_text(message))
                 for call in response.get("toolCalls", []):
-                    self._append(
-                        "TOOL/ACTION",
-                        f"{call.get('label') or call.get('name')}"
-                        f" [{call.get('name')}] · "
-                        f"{call.get('status') or call.get('reason') or 'observed'}",
-                    )
+                    self._append("TOOL/ACTION", format_tool_call(call))
             else:
                 self._append(
                     "SYSTEM",

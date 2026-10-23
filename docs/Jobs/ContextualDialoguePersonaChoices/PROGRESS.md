@@ -166,3 +166,14 @@ Completed locally on ProjectHoomans `main`.
 - EN/TL response JSON parsing and `git diff --check`: **PASS**.
 
 **Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.
+
+## P11I follow-up — readable tool/action transcript entries
+
+Completed locally on ProjectHoomans `main`.
+
+- Added one reusable bounded formatter for transcript tool/action calls across typed input, semantic suggestion clicks, and graph clicks.
+- Tool entries now show the contract, status, authority/source route, compact input, response text, relationship changes, and resulting relationship state as readable lines.
+- Large nested snapshots and transport/session tokens remain available in the structured inspector and are omitted from the visible conversation transcript.
+- Focused formatter tests: **2/2 passed**; real Tk/Xvfb contextual interaction suite: **7/7 passed**; live worker sample confirmed the identity request and relationship adjustment render with their response and delta.
+
+**Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.
