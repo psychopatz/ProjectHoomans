@@ -51,7 +51,7 @@ from ..studio.workflow import SemanticLabWorkflowPane
 from .state import load as load_ui_state
 from .state import save as save_ui_state
 from .state import state_path as ui_state_path
-from .workbench import ActorInventoryView, WorkbenchPage
+from .workbench import ActorInventoryView, InventoryGiftWorkbench, WorkbenchPage
 
 
 def npc_message_text(message: dict[str, Any]) -> str:
@@ -1164,6 +1164,9 @@ class SemanticHarnessApp:
             self.proposal_button.configure(state=state)
         if hasattr(self, "auto_replay_checkbutton"):
             self.auto_replay_checkbutton.configure(state=state)
+        inventory_gift_workbench = getattr(self, "inventory_gift_workbench", None)
+        if inventory_gift_workbench is not None:
+            inventory_gift_workbench.set_busy(not enabled)
         if self.language_box is not None:
             self.language_box.configure(
                 state="readonly" if enabled and not self.busy else "disabled"
@@ -2576,6 +2579,7 @@ class SemanticHarnessApp:
         self.trait_effects_var = None
         self.trait_effects_widget = None
         self.trait_effects_widgets = {}
+        self.inventory_gift_workbench: InventoryGiftWorkbench | None = None
         catalog_controls = self.simulation_control_catalog.get("controls", [])
         if not isinstance(catalog_controls, list):
             catalog_controls = []
@@ -2747,6 +2751,16 @@ class SemanticHarnessApp:
                 columnspan=4,
                 sticky="w",
                 pady=(2, 6),
+            )
+            self.inventory_gift_workbench = InventoryGiftWorkbench(
+                relationship_page.content,
+                self,
+            )
+            relationship_page.add_widget(
+                self.inventory_gift_workbench.frame,
+                columnspan=4,
+                sticky="nsew",
+                pady=(6, 4),
             )
             relationship_page.finish()
         override_field = self.workbench_control_fields.get("npc.personalityOverride")
@@ -2949,6 +2963,13 @@ class SemanticHarnessApp:
             self.actor_inventory_views[panel_name].update(
                 actor.get("inventory"),
                 self._actor_source_info(f"{actor_key}.inventory", "MISSING"),
+            )
+        if self.inventory_gift_workbench is not None:
+            self.inventory_gift_workbench.update(
+                self.scenario.get("player", {}).get("inventory"),
+                self.scenario.get("npc", {}).get("inventory"),
+                self._actor_source_info("player.inventory", "MISSING"),
+                self._actor_source_info("npc.inventory", "MISSING"),
             )
 
     def _collect_workbench_scenario(self) -> dict[str, Any]:
@@ -3551,6 +3572,9 @@ class SemanticHarnessApp:
 
     def _show_response(self, response: dict[str, Any]) -> None:
         self.last_response = response if isinstance(response, dict) else {}
+        response_scenario = self.last_response.get("scenario")
+        if isinstance(response_scenario, dict):
+            self.scenario = response_scenario
         self._update_simulation_projection(self.last_response)
         relationship_field = self.workbench_control_fields.get("relationship.state")
         if relationship_field is not None:
@@ -3597,6 +3621,186 @@ class SemanticHarnessApp:
             self.trace_tabs.select(self.dialogue_graph_frame)
         elif hub_diagnostics.get("activeHub") is not None:
             self.trace_tabs.select(self.hub_diagnostics_frame)
+
+    @staticmethod
+    def _inventory_item_map(inventory: Any) -> dict[str, dict[str, Any]]:
+        inventory = inventory if isinstance(inventory, dict) else {}
+        raw_items = inventory.get("items", [])
+        items = list(raw_items.values()) if isinstance(raw_items, dict) else raw_items
+        if not isinstance(items, list):
+            return {}
+        output: dict[str, dict[str, Any]] = {}
+        for index, item in enumerate(items):
+            if not isinstance(item, dict):
+                continue
+            item_id = str(item.get("itemID") or item.get("id") or f"item-{index}")
+            output[item_id] = {
+                "name": str(
+                    item.get("displayName")
+                    or item.get("fullType")
+                    or item.get("type")
+                    or item_id
+                ),
+                "stack": item.get("stack", item.get("quantity", item.get("count", 1))),
+            }
+        return output
+
+    @classmethod
+    def _inventory_delta(cls, before: Any, after: Any) -> str:
+        before_items = cls._inventory_item_map(before)
+        after_items = cls._inventory_item_map(after)
+        lines: list[str] = []
+        for item_id in sorted(set(before_items) | set(after_items)):
+            left = before_items.get(item_id, {"name": item_id, "stack": 0})
+            right = after_items.get(item_id, {"name": left["name"], "stack": 0})
+            if left.get("stack") != right.get("stack"):
+                lines.append(
+                    f"{right.get('name') or left.get('name')}: "
+                    f"{left.get('stack', 0)} → {right.get('stack', 0)}"
+                )
+        return "\n".join(lines[:24]) or "no inventory delta"
+
+    @staticmethod
+    def _relationship_evidence(value: Any) -> str:
+        relationship = value if isinstance(value, dict) else {}
+        return " · ".join(
+            f"{key}={relationship.get(key, 'MISSING')}"
+            for key in ("approval", "respect", "familiarity", "state", "revision")
+        )
+
+    def _gift_result_text(
+        self,
+        response: dict[str, Any],
+        before: dict[str, Any],
+        after: dict[str, Any],
+        selected_item: dict[str, Any],
+        quantity: int,
+    ) -> str:
+        result = response.get("result") if isinstance(response, dict) else {}
+        result = result if isinstance(result, dict) else {}
+        action = result.get("actionResult")
+        action = action if isinstance(action, dict) else {}
+        decision = result.get("decision")
+        decision = decision if isinstance(decision, dict) else {}
+        display = str(
+            selected_item.get("displayName")
+            or selected_item.get("fullType")
+            or selected_item.get("type")
+            or "item"
+        )
+        messages = [
+            npc_message_text(message)
+            for message in response.get("messages", [])
+            if isinstance(message, dict) and message.get("speaker") == "npc"
+        ]
+        relationship_before = before.get("npc", {}).get("relationship")
+        relationship_after = after.get("npc", {}).get("relationship")
+        source_kind = (
+            self.source_snapshot_projection.get("metadata", {}).get("sourceKind")
+            if isinstance(self.source_snapshot_projection, dict)
+            else "MISSING"
+        )
+        return "\n".join(
+            [
+                "Gift: Player → NPC",
+                f"item/count: {display} × {quantity}",
+                f"production status: {action.get('status') or decision.get('branch') or 'unknown'}",
+                "",
+                "Player inventory before → after:",
+                self._inventory_delta(
+                    before.get("player", {}).get("inventory"),
+                    after.get("player", {}).get("inventory"),
+                ),
+                "NPC inventory before → after:",
+                self._inventory_delta(
+                    before.get("npc", {}).get("inventory"),
+                    after.get("npc", {}).get("inventory"),
+                ),
+                "",
+                f"NPC response: {messages[0] if messages else 'no production response'}",
+                "Relationship before: " + self._relationship_evidence(relationship_before),
+                "Relationship after: " + self._relationship_evidence(relationship_after),
+                "",
+                f"Source save: UNCHANGED · source {str(source_kind or 'MISSING').upper()} · detached working world only",
+            ]
+        )
+
+    def gift_selected_inventory_item(self, item: dict[str, Any], raw_quantity: Any) -> None:
+        if self.closed or not self.session.ready or self.busy:
+            return
+        try:
+            quantity = max(1, min(999, int(str(raw_quantity or "1"))))
+        except (TypeError, ValueError):
+            quantity = 1
+        display = str(
+            item.get("displayName")
+            or item.get("fullType")
+            or item.get("type")
+            or "item"
+        )
+        quantity_text = str(quantity)
+        utterance = f"here's {quantity_text} {display} for you"
+        before = deepcopy(self.scenario)
+
+        def operation(worker: LuaSemanticWorker) -> dict[str, Any]:
+            response = worker.input(utterance)
+            return {"response": response, "actorState": worker.inspect_actor_state()}
+
+        def finish(payload: dict[str, Any]) -> None:
+            response = payload.get("response") if isinstance(payload, dict) else {}
+            actor_state = payload.get("actorState") if isinstance(payload, dict) else {}
+            response = response if isinstance(response, dict) else {}
+            actor_state = actor_state if isinstance(actor_state, dict) else {}
+            state_scenario = actor_state.get("scenario")
+            state_scenario = state_scenario if isinstance(state_scenario, dict) else {}
+            after = deepcopy(self.scenario)
+            for actor_key in ("player", "npc"):
+                state_actor = state_scenario.get(actor_key)
+                if not isinstance(state_actor, dict):
+                    continue
+                actor = after.setdefault(actor_key, {})
+                if isinstance(actor, dict) and isinstance(state_actor.get("inventory"), dict):
+                    actor["inventory"] = state_actor["inventory"]
+                if actor_key == "npc" and isinstance(actor, dict):
+                    relationship = state_actor.get("relationship")
+                    if isinstance(relationship, dict):
+                        actor["relationship"] = relationship
+            self.scenario = after
+            self._show_response(response)
+            self.scenario = after
+            self._refresh_actor_inspectors()
+            if response.get("accepted") is True:
+                self._record_replay_step({"kind": "input", "text": utterance})
+            if self.inventory_gift_workbench is not None:
+                self.inventory_gift_workbench.show_result(
+                    self._gift_result_text(response, before, after, item, quantity)
+                )
+
+        self._start_operation(operation, finish)
+
+    def reset_working_world(self) -> None:
+        """Restore the imported source baseline without rereading disk."""
+
+        if self.closed or not self.session.ready or self.busy:
+            return
+
+        def finish(response: dict[str, Any]) -> None:
+            scenario = response.get("scenario") if isinstance(response, dict) else None
+            if isinstance(scenario, dict):
+                self.scenario = scenario
+                self._sync_workbench_from_scenario(scenario)
+            self._update_simulation_projection(response)
+            self._set_text(
+                self.inventory_gift_workbench.result,
+                "Working world reset to the already-imported baseline.\n"
+                "Source save: UNCHANGED · no disk reread.",
+            )
+            self._append("SYSTEM", "Reset working world to imported source baseline.")
+
+        self._start_operation(
+            lambda worker: worker.reset_working_world(),
+            finish,
+        )
 
     def _on_suggestion_group(self) -> None:
         if not self.suggestion_projection:

@@ -22,6 +22,7 @@ local capabilities = {
     "CONFIG", "IMPORT_SOURCE", "RESET", "RESET_TURN", "RESET_CONVERSATION",
     "RESET_ACTOR_MUTATIONS", "RESET_WORLD", "INPUT", "LANGUAGE", "TOOL_REPLY",
     "PREVIEW", "SNAPSHOT", "CONVERSATION_GRAPH", "FLOW_CATALOG", "FLOW_VALIDATE",
+    "INSPECT_ACTOR_STATE",
     "RELATIONSHIP_PROPOSAL", "RELATIONSHIP_PREVIEW",
     "SUGGESTION_PREDICATE", "SUGGESTION_CLICK",
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
@@ -34,6 +35,81 @@ local capabilities = {
     "SIMULATION_CONTROL_CATALOG",
     "TALK_CATALOG", "TALK_START", "TALK_MATRIX",
 }
+
+local function boundedInventory(context, inventory)
+    local source = type(inventory) == "table" and inventory or {}
+    local output = {
+        revision = source.revision,
+        items = {},
+    }
+    local itemIDs = {}
+    for itemID in pairs(type(source.items) == "table" and source.items or {}) do
+        itemIDs[#itemIDs + 1] = tostring(itemID)
+    end
+    table.sort(itemIDs)
+    for index = 1, math.min(#itemIDs, 512) do
+        local itemID = itemIDs[index]
+        local item = source.items[itemID]
+        if type(item) == "table" then
+            output.items[itemID] = {
+                id = item.id or itemID,
+                itemID = item.itemID or itemID,
+                type = item.type,
+                fullType = item.fullType,
+                displayName = item.displayName or item.customName,
+                stack = item.stack or item.quantity or item.count,
+                container = item.container,
+                equipped = item.equipped,
+                equipSlot = item.equipSlot,
+                condition = item.condition or item.cond,
+                uses = item.uses,
+            }
+        end
+    end
+    return output
+end
+
+local function boundedRelationship(context)
+    local scenario = context.Runtime.scenario or {}
+    local npc = scenario.npc or {}
+    local snapshot = context.SemanticAdapters
+        and type(context.SemanticAdapters.relationshipSnapshotFor) == "function"
+        and context.SemanticAdapters.relationshipSnapshotFor(
+            context, npc.npcID or npc.id
+        ) or npc.relationship
+    local relationship = type(snapshot) == "table" and snapshot or {}
+    local output = {}
+    for _, key in ipairs({
+        "baselineApproval", "baselineRespect", "approval", "respect",
+        "familiarity", "state", "previousState", "revision",
+        "interactionRevision", "saturation", "cooldownUntil",
+    }) do
+        output[key] = relationship[key]
+    end
+    output.bond = context.Values.copy(relationship.bond)
+    return output
+end
+
+local function actorStateProjection(context)
+    local scenario = context.Runtime.scenario or {}
+    local player = scenario.player or {}
+    local npc = scenario.npc or {}
+    return {
+        ok = true,
+        type = "actor_state",
+        scenario = {
+            player = {
+                inventory = boundedInventory(context, context.playerInventory
+                    or player.inventory),
+            },
+            npc = {
+                inventory = boundedInventory(context, context.npcInventory
+                    or npc.inventory),
+                relationship = boundedRelationship(context),
+            },
+        },
+    }
+end
 
 local function catalogValues(source, fallback)
     local values = {}
@@ -1200,6 +1276,8 @@ function CommandRouter.dispatch(context, request)
         return response
     elseif command == "TOOL_REPLY" then
         return context.OutputProjection.toolReply(context, payload)
+    elseif command == "INSPECT_ACTOR_STATE" then
+        return actorStateProjection(context)
     elseif command == "SNAPSHOT" then
         return context.ScenarioSession.snapshot(context)
     elseif command == "CONVERSATION_GRAPH" then

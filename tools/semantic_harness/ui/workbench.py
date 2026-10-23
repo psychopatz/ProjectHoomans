@@ -15,6 +15,7 @@ class ActorInventoryView:
         self.ttk = host._ttk
         self.tk = host._tk
         self.actor_label = actor_label
+        self.item_rows: dict[str, dict[str, Any]] = {}
         self.frame = self.ttk.Frame(parent, padding=6)
         self.frame.columnconfigure(0, weight=1)
         self.frame.rowconfigure(1, weight=1)
@@ -64,6 +65,7 @@ class ActorInventoryView:
     ) -> None:
         for item_id in self.tree.get_children(""):
             self.tree.delete(item_id)
+        self.item_rows = {}
         inventory = inventory if isinstance(inventory, dict) else {}
         raw_items = inventory.get("items", [])
         if isinstance(raw_items, dict):
@@ -100,10 +102,12 @@ class ActorInventoryView:
                 "stack", item.get("quantity", item.get("count", 1))
             )
             item_source = str(item.get("source") or source).upper()
+            row_id = f"{self.actor_label}-{index}"
+            self.item_rows[row_id] = item
             self.tree.insert(
                 "",
                 "end",
-                iid=f"{self.actor_label}-{index}",
+                iid=row_id,
                 values=(full_type, quantity, item_source),
             )
             visible += 1
@@ -112,6 +116,134 @@ class ActorInventoryView:
             if visible
             else f"{self.actor_label} inventory is unavailable or empty · source {source}"
         )
+
+
+class InventoryGiftWorkbench:
+    """Side-by-side read-only inventories with a production gift action."""
+
+    def __init__(self, parent: Any, host: Any) -> None:
+        self.host = host
+        self.ttk = host._ttk
+        self.tk = host._tk
+        self.frame = self.ttk.LabelFrame(
+            parent,
+            text="Inventory / Gift verification · isolated working world",
+            padding=6,
+        )
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.columnconfigure(1, minsize=20)
+        self.frame.columnconfigure(2, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+        self.player_view = ActorInventoryView(self.frame, host, "gift-player")
+        self.npc_view = ActorInventoryView(self.frame, host, "gift-npc")
+        self.player_view.frame.grid(row=1, column=0, sticky="nsew")
+        self.npc_view.frame.grid(row=1, column=2, sticky="nsew")
+        self.ttk.Label(self.frame, text="Player → NPC").grid(
+            row=0, column=0, columnspan=3, sticky="w", pady=(0, 4)
+        )
+        self.player_view.tree.bind(
+            "<<TreeviewSelect>>", lambda _event: self._on_player_select()
+        )
+        action = self.ttk.Frame(self.frame)
+        action.grid(row=2, column=0, columnspan=3, sticky="ew", pady=(6, 2))
+        action.columnconfigure(1, weight=1)
+        self.selected_var = self.tk.StringVar(value="Selected: none")
+        self.ttk.Label(action, textvariable=self.selected_var, anchor="w").grid(
+            row=0, column=0, sticky="w", padx=(0, 8)
+        )
+        self.quantity_var = self.tk.StringVar(value="1")
+        self.ttk.Label(action, text="Count").grid(row=0, column=1, sticky="e")
+        self.quantity_box = self.ttk.Spinbox(
+            action,
+            from_=1,
+            to=999,
+            width=5,
+            textvariable=self.quantity_var,
+        )
+        self.quantity_box.grid(row=0, column=2, sticky="w", padx=(4, 8))
+        self.give_button = self.ttk.Button(
+            action,
+            text="Give selected →",
+            command=self._give_selected,
+        )
+        self.give_button.grid(row=0, column=3, sticky="e")
+        self.reset_button = self.ttk.Button(
+            action,
+            text="Reset Working World",
+            command=host.reset_working_world,
+        )
+        self.reset_button.grid(row=0, column=4, sticky="e", padx=(6, 0))
+        self.status_var = self.tk.StringVar(
+            value="Select a Player item to route it through production gift semantics."
+        )
+        self.ttk.Label(
+            self.frame,
+            textvariable=self.status_var,
+            anchor="w",
+            justify="left",
+            wraplength=760,
+        ).grid(row=3, column=0, columnspan=3, sticky="ew", pady=(2, 4))
+        self.result = host._ScrolledText(
+            self.frame,
+            wrap="word",
+            height=8,
+            state="disabled",
+        )
+        self.result.grid(row=4, column=0, columnspan=3, sticky="ew")
+        self.selected_item: dict[str, Any] | None = None
+
+    def _on_player_select(self) -> None:
+        selection = self.player_view.tree.selection()
+        self.selected_item = (
+            self.player_view.item_rows.get(selection[0]) if selection else None
+        )
+        if not self.selected_item:
+            self.selected_var.set("Selected: none")
+            self._set_action_state(False)
+            return
+        display = str(
+            self.selected_item.get("displayName")
+            or self.selected_item.get("fullType")
+            or self.selected_item.get("type")
+            or "item"
+        )
+        stack = self.selected_item.get(
+            "stack", self.selected_item.get("quantity", 1)
+        )
+        self.selected_var.set(f"Selected: {display} × {stack}")
+        self.quantity_var.set("1")
+        self.status_var.set(
+            "Selected item will use the production semantic GIFT route; "
+            "the UI does not mutate inventory tables."
+        )
+        self._set_action_state(True)
+
+    def _set_action_state(self, selected: bool) -> None:
+        self.give_button.configure(
+            state=("normal" if selected and not self.host.busy else "disabled")
+        )
+
+    def set_busy(self, busy: bool) -> None:
+        self._set_action_state(self.selected_item is not None and not busy)
+        self.reset_button.configure(state="disabled" if busy else "normal")
+
+    def _give_selected(self) -> None:
+        if self.selected_item is not None:
+            self.host.gift_selected_inventory_item(
+                self.selected_item,
+                self.quantity_var.get(),
+            )
+
+    def update(self, player: Any, npc: Any, player_provenance: Any, npc_provenance: Any) -> None:
+        self.player_view.update(player, player_provenance)
+        self.npc_view.update(npc, npc_provenance)
+        self.selected_item = None
+        self.selected_var.set("Selected: none")
+        self._set_action_state(False)
+
+    def show_result(self, text: str) -> None:
+        self._set_action_state(False)
+        self.host._set_text(self.result, text)
 
 
 class WorkbenchPage:

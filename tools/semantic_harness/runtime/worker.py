@@ -261,6 +261,11 @@ class LuaSemanticWorker:
         self._sync_effective_scenario(response)
         return response
 
+    def inspect_actor_state(self) -> dict[str, Any]:
+        """Return bounded production actor state after an isolated mutation."""
+
+        return self._request("INSPECT_ACTOR_STATE")
+
     def relationship_proposal(self, npc_id: str | None = None) -> dict[str, Any]:
         """Submit the canonical proposal action to the server-authority seam."""
 

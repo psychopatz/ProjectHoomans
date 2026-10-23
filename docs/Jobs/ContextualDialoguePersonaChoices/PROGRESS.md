@@ -1,9 +1,9 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
 **Updated:** 2026-10-24  
-**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13A/P13B/P13C/P13D complete; P13 operational usability remains mandatory.
-**Current mandatory phase:** P13E — Inventory / Gift Verification Workbench.
-**Current remote baseline audited:** ProjectHoomans `main` at `ccb10f8e` before the P13D implementation commit.
+**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13A/P13B/P13C/P13D/P13E complete; P13 operational usability remains mandatory.
+**Current mandatory phase:** P13F — Agent-grade CLI parity.
+**Current remote baseline audited:** ProjectHoomans `main` at `ff3ef50b` before the P13E implementation commit.
 **Normal Semantic Lab runtime requirement:** Project Zomboid may remain CLOSED/OFFLINE.  
 **Source save mutation:** FORBIDDEN.  
 **Optional live profiler:** read-only enrichment only.
@@ -293,9 +293,44 @@ Exact evidence on 2026-10-24:
 - `python3 -m py_compile` and `git diff --check` passed. No production Lua
   files changed in P13D.
 
-## Current Exact Next Chunk — P13E
+## P13E — Inventory / Gift Verification Workbench — COMPLETE
 
-Build the side-by-side Player/NPC inventory and gift-verification workbench.
-Selection must invoke the existing semantic/gift production path, show before /
-after inventory and relationship evidence, and reset only the detached working
-world while proving the source save remains unchanged.
+Implemented on existing `main` using the shared actor inventory presentation and
+the existing production semantic gift route:
+
+- Added side-by-side read-only Player/NPC inventory panels with selected item,
+  bounded quantity, `Give selected →`, reset, provenance/source labels, and a
+  bounded result report.
+- UI gift execution invokes the existing semantic `GIFT` path through
+  `PNC.Client.SendInventoryTransfer`; it does not mutate inventory tables.
+- Added bounded Lua worker `INSPECT_ACTOR_STATE` readback so large saved
+  relationship journals do not exceed the JSON-lines transport limit. It returns
+  bounded inventories and relationship scalars/bond only.
+- Result evidence shows production status, Player/NPC inventory deltas, NPC
+  response, relationship before/after, and `Source save: UNCHANGED`.
+- `Reset Working World` reuses the existing imported-snapshot reset boundary;
+  it restores Player/NPC inventories and relationship while avoiding a disk
+  reread.
+
+Exact evidence on 2026-10-24:
+
+- Real Tk/Xvfb acceptance at `1080x700` selected a compatible real save, Player,
+  persisted faction member `npcAdamBloom_48G5`, and native `Base.Bandage`; the
+  production gift route changed isolated Player inventory and relationship,
+  displayed the full evidence report, reset to the imported baseline, and kept
+  the source save SHA-256 unchanged.
+- Focused Tk regression set (`P13E`, P13C actor inspectors, P13D faction /
+  community workbench, P13A browser, P10E workbench): `5/5` passed.
+- Real Lua worker gift/lifecycle and save-backed conversation regressions:
+  `5/5` passed; Python compile, `luac5.3 -p` for the worker router, and
+  `git diff --check` passed.
+- Full worker snapshot was intentionally not used for post-gift UI readback;
+  the bounded command is the transport-safe evidence path for imported saves
+  with large relationship memory state.
+
+## Current Exact Next Chunk — P13F
+
+Provide machine-readable CLI parity for save discovery, saved actors/groups,
+Player/NPC inspection, inventory/relationship inspection, Talk, semantic input,
+gift/recruit/propose, working-world diff, reset, and reload using the same
+backend owners as the GUI.
