@@ -386,6 +386,40 @@ Implemented and verified the complete real-save operational workflow on existing
   `luac5.3 -p`, and `pz_verify --kahlua --severity ERROR` clean;
 - `git diff --check` and Python compilation clean.
 
+## Post-P13G — Semantic Lab UI organization and faction context — COMPLETE
+
+Implemented on existing `main` without replacing the P12/P13 save-backed owners:
+
+- Added a compact Simulation context/action bar with readable `SAVE`, Player,
+  target, faction, and community context.
+- Save-backed mode collapses the Semantic trace and low-frequency reset,
+  replay, settings, and fixture controls behind explicit diagnostics/advanced
+  actions. Synthetic controls remain available in Developer/Test mode.
+- Corrected save-backed splitter restoration so the conversation remains usable
+  at `1080x700` and `1280x800` after diagnostics are hidden.
+- Extended `SavedWorldBrowser` with backend-owned readable faction/community
+  labels and provenance; derived community labels never expose the full raw ID
+  as the normal actor label. World Browser actor rows use `NPC: faction` or
+  `NPC: community` display text.
+- NPC inspector identity now presents readable faction/community names first;
+  raw NPC/faction/community/player identifiers remain only as technical details.
+- Added a first-class `Faction / Community` workbench tab. It renders selected
+  group membership, leader, roles/provider context, and separate personal
+  relationship versus faction/community standing verification. Missing group
+  standing is shown as `MISSING`; NPC approval is never substituted for group
+  standing. Imported/effective standing fields are ready for future production
+  group projections without inventing saved truth.
+
+Exact evidence on 2026-10-24:
+
+- `test_ui_organization`: `2/2` real-save Tk/Xvfb tests passed at minimum and
+  desktop geometries, including save/player/group/NPC/import, readable context,
+  compact layout, diagnostics/advanced toggles, and faction standing display.
+- Focused Tk regression set: `17/17` passed; save-browser backend tests: `2/2`
+  passed; this includes P13A/P13C/P13D/P13E/P13G and workbench coverage.
+- `python3 -m py_compile` passed changed Python files and `git diff --check`
+  passed. No production Lua or source-save files changed.
+
 ## Current Exact Next Chunk — none documented after P13G
 
 `ROADMAP.md` currently ends at P13G. No later phase is being invented or

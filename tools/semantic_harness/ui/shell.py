@@ -330,6 +330,11 @@ class SemanticHarnessApp:
         self.saved_world_entries: list[dict[str, Any]] = []
         self.saved_world_category_rows: dict[str, list[dict[str, Any]]] = {}
         self.saved_world_save_labels: dict[str, dict[str, Any]] = {}
+        self.saved_world_selected_actor: dict[str, Any] = {}
+        self.saved_world_selected_group: dict[str, Any] = {}
+        self.save_backed_mode = False
+        self.trace_panel_visible = True
+        self.advanced_controls_visible = True
         self.persona_catalog: dict[str, Any] = {}
         self.simulation_control_catalog: dict[str, Any] = {}
         self.talk_catalog: dict[str, Any] = {}
@@ -394,7 +399,8 @@ class SemanticHarnessApp:
         simulation_tab = ttk.Frame(self.main_tabs, padding=8)
         studio_tab.rowconfigure(0, weight=1)
         studio_tab.columnconfigure(0, weight=1)
-        simulation_tab.rowconfigure(0, weight=1)
+        simulation_tab.rowconfigure(0, weight=0)
+        simulation_tab.rowconfigure(1, weight=1)
         simulation_tab.columnconfigure(0, weight=1)
         studio_notebook = ttk.Notebook(studio_tab)
         self.studio_notebook = studio_notebook
@@ -451,13 +457,51 @@ class SemanticHarnessApp:
         self.world_browser_tab = world_browser_tab
         self._build_saved_world_browser(world_browser_tab)
 
+        simulation_toolbar = ttk.Frame(simulation_tab)
+        simulation_toolbar.grid(row=0, column=0, sticky="ew", pady=(0, 6))
+        simulation_toolbar.columnconfigure(0, weight=1)
+        self.simulation_context_var = self._tk.StringVar(
+            value="Developer/Test source · select a saved target from World Browser"
+        )
+        self.simulation_context_label = ttk.Label(
+            simulation_toolbar,
+            textvariable=self.simulation_context_var,
+            anchor="w",
+            justify="left",
+            wraplength=720,
+        )
+        self.simulation_context_label.grid(
+            row=0, column=0, sticky="ew", padx=(2, 8)
+        )
+        ttk.Button(
+            simulation_toolbar,
+            text="World Browser",
+            command=lambda: self.main_tabs.select(self.world_browser_tab),
+        ).grid(row=0, column=1, sticky="e", padx=(0, 4))
+        self.diagnostics_toggle_button = ttk.Button(
+            simulation_toolbar,
+            text="Hide diagnostics",
+            command=self._toggle_trace_panel,
+        )
+        self.diagnostics_toggle_button.grid(
+            row=0, column=2, sticky="e", padx=(0, 4)
+        )
+        self.advanced_toggle_button = ttk.Button(
+            simulation_toolbar,
+            text="Hide advanced",
+            command=self._toggle_advanced_controls,
+        )
+        self.advanced_toggle_button.grid(row=0, column=3, sticky="e")
+        self.simulation_toolbar = simulation_toolbar
+
         container = ttk.Frame(simulation_tab)
-        container.pack(fill="both", expand=True)
+        container.grid(row=1, column=0, sticky="nsew")
         container.rowconfigure(0, weight=1)
         container.columnconfigure(0, weight=1)
         self.simulation_panes = ttk.PanedWindow(container, orient="horizontal")
         self.simulation_panes.grid(row=0, column=0, sticky="nsew")
         workflow_pane = ttk.Frame(self.simulation_panes)
+        self.simulation_workflow_pane = workflow_pane
         workflow_pane.rowconfigure(0, weight=1)
         workflow_pane.columnconfigure(0, weight=1)
         self.workflow_pane_split = ttk.PanedWindow(
@@ -582,6 +626,7 @@ class SemanticHarnessApp:
             value="Common context controls · changes apply through the Lua worker."
         )
         workbench_footer = ttk.Frame(self.workbench_content)
+        self.workbench_footer = workbench_footer
         workbench_footer.grid(row=1, column=0, sticky="ew", pady=(3, 0))
         workbench_footer.columnconfigure(0, weight=1)
         workbench_footer.columnconfigure(1, weight=1)
@@ -626,6 +671,7 @@ class SemanticHarnessApp:
         workbench_actions.columnconfigure(3, weight=1)
 
         controls = ttk.Frame(workbench_pane)
+        self.advanced_controls = controls
         controls.grid(row=1, column=0, sticky="ew", pady=(4, 0))
         controls.columnconfigure(0, weight=1)
         controls.columnconfigure(1, weight=0)
@@ -692,6 +738,7 @@ class SemanticHarnessApp:
         right.rowconfigure(0, weight=1)
         right.columnconfigure(0, weight=1)
         right.configure(width=420)
+        self.trace_pane = right
         self.simulation_panes.add(right, weight=2)
         self.workflow_pane_split.add(conversation_pane, weight=3)
         self.workflow_pane_split.add(workbench_pane, weight=2)
@@ -1627,9 +1674,34 @@ class SemanticHarnessApp:
     def _restore_splitters(self) -> None:
         if self.closed or self.main_tabs.select() != str(self.simulation_tab):
             return
-        simulation_width = max(1, self.simulation_panes.winfo_width())
         workflow_height = max(1, self.workflow_pane_split.winfo_height())
-        if simulation_width <= 10 or workflow_height <= 10:
+        if workflow_height <= 10:
+            self._schedule_splitter_restore(100)
+            return
+        workflow_minimum = 340 if self.save_backed_mode else 240
+        workflow_maximum = max(
+            workflow_minimum,
+            workflow_height - (220 if self.save_backed_mode else 260),
+        )
+        workflow_value = self._ui_state.get("workflow_sash")
+        if workflow_value is None:
+            workflow_value = min(
+                max(workflow_minimum, int(workflow_height * 0.50)),
+                workflow_maximum,
+            )
+        else:
+            workflow_value = min(
+                max(workflow_minimum, int(workflow_value)),
+                workflow_maximum,
+            )
+        try:
+            self.workflow_pane_split.sashpos(0, int(workflow_value))
+        except (self._tk.TclError, TypeError, ValueError):
+            pass
+        if not self.trace_panel_visible:
+            return
+        simulation_width = max(1, self.simulation_panes.winfo_width())
+        if simulation_width <= 10:
             self._schedule_splitter_restore(100)
             return
         simulation_value = self._ui_state.get("simulation_sash")
@@ -1643,21 +1715,6 @@ class SemanticHarnessApp:
                 max(620, int(simulation_value)),
                 max(620, simulation_width - 420),
             )
-        workflow_value = self._ui_state.get("workflow_sash")
-        if workflow_value is None:
-            workflow_value = min(
-                max(240, int(workflow_height * 0.50)),
-                max(240, workflow_height - 260),
-            )
-        else:
-            workflow_value = min(
-                max(240, int(workflow_value)),
-                max(240, workflow_height - 260),
-            )
-        try:
-            self.workflow_pane_split.sashpos(0, int(workflow_value))
-        except (self._tk.TclError, TypeError, ValueError):
-            pass
         try:
             self.simulation_panes.sashpos(0, int(simulation_value))
         except (self._tk.TclError, TypeError, ValueError):
@@ -1709,7 +1766,7 @@ class SemanticHarnessApp:
             )
             state["talk_target"] = selected_talk
             state["talk_utterance"] = self.talk_utterance_var.get()
-            if self.simulation_panes.winfo_width() > 10:
+            if self.trace_panel_visible and self.simulation_panes.winfo_width() > 10:
                 state["simulation_sash"] = self.simulation_panes.sashpos(0)
             if self.workflow_pane_split.winfo_height() > 10:
                 state["workflow_sash"] = self.workflow_pane_split.sashpos(0)
@@ -1991,6 +2048,8 @@ class SemanticHarnessApp:
                 self.saved_world_player_var.set(player_labels[0])
             self.saved_world_search_var.set("")
             self.saved_world_npc_var.set("")
+            self.saved_world_selected_actor = {}
+            self.saved_world_selected_group = {}
             self._render_saved_world_tree()
             counts = self.saved_world_browser.get("counts") or {}
             self.saved_world_status_var.set(
@@ -2060,6 +2119,13 @@ class SemanticHarnessApp:
                 if member.get("isTrader") is True:
                     flags.append("trader")
                 label = str(member.get("label") or member.get("id") or "NPC")
+                group_affiliation = str(
+                    member.get("factionLabel")
+                    or member.get("communityLabel")
+                    or ""
+                ).strip()
+                if group_affiliation:
+                    label = f"{label}: {group_affiliation}"
                 if flags:
                     label = f"{label} · {', '.join(flags)}"
                 self.saved_world_tree.insert(
@@ -2149,14 +2215,20 @@ class SemanticHarnessApp:
         selected_id = selection[0]
         group = self.saved_world_tree_group_nodes.get(selected_id)
         if group is not None:
+            self.saved_world_selected_group = deepcopy(group)
+            self.saved_world_selected_actor = {}
             self._render_saved_world_group_details(group)
+            self._refresh_faction_context()
             return
         actor = self.saved_world_tree_actor_rows.get(selected_id)
         if not actor:
             return
         group_id = self.saved_world_tree_actor_groups.get(selected_id)
+        group = self.saved_world_tree_group_nodes.get(group_id)
+        self.saved_world_selected_actor = deepcopy(actor)
+        self.saved_world_selected_group = deepcopy(group or {})
         self._render_saved_world_group_details(
-            self.saved_world_tree_group_nodes.get(group_id)
+            group
         )
         self.saved_world_npc_var.set(str(actor.get("id") or ""))
         label = str(actor.get("label") or actor.get("id") or "NPC")
@@ -2164,6 +2236,8 @@ class SemanticHarnessApp:
             f"Selected NPC: {label} · source {actor.get('source') or 'MISSING'} · "
             "double-click or Load selected NPC"
         )
+        self._refresh_faction_context()
+        self._refresh_simulation_context()
 
     def _import_saved_world_target(self) -> None:
         entry = self._selected_saved_world_entry()
@@ -2596,7 +2670,13 @@ class SemanticHarnessApp:
                 and control.get("workbenchVisible", True) is not False
             )
         ]
-        panel_names = ("NPC Target", "Player", "Relationship", "World")
+        panel_names = (
+            "NPC Target",
+            "Player",
+            "Relationship",
+            "World",
+            "Faction / Community",
+        )
         actor_tabs = ("Overview", "Needs", "Personality & Traits", "Inventory")
         pages: dict[tuple[str, str], WorkbenchPage] = {}
         page_controls: dict[tuple[str, str], list[dict[str, Any]]] = {}
@@ -2604,6 +2684,7 @@ class SemanticHarnessApp:
         self.actor_needs_summaries: dict[str, Any] = {}
         self.actor_traits_summaries: dict[str, Any] = {}
         self.actor_inventory_views: dict[str, ActorInventoryView] = {}
+        self.faction_context_summary: Any | None = None
 
         def page_layout(panel_name: str, tab_name: str) -> str:
             if panel_name in {"NPC Target", "Player"}:
@@ -2661,6 +2742,13 @@ class SemanticHarnessApp:
                 )
                 page.frame.grid(row=0, column=0, sticky="nsew")
                 pages[(panel_name, "Overview")] = page
+
+        faction_page = pages[("Faction / Community", "Overview")]
+        self.faction_context_summary = faction_page.add_summary(
+            "Selected faction / community · read-only source",
+            height=18,
+        )
+        faction_page.finish()
 
         for panel_name in ("NPC Target", "Player"):
             overview = pages[(panel_name, "Overview")]
@@ -2817,6 +2905,93 @@ class SemanticHarnessApp:
             self.workbench_content.grid_remove()
             self.workbench_toggle_button.configure(text="Show controls")
 
+    def _toggle_trace_panel(self) -> None:
+        """Show diagnostics on demand so the normal conversation gets the width."""
+
+        if self.trace_panel_visible:
+            self.simulation_panes.forget(self.trace_pane)
+            self.simulation_panes.pane(self.simulation_workflow_pane, weight=1)
+            self.trace_panel_visible = False
+            self.diagnostics_toggle_button.configure(text="Show diagnostics")
+        else:
+            self.simulation_panes.add(self.trace_pane, weight=2)
+            self.simulation_panes.pane(self.simulation_workflow_pane, weight=3)
+            self.trace_panel_visible = True
+            self.diagnostics_toggle_button.configure(text="Hide diagnostics")
+            self._schedule_splitter_restore()
+
+    def _toggle_advanced_controls(self) -> None:
+        """Collapse low-frequency reset/fixture/replay controls."""
+
+        if self.advanced_controls_visible:
+            self.advanced_controls.grid_remove()
+            self.workbench_footer.grid_remove()
+            self.advanced_controls_visible = False
+            self.advanced_toggle_button.configure(text="Show advanced")
+        else:
+            self.advanced_controls.grid()
+            self.workbench_footer.grid()
+            self.advanced_controls_visible = True
+            self.advanced_toggle_button.configure(text="Hide advanced")
+
+    def _refresh_simulation_context(self) -> None:
+        """Render the readable save-backed target context above the workbench."""
+
+        if not hasattr(self, "simulation_context_var"):
+            return
+        source_snapshot = self.source_snapshot_projection
+        metadata = (
+            source_snapshot.get("metadata", {})
+            if isinstance(source_snapshot, dict)
+            else {}
+        )
+        source = str(
+            metadata.get("sourceKind")
+            or ("SAVE" if self.save_backed_mode else "FIXTURE")
+        ).upper()
+        save_name = str(self.saved_world_browser.get("saveName") or "").strip()
+        player = self.scenario.get("player", {})
+        npc = self.scenario.get("npc", {})
+        player = player if isinstance(player, dict) else {}
+        npc = npc if isinstance(npc, dict) else {}
+        selected_actor = self.saved_world_selected_actor
+        if not isinstance(selected_actor, dict):
+            selected_actor = {}
+        if selected_actor.get("id") and selected_actor.get("id") != npc.get("npcID"):
+            selected_actor = {}
+        target = str(
+            npc.get("displayName")
+            or selected_actor.get("label")
+            or "No NPC target"
+        )
+        player_label = str(
+            player.get("displayName")
+            or player.get("characterUUID")
+            or "No Player"
+        )
+        faction = str(
+            selected_actor.get("factionLabel")
+            or npc.get("factionLabel")
+            or "MISSING"
+        )
+        community = str(
+            selected_actor.get("communityLabel")
+            or npc.get("communityLabel")
+            or "MISSING"
+        )
+        parts = [f"Source {source}"]
+        if save_name:
+            parts.append(f"Save: {save_name}")
+        parts.extend(
+            [
+                f"Player: {player_label}",
+                f"Target: {target}",
+                f"Faction: {faction}",
+                f"Community: {community}",
+            ]
+        )
+        self.simulation_context_var.set(" · ".join(parts))
+
     def _selected_npc_profile(self) -> str:
         selected_label = self.npc_profile_var.get()
         return next(
@@ -2890,9 +3065,9 @@ class SemanticHarnessApp:
             ]
             if actor_key == "player":
                 for label, key in (
-                    ("character UUID", "characterUUID"),
-                    ("account key", "accountKey"),
-                    ("entity key", "entityKey"),
+                    ("technical character UUID", "characterUUID"),
+                    ("technical account key", "accountKey"),
+                    ("technical entity key", "entityKey"),
                     ("gender", "gender"),
                 ):
                     if actor.get(key) not in (None, ""):
@@ -2910,11 +3085,34 @@ class SemanticHarnessApp:
                         f"{native_player.get('reason') or 'unavailable'}"
                     )
             else:
+                selected_actor = self.saved_world_selected_actor
+                selected_actor = (
+                    selected_actor
+                    if isinstance(selected_actor, dict)
+                    and selected_actor.get("id") == actor.get("npcID")
+                    else {}
+                )
+                faction_label = str(
+                    selected_actor.get("factionLabel")
+                    or actor.get("factionLabel")
+                    or "MISSING"
+                )
+                community_label = str(
+                    selected_actor.get("communityLabel")
+                    or actor.get("communityLabel")
+                    or "MISSING"
+                )
+                identity_lines.extend(
+                    [
+                        f"Faction: {faction_label}",
+                        f"Community: {community_label}",
+                    ]
+                )
                 for label, key in (
-                    ("NPC ID", "npcID"),
+                    ("technical NPC ID", "npcID"),
                     ("tactical class", "tacticalClass"),
-                    ("faction", "factionID"),
-                    ("community", "communityID"),
+                    ("technical faction ID", "factionID"),
+                    ("technical community ID", "communityID"),
                     ("role", "role"),
                     ("behavior", "activeBehavior"),
                 ):
@@ -2960,6 +3158,7 @@ class SemanticHarnessApp:
                 self.actor_traits_summaries[panel_name],
                 "\n".join(trait_lines),
             )
+
             self.actor_inventory_views[panel_name].update(
                 actor.get("inventory"),
                 self._actor_source_info(f"{actor_key}.inventory", "MISSING"),
@@ -2971,6 +3170,103 @@ class SemanticHarnessApp:
                 self._actor_source_info("player.inventory", "MISSING"),
                 self._actor_source_info("npc.inventory", "MISSING"),
             )
+        self._refresh_faction_context()
+        self._refresh_simulation_context()
+
+    def _refresh_faction_context(self) -> None:
+        """Render group membership and standing without confusing it with NPC affinity."""
+
+        if self.faction_context_summary is None:
+            return
+        group = self.saved_world_selected_group
+        if not isinstance(group, dict) or not group:
+            self._set_text(
+                self.faction_context_summary,
+                "No saved faction or community target selected.\n\n"
+                "Choose a group or NPC in World Browser to inspect its persisted context.",
+            )
+            return
+        persisted = group.get("group")
+        persisted = persisted if isinstance(persisted, dict) else {}
+        kind = str(group.get("kind") or "group").title()
+        label = str(group.get("label") or "Unnamed group")
+        source = str(group.get("source") or "MISSING").upper()
+        membership_source = str(
+            group.get("membershipSource") or "MISSING"
+        ).upper()
+        member_rows = [
+            row for row in (group.get("members") or []) if isinstance(row, dict)
+        ]
+        member_labels = {
+            str(row.get("id")): str(row.get("label") or row.get("id"))
+            for row in member_rows
+        }
+        leader_id = persisted.get("leaderNPCID")
+        leader = member_labels.get(str(leader_id), "MISSING") if leader_id else "MISSING"
+        standing = persisted.get("standing")
+        diplomacy = persisted.get("diplomacy")
+        group_projection = self.simulation_projection.get("factionRelationship")
+        group_projection = (
+            group_projection if isinstance(group_projection, dict) else {}
+        )
+        imported_standing = group_projection.get("imported", standing)
+        effective_standing = group_projection.get(
+            "effective",
+            group_projection.get("standing", standing),
+        )
+        standing_source = str(
+            group_projection.get("source")
+            or (
+                "HARNESS_MUTATION"
+                if group_projection.get("mutated") is True
+                else source if imported_standing is not None else "MISSING"
+            )
+        ).upper()
+        personal = self.simulation_projection.get("relationship")
+        personal = personal if isinstance(personal, dict) else {}
+        personal_source = str(
+            self._actor_source_info("npc.relationship", "MISSING").get("source")
+            or "MISSING"
+        ).upper()
+        lines = [
+            f"Target: {kind} · {label}",
+            f"Source: {source} · membership: {membership_source}",
+            f"Technical group ID: {persisted.get('id') or group.get('id') or 'MISSING'}",
+            f"Leader: {leader}",
+            f"Members: {len(member_rows)}",
+            "",
+            "Standing verification",
+            "Personal NPC relationship (NPC ↔ Player): "
+            f"{personal.get('standing') or personal.get('state') or 'MISSING'} "
+            f"· source {personal_source}",
+            "Faction/community standing (group):",
+            f"  imported: {imported_standing if imported_standing is not None else 'MISSING'}",
+            f"  effective: {effective_standing if effective_standing is not None else 'MISSING'}",
+            f"  source: {standing_source}",
+        ]
+        if imported_standing is None and not group_projection:
+            lines.append(
+                "No authoritative persisted group-standing value is available; "
+                "the harness will not infer one from NPC approval."
+            )
+        if diplomacy not in (None, "", {}, []):
+            lines.append(f"Diplomacy: {str(diplomacy)[:280]}")
+        for title, key in (
+            ("Roles", "roles"),
+            ("Member roles", "memberRoles"),
+            ("Provider overlay", "providerOverlay"),
+        ):
+            value = persisted.get(key)
+            if value not in (None, "", {}, []):
+                lines.append(f"{title}: {str(value)[:280]}")
+        lines.append("")
+        lines.append("Members")
+        for row in member_rows[:48]:
+            member = str(row.get("label") or row.get("id") or "NPC")
+            if row.get("role"):
+                member += f" · role {row['role']}"
+            lines.append(f"  • {member}")
+        self._set_text(self.faction_context_summary, "\n".join(lines))
 
     def _collect_workbench_scenario(self) -> dict[str, Any]:
         selected_profile = self._selected_npc_profile()
@@ -3929,6 +4225,8 @@ class SemanticHarnessApp:
     def _set_save_backed_mode(self, active: bool) -> None:
         """Demote synthetic fixture controls after a real save import."""
 
+        self.save_backed_mode = active
+
         if active:
             self.fixture_mode_var.set(
                 "Save-backed mode active · synthetic fixtures are hidden"
@@ -3936,6 +4234,11 @@ class SemanticHarnessApp:
             self.npc_profile_label.grid_remove()
             self.npc_profile_box.grid_remove()
             self.developer_test_frame.grid_remove()
+            if self.trace_panel_visible:
+                self._toggle_trace_panel()
+            if self.advanced_controls_visible:
+                self._toggle_advanced_controls()
+            self._schedule_splitter_restore()
         else:
             self.fixture_mode_var.set(
                 "Synthetic scenario controls · not save-backed authority"
@@ -3943,6 +4246,11 @@ class SemanticHarnessApp:
             self.npc_profile_label.grid()
             self.npc_profile_box.grid()
             self.developer_test_frame.grid()
+            if not self.trace_panel_visible:
+                self._toggle_trace_panel()
+            if not self.advanced_controls_visible:
+                self._toggle_advanced_controls()
+        self._refresh_simulation_context()
         self._refresh_suggestion_controls(self.session.ready and not self.busy)
 
     def submit(self) -> None:

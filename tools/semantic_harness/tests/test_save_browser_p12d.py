@@ -144,6 +144,9 @@ class SaveBrowserTests(unittest.TestCase):
             {row["label"] for row in result["categories"]["Hostile NPCs"]},
             {"Hostile Saved"},
         )
+        follower = result["categories"]["Followers"][0]
+        self.assertEqual(follower["factionLabel"], "Saved Fellowship")
+        self.assertEqual(follower["communityLabel"], "Community · saved")
         self.assertEqual(result["factions"][0]["label"], "Saved Fellowship")
         self.assertEqual(result["communities"][0]["id"], "community_saved")
         hierarchy = result["worldHierarchy"]
@@ -152,6 +155,8 @@ class SaveBrowserTests(unittest.TestCase):
             row for row in hierarchy["groups"] if row["id"] == "faction:faction_saved"
         )
         self.assertEqual(faction_group["membershipSource"], "SAVE")
+        self.assertEqual(faction_group["label"], "Saved Fellowship")
+        self.assertEqual(faction_group["labelSource"], "SAVE")
         self.assertEqual(faction_group["memberIDs"], ["npcFollower"])
         community_group = next(
             row for row in hierarchy["groups"] if row["id"] == "community:community_saved"

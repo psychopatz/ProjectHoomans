@@ -89,7 +89,13 @@ class RuntimeParityP11ATests(unittest.TestCase):
             ]
             self.assertEqual(
                 panels,
-                ["NPC Target", "Player", "Relationship", "World"],
+                [
+                    "NPC Target",
+                    "Player",
+                    "Relationship",
+                    "World",
+                    "Faction / Community",
+                ],
             )
             self.assertEqual(
                 [

@@ -14,6 +14,32 @@ class SaveBrowserError(ValueError):
     """A save cannot be projected into the bounded world browser."""
 
 
+def _display_group_label(row: dict[str, Any], kind: str) -> tuple[str, str]:
+    """Return a readable label while preserving missing source truth."""
+
+    group_id = str(row.get("id") or row.get(f"{kind}ID") or "").strip()
+    label = str(row.get("label") or row.get("name") or "").strip()
+    if label and label != group_id:
+        return label, "SAVE"
+    if not group_id:
+        return f"{kind.title()} (unnamed)", "MISSING"
+    suffix = group_id.rsplit("_", 1)[-1]
+    return f"{kind.title()} · {suffix}", "DERIVED"
+
+
+def _group_labels(rows: list[dict[str, Any]], kind: str) -> dict[str, dict[str, str]]:
+    labels: dict[str, dict[str, str]] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        group_id = str(row.get("id") or row.get(f"{kind}ID") or "").strip()
+        if not group_id:
+            continue
+        label, label_source = _display_group_label(row, kind)
+        labels[group_id] = {"label": label, "labelSource": label_source}
+    return labels
+
+
 @dataclass(frozen=True)
 class SavedWorldBrowser:
     """Project persisted world actors without mutating or materializing PZ."""
@@ -35,6 +61,10 @@ class SavedWorldBrowser:
         hoomans = providers["projecthoomans"]["projection"]
         trading = providers["dynamictrading"]["projection"]
         actors = deepcopy(hoomans.get("actors") or [])
+        factions = deepcopy(hoomans.get("factions") or [])
+        communities = deepcopy(hoomans.get("communities") or [])
+        faction_labels = _group_labels(factions, "faction")
+        community_labels = _group_labels(communities, "community")
         provider_rows = {
             str(row.get("id")): row
             for row in trading.get("knownActors") or []
@@ -43,6 +73,14 @@ class SavedWorldBrowser:
         for actor in actors:
             provider_row = provider_rows.get(str(actor.get("id")))
             actor["isTrader"] = provider_row is not None
+            faction = faction_labels.get(str(actor.get("factionID")))
+            community = community_labels.get(str(actor.get("communityID")))
+            if faction is not None:
+                actor["factionLabel"] = faction["label"]
+                actor["factionLabelSource"] = faction["labelSource"]
+            if community is not None:
+                actor["communityLabel"] = community["label"]
+                actor["communityLabelSource"] = community["labelSource"]
             if provider_row is not None:
                 actor["provider"] = provider_row.get("provider")
 
@@ -61,7 +99,6 @@ class SavedWorldBrowser:
             "Hostile NPCs": [actor for actor in actors if actor["isHostile"]],
             "Known Traders": [actor for actor in actors if actor["isTrader"]],
         }
-        communities = deepcopy(hoomans.get("communities") or [])
         if not communities:
             derived: dict[str, dict[str, Any]] = {}
             for actor in actors:
@@ -72,7 +109,10 @@ class SavedWorldBrowser:
                     str(community_id),
                     {
                         "id": str(community_id),
-                        "label": str(community_id),
+                        "label": _display_group_label(
+                            {"id": str(community_id)}, "community"
+                        )[0],
+                        "labelSource": "DERIVED",
                         "memberIDs": [],
                         "source": "DERIVED",
                         "baseSource": "SAVE",
@@ -82,6 +122,12 @@ class SavedWorldBrowser:
             for row in derived.values():
                 row["memberIDs"] = sorted(set(row["memberIDs"]))
             communities = sorted(derived.values(), key=lambda item: item["id"])
+            community_labels = _group_labels(communities, "community")
+            for actor in actors:
+                community = community_labels.get(str(actor.get("communityID")))
+                if community is not None:
+                    actor["communityLabel"] = community["label"]
+                    actor["communityLabelSource"] = community["labelSource"]
         world_hierarchy = _build_world_hierarchy(
             actors=actors,
             factions=hoomans.get("factions") or [],
@@ -101,7 +147,7 @@ class SavedWorldBrowser:
             "providers": providers,
             "players": hoomans.get("players") or [],
             "categories": categories,
-            "factions": hoomans.get("factions") or [],
+            "factions": factions,
             "communities": communities,
             "providerActors": trading.get("knownActors") or [],
             "worldHierarchy": world_hierarchy,
@@ -127,7 +173,9 @@ def _actor_reference(actor: dict[str, Any], provider_row: dict[str, Any] | None)
         "id": actor.get("id"),
         "label": actor.get("label") or actor.get("id"),
         "factionID": actor.get("factionID"),
+        "factionLabel": actor.get("factionLabel"),
         "communityID": actor.get("communityID"),
+        "communityLabel": actor.get("communityLabel"),
         "role": actor.get("role"),
         "isFollower": actor.get("isFollower") is True,
         "isHostile": actor.get("isHostile") is True,
@@ -203,7 +251,8 @@ def _build_world_hierarchy(
                 {
                     "id": f"{kind}:{group_id}",
                     "kind": kind,
-                    "label": str(row.get("label") or row.get("name") or group_id),
+                    "label": _display_group_label(row, kind)[0],
+                    "labelSource": _display_group_label(row, kind)[1],
                     "source": row.get("source") or "SAVE",
                     "membershipSource": membership_source,
                     "group": deepcopy(row),
