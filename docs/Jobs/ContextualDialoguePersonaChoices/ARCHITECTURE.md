@@ -858,3 +858,55 @@ GUI and agent/CLI workflows must consume the same save-backed state owners and p
 CLI parity exists to let coding agents verify ordinary semantic behavior without screenshot-driven UI automation.
 
 Neither GUI nor CLI becomes a separate gameplay authority.
+
+
+## 42. Harness execution ownership
+
+The harness is a stripped execution environment for Project Hoomans, not a second implementation.
+
+Canonical boundary:
+
+```text
+Python
+  save discovery / transport / isolation / UI / CLI / fixtures
+        ↓
+production Lua
+  persistence / normalization / gameplay behavior
+```
+
+If a Project Hoomans production Lua owner already exists, use it.
+
+## 43. Production rehydration
+
+Raw persisted Hoomans records should cross into the Lua worker before gameplay interpretation.
+
+Production persistence/load code owns migration, normalization and hydration.
+
+Python should avoid schema-dependent runtime reconstruction beyond selecting and transporting raw records.
+
+## 44. Fixture boundary
+
+Fixtures replace Project Zomboid engine services only.
+
+Good fixture targets include time, weather, native objects, rendering, audio, networking and other engine-only APIs.
+
+Do not fixture relationships, factions, inventory persistence or semantic policy.
+
+## 45. Social context separation
+
+These remain independent dimensions:
+
+```text
+personal relationship
+faction relation
+tactical hostility
+conversation audience
+```
+
+Conversation/speech may consume all of them, but one must not be fabricated from another.
+
+## 46. Future world-object compatibility
+
+Future world-object datasets may enter through engine/world provider boundaries and feed production semantic/action code.
+
+P14 does not own that dataset, pathing or scene indexing.
