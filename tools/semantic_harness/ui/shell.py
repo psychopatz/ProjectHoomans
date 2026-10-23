@@ -311,6 +311,8 @@ class SemanticHarnessApp:
         self._production_catalog: dict[str, Any] | None = None
         self.persona_catalog: dict[str, Any] = {}
         self.simulation_control_catalog: dict[str, Any] = {}
+        self.talk_catalog: dict[str, Any] = {}
+        self.talk_target_ids_by_label: dict[str, str] = {}
         self.simulation_projection: dict[str, Any] = {}
         self.settings_variables: dict[str, Any] = {}
         self.settings_control_widgets: dict[str, Any] = {}
@@ -606,7 +608,7 @@ class SemanticHarnessApp:
         self.save_button.grid(row=0, column=3, sticky="ew", padx=(3, 0))
         ttk.Label(
             secondary_actions,
-            text="Use the inspector tabs for Diagnostics, World Knowledge, and Compare.",
+            text="Use the inspector tabs for Diagnostics, World Knowledge, Compare, and Talk parity.",
         ).pack(side="left", padx=2)
         self.language_var = self._tk.StringVar(
             value=self.scenario.get("runtime", {}).get("language", "EN")
@@ -614,6 +616,10 @@ class SemanticHarnessApp:
         self.language_box: Any | None = None
         self.compare_utterance_var = self._tk.StringVar(value="hello")
         self.matrix_dimension_var = self._tk.StringVar(value="persona")
+        self.talk_utterance_var = self._tk.StringVar(
+            value=str(self._ui_state.get("talk_utterance") or "hello")
+        )
+        self.talk_target_var = self._tk.StringVar(value="Current target")
         self.status_var = self._tk.StringVar(value="Starting…")
         self.status_label = ttk.Label(status_controls, textvariable=self.status_var)
         self.status_label.pack(anchor="e")
@@ -700,6 +706,49 @@ class SemanticHarnessApp:
         self.compare_output.grid(row=1, column=0, sticky="nsew")
         self.trace_tabs.add(compare_frame, text="Compare")
         self.compare_frame = compare_frame
+
+        talk_frame = ttk.Frame(self.trace_tabs, padding=6)
+        talk_frame.rowconfigure(2, weight=1)
+        talk_frame.columnconfigure(0, weight=1)
+        talk_controls = ttk.Frame(talk_frame)
+        talk_controls.grid(row=0, column=0, sticky="ew", pady=(0, 6))
+        talk_controls.columnconfigure(1, weight=1)
+        ttk.Label(
+            talk_controls,
+            text="Simulate the production Talk entry point for one NPC type or compare all normal target types.",
+            wraplength=720,
+            justify="left",
+        ).grid(row=0, column=0, columnspan=5, sticky="w", pady=(0, 6))
+        ttk.Label(talk_controls, text="First utterance").grid(
+            row=1, column=0, sticky="w", padx=(0, 6)
+        )
+        self.talk_utterance_box = ttk.Entry(
+            talk_controls, textvariable=self.talk_utterance_var
+        )
+        self.talk_utterance_box.grid(row=1, column=1, sticky="ew")
+        ttk.Label(talk_controls, text="Talk target").grid(
+            row=1, column=2, sticky="w", padx=(10, 6)
+        )
+        self.talk_target_box = ttk.Combobox(
+            talk_controls,
+            textvariable=self.talk_target_var,
+            values=("Current target",),
+            width=24,
+            state="readonly",
+        )
+        self.talk_target_box.grid(row=1, column=3, sticky="w")
+        self.talk_start_button = ttk.Button(
+            talk_controls, text="Start Talk", command=self.start_talk_parity
+        )
+        self.talk_start_button.grid(row=1, column=4, sticky="w", padx=(8, 0))
+        self.talk_matrix_button = ttk.Button(
+            talk_controls, text="Run all Talk types", command=self.run_talk_matrix
+        )
+        self.talk_matrix_button.grid(row=1, column=5, sticky="w", padx=(8, 0))
+        self.talk_output = ScrolledText(talk_frame, wrap="none", state="disabled")
+        self.talk_output.grid(row=2, column=0, sticky="nsew")
+        self.trace_tabs.add(talk_frame, text="Talk parity")
+        self.talk_parity_frame = talk_frame
 
         diagnostics_frame = ttk.Frame(self.trace_tabs, padding=6)
         diagnostics_frame.columnconfigure(0, weight=1)
@@ -868,6 +917,8 @@ class SemanticHarnessApp:
             self.snapshot_button,
             self.persona_matrix_button,
             self.capture_baseline_button,
+            self.talk_start_button,
+            self.talk_matrix_button,
             self.workbench_apply_button,
             self.replay_button,
             self.world_knowledge_button,
@@ -883,6 +934,14 @@ class SemanticHarnessApp:
             )
         if hasattr(self, "compare_utterance_box"):
             self.compare_utterance_box.configure(
+                state="normal" if enabled and not self.busy else "disabled"
+            )
+        if hasattr(self, "talk_target_box"):
+            self.talk_target_box.configure(
+                state="readonly" if enabled and not self.busy else "disabled"
+            )
+        if hasattr(self, "talk_utterance_box"):
+            self.talk_utterance_box.configure(
                 state="normal" if enabled and not self.busy else "disabled"
             )
         self.npc_profile_box.configure(
@@ -1358,6 +1417,11 @@ class SemanticHarnessApp:
                 self.studio_notebook.select()
             )
             state["trace_tab"] = self.trace_tabs.index(self.trace_tabs.select())
+            selected_talk = self.talk_target_ids_by_label.get(
+                self.talk_target_var.get(), "current"
+            )
+            state["talk_target"] = selected_talk
+            state["talk_utterance"] = self.talk_utterance_var.get()
             if self.simulation_panes.winfo_width() > 10:
                 state["simulation_sash"] = self.simulation_panes.sashpos(0)
             if self.workflow_pane_split.winfo_height() > 10:
@@ -1477,6 +1541,8 @@ class SemanticHarnessApp:
         self.simulation_control_catalog = (
             result.capabilities.get("simulationControlCatalog") or {}
         )
+        self.talk_catalog = result.capabilities.get("talkCatalog") or {}
+        self._set_talk_catalog()
         self._update_simulation_projection(result.capabilities)
         self._build_simulation_workbench()
         self._set_status(f"Ready · Lua PID {result.status.get('pid')}")
@@ -1509,6 +1575,202 @@ class SemanticHarnessApp:
         self.block_registry.set_catalog(flow_catalog)
         self._production_catalog = flow_catalog
         self.workflow_pane.set_production_catalog(flow_catalog)
+
+    def _set_talk_catalog(self) -> None:
+        """Populate the Talk parity selector from the production catalog."""
+
+        rows = self.talk_catalog.get("targets", [])
+        if not isinstance(rows, list):
+            rows = []
+        labels: list[str] = []
+        self.talk_target_ids_by_label = {}
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            target_id = str(row.get("id") or "")
+            label = str(row.get("label") or target_id)
+            if not target_id or label in self.talk_target_ids_by_label:
+                continue
+            labels.append(label)
+            self.talk_target_ids_by_label[label] = target_id
+        if not labels:
+            labels = ["Current target"]
+            self.talk_target_ids_by_label[labels[0]] = "current"
+        self.talk_target_box.configure(values=tuple(labels))
+        wanted = str(self._ui_state.get("talk_target") or "current")
+        selected = next(
+            (
+                label
+                for label, target_id in self.talk_target_ids_by_label.items()
+                if target_id == wanted
+            ),
+            labels[0],
+        )
+        self.talk_target_var.set(selected)
+
+    def _selected_talk_target(self) -> str:
+        return self.talk_target_ids_by_label.get(
+            self.talk_target_var.get(), "current"
+        )
+
+    def _talk_utterance(self) -> str:
+        return (
+            self.talk_utterance_var.get().strip()
+            or self.input_var.get().strip()
+            or self.last_test_utterance.strip()
+            or "hello"
+        )
+
+    def start_talk_parity(self) -> None:
+        """Start one production Talk target and show its opening evidence."""
+
+        if not self.session.ready or self.busy:
+            return
+        target_id = self._selected_talk_target()
+        utterance = self._talk_utterance()
+        self.activity_log.record(
+            "ui", "talk_start_requested", target=target_id, utterance=utterance
+        )
+
+        def finish(result: dict[str, Any]) -> None:
+            scenario = result.get("scenario")
+            if isinstance(scenario, dict):
+                self.scenario = scenario
+                self._sync_workbench_from_scenario(scenario)
+            turn = result.get("turn") or {}
+            if isinstance(turn, dict):
+                self._show_response(turn)
+            self._set_text(self.talk_output, self._format_talk_start(result))
+            self.trace_tabs.select(self.talk_parity_frame)
+            target = (result.get("start") or {}).get("target") or {}
+            self._append(
+                "SYSTEM",
+                f"Talk parity started: {target.get('label') or target_id} · "
+                f"route {target.get('route') or 'unknown'}",
+            )
+            self.activity_log.record(
+                "ui",
+                "talk_start_completed",
+                target=target_id,
+                route=target.get("route"),
+            )
+
+        self._start_operation(
+            lambda worker: worker.talk_start(target_id, utterance), finish
+        )
+
+    def run_talk_matrix(self) -> None:
+        """Compare the native Talk start across the normal production types."""
+
+        if not self.session.ready or self.busy:
+            return
+        utterance = self._talk_utterance()
+        self.activity_log.record(
+            "ui", "talk_matrix_requested", utterance=utterance
+        )
+
+        def finish(result: dict[str, Any]) -> None:
+            self._set_text(self.talk_output, self._format_talk_matrix(result))
+            self.trace_tabs.select(self.talk_parity_frame)
+            rows = result.get("rows") if isinstance(result, dict) else []
+            self._append(
+                "SYSTEM",
+                f"Talk parity comparison completed: {len(rows) if isinstance(rows, list) else 0} target types.",
+            )
+            self.activity_log.record(
+                "ui",
+                "talk_matrix_completed",
+                rowCount=len(rows) if isinstance(rows, list) else 0,
+            )
+
+        self._start_operation(
+            lambda worker: worker.talk_matrix(text=utterance), finish
+        )
+
+    def _format_talk_start(self, result: dict[str, Any]) -> str:
+        start = result.get("start") or {}
+        target = start.get("target") or {}
+        opening = start.get("opening") or {}
+        choices = opening.get("choices") or []
+        lines = [
+            "Native Talk parity",
+            "",
+            f"Target: {target.get('label') or 'unknown'}",
+            f"Production target type: {target.get('targetType') or 'unknown'}",
+            f"Tactical class: {target.get('tacticalClass') or 'unknown'}",
+            f"Audience: {target.get('audience') or 'unknown'}",
+            f"Route: {target.get('route') or 'unknown'}",
+            f"Hostile: {'yes' if target.get('hostile') else 'no'}",
+            f"Hostile inline integration: {'available' if target.get('hostileInlineAvailable') else 'not loaded in worker'}",
+            f"Relationship ID: {target.get('relationshipID') or 'unknown'}",
+            "",
+            f"Opening node: {opening.get('nodeID') or 'unknown'}",
+            "Opening choices:",
+        ]
+        for choice in choices:
+            if isinstance(choice, dict):
+                status = "available" if choice.get("enabled") else "locked"
+                lines.append(
+                    f"  - {choice.get('id') or 'unknown'} [{status}] "
+                    f"{choice.get('text') or choice.get('textKey') or ''}"
+                )
+        observation = result.get("observation") or {}
+        lines.extend(
+            (
+                "",
+                f"First response: {observation.get('npcResponse') or '—'}",
+                f"Graph: {(observation.get('runtimeGraphPath') or {}).get('kind') or '—'}",
+                "",
+                "Production evidence:",
+                pretty({
+                    "schema": result.get("schema"),
+                    "start": start,
+                    "observation": observation,
+                }),
+            )
+        )
+        return "\n".join(lines)
+
+    def _format_talk_matrix(self, result: dict[str, Any]) -> str:
+        rows = result.get("rows") if isinstance(result, dict) else None
+        if not isinstance(rows, list) or not rows:
+            return pretty(result)
+        lines = [
+            f"Talk parity · {result.get('schema', 'production matrix')}",
+            f"First utterance: {result.get('utterance') or 'hello'}",
+            "",
+            "Target | Production type | Audience | Route | NPC response | Graph",
+            "-------|------------------|----------|-------|---------------|------",
+        ]
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            target = row.get("target") or {}
+            graph = row.get("runtimeGraphPath") or {}
+            lines.append(
+                " | ".join(
+                    (
+                        str(target.get("label") or row.get("label") or "unknown"),
+                        str(target.get("targetType") or "unknown"),
+                        str(target.get("audience") or "unknown"),
+                        str(target.get("route") or "unknown"),
+                        str(row.get("npcResponse") or "—").replace("\n", " ")[:72],
+                        str(graph.get("kind") or "—"),
+                    )
+                )
+            )
+            choices = row.get("semanticHubChoices") or []
+            if choices:
+                lines.append(
+                    "  choices: "
+                    + ", ".join(
+                        str(item.get("label") or item.get("id"))
+                        for item in choices[:6]
+                        if isinstance(item, dict)
+                    )
+                )
+        lines.extend(("", "Production evidence:", pretty(result)))
+        return "\n".join(lines)
 
     def _scenario_control_value(self, control: dict[str, Any], scenario: dict[str, Any]) -> Any:
         control_id = str(control.get("id") or "")

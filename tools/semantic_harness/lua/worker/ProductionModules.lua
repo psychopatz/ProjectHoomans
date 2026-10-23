@@ -269,6 +269,15 @@ load(
         "social_authority"
     )
     load("ProjectHoomans", "shared", "PNC/Translation/PNC_TranslationBootstrap.lua", "translation")
+    load(
+        "ProjectHoomans", "client", "PNC/UI/PNC_NPCTypePalette.lua",
+        "conversation_target_projection"
+    )
+    load(
+        "ProjectHoomans", "client",
+        "PNC/Conversation/PNC_ConversationTalkParity.lua",
+        "conversation_target_projection"
+    )
     -- The Semantic Lab must exercise the same authored category/block registry
     -- as the game composer. This is read-only for semantic suggestion builds;
     -- category clicks still enter through the existing authority path.

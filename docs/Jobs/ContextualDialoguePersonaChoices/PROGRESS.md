@@ -167,6 +167,19 @@ Completed locally on ProjectHoomans `main`.
 
 **Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.
 
+## P11J — native Talk target parity
+
+Completed locally on ProjectHoomans `main`.
+
+- Added the production-owned `PNC.Conversation.TalkParity` catalog. Normal targets are `current`, `colonist`, `follower`, `neutral`, and `hostile`; the UI label is `Hostile / Enemy` while the production tactical class remains `hostile`. Target facts are mapped to the same ownership, follow-order, hostility, and palette classification inputs used by native Talk.
+- Added one worker contract for both clients: `TALK_CATALOG`, `TALK_START`, and `TALK_MATRIX`. The GUI and CLI call the same `LuaSemanticWorker` methods; Python does not reimplement target classification or conversation routing.
+- Added the Simulation trace `Talk parity` surface with a first utterance field, production target selector, single-target `Start Talk`, and all-normal-types matrix. Evidence shows target type, audience, hostile inline availability, route, opening choices, response, and runtime graph kind. Selected Talk target and utterance are saved with the existing Semantic Lab UI state.
+- Hostile matrix rows expose the actual headless-worker fallback route (`hostile_full_conversation`) and report when the optional native inline integration is unavailable, rather than hiding that boundary.
+- Focused Talk Parity Python/Tk acceptance: **4/4 passed**. CLI subprocess matrix returned **0** with Colonist, Follower, Neutral, and Hostile rows. Existing P11E/P11F/profile regressions: **8/8 non-GUI tests passed** with their two display-gated tests skipped in the headless run; the P11A Tk interaction and Talk Parity Tk interaction each passed separately.
+- Embedded Lua smoke evidence: `pnc_npc_type_palette_smoke.lua` and `pnc_conversation_smoke.lua` both passed. Changed-file `luac5.3 -p`, Python compilation, and `git diff --check` passed.
+
+**Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.
+
 ## P11I follow-up — activity-log startup regression correction
 
 Completed locally on ProjectHoomans `main`.

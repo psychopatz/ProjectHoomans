@@ -164,6 +164,44 @@ class LuaSemanticWorker:
 
         return self._request("SIMULATION_CONTROL_CATALOG")
 
+    def talk_catalog(self) -> dict[str, Any]:
+        """Return the production-owned native Talk target catalog."""
+
+        return self._request("TALK_CATALOG")
+
+    def talk_start(
+        self, target_id: str = "current", utterance: str = "hello"
+    ) -> dict[str, Any]:
+        """Start the native Talk parity projection for one target type."""
+
+        result = self._request(
+            "TALK_START",
+            {
+                "targetID": str(target_id or "current"),
+                "utterance": str(utterance or "hello"),
+            },
+        )
+        scenario = result.get("scenario")
+        if isinstance(scenario, dict):
+            self.scenario = scenario
+        return result
+
+    def talk_matrix(
+        self,
+        target_types: list[str] | None = None,
+        text: str = "hello",
+        maximum: int = 8,
+    ) -> dict[str, Any]:
+        """Compare native Talk startup and the first turn across target types."""
+
+        payload: dict[str, Any] = {
+            "utterance": str(text or "hello"),
+            "maximum": int(maximum),
+        }
+        if target_types is not None:
+            payload["targetIDs"] = [str(value) for value in target_types]
+        return self._request("TALK_MATRIX", payload)
+
     def item_catalog(self, query: str = "", limit: int = 50) -> dict[str, Any]:
         """Search installed Project Zomboid item definitions for the Lab editor."""
 

@@ -215,6 +215,16 @@ def cli(arguments: argparse.Namespace) -> int:
         ) as worker:
             emit_activity()
             ledger = ConflictLedger() if arguments.audit else None
+            if arguments.talk_start is not None:
+                result = worker.talk_start(
+                    arguments.talk_start, arguments.talk_utterance
+                )
+                _print_result(result, arguments.jsonl)
+                emit_activity()
+            if arguments.talk_matrix:
+                result = worker.talk_matrix(text=arguments.talk_utterance)
+                _print_result(result, arguments.jsonl)
+                emit_activity()
             if arguments.snapshot:
                 _print_result(worker.snapshot(), arguments.jsonl)
                 emit_activity()
@@ -376,6 +386,22 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--doctor-json", action="store_true", help="emit doctor diagnostics as one JSON record")
     parser.add_argument("--snapshot", action="store_true")
     parser.add_argument("--language", choices=("EN", "TL"), help="production translation language")
+    talk = parser.add_mutually_exclusive_group()
+    talk.add_argument(
+        "--talk-start",
+        metavar="TARGET",
+        help="start native Talk parity for current, colonist, follower, neutral, or hostile",
+    )
+    talk.add_argument(
+        "--talk-matrix",
+        action="store_true",
+        help="compare native Talk startup across the production target catalog",
+    )
+    parser.add_argument(
+        "--talk-utterance",
+        default="hello",
+        help="first utterance used by --talk-start/--talk-matrix (default: hello)",
+    )
     parser.add_argument("--input", action="append", default=[], help="chat input; repeatable")
     parser.add_argument("--timeout", type=float, default=5.0, help="per-request timeout in seconds")
     parser.add_argument("--startup-timeout", type=float, default=8.0, help="worker startup timeout in seconds")

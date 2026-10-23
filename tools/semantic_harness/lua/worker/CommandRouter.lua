@@ -1,6 +1,16 @@
 -- JSON-lines command routing for one semantic worker session.
 
 local CommandRouter = {}
+local TalkParity = PNC.Conversation
+    and PNC.Conversation.TalkParity
+    or require "PNC/Conversation/PNC_ConversationTalkParity"
+
+local function talkCatalog()
+    return {
+        schema = "semantic.talk.catalog.v1",
+        targets = TalkParity.GetCatalog(),
+    }
+end
 
 local function hasEntries(value)
     if type(value) ~= "table" then return false end
@@ -21,6 +31,7 @@ local capabilities = {
     "WORLD_KNOWLEDGE_INSPECT", "WORLD_KNOWLEDGE_PROPAGATE",
     "PERSONA_CATALOG", "PERSONA_PREVIEW",
     "SIMULATION_CONTROL_CATALOG",
+    "TALK_CATALOG", "TALK_START", "TALK_MATRIX",
 }
 
 local function catalogValues(source, fallback)
@@ -961,6 +972,7 @@ function CommandRouter.hello(context)
         headlessRequires = Runtime.headlessRequires,
         personaCatalog = personaCatalog(context),
         simulationControlCatalog = simulationControlCatalog(context),
+        talkCatalog = talkCatalog(),
         simulationProjection = context.ScenarioSession
             .simulationProjection(context),
         suggestions = context.Values.copy(
@@ -1193,6 +1205,24 @@ function CommandRouter.dispatch(context, request)
         return personaPreview(context, payload)
     elseif command == "SIMULATION_CONTROL_CATALOG" then
         return simulationControlCatalog(context, payload)
+    elseif command == "TALK_CATALOG" then
+        return {
+            ok = true,
+            type = "talk_catalog",
+            schema = "semantic.talk.catalog.v1",
+            targets = TalkParity.GetCatalog(),
+        }
+    elseif command == "TALK_START" then
+        payload = type(payload) == "table" and payload or {}
+        local result, reason = TalkParity.Start(
+            context,
+            payload.targetID or payload.target or "current",
+            payload.utterance or "hello"
+        )
+        if not result then return nil, reason end
+        return result
+    elseif command == "TALK_MATRIX" then
+        return TalkParity.Matrix(context, payload)
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,
@@ -1225,6 +1255,7 @@ function CommandRouter.dispatch(context, request)
             headlessRequires = Runtime.headlessRequires,
             personaCatalog = personaCatalog(context),
             simulationControlCatalog = simulationControlCatalog(context),
+            talkCatalog = talkCatalog(),
             simulationProjection = context.ScenarioSession
                 .simulationProjection(context),
             suggestions = context.Values.copy(

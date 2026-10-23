@@ -4,6 +4,7 @@
 -- can enter Core's optional voice stream.
 require "PNC/Integrations/PNC_VoiceGateway"
 require "PNC/UI/PNC_NPCTypePalette"
+require "PNC/Conversation/PNC_ConversationTalkParity"
 require "PNC/UI/Factions/PNC_FactionPresentation"
 require "PNC/UI/Relationships/PNC_RelationshipGraphPanel"
 require "PNC/UI/Context/PNC_ContextHub"
