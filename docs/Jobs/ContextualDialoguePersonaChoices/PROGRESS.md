@@ -3,7 +3,7 @@
 **Updated:** 2026-10-24  
 **Parent status:** IN PROGRESS — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is mandatory.
 **Current mandatory phase:** P12K — Final safety/parity matrix.
-**Current local baseline audited:** ProjectHoomans `main` at `fbf3ed34`; upstream remains unchanged and local `main` is ahead by nine commits.
+**Current local baseline audited:** ProjectHoomans `main` at `8ac1a18f`; upstream remains unchanged and local `main` is ahead by eleven commits.
 **Normal Semantic Lab runtime requirement:** Project Zomboid CLOSED/OFFLINE is supported and expected.  
 **Source save mutation:** FORBIDDEN.  
 **Optional live profiler:** disabled by default; read-only enrichment only.
