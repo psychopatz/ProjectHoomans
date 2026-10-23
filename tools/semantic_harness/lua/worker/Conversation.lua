@@ -784,7 +784,7 @@ function Conversation.buildView(context)
     local spec = {
         npcID = npc.npcID,
         context = Conversation.buildContext(context),
-        nodes = { menu = { choices = {} } },
+        nodes = { greeting = { choices = {} }, menu = { choices = {} } },
         choicePresentation = function(view, authoredChoices)
             local input = PNC.Semantics
                 and PNC.Semantics.DialogueInput or nil
@@ -828,17 +828,78 @@ function Conversation.buildView(context)
             spec.context.categoryDiagnostics = diagnostics
         end
     end
-    if composer and type(composer.BuildRootNode) == "function"
+    local root
+    -- Build the headless opening from the same definition builder used by
+    -- native Talk. This supplies authored menu options such as identity
+    -- exchange and companion departure without moving their policy into the
+    -- harness. The composer remains a guarded fallback for diagnostic
+    -- bootstraps where the full definition module is not loaded.
+    local talkParity = PNC.Conversation
+        and PNC.Conversation.TalkParity or nil
+    local targetID = scenario.runtime
+        and scenario.runtime.semanticLabTalkTarget or "current"
+    local entry
+    local talkProjection
+    if talkParity and type(talkParity.BuildEntry) == "function"
+        and type(talkParity.Resolve) == "function"
+    then
+        entry = select(1, talkParity.BuildEntry(scenario, targetID))
+        talkProjection = select(
+            1, talkParity.Resolve(scenario, targetID, player)
+        )
+    end
+    local definitionBuilder = PNC.Conversation
+        and PNC.Conversation.BuildDefinition or nil
+    if type(definitionBuilder) == "function" and type(entry) == "table" then
+        local ok, definition = pcall(
+            definitionBuilder, entry, player, nil, talkProjection
+        )
+        if ok and type(definition) == "table"
+            and type(definition.nodes) == "table"
+            and type(definition.nodes.greeting) == "table"
+        then
+            root = definition.nodes.greeting
+        end
+    end
+    if not root and composer and type(composer.BuildRootNode) == "function"
         and type(spec.context.conversationBlockContext) == "table"
     then
-        local ok, root = pcall(
+        local menuOptions = spec.context.conversationMenuOptions
+        if type(menuOptions) ~= "table" then
+            menuOptions = {}
+            spec.context.conversationMenuOptions = menuOptions
+        end
+        local identityChoice = PNC.Conversation
+            and PNC.Conversation.IdentityChoice or nil
+        local presentation = PNC.Network
+            and PNC.Network.ClientState
+            and PNC.Network.ClientState.npcPresentations
+            and PNC.Network.ClientState.npcPresentations[npc.npcID]
+            or nil
+        if not menuOptions.askNameChoice
+            and identityChoice
+            and type(identityChoice.Build) == "function"
+            and presentation and presentation.canAskName == true
+        then
+            menuOptions.askNameChoice = identityChoice.Build(
+                npc.npcID,
+                presentation,
+                {
+                    playerName = player.displayName or player.forename,
+                    npcName = npc.forename or npc.displayName,
+                }
+            )
+        end
+        local ok, fallbackRoot = pcall(
             composer.BuildRootNode,
             spec.context.conversationBlockContext,
-            spec.context.conversationMenuOptions or {}
+            menuOptions
         )
-        if ok and type(root) == "table" then
-            spec.nodes.menu = { choices = root.choices or {} }
-        end
+        if ok and type(fallbackRoot) == "table" then root = fallbackRoot end
+    end
+    if root then
+        spec.nodes.greeting = root
+        spec.nodes.menu = { choices = root.choices or {} }
     end
     local view = {
         headless = true,
@@ -848,8 +909,10 @@ function Conversation.buildView(context)
     }
     session.view = view
     session.spec = spec
-    session.currentNode = spec.nodes.menu
-    session:setChoices(session.currentNode.choices)
+    -- Enter the same production opening node that native Talk enters. The
+    -- headless adapter keeps its lightweight session, while the greeting
+    -- payload and landing choices still come from the production composer.
+    session:enterNode("greeting")
     view.spec.context.conversationBlock = Conversation.blockProjection(view)
     view.spec.context.conversationGraph = Conversation.graphProjection(view)
     if composer and type(composer.BuildSemanticRootProjection) == "function" then
@@ -1119,6 +1182,25 @@ local function sliced(values, startIndex)
     return output
 end
 
+local function presentedChoices(view, Values)
+    local output = {}
+    local choices = view and view.session and view.session.choices or {}
+    for _, choice in ipairs(choices) do
+        if type(choice) == "table" then
+            local source = type(choice.source) == "table"
+                and choice.source or {}
+            output[#output + 1] = {
+                id = choice.id,
+                text = resolvedPayload(choice.text),
+                enabled = choice.enabled ~= false,
+                frame = Values.copy(source.semanticFrame),
+                source = Values.copy(source),
+            }
+        end
+    end
+    return output
+end
+
 function Conversation.semanticClick(context, frame)
     local Runtime = context.Runtime
     local Values = context.Values
@@ -1140,10 +1222,18 @@ function Conversation.semanticClick(context, frame)
     local isRootChoice = Suggestions
         and Suggestions.IsConversationRootChoiceFrame
         and Suggestions.IsConversationRootChoiceFrame(frame)
+    local isShortcut = Suggestions
+        and Suggestions.IsShortcutFrame
+        and Suggestions.IsShortcutFrame(frame)
+    local isBack = Suggestions
+        and Suggestions.IsBackFrame
+        and Suggestions.IsBackFrame(frame)
     local isGroup = Suggestions
         and Suggestions.IsGroupFrame
         and Suggestions.IsGroupFrame(frame)
-    if not isCategory and not isChoice and not isRootChoice and not isGroup then
+    if not isCategory and not isChoice and not isRootChoice
+        and not isShortcut and not isBack and not isGroup
+    then
         return nil, "unsupported_conversation_frame"
     end
 
@@ -1339,7 +1429,10 @@ function Conversation.semanticClick(context, frame)
         response,
         view.spec and view.spec.context
     )
-    if (isRootChoice or isGroup) and view.semanticSuggestions then
+    response.observation.choices = presentedChoices(view, Values)
+    if (isRootChoice or isGroup or isShortcut or isBack)
+        and view.semanticSuggestions
+    then
         response.observation.suggestions = Values.copy(
             view.semanticSuggestions
         )

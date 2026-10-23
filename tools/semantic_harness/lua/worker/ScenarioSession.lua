@@ -191,6 +191,23 @@ function ScenarioSession.reset(context, scenario)
     context.Translations.setLanguage(
         context, context.Translations.scenarioLanguage(context)
     )
+    -- Native Talk seeds the client presentation snapshot before it builds the
+    -- definition. The headless adapter must establish the same transport
+    -- state so production identity menu options are present on the first
+    -- opening projection.
+    local clientState = PNC.Network and PNC.Network.ClientState or nil
+    local npc = scenario.npc or {}
+    local npcID = tostring(npc.npcID or npc.id or "")
+    if clientState and npcID ~= "" then
+        clientState.npcPresentations = clientState.npcPresentations or {}
+        local identityState = tostring(npc.identityState or "unknown")
+        clientState.npcPresentations[npcID] = {
+            npcID = npcID,
+            state = identityState,
+            canAskName = identityState ~= "known",
+            requestState = identityState == "known" and nil or "ready",
+        }
+    end
     Runtime.view = context.Conversation.buildView(context)
     if PsychopatzCore and PsychopatzCore.Conversation then
         -- The production disclosure receiver owns the live conversation

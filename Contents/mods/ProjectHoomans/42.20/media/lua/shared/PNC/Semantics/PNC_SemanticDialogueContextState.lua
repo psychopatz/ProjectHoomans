@@ -179,6 +179,17 @@ function Context:SetTopic(topic, preservePrevious)
     return true, topic
 end
 
+-- Presentation navigation can leave the active topic while retaining the
+-- session history used by "Talk again about". This is deliberately separate
+-- from Reset: Back changes focus, not the conversation's semantic memory.
+function Context:ClearTopicFocus()
+    if self.currentTopic then
+        self.previousTopic = self.currentTopic
+    end
+    self.currentTopic = nil
+    return true, "cleared"
+end
+
 require "PNC/Semantics/PNC_SemanticDialogueContextState_Mentions"
 require "PNC/Semantics/PNC_SemanticDialogueContextState_Turns"
 require "PNC/Semantics/PNC_SemanticDialogueContextState_Snapshot"

@@ -447,6 +447,11 @@ load(
     )
     load(
         "ProjectHoomans", "client",
+        "PNC/Conversation/Definition/PNC_ConversationDefinition_Builder.lua",
+        "conversation_definition"
+    )
+    load(
+        "ProjectHoomans", "client",
         "PNC/Conversation/Definition/PNC_ConversationDefinition_Lifecycle.lua",
         "conversation_lifecycle"
     )

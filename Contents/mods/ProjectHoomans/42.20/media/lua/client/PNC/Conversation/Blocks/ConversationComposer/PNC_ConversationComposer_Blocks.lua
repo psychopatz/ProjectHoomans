@@ -142,11 +142,19 @@ end
 
 local function rootNodeFor(view)
     local spec = view and view.spec or nil
-    local session = view and view.session or nil
-    local nodeID = tostring(session and session.currentNodeID or "")
-    if nodeID ~= "greeting" and nodeID ~= "menu" then return nil, nil end
-    local node = spec and spec.nodes and spec.nodes[nodeID] or nil
-    return node, nodeID
+    local nodes = spec and spec.nodes or nil
+    if type(nodes) ~= "table" then return nil, nil end
+    -- Keep the semantic landing projection anchored to the production root.
+    -- The live session enters authored blocks after the landing page, so its
+    -- current node is not a stable root identity.
+    -- BuildDefinition exposes the stable menu projection alongside the
+    -- greeting entry. Prefer that identity so native and headless callers
+    -- produce the same root frame IDs while the live session is elsewhere.
+    for _, nodeID in ipairs({ "menu", "greeting" }) do
+        local node = nodes[nodeID]
+        if type(node) == "table" then return node, nodeID end
+    end
+    return nil, nil
 end
 
 -- Read-only semantic projection of the dynamic production root choices. The

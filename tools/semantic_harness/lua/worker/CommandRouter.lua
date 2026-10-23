@@ -1101,6 +1101,10 @@ function CommandRouter.dispatch(context, request)
                 or (type(suggestions.IsConversationRootChoiceFrame)
                     == "function"
                     and suggestions.IsConversationRootChoiceFrame(payload.frame))
+                or (type(suggestions.IsShortcutFrame) == "function"
+                    and suggestions.IsShortcutFrame(payload.frame))
+                or (type(suggestions.IsBackFrame) == "function"
+                    and suggestions.IsBackFrame(payload.frame))
                 or (type(suggestions.IsGroupFrame) == "function"
                     and suggestions.IsGroupFrame(payload.frame))
             )

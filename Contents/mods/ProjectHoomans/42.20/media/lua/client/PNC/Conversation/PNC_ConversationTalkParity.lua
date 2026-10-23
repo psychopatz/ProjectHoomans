@@ -231,6 +231,9 @@ local function choicesFor(view)
                 text = resolvedText(choice.text),
                 textKey = choice.textKey,
                 enabled = choice.enabled ~= false,
+                frame = copy(
+                    choice.source and choice.source.semanticFrame
+                ),
                 action = choice.actionID
                     or choice.semantic and choice.semantic.actionID,
                 route = choice.semantic and choice.semantic.route,
@@ -282,6 +285,7 @@ function TalkParity.StartProjection(context, value, view)
         integration = integration,
         opening = {
             nodeID = view and view.session and view.session.currentNodeID,
+            messages = context.Values.copy(Runtime.transcript or {}),
             choices = choicesFor(view),
             suggestions = context.Values.copy(
                 view and view.semanticSuggestions
@@ -351,6 +355,8 @@ local function compactObservation(context, start, turn, snapshot)
             kind = graph and graph.graphKind or "none",
             graph = context.Values.copy(graph),
         },
+        suggestions = context.Values.copy(suggestions),
+        choices = choicesFor(context.Runtime.view),
         messages = context.Values.copy(turn and turn.messages or {}),
         toolCalls = context.Values.copy(turn and turn.toolCalls or {}),
         accepted = turn and turn.accepted == true or false,

@@ -267,6 +267,57 @@ hostile inline/fallback behavior, landing shortcut behavior, Back navigation,
 and any observable graph path against Semantic Lab. Native SP/MP remains
 **UNTESTED / user-owned** until that evidence is supplied.
 
+## P11J4 corrective landing and harness parity repair — accepted developer slice
+
+This slice repaired the production-owned Talk opening and landing surface exposed
+by native screenshots and the harness comparison:
+
+- headless Talk now enters the production `greeting` opening and uses the
+  production definition builder/menu options when loaded; initial NPC flavor is
+  present in `TALK_START` and the GUI Talk transcript;
+- root semantic resolution is anchored to the stable production `menu` node,
+  so root frames remain valid after an authored `block:opening` transition;
+- Back and shortcut frames use the same typed worker/native submission path;
+  Back clears semantic topic focus while retaining session history and respects
+  `allowBack=false`;
+- the landing surface contains direct shortcuts/actions, an explicit
+  `Talk again about` context index after topic history exists, and nested
+  production category choices; valid owned companion capabilities remain
+  visible on the landing surface;
+- debug text, dossier, authored trade/territory rows, and other dead legacy
+  landing husks are filtered from the normal semantic projection; Dynamic
+  Trading remains provider-owned;
+- the Talk tab now renders returned production choice frames and submits button
+  clicks through the existing worker `SUGGESTION_CLICK` operation. No Python
+  Talk classifier or second dialogue route was added.
+
+Evidence:
+
+- `lua5.3 tests/pnc_semantic_dialogue_input_smoke.lua` — PASS;
+- `lua5.3 tests/pnc_conversation_smoke.lua` — PASS;
+- `lua5.3 tests/pnc_conversation_talk_start_projection_smoke.lua` — PASS;
+- focused P11J, contextual suggestion, runtime graph, and hub history suites:
+  **23/23 PASS**;
+- direct worker check: opening flavor, neutral identity shortcut, companion
+  departure/follow/stay/wait, hostile ceasefire, Back, and context index all
+  exercised;
+- changed Lua `luac5.3 -p` — PASS; `pz_verify --kahlua --severity ERROR` —
+  **0 errors**; translation JSON, Python compile, doctor, and `git diff --check`
+  — PASS;
+- the unbounded full `unittest discover` run was stopped after it remained in a
+  worker wait with no output for over seven minutes; the bounded affected suites
+  completed successfully.
+
+Native SP/MP remains **UNTESTED / user-owned**.
+
+## Current Exact Next Chunk — native user handoff evidence
+
+Use the actual in-game context-menu Talk path for Colonist, Follower, Neutral,
+and Hostile. Compare each with Semantic Lab for target type, route, opening
+flavor, landing choices, first response, Back/context navigation, and hostile
+inline/fallback behavior. Do not claim READY until that user-owned evidence and
+the remaining final gate are supplied.
+
 ## Known separate relationship boundary
 
 The server relationship proposal policy/service and Semantic Lab proposal action

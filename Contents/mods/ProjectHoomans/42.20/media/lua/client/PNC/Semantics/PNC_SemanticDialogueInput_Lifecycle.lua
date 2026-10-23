@@ -209,35 +209,6 @@ local function buildCoreChoices(view, projection)
         end
     end
 
-    -- Core's native list is scrollable, so the projection can expose every
-    -- currently safe topic without a hidden five-row global cap. Navigation
-    -- rows use the same typed click contract and only change the selected
-    -- projection group; they never parse or execute gameplay.
-    for _, group in ipairs(projection.groups or {}) do
-        if (not selectedGroup or group.id ~= selectedGroup.id)
-            and group.id ~= rootGroupID
-        then
-            local frame = Suggestions.BuildGroupFrame
-                and Suggestions.BuildGroupFrame(group, projection.revision)
-                or nil
-            if frame then
-                append({
-                    id = frame.candidateID,
-                    frame = frame,
-                    display = {
-                        label = group.label,
-                        labelFallback = group.label,
-                    },
-                    source = {
-                        kind = "semantic_group_navigation",
-                        revision = projection.revision,
-                        groupID = group.id,
-                    },
-                }, true)
-            end
-        end
-    end
-
     local candidates = selectedGroup and selectedGroup.candidates
         or projection.candidates or {}
     for _, candidate in ipairs(candidates) do
@@ -249,6 +220,21 @@ local function buildCoreChoices(view, projection)
         append(capability,
             capability.status == "eligible"
                 or capability.status == "selected_for_preflight")
+    end
+    -- Owned companion actions are real landing actions, not a topic browser.
+    -- Keep them beside the landing choices while leaving unrelated groups
+    -- behind the explicit context index.
+    if selectedGroup and selectedGroup.id == rootGroupID then
+        for _, group in ipairs(projection.groups or {}) do
+            if group.id == "owned_actions" then
+                for _, capability in ipairs(group.capabilities or {}) do
+                    append(capability,
+                        capability.status == "eligible"
+                            or capability.status == "selected_for_preflight")
+                end
+                break
+            end
+        end
     end
     if view then view.semanticSuggestionRows = rows end
     return rows
@@ -300,6 +286,22 @@ local function applyCoreChoices(view, projection)
             -- projection or the authored fallback.
             view.semanticPresentationPending = projection
             return false, "semantic_choices_deferred"
+        end
+        if projection
+            and tostring(projection.currentGroupID or "")
+                == tostring(projection.rootGroupID or "")
+        then
+            -- Back is still a valid presentation transition when the
+            -- landing group has no currently eligible rows. Keep the
+            -- production surface empty rather than rejecting the navigation
+            -- frame as if the root itself were stale.
+            view.semanticPresentationPending = nil
+            session:setPresentedChoices({}, {
+                source = "semantic_suggestions_empty",
+                revision = projection.revision,
+                presentedCount = 0,
+            })
+            return true, rows
         end
         local node = session.currentNode or {}
         if type(session.setChoices) == "function" then
@@ -406,6 +408,32 @@ function Internal.SelectSemanticGroup(view, frame)
     return true, "accepted"
 end
 
+local function clearSemanticTopicFocus(view)
+    local session = view and view.session or nil
+    local dialogueState = session and session.semanticDialogueState or nil
+    if type(dialogueState) == "table" then
+        if type(dialogueState.ClearTopicFocus) == "function" then
+            dialogueState:ClearTopicFocus()
+        else
+            if dialogueState.currentTopic then
+                dialogueState.previousTopic = dialogueState.currentTopic
+            end
+            dialogueState.currentTopic = nil
+        end
+    end
+    local contextState = session and session.semanticDialogueContext or nil
+    if type(contextState) == "table" then
+        if type(contextState.ClearTopicFocus) == "function" then
+            contextState:ClearTopicFocus()
+        else
+            if contextState.currentTopic then
+                contextState.previousTopic = contextState.currentTopic
+            end
+            contextState.currentTopic = nil
+        end
+    end
+end
+
 function Internal.SelectSemanticRoot(view, frame)
     if not view or not view.session
         or type(Suggestions.IsBackFrame) ~= "function"
@@ -454,6 +482,7 @@ function Internal.SelectSemanticRoot(view, frame)
     then
         return false, "stale_suggestion"
     end
+    clearSemanticTopicFocus(view)
     projection.currentGroupID = rootID
     local applied, reason = applyCoreChoices(view, projection)
     if not applied then return false, reason end

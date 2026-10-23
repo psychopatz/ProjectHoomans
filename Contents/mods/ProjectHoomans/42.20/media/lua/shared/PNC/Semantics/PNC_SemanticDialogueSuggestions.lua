@@ -22,6 +22,7 @@ local ChoiceRanking = PNC.Semantics.DialogueChoiceRanking
 
 Suggestions.VERSION = 1
 Suggestions.ROOT_GROUP_ID = "conversation_landing"
+Suggestions.CONTEXT_INDEX_GROUP_ID = "conversation_context_index"
 -- The visual part keeps five rows per selected group. The projection itself
 -- is bounded separately so a dynamic root can expose every safe topic through
 -- the existing group selector without pretending that five is a global cap.
@@ -1288,6 +1289,12 @@ local function appendConversationRootChoices(
         if type(semantic) == "table" and choiceID ~= ""
             and (semantic.route == "conversation_category"
                 or semantic.route == "conversation_root_choice")
+            and not (
+                choiceID == "show_debug_text"
+                or choiceID == "view_dossier"
+                or semantic.categoryID == "projecthoomans:set_territory"
+                or semantic.categoryID == "projecthoomans:trade"
+            )
             and #output < Suggestions.MAX_CANDIDATES
         then
             local candidateID = table.concat({
@@ -1295,11 +1302,15 @@ local function appendConversationRootChoices(
             }, ":")
             if not seen[candidateID] then
                 local topic = tostring(semantic.topic or "")
-                -- Root choices belong to the production landing surface.  The
-                -- authored choice itself still carries its original semantic
-                -- topic/route in the frame, so the existing composer remains
-                -- the owner when it is clicked.
-                local groupID = Suggestions.ROOT_GROUP_ID
+                -- Categories are a second-level context index. Direct root
+                -- actions remain on the landing page. The authored choice
+                -- still carries its original route, so the composer remains
+                -- the owner when a category is selected.
+                local directCategory = choiceID == "ceasefire"
+                local groupID = semantic.route == "conversation_category"
+                    and not directCategory
+                    and Suggestions.CONTEXT_INDEX_GROUP_ID
+                    or Suggestions.ROOT_GROUP_ID
                 local text = boundedText(choice.text or choiceID, 160)
                 local enabled = choice.enabled == true
                 local reason = enabled and "production_root_choice_eligible"
@@ -1369,6 +1380,23 @@ local function appendConversationRootChoices(
     end
 end
 
+local function hasConversationHistory(context)
+    context = type(context) == "table" and context or {}
+    local function isNonGreeting(topic)
+        return topic ~= nil and tostring(topic) ~= "greeting"
+    end
+    if isNonGreeting(context.currentTopic)
+        or isNonGreeting(context.previousTopic)
+    then
+        return true
+    end
+    local semantic = context.semanticDialogueContext
+    if type(semantic) ~= "table" then return false end
+    return isNonGreeting(semantic.currentTopic)
+        or isNonGreeting(semantic.previousTopic)
+        or #(semantic.priorTopics or {}) > 0
+end
+
 local function appendLandingShortcuts(
     output, seen, revision, predicateTrace
 )
@@ -1432,6 +1460,61 @@ local function appendLandingShortcuts(
     seen[candidateID] = candidate
 end
 
+local function appendTalkAgainAbout(
+    output, seen, context, revision, predicateTrace
+)
+    local candidateID = "conversation.landing:talk_again_about"
+    if seen[candidateID]
+        or not hasConversationHistory(context)
+        or #output >= Suggestions.MAX_CANDIDATES
+    then
+        return
+    end
+    local labelKey =
+        "UI_PNC_Conversation_Suggestion_TalkAgainAbout_Label"
+    local label = resolvedText(labelKey, "Talk again about")
+    local frame = Suggestions.BuildGroupFrame({
+        id = Suggestions.CONTEXT_INDEX_GROUP_ID,
+        label = label,
+        labelKey = labelKey,
+        allowBack = true,
+    }, revision)
+    if not frame then return end
+    local source = sourceRecord(
+        "conversation_root", revision, "conversation_context_index"
+    )
+    output[#output + 1] = {
+        id = candidateID,
+        groupID = Suggestions.ROOT_GROUP_ID,
+        rank = #output + 1,
+        source = source,
+        sources = { source },
+        frame = frame,
+        enabled = true,
+        display = {
+            labelKey = labelKey,
+            labelFallback = label,
+            label = label,
+        },
+        visibility = "player",
+        eligibility = {
+            status = "allowed",
+            allowed = true,
+            reason = "conversation_context_history",
+        },
+    }
+    if #predicateTrace < Predicates.MAX_TRACE then
+        predicateTrace[#predicateTrace + 1] = {
+            candidateID = candidateID,
+            source = "conversation_root",
+            path = "conversationLanding.contextIndex",
+            status = "allowed",
+            reason = "conversation_context_history",
+        }
+    end
+    seen[candidateID] = output[#output]
+end
+
 local GROUP_LABELS = {
     whats_up = {
         key = "UI_PNC_Conversation_Suggestion_Group_WhatsUp_Label",
@@ -1480,6 +1563,18 @@ local function groupPresentation(id, topic)
                 "Talk"
             ),
             labelKey = "UI_PNC_Conversation_Suggestion_Group_Landing_Label",
+            allowBack = true,
+        }
+    end
+    if id == Suggestions.CONTEXT_INDEX_GROUP_ID then
+        return {
+            id = id,
+            label = resolvedText(
+                "UI_PNC_Conversation_Suggestion_TalkAgainAbout_Label",
+                "Talk again about"
+            ),
+            labelKey =
+                "UI_PNC_Conversation_Suggestion_TalkAgainAbout_Label",
             allowBack = true,
         }
     end
@@ -1623,7 +1718,11 @@ local function buildGroups(candidates, capabilities, currentTopic, revision)
     end
     local rootGroupID = byID[Suggestions.ROOT_GROUP_ID]
         and Suggestions.ROOT_GROUP_ID or nil
-    local currentGroupID = not currentTopic and rootGroupID
+    -- The authored greeting is the opening lifecycle state, not a selected
+    -- semantic topic. Keep the first Talk surface on the landing page.
+    local semanticTopicActive = currentTopic
+        and tostring(currentTopic) ~= "greeting"
+    local currentGroupID = not semanticTopicActive and rootGroupID
         or currentTopic == "whats_up"
         and byID["semantic_hub.whats_up"]
         and "semantic_hub.whats_up" or topicGroupID(currentTopic)
@@ -1869,6 +1968,9 @@ function Suggestions.Build(result, context, messages)
     )
     appendLandingShortcuts(
         candidates, seen, revision, predicateTrace
+    )
+    appendTalkAgainAbout(
+        candidates, seen, context, revision, predicateTrace
     )
     appendConversationChoices(
         candidates, seen, context, revision, predicateTrace

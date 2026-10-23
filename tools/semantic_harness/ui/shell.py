@@ -57,7 +57,9 @@ from .workbench import WorkbenchPage
 def npc_message_text(message: dict[str, Any]) -> str:
     """Return rendered production text before its English fallback."""
 
-    payload = message.get("payload", {})
+    payload = message.get("payload") or message.get("value") or {}
+    if isinstance(payload, str):
+        return payload
     return str(payload.get("text") or payload.get("fallback") or "")
 
 
@@ -729,6 +731,15 @@ class SemanticHarnessApp:
             talk_controls, text="All types", command=self.run_talk_matrix
         )
         self.talk_matrix_button.grid(row=0, column=3, sticky="w", padx=(6, 0))
+        self.talk_choices_frame = ttk.LabelFrame(
+            talk_frame, text="Current Talk choices"
+        )
+        self.talk_choices_frame.grid(
+            row=1, column=0, sticky="ew", pady=(0, 6)
+        )
+        for column in range(3):
+            self.talk_choices_frame.columnconfigure(column, weight=1)
+        self.talk_choice_buttons: list[Any] = []
         self.talk_output = ScrolledText(talk_frame, wrap="none", state="disabled")
         self.talk_output.grid(row=2, column=0, sticky="nsew")
         self.trace_tabs.add(talk_frame, text="Talk parity")
@@ -1605,6 +1616,78 @@ class SemanticHarnessApp:
             or "hello"
         )
 
+    def _render_talk_choices(self, choices: Any) -> None:
+        """Render the worker's production choice surface without reclassifying it."""
+
+        if not isinstance(choices, list):
+            choices = []
+        for button in self.talk_choice_buttons:
+            button.destroy()
+        self.talk_choice_buttons = []
+        visible = [
+            choice for choice in choices
+            if isinstance(choice, dict) and isinstance(choice.get("frame"), dict)
+        ]
+        if not visible:
+            label = self._ttk.Label(
+                self.talk_choices_frame,
+                text="Start Talk to load the production landing choices.",
+            )
+            label.grid(row=0, column=0, columnspan=3, sticky="w", padx=6, pady=4)
+            self.talk_choice_buttons.append(label)
+            return
+        for index, choice in enumerate(visible):
+            frame = choice["frame"]
+            text = str(
+                choice.get("text")
+                or choice.get("label")
+                or frame.get("labelFallback")
+                or frame.get("textFallback")
+                or choice.get("id")
+                or "choice"
+            )
+            button = self._ttk.Button(
+                self.talk_choices_frame,
+                text=text,
+                command=lambda selected=frame: self._click_talk_choice(selected),
+            )
+            button.grid(
+                row=index // 3,
+                column=index % 3,
+                sticky="ew",
+                padx=3,
+                pady=3,
+            )
+            if choice.get("enabled") is False:
+                button.configure(state="disabled")
+            self.talk_choice_buttons.append(button)
+
+    def _click_talk_choice(self, frame: dict[str, Any]) -> None:
+        if not self.session.ready or self.busy:
+            return
+
+        def finish(response: dict[str, Any]) -> None:
+            scenario = response.get("scenario")
+            if isinstance(scenario, dict):
+                self.scenario = scenario
+                self._sync_workbench_from_scenario(scenario)
+            if response.get("accepted") is not True:
+                self._append(
+                    "SYSTEM",
+                    f"Talk choice rejected: {response.get('reason') or 'unknown'}",
+                )
+            self._show_response(response)
+            observation = response.get("observation") or {}
+            self._render_talk_choices(observation.get("choices") or [])
+            self._set_text(
+                self.talk_output,
+                "Talk choice\n\n" + pretty(response),
+            )
+
+        self._start_operation(
+            lambda worker: worker.suggestion_click(frame), finish
+        )
+
     def start_talk_parity(self) -> None:
         """Start one production Talk target and show its opening evidence."""
 
@@ -1621,9 +1704,18 @@ class SemanticHarnessApp:
             if isinstance(scenario, dict):
                 self.scenario = scenario
                 self._sync_workbench_from_scenario(scenario)
+            start = result.get("start") or {}
+            opening = start.get("opening") or {}
+            for message in opening.get("messages") or []:
+                if isinstance(message, dict) and message.get("speaker") == "npc":
+                    self._append("NPC", npc_message_text(message))
             turn = result.get("turn") or {}
             if isinstance(turn, dict):
                 self._show_response(turn)
+            observation = result.get("observation") or {}
+            self._render_talk_choices(
+                observation.get("choices") or opening.get("choices") or []
+            )
             self._set_text(self.talk_output, self._format_talk_start(result))
             self.trace_tabs.select(self.talk_parity_frame)
             target = (result.get("start") or {}).get("target") or {}
@@ -1692,8 +1784,17 @@ class SemanticHarnessApp:
             f"Trader overlay: {'enabled' if ((start.get('integration') or {}).get('traderOverlay') or {}).get('enabled') else 'disabled'}",
             "",
             f"Opening node: {opening.get('nodeID') or 'unknown'}",
-            "Opening choices:",
+            "Opening flavor:",
         ]
+        opening_messages = opening.get("messages") or []
+        for message in opening_messages:
+            if isinstance(message, dict) and message.get("speaker") == "npc":
+                lines.append(f"  NPC: {npc_message_text(message)}")
+        if not opening_messages:
+            lines.append("  —")
+        lines.append(
+            "Opening choices:",
+        )
         for choice in choices:
             if isinstance(choice, dict):
                 status = "available" if choice.get("enabled") else "locked"
