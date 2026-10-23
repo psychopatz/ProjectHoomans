@@ -147,6 +147,27 @@ class SaveImportTests(unittest.TestCase):
                 imported["scenario"]["npc"]["relationship"]["approval"],
                 90,
             )
+            relationship_projection = imported["simulationProjection"][
+                "relationship"
+            ]
+            self.assertEqual(
+                relationship_projection["record"]["baselineApproval"],
+                73,
+            )
+            self.assertEqual(
+                relationship_projection["record"]["interactionRevision"],
+                12,
+            )
+            self.assertEqual(
+                relationship_projection["productionPresentation"][
+                    "interactionRevision"
+                ],
+                12,
+            )
+            self.assertEqual(
+                relationship_projection["productionGraph"]["attitude"],
+                "admire",
+            )
 
             worker.input("here's an apple for you")
             mutated = worker.snapshot()

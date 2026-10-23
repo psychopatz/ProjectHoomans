@@ -2,8 +2,8 @@
 
 **Updated:** 2026-10-24  
 **Parent status:** REOPENED — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is mandatory.  
-**Current mandatory phase:** P12G — Optional read-only live profiler provider.
-**Current local baseline audited:** ProjectHoomans `main` at `25ef4034`; upstream remains unchanged and local `main` is ahead by six commits.
+**Current mandatory phase:** P12J — Save-backed conversation parity.
+**Current local baseline audited:** ProjectHoomans `main` at `d966cd3a`; upstream remains unchanged and local `main` is ahead by eight commits.
 **Normal Semantic Lab runtime requirement:** Project Zomboid CLOSED/OFFLINE is supported and expected.  
 **Source save mutation:** FORBIDDEN.  
 **Optional live profiler:** disabled by default; read-only enrichment only.
@@ -329,9 +329,25 @@ Evidence:
 - P12A–P12G focused suite remained green; `luac5.3 -p`, `git diff --check`, and `pz-verify` Kahlua checks for all three changed Lua files passed with zero issues;
 - no save file or live Project Zomboid object was written.
 
-## Current Exact Next Chunk — P12I Source-aware UI + relationship parity
+## Completed Chunk — P12I Source-aware UI + relationship parity
 
-Expose SAVE/FIXTURE/LIVE/DERIVED/HARNESS MUTATION/MISSING provenance in the normal Semantic Lab UI and project the full production relationship graph, baselines, standing, durable bond, memories, cooldowns, interaction history, and revisions.
+Implemented source-aware normal UI and production relationship projection:
+
+- Semantic Lab now shows source kind, immutable-source status, working-world override count, imported/effective values, base source, and provider for important relationship/world/actor/inventory fields in a dedicated Provenance inspector;
+- the relationship inspector exposes the complete imported directed record, including baselines, approval/respect/familiarity, current and previous standing, bond, memories, cooldowns, interaction journal/revision, and relationship revision;
+- the Lua projection now calls the production `PNC.RelationshipPresentation` and `PNC.RelationshipGraph` modules and labels their record/graph/presentation output as the authority; Python only bounds display size;
+- the existing synthetic path remains explicitly Developer/Test-backed and the source snapshot remains read-only.
+
+Evidence:
+
+- `tools/semantic_harness/tests/test_save_import_p12c.py`: 2 saved-import tests passed, including production Graph/Presentation projections and source immutability;
+- `tools/semantic_harness/tests/test_save_browser_p12d.py`: 2 tests passed under Xvfb, including the Provenance tab;
+- P12A–P12H plus P11J regression set: 28 tests passed;
+- `python3 -m py_compile`, `luac5.3 -p`, and `git diff --check` passed; `pz-verify` found zero Kahlua issues in the changed ScenarioSession file, while the unchanged legacy loader findings in ProductionModules remain pre-existing.
+
+## Current Exact Next Chunk — P12J Save-backed conversation parity
+
+From a selected real saved Player/NPC pair, exercise Talk, identity, relationship, friend promotion, proposal, recruitment, factions, knowledge, inventory, Dynamic Trading, semantic tools, Flow/Hub/ConversationBlock graphs, Replay, and Compare without requiring a hand-authored synthetic NPC scenario.
 
 ## P12A acceptance
 

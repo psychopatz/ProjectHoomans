@@ -335,6 +335,9 @@ class SemanticHarnessApp:
         self.talk_catalog: dict[str, Any] = {}
         self.talk_target_ids_by_label: dict[str, str] = {}
         self.simulation_projection: dict[str, Any] = {}
+        self.source_snapshot_projection: dict[str, Any] = {}
+        self.working_world_projection: dict[str, Any] = {}
+        self.provenance_projection: dict[str, Any] = {}
         self.settings_variables: dict[str, Any] = {}
         self.settings_control_widgets: dict[str, Any] = {}
         self.settings_control_fields: dict[str, Any] = {}
@@ -573,6 +576,7 @@ class SemanticHarnessApp:
         workbench_footer = ttk.Frame(self.workbench_content)
         workbench_footer.grid(row=1, column=0, sticky="ew", pady=(3, 0))
         workbench_footer.columnconfigure(0, weight=1)
+        workbench_footer.columnconfigure(1, weight=1)
         ttk.Label(
             workbench_footer,
             textvariable=self.workbench_status_var,
@@ -580,6 +584,16 @@ class SemanticHarnessApp:
             justify="left",
             wraplength=620,
         ).grid(row=0, column=0, sticky="ew", pady=(0, 3))
+        self.provenance_status_var = self._tk.StringVar(
+            value="Source provenance: FIXTURE · isolated working world"
+        )
+        ttk.Label(
+            workbench_footer,
+            textvariable=self.provenance_status_var,
+            anchor="w",
+            justify="left",
+            wraplength=620,
+        ).grid(row=0, column=1, sticky="ew", padx=(12, 0), pady=(0, 3))
         workbench_actions = ttk.Frame(workbench_footer)
         workbench_actions.grid(row=1, column=0, sticky="ew")
         self.workbench_apply_button = ttk.Button(
@@ -899,6 +913,15 @@ class SemanticHarnessApp:
         )
         self.suggestion_inspector.grid(row=0, column=0, sticky="nsew")
         self.trace_tabs.add(suggestion_trace_frame, text="Suggestions + predicates")
+
+        provenance_frame = ttk.Frame(self.trace_tabs)
+        provenance_frame.rowconfigure(0, weight=1)
+        provenance_frame.columnconfigure(0, weight=1)
+        self.provenance_inspector = ScrolledText(
+            provenance_frame, wrap="none", state="disabled"
+        )
+        self.provenance_inspector.grid(row=0, column=0, sticky="nsew")
+        self.trace_tabs.add(provenance_frame, text="Provenance")
 
         world_knowledge_frame = ttk.Frame(self.trace_tabs)
         self.world_knowledge_frame = world_knowledge_frame
@@ -2797,7 +2820,166 @@ class SemanticHarnessApp:
         self._set_text(self.trace, str(error))
         self._messagebox.showerror("Harness error", str(error))
 
+    @staticmethod
+    def _provenance_value(value: Any, depth: int = 2) -> Any:
+        """Keep the provenance inspector readable for large saved records."""
+
+        if isinstance(value, dict):
+            if depth <= 0:
+                return {"keys": len(value)}
+            keys = sorted(value, key=lambda item: str(item).casefold())
+            output = {
+                str(key): SemanticHarnessApp._provenance_value(
+                    value[key], depth - 1
+                )
+                for key in keys[:12]
+            }
+            if len(keys) > 12:
+                output["_omittedKeys"] = len(keys) - 12
+            return output
+        if isinstance(value, list):
+            if depth <= 0:
+                return {"count": len(value)}
+            return {
+                "count": len(value),
+                "sample": [
+                    SemanticHarnessApp._provenance_value(item, depth - 1)
+                    for item in value[:3]
+                ],
+            }
+        return deepcopy(value)
+
+    @staticmethod
+    def _value_at_path(value: Any, path: str) -> Any:
+        current = value
+        for segment in path.split("."):
+            if not isinstance(current, dict):
+                return None
+            current = current.get(segment)
+        return current
+
+    def _update_source_provenance(self, response: dict[str, Any]) -> None:
+        if not isinstance(response, dict):
+            return
+        source = response.get("sourceSnapshot")
+        working = response.get("workingWorld")
+        if isinstance(source, dict):
+            self.source_snapshot_projection = deepcopy(source)
+        if isinstance(working, dict):
+            self.working_world_projection = deepcopy(working)
+        source = self.source_snapshot_projection
+        working = self.working_world_projection
+        if not isinstance(source, dict) or not isinstance(working, dict):
+            return
+        source_data = source.get("data") if isinstance(source.get("data"), dict) else {}
+        effective = response.get("scenario")
+        if not isinstance(effective, dict):
+            effective = working.get("effective")
+        if not isinstance(effective, dict):
+            effective = {}
+        metadata = source.get("metadata") if isinstance(source.get("metadata"), dict) else {}
+        provenance = source.get("provenance") if isinstance(source.get("provenance"), dict) else {}
+        path_sources = provenance.get("paths") if isinstance(provenance.get("paths"), dict) else {}
+        patches = working.get("patches") if isinstance(working.get("patches"), list) else []
+        patch_sources = {
+            str(patch.get("path")): patch
+            for patch in patches
+            if isinstance(patch, dict) and patch.get("path")
+        }
+        important_paths = (
+            "npc.relationship.baselineApproval",
+            "npc.relationship.baselineRespect",
+            "npc.relationship.approval",
+            "npc.relationship.respect",
+            "npc.relationship.familiarity",
+            "npc.relationship.state",
+            "npc.relationship.previousState",
+            "npc.relationship.bond",
+            "npc.relationship.memories",
+            "npc.relationship.cooldowns",
+            "npc.relationship.interactionJournal",
+            "npc.relationship.interactionRevision",
+            "npc.relationship.revision",
+            "world.weather",
+            "world.timeOfDay",
+            "world.temperature",
+            "world.season",
+            "player.needs",
+            "npc.needs",
+            "player.inventory.revision",
+            "npc.inventory.revision",
+        )
+        fields: dict[str, Any] = {}
+        for path in important_paths:
+            imported = self._value_at_path(source_data, path)
+            current = self._value_at_path(effective, path)
+            patch = patch_sources.get(path)
+            source_info = path_sources.get(path)
+            source_info = source_info if isinstance(source_info, dict) else {}
+            origin = (
+                str(patch.get("source"))
+                if patch is not None
+                else str(source_info.get("source") or metadata.get("sourceKind") or "MISSING")
+            )
+            fields[path] = {
+                "imported": self._provenance_value(imported),
+                "effective": self._provenance_value(current),
+                "source": origin,
+                "baseSource": str(
+                    patch.get("baseSource")
+                    if patch is not None
+                    else source_info.get("source")
+                    or metadata.get("sourceKind")
+                    or "MISSING"
+                ),
+                "provider": source_info.get("provider"),
+            }
+        self.provenance_projection = {
+            "schema": "semantic.ui.provenance_projection.v1",
+            "source": {
+                "kind": metadata.get("sourceKind", "MISSING"),
+                "id": metadata.get("sourceID"),
+                "mode": metadata.get("mode"),
+                "immutable": source.get("immutable") is True
+                or metadata.get("immutable") is True,
+            },
+            "workingWorld": {
+                "schema": working.get("schema"),
+                "sourceSnapshotID": working.get("sourceSnapshotID"),
+                "resetCount": working.get("resetCount", 0),
+                "patchCount": len(patches),
+            },
+            "fields": fields,
+        }
+        simulation = response.get("simulationProjection")
+        projected_relationship = (
+            simulation.get("relationship")
+            if isinstance(simulation, dict)
+            else None
+        )
+        if isinstance(projected_relationship, dict):
+            self.provenance_projection["relationshipAuthority"] = {
+                "authority": "PNC.RelationshipGraph + PNC.RelationshipPresentation",
+                "record": self._provenance_value(
+                    projected_relationship.get("record")
+                ),
+                "graph": self._provenance_value(
+                    projected_relationship.get("productionGraph")
+                ),
+                "presentation": self._provenance_value(
+                    projected_relationship.get("productionPresentation")
+                ),
+            }
+        if getattr(self, "provenance_status_var", None) is not None:
+            self.provenance_status_var.set(
+                f"Source: {metadata.get('sourceKind', 'MISSING')} · "
+                f"working overrides: {len(patches)} · immutable source snapshot"
+            )
+        if hasattr(self, "provenance_inspector"):
+            self._set_text(self.provenance_inspector, pretty(self.provenance_projection))
+
     def _update_simulation_projection(self, response: dict[str, Any]) -> None:
+        self._update_source_provenance(response)
         projection = response.get("simulationProjection") if isinstance(response, dict) else None
         if isinstance(projection, dict):
             self.simulation_projection = projection

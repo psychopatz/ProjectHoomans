@@ -283,6 +283,11 @@ load(
     )
     load(
         "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_RelationshipPresentation.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
         "PNC/Core/Factions/PNC_FactionConstants.lua",
         "recruitment_authority"
     )

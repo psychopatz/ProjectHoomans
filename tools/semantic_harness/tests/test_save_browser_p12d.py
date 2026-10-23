@@ -176,6 +176,11 @@ class SaveBrowserTests(unittest.TestCase):
             self.assertTrue(hasattr(app, "saved_world_save_box"))
             self.assertTrue(hasattr(app, "saved_world_category_box"))
             self.assertTrue(hasattr(app, "saved_world_import_button"))
+            self.assertTrue(hasattr(app, "provenance_inspector"))
+            self.assertIn(
+                "Provenance",
+                {app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()},
+            )
         finally:
             app.close()
 
