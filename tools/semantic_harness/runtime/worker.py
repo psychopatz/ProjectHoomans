@@ -10,6 +10,7 @@ from .config import HarnessConfig
 from .item_catalog import search_item_catalog
 from .process import HarnessError, LuaProcess
 from .scenario import load_scenario, validate_scenario
+from .save_catalog import SaveCatalog
 from .state import HarnessWorkingWorld, ImportedSourceSnapshot, Provenance
 from .activity import ActivityLog, default_activity_path
 
@@ -313,6 +314,14 @@ class LuaSemanticWorker:
         """Search installed Project Zomboid item definitions for the Lab editor."""
 
         return search_item_catalog(query, limit, self.scenario)
+
+    def save_catalog(self, roots: list[Path] | None = None) -> dict[str, Any]:
+        """Discover validated offline saves through PsychopatzCore's reader."""
+
+        return SaveCatalog(
+            roots,
+            core_repository=self.config.core_repository,
+        ).discover()
 
     def context_matrix(
         self,

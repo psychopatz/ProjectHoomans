@@ -214,9 +214,28 @@ Evidence:
 - `python3 -m py_compile`, `luac5.3 -p`, and `git diff --check` passed;
 - the broader legacy `test_harness` module ran 24 tests but retains 2 identity-presentation assertion failures outside P12A.
 
-## Current Exact Next Chunk — P12B
+## Completed Chunk — P12B Core reader reuse + save catalog
 
-Reuse `psychopatzCore/tools/profiler/moddata_reader.py` and `GlobalModDataReader` for a read-only offline save catalog. Do not add another `global_mod_data.bin` decoder. Discover compatible saves and enumerate the required persisted roots, failing closed for unsupported, corrupt, missing-table, and invalid-schema inputs.
+Implemented a read-only offline save catalog over the existing Core reader:
+
+- `tools/semantic_harness/runtime/save_catalog.py` loads and reuses Core `GlobalModDataReader` and `ModDataFormatError` directly;
+- no second `global_mod_data.bin` decoder was added;
+- conventional `Zomboid/Saves` roots and explicit `PZ_SAVE_ROOT` / `ZOMBOID_SAVE_ROOT` roots are discovered without Project Zomboid running;
+- compatible saves enumerate `PNC_PlayerCharacters`, `PNC_Core_Global`, every `PNC_npc<ID>` table, file metadata, and source IDs;
+- Build 42.20 world version 249 and persisted Project Hoomans schema versions 6/16/16 are validated through Core inspection;
+- unsupported world versions, corrupt files, missing required tables, invalid schema versions, and changing files are rejected rather than imported;
+- the high-level worker exposes the catalog without sending any command to Project Zomboid.
+
+Evidence:
+
+- `tools/semantic_harness/tests/test_save_catalog_p12b.py`: 4 tests passed;
+- PsychopatzCore `tools/profiler/tests/test_moddata_reader.py`: 7 tests passed;
+- P12A plus P12B focused suite: 6 tests passed;
+- no source-save writes are performed by the catalog.
+
+## Current Exact Next Chunk — P12C
+
+Import a real saved Player/NPC pair and install the persisted NPC relationship record into the isolated working world, including the saved baselines, standing, bond, memories, cooldowns, interaction journal, and revisions. Remove harness-owned relationship policy from `SemanticAdapters` as production relationship services become authoritative.
 
 ## P12A acceptance
 
