@@ -1,7 +1,7 @@
 # Contextual Dialogue Persona & Choices
 
-**Status:** REOPENED — P11 runtime-parity foundation retained; P11J native Talk shared-entry parity is the current mandatory gap.  
-**Current source-audit baseline:** ProjectHoomans remote main at c9385c4f2b1b86feb09ed24144896e473bd6fec8 (2026-10-23).  
+**Status:** REOPENED — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is the current mandatory architecture.  
+**Current source-audit baseline:** ProjectHoomans remote main at 73e1ac5d0e49045a4660f447296a4b99544b4f0f (2026-10-24).  
 **Dynamic Trading provider baseline:** psychopatz/DynamicTrading at 5db64cbcc764f035146f044fdc34e930ce47d7c8.  
 **Native Project Zomboid SP/MP:** untested; user-owned acceptance.
 
@@ -20,7 +20,7 @@ The existing P0-P7 implementation is retained as foundation, but the 2026-10-22 
 
 The P8 behavioral foundation is now implemented, but the 2026-10-22 UI/routing audit found a new product gap: Semantic Lab still hides real conversation branching, and typed authored-category utterances such as `whatsup` redundantly produce an `Ask what's up` button instead of entering the already-recognized category directly.
 
-P10 hub/control infrastructure and the P11 actor/relationship/runtime-graph work are retained. A later Talk audit found that the harness-side P11J matrix now models the correct Colonist/Follower/Neutral/Hostile cases, but native `PNC.Conversation.Open` still does not consume the same Talk-start projection. The current mandatory gap is therefore **P11J native Talk parity: converge native Talk and Semantic Lab onto one production Talk-start boundary**.
+P10/P11/P11J have now brought routing, Talk-start projection, actor controls, relationship logic, graphs, recruitment authority, and production semantic execution close to parity. The remaining structural drift is the source of state: normal Semantic Lab still starts from synthetic scenario fixtures and reconstructs production-like actor/relationship/world state. The current mandatory goal is therefore **P12 — Save-Backed Offline Semantic Runtime**: seed the harness from real saved mod state, keep engine-only values as explicit offline fixtures, make every mutation occur only in an isolated harness copy through production Lua, and support an optional settings-text-controlled read-only live profiler enrichment path.
 
 ## Relationship / bond direction
 
@@ -90,8 +90,10 @@ This job builds on and must not duplicate:
 8. SEMANTIC_SIMULATION_UX_AND_CONTEXTUAL_HUB.md
 9. RUNTIME_PARITY_ACTORS_RELATIONSHIPS_AND_UX.md
 10. NATIVE_TALK_PARITY.md
-11. ROADMAP.md
-12. HARNESS_ACCEPTANCE.md
-13. PROGRESS.md **last** for current truth and the exact Next Chunk
+11. PRODUCTION_RELATIONSHIP_PROPOSAL_INTEGRATION.md
+12. SAVE_BACKED_OFFLINE_SEMANTIC_RUNTIME.md
+13. ROADMAP.md
+14. HARNESS_ACCEPTANCE.md
+15. PROGRESS.md **last** for current truth and the exact Next Chunk
 
 No checked-in GOAL_PROMPT.md is allowed. The executable /goal remains chat-only.
