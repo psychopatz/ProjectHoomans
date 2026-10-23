@@ -10,6 +10,7 @@ import tkinter as tk
 import unittest
 
 from tools.semantic_harness.cli import _parser
+from tools.semantic_harness.runtime.npc_profiles import apply_npc_profile
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
@@ -93,6 +94,72 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
         self.assertTrue(arguments.talk_matrix)
         self.assertIsNone(arguments.talk_start)
         self.assertEqual(arguments.talk_utterance, "hello")
+
+    def test_unavailable_current_target_reports_reason_and_restores_scenario(self) -> None:
+        scenario = deepcopy(DEFAULT_SCENARIO)
+        scenario["npc"]["alive"] = False
+        with LuaSemanticWorker(scenario) as worker:
+            matrix = worker.talk_matrix(target_types=["current"])
+            restored = worker.snapshot()["scenario"]
+
+        row = matrix["rows"][0]
+        self.assertEqual(row["target"]["route"], "unavailable")
+        self.assertEqual(
+            row["target"]["availability"]["reason"], "npc_unavailable"
+        )
+        self.assertFalse(restored["npc"]["alive"])
+        self.assertEqual(restored["npc"]["npcID"], scenario["npc"]["npcID"])
+        self.assertNotIn("semanticLabTalkTarget", restored["runtime"])
+
+    def test_trader_capability_is_an_overlay_on_the_talk_target(self) -> None:
+        scenario = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), "trader")
+        with LuaSemanticWorker(scenario) as worker:
+            matrix = worker.talk_matrix(target_types=["current"])
+
+        row = matrix["rows"][0]
+        target = row["target"]
+        integration = row["integration"]
+        self.assertEqual(target["targetType"], "neutral")
+        self.assertEqual(target["tacticalClass"], "neutral")
+        self.assertTrue(integration["traderOverlay"]["enabled"])
+        self.assertEqual(
+            integration["traderOverlay"]["providerID"],
+            "dynamictrading.trader",
+        )
+        self.assertTrue(integration["dynamicTrading"]["loaded"])
+        self.assertIn(
+            "dynamictrading.trade",
+            {choice["id"] for choice in row["semanticHubChoices"]},
+        )
+
+    def test_en_tl_keep_talk_routes_and_semantic_choices_identical(self) -> None:
+        rows_by_language = {}
+        for language in ("EN", "TL"):
+            scenario = deepcopy(DEFAULT_SCENARIO)
+            scenario["runtime"]["language"] = language
+            with LuaSemanticWorker(scenario) as worker:
+                matrix = worker.talk_matrix(
+                    target_types=["colonist", "neutral", "hostile"],
+                    text="hello",
+                )
+            rows_by_language[language] = {
+                row["target"]["id"]: row for row in matrix["rows"]
+            }
+
+        for target_id in ("colonist", "neutral", "hostile"):
+            english = rows_by_language["EN"][target_id]
+            tagalog = rows_by_language["TL"][target_id]
+            self.assertEqual(
+                english["target"]["targetType"],
+                tagalog["target"]["targetType"],
+            )
+            self.assertEqual(
+                english["target"]["route"], tagalog["target"]["route"]
+            )
+            self.assertEqual(
+                [choice["id"] for choice in english["semanticHubChoices"]],
+                [choice["id"] for choice in tagalog["semanticHubChoices"]],
+            )
 
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_tk_talk_parity_surface_runs_the_real_worker(self) -> None:

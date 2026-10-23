@@ -1700,9 +1700,12 @@ class SemanticHarnessApp:
             f"Tactical class: {target.get('tacticalClass') or 'unknown'}",
             f"Audience: {target.get('audience') or 'unknown'}",
             f"Route: {target.get('route') or 'unknown'}",
+            f"Route reason: {target.get('routeReason') or 'unknown'}",
+            f"Availability: {(target.get('availability') or {}).get('reason') or 'available'}",
             f"Hostile: {'yes' if target.get('hostile') else 'no'}",
             f"Hostile inline integration: {'available' if target.get('hostileInlineAvailable') else 'not loaded in worker'}",
             f"Relationship ID: {target.get('relationshipID') or 'unknown'}",
+            f"Trader overlay: {'enabled' if ((start.get('integration') or {}).get('traderOverlay') or {}).get('enabled') else 'disabled'}",
             "",
             f"Opening node: {opening.get('nodeID') or 'unknown'}",
             "Opening choices:",
@@ -1739,14 +1742,17 @@ class SemanticHarnessApp:
             f"Talk parity · {result.get('schema', 'production matrix')}",
             f"First utterance: {result.get('utterance') or 'hello'}",
             "",
-            "Target | Production type | Audience | Route | NPC response | Graph",
-            "-------|------------------|----------|-------|---------------|------",
+            "Target | Production type | Audience | Route | Availability | Provider | NPC response | Graph",
+            "-------|------------------|----------|-------|--------------|----------|---------------|------",
         ]
         for row in rows:
             if not isinstance(row, dict):
                 continue
             target = row.get("target") or {}
             graph = row.get("runtimeGraphPath") or {}
+            availability = target.get("availability") or {}
+            integration = row.get("integration") or {}
+            trader = integration.get("traderOverlay") or {}
             lines.append(
                 " | ".join(
                     (
@@ -1754,6 +1760,8 @@ class SemanticHarnessApp:
                         str(target.get("targetType") or "unknown"),
                         str(target.get("audience") or "unknown"),
                         str(target.get("route") or "unknown"),
+                        str(availability.get("reason") or "available"),
+                        "trader" if trader.get("enabled") else "—",
                         str(row.get("npcResponse") or "—").replace("\n", " ")[:72],
                         str(graph.get("kind") or "—"),
                     )

@@ -247,6 +247,28 @@ function TalkParity.StartProjection(context, value, view)
         scenario, value, context.player
     )
     if not resolved then return nil, reason end
+    local runtime = scenario.runtime or {}
+    local npc = scenario.npc or {}
+    local dynamicTradingLoad = Runtime.dynamicTradingLoad or {
+        requested = runtime.availableMods
+            and runtime.availableMods.DTHoomans == true or false,
+        loaded = false,
+        reason = "disabled",
+    }
+    local traderOverlay = tostring(npc.role or "") == "trader"
+    local integration = {
+        pbrainz = {
+            inlineAvailable = resolved.hostileInlineAvailable == true,
+            reason = resolved.hostileInlineReason,
+        },
+        dynamicTrading = context.Values.copy(dynamicTradingLoad),
+        traderOverlay = {
+            enabled = traderOverlay,
+            providerID = traderOverlay and "dynamictrading.trader" or nil,
+            targetType = resolved.targetType,
+            tacticalClass = resolved.tacticalClass,
+        },
+    }
     local graph = context.Conversation
         and type(context.Conversation.graphProjection) == "function"
         and context.Conversation.graphProjection(view) or nil
@@ -257,6 +279,7 @@ function TalkParity.StartProjection(context, value, view)
         targetType = resolved.targetType,
         audience = resolved.audience,
         hostile = resolved.hostile,
+        integration = integration,
         opening = {
             nodeID = view and view.session and view.session.currentNodeID,
             choices = choicesFor(view),
@@ -369,6 +392,7 @@ function TalkParity.Matrix(context, payload)
     local Values = context.Values
     payload = type(payload) == "table" and payload or {}
     local original = Values.copy(Runtime.scenario)
+    local originalDynamicTradingLoaded = Runtime.dynamicTradingLoaded
     local base = Values.copy(original)
     local targetIDs = payload.targetIDs
     if type(targetIDs) ~= "table" or #targetIDs == 0 then
@@ -381,6 +405,7 @@ function TalkParity.Matrix(context, payload)
         local targetID = targetIDs[index]
         local scenario, canonicalOrReason = TalkParity.ApplyTarget(base, targetID)
         if scenario then
+            Runtime.dynamicTradingLoaded = originalDynamicTradingLoaded
             context.ScenarioSession.reset(context, scenario)
             local start, startReason = TalkParity.StartProjection(
                 context, canonicalOrReason, Runtime.view
@@ -392,6 +417,7 @@ function TalkParity.Matrix(context, payload)
                 row.index = index - 1
                 row.label = start.target.label
                 row.target = start.target
+                row.integration = Values.copy(start.integration)
                 rows[#rows + 1] = row
             else
                 rows[#rows + 1] = {
@@ -408,6 +434,7 @@ function TalkParity.Matrix(context, payload)
             }
         end
     end
+    Runtime.dynamicTradingLoaded = originalDynamicTradingLoaded
     context.ScenarioSession.reset(context, original)
     return {
         ok = true,
