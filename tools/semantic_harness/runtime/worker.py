@@ -10,6 +10,7 @@ from .config import HarnessConfig
 from .item_catalog import search_item_catalog
 from .process import HarnessError, LuaProcess
 from .scenario import load_scenario, validate_scenario
+from .save_browser import SavedWorldBrowser
 from .save_catalog import SaveCatalog
 from .save_import import SaveBackedImporter
 from .state import HarnessWorkingWorld, ImportedSourceSnapshot, Provenance
@@ -325,6 +326,13 @@ class LuaSemanticWorker:
             roots,
             core_repository=self.config.core_repository,
         ).discover()
+
+    def save_browser(self, save_path: Path) -> dict[str, Any]:
+        """Return a bounded read-only actor/world projection for one save."""
+
+        return SavedWorldBrowser(
+            core_repository=self.config.core_repository,
+        ).browse(Path(save_path))
 
     def import_saved_selection(
         self,

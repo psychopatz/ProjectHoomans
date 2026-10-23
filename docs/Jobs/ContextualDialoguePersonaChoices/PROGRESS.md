@@ -2,7 +2,7 @@
 
 **Updated:** 2026-10-24  
 **Parent status:** REOPENED — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is mandatory.  
-**Current mandatory phase:** P12C — Real actor + relationship import.
+**Current mandatory phase:** P12D — Save-backed World Browser.
 **Current local baseline audited:** ProjectHoomans `main` at `b1cb1846`; upstream is synchronized.
 **Normal Semantic Lab runtime requirement:** Project Zomboid CLOSED/OFFLINE is supported and expected.  
 **Source save mutation:** FORBIDDEN.  
@@ -251,9 +251,24 @@ Evidence:
 - local real-save smoke test imported `player:sp_slot_0:char_1791957489838_240087` and `npcAdamBloom_48G5`, exposed the persisted relationship/memories, reached production proposal policy, applied a gift mutation only to the working world, and reset to the imported baseline;
 - Python compilation, `luac5.3 -p`, and `git diff --check` passed; no save or live-game writes were performed.
 
-## Current Exact Next Chunk — P12D
+## Completed Chunk — P12D Save-backed World Browser
 
-Add the normal save-backed World Browser over the selected catalog/save: players, companions/colonists/followers, neutral/hostile NPCs, factions/communities, and known trader/provider actors. Selecting an NPC must change the conversation target without requiring a hand-authored synthetic profile.
+Implemented a bounded, read-only browser over a validated save:
+
+- `tools/semantic_harness/runtime/save_browser.py` reuses `GlobalModDataReader` through the P12B catalog seam and projects saved Players, NPC categories, factions, derived community references, and Dynamic Trading provider actors;
+- saved actor rows retain persisted identity, affiliation, hostility, order, generation, faction/community IDs, and `source = SAVE`; community references explicitly report `source = DERIVED` with `baseSource = SAVE`;
+- `LuaSemanticWorker.save_browser(...)` exposes the browser and the GUI provides Discover saves, Inspect, category/actor selection, and Import target controls;
+- normal target import calls the existing save-backed importer, so selecting a browser NPC changes the production conversation target without authoring a synthetic profile.
+
+Evidence:
+
+- `tools/semantic_harness/tests/test_save_browser_p12d.py`: backend source-immutability/category test and Xvfb UI-control smoke test passed;
+- local real-save browser smoke: 1 Player, 111 NPCs, 43 factions, 5 community references, 2 followers/companions, and 9 known Dynamic Trading actors;
+- P12C saved-import tests remained green; Python compilation, Xvfb startup, and `git diff --check` passed.
+
+## Current Exact Next Chunk — P12E
+
+Introduce adopter-owned dynamic mod-state projection/provider contracts. Keep Core responsible for binary decoding while ProjectHoomans, PsychopatzCore, and DynamicTrading interpret their own persisted schemas; separate the raw save inspector from the semantic state catalog.
 
 ## P12A acceptance
 

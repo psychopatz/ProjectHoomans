@@ -325,6 +325,11 @@ class SemanticHarnessApp:
         # separate so callers cannot submit during that short handoff.
         self._worker_initialized = False
         self._production_catalog: dict[str, Any] | None = None
+        self.saved_catalog: dict[str, Any] = {}
+        self.saved_world_browser: dict[str, Any] = {}
+        self.saved_world_entries: list[dict[str, Any]] = []
+        self.saved_world_category_rows: dict[str, list[dict[str, Any]]] = {}
+        self.saved_world_save_labels: dict[str, dict[str, Any]] = {}
         self.persona_catalog: dict[str, Any] = {}
         self.simulation_control_catalog: dict[str, Any] = {}
         self.talk_catalog: dict[str, Any] = {}
@@ -626,6 +631,80 @@ class SemanticHarnessApp:
         self.settings_button.grid(row=0, column=2, sticky="ew", padx=3)
         self.save_button = ttk.Button(primary_actions, text="Save scenario", command=self.save)
         self.save_button.grid(row=0, column=3, sticky="ew", padx=(3, 0))
+        saved_world = ttk.LabelFrame(
+            controls,
+            text="Saved world · read-only source",
+            padding=(4, 3),
+        )
+        saved_world.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(5, 0))
+        saved_world.columnconfigure(1, weight=1)
+        saved_world.columnconfigure(4, weight=1)
+        saved_world.columnconfigure(7, weight=1)
+        self.saved_world_save_var = self._tk.StringVar(value="")
+        self.saved_world_player_var = self._tk.StringVar(value="")
+        self.saved_world_category_var = self._tk.StringVar(value="All NPCs")
+        self.saved_world_npc_var = self._tk.StringVar(value="")
+        ttk.Label(saved_world, text="Save").grid(row=0, column=0, padx=(0, 4))
+        self.saved_world_save_box = ttk.Combobox(
+            saved_world,
+            textvariable=self.saved_world_save_var,
+            state="disabled",
+            width=34,
+        )
+        self.saved_world_save_box.grid(row=0, column=1, sticky="ew", padx=(0, 5))
+        self.saved_world_discover_button = ttk.Button(
+            saved_world,
+            text="Discover saves",
+            command=self._discover_saved_worlds,
+        )
+        self.saved_world_discover_button.grid(row=0, column=2, padx=(0, 8))
+        ttk.Label(saved_world, text="Player").grid(row=0, column=3, padx=(0, 4))
+        self.saved_world_player_box = ttk.Combobox(
+            saved_world,
+            textvariable=self.saved_world_player_var,
+            state="disabled",
+            width=20,
+        )
+        self.saved_world_player_box.grid(row=0, column=4, sticky="ew", padx=(0, 5))
+        ttk.Label(saved_world, text="NPC group").grid(row=0, column=5, padx=(0, 4))
+        self.saved_world_category_box = ttk.Combobox(
+            saved_world,
+            textvariable=self.saved_world_category_var,
+            state="disabled",
+            width=16,
+        )
+        self.saved_world_category_box.grid(row=0, column=6, padx=(0, 5))
+        self.saved_world_category_box.bind(
+            "<<ComboboxSelected>>", lambda _: self._on_saved_world_category()
+        )
+        ttk.Label(saved_world, text="NPC").grid(row=0, column=7, padx=(0, 4))
+        self.saved_world_npc_box = ttk.Combobox(
+            saved_world,
+            textvariable=self.saved_world_npc_var,
+            state="disabled",
+            width=24,
+        )
+        self.saved_world_npc_box.grid(row=0, column=8, sticky="ew", padx=(0, 5))
+        self.saved_world_inspect_button = ttk.Button(
+            saved_world,
+            text="Inspect",
+            command=self._inspect_saved_world,
+        )
+        self.saved_world_inspect_button.grid(row=0, column=9, padx=(0, 4))
+        self.saved_world_import_button = ttk.Button(
+            saved_world,
+            text="Import target",
+            command=self._import_saved_world_target,
+        )
+        self.saved_world_import_button.grid(row=0, column=10)
+        self.saved_world_status_var = self._tk.StringVar(
+            value="Discover saves to browse persisted Players, NPCs, factions, and communities."
+        )
+        ttk.Label(
+            saved_world,
+            textvariable=self.saved_world_status_var,
+            anchor="w",
+        ).grid(row=1, column=0, columnspan=11, sticky="ew", pady=(3, 0))
         self.language_var = self._tk.StringVar(
             value=self.scenario.get("runtime", {}).get("language", "EN")
         )
@@ -935,8 +1014,22 @@ class SemanticHarnessApp:
             self.workbench_apply_button,
             self.replay_button,
             self.world_knowledge_button,
+            self.saved_world_discover_button,
+            self.saved_world_inspect_button,
+            self.saved_world_import_button,
         ):
             button.configure(state=state)
+        if hasattr(self, "saved_world_save_box"):
+            combo_state = "readonly" if enabled and not self.busy else "disabled"
+            self.saved_world_save_box.configure(
+                state=combo_state if self.saved_world_entries else "disabled"
+            )
+            browser_state = (
+                combo_state if self.saved_world_browser else "disabled"
+            )
+            self.saved_world_player_box.configure(state=browser_state)
+            self.saved_world_category_box.configure(state=browser_state)
+            self.saved_world_npc_box.configure(state=browser_state)
         if hasattr(self, "proposal_button"):
             self.proposal_button.configure(state=state)
         if hasattr(self, "auto_replay_checkbutton"):
@@ -1678,6 +1771,151 @@ class SemanticHarnessApp:
             labels[0],
         )
         self.talk_target_var.set(selected)
+
+    def _discover_saved_worlds(self) -> None:
+        """Discover validated offline saves without starting Project Zomboid."""
+
+        def finish(result: dict[str, Any]) -> None:
+            self.saved_catalog = result if isinstance(result, dict) else {}
+            entries = self.saved_catalog.get("saves") or []
+            self.saved_world_entries = [
+                entry for entry in entries if isinstance(entry, dict)
+            ]
+            self.saved_world_save_labels = {}
+            labels: list[str] = []
+            for entry in self.saved_world_entries:
+                label = (
+                    f"{entry.get('saveName') or 'save'} · "
+                    f"{entry.get('mode') or 'unknown mode'} · "
+                    f"{entry.get('path') or ''}"
+                )
+                labels.append(label)
+                self.saved_world_save_labels[label] = entry
+            self.saved_world_save_box.configure(values=tuple(labels))
+            if labels:
+                self.saved_world_save_var.set(labels[0])
+                self.saved_world_status_var.set(
+                    f"{len(labels)} validated save(s); choose one and Inspect."
+                )
+            else:
+                rejected = len(self.saved_catalog.get("rejected") or [])
+                self.saved_world_save_var.set("")
+                self.saved_world_status_var.set(
+                    f"No compatible saves found ({rejected} rejected)."
+                )
+            self._set_controls(True)
+
+        self._start_operation(lambda worker: worker.save_catalog(), finish)
+
+    def _selected_saved_world_entry(self) -> dict[str, Any] | None:
+        return self.saved_world_save_labels.get(self.saved_world_save_var.get())
+
+    def _inspect_saved_world(self) -> None:
+        entry = self._selected_saved_world_entry()
+        if entry is None:
+            self.saved_world_status_var.set("Discover and select a compatible save first.")
+            return
+        save_path = str(entry.get("path") or "")
+        if not save_path:
+            self.saved_world_status_var.set("Selected save has no readable path.")
+            return
+
+        def finish(result: dict[str, Any]) -> None:
+            self.saved_world_browser = result if isinstance(result, dict) else {}
+            players = self.saved_world_browser.get("players") or []
+            self.saved_world_category_rows = {
+                str(key): value
+                for key, value in (self.saved_world_browser.get("categories") or {}).items()
+                if isinstance(value, list)
+            }
+            player_labels = [
+                str(row.get("label") or row.get("id"))
+                for row in players
+                if isinstance(row, dict)
+            ]
+            self.saved_world_player_labels = {
+                str(row.get("label") or row.get("id")): row
+                for row in players
+                if isinstance(row, dict)
+            }
+            self.saved_world_player_box.configure(values=tuple(player_labels))
+            if player_labels:
+                self.saved_world_player_var.set(player_labels[0])
+            category_labels = sorted(self.saved_world_category_rows)
+            self.saved_world_category_box.configure(values=tuple(category_labels))
+            if category_labels:
+                preferred = (
+                    "All NPCs" if "All NPCs" in category_labels else category_labels[0]
+                )
+                self.saved_world_category_var.set(preferred)
+            self._on_saved_world_category()
+            counts = self.saved_world_browser.get("counts") or {}
+            self.saved_world_status_var.set(
+                "Browsed save: "
+                f"{counts.get('players', 0)} player(s), "
+                f"{counts.get('npcs', 0)} NPC(s), "
+                f"{counts.get('factions', 0)} faction(s), "
+                f"{counts.get('communities', 0)} community reference(s)."
+            )
+            self._set_controls(True)
+
+        self._start_operation(
+            lambda worker: worker.save_browser(Path(save_path)), finish
+        )
+
+    def _on_saved_world_category(self) -> None:
+        rows = self.saved_world_category_rows.get(
+            self.saved_world_category_var.get(), []
+        )
+        self.saved_world_npc_labels = {
+            str(row.get("label") or row.get("id")): row
+            for row in rows
+            if isinstance(row, dict)
+        }
+        labels = list(self.saved_world_npc_labels)
+        self.saved_world_npc_box.configure(values=tuple(labels))
+        self.saved_world_npc_var.set(labels[0] if labels else "")
+
+    def _import_saved_world_target(self) -> None:
+        entry = self._selected_saved_world_entry()
+        player = getattr(self, "saved_world_player_labels", {}).get(
+            self.saved_world_player_var.get()
+        )
+        npc = getattr(self, "saved_world_npc_labels", {}).get(
+            self.saved_world_npc_var.get()
+        )
+        if entry is None or not player or not npc:
+            self.saved_world_status_var.set(
+                "Inspect a save, then choose both a Player and an NPC target."
+            )
+            return
+
+        def finish(result: dict[str, Any]) -> None:
+            scenario = result.get("scenario") if isinstance(result, dict) else None
+            if isinstance(scenario, dict):
+                self.scenario = scenario
+                self._sync_workbench_from_scenario(scenario)
+            self._update_simulation_projection(result)
+            source = (result.get("sourceSnapshot") or {}).get("metadata", {})
+            self.saved_world_status_var.set(
+                "Imported saved target: "
+                f"{player.get('label')} → {npc.get('label')} · "
+                f"source {source.get('sourceKind', 'SAVE')}"
+            )
+            self._set_text(self.trace, pretty(result))
+            self._append(
+                "SYSTEM",
+                f"Imported saved target {npc.get('label')} from read-only source save.",
+            )
+
+        self._start_operation(
+            lambda worker: worker.import_saved_selection(
+                Path(str(entry.get("path"))),
+                player_uuid=str(player.get("uuid") or player.get("id")),
+                npc_id=str(npc.get("id")),
+            ),
+            finish,
+        )
 
     def _selected_talk_target(self) -> str:
         return self.talk_target_ids_by_label.get(
