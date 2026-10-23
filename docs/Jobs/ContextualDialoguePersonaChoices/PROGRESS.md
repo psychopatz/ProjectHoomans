@@ -362,9 +362,27 @@ Evidence:
 - offline real-save smoke using `2026-10-14_13-57-03`, player `char_1791957489838_240087`, NPC `npcAdamBloom_48G5`: source `SAVE`, Talk `full_conversation`, identity/inventory/graph/replay/knowledge paths exercised, source snapshot and save hash unchanged;
 - changed Python compiled, changed Lua parsed with `luac5.3`, `git diff --check` passed; `pz-verify` reported zero Kahlua issues in changed production Lua and the existing worker `io.*` finding only in `RuntimeEnvironment.lua`.
 
-## Current Exact Next Chunk — P12K Final safety/parity matrix
+## Completed Chunk — P12K Final safety/parity matrix
 
-Validate multiple real saves/players/NPC types and relationship states, provider presence/absence, corrupt/unsupported saves, offline fixtures, optional live-provider behavior, Reset World, Reload Save, source immutability, and the final Python/Tk/Xvfb/Lua/Kahlua/doctor/catalog/translation checks.
+Completed the final bounded save-backed safety/parity matrix and closed P12:
+
+- cataloged 8 accepted real saves and 6 fail-closed saves from `/home/psychopatz/Zomboid/Saves`; accepted records include multiple saved Player entity keys, large NPC worlds, compact companion worlds, factions, communities, neutral NPCs, hostile NPCs, followers, and known traders;
+- exercised six real saved imports across three saves/players, including neutral, hostile, owned-follower, and known-trader targets; production Talk routes, detached reset, source-snapshot immutability, and on-disk save hashes all passed;
+- verified actual provider presence/absence: Core and ProjectHoomans `SAVE` projections remain available, while DynamicTrading is `SAVE` in trader-bearing saves and explicit `MISSING` in saves without its tables;
+- rejected actual unsupported world versions and missing required tables; retained synthetic corrupt/unsupported/invalid-schema coverage from P12B; offline fixture and optional live-profiler default-disabled/read-only coverage remained green;
+- verified explicit source reload rereads changed disk content and Reset World restores the already-imported baseline; no source save or live Project Zomboid state was written;
+- added the bounded worker transport projection required for large saved actor/provider records and restored compatibility with legacy test loaders; production relationship, Talk, and semantic behavior remains authoritative.
+
+Final evidence:
+
+- retained P12A–P12H/P11J/P12J Python regression set: 30 tests passed;
+- P12D/P11J Xvfb UI/worker set: 15 tests passed;
+- full Lua regression: 871/871 passed; focused catalog/translation set: 4/4 passed;
+- harness doctor: all required checks passed, including Tk/display, paired Core, worker syntax, and READY/PING/CAPABILITIES;
+- changed Python compiled, changed Lua parsed with `luac5.3`, production/worker Kahlua checks passed except the pre-existing worker-only `RuntimeEnvironment.lua` `io.*` finding, and `git diff --check` passed;
+- the unbounded full Python discovery command was stopped after 22 minutes in an idle poll state with no result; no failure from that run is being claimed, and bounded P12 evidence above is the acceptance evidence.
+
+**P12 status:** COMPLETE. The normal Semantic Lab workflow now loads real saved state read-only, applies explicit fixtures/provider projections, runs production semantic/conversation Lua offline, mutates only detached harness state, resets/reloads safely, and proves source immutability.
 
 ## P12A acceptance
 

@@ -3,7 +3,19 @@
 require "PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationLLMInput"
 require "PsychopatzCore/Semantics/PsychopatzSemanticDialogueRouter"
 require "PNC/Semantics/PNC_SemanticDiagnostics"
-local DialogueRuntime = require "PNC/Semantics/PNC_SemanticDialogueRuntime"
+local DialogueRuntime = PNC and PNC.Semantics
+    and PNC.Semantics.SemanticDialogueRuntime or nil
+if type(DialogueRuntime) ~= "table" then
+    local loadedDialogueRuntime = require
+        "PNC/Semantics/PNC_SemanticDialogueRuntime"
+    DialogueRuntime = type(loadedDialogueRuntime) == "table"
+        and loadedDialogueRuntime
+        or PNC and PNC.Semantics
+            and PNC.Semantics.SemanticDialogueRuntime
+        or {
+            IsEnabled = function() return true end,
+        }
+end
 -- Optional module boundary: a legacy package must keep its ordinary
 -- deterministic conversation path if this diagnostic spoke is absent.
 local handshakeLoaded, SemanticCapabilityHandshake = pcall(require,

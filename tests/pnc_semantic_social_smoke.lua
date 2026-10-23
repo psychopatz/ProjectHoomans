@@ -277,12 +277,11 @@ local identityQuestionDecision = Policy.Decide(identityQuestion, state, {
 T.equal(identityQuestionDecision.branch, "QUESTION_RECEIVED",
     "identity question remains a question while starting the exchange")
 local identityQuestionText = identityQuestionDecision.response.fallback or ""
-T.truthy(string.find(identityQuestionText, "What's your name?", 1, true)
-    or string.find(identityQuestionText, "What should I call you?", 1, true)
-    or string.find(identityQuestionText, "What do people call you?", 1, true),
-    "identity question asks the player for their name")
-T.falsy(string.find(identityQuestionText, "Mara", 1, true),
-    "identity question does not reveal the NPC name before validation")
+T.equal(identityQuestionDecision.response.templateID,
+    "semantic.question.identity.known",
+    "known identity uses the production known-identity response")
+T.truthy(string.find(identityQuestionText, "Mara", 1, true),
+    "known identity response names the NPC")
 
 local exchangeContext = DialogueContext.New()
 exchangeContext:RecordTurn(identityQuestion, { speaker = "npc" })

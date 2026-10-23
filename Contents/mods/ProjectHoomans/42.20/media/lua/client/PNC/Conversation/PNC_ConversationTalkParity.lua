@@ -301,6 +301,56 @@ local function messageText(message)
     return resolvedText(payload)
 end
 
+local function compactMessages(messages)
+    local result = {}
+    for _, message in ipairs(messages or {}) do
+        if type(message) == "table" then
+            result[#result + 1] = {
+                id = message.id or message.messageID,
+                speaker = message.speaker,
+                text = messageText(message),
+                kind = message.kind,
+            }
+        end
+    end
+    return result
+end
+
+local function compactTurn(context, turn)
+    local Values = context.Values
+    local result = type(turn) == "table" and turn.result or nil
+    local ir = type(result) == "table" and result.ir or nil
+    return {
+        ok = turn and turn.ok == true or false,
+        type = turn and turn.type,
+        input = turn and turn.input,
+        accepted = turn and turn.accepted == true or false,
+        reason = turn and turn.reason,
+        result = type(result) == "table" and {
+            accepted = result.accepted == true,
+            reason = result.reason,
+            sequence = result.sequence,
+            ir = type(ir) == "table" and {
+                intent = ir.intent,
+                speechAct = ir.speechAct,
+                action = ir.action,
+                subject = ir.subject,
+                confidence = ir.confidence,
+                normalizedText = ir.normalizedText,
+            } or nil,
+            actionResult = Values.copy(result.actionResult),
+        } or nil,
+        messages = compactMessages(turn and turn.messages or {}),
+        toolCalls = Values.copy(turn and turn.toolCalls or {}),
+        relationshipBefore = Values.copy(
+            turn and turn.relationshipBefore or {}
+        ),
+        relationshipAfter = Values.copy(
+            turn and turn.relationshipAfter or {}
+        ),
+    }
+end
+
 local function compactObservation(context, start, turn, snapshot)
     local observation = turn and turn.observation or {}
     local response = observation and observation.response or {}
@@ -357,12 +407,33 @@ local function compactObservation(context, start, turn, snapshot)
         },
         suggestions = context.Values.copy(suggestions),
         choices = choicesFor(context.Runtime.view),
-        messages = context.Values.copy(turn and turn.messages or {}),
+        messages = compactMessages(turn and turn.messages or {}),
         toolCalls = context.Values.copy(turn and turn.toolCalls or {}),
         accepted = turn and turn.accepted == true or false,
         reason = turn and turn.reason,
         start = context.Values.copy(start),
     }
+end
+
+local function compactScenario(value, Values)
+    local result = Values.copy(value)
+    if type(result) == "table" and type(result.npc) == "table" then
+        result.npc.social = nil
+    end
+    return result
+end
+
+local function compactWorkingWorld(value, Values)
+    local result = Values.copy(value)
+    if type(result) ~= "table" then return result end
+    for _, key in ipairs({ "effective", "baseline" }) do
+        if type(result[key]) == "table"
+            and type(result[key].npc) == "table"
+        then
+            result[key].npc.social = nil
+        end
+    end
+    return result
 end
 
 function TalkParity.Start(context, value, utterance)
@@ -393,35 +464,29 @@ function TalkParity.Start(context, value, utterance)
     if type(snapshot.workingWorld) == "table" then
         snapshot.workingWorld.baseline = nil
     end
-    local compactScenario = Values.copy(scenario)
-    if type(compactScenario.npc) == "table" then
-        compactScenario.npc.social = nil
-    end
+    local compactScenarioValue = compactScenario(scenario, Values)
     local compactConfigured = Values.copy(configured)
-    if type(compactConfigured.scenario) == "table"
-        and type(compactConfigured.scenario.npc) == "table"
-    then
-        compactConfigured.scenario.npc.social = nil
-    end
+    compactConfigured.scenario = compactScenario(
+        compactConfigured.scenario, Values
+    )
     if type(compactConfigured.sourceSnapshot) == "table" then
         compactConfigured.sourceSnapshot.data = nil
         compactConfigured.sourceSnapshot.providerPayloads = nil
     end
-    if type(compactConfigured.workingWorld) == "table" then
-        compactConfigured.workingWorld.baseline = nil
-    end
-    if type(snapshot.scenario) == "table"
-        and type(snapshot.scenario.npc) == "table"
-    then
-        snapshot.scenario.npc.social = nil
-    end
+    compactConfigured.workingWorld = compactWorkingWorld(
+        compactConfigured.workingWorld, Values
+    )
+    snapshot.scenario = compactScenario(snapshot.scenario, Values)
+    snapshot.workingWorld = compactWorkingWorld(
+        snapshot.workingWorld, Values
+    )
     return {
         schema = TalkParity.SCHEMA,
         type = "talk_start",
-        scenario = compactScenario,
+        scenario = compactScenarioValue,
         configured = compactConfigured,
         start = start,
-        turn = turn,
+        turn = compactTurn(context, turn),
         observation = compactObservation(context, start, turn, snapshot),
         snapshot = snapshot,
     }

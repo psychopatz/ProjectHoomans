@@ -111,6 +111,29 @@ local function workingWorldProjection(context)
     }
 end
 
+local function compactTransportScenario(value)
+    if type(value) == "table" and type(value.npc) == "table" then
+        value.npc.social = nil
+    end
+    return value
+end
+
+function ScenarioSession.compactTransportResponse(context, response)
+    if type(response) ~= "table" then return response end
+    compactTransportScenario(response.scenario)
+    local source = response.sourceSnapshot
+    if type(source) == "table" then
+        source.data = nil
+        source.providerPayloads = nil
+    end
+    local working = response.workingWorld
+    if type(working) == "table" then
+        compactTransportScenario(working.effective)
+        working.baseline = nil
+    end
+    return response
+end
+
 local function relationshipProposalProjection(context)
     local Values = context.Values
     local npc = context.Runtime.scenario

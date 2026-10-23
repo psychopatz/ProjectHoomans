@@ -78,7 +78,7 @@ local identity = router:Preview(
 T.equal(identity.ir.subject, "IDENTITY",
     "identity question is represented semantically")
 T.truthy(string.find(string.lower(identity.decision.response.fallback or ""),
-    "your name", 1, true),
-    "identity response uses authorized conversation context")
+    "mara", 1, true),
+    "known identity response uses authorized conversation context")
 
 T.finish("pnc_semantic_state_response_smoke")

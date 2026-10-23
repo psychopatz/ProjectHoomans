@@ -1019,32 +1019,50 @@ function CommandRouter.dispatch(context, request)
         if type(payload) ~= "table" then
             return nil, "scenario_must_be_object"
         end
-        return context.ScenarioSession.reset(context, payload)
+        return context.ScenarioSession.compactTransportResponse(
+            context,
+            context.ScenarioSession.reset(context, payload)
+        )
     elseif command == "IMPORT_SOURCE" then
         if type(payload) ~= "table"
             or type(payload.scenario) ~= "table"
         then
             return nil, "source_scenario_must_be_object"
         end
-        return context.ScenarioSession.importSource(
+        return context.ScenarioSession.compactTransportResponse(
             context,
-            payload.scenario,
-            payload.metadata,
-            payload.provenance,
-            payload.providerPayloads
+            context.ScenarioSession.importSource(
+                context,
+                payload.scenario,
+                payload.metadata,
+                payload.provenance,
+                payload.providerPayloads
+            )
         )
     elseif command == "RESET" then
-        return context.ScenarioSession.reset(context, Values.copy(Runtime.scenario))
+        return context.ScenarioSession.compactTransportResponse(
+            context,
+            context.ScenarioSession.reset(context, Values.copy(Runtime.scenario))
+        )
     elseif command == "RESET_TURN" then
         context.RuntimeState.resetTurn(Runtime)
         return context.ScenarioSession.snapshot(context)
     elseif command == "RESET_CONVERSATION" then
-        return context.ScenarioSession.resetConversation(context)
+        return context.ScenarioSession.compactTransportResponse(
+            context,
+            context.ScenarioSession.resetConversation(context)
+        )
     elseif command == "RESET_ACTOR_MUTATIONS" then
         local actor = type(payload) == "table" and payload.actor or payload
-        return context.ScenarioSession.resetActorMutations(context, actor)
+        return context.ScenarioSession.compactTransportResponse(
+            context,
+            context.ScenarioSession.resetActorMutations(context, actor)
+        )
     elseif command == "RESET_WORLD" then
-        return context.ScenarioSession.resetWorld(context)
+        return context.ScenarioSession.compactTransportResponse(
+            context,
+            context.ScenarioSession.resetWorld(context)
+        )
     elseif command == "INPUT" then
         if payload == nil then return nil, "input_required" end
         return context.Conversation.turn(context, tostring(payload))
