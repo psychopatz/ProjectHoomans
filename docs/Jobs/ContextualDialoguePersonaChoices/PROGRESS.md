@@ -328,9 +328,42 @@ Exact evidence on 2026-10-24:
   the bounded command is the transport-safe evidence path for imported saves
   with large relationship memory state.
 
-## Current Exact Next Chunk — P13F
+## P13F — Agent-grade CLI Parity — COMPLETE
 
-Provide machine-readable CLI parity for save discovery, saved actors/groups,
-Player/NPC inspection, inventory/relationship inspection, Talk, semantic input,
-gift/recruit/propose, working-world diff, reset, and reload using the same
-backend owners as the GUI.
+Extended the existing `tools.semantic_harness` CLI and app routing to use the
+same `SaveCatalog`, `SavedWorldBrowser`, `SaveBackedImporter`, Lua worker, and
+production action routes as Semantic Lab:
+
+- Added bounded machine-readable save discovery/inspection, Player/faction/
+  community listing, and NPC search operations.
+- Added save-backed pair loading by save path, Player UUID, and NPC ID, plus
+  Player/NPC/inventory/relationship inspection from bounded production actor
+  state.
+- Added CLI Talk startup, semantic input, gift, recruitment, and relationship
+  proposal dispatch without a CLI-only gameplay implementation.
+- Added bounded working-world diff output with imported/effective values,
+  `HARNESS_MUTATION`, and base source provenance; reset-world, turn,
+  conversation, actor, and explicit reload-save operations are available.
+- Kept discovery, raw save validation, and world projections read-only; the
+  CLI never writes the source save.
+
+Exact evidence on 2026-10-24:
+
+- Real CLI acceptance against `/home/psychopatz/Zomboid/Saves/Apocalypse/2026-10-14_13-57-03`:
+  discovered compatible/rejected saves, listed real Players/factions/
+  communities, searched a real NPC, loaded a real Player/NPC pair, inspected
+  inventories, routed a production gift, observed a changed working-world
+  diff, reset it to zero diff, and verified the source SHA-256 was unchanged.
+- The same CLI acceptance exercised Talk startup, proposal, recruitment, and
+  explicit reload-save commands: `3/3` tests passed.
+- Combined non-Tk CLI/save/gift/conversation regressions passed; Tk/Xvfb
+  P13A/P13C/P13D/P13E/P10E suite passed with real worker interaction.
+- Production worker smoke/gift/task suite: `11/11` passed. Python compile,
+  worker-router `luac5.3 -p`, and `git diff --check` passed.
+
+## Current Exact Next Chunk — P13G
+
+Run the complete operational real-save acceptance matrix: GUI at minimum and
+desktop geometry plus CLI parity, Talk, gift, working-world diff, reset,
+source immutability, and available follower/neutral/hostile/trader/provider
+coverage. Do not claim operational completion from fixture-only evidence.

@@ -94,15 +94,43 @@ local function actorStateProjection(context)
     local scenario = context.Runtime.scenario or {}
     local player = scenario.player or {}
     local npc = scenario.npc or {}
+    local function traits(value)
+        local output = {}
+        if type(value) ~= "table" then return output end
+        for index = 1, math.min(#value, 64) do
+            output[#output + 1] = value[index]
+        end
+        return output
+    end
     return {
         ok = true,
         type = "actor_state",
         scenario = {
             player = {
+                characterUUID = player.characterUUID,
+                displayName = player.displayName,
+                accountKey = player.accountKey,
+                entityKey = player.entityKey,
+                gender = player.gender,
+                traits = traits(player.traits),
                 inventory = boundedInventory(context, context.playerInventory
                     or player.inventory),
             },
             npc = {
+                npcID = npc.npcID or npc.id,
+                displayName = npc.displayName,
+                gender = npc.gender,
+                identityState = npc.identityState,
+                recruited = npc.recruited,
+                companion = npc.companion,
+                ownedByPlayer = npc.ownedByPlayer,
+                factionID = npc.factionID,
+                communityID = npc.communityID,
+                role = npc.role,
+                isTrader = npc.isTrader,
+                isHostile = npc.isHostile,
+                activeBehavior = npc.activeBehavior,
+                traits = traits(npc.traits),
                 inventory = boundedInventory(context, context.npcInventory
                     or npc.inventory),
                 relationship = boundedRelationship(context),

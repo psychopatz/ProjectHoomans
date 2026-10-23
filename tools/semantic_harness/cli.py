@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from pathlib import Path
 import sys
 
@@ -11,6 +12,8 @@ from .inspection.rendering import print_result as _print_result
 from .testing.runner import ConflictLedger, load_case, run_case
 from .runtime.config import ConfigurationError
 from .runtime.scenario import load_scenario
+from .runtime.save_browser import SavedWorldBrowser
+from .runtime.save_catalog import SaveCatalog
 from .runtime.worker import HarnessError, LuaSemanticWorker
 from .runtime.activity import (
     ActivityLog,
@@ -36,6 +39,244 @@ AUTHORING_OPERATIONS = (
     "workflow_generate",
     "adapt_dataset",
 )
+CLI_OPERATIONS = (
+    "discover_saves",
+    "inspect_save",
+    "save",
+    "list_players",
+    "list_factions",
+    "list_communities",
+    "search_npcs",
+    "load_saved_pair",
+    "inspect_player",
+    "inspect_npc",
+    "inspect_inventories",
+    "inspect_relationship",
+    "gift",
+    "recruit",
+    "propose",
+    "working_world_diff",
+    "reset_world",
+    "reset_turn",
+    "reset_conversation",
+    "reset_actor",
+    "reload_save",
+)
+
+
+def _save_file(value: str | Path) -> Path:
+    path = Path(value).expanduser()
+    if path.is_dir():
+        path = path / "global_mod_data.bin"
+    return path.resolve()
+
+
+def _actor_row(row: dict) -> dict:
+    return {
+        key: row.get(key)
+        for key in (
+            "id", "label", "source", "factionID", "communityID", "role",
+            "isFollower", "isHostile", "isTrader", "provider",
+        )
+        if row.get(key) not in (None, "")
+    }
+
+
+def _group_row(row: dict) -> dict:
+    output = {
+        key: row.get(key)
+        for key in (
+            "id", "label", "source", "membershipSource", "status",
+            "leaderNPCID", "ownerPlayerKey", "factionID", "communityID",
+            "archetypeID", "roles", "memberRoles", "roleByMemberID",
+            "standing", "diplomacy", "provider", "providerID",
+            "providerOverlay",
+        )
+        if row.get(key) not in (None, "", {}, [])
+    }
+    output["memberIDs"] = list(row.get("memberIDs") or [])
+    return output
+
+
+def _browser_summary(browser: dict, *, query: str = "") -> dict:
+    actors = browser.get("categories", {}).get("All NPCs", [])
+    if query:
+        needle = query.casefold()
+        actors = [
+            row for row in actors
+            if needle in str(row.get("label") or row.get("id") or "").casefold()
+        ]
+    return {
+        "schema": "semantic.cli.saved_world_projection.v1",
+        "source": browser.get("source", "MISSING"),
+        "sourceID": browser.get("sourceID"),
+        "saveName": browser.get("saveName"),
+        "worldVersion": browser.get("worldVersion"),
+        "counts": browser.get("counts", {}),
+        "players": [
+            _actor_row(row) for row in browser.get("players", [])
+            if isinstance(row, dict)
+        ],
+        "factions": [
+            _group_row(row) for row in browser.get("factions", [])
+            if isinstance(row, dict)
+        ],
+        "communities": [
+            _group_row(row) for row in browser.get("communities", [])
+            if isinstance(row, dict)
+        ],
+        "npcs": [_actor_row(row) for row in actors if isinstance(row, dict)],
+        "providerActors": [
+            _actor_row(row) for row in browser.get("providerActors", [])
+            if isinstance(row, dict)
+        ],
+    }
+
+
+def _run_offline_cli_operation(
+    arguments: argparse.Namespace,
+    repository: Path,
+) -> dict | None:
+    offline_flags = (
+        arguments.discover_saves,
+        arguments.inspect_save,
+        arguments.list_players,
+        arguments.list_factions,
+        arguments.list_communities,
+        arguments.search_npcs is not None,
+    )
+    if not any(offline_flags):
+        return None
+    core_repository = (
+        Path(arguments.core_repository).expanduser().resolve()
+        if arguments.core_repository
+        else repository.parent / "psychopatzCore"
+    )
+    catalog = SaveCatalog(core_repository=core_repository)
+    if arguments.discover_saves:
+        discovered = catalog.discover()
+        entries = []
+        for entry in discovered.get("saves", []):
+            if not isinstance(entry, dict):
+                continue
+            entries.append(
+                {
+                    key: entry.get(key)
+                    for key in (
+                        "source", "sourceID", "path", "mode", "saveName",
+                        "worldVersion", "formatCompatibility", "fileBytes",
+                        "fileMtimeMs",
+                    )
+                    if entry.get(key) not in (None, "")
+                }
+            )
+        return {
+            "ok": True,
+            "type": "saved_world_catalog",
+            "catalog": entries,
+            "rejected": discovered.get("rejected", []),
+        }
+    raw_path = arguments.inspect_save or arguments.save
+    if not raw_path:
+        raise ValueError("save path required for offline world operation")
+    save_path = _save_file(raw_path)
+    browser = SavedWorldBrowser(core_repository=core_repository).browse(save_path)
+    if arguments.inspect_save:
+        entry = catalog.inspect(save_path).to_dict()
+        return {
+            "ok": True,
+            "type": "saved_world_inspection",
+            "save": entry,
+            "world": _browser_summary(browser),
+        }
+    summary = _browser_summary(
+        browser,
+        query=arguments.search_npcs or "",
+    )
+    if arguments.list_players:
+        return {"ok": True, "type": "saved_players", "players": summary["players"], "saveName": summary["saveName"]}
+    if arguments.list_factions:
+        return {"ok": True, "type": "saved_factions", "factions": summary["factions"], "saveName": summary["saveName"]}
+    if arguments.list_communities:
+        return {"ok": True, "type": "saved_communities", "communities": summary["communities"], "saveName": summary["saveName"]}
+    return {
+        "ok": True,
+        "type": "saved_npc_search",
+        "query": arguments.search_npcs,
+        "npcs": summary["npcs"],
+        "saveName": summary["saveName"],
+    }
+
+
+def _bounded_actor_state(state: dict) -> dict:
+    scenario = state.get("scenario") if isinstance(state, dict) else {}
+    scenario = scenario if isinstance(scenario, dict) else {}
+    return {
+        "schema": "semantic.cli.actor_state.v1",
+        "player": deepcopy(scenario.get("player") or {}),
+        "npc": deepcopy(scenario.get("npc") or {}),
+    }
+
+
+def _inventory_items(value: dict | None) -> dict[str, dict]:
+    inventory = value if isinstance(value, dict) else {}
+    raw = inventory.get("items", {})
+    if isinstance(raw, dict):
+        return {str(key): item for key, item in raw.items() if isinstance(item, dict)}
+    if isinstance(raw, list):
+        output = {}
+        for index, item in enumerate(raw):
+            if not isinstance(item, dict):
+                continue
+            item_id = str(item.get("itemID") or item.get("id") or f"item-{index}")
+            output[item_id] = item
+        return output
+    return {}
+
+
+def _actor_state_diff(before: dict, after: dict, source_kind: str) -> dict:
+    patches: list[dict] = []
+    for actor in ("player", "npc"):
+        left = before.get(actor) if isinstance(before.get(actor), dict) else {}
+        right = after.get(actor) if isinstance(after.get(actor), dict) else {}
+        if actor == "npc":
+            fields = (
+                "baselineApproval", "baselineRespect", "approval", "respect",
+                "familiarity", "state", "previousState", "revision",
+                "interactionRevision", "bond", "recruited", "ownedByPlayer",
+                "factionID", "communityID",
+            )
+            for field in fields:
+                if left.get(field) != right.get(field):
+                    patches.append({
+                        "path": f"npc.{field}",
+                        "imported": deepcopy(left.get(field)),
+                        "effective": deepcopy(right.get(field)),
+                        "source": "HARNESS_MUTATION",
+                        "baseSource": source_kind,
+                    })
+        before_items = _inventory_items(left.get("inventory"))
+        after_items = _inventory_items(right.get("inventory"))
+        for item_id in sorted(set(before_items) | set(after_items)):
+            before_item = before_items.get(item_id)
+            after_item = after_items.get(item_id)
+            before_stack = before_item.get("stack") if isinstance(before_item, dict) else 0
+            after_stack = after_item.get("stack") if isinstance(after_item, dict) else 0
+            if before_stack != after_stack:
+                patches.append({
+                    "path": f"{actor}.inventory.items.{item_id}.stack",
+                    "imported": before_stack,
+                    "effective": after_stack,
+                    "source": "HARNESS_MUTATION",
+                    "baseSource": source_kind,
+                })
+    return {
+        "schema": "semantic.harness_working_world.diff.v1",
+        "source": source_kind,
+        "scope": "bounded actor state",
+        "patches": patches[:512],
+        "changed": bool(patches),
+    }
 
 
 def _resolve_authoring_source(
@@ -179,6 +420,12 @@ def cli(arguments: argparse.Namespace) -> int:
         if authoring_report is not None:
             _print_result(authoring_report, arguments.jsonl)
             return 0 if authoring_report.get("ok") is True else 2
+        offline_report = _run_offline_cli_operation(
+            arguments, authoring_service.repository
+        )
+        if offline_report is not None:
+            _print_result(offline_report, arguments.jsonl)
+            return 0 if offline_report.get("ok") is True else 2
         worker_kwargs = {
             "lua_bin": arguments.lua,
             "repository": Path(arguments.repository) if arguments.repository else None,
@@ -215,6 +462,40 @@ def cli(arguments: argparse.Namespace) -> int:
         ) as worker:
             emit_activity()
             ledger = ConflictLedger() if arguments.audit else None
+            if arguments.load_saved_pair and not arguments.save:
+                raise ValueError("--load-saved-pair requires --save")
+            baseline_actor_state: dict | None = None
+            source_kind = "FIXTURE"
+            if arguments.save or arguments.reload_save:
+                if not arguments.save:
+                    raise ValueError("--reload-save requires --save")
+                save_path = _save_file(arguments.save)
+                loaded = worker.import_saved_selection(
+                    save_path,
+                    player_uuid=arguments.player,
+                    npc_id=arguments.npc,
+                )
+                source_kind = str(
+                    loaded.get("sourceSnapshot", {})
+                    .get("metadata", {})
+                    .get("sourceKind", "SAVE")
+                ).upper()
+                loaded_state = _bounded_actor_state(
+                    worker.inspect_actor_state()
+                )
+                baseline_actor_state = deepcopy(loaded_state)
+                _print_result(
+                    {
+                        "ok": True,
+                        "type": "saved_pair_loaded",
+                        "source": source_kind,
+                        "save": str(save_path),
+                        "player": loaded_state.get("player", {}),
+                        "npc": loaded_state.get("npc", {}),
+                    },
+                    arguments.jsonl,
+                )
+                emit_activity()
             if arguments.talk_start is not None:
                 result = worker.talk_start(
                     arguments.talk_start, arguments.talk_utterance
@@ -233,6 +514,108 @@ def cli(arguments: argparse.Namespace) -> int:
                 if ledger is not None:
                     ledger.add(result)
                 _print_result(result, arguments.jsonl)
+                emit_activity()
+            for item in arguments.gift or []:
+                quantity = max(1, min(999, int(arguments.gift_quantity)))
+                result = worker.input(
+                    f"here's {quantity} {item} for you"
+                )
+                if ledger is not None:
+                    ledger.add(result)
+                _print_result(
+                    {
+                        "ok": True,
+                        "type": "gift",
+                        "item": item,
+                        "quantity": quantity,
+                        "response": result,
+                    },
+                    arguments.jsonl,
+                )
+                emit_activity()
+            if arguments.recruit:
+                result = worker.input("Would you like to join us?")
+                if ledger is not None:
+                    ledger.add(result)
+                _print_result(
+                    {"ok": True, "type": "recruitment", "response": result},
+                    arguments.jsonl,
+                )
+                emit_activity()
+            if arguments.propose:
+                result = worker.relationship_proposal(arguments.npc)
+                _print_result(
+                    {"ok": True, "type": "relationship_proposal", "response": result},
+                    arguments.jsonl,
+                )
+                emit_activity()
+            reset_result = None
+            if arguments.reset_world:
+                reset_result = worker.reset_working_world()
+            elif arguments.reset_turn:
+                reset_result = worker.reset_turn()
+            elif arguments.reset_conversation:
+                reset_result = worker.reset_conversation()
+            elif arguments.reset_actor:
+                reset_result = worker.reset_selected_actor(arguments.reset_actor)
+            if reset_result is not None:
+                current = _bounded_actor_state(worker.inspect_actor_state())
+                _print_result(
+                    {
+                        "ok": True,
+                        "type": (
+                            "reset_world" if arguments.reset_world
+                            else "reset_turn" if arguments.reset_turn
+                            else "reset_conversation" if arguments.reset_conversation
+                            else "reset_actor"
+                        ),
+                        "actor": arguments.reset_actor,
+                        "state": current,
+                        "source": source_kind,
+                    },
+                    arguments.jsonl,
+                )
+                emit_activity()
+            inspection_flags = (
+                arguments.inspect_player,
+                arguments.inspect_npc,
+                arguments.inspect_inventories,
+                arguments.inspect_relationship,
+            )
+            if any(inspection_flags):
+                current = _bounded_actor_state(worker.inspect_actor_state())
+                inspection = {
+                    "ok": True,
+                    "type": "actor_inspection",
+                    "source": source_kind,
+                }
+                if arguments.inspect_player:
+                    inspection["player"] = current["player"]
+                if arguments.inspect_npc:
+                    inspection["npc"] = current["npc"]
+                if arguments.inspect_inventories:
+                    inspection["inventories"] = {
+                        "player": current["player"].get("inventory", {}),
+                        "npc": current["npc"].get("inventory", {}),
+                    }
+                if arguments.inspect_relationship:
+                    inspection["relationship"] = current["npc"].get(
+                        "relationship", {}
+                    )
+                _print_result(inspection, arguments.jsonl)
+                emit_activity()
+            if arguments.working_world_diff:
+                current = _bounded_actor_state(worker.inspect_actor_state())
+                if baseline_actor_state is None:
+                    baseline_actor_state = deepcopy(current)
+                _print_result(
+                    _actor_state_diff(
+                        baseline_actor_state,
+                        current,
+                        source_kind,
+                    ),
+                    arguments.jsonl,
+                )
                 emit_activity()
             if arguments.interactive:
                 for line in sys.stdin:
@@ -385,6 +768,64 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--doctor", action="store_true", help="run bounded headless runtime diagnostics")
     parser.add_argument("--doctor-json", action="store_true", help="emit doctor diagnostics as one JSON record")
     parser.add_argument("--snapshot", action="store_true")
+    parser.add_argument(
+        "--discover-saves",
+        action="store_true",
+        help="discover compatible offline saves and emit a bounded catalog",
+    )
+    parser.add_argument(
+        "--inspect-save",
+        metavar="PATH",
+        help="inspect one save catalog entry and bounded world projection",
+    )
+    parser.add_argument(
+        "--save",
+        metavar="PATH",
+        help="global_mod_data.bin or save directory for save-backed CLI work",
+    )
+    parser.add_argument("--player", help="saved Player UUID for --save")
+    parser.add_argument("--npc", help="saved NPC ID for --save")
+    parser.add_argument(
+        "--load-saved-pair",
+        action="store_true",
+        help="load --save plus --player/--npc into the isolated worker",
+    )
+    parser.add_argument("--list-players", action="store_true")
+    parser.add_argument("--list-factions", action="store_true")
+    parser.add_argument("--list-communities", action="store_true")
+    parser.add_argument("--search-npcs", metavar="QUERY")
+    parser.add_argument("--inspect-player", action="store_true")
+    parser.add_argument("--inspect-npc", action="store_true")
+    parser.add_argument("--inspect-inventories", action="store_true")
+    parser.add_argument("--inspect-relationship", action="store_true")
+    parser.add_argument(
+        "--gift",
+        action="append",
+        metavar="ITEM",
+        help="route one production gift by item display/full type; repeatable",
+    )
+    parser.add_argument("--gift-quantity", type=int, default=1)
+    parser.add_argument(
+        "--recruit",
+        action="store_true",
+        help="route the canonical production recruitment utterance",
+    )
+    parser.add_argument(
+        "--propose",
+        action="store_true",
+        help="route the production relationship proposal service",
+    )
+    parser.add_argument("--working-world-diff", action="store_true")
+    reset = parser.add_mutually_exclusive_group()
+    reset.add_argument("--reset-world", action="store_true")
+    reset.add_argument("--reset-turn", action="store_true")
+    reset.add_argument("--reset-conversation", action="store_true")
+    reset.add_argument("--reset-actor", metavar="ACTOR")
+    parser.add_argument(
+        "--reload-save",
+        action="store_true",
+        help="reread --save from disk into a fresh isolated source snapshot",
+    )
     parser.add_argument("--language", choices=("EN", "TL"), help="production translation language")
     talk = parser.add_mutually_exclusive_group()
     talk.add_argument(

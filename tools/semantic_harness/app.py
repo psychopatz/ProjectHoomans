@@ -9,13 +9,13 @@ from typing import Sequence
 if __package__ in {None, ""}:
     # Preserve direct `python tools/semantic_harness/app.py` execution.
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-    from tools.semantic_harness.cli import AUTHORING_OPERATIONS, _parser, cli
+    from tools.semantic_harness.cli import AUTHORING_OPERATIONS, CLI_OPERATIONS, _parser, cli
     from tools.semantic_harness.testing.doctor import run_doctor
     from tools.semantic_harness.ui.shell import SemanticHarnessApp, run_gui
     from tools.semantic_harness.runtime.process import install_shutdown_handler
     from tools.semantic_harness.inspection.rendering import pretty, print_result as _print_result
 else:
-    from .cli import AUTHORING_OPERATIONS, _parser, cli
+    from .cli import AUTHORING_OPERATIONS, CLI_OPERATIONS, _parser, cli
     from .testing.doctor import run_doctor
     from .ui.shell import SemanticHarnessApp, run_gui
     from .runtime.process import install_shutdown_handler
@@ -36,7 +36,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     if arguments.no_gui or any(
         getattr(arguments, operation, None)
-        for operation in AUTHORING_OPERATIONS
+        for operation in (*AUTHORING_OPERATIONS, *CLI_OPERATIONS)
     ):
         return cli(arguments)
     return run_gui(arguments)
