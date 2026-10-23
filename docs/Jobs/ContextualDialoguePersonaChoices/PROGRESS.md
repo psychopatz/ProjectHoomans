@@ -1,229 +1,152 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
-**Updated:** 2026-10-23
-
-**Parent status:** P11 runtime parity and requested Semantic Lab usability polish completed locally.
-
-**Current exact next chunk:** User-owned native Project Zomboid SP/MP live test.
-
+**Updated:** 2026-10-23  
+**Parent status:** REOPENED — P11 runtime-parity foundation retained; P11J native Talk shared-entry parity is mandatory.  
+**Current mandatory phase:** P11J2 — Native shared Talk-start projection.  
+**Current remote baseline audited:** ProjectHoomans `main` at `c9385c4f2b1b86feb09ed24144896e473bd6fec8`.  
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned.
 
-## Accepted foundation
+## Stable accepted foundation
 
-P10 infrastructure remains preserved: contextual What's Up semantic hub, removal of the legacy authored What's Up category, provider-driven contextual choices, typed Simulation Control Catalog, structured inventory with Advanced JSON, Apply + Replay, ActorConversationContext, SpeechStyleContext, relationship-state resolution, EN/TL realization, graph renderer/history infrastructure, and the Dynamic Trading provider boundary.
+Preserve the already-implemented work:
 
-## P11A — actor-centric workbench and truthful catalogs
+- P10 contextual What's Up hub and structured Simulation controls;
+- actor-centric Player/NPC/Relationship/World workbench;
+- first-class Player/NPC needs and production traits/personality;
+- dynamic durable friend promotion;
+- proposal/lover relationship policy and harness simulation;
+- relationship live preview and Compare;
+- unified semantic Flow / Hub / ConversationBlock graph renderer;
+- modular speech realization packs;
+- deterministic identity/backstory/Core content work;
+- shared activity logging and readable action transcript;
+- production target catalog and harness Talk matrix from P11J1.
 
-Completed on ProjectHoomans `main`.
+## P11J audit reconciliation
 
-- Main Simulation workbench exposes NPC Target, Player, Relationship, and World ownership with Overview, Needs, and Personality & Traits access.
-- Normal relationship catalogs expose only current production kinds: `friend`, `lover`, `mother`, `father`, `sister`, and `brother`.
-- Preview, Snapshot, Restart worker, World Knowledge, Compare, Apply, Apply + Replay, structured inventory, and Advanced JSON remain available under their intended surfaces.
-- Real Tk/Xvfb workbench coverage passed the minimum and normal desktop sizes.
+The original Talk audit was correct that a normal semantic turn is not proof of native Talk parity.
 
-## P11B — first-class actor needs and production personality
+P11J1 later implemented:
 
-Completed on ProjectHoomans `main`.
+```text
+PNC.Conversation.TalkParity
+TALK_CATALOG
+TALK_START
+TALK_MATRIX
+GUI Talk parity surface
+CLI Talk matrix/start
+```
 
-- Player and NPC own Hunger, Thirst, Fatigue, Stress, Boredom, and Panic. Legacy world fields remain compatibility fallbacks.
-- Player traits come from `PNC.SocialTraits` and feed the production social-profile resolver.
-- NPC traits come from registered `PNC.NPCTraits`; generated personality is the default read-only source.
-- Manual personality controls require an explicit generated-personality override.
-- Legacy/manual profile normalization preserves explicit numeric values, and explicit empty needs/condition maps clear legacy defaults.
+with canonical cases:
 
-## P11C — durable friend bond
+```text
+current
+colonist
+follower
+neutral
+hostile
+```
 
-Completed on ProjectHoomans `main`.
+and truthful production mapping:
 
-- Durable bond is stored on the existing directed relationship record with schema normalization and migration support.
-- Friend promotion uses approval `80`, respect `50`, familiarity `60`, standing gates, family exclusion, bounded event/memory, revisions, and normal persistence.
-- The bond remains durable after standing deterioration; starting friend, lover, and authored family relationships seed the same record.
-- ActorConversationContext and semantic realization consume the durable bond.
+- follower derives from colonist + follow order;
+- hostile is the real tactical type;
+- "Hostile / Enemy" is only a display label;
+- trader remains a Dynamic Trading/provider overlay.
 
-## P11D — romance proposal to lover
+However, source audit at the current baseline shows the native context-menu path still enters:
 
-Completed in commit `685d88a0`.
+```text
+PNC_ContextProvider_Conversation
+ -> PNC.Conversation.Open(real entry, player)
+ -> Conversation.BuildDefinition(real entry, player)
+```
 
-- One canonical `RELATIONSHIP_PROPOSAL` action uses production gender, player trait/social profile, NPC profile, and mutual orientation compatibility.
-- Eligibility uses friend bond, approval `85`, respect `60`, familiarity `80`, standing/availability/family gates, and cooldown.
-- Acceptance is server-authoritative, deterministic, bounded, and personality-aware.
-- Acceptance promotes friend to lover and records event, memory, revision, and persistence state. Rejection preserves friend and applies cooldown.
+while the harness enters:
 
-## P11E — live relationship preview and Compare
+```text
+scenario
+ -> TalkParity.BuildEntry
+ -> TalkParity.Resolve
+ -> Conversation.turn
+```
 
-Completed in commit `2296eaf9`.
+Both reuse production helpers such as NPCTypePalette and Audience, but native `Conversation.Open` does not currently call `TalkParity` or another common Talk-start projection.
 
-- Non-persisted `RELATIONSHIP_PREVIEW` uses the production standing resolver and proposal policy while sliders move.
-- The workbench shows standing reason, friend progress, compatibility, proposal thresholds, cooldown, availability, Apply, Apply + Replay, and optional debounced Auto replay.
-- Compare runs the real Lua worker and reports NPC response, semantic choices, SpeechStyleContext, relationship state, durable bond, and runtime graph path.
+Therefore the P11J1 harness matrix is useful and retained, but **P11J is not yet accepted as full native parity**.
 
-## P11F — unified runtime dialogue graph
+## Current Exact Next Chunk — P11J2
 
-Completed in commit `ada3b647`.
+On the user's actual local checkout:
 
-- `hello` projects the actual greeting semantic Flow with current, visited, completed, and future transitions.
-- What's Up projects the real provider/candidate semantic Hub graph and preserves visited/completed history after route closure.
-- Authored ConversationBlock projections continue through the same graph interaction path.
-- Tk graph adapters share the `semantic_flow`, `semantic_hub`, and `conversation_block` renderer family.
+1. read root `AGENTS.md` and the ContextualDialoguePersonaChoices docs in documented order, including `NATIVE_TALK_PARITY.md`;
+2. inspect local ProjectHoomans/Core/DynamicTrading branches, HEADs, upstream/divergence, dirty/concurrent work; existing `main` only;
+3. trace side-by-side:
+   - `PNC_ContextProvider_Conversation.lua`;
+   - `PNC_ConversationDefinition_Lifecycle.lua`;
+   - `PNC_ConversationDefinition_Builder.lua`;
+   - Audience/Relationship/Rules/Palette;
+   - hostile/PBrainZ inline/full fallback logic;
+   - `PNC_ConversationTalkParity.lua`;
+   - worker `TALK_START/TALK_MATRIX`;
+4. identify the smallest production-owned reusable Talk-start projection that can accept a canonical entry/player and return:
+   - target type;
+   - tactical class;
+   - ownership/follow facts;
+   - relationship/audience;
+   - availability/safety;
+   - hostile inline/full route;
+   - conversation definition/opening choices;
+5. make native `PNC.Conversation.Open` consume that shared production projection;
+6. make TalkParity consume the same projection;
+7. keep scenario-to-entry conversion harness-only;
+8. remove duplicated target classification/route policy from TalkParity where the shared projection owns it;
+9. preserve native behavior where semantics are unchanged;
+10. keep existing P11J1 worker/GUI/CLI schema stable unless a versioned additive change is required;
+11. add focused source/runtime tests proving native and harness use the same shared projection;
+12. run conversation smoke, P11J focused tests, relevant graph/hub/relationship regressions, Lua syntax/Kahlua and diff checks;
+13. update this ledger with exact evidence and continue automatically to P11J3 if green.
 
-## P11G — modular speech realization packs
+## P11J2 acceptance
 
-Completed in commit `3499ffc8`.
+Developer evidence must prove:
 
-- One SpeechRealization registry, resolver, fallback, and translation path remain in place.
-- Built-in phrase content is split into cohesive Status, Social, Knowledge, and Actions packs with shared builders.
-- Catalog validation reports 39 registered families across 15 coverage domains; EN/TL family-address behavior remains covered.
+```text
+REAL NATIVE TALK
+real entry
+ -> shared Talk-start projection
+ -> Conversation.Open
 
-## P11H — final runtime-parity usability gate
+SEMANTIC LAB
+scenario adapter
+ -> canonical entry
+ -> SAME shared Talk-start projection
+ -> TALK_START / TALK_MATRIX
+```
 
-Completed locally on ProjectHoomans `main`.
+A test that merely compares two independently computed route strings is insufficient.
 
-- Full Python/Tk discovery under Xvfb: **412/412 passed**.
-- Focused P11A-G and P10 regression suite under Xvfb: **70/70 passed**.
-- Embedded semantic Lua suite: **73/73 passed**.
-- Relationship, translation, starting-companion, authority, and inventory Lua suites: **54/54 passed**.
-- Doctor: all required checks passed; only the optional active-venv check was unavailable under the system interpreter.
-- Full-mod Kahlua verification: **3,086 Lua files, zero findings**.
-- Dedicated Kahlua lint: zero findings.
-- Changed-file `luac5.3 -p`, Python compilation, and `git diff --check`: passed.
-- EN/TL catalog validation: **35/35 matching files, zero key mismatches**.
-- Speech catalog validation: **39 families, 15 coverage domains**.
-- Normal relationship catalog validation: `mother`, `father`, `sister`, `brother`, `friend`, `lover`; no hypothetical future kinds.
-- Privacy, stale/replay, gameplay authority, structured inventory, Advanced JSON, persistence/migration, friend promotion, romance compatibility/acceptance/cooldown, family exclusion, starting relationships, graph history, and P10 contextual hub regressions are covered by the completed suites.
-- Duplicate-state scan found no bond, personality, or conversation-graph ModData persistence. Existing unrelated knowledge/runtime ModData boundaries remain unchanged.
+## Remaining P11J milestones
 
-## Post-P11 Semantic Lab usability polish
+After P11J2:
 
-Completed locally on ProjectHoomans `main`.
+- **P11J3:** route/availability parity matrix for colonist/follower/neutral/hostile inline/hostile fallback/dead-unavailable/trader overlay/EN-TL;
+- **P11J4:** focused + impacted regression, then user-owned native Project Zomboid validation.
 
-- NPC trait selection now displays production registry effects and requests a non-persisted production personality preview; generated sliders update automatically while remaining read-only until override is enabled.
-- Relationship controls use a readable single-column layout with wrapped preview text instead of clipped two-column rows.
-- Player display name and player/NPC harness IDs derive from the actor name fields; derived controls are visibly marked and not manually editable.
-- Apply and Apply + replay show the number of pending edits and a clear staged/applied status.
-- Trait effects are bounded in a scrollable read-only pane so minimum-size Simulation keeps conversation and runtime controls visible.
-- Focused Tk/Xvfb regression suite after the polish: **18/18 passed**.
+See `NATIVE_TALK_PARITY.md`.
 
-## Cross-process harness activity observability
+## Known separate relationship boundary
 
-Completed locally on ProjectHoomans `main`.
+The server relationship proposal policy/service and Semantic Lab proposal action exist.
 
-- GUI, CLI, and direct `LuaSemanticWorker` clients now append to one bounded per-repository JSONL activity stream in the user state directory.
-- The Log tab reads events from other live sessions and identifies the client, session, worker PID, request ID, command, and bounded action details.
-- CLI agents can use `--activity-client agent`, and `--activity-log PATH` is available when a shared stream must be explicit.
-- Clear view removes rendered entries without deleting another session's shared history.
-- Real Tk/Xvfb cross-process smoke passed: a separate `agent` event appeared in the open GUI Log tab.
-- CLI shared-stream smoke passed with `--trace`, real Lua worker startup, request/response events, and `hello`.
-- Shared activity writes are lock-protected and rotate after the bounded file size limit; activity failures do not interrupt harness work.
+A separate source audit found no normal production dialogue/provider caller of `PNC.Relationships.Propose` yet. Do not silently claim that the real player proposal UX is native-complete unless a production semantic/action route is verified or added under its own bounded chunk.
 
-## P11 continuation — reusable Simulation workbench correction
-
-Completed locally on ProjectHoomans `main`.
-
-- Added a reusable `WorkbenchPage` component with shared section, two-column, stacked, summary, and scrollable viewport layout behavior.
-- Needs pages now use full-width actor-owned sliders, preventing label/value collisions at 1080x700 and 1280x800.
-- Personality & Traits pages group registered traits, production effects, personality source, derived social profile, and generated personality controls; NPC trait selection refreshes production preview sliders automatically.
-- Player trait selection now uses the same `PERSONA_PREVIEW` worker route to expose the production social profile, conflicts, and fingerprint in the workbench.
-- Derived player ID/display name and NPC ID controls remain in the worker catalog for Advanced JSON/diagnostics but are hidden from normal workbench/settings editing; first/surname remain editable and continue to derive identity values.
-- Real Tk/Xvfb smoke passed at 1080x700 and 1280x800, including hidden derived controls, full-width needs, scrollable personality controls, player trait profile feedback, and NPC Berserker preview (`aggression` 0.4505 → 0.6005).
-- Focused regression suite under Xvfb: **15/15 passed**; `luac5.3 -p`, Python compile, worker catalog/preview smoke, and `git diff --check` passed.
-
-**Current exact next chunk:** user review of the updated Simulation workbench at normal and minimum desktop sizes, followed by any remaining visual adjustments before native Project Zomboid SP/MP validation.
+This is distinct from P11J Talk parity and must not be hidden by native Talk work.
 
 ## Handoff condition
 
-P11A-P11H runtime parity and the current Semantic Lab workbench continuation are locally validated. Native Project Zomboid SP/MP remains **UNTESTED / user-owned**; no new READY claim is made by this workbench correction.
+Do not report **READY FOR USER LIVE TEST** solely because P11J1 matrix tests pass.
 
-## P11I — deterministic identity choices and shared Core content seed boundary
+After P11J2-P11J4 developer gates pass, hand native Project Zomboid SP/MP verification to the user.
 
-First implementation slice completed across `psychopatzCore` and Project Hoomans `main`.
-
-- `PsychopatzCore/Content/PsychopatzDeterministicContent.lua` now owns versioned save-seed resolution, canonical seed composition, bounded hashing/index/range/choose primitives, native `SurvivorFactory` name-pool reading, and deterministic name generation.
-- Native name-pool selection reads `SurvivorFactory.FemaleForenames`, `MaleForenames`, and `Surnames` without calling `CreateSurvivor`; the current save seed comes from `WorldGenParams.INSTANCE:getSeedString()` when no explicit scenario seed is supplied.
-- Project Hoomans identity aliases use `saveSeed + player identity seed + namespaced attempt` and are recomputed by the server. Alias text is not stored in ModData.
-- Pending identity now presents exactly three provider-backed semantic frames: real name, rude refusal, and deterministic generated alias. The existing semantic identity request and server authority route remains the only mutation path.
-- NPC generated names use the same Core-backed deterministic name boundary while native SurvivorFactory remains available for appearance and voice data.
-- Harness context and observation projections carry the authoritative pending identity state, so direct Lua, CLI worker, and GUI worker suggestions use the same three-choice provider path.
-- Focused evidence: Core deterministic content smoke **PASS**; Hoomans identity-choice smoke **PASS**; Python identity/wellbeing suite **10/10 passed**; worker suggestion-click smoke covered all three frames and server identity request dispatch; changed Lua `luac5.3 -p` **PASS**; targeted `pz_verify` Kahlua scans **PASS**; translation JSON and `git diff --check` **PASS**.
-- The repository-wide `tests/run_tests.py` command remains unavailable in this checkout because it imports the missing pre-existing `tools.semantic_harness.suite` module; direct focused tests were used and this runner issue was not changed.
-
-## P11I follow-up — deterministic first-name and surname overrides
-
-Completed locally on ProjectHoomans `main` and psychopatzCore `main`.
-
-- Core `DeterministicContent.GenerateName` now accepts canonical `firstName` and `surname` overrides, plus `forename` and `lastName` aliases for SurvivorDesc-style integrations. An omitted component remains derived from save seed, identity seed, namespace, version, gender, and archetype.
-- Project Hoomans `PNC.Identity.GenerateResolvedIdentity` and `PNC.IdentityNames.Generate` pass partial overrides through the Core boundary instead of falling back to the native factory's unseeded name.
-- Starting Companion family construction passes the authored player's surname into the identity factory for `mother`, `father`, `sister`, and `brother`; the existing persisted-record repair path remains in place.
-- Focused evidence: Core deterministic content smoke **PASS**; Hoomans deterministic identity smoke **PASS** including surname-only and first-name-only overrides; Starting Companion and family appearance smoke **PASS**; changed Lua `luac5.3 -p` **PASS**; targeted Kahlua verification **PASS**.
-
-## P11I follow-up — identity lie choice harness parity
-
-Completed locally on ProjectHoomans `main`.
-
-- The identity lie choice continues through the generated alias in its canonical `SemanticIdentityRequest`; it no longer relies on a generic acknowledgement path.
-- The false-name response is restored to the former concise disbelief behavior: `I don't believe you.` with the matching TL catalog entry.
-- Focused worker regression: **11/11 passed**, including generated-alias request payload, server rejection, trust consequence, and cleared pending exchange.
-- Real Tk/Xvfb regression: **7/7 passed**, including clicking the visible `identity.choice.lie_name` row and verifying the rendered NPC response.
-- EN/TL response JSON parsing and `git diff --check`: **PASS**.
-
-**Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.
-
-## P11J — native Talk target parity
-
-Completed locally on ProjectHoomans `main`.
-
-- Added the production-owned `PNC.Conversation.TalkParity` catalog. Normal targets are `current`, `colonist`, `follower`, `neutral`, and `hostile`; the UI label is `Hostile / Enemy` while the production tactical class remains `hostile`. Target facts are mapped to the same ownership, follow-order, hostility, and palette classification inputs used by native Talk.
-- Added one worker contract for both clients: `TALK_CATALOG`, `TALK_START`, and `TALK_MATRIX`. The GUI and CLI call the same `LuaSemanticWorker` methods; Python does not reimplement target classification or conversation routing.
-- Added the Simulation trace `Talk parity` surface with a first utterance field, production target selector, single-target `Start Talk`, and all-normal-types matrix. Evidence shows target type, audience, hostile inline availability, route, opening choices, response, and runtime graph kind. Selected Talk target and utterance are saved with the existing Semantic Lab UI state.
-- Hostile matrix rows expose the actual headless-worker fallback route (`hostile_full_conversation`) and report when the optional native inline integration is unavailable, rather than hiding that boundary.
-- Focused Talk Parity Python/Tk acceptance: **4/4 passed**. CLI subprocess matrix returned **0** with Colonist, Follower, Neutral, and Hostile rows. Existing P11E/P11F/profile regressions: **8/8 non-GUI tests passed** with their two display-gated tests skipped in the headless run; the P11A Tk interaction and Talk Parity Tk interaction each passed separately.
-- Embedded Lua smoke evidence: `pnc_npc_type_palette_smoke.lua` and `pnc_conversation_smoke.lua` both passed. Changed-file `luac5.3 -p`, Python compilation, and `git diff --check` passed.
-
-**Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.
-
-## P11I follow-up — activity-log startup regression correction
-
-Completed locally on ProjectHoomans `main`.
-
-- Root cause confirmed: the shared GUI/CLI activity poll reparsed the complete JSONL history every 150 ms on the Tk thread. The local stream reached about 1.77 MB and 7,122 records, with each poll measured around 74 ms before the correction.
-- `ActivityLog.new_shared_events` now reads the bounded historical window once and advances a file cursor for appended records; file identity, size, and first-record signatures detect truncation or rotation.
-- Focused activity-log tests: **2/2 passed**, including append-only polling and cursor reset after truncation.
-- After the first read, repeated polling measured about **0.04 ms** instead of 74 ms; identity regression **11/11**, formatter regression **2/2**, and Tk/Xvfb interaction **7/7** passed.
-
-**Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.
-
-## P11I follow-up — readable tool/action transcript entries
-
-Completed locally on ProjectHoomans `main`.
-
-- Added one reusable bounded formatter for transcript tool/action calls across typed input, semantic suggestion clicks, and graph clicks.
-- Tool entries now show the contract, status, authority/source route, compact input, response text, relationship changes, and resulting relationship state as readable lines.
-- Large nested snapshots and transport/session tokens remain available in the structured inspector and are omitted from the visible conversation transcript.
-- Focused formatter tests: **2/2 passed**; real Tk/Xvfb contextual interaction suite: **7/7 passed**; live worker sample confirmed the identity request and relationship adjustment render with their response and delta.
-
-**Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.
-
-## P11K — Core-facing deterministic backstory and flavour projections
-
-Completed locally across ProjectHoomans `main` and psychopatzCore `main`.
-
-- Core deterministic content now exposes a versioned projection boundary, actor identity resolution, and weighted selection helpers built from save seed + actor identity seed + namespace + salt. Existing name generation and override behavior remain unchanged.
-- Hoomans backstory selection uses the Core boundary for unpinned NPC profiles while preserving the existing stable-ID metadata, persistence pinning, authored overrides, catalog migration, and legacy reconstruction behavior. The in-memory profile reports the resolved save seed for diagnostics; it is not persisted as a second identity/bond store.
-- Core social flavor line selection uses the same boundary when save/actor context is available, with the prior local hash retained only for legacy callers that provide no projection context. The Hoomans receive context fills identity and save seed from the authoritative payload/summary or bounded NPC ID fallback.
-- The worker `BACKSTORY` and `BACKSTORY_FACT` routes now use the active scenario save seed by default and accept an explicit `saveSeed` for deterministic CLI/API fixtures. GUI and CLI continue to share the real Lua worker route.
-- Focused evidence: Core deterministic content smoke **PASS**; Hoomans backstory persistence/save-seed smoke **PASS**; Core social flavor smoke and full incapacitated flavor matrix **PASS**; semantic backstory fact, disclosure, leader-loss flavor/pipeline, social presentation, and identity-choice Lua suites **PASS**; grounded personal-dialogue worker suite **5/5 passed**; related worker backstory suite **7/7 passed**.
-- Changed Lua `luac5.3 -p`, targeted `pz_verify` Kahlua scans, Python compilation, and `git diff --check` **PASS**. Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
-
-**Current exact next chunk:** audit and validate the remaining identity and native Project Zomboid integration paths, including the production composition/load-order boundary for the Core content projection API.
-
-## P11L — native identity bridge and production composition audit
-
-Completed locally across ProjectHoomans `main` and psychopatzCore `main`.
-
-- The current Project Zomboid Java baseline confirms `WorldGenParams` is `@UsedFromLua`, exposes the static `INSTANCE`, and provides `getSeedString()`. It also confirms `SurvivorFactory` is `@UsedFromLua`, exposes `FemaleForenames`, `MaleForenames`, and `Surnames`, and is exposed by `LuaManager` together with `WorldGenParams`.
-- Core's native content boundary therefore uses the real save seed and native name pools when available, while remaining guarded for harness/fallback runtimes. Native name selection still reads the pools directly and never calls `CreateSurvivor`; appearance construction remains the separate Hoomans identity-factory concern.
-- The production load order is explicit: Hoomans declares `require=PsychopatzCore`, Core's shared composition loads the deterministic content module, and Hoomans' IdentitySocial composition explicitly requires the same Core module before identity-name providers. No second content/bond store or alternate identity route was introduced.
-- The Core deterministic-content smoke now exercises the `WorldGenParams.INSTANCE.getSeedString()` bridge shape. The composition smoke expectation now includes the already-production `PNC/Conversation/PNC_ConversationTalkParity` dependency, removing a stale test failure without changing runtime order.
-- Focused evidence: Core deterministic-content smoke **PASS**; Hoomans composition bootstrap smoke **PASS** (exit 0, expected adapter-unavailable warning only); deterministic identity-name smoke **PASS**; semantic identity-choice smoke **PASS**. The Java baseline decompile is current at `/home/psychopatz/Desktop/Projects/ZomboidDecompiler/output/source/zombie` and the indexed `pz-java-baseline` generation is `2026-09-17T09:04:19Z`.
-- Changed Lua/test files pass `luac5.3 -p` and `git diff --check`. Native Project Zomboid SP/MP remains **UNTESTED / user-owned**; no native game process was launched.
-
-**Current exact next chunk:** user-owned native Project Zomboid startup validation of the Core `WorldGenParams`/`SurvivorFactory` bridge and Talk Parity runtime surface, followed by the final P11H evidence gate. Until that is available, do not make another READY FOR USER LIVE TEST claim.
+Native verification remains **UNTESTED / user-owned** until the user supplies evidence.
