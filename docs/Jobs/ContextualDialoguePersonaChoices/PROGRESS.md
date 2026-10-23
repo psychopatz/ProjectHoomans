@@ -1,503 +1,252 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
-**Updated:** 2026-10-23
-**Parent status:** REOPENED — P11 runtime-parity foundation retained; P11J native Talk click-boundary repair is mandatory before native handoff.
-**Current mandatory phase:** P11J4 corrective native semantic choice boundary plus production landing/Back navigation; developer repair accepted, native Project Zomboid validation remains user-owned.
-**Current remote baseline audited:** ProjectHoomans `main` at `c9385c4f2b1b86feb09ed24144896e473bd6fec8`.
-**Native Project Zomboid SP/MP:** UNTESTED / user-owned.
+**Updated:** 2026-10-24  
+**Parent status:** REOPENED — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is mandatory.  
+**Current mandatory phase:** P12A — Snapshot/provenance architecture.  
+**Current remote baseline audited:** ProjectHoomans `main` at `73e1ac5d0e49045a4660f447296a4b99544b4f0f`.  
+**Normal Semantic Lab runtime requirement:** Project Zomboid CLOSED/OFFLINE is supported and expected.  
+**Source save mutation:** FORBIDDEN.  
+**Optional live profiler:** disabled by default; read-only enrichment only.
 
-## Stable accepted foundation
+## Accepted foundation to preserve
 
-Preserve the already-implemented work:
+Current source already materially contains:
 
-- P10 contextual What's Up hub and structured Simulation controls;
+- production semantic Lua worker;
+- production Talk-start projection shared with native conversation;
+- contextual What's Up hub;
+- semantic Flow / Hub / ConversationBlock runtime graphs;
 - actor-centric Player/NPC/Relationship/World workbench;
-- first-class Player/NPC needs and production traits/personality;
-- dynamic durable friend promotion;
-- proposal/lover relationship policy and harness simulation;
-- relationship live preview and Compare;
-- unified semantic Flow / Hub / ConversationBlock graph renderer;
-- modular speech realization packs;
-- deterministic identity/backstory/Core content work;
-- shared activity logging and readable action transcript;
-- production target catalog and harness Talk matrix from P11J1.
+- generated NPC personality and real trait catalogs;
+- directed relationship standing and durable bond services;
+- automatic friend promotion;
+- proposal policy/service and harness diagnostic proposal operation;
+- production recruitment/community authority in the worker;
+- structured inventory + Advanced JSON;
+- replay/Compare/activity logging;
+- deterministic identity/backstory work;
+- native Talk parity target catalog/matrix/GUI/CLI;
+- current synthetic scenario/configure infrastructure.
 
-## P11J audit reconciliation
+Do not discard those systems.
 
-The original Talk audit was correct that a normal semantic turn is not proof of native Talk parity.
+## Architectural pivot
 
-P11J1 remains accepted with `PNC.Conversation.TalkParity`, `TALK_CATALOG`,
-`TALK_START`, `TALK_MATRIX`, the GUI/CLI surfaces, and these canonical cases:
+The remaining parity drift is now mostly caused by **state origin**.
 
-```text
-current · colonist · follower · neutral · hostile
-```
+Normal Semantic Lab still starts from synthetic scenario data for significant mod-owned state and engine-derived values.
 
-Production mapping remains truthful: follower derives from colonist ownership and
-the follow order; hostile is the production tactical type; `Hostile / Enemy` is
-only a display label; and trader remains a Dynamic Trading/provider overlay.
+Examples include:
 
-## P11J2 — accepted developer implementation
+- manually selected NPC profile;
+- hand-authored actor relationship fields;
+- adapter reconstruction of bond/friend promotion;
+- needs;
+- time;
+- weather;
+- world age;
+- other scenario-defined runtime facts.
 
-Commit: `6818110e` — `P11J2 share native Talk start projection`.
-
-Added the production-owned `PNC.Conversation.TalkStart` projection at:
-
-```text
-Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkStart.lua
-```
-
-The projection consumes a canonical entry, player, and runtime integration state.
-It returns the target type, tactical class, ownership and follow facts,
-conversation relationship and audience, availability, hostile inline/full route,
-and the canonical greeting opening state.
-
-Native Talk now follows:
+P12 changes the normal product architecture to:
 
 ```text
-real entry
-    ↓
-shared TalkStart.Project
-    ↓
-Conversation.BuildDefinition
-    ↓
-Conversation.Open
+real saved mod state
++ explicit offline engine fixtures
++ optional read-only live profiler snapshot
+        ↓
+immutable imported source snapshot
+        ↓
+isolated mutable harness working world
+        ↓
+production Lua
 ```
 
-The builder carries the same projection into the production definition and
-conversation context. Semantic Lab keeps its scenario-to-entry conversion in
-`TalkParity`, then enters the same `TalkStart.Project` boundary for `TALK_START`
-and `TALK_MATRIX`. Harness classification, audience, relationship, availability,
-and route policy were removed from that boundary. The harness relationship adapter
-preserves the production conversation relationship resolver and adds only its
-presentation receipt hook.
+Synthetic scenarios remain for CI/tests/malformed fixtures only.
 
-P11J2 evidence:
+## Save reader foundation
 
-- `lua5.3 tests/pnc_conversation_talk_start_projection_smoke.lua` — PASS;
-- `lua5.3 tests/pnc_conversation_audience_smoke.lua`,
-  `pnc_npc_type_palette_smoke.lua`, and `pnc_conversation_smoke.lua` — PASS;
-- P11J source/runtime tests proved native lifecycle, definition builder, and
-  harness parity callers reference `TalkStart.Project` and the worker emits the
-  shared projection schema;
-- changed production Lua passed `pz_verify --kahlua --severity ERROR` with zero
-  findings and `luac5.3 -p` passed;
-- `git diff --check` passed.
-
-The headless worker reports hostile inline support as unavailable unless the real
-PBrainZ integration reports ready and exposes its inline target route. Native
-Project Zomboid SP/MP remains **UNTESTED / user-owned**.
-
-## P11J3 — accepted developer implementation
-
-Commit: `6f378973` — `P11J3 complete Talk parity route matrix`.
-
-The shared projection now carries row-level availability and integration state.
-The matrix uses clean scenario copies, restores the original scenario, and keeps
-the optional Dynamic Trading provider state from becoming a Talk tactical type.
-The normal catalog remains exactly:
+PsychopatzCore already owns the low-level read-only Build 42.20 parser:
 
 ```text
-current · colonist · follower · neutral · hostile
+psychopatzCore/tools/profiler/moddata_reader.py
+GlobalModDataReader
 ```
 
-The real worker evidence covers:
+P12 must reuse it.
 
-| Case | Projection | Route | Result |
-| --- | --- | --- | --- |
-| Colonist | `colonist` / `colonist` | `full_conversation` | greeting opening and first response |
-| Follower | `follower` / `colonist` | `full_conversation` | follow state is derived |
-| Neutral | `neutral` / `neutral` | `full_conversation` | non-owned authority preserved |
-| Hostile | `hostile` / `hostile` | `hostile_full_conversation` | headless worker does not fake inline support |
-| Unavailable diagnostic | production target facts | `unavailable` | reason is exposed and scenario restored |
-| Trader overlay | tactical target remains neutral/colonist/etc. | unchanged | Dynamic Trading provider is an overlay |
+Do not build another `global_mod_data.bin` decoder.
 
-Production projection smoke also covers the real PBrainZ ready branch as
-`hostile_inline` and the unavailable branch. The headless worker only reports the
-route supported by its actual loaded integrations.
+Known first persisted roots include:
 
-P11J3 evidence:
+```text
+PNC_Core_Global
+PNC_npc<ID>
+PNC_PlayerCharacters
+```
 
-- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j -v` — **8/8 PASS**;
-- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j tools.semantic_harness.tests.test_contextual_dynamic_trading_p5 -q` — **12/12 PASS**;
-- CLI `TALK_START` emitted `semantic.talk.parity.v1`, the shared target projection,
-  opening state, first NPC response, graph path, and `SpeechStyleContext`;
-- CLI `TALK_MATRIX` emitted `semantic.talk.parity.matrix.v1`, four canonical
-  production rows, and `restoredScenario=true`;
-- GUI Talk parity uses the same worker operations and formatter exposes route,
-  availability, provider overlay, response, and graph columns;
-- EN/TL tests kept routes and semantic choice IDs identical while presentation
-  localization changed;
-- `pnc_conversation_talk_start_projection_smoke.lua`, audience, palette, and
-  conversation smokes passed;
-- changed Lua passed `luac5.3 -p` and Kahlua verification; Python compilation
-  and `git diff --check` passed.
+and additional Core/Hoomans/DynamicTrading roots discovered by their state providers.
 
-## P11J4 — accepted developer gates
+## Relationship parity finding
 
-The P11J2 shared boundary and P11J3 route matrix passed the impacted developer
-regression gates:
+The current worker still reconstructs relationship policy in SemanticAdapters.
 
-- P11J and Dynamic Trading parity suites: **12/12 PASS**;
-- impacted P10/P11 non-GUI suites: **69 PASS**, with nine display-only tests
-  skipped in the intentionally headless run;
-- Tk selected-target Talk start: **PASS** for Hostile / Enemy;
-- Tk full Talk matrix: **PASS** for Colonist, Follower, Neutral, and Hostile / Enemy;
-- CLI `TALK_START`: `semantic.talk.parity.v1`, hostile full-conversation route,
-  greeting opening, first response, semantic Flow graph, and
-  `speech.style.context.v1` all present;
-- CLI `TALK_MATRIX`: `semantic.talk.parity.matrix.v1`, `ok=true`,
-  `restoredScenario=true`, and all four production rows present;
-- `python3 -m tools.semantic_harness --no-gui --doctor --doctor-json`: required
-  checks passed, including Lua, worker syntax, and worker boot; the optional
-  virtual-environment check reported the system interpreter as a warning;
-- EN/TL Talk parity kept target routes and semantic choice IDs identical;
-- `luac5.3 -p` passed for changed Lua and `pz_verify --kahlua` reported zero
-  errors;
-- `python3 -m py_compile` passed for changed Python;
-- `git diff --check` passed;
-- Talk start/parity modules contain no `getModData`, `ModData`, or
-  `GlobalModData` access; matrix-only target state is transient runtime state and
-  is restored after each row and after the matrix.
+For example, the harness currently:
 
-The codebase graph coverage report was best-effort and marked several changed
-files as missing or metadata-changed in its older generation. The implementation
-claims above therefore rely on direct source inspection plus the runtime tests,
-with the graph result treated as a coverage signal rather than proof of
-completeness.
+- resolves relationship state;
+- reconstructs starting bond;
+- performs its own 80/50/60 friend-promotion check;
+- creates a harness social event;
+- caches the result in `Runtime.relationships`.
 
-## P11J4 corrective native semantic choice boundary
+This is now architectural debt.
 
-The native screenshots exposed a real production UI boundary regression: Core's
-native choice list could receive semantic rows while the conversation session was
-still busy delivering its opening/response, even though Core correctly rejected
-clicks in that state. A rejected or stale semantic row could also be cleared by
-Core without restoring the production choice surface.
+P12 must instead import the real relationship record:
 
-Commit: `f18e5ff6` — `fix: restore native semantic conversation choices`.
+```text
+npcRecord.social.relationships[playerEntityKey]
+```
 
-The repair keeps Core as the native renderer and keeps the canonical semantic
-submission path in Project Hoomans. It defers semantic rows while the Core
-session is busy, publishes the native view as the runtime semantic input host,
-records accepted/rejected typed row clicks through the existing semantic audit,
-and restores the production menu after rejected/stale/unavailable frames. The
-runtime-only failure receipt is not persisted or sent over the network.
+and run mutations through production relationship services in the isolated working world.
 
-Evidence:
+## Engine fixture rule
 
-- `lua5.3 tests/pnc_semantic_dialogue_input_smoke.lua` — PASS, including a
-  rendered-row action callback, rejected-click restoration, and busy-session
-  deferral;
-- `lua5.3 tests/pnc_conversation_smoke.lua` — PASS, including native active-view
-  publication;
-- `lua5.3 tests/pnc_conversation_talk_start_projection_smoke.lua` — PASS;
-- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j -q`
-  — **8/8 PASS**;
-- `luac5.3 -p` passed for changed Lua and `git diff --check` passed.
+Project Zomboid does not need to be active.
 
-The repair has not been called a native Project Zomboid verification. The native
-SP/MP conversation click path remains **UNTESTED / user-owned**.
+Engine/transient values may remain editable fixtures when not available from supported offline readers, including:
 
-## Native no-window diagnostic follow-up
+- needs;
+- time;
+- weather;
+- climate;
+- current activity;
+- position;
+- nearby zombie density;
+- other engine-only facts.
 
-Commit: `7e179f02` — `fix: trace and fall back native talk handoff`.
+These must be explicitly marked:
 
-The native context-menu Talk callback now records its entry and result through
-the existing semantic audit when enabled. `Conversation.Open` records the
-shared Talk-start projection, inline handoff result, and full-view result. If an
-optional hostile inline handoff rejects its selected target, the production
-route is changed to the existing hostile full-conversation fallback so the
-definition does not retain an inline-only route marker.
+```text
+source = FIXTURE
+```
 
-The persisted debug profile is configured for this investigation:
+rather than presented as saved truth.
 
-- `ProjectHoomans.SemanticDialogueAudit=true`;
-- `ProjectHoomans.NativeHandoffAudit=true`;
-- `ProjectHoomans.PerformanceDiagnostics=false`;
-- all other unrelated diagnostics remain disabled.
+## Optional live profiler rule
 
-All three settings are runtime-mutable and require the in-game Debug Settings
-`Reload File & Apply` action before reproducing the native click. A new save is
-not required for this UI and routing change.
+Live enrichment is optional.
 
-Developer evidence: `pnc_conversation_smoke.lua`,
-`pnc_semantic_dialogue_input_smoke.lua`, and
-`pnc_conversation_talk_start_projection_smoke.lua` pass; changed Lua passes
-`luac5.3 -p` and `git diff --check`.
+The game side must be:
 
-## Production conversation landing and nested Back navigation
+- disabled by default;
+- enabled by external settings/config text only;
+- restart-required;
+- not exposed as a normal in-game toggle;
+- strictly read-only.
 
-The native Core choice surface now has an explicit production-owned landing
-group, `conversation_landing`. Current authored root choices are projected into
-that group, and the landing surface includes a `What's up?` shortcut frame.
-The shortcut submits the canonical `What's up?` utterance through the existing
-raw semantic input/parser path, so it does not create a second harness parser
-or button-specific dialogue route.
+Semantic Lab may consume a live snapshot and copy it into the harness working world.
 
-The landing group remains in the projection while a topic, semantic hub, or
-conversation branch is active. Nested groups can therefore return to a real
-landing state. Back is a presentation-only `semantic_back_click_frame`: it
-checks the current revision and selected group, changes only the selected
-projection group, and never creates a conversation turn.
+Semantic Lab must never send gameplay mutations back to the running game.
 
-Back is metadata-controlled and defaults to enabled. A future required
-confirmation/yes-no group can set `allowBack=false` on the projected group or
-candidate/frame; both the row builder and the submission boundary enforce it.
-No Talk-parity or Back state is persisted in ModData.
+## Current Exact Next Chunk — P12A
 
-Evidence for this slice:
+On the user's actual local checkout:
 
-- `lua5.3 tests/pnc_semantic_dialogue_input_smoke.lua` — PASS, including raw
-  shortcut routing, Back navigation, no-turn behavior, projection-level
-  `allowBack=false`, and selected-group `allowBack=false`;
-- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j -q` — **9/9 PASS**;
-- real worker Talk start after `What's up?` reports
-  `currentGroupID=semantic_hub.whats_up`,
-  `rootGroupID=conversation_landing`, and a root raw shortcut frame;
-- `luac5.3 -p`, `pz_verify --kahlua --severity ERROR`, translation JSON
-  validation, and `git diff --check` — PASS.
+1. read root `AGENTS.md` and the ContextualDialoguePersonaChoices docs in documented order, including `SAVE_BACKED_OFFLINE_SEMANTIC_RUNTIME.md`;
+2. inspect local ProjectHoomans/PsychopatzCore/DynamicTrading branches, HEADs, upstream/divergence, dirty/concurrent work; existing `main` only;
+3. audit current scenario ownership:
+   - Python `scenario.py`;
+   - Lua worker Runtime/scenario;
+   - configure/apply/replay paths;
+   - workbench draft state;
+   - relationship/runtime caches;
+   - inventory/knowledge/provider state;
+4. define one versioned source snapshot contract containing:
+   - immutable imported state;
+   - source metadata;
+   - provenance;
+   - raw provider payloads where needed;
+5. define one mutable working-world contract copied from the source snapshot;
+6. define provenance classes:
+   - SAVE;
+   - FIXTURE;
+   - LIVE;
+   - DERIVED;
+   - HARNESS_MUTATION;
+   - MISSING;
+7. define override/patch semantics so a mutation does not destroy the imported source value;
+8. define reset boundaries:
+   - reset turn;
+   - reset conversation;
+   - reset selected actor mutations;
+   - reset working world to imported snapshot;
+   - reload source from disk;
+9. keep current synthetic scenario loading as an explicit Developer/Test source so CI remains deterministic;
+10. change normal product abstractions so future P12 save imports target the source/working-world contracts rather than adding more fields directly to the legacy flat scenario;
+11. add tests proving:
+   - worker mutations cannot alter the immutable source snapshot;
+   - reset working world restores imported values;
+   - provenance survives configure/mutation/reset;
+   - fixture/test mode still works;
+12. do NOT implement binary save browsing yet unless a minimal seam is required for the contract;
+13. run focused Python/Lua/Tk checks and `git diff --check`;
+14. update this ledger with exact evidence and continue automatically to P12B if green.
 
-## Current Exact Next Chunk — native user handoff
+## P12A acceptance
 
-The developer side is ready for the user's native Project Zomboid comparison
-of the repaired Talk boundary and the landing/navigation surface. Use the
-actual context-menu Talk path for Colonist, Follower, Neutral, and Hostile,
-then compare target classification, route, opening choices, first response,
-hostile inline/fallback behavior, landing shortcut behavior, Back navigation,
-and any observable graph path against Semantic Lab. Native SP/MP remains
-**UNTESTED / user-owned** until that evidence is supplied.
+Developer evidence must prove:
 
-## P11J4 corrective landing and harness parity repair — accepted developer slice
+```text
+SOURCE SNAPSHOT
+immutable
+        │ copy
+        ▼
+WORKING WORLD
+mutable through production Lua
+```
 
-This slice repaired the production-owned Talk opening and landing surface exposed
-by native screenshots and the harness comparison:
+A relationship/recruitment/inventory test mutation against the working world must not alter the source snapshot object or serialized source representation.
 
-- headless Talk now enters the production `greeting` opening and uses the
-  production definition builder/menu options when loaded; initial NPC flavor is
-  present in `TALK_START` and the GUI Talk transcript;
-- root semantic resolution is anchored to the stable production `menu` node,
-  so root frames remain valid after an authored `block:opening` transition;
-- Back and shortcut frames use the same typed worker/native submission path;
-  Back clears semantic topic focus while retaining session history and respects
-  `allowBack=false`;
-- the landing surface contains direct shortcuts/actions, an explicit
-  `Talk again about` context index after topic history exists, and nested
-  production category choices; valid owned companion capabilities remain
-  visible on the landing surface;
-- debug text, dossier, authored trade/territory rows, and other dead legacy
-  landing husks are filtered from the normal semantic projection; Dynamic
-  Trading remains provider-owned;
-- the Talk tab now renders returned production choice frames and submits button
-  clicks through the existing worker `SUGGESTION_CLICK` operation. No Python
-  Talk classifier or second dialogue route was added.
+Resetting the working world must reproduce the original imported values exactly.
 
-Evidence:
+## Ordered remaining P12 milestones
 
-- `lua5.3 tests/pnc_semantic_dialogue_input_smoke.lua` — PASS;
-- `lua5.3 tests/pnc_conversation_smoke.lua` — PASS;
-- `lua5.3 tests/pnc_conversation_talk_start_projection_smoke.lua` — PASS;
-- focused P11J, contextual suggestion, runtime graph, and hub history suites:
-  **23/23 PASS**;
-- direct worker check: opening flavor, neutral identity shortcut, companion
-  departure/follow/stay/wait, hostile ceasefire, Back, and context index all
-  exercised;
-- changed Lua `luac5.3 -p` — PASS; `pz_verify --kahlua --severity ERROR` —
-  **0 errors**; translation JSON, Python compile, doctor, and `git diff --check`
-  — PASS;
-- the unbounded full `unittest discover` run was stopped after it remained in a
-  worker wait with no output for over seven minutes; the bounded affected suites
-  completed successfully.
+After P12A continue automatically:
 
-Native SP/MP remains **UNTESTED / user-owned**.
+- **P12B:** reuse Core reader + save catalog;
+- **P12C:** real Player/NPC/relationship import;
+- **P12D:** save-backed World Browser;
+- **P12E:** dynamic mod-state providers;
+- **P12F:** explicit offline engine fixture provider;
+- **P12G:** optional read-only live profiler provider;
+- **P12H:** production mutations in isolated world, including outstanding normal proposal-route completion;
+- **P12I:** source-aware UI + full relationship parity;
+- **P12J:** save-backed Talk/semantic/replay parity;
+- **P12K:** final parity/safety matrix.
 
-## Current Exact Next Chunk — native user handoff evidence
+See `SAVE_BACKED_OFFLINE_SEMANTIC_RUNTIME.md`.
 
-Use the actual in-game context-menu Talk path for Colonist, Follower, Neutral,
-and Hostile. Compare each with Semantic Lab for target type, route, opening
-flavor, landing choices, first response, Back/context navigation, and hostile
-inline/fallback behavior. Do not claim READY until that user-owned evidence and
-the remaining final gate are supplied.
+## P11J / P11M disposition
 
-## Known separate relationship boundary
+P11J Talk parity infrastructure is retained as completed foundation.
 
-The server relationship proposal policy/service and Semantic Lab proposal action
-exist. A separate source audit found no normal production dialogue/provider caller
-of `PNC.Relationships.Propose` yet. Do not silently claim real player proposal UX
-is native-complete unless that separate bounded relationship action chunk verifies
-the production caller.
+Do not replay old P11J2 instructions.
+
+The outstanding P11M normal production proposal-action requirement remains mandatory, but is folded into **P12H** so it is proven against the same isolated save-backed runtime instead of a separate fixture-only path.
 
 ## Handoff condition
 
-Do not report **READY FOR USER LIVE TEST** solely because P11J1 matrix tests pass.
-After P11J2–P11J4 developer gates pass, hand native Project Zomboid SP/MP
-verification to the user. Native verification remains **UNTESTED / user-owned**
-until the user supplies evidence.
+Do not report **READY FOR USER LIVE TEST** from fixture-only acceptance.
 
-## Recruitment request semantic bridge — bounded follow-up
+P12 is complete only when the normal Semantic Lab workflow can:
 
-The harness recruitment shortcut and typed request now enter the existing production conversation request path. The worker composes the same recruitment authority prerequisites used by the native server composition, including relationship graph and faction modules, then routes `RECRUIT` through `PNC.Conversation.Composer.RequestRecruit`. The semantic action resolves the live composer and relationship seam at dispatch time so native module load order cannot leave the action disconnected. Native preview requirement state is still set to `recruit`; server validation remains authoritative for audience, lease, availability, relationship, and ownership gates.
+```text
+load real saved world
+ -> select real saved Player/NPC
+ -> import real mod-owned state read-only
+ -> run production semantic/conversation services offline
+ -> mutate only isolated harness state
+ -> reset safely
+ -> prove source save unchanged
+```
 
-Recruitment request patterns cover the authored “Would you like to join us?”, “Do you want to join us?”, “Would you like to join me?”, “Do you want to join me?”, “Join us”, and “Come with us” forms. The local semantic acknowledgement is suppressed while the production recruitment result owns the NPC response. Rejection responses now have truthful member, hostile, and unavailable variants in EN/TL. The harness companion profile also carries the canonical `recruited` record fact so its second-invite response follows the production service rather than only the UI capability projection.
-
-Evidence:
-
-- neutral root shortcut click: nonblank production relationship-threshold response;
-- typed request through fresh worker: nonblank production responses for companion/member and hostile/audience cases;
-- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j -v` — **10/10 PASS**;
-- `lua5.3 tests/pnc_conversation_smoke.lua`, `tests/pnc_semantic_dialogue_input_smoke.lua`, and `tests/pnc_conversation_talk_start_projection_smoke.lua` — PASS;
-- CLI `TALK_START` returned the neutral recruitment response; CLI `TALK_MATRIX` returned colonist, follower, neutral, and hostile rows;
-- changed Lua `luac5.3 -p`, changed Python `py_compile`, translation JSON parsing, and `git diff --check` — PASS;
-- no recruitment or Talk-parity ModData/persistent state added.
-
-Native Project Zomboid SP/MP recruitment behavior remains **UNTESTED / user-owned**. Compare the neutral recruitment shortcut, typed request, companion response, hostile response, hover preview, and server result in the real context-menu Talk flow before claiming native parity.
-
-## Current Exact Next Chunk — native recruitment handoff evidence
-
-Use the actual in-game context-menu Talk path for a neutral NPC, an owned companion, and a hostile NPC. Verify the recruitment shortcut, typed equivalent, hover preview/gates, response text, and rejection/acceptance result against the Semantic Lab. Preserve the broader P11J native Talk handoff checks for Colonist, Follower, Neutral, and Hostile. Do not report **READY FOR USER LIVE TEST** until user-owned native evidence is supplied.
-
-## Corrective semantic navigation and recruitment authority slice
-
-The shared semantic suggestion projection now owns the nested navigation row. Topic and hub groups expose the canonical `semantic_back_click_frame` with the localized “Let's talk something else” label, while `allowBack=false` remains respected. Native Core and Semantic Lab consume that same navigation projection, so returning to the landing group does not create a dialogue turn or append transcript text.
-
-The worker's production composition now loads the same community value objects and `PNC_CommunityService` required by native recruitment assignment. The fixture relationship adapter also rebinds the existing personal relationship query seam after installing scenario-backed values. High relationship recruitment therefore reaches the production faction/community assignment and result path instead of reading stale zero scores or stopping at `communities_unavailable`.
-
-Evidence:
-
-- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j -v` — **12/12 PASS**, including navigation return/no-turn and high-relationship production recruitment assignment;
-- direct worker check — neutral target at approval 94, respect 95, familiarity 92 returned `success=true`, `reason=recruited`, and `response.recruit.admire.1`;
-- `luac5.3 -p` on changed worker, semantic input, suggestion, and community loader Lua — PASS;
-- `git diff --check` — PASS;
-- no new Talk-parity or relationship persistence store was introduced.
-
-Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
-
-## Current Exact Next Chunk — automatic simulation apply and honest pending state
-
-Make staged workbench edits apply through the existing worker configuration boundary with a debounced automatic commit, keep Apply as an explicit immediate action, and make pending status identify the actual staged fields instead of a misleading count. Preserve Apply + replay as a separate future macro operation until replay clears the conversation and executes a recorded step sequence.
-
-## Automatic workbench apply and honest pending state
-
-Inline workbench edits now debounce into the existing Lua worker `configure` boundary automatically. The Apply button remains an immediate explicit commit, while automatic commits update the simulation projection and preserve the conversation transcript instead of fabricating a response turn. Pending labels now count direct staged controls only; derived identity values and widget state changes do not appear as extra edits. Catalog field enable/disable operations suppress dirty callbacks so normal worker refreshes cannot create phantom pending fields.
-
-Evidence:
-
-- `python3 -m unittest tools.semantic_harness.tests.test_simulation_workbench_p10e tools.semantic_harness.tests.test_contextual_runtime_parity_p11c tools.semantic_harness.tests.test_contextual_talk_parity_p11j -v` — **18/18 PASS**;
-- real Tk/X11 interaction — workbench starts with no pending edits, a changed relationship field auto-applies through the worker, status reports auto-apply, and the conversation retains its last utterance;
-- `python3 -m py_compile` on changed Python files — PASS;
-- `git diff --check` — PASS.
-
-Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
-
-## Current Exact Next Chunk — settings ownership cleanup
-
-Remove ordinary actor/world controls from the duplicate Simulation Settings dialog, retain uncommon/advanced controls there, and expose time/world facts in the main World workbench panel. Keep the same catalog and worker configuration path so GUI and CLI remain one system.
-
-## Settings ownership cleanup
-
-The simulation catalog now marks time and world facts as World workbench controls. Legacy `world.*` need fields are explicitly hidden from ordinary settings because actor-owned Player/NPC needs are the supported editor path; legacy scenario compatibility remains in the worker and Advanced JSON. The settings dialog now filters out workbench-owned controls by default and retains non-workbench inventories, runtime/integration state, identity/bond diagnostics, and advanced controls. An explicit `settingsVisible=true` catalog row can still appear in both surfaces when an uncommon diagnostic needs it.
-
-Evidence:
-
-- `python3 -m unittest tools.semantic_harness.tests.test_simulation_workbench_p10e.SimulationWorkbenchP10ETests -v` — **2/2 PASS**, including real Tk settings inspection;
-- `luac5.3 -p tools/semantic_harness/lua/worker/CommandRouter.lua` — PASS;
-- `python3 -m py_compile` on changed settings/test files — PASS;
-- `git diff --check` — PASS.
-
-Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
-
-## Current Exact Next Chunk — replay as a real macro
-
-Separate Apply + replay from ordinary auto-apply. Make replay clear the current conversation projection, execute a recorded sequence through the same worker operations, and display each step and resulting variation in order. Keep one-step Apply free of replay side effects.
-
-## Replay macro execution
-
-Apply + replay now uses a bounded session macro. Accepted typed inputs, semantic suggestion clicks, graph clicks, and presentation navigation are recorded as canonical steps in the GUI activity stream. Replay configures a clean worker first, resolves stored choice IDs against the fresh production suggestion revision, executes each step in order, stops visibly at a rejected step, and replaces the transcript with the replay run. Presentation-only navigation does not add a player dialogue line. A configure-only Apply remains free of replay side effects; Reset and Load clear the macro.
-
-Evidence:
-
-- `python3 -m unittest tools.semantic_harness.tests.test_simulation_workbench_p10e -v` — **3/3 PASS**, including a real Tk two-step semantic macro replay;
-- affected regression suite `test_simulation_workbench_p10e`, `test_contextual_runtime_parity_p11c`, and `test_contextual_talk_parity_p11j` — **19/19 PASS**;
-- replay starts from a clean visible transcript and shows ordered `PLAYER`, `NPC`, and `TOOL/ACTION` rows;
-- `python3 -m py_compile` and `git diff --check` — PASS.
-
-Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
-
-## Current Exact Next Chunk — user-facing GUI audit and diagnostics polish
-
-Run the complete selected-target Tk/Xvfb surface at compact and normal sizes, verify Simulation/Studio/Log order and saved tab/splitter state, check chat visibility and horizontal pane dragging, and inspect shared activity logging from GUI/CLI/agent worker operations. Fix only evidence-backed layout or logging regressions before the final developer gate.
-
-## GUI compact/normal layout, persisted tabs, and shared agent log audit
-
-The Semantic Lab UI audit now covers the user-facing state that was previously hard to verify. The main tabs remain ordered `Simulation`, `Studio`, `Log`; the selected main, Studio, trace, and workbench tabs plus both horizontal splitters are persisted and restored. The conversation transcript and semantic trace remain visible at compact `1080x700` and normal `1920x1080` sizes. The Log tab reads the same shared activity stream used by GUI, CLI, and agent operations, so an agent operation recorded while the app is open is visible in the live GUI log.
-
-Splitter restoration and activity polling now use single-owner cancellable Tk timers. Startup, tab changes, manual shared-log refreshes, and close no longer leave orphaned callbacks behind.
-
-Evidence:
-
-- `xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_contextual_runtime_parity_p11a -v` — **4/4 PASS**, including real Tk compact/normal layout, persisted tab/splitter state, and an agent event appearing in the GUI Log; no stale Tcl callback errors.
-- `python3 -m py_compile tools/semantic_harness/ui/shell.py tools/semantic_harness/tests/test_contextual_runtime_parity_p11a.py` — PASS.
-- `git diff --check` — PASS.
-
-Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
-
-## Current Exact Next Chunk — impacted developer gate and native Talk handoff
-
-Run the focused P10/P11 semantic, relationship, graph, identity, inventory, activity-log, and Talk-parity suites through the shared worker; run Lua/Kahlua, translation, doctor, and diff checks; then hand the remaining native context-menu Talk comparison to the user. Do not claim native verification or `READY FOR USER LIVE TEST` until user-owned evidence is supplied.
-
-## P11J4 — impacted developer gate complete
-
-The shared Talk-start projection, route matrix, semantic navigation, recruitment bridge, GUI/CLI surfaces, workbench auto-apply, persisted layout state, shared activity log, and replay macro changes passed the impacted developer gate. Conversation definition composition was also made resilient to direct worker load order so identity and Talk parity use the same production definition path.
-
-Evidence:
-
-- affected P10/P11 Tk/Xvfb suites — **85/85 PASS**, including contextual hub, semantic navigation, identity, relationship, inventory, activity logging, replay, UI persistence, and P11J Talk parity; no stale Tk callback errors;
-- embedded Lua suite — **871/871 PASS** through `python3 tests/run_tests.py --jobs 1`;
-- `TALK_START` hostile CLI projection — `targetType=hostile`, `route=hostile_full_conversation`;
-- `TALK_MATRIX` — clean rows for colonist, follower, neutral, and hostile, with the hostile fallback route and no trader tactical type;
-- doctor — **9/9 checks PASS**;
-- `luac5.3 -p` — **27 changed Lua files PASS**;
-- `py_compile` — **12 changed Python files PASS**;
-- Kahlua verification — **3,089 files scanned, 0 flagged, 0 errors**;
-- Dataset Library catalog enumerated four existing sources; translation/catalog integration checks passed in the affected suite;
-- `git diff --check` — PASS;
-- no Talk-parity ModData or second relationship/bond store introduced.
-
-The unbounded Tk discovery command was stopped after several minutes without output because it remained in a worker wait; the bounded affected suites completed successfully and are the evidence used for this gate. Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
-
-## Corrective follow-up — shared semantic identity, tone, navigation, and runtime gate
-
-The production semantic path now treats owned/recruited companions as already
-identified: the landing surface omits the redundant identity shortcut, and a
-typed identity question resolves through the same production response resolver
-with a known-companion response. Negative approval/respect values now add
-guarded speech pressure even while relationship standing is still unknown.
-
-“Let’s talk something else” remains a presentation label, while its shared
-typed frame carries a deterministic player utterance derived from save seed,
-player identity, NPC, and topic group. The shared lifecycle records that reply
-when returning to the landing group. Existing `allowBack=false` gates remain
-authoritative.
-
-The automatic workbench CONFIG boundary now fetches and renders the worker’s
-authoritative snapshot, so profile, combobox, scale, and dial edits refresh the
-conversation/suggestions/graph surface. The semantic dialogue performance
-switch is a single persisted runtime control: PsychopatzCore owns native
-settings persistence, while the harness stores the same field in its scenario
-and calls the same Lua runtime gate.
-
-Evidence:
-
-- focused impacted worker/UI suites — **59/59 PASS**;
-- `xvfb-run` workbench apply/replay interaction — **PASS**;
-- full Project Hoomans Lua tree `luac5.3 -p` — **PASS**;
-- `pz_verify --kahlua` — **0 compatibility errors**;
-- doctor — **worker boot PASS**;
-- `git diff --check` — **PASS**.
-
-Native Project Zomboid SP/MP remains **UNTESTED / user-owned**. This follow-up
-does not claim native live behavior until the user compares the in-game Talk
-surface against the harness.
-
-## Current Exact Next Chunk — native Talk handoff evidence
-
-Use the real in-game context-menu Talk path for a colonist, follower, neutral, and hostile. Compare target classification, route, opening flavor, landing choices, first response, semantic back/context navigation, and hostile inline/fallback behavior against Semantic Lab. Also verify the neutral recruitment shortcut and typed equivalent, companion response, hover gates, and server result. Do not claim native verification or `READY FOR USER LIVE TEST` until the user supplies that evidence.
+Optional profiler enrichment is not required for P12 completion unless its specific P12G gate is being tested.
