@@ -576,3 +576,62 @@ A fresh user must be able to:
 11. use Compare without knowing what Sweep means.
 
 A passing backend suite without this real Tk/Xvfb interaction proof is insufficient.
+
+
+## P11J acceptance — native Talk parity
+
+### Shared production boundary
+
+Acceptance requires native `PNC.Conversation.Open` and Semantic Lab `TALK_START/TALK_MATRIX` to consume the same production Talk-start projection.
+
+A harness copy of the same conditions is not sufficient.
+
+### Canonical target matrix
+
+Required normal cases:
+
+- Colonist;
+- Follower;
+- Neutral;
+- Hostile.
+
+Required diagnostic/integration cases:
+
+- dead/unavailable;
+- hostile inline available;
+- hostile inline unavailable/full fallback;
+- trader overlay enabled/disabled.
+
+### Row evidence
+
+Each case must expose:
+
+- canonical target;
+- production target type;
+- tactical class;
+- ownership/recruited/follow facts;
+- audience;
+- relationship standing;
+- durable bond;
+- availability/safety reason;
+- Talk route;
+- opening choices;
+- first NPC response;
+- semantic choice IDs;
+- graph kind/path;
+- SpeechStyleContext;
+- provider/integration availability.
+
+### Isolation
+
+Each matrix row starts from the same clean scenario copy and may not leak temporary Talk target, relationship mutations, conversation tokens, provider state, graph history or cooldown state into another row.
+
+### GUI/CLI equivalence
+
+GUI and CLI must call the same worker commands and expose the same versioned schema.
+
+### Native user acceptance
+
+After developer gates pass, user-owned native validation compares the actual context-menu Talk action against Semantic Lab for the same target classes.
+
+Do not convert headless harness parity into a claim of native runtime verification.
