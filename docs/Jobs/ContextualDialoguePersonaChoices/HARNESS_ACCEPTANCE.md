@@ -708,3 +708,88 @@ After a destructive harness test session:
 - source save remains unchanged;
 - Reset World restores the imported baseline;
 - Reload Save rereads disk explicitly.
+
+
+## P13 acceptance — operational Semantic Test Workbench
+
+### P13A World Browser interaction
+
+At both minimum supported and normal desktop geometry, the test must actually:
+
+1. discover multiple saves;
+2. select a save;
+3. select a saved Player;
+4. expand/browse a faction/community/actor hierarchy;
+5. select an NPC;
+6. import the Player/NPC pair;
+7. verify the workbench target changed;
+8. Start Talk.
+
+Widget existence alone is insufficient.
+
+The save selector, Player selector and actor hierarchy must remain visibly operable; clipped/collapsed controls fail acceptance.
+
+### Player engine-state provider
+
+Offline native Player state is accepted only when:
+
+- the current Build 42.20 source format is verified;
+- the provider is version-gated and bounded;
+- the provider is read-only;
+- item identity comes from authoritative saved mapping where required;
+- unsupported data reports MISSING/reason;
+- source hash remains unchanged.
+
+### Symmetric actor inspection
+
+Player and NPC Target must each provide usable:
+
+- Overview;
+- Needs;
+- Personality & Traits;
+- Inventory.
+
+Both should expose provenance and effective/imported state where relevant.
+
+### Faction/community workbench
+
+A real saved faction/community must be browsable with members and leader/role metadata where persisted.
+
+Clicking a member must change the current NPC target through the normal save-backed selection path.
+
+### Gift acceptance
+
+A save-backed gift acceptance test must:
+
+```text
+inspect Player inventory
+ -> inspect NPC inventory
+ -> choose gift item
+ -> invoke production gift path
+ -> observe transfer
+ -> observe NPC response
+ -> observe relationship delta when applicable
+ -> inspect working-world diff
+ -> Reset World
+ -> verify both inventories/relationship return to imported baseline
+ -> verify source save unchanged
+```
+
+Direct Python table transfer is not acceptance.
+
+### CLI parity
+
+The same essential workflow must be reproducible machine-readably without Tk:
+
+- select save/player/NPC;
+- inspect inventories/relationship;
+- Start Talk;
+- execute gift/recruit/proposal where supported;
+- inspect diff;
+- reset/reload.
+
+### Final P13 operational gate
+
+P13 is accepted only when Semantic Lab is usable as the primary semantic/conversation development verification surface.
+
+Native Project Zomboid remains final user-owned live acceptance.
