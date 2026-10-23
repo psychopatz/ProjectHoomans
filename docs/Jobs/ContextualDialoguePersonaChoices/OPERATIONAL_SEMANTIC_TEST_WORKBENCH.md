@@ -1,11 +1,19 @@
 # P13 — Operational Semantic Test Workbench
 
-**Status:** ACTIVE / mandatory usability-parity phase  
+**Status:** OPERATIONAL FOUNDATION COMPLETE / retained under P14  
 **Opened:** 2026-10-24  
 **Implementation baseline audited:** ProjectHoomans remote `main` at `dbfd9099a0b687bc2f6505f58e81e32ea6dc5966`.  
 **P12 disposition:** save-backed runtime/backend foundation retained; product usability acceptance reopened.  
 **Native Project Zomboid requirement:** none for normal Semantic Lab operation.  
 **Source save mutation:** FORBIDDEN.
+
+## P14 supersession note
+
+P13's World Browser, Player engine-state provider, symmetric actor inspectors, faction/community workbench, gift verification, CLI parity, and operational acceptance are retained.
+
+P14 is now active because the remaining parity defect is no longer operational usability; it is that some Project Hoomans persisted gameplay state is still interpreted in Python rather than rehydrated by the production Lua owners.
+
+Do not replay P13A-P13G unless a regression is demonstrated.
 
 ## Why P13 exists
 
