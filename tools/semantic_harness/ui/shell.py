@@ -351,6 +351,7 @@ class SemanticHarnessApp:
         self._personality_preview_after: Any | None = None
         self._auto_replay_after: Any | None = None
         self._auto_apply_after: Any | None = None
+        self._splitter_restore_after: Any | None = None
         self.replay_steps: list[dict[str, Any]] = []
         self._relationship_preview_future: Future[Any] | None = None
         self._personality_preview_future: Future[Any] | None = None
@@ -1400,7 +1401,7 @@ class SemanticHarnessApp:
         simulation_width = max(1, self.simulation_panes.winfo_width())
         workflow_height = max(1, self.workflow_pane_split.winfo_height())
         if simulation_width <= 10 or workflow_height <= 10:
-            self.root.after(100, self._restore_splitters)
+            self._schedule_splitter_restore(100)
             return
         simulation_value = self._ui_state.get("simulation_sash")
         if simulation_value is None:
@@ -1433,11 +1434,22 @@ class SemanticHarnessApp:
         except (self._tk.TclError, TypeError, ValueError):
             pass
 
+    def _schedule_splitter_restore(self, delay_ms: int = 250) -> None:
+        if self.closed:
+            return
+        if self._splitter_restore_after is not None:
+            try:
+                self.root.after_cancel(self._splitter_restore_after)
+            except self._tk.TclError:
+                pass
+        self._splitter_restore_after = self.root.after(
+            delay_ms, self._restore_splitters
+        )
+
     def _on_main_tab_changed(self) -> None:
         if self.closed or self.main_tabs.select() != str(self.simulation_tab):
             return
-        self.root.after_idle(self._restore_splitters)
-        self.root.after(250, self._restore_splitters)
+        self._schedule_splitter_restore()
 
     def _restore_workbench_tabs(self) -> None:
         selections = self._ui_state.get("workbench_tabs") or {}
@@ -1513,9 +1525,20 @@ class SemanticHarnessApp:
     def _schedule_activity_poll(self) -> None:
         if self.closed:
             return
+        if self._activity_after is not None:
+            try:
+                self.root.after_cancel(self._activity_after)
+            except self._tk.TclError:
+                pass
         self._activity_after = self.root.after(150, self._poll_activity_log)
 
     def _poll_activity_log(self) -> None:
+        if self._activity_after is not None:
+            try:
+                self.root.after_cancel(self._activity_after)
+            except self._tk.TclError:
+                pass
+        self._activity_after = None
         if self.closed:
             return
         records = self.activity_log.new_shared_events(self._activity_seen_ids)
@@ -2191,7 +2214,7 @@ class SemanticHarnessApp:
         self._clear_workbench_pending()
         self.root.after_idle(self._restore_workbench_tabs)
         self.root.after_idle(self._restore_ui_state)
-        self.root.after(250, self._restore_splitters)
+        self._schedule_splitter_restore()
 
     def _update_generated_personality_controls(self, *_args: Any) -> None:
         override_field = self.workbench_control_fields.get("npc.personalityOverride")
@@ -3506,6 +3529,7 @@ class SemanticHarnessApp:
             self._personality_preview_after,
             self._auto_replay_after,
             self._auto_apply_after,
+            self._splitter_restore_after,
             self._activity_after,
         ):
             if after_id is not None:

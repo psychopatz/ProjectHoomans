@@ -425,3 +425,21 @@ Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
 ## Current Exact Next Chunk — user-facing GUI audit and diagnostics polish
 
 Run the complete selected-target Tk/Xvfb surface at compact and normal sizes, verify Simulation/Studio/Log order and saved tab/splitter state, check chat visibility and horizontal pane dragging, and inspect shared activity logging from GUI/CLI/agent worker operations. Fix only evidence-backed layout or logging regressions before the final developer gate.
+
+## GUI compact/normal layout, persisted tabs, and shared agent log audit
+
+The Semantic Lab UI audit now covers the user-facing state that was previously hard to verify. The main tabs remain ordered `Simulation`, `Studio`, `Log`; the selected main, Studio, trace, and workbench tabs plus both horizontal splitters are persisted and restored. The conversation transcript and semantic trace remain visible at compact `1080x700` and normal `1920x1080` sizes. The Log tab reads the same shared activity stream used by GUI, CLI, and agent operations, so an agent operation recorded while the app is open is visible in the live GUI log.
+
+Splitter restoration and activity polling now use single-owner cancellable Tk timers. Startup, tab changes, manual shared-log refreshes, and close no longer leave orphaned callbacks behind.
+
+Evidence:
+
+- `xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_contextual_runtime_parity_p11a -v` — **4/4 PASS**, including real Tk compact/normal layout, persisted tab/splitter state, and an agent event appearing in the GUI Log; no stale Tcl callback errors.
+- `python3 -m py_compile tools/semantic_harness/ui/shell.py tools/semantic_harness/tests/test_contextual_runtime_parity_p11a.py` — PASS.
+- `git diff --check` — PASS.
+
+Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
+
+## Current Exact Next Chunk — impacted developer gate and native Talk handoff
+
+Run the focused P10/P11 semantic, relationship, graph, identity, inventory, activity-log, and Talk-parity suites through the shared worker; run Lua/Kahlua, translation, doctor, and diff checks; then hand the remaining native context-menu Talk comparison to the user. Do not claim native verification or `READY FOR USER LIVE TEST` until user-owned evidence is supplied.

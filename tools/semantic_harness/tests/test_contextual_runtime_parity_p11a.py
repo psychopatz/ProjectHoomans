@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import gc
 import os
+from pathlib import Path
+import tempfile
 import time
 import tkinter as tk
 import unittest
@@ -12,6 +14,7 @@ from copy import deepcopy
 from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
+from tools.semantic_harness.runtime.activity import ActivityLog
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 
 
@@ -134,6 +137,108 @@ class RuntimeParityP11ATests(unittest.TestCase):
             del app
             del root
             gc.collect()
+
+    @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
+    def test_tk_compact_normal_state_and_shared_agent_log(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            state_path = Path(directory) / "semantic-lab-ui.json"
+            activity_path = Path(directory) / "semantic-lab.activity.jsonl"
+            arguments = _parser().parse_args(
+                [
+                    "--ui-state",
+                    str(state_path),
+                    "--activity-log",
+                    str(activity_path),
+                ]
+            )
+            root = tk.Tk()
+            app = SemanticHarnessApp(root, arguments)
+
+            def wait_until(predicate: object, timeout: float = 15.0) -> None:
+                deadline = time.monotonic() + timeout
+                while not predicate() and time.monotonic() < deadline:
+                    root.update()
+                    time.sleep(0.02)
+                self.assertTrue(predicate())
+
+            try:
+                wait_until(lambda: app.worker_ready and not app.busy)
+                root.geometry("1080x700")
+                root.update_idletasks()
+                self.assertGreater(app.transcript.winfo_width(), 0)
+                self.assertGreater(app.transcript.winfo_height(), 0)
+                self.assertGreater(app.simulation_panes.winfo_width(), 0)
+
+                root.geometry("1920x1080")
+                root.update_idletasks()
+                self.assertGreater(app.transcript.winfo_width(), 0)
+                self.assertGreater(app.transcript.winfo_height(), 0)
+
+                ActivityLog(path=activity_path, client="agent").record(
+                    "agent",
+                    "operation",
+                    command="INPUT",
+                    message="agent harness action",
+                )
+                app._poll_activity_log()
+                self.assertIn("agent", app.activity_log_widget.get("1.0", "end"))
+
+                talk_tab = next(
+                    tab
+                    for tab in app.trace_tabs.tabs()
+                    if app.trace_tabs.tab(tab, "text") == "Talk parity"
+                )
+                app.main_tabs.select(app.log_tab)
+                app.studio_notebook.select(app.studio_notebook.tabs()[-1])
+                app.trace_tabs.select(talk_tab)
+                app.workbench_notebook.select(app.workbench_notebook.tabs()[1])
+                app.simulation_panes.sashpos(0, 700)
+                app.workflow_pane_split.sashpos(0, 280)
+                root.update_idletasks()
+            finally:
+                app.close()
+                del app
+                try:
+                    root.destroy()
+                except tk.TclError:
+                    pass
+
+            root2 = tk.Tk()
+            app2 = SemanticHarnessApp(root2, arguments)
+
+            def wait_until_reopened(predicate: object, timeout: float = 15.0) -> None:
+                deadline = time.monotonic() + timeout
+                while not predicate() and time.monotonic() < deadline:
+                    root2.update()
+                    time.sleep(0.02)
+                self.assertTrue(predicate())
+
+            try:
+                wait_until_reopened(lambda: app2.worker_ready and not app2.busy)
+                root2.update()
+                self.assertEqual(app2.main_tabs.index(app2.main_tabs.select()), 2)
+                self.assertEqual(
+                    app2.studio_notebook.index(app2.studio_notebook.select()),
+                    len(app2.studio_notebook.tabs()) - 1,
+                )
+                restored_talk = app2.trace_tabs.tab(
+                    app2.trace_tabs.select(), "text"
+                )
+                self.assertEqual(restored_talk, "Talk parity")
+                app2.main_tabs.select(app2.simulation_tab)
+                for _ in range(20):
+                    root2.update()
+                    time.sleep(0.05)
+                self.assertEqual(app2.simulation_panes.sashpos(0), 700)
+                self.assertEqual(app2.workflow_pane_split.sashpos(0), 280)
+            finally:
+                app2.close()
+                del app2
+                try:
+                    root2.destroy()
+                except tk.TclError:
+                    pass
+                gc.collect()
 
 
 if __name__ == "__main__":
