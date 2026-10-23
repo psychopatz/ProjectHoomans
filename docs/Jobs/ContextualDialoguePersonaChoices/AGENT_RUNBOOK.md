@@ -397,3 +397,63 @@ Adapters provide boundaries, not alternate business policy.
 The missing normal production relationship-proposal entry route remains mandatory, but it is now completed under P12H against the isolated save-backed runtime.
 
 Do not treat the old standalone P11M phase as a competing active roadmap.
+
+
+## P13 execution rules — operational test workbench
+
+P13 is the active product phase.
+
+P12 backend/runtime work is retained. Do not replay P12 save architecture unless a regression is proven.
+
+### Operational usability over infrastructure presence
+
+Do not accept a GUI milestone because controls exist in source or because `hasattr(widget)` passes.
+
+For user-facing P13 gates, exercise the real Tk workflow at realistic geometry.
+
+### World Browser
+
+Use the existing P12 save catalog/browser/import/provider owners.
+
+Do not create:
+
+- another save parser;
+- another save catalog;
+- another world-state owner;
+- another standalone browser app.
+
+The dedicated World Browser belongs inside the existing Semantic Lab.
+
+### Save-backed mode
+
+When a real saved world is active:
+
+- saved actor state is authoritative;
+- synthetic NPC profile controls must not visually masquerade as authority;
+- fixture/scenario controls may remain under explicit Developer/Test/Advanced surfaces.
+
+### Player engine state
+
+Audit actual Build 42.20 ownership before decoding native Player state.
+
+Never guess binary formats or item identities.
+
+Unsupported fields remain MISSING with a reason.
+
+All engine-save readers are read-only.
+
+### Inventory and gifts
+
+Use one reusable actor-inventory presentation family.
+
+Raw JSON is diagnostic/Advanced only.
+
+Gift execution must route through production semantic/gift/inventory authorities; the UI may not directly move items in Python.
+
+### GUI/CLI parity
+
+Every important save-backed P13 workflow must have a machine-readable backend/CLI equivalent.
+
+Autonomous agents should prefer CLI/worker operations over screenshot-driven interaction when both prove the same behavior.
+
+Native PZ remains user-owned final acceptance, not the ordinary agent verification path.
