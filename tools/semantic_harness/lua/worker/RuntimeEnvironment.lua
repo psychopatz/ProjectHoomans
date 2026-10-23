@@ -232,6 +232,9 @@ function RuntimeEnvironment.configure(context)
         getSurname = function() return playerData.surname end,
     }
     local player = {
+        isFemale = function()
+            return playerData.gender == "female"
+        end,
         getUsername = function()
             return playerData.username or playerData.displayName
                 or "harness-player"

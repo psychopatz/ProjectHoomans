@@ -381,11 +381,45 @@ function TalkParity.Start(context, value, utterance)
         context, tostring(utterance or "hello")
     )
     local snapshot = context.ScenarioSession.snapshot(context)
+    -- A saved actor may carry a large raw provider payload (for example a
+    -- native inventory blob). Talk parity needs the effective scenario and
+    -- conversation projection, not a second copy of the complete source
+    -- snapshot on every turn. The full immutable source remains available
+    -- through SNAPSHOT/import responses.
+    if type(snapshot.sourceSnapshot) == "table" then
+        snapshot.sourceSnapshot.data = nil
+        snapshot.sourceSnapshot.providerPayloads = nil
+    end
+    if type(snapshot.workingWorld) == "table" then
+        snapshot.workingWorld.baseline = nil
+    end
+    local compactScenario = Values.copy(scenario)
+    if type(compactScenario.npc) == "table" then
+        compactScenario.npc.social = nil
+    end
+    local compactConfigured = Values.copy(configured)
+    if type(compactConfigured.scenario) == "table"
+        and type(compactConfigured.scenario.npc) == "table"
+    then
+        compactConfigured.scenario.npc.social = nil
+    end
+    if type(compactConfigured.sourceSnapshot) == "table" then
+        compactConfigured.sourceSnapshot.data = nil
+        compactConfigured.sourceSnapshot.providerPayloads = nil
+    end
+    if type(compactConfigured.workingWorld) == "table" then
+        compactConfigured.workingWorld.baseline = nil
+    end
+    if type(snapshot.scenario) == "table"
+        and type(snapshot.scenario.npc) == "table"
+    then
+        snapshot.scenario.npc.social = nil
+    end
     return {
         schema = TalkParity.SCHEMA,
         type = "talk_start",
-        scenario = Values.copy(scenario),
-        configured = Values.copy(configured),
+        scenario = compactScenario,
+        configured = compactConfigured,
         start = start,
         turn = turn,
         observation = compactObservation(context, start, turn, snapshot),

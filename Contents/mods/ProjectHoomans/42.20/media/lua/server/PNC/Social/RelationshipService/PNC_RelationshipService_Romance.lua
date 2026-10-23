@@ -24,7 +24,8 @@ local function methodValue(target, methodName)
     local value
     if type(method) ~= "function" then return nil end
     ok, value = pcall(method, target)
-    return ok and value or nil
+    if not ok then return nil end
+    return value
 end
 
 local function playerIsFemale(player)
@@ -32,7 +33,10 @@ local function playerIsFemale(player)
     if type(value) == "function" then
         value = methodValue(player, "isFemale")
     end
-    return type(value) == "boolean" and value or nil
+    if type(value) == "boolean" then
+        return value
+    end
+    return nil
 end
 
 local function npcIsFemale(record)

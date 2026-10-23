@@ -1,9 +1,9 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
 **Updated:** 2026-10-24  
-**Parent status:** REOPENED — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is mandatory.  
-**Current mandatory phase:** P12J — Save-backed conversation parity.
-**Current local baseline audited:** ProjectHoomans `main` at `d966cd3a`; upstream remains unchanged and local `main` is ahead by eight commits.
+**Parent status:** IN PROGRESS — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is mandatory.
+**Current mandatory phase:** P12K — Final safety/parity matrix.
+**Current local baseline audited:** ProjectHoomans `main` at `fbf3ed34`; upstream remains unchanged and local `main` is ahead by nine commits.
 **Normal Semantic Lab runtime requirement:** Project Zomboid CLOSED/OFFLINE is supported and expected.  
 **Source save mutation:** FORBIDDEN.  
 **Optional live profiler:** disabled by default; read-only enrichment only.
@@ -345,9 +345,26 @@ Evidence:
 - P12A–P12H plus P11J regression set: 28 tests passed;
 - `python3 -m py_compile`, `luac5.3 -p`, and `git diff --check` passed; `pz-verify` found zero Kahlua issues in the changed ScenarioSession file, while the unchanged legacy loader findings in ProductionModules remain pre-existing.
 
-## Current Exact Next Chunk — P12J Save-backed conversation parity
+## Completed Chunk — P12J Save-backed conversation parity
 
-From a selected real saved Player/NPC pair, exercise Talk, identity, relationship, friend promotion, proposal, recruitment, factions, knowledge, inventory, Dynamic Trading, semantic tools, Flow/Hub/ConversationBlock graphs, Replay, and Compare without requiring a hand-authored synthetic NPC scenario.
+Completed save-backed conversation parity against a selected persisted Player/NPC pair without requiring a hand-authored synthetic NPC during normal workflow:
+
+- imported saved actor identity, tactical/affiliation/hostility/order projection, personality, supported inventory, and DynamicTrading provider state with explicit `SAVE`/`MISSING` provenance;
+- kept unsupported native inventory blobs explicit rather than inventing a saved inventory projection;
+- exercised Talk, identity, relationship, inventory, Flow/Hub/ConversationBlock graph, Replay, Compare, knowledge, normal production relationship proposal, recruitment, and Dynamic Trading overlay paths;
+- compacted Talk transport copies so large raw provider payloads do not exceed the worker response limit while the complete immutable source remains available through snapshot/import responses;
+- removed the worker relationship-presentation override so production `RelationshipPresentation` remains authoritative; fixed saved male-player `isFemale() == false` handling so production romance eligibility is evaluated correctly.
+
+Evidence:
+
+- `tools/semantic_harness/tests/test_save_backed_conversation_p12j.py`: 2 tests passed;
+- retained P12A–P12H/P11J/P12J regression set: 30 tests passed;
+- offline real-save smoke using `2026-10-14_13-57-03`, player `char_1791957489838_240087`, NPC `npcAdamBloom_48G5`: source `SAVE`, Talk `full_conversation`, identity/inventory/graph/replay/knowledge paths exercised, source snapshot and save hash unchanged;
+- changed Python compiled, changed Lua parsed with `luac5.3`, `git diff --check` passed; `pz-verify` reported zero Kahlua issues in changed production Lua and the existing worker `io.*` finding only in `RuntimeEnvironment.lua`.
+
+## Current Exact Next Chunk — P12K Final safety/parity matrix
+
+Validate multiple real saves/players/NPC types and relationship states, provider presence/absence, corrupt/unsupported saves, offline fixtures, optional live-provider behavior, Reset World, Reload Save, source immutability, and the final Python/Tk/Xvfb/Lua/Kahlua/doctor/catalog/translation checks.
 
 ## P12A acceptance
 

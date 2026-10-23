@@ -169,6 +169,14 @@ class SaveImportTests(unittest.TestCase):
                 "admire",
             )
 
+            # The fixture save intentionally has no persisted inventory. Add
+            # an item as an explicit working-world edit before exercising the
+            # production gift route; the importer must not invent saved items.
+            staged = deepcopy(worker.scenario)
+            staged["player"]["inventory"] = deepcopy(
+                DEFAULT_SCENARIO["player"]["inventory"]
+            )
+            worker.configure(staged)
             worker.input("here's an apple for you")
             mutated = worker.snapshot()
             self.assertTrue(mutated["workingWorld"]["patches"])

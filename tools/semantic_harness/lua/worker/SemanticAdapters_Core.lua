@@ -532,11 +532,6 @@ function Provider.configure(context, SemanticAdapters)
             return applied, reason, evaluation
         end
     end
-    PNC.RelationshipPresentation = PNC.RelationshipPresentation or {}
-    PNC.RelationshipPresentation.Summarize = function(value)
-        return Values.copy(value)
-    end
-
     PNC.NPCKnowledgeAPI = PNC.NPCKnowledgeAPI or {}
     if type(PNC.NPCKnowledgeAPI.DiscloseForPlayer) ~= "function" then
     PNC.NPCKnowledgeAPI.DiscloseForPlayer = function(_, options)

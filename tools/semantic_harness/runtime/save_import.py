@@ -59,6 +59,71 @@ def _saved_relationship(
     return deepcopy(value), "SAVE"
 
 
+def _empty_inventory() -> dict[str, Any]:
+    """Represent an inventory that has no supported offline projection."""
+
+    return {"revision": 0, "items": {}, "containers": []}
+
+
+def _saved_inventory(record: dict[str, Any]) -> tuple[dict[str, Any], str]:
+    value = record.get("inventory")
+    if isinstance(value, dict) and isinstance(value.get("items"), (dict, list)):
+        return deepcopy(value), "SAVE"
+    return _empty_inventory(), "MISSING"
+
+
+def _saved_actor_projection(
+    npc_record: dict[str, Any], player_entity_key: str
+) -> dict[str, Any]:
+    """Project persisted actor capability facts without inventing gameplay state."""
+
+    affiliation = _as_dict(npc_record.get("affiliation"))
+    hostility = _as_dict(npc_record.get("hostility"))
+    order = _as_dict(npc_record.get("orderSpec"))
+    generation = _as_dict(npc_record.get("generation"))
+    hostility_mode = str(hostility.get("mode") or "unknown")
+    order_kind = str(order.get("kind") or "")
+    follower = order_kind == "follow" or hostility_mode == "defend_owner"
+    owner_key = str(
+        affiliation.get("ownerPlayerKey")
+        or npc_record.get("ownerPlayerKey")
+        or ""
+    )
+    owned = follower or owner_key == player_entity_key
+    hostile = bool(hostility.get("attackPlayers")) or hostility_mode in {
+        "hostile",
+        "aggressive",
+        "attack",
+    }
+    source = str(generation.get("source") or "").lower()
+    origin = str(affiliation.get("originArchetypeID") or "").lower()
+    trader = source == "dynamic_trading" or origin == "trader"
+    tactical_class = str(npc_record.get("tacticalClass") or "neutral")
+    return {
+        "tacticalClass": tactical_class,
+        "factionID": affiliation.get("factionID"),
+        "communityID": affiliation.get("communityID"),
+        "factionRole": affiliation.get("role"),
+        "role": "trader" if trader else None,
+        "recruited": owned,
+        "companion": owned,
+        "ownedByPlayer": owned,
+        "actorAuthority": {
+            "eligible": owned,
+            "companion": owned,
+            "owned": owned,
+            "status": "eligible" if owned else "not_owned",
+        },
+        "followState": {"mode": "following" if follower else "idle"},
+        "orderSpec": deepcopy(order),
+        "activeBehavior": (
+            "following" if follower else "hostile" if hostile else "idle"
+        ),
+        "hostility": deepcopy(hostility),
+        "isTrader": trader,
+    }
+
+
 class SaveBackedImporter:
     """Load selected persisted records through Core into a detached source."""
 
@@ -176,6 +241,14 @@ class SaveBackedImporter:
         npc_relationship, relationship_source = _saved_relationship(
             npc_record, player_entity_key
         )
+        player_inventory, player_inventory_source = _saved_inventory(player_record)
+        npc_inventory, npc_inventory_source = _saved_inventory(npc_record)
+        actor_projection = _saved_actor_projection(
+            npc_record, player_entity_key
+        )
+        saved_personality = deepcopy(
+            _as_dict(npc_record.get("social")).get("personality") or {}
+        )
         saved_gender = (
             "female" if identity.get("isFemale") is True
             else "male" if identity.get("isFemale") is False
@@ -192,28 +265,46 @@ class SaveBackedImporter:
                     "displayName": player_display,
                     "accountKey": account_key,
                     "entityKey": player_entity_key,
-                    "gender": fixtures.get("playerGender", "unknown"),
+                    "gender": player_record.get("gender")
+                    or fixtures.get("playerGender", "unknown"),
                     "socialProfile": deepcopy(
                         player_record.get("socialProfile") or {}
                     ),
+                    "inventory": player_inventory,
                 },
                 "npc": {
                     "npcID": selected_npc_id,
                     "forename": forename,
                     "surname": surname,
                     "displayName": display_name,
+                    "identity": deepcopy(identity),
                     "identityState": "unknown",
                     "gender": saved_gender,
                     "identitySeed": identity.get("seed") or selected_npc_id,
                     "archetype": identity.get("archetypeID") or "General",
                     "archetypeID": identity.get("archetypeID") or "General",
+                    "tacticalClass": actor_projection["tacticalClass"],
+                    "factionID": actor_projection["factionID"],
+                    "communityID": actor_projection["communityID"],
+                    "factionRole": actor_projection["factionRole"],
+                    "role": actor_projection["role"],
+                    "recruited": actor_projection["recruited"],
+                    "companion": actor_projection["companion"],
+                    "ownedByPlayer": actor_projection["ownedByPlayer"],
+                    "actorAuthority": actor_projection["actorAuthority"],
+                    "followState": actor_projection["followState"],
+                    "orderSpec": actor_projection["orderSpec"],
+                    "activeBehavior": actor_projection["activeBehavior"],
+                    "hostility": actor_projection["hostility"],
                     "traits": deepcopy(npc_record.get("npcTraits") or []),
                     "personality": deepcopy(
-                        _as_dict(npc_record.get("social")).get("personality")
-                        or {}
+                        saved_personality
                     ),
+                    "personalityOverride": bool(saved_personality),
+                    "personalityMode": "saved" if saved_personality else "",
                     "social": deepcopy(_as_dict(npc_record.get("social"))),
                     "relationship": npc_relationship,
+                    "inventory": npc_inventory,
                 },
                 "world": fixtures.get("world", {}),
                 "runtime": {
@@ -222,6 +313,11 @@ class SaveBackedImporter:
                     else "singleplayer",
                     "semanticLabSource": "SAVE",
                     "semanticLabSourceID": catalog_entry.source_id,
+                    "availableMods": (
+                        {"DTHoomans": True}
+                        if actor_projection["isTrader"]
+                        else {}
+                    ),
                 },
                 "sourceSelection": {
                     "savePath": str(save_path),
@@ -282,6 +378,16 @@ class SaveBackedImporter:
                     "recordKey": selected_uuid,
                 },
                 "npc.needs": {"source": "FIXTURE"},
+                "player.inventory": {
+                    "source": player_inventory_source,
+                    "table": player_table,
+                    "recordKey": selected_uuid,
+                },
+                "npc.inventory": {
+                    "source": npc_inventory_source,
+                    "table": npc_table,
+                    "recordKey": selected_npc_id,
+                },
                 "world": {"source": "FIXTURE"},
             },
         }
@@ -289,6 +395,17 @@ class SaveBackedImporter:
             "ProjectHoomans": {
                 "PNC_PlayerCharacters": {selected_uuid: deepcopy(player_record)},
                 "PNC_" + selected_npc_id: deepcopy(npc_record),
+            },
+            "DynamicTrading": {
+                "source": "SAVE" if actor_projection["isTrader"] else "MISSING",
+                "selectedActor": (
+                    {
+                        "id": selected_npc_id,
+                        "provider": "dynamictrading",
+                    }
+                    if actor_projection["isTrader"]
+                    else None
+                ),
             },
             "selection": {
                 "playerEntityKey": player_entity_key,
