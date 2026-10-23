@@ -739,3 +739,65 @@ Follower is derived from colonist ownership plus follow order.
 Trader is a capability/provider overlay and never a tactical Talk type.
 
 Hostile inline behavior depends on the real integration availability. A headless harness must report missing inline support and exercise the production full-conversation fallback rather than inventing availability.
+
+
+## 31. Save-backed state ownership
+
+Semantic Lab now distinguishes:
+
+```text
+source snapshot
+    immutable imported truth
+
+working world
+    detached mutable copy used by production Lua
+```
+
+Save files and live runtime snapshots are never mutation targets.
+
+The working world may mutate freely through production services.
+
+## 32. State provenance
+
+Conversation-relevant state carries one source classification:
+
+```text
+SAVE
+FIXTURE
+LIVE
+DERIVED
+HARNESS_MUTATION
+MISSING
+```
+
+Derived production values should be recomputed rather than copied when authoritative inputs exist.
+
+## 33. Offline engine fixture boundary
+
+Engine/transient state is not automatically equivalent to persisted mod state.
+
+If no supported offline reader exists, Semantic Lab uses explicit fixtures for values such as needs/time/weather.
+
+This does not make the fixture the gameplay authority; it is an engine stand-in.
+
+## 34. Save-state provider boundary
+
+Core owns low-level save decoding.
+
+Each mod owns interpretation/projection of its persisted schema.
+
+Expected providers include Core, Project Hoomans and Dynamic Trading.
+
+Central Python must not become a registry of every adopter-owned field.
+
+## 35. Optional live profiler boundary
+
+Live profiler integration is a one-way observation channel.
+
+It may enrich a copied snapshot with transient engine values, but it may not accept mutation requests from Semantic Lab.
+
+## 36. Relationship parity
+
+The harness must install the real saved directed relationship record into the isolated NPC/social record and use production relationship services for mutations.
+
+SemanticAdapters must not duplicate friend-promotion, bond, proposal or relationship-state policy once P12C replaces the fixture path.
