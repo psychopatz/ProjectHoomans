@@ -68,13 +68,17 @@ function Conversation.buildContext(context)
         or (authorityEligible and "eligible"
             or (companion == false and "not_companion"
                 or owned == false and "not_owned" or "authority_unknown"))
+    local identityKnown = npc.identityState == "known"
+        or (owned == true and npc.recruited == true)
+    local effectiveIdentityState = identityKnown and "known"
+        or (npc.identityState or "unknown")
     local priorContext = Runtime.view and Runtime.view.spec
         and Runtime.view.spec.context or nil
     local output = {
         npcID = npc.npcID,
         saveSeed = world.seedString or world.worldSeedString
             or world.worldSeed,
-        identityState = npc.identityState or "unknown",
+        identityState = effectiveIdentityState,
         identity = copy(npc.identity),
         npcName = npcName,
         npcFullName = npcName,
@@ -82,7 +86,7 @@ function Conversation.buildContext(context)
         npcState = {
             traits = copy(npc.traits or {}),
             startingRelationship = copy(npc.startingRelationship),
-            identityState = npc.identityState or "unknown",
+            identityState = effectiveIdentityState,
             healthState = npc.healthState,
             activeBehavior = npc.activeBehavior,
             followState = copy(npc.followState or { mode = "idle" }),

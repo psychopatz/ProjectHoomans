@@ -70,10 +70,9 @@ local function identityText(context)
     local name = type(context) == "table" and (
         context.npcFullName or context.npcName
     ) or nil
-    local identityState = type(context) == "table"
-        and context.identityState or nil
+    local identityKnown = Internal.IdentityKnown(context)
     name = tostring(name or "")
-    if identityState == "known"
+    if identityKnown
         and name ~= ""
         and string.lower(name) ~= "unknown survivor"
     then

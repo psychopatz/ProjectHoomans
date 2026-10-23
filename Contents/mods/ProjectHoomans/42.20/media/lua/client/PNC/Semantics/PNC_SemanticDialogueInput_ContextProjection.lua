@@ -63,6 +63,20 @@ function Projection.Build(view, getProviderStatus)
     output.llmProviderStatus = providerStatus.status
     output.llmProviderReason = providerStatus.reason
     output.npcID = view and view.spec and view.spec.npcID or output.npcID
+    local clientState = PNC.Network and PNC.Network.ClientState or nil
+    local presentation = clientState and clientState.npcPresentations
+        and clientState.npcPresentations[tostring(output.npcID or "")]
+        or nil
+    if type(presentation) == "table"
+        and (presentation.state == "known"
+            or presentation.canAskName == false)
+    then
+        -- The presentation gateway is the player-scoped identity authority.
+        -- Keep the semantic context aligned with it even when the NPC entry
+        -- itself has no local identityState field.
+        output.identityState = "known"
+        output.identityKnown = true
+    end
     local socialFlavor = PNC.SocialFlavorPresentation
     if socialFlavor
         and type(socialFlavor.GetActiveMedicalSupplyRequest) == "function"

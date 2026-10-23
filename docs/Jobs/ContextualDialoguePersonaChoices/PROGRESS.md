@@ -464,6 +464,40 @@ Evidence:
 
 The unbounded Tk discovery command was stopped after several minutes without output because it remained in a worker wait; the bounded affected suites completed successfully and are the evidence used for this gate. Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
 
+## Corrective follow-up — shared semantic identity, tone, navigation, and runtime gate
+
+The production semantic path now treats owned/recruited companions as already
+identified: the landing surface omits the redundant identity shortcut, and a
+typed identity question resolves through the same production response resolver
+with a known-companion response. Negative approval/respect values now add
+guarded speech pressure even while relationship standing is still unknown.
+
+“Let’s talk something else” remains a presentation label, while its shared
+typed frame carries a deterministic player utterance derived from save seed,
+player identity, NPC, and topic group. The shared lifecycle records that reply
+when returning to the landing group. Existing `allowBack=false` gates remain
+authoritative.
+
+The automatic workbench CONFIG boundary now fetches and renders the worker’s
+authoritative snapshot, so profile, combobox, scale, and dial edits refresh the
+conversation/suggestions/graph surface. The semantic dialogue performance
+switch is a single persisted runtime control: PsychopatzCore owns native
+settings persistence, while the harness stores the same field in its scenario
+and calls the same Lua runtime gate.
+
+Evidence:
+
+- focused impacted worker/UI suites — **59/59 PASS**;
+- `xvfb-run` workbench apply/replay interaction — **PASS**;
+- full Project Hoomans Lua tree `luac5.3 -p` — **PASS**;
+- `pz_verify --kahlua` — **0 compatibility errors**;
+- doctor — **worker boot PASS**;
+- `git diff --check` — **PASS**.
+
+Native Project Zomboid SP/MP remains **UNTESTED / user-owned**. This follow-up
+does not claim native live behavior until the user compares the in-game Talk
+surface against the harness.
+
 ## Current Exact Next Chunk — native Talk handoff evidence
 
 Use the real in-game context-menu Talk path for a colonist, follower, neutral, and hostile. Compare target classification, route, opening flavor, landing choices, first response, semantic back/context navigation, and hostile inline/fallback behavior against Semantic Lab. Also verify the neutral recruitment shortcut and typed equivalent, companion response, hover gates, and server result. Do not claim native verification or `READY FOR USER LIVE TEST` until the user supplies that evidence.

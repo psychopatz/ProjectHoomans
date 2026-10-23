@@ -17,6 +17,30 @@ from tools.semantic_harness.ui.shell import SemanticHarnessApp
 
 
 class SimulationWorkbenchP10ETests(unittest.TestCase):
+    def test_semantic_dialogue_toggle_uses_worker_gate_and_saved_runtime(self) -> None:
+        disabled = deepcopy(DEFAULT_SCENARIO)
+        disabled["runtime"]["semanticDialogueEnabled"] = False
+        with LuaSemanticWorker(disabled) as worker:
+            snapshot = worker.snapshot()
+            self.assertFalse(
+                snapshot["scenario"]["runtime"]["semanticDialogueEnabled"]
+            )
+            self.assertEqual(snapshot["suggestions"]["candidates"], [])
+            self.assertEqual(
+                snapshot["suggestions"]["trace"][0]["reason"],
+                "semantic_dialogue_disabled",
+            )
+
+            enabled = deepcopy(disabled)
+            enabled["runtime"]["semanticDialogueEnabled"] = True
+            worker.configure(enabled)
+            refreshed = worker.snapshot()
+
+        self.assertTrue(
+            refreshed["scenario"]["runtime"]["semanticDialogueEnabled"]
+        )
+        self.assertTrue(refreshed["suggestions"]["candidates"])
+
     def test_worker_marks_quick_controls_in_the_shared_catalog(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.simulation_control_catalog()

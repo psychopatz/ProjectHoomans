@@ -3,6 +3,7 @@
 require "PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationLLMInput"
 require "PsychopatzCore/Semantics/PsychopatzSemanticDialogueRouter"
 require "PNC/Semantics/PNC_SemanticDiagnostics"
+local DialogueRuntime = require "PNC/Semantics/PNC_SemanticDialogueRuntime"
 -- Optional module boundary: a legacy package must keep its ordinary
 -- deterministic conversation path if this diagnostic spoke is absent.
 local handshakeLoaded, SemanticCapabilityHandshake = pcall(require,
@@ -136,6 +137,9 @@ local function finishDirectFrame(view, key)
 end
 
 function Input.Submit(view, value, part)
+    if not DialogueRuntime.IsEnabled() then
+        return false, "semantic_dialogue_disabled"
+    end
     local group = view and view.groupConversation
     if group and type(group.Submit) == "function" then
         return group:Submit(value, part)
@@ -144,6 +148,9 @@ function Input.Submit(view, value, part)
 end
 
 function Input.SubmitSemanticFrame(view, frame)
+    if not DialogueRuntime.IsEnabled() then
+        return false, "semantic_dialogue_disabled"
+    end
     if type(Suggestions.IsBackFrame) == "function"
         and Suggestions.IsBackFrame(frame)
     then

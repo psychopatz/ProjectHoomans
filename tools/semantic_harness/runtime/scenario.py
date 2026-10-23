@@ -139,6 +139,7 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "language": "EN",
         "llmEnabled": False,
         "providerAvailable": False,
+        "semanticDialogueEnabled": True,
         "semanticLabProfile": "companion",
         "availableMods": {},
         "nativeTranslations": {},
@@ -320,6 +321,13 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
     profile = runtime.get("semanticLabProfile")
     if profile is not None and not isinstance(profile, str):
         raise ValueError("runtime.semanticLabProfile must be a string or null")
+    semantic_dialogue_enabled = runtime.get("semanticDialogueEnabled")
+    if semantic_dialogue_enabled is not None and not isinstance(
+        semantic_dialogue_enabled, bool
+    ):
+        raise ValueError(
+            "runtime.semanticDialogueEnabled must be a boolean or null"
+        )
     available_mods = runtime.get("availableMods")
     if available_mods == []:
         available_mods = {}

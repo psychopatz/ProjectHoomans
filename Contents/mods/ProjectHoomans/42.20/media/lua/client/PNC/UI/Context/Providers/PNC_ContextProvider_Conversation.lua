@@ -1,6 +1,9 @@
 -- Build 42.20 world-context integration for conversations.
 PNC = PNC or {}
 PNC.ContextHub = PNC.ContextHub or {}
+local DialogueRuntime = PNC.Semantics
+    and PNC.Semantics.SemanticDialogueRuntime
+    or require "PNC/Semantics/PNC_SemanticDialogueRuntime"
 
 local Provider = {
     id = "conversation",
@@ -31,7 +34,7 @@ local function tr(key)
 end
 
 function Provider.isEnabled(entry)
-    return entry and entry.id ~= nil
+    return DialogueRuntime.IsEnabled() and entry and entry.id ~= nil
 end
 
 function Provider.addOptions(menu, entry, player)

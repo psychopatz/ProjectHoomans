@@ -194,7 +194,9 @@ local function buildCoreChoices(view, projection)
         -- Compatibility for projections produced before shared navigation was
         -- added. New projections carry this row in group.navigation.
         local frame = Suggestions.BuildBackFrame(
-            projection.revision, selectedGroup.id
+            projection.revision,
+            selectedGroup.id,
+            Internal.ShallowContext(view)
         )
         if frame then
             navigation = {{
@@ -493,6 +495,28 @@ function Internal.SelectSemanticRoot(view, frame)
     projection.currentGroupID = rootID
     local applied, reason = applyCoreChoices(view, projection)
     if not applied then return false, reason end
+    local reply = frame.utterance or frame.textFallback
+    if frame.playerReply == true and type(reply) == "string"
+        and reply ~= ""
+    then
+        local group = view.groupConversation
+        local session = group and type(group.PrimarySession) == "function"
+            and group:PrimarySession() or view.session
+        if session and type(session.append) == "function" then
+            session:append("player", reply, {
+                source = {
+                    kind = "semantic",
+                    channel = "navigation",
+                },
+                candidateID = frame.candidateID,
+                fromGroupID = frame.fromGroupID,
+                groupID = group and group.id or nil,
+                participants = group and group.participantIDs or nil,
+                groupTurnID = group and group.activeTurn
+                    and group.activeTurn.id or nil,
+            })
+        end
+    end
     return true, "accepted"
 end
 

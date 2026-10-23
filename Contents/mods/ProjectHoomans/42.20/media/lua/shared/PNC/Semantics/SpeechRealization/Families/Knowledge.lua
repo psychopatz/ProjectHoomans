@@ -4,6 +4,7 @@ local Builders = require
     "PNC/Semantics/PNC_SpeechRealization_FamilyBuilders"
 local phraseFamily = Builders.phraseFamily
 local bondPhraseFamily = Builders.bondPhraseFamily
+local identityKnownFamily = Builders.identityKnownFamily
 
 return {
     ["semantic.question.identity"] = phraseFamily(
@@ -11,6 +12,7 @@ return {
         "I'll tell you my name once we know each other. What should I call you?",
         "Not yet. Your name?", "I don't share my name yet. What's yours?"
     ),
+    ["semantic.question.identity.known"] = identityKnownFamily(),
     ["semantic.question.knowledge.unknown"] = phraseFamily(
         "KnowledgeUnknown", "I don't have reliable information about that.",
         "I don't know enough about that to help.", "I don't know.",

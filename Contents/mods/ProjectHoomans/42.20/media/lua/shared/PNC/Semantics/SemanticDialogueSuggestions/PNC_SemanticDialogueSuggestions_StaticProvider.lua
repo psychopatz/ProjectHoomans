@@ -207,6 +207,20 @@ local function ownedCompanion(actor)
         and roles.authorityEligible == true
 end
 
+local function identityKnown(context)
+    context = type(context) == "table" and context or {}
+    if context.identityState == "known"
+        or context.identityKnown == true
+    then
+        return true
+    end
+    local actor = type(context.actorConversationContext) == "table"
+        and context.actorConversationContext or {}
+    local roles = type(actor.roles) == "table" and actor.roles or {}
+    return roles.companion == true and roles.owned == true
+        and roles.authorityEligible == true
+end
+
 local function pendingIdentity(context)
     local state = context and context.semanticContextState
     return context and context.pendingIdentityExchange
@@ -438,7 +452,15 @@ function Provider.collect(context)
         return identityChoiceCandidates(context)
     end
     if context.activeHubID ~= "whats_up" then
-        return Provider.Definitions
+        local output = {}
+        for _, definition in ipairs(Provider.Definitions) do
+            if definition.id ~= "question.identity"
+                or not identityKnown(context)
+            then
+                output[#output + 1] = definition
+            end
+        end
+        return output
     end
 
     local actor = type(context.actorConversationContext) == "table"
@@ -448,7 +470,10 @@ function Provider.collect(context)
     local safeGossip = hasSafeGossip(context)
     local output = {}
     for _, definition in ipairs(Provider.Definitions) do
-        if definition.hubID == "whats_up" then
+        if definition.hubID == "whats_up"
+            and (definition.id ~= "question.identity"
+                or not identityKnown(context))
+        then
             local allowed = not hostile
                 or definition.id == "question.weather"
             local contextReason = hostile

@@ -124,7 +124,25 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
             "semantic_back_click_frame",
         )
 
-    def test_talk_something_else_returns_to_landing_without_a_dialogue_turn(self) -> None:
+    def test_owned_companion_uses_known_identity_policy(self) -> None:
+        scenario = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), "companion")
+        with LuaSemanticWorker(scenario) as worker:
+            root = worker.snapshot()["suggestions"]
+            turn = worker.input("What's your name?")
+
+        root_ids = {
+            candidate["id"] for candidate in root.get("candidates", [])
+        }
+        self.assertNotIn("question.identity", root_ids)
+        queued = (turn["observation"]["response"].get("queued") or [])
+        self.assertTrue(queued)
+        self.assertEqual(
+            turn["observation"]["response"]["templateID"],
+            "semantic.question.identity.known",
+        )
+        self.assertIn("already know each other", queued[0]["text"])
+
+    def test_talk_something_else_returns_to_landing_with_navigation_reply(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             started = worker.talk_start(
                 target_id="neutral", utterance="What's up?"
@@ -144,7 +162,13 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
         self.assertEqual(after["suggestions"]["currentGroupID"], "conversation_landing")
         self.assertEqual(
             len(after["transcript"]),
-            len(before["transcript"]),
+            len(before["transcript"]) + 1,
+        )
+        self.assertEqual(after["transcript"][-1]["speaker"], "player")
+        self.assertTrue(after["transcript"][-1]["value"])
+        self.assertEqual(
+            after["transcript"][-1]["value"],
+            frame["textFallback"],
         )
         self.assertEqual(
             after["scenario"]["conversation"].get("turn", 0),

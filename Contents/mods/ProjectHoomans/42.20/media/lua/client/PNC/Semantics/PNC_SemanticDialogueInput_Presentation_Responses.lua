@@ -39,6 +39,9 @@ local function semanticTranslationKey(response)
         end
         return "UI_PNC_Conversation_Semantic_QuestionIdentity"
     end
+    if templateID == "semantic.question.identity.known" then
+        return "UI_PNC_Conversation_Semantic_QuestionIdentityKnown"
+    end
     if templateID == "semantic.question.backstory.known" then
         local args = response and response.args
         return BACKSTORY_KINDS[args and args.kind]

@@ -162,9 +162,26 @@ function Style.Resolve(source)
         provenance.personality[#provenance.personality + 1] = "social_style_withdrawn"
     end
 
-    add(values, "warmth", (normalizedSigned(relationship.approval) - 0.5) * 0.28)
-    add(values, "deference", (normalizedSigned(relationship.respect) - 0.5) * 0.18)
+    local approval = normalizedSigned(relationship.approval)
+    local respect = normalizedSigned(relationship.respect)
+    add(values, "warmth", (approval - 0.5) * 0.28)
+    add(values, "deference", (respect - 0.5) * 0.18)
     add(values, "openness", (number(relationship.familiarity, 0) / 100 - 0.5) * 0.28)
+    -- Standing can remain unknown while raw approval/respect are already
+    -- strongly negative. Preserve that signal for speech tone instead of
+    -- making the NPC sound neutral until the familiarity threshold is met.
+    local negativeApproval = math.max(0, 0.5 - approval)
+    local negativeRespect = math.max(0, 0.5 - respect)
+    if negativeApproval > 0 or negativeRespect > 0 then
+        add(values, "hostility", negativeApproval * 0.46
+            + negativeRespect * 0.28)
+        add(values, "directness", negativeApproval * 0.18
+            + negativeRespect * 0.12)
+        add(values, "openness", -negativeApproval * 0.12
+            - negativeRespect * 0.08)
+        provenance.relationship[#provenance.relationship + 1] =
+            "negative_standing_pressure"
+    end
     if relationship.state == "friend" then
         add(values, "warmth", 0.12)
         add(values, "openness", 0.10)

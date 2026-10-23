@@ -354,6 +354,10 @@ local function simulationControlCatalog(context, payload)
     })
     add("runtime.llmEnabled", "runtime.llmEnabled", "Runtime", "Integrations", "LLM bridge enabled", "boolean", "boolean")
     add("runtime.providerAvailable", "runtime.providerAvailable", "Runtime", "Integrations", "LLM provider available", "boolean", "boolean")
+    add("runtime.semanticDialogueEnabled", "runtime.semanticDialogueEnabled", "Runtime", "Worker", "Semantic dialogue enabled", "boolean", "boolean", {
+        workbench = true, workbenchPanel = "World", workbenchTab = "Overview",
+        workbenchSection = "Context",
+    })
     add("runtime.DTHoomans", "runtime.availableMods.DTHoomans", "Runtime", "Integrations", "Dynamic Trading adapter enabled", "boolean", "boolean", {
         workbench = true, workbenchPanel = "World", workbenchTab = "Overview",
         workbenchSection = "Context",

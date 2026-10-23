@@ -60,6 +60,9 @@ def apply_npc_profile(scenario: dict[str, Any], selected: str) -> dict[str, Any]
     npc["recruited"] = selected == "companion"
     npc["followState"] = {"mode": "idle"}
     npc["hostility"] = {"attackPlayers": False}
+    # Owned/recruited colonists have already been identified by the player.
+    # Keep this canonical fact aligned with the native actor path.
+    npc["identityState"] = "known" if selected == "companion" else "unknown"
 
     if selected == "companion":
         npc["activeBehavior"] = "idle"

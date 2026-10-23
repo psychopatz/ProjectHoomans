@@ -6,6 +6,8 @@
 -- into an IR and send it through the existing DialogueInput boundary.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+local DialogueRuntime = PNC.Semantics.SemanticDialogueRuntime
+    or require "PNC/Semantics/PNC_SemanticDialogueRuntime"
 
 local Suggestions = PNC.Semantics.DialogueSuggestions or {}
 PNC.Semantics.DialogueSuggestions = Suggestions
@@ -19,6 +21,8 @@ local ActorConversationContext = PNC.Semantics.ActorConversationContext
     or require "PNC/Semantics/PNC_ActorConversationContext"
 local ChoiceRanking = PNC.Semantics.DialogueChoiceRanking
     or require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_Ranking"
+local Identity = PNC.Identity
+    or require "PNC/Core/Identity/PNC_Identity"
 
 Suggestions.VERSION = 1
 Suggestions.ROOT_GROUP_ID = "conversation_landing"
@@ -1672,7 +1676,9 @@ local function groupPresentation(id, topic)
     return { id = id, label = id }
 end
 
-local function buildGroups(candidates, capabilities, currentTopic, revision)
+local function buildGroups(
+    candidates, capabilities, currentTopic, revision, context
+)
     local groups = {}
     local byID = {}
     local function ensure(id, topic)
@@ -1752,7 +1758,9 @@ local function buildGroups(candidates, capabilities, currentTopic, revision)
             and group.allowBack ~= false
             and Suggestions.BuildBackFrame
         then
-            local frame = Suggestions.BuildBackFrame(revision, group.id)
+            local frame = Suggestions.BuildBackFrame(
+                revision, group.id, context
+            )
             if frame then
                 group.navigation[#group.navigation + 1] = {
                     id = frame.candidateID,
@@ -1867,19 +1875,42 @@ function Suggestions.IsShortcutFrame(frame)
         and tonumber(frame.requestRevision) ~= nil
 end
 
-function Suggestions.BuildBackFrame(revision, fromGroupID)
+function Suggestions.BuildBackFrame(revision, fromGroupID, context)
     fromGroupID = tostring(fromGroupID or "")
     if fromGroupID == "" then return nil end
     local labelKey =
         "UI_PNC_Conversation_Suggestion_TalkSomethingElse_Label"
     local label = resolvedText(labelKey, "Let's talk something else")
+    context = type(context) == "table" and context or {}
+    local seed = context.saveSeed
+        or context.playerIdentitySeed
+        or context.npcID
+        or "semantic_navigation"
+    local replies = {
+        "Let's talk about something else.",
+        "Maybe we should change the subject.",
+        "There's something else I wanted to discuss.",
+    }
+    local reply = replies[Identity.Index(
+        seed,
+        table.concat({
+            "semantic_back_reply",
+            tostring(context.playerIdentitySeed or "player"),
+            tostring(context.npcID or "npc"),
+            fromGroupID,
+        }, ":"),
+        #replies
+    )]
     return {
         schemaVersion = Suggestions.VERSION,
         kind = "semantic_back_click_frame",
         candidateID = "semantic.back_to_root:" .. fromGroupID,
         groupID = Suggestions.ROOT_GROUP_ID,
         fromGroupID = fromGroupID,
-        textFallback = label,
+        utterance = reply,
+        textFallback = reply,
+        playerReply = true,
+        navigationReply = true,
         labelKey = labelKey,
         labelFallback = label,
         requestRevision = tonumber(revision) or 0,
@@ -1936,6 +1967,28 @@ function Suggestions.IsConversationRootChoiceFrame(frame)
 end
 
 function Suggestions.Build(result, context, messages)
+    if not DialogueRuntime.IsEnabled() then
+        return {
+            schemaVersion = Suggestions.VERSION,
+            kind = "semantic_dialogue_suggestions",
+            revision = 0,
+            turnID = 0,
+            candidates = {},
+            sources = {},
+            permittedCapabilities = {},
+            groups = {},
+            currentTopic = nil,
+            currentGroupID = nil,
+            rootGroupID = nil,
+            allowBack = false,
+            predicateTrace = {},
+            trace = {{
+                source = "semantic_runtime",
+                status = "disabled",
+                reason = "semantic_dialogue_disabled",
+            }},
+        }
+    end
     result = type(result) == "table" and result or {}
     context = type(context) == "table" and context or {}
     local revision, turnID = revisionFor(result)
@@ -2214,7 +2267,7 @@ function Suggestions.Build(result, context, messages)
     )
     candidates = orderedCandidates
     local groups, currentGroupID, rootGroupID = buildGroups(
-        candidates, capabilities, currentTopic, revision
+        candidates, capabilities, currentTopic, revision, context
     )
 
     return {

@@ -2415,7 +2415,10 @@ class SemanticHarnessApp:
         def operation(worker: LuaSemanticWorker) -> dict[str, Any]:
             configured = worker.configure(updated)
             if not replay:
-                return {"configured": configured}
+                # CONFIG resets the production conversation view. Fetch that
+                # same view once so automatic edits cannot leave stale
+                # suggestions, graph nodes, or projection text on screen.
+                return {"configured": configured, "snapshot": worker.snapshot()}
             step_results: list[dict[str, Any]] = []
             for step in steps:
                 response = self._replay_step(worker, step)
@@ -2438,7 +2441,8 @@ class SemanticHarnessApp:
             )
             self.scenario = effective_scenario
             configured = result.get("configured") or {}
-            self._update_simulation_projection(configured)
+            rendered_state = final_snapshot if isinstance(final_snapshot, dict) else configured
+            self._update_simulation_projection(rendered_state)
             self._sync_workbench_from_scenario(effective_scenario)
             if replay:
                 response = {}
@@ -2473,6 +2477,15 @@ class SemanticHarnessApp:
                         )
                         self.last_test_utterance = text
                         self._append("PLAYER", text)
+                    elif frame_kind == "semantic_back_click_frame":
+                        for message in step_response.get(
+                            "transcriptMessages", []
+                        ):
+                            if message.get("speaker") == "player":
+                                self._append(
+                                    "PLAYER",
+                                    str(message.get("value") or ""),
+                                )
                     for message in step_response.get("messages", []):
                         if message.get("speaker") == "npc":
                             self._append("NPC", npc_message_text(message))
@@ -2488,19 +2501,22 @@ class SemanticHarnessApp:
                     "Applied and replayed through the Lua worker."
                 )
             else:
-                response = configured
-                if automatic:
-                    self._update_simulation_projection(response)
-                    self._refresh_workbench_feedback(
-                        "Auto-applied staged changes through the Lua worker."
-                    )
-                else:
-                    self._show_response(response)
-                    self._append(
-                        "SYSTEM",
-                        "Applied simulation workbench settings to the Lua worker.",
-                    )
-                    self._refresh_workbench_feedback("Applied to the Lua worker.")
+                response = rendered_state
+                # The worker reset is authoritative, so clear the old visual
+                # conversation and render the returned production snapshot.
+                self._set_text(self.transcript, "")
+                self._show_response(response)
+                message = (
+                    "Auto-applied staged changes through the Lua worker."
+                    if automatic
+                    else "Applied simulation workbench settings to the Lua worker."
+                )
+                self._append("SYSTEM", message)
+                self._refresh_workbench_feedback(
+                    "Auto-applied staged changes through the Lua worker."
+                    if automatic
+                    else "Applied to the Lua worker."
+                )
             self.activity_log.record(
                 "ui",
                 "apply_completed",
@@ -2589,14 +2605,10 @@ class SemanticHarnessApp:
     def _on_relationship_slider_changed(self, *_args: Any) -> None:
         if self.closed or not self.worker_ready or self.busy:
             return
-        if self._relationship_preview_after is not None:
-            try:
-                self.root.after_cancel(self._relationship_preview_after)
-            except self._tk.TclError:
-                pass
-        self._relationship_preview_after = self.root.after(
-            140, self._request_relationship_preview
-        )
+        # The field dirty callback already coalesces this edit into the one
+        # production CONFIG boundary. A second preview request used to race
+        # that CONFIG and made slider edits look stale while adding latency.
+        self._schedule_workbench_auto_apply()
         if self.auto_replay_var is not None and self.auto_replay_var.get():
             if self._auto_replay_after is not None:
                 try:

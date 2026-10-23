@@ -10,12 +10,50 @@ local Response = PNC.Semantics.LocalResponse or {}
 PNC.Semantics.LocalResponse = Response
 
 Response.VERSION = 1
+Response.Internal = Response.Internal or {}
 local Catalog = PNC.Semantics.ResponseCatalog
 if type(Catalog) ~= "table" then
     local loaded = require
         "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
     Catalog = type(loaded) == "table" and loaded or nil
 end
+
+local function identityKnown(context)
+    context = type(context) == "table" and context or {}
+    if context.identityState == "known"
+        or context.identityKnown == true
+    then
+        return true
+    end
+    local actor = type(context.actorConversationContext) == "table"
+        and context.actorConversationContext or {}
+    local identity = type(actor.identity) == "table"
+        and actor.identity or {}
+    if identity.state == "known" then return true end
+    local roles = type(actor.roles) == "table" and actor.roles or {}
+    if roles.companion == true and roles.owned == true
+        and roles.authorityEligible == true
+    then
+        return true
+    end
+    local authority = type(context.actorAuthority) == "table"
+        and context.actorAuthority or {}
+    if authority.companion == true and authority.owned == true
+        and authority.eligible == true
+    then
+        return true
+    end
+    local clientState = PNC.Network and PNC.Network.ClientState or nil
+    local presentations = clientState and clientState.npcPresentations
+        or nil
+    local presentation = presentations
+        and presentations[tostring(context.npcID or "")] or nil
+    return type(presentation) == "table"
+        and (presentation.state == "known"
+            or presentation.canAskName == false)
+end
+
+Response.Internal.IdentityKnown = identityKnown
 local ResponsePlan = PNC.Semantics.ResponsePlan
 if type(ResponsePlan) ~= "table" then
     local loaded = require

@@ -52,6 +52,20 @@ function Response.ResolveFlow(ir, state, context, flow)
     end
     local poolID = tostring(flow.responsePool or "")
     if poolID == "" then return nil, "flow_response_pool_unavailable" end
+    if poolID == "semantic.question.identity"
+        and Internal.IdentityKnown(context)
+        and type(resolveQuestion) == "function"
+    then
+        local knownResponse = resolveQuestion(
+            ir, state, context
+        )
+        if type(knownResponse) == "table" then
+            knownResponse.selectionSource = "flow"
+            knownResponse.sourceFlowID = flow.flowId
+            knownResponse.flowTransition = flow.transition
+            return knownResponse
+        end
+    end
     local response = catalogResponse(poolID, ir, state, context)
     if type(response) ~= "table" then
         return nil, "flow_response_variant_unavailable"

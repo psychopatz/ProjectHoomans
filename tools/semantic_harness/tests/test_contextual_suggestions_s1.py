@@ -40,7 +40,10 @@ class ContextualSuggestionsS1Tests(unittest.TestCase):
 
         for candidate in first_suggestions["candidates"]:
             frame = candidate["frame"]
-            self.assertEqual(frame["kind"], "semantic_click_frame")
+            self.assertIn(
+                frame["kind"],
+                {"semantic_click_frame", "semantic_shortcut_frame"},
+            )
             self.assertNotIn("callback", frame)
             self.assertNotIn("action", frame)
 

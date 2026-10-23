@@ -42,4 +42,25 @@ function Builders.bondPhraseFamily(prefix, neutral, warm, terse, guarded)
     return family
 end
 
+function Builders.identityKnownFamily()
+    return {
+        neutral = {
+            key = "UI_PNC_Conversation_Semantic_QuestionIdentityKnown",
+            fallback = "I'm %s. We already know each other.",
+        },
+        warm = {
+            key = "UI_PNC_Conversation_Semantic_QuestionIdentityKnownWarm",
+            fallback = "I'm %s. Good to see you again.",
+        },
+        terse = {
+            key = "UI_PNC_Conversation_Semantic_QuestionIdentityKnownTerse",
+            fallback = "You know me. I'm %s.",
+        },
+        guarded = {
+            key = "UI_PNC_Conversation_Semantic_QuestionIdentityKnownGuarded",
+            fallback = "I'm %s. You should already know that.",
+        },
+    }
+end
+
 return Builders

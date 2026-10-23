@@ -80,10 +80,15 @@ local function resolveIdentityQuestion(ir, state, context)
         )
         if response then return response end
         text = "I don't share my name with liars. What's yours, truthfully?"
-    elseif context and context.identityState == "known"
-        and context.identityClaimVerified == true
+    elseif Internal.IdentityKnown(context)
     then
-        text = identityText(context) .. " What's your name?"
+        return {
+            templateID = "semantic.question.identity.known",
+            fallback = identityText(context) .. " We already know each other.",
+            args = copyArgs({
+                npcName = context.npcFullName or context.npcName,
+            }),
+        }
     else
         local response = catalogResponse(
             "semantic.question.identity", ir, state, context

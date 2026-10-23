@@ -3,6 +3,8 @@
 local RuntimeEnvironment = require "worker/RuntimeEnvironment"
 local SemanticAdapters = require "worker/SemanticAdapters"
 local InventoryFixtures = require "worker/InventoryFixtures"
+local SemanticDialogueRuntime = require
+    "PNC/Semantics/PNC_SemanticDialogueRuntime"
 
 local ScenarioSession = {}
 
@@ -141,7 +143,13 @@ ScenarioSession.initialScenario = {
         zombieKills = 0,
     },
     conversation = { topic = "greeting", token = "harness-lease" },
-    runtime = { mode = "singleplayer", language = "EN", llmEnabled = false, providerAvailable = false },
+    runtime = {
+        mode = "singleplayer",
+        language = "EN",
+        llmEnabled = false,
+        providerAvailable = false,
+        semanticDialogueEnabled = true,
+    },
 }
 
 function ScenarioSession.configureRuntime(context)
@@ -157,6 +165,9 @@ function ScenarioSession.reset(context, scenario)
     context.RuntimeState.resetContainers(Runtime)
     ScenarioSession.configureRuntime(context)
     local runtime = scenario.runtime or {}
+    SemanticDialogueRuntime.SetHarnessOverride(
+        runtime.semanticDialogueEnabled ~= false
+    )
     if context.ProductionModules
         and type(context.ProductionModules.loadOptional) == "function"
     then
@@ -191,16 +202,30 @@ function ScenarioSession.reset(context, scenario)
     context.Translations.setLanguage(
         context, context.Translations.scenarioLanguage(context)
     )
-    -- Native Talk seeds the client presentation snapshot before it builds the
-    -- definition. The headless adapter must establish the same transport
-    -- state so production identity menu options are present on the first
-    -- opening projection.
-    local clientState = PNC.Network and PNC.Network.ClientState or nil
+    PNC.Network.ClientState.conversationRelationships = {}
+    PNC.Network.ClientState.pendingSemanticIdentity = {}
+    PNC.Network.ClientState.identityTrust = {}
+    PNC.Network.ClientState.semanticIdentityResults = {}
+    PNC.Network.ClientState.semanticQuestResults = {}
+    PNC.Network.ClientState.semanticQuestResultOrder = {}
+    PNC.Network.ClientState.npcPresentations = {}
+    PNC.Network.ClientState.pendingDisclosure = {}
+    PNC.Network.ClientState.npcKnowledge = {}
     local npc = scenario.npc or {}
+    -- Native Talk seeds this client presentation after the adapter reset.
+    -- Seeding before the reset made owned companions look like strangers.
+    local clientState = PNC.Network and PNC.Network.ClientState or nil
     local npcID = tostring(npc.npcID or npc.id or "")
     if clientState and npcID ~= "" then
         clientState.npcPresentations = clientState.npcPresentations or {}
+        local authority = type(npc.actorAuthority) == "table"
+            and npc.actorAuthority or {}
+        local owned = authority.owned == true or npc.ownedByPlayer == true
+        local recruited = npc.recruited == true
         local identityState = tostring(npc.identityState or "unknown")
+        if identityState ~= "known" and owned and recruited then
+            identityState = "known"
+        end
         clientState.npcPresentations[npcID] = {
             npcID = npcID,
             state = identityState,
@@ -215,16 +240,6 @@ function ScenarioSession.reset(context, scenario)
         -- context-recording path remains observable in headless tests.
         PsychopatzCore.Conversation.instance = Runtime.view
     end
-    PNC.Network.ClientState.conversationRelationships = {}
-    PNC.Network.ClientState.pendingSemanticIdentity = {}
-    PNC.Network.ClientState.identityTrust = {}
-    PNC.Network.ClientState.semanticIdentityResults = {}
-    PNC.Network.ClientState.semanticQuestResults = {}
-    PNC.Network.ClientState.semanticQuestResultOrder = {}
-    PNC.Network.ClientState.npcPresentations = {}
-    PNC.Network.ClientState.pendingDisclosure = {}
-    PNC.Network.ClientState.npcKnowledge = {}
-    local npc = scenario.npc or {}
     PNC.Network.ClientState.conversationRelationships[npc.npcID] =
         context.Conversation.relationshipSnapshot(context)
     PNC.Network.ClientState.characterPayloads[npc.npcID] = {
