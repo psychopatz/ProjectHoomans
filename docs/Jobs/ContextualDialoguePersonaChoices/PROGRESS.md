@@ -1,8 +1,8 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
 **Updated:** 2026-10-24  
-**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13A complete; P13 operational usability remains mandatory.
-**Current mandatory phase:** P13B — Offline Player Engine-State Provider.
+**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13A/P13B complete; P13 operational usability remains mandatory.
+**Current mandatory phase:** P13C — Symmetric Player/NPC Actor Inspectors.
 **Current remote baseline audited:** ProjectHoomans `main` at `dbfd9099a0b687bc2f6505f58e81e32ea6dc5966`.  
 **Normal Semantic Lab runtime requirement:** Project Zomboid may remain CLOSED/OFFLINE.  
 **Source save mutation:** FORBIDDEN.  
@@ -125,7 +125,7 @@ Work on the user's existing local `main`.
    - Start Talk.
 15. Keep source save read-only and verify hash/source immutability.
 16. Run focused Python/Tk/Lua checks and `git diff --check`.
-17. Update this ledger with exact evidence and continue automatically to P13B when green.
+17. Update this ledger with exact evidence and continue automatically to P13C when green.
 
 ## P13A acceptance
 
@@ -151,7 +151,7 @@ The UI test must perform this workflow, not merely confirm controls exist.
 
 ## Ordered remaining P13 milestones
 
-- **P13B:** read-only offline Player engine-state provider, Player inventory first;
+- **P13B:** read-only offline Player engine-state provider, Player inventory first — complete;
 - **P13C:** symmetric Player/NPC actor inspectors;
 - **P13D:** faction/community workbench;
 - **P13E:** inventory/gift verification workbench;
@@ -183,3 +183,57 @@ This does not replace final user-owned native Project Zomboid acceptance. It mak
 Do not report **READY FOR USER LIVE TEST** merely because backend save import or fixture tests pass.
 
 P13G operational acceptance must pass first.
+
+## P13B — Offline Player Engine-State Provider — COMPLETE
+
+Implemented on existing `main` without changing production Lua or the shared
+Core ModData decoder.
+
+- Audited the Build 42.20 engine baseline: `IsoWorld.WorldVersion = 249`,
+  `PlayerDB` stores local Players in read-only SQLite `players.db`, and
+  `localPlayers.data` contains the versioned `IsoPlayer` blob.
+- Added `OfflinePlayerEngineStateProvider` in
+  `tools/semantic_harness/runtime/player_engine_state.py`.
+- The provider is bounded, read-only, version-gated to world version `249`,
+  detects a source file changing during the read, resolves item registry IDs
+  through that save's `WorldDictionaryReadable.lua`, and fails closed with
+  `source = MISSING` for unsupported/corrupt/missing native state.
+- The projection imports native Player inventory groups with `source = SAVE`;
+  worn/equipped state remains explicitly `MISSING` until the remaining native
+  serializer tail has an independently verified projection.
+- `SaveBackedImporter` now uses native Player inventory when `players.db` is
+  present, keeps PNC inventory fallback only for synthetic/developer fixtures
+  without `players.db`, and publishes the native provider payload and
+  provenance under `ProjectZomboid`.
+
+Evidence on 2026-10-24:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_player_engine_state_p13b`:
+  `3/3` passed, including real-save inventory and unsupported-version
+  fail-closed cases.
+- Real save `/home/psychopatz/Zomboid/Saves/Apocalypse/2026-10-14_13-57-03`
+  exposed `19` native Player inventory groups; the real Lua worker imported
+  them, ran production Talk with route `full_conversation`, and the
+  `players.db` SHA-256 was unchanged.
+- `P13_STATE=$(mktemp -d); XDG_STATE_HOME="$P13_STATE" timeout 180s
+  xvfb-run -a -s '-screen 0 1440x1000x24' python3 -m unittest
+  tools.semantic_harness.tests.test_save_catalog_p12b
+  tools.semantic_harness.tests.test_save_import_p12c
+  tools.semantic_harness.tests.test_save_browser_p12d
+  tools.semantic_harness.tests.test_operational_world_browser_p13a
+  tools.semantic_harness.tests.test_player_engine_state_p13b
+  tools.semantic_harness.tests.test_save_backed_conversation_p12j`:
+  `14/14` passed.
+- `python3 -m py_compile tools/semantic_harness/runtime/*.py
+  tools/semantic_harness/tests/test_player_engine_state_p13b.py` and
+  `git diff --check` passed.
+- Existing production Lua smoke/gift/task checks remained green; no Lua files
+  changed in P13B.
+
+## Current Exact Next Chunk — P13C
+
+Build symmetric Player/NPC actor inspectors using the existing save-backed
+provider payloads and one shared actor-inventory presentation family. Keep
+unsupported native Player fields explicitly `MISSING`; do not decode or invent
+traits, needs, worn items, or equipment until their authoritative persisted
+source is proven.

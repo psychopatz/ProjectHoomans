@@ -9,6 +9,7 @@ from typing import Any
 
 from .scenario import DEFAULT_SCENARIO, merge
 from .save_catalog import SaveCatalog, SaveCatalogError, _load_core_reader
+from .player_engine_state import OfflinePlayerEngineStateProvider
 
 
 FULL_READ_MAX_DEPTH = 64
@@ -241,7 +242,42 @@ class SaveBackedImporter:
         npc_relationship, relationship_source = _saved_relationship(
             npc_record, player_entity_key
         )
-        player_inventory, player_inventory_source = _saved_inventory(player_record)
+        native_player_state = OfflinePlayerEngineStateProvider().project(
+            save_path,
+            player_uuid=selected_uuid,
+        )
+        native_save_root = save_path if save_path.is_dir() else save_path.parent
+        if native_player_state.get("available"):
+            player_inventory = deepcopy(native_player_state["inventory"])
+            player_inventory_source = "SAVE"
+            player_inventory_provenance = deepcopy(
+                native_player_state.get("provenance") or {}
+            )
+        elif (native_save_root / "players.db").is_file():
+            # A native database exists but was not safely understood.  Do not
+            # fall back to the Hoomans identity/social registry as physical
+            # Player inventory authority.
+            player_inventory = _empty_inventory()
+            player_inventory_source = "MISSING"
+            player_inventory_provenance = {
+                "source": "MISSING",
+                "table": "players.db.localPlayers",
+                "recordKey": selected_uuid,
+                "reason": native_player_state.get("reason")
+                or "native_player_state_unavailable",
+            }
+        else:
+            # Compatibility for synthetic/developer fixtures which contain no
+            # native players.db.  Real save-backed imports take the branch
+            # above whenever the native database is present.
+            player_inventory, player_inventory_source = _saved_inventory(
+                player_record
+            )
+            player_inventory_provenance = {
+                "source": player_inventory_source,
+                "table": player_table,
+                "recordKey": selected_uuid,
+            }
         npc_inventory, npc_inventory_source = _saved_inventory(npc_record)
         actor_projection = _saved_actor_projection(
             npc_record, player_entity_key
@@ -380,8 +416,7 @@ class SaveBackedImporter:
                 "npc.needs": {"source": "FIXTURE"},
                 "player.inventory": {
                     "source": player_inventory_source,
-                    "table": player_table,
-                    "recordKey": selected_uuid,
+                    **player_inventory_provenance,
                 },
                 "npc.inventory": {
                     "source": npc_inventory_source,
@@ -407,6 +442,7 @@ class SaveBackedImporter:
                     else None
                 ),
             },
+            "ProjectZomboid": native_player_state,
             "selection": {
                 "playerEntityKey": player_entity_key,
                 "relationshipKey": player_entity_key,
