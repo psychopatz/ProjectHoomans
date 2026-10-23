@@ -155,4 +155,14 @@ Completed locally on ProjectHoomans `main` and psychopatzCore `main`.
 - Starting Companion family construction passes the authored player's surname into the identity factory for `mother`, `father`, `sister`, and `brother`; the existing persisted-record repair path remains in place.
 - Focused evidence: Core deterministic content smoke **PASS**; Hoomans deterministic identity smoke **PASS** including surname-only and first-name-only overrides; Starting Companion and family appearance smoke **PASS**; changed Lua `luac5.3 -p` **PASS**; targeted Kahlua verification **PASS**.
 
-**Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate identity choices through the real Tk/Xvfb Semantic Lab surface before native Project Zomboid validation.
+## P11I follow-up — identity lie choice harness parity
+
+Completed locally on ProjectHoomans `main`.
+
+- The identity lie choice continues through the generated alias in its canonical `SemanticIdentityRequest`; it no longer relies on a generic acknowledgement path.
+- The false-name response is restored to the former concise disbelief behavior: `I don't believe you.` with the matching TL catalog entry.
+- Focused worker regression: **11/11 passed**, including generated-alias request payload, server rejection, trust consequence, and cleared pending exchange.
+- Real Tk/Xvfb regression: **7/7 passed**, including clicking the visible `identity.choice.lie_name` row and verifying the rendered NPC response.
+- EN/TL response JSON parsing and `git diff --check`: **PASS**.
+
+**Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.

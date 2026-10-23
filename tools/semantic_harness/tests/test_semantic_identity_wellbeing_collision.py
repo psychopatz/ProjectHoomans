@@ -185,7 +185,29 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         self.assertEqual(turn["relationshipAfter"]["identityTrust"], "untrustworthy")
         self.assertEqual(turn["relationshipAfter"]["approval"], -4)
         self.assertEqual(turn["relationshipAfter"]["respect"], -6)
-        self.assertIn("isn't your exact name", self.message_text(turn))
+        self.assertEqual(self.message_text(turn), "I don't believe you.")
+        self.assertIsNone(self.pending_exchange(turn))
+
+    def test_lie_choice_submits_generated_alias_and_uses_disbelief_response(self) -> None:
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            turn = worker.input("who are you")
+            lie = next(
+                candidate
+                for candidate in turn["observation"]["suggestions"]["candidates"]
+                if candidate["id"] == "identity.choice.lie_name"
+            )
+            alias = lie["frame"]["slots"]["identityClaim"]["name"]
+            turn = worker.suggestion_click(lie["frame"])
+
+        requests = self.identity_requests(turn, "identity_claim")
+        self.assertEqual(len(requests), 1)
+        self.assertEqual(requests[0]["payload"]["claimedName"], alias)
+        self.assertEqual(
+            turn["result"]["decision"]["branch"],
+            "IDENTITY_CLAIM_RECEIVED",
+        )
+        self.assertEqual(turn["relationshipAfter"]["identityTrust"], "untrustworthy")
+        self.assertEqual(self.message_text(turn), "I don't believe you.")
         self.assertIsNone(self.pending_exchange(turn))
 
     def test_explicit_refusal_remains_identity_evasion(self) -> None:

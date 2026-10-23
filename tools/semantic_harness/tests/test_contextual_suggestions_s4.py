@@ -151,6 +151,51 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             del root
             gc.collect()
 
+    def test_identity_lie_choice_reaches_authoritative_worker(self) -> None:
+        if not os.environ.get("DISPLAY"):
+            self.skipTest("Tk display is unavailable")
+
+        root = tk.Tk()
+        app = SemanticHarnessApp(root, _parser().parse_args([]))
+
+        def wait_until(predicate: object, timeout: float = 10.0) -> None:
+            deadline = time.monotonic() + timeout
+            while not predicate() and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertTrue(predicate())
+
+        try:
+            wait_until(lambda: app.worker_ready)
+            app.main_tabs.select(app.simulation_tab)
+            app.input_var.set("who are you")
+            app.submit()
+            wait_until(
+                lambda: not app.busy
+                and any(
+                    row.get("id") == "identity.choice.lie_name"
+                    for row in app.suggestion_rows
+                )
+            )
+
+            lie_index = next(
+                index
+                for index, row in enumerate(app.suggestion_rows)
+                if row.get("id") == "identity.choice.lie_name"
+            )
+            app.click_suggestion(lie_index)
+            wait_until(lambda: not app.busy)
+
+            transcript = app.transcript.get("1.0", "end")
+            self.assertIn("PLAYER: I'll go by ", transcript)
+            self.assertIn("NPC: I don't believe you.", transcript)
+            self.assertNotIn("NPC: Understood.", transcript)
+        finally:
+            app.close()
+            del app
+            del root
+            gc.collect()
+
     def test_whats_up_gui_activates_hub_without_a_conversation_graph(self) -> None:
         if not os.environ.get("DISPLAY"):
             self.skipTest("Tk display unavailable")
