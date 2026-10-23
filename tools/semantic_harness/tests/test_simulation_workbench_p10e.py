@@ -42,6 +42,24 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             self.assertTrue(rows[control_id].get("workbench"), control_id)
             self.assertTrue(rows[control_id].get("workbenchSection"), control_id)
         self.assertEqual(rows["relationship.state"]["control"], "read_only")
+        for control_id in (
+            "world.timeOfDay",
+            "world.worldAgeHours",
+            "world.zombieKills",
+            "world.weather",
+            "world.weatherTransition",
+        ):
+            self.assertTrue(rows[control_id].get("workbench"), control_id)
+            self.assertEqual(rows[control_id].get("workbenchPanel"), "World")
+        for control_id in (
+            "world.hunger",
+            "world.thirst",
+            "world.fatigue",
+            "world.stress",
+            "world.boredom",
+            "world.panic",
+        ):
+            self.assertIs(rows[control_id].get("settingsVisible"), False, control_id)
 
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_tk_workbench_applies_and_replays_latest_hub_utterance(self) -> None:
@@ -67,6 +85,16 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             self.assertIsInstance(fields["persona.personality.compassion"].widget, tk.Scale)
             self.assertIsInstance(app.language_box, ttk.Combobox)
             self.assertEqual(fields["relationship.state"].kind, "read_only")
+
+            app.open_runtime_settings()
+            root.update()
+            self.assertIsNotNone(app.settings_window)
+            self.assertIn("npc.inventory", app.settings_control_fields)
+            self.assertNotIn("npc.needs.hunger", app.settings_control_fields)
+            self.assertNotIn("world.timeOfDay", app.settings_control_fields)
+            app.settings_window.destroy()
+            app.settings_window = None
+            app.settings_control_fields = {}
 
             app.input_var.set("What's up?")
             app.submit()

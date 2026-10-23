@@ -391,3 +391,20 @@ Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
 ## Current Exact Next Chunk — settings ownership cleanup
 
 Remove ordinary actor/world controls from the duplicate Simulation Settings dialog, retain uncommon/advanced controls there, and expose time/world facts in the main World workbench panel. Keep the same catalog and worker configuration path so GUI and CLI remain one system.
+
+## Settings ownership cleanup
+
+The simulation catalog now marks time and world facts as World workbench controls. Legacy `world.*` need fields are explicitly hidden from ordinary settings because actor-owned Player/NPC needs are the supported editor path; legacy scenario compatibility remains in the worker and Advanced JSON. The settings dialog now filters out workbench-owned controls by default and retains non-workbench inventories, runtime/integration state, identity/bond diagnostics, and advanced controls. An explicit `settingsVisible=true` catalog row can still appear in both surfaces when an uncommon diagnostic needs it.
+
+Evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_simulation_workbench_p10e.SimulationWorkbenchP10ETests -v` — **2/2 PASS**, including real Tk settings inspection;
+- `luac5.3 -p tools/semantic_harness/lua/worker/CommandRouter.lua` — PASS;
+- `python3 -m py_compile` on changed settings/test files — PASS;
+- `git diff --check` — PASS.
+
+Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
+
+## Current Exact Next Chunk — replay as a real macro
+
+Separate Apply + replay from ordinary auto-apply. Make replay clear the current conversation projection, execute a recorded sequence through the same worker operations, and display each step and resulting variation in order. Keep one-step Apply free of replay side effects.

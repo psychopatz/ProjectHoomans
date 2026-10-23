@@ -359,7 +359,12 @@ def collect_scenario_settings(
 
 
 def open_runtime_settings(host: SettingsDialogHost) -> None:
-    """Render the bounded worker catalog as ordinary typed simulation controls."""
+    """Render uncommon and advanced controls from the worker catalog.
+
+    Controls owned by the actor-centric Simulation workbench stay in their
+    primary panel. A catalog row may explicitly opt into both surfaces with
+    ``settingsVisible=True`` when a diagnostic or advanced workflow needs it.
+    """
 
     if not host.worker_ready or host.busy:
         return
@@ -384,6 +389,14 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
         control for control in controls[:96]
         if isinstance(control, dict) and control.get("id")
     ]
+
+    def settings_visible(control: dict[str, Any]) -> bool:
+        if control.get("settingsVisible") is False:
+            return False
+        return not (
+            control.get("workbench") is True
+            and control.get("settingsVisible") is not True
+        )
 
     dialog = tk.Toplevel(host.root)
     host.settings_window = dialog
@@ -485,7 +498,7 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
         return value
 
     for control in controls:
-        if control.get("settingsVisible", True) is False:
+        if not settings_visible(control):
             continue
         control_id = str(control["id"])
         page_title = str(control.get("page") or "Simulation")
@@ -544,7 +557,7 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
     def collect() -> dict[str, Any]:
         values: dict[str, Any] = {}
         for control in controls:
-            if control.get("settingsVisible", True) is False:
+            if not settings_visible(control):
                 continue
             control_id = str(control["id"])
             widget_kind = str(control.get("control") or "text")

@@ -365,6 +365,7 @@ local function simulationControlCatalog(context, payload)
         add("world." .. key, "world." .. key, "World", "Needs", title, "slider", "number", {
             min = 0, max = 1, step = 0.05, format = "%.2f",
             legacy = true,
+            settingsVisible = false,
             description = "Legacy world fallback for older scenarios; edit the owning actor field instead.",
         })
     end
@@ -387,19 +388,29 @@ local function simulationControlCatalog(context, payload)
     addActorNeeds("npc", "NPC", "NPC Target")
     add("world.timeOfDay", "world.timeOfDay", "World", "Time", "Time of day", "slider", "number", {
         min = 0, max = 24, step = 0.25, format = "%.2f",
+        workbench = true, workbenchPanel = "World", workbenchTab = "Overview",
+        workbenchSection = "Time",
     })
     add("world.worldAgeHours", "world.worldAgeHours", "World", "Time", "World age (hours)", "spinbox", "number", {
         min = 0, max = 1000000, step = 0.5, format = "%.1f",
+        workbench = true, workbenchPanel = "World", workbenchTab = "Overview",
+        workbenchSection = "Time",
     })
     add("world.zombieKills", "world.zombieKills", "World", "World facts", "Zombie kills", "integer", "integer", {
         min = 0, max = 1000000, step = 1,
+        workbench = true, workbenchPanel = "World", workbenchTab = "Overview",
+        workbenchSection = "World facts",
     })
     add("world.weather", "world.weather", "World", "World facts", "Weather", "combobox", "enum", {
         options = { "clear", "rain", "fog", "snow" },
         optionsSource = "semantic_lab.harness",
+        workbench = true, workbenchPanel = "World", workbenchTab = "Overview",
+        workbenchSection = "World facts",
     })
     add("world.weatherTransition", "world.weatherTransition", "World", "World facts", "Weather transition", "text", "text", {
         emptyToNull = true,
+        workbench = true, workbenchPanel = "World", workbenchTab = "Overview",
+        workbenchSection = "World facts",
     })
 
     add("player.characterUUID", "player.characterUUID", "Actors", "Player", "Player ID", "text", "text", {
