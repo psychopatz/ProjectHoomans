@@ -1,10 +1,16 @@
 # P11J — Native Talk Parity
 
-**Status:** PARTIALLY IMPLEMENTED / REOPENED FOR NATIVE SHARED-ENTRY PARITY  
+**Status:** RETAINED FOUNDATION / superseded as active phase by P12  
 **Opened from audit:** 2026-10-23  
 **Current remote baseline audited:** ProjectHoomans `main` at `c9385c4f2b1b86feb09ed24144896e473bd6fec8`.  
 **Existing P11J implementation commit:** `b0a4850b6d9082cc5cc9909832a6277c3999356e`.  
 **Native Project Zomboid SP/MP:** user-owned and not required for developer-side code acceptance.
+
+## P12 supersession note
+
+The shared Talk-start projection, target catalog, Talk matrix and subsequent landing/navigation fixes are retained foundation.
+
+P12 is now the active Semantic Lab architecture because state origin—not Talk routing—is the larger remaining parity problem. Do not replay P11J2-P11J4 unless a P12 regression proves the shared Talk boundary is broken.
 
 ## Goal
 
