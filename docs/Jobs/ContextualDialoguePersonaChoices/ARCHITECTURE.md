@@ -801,3 +801,60 @@ It may enrich a copied snapshot with transient engine values, but it may not acc
 The harness must install the real saved directed relationship record into the isolated NPC/social record and use production relationship services for mutations.
 
 SemanticAdapters must not duplicate friend-promotion, bond, proposal or relationship-state policy once P12C replaces the fixture path.
+
+
+## 37. Operational World Browser boundary
+
+The P12 save catalog/browser/import/provider stack remains the state authority.
+
+P13 may add hierarchy/search/navigation projections for factions, communities and actors, but must not create a second save-state owner.
+
+Tk renders the projected hierarchy; it does not infer faction/community membership independently.
+
+## 38. Player engine-state provider boundary
+
+`PNC_PlayerCharacters` remains the Project Hoomans Player identity/social registry.
+
+Native Project Zomboid Player physical state such as inventory belongs to the engine save/runtime source, not to `PNC_PlayerCharacters`.
+
+Any offline Player engine-state provider must therefore:
+
+- verify the current Build 42.20 persisted format;
+- remain read-only;
+- be version-gated and bounded;
+- use authoritative saved item/type mapping where required;
+- fail closed with MISSING provenance when unsupported.
+
+Do not merge native Player inventory ownership into the Hoomans identity registry.
+
+## 39. Symmetric actor presentation
+
+Semantic Lab should present Player and NPC Target as parallel actor surfaces while preserving their different authorities.
+
+A reusable actor-inventory presentation component may render either actor's normalized inventory projection.
+
+Presentation reuse does not imply shared persistence ownership.
+
+## 40. Gift verification authority
+
+The operational gift workbench is presentation/orchestration only.
+
+The gift action remains:
+
+```text
+selected normalized item
+ -> existing semantic/gift request
+ -> production inventory authority
+ -> production gift result
+ -> relationship/social reaction
+```
+
+No Tk or Python presentation layer may directly perform gameplay transfer as acceptance.
+
+## 41. GUI/CLI parity
+
+GUI and agent/CLI workflows must consume the same save-backed state owners and production mutation boundaries.
+
+CLI parity exists to let coding agents verify ordinary semantic behavior without screenshot-driven UI automation.
+
+Neither GUI nor CLI becomes a separate gameplay authority.
