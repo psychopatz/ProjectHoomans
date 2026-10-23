@@ -198,6 +198,33 @@ Evidence:
 The repair has not been called a native Project Zomboid verification. The native
 SP/MP conversation click path remains **UNTESTED / user-owned**.
 
+## Native no-window diagnostic follow-up
+
+Commit: `7e179f02` — `fix: trace and fall back native talk handoff`.
+
+The native context-menu Talk callback now records its entry and result through
+the existing semantic audit when enabled. `Conversation.Open` records the
+shared Talk-start projection, inline handoff result, and full-view result. If an
+optional hostile inline handoff rejects its selected target, the production
+route is changed to the existing hostile full-conversation fallback so the
+definition does not retain an inline-only route marker.
+
+The persisted debug profile is configured for this investigation:
+
+- `ProjectHoomans.SemanticDialogueAudit=true`;
+- `ProjectHoomans.NativeHandoffAudit=true`;
+- `ProjectHoomans.PerformanceDiagnostics=false`;
+- all other unrelated diagnostics remain disabled.
+
+All three settings are runtime-mutable and require the in-game Debug Settings
+`Reload File & Apply` action before reproducing the native click. A new save is
+not required for this UI and routing change.
+
+Developer evidence: `pnc_conversation_smoke.lua`,
+`pnc_semantic_dialogue_input_smoke.lua`, and
+`pnc_conversation_talk_start_projection_smoke.lua` pass; changed Lua passes
+`luac5.3 -p` and `git diff --check`.
+
 ## Current Exact Next Chunk — native user handoff
 
 The developer side is ready for the user's native Project Zomboid comparison.
