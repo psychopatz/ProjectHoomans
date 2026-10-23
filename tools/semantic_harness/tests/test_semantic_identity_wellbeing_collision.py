@@ -8,6 +8,7 @@ from pathlib import Path
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.testing.runner import load_case, run_case
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
+from tools.semantic_harness.ui.shell import semantic_suggestion_rows
 
 
 ORIGINAL_TRACE_CASE = (
@@ -142,7 +143,13 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
             turn = worker.input("who are you")
 
-        candidates = turn["observation"]["suggestions"]["candidates"]
+        suggestions = turn["observation"]["suggestions"]
+        current_group = next(
+            group
+            for group in suggestions["groups"]
+            if group["id"] == suggestions["currentGroupID"]
+        )
+        candidates = current_group["candidates"]
         self.assertEqual(
             [candidate["id"] for candidate in candidates],
             [
@@ -165,6 +172,15 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         self.assertEqual(
             candidates[2]["frame"]["extensions"]["identityClaimMode"],
             "generated",
+        )
+        self.assertEqual(
+            [row["id"] for row in semantic_suggestion_rows(suggestions)],
+            [
+                "semantic.back_to_root:topic:identity",
+                "identity.choice.real_name",
+                "identity.choice.refuse_name",
+                "identity.choice.lie_name",
+            ],
         )
         self.assertEqual(
             turn["contextAfter"]["dialogue"]["pendingIdentityExchange"],

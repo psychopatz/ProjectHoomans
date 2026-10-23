@@ -3,7 +3,54 @@ PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local Conversation = PNC.Conversation
-local Time = Conversation.Time
+
+-- Definition rebuilds can be requested by identity/knowledge result handlers
+-- before the full client composition root has completed. Load the existing
+-- owners here as a guarded composition fallback, then capture their tables.
+if type(Conversation.Time) ~= "table"
+    or type(Conversation.Time.Resolve) ~= "function"
+then
+    pcall(require, "PNC/Conversation/PNC_ConversationTime")
+end
+if type(Conversation.TextLoader) ~= "table"
+    or type(Conversation.TextLoader.EnsureSource) ~= "function"
+then
+    pcall(require, "PNC/Conversation/Blocks/PNC_ConversationTextLoader")
+end
+if type(Conversation.Backgrounds) ~= "table"
+    or type(Conversation.Backgrounds.Get) ~= "function"
+then
+    pcall(require, "PNC/Conversation/PNC_ConversationBackgrounds")
+end
+if type(Conversation.Relationship) ~= "table"
+    or type(Conversation.Relationship.GetPresentation) ~= "function"
+    or type(Conversation.Relationship.IsPresentationVisible) ~= "function"
+then
+    pcall(require, "PNC/Conversation/ConversationRelationship/PNC_ConversationRelationship")
+end
+if type(Conversation.TalkStart) ~= "table"
+    or type(Conversation.TalkStart.Project) ~= "function"
+then
+    pcall(require, "PNC/Conversation/PNC_ConversationTalkStart")
+end
+if type(Conversation.Lifecycle) ~= "table"
+    or type(Conversation.Lifecycle.Create) ~= "function"
+then
+    pcall(require, "PNC/Conversation/PNC_ConversationLifecycle")
+end
+if type(Conversation.Composer) ~= "table"
+    or type(Conversation.Composer.BuildContext) ~= "function"
+    or type(Conversation.Composer.BuildRootNode) ~= "function"
+then
+    pcall(require, "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer")
+end
+if type(PNC.NPCTypePalette) ~= "table"
+    or type(PNC.NPCTypePalette.ResolveType) ~= "function"
+    or type(PNC.NPCTypePalette.BuildConversationTheme) ~= "function"
+then
+    pcall(require, "PNC/UI/PNC_NPCTypePalette")
+end
+
 local Relationship = Conversation.Relationship
 local Lifecycle = Conversation.Lifecycle
 local Composer = Conversation.Composer
@@ -16,6 +63,22 @@ local Context = require "PNC/Conversation/Definition/PNC_ConversationDefinition_
 local ExtensionParts = require "PNC/Conversation/Definition/PNC_ConversationDefinition_ExtensionParts"
 local IdentityChoice = require "PNC/Conversation/Blocks/PNC_ConversationIdentityChoice"
 local semanticInputWarningEmitted = false
+
+if type(FlavorAddress) ~= "table"
+    or type(FlavorAddress.ResolveNPCSeed) ~= "function"
+then
+    pcall(require, "PNC/Core/Identity/PNC_FlavorAddress")
+    FlavorAddress = PNC.FlavorAddress
+end
+
+local function conversationTime()
+    local time = Conversation.Time
+    if type(time) == "table" and type(time.Resolve) == "function" then
+        return time
+    end
+    pcall(require, "PNC/Conversation/PNC_ConversationTime")
+    return Conversation.Time
+end
 
 local function warnSemanticInput(reason)
     if semanticInputWarningEmitted then return end
@@ -217,7 +280,8 @@ function Conversation.BuildDefinition(
     forcedTime,
     talkStartProjection
 )
-    local timeID = forcedTime or Time.Resolve()
+    local time = conversationTime()
+    local timeID = forcedTime or time.Resolve()
     local semanticFactory = semanticInputFactory()
     local projection = talkStartProjection
         or TalkStart.Project(entry, player, { source = "definition" })

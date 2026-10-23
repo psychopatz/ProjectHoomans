@@ -18,18 +18,24 @@ class ContextualSuggestionsFollowupTests(unittest.TestCase):
         suggestions = response["observation"]["suggestions"]
         self.assertEqual(suggestions["currentTopic"], "time")
         self.assertEqual(suggestions["currentGroupID"], "topic:time")
+        current_group = next(
+            group
+            for group in suggestions["groups"]
+            if group["id"] == suggestions["currentGroupID"]
+        )
         self.assertEqual(
-            [candidate["id"] for candidate in suggestions["candidates"]],
+            [candidate["id"] for candidate in current_group["candidates"]],
             ["question.time", "question.date"],
         )
         rows = semantic_suggestion_rows(suggestions)
         self.assertEqual([row["id"] for row in rows], [
+            "semantic.back_to_root:topic:time",
             "question.time",
             "question.date",
         ])
         self.assertEqual(
-            [group["id"] for group in suggestions["groups"]],
-            ["topic:time", "owned_actions"],
+            suggestions["rootGroupID"],
+            "conversation_landing",
         )
 
     def test_unowned_npc_has_no_discoverable_companion_actions(self) -> None:

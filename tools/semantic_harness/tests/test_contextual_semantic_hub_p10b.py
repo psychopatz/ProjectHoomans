@@ -196,8 +196,19 @@ class ContextualSemanticHubP10BTests(unittest.TestCase):
             {"approval": 90, "respect": 80, "familiarity": 100}
         )
         _, suggestions = self._hub_turn(scenario)
-        candidates = self._candidate_map(suggestions)
-        self.assertEqual(set(candidates), {"question.weather"})
+        current_group = next(
+            group
+            for group in suggestions["groups"]
+            if group["id"] == suggestions["currentGroupID"]
+        )
+        self.assertEqual(
+            {candidate["id"] for candidate in current_group["candidates"]},
+            {"question.weather"},
+        )
+        self.assertEqual(
+            [row["id"] for row in current_group["navigation"]],
+            ["semantic.back_to_root:semantic_hub.whats_up"],
+        )
 
     def test_safe_gossip_is_context_gated_and_owned_by_world_knowledge(self) -> None:
         scenario = world_gossip_scenario(

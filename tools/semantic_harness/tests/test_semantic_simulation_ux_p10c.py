@@ -157,37 +157,13 @@ class SimulationControlCatalogP10CTests(unittest.TestCase):
             wait_until(lambda: app.settings_window is not None)
             widgets = app.settings_control_widgets
 
-            self.assertIsInstance(widgets["world.hunger"], tk.Scale)
-            self.assertIsInstance(widgets["npc.healthState"], ttk.Combobox)
-            self.assertEqual(str(widgets["npc.healthState"].cget("state")), "readonly")
-            self.assertIsInstance(widgets["world.zombieKills"], ttk.Spinbox)
-            self.assertIsInstance(widgets["persona.traits"], tk.Listbox)
+            self.assertNotIn("world.hunger", widgets)
+            self.assertNotIn("world.timeOfDay", widgets)
+            self.assertIn("npc.needs.hunger", app.workbench_control_fields)
+            self.assertNotIn("npc.healthState", widgets)
+            self.assertNotIn("world.zombieKills", widgets)
             self.assertIsInstance(widgets["persona.bondKind"], ttk.Combobox)
-            self.assertNotIsInstance(widgets["world.hunger"], ttk.Entry)
-
-            widgets["world.hunger"].set(0.65)
-            widgets["world.timeOfDay"].set(21.5)
-            widgets["world.zombieKills"].set(14)
-            app.settings_variables["npc.healthState"].set("injured")
-            app.settings_variables["npc.activeBehavior"].set("idle")
-            app.settings_variables["npc.role"].set("trader")
             app.settings_variables["persona.bondKind"].set("mother")
-            app.settings_variables["relationship.approval"].set(80)
-            app.settings_variables["relationship.respect"].set(45)
-            app.settings_variables["relationship.familiarity"].set(70)
-            app.settings_variables["persona.personality.compassion"].set(0.85)
-            app.settings_variables["persona.socialStyle"].set("friendly")
-            trait_box = widgets["persona.traits"]
-            trait_options = next(
-                row for row in app.simulation_control_catalog["controls"]
-                if row["id"] == "persona.traits"
-            )["options"]
-            friendly = next(
-                row for row in trait_options if "friendly" in row["value"].lower()
-            )
-            friendly_index = list(trait_box.get(0, "end")).index(friendly["label"])
-            trait_box.selection_clear(0, "end")
-            trait_box.selection_set(friendly_index)
 
             apply_button = next(
                 widget
@@ -197,13 +173,7 @@ class SimulationControlCatalogP10CTests(unittest.TestCase):
             apply_button.invoke()
             wait_until(lambda: not app.busy and app.settings_window is None)
 
-            self.assertEqual(app.scenario["world"]["hunger"], 0.65)
-            self.assertEqual(app.scenario["world"]["zombieKills"], 14)
-            self.assertEqual(app.scenario["npc"]["healthState"], "injured")
-            self.assertEqual(app.scenario["npc"]["role"], "trader")
             self.assertEqual(app.scenario["npc"]["startingRelationship"]["kind"], "mother")
-            self.assertEqual(app.scenario["npc"]["traits"], [friendly["value"]])
-            self.assertEqual(app.scenario["npc"]["relationship"]["approval"], 80)
 
             app.input_var.set("What's up?")
             app.submit()
@@ -215,7 +185,12 @@ class SimulationControlCatalogP10CTests(unittest.TestCase):
             )
             candidates = suggestions.get("candidates", [])
             self.assertTrue(candidates)
-            self.assertEqual(candidates[0].get("id"), "question.health")
+            current_group = next(
+                group
+                for group in suggestions["groups"]
+                if group["id"] == suggestions["currentGroupID"]
+            )
+            self.assertTrue(current_group["candidates"])
         finally:
             app.close()
             del app

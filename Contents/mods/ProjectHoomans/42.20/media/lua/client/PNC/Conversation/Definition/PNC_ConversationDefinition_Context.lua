@@ -8,6 +8,20 @@ local FlavorAddress = PNC.FlavorAddress
 local IdentityPresentation = PNC.NPCIdentityPresentation
 local Loader = Conversation.TextLoader
 
+if type(FlavorAddress) ~= "table"
+    or type(FlavorAddress.ResolveForNPC) ~= "function"
+then
+    pcall(require, "PNC/Core/Identity/PNC_FlavorAddress")
+    FlavorAddress = PNC.FlavorAddress
+end
+if type(IdentityPresentation) ~= "table"
+    or type(IdentityPresentation.GetFact) ~= "function"
+    or type(IdentityPresentation.IsNameKnown) ~= "function"
+then
+    pcall(require, "PNC/Knowledge/PNC_NPCIdentityPresentation")
+    IdentityPresentation = PNC.NPCIdentityPresentation
+end
+
 local SYSTEM_SOURCE = {
     modID = "ProjectHoomans",
     pathPattern = "media/conversation/system/shared/{language}/categories.json",
