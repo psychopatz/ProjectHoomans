@@ -508,3 +508,75 @@ Core corrections:
 9. replace Sweep/Persona Matrix with Compare;
 10. unified Flow/Hub/ConversationBlock runtime graph;
 11. keep speech realization modular as content grows.
+
+
+---
+
+# P12 state-origin / save-backed harness audit — 2026-10-24
+
+**User evidence:** native Project Zomboid conversation screenshot plus current Semantic Lab screenshot.  
+**Source baseline:** ProjectHoomans remote `main` at `73e1ac5d0e49045a4660f447296a4b99544b4f0f`.
+
+## Verdict
+
+Conversation routing and production-Lua reuse are now close to parity, but the normal Semantic Lab still begins from a synthetic state model.
+
+The dominant remaining mismatch is **state origin**, especially relationship/social state and engine-derived values.
+
+## Verified relationship mismatch
+
+Current `SemanticAdapters_Identity.lua` reconstructs relationship behavior from scenario data:
+
+- resolves state;
+- reconstructs starting bond;
+- performs the friend promotion gate;
+- creates a harness social event;
+- caches the result in `Runtime.relationships`.
+
+The real mod persists a fuller directed relationship record including baselines, memories, cooldowns, interaction history, revisions and durable bond.
+
+P12 therefore replaces relationship reconstruction with import of the actual saved relationship into an isolated production-normalized worker record.
+
+## Verified save-reader foundation
+
+PsychopatzCore already provides a read-only Build 42.20 `global_mod_data.bin` parser through `tools/profiler/moddata_reader.py`.
+
+Known Project Hoomans persisted roots include:
+
+- `PNC_Core_Global`;
+- isolated `PNC_npc<ID>`;
+- `PNC_PlayerCharacters`.
+
+This is sufficient to begin save-backed actor/relationship discovery without launching Project Zomboid.
+
+## Engine-state decision
+
+Project Zomboid does not need to remain active.
+
+Current engine-derived harness values such as needs/time/weather may remain explicit offline fixtures until a proven offline reader exists.
+
+Optional live profiler integration is useful only as read-only enrichment and must not become a runtime dependency.
+
+## Safety decision
+
+Save/live sources are immutable inputs.
+
+All semantic/gameplay mutations occur only in a detached working copy.
+
+This includes:
+
+- relationship changes;
+- friend/lover transitions;
+- recruitment;
+- factions/communities;
+- knowledge;
+- inventory;
+- quest/tool effects.
+
+No harness mutation may write back to the save or running game.
+
+## Product direction
+
+P12 — Save-Backed Offline Semantic Runtime — is now the primary Semantic Lab architecture.
+
+Synthetic scenarios remain test/developer fixtures, not the normal product model.
