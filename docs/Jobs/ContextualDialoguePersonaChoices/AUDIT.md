@@ -691,3 +691,77 @@ Later P13 chunks add:
 - real operational acceptance.
 
 The goal is to make Semantic Lab the normal semantic/conversation verification environment for humans and coding agents while leaving native PZ as user-owned final live acceptance.
+
+
+---
+
+# P14 production rehydration audit — 2026-10-24
+
+**User evidence:** real save-backed Semantic Lab screenshots using a hostile raider/faction target.  
+**Source baseline audited:** ProjectHoomans remote `main` at `d3c6c2018b4a074bdf6178b7f060f18832ed2344`.
+
+## Verdict
+
+P13 made Semantic Lab operational, but a remaining parity defect exists below the UI:
+
+> the harness still interprets portions of Project Hoomans persisted gameplay state in Python rather than executing the production Lua persistence/runtime owners.
+
+This can make the harness operationally convenient while still diverging from the real mod whenever the persisted schema changes or uses compact production representations.
+
+## Verified hostile-raider behavior
+
+The hostile Talk choices are correctly driven by tactical hostility.
+
+A hostile NPC does not necessarily have a persisted personal NPC→Player relationship.
+
+Therefore:
+
+```text
+personal relationship = unknown/MISSING
+tactical hostility = hostile
+conversation audience = hostile
+```
+
+may be valid.
+
+Do not auto-create a personal enemy relationship.
+
+## Verified false NPC-inventory MISSING
+
+Project Hoomans inventory persistence supports compact modes including `SEED_ONLY`, `BASELINE_DELTA`, and `FULL`.
+
+The current Python importer only recognizes an already-expanded inventory/items shape.
+
+A valid compact persisted NPC inventory can therefore be falsely exposed as MISSING.
+
+This should be fixed by invoking production Lua inventory/persistence rehydration, not by reimplementing deltas in Python.
+
+## Verified faction-context omission
+
+The save-backed provider imports useful faction identity/membership but does not yet preserve enough production diplomacy state to resolve the selected Player's faction/provisional diplomacy relationship against the NPC faction.
+
+This can produce MISSING faction standing even when the save contains directed diplomacy data.
+
+## Architecture conclusion
+
+The harness should behave as:
+
+```text
+Python
+    transport/isolate/present
+        ↓
+production Lua
+    deserialize/normalize/derive/mutate
+```
+
+Only Project Zomboid engine-owned boundaries should be fixtures.
+
+This becomes the P14 governing invariant:
+
+> **Fixture the engine, never fixture the mod.**
+
+## Future object semantics
+
+The user's future plan to build a world-object/item dataset for commands such as "stand near the garbage bin" is compatible with this architecture but is explicitly out of P14 scope.
+
+That future dataset should enter through an engine/world provider boundary and feed the same production semantic/action code, not become another parallel behavior implementation.
