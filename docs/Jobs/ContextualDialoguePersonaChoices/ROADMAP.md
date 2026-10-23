@@ -1,6 +1,6 @@
 # Roadmap — Contextual Dialogue Persona & Choices
 
-**Parent status:** REOPENED — P0-P10 foundation retained; P11 runtime-parity actors/dynamic relationships/UX is mandatory.  
+**Parent status:** REOPENED — P0-P11 foundation retained; P11J native Talk shared-entry parity is mandatory.  
 Phases are organization and acceptance checkpoints; completing one phase never completes the parent objective.
 
 ## P0 — Current-path contract baseline
@@ -467,3 +467,96 @@ Validate:
 - Python/Lua/Kahlua/doctor/catalog/diff checks.
 
 **Gate:** only after P11A-P11H pass may the parent return to **READY FOR USER LIVE TEST**. Native SP/MP remains user-owned.
+
+
+## P11J — Native Talk Parity
+
+A Talk audit found that the harness previously simulated semantic turns without entering the same native Talk boundary used by the context-menu action.
+
+Read `NATIVE_TALK_PARITY.md`.
+
+### P11J0 — Audit and production target truth
+
+**Status: complete.**
+
+Established:
+
+- native Talk context action -> `PNC.Conversation.Open`;
+- production target types:
+  - colonist;
+  - follower;
+  - neutral;
+  - hostile;
+- follower = colonist ownership + follow order;
+- `enemy` is display/harness alias only;
+- trader is an orthogonal Dynamic Trading capability;
+- dead/unavailable is diagnostic availability state.
+
+### P11J1 — Harness Talk surface and matrix
+
+**Status: implemented in `b0a4850b6d9082cc5cc9909832a6277c3999356e`.**
+
+Implemented:
+
+- production-owned `PNC.Conversation.TalkParity`;
+- `TALK_CATALOG`;
+- `TALK_START`;
+- `TALK_MATRIX`;
+- GUI/CLI shared worker route;
+- selected target Start Talk;
+- all-target comparison;
+- target type/audience/route/response/choices/graph/relationship/speech output;
+- base scenario restoration.
+
+This work is retained.
+
+### P11J2 — Native shared Talk-start projection
+
+**Current mandatory chunk.**
+
+The remaining architecture gap is that native `Conversation.Open` and harness `TalkParity` still compute their start path separately.
+
+Required:
+
+- extract one production-owned Talk-start projection/boundary;
+- native `Conversation.Open` consumes it;
+- harness `TALK_START/TALK_MATRIX` consumes it;
+- harness-only scenario adapter may build canonical entry facts, but may not own classification/routing policy;
+- preserve current native behavior;
+- remove duplicated route/classification decisions from TalkParity.
+
+**Gate:** native and harness execute the same production Talk-start boundary.
+
+### P11J3 — Route and availability parity matrix
+
+Prove the shared boundary for:
+
+- colonist;
+- follower;
+- neutral;
+- hostile with inline integration available;
+- hostile with inline integration unavailable;
+- dead/unavailable;
+- trader capability overlay;
+- EN/TL.
+
+Compare:
+
+- target type;
+- audience;
+- route;
+- availability reason;
+- opening choices;
+- first semantic response;
+- graph kind/path;
+- relationship standing/bond.
+
+**Gate:** no harness-only Talk route decision remains.
+
+### P11J4 — Regression and user-owned native handoff
+
+Run focused and impacted regression suites, then hand off native Project Zomboid validation to the user.
+
+Native validation must compare real context-menu Talk behavior with Semantic Lab Talk parity results.
+
+**Gate:** developer-side parity green; native SP/MP remains UNTESTED until user evidence is supplied.
