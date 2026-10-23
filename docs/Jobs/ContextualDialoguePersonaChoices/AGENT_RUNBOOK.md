@@ -457,3 +457,67 @@ Every important save-backed P13 workflow must have a machine-readable backend/CL
 Autonomous agents should prefer CLI/worker operations over screenshot-driven interaction when both prove the same behavior.
 
 Native PZ remains user-owned final acceptance, not the ordinary agent verification path.
+
+
+## P14 execution rules — production rehydration parity
+
+P14 is the active architecture-corrective phase.
+
+P12/P13 operational save-backed work is retained.
+
+### Fixture the engine, never the mod
+
+When a production Project Hoomans Lua owner exists, the harness must call it rather than reproduce its behavior in Python.
+
+Python may own discovery, read-only transport, isolation, provenance, process orchestration, GUI/CLI presentation and genuine engine fixtures.
+
+Python must not independently own:
+
+- NPC persistence migration;
+- compact inventory rehydration;
+- relationship/bond policy;
+- faction diplomacy;
+- recruitment/proposal/gift policy;
+- semantic provider/business rules.
+
+### Raw saved state should reach production Lua
+
+For Project Hoomans records, prefer:
+
+```text
+raw saved payload
+ -> worker transport
+ -> production Lua deserialize/normalize
+ -> isolated registry/runtime
+```
+
+over Python constructing a runtime approximation.
+
+### Engine fixtures stay narrow
+
+Time, weather, needs, Java-native objects, rendering/audio/UI/networking and similar engine-owned boundaries may remain fixtures.
+
+A fixture must not absorb Hoomans gameplay policy.
+
+### Social layers stay separate
+
+Do not derive a personal enemy relationship merely because tactical hostility is hostile.
+
+Preserve distinct:
+
+- personal relationship;
+- faction diplomacy;
+- tactical hostility;
+- conversation audience.
+
+### MISSING is diagnostic evidence
+
+Do not hide MISSING with arbitrary defaults.
+
+Classify it as legitimate absence, engine-only, unsupported format, provider omission or rehydration failure.
+
+### Future object dataset
+
+World-object/item dataset generation and spatial command grounding are out of scope for P14.
+
+Do not expand P14 into scene indexing/pathing/object semantics.
