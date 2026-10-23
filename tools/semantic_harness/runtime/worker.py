@@ -148,6 +148,16 @@ class LuaSemanticWorker:
                 "providerPayloads": snapshot.to_dict()["providerPayloads"],
             },
         )
+        # Keep provider projections available to the Python/UI read model. Lua
+        # only needs the source metadata/provenance for its response, while
+        # actor inspectors must be able to explain native SAVE/FIXTURE/LIVE
+        # state without rereading or reinterpreting a source.
+        if isinstance(response, dict):
+            response_source = response.setdefault("sourceSnapshot", {})
+            if isinstance(response_source, dict):
+                response_source["providerPayloads"] = deepcopy(
+                    snapshot.to_dict()["providerPayloads"]
+                )
         self.source_snapshot = snapshot
         self.working_world = HarnessWorkingWorld(snapshot)
         self._sync_effective_scenario(response, establish_baseline=True)

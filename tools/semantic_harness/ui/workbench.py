@@ -7,6 +7,113 @@ from typing import Any
 from .dialogs.catalog_control import CatalogControlField
 
 
+class ActorInventoryView:
+    """Shared read-only inventory presentation for Player and NPC actors."""
+
+    def __init__(self, parent: Any, host: Any, actor_label: str) -> None:
+        self.host = host
+        self.ttk = host._ttk
+        self.tk = host._tk
+        self.actor_label = actor_label
+        self.frame = self.ttk.Frame(parent, padding=6)
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+        self.source_var = self.tk.StringVar(value="Source: MISSING")
+        self.ttk.Label(
+            self.frame,
+            textvariable=self.source_var,
+            anchor="w",
+            justify="left",
+            wraplength=620,
+        ).grid(row=0, column=0, sticky="ew", pady=(0, 6))
+        table_frame = self.ttk.Frame(self.frame)
+        table_frame.grid(row=1, column=0, sticky="nsew")
+        table_frame.columnconfigure(0, weight=1)
+        table_frame.rowconfigure(0, weight=1)
+        self.tree = self.ttk.Treeview(
+            table_frame,
+            columns=("fullType", "quantity", "source"),
+            show="headings",
+            selectmode="browse",
+            height=10,
+        )
+        for column, title, width in (
+            ("fullType", "Item", 270),
+            ("quantity", "Stack", 90),
+            ("source", "Origin", 150),
+        ):
+            self.tree.heading(column, text=title)
+            self.tree.column(column, width=width, stretch=column != "quantity")
+        self.tree.grid(row=0, column=0, sticky="nsew")
+        scrollbar = self.ttk.Scrollbar(
+            table_frame, orient="vertical", command=self.tree.yview
+        )
+        scrollbar.grid(row=0, column=1, sticky="ns")
+        self.tree.configure(yscrollcommand=scrollbar.set)
+        self.empty_var = self.tk.StringVar(value="")
+        self.ttk.Label(
+            self.frame,
+            textvariable=self.empty_var,
+            anchor="w",
+        ).grid(row=2, column=0, sticky="ew", pady=(6, 0))
+
+    def update(
+        self,
+        inventory: Any,
+        provenance: Any,
+    ) -> None:
+        for item_id in self.tree.get_children(""):
+            self.tree.delete(item_id)
+        inventory = inventory if isinstance(inventory, dict) else {}
+        raw_items = inventory.get("items", [])
+        if isinstance(raw_items, dict):
+            items = list(raw_items.values())
+        elif isinstance(raw_items, list):
+            items = raw_items
+        else:
+            items = []
+        provenance = provenance if isinstance(provenance, dict) else {}
+        source = str(
+            inventory.get("source")
+            or provenance.get("source")
+            or "MISSING"
+        ).upper()
+        reason = str(provenance.get("reason") or "").strip()
+        table = str(provenance.get("table") or "").strip()
+        details = [f"Source: {source}"]
+        if table:
+            details.append(f"authority: {table}")
+        if reason:
+            details.append(f"reason: {reason}")
+        self.source_var.set(" · ".join(details))
+        visible = 0
+        for index, item in enumerate(items[:512]):
+            if not isinstance(item, dict):
+                continue
+            full_type = str(
+                item.get("displayName")
+                or item.get("fullType")
+                or item.get("type")
+                or "Unstructured item"
+            )
+            quantity = item.get(
+                "stack", item.get("quantity", item.get("count", 1))
+            )
+            item_source = str(item.get("source") or source).upper()
+            self.tree.insert(
+                "",
+                "end",
+                iid=f"{self.actor_label}-{index}",
+                values=(full_type, quantity, item_source),
+            )
+            visible += 1
+        self.empty_var.set(
+            ""
+            if visible
+            else f"{self.actor_label} inventory is unavailable or empty · source {source}"
+        )
+
+
 class WorkbenchPage:
     """Place catalog fields with predictable spacing and page-specific density."""
 

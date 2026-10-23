@@ -51,7 +51,7 @@ from ..studio.workflow import SemanticLabWorkflowPane
 from .state import load as load_ui_state
 from .state import save as save_ui_state
 from .state import state_path as ui_state_path
-from .workbench import WorkbenchPage
+from .workbench import ActorInventoryView, WorkbenchPage
 
 
 def npc_message_text(message: dict[str, Any]) -> str:
@@ -2477,9 +2477,13 @@ class SemanticHarnessApp:
             )
         ]
         panel_names = ("NPC Target", "Player", "Relationship", "World")
-        actor_tabs = ("Overview", "Needs", "Personality & Traits")
+        actor_tabs = ("Overview", "Needs", "Personality & Traits", "Inventory")
         pages: dict[tuple[str, str], WorkbenchPage] = {}
         page_controls: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        self.actor_overview_summaries: dict[str, Any] = {}
+        self.actor_needs_summaries: dict[str, Any] = {}
+        self.actor_traits_summaries: dict[str, Any] = {}
+        self.actor_inventory_views: dict[str, ActorInventoryView] = {}
 
         def page_layout(panel_name: str, tab_name: str) -> str:
             if panel_name in {"NPC Target", "Player"}:
@@ -2537,6 +2541,32 @@ class SemanticHarnessApp:
                 )
                 page.frame.grid(row=0, column=0, sticky="nsew")
                 pages[(panel_name, "Overview")] = page
+
+        for panel_name in ("NPC Target", "Player"):
+            overview = pages[(panel_name, "Overview")]
+            self.actor_overview_summaries[panel_name] = overview.add_summary(
+                "Actor identity · read-only source",
+                height=7,
+            )
+            needs = pages[(panel_name, "Needs")]
+            self.actor_needs_summaries[panel_name] = needs.add_summary(
+                "Needs provenance",
+                height=3,
+            )
+            traits = pages[(panel_name, "Personality & Traits")]
+            self.actor_traits_summaries[panel_name] = traits.add_summary(
+                "Personality / traits provenance",
+                height=5,
+            )
+            inventory = pages[(panel_name, "Inventory")]
+            inventory_view = ActorInventoryView(
+                inventory.content,
+                self,
+                "player" if panel_name == "Player" else "npc",
+            )
+            inventory.add_widget(inventory_view.frame, sticky="nsew")
+            self.actor_inventory_views[panel_name] = inventory_view
+            inventory.finish()
 
         for control in self.workbench_controls:
             panel_name = str(control.get("workbenchPanel") or "World")
@@ -2681,8 +2711,129 @@ class SemanticHarnessApp:
         self.player_trait_fingerprint = ""
         self._update_generated_personality_controls()
         self._render_trait_effects()
+        self._refresh_actor_inspectors()
         if clear_pending:
             self._clear_workbench_pending()
+
+    def _actor_source_info(self, path: str, fallback: str = "MISSING") -> dict[str, Any]:
+        source_snapshot = getattr(self, "source_snapshot_projection", {})
+        if not isinstance(source_snapshot, dict):
+            return {"source": fallback}
+        provenance = source_snapshot.get("provenance")
+        paths = provenance.get("paths") if isinstance(provenance, dict) else {}
+        info = paths.get(path) if isinstance(paths, dict) else None
+        if isinstance(info, dict):
+            return info
+        return {"source": fallback}
+
+    def _refresh_actor_inspectors(self) -> None:
+        """Refresh the shared read-only Player/NPC actor inspector family."""
+
+        if not hasattr(self, "actor_inventory_views"):
+            return
+        source_snapshot = getattr(self, "source_snapshot_projection", {})
+        metadata = source_snapshot.get("metadata", {}) if isinstance(source_snapshot, dict) else {}
+        provider_payloads = (
+            source_snapshot.get("providerPayloads", {})
+            if isinstance(source_snapshot, dict)
+            else {}
+        )
+        native_player = (
+            provider_payloads.get("ProjectZomboid", {})
+            if isinstance(provider_payloads, dict)
+            else {}
+        )
+        for panel_name, actor_key in (("Player", "player"), ("NPC Target", "npc")):
+            actor = self.scenario.get(actor_key, {})
+            actor = actor if isinstance(actor, dict) else {}
+            actor_source = self._actor_source_info(actor_key, "MISSING")
+            needs_source = self._actor_source_info(f"{actor_key}.needs", "MISSING")
+            traits_source = self._actor_source_info(f"{actor_key}.traits", "MISSING")
+            personality_source = self._actor_source_info(
+                f"{actor_key}.personality",
+                "DERIVED" if actor_key == "npc" else "MISSING",
+            )
+
+            identity_lines = [
+                f"Actor: {actor.get('displayName') or actor.get('npcID') or 'unknown'}",
+                f"Source: {str(actor_source.get('source') or 'MISSING').upper()}",
+            ]
+            if actor_key == "player":
+                for label, key in (
+                    ("character UUID", "characterUUID"),
+                    ("account key", "accountKey"),
+                    ("entity key", "entityKey"),
+                    ("gender", "gender"),
+                ):
+                    if actor.get(key) not in (None, ""):
+                        identity_lines.append(f"{label}: {actor.get(key)}")
+                if isinstance(native_player, dict) and native_player.get("available"):
+                    identity_lines.append(
+                        "native engine state: SAVE · "
+                        f"world {native_player.get('worldVersion')} · "
+                        f"local Player {native_player.get('localPlayerID')}"
+                    )
+                elif isinstance(native_player, dict):
+                    identity_lines.append(
+                        "native engine state: "
+                        f"{str(native_player.get('source') or 'MISSING').upper()} · "
+                        f"{native_player.get('reason') or 'unavailable'}"
+                    )
+            else:
+                for label, key in (
+                    ("NPC ID", "npcID"),
+                    ("tactical class", "tacticalClass"),
+                    ("faction", "factionID"),
+                    ("community", "communityID"),
+                    ("role", "role"),
+                    ("behavior", "activeBehavior"),
+                ):
+                    if actor.get(key) not in (None, ""):
+                        identity_lines.append(f"{label}: {actor.get(key)}")
+            identity_lines.append(
+                f"source save: {metadata.get('sourceID') or 'developer/test fixture'}"
+            )
+            self._set_text(
+                self.actor_overview_summaries[panel_name],
+                "\n".join(identity_lines),
+            )
+
+            needs = actor.get("needs")
+            needs = needs if isinstance(needs, dict) else {}
+            need_lines = [
+                f"Source: {str(needs_source.get('source') or 'MISSING').upper()}",
+                " · ".join(
+                    f"{key}={needs.get(key, 'MISSING')}"
+                    for key in ("hunger", "thirst", "fatigue", "stress", "panic")
+                )
+                or "No persisted/offline need values available.",
+            ]
+            self._set_text(
+                self.actor_needs_summaries[panel_name],
+                "\n".join(need_lines),
+            )
+
+            traits = actor.get("traits")
+            trait_text = (
+                ", ".join(str(item) for item in traits[:32])
+                if isinstance(traits, list) and traits
+                else "none recorded"
+            )
+            personality = actor.get("personality") if actor_key == "npc" else actor.get("socialProfile")
+            trait_lines = [
+                f"Traits source: {str(traits_source.get('source') or 'MISSING').upper()}",
+                f"traits: {trait_text}",
+                f"Profile source: {str(personality_source.get('source') or 'MISSING').upper()}",
+                f"personality/social profile: {', '.join(f'{key}={value}' for key, value in list(personality.items())[:8]) if isinstance(personality, dict) and personality else 'not recorded'}",
+            ]
+            self._set_text(
+                self.actor_traits_summaries[panel_name],
+                "\n".join(trait_lines),
+            )
+            self.actor_inventory_views[panel_name].update(
+                actor.get("inventory"),
+                self._actor_source_info(f"{actor_key}.inventory", "MISSING"),
+            )
 
     def _collect_workbench_scenario(self) -> dict[str, Any]:
         selected_profile = self._selected_npc_profile()
@@ -3128,6 +3279,7 @@ class SemanticHarnessApp:
             )
         if hasattr(self, "provenance_inspector"):
             self._set_text(self.provenance_inspector, pretty(self.provenance_projection))
+        self._refresh_actor_inspectors()
 
     def _update_simulation_projection(self, response: dict[str, Any]) -> None:
         self._update_source_provenance(response)

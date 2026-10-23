@@ -1,9 +1,9 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
 **Updated:** 2026-10-24  
-**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13A/P13B complete; P13 operational usability remains mandatory.
-**Current mandatory phase:** P13C — Symmetric Player/NPC Actor Inspectors.
-**Current remote baseline audited:** ProjectHoomans `main` at `dbfd9099a0b687bc2f6505f58e81e32ea6dc5966`.  
+**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13A/P13B/P13C complete; P13 operational usability remains mandatory.
+**Current mandatory phase:** P13D — Faction/Community Workbench.
+**Current remote baseline audited:** ProjectHoomans `main` at `1f33a4a0` before the P13C implementation commit.
 **Normal Semantic Lab runtime requirement:** Project Zomboid may remain CLOSED/OFFLINE.  
 **Source save mutation:** FORBIDDEN.  
 **Optional live profiler:** read-only enrichment only.
@@ -152,7 +152,7 @@ The UI test must perform this workflow, not merely confirm controls exist.
 ## Ordered remaining P13 milestones
 
 - **P13B:** read-only offline Player engine-state provider, Player inventory first — complete;
-- **P13C:** symmetric Player/NPC actor inspectors;
+- **P13C:** symmetric Player/NPC actor inspectors — complete;
 - **P13D:** faction/community workbench;
 - **P13E:** inventory/gift verification workbench;
 - **P13F:** agent-grade CLI parity;
@@ -230,10 +230,42 @@ Evidence on 2026-10-24:
 - Existing production Lua smoke/gift/task checks remained green; no Lua files
   changed in P13B.
 
-## Current Exact Next Chunk — P13C
+## P13C — Symmetric Player/NPC Actor Inspectors — COMPLETE
 
-Build symmetric Player/NPC actor inspectors using the existing save-backed
-provider payloads and one shared actor-inventory presentation family. Keep
-unsupported native Player fields explicitly `MISSING`; do not decode or invent
-traits, needs, worn items, or equipment until their authoritative persisted
-source is proven.
+Implemented on existing `main` using the existing Simulation workbench,
+`SaveBackedImporter`, worker, and provider projections:
+
+- Added matching Player and NPC Target surfaces for `Overview`, `Needs`,
+  `Personality & Traits`, and `Inventory`.
+- Added one shared, bounded, read-only `ActorInventoryView` presentation for
+  both actors. It shows item, stack, origin, authority table, and explicit
+  unavailable/empty state; it has no direct inventory mutation path.
+- Added actor identity/tactical/faction/community summaries and provenance
+  labels. Native Player identity and inventory show `SAVE` when the proven
+  Build 42.20 provider is available; unsupported needs, traits, worn/equipped
+  state remain explicit `MISSING` or `FIXTURE` rather than being invented.
+- Added persisted Player/NPC identity, traits, and NPC personality provenance
+  paths in the save importer.
+- Preserved provider projections across the Python worker response boundary so
+  the UI does not reread or reinterpret source saves.
+
+Exact evidence on 2026-10-24:
+
+- `xvfb-run -a python3 -m unittest
+  tools.semantic_harness.tests.test_actor_inspectors_p13c`: `1/1` passed against
+  real save `2026-10-14_13-57-03`, including native Player inventory rows,
+  Player UUID, NPC target, shared columns, and unchanged source hash.
+- Combined focused Tk/Python regression suite for P13C, P13A, P13B, P12C,
+  P10E, and P11A: `15/15` passed at Xvfb minimum geometry; P13A continues to
+  exercise both `1080x700` and `1280x800` real-save workflows.
+- `python3 -m py_compile` passed for changed Python files and `git diff --check`
+  passed. No production Lua files changed in P13C.
+- Existing real-worker Lua smoke/gift/task checks remain the P12/P13B evidence;
+  this chunk only extends the read-only actor presentation and transport seam.
+
+## Current Exact Next Chunk — P13D
+
+Build the saved faction/community workbench from the existing backend-owned
+hierarchy and provider projections. Selecting a member must use the normal
+save-backed NPC target/import path; Semantic Lab must not duplicate faction or
+community state.

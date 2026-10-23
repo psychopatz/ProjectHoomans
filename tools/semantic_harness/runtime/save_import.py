@@ -303,6 +303,7 @@ class SaveBackedImporter:
                     "entityKey": player_entity_key,
                     "gender": player_record.get("gender")
                     or fixtures.get("playerGender", "unknown"),
+                    "traits": deepcopy(player_record.get("traits") or []),
                     "socialProfile": deepcopy(
                         player_record.get("socialProfile") or {}
                     ),
@@ -405,7 +406,24 @@ class SaveBackedImporter:
                     "table": npc_table,
                     "recordKey": player_entity_key,
                 },
+                "player.identity": {
+                    "source": "SAVE",
+                    "table": player_table,
+                    "recordKey": selected_uuid,
+                },
+                "npc.identity": {
+                    "source": "SAVE",
+                    "table": npc_table,
+                    "recordKey": selected_npc_id,
+                },
                 "player.needs": {"source": "FIXTURE"},
+                "player.traits": {
+                    "source": "SAVE"
+                    if isinstance(player_record.get("traits"), (list, dict))
+                    else "MISSING",
+                    "table": player_table,
+                    "recordKey": selected_uuid,
+                },
                 "player.socialProfile": {
                     "source": "SAVE"
                     if isinstance(player_record.get("socialProfile"), dict)
@@ -414,6 +432,18 @@ class SaveBackedImporter:
                     "recordKey": selected_uuid,
                 },
                 "npc.needs": {"source": "FIXTURE"},
+                "npc.traits": {
+                    "source": "SAVE"
+                    if isinstance(npc_record.get("npcTraits"), (list, dict))
+                    else "MISSING",
+                    "table": npc_table,
+                    "recordKey": selected_npc_id,
+                },
+                "npc.personality": {
+                    "source": "SAVE" if saved_personality else "DERIVED",
+                    "table": npc_table,
+                    "recordKey": selected_npc_id,
+                },
                 "player.inventory": {
                     "source": player_inventory_source,
                     **player_inventory_provenance,
