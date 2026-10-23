@@ -87,6 +87,18 @@ local RECRUIT_REPLY_VARIANTS = {
         "response.recruit.reject.cooldown.1",
         "response.recruit.reject.cooldown.2",
     },
+    member = {
+        "response.recruit.reject.member.1",
+        "response.recruit.reject.member.2",
+    },
+    hostile = {
+        "response.recruit.reject.hostile.1",
+        "response.recruit.reject.hostile.2",
+    },
+    unavailable = {
+        "response.recruit.reject.unavailable.1",
+        "response.recruit.reject.unavailable.2",
+    },
     general = {
         "response.recruit.reject.general.1",
         "response.recruit.reject.general.2",
@@ -104,12 +116,31 @@ local function stableVariantIndex(value, count)
 end
 
 local function recruitReplyKey(npcID, reason, route, worldAgeHours)
-    local group = route == "admire" and "admire"
-        or route == "fear" and "fear"
-        or reason == "relationship_threshold" and "relationship"
-        or reason == "leader_active" and "leader"
-        or reason == "cooldown_active" and "cooldown"
-        or "general"
+    local group
+    if reason == "already_recruited"
+        or reason == "npc_not_debug_recruitable"
+    then
+        group = "member"
+    elseif reason == "hostile_audience" then
+        group = "hostile"
+    elseif reason == "npc_unavailable"
+        or reason == "npc_not_found"
+        or reason == "recruitment_service_unavailable"
+    then
+        group = "unavailable"
+    elseif route == "admire" then
+        group = "admire"
+    elseif route == "fear" then
+        group = "fear"
+    elseif reason == "relationship_threshold" then
+        group = "relationship"
+    elseif reason == "leader_active" then
+        group = "leader"
+    elseif reason == "cooldown_active" then
+        group = "cooldown"
+    else
+        group = "general"
+    end
     local variants = RECRUIT_REPLY_VARIANTS[group]
     local index = stableVariantIndex(table.concat({
         tostring(npcID or ""), tostring(reason or ""), tostring(route or ""),

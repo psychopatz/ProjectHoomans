@@ -31,7 +31,7 @@
     "response.recruit.reject.leader.2": "I am responsible for this shelter. Until that changes, I am staying here.",
     "response.recruit.reject.cooldown.1": "We already had this conversation today. Give me time to think before you press me again.",
     "response.recruit.reject.cooldown.2": "Not again today. Let us see how things stand tomorrow.",
-    "response.recruit.reject.general.1": "I cannot make that decision right now. There is too much working against it.",
+    "response.recruit.reject.member.1":"You are already with us. Ask me about orders instead of recruiting me again.","response.recruit.reject.member.2":"I am already part of this group.","response.recruit.reject.hostile.1":"You want me to join you? Keep your distance.","response.recruit.reject.hostile.2":"I am not joining you. Do not mistake this conversation for trust.","response.recruit.reject.unavailable.1":"I cannot make that decision while I am unavailable.","response.recruit.reject.unavailable.2":"This is not a conversation I can have right now.","response.recruit.reject.general.1": "I cannot make that decision right now. There is too much working against it.",
     "response.recruit.reject.general.2": "No. I appreciate the offer, but joining you is not possible at the moment.",
     "response.recruit.reject.general.3": "I need to sort out a few things before I can even consider leaving with you.",
     "response.departure.warning": "If you cast me out, I will leave this group and make my own way. You cannot take that back.",

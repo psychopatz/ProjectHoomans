@@ -31,7 +31,7 @@
     "response.recruit.reject.leader.2": "Ako ang may pananagutan sa kanlungang ito. Hanggang sa magbago iyon, nananatili ako rito.",
     "response.recruit.reject.cooldown.1": "Napag-usapan na natin ito ngayon. Bigyan mo ako ng oras mag-isip bago mo ako muling pilitin.",
     "response.recruit.reject.cooldown.2": "Hindi na ulit ngayon. Tingnan natin kung ano ang mangyayari bukas.",
-    "response.recruit.reject.general.1": "Hindi ko magawa ang desisyong iyon sa ngayon. Masyadong maraming nagtatrabaho laban dito.",
+    "response.recruit.reject.member.1":"Kasama na kita. Magtanong ka na lang tungkol sa mga utos kaysa i-recruit akong muli.","response.recruit.reject.member.2":"Bahagi na ako ng grupong ito.","response.recruit.reject.hostile.1":"Gusto mong sumama ako sa iyo? Lumayo ka.","response.recruit.reject.hostile.2":"Hindi ako sasama sa iyo. Huwag mong ipagkamali ang pag-uusap na ito sa tiwala.","response.recruit.reject.unavailable.1":"Hindi ko magagawa ang desisyong iyon habang hindi ako available.","response.recruit.reject.unavailable.2":"Hindi ko maaaring pag-usapan iyan ngayon.","response.recruit.reject.general.1": "Hindi ko magawa ang desisyong iyon sa ngayon. Masyadong maraming nagtatrabaho laban dito.",
     "response.recruit.reject.general.2": "Hindi. Pinahahalagahan ko ang alok, ngunit hindi posible ang pagsali sa iyo sa ngayon.",
     "response.recruit.reject.general.3": "Kailangan kong ayusin ang ilang bagay bago ko maisipang umalis kasama ka.",
     "response.departure.warning": "Kung paalisin mo ako, aalis ako sa grupong ito at gagawa ng sarili kong paraan. Hindi mo na maibabalik iyon.",

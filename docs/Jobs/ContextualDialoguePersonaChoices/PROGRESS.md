@@ -332,3 +332,25 @@ Do not report **READY FOR USER LIVE TEST** solely because P11J1 matrix tests pas
 After P11J2–P11J4 developer gates pass, hand native Project Zomboid SP/MP
 verification to the user. Native verification remains **UNTESTED / user-owned**
 until the user supplies evidence.
+
+## Recruitment request semantic bridge — bounded follow-up
+
+The harness recruitment shortcut and typed request now enter the existing production conversation request path. The worker composes the same recruitment authority prerequisites used by the native server composition, including relationship graph and faction modules, then routes `RECRUIT` through `PNC.Conversation.Composer.RequestRecruit`. The semantic action resolves the live composer and relationship seam at dispatch time so native module load order cannot leave the action disconnected. Native preview requirement state is still set to `recruit`; server validation remains authoritative for audience, lease, availability, relationship, and ownership gates.
+
+Recruitment request patterns cover the authored “Would you like to join us?”, “Do you want to join us?”, “Would you like to join me?”, “Do you want to join me?”, “Join us”, and “Come with us” forms. The local semantic acknowledgement is suppressed while the production recruitment result owns the NPC response. Rejection responses now have truthful member, hostile, and unavailable variants in EN/TL. The harness companion profile also carries the canonical `recruited` record fact so its second-invite response follows the production service rather than only the UI capability projection.
+
+Evidence:
+
+- neutral root shortcut click: nonblank production relationship-threshold response;
+- typed request through fresh worker: nonblank production responses for companion/member and hostile/audience cases;
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j -v` — **10/10 PASS**;
+- `lua5.3 tests/pnc_conversation_smoke.lua`, `tests/pnc_semantic_dialogue_input_smoke.lua`, and `tests/pnc_conversation_talk_start_projection_smoke.lua` — PASS;
+- CLI `TALK_START` returned the neutral recruitment response; CLI `TALK_MATRIX` returned colonist, follower, neutral, and hostile rows;
+- changed Lua `luac5.3 -p`, changed Python `py_compile`, translation JSON parsing, and `git diff --check` — PASS;
+- no recruitment or Talk-parity ModData/persistent state added.
+
+Native Project Zomboid SP/MP recruitment behavior remains **UNTESTED / user-owned**. Compare the neutral recruitment shortcut, typed request, companion response, hostile response, hover preview, and server result in the real context-menu Talk flow before claiming native parity.
+
+## Current Exact Next Chunk — native recruitment handoff evidence
+
+Use the actual in-game context-menu Talk path for a neutral NPC, an owned companion, and a hostile NPC. Verify the recruitment shortcut, typed equivalent, hover preview/gates, response text, and rejection/acceptance result against the Semantic Lab. Preserve the broader P11J native Talk handoff checks for Colonist, Follower, Neutral, and Hostile. Do not report **READY FOR USER LIVE TEST** until user-owned native evidence is supplied.

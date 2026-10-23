@@ -22,6 +22,7 @@ local EXECUTABLE_ACTION_BRANCHES = {
     COMMAND_ACCEPTED = true,
     REQUEST_ACKNOWLEDGED = true,
     CAMP_REQUESTED = true,
+    CONVERSATION_RECRUITMENT_REQUESTED = true,
 }
 local GIFT_DISPATCH_BRANCHES = {
     GIFT_OFFER_DISPATCHED = true,
@@ -75,7 +76,6 @@ local CampSite = PNC.Semantics.CampSite
 local ActionContext = PNC.Semantics.DialogueInputActionContext
 local ActionTargetHints = PNC.Semantics.DialogueInputActionTargetHints
 local QuestResponses = Internal.QuestResponses
-
 local function audit(eventName, data, options)
     if not Diagnostics
         or type(Diagnostics.IsEnabled) ~= "function"
@@ -290,6 +290,56 @@ function Internal.DispatchQuestAction(view, actionIntent, context, value)
     return questResult
 end
 
+local function dispatchRecruitment(view, result, value)
+    local context = actionContext(view, result, value)
+    -- Resolve these at dispatch time. Native load order can assemble the
+    -- conversation composer after the semantic input module has been loaded;
+    -- the harness and the game must therefore observe the same live seam.
+    local conversation = PNC.Conversation or {}
+    local composer = conversation.Composer
+    local relationship = conversation.Relationship
+    local setPreviewRequirement = relationship
+        and relationship.SetPreviewRequirement
+    if type(setPreviewRequirement) == "function" then
+        -- Match the native recruit-row hover/preflight state. The server still
+        -- rechecks the target, audience, lease, relationship, and ownership.
+        setPreviewRequirement(context.npcID, "recruit")
+    end
+    if not composer
+        or type(composer.RequestRecruit) ~= "function"
+    then
+        return {
+            status = "conversation_recruitment_unavailable",
+            accepted = false,
+            reason = "conversation_recruitment_unavailable",
+        }
+    end
+    local sent, reason = composer.RequestRecruit(context.npcID)
+    local requestID = view and view.spec and view.spec.context
+        and view.spec.context.pendingConversationRequest or nil
+    local output = {
+        status = sent == true
+            and "conversation_recruitment_pending"
+            or "conversation_recruitment_rejected",
+        accepted = sent == true,
+        pending = sent == true,
+        reason = sent == true and nil or reason,
+        action = "RECRUIT",
+        requestID = requestID,
+        npcID = context.npcID,
+    }
+    audit("semantic.conversation.recruitment.dispatch", {
+        npcID = context.npcID,
+        conversationID = context.conversationID,
+        requestID = requestID,
+        action = "RECRUIT",
+        status = output.status,
+        accepted = output.accepted,
+        reason = output.reason,
+    }, { requestID = requestID or context.requestID })
+    return output
+end
+
 function Internal.DispatchAction(view, result, value)
     local decision = result and result.decision or {}
     local generatedFlow = result and result.flow or nil
@@ -342,6 +392,9 @@ function Internal.DispatchAction(view, result, value)
         decision, EXECUTABLE_ACTION_BRANCHES)
     if not actionAllowed then
         return blockedDispatch(actionBlockReason)
+    end
+    if decision.actionIntent.action == "RECRUIT" then
+        return dispatchRecruitment(view, result, value)
     end
     local context = actionContext(view, result, value)
     context.generatedFlow = generatedFlow

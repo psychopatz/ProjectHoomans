@@ -268,7 +268,74 @@ load(
         "PNC/Networking/Handlers/PNC_ServerSemanticSocialInteractionCommandHandler.lua",
         "social_authority"
     )
-    load("ProjectHoomans", "shared", "PNC/Translation/PNC_TranslationBootstrap.lua", "translation")
+    -- Recruitment is a server-owned conversation effect. Keep the worker's
+    -- dual-role authority composition aligned with the native server root so a
+    -- recruit choice receives the same evaluation, persistence, and result path.
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_RelationshipGraph.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Factions/PNC_FactionConstants.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Factions/PNC_FactionBalance.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Factions/PNC_FactionArchetypes.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Factions/PNC_FactionNameGenerator.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Factions/PNC_FactionEmblems.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Factions/PNC_FactionDiplomacyMath.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Factions/PNC_FactionIncidentDefinitions.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Factions/PNC_FactionIntent.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Factions/PNC_FactionTypes.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Factions/PNC_FactionCore.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Companions/PNC_DebugCompanionRecruit.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Translation/PNC_TranslationBootstrap.lua",
+        "translation"
+    )
     load(
         "ProjectHoomans", "client", "PNC/UI/PNC_NPCTypePalette.lua",
         "conversation_target_projection"

@@ -305,6 +305,14 @@ function Internal.QueueDeterministicResponse(
         -- in front of it.
         return true
     end
+    if actionResult
+        and actionResult.status == "conversation_recruitment_pending"
+    then
+        -- The production recruitment result owns the NPC reply. The request
+        -- may resolve synchronously in the harness or later through the native
+        -- network result router, so never add a generic local acknowledgement.
+        return true
+    end
     if decision.branch == "INVENTORY_QUERY_RECEIVED"
         and actionResult
         and actionResult.accepted == false

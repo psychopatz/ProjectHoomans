@@ -52,6 +52,12 @@ def apply_npc_profile(scenario: dict[str, Any], selected: str) -> dict[str, Any]
     # A profile switch must not retain a capability-specific role from the
     # previous preset.  Custom scenarios remain untouched above.
     npc.pop("role", None)
+    npc.pop("ownerUsername", None)
+    npc.pop("colonyOwned", None)
+    # Keep the canonical record facts aligned with the production recruitment
+    # service. actorAuthority drives UI capability projection; the service
+    # itself reads the persisted recruited fact when rejecting a second invite.
+    npc["recruited"] = selected == "companion"
     npc["followState"] = {"mode": "idle"}
     npc["hostility"] = {"attackPlayers": False}
 

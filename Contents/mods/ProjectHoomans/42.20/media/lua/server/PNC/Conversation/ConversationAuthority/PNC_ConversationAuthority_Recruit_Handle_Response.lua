@@ -15,6 +15,15 @@ local recruitReplyKey = Internal.RecruitReplyKey
 local send = Internal.Send
 local worldAgeHours = Internal.WorldAgeHours
 
+local REPLY_REASONS = {
+    already_recruited = true,
+    hostile_audience = true,
+    npc_not_debug_recruitable = true,
+    npc_not_found = true,
+    npc_unavailable = true,
+    recruitment_service_unavailable = true,
+}
+
 function RecruitmentResponse.Reject(state, rejection, details)
     local args = state.args
     local payload = {
@@ -26,7 +35,9 @@ function RecruitmentResponse.Reject(state, rejection, details)
     for key, value in pairs(type(details) == "table" and details or {}) do
         payload[key] = value
     end
-    if payload.npcReaction == "declined" then
+    if payload.npcReaction == "declined"
+        or REPLY_REASONS[rejection] == true
+    then
         payload.responseKey = recruitReplyKey(
             args.npcID,
             rejection,

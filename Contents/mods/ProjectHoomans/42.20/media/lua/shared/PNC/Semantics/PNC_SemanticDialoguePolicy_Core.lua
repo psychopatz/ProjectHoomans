@@ -44,6 +44,7 @@ local COMMAND_ACTIONS = {
     QUEST_ACCEPT = true,
     QUEST_STATUS = true,
     QUEST_TURN_IN = true,
+    RECRUIT = true,
 }
 
 function Policy.GetCommandActions()
@@ -119,6 +120,10 @@ local RESPONSE_TEMPLATES = {
     GIFT_CONSENT_AMBIGUOUS = {
         templateID = "semantic.gift.consent.ambiguous",
         fallback = "More than one of us wants it. Please offer it to one person directly.",
+    },
+    CONVERSATION_RECRUITMENT_REQUESTED = {
+        templateID = "semantic.conversation.recruitment.requested",
+        fallback = "",
     },
     GOSSIP_RECEIVED = {
         templateID = "semantic.gossip.unknown",

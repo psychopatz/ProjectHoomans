@@ -59,6 +59,9 @@ return function(dependencies)
         elseif ir.intent == "OFFER" or ir.speechAct == "OFFER" then
             branch = "OFFER_RECEIVED"
             reason = "recognized_offer"
+        elseif ir.action == "RECRUIT" then
+            branch = "CONVERSATION_RECRUITMENT_REQUESTED"
+            reason = "recognized_conversation_recruitment"
         elseif ir.action and commandActions[ir.action] then
             branch = ir.action == "FETCH"
                 and "REQUEST_ACKNOWLEDGED" or "COMMAND_ACCEPTED"
