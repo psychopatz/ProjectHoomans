@@ -60,6 +60,40 @@ local function suggestionTooltip(row)
     return nil
 end
 
+local function restoreSemanticChoices(view)
+    local composer = PNC.Conversation
+        and PNC.Conversation.Composer or nil
+    local composerInternal = composer and composer.Internal or nil
+    if composerInternal
+        and type(composerInternal.RestoreCurrentChoices) == "function"
+    then
+        return composerInternal.RestoreCurrentChoices(view)
+    end
+    if type(Internal.RefreshRootSuggestions) == "function" then
+        return Internal.RefreshRootSuggestions(view)
+    end
+    return false
+end
+
+local function recordSemanticChoiceClick(view, frame, eventName, reason)
+    local session = view and view.session or nil
+    local router = session and session.semanticDialogueRouter or nil
+    local state = router and router.state or nil
+    audit(eventName, {
+        npcID = view and view.spec and view.spec.npcID,
+        conversationID = session and session.conversationID,
+        candidateID = frame and frame.candidateID,
+        frameKind = frame and frame.kind,
+        requestRevision = frame and frame.requestRevision,
+        currentRevision = state and state.sequence,
+        reason = reason,
+        currentNodeID = session and session.currentNodeID,
+        busy = session and session.busy == true,
+        pendingRequest = view and view.spec and view.spec.context
+            and view.spec.context.pendingConversationRequest ~= nil,
+    })
+end
+
 -- Build rows for Core's native choice list. This is a data adapter only: Core
 -- still owns layout, scrolling, hover, click gating, and session ordering; the
 -- canonical semantic input path owns the click frame.
@@ -104,12 +138,44 @@ local function buildCoreChoices(view, projection)
                 then
                     view.lastSemanticSuggestionReason =
                         "semantic_input_unavailable"
+                    view.lastSemanticSuggestionFailure = {
+                        candidateID = frame.candidateID,
+                        requestRevision = frame.requestRevision,
+                        reason = "semantic_input_unavailable",
+                    }
+                    recordSemanticChoiceClick(
+                        view, frame, "semantic.choice.rejected",
+                        "semantic_input_unavailable"
+                    )
                     return false
                 end
                 local accepted, reason = input.SubmitSemanticFrame(
                     view, frame
                 )
                 view.lastSemanticSuggestionReason = reason
+                if accepted ~= true then
+                    view.lastSemanticSuggestionFailure = {
+                        candidateID = frame.candidateID,
+                        frameKind = frame.kind,
+                        requestRevision = frame.requestRevision,
+                        reason = reason,
+                        currentNodeID = view.session
+                            and view.session.currentNodeID,
+                    }
+                    recordSemanticChoiceClick(
+                        view, frame, "semantic.choice.rejected", reason
+                    )
+                    -- Core clears the presented row before invoking its
+                    -- action. A stale, busy, or rejected semantic frame must
+                    -- therefore restore the production choice surface so a
+                    -- native click cannot leave the conversation blank.
+                    restoreSemanticChoices(view)
+                else
+                    view.lastSemanticSuggestionFailure = nil
+                    recordSemanticChoiceClick(
+                        view, frame, "semantic.choice.accepted", "accepted"
+                    )
+                end
                 return accepted
             end,
         }
@@ -165,8 +231,18 @@ end
 local function presentSemanticChoices(view, authoredChoices)
     local projection = view and view.semanticSuggestions or nil
     if type(projection) ~= "table" then return nil end
+    if view and view.session and view.session.busy == true then
+        -- Do not replace Core's authored/pending surface while the opening or
+        -- a response is still being delivered. Core rejects clicks in this
+        -- state, so exposing semantic rows here creates dead buttons.
+        view.semanticPresentationPending = projection
+        return nil
+    end
     local rows = buildCoreChoices(view, projection)
-    if #rows > 0 then return rows end
+    if #rows > 0 then
+        view.semanticPresentationPending = nil
+        return rows
+    end
     return nil
 end
 
@@ -176,6 +252,13 @@ local function applyCoreChoices(view, projection)
         return false, "core_choices_unavailable"
     end
     local rows = buildCoreChoices(view, projection)
+    if session.busy == true then
+        -- Session:finishPending will call setChoices after the queued NPC
+        -- response, at which point the presentation callback will apply the
+        -- same production projection with an interactive Core session.
+        view.semanticPresentationPending = projection
+        return false, "semantic_choices_deferred"
+    end
     if #rows < 1 then
         -- A projection can legitimately be empty while a dependency or
         -- current topic is unavailable. Restore the authored Core choices

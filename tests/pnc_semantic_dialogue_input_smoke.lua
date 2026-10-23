@@ -304,43 +304,116 @@ T.truthy(queuedTurnState.enabled,
     "local semantic input remains enabled while an NPC line is queued")
 session.busy = nil
 
-local presentedRows = Input.Internal.PresentSemanticChoices({
-    semanticSuggestions = {
-        currentGroupID = "conversation",
-        groups = {
-            {
-                id = "conversation",
-                candidates = {
-                    {
-                        id = "semantic:wellbeing",
-                        display = { label = "Ask about wellbeing" },
-                        frame = {
-                            candidateID = "semantic:wellbeing",
-                            requestRevision = 1,
-                        },
+local choiceProjection = {
+    currentGroupID = "conversation",
+    revision = 1,
+    groups = {
+        {
+            id = "conversation",
+            candidates = {
+                {
+                    id = "semantic:wellbeing",
+                    display = { label = "Ask about wellbeing" },
+                    frame = {
+                        candidateID = "semantic:wellbeing",
+                        requestRevision = 1,
                     },
                 },
-                capabilities = {
-                    {
-                        id = "semantic:follow",
-                        display = { label = "Ask them to follow" },
-                        status = "eligible",
-                        frame = {
-                            candidateID = "semantic:follow",
-                            requestRevision = 1,
-                        },
+            },
+            capabilities = {
+                {
+                    id = "semantic:follow",
+                    display = { label = "Ask them to follow" },
+                    status = "eligible",
+                    frame = {
+                        candidateID = "semantic:follow",
+                        requestRevision = 1,
                     },
                 },
             },
         },
     },
-}, {})
+}
+local choiceView = {
+    semanticSuggestions = choiceProjection,
+    session = {
+        conversationID = "conversation-one",
+        currentNodeID = "start",
+    },
+    spec = { npcID = "npc-alice" },
+}
+local presentedRows = Input.Internal.PresentSemanticChoices(choiceView, {})
 T.equal(#presentedRows, 2,
     "semantic projection adapts both candidate and capability rows")
 T.equal(presentedRows[1].id, "semantic:wellbeing",
     "semantic candidate keeps its stable row id")
 T.equal(presentedRows[2].source.semanticFrame.candidateID,
     "semantic:follow", "capability row keeps its typed click frame")
+
+local originalSubmitSemanticFrame = Input.SubmitSemanticFrame
+local submittedFrame
+Input.SubmitSemanticFrame = function(actualView, frame)
+    T.equal(actualView, choiceView,
+        "Core semantic row action submits against its native view")
+    submittedFrame = frame
+    return true, "accepted"
+end
+local clicked = presentedRows[1].action()
+T.truthy(clicked, "Core semantic row action accepts the typed frame")
+T.equal(submittedFrame.candidateID, "semantic:wellbeing",
+    "Core semantic row action forwards the canonical frame")
+T.equal(choiceView.lastSemanticSuggestionReason, "accepted",
+    "accepted semantic click records its result")
+
+local restoredChoices = 0
+PNC.Conversation = {
+    Composer = {
+        Internal = {
+            RestoreCurrentChoices = function(actualView)
+                T.equal(actualView, choiceView,
+                    "rejected semantic click restores the native view")
+                restoredChoices = restoredChoices + 1
+                return true
+            end,
+        },
+    },
+}
+Input.SubmitSemanticFrame = function()
+    return false, "stale_suggestion"
+end
+local rejected = presentedRows[2].action()
+T.falsy(rejected, "rejected Core semantic row action reports failure")
+T.equal(choiceView.lastSemanticSuggestionReason, "stale_suggestion",
+    "rejected semantic click records its reason")
+T.equal(choiceView.lastSemanticSuggestionFailure.candidateID,
+    "semantic:follow", "rejected click stores the failing candidate")
+T.equal(restoredChoices, 1,
+    "rejected semantic click restores the production choice surface")
+
+local presentedWhileBusy = 0
+local busyView = {
+    session = {
+        busy = true,
+        setPresentedChoices = function()
+            presentedWhileBusy = presentedWhileBusy + 1
+            return true
+        end,
+    },
+    semanticSuggestions = choiceProjection,
+}
+local deferredRows = Input.Internal.PresentSemanticChoices(busyView, {})
+T.equal(deferredRows, nil,
+    "Core presentation callback hides semantic rows while busy")
+local applied, deferredReason = Input.Internal.ApplySemanticChoices(
+    busyView, choiceProjection
+)
+T.falsy(applied, "semantic rows are deferred while Core is busy")
+T.equal(deferredReason, "semantic_choices_deferred",
+    "busy semantic presentation has an explicit deferred reason")
+T.equal(presentedWhileBusy, 0,
+    "busy Core sessions do not receive clickable semantic rows")
+
+Input.SubmitSemanticFrame = originalSubmitSemanticFrame
 
 PNC = originalPNC
 PsychopatzCore = originalCore

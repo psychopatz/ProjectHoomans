@@ -518,11 +518,15 @@ T.truthy(loadingTerritoryDiagnostic.visible,
 PNC.Network = savedNetwork
 
 local savedClient = PNC.Client
+local savedSemantics = PNC.Semantics
 PNC.Network = { ClientState = { npcPresentations = {} } }
+PNC.Semantics = { DialogueInput = {} }
 PNC.Client = {
     RequestNPCKnowledge = function() return true end,
 }
 local firstOpenDefinition = PNC.Conversation.Open(entry, player, "dawn")
+T.equal(PNC.Semantics.DialogueInput.ActiveView, firstOpenDefinition,
+    "native conversation publishes its active host to semantic input")
 local firstOpenProjection = PNC.Network.ClientState.npcPresentations[entry.id]
 T.equal(firstOpenProjection.state, "unknown",
     "first conversation open does not enter a blocking identity state")
@@ -537,6 +541,7 @@ end
 T.truthy(firstOpenAskName, "first neutral conversation offers Ask Name")
 T.truthy(firstOpenRecruit, "first neutral conversation offers Recruit")
 PNC.Client = savedClient
+PNC.Semantics = savedSemantics
 PNC.Network = savedNetwork
 PsychopatzCore.Conversation.instance = nil
 

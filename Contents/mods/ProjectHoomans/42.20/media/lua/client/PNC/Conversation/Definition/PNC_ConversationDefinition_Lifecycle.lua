@@ -118,6 +118,10 @@ function Conversation.Open(entry, player, forcedTime)
         -- semantic turns refresh the same part through the input lifecycle.
         local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
         local internal = input and input.Internal or nil
+        -- Keep the just-opened native host discoverable by the same semantic
+        -- request/composer path used by later choice clicks. This reference
+        -- is runtime-only; it is never persisted or sent over the network.
+        if input then input.ActiveView = view end
         if internal and type(internal.RefreshRootSuggestions) == "function" then
             internal.RefreshRootSuggestions(view)
         end
