@@ -85,7 +85,11 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
 
             replayed_ids = [row.get("id") for row in app.suggestion_rows]
             self.assertNotEqual(initial_ids, replayed_ids)
-            self.assertEqual(replayed_ids[0], "question.health")
+            self.assertIn("question.health", replayed_ids)
+            self.assertEqual(
+                replayed_ids[0],
+                "semantic.back_to_root:semantic_hub.whats_up",
+            )
             self.assertEqual(app.scenario["npc"]["healthState"], "injured")
             self.assertEqual(app.scenario["npc"]["relationship"]["approval"], 80)
             self.assertEqual(errors, [])
@@ -96,6 +100,16 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             wait_until(lambda: not app.busy and app.scenario["npc"]["healthState"] == "healthy")
             self.assertEqual(errors, [])
             self.assertIn("Applied simulation workbench settings", app.transcript.get("1.0", "end"))
+
+            fields["relationship.respect"].variable.set(51)
+            wait_until(
+                lambda: (
+                    not app.busy
+                    and app.scenario["npc"]["relationship"]["respect"] == 51
+                    and not app._pending_control_labels()
+                )
+            )
+            self.assertIn("Auto-applied", app.workbench_status_var.get())
         finally:
             app.close()
             del app

@@ -350,11 +350,13 @@ class SemanticHarnessApp:
         self._relationship_preview_after: Any | None = None
         self._personality_preview_after: Any | None = None
         self._auto_replay_after: Any | None = None
+        self._auto_apply_after: Any | None = None
         self._relationship_preview_future: Future[Any] | None = None
         self._personality_preview_future: Future[Any] | None = None
         self.generated_personality_preview: dict[str, Any] = {}
         self._workbench_dirty_ids: set[str] = set()
         self._workbench_profile_pending = False
+        self._workbench_initializing = False
         self.last_response: dict[str, Any] = {}
         self.settings_window: Any | None = None
         self._future: Future[Any] | None = None
@@ -977,10 +979,8 @@ class SemanticHarnessApp:
 
         if self.workbench_status_var is None:
             return
-        pending = len(self._workbench_dirty_ids) + (
-            1 if self._workbench_profile_pending else 0
-        )
         pending_labels = self._pending_control_labels()
+        pending = len(pending_labels)
         self.workbench_apply_button.configure(
             text="Apply" if pending == 0 else f"Apply ({pending} pending)"
         )
@@ -1002,14 +1002,17 @@ class SemanticHarnessApp:
             )
         else:
             self.workbench_status_var.set(
-                "Common context controls · changes apply through the Lua worker."
+                "Auto-apply enabled · edits commit through the Lua worker."
             )
 
     def _pending_control_labels(self) -> list[str]:
         labels: list[str] = []
         for control in self.workbench_controls:
             control_id = str(control.get("id") or "")
-            if control_id not in self._workbench_dirty_ids:
+            if (
+                control_id not in self._workbench_dirty_ids
+                or control.get("derivedFrom")
+            ):
                 continue
             label = str(control.get("label") or control_id)
             if control.get("derivedFrom"):
@@ -1026,6 +1029,34 @@ class SemanticHarnessApp:
             field.dirty = False
         self._refresh_workbench_feedback()
 
+    def _schedule_workbench_auto_apply(self) -> None:
+        """Debounce direct edits into the existing worker configure boundary."""
+
+        if self.closed or not self.worker_ready:
+            return
+        if self._auto_apply_after is not None:
+            try:
+                self.root.after_cancel(self._auto_apply_after)
+            except self._tk.TclError:
+                pass
+            self._auto_apply_after = None
+        if not self._pending_control_labels():
+            return
+        self._auto_apply_after = self.root.after(
+            300, self._apply_pending_workbench_changes
+        )
+
+    def _apply_pending_workbench_changes(self) -> None:
+        self._auto_apply_after = None
+        if self.closed or not self.worker_ready:
+            return
+        if self.busy:
+            self._auto_apply_after = self.root.after(
+                250, self._apply_pending_workbench_changes
+            )
+            return
+        self.apply_simulation_settings(automatic=True)
+
     def _on_workbench_field_dirty(self, field: CatalogControlField) -> None:
         """Track a direct edit and refresh derived actor presentation fields."""
 
@@ -1034,6 +1065,8 @@ class SemanticHarnessApp:
             not control_id
             or self.workbench_control_fields.get(control_id) is not field
         ):
+            return
+        if self._workbench_initializing:
             return
         self._workbench_dirty_ids.add(control_id)
         self.activity_log.record(
@@ -1052,6 +1085,7 @@ class SemanticHarnessApp:
             self._render_trait_effects()
             self._schedule_personality_preview()
         self._refresh_workbench_feedback()
+        self._schedule_workbench_auto_apply()
 
     def _sync_derived_identity_fields(self, actor: str) -> None:
         """Keep IDs and player display text readable while names are edited."""
@@ -1546,6 +1580,7 @@ class SemanticHarnessApp:
 
     def _worker_ready(self, result: WorkerReady) -> None:
         self._worker_initialized = True
+        self._workbench_initializing = True
         self.persona_catalog = result.capabilities.get("personaCatalog") or {}
         self.simulation_control_catalog = (
             result.capabilities.get("simulationControlCatalog") or {}
@@ -1557,6 +1592,7 @@ class SemanticHarnessApp:
         self._set_status(f"Ready · Lua PID {result.status.get('pid')}")
         self._set_controls(True)
         self._clear_workbench_pending()
+        self._workbench_initializing = False
         self._append("SYSTEM", "Lua worker ready. Production semantic modules are loaded.")
         initial_suggestions = result.capabilities.get("suggestions") or {}
         if initial_suggestions:
@@ -2251,13 +2287,18 @@ class SemanticHarnessApp:
             label=profile_label(selected),
         )
         self._refresh_workbench_feedback(
-            f"{profile_label(selected)} staged · choose Apply or Apply + replay."
+            f"{profile_label(selected)} staged · applying automatically…"
         )
+        self._schedule_workbench_auto_apply()
 
-    def apply_simulation_settings(self, replay: bool = False) -> None:
+    def apply_simulation_settings(
+        self, replay: bool = False, *, automatic: bool = False
+    ) -> None:
         """Apply the catalog-backed draft, optionally replaying a real utterance."""
 
         if not self.session.ready or self.busy:
+            if automatic and not self.busy:
+                self._schedule_workbench_auto_apply()
             return
         current_text = self.input_var.get().strip()
         value = current_text or self.last_test_utterance.strip()
@@ -2273,6 +2314,7 @@ class SemanticHarnessApp:
             "ui",
             "apply_started",
             replay=replay,
+            automatic=automatic,
             pending=", ".join(self._pending_control_labels()),
         )
 
@@ -2300,13 +2342,23 @@ class SemanticHarnessApp:
                 )
             else:
                 response = configured
-                self._show_response(response)
-                self._append("SYSTEM", "Applied simulation workbench settings to the Lua worker.")
-                self._refresh_workbench_feedback("Applied to the Lua worker.")
+                if automatic:
+                    self._update_simulation_projection(response)
+                    self._refresh_workbench_feedback(
+                        "Auto-applied staged changes through the Lua worker."
+                    )
+                else:
+                    self._show_response(response)
+                    self._append(
+                        "SYSTEM",
+                        "Applied simulation workbench settings to the Lua worker.",
+                    )
+                    self._refresh_workbench_feedback("Applied to the Lua worker.")
             self.activity_log.record(
                 "ui",
                 "apply_completed",
                 replay=replay,
+                automatic=automatic,
                 message="simulation settings applied",
             )
 
@@ -3301,6 +3353,7 @@ class SemanticHarnessApp:
             self._relationship_preview_after,
             self._personality_preview_after,
             self._auto_replay_after,
+            self._auto_apply_after,
             self._activity_after,
         ):
             if after_id is not None:

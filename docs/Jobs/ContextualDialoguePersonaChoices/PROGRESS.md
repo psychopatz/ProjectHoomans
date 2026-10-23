@@ -374,3 +374,20 @@ Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
 ## Current Exact Next Chunk — automatic simulation apply and honest pending state
 
 Make staged workbench edits apply through the existing worker configuration boundary with a debounced automatic commit, keep Apply as an explicit immediate action, and make pending status identify the actual staged fields instead of a misleading count. Preserve Apply + replay as a separate future macro operation until replay clears the conversation and executes a recorded step sequence.
+
+## Automatic workbench apply and honest pending state
+
+Inline workbench edits now debounce into the existing Lua worker `configure` boundary automatically. The Apply button remains an immediate explicit commit, while automatic commits update the simulation projection and preserve the conversation transcript instead of fabricating a response turn. Pending labels now count direct staged controls only; derived identity values and widget state changes do not appear as extra edits. Catalog field enable/disable operations suppress dirty callbacks so normal worker refreshes cannot create phantom pending fields.
+
+Evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_simulation_workbench_p10e tools.semantic_harness.tests.test_contextual_runtime_parity_p11c tools.semantic_harness.tests.test_contextual_talk_parity_p11j -v` — **18/18 PASS**;
+- real Tk/X11 interaction — workbench starts with no pending edits, a changed relationship field auto-applies through the worker, status reports auto-apply, and the conversation retains its last utterance;
+- `python3 -m py_compile` on changed Python files — PASS;
+- `git diff --check` — PASS.
+
+Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
+
+## Current Exact Next Chunk — settings ownership cleanup
+
+Remove ordinary actor/world controls from the duplicate Simulation Settings dialog, retain uncommon/advanced controls there, and expose time/world facts in the main World workbench panel. Keep the same catalog and worker configuration path so GUI and CLI remain one system.

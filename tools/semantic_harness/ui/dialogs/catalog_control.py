@@ -393,11 +393,16 @@ class CatalogControlField:
             return
         if self.derived:
             enabled = False
-        if self.kind == "combobox":
-            self.widget.configure(state="readonly" if enabled else "disabled")
-            return
-        state = "normal" if enabled else "disabled"
+        self._suppress_dirty = True
         try:
+            if self.kind == "combobox":
+                self.widget.configure(
+                    state="readonly" if enabled else "disabled"
+                )
+                return
+            state = "normal" if enabled else "disabled"
             self.widget.configure(state=state)
         except self.tk.TclError:
             pass
+        finally:
+            self._suppress_dirty = False
