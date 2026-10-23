@@ -9,6 +9,7 @@ from typing import Any
 from .config import HarnessConfig
 from .fixture_provider import OfflineEngineFixtureProvider
 from .item_catalog import search_item_catalog
+from .live_profiler_provider import LiveProfilerProvider
 from .process import HarnessError, LuaProcess
 from .scenario import load_scenario, validate_scenario
 from .save_browser import SavedWorldBrowser
@@ -349,6 +350,92 @@ class LuaSemanticWorker:
         """Describe editable engine-only values and their fixture provenance."""
 
         return OfflineEngineFixtureProvider().catalog(self.scenario)
+
+    def live_profiler_catalog(
+        self,
+        *,
+        enabled: bool = False,
+        snapshot_path: Path | None = None,
+        config_path: Path | None = None,
+        npc_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Describe the optional read-only live snapshot provider."""
+
+        return LiveProfilerProvider(
+            core_repository=self.config.core_repository,
+            snapshot_path=snapshot_path,
+            config_path=config_path,
+            enabled=enabled,
+        ).catalog(npc_id=npc_id)
+
+    def enrich_from_live_profiler(
+        self,
+        *,
+        enabled: bool = False,
+        snapshot_path: Path | None = None,
+        config_path: Path | None = None,
+        player_id: str | None = None,
+        npc_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Explicitly copy live engine values into the isolated source world.
+
+        Only paths owned by ``OfflineEngineFixtureProvider`` are eligible for
+        enrichment.  The existing imported source save/fixture is never
+        reopened or written; a new immutable in-memory snapshot is installed
+        for the detached worker only, with LIVE provenance on each copied
+        path.
+        """
+
+        provider = LiveProfilerProvider(
+            core_repository=self.config.core_repository,
+            snapshot_path=snapshot_path,
+            config_path=config_path,
+            enabled=enabled,
+        )
+        projection = provider.project(
+            operation="GET_SNAPSHOT",
+            player_id=player_id,
+            npc_id=npc_id,
+        )
+        enrichment, live_paths = provider.fixture_enrichment(projection)
+        if not enrichment:
+            return {"ok": False, "liveProfiler": projection, "imported": False}
+
+        def merge_overlay(target: dict[str, Any], overlay: dict[str, Any]) -> None:
+            for key, value in overlay.items():
+                if isinstance(value, dict) and isinstance(target.get(key), dict):
+                    merge_overlay(target[key], value)
+                else:
+                    target[key] = deepcopy(value)
+
+        source = self.source_snapshot.to_dict()
+        enriched_data = deepcopy(source["data"])
+        merge_overlay(enriched_data, enrichment)
+        metadata = deepcopy(source["metadata"])
+        metadata["liveProfiler"] = {
+            "providerID": provider.provider_id,
+            "snapshotPath": str(provider.snapshot_path),
+            "configPath": str(provider.config_path),
+            "snapshot": deepcopy(projection.get("snapshot")),
+        }
+        provenance = deepcopy(source["provenance"])
+        provenance.setdefault("schema", "semantic.provenance.v1")
+        provenance.setdefault("paths", {}).update(live_paths)
+        provider_payloads = deepcopy(source["providerPayloads"])
+        provider_payloads[provider.provider_id] = projection
+        response = self.import_source(
+            enriched_data,
+            source=metadata.get("sourceKind", self.source_snapshot.source),
+            source_id=str(metadata.get("sourceID") or "live-enriched-source"),
+            mode=str(metadata.get("mode") or "offline_save"),
+            metadata=metadata,
+            provenance=provenance,
+            provider_payloads=provider_payloads,
+        )
+        response["liveProfiler"] = projection
+        response["imported"] = True
+        response["enrichedPaths"] = sorted(live_paths)
+        return response
 
     def save_browser(self, save_path: Path) -> dict[str, Any]:
         """Return a bounded read-only actor/world projection for one save."""

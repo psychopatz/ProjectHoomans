@@ -2,8 +2,8 @@
 
 **Updated:** 2026-10-24  
 **Parent status:** REOPENED — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is mandatory.  
-**Current mandatory phase:** P12F — Offline engine fixture provider.
-**Current local baseline audited:** ProjectHoomans `main` at `b1cb1846`; upstream is synchronized.
+**Current mandatory phase:** P12G — Optional read-only live profiler provider.
+**Current local baseline audited:** ProjectHoomans `main` at `25ef4034`; upstream remains unchanged and local `main` is ahead by six commits.
 **Normal Semantic Lab runtime requirement:** Project Zomboid CLOSED/OFFLINE is supported and expected.  
 **Source save mutation:** FORBIDDEN.  
 **Optional live profiler:** disabled by default; read-only enrichment only.
@@ -296,9 +296,26 @@ Evidence:
 - `tools/semantic_harness/tests/test_fixture_provider_p12f.py`: 2 tests passed;
 - P12A–P12D focused suites remained green; Python compilation and `git diff --check` passed.
 
-## Current Exact Next Chunk — P12G
+## Completed Chunk — P12G Optional read-only live profiler provider
 
-Audit and, if needed, add the optional read-only live profiler provider. It must be disabled by default, settings-text/restart controlled, one-way from Project Zomboid to Semantic Lab, and never expose mutation commands.
+Audited the existing PsychopatzCore/Hoomans profiler lifecycle and added an explicit Semantic Lab read-only provider:
+
+- the existing Core `PsychopatzCore_Profiler.txt` contract remains the only game-side gate: missing/invalid configuration resolves to `OFF`, configuration is read at bootstrap, and the runtime snapshot includes a version/fingerprint/capture manifest;
+- `tools/semantic_harness/runtime/live_profiler_provider.py` reuses Core's existing `profiler_cli.read_snapshot`, `capture_manifest`, `snapshot_npc_data`, and `profiler_config.read_capture_config` helpers rather than adding a snapshot decoder;
+- the provider is disabled by default, requires explicit opt-in plus a non-`OFF` external config, reports `LIVE` only for bounded copied projections, and reports `MISSING` with a reason when PZ/snapshot/config data is unavailable;
+- the contract exposes only `GET_SNAPSHOT`, `GET_PLAYER`, `GET_NPC`, `GET_WORLD`, and `GET_FACTIONS`; mutation command names are explicitly forbidden and no command transport exists;
+- `LuaSemanticWorker.live_profiler_catalog(...)` exposes the provider without changing the normal offline path; `enrich_from_live_profiler(...)` is an explicit copy operation limited to engine-fixture-shaped paths, records `LIVE` provenance, and keeps the snapshot file untouched;
+- live data can enrich the detached source/working snapshot while PZ is closed; no data or gameplay command is sent to the running game.
+
+Evidence:
+
+- `tools/semantic_harness/tests/test_live_profiler_provider_p12g.py`: default-disabled, forbidden-operation, bounded-projection, explicit-enrichment, reset, and snapshot-immutability tests passed;
+- P12A–P12F focused tests remained green; Python compilation, `luac5.3 -p`, and `git diff --check` passed;
+- the existing Core profiler CLI reported the saved runtime identity but no connected Project Zomboid process; no profiler setting was changed.
+
+## Current Exact Next Chunk — P12H Production mutations in isolated world
+
+Prove the real production relationship, proposal, recruitment, faction/community, knowledge, inventory, quest/tool mutation paths against imported save-backed working state, including the normal semantic proposal choice route, while keeping the source snapshot and source save unchanged.
 
 ## P12A acceptance
 
