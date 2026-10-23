@@ -50,6 +50,7 @@ from ..studio.workflow import SemanticLabWorkflowPane
 from .state import load as load_ui_state
 from .state import save as save_ui_state
 from .state import state_path as ui_state_path
+from .workbench import WorkbenchPage
 
 
 def npc_message_text(message: dict[str, Any]) -> str:
@@ -322,6 +323,10 @@ class SemanticHarnessApp:
         self.relationship_preview_var: Any | None = None
         self.trait_effects_var: Any | None = None
         self.trait_effects_widget: Any | None = None
+        self.trait_effects_widgets: dict[str, Any] = {}
+        self.player_social_profile_preview: dict[str, Any] = {}
+        self.player_trait_conflicts: list[Any] = []
+        self.player_trait_fingerprint = ""
         self.auto_replay_var: Any | None = None
         self._relationship_preview_after: Any | None = None
         self._personality_preview_after: Any | None = None
@@ -529,7 +534,7 @@ class SemanticHarnessApp:
         )
         self.workbench_toggle_button.grid(row=0, column=5, sticky="e")
         self.workbench_content = ttk.Frame(self.simulation_workbench)
-        self.workbench_content.grid(row=1, column=0, sticky="ew", pady=(3, 0))
+        self.workbench_content.grid(row=1, column=0, sticky="nsew", pady=(3, 0))
         self.workbench_content.columnconfigure(0, weight=1)
         self.workbench_content.rowconfigure(0, weight=1)
         self.workbench_notebook = ttk.Notebook(self.workbench_content)
@@ -974,7 +979,7 @@ class SemanticHarnessApp:
             "npc.forename", "npc.surname",
         }:
             self._sync_derived_identity_fields(control_id.split(".", 1)[0])
-        if control_id == "persona.traits":
+        if control_id in {"persona.traits", "player.traits"}:
             self._render_trait_effects()
             self._schedule_personality_preview()
         self._refresh_workbench_feedback()
@@ -1037,12 +1042,19 @@ class SemanticHarnessApp:
             lines.extend(self._flatten_trait_effects(value[key], child_prefix))
         return lines
 
+    def _write_trait_effects(self, actor: str, lines: list[str]) -> None:
+        rendered = "\n".join(lines)
+        widget = self.trait_effects_widgets.get(actor)
+        if widget is not None:
+            widget.configure(state="normal")
+            widget.delete("1.0", "end")
+            widget.insert("1.0", rendered)
+            widget.configure(state="disabled")
+
     def _render_trait_effects(self) -> None:
-        if self.trait_effects_var is None:
-            return
-        field = self.workbench_control_fields.get("persona.traits")
-        selected = field.get_value() if field is not None else []
-        selected = selected if isinstance(selected, list) else []
+        npc_field = self.workbench_control_fields.get("persona.traits")
+        selected_npc = npc_field.get_value() if npc_field is not None else []
+        selected_npc = selected_npc if isinstance(selected_npc, list) else []
         definitions = {
             str(row.get("id")): row
             for row in self.persona_catalog.get("traits", [])
@@ -1051,44 +1063,75 @@ class SemanticHarnessApp:
         for definition in tuple(definitions.values()):
             for alias in definition.get("aliases") or []:
                 definitions.setdefault(str(alias), definition)
-        lines = ["Production registry effects"]
-        if not selected:
-            lines.append("Select a registered trait to inspect its effects.")
-        for trait_id in selected[:8]:
+        npc_lines = ["Production registry effects"]
+        if not selected_npc:
+            npc_lines.append("Select a registered trait to inspect its effects.")
+        for trait_id in selected_npc[:8]:
             definition = definitions.get(str(trait_id))
             if not definition:
-                lines.append(f"{trait_id}: definition unavailable")
+                npc_lines.append(f"{trait_id}: definition unavailable")
                 continue
             label = str(definition.get("label") or trait_id)
             source = str(definition.get("source") or "production")
-            lines.append(f"{label} · source: {source}")
+            npc_lines.append(f"{label} · source: {source}")
             effects = definition.get("effects")
-            effect_lines = self._flatten_trait_effects(effects, "effects")
-            lines.extend(f"  {line}" for line in effect_lines)
+            npc_lines.extend(
+                f"  {line}"
+                for line in self._flatten_trait_effects(effects, "effects")
+            )
             speech = definition.get("speechStyle")
             if speech:
-                lines.extend(
+                npc_lines.extend(
                     f"  {line}"
                     for line in self._flatten_trait_effects(speech, "speech style")
                 )
-        if self.generated_personality_preview and selected:
+        if self.generated_personality_preview and selected_npc:
             values = self.generated_personality_preview
-            shown = ("compassion", "sociability", "forgiveness", "bravery", "aggression")
+            shown = (
+                "compassion",
+                "sociability",
+                "forgiveness",
+                "bravery",
+                "aggression",
+            )
             preview = " · ".join(
                 f"{key} {self._format_trait_effect_value(values[key])}"
                 for key in shown
                 if key in values
             )
             if preview:
-                lines.append(f"Generated profile preview · {preview}")
-        rendered = "\n".join(lines)
-        if self.trait_effects_var is not None:
-            self.trait_effects_var.set(rendered)
-        if self.trait_effects_widget is not None:
-            self.trait_effects_widget.configure(state="normal")
-            self.trait_effects_widget.delete("1.0", "end")
-            self.trait_effects_widget.insert("1.0", rendered)
-            self.trait_effects_widget.configure(state="disabled")
+                npc_lines.append(f"Generated personality preview: {preview}")
+        self._write_trait_effects("npc", npc_lines)
+
+        player_field = self.workbench_control_fields.get("player.traits")
+        selected_player = player_field.get_value() if player_field is not None else []
+        selected_player = selected_player if isinstance(selected_player, list) else []
+        player_projection = self.simulation_projection.get("player", {})
+        if not isinstance(player_projection, dict):
+            player_projection = {}
+        player_profile = self.player_social_profile_preview or (
+            player_projection.get("socialProfile")
+            or self.persona_catalog.get("playerSocialProfile", {})
+        )
+        player_lines = ["Production-derived social profile"]
+        if not selected_player:
+            player_lines.append("Select registered player traits to preview their effects.")
+        for key in (
+            "orientation",
+            "romanceStyle",
+            "jealousyStyle",
+            "socialStyle",
+            "foodPreference",
+        ):
+            player_lines.append(f"{key}: {player_profile.get(key, 'unknown')}")
+        if self.player_trait_fingerprint:
+            player_lines.append(f"trait fingerprint: {self.player_trait_fingerprint}")
+        if self.player_trait_conflicts:
+            player_lines.append(
+                "trait conflicts: "
+                + ", ".join(str(item) for item in self.player_trait_conflicts[:4])
+            )
+        self._write_trait_effects("player", player_lines)
 
     def _schedule_personality_preview(self) -> None:
         if self._personality_preview_after is not None:
@@ -1138,6 +1181,25 @@ class SemanticHarnessApp:
         self.generated_personality_preview = (
             dict(preview) if isinstance(preview, dict) else {}
         )
+        if isinstance(value, dict):
+            player_profile = value.get("playerSocialProfile")
+            self.player_social_profile_preview = (
+                dict(player_profile) if isinstance(player_profile, dict) else {}
+            )
+            conflicts = value.get("playerTraitConflicts")
+            self.player_trait_conflicts = (
+                list(conflicts) if isinstance(conflicts, list) else []
+            )
+            self.player_trait_fingerprint = str(
+                value.get("playerTraitFingerprint") or ""
+            )
+            for control in self.workbench_controls:
+                control_id = str(control.get("id") or "")
+                if not control_id.startswith("player.socialProfile."):
+                    continue
+                field = self.workbench_control_fields.get(control_id)
+                if field is not None:
+                    field.set_value(self._scenario_control_value(control, self.scenario))
         self._update_generated_personality_controls()
         self._render_trait_effects()
 
@@ -1511,6 +1573,10 @@ class SemanticHarnessApp:
             return control.get("currentValue", "generated")
         if control_id.startswith("player.socialProfile."):
             key = control_id.rsplit(".", 1)[-1]
+            if self.player_social_profile_preview:
+                return self.player_social_profile_preview.get(
+                    key, control.get("currentValue", "unknown")
+                )
             projection = self.simulation_projection.get("player", {})
             profile = projection.get("socialProfile") or self.persona_catalog.get("playerSocialProfile", {})
             response = self.last_response if isinstance(self.last_response, dict) else {}
@@ -1549,6 +1615,7 @@ class SemanticHarnessApp:
         self.workbench_panel_notebooks = {}
         self.trait_effects_var = None
         self.trait_effects_widget = None
+        self.trait_effects_widgets = {}
         catalog_controls = self.simulation_control_catalog.get("controls", [])
         if not isinstance(catalog_controls, list):
             catalog_controls = []
@@ -1559,48 +1626,73 @@ class SemanticHarnessApp:
         self.workbench_controls = [
             control
             for control in catalog_controls[:control_limit]
-            if isinstance(control, dict) and control.get("workbench") is True
+            if (
+                isinstance(control, dict)
+                and control.get("workbench") is True
+                and control.get("workbenchVisible", True) is not False
+            )
         ]
         panel_names = ("NPC Target", "Player", "Relationship", "World")
         actor_tabs = ("Overview", "Needs", "Personality & Traits")
-        pages: dict[tuple[str, str], Any] = {}
-        rows_by_page: dict[tuple[str, str], int] = {}
+        pages: dict[tuple[str, str], WorkbenchPage] = {}
+        page_controls: dict[tuple[str, str], list[dict[str, Any]]] = {}
+
+        def page_layout(panel_name: str, tab_name: str) -> str:
+            if panel_name in {"NPC Target", "Player"}:
+                if tab_name == "Needs":
+                    return "stacked"
+                if tab_name == "Personality & Traits":
+                    return "personality"
+                return "two_column"
+            return "stacked"
+
+        def section_order(control: dict[str, Any]) -> tuple[int, str]:
+            panel_name = str(control.get("workbenchPanel") or "World")
+            tab_name = str(control.get("workbenchTab") or "Overview")
+            section = str(control.get("workbenchSection") or "")
+            if tab_name == "Personality & Traits":
+                priority = {
+                    "Traits": 0,
+                    "Registered traits": 0,
+                    "Personality source": 1,
+                    "Derived social profile": 2,
+                    "Generated personality": 3,
+                }
+                return priority.get(section, 10), section
+            return 0, section
 
         for panel_name in panel_names:
             panel = self._ttk.Frame(self.workbench_notebook, padding=(6, 2))
+            panel.rowconfigure(0, weight=1)
             panel.columnconfigure(0, weight=1)
             self.workbench_notebook.add(panel, text=panel_name)
             if panel_name in {"NPC Target", "Player"}:
                 notebook = self._ttk.Notebook(panel)
-                notebook.grid(row=0, column=0, sticky="ew")
+                notebook.grid(row=0, column=0, sticky="nsew")
                 self.workbench_panel_notebooks[panel_name] = notebook
                 for tab_name in actor_tabs:
-                    page = self._ttk.Frame(notebook, padding=(6, 2))
-                    for column in (1, 3):
-                        page.columnconfigure(column, weight=1)
-                    notebook.add(page, text=tab_name)
+                    page = WorkbenchPage(
+                        notebook,
+                        self._tk,
+                        self._ttk,
+                        self._ScrolledText,
+                        self,
+                        layout=page_layout(panel_name, tab_name),
+                    )
+                    page.frame.grid(row=0, column=0, sticky="nsew")
+                    notebook.add(page.frame, text=tab_name)
                     pages[(panel_name, tab_name)] = page
-                    rows_by_page[(panel_name, tab_name)] = 0
-                if panel_name == "Player":
-                    self._ttk.Label(
-                        pages[(panel_name, "Needs")],
-                        text="Player needs become actor-owned controls in the next runtime-parity slice.",
-                    ).grid(row=0, column=0, columnspan=4, sticky="w", pady=3)
-                    self._ttk.Label(
-                        pages[(panel_name, "Personality & Traits")],
-                        text="Player traits and derived social profile are supplied by production registries.",
-                    ).grid(row=0, column=0, columnspan=4, sticky="w", pady=3)
-                elif panel_name == "NPC Target":
-                    self._ttk.Label(
-                        pages[(panel_name, "Needs")],
-                        text="NPC needs are being moved to actor-owned scenario fields.",
-                    ).grid(row=0, column=0, columnspan=4, sticky="w", pady=3)
             else:
-                page = self._ttk.Frame(panel, padding=(6, 2))
-                page.columnconfigure(1, weight=1)
-                page.grid(row=0, column=0, sticky="ew")
+                page = WorkbenchPage(
+                    panel,
+                    self._tk,
+                    self._ttk,
+                    self._ScrolledText,
+                    self,
+                    layout=page_layout(panel_name, "Overview"),
+                )
+                page.frame.grid(row=0, column=0, sticky="nsew")
                 pages[(panel_name, "Overview")] = page
-                rows_by_page[(panel_name, "Overview")] = 0
 
         for control in self.workbench_controls:
             panel_name = str(control.get("workbenchPanel") or "World")
@@ -1609,89 +1701,64 @@ class SemanticHarnessApp:
             tab_name = str(control.get("workbenchTab") or "Overview")
             if (panel_name, tab_name) not in pages:
                 tab_name = "Overview"
-            page_key = (panel_name, tab_name)
+            page_controls.setdefault((panel_name, tab_name), []).append(control)
+
+        for page_key, controls in page_controls.items():
+            controls.sort(key=section_order)
             page = pages[page_key]
-            if page is None:
-                continue
-            index = rows_by_page[page_key]
-            rows_by_page[page_key] = index + 1
-            single_column = panel_name == "Relationship"
-            row = index if single_column else index // 2
-            pair_column = 0 if single_column else (index % 2) * 2
-            field = CatalogControlField(
-                page,
-                self._tk,
-                self._ttk,
-                self._ScrolledText,
-                self,
-                control,
-                self._scenario_control_value(control, self.scenario),
-                row=row,
-                label_column=pair_column,
-                value_column=pair_column + 1,
-                width=18,
-            )
-            if control.get("id") == "runtime.language":
-                field.variable = self.language_var
-                field.widget.configure(textvariable=self.language_var)
-                self.language_box = field.widget
-            self.workbench_control_fields[str(control["id"])] = field
-            if control.get("id") == "persona.traits":
-                field.widget.bind(
-                    "<<ListboxSelect>>",
-                    lambda _event, selected_field=field: self._on_workbench_field_dirty(
-                        selected_field
-                    ),
-                    add="+",
+            for control in controls:
+                page.add_section(control.get("workbenchSection"))
+                field = page.add_control(
+                    control,
+                    self._scenario_control_value(control, self.scenario),
                 )
-                self.trait_effects_var = self._tk.StringVar()
-                effects_row = rows_by_page[page_key]
-                effects_widget = self._ScrolledText(
-                    page,
-                    height=5,
-                    width=72,
-                    wrap="word",
-                    state="disabled",
-                )
-                effects_widget.grid(
-                    row=effects_row,
-                    column=0,
-                    columnspan=4,
-                    sticky="ew",
-                    pady=(2, 5),
-                )
-                self.trait_effects_widget = effects_widget
-                rows_by_page[page_key] = effects_row + 1
+                control_id = str(control["id"])
+                if control_id == "runtime.language":
+                    field.variable = self.language_var
+                    field.widget.configure(textvariable=self.language_var)
+                    self.language_box = field.widget
+                self.workbench_control_fields[control_id] = field
+                if control_id in {"persona.traits", "player.traits"}:
+                    actor = "npc" if control_id == "persona.traits" else "player"
+                    title = (
+                        "Production trait effects"
+                        if actor == "npc"
+                        else "Production-derived social profile"
+                    )
+                    effects_widget = page.add_summary(title, height=4)
+                    self.trait_effects_widgets[actor] = effects_widget
+                    if actor == "npc":
+                        self.trait_effects_widget = effects_widget
+            page.finish()
         relationship_page = pages.get(("Relationship", "Overview"))
         if relationship_page is not None:
-            proposal_row = rows_by_page[("Relationship", "Overview")] + 1
             self.proposal_button = self._ttk.Button(
-                relationship_page,
+                relationship_page.content,
                 text="Propose relationship",
                 command=self.propose_relationship,
             )
-            self.proposal_button.grid(
-                row=proposal_row,
-                column=0,
-                columnspan=2,
+            relationship_page.add_widget(
+                self.proposal_button,
+                columnspan=4,
                 sticky="w",
                 pady=(8, 3),
             )
             self.relationship_preview_var = self._tk.StringVar(
                 value="Live preview: waiting for production resolver"
             )
-            self._ttk.Label(
-                relationship_page,
+            preview_label = self._ttk.Label(
+                relationship_page.content,
                 textvariable=self.relationship_preview_var,
                 justify="left",
                 wraplength=560,
-            ).grid(
-                row=proposal_row + 1,
-                column=0,
-                columnspan=2,
+            )
+            relationship_page.add_widget(
+                preview_label,
+                columnspan=4,
                 sticky="w",
                 pady=(2, 6),
             )
+            relationship_page.finish()
         override_field = self.workbench_control_fields.get("npc.personalityOverride")
         if override_field is not None and override_field.variable is not None:
             override_field.variable.trace_add(
@@ -1765,6 +1832,9 @@ class SemanticHarnessApp:
                 field.set_value(self._scenario_control_value(control, scenario))
                 field.dirty = False
         self.generated_personality_preview = {}
+        self.player_social_profile_preview = {}
+        self.player_trait_conflicts = []
+        self.player_trait_fingerprint = ""
         self._update_generated_personality_controls()
         self._render_trait_effects()
         if clear_pending:

@@ -115,8 +115,20 @@ Completed locally on ProjectHoomans `main`.
 - CLI shared-stream smoke passed with `--trace`, real Lua worker startup, request/response events, and `hello`.
 - Shared activity writes are lock-protected and rotate after the bounded file size limit; activity failures do not interrupt harness work.
 
-**Current exact next chunk:** user review of the open GUI Log tab while a separate CLI/agent harness session runs, followed by user-owned native Project Zomboid SP/MP validation.
+## P11 continuation — reusable Simulation workbench correction
+
+Completed locally on ProjectHoomans `main`.
+
+- Added a reusable `WorkbenchPage` component with shared section, two-column, stacked, summary, and scrollable viewport layout behavior.
+- Needs pages now use full-width actor-owned sliders, preventing label/value collisions at 1080x700 and 1280x800.
+- Personality & Traits pages group registered traits, production effects, personality source, derived social profile, and generated personality controls; NPC trait selection refreshes production preview sliders automatically.
+- Player trait selection now uses the same `PERSONA_PREVIEW` worker route to expose the production social profile, conflicts, and fingerprint in the workbench.
+- Derived player ID/display name and NPC ID controls remain in the worker catalog for Advanced JSON/diagnostics but are hidden from normal workbench/settings editing; first/surname remain editable and continue to derive identity values.
+- Real Tk/Xvfb smoke passed at 1080x700 and 1280x800, including hidden derived controls, full-width needs, scrollable personality controls, player trait profile feedback, and NPC Berserker preview (`aggression` 0.4505 → 0.6005).
+- Focused regression suite under Xvfb: **15/15 passed**; `luac5.3 -p`, Python compile, worker catalog/preview smoke, and `git diff --check` passed.
+
+**Current exact next chunk:** user review of the updated Simulation workbench at normal and minimum desktop sizes, followed by any remaining visual adjustments before native Project Zomboid SP/MP validation.
 
 ## Handoff condition
 
-P11A-P11H and the requested Semantic Lab usability polish pass locally. **READY FOR USER LIVE TEST** remains valid for user-owned native Project Zomboid SP/MP validation. The agent did not operate native Project Zomboid and does not claim SP/MP evidence.
+P11A-P11H runtime parity and the current Semantic Lab workbench continuation are locally validated. Native Project Zomboid SP/MP remains **UNTESTED / user-owned**; no new READY claim is made by this workbench correction.

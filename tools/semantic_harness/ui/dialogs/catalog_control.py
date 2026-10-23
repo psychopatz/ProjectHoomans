@@ -45,6 +45,11 @@ class CatalogControlField:
         row: int,
         label_column: int = 0,
         value_column: int = 1,
+        label_columnspan: int = 1,
+        value_columnspan: int = 1,
+        label_padx: tuple[int, int] = (0, 6),
+        value_padx: tuple[int, int] = (0, 0),
+        value_sticky: str = "ew",
         width: int = 30,
     ) -> None:
         self.control = control
@@ -60,6 +65,11 @@ class CatalogControlField:
         self.listbox_values: list[Any] = []
         self.editor: StructuredInventoryEditor | None = None
         self.width = width
+        self.label_columnspan = max(1, int(label_columnspan))
+        self.value_columnspan = max(1, int(value_columnspan))
+        self.label_padx = label_padx
+        self.value_padx = value_padx
+        self.value_sticky = value_sticky
         self.dirty = False
         self._suppress_dirty = False
         self.derived = bool(control.get("derivedFrom"))
@@ -82,8 +92,9 @@ class CatalogControlField:
             self.widget.grid(
                 row=row,
                 column=label_column,
-                columnspan=2,
+                columnspan=self.label_columnspan + self.value_columnspan,
                 sticky="w",
+                padx=self.label_padx,
                 pady=3,
             )
             return
@@ -94,7 +105,14 @@ class CatalogControlField:
         ttk.Label(
             parent,
             text=label,
-        ).grid(row=row, column=label_column, sticky="w", padx=(0, 6), pady=3)
+        ).grid(
+            row=row,
+            column=label_column,
+            columnspan=self.label_columnspan,
+            sticky="w",
+            padx=self.label_padx,
+            pady=3,
+        )
 
         if self.kind == "combobox":
             self.option_map = {label: value for value, label in rows}
@@ -107,7 +125,14 @@ class CatalogControlField:
                 state="readonly",
                 width=width,
             )
-            self.widget.grid(row=row, column=value_column, sticky="ew", pady=2)
+            self.widget.grid(
+                row=row,
+                column=value_column,
+                columnspan=self.value_columnspan,
+                sticky=self.value_sticky,
+                padx=self.value_padx,
+                pady=2,
+            )
         elif self.kind == "slider":
             minimum = float(control.get("min", 0))
             maximum = float(control.get("max", 1))
@@ -119,7 +144,14 @@ class CatalogControlField:
             numeric = min(max(numeric, minimum), maximum)
             self.variable = tk.DoubleVar(value=numeric)
             holder = ttk.Frame(parent)
-            holder.grid(row=row, column=value_column, sticky="ew", pady=1)
+            holder.grid(
+                row=row,
+                column=value_column,
+                columnspan=self.value_columnspan,
+                sticky=self.value_sticky,
+                padx=self.value_padx,
+                pady=1,
+            )
             holder.columnconfigure(0, weight=1)
             self.widget = tk.Scale(
                 holder,
@@ -171,13 +203,27 @@ class CatalogControlField:
                 increment=control.get("step", 1),
                 width=width,
             )
-            self.widget.grid(row=row, column=value_column, sticky="ew", pady=2)
+            self.widget.grid(
+                row=row,
+                column=value_column,
+                columnspan=self.value_columnspan,
+                sticky=self.value_sticky,
+                padx=self.value_padx,
+                pady=2,
+            )
         elif self.kind == "multi_select":
             selected = {str(value) for value in initial} if isinstance(initial, list) else set()
             existing = {str(value) for value, _label in rows}
             rows.extend((value, value) for value in sorted(selected - existing))
             frame = ttk.Frame(parent)
-            frame.grid(row=row, column=value_column, sticky="ew", pady=2)
+            frame.grid(
+                row=row,
+                column=value_column,
+                columnspan=self.value_columnspan,
+                sticky=self.value_sticky,
+                padx=self.value_padx,
+                pady=2,
+            )
             frame.columnconfigure(0, weight=1)
             listbox = tk.Listbox(
                 frame,
@@ -200,7 +246,14 @@ class CatalogControlField:
         elif self.kind in {"text", "searchable_catalog"}:
             self.variable = tk.StringVar(value="" if initial is None else str(initial))
             self.widget = ttk.Entry(parent, textvariable=self.variable, width=width)
-            self.widget.grid(row=row, column=value_column, sticky="ew", pady=2)
+            self.widget.grid(
+                row=row,
+                column=value_column,
+                columnspan=self.value_columnspan,
+                sticky=self.value_sticky,
+                padx=self.value_padx,
+                pady=2,
+            )
         elif (
             self.kind == "structured_collection"
             and control.get("collectionType") == "inventory"
@@ -209,18 +262,46 @@ class CatalogControlField:
             self.editor = StructuredInventoryEditor(parent, host, owner, initial)
             self.widget = self.editor.frame
             self.value_widget = self.widget
-            self.widget.grid(row=row, column=value_column, sticky="ew", pady=2)
+            self.widget.grid(
+                row=row,
+                column=value_column,
+                columnspan=self.value_columnspan,
+                sticky=self.value_sticky,
+                padx=self.value_padx,
+                pady=2,
+            )
         elif self.kind == "advanced_json":
             self.widget = scrolled_text(parent, height=10, width=58, wrap="none")
-            self.widget.grid(row=row, column=value_column, sticky="ew", pady=2)
+            self.widget.grid(
+                row=row,
+                column=value_column,
+                columnspan=self.value_columnspan,
+                sticky=self.value_sticky,
+                padx=self.value_padx,
+                pady=2,
+            )
             self.widget.insert("1.0", pretty(initial if initial is not None else {}))
             self.variable = self.widget
         elif self.kind == "read_only":
             self.widget = ttk.Label(parent, text=str(initial or "unknown"))
-            self.widget.grid(row=row, column=value_column, sticky="w", pady=2)
+            self.widget.grid(
+                row=row,
+                column=value_column,
+                columnspan=self.value_columnspan,
+                sticky=self.value_sticky if self.value_sticky else "w",
+                padx=self.value_padx,
+                pady=2,
+            )
         else:
             self.widget = ttk.Label(parent, text=f"Unsupported worker control: {self.kind}")
-            self.widget.grid(row=row, column=value_column, sticky="w", pady=2)
+            self.widget.grid(
+                row=row,
+                column=value_column,
+                columnspan=self.value_columnspan,
+                sticky=self.value_sticky if self.value_sticky else "w",
+                padx=self.value_padx,
+                pady=2,
+            )
         self.value_widget = self.value_widget or self.widget
         if self.kind == "multi_select" and self.widget is not None:
             self.widget.bind("<<ListboxSelect>>", self._mark_dirty)

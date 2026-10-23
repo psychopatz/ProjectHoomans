@@ -236,6 +236,8 @@ end
 local function personaPreview(context, payload)
     local Values = context.Values
     local scenario = type(payload) == "table" and payload.scenario or nil
+    local player = type(scenario) == "table" and scenario.player
+        or context.Runtime.scenario and context.Runtime.scenario.player or {}
     local npc = type(scenario) == "table" and scenario.npc
         or context.Runtime.scenario and context.Runtime.scenario.npc or {}
     local identitySeed = npc.identitySeed
@@ -252,6 +254,15 @@ local function personaPreview(context, payload)
         nil,
         { npcTraits = npc.traits or {} }
     )
+    local playerProfile = {}
+    local playerConflicts = {}
+    local playerFingerprint = ""
+    local socialTraits = PNC.SocialTraits
+    if socialTraits and type(socialTraits.ResolveTraits) == "function" then
+        playerProfile, playerConflicts, playerFingerprint = socialTraits.ResolveTraits(
+            player.traits or player.socialTraits or {}
+        )
+    end
     return {
         ok = true,
         type = "persona_preview",
@@ -259,6 +270,9 @@ local function personaPreview(context, payload)
         mode = "generated",
         personality = Values.copy(personality),
         traits = Values.copy(npc.traits or {}),
+        playerSocialProfile = Values.copy(playerProfile),
+        playerTraitConflicts = Values.copy(playerConflicts),
+        playerTraitFingerprint = playerFingerprint or "",
         persisted = false,
     }
 end
@@ -380,7 +394,7 @@ local function simulationControlCatalog(context, payload)
     add("player.characterUUID", "player.characterUUID", "Actors", "Player", "Player ID", "text", "text", {
         derivedFrom = { "player.forename", "player.surname" },
         workbench = true, workbenchPanel = "Player", workbenchTab = "Overview",
-        workbenchSection = "Overview",
+        workbenchSection = "Overview", workbenchVisible = false, settingsVisible = false,
     })
     add("player.forename", "player.forename", "Actors", "Player", "Player first name", "text", "text", {
         workbench = true, workbenchPanel = "Player", workbenchTab = "Overview",
@@ -393,7 +407,7 @@ local function simulationControlCatalog(context, payload)
     add("player.displayName", "player.displayName", "Actors", "Player", "Player display name", "text", "text", {
         derivedFrom = { "player.forename", "player.surname" },
         workbench = true, workbenchPanel = "Player", workbenchTab = "Overview",
-        workbenchSection = "Overview",
+        workbenchSection = "Overview", workbenchVisible = false, settingsVisible = false,
     })
     add("player.gender", "player.gender", "Actors", "Player", "Gender", "combobox", "enum", {
         options = persona.identity.genders,
@@ -429,7 +443,7 @@ local function simulationControlCatalog(context, payload)
     add("npc.npcID", "npc.npcID", "Actors", "NPC", "NPC ID", "text", "text", {
         derivedFrom = { "npc.forename", "npc.surname" },
         workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
-        workbenchSection = "Overview",
+        workbenchSection = "Overview", workbenchVisible = false, settingsVisible = false,
     })
     add("npc.forename", "npc.forename", "Actors", "NPC", "First name", "text", "text", {
         workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
@@ -483,7 +497,7 @@ local function simulationControlCatalog(context, payload)
         options = traits,
         optionsSource = "PNC.NPCTraits",
         workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Personality & Traits",
-        workbenchSection = "Needs + personality",
+        workbenchSection = "Registered traits",
     })
     add("npc.personalityOverride", "npc.personalityOverride", "Persona", "Personality", "Override generated personality", "boolean", "boolean", {
         workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Personality & Traits",
@@ -501,7 +515,7 @@ local function simulationControlCatalog(context, payload)
         currentValue = context.npcPersonality and context.npcPersonality.socialStyle,
         requiresOverride = "npc.personalityOverride",
         workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Personality & Traits",
-        workbenchSection = "Needs + personality",
+        workbenchSection = "Generated personality",
     })
     add("relationship.approval", "npc.relationship.approval", "Persona", "Relationship", "Approval", "slider", "number", {
         min = -100, max = 100, step = 1, format = "%.0f",
@@ -525,7 +539,7 @@ local function simulationControlCatalog(context, payload)
             currentValue = context.npcPersonality and context.npcPersonality[key],
             requiresOverride = "npc.personalityOverride",
             workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Personality & Traits",
-            workbenchSection = "Needs + personality",
+            workbenchSection = "Generated personality",
         })
     end
     for _, key in ipairs({ "companion", "owned", "eligible" }) do

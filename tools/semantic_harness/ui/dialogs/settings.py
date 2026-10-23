@@ -485,6 +485,8 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
         return value
 
     for control in controls:
+        if control.get("settingsVisible", True) is False:
+            continue
         control_id = str(control["id"])
         page_title = str(control.get("page") or "Simulation")
         section_title = str(control.get("section") or "Scenario")
@@ -542,6 +544,8 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
     def collect() -> dict[str, Any]:
         values: dict[str, Any] = {}
         for control in controls:
+            if control.get("settingsVisible", True) is False:
+                continue
             control_id = str(control["id"])
             widget_kind = str(control.get("control") or "text")
             field = fields[control_id]
