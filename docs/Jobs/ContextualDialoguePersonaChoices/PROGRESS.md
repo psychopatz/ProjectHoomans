@@ -2,7 +2,7 @@
 
 **Updated:** 2026-10-23
 **Parent status:** REOPENED — P11 runtime-parity foundation retained; P11J native Talk shared-entry parity is mandatory.
-**Current mandatory phase:** P11J4 — Regression and native handoff.
+**Current mandatory phase:** P11J4 — developer gates accepted; ready for user-owned native Talk validation.
 **Current remote baseline audited:** ProjectHoomans `main` at `c9385c4f2b1b86feb09ed24144896e473bd6fec8`.
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned.
 
@@ -90,7 +90,7 @@ Project Zomboid SP/MP remains **UNTESTED / user-owned**.
 
 ## P11J3 — accepted developer implementation
 
-Commit: pending after this milestone is committed.
+Commit: `6f378973` — `P11J3 complete Talk parity route matrix`.
 
 The shared projection now carries row-level availability and integration state.
 The matrix uses clean scenario copies, restores the original scenario, and keeps
@@ -133,19 +133,47 @@ P11J3 evidence:
 - changed Lua passed `luac5.3 -p` and Kahlua verification; Python compilation
   and `git diff --check` passed.
 
-## Current Exact Next Chunk — P11J4
+## P11J4 — accepted developer gates
 
-Run the focused and impacted developer-side regression gates:
+The P11J2 shared boundary and P11J3 route matrix passed the impacted developer
+regression gates:
 
-1. P11J Talk parity Python tests and Tk/Xvfb selected-target and full-matrix paths;
-2. CLI `TALK_START` and `TALK_MATRIX` with compact schema/route checks;
-3. conversation, NPC type palette, contextual hub, graph, relationship/bond,
-   identity, inventory, and activity-log regressions;
-4. EN/TL validation, `luac5.3 -p`, Kahlua verification, doctor, and
-   `git diff --check`;
-5. prove no new Talk-parity persistent ModData/state;
-6. update this file with exact evidence, commit safely on `main`, and hand native
-   Talk comparison to the user.
+- P11J and Dynamic Trading parity suites: **12/12 PASS**;
+- impacted P10/P11 non-GUI suites: **69 PASS**, with nine display-only tests
+  skipped in the intentionally headless run;
+- Tk selected-target Talk start: **PASS** for Hostile / Enemy;
+- Tk full Talk matrix: **PASS** for Colonist, Follower, Neutral, and Hostile / Enemy;
+- CLI `TALK_START`: `semantic.talk.parity.v1`, hostile full-conversation route,
+  greeting opening, first response, semantic Flow graph, and
+  `speech.style.context.v1` all present;
+- CLI `TALK_MATRIX`: `semantic.talk.parity.matrix.v1`, `ok=true`,
+  `restoredScenario=true`, and all four production rows present;
+- `python3 -m tools.semantic_harness --no-gui --doctor --doctor-json`: required
+  checks passed, including Lua, worker syntax, and worker boot; the optional
+  virtual-environment check reported the system interpreter as a warning;
+- EN/TL Talk parity kept target routes and semantic choice IDs identical;
+- `luac5.3 -p` passed for changed Lua and `pz_verify --kahlua` reported zero
+  errors;
+- `python3 -m py_compile` passed for changed Python;
+- `git diff --check` passed;
+- Talk start/parity modules contain no `getModData`, `ModData`, or
+  `GlobalModData` access; matrix-only target state is transient runtime state and
+  is restored after each row and after the matrix.
+
+The codebase graph coverage report was best-effort and marked several changed
+files as missing or metadata-changed in its older generation. The implementation
+claims above therefore rely on direct source inspection plus the runtime tests,
+with the graph result treated as a coverage signal rather than proof of
+completeness.
+
+## Current Exact Next Chunk — native user handoff
+
+The developer side is ready for the user's native Project Zomboid comparison.
+Use the actual context-menu Talk path for Colonist, Follower, Neutral, and
+Hostile, then compare target classification, route, opening choices, first
+response, hostile inline/fallback behavior, and any observable graph path against
+Semantic Lab. Native SP/MP remains **UNTESTED / user-owned** until that evidence
+is supplied.
 
 ## Known separate relationship boundary
 
