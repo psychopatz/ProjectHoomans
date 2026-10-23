@@ -1,7 +1,7 @@
 # Contextual Dialogue Persona & Choices
 
-**Status:** REOPENED — P12 save-backed runtime foundation retained; P13 Operational Semantic Test Workbench is the current mandatory phase.  
-**Current source-audit baseline:** ProjectHoomans remote main at dbfd9099a0b687bc2f6505f58e81e32ea6dc5966 (2026-10-24).  
+**Status:** REOPENED — P12/P13 save-backed operational workbench retained; P14 Production Rehydration & Mod-Code Execution Parity is the current mandatory phase.  
+**Current source-audit baseline:** ProjectHoomans remote main at d3c6c2018b4a074bdf6178b7f060f18832ed2344 (2026-10-24).  
 **Dynamic Trading provider baseline:** psychopatz/DynamicTrading at 5db64cbcc764f035146f044fdc34e930ce47d7c8.  
 **Native Project Zomboid SP/MP:** untested; user-owned acceptance.
 
@@ -20,7 +20,7 @@ The existing P0-P7 implementation is retained as foundation, but the 2026-10-22 
 
 The P8 behavioral foundation is now implemented, but the 2026-10-22 UI/routing audit found a new product gap: Semantic Lab still hides real conversation branching, and typed authored-category utterances such as `whatsup` redundantly produce an `Ask what's up` button instead of entering the already-recognized category directly.
 
-P12 has now implemented the save-backed runtime foundation: immutable read-only save snapshots, detached working worlds, real saved Player/NPC/relationship import, provider-backed factions/communities/traders, production relationship/proposal/recruitment mutation paths, explicit offline engine fixtures, optional read-only profiler enrichment, and source provenance. The current product gap is no longer backend state origin; it is **operational usability**. The save browser is compressed into an impractical one-row control strip, faction/community membership is not navigable as an actor hierarchy, Player and NPC inspection are asymmetric, real offline Player inventory is not yet projected where available, and gift verification is not a first-class visual/machine-readable workflow. The current mandatory goal is therefore **P13 — Operational Semantic Test Workbench**.
+P12/P13 have now delivered a real save-backed and operational Semantic Lab: save/world browsing, real Player/NPC selection, isolated working-world mutations, Player inventory decoding, faction/community inspection, gift verification, CLI parity, and operational acceptance. The latest real-save audit found a deeper remaining parity problem: Python still interprets portions of Project Hoomans persisted gameplay state instead of feeding raw saved records through the production Lua persistence/runtime owners. This causes false `MISSING`/`unknown` state, including compact NPC inventory persistence and incomplete faction diplomacy context. The current mandatory goal is therefore **P14 — Production Rehydration & Mod-Code Execution Parity**. The governing rule is: **fixture the engine, never fixture the mod**.
 
 ## Relationship / bond direction
 
@@ -93,8 +93,9 @@ This job builds on and must not duplicate:
 11. PRODUCTION_RELATIONSHIP_PROPOSAL_INTEGRATION.md
 12. SAVE_BACKED_OFFLINE_SEMANTIC_RUNTIME.md
 13. OPERATIONAL_SEMANTIC_TEST_WORKBENCH.md
-14. ROADMAP.md
-15. HARNESS_ACCEPTANCE.md
-16. PROGRESS.md **last** for current truth and the exact Next Chunk
+14. PRODUCTION_REHYDRATION_AND_MOD_CODE_PARITY.md
+15. ROADMAP.md
+16. HARNESS_ACCEPTANCE.md
+17. PROGRESS.md **last** for current truth and the exact Next Chunk
 
 No checked-in GOAL_PROMPT.md is allowed. The executable /goal remains chat-only.
