@@ -1,6 +1,6 @@
 # Roadmap — Contextual Dialogue Persona & Choices
 
-**Parent status:** REOPENED — P0-P11J foundation retained; P12 save-backed offline Semantic Lab is mandatory.  
+**Parent status:** REOPENED — P0-P12 save-backed runtime foundation retained; P13 Operational Semantic Test Workbench is mandatory.  
 Phases are organization and acceptance checkpoints; completing one phase never completes the parent objective.
 
 ## P0 — Current-path contract baseline
@@ -721,3 +721,128 @@ Run Talk, hub, identity, recruitment, proposal, relationship/faction/knowledge/i
 Validate multiple saves/players/NPCs, corrupt/unsupported saves, provider presence/absence, offline fixtures, optional live enrichment, source-save immutability, and full regression.
 
 **Gate:** Semantic Lab is a read-only save-seeded, isolated, production-Lua semantic runtime.
+
+
+## P13 — Operational Semantic Test Workbench
+
+P13 converts the P12 save-backed runtime into a practical primary verification environment.
+
+P12 backend/runtime work is retained. Do not replay P12A-P12K unless a regression is found.
+
+Read `OPERATIONAL_SEMANTIC_TEST_WORKBENCH.md`.
+
+### P13A — Operational World Browser UX
+
+Replace the compressed one-row save browser with a dedicated usable save/player/world browser.
+
+Required:
+
+- real save selector;
+- saved Player selector;
+- hierarchical faction/community/NPC tree;
+- search/filter;
+- simple select/double-click target load;
+- loaded NPC becomes Talk target;
+- fixture NPC profile hidden/demoted in save-backed mode;
+- realistic desktop/minimum geometry interaction tests.
+
+**Gate:** select one of multiple saves -> select Player -> expand faction/group -> select/import NPC -> Start Talk through actual Tk interaction.
+
+### P13B — Offline Player Engine-State Provider
+
+Audit current Build 42.20 Player save ownership and implement the smallest safe read-only provider required for Player inventory parity.
+
+Priority:
+
+- inventory;
+- worn/equipped items;
+- traits where authoritative persisted source exists;
+- needs/condition values only where format is proven useful.
+
+Version-gate and fail closed.
+
+Do not invent inventory and do not require the live profiler.
+
+**Gate:** at least one real compatible save exposes real Player inventory offline with unchanged source hash; unsupported formats report MISSING/reason.
+
+### P13C — Symmetric Player/NPC Actor Inspectors
+
+Give Player and NPC Target parallel:
+
+- Overview;
+- Needs;
+- Personality & Traits;
+- Inventory.
+
+Reuse one inventory presentation family.
+
+**Gate:** selecting a different saved Player/NPC refreshes both first-class actor surfaces with correct provenance.
+
+### P13D — Faction/Community Workbench
+
+Expose:
+
+- factions;
+- communities;
+- leaders;
+- members;
+- roles;
+- standings/diplomacy where available;
+- trader/provider overlays.
+
+Member selection changes the current NPC target.
+
+**Gate:** real saved faction membership is operationally navigable.
+
+### P13E — Inventory/Gift Verification Workbench
+
+Add side-by-side Player/NPC inventory and run gifting through the existing production semantic/inventory/gift path.
+
+Show:
+
+- selected item/count;
+- before/after inventory;
+- NPC reaction;
+- relationship delta;
+- provenance/source immutability.
+
+**Gate:** one real save-backed gift is verifiable end-to-end and Reset World restores the imported baseline.
+
+### P13F — Agent-grade CLI parity
+
+Expose the same backend operations machine-readably:
+
+- saves;
+- players;
+- factions/communities;
+- NPC search/list;
+- actor pair load;
+- actor/inventory/relationship inspection;
+- Talk;
+- semantic action;
+- gift/recruit/propose;
+- diff/reset/reload.
+
+**Gate:** agent can reproduce the key gift/relationship test without Tk or screenshots.
+
+### P13G — Operational acceptance
+
+Run the full real-save workflow through realistic Tk/Xvfb and CLI:
+
+```text
+discover save
+ -> select Player
+ -> browse faction
+ -> select NPC
+ -> inspect both inventories
+ -> Start Talk
+ -> execute gift
+ -> observe semantic + inventory + relationship changes
+ -> reset
+ -> verify baseline restored
+ -> verify source save unchanged
+```
+
+Cover follower/companion, neutral, hostile where supported, trader/provider, and missing-player-inventory cases.
+
+**Gate:** Semantic Lab is operational enough to be the primary semantic/conversation verification environment; native PZ remains user-owned final acceptance.
