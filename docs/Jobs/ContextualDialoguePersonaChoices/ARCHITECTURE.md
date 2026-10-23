@@ -708,3 +708,34 @@ The speech-realization registry/resolver remains singular.
 Built-in content should be registered from a small number of cohesive domain packs rather than accumulated indefinitely in the core resolver module.
 
 The modularity boundary is content ownership, not one-file-per-string fragmentation.
+
+
+## 30. Native Talk parity boundary
+
+Talk classification and route selection are production concerns.
+
+The canonical architecture is:
+
+```text
+native NPC entry + player
+        ↓
+production Talk-start projection
+        ↓
+target type / audience / safety / route
+        ↓
+conversation definition / opening state
+```
+
+Semantic Lab may construct a canonical entry from a scenario fixture, but once the entry exists it must enter the same production Talk-start projection.
+
+Do not maintain a second harness-owned route/classification policy.
+
+Normal production Talk target types are `colonist`, `follower`, `neutral`, and `hostile`.
+
+Follower is derived from colonist ownership plus follow order.
+
+`enemy` is a display alias only.
+
+Trader is a capability/provider overlay and never a tactical Talk type.
+
+Hostile inline behavior depends on the real integration availability. A headless harness must report missing inline support and exercise the production full-conversation fallback rather than inventing availability.
