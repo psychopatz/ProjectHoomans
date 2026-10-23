@@ -322,6 +322,7 @@ local conversationCompositionCalls = capture(
 local expectedConversationComposition = {
     "PNC/Integrations/PNC_VoiceGateway",
     "PNC/UI/PNC_NPCTypePalette",
+    "PNC/Conversation/PNC_ConversationTalkParity",
     "PNC/UI/Factions/PNC_FactionPresentation",
     "PNC/UI/Relationships/PNC_RelationshipGraphPanel",
     "PNC/UI/Context/PNC_ContextHub",

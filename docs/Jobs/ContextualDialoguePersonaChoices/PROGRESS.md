@@ -214,3 +214,16 @@ Completed locally across ProjectHoomans `main` and psychopatzCore `main`.
 - Changed Lua `luac5.3 -p`, targeted `pz_verify` Kahlua scans, Python compilation, and `git diff --check` **PASS**. Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
 
 **Current exact next chunk:** audit and validate the remaining identity and native Project Zomboid integration paths, including the production composition/load-order boundary for the Core content projection API.
+
+## P11L — native identity bridge and production composition audit
+
+Completed locally across ProjectHoomans `main` and psychopatzCore `main`.
+
+- The current Project Zomboid Java baseline confirms `WorldGenParams` is `@UsedFromLua`, exposes the static `INSTANCE`, and provides `getSeedString()`. It also confirms `SurvivorFactory` is `@UsedFromLua`, exposes `FemaleForenames`, `MaleForenames`, and `Surnames`, and is exposed by `LuaManager` together with `WorldGenParams`.
+- Core's native content boundary therefore uses the real save seed and native name pools when available, while remaining guarded for harness/fallback runtimes. Native name selection still reads the pools directly and never calls `CreateSurvivor`; appearance construction remains the separate Hoomans identity-factory concern.
+- The production load order is explicit: Hoomans declares `require=PsychopatzCore`, Core's shared composition loads the deterministic content module, and Hoomans' IdentitySocial composition explicitly requires the same Core module before identity-name providers. No second content/bond store or alternate identity route was introduced.
+- The Core deterministic-content smoke now exercises the `WorldGenParams.INSTANCE.getSeedString()` bridge shape. The composition smoke expectation now includes the already-production `PNC/Conversation/PNC_ConversationTalkParity` dependency, removing a stale test failure without changing runtime order.
+- Focused evidence: Core deterministic-content smoke **PASS**; Hoomans composition bootstrap smoke **PASS** (exit 0, expected adapter-unavailable warning only); deterministic identity-name smoke **PASS**; semantic identity-choice smoke **PASS**. The Java baseline decompile is current at `/home/psychopatz/Desktop/Projects/ZomboidDecompiler/output/source/zombie` and the indexed `pz-java-baseline` generation is `2026-09-17T09:04:19Z`.
+- Changed Lua/test files pass `luac5.3 -p` and `git diff --check`. Native Project Zomboid SP/MP remains **UNTESTED / user-owned**; no native game process was launched.
+
+**Current exact next chunk:** user-owned native Project Zomboid startup validation of the Core `WorldGenParams`/`SurvivorFactory` bridge and Talk Parity runtime surface, followed by the final P11H evidence gate. Until that is available, do not make another READY FOR USER LIVE TEST claim.
