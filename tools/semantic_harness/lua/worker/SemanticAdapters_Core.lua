@@ -10,28 +10,42 @@ function Provider.configure(context, SemanticAdapters)
     local runtime = context.runtime
     local player = context.player
     local conversationToken = tostring(conversationData.token or "")
+    local sourceKind = Runtime.sourceMetadata
+        and Runtime.sourceMetadata.sourceKind or "FIXTURE"
 
     npcData.id = npcData.id or npcData.npcID
     npcData.runtime = type(npcData.runtime) == "table"
         and npcData.runtime or {}
+    local productionRecord = sourceKind == "SAVE"
+        and Runtime.hydratedNpcRecord or nil
     PNC = PNC or {}
     PNC.ConversationScene = PNC.ConversationScene or {}
     PNC.ConversationScene.LEASE_MS =
         tonumber(PNC.ConversationScene.LEASE_MS) or 3500
     local leaseDuration = PNC.ConversationScene.LEASE_MS
-    if type(npcData.runtime.conversationLease) ~= "table" then
-        npcData.runtime.conversationLease = {
-            token = conversationToken,
-            playerOnlineID = player and player.getOnlineID
-                and player:getOnlineID() or nil,
-            playerUsername = player and player.getUsername
-                and player:getUsername() or nil,
-            startedAt = tonumber(Runtime.now) or 0,
-            expiresAt = (tonumber(Runtime.now) or 0) + leaseDuration,
-            maximumDistance = 6,
-            dangerRadius = 8,
-        }
+    local function ensureConversationLease(record)
+        if type(record) ~= "table" then return end
+        record.runtime = type(record.runtime) == "table"
+            and record.runtime or {}
+        if type(record.runtime.conversationLease) ~= "table" then
+            record.runtime.conversationLease = {
+                token = conversationToken,
+                playerOnlineID = player and player.getOnlineID
+                    and player:getOnlineID() or nil,
+                playerUsername = player and player.getUsername
+                    and player:getUsername() or nil,
+                startedAt = tonumber(Runtime.now) or 0,
+                expiresAt = (tonumber(Runtime.now) or 0) + leaseDuration,
+                maximumDistance = 6,
+                dangerRadius = 8,
+            }
+        end
     end
+    ensureConversationLease(npcData)
+    -- The conversation authority resolves SAVE actors through the isolated
+    -- production registry. The lease is an engine/scene fixture, so attach
+    -- the same worker-owned lease to that hydrated working record as well.
+    ensureConversationLease(productionRecord)
 
     local function identityName(npc)
         return SemanticAdapters.identityName(context, npc)
@@ -137,8 +151,19 @@ function Provider.configure(context, SemanticAdapters)
         return true, leaseOrReason
     end
     PNC.Registry = PNC.Registry or {}
-    PNC.Registry.Get = function(id)
-        return tostring(id) == tostring(npcData.npcID) and npcData or nil
+    if sourceKind == "SAVE"
+        and type(Runtime.hydratedNpcRecord) == "table"
+    then
+        -- The production relationship/knowledge services resolve through the
+        -- isolated hydrated record, never through the Python scenario table.
+        PNC.Registry.Get = function(id)
+            return tostring(id) == tostring(Runtime.hydratedNpcRecord.id)
+                and Runtime.hydratedNpcRecord or nil
+        end
+    else
+        PNC.Registry.Get = function(id)
+            return tostring(id) == tostring(npcData.npcID) and npcData or nil
+        end
     end
     PNC.Registry.GetLiveZombie = function(id)
         return tostring(id) == tostring(npcData.id) and {} or nil
@@ -180,16 +205,20 @@ function Provider.configure(context, SemanticAdapters)
     end
     PNC.PlayerContext.Peek = PNC.PlayerContext.Resolve
     PNC.Relationships = PNC.Relationships or {}
-    local sourceKind = Runtime.sourceMetadata
-        and Runtime.sourceMetadata.sourceKind or "FIXTURE"
     local relationshipTargetKey = playerData.entityKey
         or ("player:harness:" .. tostring(playerData.characterUUID))
     Runtime.relationshipTargetKey = relationshipTargetKey
-    npcData.social = type(npcData.social) == "table"
-        and npcData.social or {}
-    npcData.social.relationships = type(npcData.social.relationships) == "table"
-        and npcData.social.relationships or {}
-    if type(npcData.relationship) == "table"
+    if sourceKind ~= "SAVE" then
+        -- Developer fixtures use the compact scenario relationship seam.
+        -- SAVE actors resolve social state through the hydrated production
+        -- registry and must not rebuild a second scenario-owned social map.
+        npcData.social = type(npcData.social) == "table"
+            and npcData.social or {}
+        npcData.social.relationships = type(npcData.social.relationships) == "table"
+            and npcData.social.relationships or {}
+    end
+    if sourceKind ~= "SAVE"
+        and type(npcData.relationship) == "table"
         and npcData.social.relationships[relationshipTargetKey] == nil
     then
         npcData.social.relationships[relationshipTargetKey] = Values.copy(

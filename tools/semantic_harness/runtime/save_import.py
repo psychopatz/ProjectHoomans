@@ -460,6 +460,20 @@ class SaveBackedImporter:
             "ProjectHoomans": {
                 "PNC_PlayerCharacters": {selected_uuid: deepcopy(player_record)},
                 "PNC_" + selected_npc_id: deepcopy(npc_record),
+                # The Lua worker is the only owner of Hoomans runtime
+                # deserialization. Keep the selected records explicit so the
+                # production rehydration boundary never has to reconstruct a
+                # record from the Python scenario projection.
+                "rawRecords": {
+                    "player": deepcopy(player_record),
+                    "npc": deepcopy(npc_record),
+                },
+                "selection": {
+                    "playerTable": player_table,
+                    "playerUUID": selected_uuid,
+                    "npcTable": npc_table,
+                    "npcID": selected_npc_id,
+                },
             },
             "DynamicTrading": {
                 "source": "SAVE" if actor_projection["isTrader"] else "MISSING",

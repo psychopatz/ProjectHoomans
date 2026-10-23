@@ -316,6 +316,29 @@ local function compactMessages(messages)
     return result
 end
 
+local function compactRelationshipRecord(value, Values)
+    local result = Values.copy(value)
+    if type(result) ~= "table" then return result end
+    for _, key in ipairs({
+        "memories", "saturation", "cooldowns", "interactionJournal",
+        "events", "history", "recentEvents",
+    }) do
+        result[key] = nil
+    end
+    return result
+end
+
+local function compactStart(value, Values)
+    local result = Values.copy(value)
+    if type(result) ~= "table" or type(result.opening) ~= "table" then
+        return result
+    end
+    -- The opening suggestions are already returned by snapshot.suggestions;
+    -- avoid repeating the full production candidate graph in every response.
+    result.opening.suggestions = nil
+    return result
+end
+
 local function compactTurn(context, turn)
     local Values = context.Values
     local result = type(turn) == "table" and turn.result or nil
@@ -342,11 +365,11 @@ local function compactTurn(context, turn)
         } or nil,
         messages = compactMessages(turn and turn.messages or {}),
         toolCalls = Values.copy(turn and turn.toolCalls or {}),
-        relationshipBefore = Values.copy(
-            turn and turn.relationshipBefore or {}
+        relationshipBefore = compactRelationshipRecord(
+            turn and turn.relationshipBefore or {}, Values
         ),
-        relationshipAfter = Values.copy(
-            turn and turn.relationshipAfter or {}
+        relationshipAfter = compactRelationshipRecord(
+            turn and turn.relationshipAfter or {}, Values
         ),
     }
 end
@@ -411,20 +434,8 @@ local function compactObservation(context, start, turn, snapshot)
         toolCalls = context.Values.copy(turn and turn.toolCalls or {}),
         accepted = turn and turn.accepted == true or false,
         reason = turn and turn.reason,
-        start = context.Values.copy(start),
+        start = compactStart(start, context.Values),
     }
-end
-
-local function compactRelationshipRecord(value, Values)
-    local result = Values.copy(value)
-    if type(result) ~= "table" then return result end
-    for _, key in ipairs({
-        "memories", "saturation", "cooldowns", "interactionJournal",
-        "events", "history", "recentEvents",
-    }) do
-        result[key] = nil
-    end
-    return result
 end
 
 local function compactScenario(value, Values)
@@ -476,6 +487,9 @@ local function compactSnapshot(value, Values)
     result.scenario = compactScenario(result.scenario, Values)
     result.workingWorld = compactWorkingWorld(result.workingWorld, Values)
     result.context = compactContext(result.context, Values)
+    result.relationship = compactRelationshipRecord(
+        result.relationship, Values
+    )
     local simulation = result.simulationProjection
     local relationship = type(simulation) == "table"
         and simulation.relationship or nil

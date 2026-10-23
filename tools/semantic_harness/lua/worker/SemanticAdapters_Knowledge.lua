@@ -31,7 +31,10 @@ local function configureWorldKnowledge(context, Runtime, Values, npcData, runtim
         records[tostring(record.id or "")] = record
         records[tostring(record.coreActorID or "")] = record
     end
-    addRecord(npcData)
+    -- SAVE imports must expose the production-hydrated record to knowledge
+    -- and downstream services. The scenario projection remains an engine/UI
+    -- view, never a second Hoomans registry record.
+    addRecord(Runtime.hydratedNpcRecord or npcData)
     if type(fixture.actors) == "table" then
         for key, value in pairs(fixture.actors) do
             if type(value) == "table" then

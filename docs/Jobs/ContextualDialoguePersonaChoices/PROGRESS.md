@@ -2,8 +2,8 @@
 
 **Updated:** 2026-10-24  
 **Parent status:** REOPENED — P12/P13 save-backed operational workbench retained; P14 production rehydration parity is mandatory.  
-**Current mandatory phase:** P14A — Production rehydration boundary.  
-**Current remote baseline audited:** ProjectHoomans `main` at `d3c6c2018b4a074bdf6178b7f060f18832ed2344`.  
+**Current mandatory phase:** P14B — Production NPC inventory rehydration.
+**Current local baseline audited:** ProjectHoomans `main` at `25b51c07`.
 **Normal Semantic Lab runtime requirement:** Project Zomboid may remain CLOSED/OFFLINE.  
 **Source save mutation:** FORBIDDEN.
 
@@ -88,38 +88,55 @@ Python owns discovery/transport/isolation/presentation.
 
 Production Lua owns Hoomans deserialization, normalization, derivation and gameplay mutation.
 
-## Current Exact Next Chunk — P14A
+## Completed P14A — production rehydration boundary
 
-On the user's existing local `main`:
+Evidence recorded on 2026-10-24:
 
-1. read root `AGENTS.md` and this job's docs in documented order, including `PRODUCTION_REHYDRATION_AND_MOD_CODE_PARITY.md`;
-2. inspect local ProjectHoomans/Core/DynamicTrading branch/HEAD/upstream/divergence and preserve concurrent work;
-3. trace one real imported `PNC_npc<ID>` from:
-   - Core GlobalModDataReader;
-   - Python save provider/importer;
-   - worker configure/install;
-   - isolated registry;
-   - conversation/semantic context;
-4. audit the actual production Lua persistence/load owners for NPC records, inventory, social state and migrations;
-5. define the smallest raw-record transport contract from Python to Lua;
-6. add/reuse a worker operation that accepts raw persisted NPC data and invokes the real production deserialization/normalization path;
-7. install the hydrated production record into the isolated worker registry;
-8. preserve immutable raw source/provenance alongside the hydrated working state;
-9. stop Python from interpreting normal NPC runtime fields that the production Lua path now owns;
-10. keep genuine engine fixtures unchanged;
-11. do not implement world-object datasets, scene indexing, pathing or spatial commands in this chunk;
-12. add focused tests proving:
-    - raw saved record enters production Lua;
-    - production rehydration output is used by the worker;
-    - source snapshot is unchanged;
-    - reset restores the imported baseline;
-    - legacy Developer/Test fixtures still work through their explicit path;
-13. run focused Python/Lua/Tk checks and `git diff --check`;
-14. update this ledger with exact evidence and continue automatically to P14B when green.
+- Python `SaveBackedImporter` transports selected raw records through
+  `ProjectHoomans.rawRecords` without making Lua runtime decisions.
+- Lua worker invokes `PNC.Persistence.DeserializeRecord` and
+  `PNC.Inventory.EnsureRecordInventory`, then installs the result in an
+  isolated `PNC.Registry`.
+- SAVE relationship, recruitment, trader overlay, inventory transfer, and
+  conversation paths use the hydrated production record; the worker only
+  supplies engine/scene fixtures such as the conversation lease.
+- Large real-save records remain within the bounded worker transport by
+  removing duplicate legacy provider copies from the worker request.
+- UI/Talk responses remain bounded by compacting public relationship and
+  conversation projections while retaining the full record privately in the
+  production registry.
+- Source-save SHA and immutable source snapshots remain unchanged across
+  import, configure, mutation, and reset.
+
+Focused evidence:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_production_rehydration_p14a
+python3 -m unittest tools.semantic_harness.tests.test_save_import_p12c tools.semantic_harness.tests.test_save_backed_conversation_p12j tools.semantic_harness.tests.test_save_backed_snapshot_p12a tools.semantic_harness.tests.test_cli_parity_p13f
+xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_actor_inspectors_p13c tools.semantic_harness.tests.test_inventory_gift_workbench_p13e tools.semantic_harness.tests.test_operational_acceptance_p13g
+```
+
+All listed checks pass. P14A is accepted; continue with P14B.
+
+## Current Exact Next Chunk — P14B
+
+On the existing local `main`:
+
+1. prove production inventory hydration for `SEED_ONLY`, `BASELINE_DELTA`,
+   and `FULL` records through the actual inventory persistence owner;
+2. add a real compact `BASELINE_DELTA` regression with deterministic seed and
+   delta replay; do not implement delta logic in Python;
+3. ensure hydrated inventory is displayed consistently in GUI and CLI;
+4. exercise production gift mutation against the hydrated record and verify
+   reset restores the imported baseline;
+5. keep source saves immutable and preserve explicit Developer/Test fixture
+   mode;
+6. run focused Python, Lua, Tk/Xvfb, CLI, Kahlua, and diff checks, then update
+   this ledger and continue automatically to P14C.
 
 ## P14A acceptance
 
-Evidence must structurally prove:
+Evidence structurally proved:
 
 ```text
 Python

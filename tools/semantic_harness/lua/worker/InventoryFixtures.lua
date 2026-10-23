@@ -1,6 +1,19 @@
 -- Scenario inventory shapes and native-like inventory boundary objects.
 
 local InventoryFixtures = {}
+local productionEnsureRecordInventory
+local fixtureEnsureRecordInventory
+
+function InventoryFixtures.restoreProduction(context)
+    local sourceKind = context.Runtime.sourceMetadata
+        and context.Runtime.sourceMetadata.sourceKind or "FIXTURE"
+    if sourceKind == "SAVE"
+        and type(productionEnsureRecordInventory) == "function"
+    then
+        PNC.Inventory = PNC.Inventory or {}
+        PNC.Inventory.EnsureRecordInventory = productionEnsureRecordInventory
+    end
+end
 
 local function normalizeInventory(context, inventory)
     local number = context.Values.number
@@ -183,6 +196,9 @@ local function configureInventoryTransfer(context)
     local runtime = context.runtime
     local playerInventory = context.playerInventory
     local npcInventory = context.npcInventory
+    local sourceKind = Runtime.sourceMetadata
+        and Runtime.sourceMetadata.sourceKind or "FIXTURE"
+    local productionRecord = Runtime.hydratedNpcRecord
 
     PNC.Client.RequestSemanticInventoryQuery = function(request, _)
         request = type(request) == "table" and request or {}
@@ -253,7 +269,28 @@ local function configureInventoryTransfer(context)
                 gifted.itemID = newID
                 gifted.stack = amount
                 gifted.container = args.npcContainer or "root"
+            if sourceKind == "SAVE"
+                and productionRecord
+                and PNC.Inventory
+                and type(PNC.Inventory.AddItems) == "function"
+            then
+                local accepted, addReason, addedIDs = PNC.Inventory.AddItems(
+                    productionRecord,
+                    { gifted },
+                    gifted.container,
+                    "semantic_gift"
+                )
+                if not accepted then
+                    return false, addReason or "production_inventory_add_failed"
+                end
+                newID = addedIDs and addedIDs[1] or newID
+                gifted.id = newID
+                gifted.itemID = newID
+                npcInventory = productionRecord.inventory
+                context.npcInventory = npcInventory
+            else
                 npcInventory.items[newID] = gifted
+            end
                 itemTypes[#itemTypes + 1] = gifted.fullType or gifted.type
                 newItemIDs[#newItemIDs + 1] = newID
                 moved = moved + amount
@@ -273,7 +310,9 @@ local function configureInventoryTransfer(context)
             return false, "quantity_unavailable"
         end
         playerInventory.revision = playerInventory.revision + 1
+    if sourceKind ~= "SAVE" then
         npcInventory.revision = npcInventory.revision + 1
+    end
         local effect = PNC.Gifts and PNC.Gifts.EvaluateEffect
             and PNC.Gifts.EvaluateEffect(itemTypes) or {
                 approval = 0, respect = 0, familiarity = 0,
@@ -338,15 +377,38 @@ function InventoryFixtures.configure(context)
     local scenario = context.Runtime.scenario or {}
     local playerData = scenario.player or {}
     local npcData = scenario.npc or {}
+    local sourceKind = context.Runtime.sourceMetadata
+        and context.Runtime.sourceMetadata.sourceKind or "FIXTURE"
     context.playerData = playerData
     context.npcData = npcData
     context.playerInventory = normalizeInventory(context, playerData.inventory)
-    context.npcInventory = normalizeInventory(context, npcData.inventory)
+    if sourceKind == "SAVE"
+        and type(context.Runtime.hydratedNpcRecord) == "table"
+        and type(context.Runtime.hydratedNpcRecord.inventory) == "table"
+    then
+        context.npcInventory = context.Runtime.hydratedNpcRecord.inventory
+    else
+        context.npcInventory = normalizeInventory(context, npcData.inventory)
+    end
 
     configureMarketSense(context)
-    PNC.Inventory = PNC.Inventory or {}
-    PNC.Inventory.EnsureRecordInventory = function(record)
-        return normalizeInventory(context, record and record.inventory)
+    if sourceKind ~= "SAVE" then
+        -- Developer fixtures retain their explicit, compact scenario seam.
+        -- SAVE records remain on the production persistence owner loaded by
+        -- ProductionModules and invoked by ProductionRehydration.
+        PNC.Inventory = PNC.Inventory or {}
+        if type(PNC.Inventory.EnsureRecordInventory) == "function"
+            and PNC.Inventory.EnsureRecordInventory ~= fixtureEnsureRecordInventory
+        then
+            productionEnsureRecordInventory = PNC.Inventory.EnsureRecordInventory
+        end
+        fixtureEnsureRecordInventory = function(record)
+            return normalizeInventory(context, record and record.inventory)
+        end
+        PNC.Inventory.EnsureRecordInventory = fixtureEnsureRecordInventory
+    elseif type(productionEnsureRecordInventory) == "function" then
+        PNC.Inventory = PNC.Inventory or {}
+        PNC.Inventory.EnsureRecordInventory = productionEnsureRecordInventory
     end
     PNC.Client = PNC.Client or {}
     configureInventoryTransfer(context)

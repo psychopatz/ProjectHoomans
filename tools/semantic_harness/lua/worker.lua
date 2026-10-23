@@ -46,6 +46,7 @@ local Conversation = require "worker/Conversation"
 local OutputProjection = require "worker/OutputProjection"
 local FlowEditor = require "worker/FlowEditor"
 local ScenarioSession = require "worker/ScenarioSession"
+local ProductionRehydration = require "worker/ProductionRehydration"
 local CommandRouter = require "worker/CommandRouter"
 local Commitments = require "worker/Commitments"
 
@@ -69,6 +70,7 @@ local Context = {
     OutputProjection = OutputProjection,
     FlowEditor = FlowEditor,
     ScenarioSession = ScenarioSession,
+    ProductionRehydration = ProductionRehydration,
     Commitments = Commitments,
     EngineFacts = nil,
     EngineEvents = nil,

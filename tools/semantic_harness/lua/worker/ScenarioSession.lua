@@ -3,6 +3,7 @@
 local RuntimeEnvironment = require "worker/RuntimeEnvironment"
 local SemanticAdapters = require "worker/SemanticAdapters"
 local InventoryFixtures = require "worker/InventoryFixtures"
+local ProductionRehydration = require "worker/ProductionRehydration"
 local SemanticDialogueRuntime = require
     "PNC/Semantics/PNC_SemanticDialogueRuntime"
 
@@ -297,6 +298,11 @@ ScenarioSession.initialScenario = {
 }
 
 function ScenarioSession.configureRuntime(context)
+    InventoryFixtures.restoreProduction(context)
+    local rehydrated, reason = ProductionRehydration.configure(context)
+    if not rehydrated then
+        error("production_rehydration_failed:" .. tostring(reason))
+    end
     RuntimeEnvironment.configure(context)
     SemanticAdapters.configure(context)
     InventoryFixtures.configure(context)
@@ -428,6 +434,7 @@ function ScenarioSession.reset(context, scenario)
         type = "configured",
         scenario = Values.copy(Runtime.scenario),
         sourceSnapshot = sourceSnapshotProjection(context),
+        productionRehydration = Values.copy(Runtime.productionRehydration),
         workingWorld = workingWorldProjection(context),
         loadedModules = Runtime.loadedModules,
         moduleManifest = Values.copy(Runtime.moduleManifest),
@@ -504,11 +511,13 @@ end
 function ScenarioSession.snapshot(context)
     local Runtime = context.Runtime
     local Values = context.Values
+    ProductionRehydration.refreshProjection(context)
     return {
         ok = true,
         type = "snapshot",
         scenario = Values.copy(Runtime.scenario),
         sourceSnapshot = sourceSnapshotProjection(context),
+        productionRehydration = Values.copy(Runtime.productionRehydration),
         workingWorld = workingWorldProjection(context),
         transcript = Values.copy(Runtime.transcript),
         queued = Values.copy(Runtime.queued),

@@ -477,6 +477,31 @@ class LuaSemanticWorker:
             npc_id=npc_id,
             engine_fixtures=engine_fixtures,
         )
+        # The selected raw records are transported in the explicit
+        # ProjectHoomans.rawRecords envelope. Do not send a second copy of
+        # those same records through the legacy provider keys: large real-save
+        # NPC records can otherwise exceed the Lua worker's bounded protocol
+        # message size before production rehydration begins.
+        provider_payloads = deepcopy(selection.provider_payloads)
+        hoomans_payload = provider_payloads.get("ProjectHoomans")
+        raw_records = (
+            hoomans_payload.get("rawRecords")
+            if isinstance(hoomans_payload, dict)
+            else None
+        )
+        if isinstance(hoomans_payload, dict) and isinstance(raw_records, dict):
+            npc_record = raw_records.get("npc")
+            player_record = raw_records.get("player")
+            if isinstance(npc_record, dict):
+                npc_id_value = str(
+                    npc_record.get("id")
+                    or selection.scenario.get("npc", {}).get("npcID")
+                    or ""
+                )
+                if npc_id_value:
+                    hoomans_payload.pop("PNC_" + npc_id_value, None)
+            if isinstance(player_record, dict):
+                hoomans_payload.pop("PNC_PlayerCharacters", None)
         return self.import_source(
             selection.scenario,
             source=Provenance.SAVE,
@@ -484,7 +509,7 @@ class LuaSemanticWorker:
             mode="offline_save",
             metadata=selection.metadata,
             provenance=selection.provenance,
-            provider_payloads=selection.provider_payloads,
+            provider_payloads=provider_payloads,
         )
 
     def context_matrix(
