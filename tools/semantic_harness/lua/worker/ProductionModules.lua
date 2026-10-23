@@ -326,6 +326,39 @@ load(
         "PNC/Factions/PNC_FactionCore.lua",
         "recruitment_authority"
     )
+    -- CommunityService is a native server dependency of recruitment.  Load
+    -- the same shared value objects that the native shared composition loads
+    -- before entering the service, so the worker does not create a weaker
+    -- recruitment path just because it is headless.
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Communities/PNC_CommunityConstants.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Communities/PNC_CommunityProfiles.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Communities/PNC_CommunityMath.lua",
+        "recruitment_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Communities/PNC_CommunityTypes.lua",
+        "recruitment_authority"
+    )
+    -- Recruitment assignment is a production faction/community transaction.
+    -- Keep the worker composition aligned with the native server root so a
+    -- successful high-relationship proposal can complete the same ownership
+    -- path instead of stopping at communities_unavailable.
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Communities/PNC_CommunityService.lua",
+        "recruitment_authority"
+    )
     load(
         "ProjectHoomans", "server",
         "PNC/Companions/PNC_DebugCompanionRecruit.lua",

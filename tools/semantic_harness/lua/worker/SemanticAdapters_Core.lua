@@ -209,6 +209,32 @@ function Provider.configure(context, SemanticAdapters)
             memoryType = effect.memoryType,
         }
     end
+    -- The production authority resolves personal relationships through this
+    -- existing boundary. Its native loader captures function references once,
+    -- so rebind the boundary after the fixture adapter is installed. This
+    -- keeps the harness scenario behind the production relationship owner
+    -- instead of creating a second relationship service.
+    local personal = PNC.Relationships.Personal
+    if type(personal) == "table" then
+        personal.Queries = personal.Queries or {}
+        personal.Queries.Get = PNC.Relationships.Get
+        personal.Queries.GetApproval = function(npcID, targetKey)
+            return number(relationshipSnapshotFor(npcID).approval, 0)
+        end
+        personal.Queries.GetRespect = function(npcID, targetKey)
+            return number(relationshipSnapshotFor(npcID).respect, 0)
+        end
+        personal.Queries.GetFamiliarity = function(npcID, targetKey)
+            return number(relationshipSnapshotFor(npcID).familiarity, 0)
+        end
+        personal.Queries.GetState = function(npcID, targetKey)
+            local relationship = relationshipSnapshotFor(npcID)
+            return relationship.state or relationship.relationshipState
+        end
+        personal.Commands = personal.Commands or {}
+        personal.Commands.ApplyConversationEffect =
+            PNC.Relationships.ApplyConversationEffect
+    end
     local function proposalEvaluation(npcID, relationshipOverride)
         local relationship = relationshipOverride or relationshipFor(npcID)
         local npcProfile = context.npcPersonality or {}

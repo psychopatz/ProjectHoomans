@@ -115,6 +115,41 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
             if group["id"] == "semantic_hub.whats_up"
         )
         self.assertTrue(hub["allowBack"])
+        self.assertEqual(
+            hub["navigation"][0]["display"]["label"],
+            "Let's talk something else",
+        )
+        self.assertEqual(
+            hub["navigation"][0]["frame"]["kind"],
+            "semantic_back_click_frame",
+        )
+
+    def test_talk_something_else_returns_to_landing_without_a_dialogue_turn(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            started = worker.talk_start(
+                target_id="neutral", utterance="What's up?"
+            )
+            suggestions = started["snapshot"]["suggestions"]
+            group = next(
+                group
+                for group in suggestions["groups"]
+                if group["id"] == suggestions["currentGroupID"]
+            )
+            frame = group["navigation"][0]["frame"]
+            before = worker.snapshot()
+            clicked = worker.suggestion_click(frame)
+            after = worker.snapshot()
+
+        self.assertTrue(clicked["accepted"])
+        self.assertEqual(after["suggestions"]["currentGroupID"], "conversation_landing")
+        self.assertEqual(
+            len(after["transcript"]),
+            len(before["transcript"]),
+        )
+        self.assertEqual(
+            after["scenario"]["conversation"].get("turn", 0),
+            before["scenario"]["conversation"].get("turn", 0),
+        )
 
     def test_cli_exposes_the_same_talk_operations(self) -> None:
         arguments = _parser().parse_args(["--no-gui", "--talk-matrix"])
@@ -232,6 +267,38 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
             payload = npc_messages[-1]["payload"]
             self.assertTrue(payload.get("text"))
             self.assertTrue(payload.get("key", "").startswith(response_prefix))
+
+    def test_recruitment_authority_reads_staged_relationship_and_assigns_member(self) -> None:
+        scenario = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), "neutral")
+        scenario["npc"]["tacticalClass"] = "neutral"
+        scenario["npc"]["relationship"].update(
+            approval=94,
+            respect=95,
+            familiarity=92,
+            revision=2,
+        )
+
+        with LuaSemanticWorker(scenario) as worker:
+            result = worker.input("Would you like to join us?")
+            snapshot = worker.snapshot()
+
+        npc_messages = [
+            message
+            for message in result["messages"]
+            if message.get("speaker") == "npc"
+        ]
+        self.assertTrue(npc_messages)
+        self.assertTrue(
+            npc_messages[-1]["payload"]["key"].startswith("response.recruit.")
+        )
+        recruit_results = [
+            item
+            for item in result.get("transport", [])
+            if item.get("payload", {}).get("success") is True
+            and item.get("payload", {}).get("reason") == "recruited"
+        ]
+        self.assertTrue(recruit_results)
+        self.assertTrue(snapshot["scenario"]["npc"]["recruited"])
 
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_tk_talk_parity_surface_runs_the_real_worker(self) -> None:

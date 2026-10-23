@@ -1742,6 +1742,34 @@ local function buildGroups(candidates, capabilities, currentTopic, revision)
             end
         end
     end
+    -- Navigation is part of the shared projection, not a renderer-only
+    -- convenience. Native Core and Semantic Lab must receive the same typed
+    -- presentation frame and the same allowBack gate.
+    for _, group in ipairs(groups) do
+        group.navigation = {}
+        if rootGroupID
+            and group.id ~= rootGroupID
+            and group.allowBack ~= false
+            and Suggestions.BuildBackFrame
+        then
+            local frame = Suggestions.BuildBackFrame(revision, group.id)
+            if frame then
+                group.navigation[#group.navigation + 1] = {
+                    id = frame.candidateID,
+                    frame = frame,
+                    display = {
+                        label = frame.labelFallback,
+                        labelFallback = frame.labelFallback,
+                    },
+                    source = {
+                        kind = "semantic_back_navigation",
+                        revision = revision,
+                        fromGroupID = group.id,
+                    },
+                }
+            end
+        end
+    end
     return groups, currentGroupID, rootGroupID
 end
 
@@ -1842,8 +1870,9 @@ end
 function Suggestions.BuildBackFrame(revision, fromGroupID)
     fromGroupID = tostring(fromGroupID or "")
     if fromGroupID == "" then return nil end
-    local labelKey = "UI_PNC_Conversation_Suggestion_Back_Label"
-    local label = resolvedText(labelKey, "Back")
+    local labelKey =
+        "UI_PNC_Conversation_Suggestion_TalkSomethingElse_Label"
+    local label = resolvedText(labelKey, "Let's talk something else")
     return {
         schemaVersion = Suggestions.VERSION,
         kind = "semantic_back_click_frame",

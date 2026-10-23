@@ -354,3 +354,23 @@ Native Project Zomboid SP/MP recruitment behavior remains **UNTESTED / user-owne
 ## Current Exact Next Chunk — native recruitment handoff evidence
 
 Use the actual in-game context-menu Talk path for a neutral NPC, an owned companion, and a hostile NPC. Verify the recruitment shortcut, typed equivalent, hover preview/gates, response text, and rejection/acceptance result against the Semantic Lab. Preserve the broader P11J native Talk handoff checks for Colonist, Follower, Neutral, and Hostile. Do not report **READY FOR USER LIVE TEST** until user-owned native evidence is supplied.
+
+## Corrective semantic navigation and recruitment authority slice
+
+The shared semantic suggestion projection now owns the nested navigation row. Topic and hub groups expose the canonical `semantic_back_click_frame` with the localized “Let's talk something else” label, while `allowBack=false` remains respected. Native Core and Semantic Lab consume that same navigation projection, so returning to the landing group does not create a dialogue turn or append transcript text.
+
+The worker's production composition now loads the same community value objects and `PNC_CommunityService` required by native recruitment assignment. The fixture relationship adapter also rebinds the existing personal relationship query seam after installing scenario-backed values. High relationship recruitment therefore reaches the production faction/community assignment and result path instead of reading stale zero scores or stopping at `communities_unavailable`.
+
+Evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j -v` — **12/12 PASS**, including navigation return/no-turn and high-relationship production recruitment assignment;
+- direct worker check — neutral target at approval 94, respect 95, familiarity 92 returned `success=true`, `reason=recruited`, and `response.recruit.admire.1`;
+- `luac5.3 -p` on changed worker, semantic input, suggestion, and community loader Lua — PASS;
+- `git diff --check` — PASS;
+- no new Talk-parity or relationship persistence store was introduced.
+
+Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
+
+## Current Exact Next Chunk — automatic simulation apply and honest pending state
+
+Make staged workbench edits apply through the existing worker configuration boundary with a debounced automatic commit, keep Apply as an explicit immediate action, and make pending status identify the actual staged fields instead of a misleading count. Preserve Apply + replay as a separate future macro operation until replay clears the conversation and executes a recorded step sequence.

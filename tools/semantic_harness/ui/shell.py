@@ -90,6 +90,20 @@ def semantic_suggestion_rows(
         else suggestions.get("permittedCapabilities")
     ) or []
     rows: list[dict[str, Any]] = []
+    for navigation in (
+        selected.get("navigation") if selected is not None else []
+    ) or []:
+        rows.append(
+            {
+                "id": navigation.get("id"),
+                "frame": navigation.get("frame"),
+                "display": navigation.get("display") or {},
+                "status": "navigation",
+                "enabled": True,
+                "source": navigation.get("source"),
+                "groupID": selected.get("id") if selected else None,
+            }
+        )
     for candidate in candidates:
         rows.append(
             {

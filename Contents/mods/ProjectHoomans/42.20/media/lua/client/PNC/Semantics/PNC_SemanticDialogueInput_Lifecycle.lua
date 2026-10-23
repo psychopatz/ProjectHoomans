@@ -182,18 +182,22 @@ local function buildCoreChoices(view, projection)
     end
 
     local rootGroupID = projection.rootGroupID
-    if selectedGroup
+    local navigation = selectedGroup and selectedGroup.navigation or {}
+    if #navigation == 0
+        and selectedGroup
         and rootGroupID
         and selectedGroup.id ~= rootGroupID
         and projection.allowBack ~= false
         and selectedGroup.allowBack ~= false
         and Suggestions.BuildBackFrame
     then
+        -- Compatibility for projections produced before shared navigation was
+        -- added. New projections carry this row in group.navigation.
         local frame = Suggestions.BuildBackFrame(
             projection.revision, selectedGroup.id
         )
         if frame then
-            append({
+            navigation = {{
                 id = frame.candidateID,
                 frame = frame,
                 display = {
@@ -205,8 +209,11 @@ local function buildCoreChoices(view, projection)
                     revision = projection.revision,
                     fromGroupID = selectedGroup.id,
                 },
-            }, true)
+            }}
         end
+    end
+    for _, row in ipairs(navigation) do
+        append(row, true)
     end
 
     local candidates = selectedGroup and selectedGroup.candidates
