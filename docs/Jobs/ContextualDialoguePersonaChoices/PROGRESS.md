@@ -443,3 +443,27 @@ Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
 ## Current Exact Next Chunk — impacted developer gate and native Talk handoff
 
 Run the focused P10/P11 semantic, relationship, graph, identity, inventory, activity-log, and Talk-parity suites through the shared worker; run Lua/Kahlua, translation, doctor, and diff checks; then hand the remaining native context-menu Talk comparison to the user. Do not claim native verification or `READY FOR USER LIVE TEST` until user-owned evidence is supplied.
+
+## P11J4 — impacted developer gate complete
+
+The shared Talk-start projection, route matrix, semantic navigation, recruitment bridge, GUI/CLI surfaces, workbench auto-apply, persisted layout state, shared activity log, and replay macro changes passed the impacted developer gate. Conversation definition composition was also made resilient to direct worker load order so identity and Talk parity use the same production definition path.
+
+Evidence:
+
+- affected P10/P11 Tk/Xvfb suites — **85/85 PASS**, including contextual hub, semantic navigation, identity, relationship, inventory, activity logging, replay, UI persistence, and P11J Talk parity; no stale Tk callback errors;
+- embedded Lua suite — **871/871 PASS** through `python3 tests/run_tests.py --jobs 1`;
+- `TALK_START` hostile CLI projection — `targetType=hostile`, `route=hostile_full_conversation`;
+- `TALK_MATRIX` — clean rows for colonist, follower, neutral, and hostile, with the hostile fallback route and no trader tactical type;
+- doctor — **9/9 checks PASS**;
+- `luac5.3 -p` — **27 changed Lua files PASS**;
+- `py_compile` — **12 changed Python files PASS**;
+- Kahlua verification — **3,089 files scanned, 0 flagged, 0 errors**;
+- Dataset Library catalog enumerated four existing sources; translation/catalog integration checks passed in the affected suite;
+- `git diff --check` — PASS;
+- no Talk-parity ModData or second relationship/bond store introduced.
+
+The unbounded Tk discovery command was stopped after several minutes without output because it remained in a worker wait; the bounded affected suites completed successfully and are the evidence used for this gate. Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
+
+## Current Exact Next Chunk — native Talk handoff evidence
+
+Use the real in-game context-menu Talk path for a colonist, follower, neutral, and hostile. Compare target classification, route, opening flavor, landing choices, first response, semantic back/context navigation, and hostile inline/fallback behavior against Semantic Lab. Also verify the neutral recruitment shortcut and typed equivalent, companion response, hover gates, and server result. Do not claim native verification or `READY FOR USER LIVE TEST` until the user supplies that evidence.
