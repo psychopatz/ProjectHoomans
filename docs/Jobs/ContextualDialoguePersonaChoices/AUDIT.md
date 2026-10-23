@@ -580,3 +580,114 @@ No harness mutation may write back to the save or running game.
 P12 — Save-Backed Offline Semantic Runtime — is now the primary Semantic Lab architecture.
 
 Synthetic scenarios remain test/developer fixtures, not the normal product model.
+
+
+---
+
+# P13 operational usability audit — 2026-10-24
+
+**User evidence:** current Semantic Lab screenshot after P12 completion.  
+**Implementation baseline audited:** ProjectHoomans remote `main` at `dbfd9099a0b687bc2f6505f58e81e32ea6dc5966`.
+
+## Verdict
+
+P12 save-backed runtime/backend work is materially implemented, but the normal GUI is not yet an operational primary testing surface.
+
+The prior P12 product-complete conclusion is therefore narrowed to backend/runtime foundation complete.
+
+## Verified save-browser defect
+
+`tools/semantic_harness/ui/shell.py` renders the complete save workflow in a single horizontal `Saved world · read-only source` row:
+
+- Save combobox;
+- Discover saves;
+- Player combobox;
+- NPC group combobox;
+- NPC combobox;
+- Inspect;
+- Import target.
+
+The normal left-pane geometry compresses these controls so severely that the save selector can be effectively unusable even after discovery succeeds.
+
+The user screenshot shows the status:
+
+```text
+8 validated save(s); choose one and Inspect.
+```
+
+while the save selector is not practically browsable.
+
+## Verified backend state
+
+The backend itself is real:
+
+- `SaveCatalog` discovers compatible saves;
+- `SemanticStateCatalog` projects Core/Hoomans/DynamicTrading state;
+- `SavedWorldBrowser` returns Players, actors, factions, communities and provider actors;
+- `SaveBackedImporter` imports selected Player/NPC state into the isolated worker.
+
+Do not replace these owners.
+
+## Verified actor grouping limitation
+
+`SavedWorldBrowser` currently constructs flat categories:
+
+- All NPCs;
+- Companions;
+- Colonists;
+- Followers;
+- Neutral NPCs;
+- Hostile NPCs;
+- Known Traders.
+
+Factions and communities are returned separately.
+
+There is no faction/community -> member actor hierarchy for the UI to navigate.
+
+## Verified UI-test limitation
+
+Current P12D GUI coverage primarily checks that save-browser controls and Provenance tabs exist.
+
+This does not prove that the user can:
+
+- choose a save;
+- choose a Player;
+- browse a faction;
+- choose an NPC;
+- import the pair;
+- start Talk
+
+at realistic geometry.
+
+P13 requires interaction acceptance.
+
+## Verified Player inventory limitation
+
+`SaveBackedImporter` reads `player_record.inventory` only when such a supported dict exists.
+
+`PNC_PlayerCharacters` is primarily the persistent Player identity/social registry, not the authoritative Project Zomboid physical Player inventory store.
+
+Therefore a normal save-backed Player inventory can legitimately report:
+
+```text
+source = MISSING
+```
+
+P13 must audit and add a separate read-only engine Player-state provider rather than invent saved inventory.
+
+## Product direction
+
+P13 — Operational Semantic Test Workbench — is now mandatory.
+
+First visible chunk: P13A World Browser UX.
+
+Later P13 chunks add:
+
+- offline Player inventory/state provider;
+- symmetric Player/NPC inspectors;
+- faction/community workbench;
+- production gift verification;
+- agent-grade CLI parity;
+- real operational acceptance.
+
+The goal is to make Semantic Lab the normal semantic/conversation verification environment for humans and coding agents while leaving native PZ as user-owned final live acceptance.
