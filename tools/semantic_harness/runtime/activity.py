@@ -53,6 +53,10 @@ class ActivityLog:
         self._events: deque[dict[str, Any]] = deque(maxlen=self.capacity)
         self._sequence = 0
         self._lock = Lock()
+        self._shared_read_lock = Lock()
+        self._shared_read_offset: int | None = None
+        self._shared_file_identity: tuple[int, int] | None = None
+        self._shared_file_head: str | None = None
 
     def record(self, source: str, event: str, **details: Any) -> dict[str, Any]:
         with self._lock:
@@ -86,34 +90,87 @@ class ActivityLog:
 
         if self.path is None:
             return self.snapshot()
-        records: deque[dict[str, Any]] = deque(maxlen=self.capacity)
         try:
-            with self.path.open("r", encoding="utf-8") as stream:
-                if fcntl is not None:
-                    fcntl.flock(stream.fileno(), fcntl.LOCK_SH)
-                try:
-                    for line in stream:
-                        try:
-                            value = json.loads(line)
-                        except (TypeError, ValueError):
-                            continue
-                        if isinstance(value, dict) and value.get("eventID"):
-                            records.append(value)
-                finally:
-                    if fcntl is not None:
-                        fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+            records, _offset, _identity, _head = self._read_shared_records()
         except OSError:
             return self.snapshot()
-        return [dict(record) for record in records]
+        return records
 
     def new_shared_events(self, seen_event_ids: set[str]) -> list[dict[str, Any]]:
-        """Return shared events not already rendered by a client."""
+        """Return shared events without rescanning old records every poll."""
+
+        if self.path is None:
+            records = self.snapshot()
+            return [
+                record
+                for record in records
+                if str(record.get("eventID") or "") not in seen_event_ids
+            ]
+
+        with self._shared_read_lock:
+            try:
+                stat = self.path.stat()
+                identity = (int(stat.st_dev), int(stat.st_ino))
+                offset = self._shared_read_offset
+                reset = (
+                    offset is None
+                    or identity != self._shared_file_identity
+                    or int(stat.st_size) < offset
+                )
+                records, next_offset, next_identity, next_head = self._read_shared_records(
+                    start_offset=None if reset else offset
+                )
+                self._shared_read_offset = next_offset
+                self._shared_file_identity = next_identity
+                self._shared_file_head = next_head
+            except OSError:
+                records = self.snapshot()
 
         return [
             record
-            for record in self.shared_snapshot()
+            for record in records
             if str(record.get("eventID") or "") not in seen_event_ids
         ]
+
+    def _read_shared_records(
+        self, start_offset: int | None = None
+    ) -> tuple[list[dict[str, Any]], int, tuple[int, int], str]:
+        """Read bounded records and return the byte position for the next poll."""
+
+        records: deque[dict[str, Any]] = deque(maxlen=self.capacity)
+        with self.path.open("r", encoding="utf-8") as stream:  # type: ignore[union-attr]
+            if fcntl is not None:
+                fcntl.flock(stream.fileno(), fcntl.LOCK_SH)
+            try:
+                stat = os.fstat(stream.fileno())
+                stream.seek(0)
+                head = stream.readline()
+                effective_offset = start_offset
+                if effective_offset is not None and (
+                    effective_offset > int(stat.st_size)
+                    or (
+                        self._shared_file_head is not None
+                        and head != self._shared_file_head
+                    )
+                ):
+                    effective_offset = None
+                stream.seek(effective_offset if effective_offset is not None else 0)
+                for line in stream:
+                    try:
+                        value = json.loads(line)
+                    except (TypeError, ValueError):
+                        continue
+                    if isinstance(value, dict) and value.get("eventID"):
+                        records.append(value)
+                return (
+                    [dict(record) for record in records],
+                    stream.tell(),
+                    (int(stat.st_dev), int(stat.st_ino)),
+                    head,
+                )
+            finally:
+                if fcntl is not None:
+                    fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
 
     @property
     def latest_sequence(self) -> int:

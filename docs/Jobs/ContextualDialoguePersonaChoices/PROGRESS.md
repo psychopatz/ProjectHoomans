@@ -167,6 +167,17 @@ Completed locally on ProjectHoomans `main`.
 
 **Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.
 
+## P11I follow-up — activity-log startup regression correction
+
+Completed locally on ProjectHoomans `main`.
+
+- Root cause confirmed: the shared GUI/CLI activity poll reparsed the complete JSONL history every 150 ms on the Tk thread. The local stream reached about 1.77 MB and 7,122 records, with each poll measured around 74 ms before the correction.
+- `ActivityLog.new_shared_events` now reads the bounded historical window once and advances a file cursor for appended records; file identity, size, and first-record signatures detect truncation or rotation.
+- Focused activity-log tests: **2/2 passed**, including append-only polling and cursor reset after truncation.
+- After the first read, repeated polling measured about **0.04 ms** instead of 74 ms; identity regression **11/11**, formatter regression **2/2**, and Tk/Xvfb interaction **7/7** passed.
+
+**Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.
+
 ## P11I follow-up — readable tool/action transcript entries
 
 Completed locally on ProjectHoomans `main`.
