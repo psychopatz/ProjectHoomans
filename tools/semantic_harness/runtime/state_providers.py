@@ -150,6 +150,7 @@ class ProjectHoomansStateProvider:
             "generation": deepcopy(generation),
             "factionID": affiliation.get("factionID"),
             "communityID": affiliation.get("communityID"),
+            "role": affiliation.get("role"),
             "hostilityMode": hostility_mode,
             "orderKind": order_kind,
             "isFollower": follower,
@@ -162,8 +163,7 @@ class ProjectHoomansStateProvider:
         rows: list[dict[str, Any]] = []
         for row_id, raw in sorted(_as_dict(value).items()):
             record = _as_dict(raw)
-            rows.append(
-                {
+            row = {
                     "id": str(record.get("id") or row_id),
                     "label": str(record.get(name_key) or row_id),
                     "status": str(record.get("status") or "unknown"),
@@ -176,7 +176,20 @@ class ProjectHoomansStateProvider:
                     ),
                     "source": "SAVE",
                 }
-            )
+            for key in (
+                "roles",
+                "memberRoles",
+                "roleByMemberID",
+                "owner",
+                "standing",
+                "diplomacy",
+                "provider",
+                "providerID",
+                "providerOverlay",
+            ):
+                if key in record:
+                    row[key] = deepcopy(record.get(key))
+            rows.append(row)
         return rows
 
     def project(self, context: ProviderContext) -> dict[str, Any]:

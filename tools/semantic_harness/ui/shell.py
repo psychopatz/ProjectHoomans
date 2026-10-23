@@ -1061,6 +1061,7 @@ class SemanticHarnessApp:
         browser_frame.grid(row=1, column=0, sticky="nsew")
         browser_frame.rowconfigure(0, weight=1)
         browser_frame.columnconfigure(0, weight=1)
+        browser_frame.columnconfigure(2, weight=1, minsize=300)
         self.saved_world_tree = ttk.Treeview(
             browser_frame,
             columns=("kind", "source"),
@@ -1079,6 +1080,40 @@ class SemanticHarnessApp:
         )
         tree_scroll.grid(row=0, column=1, sticky="ns")
         self.saved_world_tree.configure(yscrollcommand=tree_scroll.set)
+        group_frame = ttk.LabelFrame(
+            browser_frame,
+            text="Faction / Community context · read-only",
+            padding=6,
+        )
+        group_frame.grid(row=0, column=2, sticky="nsew", padx=(8, 0))
+        group_frame.rowconfigure(2, weight=1)
+        group_frame.columnconfigure(0, weight=1)
+        self.saved_world_group_title_var = self._tk.StringVar(
+            value="Select a faction, community, or overlay"
+        )
+        self.saved_world_group_source_var = self._tk.StringVar(value="Source: MISSING")
+        ttk.Label(
+            group_frame,
+            textvariable=self.saved_world_group_title_var,
+            anchor="w",
+            wraplength=360,
+        ).grid(row=0, column=0, sticky="ew", pady=(0, 2))
+        ttk.Label(
+            group_frame,
+            textvariable=self.saved_world_group_source_var,
+            anchor="w",
+            wraplength=360,
+        ).grid(row=1, column=0, sticky="ew", pady=(0, 4))
+        self.saved_world_group_inspector = self._ScrolledText(
+            group_frame,
+            wrap="word",
+            height=16,
+            width=38,
+            state="disabled",
+        )
+        self.saved_world_group_inspector.grid(
+            row=2, column=0, sticky="nsew", pady=(2, 0)
+        )
         self.saved_world_tree.bind(
             "<<TreeviewSelect>>", lambda _event: self._on_saved_world_tree_select()
         )
@@ -1086,7 +1121,8 @@ class SemanticHarnessApp:
             "<Double-1>", lambda _event: self._import_saved_world_target()
         )
         self.saved_world_tree_actor_rows: dict[str, dict[str, Any]] = {}
-        self.saved_world_tree_group_nodes: dict[str, str] = {}
+        self.saved_world_tree_group_nodes: dict[str, dict[str, Any]] = {}
+        self.saved_world_tree_actor_groups: dict[str, str] = {}
 
     def _set_controls(self, enabled: bool) -> None:
         state = "normal" if enabled and not self.busy else "disabled"
@@ -1977,6 +2013,7 @@ class SemanticHarnessApp:
             self.saved_world_tree.delete(item)
         self.saved_world_tree_actor_rows = {}
         self.saved_world_tree_group_nodes = {}
+        self.saved_world_tree_actor_groups = {}
         hierarchy = self.saved_world_browser.get("worldHierarchy") or {}
         groups = hierarchy.get("groups") if isinstance(hierarchy, dict) else []
         query = self.saved_world_search_var.get().strip().casefold()
@@ -2031,14 +2068,93 @@ class SemanticHarnessApp:
                     open=False,
                 )
                 self.saved_world_tree_actor_rows[actor_iid] = member
+                self.saved_world_tree_actor_groups[actor_iid] = group_iid
+
+    def _render_saved_world_group_details(
+        self, group: dict[str, Any] | None
+    ) -> None:
+        if not hasattr(self, "saved_world_group_inspector"):
+            return
+        if not isinstance(group, dict):
+            self.saved_world_group_title_var.set(
+                "Select a faction, community, or overlay"
+            )
+            self.saved_world_group_source_var.set("Source: MISSING")
+            self._set_text(
+                self.saved_world_group_inspector,
+                "No saved group is selected.",
+            )
+            return
+        persisted = group.get("group")
+        persisted = persisted if isinstance(persisted, dict) else {}
+        kind = str(group.get("kind") or "group")
+        label = str(group.get("label") or group.get("id") or "Group")
+        source = str(group.get("source") or "MISSING").upper()
+        membership_source = str(
+            group.get("membershipSource") or "MISSING"
+        ).upper()
+        self.saved_world_group_title_var.set(f"{kind.title()}: {label}")
+        self.saved_world_group_source_var.set(
+            f"Source: {source} · membership: {membership_source}"
+        )
+        lines = [
+            f"ID: {persisted.get('id') or group.get('id') or 'MISSING'}",
+            f"status: {persisted.get('status') or 'MISSING'}",
+        ]
+        for title, key in (
+            ("leader", "leaderNPCID"),
+            ("owner", "ownerPlayerKey"),
+            ("faction", "factionID"),
+            ("community", "communityID"),
+            ("archetype", "archetypeID"),
+        ):
+            if persisted.get(key) not in (None, ""):
+                lines.append(f"{title}: {persisted[key]}")
+        for title, key in (
+            ("roles", "roles"),
+            ("member roles", "memberRoles"),
+            ("role by member", "roleByMemberID"),
+            ("standing", "standing"),
+            ("diplomacy", "diplomacy"),
+        ):
+            value = persisted.get(key)
+            if value not in (None, "", {}, []):
+                lines.append(f"{title}: {str(value)[:240]}")
+        overlay = persisted.get("providerOverlay") or persisted.get("provider")
+        if overlay not in (None, "", {}, []):
+            lines.append(f"provider overlay: {str(overlay)[:240]}")
+        member_ids = group.get("memberIDs")
+        member_ids = member_ids if isinstance(member_ids, list) else []
+        lines.append(f"members: {len(member_ids)}")
+        members = group.get("members")
+        members = members if isinstance(members, list) else []
+        for member in members[:32]:
+            if not isinstance(member, dict):
+                continue
+            member_line = str(member.get("label") or member.get("id") or "NPC")
+            if member.get("role"):
+                member_line += f" · role {member['role']}"
+            if member.get("provider"):
+                member_line += f" · provider {member['provider']}"
+            lines.append(f"  • {member_line}")
+        self._set_text(self.saved_world_group_inspector, "\n".join(lines))
 
     def _on_saved_world_tree_select(self) -> None:
         selection = self.saved_world_tree.selection()
         if not selection:
             return
-        actor = self.saved_world_tree_actor_rows.get(selection[0])
+        selected_id = selection[0]
+        group = self.saved_world_tree_group_nodes.get(selected_id)
+        if group is not None:
+            self._render_saved_world_group_details(group)
+            return
+        actor = self.saved_world_tree_actor_rows.get(selected_id)
         if not actor:
             return
+        group_id = self.saved_world_tree_actor_groups.get(selected_id)
+        self._render_saved_world_group_details(
+            self.saved_world_tree_group_nodes.get(group_id)
+        )
         self.saved_world_npc_var.set(str(actor.get("id") or ""))
         label = str(actor.get("label") or actor.get("id") or "NPC")
         self.saved_world_target_var.set(

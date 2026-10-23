@@ -128,6 +128,7 @@ def _actor_reference(actor: dict[str, Any], provider_row: dict[str, Any] | None)
         "label": actor.get("label") or actor.get("id"),
         "factionID": actor.get("factionID"),
         "communityID": actor.get("communityID"),
+        "role": actor.get("role"),
         "isFollower": actor.get("isFollower") is True,
         "isHostile": actor.get("isHostile") is True,
         "isTrader": provider_row is not None,

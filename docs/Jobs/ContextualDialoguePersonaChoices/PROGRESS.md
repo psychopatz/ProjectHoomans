@@ -1,9 +1,9 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
 **Updated:** 2026-10-24  
-**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13A/P13B/P13C complete; P13 operational usability remains mandatory.
-**Current mandatory phase:** P13D — Faction/Community Workbench.
-**Current remote baseline audited:** ProjectHoomans `main` at `1f33a4a0` before the P13C implementation commit.
+**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13A/P13B/P13C/P13D complete; P13 operational usability remains mandatory.
+**Current mandatory phase:** P13E — Inventory / Gift Verification Workbench.
+**Current remote baseline audited:** ProjectHoomans `main` at `ccb10f8e` before the P13D implementation commit.
 **Normal Semantic Lab runtime requirement:** Project Zomboid may remain CLOSED/OFFLINE.  
 **Source save mutation:** FORBIDDEN.  
 **Optional live profiler:** read-only enrichment only.
@@ -153,7 +153,7 @@ The UI test must perform this workflow, not merely confirm controls exist.
 
 - **P13B:** read-only offline Player engine-state provider, Player inventory first — complete;
 - **P13C:** symmetric Player/NPC actor inspectors — complete;
-- **P13D:** faction/community workbench;
+- **P13D:** faction/community workbench — complete;
 - **P13E:** inventory/gift verification workbench;
 - **P13F:** agent-grade CLI parity;
 - **P13G:** real-save operational acceptance.
@@ -263,9 +263,39 @@ Exact evidence on 2026-10-24:
 - Existing real-worker Lua smoke/gift/task checks remain the P12/P13B evidence;
   this chunk only extends the read-only actor presentation and transport seam.
 
-## Current Exact Next Chunk — P13D
+## P13D — Faction/Community Workbench — COMPLETE
 
-Build the saved faction/community workbench from the existing backend-owned
-hierarchy and provider projections. Selecting a member must use the normal
-save-backed NPC target/import path; Semantic Lab must not duplicate faction or
-community state.
+Implemented on existing `main` by extending the backend-owned `SavedWorldBrowser`
+projection and the existing Semantic Lab World Browser:
+
+- Preserved persisted faction/community rows, IDs, member IDs, leader, owner,
+  status, archetype, roles, standing/diplomacy, and provider overlay fields
+  when those fields exist in the adopter-owned projection.
+- Added a read-only `Faction / Community context` inspector beside the existing
+  hierarchy. It reports group source and membership source, identifiers,
+  leader/owner, membership count, roles/standing/diplomacy, provider overlay,
+  and bounded member labels.
+- Kept member clicks and double-clicks on the existing Treeview selection path;
+  selecting a member updates the current NPC target and loading it continues
+  through `SaveBackedImporter` into the isolated workbench.
+- No faction/community state is duplicated in the UI; the panel renders the
+  existing save/provider projection and never infers ownership from labels.
+
+Exact evidence on 2026-10-24:
+
+- `xvfb-run -a python3 -m unittest
+  tools.semantic_harness.tests.test_faction_community_workbench_p13d`: `1/1`
+  passed against the real Apocalypse save, proving faction, community, and
+  Dynamic Trading provider-overlay groups, persisted ID/member context, member
+  target selection/import, and unchanged source hash.
+- Focused save-backed regression set (`P13D`, actor inspectors, P13A browser,
+  P12 save browser/import, P13B provider): `10/10` passed under Xvfb.
+- `python3 -m py_compile` and `git diff --check` passed. No production Lua
+  files changed in P13D.
+
+## Current Exact Next Chunk — P13E
+
+Build the side-by-side Player/NPC inventory and gift-verification workbench.
+Selection must invoke the existing semantic/gift production path, show before /
+after inventory and relationship evidence, and reset only the detached working
+world while proving the source save remains unchanged.
