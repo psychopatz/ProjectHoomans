@@ -269,3 +269,65 @@ Move them to Diagnostics, relevant inspector tabs, or the Compare surface.
 A blank graph for a live semantic Flow or hub is not acceptable merely because ConversationBlock graph tests pass.
 
 P11F requires real runtime Flow, Hub, and ConversationBlock adapters.
+
+
+## P11J execution rules — native Talk parity
+
+The existing P11J1 Talk matrix is accepted infrastructure, not final native parity.
+
+### One Talk-start policy
+
+The native context-menu Talk path and Semantic Lab Talk operations must consume one production-owned Talk-start projection.
+
+Do not accept:
+
+```text
+native route policy
+and
+harness route policy
+```
+
+that merely happen to return the same strings in tests.
+
+### Native entry remains authoritative
+
+The real native entry/player shape remains the authority.
+
+Semantic Lab may adapt a scenario into that canonical entry shape for testing.
+
+Do not change production semantics merely to fit the harness schema.
+
+### Target truth
+
+Normal tactical Talk types are:
+
+```text
+colonist
+follower
+neutral
+hostile
+```
+
+Follower is derived from colonist + follow order.
+
+`enemy` is presentation alias only.
+
+Trader is an orthogonal capability/provider overlay.
+
+### Hostile parity
+
+Do not fake PBrainZ inline availability in the headless worker.
+
+Report real availability and use the production full-conversation/ceasefire fallback when inline is unavailable.
+
+### Talk start precedes utterance
+
+`Conversation.turn("hello")` alone is not Talk-start acceptance.
+
+The shared opening/availability/route projection must exist before processing the first utterance.
+
+### Native acceptance remains user-owned
+
+Developer-side source/worker/Tk evidence can prove the shared boundary.
+
+Only the user can supply final native Project Zomboid SP/MP evidence unless project policy changes.
