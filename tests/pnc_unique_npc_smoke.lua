@@ -110,7 +110,9 @@ local fallback = PNC.Identity.GenerateResolvedIdentity({
     identitySeed = 11,
 })
 T.equal(fallback.displayName,
-    PNC.IdentityNames.Generate(11, false, nil),
+    PNC.IdentityNames.Generate(11, false, nil, {
+        namespace = "projecthoomans.identity.npc_name",
+    }),
     "deterministic name fallback")
 
 PNC.AbstractWorldStore = {

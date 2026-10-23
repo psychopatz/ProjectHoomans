@@ -106,6 +106,9 @@ listing:close()
 -- recruitment coordinator by its composition root.
 -- PNC_ConversationAuthority_Recruit_Handle is loaded by the recruitment
 -- composition root and the authority facade.
+-- PNC_RelationshipService_Bond and PNC_RelationshipService_Romance are
+-- loaded by the relationship-service composition root for durable bond and
+-- proposal policy persistence.
 -- PNC_SocialGreetingService_TryGreet is loaded by the social greeting
 -- composition root.
 -- PNC_ServerLLMSocialReactionCommandHandler_Handle is loaded by the LLM
@@ -146,7 +149,7 @@ listing:close()
 -- activity root.
 -- The three need-facility effect spokes are loaded by its guarded root.
 -- The four UniqueNPCRegistry providers are loaded by its guarded root.
-T.equal(#serverOnlyFiles, 993,
+T.equal(#serverOnlyFiles, 995,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

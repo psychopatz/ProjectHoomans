@@ -19,7 +19,7 @@ TESTS = ROOT / "tests"
 VERSION = re.compile(r"^\d+\.\d+$")
 sys.path.insert(0, str(ROOT))
 
-from tools.semantic_harness.suite import (
+from tools.semantic_harness.testing.suite import (
     BoundedLuaTestRunner,
     install_suite_shutdown_handler,
     write_report,

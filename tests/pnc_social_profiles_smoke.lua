@@ -397,7 +397,7 @@ local authoredNPC = PNC.Types.NewRecord({
         },
     },
 })
-T.equal(authoredNPC.social.schemaVersion, 3, "NPC social V3")
+T.equal(authoredNPC.social.schemaVersion, 4, "NPC social V4")
 T.equal(authoredNPC.social.personality.orientation, "gay",
     "constructor applies authored enum")
 T.equal(authoredNPC.social.personality.compassion, 0.88,
