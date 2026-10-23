@@ -50,11 +50,11 @@ function Provider.configure(context, SemanticAdapters)
             npcData.identity.displayName = normalizedName
         end
     end
-    local function relationshipFor(npcID)
-        return SemanticAdapters.relationshipFor(context, npcID)
+    local function rawRelationshipFor(npcID)
+        return SemanticAdapters.identityRelationshipFor(context, npcID)
     end
-    local function relationshipSnapshotFor(npcID)
-        return SemanticAdapters.relationshipSnapshotFor(context, npcID)
+    local function rawRelationshipSnapshotFor(npcID)
+        return SemanticAdapters.identityRelationshipSnapshotFor(context, npcID)
     end
 
     PNC = PNC or {}
@@ -145,7 +145,8 @@ function Provider.configure(context, SemanticAdapters)
     end
     PNC.PlayerCharacters = PNC.PlayerCharacters or {}
     PNC.PlayerCharacters.GetEntityKey = function()
-        return "player:harness:" .. tostring(playerData.characterUUID),
+        return playerData.entityKey
+            or ("player:harness:" .. tostring(playerData.characterUUID)),
             "harness_resolved"
     end
     PNC.PlayerCharacters.GetRegistryRecord = function(characterUUID)
@@ -159,6 +160,7 @@ function Provider.configure(context, SemanticAdapters)
             displayName = playerData.displayName,
             forename = playerData.forename,
             surname = playerData.surname,
+            socialProfile = Values.copy(playerData.socialProfile),
         }
     end
     PNC.PlayerCharacters.Registry = PNC.PlayerCharacters.Registry or {
@@ -172,17 +174,101 @@ function Provider.configure(context, SemanticAdapters)
     PNC.PlayerContext.Resolve = function()
         return {
             characterUUID = playerData.characterUUID,
-            entityKey = "player:" .. tostring(playerData.characterUUID),
+            entityKey = playerData.entityKey
+                or ("player:harness:" .. tostring(playerData.characterUUID)),
         }, "harness_resolved"
     end
     PNC.PlayerContext.Peek = PNC.PlayerContext.Resolve
     PNC.Relationships = PNC.Relationships or {}
-    PNC.Relationships.Get = function(npcID)
+    local sourceKind = Runtime.sourceMetadata
+        and Runtime.sourceMetadata.sourceKind or "FIXTURE"
+    local relationshipTargetKey = playerData.entityKey
+        or ("player:harness:" .. tostring(playerData.characterUUID))
+    Runtime.relationshipTargetKey = relationshipTargetKey
+    npcData.social = type(npcData.social) == "table"
+        and npcData.social or {}
+    npcData.social.relationships = type(npcData.social.relationships) == "table"
+        and npcData.social.relationships or {}
+    if type(npcData.relationship) == "table"
+        and npcData.social.relationships[relationshipTargetKey] == nil
+    then
+        npcData.social.relationships[relationshipTargetKey] = Values.copy(
+            npcData.relationship
+        )
+    end
+    local productionRelationships = Runtime.productionRelationshipService
+    local productionGet = productionRelationships
+        and productionRelationships.Get
+    local productionEvaluateProposal = productionRelationships
+        and productionRelationships.EvaluateProposal
+    local productionPropose = productionRelationships
+        and productionRelationships.Propose
+    local function authoritativeRelationship(npcID, fallback)
+        if sourceKind == "SAVE" and type(productionGet) == "function" then
+            local value = productionGet(npcID, relationshipTargetKey)
+            if type(value) == "table" then
+                return Values.copy(value)
+            end
+        end
+        return fallback
+    end
+    local function relationshipFor(npcID)
+        local fallback
+        if sourceKind == "FIXTURE"
+            and type(SemanticAdapters.developerTestRelationshipFor)
+                == "function"
+        then
+            fallback = SemanticAdapters.developerTestRelationshipFor(
+                context, npcID
+            )
+        else
+            fallback = rawRelationshipFor(npcID)
+        end
+        local resolved = authoritativeRelationship(npcID, fallback)
+        Runtime.relationships = Runtime.relationships or {}
+        Runtime.relationships[npcID] = Values.copy(resolved)
+        return Runtime.relationships[npcID]
+    end
+    local function syncAuthoritativeRelationship(npcID)
+        local resolved = relationshipFor(npcID)
+        npcData.relationship = Values.copy(resolved)
+        if npcData.social and npcData.social.relationships then
+            npcData.social.relationships[relationshipTargetKey] = Values.copy(
+                resolved
+            )
+        end
+        return resolved
+    end
+    local function relationshipSnapshotFor(npcID)
+        return Values.copy(relationshipFor(npcID))
+    end
+    SemanticAdapters.relationshipFor = function(_, npcID)
+        return relationshipFor(npcID)
+    end
+    SemanticAdapters.relationshipSnapshotFor = function(_, npcID)
+        return relationshipSnapshotFor(npcID)
+    end
+    PNC.Relationships.Get = function(npcID, targetKey)
+        if sourceKind == "SAVE" and type(productionGet) == "function" then
+            return productionGet(npcID, targetKey or relationshipTargetKey)
+        end
         return relationshipSnapshotFor(npcID)
     end
     PNC.Relationships.ApplyConversationEffect = function(
         npcID, _, effect, effectContext
     )
+        local productionApply = productionRelationships
+            and productionRelationships.ApplyConversationEffect
+        if sourceKind == "SAVE" and type(productionApply) == "function" then
+            local applied, reason, result = productionApply(
+                npcID,
+                relationshipTargetKey,
+                effect,
+                Values.copy(effectContext or {})
+            )
+            syncAuthoritativeRelationship(npcID)
+            return applied, reason, result
+        end
         local relationship = relationshipFor(npcID)
         relationship.approval = number(relationship.approval, 0)
             + number(effect.approval, 0)
@@ -247,8 +333,7 @@ function Provider.configure(context, SemanticAdapters)
             and npcData.available ~= false
             and npcData.healthState ~= "dead"
             and playerData.alive ~= false
-        local targetKey = "player:harness:"
-            .. tostring(playerData.characterUUID or "")
+        local targetKey = relationshipTargetKey
         if PNC.SocialProfileMath
             and type(PNC.SocialProfileMath.AreMutuallyOrientationCompatible)
                 == "function"
@@ -305,6 +390,30 @@ function Provider.configure(context, SemanticAdapters)
         evaluation.standingReason = explanation.reason
         evaluation.preview = true
         return evaluation
+    end
+    if sourceKind == "SAVE"
+        and type(productionEvaluateProposal) == "function"
+    then
+        PNC.Relationships.Preview = function(npcID)
+            local evaluation, reason = productionEvaluateProposal(
+                npcID,
+                relationshipTargetKey,
+                context.player,
+                tonumber(Runtime.now) or 0
+            )
+            if type(evaluation) ~= "table" then
+                return {
+                    action = "RELATIONSHIP_PROPOSAL",
+                    eligible = false,
+                    preview = true,
+                    reason = reason or "relationship_proposal_unavailable",
+                }
+            end
+            evaluation.action = evaluation.action
+                or "RELATIONSHIP_PROPOSAL"
+            evaluation.preview = true
+            return evaluation
+        end
     end
     PNC.Relationships.Propose = function(npcID)
         local evaluation = proposalEvaluation(npcID)
@@ -384,6 +493,44 @@ function Provider.configure(context, SemanticAdapters)
                 PNC.RelationshipProposalPolicy.CooldownType()
             ] or nil
         return true, evaluation.result, evaluation
+    end
+    -- SAVE worlds delegate proposal eligibility and mutation to the
+    -- production RelationshipService.  The synthetic branch above is kept
+    -- only for explicit Developer/Test fixtures while P12 compatibility is
+    -- being retired from the normal save-backed path.
+    if sourceKind == "SAVE"
+        and type(productionEvaluateProposal) == "function"
+    then
+        PNC.Relationships.EvaluateProposal = function(npcID)
+            local evaluation, reason = productionEvaluateProposal(
+                npcID,
+                relationshipTargetKey,
+                context.player,
+                tonumber(Runtime.now) or 0
+            )
+            if type(evaluation) ~= "table" then
+                return {
+                    action = "RELATIONSHIP_PROPOSAL",
+                    eligible = false,
+                    reason = reason or "relationship_proposal_unavailable",
+                }
+            end
+            evaluation.action = evaluation.action
+                or "RELATIONSHIP_PROPOSAL"
+            return evaluation
+        end
+    end
+    if sourceKind == "SAVE" and type(productionPropose) == "function" then
+        PNC.Relationships.Propose = function(npcID)
+            local applied, reason, evaluation = productionPropose(
+                npcID,
+                relationshipTargetKey,
+                context.player,
+                tonumber(Runtime.now) or 0
+            )
+            syncAuthoritativeRelationship(npcID)
+            return applied, reason, evaluation
+        end
     end
     PNC.RelationshipPresentation = PNC.RelationshipPresentation or {}
     PNC.RelationshipPresentation.Summarize = function(value)

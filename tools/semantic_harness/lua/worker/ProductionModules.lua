@@ -255,6 +255,11 @@ load(
     )
     load(
         "ProjectHoomans", "server",
+        "PNC/Social/PNC_SocialProfileService.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
         "PNC/Social/PNC_RelationshipService.lua",
         "social_authority"
     )

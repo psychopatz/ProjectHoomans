@@ -78,6 +78,16 @@ ScenarioSession.configureRuntime(Context)
 ProductionModules.load(Context)
 Context.EngineFacts = PNC.Semantics.EngineFacts
 Context.EngineEvents = PNC.Semantics.EngineEvents
+Runtime.productionRelationshipService = {}
+for _, method in ipairs({
+    "Get", "GetOrCreate", "ApplyConversationEffect", "ApplyEventMutation",
+    "EvaluateProposal", "Propose", "Preview", "SetInitialBaseline",
+    "SetDebugBaseline", "AddMemory", "RemoveMemory", "RecordInteraction",
+}) do
+    if PNC.Relationships and type(PNC.Relationships[method]) == "function" then
+        Runtime.productionRelationshipService[method] = PNC.Relationships[method]
+    end
+end
 ScenarioSession.importSource(
     Context,
     ScenarioSession.initialScenario,

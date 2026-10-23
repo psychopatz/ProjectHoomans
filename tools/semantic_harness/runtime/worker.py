@@ -11,6 +11,7 @@ from .item_catalog import search_item_catalog
 from .process import HarnessError, LuaProcess
 from .scenario import load_scenario, validate_scenario
 from .save_catalog import SaveCatalog
+from .save_import import SaveBackedImporter
 from .state import HarnessWorkingWorld, ImportedSourceSnapshot, Provenance
 from .activity import ActivityLog, default_activity_path
 
@@ -103,6 +104,7 @@ class LuaSemanticWorker:
         source_id: str = "fixture:synthetic-scenario",
         mode: str = "developer_test",
         metadata: dict[str, Any] | None = None,
+        provenance: dict[str, Any] | None = None,
         provider_payloads: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Install a new immutable source and derive a fresh working world."""
@@ -114,6 +116,7 @@ class LuaSemanticWorker:
             source_id=source_id,
             mode=mode,
             metadata=metadata,
+            provenance=provenance,
             provider_payloads=provider_payloads,
         )
         response = self._request(
@@ -322,6 +325,34 @@ class LuaSemanticWorker:
             roots,
             core_repository=self.config.core_repository,
         ).discover()
+
+    def import_saved_selection(
+        self,
+        save_path: Path,
+        *,
+        player_uuid: str | None = None,
+        npc_id: str | None = None,
+        engine_fixtures: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Import one saved Player/NPC pair into the detached worker world."""
+
+        selection = SaveBackedImporter(
+            core_repository=self.config.core_repository,
+        ).load(
+            Path(save_path),
+            player_uuid=player_uuid,
+            npc_id=npc_id,
+            engine_fixtures=engine_fixtures,
+        )
+        return self.import_source(
+            selection.scenario,
+            source=Provenance.SAVE,
+            source_id=selection.metadata["sourceID"],
+            mode="offline_save",
+            metadata=selection.metadata,
+            provenance=selection.provenance,
+            provider_payloads=selection.provider_payloads,
+        )
 
     def context_matrix(
         self,

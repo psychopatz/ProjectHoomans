@@ -2,7 +2,7 @@
 
 **Updated:** 2026-10-24  
 **Parent status:** REOPENED — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is mandatory.  
-**Current mandatory phase:** P12B — Core reader reuse + save catalog.
+**Current mandatory phase:** P12C — Real actor + relationship import.
 **Current local baseline audited:** ProjectHoomans `main` at `b1cb1846`; upstream is synchronized.
 **Normal Semantic Lab runtime requirement:** Project Zomboid CLOSED/OFFLINE is supported and expected.  
 **Source save mutation:** FORBIDDEN.  
@@ -233,9 +233,27 @@ Evidence:
 - P12A plus P12B focused suite: 6 tests passed;
 - no source-save writes are performed by the catalog.
 
-## Current Exact Next Chunk — P12C
+## Completed Chunk — P12C Real actor + relationship import
 
-Import a real saved Player/NPC pair and install the persisted NPC relationship record into the isolated working world, including the saved baselines, standing, bond, memories, cooldowns, interaction journal, and revisions. Remove harness-owned relationship policy from `SemanticAdapters` as production relationship services become authoritative.
+Implemented real saved Player/NPC selection and isolated relationship import:
+
+- `tools/semantic_harness/runtime/save_import.py` reuses the P12B catalog/Core reader, selects a saved player and `PNC_npc<ID>`, derives the production entity key, and imports the full persisted relationship under `npcRecord.social.relationships[playerEntityKey]`;
+- saved player social profiles and NPC social/personality payloads remain provider-owned source data; needs/world values remain explicit `FIXTURE` values;
+- `SAVE` source worlds delegate relationship reads, conversation effects, proposal evaluation, and proposal mutation to the production social-profile/relationship services;
+- relationship policy was removed from `SemanticAdapters_Identity`; the old synthetic relationship policy is isolated in the explicit Developer/Test provider so P8/P11 fixture tests remain compatible;
+- the worker exposes `import_saved_selection(...)` without requiring Project Zomboid to run.
+
+Evidence:
+
+- `tools/semantic_harness/tests/test_save_import_p12c.py`: 2 tests passed, including saved entity/relationship/profile provenance and source immutability across mutation/reset;
+- focused P12C plus P8A compatibility suite: 8 tests passed;
+- P11D/P11E proposal compatibility suite: 11 tests passed;
+- local real-save smoke test imported `player:sp_slot_0:char_1791957489838_240087` and `npcAdamBloom_48G5`, exposed the persisted relationship/memories, reached production proposal policy, applied a gift mutation only to the working world, and reset to the imported baseline;
+- Python compilation, `luac5.3 -p`, and `git diff --check` passed; no save or live-game writes were performed.
+
+## Current Exact Next Chunk — P12D
+
+Add the normal save-backed World Browser over the selected catalog/save: players, companions/colonists/followers, neutral/hostile NPCs, factions/communities, and known trader/provider actors. Selecting an NPC must change the conversation target without requiring a hand-authored synthetic profile.
 
 ## P12A acceptance
 

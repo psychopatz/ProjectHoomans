@@ -3,11 +3,13 @@
 
 local SemanticAdapters = {}
 local Identity = require "worker/SemanticAdapters_Identity"
+local DeveloperTest = require "worker/SemanticAdapters_DeveloperTest"
 local Core = require "worker/SemanticAdapters_Core"
 local Transport = require "worker/SemanticAdapters_Transport"
 local Knowledge = require "worker/SemanticAdapters_Knowledge"
 
 Identity.install(SemanticAdapters)
+DeveloperTest.install(SemanticAdapters)
 
 function SemanticAdapters.configure(context)
     local deps = Core.configure(context, SemanticAdapters)

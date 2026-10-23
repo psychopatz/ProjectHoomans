@@ -111,6 +111,7 @@ class ImportedSourceSnapshot:
         source_id: str = "fixture:synthetic-scenario",
         mode: str = "developer_test",
         metadata: Mapping[str, Any] | None = None,
+        provenance: Mapping[str, Any] | None = None,
         provider_payloads: Mapping[str, Any] | None = None,
     ) -> "ImportedSourceSnapshot":
         source_kind = _source_kind(source)
@@ -124,16 +125,14 @@ class ImportedSourceSnapshot:
                 "immutable": True,
             }
         )
+        supplied_provenance = dict(provenance or {})
+        supplied_provenance.setdefault("schema", PROVENANCE_SCHEMA)
+        supplied_provenance.setdefault("defaultSource", source_kind)
+        supplied_provenance.setdefault("paths", {})
         return cls(
             data=_freeze(deepcopy(dict(scenario))),
             metadata=_freeze(supplied_metadata),
-            provenance=_freeze(
-                {
-                    "schema": PROVENANCE_SCHEMA,
-                    "defaultSource": source_kind,
-                    "paths": {},
-                }
-            ),
+            provenance=_freeze(supplied_provenance),
             provider_payloads=_freeze(deepcopy(dict(provider_payloads or {}))),
         )
 

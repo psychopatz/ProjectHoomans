@@ -16,7 +16,20 @@ local function projectSocialProfiles(context, playerData, npcData)
         or npcData.npcID
     local archetypeID = npcData.archetype or npcData.archetypeID or "General"
 
-    if PNC and PNC.SocialTraits
+    local sourceKind = context.Runtime.sourceMetadata
+        and context.Runtime.sourceMetadata.sourceKind or "FIXTURE"
+    if sourceKind == "SAVE"
+        and type(playerData.socialProfile) == "table"
+        and PNC and PNC.SocialProfileTypes
+        and type(PNC.SocialProfileTypes.NormalizePlayerSocialProfile)
+            == "function"
+    then
+        playerProfile = PNC.SocialProfileTypes.NormalizePlayerSocialProfile(
+            playerData.socialProfile
+        )
+        playerConflicts = {}
+        playerFingerprint = playerProfile.sourceFingerprint or "saved"
+    elseif PNC and PNC.SocialTraits
         and type(PNC.SocialTraits.ResolveTraits) == "function"
     then
         playerProfile, playerConflicts, playerFingerprint =
