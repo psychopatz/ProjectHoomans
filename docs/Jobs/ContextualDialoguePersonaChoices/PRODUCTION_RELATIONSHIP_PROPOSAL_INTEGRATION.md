@@ -1,9 +1,17 @@
 # P11M — Production Relationship Proposal Integration
 
-**Status:** ACTIVE / mandatory developer-side completion phase  
+**Status:** FOLDED INTO P12H / requirement remains mandatory  
 **Opened:** 2026-10-23  
 **Implementation baseline audited:** ProjectHoomans remote `main` at `c9385c4f2b1b86feb09ed24144896e473bd6fec8`.  
 **Native Project Zomboid SP/MP:** remains user-owned and untested.
+
+## P12 folding note
+
+The normal production proposal-entry requirement remains mandatory, but it is no longer a separate active roadmap.
+
+P12H must complete and prove this route against the isolated save-backed working world so proposal, friendship, recruitment and other production mutations share one realistic harness state model.
+
+Do not treat the existing harness-only direct proposal command as sufficient.
 
 ## Why P11M exists
 
