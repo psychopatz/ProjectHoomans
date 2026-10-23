@@ -1,8 +1,8 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
 **Updated:** 2026-10-23
-**Parent status:** REOPENED — P11 runtime-parity foundation retained; P11J native Talk shared-entry parity is mandatory.
-**Current mandatory phase:** P11J4 — developer gates accepted; ready for user-owned native Talk validation.
+**Parent status:** REOPENED — P11 runtime-parity foundation retained; P11J native Talk click-boundary repair is mandatory before native handoff.
+**Current mandatory phase:** P11J4 corrective native semantic choice boundary; developer repair accepted, native Project Zomboid validation remains user-owned.
 **Current remote baseline audited:** ProjectHoomans `main` at `c9385c4f2b1b86feb09ed24144896e473bd6fec8`.
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned.
 
@@ -165,6 +165,38 @@ files as missing or metadata-changed in its older generation. The implementation
 claims above therefore rely on direct source inspection plus the runtime tests,
 with the graph result treated as a coverage signal rather than proof of
 completeness.
+
+## P11J4 corrective native semantic choice boundary
+
+The native screenshots exposed a real production UI boundary regression: Core's
+native choice list could receive semantic rows while the conversation session was
+still busy delivering its opening/response, even though Core correctly rejected
+clicks in that state. A rejected or stale semantic row could also be cleared by
+Core without restoring the production choice surface.
+
+Commit: `f18e5ff6` — `fix: restore native semantic conversation choices`.
+
+The repair keeps Core as the native renderer and keeps the canonical semantic
+submission path in Project Hoomans. It defers semantic rows while the Core
+session is busy, publishes the native view as the runtime semantic input host,
+records accepted/rejected typed row clicks through the existing semantic audit,
+and restores the production menu after rejected/stale/unavailable frames. The
+runtime-only failure receipt is not persisted or sent over the network.
+
+Evidence:
+
+- `lua5.3 tests/pnc_semantic_dialogue_input_smoke.lua` — PASS, including a
+  rendered-row action callback, rejected-click restoration, and busy-session
+  deferral;
+- `lua5.3 tests/pnc_conversation_smoke.lua` — PASS, including native active-view
+  publication;
+- `lua5.3 tests/pnc_conversation_talk_start_projection_smoke.lua` — PASS;
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j -q`
+  — **8/8 PASS**;
+- `luac5.3 -p` passed for changed Lua and `git diff --check` passed.
+
+The repair has not been called a native Project Zomboid verification. The native
+SP/MP conversation click path remains **UNTESTED / user-owned**.
 
 ## Current Exact Next Chunk — native user handoff
 
