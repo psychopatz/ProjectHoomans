@@ -415,10 +415,27 @@ local function compactObservation(context, start, turn, snapshot)
     }
 end
 
+local function compactRelationshipRecord(value, Values)
+    local result = Values.copy(value)
+    if type(result) ~= "table" then return result end
+    for _, key in ipairs({
+        "memories", "saturation", "cooldowns", "interactionJournal",
+        "events", "history", "recentEvents",
+    }) do
+        result[key] = nil
+    end
+    return result
+end
+
 local function compactScenario(value, Values)
     local result = Values.copy(value)
     if type(result) == "table" and type(result.npc) == "table" then
         result.npc.social = nil
+        if type(result.npc.relationship) == "table" then
+            result.npc.relationship = compactRelationshipRecord(
+                result.npc.relationship, Values
+            )
+        end
     end
     return result
 end
@@ -430,8 +447,42 @@ local function compactWorkingWorld(value, Values)
         if type(result[key]) == "table"
             and type(result[key].npc) == "table"
         then
-            result[key].npc.social = nil
+            result[key] = compactScenario(result[key], Values)
         end
+    end
+    return result
+end
+
+local function compactContext(value, Values)
+    local result = Values.copy(value)
+    if type(result) ~= "table" then return result end
+    for _, key in ipairs({
+        "knowledge", "dossier", "dialogue", "state", "engineFacts",
+        "engineEvents", "categoryDiagnostics", "conversationRoot",
+        "conversationBlock",
+    }) do
+        result[key] = nil
+    end
+    local actor = result.actorConversationContext
+    if type(actor) == "table" and type(actor.relationship) == "table" then
+        actor.relationship = compactRelationshipRecord(actor.relationship, Values)
+    end
+    return result
+end
+
+local function compactSnapshot(value, Values)
+    local result = Values.copy(value)
+    if type(result) ~= "table" then return result end
+    result.scenario = compactScenario(result.scenario, Values)
+    result.workingWorld = compactWorkingWorld(result.workingWorld, Values)
+    result.context = compactContext(result.context, Values)
+    local simulation = result.simulationProjection
+    local relationship = type(simulation) == "table"
+        and simulation.relationship or nil
+    if type(relationship) == "table" then
+        relationship.record = compactRelationshipRecord(
+            relationship.record, Values
+        )
     end
     return result
 end
@@ -465,10 +516,7 @@ function TalkParity.Start(context, value, utterance)
         snapshot.workingWorld.baseline = nil
     end
     local compactScenarioValue = compactScenario(scenario, Values)
-    local compactConfigured = Values.copy(configured)
-    compactConfigured.scenario = compactScenario(
-        compactConfigured.scenario, Values
-    )
+    local compactConfigured = compactSnapshot(configured, Values)
     if type(compactConfigured.sourceSnapshot) == "table" then
         compactConfigured.sourceSnapshot.data = nil
         compactConfigured.sourceSnapshot.providerPayloads = nil
@@ -476,10 +524,7 @@ function TalkParity.Start(context, value, utterance)
     compactConfigured.workingWorld = compactWorkingWorld(
         compactConfigured.workingWorld, Values
     )
-    snapshot.scenario = compactScenario(snapshot.scenario, Values)
-    snapshot.workingWorld = compactWorkingWorld(
-        snapshot.workingWorld, Values
-    )
+    snapshot = compactSnapshot(snapshot, Values)
     return {
         schema = TalkParity.SCHEMA,
         type = "talk_start",

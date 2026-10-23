@@ -1,9 +1,9 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
 **Updated:** 2026-10-24  
-**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13A/P13B/P13C/P13D/P13E complete; P13 operational usability remains mandatory.
-**Current mandatory phase:** P13F — Agent-grade CLI parity.
-**Current remote baseline audited:** ProjectHoomans `main` at `ff3ef50b` before the P13E implementation commit.
+**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13A/P13B/P13C/P13D/P13E/P13F/P13G complete.
+**Current mandatory phase:** P13G — Operational acceptance — COMPLETE.
+**Current remote baseline audited:** ProjectHoomans `main` at `b3dcd2b1` before the P13G implementation commit.
 **Normal Semantic Lab runtime requirement:** Project Zomboid may remain CLOSED/OFFLINE.  
 **Source save mutation:** FORBIDDEN.  
 **Optional live profiler:** read-only enrichment only.
@@ -361,9 +361,32 @@ Exact evidence on 2026-10-24:
 - Production worker smoke/gift/task suite: `11/11` passed. Python compile,
   worker-router `luac5.3 -p`, and `git diff --check` passed.
 
-## Current Exact Next Chunk — P13G
+## P13G — Operational Acceptance — COMPLETE
 
-Run the complete operational real-save acceptance matrix: GUI at minimum and
-desktop geometry plus CLI parity, Talk, gift, working-world diff, reset,
-source immutability, and available follower/neutral/hostile/trader/provider
-coverage. Do not claim operational completion from fixture-only evidence.
+Implemented and verified the complete real-save operational workflow on existing
+`main` without changing source saves or requiring Project Zomboid to run:
+
+- tightened production Talk parity transport to omit only oversized diagnostic
+  relationship/knowledge payloads from worker responses while preserving the
+  full isolated working-world state and real target entry ID;
+- added `test_operational_acceptance_p13g.py` covering the real saved
+  companion/follower, neutral, hostile, and trader/provider overlays;
+- real worker matrix passed production routes for all available categories:
+  follower/neutral/trader `full_conversation`, hostile
+  `hostile_full_conversation`, and trader overlay enabled;
+- real CLI JSONL workflow passed Talk → gift → changed working-world diff,
+  then gift → Reset World → zero diff; source save SHA-256 remained unchanged;
+- real Tk workflow passed at `1080x700` and `1280x800`: discover save, choose
+  Player, expand persisted faction membership, choose NPC, import pair, Start
+  Talk, gift `Base.Bandage`, inspect NPC response/inventory/relationship delta,
+  reset imported baseline, and verify source save unchanged;
+- validation evidence on 2026-10-24: `11/11` Tk/Xvfb interaction tests,
+  `24` focused non-Tk worker/CLI/production tests (`OK`, two GUI cases skipped
+  only in the display-free rerun), worker smoke/gift/task `11/11`,
+  `luac5.3 -p`, and `pz_verify --kahlua --severity ERROR` clean;
+- `git diff --check` and Python compilation clean.
+
+## Current Exact Next Chunk — none documented after P13G
+
+`ROADMAP.md` currently ends at P13G. No later phase is being invented or
+started by this handoff.
