@@ -146,6 +146,18 @@ class SaveBrowserTests(unittest.TestCase):
         )
         self.assertEqual(result["factions"][0]["label"], "Saved Fellowship")
         self.assertEqual(result["communities"][0]["id"], "community_saved")
+        hierarchy = result["worldHierarchy"]
+        self.assertEqual(hierarchy["schema"], "semantic.save_world_hierarchy.v1")
+        faction_group = next(
+            row for row in hierarchy["groups"] if row["id"] == "faction:faction_saved"
+        )
+        self.assertEqual(faction_group["membershipSource"], "SAVE")
+        self.assertEqual(faction_group["memberIDs"], ["npcFollower"])
+        community_group = next(
+            row for row in hierarchy["groups"] if row["id"] == "community:community_saved"
+        )
+        self.assertEqual(community_group["membershipSource"], "DERIVED")
+        self.assertEqual(community_group["memberIDs"], ["npcFollower"])
         self.assertEqual(
             set(state_catalog["providers"]),
             {"psychopatzCore", "projecthoomans", "dynamictrading"},
@@ -174,8 +186,12 @@ class SaveBrowserTests(unittest.TestCase):
                 time.sleep(0.02)
             self.assertTrue(app._worker_initialized)
             self.assertTrue(hasattr(app, "saved_world_save_box"))
-            self.assertTrue(hasattr(app, "saved_world_category_box"))
+            self.assertTrue(hasattr(app, "saved_world_tree"))
             self.assertTrue(hasattr(app, "saved_world_import_button"))
+            self.assertEqual(
+                app.main_tabs.tab(app.world_browser_tab, "text"),
+                "World Browser",
+            )
             self.assertTrue(hasattr(app, "provenance_inspector"))
             self.assertIn(
                 "Provenance",

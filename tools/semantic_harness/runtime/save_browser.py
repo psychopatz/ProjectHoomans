@@ -82,6 +82,12 @@ class SavedWorldBrowser:
             for row in derived.values():
                 row["memberIDs"] = sorted(set(row["memberIDs"]))
             communities = sorted(derived.values(), key=lambda item: item["id"])
+        world_hierarchy = _build_world_hierarchy(
+            actors=actors,
+            factions=hoomans.get("factions") or [],
+            communities=communities,
+            provider_actors=trading.get("knownActors") or [],
+        )
         raw = state_catalog["raw"]
 
         return {
@@ -98,6 +104,7 @@ class SavedWorldBrowser:
             "factions": hoomans.get("factions") or [],
             "communities": communities,
             "providerActors": trading.get("knownActors") or [],
+            "worldHierarchy": world_hierarchy,
             "counts": {
                 "players": len(hoomans.get("players") or []),
                 "npcs": len(actors),
@@ -106,6 +113,155 @@ class SavedWorldBrowser:
                 "providerActors": len(trading.get("knownActors") or []),
             },
         }
+
+
+def _actor_reference(actor: dict[str, Any], provider_row: dict[str, Any] | None) -> dict[str, Any]:
+    """Return a bounded actor reference for hierarchy rendering.
+
+    The full actor projections remain available in ``categories``.  Hierarchy
+    rows deliberately contain only the persisted identity/group fields needed
+    by a browser so a large save is not duplicated once per group.
+    """
+
+    reference = {
+        "id": actor.get("id"),
+        "label": actor.get("label") or actor.get("id"),
+        "factionID": actor.get("factionID"),
+        "communityID": actor.get("communityID"),
+        "isFollower": actor.get("isFollower") is True,
+        "isHostile": actor.get("isHostile") is True,
+        "isTrader": provider_row is not None,
+        "source": actor.get("source") or "SAVE",
+    }
+    if provider_row is not None:
+        reference["provider"] = provider_row.get("provider")
+    return reference
+
+
+def _member_ids(value: Any) -> list[str]:
+    """Normalize persisted member collections without inventing membership."""
+
+    if isinstance(value, dict):
+        return sorted({str(key) for key, present in value.items() if present is not False})
+    if isinstance(value, (list, tuple, set)):
+        return sorted({str(item) for item in value if item is not None})
+    return []
+
+
+def _build_world_hierarchy(
+    *,
+    actors: list[dict[str, Any]],
+    factions: list[dict[str, Any]],
+    communities: list[dict[str, Any]],
+    provider_actors: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Project persisted groups plus explicit actor overlays for Tk.
+
+    Group membership is taken from persisted ``memberIDs`` when available.
+    The actor affiliation projection is used only as a bounded fallback for a
+    persisted group whose member list is absent, and is marked ``DERIVED``.
+    Tk consumes this projection and never infers ownership from labels.
+    """
+
+    actors_by_id = {
+        str(actor.get("id")): actor
+        for actor in actors
+        if isinstance(actor, dict) and actor.get("id")
+    }
+    provider_by_id = {
+        str(row.get("id")): row
+        for row in provider_actors
+        if isinstance(row, dict) and row.get("id")
+    }
+    groups: list[dict[str, Any]] = []
+
+    def add_persisted_groups(rows: list[dict[str, Any]], kind: str) -> None:
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            group_id = str(row.get("id") or row.get(f"{kind}ID") or "")
+            if not group_id:
+                continue
+            member_ids = _member_ids(row.get("memberIDs"))
+            membership_source = str(row.get("source") or "SAVE")
+            if not member_ids:
+                affiliation_key = "factionID" if kind == "faction" else "communityID"
+                member_ids = sorted(
+                    actor_id
+                    for actor_id, actor in actors_by_id.items()
+                    if actor.get(affiliation_key) == group_id
+                )
+                if member_ids:
+                    membership_source = "DERIVED"
+            members = [
+                _actor_reference(actors_by_id[actor_id], provider_by_id.get(actor_id))
+                for actor_id in member_ids
+                if actor_id in actors_by_id
+            ]
+            groups.append(
+                {
+                    "id": f"{kind}:{group_id}",
+                    "kind": kind,
+                    "label": str(row.get("label") or row.get("name") or group_id),
+                    "source": row.get("source") or "SAVE",
+                    "membershipSource": membership_source,
+                    "group": deepcopy(row),
+                    "memberIDs": [member["id"] for member in members],
+                    "members": members,
+                }
+            )
+
+    add_persisted_groups(factions, "faction")
+    add_persisted_groups(communities, "community")
+
+    def add_overlay(group_id: str, kind: str, label: str, rows: list[dict[str, Any]]) -> None:
+        members = [
+            _actor_reference(actor, provider_by_id.get(str(actor.get("id"))))
+            for actor in rows
+            if isinstance(actor, dict) and actor.get("id")
+        ]
+        if members:
+            groups.append(
+                {
+                    "id": group_id,
+                    "kind": kind,
+                    "label": label,
+                    "source": "DERIVED",
+                    "membershipSource": "DERIVED",
+                    "memberIDs": [member["id"] for member in members],
+                    "members": members,
+                }
+            )
+
+    faction_or_community = {
+        str(actor.get("id"))
+        for actor in actors
+        if actor.get("factionID") or actor.get("communityID")
+    }
+    add_overlay(
+        "unaffiliated",
+        "overlay",
+        "Unaffiliated",
+        [
+            actor
+            for actor in actors
+            if actor.get("id") not in faction_or_community
+            and not actor.get("isHostile")
+        ],
+    )
+    add_overlay(
+        "hostile",
+        "overlay",
+        "Hostile",
+        [actor for actor in actors if actor.get("isHostile")],
+    )
+    add_overlay(
+        "traders",
+        "provider_overlay",
+        "Known Traders",
+        [actor for actor in actors if str(actor.get("id")) in provider_by_id],
+    )
+    return {"schema": "semantic.save_world_hierarchy.v1", "groups": groups}
 
 
 __all__ = ["SaveBrowserError", "SavedWorldBrowser"]

@@ -437,12 +437,19 @@ class SemanticHarnessApp:
         )
         self.activity_log_widget.grid(row=1, column=0, sticky="nsew")
 
+        world_browser_tab = ttk.Frame(self.main_tabs, padding=10)
+        world_browser_tab.rowconfigure(1, weight=1)
+        world_browser_tab.columnconfigure(0, weight=1)
+
         # Keep the primary workflow order stable: Simulation, Studio, Log.
         self.main_tabs.add(simulation_tab, text="Simulation")
         self.main_tabs.add(studio_tab, text="Studio")
         self.main_tabs.add(log_tab, text="Log")
+        self.main_tabs.add(world_browser_tab, text="World Browser")
         self.studio_tab = studio_tab
         self.log_tab = log_tab
+        self.world_browser_tab = world_browser_tab
+        self._build_saved_world_browser(world_browser_tab)
 
         container = ttk.Frame(simulation_tab)
         container.pack(fill="both", expand=True)
@@ -546,6 +553,7 @@ class SemanticHarnessApp:
         ttk.Label(workbench_header, text="NPC profile").grid(
             row=0, column=1, sticky="e", padx=(0, 4)
         )
+        self.npc_profile_label = workbench_header.grid_slaves(row=0, column=1)[0]
         self.npc_profile_var = self._tk.StringVar(
             value=profile_label(profile_id(self.scenario))
         )
@@ -637,88 +645,35 @@ class SemanticHarnessApp:
         status_controls.grid(row=1, column=1, sticky="e", padx=(8, 0), pady=(4, 0))
         self.reset_button = ttk.Button(primary_actions, text="Reset", command=self.reset)
         self.reset_button.grid(row=0, column=0, sticky="ew", padx=(0, 3))
-        self.load_button = ttk.Button(primary_actions, text="Load scenario", command=self.load)
-        self.load_button.grid(row=0, column=1, sticky="ew", padx=3)
         self.settings_button = ttk.Button(
             primary_actions, text="Simulation settings…", command=self.open_runtime_settings
         )
-        self.settings_button.grid(row=0, column=2, sticky="ew", padx=3)
-        self.save_button = ttk.Button(primary_actions, text="Save scenario", command=self.save)
-        self.save_button.grid(row=0, column=3, sticky="ew", padx=(3, 0))
-        saved_world = ttk.LabelFrame(
+        self.settings_button.grid(row=0, column=1, sticky="ew", padx=3)
+        developer_test = ttk.LabelFrame(
             controls,
-            text="Saved world · read-only source",
+            text="Developer / Test fixtures",
             padding=(4, 3),
         )
-        saved_world.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(5, 0))
-        saved_world.columnconfigure(1, weight=1)
-        saved_world.columnconfigure(4, weight=1)
-        saved_world.columnconfigure(7, weight=1)
-        self.saved_world_save_var = self._tk.StringVar(value="")
-        self.saved_world_player_var = self._tk.StringVar(value="")
-        self.saved_world_category_var = self._tk.StringVar(value="All NPCs")
-        self.saved_world_npc_var = self._tk.StringVar(value="")
-        ttk.Label(saved_world, text="Save").grid(row=0, column=0, padx=(0, 4))
-        self.saved_world_save_box = ttk.Combobox(
-            saved_world,
-            textvariable=self.saved_world_save_var,
-            state="disabled",
-            width=34,
-        )
-        self.saved_world_save_box.grid(row=0, column=1, sticky="ew", padx=(0, 5))
-        self.saved_world_discover_button = ttk.Button(
-            saved_world,
-            text="Discover saves",
-            command=self._discover_saved_worlds,
-        )
-        self.saved_world_discover_button.grid(row=0, column=2, padx=(0, 8))
-        ttk.Label(saved_world, text="Player").grid(row=0, column=3, padx=(0, 4))
-        self.saved_world_player_box = ttk.Combobox(
-            saved_world,
-            textvariable=self.saved_world_player_var,
-            state="disabled",
-            width=20,
-        )
-        self.saved_world_player_box.grid(row=0, column=4, sticky="ew", padx=(0, 5))
-        ttk.Label(saved_world, text="NPC group").grid(row=0, column=5, padx=(0, 4))
-        self.saved_world_category_box = ttk.Combobox(
-            saved_world,
-            textvariable=self.saved_world_category_var,
-            state="disabled",
-            width=16,
-        )
-        self.saved_world_category_box.grid(row=0, column=6, padx=(0, 5))
-        self.saved_world_category_box.bind(
-            "<<ComboboxSelected>>", lambda _: self._on_saved_world_category()
-        )
-        ttk.Label(saved_world, text="NPC").grid(row=0, column=7, padx=(0, 4))
-        self.saved_world_npc_box = ttk.Combobox(
-            saved_world,
-            textvariable=self.saved_world_npc_var,
-            state="disabled",
-            width=24,
-        )
-        self.saved_world_npc_box.grid(row=0, column=8, sticky="ew", padx=(0, 5))
-        self.saved_world_inspect_button = ttk.Button(
-            saved_world,
-            text="Inspect",
-            command=self._inspect_saved_world,
-        )
-        self.saved_world_inspect_button.grid(row=0, column=9, padx=(0, 4))
-        self.saved_world_import_button = ttk.Button(
-            saved_world,
-            text="Import target",
-            command=self._import_saved_world_target,
-        )
-        self.saved_world_import_button.grid(row=0, column=10)
-        self.saved_world_status_var = self._tk.StringVar(
-            value="Discover saves to browse persisted Players, NPCs, factions, and communities."
+        self.developer_test_frame = developer_test
+        developer_test.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(5, 0))
+        developer_test.columnconfigure(4, weight=1)
+        self.fixture_mode_var = self._tk.StringVar(
+            value="Synthetic scenario controls · not save-backed authority"
         )
         ttk.Label(
-            saved_world,
-            textvariable=self.saved_world_status_var,
+            developer_test,
+            textvariable=self.fixture_mode_var,
             anchor="w",
-        ).grid(row=1, column=0, columnspan=11, sticky="ew", pady=(3, 0))
+        ).grid(row=0, column=0, columnspan=5, sticky="w", padx=(0, 8))
+        self.load_button = ttk.Button(developer_test, text="Load scenario", command=self.load)
+        self.load_button.grid(row=1, column=0, sticky="w", pady=(3, 0))
+        self.save_button = ttk.Button(developer_test, text="Save scenario", command=self.save)
+        self.save_button.grid(row=1, column=1, sticky="w", padx=(6, 0), pady=(3, 0))
+        ttk.Button(
+            developer_test,
+            text="Open World Browser",
+            command=lambda: self.main_tabs.select(self.world_browser_tab),
+        ).grid(row=1, column=2, sticky="w", padx=(12, 0), pady=(3, 0))
         self.language_var = self._tk.StringVar(
             value=self.scenario.get("runtime", {}).get("language", "EN")
         )
@@ -736,10 +691,12 @@ class SemanticHarnessApp:
         right = ttk.LabelFrame(self.simulation_panes, text="Semantic trace")
         right.rowconfigure(0, weight=1)
         right.columnconfigure(0, weight=1)
+        right.configure(width=420)
         self.simulation_panes.add(right, weight=2)
         self.workflow_pane_split.add(conversation_pane, weight=3)
         self.workflow_pane_split.add(workbench_pane, weight=2)
         self.trace_tabs = ttk.Notebook(right)
+        self.trace_tabs.configure(width=420)
         self.trace_tabs.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
 
         dialogue_graph_frame = ttk.Frame(self.trace_tabs)
@@ -1020,6 +977,117 @@ class SemanticHarnessApp:
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")
         self._set_controls(False)
 
+    def _build_saved_world_browser(self, parent: Any) -> None:
+        """Build the save-backed world browser as a full-width Lab surface."""
+
+        ttk = self._ttk
+        parent.columnconfigure(0, weight=1)
+        parent.rowconfigure(1, weight=1)
+
+        self.saved_world_save_var = self._tk.StringVar(value="")
+        self.saved_world_player_var = self._tk.StringVar(value="")
+        self.saved_world_search_var = self._tk.StringVar(value="")
+        self.saved_world_category_var = self._tk.StringVar(value="")
+        self.saved_world_npc_var = self._tk.StringVar(value="")
+        self.saved_world_status_var = self._tk.StringVar(
+            value="Discover compatible saves to browse the persisted world."
+        )
+        self.saved_world_target_var = self._tk.StringVar(
+            value="No saved Player/NPC pair loaded"
+        )
+
+        header = ttk.LabelFrame(parent, text="Saved World · read-only source", padding=8)
+        header.grid(row=0, column=0, sticky="ew", pady=(0, 8))
+        header.columnconfigure(1, weight=1)
+        header.columnconfigure(4, weight=1)
+        ttk.Label(header, text="Save").grid(row=0, column=0, sticky="w", padx=(0, 6))
+        self.saved_world_save_box = ttk.Combobox(
+            header,
+            textvariable=self.saved_world_save_var,
+            state="disabled",
+            width=40,
+        )
+        self.saved_world_save_box.grid(row=0, column=1, sticky="ew", padx=(0, 8))
+        self.saved_world_save_box.bind(
+            "<<ComboboxSelected>>", lambda _event: self._on_saved_world_save()
+        )
+        self.saved_world_discover_button = ttk.Button(
+            header,
+            text="Reload saves",
+            command=self._discover_saved_worlds,
+        )
+        self.saved_world_discover_button.grid(row=0, column=2, sticky="w", padx=(0, 18))
+        ttk.Label(header, text="Player").grid(row=0, column=3, sticky="w", padx=(0, 6))
+        self.saved_world_player_box = ttk.Combobox(
+            header,
+            textvariable=self.saved_world_player_var,
+            state="disabled",
+            width=28,
+        )
+        self.saved_world_player_box.grid(row=0, column=4, sticky="ew", padx=(0, 8))
+        self.saved_world_inspect_button = ttk.Button(
+            header,
+            text="Refresh world",
+            command=self._inspect_saved_world,
+        )
+        self.saved_world_inspect_button.grid(row=0, column=5, sticky="w")
+
+        ttk.Label(header, text="Search world").grid(
+            row=1, column=0, sticky="w", padx=(0, 6), pady=(8, 0)
+        )
+        search_entry = ttk.Entry(header, textvariable=self.saved_world_search_var)
+        search_entry.grid(row=1, column=1, columnspan=4, sticky="ew", pady=(8, 0))
+        search_entry.bind("<KeyRelease>", lambda _event: self._render_saved_world_tree())
+        self.saved_world_import_button = ttk.Button(
+            header,
+            text="Load selected NPC",
+            command=self._import_saved_world_target,
+        )
+        self.saved_world_import_button.grid(row=1, column=5, sticky="w", pady=(8, 0))
+        ttk.Label(
+            header,
+            textvariable=self.saved_world_target_var,
+            anchor="w",
+        ).grid(row=2, column=0, columnspan=6, sticky="ew", pady=(8, 0))
+        ttk.Label(
+            header,
+            textvariable=self.saved_world_status_var,
+            anchor="w",
+            justify="left",
+            wraplength=1000,
+        ).grid(row=3, column=0, columnspan=6, sticky="ew", pady=(4, 0))
+
+        browser_frame = ttk.LabelFrame(parent, text="World", padding=6)
+        browser_frame.grid(row=1, column=0, sticky="nsew")
+        browser_frame.rowconfigure(0, weight=1)
+        browser_frame.columnconfigure(0, weight=1)
+        self.saved_world_tree = ttk.Treeview(
+            browser_frame,
+            columns=("kind", "source"),
+            show="tree headings",
+            selectmode="browse",
+        )
+        self.saved_world_tree.heading("#0", text="Saved actors")
+        self.saved_world_tree.heading("kind", text="Group")
+        self.saved_world_tree.heading("source", text="Source")
+        self.saved_world_tree.column("#0", minwidth=260, width=520, stretch=True)
+        self.saved_world_tree.column("kind", minwidth=110, width=150, stretch=False)
+        self.saved_world_tree.column("source", minwidth=90, width=110, stretch=False)
+        self.saved_world_tree.grid(row=0, column=0, sticky="nsew")
+        tree_scroll = ttk.Scrollbar(
+            browser_frame, orient="vertical", command=self.saved_world_tree.yview
+        )
+        tree_scroll.grid(row=0, column=1, sticky="ns")
+        self.saved_world_tree.configure(yscrollcommand=tree_scroll.set)
+        self.saved_world_tree.bind(
+            "<<TreeviewSelect>>", lambda _event: self._on_saved_world_tree_select()
+        )
+        self.saved_world_tree.bind(
+            "<Double-1>", lambda _event: self._import_saved_world_target()
+        )
+        self.saved_world_tree_actor_rows: dict[str, dict[str, Any]] = {}
+        self.saved_world_tree_group_nodes: dict[str, str] = {}
+
     def _set_controls(self, enabled: bool) -> None:
         state = "normal" if enabled and not self.busy else "disabled"
         for button in (
@@ -1051,8 +1119,11 @@ class SemanticHarnessApp:
                 combo_state if self.saved_world_browser else "disabled"
             )
             self.saved_world_player_box.configure(state=browser_state)
-            self.saved_world_category_box.configure(state=browser_state)
-            self.saved_world_npc_box.configure(state=browser_state)
+            self.saved_world_tree.configure(
+                selectmode=(
+                    "browse" if enabled and self.saved_world_browser else "none"
+                )
+            )
         if hasattr(self, "proposal_button"):
             self.proposal_button.configure(state=state)
         if hasattr(self, "auto_replay_checkbutton"):
@@ -1080,6 +1151,9 @@ class SemanticHarnessApp:
             field.set_enabled(enabled and not self.busy)
         if enabled and not self.busy:
             self._update_generated_personality_controls()
+            if self.main_tabs.select() == str(self.simulation_tab):
+                self._restore_splitters()
+                self._schedule_splitter_restore(0)
         self.matrix_dimension_box.configure(
             state="readonly" if enabled and not self.busy else "disabled"
         )
@@ -1733,6 +1807,8 @@ class SemanticHarnessApp:
         self._build_simulation_workbench()
         self._set_status(f"Ready · Lua PID {result.status.get('pid')}")
         self._set_controls(True)
+        self.root.update_idletasks()
+        self._restore_splitters()
         self._clear_workbench_pending()
         self._workbench_initializing = False
         self._append("SYSTEM", "Lua worker ready. Production semantic modules are loaded.")
@@ -1807,31 +1883,46 @@ class SemanticHarnessApp:
             self.saved_world_save_labels = {}
             labels: list[str] = []
             for entry in self.saved_world_entries:
-                label = (
+                base_label = (
                     f"{entry.get('saveName') or 'save'} · "
-                    f"{entry.get('mode') or 'unknown mode'} · "
-                    f"{entry.get('path') or ''}"
+                    f"{entry.get('mode') or 'unknown mode'}"
                 )
+                label = base_label
+                suffix = 2
+                while label in self.saved_world_save_labels:
+                    label = f"{base_label} ({suffix})"
+                    suffix += 1
                 labels.append(label)
                 self.saved_world_save_labels[label] = entry
             self.saved_world_save_box.configure(values=tuple(labels))
+            self.saved_world_browser = {}
+            self.saved_world_player_box.configure(values=())
+            self.saved_world_player_var.set("")
+            self.saved_world_target_var.set("No saved Player/NPC pair loaded")
+            self._render_saved_world_tree()
             if labels:
                 self.saved_world_save_var.set(labels[0])
                 self.saved_world_status_var.set(
-                    f"{len(labels)} validated save(s); choose one and Inspect."
+                    f"{len(labels)} validated save(s); choose a save to browse its world."
                 )
+                self._set_controls(True)
+                self._inspect_saved_world()
             else:
                 rejected = len(self.saved_catalog.get("rejected") or [])
                 self.saved_world_save_var.set("")
                 self.saved_world_status_var.set(
                     f"No compatible saves found ({rejected} rejected)."
                 )
-            self._set_controls(True)
+                self._set_controls(True)
 
         self._start_operation(lambda worker: worker.save_catalog(), finish)
 
     def _selected_saved_world_entry(self) -> dict[str, Any] | None:
         return self.saved_world_save_labels.get(self.saved_world_save_var.get())
+
+    def _on_saved_world_save(self) -> None:
+        if self.saved_world_save_var.get():
+            self._inspect_saved_world()
 
     def _inspect_saved_world(self) -> None:
         entry = self._selected_saved_world_entry()
@@ -1846,11 +1937,6 @@ class SemanticHarnessApp:
         def finish(result: dict[str, Any]) -> None:
             self.saved_world_browser = result if isinstance(result, dict) else {}
             players = self.saved_world_browser.get("players") or []
-            self.saved_world_category_rows = {
-                str(key): value
-                for key, value in (self.saved_world_browser.get("categories") or {}).items()
-                if isinstance(value, list)
-            }
             player_labels = [
                 str(row.get("label") or row.get("id"))
                 for row in players
@@ -1864,14 +1950,9 @@ class SemanticHarnessApp:
             self.saved_world_player_box.configure(values=tuple(player_labels))
             if player_labels:
                 self.saved_world_player_var.set(player_labels[0])
-            category_labels = sorted(self.saved_world_category_rows)
-            self.saved_world_category_box.configure(values=tuple(category_labels))
-            if category_labels:
-                preferred = (
-                    "All NPCs" if "All NPCs" in category_labels else category_labels[0]
-                )
-                self.saved_world_category_var.set(preferred)
-            self._on_saved_world_category()
+            self.saved_world_search_var.set("")
+            self.saved_world_npc_var.set("")
+            self._render_saved_world_tree()
             counts = self.saved_world_browser.get("counts") or {}
             self.saved_world_status_var.set(
                 "Browsed save: "
@@ -1880,36 +1961,101 @@ class SemanticHarnessApp:
                 f"{counts.get('factions', 0)} faction(s), "
                 f"{counts.get('communities', 0)} community reference(s)."
             )
+            self.saved_world_target_var.set(
+                "Choose a Player, expand a group, then double-click an NPC or use Load selected NPC."
+            )
             self._set_controls(True)
 
         self._start_operation(
             lambda worker: worker.save_browser(Path(save_path)), finish
         )
 
-    def _on_saved_world_category(self) -> None:
-        rows = self.saved_world_category_rows.get(
-            self.saved_world_category_var.get(), []
+    def _render_saved_world_tree(self) -> None:
+        if not hasattr(self, "saved_world_tree"):
+            return
+        for item in self.saved_world_tree.get_children(""):
+            self.saved_world_tree.delete(item)
+        self.saved_world_tree_actor_rows = {}
+        self.saved_world_tree_group_nodes = {}
+        hierarchy = self.saved_world_browser.get("worldHierarchy") or {}
+        groups = hierarchy.get("groups") if isinstance(hierarchy, dict) else []
+        query = self.saved_world_search_var.get().strip().casefold()
+        if not isinstance(groups, list):
+            groups = []
+        for group_index, group in enumerate(groups):
+            if not isinstance(group, dict):
+                continue
+            members = [
+                row for row in (group.get("members") or []) if isinstance(row, dict)
+            ]
+            matching_members = [
+                row
+                for row in members
+                if not query
+                or query in str(row.get("label") or "").casefold()
+                or query in str(row.get("id") or "").casefold()
+            ]
+            group_label = str(group.get("label") or group.get("id") or "World")
+            if query and query not in group_label.casefold() and not matching_members:
+                continue
+            group_iid = f"world-group-{group_index}"
+            kind = str(group.get("kind") or "group")
+            source = str(group.get("membershipSource") or group.get("source") or "MISSING")
+            self.saved_world_tree.insert(
+                "",
+                "end",
+                iid=group_iid,
+                text=f"{group_label} ({len(matching_members) if query else len(members)})",
+                values=(kind, source),
+                open=False,
+            )
+            self.saved_world_tree_group_nodes[group_iid] = group
+            for member_index, member in enumerate(matching_members):
+                actor_iid = f"{group_iid}-actor-{member_index}"
+                flags: list[str] = []
+                if member.get("isFollower") is True:
+                    flags.append("follower")
+                if member.get("isHostile") is True:
+                    flags.append("hostile")
+                if member.get("isTrader") is True:
+                    flags.append("trader")
+                label = str(member.get("label") or member.get("id") or "NPC")
+                if flags:
+                    label = f"{label} · {', '.join(flags)}"
+                self.saved_world_tree.insert(
+                    group_iid,
+                    "end",
+                    iid=actor_iid,
+                    text=label,
+                    values=("NPC", str(member.get("source") or "MISSING")),
+                    open=False,
+                )
+                self.saved_world_tree_actor_rows[actor_iid] = member
+
+    def _on_saved_world_tree_select(self) -> None:
+        selection = self.saved_world_tree.selection()
+        if not selection:
+            return
+        actor = self.saved_world_tree_actor_rows.get(selection[0])
+        if not actor:
+            return
+        self.saved_world_npc_var.set(str(actor.get("id") or ""))
+        label = str(actor.get("label") or actor.get("id") or "NPC")
+        self.saved_world_target_var.set(
+            f"Selected NPC: {label} · source {actor.get('source') or 'MISSING'} · "
+            "double-click or Load selected NPC"
         )
-        self.saved_world_npc_labels = {
-            str(row.get("label") or row.get("id")): row
-            for row in rows
-            if isinstance(row, dict)
-        }
-        labels = list(self.saved_world_npc_labels)
-        self.saved_world_npc_box.configure(values=tuple(labels))
-        self.saved_world_npc_var.set(labels[0] if labels else "")
 
     def _import_saved_world_target(self) -> None:
         entry = self._selected_saved_world_entry()
         player = getattr(self, "saved_world_player_labels", {}).get(
             self.saved_world_player_var.get()
         )
-        npc = getattr(self, "saved_world_npc_labels", {}).get(
-            self.saved_world_npc_var.get()
-        )
+        selection = self.saved_world_tree.selection()
+        npc = self.saved_world_tree_actor_rows.get(selection[0]) if selection else None
         if entry is None or not player or not npc:
             self.saved_world_status_var.set(
-                "Inspect a save, then choose both a Player and an NPC target."
+                "Choose a save, Player, and NPC from the World hierarchy first."
             )
             return
 
@@ -1919,6 +2065,10 @@ class SemanticHarnessApp:
                 self.scenario = scenario
                 self._sync_workbench_from_scenario(scenario)
             self._update_simulation_projection(result)
+            self._set_save_backed_mode(True)
+            self.saved_world_target_var.set(
+                f"Loaded Player {player.get('label')} → NPC {npc.get('label')}"
+            )
             source = (result.get("sourceSnapshot") or {}).get("metadata", {})
             self.saved_world_status_var.set(
                 "Imported saved target: "
@@ -1930,6 +2080,7 @@ class SemanticHarnessApp:
                 "SYSTEM",
                 f"Imported saved target {npc.get('label')} from read-only source save.",
             )
+            self.main_tabs.select(self.simulation_tab)
 
         self._start_operation(
             lambda worker: worker.import_saved_selection(
@@ -3302,6 +3453,24 @@ class SemanticHarnessApp:
                 }
             ),
         )
+
+    def _set_save_backed_mode(self, active: bool) -> None:
+        """Demote synthetic fixture controls after a real save import."""
+
+        if active:
+            self.fixture_mode_var.set(
+                "Save-backed mode active · synthetic fixtures are hidden"
+            )
+            self.npc_profile_label.grid_remove()
+            self.npc_profile_box.grid_remove()
+            self.developer_test_frame.grid_remove()
+        else:
+            self.fixture_mode_var.set(
+                "Synthetic scenario controls · not save-backed authority"
+            )
+            self.npc_profile_label.grid()
+            self.npc_profile_box.grid()
+            self.developer_test_frame.grid()
         self._refresh_suggestion_controls(self.session.ready and not self.busy)
 
     def submit(self) -> None:

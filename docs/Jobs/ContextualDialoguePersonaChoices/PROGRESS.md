@@ -1,8 +1,8 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
 **Updated:** 2026-10-24  
-**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13 operational usability is mandatory.  
-**Current mandatory phase:** P13A — Operational World Browser UX.  
+**Parent status:** REOPENED — P12 save-backed runtime/backend foundation retained; P13A complete; P13 operational usability remains mandatory.
+**Current mandatory phase:** P13B — Offline Player Engine-State Provider.
 **Current remote baseline audited:** ProjectHoomans `main` at `dbfd9099a0b687bc2f6505f58e81e32ea6dc5966`.  
 **Normal Semantic Lab runtime requirement:** Project Zomboid may remain CLOSED/OFFLINE.  
 **Source save mutation:** FORBIDDEN.  
@@ -56,7 +56,29 @@ Current screenshot + source audit show:
 
 Therefore P13 is mandatory.
 
-## Current Exact Next Chunk — P13A
+## P13A — Operational World Browser UX — COMPLETE
+
+Implemented on existing `main`:
+
+- replaced the compressed Simulation save row with a dedicated full-width `World Browser` tab inside Semantic Lab;
+- kept save discovery, inspection, and import on the existing `SaveCatalog`, `SavedWorldBrowser`, `SaveBackedImporter`, and worker path;
+- added a backend-owned `semantic.save_world_hierarchy.v1` projection containing persisted faction/community groups plus explicit unaffiliated, hostile, and trader/provider overlays;
+- rendered that projection with a Tk `ttk.Treeview` with group expansion, NPC selection/double-click loading, and bounded search filtering;
+- automatically inspects the first discovered save and re-inspects when the save selector changes;
+- demoted synthetic `Load scenario`, `Save scenario`, and NPC profile controls into `Developer / Test fixtures`, hiding them after a real save import;
+- shortened save labels to save name + mode so the selector remains usable at minimum geometry.
+
+Exact evidence:
+
+- pre-change real-worker reproduction: at `1080x700`, 8 real saves were discovered but the old save row requested `1355px` while only `630px` was available; its save combobox rendered at `1px`; the same left-pane compression persisted at `1320x860`;
+- `P13_STATE=$(mktemp -d); XDG_STATE_HOME="$P13_STATE" xvfb-run -a -s '-screen 0 1440x1000x24' python3 -m unittest tools.semantic_harness.tests.test_operational_world_browser_p13a tools.semantic_harness.tests.test_save_browser_p12d`: `3/3` passed;
+- the real-worker Tk acceptance exercised both `1080x700` and `1280x800`: discovered multiple real saves, selected a non-first save and Player, searched/expanded the hierarchy, selected an NPC, loaded the Player/NPC pair through `SaveBackedImporter`, started production Talk, and verified the source hash was unchanged;
+- focused save-backed Python regression set (`test_save_catalog_p12b`, `test_save_import_p12c`, `test_save_browser_p12d`, `test_operational_world_browser_p13a`, `test_save_backed_conversation_p12j`): `11/11` passed;
+- real production Lua worker checks: `pnc_semantic_dialogue_input_smoke` `1/1`, `pnc_semantic_gift` `5/5`, `pnc_semantic_task` `5/5` passed;
+- `python3 -m py_compile` for changed Python files and `git diff --check` passed; no production Lua files changed, so no new Kahlua surface was introduced;
+- the broader legacy `test_contextual_suggestions_s4` remains at its current `3` unrelated semantic-expectation failures (greeting realization, identity response wording, and hub back-navigation ordering); P13A did not change semantic/runtime Lua owners.
+
+## Current Exact Next Chunk — P13B
 
 Work on the user's existing local `main`.
 
