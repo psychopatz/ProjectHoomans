@@ -1,7 +1,7 @@
 # Contextual Dialogue Persona & Choices
 
-**Status:** REOPENED — P10 hub/control infrastructure retained; P11 runtime-parity actors/dynamic-relationship UX is mandatory.  
-**Current source-audit baseline:** ProjectHoomans remote main at c412d50c27a423965911e115c0947b65c1eb2b6c (2026-10-23).  
+**Status:** REOPENED — P11 runtime-parity foundation retained; P11J native Talk shared-entry parity is the current mandatory gap.  
+**Current source-audit baseline:** ProjectHoomans remote main at c9385c4f2b1b86feb09ed24144896e473bd6fec8 (2026-10-23).  
 **Dynamic Trading provider baseline:** psychopatz/DynamicTrading at 5db64cbcc764f035146f044fdc34e930ce47d7c8.  
 **Native Project Zomboid SP/MP:** untested; user-owned acceptance.
 
@@ -20,7 +20,7 @@ The existing P0-P7 implementation is retained as foundation, but the 2026-10-22 
 
 The P8 behavioral foundation is now implemented, but the 2026-10-22 UI/routing audit found a new product gap: Semantic Lab still hides real conversation branching, and typed authored-category utterances such as `whatsup` redundantly produce an `Ask what's up` button instead of entering the already-recognized category directly.
 
-P10 hub/control infrastructure is retained, but the 2026-10-23 live UI/source audit found a new parity gap: Simulation still exposes developer-only controls, player/NPC state is asymmetric, generated personality is presented as manual sliders, the graph does not visualize semantic Flows/hubs, and the relationship bond model is too manual. The current mandatory goal is therefore **P11 — Runtime-Parity Actors, Dynamic Relationships, and Semantic Lab UX**.
+P10 hub/control infrastructure and the P11 actor/relationship/runtime-graph work are retained. A later Talk audit found that the harness-side P11J matrix now models the correct Colonist/Follower/Neutral/Hostile cases, but native `PNC.Conversation.Open` still does not consume the same Talk-start projection. The current mandatory gap is therefore **P11J native Talk parity: converge native Talk and Semantic Lab onto one production Talk-start boundary**.
 
 ## Relationship / bond direction
 
@@ -89,8 +89,9 @@ This job builds on and must not duplicate:
 7. SEMANTIC_LAB_CONVERSATION_VISUALIZATION.md
 8. SEMANTIC_SIMULATION_UX_AND_CONTEXTUAL_HUB.md
 9. RUNTIME_PARITY_ACTORS_RELATIONSHIPS_AND_UX.md
-10. ROADMAP.md
-11. HARNESS_ACCEPTANCE.md
-12. PROGRESS.md **last** for current truth and the exact Next Chunk
+10. NATIVE_TALK_PARITY.md
+11. ROADMAP.md
+12. HARNESS_ACCEPTANCE.md
+13. PROGRESS.md **last** for current truth and the exact Next Chunk
 
 No checked-in GOAL_PROMPT.md is allowed. The executable /goal remains chat-only.
