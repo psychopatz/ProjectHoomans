@@ -32,6 +32,33 @@ local GIFT_PREFERENCE_RESPONSES = {
     },
 }
 
+local function auditTalkStart(eventName, projection, extra)
+    local diagnostics = PNC.Semantics
+        and PNC.Semantics.SemanticDiagnostics or nil
+    if not diagnostics or type(diagnostics.Record) ~= "function" then
+        return false
+    end
+    local data = {
+        entryID = projection and projection.entryID,
+        targetType = projection and projection.targetType,
+        tacticalClass = projection and projection.tacticalClass,
+        route = projection and projection.route,
+        routeReason = projection and projection.routeReason,
+        available = projection and projection.availability
+            and projection.availability.available,
+        availabilityReason = projection and projection.availability
+            and projection.availability.reason,
+        hostileInlineAvailable = projection
+            and projection.hostileInlineAvailable,
+        hostileInlineReason = projection
+            and projection.hostileInlineReason,
+    }
+    for key, value in pairs(type(extra) == "table" and extra or {}) do
+        data[key] = value
+    end
+    return diagnostics.Record(eventName, data)
+end
+
 function Conversation.RequestCeasefire(context)
     return Lifecycle and Lifecycle.RequestCeasefire
         and Lifecycle.RequestCeasefire(context) or false
@@ -65,6 +92,7 @@ function Conversation.Open(entry, player, forcedTime)
     local talkStart = TalkStart.Project(entry, player, {
         source = "native",
     })
+    auditTalkStart("native.talk.start", talkStart)
     -- Hostile NPCs use the compact nameplate chat route. Opening the full
     -- conversation view first would create a normal scene lease and let the
     -- combat safety gate reject it before the player can type anything.
@@ -73,13 +101,23 @@ function Conversation.Open(entry, player, forcedTime)
     if talkStart.route == "hostile_inline"
         and PNC.PBrainZ
         and PNC.PBrainZ.OpenInlineForTarget
-        and PNC.PBrainZ.OpenInlineForTarget(entry)
     then
-        Relationship.RequestPresentation(npcID)
-        if PNC.Client and PNC.Client.RequestNPCKnowledge then
-            PNC.Client.RequestNPCKnowledge(npcID)
+        local handedOff = PNC.PBrainZ.OpenInlineForTarget(entry)
+        auditTalkStart("native.talk.inline_handoff", talkStart, {
+            handedOff = handedOff == true,
+        })
+        if not handedOff then
+            -- Continue through the production fallback conversation when the
+            -- optional inline provider cannot open its selected target.
+            talkStart.route = "hostile_full_conversation"
+            talkStart.routeReason = "hostile_inline_handoff_rejected"
+        else
+            Relationship.RequestPresentation(npcID)
+            if PNC.Client and PNC.Client.RequestNPCKnowledge then
+                PNC.Client.RequestNPCKnowledge(npcID)
+            end
+            return nil
         end
-        return nil
     end
     local state = PNC.Network and PNC.Network.ClientState
     if state then
@@ -112,6 +150,11 @@ function Conversation.Open(entry, player, forcedTime)
         talkStart
     )
     local view = PsychopatzCore.Conversation.Open(definition)
+    auditTalkStart("native.talk.view_result", talkStart, {
+        opened = view ~= nil,
+        conversationID = view and view.session
+            and view.session.conversationID or nil,
+    })
     if view then
         -- The semantic projection is rendered through Core's native choices
         -- part. Refresh once after Core has created the session; subsequent

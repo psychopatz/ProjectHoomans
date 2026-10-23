@@ -12,6 +12,15 @@ local SOURCE = {
     domain = "pnc.system.shared.categories",
 }
 
+local function auditTalk(eventName, data)
+    local diagnostics = PNC.Semantics
+        and PNC.Semantics.SemanticDiagnostics or nil
+    if diagnostics and type(diagnostics.Record) == "function" then
+        return diagnostics.Record(eventName, data)
+    end
+    return false
+end
+
 local function tr(key)
     if PNC.Conversation and PNC.Conversation.TextLoader then
         PNC.Conversation.TextLoader.EnsureSource(SOURCE, { key })
@@ -31,7 +40,23 @@ function Provider.addOptions(menu, entry, player)
         nil,
         function()
             if PNC.Conversation and PNC.Conversation.Open then
-                PNC.Conversation.Open(entry, player)
+                auditTalk("native.talk.context_click", {
+                    entryID = entry and entry.id,
+                    playerName = player and type(player.getDisplayName)
+                        == "function" and player:getDisplayName() or nil,
+                })
+                local view = PNC.Conversation.Open(entry, player)
+                auditTalk("native.talk.context_result", {
+                    entryID = entry and entry.id,
+                    opened = view ~= nil,
+                    conversationID = view and view.session
+                        and view.session.conversationID or nil,
+                    route = view and view.spec and view.spec.context
+                        and (view.spec.context.talkStartRoute
+                            or view.spec.context.talkStartProjection
+                            and view.spec.context.talkStartProjection.route)
+                        or nil,
+                })
             end
         end
     )
