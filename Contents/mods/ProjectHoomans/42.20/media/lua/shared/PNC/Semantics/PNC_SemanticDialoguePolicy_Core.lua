@@ -45,6 +45,7 @@ local COMMAND_ACTIONS = {
     QUEST_STATUS = true,
     QUEST_TURN_IN = true,
     RECRUIT = true,
+    RELATIONSHIP_PROPOSAL = true,
 }
 
 function Policy.GetCommandActions()

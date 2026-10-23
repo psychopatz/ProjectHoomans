@@ -313,9 +313,25 @@ Evidence:
 - P12A–P12F focused tests remained green; Python compilation, `luac5.3 -p`, and `git diff --check` passed;
 - the existing Core profiler CLI reported the saved runtime identity but no connected Project Zomboid process; no profiler setting was changed.
 
-## Current Exact Next Chunk — P12H Production mutations in isolated world
+## Completed Chunk — P12H Production mutations in isolated world
 
-Prove the real production relationship, proposal, recruitment, faction/community, knowledge, inventory, quest/tool mutation paths against imported save-backed working state, including the normal semantic proposal choice route, while keeping the source snapshot and source save unchanged.
+Completed the remaining normal semantic proposal route and kept the existing production mutation owners in the isolated worker:
+
+- `PNC_SemanticDialogueSuggestions_SocialProvider` advertises a typed relationship-proposal choice only when the production relationship service is present and `EvaluateProposal(...)` reports eligibility;
+- the choice frame carries `RELATIONSHIP_PROPOSAL`, the production dialogue policy recognizes it as an executable action, and the action boundary calls `PNC.Relationships.Propose(...)` rather than mutating a harness relationship directly;
+- the result reports the production relationship-service route and retains the production acceptance/rejection memory, bond, cooldown, and revision effects in the detached working world;
+- existing production recruitment/faction/community assignment, supported inventory/tool effects, knowledge, and quest replay paths remain loaded through their service owners; no second harness gameplay policy was introduced.
+
+Evidence:
+
+- `tools/semantic_harness/tests/test_production_mutations_p12h.py`: normal semantic proposal choice reached `PNC.Relationships.Propose(...)`, changed only the working relationship revision/memory, and left the immutable source snapshot unchanged;
+- retained Talk/recruitment production suite: 14 tests passed, including shortcut and typed recruitment assignment through the production authority;
+- P12A–P12G focused suite remained green; `luac5.3 -p`, `git diff --check`, and `pz-verify` Kahlua checks for all three changed Lua files passed with zero issues;
+- no save file or live Project Zomboid object was written.
+
+## Current Exact Next Chunk — P12I Source-aware UI + relationship parity
+
+Expose SAVE/FIXTURE/LIVE/DERIVED/HARNESS MUTATION/MISSING provenance in the normal Semantic Lab UI and project the full production relationship graph, baselines, standing, durable bond, memories, cooldowns, interaction history, and revisions.
 
 ## P12A acceptance
 

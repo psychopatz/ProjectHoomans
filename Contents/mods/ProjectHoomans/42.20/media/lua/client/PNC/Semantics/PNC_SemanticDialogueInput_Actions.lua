@@ -340,6 +340,45 @@ local function dispatchRecruitment(view, result, value)
     return output
 end
 
+local function dispatchRelationshipProposal(view, result, value)
+    local context = actionContext(view, result, value)
+    local relationships = PNC.Relationships or {}
+    if type(relationships.Propose) ~= "function" then
+        return {
+            status = "relationship_proposal_unavailable",
+            accepted = false,
+            reason = "relationship_proposal_unavailable",
+            action = "RELATIONSHIP_PROPOSAL",
+            npcID = context.npcID,
+        }
+    end
+    local applied, reason, details = relationships.Propose(context.npcID)
+    details = type(details) == "table" and details or {}
+    local output = {
+        status = applied == true
+            and "relationship_proposal_applied"
+            or "relationship_proposal_rejected",
+        accepted = applied == true,
+        pending = false,
+        reason = reason,
+        action = "RELATIONSHIP_PROPOSAL",
+        npcID = context.npcID,
+        serverAuthoritative = true,
+        proposal = details,
+    }
+    audit("semantic.relationship.proposal.dispatch", {
+        npcID = context.npcID,
+        conversationID = context.conversationID,
+        requestID = context.requestID,
+        action = output.action,
+        status = output.status,
+        accepted = output.accepted,
+        reason = output.reason,
+        route = "production_relationship_service",
+    }, { requestID = context.requestID })
+    return output
+end
+
 function Internal.DispatchAction(view, result, value)
     local decision = result and result.decision or {}
     local generatedFlow = result and result.flow or nil
@@ -392,6 +431,9 @@ function Internal.DispatchAction(view, result, value)
         decision, EXECUTABLE_ACTION_BRANCHES)
     if not actionAllowed then
         return blockedDispatch(actionBlockReason)
+    end
+    if decision.actionIntent.action == "RELATIONSHIP_PROPOSAL" then
+        return dispatchRelationshipProposal(view, result, value)
     end
     if decision.actionIntent.action == "RECRUIT" then
         return dispatchRecruitment(view, result, value)
