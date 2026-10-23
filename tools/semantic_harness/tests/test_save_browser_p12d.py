@@ -12,6 +12,7 @@ import unittest
 
 from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.runtime.save_browser import SavedWorldBrowser
+from tools.semantic_harness.runtime.state_providers import SemanticStateCatalog
 from tools.semantic_harness.tests.test_save_catalog_p12b import pz_file
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 
@@ -123,6 +124,9 @@ class SaveBrowserTests(unittest.TestCase):
     def test_browser_projects_saved_world_categories_without_writing(self) -> None:
         before = sha256(self.save_path.read_bytes()).hexdigest()
         result = SavedWorldBrowser(CORE_REPOSITORY).browse(self.save_path)
+        state_catalog = SemanticStateCatalog(
+            core_repository=CORE_REPOSITORY,
+        ).load(self.save_path)
         after = sha256(self.save_path.read_bytes()).hexdigest()
 
         self.assertEqual(result["schema"], "semantic.save_browser.v1")
@@ -142,6 +146,19 @@ class SaveBrowserTests(unittest.TestCase):
         )
         self.assertEqual(result["factions"][0]["label"], "Saved Fellowship")
         self.assertEqual(result["communities"][0]["id"], "community_saved")
+        self.assertEqual(
+            set(state_catalog["providers"]),
+            {"psychopatzCore", "projecthoomans", "dynamictrading"},
+        )
+        self.assertEqual(
+            state_catalog["providers"]["dynamictrading"]["projection"]["source"],
+            "SAVE",
+        )
+        self.assertTrue(
+            state_catalog["providers"]["dynamictrading"]["projection"][
+                "available"
+            ]
+        )
         self.assertEqual(before, after)
 
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")

@@ -2,7 +2,7 @@
 
 **Updated:** 2026-10-24  
 **Parent status:** REOPENED — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is mandatory.  
-**Current mandatory phase:** P12D — Save-backed World Browser.
+**Current mandatory phase:** P12E — Dynamic mod-state providers.
 **Current local baseline audited:** ProjectHoomans `main` at `b1cb1846`; upstream is synchronized.
 **Normal Semantic Lab runtime requirement:** Project Zomboid CLOSED/OFFLINE is supported and expected.  
 **Source save mutation:** FORBIDDEN.  
@@ -266,9 +266,25 @@ Evidence:
 - local real-save browser smoke: 1 Player, 111 NPCs, 43 factions, 5 community references, 2 followers/companions, and 9 known Dynamic Trading actors;
 - P12C saved-import tests remained green; Python compilation, Xvfb startup, and `git diff --check` passed.
 
-## Current Exact Next Chunk — P12E
+## Completed Chunk — P12E Dynamic mod-state providers
 
-Introduce adopter-owned dynamic mod-state projection/provider contracts. Keep Core responsible for binary decoding while ProjectHoomans, PsychopatzCore, and DynamicTrading interpret their own persisted schemas; separate the raw save inspector from the semantic state catalog.
+Introduced the save-state interpretation boundary:
+
+- `tools/semantic_harness/runtime/state_providers.py` defines the bounded `SaveStateProvider` contract, `ProviderContext`, and `SemanticStateCatalog`;
+- `CoreStateProvider`, `ProjectHoomansStateProvider`, and `DynamicTradingStateProvider` own their respective schema projections while all binary decoding remains in PsychopatzCore `GlobalModDataReader`;
+- `RawSaveInspector` keeps validated raw-save/catalog metadata separate from the semantic provider projections;
+- persisted `PNC_Communities` records are used when present; only absent community tables fall back to explicit `DERIVED` references from saved actor affiliations;
+- provider absence is represented as `available = false`, `source = MISSING`, and a bounded reason rather than invented state.
+
+Evidence:
+
+- P12D browser tests now assert all three provider IDs, Dynamic Trading provider ownership, and source-save immutability;
+- local real-save provider smoke exposed Core schema 16, persisted communities as `SAVE`, and 9 Dynamic Trading provider actors;
+- P12B/P12C/P12D suite: 8 tests passed; Xvfb worker/UI regression: 3 tests passed; Python compilation and `git diff --check` passed.
+
+## Current Exact Next Chunk — P12F
+
+Add the explicit offline engine-fixture provider for transient engine-derived values such as needs, time, weather, temperature, season, activity, position, and nearby density. Keep these values editable and visibly `FIXTURE`; never let them silently replace save-owned mod state.
 
 ## P12A acceptance
 

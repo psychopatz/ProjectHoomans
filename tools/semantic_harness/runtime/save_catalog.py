@@ -28,6 +28,16 @@ class SaveCatalogError(ValueError):
     """A save cannot be safely cataloged or is outside the supported schema."""
 
 
+class RawSaveInspector:
+    """Read-only raw-save validation seam used by semantic state providers."""
+
+    def __init__(self, *, core_repository: Path | None = None) -> None:
+        self.catalog = SaveCatalog(core_repository=core_repository)
+
+    def inspect(self, path: Path) -> "SaveCandidate":
+        return self.catalog.inspect(path)
+
+
 @dataclass(frozen=True)
 class SaveCandidate:
     """A validated, read-only save catalog entry."""
@@ -259,6 +269,7 @@ class SaveCatalog:
 
 
 __all__ = [
+    "RawSaveInspector",
     "SaveCandidate",
     "SaveCatalog",
     "SaveCatalogError",
