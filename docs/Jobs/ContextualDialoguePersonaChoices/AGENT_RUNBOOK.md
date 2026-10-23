@@ -331,3 +331,69 @@ The shared opening/availability/route projection must exist before processing th
 Developer-side source/worker/Tk evidence can prove the shared boundary.
 
 Only the user can supply final native Project Zomboid SP/MP evidence unless project policy changes.
+
+
+## P12 execution rules — save-backed offline Semantic Lab
+
+P12 is the active architecture.
+
+Do not add new normal user-facing Semantic Lab behavior on top of the old synthetic scenario as if it were authoritative world state.
+
+### Read-only source / mutable copy
+
+All real save and optional live-profiler inputs are read-only.
+
+Semantic Lab mutations occur only in the isolated working world.
+
+Never:
+
+- write to a source save;
+- invoke GlobalModData.save against the source;
+- mutate a live PZ object through the profiler bridge;
+- route harness relationship/recruitment/faction/inventory effects back into the running game.
+
+### Save-backed normal workflow
+
+The normal product workflow should load a real saved world and actor pair.
+
+Synthetic scenario mode remains only for tests, malformed fixtures, CI, and explicit developer use.
+
+### Reuse Core parser
+
+Use PsychopatzCore's existing GlobalModDataReader.
+
+Do not implement another binary decoder.
+
+### Engine state
+
+PZ is not required to be running.
+
+Engine-only/transient values may remain explicit offline fixtures.
+
+Label them honestly and track provenance.
+
+### Live profiler
+
+Optional only.
+
+Disabled by default.
+
+External settings/config text only.
+
+Restart PZ to enable.
+
+Read-only one-way snapshots.
+
+No in-game toggle and no mutation commands.
+
+### Production mutation authority
+
+Once state is copied into the working world, use real production services for relationship, recruitment, proposal, faction/community, knowledge, inventory, quest and other supported mutations.
+
+Adapters provide boundaries, not alternate business policy.
+
+### P11M disposition
+
+The missing normal production relationship-proposal entry route remains mandatory, but it is now completed under P12H against the isolated save-backed runtime.
+
+Do not treat the old standalone P11M phase as a competing active roadmap.
