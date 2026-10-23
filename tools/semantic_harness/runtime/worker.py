@@ -438,16 +438,20 @@ class LuaSemanticWorker:
         identity_seed: int,
         tactical_class: str = "colonist",
         npc_id: str = "harness-backstory-npc",
+        save_seed: str | int | None = None,
     ) -> dict[str, Any]:
         """Read a bounded seed-derived backstory projection from production Lua."""
 
+        payload: dict[str, Any] = {
+            "identitySeed": identity_seed,
+            "tacticalClass": tactical_class,
+            "npcID": npc_id,
+        }
+        if save_seed is not None:
+            payload["saveSeed"] = save_seed
         return self._request(
             "BACKSTORY",
-            {
-                "identitySeed": identity_seed,
-                "tacticalClass": tactical_class,
-                "npcID": npc_id,
-            },
+            payload,
         )
 
     def backstory_fact(
@@ -457,18 +461,22 @@ class LuaSemanticWorker:
         tactical_class: str = "colonist",
         language: str = "EN",
         npc_id: str = "harness-backstory-npc",
+        save_seed: str | int | None = None,
     ) -> dict[str, Any]:
         """Resolve one authoritative offline backstory fact in production Lua."""
 
+        payload: dict[str, Any] = {
+            "identitySeed": identity_seed,
+            "kind": kind,
+            "tacticalClass": tactical_class,
+            "language": language,
+            "npcID": npc_id,
+        }
+        if save_seed is not None:
+            payload["saveSeed"] = save_seed
         return self._request(
             "BACKSTORY_FACT",
-            {
-                "identitySeed": identity_seed,
-                "kind": kind,
-                "tacticalClass": tactical_class,
-                "language": language,
-                "npcID": npc_id,
-            },
+            payload,
         )
 
     def flow_catalog(self) -> dict[str, Any]:

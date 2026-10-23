@@ -132,6 +132,7 @@ ScenarioSession.initialScenario = {
         relationship = { approval = 0, respect = 0, familiarity = 0, revision = 1 },
     },
     world = {
+        seedString = "semantic-harness-default-save",
         hunger = 0.2,
         thirst = 0.4,
         fatigue = 0.1,

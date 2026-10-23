@@ -41,6 +41,8 @@ record.currentResidence = "Rosewood"
 record.medicalStatus = "healthy"
 
 local initial = Memory.GetBackstoryProfile(record)
+T.truthy(initial.saveSeed ~= nil,
+    "backstory profile exposes the deterministic save seed projection")
 local initialHometown = profileFact(initial, "hometown")
 local initialJob = profileFact(initial, "former_job")
 local payload = PNC.Persistence.SerializeRecord(record)
@@ -150,4 +152,35 @@ T.truthy(legacy.identity.backstory,
     "legacy profile was not pinned after reconstruction")
 
 Memory.BACKSTORY_CATALOG_VERSION = originalCatalogVersion
+
+-- Unpinned profiles use the Core save-seed boundary in addition to the NPC
+-- identity seed.  This keeps the same identity coherent across one save while
+-- allowing another save to produce a different authored biography.
+local seededA = PNC.Types.NewRecord({
+    id = "npc:backstory:seed-a",
+    displayName = "Seed A",
+    identitySeed = 90212,
+    tacticalClass = "colonist",
+})
+seededA.saveSeed = "projection-save-a"
+local seededProfileA = Memory.GetBackstoryProfile(seededA)
+local selectedA = profileFact(seededProfileA, "hometown").id
+local changedProjection = false
+for index = 1, 32 do
+    local candidate = PNC.Types.NewRecord({
+        id = "npc:backstory:seed-b:" .. tostring(index),
+        displayName = "Seed B " .. tostring(index),
+        identitySeed = 90212,
+        tacticalClass = "colonist",
+    })
+    candidate.saveSeed = "projection-save-b:" .. tostring(index)
+    local candidateProfile = Memory.GetBackstoryProfile(candidate)
+    if profileFact(candidateProfile, "hometown").id ~= selectedA then
+        changedProjection = true
+        break
+    end
+end
+T.truthy(changedProjection,
+    "save seed participates in unpinned backstory selection")
+
 T.finish("pnc_backstory_persistence_stability_smoke")

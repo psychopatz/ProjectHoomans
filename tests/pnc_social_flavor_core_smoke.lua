@@ -79,6 +79,45 @@ T.equal(messages[1].source.excludeFromLLM, true,
     "routine flavor does not enter durable LLM memory by default")
 T.equal(#deliveries, 1, "delivery event is emitted")
 
+local seededOne = Flavor.ResolveDetailed("test.social_comment", "npc",
+    "event-a", {
+        socialRole = "hostile",
+        saveSeed = "flavor-save-a",
+        identitySeed = "npc-one",
+    })
+local seededRepeat = Flavor.ResolveDetailed("test.social_comment", "npc",
+    "event-a", {
+        socialRole = "hostile",
+        saveSeed = "flavor-save-a",
+        identitySeed = "npc-one",
+    })
+T.equal(seededOne.lineIndex, seededRepeat.lineIndex,
+    "Core flavor projections remain stable for the same save and speaker")
+T.truthy(seededOne.lineIndex ~= nil,
+    "Core flavor projection uses the deterministic content boundary")
+
+Flavor.Register("test.seeded_comment", {
+    npc = { "seed line one", "seed line two", "seed line three" },
+})
+local seededBaseline = Flavor.ResolveDetailed("test.seeded_comment", "npc",
+    "event-a", {
+        saveSeed = "flavor-rotation-1",
+        identitySeed = "npc-one",
+    })
+local rotated = false
+for index = 2, 24 do
+    local projection = Flavor.ResolveDetailed("test.seeded_comment", "npc",
+        "event-a", {
+            saveSeed = "flavor-rotation-" .. tostring(index),
+            identitySeed = "npc-one",
+        })
+    if projection.lineIndex ~= seededBaseline.lineIndex then
+        rotated = true
+        break
+    end
+end
+T.truthy(rotated, "save seed can rotate Core flavor lines")
+
 Client.Reset()
 local first = Client.Enqueue({
     eventID = "event:merge:one",

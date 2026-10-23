@@ -3,6 +3,15 @@
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
+local CoreContent = PsychopatzCore
+    and PsychopatzCore.DeterministicContent or nil
+if type(CoreContent) ~= "table" then
+    local ok, loaded = pcall(require,
+        "PsychopatzCore/Content/PsychopatzDeterministicContent"
+    )
+    if ok and type(loaded) == "table" then CoreContent = loaded end
+end
+
 local Memory = PNC.Conversation.Memory
 local Data = Memory._registry
 local PROFILE_CACHE_LIMIT = 256
@@ -205,14 +214,30 @@ local function recordContext(record)
     if not CLASS_SET[class] then
         class = "shared"
     end
-    return seed, class
+    local saveSeed = CoreContent
+        and type(CoreContent.ResolveSaveSeed) == "function"
+        and CoreContent.ResolveSaveSeed(record) or nil
+    return seed, class, saveSeed
 end
 
-local function chooseBackstory(seed, class, kind)
+local function chooseBackstory(seed, class, kind, saveSeed)
     local classBuckets = Data.backstoryBuckets[class]
     local bucket = classBuckets and classBuckets[kind]
     if not bucket or bucket.totalWeight <= 0 then
         return nil
+    end
+    if CoreContent and type(CoreContent.ChooseWeighted) == "function" then
+        local selected = CoreContent.ChooseWeighted(
+            bucket.entries,
+            {
+                saveSeed = saveSeed,
+                identitySeed = seed,
+            },
+            "projecthoomans.backstory." .. class,
+            kind,
+            1
+        )
+        if selected then return selected end
     end
     local identityAPI = PNC.Identity
     local roll
@@ -252,7 +277,7 @@ local function selectedEntry(kind, id)
     return entry
 end
 
-local function ensureSelectionMetadata(record, seed, class)
+local function ensureSelectionMetadata(record, seed, class, saveSeed)
     local identity
     local raw
     local metadata
@@ -296,7 +321,9 @@ local function ensureSelectionMetadata(record, seed, class)
                 changed = true
             end
         elseif not metadata.selections[kind] then
-            generated = chooseBackstory(seed, selectionClass, kind)
+            generated = chooseBackstory(
+                seed, selectionClass, kind, saveSeed
+            )
             if generated then
                 metadata.selections[kind] = generated.id
                 changed = true
@@ -325,13 +352,16 @@ end
 function Memory.EnsureBackstoryMetadata(record)
     local seed
     local class
+    local saveSeed
     local metadata
     local changed
     if type(record) ~= "table" then
         return nil, false
     end
-    seed, class = recordContext(record)
-    metadata, changed = ensureSelectionMetadata(record, seed, class)
+    seed, class, saveSeed = recordContext(record)
+    metadata, changed = ensureSelectionMetadata(
+        record, seed, class, saveSeed
+    )
     markMetadataDirty(record, changed)
     return metadata, changed
 end
@@ -361,21 +391,26 @@ function Memory.GetBackstory(record, kind)
     local metadata
     local seed
     local class
+    local saveSeed
     local entry
     if type(record) ~= "table" or type(kind) ~= "string" then
         return nil
     end
-    seed, class = recordContext(record)
+    seed, class, saveSeed = recordContext(record)
     metadata = Memory.EnsureBackstoryMetadata(record)
     if metadata then
         entry = selectedEntry(kind, metadata.selections[kind])
         return resolveBackstory(entry, record)
     end
-    return resolveBackstory(chooseBackstory(seed, class, kind), record)
+    return resolveBackstory(
+        chooseBackstory(seed, class, kind, saveSeed),
+        record
+    )
 end
 
-local function getCachedSelection(seed, class)
-    local cacheKey = class .. ":" .. tostring(seed)
+local function getCachedSelection(seed, class, saveSeed)
+    local cacheKey = class .. ":" .. tostring(saveSeed or "")
+        .. ":" .. tostring(seed)
     local cached = Data.profileCache[cacheKey]
     if cached then
         return cached
@@ -383,7 +418,7 @@ local function getCachedSelection(seed, class)
     local definitions = {}
     for i = 1, #Data.backstoryKinds do
         local kind = Data.backstoryKinds[i]
-        definitions[kind] = chooseBackstory(seed, class, kind)
+        definitions[kind] = chooseBackstory(seed, class, kind, saveSeed)
     end
     cached = { definitions = definitions }
     if Data.profileCount < PROFILE_CACHE_LIMIT then
@@ -406,11 +441,12 @@ function Memory.GetBackstoryProfile(record)
     if type(record) ~= "table" then
         return nil
     end
-    local seed, class = recordContext(record)
+    local seed, class, saveSeed = recordContext(record)
     metadata = Memory.EnsureBackstoryMetadata(record)
     local selection = getCachedSelection(
         seed,
-        metadata and metadata.selectionClass or class
+        metadata and metadata.selectionClass or class,
+        saveSeed
     )
     local facts = {}
     for i = 1, #Data.backstoryKinds do
@@ -426,6 +462,7 @@ function Memory.GetBackstoryProfile(record)
     local birth = facts.date_of_birth
     return {
         identitySeed = seed,
+        saveSeed = saveSeed,
         tacticalClass = class,
         facts = facts,
         dateOfBirth = birth,

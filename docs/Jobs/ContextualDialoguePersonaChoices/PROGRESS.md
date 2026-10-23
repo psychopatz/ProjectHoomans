@@ -201,3 +201,16 @@ Completed locally on ProjectHoomans `main`.
 - Focused formatter tests: **2/2 passed**; real Tk/Xvfb contextual interaction suite: **7/7 passed**; live worker sample confirmed the identity request and relationship adjustment render with their response and delta.
 
 **Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate the remaining identity and native Project Zomboid integration paths.
+
+## P11K — Core-facing deterministic backstory and flavour projections
+
+Completed locally across ProjectHoomans `main` and psychopatzCore `main`.
+
+- Core deterministic content now exposes a versioned projection boundary, actor identity resolution, and weighted selection helpers built from save seed + actor identity seed + namespace + salt. Existing name generation and override behavior remain unchanged.
+- Hoomans backstory selection uses the Core boundary for unpinned NPC profiles while preserving the existing stable-ID metadata, persistence pinning, authored overrides, catalog migration, and legacy reconstruction behavior. The in-memory profile reports the resolved save seed for diagnostics; it is not persisted as a second identity/bond store.
+- Core social flavor line selection uses the same boundary when save/actor context is available, with the prior local hash retained only for legacy callers that provide no projection context. The Hoomans receive context fills identity and save seed from the authoritative payload/summary or bounded NPC ID fallback.
+- The worker `BACKSTORY` and `BACKSTORY_FACT` routes now use the active scenario save seed by default and accept an explicit `saveSeed` for deterministic CLI/API fixtures. GUI and CLI continue to share the real Lua worker route.
+- Focused evidence: Core deterministic content smoke **PASS**; Hoomans backstory persistence/save-seed smoke **PASS**; Core social flavor smoke and full incapacitated flavor matrix **PASS**; semantic backstory fact, disclosure, leader-loss flavor/pipeline, social presentation, and identity-choice Lua suites **PASS**; grounded personal-dialogue worker suite **5/5 passed**; related worker backstory suite **7/7 passed**.
+- Changed Lua `luac5.3 -p`, targeted `pz_verify` Kahlua scans, Python compilation, and `git diff --check` **PASS**. Native Project Zomboid SP/MP remains **UNTESTED / user-owned**.
+
+**Current exact next chunk:** audit and validate the remaining identity and native Project Zomboid integration paths, including the production composition/load-order boundary for the Core content projection API.

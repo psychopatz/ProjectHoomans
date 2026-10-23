@@ -636,15 +636,19 @@ local function simulationControlCatalog(context, payload)
     }
 end
 
-local function backstorySnapshot(payload)
+local function backstorySnapshot(context, payload)
     local memory = PNC.Conversation and PNC.Conversation.Memory
     if not memory or type(memory.GetBackstoryProfile) ~= "function" then
         return nil, "backstory_memory_unavailable"
     end
     payload = type(payload) == "table" and payload or {}
+    local world = context.Runtime and context.Runtime.scenario
+        and context.Runtime.scenario.world or {}
     local record = {
         id = tostring(payload.npcID or "harness-backstory-npc"),
         tacticalClass = tostring(payload.tacticalClass or "colonist"),
+        saveSeed = payload.saveSeed or world.seedString
+            or world.worldSeedString or world.worldSeed,
         identity = {
             seed = payload.identitySeed,
         },
@@ -670,19 +674,22 @@ local function backstorySnapshot(payload)
         type = "backstory",
         profile = {
             identitySeed = profile.identitySeed,
+            saveSeed = profile.saveSeed,
             tacticalClass = profile.tacticalClass,
             facts = facts,
         },
     }
 end
 
-local function backstoryFact(payload)
+local function backstoryFact(context, payload)
     local facts = PNC.Semantics and PNC.Semantics.DialogueFacts
     local result
     payload = type(payload) == "table" and payload or {}
     if not facts or type(facts.Resolve) ~= "function" then
         return nil, "dialogue_fact_registry_unavailable"
     end
+    local world = context.Runtime and context.Runtime.scenario
+        and context.Runtime.scenario.world or {}
     result = facts.Resolve({
         subject = "NPC_BACKSTORY",
         slots = { kind = payload.kind or payload.topic },
@@ -690,6 +697,8 @@ local function backstoryFact(payload)
         npcRecord = {
             id = tostring(payload.npcID or "harness-backstory-npc"),
             tacticalClass = tostring(payload.tacticalClass or "colonist"),
+            saveSeed = payload.saveSeed or world.seedString
+                or world.worldSeedString or world.worldSeed,
             identitySeed = payload.identitySeed,
             identity = { seed = payload.identitySeed },
         },
@@ -1172,9 +1181,9 @@ function CommandRouter.dispatch(context, request)
         end
         return context.Commitments.dispatch(context, payload)
     elseif command == "BACKSTORY" then
-        return backstorySnapshot(payload)
+        return backstorySnapshot(context, payload)
     elseif command == "BACKSTORY_FACT" then
-        return backstoryFact(payload)
+        return backstoryFact(context, payload)
     elseif command == "KNOWLEDGE_BOOTSTRAP" then
         local callback = PNC.PlayerKnowledgeCommands
             and PNC.PlayerKnowledgeCommands.HandleBootstrap

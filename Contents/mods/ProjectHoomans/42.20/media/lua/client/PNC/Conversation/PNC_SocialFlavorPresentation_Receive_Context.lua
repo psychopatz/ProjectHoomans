@@ -59,6 +59,15 @@ function H.BuildReceiveContext(ambientFlavor, summary, networkArgs)
     local active, view = H.ActiveConversationFor(npcID)
     local context = type(ambientFlavor.context) == "table"
         and ambientFlavor.context or {}
+    context.identitySeed = context.identitySeed
+        or ambientFlavor.identitySeed
+        or summary and summary.identitySeed
+        or summary and summary.identitySummary
+            and summary.identitySummary.identitySeed
+        or npcID
+    context.saveSeed = context.saveSeed
+        or ambientFlavor.saveSeed
+        or summary and summary.saveSeed
     return {
         ambientFlavor = ambientFlavor,
         summary = summary,

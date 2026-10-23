@@ -134,16 +134,23 @@ class GroundedPersonalDialogueB0Tests(unittest.TestCase):
 
     def test_seed_backstory_reconstructs_across_language_and_worker_reload(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            first = worker.backstory(90210, "colonist", "npc-backstory-b0")
+            first = worker.backstory(
+                90210, "colonist", "npc-backstory-b0", save_seed="save-a"
+            )
             worker.set_language("TL")
-            localized = worker.backstory(90210, "colonist", "npc-backstory-b0")
+            localized = worker.backstory(
+                90210, "colonist", "npc-backstory-b0", save_seed="save-a"
+            )
             worker.restart()
-            reloaded = worker.backstory(90210, "colonist", "npc-backstory-b0")
+            reloaded = worker.backstory(
+                90210, "colonist", "npc-backstory-b0", save_seed="save-a"
+            )
 
         self.assertTrue(first["ok"])
         self.assertEqual(first["profile"], localized["profile"])
         self.assertEqual(first["profile"], reloaded["profile"])
         self.assertEqual(first["profile"]["identitySeed"], 90210)
+        self.assertEqual(first["profile"]["saveSeed"], "save-a")
         self.assertEqual(first["profile"]["tacticalClass"], "colonist")
         self.assertIn("former_job", first["profile"]["facts"])
         self.assertIn("hometown", first["profile"]["facts"])
