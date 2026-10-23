@@ -1,11 +1,19 @@
 # P12 — Save-Backed Offline Semantic Runtime
 
-**Status:** ACTIVE / new primary Semantic Lab architecture  
+**Status:** BACKEND FOUNDATION COMPLETE / operational usability acceptance continues in P13  
 **Opened:** 2026-10-24  
 **Current implementation baseline audited:** ProjectHoomans remote main at `73e1ac5d0e49045a4660f447296a4b99544b4f0f`.  
 **Source-save mutation:** FORBIDDEN.  
 **Native Project Zomboid requirement:** none for normal Semantic Lab operation.  
 **Optional live profiler:** read-only enrichment only; disabled by default and enabled through external settings text + game restart.
+
+## P13 operational supersession note
+
+P12's save-backed runtime/backend architecture is retained and should not be replayed.
+
+The former P12 completion claim did not prove that the GUI was practically usable at realistic geometry. P13 reopens product acceptance around the operational workbench: usable save selection, faction/community actor browsing, symmetric Player/NPC inspection, offline Player inventory where supported, gift verification, and GUI/CLI parity.
+
+Read `OPERATIONAL_SEMANTIC_TEST_WORKBENCH.md` for the active phase.
 
 ## Why P12 exists
 
