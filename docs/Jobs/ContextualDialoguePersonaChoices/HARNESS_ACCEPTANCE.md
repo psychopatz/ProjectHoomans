@@ -793,3 +793,49 @@ The same essential workflow must be reproducible machine-readably without Tk:
 P13 is accepted only when Semantic Lab is usable as the primary semantic/conversation development verification surface.
 
 Native Project Zomboid remains final user-owned live acceptance.
+
+
+## P14 acceptance — production rehydration and mod-code execution
+
+### Structural proof
+
+Acceptance must prove saved Project Hoomans state reaches production Lua before runtime interpretation.
+
+A Python-created equivalent runtime table is insufficient when production deserialization exists.
+
+### NPC inventory
+
+Real-save acceptance must cover production hydration for:
+
+- SEED_ONLY;
+- BASELINE_DELTA;
+- FULL.
+
+At least one previously false-MISSING BASELINE_DELTA inventory must hydrate correctly.
+
+### Faction diplomacy
+
+Preserve and resolve real directed faction relations and Player diplomacy-faction mapping through production owners.
+
+Do not infer a personal enemy relationship from tactical hostility.
+
+### Social context
+
+GUI/CLI must distinguish:
+
+- personal relationship;
+- faction relation;
+- tactical hostility;
+- audience;
+- bond;
+- speech style.
+
+### MISSING classification
+
+Important missing values must carry a bounded reason category rather than unexplained generic MISSING when possible.
+
+### Regression
+
+Real-save matrix must include companion/follower, neutral, hostile raider and trader/provider cases.
+
+Source saves remain unchanged and reset restores the isolated baseline.
