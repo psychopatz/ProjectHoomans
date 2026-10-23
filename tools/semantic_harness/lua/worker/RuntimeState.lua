@@ -5,6 +5,17 @@ local RuntimeState = {}
 function RuntimeState.new()
     return {
         scenario = nil,
+        -- P12 source/working-world boundary.  sourceSnapshot is only read
+        -- through Values.copy; production services receive Runtime.scenario,
+        -- which is the detached mutable working projection.
+        sourceSnapshot = nil,
+        sourceMetadata = nil,
+        sourceProvenance = nil,
+        sourceProviderPayloads = {},
+        sourceWorkingBaseline = nil,
+        captureWorkingBaseline = false,
+        workingWorldRevision = 0,
+        workingResetCount = 0,
         queued = {},
         transcript = {},
         trace = {},
@@ -37,6 +48,12 @@ function RuntimeState.resetContainers(runtime)
     runtime.lastSuggestionRevision = nil
     runtime.semanticClickReceipts = {}
     runtime.relationships = {}
+end
+
+function RuntimeState.resetTurn(runtime)
+    runtime.queued = {}
+    runtime.transport = {}
+    runtime.trace = {}
 end
 
 return RuntimeState

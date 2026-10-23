@@ -78,7 +78,15 @@ ScenarioSession.configureRuntime(Context)
 ProductionModules.load(Context)
 Context.EngineFacts = PNC.Semantics.EngineFacts
 Context.EngineEvents = PNC.Semantics.EngineEvents
-ScenarioSession.reset(Context, ScenarioSession.initialScenario)
+ScenarioSession.importSource(
+    Context,
+    ScenarioSession.initialScenario,
+    {
+        sourceKind = "FIXTURE",
+        sourceID = "fixture:worker-bootstrap",
+        mode = "developer_test",
+    }
+)
 
 Protocol.emit(CommandRouter.hello(Context), "__hello__")
 

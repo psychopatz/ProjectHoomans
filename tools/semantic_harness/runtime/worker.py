@@ -9,7 +9,8 @@ from typing import Any
 from .config import HarnessConfig
 from .item_catalog import search_item_catalog
 from .process import HarnessError, LuaProcess
-from .scenario import validate_scenario
+from .scenario import load_scenario, validate_scenario
+from .state import HarnessWorkingWorld, ImportedSourceSnapshot, Provenance
 from .activity import ActivityLog, default_activity_path
 
 
@@ -36,7 +37,14 @@ class LuaSemanticWorker:
         activity_log: ActivityLog | None = None,
     ) -> None:
         validate_scenario(scenario)
-        self.scenario = scenario
+        self.source_snapshot = ImportedSourceSnapshot.from_scenario(
+            scenario,
+            source=Provenance.FIXTURE,
+            source_id="fixture:synthetic-scenario",
+            mode="developer_test",
+        )
+        self.working_world = HarnessWorkingWorld(self.source_snapshot)
+        self.scenario = self.working_world.data
         self.config = config or HarnessConfig.discover(
             repository=repository or REPOSITORY,
             core_repository=core_repository or CORE_REPOSITORY,
@@ -53,7 +61,7 @@ class LuaSemanticWorker:
         self.runtime = LuaProcess(self.config, activity_log=self.activity_log)
         try:
             self.runtime.start()
-            self.configure(scenario)
+            self.import_source(scenario)
         except Exception:
             self.runtime.close()
             raise
@@ -71,13 +79,110 @@ class LuaSemanticWorker:
         return self.runtime.request(command, value)
 
     def configure(self, scenario: dict[str, Any]) -> dict[str, Any]:
+        """Apply a working-world draft without replacing the imported source."""
+
         validate_scenario(scenario)
         response = self._request("CONFIG", scenario)
-        self.scenario = scenario
+        self.working_world.replace(scenario)
+        self.scenario = self.working_world.data
         return response
 
     def reset(self) -> dict[str, Any]:
-        return self._request("RESET")
+        """Reset the conversation/runtime containers, preserving world edits."""
+
+        response = self._request("RESET")
+        self._sync_effective_scenario(response)
+        return response
+
+    def import_source(
+        self,
+        scenario: dict[str, Any],
+        *,
+        source: Provenance | str = Provenance.FIXTURE,
+        source_id: str = "fixture:synthetic-scenario",
+        mode: str = "developer_test",
+        metadata: dict[str, Any] | None = None,
+        provider_payloads: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Install a new immutable source and derive a fresh working world."""
+
+        validate_scenario(scenario)
+        snapshot = ImportedSourceSnapshot.from_scenario(
+            scenario,
+            source=source,
+            source_id=source_id,
+            mode=mode,
+            metadata=metadata,
+            provider_payloads=provider_payloads,
+        )
+        response = self._request(
+            "IMPORT_SOURCE",
+            {
+                "scenario": snapshot.to_dict()["data"],
+                "metadata": snapshot.to_dict()["metadata"],
+                "provenance": snapshot.to_dict()["provenance"],
+                "providerPayloads": snapshot.to_dict()["providerPayloads"],
+            },
+        )
+        self.source_snapshot = snapshot
+        self.working_world = HarnessWorkingWorld(snapshot)
+        self._sync_effective_scenario(response, establish_baseline=True)
+        return response
+
+    def reload_source(
+        self,
+        scenario: dict[str, Any] | None = None,
+        *,
+        path: Path | None = None,
+        source: Provenance | str = Provenance.FIXTURE,
+        source_id: str | None = None,
+        mode: str = "developer_test",
+    ) -> dict[str, Any]:
+        """Explicitly reread/reinstall a source; reset never calls this path."""
+
+        if path is not None:
+            scenario = load_scenario(Path(path))
+            source_id = source_id or f"fixture:file:{Path(path).resolve()}"
+        if scenario is None:
+            scenario = self.source_snapshot.to_dict()["data"]
+        return self.import_source(
+            scenario,
+            source=source,
+            source_id=source_id or "fixture:synthetic-scenario",
+            mode=mode,
+        )
+
+    def reset_turn(self) -> dict[str, Any]:
+        return self._request("RESET_TURN")
+
+    def reset_conversation(self) -> dict[str, Any]:
+        response = self._request("RESET_CONVERSATION")
+        self._sync_effective_scenario(response)
+        return response
+
+    def reset_selected_actor(self, actor: str = "npc") -> dict[str, Any]:
+        response = self._request("RESET_ACTOR_MUTATIONS", {"actor": str(actor)})
+        self._sync_effective_scenario(response)
+        return response
+
+    def reset_working_world(self) -> dict[str, Any]:
+        """Restore the imported snapshot without rereading its source."""
+
+        response = self._request("RESET_WORLD")
+        self.working_world.reset()
+        self._sync_effective_scenario(response)
+        return response
+
+    def _sync_effective_scenario(
+        self, response: dict[str, Any], *, establish_baseline: bool = False
+    ) -> None:
+        scenario = response.get("scenario") if isinstance(response, dict) else None
+        if isinstance(scenario, dict):
+            if establish_baseline:
+                self.working_world.set_baseline(scenario)
+            else:
+                self.working_world.replace(scenario)
+            self.scenario = self.working_world.data
 
     def input(self, text: str) -> dict[str, Any]:
         return self._request("INPUT", str(text))
@@ -118,7 +223,9 @@ class LuaSemanticWorker:
         )
 
     def snapshot(self) -> dict[str, Any]:
-        return self._request("SNAPSHOT")
+        response = self._request("SNAPSHOT")
+        self._sync_effective_scenario(response)
+        return response
 
     def relationship_proposal(self, npc_id: str | None = None) -> dict[str, Any]:
         """Submit the canonical proposal action to the server-authority seam."""
@@ -532,11 +639,19 @@ class LuaSemanticWorker:
         return capabilities
 
     def restart(self) -> dict[str, Any]:
-        """Restart the isolated worker and restore the current scenario."""
+        """Restart the isolated worker from its immutable imported source."""
 
         self.runtime.close()
         self.runtime.start()
-        return self.configure(self.scenario)
+        source = self.source_snapshot.to_dict()
+        return self.import_source(
+            source["data"],
+            source=source["metadata"].get("sourceKind", Provenance.FIXTURE.value),
+            source_id=source["metadata"].get("sourceID", "fixture:synthetic-scenario"),
+            mode=source["metadata"].get("mode", "developer_test"),
+            metadata=source["metadata"],
+            provider_payloads=source["providerPayloads"],
+        )
 
     def close(self) -> None:
         self.runtime.close()

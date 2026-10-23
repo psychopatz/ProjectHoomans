@@ -19,7 +19,8 @@ local function hasEntries(value)
 end
 
 local capabilities = {
-    "CONFIG", "RESET", "INPUT", "LANGUAGE", "TOOL_REPLY",
+    "CONFIG", "IMPORT_SOURCE", "RESET", "RESET_TURN", "RESET_CONVERSATION",
+    "RESET_ACTOR_MUTATIONS", "RESET_WORLD", "INPUT", "LANGUAGE", "TOOL_REPLY",
     "PREVIEW", "SNAPSHOT", "CONVERSATION_GRAPH", "FLOW_CATALOG", "FLOW_VALIDATE",
     "RELATIONSHIP_PROPOSAL", "RELATIONSHIP_PREVIEW",
     "SUGGESTION_PREDICATE", "SUGGESTION_CLICK",
@@ -1019,8 +1020,31 @@ function CommandRouter.dispatch(context, request)
             return nil, "scenario_must_be_object"
         end
         return context.ScenarioSession.reset(context, payload)
+    elseif command == "IMPORT_SOURCE" then
+        if type(payload) ~= "table"
+            or type(payload.scenario) ~= "table"
+        then
+            return nil, "source_scenario_must_be_object"
+        end
+        return context.ScenarioSession.importSource(
+            context,
+            payload.scenario,
+            payload.metadata,
+            payload.provenance,
+            payload.providerPayloads
+        )
     elseif command == "RESET" then
         return context.ScenarioSession.reset(context, Values.copy(Runtime.scenario))
+    elseif command == "RESET_TURN" then
+        context.RuntimeState.resetTurn(Runtime)
+        return context.ScenarioSession.snapshot(context)
+    elseif command == "RESET_CONVERSATION" then
+        return context.ScenarioSession.resetConversation(context)
+    elseif command == "RESET_ACTOR_MUTATIONS" then
+        local actor = type(payload) == "table" and payload.actor or payload
+        return context.ScenarioSession.resetActorMutations(context, actor)
+    elseif command == "RESET_WORLD" then
+        return context.ScenarioSession.resetWorld(context)
     elseif command == "INPUT" then
         if payload == nil then return nil, "input_required" end
         return context.Conversation.turn(context, tostring(payload))

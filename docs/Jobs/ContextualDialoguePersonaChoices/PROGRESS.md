@@ -2,8 +2,8 @@
 
 **Updated:** 2026-10-24  
 **Parent status:** REOPENED — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is mandatory.  
-**Current mandatory phase:** P12A — Snapshot/provenance architecture.  
-**Current remote baseline audited:** ProjectHoomans `main` at `73e1ac5d0e49045a4660f447296a4b99544b4f0f`.  
+**Current mandatory phase:** P12B — Core reader reuse + save catalog.
+**Current local baseline audited:** ProjectHoomans `main` at `b1cb1846`; upstream is synchronized.
 **Normal Semantic Lab runtime requirement:** Project Zomboid CLOSED/OFFLINE is supported and expected.  
 **Source save mutation:** FORBIDDEN.  
 **Optional live profiler:** disabled by default; read-only enrichment only.
@@ -147,7 +147,7 @@ Semantic Lab may consume a live snapshot and copy it into the harness working wo
 
 Semantic Lab must never send gameplay mutations back to the running game.
 
-## Current Exact Next Chunk — P12A
+## Historical P12A checklist (completed)
 
 On the user's actual local checkout:
 
@@ -190,6 +190,33 @@ On the user's actual local checkout:
 12. do NOT implement binary save browsing yet unless a minimal seam is required for the contract;
 13. run focused Python/Lua/Tk checks and `git diff --check`;
 14. update this ledger with exact evidence and continue automatically to P12B if green.
+
+## Completed Chunk — P12A Snapshot/provenance architecture
+
+Implemented on the existing ProjectHoomans `main` checkout:
+
+- versioned Python `ImportedSourceSnapshot` and mutable `HarnessWorkingWorld` contracts;
+- stable `SAVE`, `FIXTURE`, `LIVE`, `DERIVED`, `HARNESS_MUTATION`, and `MISSING` provenance values;
+- immutable imported values retained separately from normalized working state;
+- patch projections with imported/effective values, mutation provenance, and source baseline;
+- Lua `IMPORT_SOURCE`, `RESET_TURN`, `RESET_CONVERSATION`, `RESET_ACTOR_MUTATIONS`, and `RESET_WORLD` boundaries;
+- `CONFIG` retained as a working-world edit and `reload_source` reserved for explicit source rereads;
+- synthetic scenarios retained as `FIXTURE` / `developer_test` source;
+- no save browsing or second binary save decoder added in P12A.
+
+Evidence:
+
+- `tools/semantic_harness/tests/test_save_backed_snapshot_p12a.py`: 2 tests passed;
+- source model rejects mutation of imported nested state, while working relationship patches report `HARNESS_MUTATION` over `SAVE`;
+- production Lua inventory gift mutation changed only the working projection; the Python source snapshot remained equivalent after conversation reset and working-world reset;
+- reset restored the normalized imported baseline without rereading disk;
+- focused compatibility validation: 10 existing worker/inventory/runtime/session tests passed;
+- `python3 -m py_compile`, `luac5.3 -p`, and `git diff --check` passed;
+- the broader legacy `test_harness` module ran 24 tests but retains 2 identity-presentation assertion failures outside P12A.
+
+## Current Exact Next Chunk — P12B
+
+Reuse `psychopatzCore/tools/profiler/moddata_reader.py` and `GlobalModDataReader` for a read-only offline save catalog. Do not add another `global_mod_data.bin` decoder. Discover compatible saves and enumerate the required persisted roots, failing closed for unsupported, corrupt, missing-table, and invalid-schema inputs.
 
 ## P12A acceptance
 

@@ -8,6 +8,109 @@ local SemanticDialogueRuntime = require
 
 local ScenarioSession = {}
 
+local function sortedKeys(value)
+    local keys = {}
+    if type(value) ~= "table" then return keys end
+    for key in pairs(value) do keys[#keys + 1] = tostring(key) end
+    table.sort(keys)
+    return keys
+end
+
+local function collectPatches(imported, effective, path, patches, Values)
+    if #patches >= 512 then return end
+    if type(imported) == "table" and type(effective) == "table" then
+        local keys = {}
+        local seen = {}
+        for _, key in ipairs(sortedKeys(imported)) do
+            if not seen[key] then
+                seen[key] = true
+                keys[#keys + 1] = key
+            end
+        end
+        for _, key in ipairs(sortedKeys(effective)) do
+            if not seen[key] then
+                seen[key] = true
+                keys[#keys + 1] = key
+            end
+        end
+        table.sort(keys)
+        for _, key in ipairs(keys) do
+            if #patches >= 512 then break end
+            local childPath = path == "" and key or path .. "." .. key
+            collectPatches(imported[key], effective[key], childPath, patches, Values)
+        end
+        return
+    end
+    if imported == effective then return end
+    patches[#patches + 1] = {
+        path = path,
+        imported = Values.copy(imported),
+        effective = Values.copy(effective),
+        source = "HARNESS_MUTATION",
+    }
+end
+
+local function patchProjection(context)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local patches = {}
+    collectPatches(
+        Runtime.sourceWorkingBaseline or Runtime.sourceSnapshot or {},
+        Runtime.scenario or {},
+        "",
+        patches,
+        Values
+    )
+    local baseSource = Runtime.sourceMetadata
+        and Runtime.sourceMetadata.sourceKind or "MISSING"
+    for _, patch in ipairs(patches) do
+        patch.baseSource = baseSource
+    end
+    return patches
+end
+
+local function sourceSnapshotProjection(context)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    return {
+        schema = "semantic.imported_source_snapshot.v1",
+        schemaVersion = 1,
+        immutable = true,
+        -- Source state is an imported record, not a bounded diagnostic
+        -- projection.  Keep the production deep-copy seam here so the
+        -- original values survive transport and later working-world resets.
+        data = Values.productionCopy(Runtime.sourceSnapshot),
+        metadata = Values.productionCopy(Runtime.sourceMetadata),
+        provenance = Values.productionCopy(Runtime.sourceProvenance),
+        providerPayloads = Values.productionCopy(Runtime.sourceProviderPayloads),
+    }
+end
+
+local function workingWorldProjection(context)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local patches = patchProjection(context)
+    return {
+        schema = "semantic.harness_working_world.v1",
+        schemaVersion = 1,
+        sourceSnapshotID = Runtime.sourceMetadata
+            and Runtime.sourceMetadata.sourceID or nil,
+        effective = Values.productionCopy(Runtime.scenario),
+        baseline = Values.productionCopy(
+            Runtime.sourceWorkingBaseline or Runtime.sourceSnapshot
+        ),
+        patches = patches,
+        provenance = {
+            schema = "semantic.provenance.v1",
+            defaultSource = Runtime.sourceMetadata
+                and Runtime.sourceMetadata.sourceKind or "MISSING",
+            overrides = Values.copy(patches),
+        },
+        resetCount = Runtime.workingResetCount or 0,
+        revision = Runtime.workingWorldRevision or 0,
+    }
+end
+
 local function relationshipProposalProjection(context)
     local Values = context.Values
     local npc = context.Runtime.scenario
@@ -158,13 +261,45 @@ function ScenarioSession.configureRuntime(context)
     InventoryFixtures.configure(context)
 end
 
+function ScenarioSession.importSource(
+    context, scenario, metadata, provenance, providerPayloads
+)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local sourceMetadata = Values.copy(metadata or {})
+    sourceMetadata.schemaVersion = 1
+    sourceMetadata.sourceKind = sourceMetadata.sourceKind or "FIXTURE"
+    sourceMetadata.sourceID = sourceMetadata.sourceID
+        or "fixture:synthetic-scenario"
+    sourceMetadata.mode = sourceMetadata.mode or "developer_test"
+    sourceMetadata.immutable = true
+    Runtime.sourceSnapshot = Values.copy(scenario or {})
+    Runtime.sourceMetadata = sourceMetadata
+    Runtime.sourceProvenance = Values.copy(provenance or {
+        schema = "semantic.provenance.v1",
+        defaultSource = sourceMetadata.sourceKind,
+        paths = {},
+    })
+    Runtime.sourceProviderPayloads = Values.copy(providerPayloads or {})
+    Runtime.sourceWorkingBaseline = nil
+    Runtime.captureWorkingBaseline = true
+    Runtime.workingResetCount = 0
+    Runtime.workingWorldRevision = (Runtime.workingWorldRevision or 0) + 1
+    return ScenarioSession.reset(context, Values.copy(Runtime.sourceSnapshot))
+end
+
 function ScenarioSession.reset(context, scenario)
     local Runtime = context.Runtime
     local Values = context.Values
-    Runtime.scenario = scenario
+    Runtime.scenario = Values.copy(scenario or {})
+    Runtime.workingWorldRevision = (Runtime.workingWorldRevision or 0) + 1
     context.RuntimeState.resetContainers(Runtime)
     ScenarioSession.configureRuntime(context)
-    local runtime = scenario.runtime or {}
+    if Runtime.captureWorkingBaseline == true then
+        Runtime.sourceWorkingBaseline = Values.copy(Runtime.scenario)
+        Runtime.captureWorkingBaseline = false
+    end
+    local runtime = Runtime.scenario.runtime or {}
     SemanticDialogueRuntime.SetHarnessOverride(
         runtime.semanticDialogueEnabled ~= false
     )
@@ -211,7 +346,7 @@ function ScenarioSession.reset(context, scenario)
     PNC.Network.ClientState.npcPresentations = {}
     PNC.Network.ClientState.pendingDisclosure = {}
     PNC.Network.ClientState.npcKnowledge = {}
-    local npc = scenario.npc or {}
+    local npc = Runtime.scenario.npc or {}
     -- Native Talk seeds this client presentation after the adapter reset.
     -- Seeding before the reset made owned companions look like strangers.
     local clientState = PNC.Network and PNC.Network.ClientState or nil
@@ -250,7 +385,9 @@ function ScenarioSession.reset(context, scenario)
     return {
         ok = true,
         type = "configured",
-        scenario = Values.copy(scenario),
+        scenario = Values.copy(Runtime.scenario),
+        sourceSnapshot = sourceSnapshotProjection(context),
+        workingWorld = workingWorldProjection(context),
         loadedModules = Runtime.loadedModules,
         moduleManifest = Values.copy(Runtime.moduleManifest),
         headlessRequires = Values.copy(Runtime.headlessRequires),
@@ -292,6 +429,37 @@ function ScenarioSession.reset(context, scenario)
     }
 end
 
+function ScenarioSession.resetConversation(context)
+    local Runtime = context.Runtime
+    return ScenarioSession.reset(context, Runtime.scenario or {})
+end
+
+function ScenarioSession.resetWorld(context)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    Runtime.workingResetCount = (Runtime.workingResetCount or 0) + 1
+    return ScenarioSession.reset(
+        context,
+        Values.copy(
+            Runtime.sourceWorkingBaseline
+                or Runtime.sourceSnapshot or Runtime.scenario or {}
+        )
+    )
+end
+
+function ScenarioSession.resetActorMutations(context, actor)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local working = Values.copy(Runtime.scenario or {})
+    local source = Runtime.sourceWorkingBaseline
+        or Runtime.sourceSnapshot or {}
+    local actorID = tostring(actor or "npc")
+    if source[actorID] ~= nil then
+        working[actorID] = Values.copy(source[actorID])
+    end
+    return ScenarioSession.reset(context, working)
+end
+
 function ScenarioSession.snapshot(context)
     local Runtime = context.Runtime
     local Values = context.Values
@@ -299,6 +467,8 @@ function ScenarioSession.snapshot(context)
         ok = true,
         type = "snapshot",
         scenario = Values.copy(Runtime.scenario),
+        sourceSnapshot = sourceSnapshotProjection(context),
+        workingWorld = workingWorldProjection(context),
         transcript = Values.copy(Runtime.transcript),
         queued = Values.copy(Runtime.queued),
         relationship = context.Conversation.relationshipSnapshot(context),
