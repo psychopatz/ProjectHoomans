@@ -117,6 +117,7 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         },
     },
     "world": {
+        "seedString": "semantic-harness-default-save",
         "hunger": 0.2,
         "thirst": 0.4,
         "fatigue": 0.1,

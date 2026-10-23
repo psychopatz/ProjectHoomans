@@ -1653,6 +1653,11 @@ function Suggestions.Build(result, context, messages)
     local seen = {}
     local trace = {}
     local ir = type(result.ir) == "table" and result.ir or {}
+    local pendingIdentity = context.pendingIdentityExchange
+        or context.semanticContextState
+        and context.semanticContextState.pendingIdentityExchange
+        or context.semanticDialogueContext
+        and context.semanticDialogueContext.pendingIdentityExchange
     local activeHubID = semanticHubID(ir)
     local currentAction = normalized(ir.action)
     local capabilities, capabilitySource, predicateTrace = capabilityRows(
@@ -1802,9 +1807,15 @@ function Suggestions.Build(result, context, messages)
                 "typed_input", revision, "wellbeing_follow_up"
             )
         end
+        local pendingIdentity = context.pendingIdentityExchange
+            or context.semanticContextState
+            and context.semanticContextState.pendingIdentityExchange
+            or context.semanticDialogueContext
+            and context.semanticDialogueContext.pendingIdentityExchange
         for _, definition in ipairs(DEFINITIONS) do
             if topicMatches(definition, currentTopic)
                 and definition.hubOnly ~= true
+                and not (pendingIdentity and subject == "IDENTITY")
             then
                 if isActiveHubDefinition(definition, activeHubID) then
                     appendTrace(
@@ -1834,11 +1845,23 @@ function Suggestions.Build(result, context, messages)
     if topic then
         local followUp = topic == "WELLBEING"
         local definition = definitionForSubject(topic, followUp)
-        addCandidate(
-            candidates, seen, definition,
-            "npc_response_plan", revision, "response_plan_topic"
-        )
-        appendTrace(trace, "npc_response_plan", "allowed", topic, #candidates)
+        if not (pendingIdentity and normalized(topic) == "IDENTITY") then
+            addCandidate(
+                candidates, seen, definition,
+                "npc_response_plan", revision, "response_plan_topic"
+            )
+            appendTrace(
+                trace, "npc_response_plan", "allowed", topic, #candidates
+            )
+        else
+            appendTrace(
+                trace,
+                "npc_response_plan",
+                "consumed",
+                "identity_exchange_choices_active",
+                #candidates
+            )
+        end
     else
         appendTrace(trace, "npc_response_plan", "skipped", "topic_unknown", #candidates)
     end
@@ -1849,11 +1872,23 @@ function Suggestions.Build(result, context, messages)
     )
     local flowTopic = responseTopic({ decision = { flow = flow } })
     if flowActive and flowTopic then
-        addCandidate(
-            candidates, seen, definitionForSubject(flowTopic, false),
-            "active_flow", revision, "active_flow_response_pool"
-        )
-        appendTrace(trace, "active_flow", "allowed", "active_flow", #candidates)
+        if not (pendingIdentity and normalized(flowTopic) == "IDENTITY") then
+            addCandidate(
+                candidates, seen, definitionForSubject(flowTopic, false),
+                "active_flow", revision, "active_flow_response_pool"
+            )
+            appendTrace(
+                trace, "active_flow", "allowed", "active_flow", #candidates
+            )
+        else
+            appendTrace(
+                trace,
+                "active_flow",
+                "consumed",
+                "identity_exchange_choices_active",
+                #candidates
+            )
+        end
     else
         appendTrace(
             trace, "active_flow", "skipped",

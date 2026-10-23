@@ -17,14 +17,22 @@ function Admission.Resolve(player, args)
     local npcID = H.SafeID(args.npcID)
     local kind = tostring(args.kind or "")
     local claimedName = IdentityPresentation.Clean(args.claimedName)
+    local claimMode = tostring(args.claimMode or "")
     if not requestID or not npcID then
         return nil, "identity_request_invalid"
     end
     if kind ~= Identity.EVENT_CLAIM and kind ~= Identity.EVENT_EVASION then
         return nil, "identity_event_invalid"
     end
-    if kind == Identity.EVENT_CLAIM and claimedName == "" then
-        return nil, "identity_claim_missing"
+    if kind == Identity.EVENT_CLAIM then
+        if claimMode ~= "" and claimMode ~= "canonical"
+            and claimMode ~= "generated"
+        then
+            return nil, "identity_claim_mode_invalid"
+        end
+        if claimMode ~= "canonical" and claimedName == "" then
+            return nil, "identity_claim_missing"
+        end
     end
 
     local record = PNC.Registry and PNC.Registry.Get
@@ -58,6 +66,7 @@ function Admission.Resolve(player, args)
         npcID = npcID,
         kind = kind,
         claimedName = claimedName,
+        claimMode = claimMode,
         record = record,
         context = context,
         targetKey = targetKey,

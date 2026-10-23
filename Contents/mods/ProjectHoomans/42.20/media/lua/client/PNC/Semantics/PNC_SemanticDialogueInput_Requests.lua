@@ -123,6 +123,18 @@ local function identityClaimName(ir)
     return type(claim) == "table" and claim.name or nil
 end
 
+local function identityClaimMode(ir)
+    local extensions = ir and ir.extensions or nil
+    return type(extensions) == "table"
+        and tostring(extensions.identityClaimMode or "") or ""
+end
+
+local function identityResponseStyle(ir)
+    local extensions = ir and ir.extensions or nil
+    return type(extensions) == "table"
+        and tostring(extensions.identityResponseStyle or "") or ""
+end
+
 local function giftPreferenceFullType(value)
     if type(value) == "table" then
         value = value.fullType or value.itemType or value.value
@@ -294,6 +306,7 @@ function Requests.PrepareIdentityRequest(view, ir, context)
             kind = "identity_claim",
             npcID = npcID,
             claimedName = identityClaimName(ir),
+            claimMode = identityClaimMode(ir),
             conversationToken = lifecycle and lifecycle.token,
         }
     end
@@ -302,6 +315,7 @@ function Requests.PrepareIdentityRequest(view, ir, context)
         return {
             kind = "identity_evasion",
             npcID = npcID,
+            responseStyle = identityResponseStyle(ir),
             conversationToken = lifecycle and lifecycle.token,
         }
     end
@@ -357,6 +371,8 @@ function Requests.DispatchIdentityRequest(request)
     return client.SubmitSemanticIdentity(request.npcID, {
         kind = request.kind,
         claimedName = request.claimedName,
+        claimMode = request.claimMode,
+        responseStyle = request.responseStyle,
         conversationToken = request.conversationToken,
         origin = "semantic_dialogue",
     })

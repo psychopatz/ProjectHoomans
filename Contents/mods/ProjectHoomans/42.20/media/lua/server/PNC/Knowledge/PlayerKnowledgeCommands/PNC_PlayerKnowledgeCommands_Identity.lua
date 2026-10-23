@@ -23,6 +23,14 @@ local IdentityPolicy = require
     "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityPolicy"
 local IdentityPresentation = require
     "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityPresentation"
+local IdentityAlias = PNC.IdentityAlias
+if type(IdentityAlias) ~= "table" then
+    local ok, loaded = pcall(require, "PNC/Core/Identity/PNC_IdentityAlias")
+    IdentityAlias = PNC.IdentityAlias
+    if type(IdentityAlias) ~= "table" and ok and type(loaded) == "table" then
+        IdentityAlias = loaded
+    end
+end
 local IdentityResult = require
     "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityResult"
 local Relationships = PNC.Relationships
@@ -46,6 +54,7 @@ function Commands.HandleSemanticIdentity(player, args)
     local npcID = request.npcID
     local kind = request.kind
     local claimedName = request.claimedName
+    local claimMode = request.claimMode
     local record = request.record
     local targetKey = request.targetKey
     local lease = request.lease
@@ -68,9 +77,32 @@ function Commands.HandleSemanticIdentity(player, args)
                 "player_name_unavailable"
             )
         end
-        truthful = Identity.ClaimMatchesName
-            and Identity.ClaimMatchesName(claimedName, actualName)
-            or Identity.NamesEqual(claimedName, actualName)
+        if claimMode == "canonical" then
+            claimedName = actualName
+            truthful = true
+        elseif claimMode == "generated" then
+            local expected = IdentityAlias.Generate({
+                player = player,
+                characterUUID = request.context.characterUUID,
+                playerName = actualName,
+                saveSeed = request.context.saveSeed,
+            })
+            if not Identity.NamesEqual(claimedName, expected) then
+                return IdentityResult.SendRejected(
+                    player, args, "identity_alias_invalid"
+                )
+            end
+            if Identity.ClaimMatchesName(claimedName, actualName) then
+                return IdentityResult.SendRejected(
+                    player, args, "identity_alias_conflict"
+                )
+            end
+            truthful = false
+        else
+            truthful = Identity.ClaimMatchesName
+                and Identity.ClaimMatchesName(claimedName, actualName)
+                or Identity.NamesEqual(claimedName, actualName)
+        end
     end
     local effectReason
     effect, trustLabel, effectReason = IdentityPolicy.EffectFor(kind, truthful)
@@ -120,6 +152,9 @@ function Commands.HandleSemanticIdentity(player, args)
                 truthful,
                 actualName
             )
+    elseif kind == Identity.EVENT_EVASION then
+        responseText, responseKey, responseArgs =
+            IdentityPresentation.ResolveEvasion(player, request)
     end
 
     -- IdentityProjection reads the disclosure before the following knowledge

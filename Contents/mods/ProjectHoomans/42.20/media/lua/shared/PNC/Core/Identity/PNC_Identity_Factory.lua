@@ -104,6 +104,7 @@ function Identity.GenerateResolvedIdentity(source)
     local forename
     local surname
     local displayName
+    local generatedName
     local appearance
     local voicePrefix
     local voiceType
@@ -119,11 +120,28 @@ function Identity.GenerateResolvedIdentity(source)
     if desc and desc.setFemale then
         desc:setFemale(resolvedFemale)
     end
-    forename = normalizeString(source and source.forename)
+    local explicitForename = normalizeString(source and source.forename)
         or normalizeString(survivorOverride.forename)
-        or (desc and desc.getForename and normalizeString(desc:getForename()) or nil)
-    surname = normalizeString(source and source.surname)
+    local explicitSurname = normalizeString(source and source.surname)
         or normalizeString(survivorOverride.surname)
+    if not explicitForename and not explicitSurname
+        and Names and type(Names.Generate) == "function"
+    then
+        generatedName = Names.Generate(
+            seed,
+            resolvedFemale,
+            source and source.archetypeID or nil,
+            {
+                saveSeed = source and source.saveSeed,
+                namespace = "projecthoomans.identity.npc_name",
+            }
+        )
+    end
+    forename = explicitForename
+        or generatedName and string.match(generatedName, "^(%S+)")
+        or (desc and desc.getForename and normalizeString(desc:getForename()) or nil)
+    surname = explicitSurname
+        or generatedName and string.match(generatedName, "%s+(%S+)%s*$")
         or (desc and desc.getSurname and normalizeString(desc:getSurname()) or nil)
     if explicitName and not (source and source.forename)
         and not survivorOverride.forename

@@ -72,6 +72,8 @@ function Conversation.buildContext(context)
         and Runtime.view.spec.context or nil
     local output = {
         npcID = npc.npcID,
+        saveSeed = world.seedString or world.worldSeedString
+            or world.worldSeed,
         identityState = npc.identityState or "unknown",
         identity = copy(npc.identity),
         npcName = npcName,
@@ -115,6 +117,7 @@ function Conversation.buildContext(context)
         playerTraitFingerprint = context.playerTraitFingerprint,
         semanticFactValues = copy(context.semanticFactValues or {}),
         player = {
+            gender = player.gender,
             needs = numbersFor(playerNeedSource,
                 { "hunger", "thirst", "fatigue", "stress", "boredom", "panic" },
                 number),
@@ -125,6 +128,8 @@ function Conversation.buildContext(context)
         },
         playerNameKnown = true,
         playerName = context.SemanticAdapters.playerName(context, player),
+        playerGender = player.gender,
+        playerIdentitySeed = player.characterUUID,
         characterUUID = player.characterUUID,
         conversationTopic = conversation.topic
             or priorContext and priorContext.conversationTopic
@@ -164,6 +169,16 @@ function Conversation.buildContext(context)
         output.categoryDiagnostics = Values.copy(
             priorContext.categoryDiagnostics
         )
+    end
+    local session = Runtime.view and Runtime.view.session or nil
+    local dialogueContext = session and session.semanticDialogueContext
+    if dialogueContext then
+        output.pendingIdentityExchange = dialogueContext.pendingIdentityExchange
+        if type(dialogueContext.ToContext) == "function" then
+            output.semanticDialogueContext = Values.copy(
+                dialogueContext:ToContext()
+            )
+        end
     end
     output.currentTopic = output.conversationTopic
     output.actorConversationContext = ActorConversationContext.Build(output)

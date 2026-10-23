@@ -138,6 +138,39 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
                 self.assertEqual(turn["relationshipAfter"]["respect"], 2)
                 self.assertIsNone(self.pending_exchange(turn))
 
+    def test_pending_identity_presents_three_deterministic_choice_frames(self) -> None:
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            turn = worker.input("who are you")
+
+        candidates = turn["observation"]["suggestions"]["candidates"]
+        self.assertEqual(
+            [candidate["id"] for candidate in candidates],
+            [
+                "identity.choice.real_name",
+                "identity.choice.refuse_name",
+                "identity.choice.lie_name",
+            ],
+        )
+        self.assertEqual(
+            candidates[0]["frame"]["extensions"]["identityClaimMode"],
+            "canonical",
+        )
+        self.assertEqual(candidates[1]["frame"]["intent"], "REFUSE")
+        self.assertEqual(
+            candidates[1]["frame"]["extensions"]["identityResponseStyle"],
+            "rude",
+        )
+        alias = candidates[2]["frame"]["slots"]["identityClaim"]["name"]
+        self.assertTrue(alias)
+        self.assertEqual(
+            candidates[2]["frame"]["extensions"]["identityClaimMode"],
+            "generated",
+        )
+        self.assertEqual(
+            turn["contextAfter"]["dialogue"]["pendingIdentityExchange"],
+            {"kind": "PLAYER_NAME", "requestedAt": 1},
+        )
+
     def test_false_explicit_name_claim_remains_authoritatively_rejected(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("who are you")

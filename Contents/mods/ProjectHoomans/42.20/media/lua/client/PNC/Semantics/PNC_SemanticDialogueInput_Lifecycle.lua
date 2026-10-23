@@ -775,6 +775,7 @@ function Internal.SubmitSingle(view, value, part)
     -- server responses. Do not also queue a local reply for those turns.
     local deferIdentityResponse = identityRequest
         and (identityRequest.kind == "identity_claim"
+            or identityRequest.kind == "identity_evasion"
             or identityRequest.kind == "gift_preference_disclosure"
             or identityRequest.kind == "backstory_disclosure")
     local compoundPart = type(part) == "table"

@@ -3,6 +3,13 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 local Presentation = {}
+local DeterministicContent = PNC.DeterministicContent
+if type(DeterministicContent) ~= "table" then
+    local ok, loaded = pcall(require,
+        "PsychopatzCore/Content/PsychopatzDeterministicContent"
+    )
+    if ok and type(loaded) == "table" then DeterministicContent = loaded end
+end
 
 local function clean(value)
     value = tostring(value or "")
@@ -55,6 +62,13 @@ function Presentation.PlayerName(player, context)
         name = clean(player:getDisplayName())
     end
     return clean(name)
+end
+
+function Presentation.PlayerIdentitySeed(player, context)
+    context = type(context) == "table" and context or {}
+    return tostring(context.characterUUID or context.entityKey
+        or player and player.getUsername and player:getUsername()
+        or "player")
 end
 
 local function npcName(record)
@@ -158,6 +172,37 @@ function Presentation.ResolveClaim(
         verifiedPlayerName,
         disclosureSucceeded
     )
+end
+
+function Presentation.ResolveEvasion(player, request)
+    local variants = {
+        {
+            key = "UI_PNC_Conversation_Identity_Evasion_Rude_1",
+            fallback = "That's a rude way to answer.",
+        },
+        {
+            key = "UI_PNC_Conversation_Identity_Evasion_Rude_2",
+            fallback = "If you want my help, show some basic courtesy.",
+        },
+        {
+            key = "UI_PNC_Conversation_Identity_Evasion_Rude_3",
+            fallback = "Fine. Keep your name to yourself, then.",
+        },
+    }
+    local index = 1
+    if DeterministicContent
+        and type(DeterministicContent.Index) == "function"
+    then
+        index = DeterministicContent.Index(
+            request and request.context and request.context.saveSeed,
+            Presentation.PlayerIdentitySeed(player, request and request.context),
+            "projecthoomans.identity.evasion",
+            #variants,
+            tostring(request and request.npcID or "")
+        ) or 1
+    end
+    local selected = variants[index] or variants[1]
+    return localized(selected.key, selected.fallback), selected.key, nil
 end
 
 return Presentation

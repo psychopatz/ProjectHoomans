@@ -313,10 +313,21 @@ function OutputProjection.observation(context, record, semanticContext)
     end
     local suggestions
     if suggestionsModule and type(suggestionsModule.Build) == "function" then
+        local suggestionContext = semanticContext
+        local pendingIdentity = record.contextAfter
+            and record.contextAfter.dialogue
+            and record.contextAfter.dialogue.pendingIdentityExchange
+        if pendingIdentity and type(suggestionContext) == "table" then
+            suggestionContext = Values.copy(suggestionContext)
+            suggestionContext.pendingIdentityExchange = pendingIdentity
+            suggestionContext.semanticDialogueContext =
+                suggestionContext.semanticDialogueContext
+                or Values.copy(record.contextAfter.dialogue)
+        end
         local ok, value = pcall(
             suggestionsModule.Build,
             result,
-            semanticContext or record.contextAfter,
+            suggestionContext or record.contextAfter,
             record.messages
         )
         suggestions = ok and value or nil

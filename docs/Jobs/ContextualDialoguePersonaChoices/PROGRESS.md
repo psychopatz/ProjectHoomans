@@ -132,3 +132,18 @@ Completed locally on ProjectHoomans `main`.
 ## Handoff condition
 
 P11A-P11H runtime parity and the current Semantic Lab workbench continuation are locally validated. Native Project Zomboid SP/MP remains **UNTESTED / user-owned**; no new READY claim is made by this workbench correction.
+
+## P11I — deterministic identity choices and shared Core content seed boundary
+
+First implementation slice completed across `psychopatzCore` and Project Hoomans `main`.
+
+- `PsychopatzCore/Content/PsychopatzDeterministicContent.lua` now owns versioned save-seed resolution, canonical seed composition, bounded hashing/index/range/choose primitives, native `SurvivorFactory` name-pool reading, and deterministic name generation.
+- Native name-pool selection reads `SurvivorFactory.FemaleForenames`, `MaleForenames`, and `Surnames` without calling `CreateSurvivor`; the current save seed comes from `WorldGenParams.INSTANCE:getSeedString()` when no explicit scenario seed is supplied.
+- Project Hoomans identity aliases use `saveSeed + player identity seed + namespaced attempt` and are recomputed by the server. Alias text is not stored in ModData.
+- Pending identity now presents exactly three provider-backed semantic frames: real name, rude refusal, and deterministic generated alias. The existing semantic identity request and server authority route remains the only mutation path.
+- NPC generated names use the same Core-backed deterministic name boundary while native SurvivorFactory remains available for appearance and voice data.
+- Harness context and observation projections carry the authoritative pending identity state, so direct Lua, CLI worker, and GUI worker suggestions use the same three-choice provider path.
+- Focused evidence: Core deterministic content smoke **PASS**; Hoomans identity-choice smoke **PASS**; Python identity/wellbeing suite **10/10 passed**; worker suggestion-click smoke covered all three frames and server identity request dispatch; changed Lua `luac5.3 -p` **PASS**; targeted `pz_verify` Kahlua scans **PASS**; translation JSON and `git diff --check` **PASS**.
+- The repository-wide `tests/run_tests.py` command remains unavailable in this checkout because it imports the missing pre-existing `tools.semantic_harness.suite` module; direct focused tests were used and this runner issue was not changed.
+
+**Current exact next chunk:** add the Core-facing deterministic content adapters for NPC backstory/flavour projections, then validate identity choices through the real Tk/Xvfb Semantic Lab surface before native Project Zomboid validation.

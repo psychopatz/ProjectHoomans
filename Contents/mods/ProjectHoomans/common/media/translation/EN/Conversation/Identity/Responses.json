@@ -1,4 +1,6 @@
 {
-  "UI_PNC_Conversation_Identity_FalseName": "That isn't your exact name. Don't lie to me."
+  "UI_PNC_Conversation_Identity_FalseName": "That isn't your exact name. Don't lie to me.",
+  "UI_PNC_Conversation_Identity_Evasion_Rude_1": "That's a rude way to answer.",
+  "UI_PNC_Conversation_Identity_Evasion_Rude_2": "If you want my help, show some basic courtesy.",
+  "UI_PNC_Conversation_Identity_Evasion_Rude_3": "Fine. Keep your name to yourself, then."
 }
-
