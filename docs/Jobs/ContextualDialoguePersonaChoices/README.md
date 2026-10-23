@@ -1,7 +1,7 @@
 # Contextual Dialogue Persona & Choices
 
-**Status:** REOPENED — P10/P11/P11J runtime-parity foundation retained; P12 save-backed offline Semantic Lab is the current mandatory architecture.  
-**Current source-audit baseline:** ProjectHoomans remote main at 73e1ac5d0e49045a4660f447296a4b99544b4f0f (2026-10-24).  
+**Status:** REOPENED — P12 save-backed runtime foundation retained; P13 Operational Semantic Test Workbench is the current mandatory phase.  
+**Current source-audit baseline:** ProjectHoomans remote main at dbfd9099a0b687bc2f6505f58e81e32ea6dc5966 (2026-10-24).  
 **Dynamic Trading provider baseline:** psychopatz/DynamicTrading at 5db64cbcc764f035146f044fdc34e930ce47d7c8.  
 **Native Project Zomboid SP/MP:** untested; user-owned acceptance.
 
@@ -20,7 +20,7 @@ The existing P0-P7 implementation is retained as foundation, but the 2026-10-22 
 
 The P8 behavioral foundation is now implemented, but the 2026-10-22 UI/routing audit found a new product gap: Semantic Lab still hides real conversation branching, and typed authored-category utterances such as `whatsup` redundantly produce an `Ask what's up` button instead of entering the already-recognized category directly.
 
-P10/P11/P11J have now brought routing, Talk-start projection, actor controls, relationship logic, graphs, recruitment authority, and production semantic execution close to parity. The remaining structural drift is the source of state: normal Semantic Lab still starts from synthetic scenario fixtures and reconstructs production-like actor/relationship/world state. The current mandatory goal is therefore **P12 — Save-Backed Offline Semantic Runtime**: seed the harness from real saved mod state, keep engine-only values as explicit offline fixtures, make every mutation occur only in an isolated harness copy through production Lua, and support an optional settings-text-controlled read-only live profiler enrichment path.
+P12 has now implemented the save-backed runtime foundation: immutable read-only save snapshots, detached working worlds, real saved Player/NPC/relationship import, provider-backed factions/communities/traders, production relationship/proposal/recruitment mutation paths, explicit offline engine fixtures, optional read-only profiler enrichment, and source provenance. The current product gap is no longer backend state origin; it is **operational usability**. The save browser is compressed into an impractical one-row control strip, faction/community membership is not navigable as an actor hierarchy, Player and NPC inspection are asymmetric, real offline Player inventory is not yet projected where available, and gift verification is not a first-class visual/machine-readable workflow. The current mandatory goal is therefore **P13 — Operational Semantic Test Workbench**.
 
 ## Relationship / bond direction
 
@@ -92,8 +92,9 @@ This job builds on and must not duplicate:
 10. NATIVE_TALK_PARITY.md
 11. PRODUCTION_RELATIONSHIP_PROPOSAL_INTEGRATION.md
 12. SAVE_BACKED_OFFLINE_SEMANTIC_RUNTIME.md
-13. ROADMAP.md
-14. HARNESS_ACCEPTANCE.md
-15. PROGRESS.md **last** for current truth and the exact Next Chunk
+13. OPERATIONAL_SEMANTIC_TEST_WORKBENCH.md
+14. ROADMAP.md
+15. HARNESS_ACCEPTANCE.md
+16. PROGRESS.md **last** for current truth and the exact Next Chunk
 
 No checked-in GOAL_PROMPT.md is allowed. The executable /goal remains chat-only.
