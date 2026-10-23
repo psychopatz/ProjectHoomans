@@ -89,6 +89,33 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
         self.assertEqual(projection["tacticalClass"], "hostile")
         self.assertEqual(projection["opening"]["nodeID"], "greeting")
 
+    def test_landing_projection_keeps_shortcut_and_back_target_after_hub_turn(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            result = worker.talk_start(
+                target_id="neutral", utterance="What's up?"
+            )
+
+        projection = result["snapshot"]["suggestions"]
+        self.assertEqual(projection["rootGroupID"], "conversation_landing")
+        self.assertEqual(projection["currentGroupID"], "semantic_hub.whats_up")
+        root = next(
+            group for group in projection["groups"]
+            if group["id"] == "conversation_landing"
+        )
+        shortcut = next(
+            candidate for candidate in root["candidates"]
+            if candidate["id"] == "conversation.landing:whats_up"
+        )
+        self.assertEqual(
+            shortcut["frame"]["kind"], "semantic_shortcut_frame"
+        )
+        self.assertEqual(shortcut["frame"]["textFallback"], "What's up?")
+        hub = next(
+            group for group in projection["groups"]
+            if group["id"] == "semantic_hub.whats_up"
+        )
+        self.assertTrue(hub["allowBack"])
+
     def test_cli_exposes_the_same_talk_operations(self) -> None:
         arguments = _parser().parse_args(["--no-gui", "--talk-matrix"])
         self.assertTrue(arguments.talk_matrix)

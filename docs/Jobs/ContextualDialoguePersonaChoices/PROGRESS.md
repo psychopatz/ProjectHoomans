@@ -2,7 +2,7 @@
 
 **Updated:** 2026-10-23
 **Parent status:** REOPENED — P11 runtime-parity foundation retained; P11J native Talk click-boundary repair is mandatory before native handoff.
-**Current mandatory phase:** P11J4 corrective native semantic choice boundary; developer repair accepted, native Project Zomboid validation remains user-owned.
+**Current mandatory phase:** P11J4 corrective native semantic choice boundary plus production landing/Back navigation; developer repair accepted, native Project Zomboid validation remains user-owned.
 **Current remote baseline audited:** ProjectHoomans `main` at `c9385c4f2b1b86feb09ed24144896e473bd6fec8`.
 **Native Project Zomboid SP/MP:** UNTESTED / user-owned.
 
@@ -225,14 +225,47 @@ Developer evidence: `pnc_conversation_smoke.lua`,
 `pnc_conversation_talk_start_projection_smoke.lua` pass; changed Lua passes
 `luac5.3 -p` and `git diff --check`.
 
+## Production conversation landing and nested Back navigation
+
+The native Core choice surface now has an explicit production-owned landing
+group, `conversation_landing`. Current authored root choices are projected into
+that group, and the landing surface includes a `What's up?` shortcut frame.
+The shortcut submits the canonical `What's up?` utterance through the existing
+raw semantic input/parser path, so it does not create a second harness parser
+or button-specific dialogue route.
+
+The landing group remains in the projection while a topic, semantic hub, or
+conversation branch is active. Nested groups can therefore return to a real
+landing state. Back is a presentation-only `semantic_back_click_frame`: it
+checks the current revision and selected group, changes only the selected
+projection group, and never creates a conversation turn.
+
+Back is metadata-controlled and defaults to enabled. A future required
+confirmation/yes-no group can set `allowBack=false` on the projected group or
+candidate/frame; both the row builder and the submission boundary enforce it.
+No Talk-parity or Back state is persisted in ModData.
+
+Evidence for this slice:
+
+- `lua5.3 tests/pnc_semantic_dialogue_input_smoke.lua` — PASS, including raw
+  shortcut routing, Back navigation, no-turn behavior, projection-level
+  `allowBack=false`, and selected-group `allowBack=false`;
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j -q` — **9/9 PASS**;
+- real worker Talk start after `What's up?` reports
+  `currentGroupID=semantic_hub.whats_up`,
+  `rootGroupID=conversation_landing`, and a root raw shortcut frame;
+- `luac5.3 -p`, `pz_verify --kahlua --severity ERROR`, translation JSON
+  validation, and `git diff --check` — PASS.
+
 ## Current Exact Next Chunk — native user handoff
 
-The developer side is ready for the user's native Project Zomboid comparison.
-Use the actual context-menu Talk path for Colonist, Follower, Neutral, and
-Hostile, then compare target classification, route, opening choices, first
-response, hostile inline/fallback behavior, and any observable graph path against
-Semantic Lab. Native SP/MP remains **UNTESTED / user-owned** until that evidence
-is supplied.
+The developer side is ready for the user's native Project Zomboid comparison
+of the repaired Talk boundary and the landing/navigation surface. Use the
+actual context-menu Talk path for Colonist, Follower, Neutral, and Hostile,
+then compare target classification, route, opening choices, first response,
+hostile inline/fallback behavior, landing shortcut behavior, Back navigation,
+and any observable graph path against Semantic Lab. Native SP/MP remains
+**UNTESTED / user-owned** until that evidence is supplied.
 
 ## Known separate relationship boundary
 

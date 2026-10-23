@@ -181,12 +181,42 @@ local function buildCoreChoices(view, projection)
         }
     end
 
+    local rootGroupID = projection.rootGroupID
+    if selectedGroup
+        and rootGroupID
+        and selectedGroup.id ~= rootGroupID
+        and projection.allowBack ~= false
+        and selectedGroup.allowBack ~= false
+        and Suggestions.BuildBackFrame
+    then
+        local frame = Suggestions.BuildBackFrame(
+            projection.revision, selectedGroup.id
+        )
+        if frame then
+            append({
+                id = frame.candidateID,
+                frame = frame,
+                display = {
+                    label = frame.labelFallback,
+                    labelFallback = frame.labelFallback,
+                },
+                source = {
+                    kind = "semantic_back_navigation",
+                    revision = projection.revision,
+                    fromGroupID = selectedGroup.id,
+                },
+            }, true)
+        end
+    end
+
     -- Core's native list is scrollable, so the projection can expose every
     -- currently safe topic without a hidden five-row global cap. Navigation
     -- rows use the same typed click contract and only change the selected
     -- projection group; they never parse or execute gameplay.
     for _, group in ipairs(projection.groups or {}) do
-        if not selectedGroup or group.id ~= selectedGroup.id then
+        if (not selectedGroup or group.id ~= selectedGroup.id)
+            and group.id ~= rootGroupID
+        then
             local frame = Suggestions.BuildGroupFrame
                 and Suggestions.BuildGroupFrame(group, projection.revision)
                 or nil
@@ -371,6 +401,60 @@ function Internal.SelectSemanticGroup(view, frame)
     end
     if not selected then return false, "semantic_group_unknown" end
     projection.currentGroupID = selected.id
+    local applied, reason = applyCoreChoices(view, projection)
+    if not applied then return false, reason end
+    return true, "accepted"
+end
+
+function Internal.SelectSemanticRoot(view, frame)
+    if not view or not view.session
+        or type(Suggestions.IsBackFrame) ~= "function"
+        or not Suggestions.IsBackFrame(frame)
+    then
+        return false, "semantic_back_frame_invalid"
+    end
+    local projection = view.semanticSuggestions
+    if type(projection) ~= "table" then
+        return false, "semantic_suggestions_unavailable"
+    end
+    if tonumber(frame.requestRevision) ~= tonumber(projection.revision) then
+        return false, "stale_suggestion"
+    end
+    if projection.allowBack == false then
+        return false, "semantic_back_disabled"
+    end
+    local rootID = tostring(projection.rootGroupID or "")
+    if rootID == "" or tostring(frame.groupID or "") ~= rootID then
+        return false, "semantic_root_unknown"
+    end
+    if tostring(projection.currentGroupID or "") == rootID then
+        return false, "semantic_root_already_selected"
+    end
+    for _, group in ipairs(projection.groups or {}) do
+        if tostring(group.id or "")
+            == tostring(projection.currentGroupID or "")
+        then
+            if group.allowBack == false then
+                return false, "semantic_back_disabled"
+            end
+            break
+        end
+    end
+    local root
+    for _, group in ipairs(projection.groups or {}) do
+        if tostring(group.id or "") == rootID then
+            root = group
+            break
+        end
+    end
+    if not root then return false, "semantic_root_unknown" end
+    local fromGroupID = tostring(frame.fromGroupID or "")
+    if fromGroupID ~= ""
+        and tostring(projection.currentGroupID or "") ~= fromGroupID
+    then
+        return false, "stale_suggestion"
+    end
+    projection.currentGroupID = rootID
     local applied, reason = applyCoreChoices(view, projection)
     if not applied then return false, reason end
     return true, "accepted"

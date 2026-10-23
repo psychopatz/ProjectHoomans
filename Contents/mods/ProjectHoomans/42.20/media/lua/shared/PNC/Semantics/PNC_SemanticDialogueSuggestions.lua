@@ -21,6 +21,7 @@ local ChoiceRanking = PNC.Semantics.DialogueChoiceRanking
     or require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_Ranking"
 
 Suggestions.VERSION = 1
+Suggestions.ROOT_GROUP_ID = "conversation_landing"
 -- The visual part keeps five rows per selected group. The projection itself
 -- is bounded separately so a dynamic root can expose every safe topic through
 -- the existing group selector without pretending that five is a global cap.
@@ -1294,9 +1295,11 @@ local function appendConversationRootChoices(
             }, ":")
             if not seen[candidateID] then
                 local topic = tostring(semantic.topic or "")
-                local groupID = semantic.groupID
-                    or topicGroupID(topic)
-                    or "conversation_utilities"
+                -- Root choices belong to the production landing surface.  The
+                -- authored choice itself still carries its original semantic
+                -- topic/route in the frame, so the existing composer remains
+                -- the owner when it is clicked.
+                local groupID = Suggestions.ROOT_GROUP_ID
                 local text = boundedText(choice.text or choiceID, 160)
                 local enabled = choice.enabled == true
                 local reason = enabled and "production_root_choice_eligible"
@@ -1366,6 +1369,69 @@ local function appendConversationRootChoices(
     end
 end
 
+local function appendLandingShortcuts(
+    output, seen, revision, predicateTrace
+)
+    local candidateID = "conversation.landing:whats_up"
+    if seen[candidateID] or #output >= Suggestions.MAX_CANDIDATES then
+        return
+    end
+    local labelKey = "UI_PNC_Conversation_Suggestion_WhatsUp_Label"
+    local label = resolvedText(labelKey, "What's up?")
+    local utterance = "What's up?"
+    local frame = Suggestions.BuildShortcutFrame({
+        candidateID = candidateID,
+        topic = "whats_up",
+        labelKey = labelKey,
+        labelFallback = label,
+        utterance = utterance,
+        extensions = {
+            route = "semantic_hub",
+            hubID = "whats_up",
+            canonicalConcept = "WHATS_UP",
+            origin = "conversation_landing",
+        },
+    }, revision)
+    if not frame then return end
+    local source = sourceRecord(
+        "conversation_root", revision, "conversation_landing_shortcut"
+    )
+    local candidate = {
+        id = candidateID,
+        topic = "whats_up",
+        groupID = Suggestions.ROOT_GROUP_ID,
+        rank = #output + 1,
+        source = source,
+        sources = { source },
+        frame = frame,
+        enabled = true,
+        display = {
+            labelKey = labelKey,
+            labelFallback = label,
+            label = label,
+            utteranceFallback = utterance,
+            utterance = utterance,
+        },
+        visibility = "player",
+        eligibility = {
+            status = "allowed",
+            allowed = true,
+            reason = "conversation_landing_shortcut",
+        },
+    }
+    if #predicateTrace < Predicates.MAX_TRACE then
+        predicateTrace[#predicateTrace + 1] = {
+            candidateID = candidateID,
+            source = "conversation_root",
+            path = "conversationLanding.whatsUp",
+            status = "allowed",
+            reason = "conversation_landing_shortcut",
+        }
+    end
+    output[#output + 1] = candidate
+    seen[candidateID] = candidate
+end
+
 local GROUP_LABELS = {
     whats_up = {
         key = "UI_PNC_Conversation_Suggestion_Group_WhatsUp_Label",
@@ -1406,6 +1472,17 @@ local GROUP_LABELS = {
 }
 
 local function groupPresentation(id, topic)
+    if id == Suggestions.ROOT_GROUP_ID then
+        return {
+            id = id,
+            label = resolvedText(
+                "UI_PNC_Conversation_Suggestion_Group_Landing_Label",
+                "Talk"
+            ),
+            labelKey = "UI_PNC_Conversation_Suggestion_Group_Landing_Label",
+            allowBack = true,
+        }
+    end
     if id == "semantic_hub.whats_up" then
         local label = GROUP_LABELS.whats_up
         return {
@@ -1510,6 +1587,7 @@ local function buildGroups(candidates, capabilities, currentTopic, revision)
             group.candidates = {}
             group.capabilities = {}
             group.count = 0
+            group.allowBack = true
             group.frame = Suggestions.BuildGroupFrame(group, revision)
             byID[id] = group
             groups[#groups + 1] = group
@@ -1525,6 +1603,14 @@ local function buildGroups(candidates, capabilities, currentTopic, revision)
         if group then
             group.candidates[#group.candidates + 1] = candidate
             group.count = group.count + 1
+            if candidate.allowBack == false
+                or candidate.frame and candidate.frame.allowBack == false
+                or candidate.frame and type(candidate.frame.extensions)
+                    == "table"
+                    and candidate.frame.extensions.allowBack == false
+            then
+                group.allowBack = false
+            end
         end
     end
     for _, capability in ipairs(capabilities or {}) do
@@ -1532,9 +1618,13 @@ local function buildGroups(candidates, capabilities, currentTopic, revision)
         if group then
             group.capabilities[#group.capabilities + 1] = capability
             group.count = group.count + 1
+            if capability.allowBack == false then group.allowBack = false end
         end
     end
-    local currentGroupID = currentTopic == "whats_up"
+    local rootGroupID = byID[Suggestions.ROOT_GROUP_ID]
+        and Suggestions.ROOT_GROUP_ID or nil
+    local currentGroupID = not currentTopic and rootGroupID
+        or currentTopic == "whats_up"
         and byID["semantic_hub.whats_up"]
         and "semantic_hub.whats_up" or topicGroupID(currentTopic)
     if not byID[currentGroupID] then
@@ -1544,7 +1634,16 @@ local function buildGroups(candidates, capabilities, currentTopic, revision)
             or byID.owned_actions and "owned_actions"
             or groups[1] and groups[1].id
     end
-    return groups, currentGroupID
+    if rootGroupID then
+        for index, group in ipairs(groups) do
+            if group.id == rootGroupID and index ~= 1 then
+                table.remove(groups, index)
+                table.insert(groups, 1, group)
+                break
+            end
+        end
+    end
+    return groups, currentGroupID, rootGroupID
 end
 
 function Suggestions.IsConversationCategoryFrame(frame)
@@ -1602,6 +1701,69 @@ function Suggestions.BuildGroupFrame(group, revision)
         labelFallback = group.label or groupID,
         requestRevision = tonumber(revision) or 0,
     }
+end
+
+function Suggestions.BuildShortcutFrame(options, revision)
+    options = type(options) == "table" and options or {}
+    local candidateID = tostring(options.candidateID or "")
+    local utterance = boundedText(
+        options.utterance or options.textFallback or "", 160
+    )
+    if candidateID == "" or utterance == "" then return nil end
+    local labelFallback = boundedText(
+        options.labelFallback or utterance, 160
+    )
+    return {
+        schemaVersion = Suggestions.VERSION,
+        kind = "semantic_shortcut_frame",
+        candidateID = candidateID,
+        topic = options.topic,
+        intent = options.intent or "QUESTION",
+        speechAct = options.speechAct or "QUESTION",
+        subject = options.subject or "CONVERSATION_TOPIC",
+        textFallback = utterance,
+        utteranceFallback = utterance,
+        utterance = utterance,
+        labelKey = options.labelKey,
+        labelFallback = labelFallback,
+        extensions = copyValue(options.extensions) or {},
+        requestRevision = tonumber(revision) or 0,
+        allowBack = options.allowBack,
+    }
+end
+
+function Suggestions.IsShortcutFrame(frame)
+    return type(frame) == "table"
+        and frame.kind == "semantic_shortcut_frame"
+        and tostring(frame.candidateID or "") ~= ""
+        and tostring(frame.textFallback or frame.utterance or "") ~= ""
+        and tonumber(frame.requestRevision) ~= nil
+end
+
+function Suggestions.BuildBackFrame(revision, fromGroupID)
+    fromGroupID = tostring(fromGroupID or "")
+    if fromGroupID == "" then return nil end
+    local labelKey = "UI_PNC_Conversation_Suggestion_Back_Label"
+    local label = resolvedText(labelKey, "Back")
+    return {
+        schemaVersion = Suggestions.VERSION,
+        kind = "semantic_back_click_frame",
+        candidateID = "semantic.back_to_root:" .. fromGroupID,
+        groupID = Suggestions.ROOT_GROUP_ID,
+        fromGroupID = fromGroupID,
+        textFallback = label,
+        labelKey = labelKey,
+        labelFallback = label,
+        requestRevision = tonumber(revision) or 0,
+    }
+end
+
+function Suggestions.IsBackFrame(frame)
+    return type(frame) == "table"
+        and frame.kind == "semantic_back_click_frame"
+        and tostring(frame.candidateID or "") ~= ""
+        and tostring(frame.fromGroupID or "") ~= ""
+        and tonumber(frame.requestRevision) ~= nil
 end
 
 function Suggestions.IsGroupFrame(frame)
@@ -1682,6 +1844,8 @@ function Suggestions.Build(result, context, messages)
             groups = {},
             currentTopic = nil,
             currentGroupID = nil,
+            rootGroupID = nil,
+            allowBack = true,
             predicateTrace = {},
             trace = trace,
             choiceRegistry = ChoiceRegistry.Snapshot(),
@@ -1696,11 +1860,16 @@ function Suggestions.Build(result, context, messages)
     local flow = type(decision.flow) == "table" and decision.flow or {}
     local flowActive = flow.flowId ~= nil
         and (flow.committed == true or flow.matched == true)
-    if result.accepted ~= true then
-        appendConversationRootChoices(
-            candidates, seen, context, revision, predicateTrace
-        )
-    end
+    -- Keep the production landing choices in the projection even while a
+    -- child topic/flow is active. They stay out of the selected child group,
+    -- but this lets the shared Back frame return to a real landing surface
+    -- instead of a synthetic empty page.
+    appendConversationRootChoices(
+        candidates, seen, context, revision, predicateTrace
+    )
+    appendLandingShortcuts(
+        candidates, seen, revision, predicateTrace
+    )
     appendConversationChoices(
         candidates, seen, context, revision, predicateTrace
     )
@@ -1913,7 +2082,7 @@ function Suggestions.Build(result, context, messages)
         candidates, capabilities, context, currentTopic
     )
     candidates = orderedCandidates
-    local groups, currentGroupID = buildGroups(
+    local groups, currentGroupID, rootGroupID = buildGroups(
         candidates, capabilities, currentTopic, revision
     )
 
@@ -1943,6 +2112,8 @@ function Suggestions.Build(result, context, messages)
         groups = groups,
         currentTopic = currentTopic,
         currentGroupID = currentGroupID,
+        rootGroupID = rootGroupID,
+        allowBack = true,
         predicateTrace = predicateTrace,
         trace = trace,
         privacy = {

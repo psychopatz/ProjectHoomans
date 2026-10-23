@@ -89,6 +89,38 @@ PsychopatzCore = {
 PNC = {
     Conversation = {},
     Semantics = {
+        DialogueSuggestions = {
+            BuildGroupFrame = function(group, revision)
+                return {
+                    kind = "semantic_group_click_frame",
+                    candidateID = "semantic.group:" .. tostring(group.id),
+                    groupID = group.id,
+                    requestRevision = revision,
+                }
+            end,
+            BuildBackFrame = function(revision, fromGroupID)
+                return {
+                    kind = "semantic_back_click_frame",
+                    candidateID = "semantic.back:" .. tostring(fromGroupID),
+                    groupID = "conversation_landing",
+                    fromGroupID = fromGroupID,
+                    labelFallback = "Back",
+                    requestRevision = revision,
+                }
+            end,
+            IsBackFrame = function(frame)
+                return frame and frame.kind == "semantic_back_click_frame"
+            end,
+            IsShortcutFrame = function(frame)
+                return frame and frame.kind == "semantic_shortcut_frame"
+            end,
+            IsGroupFrame = function(frame)
+                return frame and frame.kind == "semantic_group_click_frame"
+            end,
+            ResolveFrameText = function(frame)
+                return frame and frame.textFallback or ""
+            end,
+        },
         DialogueInput = {
             Internal = {
                 Now = function() return 0 end,
@@ -414,6 +446,75 @@ T.equal(presentedWhileBusy, 0,
     "busy Core sessions do not receive clickable semantic rows")
 
 Input.SubmitSemanticFrame = originalSubmitSemanticFrame
+
+local shortcutRoutedBefore = routed
+local shortcutAccepted, shortcutReason = Input.SubmitSemanticFrame(view, {
+    kind = "semantic_shortcut_frame",
+    candidateID = "conversation.landing:whats_up",
+    textFallback = "What's up?",
+    requestRevision = 0,
+})
+T.truthy(shortcutAccepted, "shortcut frame uses the canonical text submit path")
+T.equal(shortcutReason, "accepted", "accepted shortcut has a stable reason")
+T.equal(routed, shortcutRoutedBefore + 1,
+    "shortcut is parsed by the same semantic router as typed input")
+T.equal(appended[#appended].value, "What's up?",
+    "shortcut submits its canonical utterance")
+
+local backView = {
+    semanticSuggestions = {
+        currentGroupID = "topic:wellbeing",
+        rootGroupID = "conversation_landing",
+        allowBack = true,
+        revision = 0,
+        groups = {
+            { id = "conversation_landing", candidates = {}, capabilities = {} },
+            { id = "topic:wellbeing", candidates = {}, capabilities = {} },
+        },
+    },
+    session = {
+        conversationID = "conversation-back",
+        currentNodeID = "start",
+        setPresentedChoices = function(self, rows)
+            self.presentedRows = rows
+            return true
+        end,
+    },
+    isConversationInteractive = function() return true end,
+}
+local backRows = Input.Internal.PresentSemanticChoices(
+    backView, backView.semanticSuggestions
+)
+T.equal(#backRows, 1, "nested topic exposes a Back row")
+T.equal(backRows[1].text, "Back", "Back row is presented first")
+local backAccepted, backReason = Input.SubmitSemanticFrame(backView, {
+    kind = "semantic_back_click_frame",
+    candidateID = "semantic.back:topic:wellbeing",
+    groupID = "conversation_landing",
+    fromGroupID = "topic:wellbeing",
+    requestRevision = 0,
+})
+T.truthy(backAccepted, "Back returns to the production landing group")
+T.equal(backReason, "accepted", "accepted Back has a stable reason")
+T.equal(backView.semanticSuggestions.currentGroupID,
+    "conversation_landing", "Back changes only the selected group")
+T.equal(routed, shortcutRoutedBefore + 1,
+    "Back does not create a semantic conversation turn")
+
+backView.semanticSuggestions.currentGroupID = "topic:wellbeing"
+backView.semanticSuggestions.allowBack = false
+local disabledBackRows = Input.Internal.PresentSemanticChoices(
+    backView, backView.semanticSuggestions
+)
+T.equal(disabledBackRows, nil,
+    "required branches can disable Back through projection metadata")
+backView.semanticSuggestions.allowBack = true
+backView.semanticSuggestions.groups[2].allowBack = false
+local disabledGroupBackRows = Input.Internal.PresentSemanticChoices(
+    backView, backView.semanticSuggestions
+)
+T.equal(disabledGroupBackRows, nil,
+    "required groups can disable Back without disabling the whole projection")
 
 PNC = originalPNC
 PsychopatzCore = originalCore

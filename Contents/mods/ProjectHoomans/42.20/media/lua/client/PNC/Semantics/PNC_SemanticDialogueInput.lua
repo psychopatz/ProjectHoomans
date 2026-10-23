@@ -144,6 +144,37 @@ function Input.Submit(view, value, part)
 end
 
 function Input.SubmitSemanticFrame(view, frame)
+    if type(Suggestions.IsBackFrame) == "function"
+        and Suggestions.IsBackFrame(frame)
+    then
+        local allowed, receiptOrReason = beginDirectFrame(view, frame)
+        if not allowed then return false, receiptOrReason end
+        if type(Internal.SelectSemanticRoot) ~= "function" then
+            return false, "semantic_root_unavailable"
+        end
+        local accepted, rootReason = Internal.SelectSemanticRoot(view, frame)
+        if accepted == true then
+            finishDirectFrame(view, receiptOrReason)
+        end
+        return accepted, rootReason
+    end
+    if type(Suggestions.IsShortcutFrame) == "function"
+        and Suggestions.IsShortcutFrame(frame)
+    then
+        local allowed, receiptOrReason = beginDirectFrame(view, frame)
+        if not allowed then return false, receiptOrReason end
+        local value = Suggestions.ResolveFrameText(frame)
+        if value == "" then return false, "suggestion_frame_unavailable" end
+        -- A shortcut is presentation-only. Submit its canonical utterance
+        -- through the same raw parser path as the text box so semantic hub
+        -- routing, authority, history, and response handling stay shared.
+        local accepted, submitReason = Input.Submit(view, value)
+        if accepted == true then
+            finishDirectFrame(view, receiptOrReason)
+        end
+        return accepted, accepted == true and "accepted"
+            or submitReason or "semantic_shortcut_rejected"
+    end
     if type(Suggestions.IsGroupFrame) == "function"
         and Suggestions.IsGroupFrame(frame)
     then
