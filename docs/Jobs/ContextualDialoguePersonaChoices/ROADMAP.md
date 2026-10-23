@@ -1,6 +1,6 @@
 # Roadmap — Contextual Dialogue Persona & Choices
 
-**Parent status:** REOPENED — P0-P12 save-backed runtime foundation retained; P13 Operational Semantic Test Workbench is mandatory.  
+**Parent status:** REOPENED — P0-P13 save-backed operational workbench retained; P14 Production Rehydration & Mod-Code Execution Parity is mandatory.  
 Phases are organization and acceptance checkpoints; completing one phase never completes the parent objective.
 
 ## P0 — Current-path contract baseline
@@ -846,3 +846,91 @@ discover save
 Cover follower/companion, neutral, hostile where supported, trader/provider, and missing-player-inventory cases.
 
 **Gate:** Semantic Lab is operational enough to be the primary semantic/conversation verification environment; native PZ remains user-owned final acceptance.
+
+
+## P14 — Production Rehydration & Mod-Code Execution Parity
+
+P14 corrects the remaining architecture drift between the save-backed harness and the actual mod runtime.
+
+Core invariant:
+
+> **Fixture the engine, never fixture the mod.**
+
+Python may discover/select/transport/isolate/present state. Production Lua must deserialize, normalize, derive, and mutate Project Hoomans gameplay state whenever a production owner already exists.
+
+Read `PRODUCTION_REHYDRATION_AND_MOD_CODE_PARITY.md`.
+
+### P14A — Production rehydration boundary
+
+- audit current Python save importer versus production persistence/load owners;
+- pass raw persisted NPC payload into the Lua worker;
+- invoke production deserialization/migration/normalization;
+- install hydrated record into the isolated registry;
+- retain raw source/provenance;
+- stop Python from interpreting ordinary Hoomans runtime persistence fields where Lua owns them.
+
+**Gate:** one real saved NPC is hydrated from raw persisted payload through production Lua and inspected from the isolated runtime.
+
+### P14B — Production NPC inventory rehydration
+
+- route compact inventory persistence through production inventory code;
+- prove `SEED_ONLY`, `BASELINE_DELTA`, and `FULL`;
+- use production baseline generation and delta replay;
+- GUI/CLI inventory reads the hydrated runtime result.
+
+**Gate:** a real BASELINE_DELTA NPC inventory that previously appeared MISSING is correctly restored.
+
+### P14C — Production faction/diplomacy rehydration
+
+- transport raw faction/diplomacy records;
+- preserve directed relation maps and Player diplomacy-faction mapping;
+- invoke production faction owners;
+- keep faction relation separate from personal NPC relationship;
+- prove real hostile/war/allied/neutral examples where saved data exists.
+
+**Gate:** hostile faction context resolves through production diplomacy without fabricating a personal enemy record.
+
+### P14D — Canonical social context + hostile speech parity
+
+Expose separately:
+
+- personal relationship;
+- faction relation;
+- tactical hostility;
+- conversation audience;
+- durable bond;
+- speech style.
+
+Typed greeting and Talk entry consume the same production context.
+
+**Gate:** hostile-raider GUI/CLI state is internally coherent and production wording is appropriately hostile/parley-aware.
+
+### P14E — MISSING-state audit and provider cleanup
+
+Classify important MISSING states as:
+
+- LEGITIMATE_ABSENCE;
+- ENGINE_ONLY;
+- UNSUPPORTED_FORMAT;
+- PROVIDER_OMISSION;
+- REHYDRATION_FAILURE.
+
+Remove remaining Python gameplay-policy duplication and route supported saved state through production Lua.
+
+**Gate:** no important save-owned value is generically MISSING when a production-supported raw payload exists.
+
+### P14F — Real-save production-runtime regression
+
+Exercise real saves across:
+
+- companion/follower;
+- neutral;
+- hostile raider;
+- trader/provider;
+- relationship present/absent;
+- BASELINE_DELTA inventory;
+- faction relation present/absent.
+
+Test Talk, greeting, inventory, gift, relationship/faction context, mutation/reset, GUI/CLI parity, and source-save immutability.
+
+**Gate:** evidence proves Semantic Lab executes production Project Hoomans state interpretation rather than a Python copy.
