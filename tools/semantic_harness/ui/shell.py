@@ -606,10 +606,6 @@ class SemanticHarnessApp:
         self.settings_button.grid(row=0, column=2, sticky="ew", padx=3)
         self.save_button = ttk.Button(primary_actions, text="Save scenario", command=self.save)
         self.save_button.grid(row=0, column=3, sticky="ew", padx=(3, 0))
-        ttk.Label(
-            secondary_actions,
-            text="Use the inspector tabs for Diagnostics, World Knowledge, Compare, and Talk parity.",
-        ).pack(side="left", padx=2)
         self.language_var = self._tk.StringVar(
             value=self.scenario.get("runtime", {}).get("language", "EN")
         )
@@ -712,39 +708,27 @@ class SemanticHarnessApp:
         talk_frame.columnconfigure(0, weight=1)
         talk_controls = ttk.Frame(talk_frame)
         talk_controls.grid(row=0, column=0, sticky="ew", pady=(0, 6))
-        talk_controls.columnconfigure(1, weight=1)
-        ttk.Label(
-            talk_controls,
-            text="Simulate the production Talk entry point for one NPC type or compare all normal target types.",
-            wraplength=720,
-            justify="left",
-        ).grid(row=0, column=0, columnspan=5, sticky="w", pady=(0, 6))
-        ttk.Label(talk_controls, text="First utterance").grid(
-            row=1, column=0, sticky="w", padx=(0, 6)
-        )
+        talk_controls.columnconfigure(0, weight=1)
         self.talk_utterance_box = ttk.Entry(
             talk_controls, textvariable=self.talk_utterance_var
         )
-        self.talk_utterance_box.grid(row=1, column=1, sticky="ew")
-        ttk.Label(talk_controls, text="Talk target").grid(
-            row=1, column=2, sticky="w", padx=(10, 6)
-        )
+        self.talk_utterance_box.grid(row=0, column=0, sticky="ew", padx=(0, 6))
         self.talk_target_box = ttk.Combobox(
             talk_controls,
             textvariable=self.talk_target_var,
             values=("Current target",),
-            width=24,
+            width=14,
             state="readonly",
         )
-        self.talk_target_box.grid(row=1, column=3, sticky="w")
+        self.talk_target_box.grid(row=0, column=1, sticky="w")
         self.talk_start_button = ttk.Button(
-            talk_controls, text="Start Talk", command=self.start_talk_parity
+            talk_controls, text="Start", command=self.start_talk_parity
         )
-        self.talk_start_button.grid(row=1, column=4, sticky="w", padx=(8, 0))
+        self.talk_start_button.grid(row=0, column=2, sticky="w", padx=(6, 0))
         self.talk_matrix_button = ttk.Button(
-            talk_controls, text="Run all Talk types", command=self.run_talk_matrix
+            talk_controls, text="All types", command=self.run_talk_matrix
         )
-        self.talk_matrix_button.grid(row=1, column=5, sticky="w", padx=(8, 0))
+        self.talk_matrix_button.grid(row=0, column=3, sticky="w", padx=(6, 0))
         self.talk_output = ScrolledText(talk_frame, wrap="none", state="disabled")
         self.talk_output.grid(row=2, column=0, sticky="nsew")
         self.trace_tabs.add(talk_frame, text="Talk parity")
