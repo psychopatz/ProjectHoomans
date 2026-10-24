@@ -244,6 +244,8 @@ function Envelope.SemanticChoice(frame, context)
         semantic = semantic,
         act = frame.act or frame.speechAct,
         topic = frame.topic,
+        eventType = frame.eventType or semantic.eventType,
+        eventRef = frame.eventRef or frame.eventID,
         actorID = context.actorID,
         targetID = context.targetID,
         playerUUID = context.playerUUID,
@@ -319,6 +321,7 @@ function Envelope.NPCSpeech(spec)
         flowID = spec.flowID,
         poolID = spec.poolID,
         factRefs = spec.factRefs,
+        eventType = spec.eventType,
         eventRef = spec.eventRef,
         worldHour = spec.worldHour,
         provenance = spec.provenance,
@@ -408,6 +411,17 @@ end
 
 local function activeThread(store, key)
     return store.active[key] or store.pairs[key]
+end
+
+local function topicStackIndex(thread, topic)
+    if not thread or not topic then return nil end
+    for index = #thread.topicStack, 1, -1 do
+        local beat = thread.topicStack[index]
+        if type(beat) == "table" and beat.topic == topic then
+            return index
+        end
+    end
+    return nil
 end
 
 local function removePair(store, key)
@@ -527,8 +541,10 @@ function Lifecycle.Apply(store, rawEnvelope, options)
     end
     local previousTopic = thread.topic
     local topic = envelope.topic or options.topic
+    local resumeIndex = options.resumeTopic == true
+        and topicStackIndex(thread, topic) or nil
     if topic and previousTopic and topic ~= previousTopic
-        and thread.activeBeat
+        and thread.activeBeat and not resumeIndex
     then
         if #thread.topicStack >= store.limits.topicStack then
             table.remove(thread.topicStack, 1)
@@ -584,7 +600,12 @@ function Lifecycle.Apply(store, rawEnvelope, options)
     if options.resolveBeat == true then
         thread.activeBeat = nil
     end
-    if options.resumeTopic == true and #thread.topicStack > 0 then
+    if resumeIndex then
+        thread.activeBeat = table.remove(thread.topicStack, resumeIndex)
+        thread.topic = thread.activeBeat.topic or thread.topic
+    elseif options.resumeTopic == true and #thread.topicStack > 0
+        and not thread.activeBeat
+    then
         thread.activeBeat = table.remove(thread.topicStack)
         thread.topic = thread.activeBeat.topic or thread.topic
     end

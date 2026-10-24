@@ -1,0 +1,162 @@
+-- Server-authoritative lifecycle adapter for already-parsed typed/headless
+-- semantic input. It records meaning only; gameplay actions stay in their
+-- existing domain handlers.
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
+
+PNC = PNC or {}
+local Router = PNC.ServerCommandRouter
+local Const = PNC.Const
+local Core = PNC.Core
+local Lifecycle = PNC.Semantics
+    and PNC.Semantics.InteractionLifecycle
+    or require "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+local Persistence = PNC.Conversation
+    and PNC.Conversation.InteractionLifecyclePersistence
+    or require "PNC/Conversation/PNC_InteractionLifecyclePersistence"
+
+local function text(value, maximum)
+    value = tostring(value or "")
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    if string.find(value, "%c") then return "" end
+    return string.sub(value, 1, maximum or 96)
+end
+
+local function worldAgeHours()
+    local time = getGameTime and getGameTime() or nil
+    return time and time.getWorldAgeHours
+        and math.max(0, tonumber(time:getWorldAgeHours()) or 0) or 0
+end
+
+local function expectedReply(thread, envelope)
+    local beat = thread and thread.activeBeat or nil
+    if not beat or type(beat.expectedReplies) ~= "table" then return false end
+    for _, value in ipairs(beat.expectedReplies) do
+        value = string.upper(tostring(value or ""))
+        if value == string.upper(tostring(envelope.act or "")) then
+            return true
+        end
+    end
+    return false
+end
+
+local function hasTopicStack(thread, topic)
+    if not thread or not topic then return false end
+    for index = #thread.topicStack, 1, -1 do
+        local beat = thread.topicStack[index]
+        if type(beat) == "table" and beat.topic == topic then return true end
+    end
+    return false
+end
+
+local function durableAct(act)
+    return act == "QUESTION"
+        or act == "REQUEST"
+        or act == "PROMISE"
+        or act == "COMMIT"
+        or act == "OFFER"
+end
+
+local function rejected(requestID, npcID, reason)
+    return {
+        accepted = false,
+        authority = "server",
+        requestID = requestID,
+        npcID = npcID,
+        reason = reason,
+    }
+end
+
+local function handle(player, args)
+    args = type(args) == "table" and args or {}
+    local requestID = text(args.requestID, 96)
+    local npcID = text(args.npcID, 96)
+    local interaction = type(args.interaction) == "table"
+        and args.interaction or nil
+    if not Core or type(Core.IsAuthority) ~= "function"
+        or Core.IsAuthority() ~= true
+    then
+        return rejected(requestID, npcID, "not_authority")
+    end
+    if requestID == "" or npcID == "" or not interaction then
+        return rejected(requestID, npcID, "interaction_identity_required")
+    end
+    local record = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(npcID) or nil
+    local authority = PNC.Conversation
+        and PNC.Conversation.Authority or nil
+    local validateLease = authority and authority.Internal
+        and authority.Internal.ValidateLease or nil
+    local valid
+    local reason
+    if type(validateLease) == "function" then
+        valid, reason = validateLease(
+            player,
+            record,
+            text(args.token, 128)
+        )
+    else
+        valid = false
+        reason = "conversation_authority_unavailable"
+    end
+    if valid ~= true then
+        return rejected(requestID, npcID, reason or "invalid_conversation")
+    end
+    local playerKey = PNC.PlayerCharacters
+        and PNC.PlayerCharacters.GetEntityKey
+        and PNC.PlayerCharacters.GetEntityKey(player, {
+            callback = "semantic_interaction_lifecycle",
+            worldAgeHours = worldAgeHours(),
+        }) or nil
+    if not playerKey then
+        return rejected(requestID, npcID, "player_identity_unavailable")
+    end
+    local envelope = Lifecycle.Envelope.Build({
+        source = "typed_text",
+        actorID = playerKey,
+        targetID = npcID,
+        playerUUID = playerKey,
+        act = interaction.act or interaction.speechAct
+            or interaction.intent,
+        topic = interaction.topic,
+        provenance = interaction.provenance,
+        modifiers = interaction.modifiers,
+    })
+    if not envelope then
+        return rejected(requestID, npcID, "interaction_envelope_invalid")
+    end
+    local projection = Persistence.Project(playerKey, npcID)
+    local thread = projection and projection.thread or nil
+    local at = worldAgeHours()
+    local options = {
+        meaningful = durableAct(envelope.act),
+        eventRef = "semantic:typed:" .. requestID,
+        worldHour = at,
+        topic = envelope.topic,
+        openQuestion = envelope.act == "QUESTION"
+            and envelope.topic or nil,
+        commitment = (envelope.act == "PROMISE"
+            or envelope.act == "COMMIT") and envelope.topic or nil,
+        resolveBeat = expectedReply(thread, envelope),
+        resumeTopic = thread and envelope.topic ~= nil
+            and hasTopicStack(thread, envelope.topic) or false,
+    }
+    local applied, applyReason = Persistence.Apply(envelope, options)
+    if not applied then
+        return rejected(requestID, npcID, applyReason or "lifecycle_rejected")
+    end
+    return {
+        accepted = true,
+        authority = "server",
+        requestID = requestID,
+        npcID = npcID,
+        lifecycleReason = applyReason,
+        persisted = applied.persisted == true,
+    }
+end
+
+Router.Register(Const.CMD_SEMANTIC_INTERACTION_LIFECYCLE, handle)
+
+return PNC

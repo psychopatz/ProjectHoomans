@@ -141,6 +141,43 @@ local function restoreSemanticChoices(view)
     return false
 end
 
+local function submitLifecycleEnvelope(view, result, actionResult)
+    local interaction = type(result) == "table"
+        and result.interaction or nil
+    if type(interaction) ~= "table"
+        or interaction.source ~= "typed_text"
+        or not sendClientCommand
+    then
+        return false, "lifecycle_transport_unavailable"
+    end
+    -- Directed hostility already enters the authoritative SocialEvent route;
+    -- sending a second generic lifecycle mutation would duplicate its event.
+    local act = string.upper(tostring(interaction.act or ""))
+    if act == "INSULT" or act == "HOSTILE_REMARK" or act == "THREATEN" then
+        return false, "authoritative_social_event_route"
+    end
+    local session = view and view.session or nil
+    local lifecycle = view and view.spec and view.spec.context
+        and view.spec.context.conversationLifecycleState or nil
+    local requestID = table.concat({
+        tostring(session and session.conversationID or "conversation"),
+        tostring(result.sequence or 0),
+        tostring(Internal.Now()),
+    }, ":")
+    sendClientCommand(
+        PNC.Const.MODULE,
+        PNC.Const.CMD_SEMANTIC_INTERACTION_LIFECYCLE,
+        {
+            requestID = requestID,
+            npcID = view and view.spec and view.spec.npcID,
+            token = lifecycle and lifecycle.token
+                or session and session.token,
+            interaction = interaction,
+        }
+    )
+    return true, "submitted"
+end
+
 local function recordSemanticChoiceClick(view, frame, eventName, reason)
     local session = view and view.session or nil
     local router = session and session.semanticDialogueRouter or nil
@@ -658,6 +695,7 @@ local function finishLocalSubmit(view, value, result, options)
         actionResult = Internal.DispatchAction(view, result, value)
         view.lastSemanticActionResult = actionResult
         applyGeneratedFlowResult(view, result, actionResult)
+        submitLifecycleEnvelope(view, result, actionResult)
         if Internal.ClearPendingGiftConsent then
             Internal.ClearPendingGiftConsent(view)
         end

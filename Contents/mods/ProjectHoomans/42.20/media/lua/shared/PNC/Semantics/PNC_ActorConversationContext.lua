@@ -310,6 +310,22 @@ local function identityProjection(context)
     }
 end
 
+local function interactionProjection(context)
+    local source = type(context.interactionLifecycle) == "table"
+        and context.interactionLifecycle or nil
+    if not source then return nil end
+    local beat = type(source.activeBeat) == "table"
+        and source.activeBeat or nil
+    return {
+        status = text(source.status, "ACTIVE"),
+        topic = text(source.topic),
+        activeBeat = beat and copy(beat) or nil,
+        openQuestions = copy(source.openQuestions or {}),
+        commitments = copy(source.openCommitments or source.commitments or {}),
+        topicStack = copy(source.topicStack or {}),
+    }
+end
+
 local function revisions(context, relationship, personality, roles, situation)
     local fingerprint = context.npcTraitFingerprint
     if fingerprint == nil and type(context.npcRecord) == "table" then
@@ -348,6 +364,7 @@ function Context.Build(source)
     local identity = identityProjection(context)
     local traits = sortedIDs(context.npcTraits, Context.MAX_TRAITS)
     local bond = bondProjection(context)
+    local interaction = interactionProjection(context)
     return {
         schemaVersion = Context.VERSION,
         schema = Context.SCHEMA,
@@ -361,6 +378,7 @@ function Context.Build(source)
         tacticalHostility = tacticalHostility,
         conversationAudience = conversationAudience,
         bond = bond,
+        interactionLifecycle = interaction,
         roles = roles,
         situation = situation,
         revisions = revisions(context, relationship, personality, roles, situation),
@@ -385,6 +403,9 @@ function Context.Build(source)
             roles = context.actorAuthority and "actor_authority",
             situation = context.dialogueSituation and "dialogue_situation"
                 or "actor_state_projection",
+            interactionLifecycle = interaction
+                and "semantic_interaction_lifecycle"
+                or "interaction_lifecycle_unavailable",
         },
         privacy = {
             privateFieldsOmitted = {
@@ -410,6 +431,8 @@ function Context.PublicView(value)
         and value.tacticalHostility or nil
     local conversationAudience = type(value.conversationAudience) == "table"
         and value.conversationAudience or nil
+    local interaction = type(value.interactionLifecycle) == "table"
+        and value.interactionLifecycle or nil
     return {
         schemaVersion = value.schemaVersion,
         actorID = value.actorID,
@@ -436,6 +459,14 @@ function Context.PublicView(value)
             currentTopic = situation.currentTopic,
             inCombat = situation.inCombat == true,
         },
+        interactionLifecycle = interaction and {
+            status = interaction.status,
+            topic = interaction.topic,
+            activeBeat = copy(interaction.activeBeat),
+            openQuestions = copy(interaction.openQuestions),
+            commitments = copy(interaction.commitments),
+            topicStack = copy(interaction.topicStack),
+        } or nil,
         revisions = copy(value.revisions),
         privacy = {
             privateFieldsOmitted = true,
