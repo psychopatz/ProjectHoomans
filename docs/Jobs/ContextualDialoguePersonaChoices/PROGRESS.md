@@ -219,18 +219,48 @@ xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_actor_inspecto
 All listed checks pass. Changed Lua files pass `luac5.3 -p` and `pz-verify`
 Kahlua ERROR+ checks. P14D is accepted; continue with P14E.
 
-## Current Exact Next Chunk — P14E
+## Completed P14E — MISSING-state audit and provider classification
+
+Evidence recorded on 2026-10-24:
+
+- Compact persisted NPC inventory envelopes are now provenance `SAVE` with the
+  production owner chain `PNC.Persistence.DeserializeRecord ->
+  PNC.Inventory.EnsureRecordInventory`; Python still does not decode inventory
+  modes. This removes the false `npc.inventory = MISSING` diagnostic while the
+  production Lua rehydration boundary remains authoritative.
+- Important honest absences now carry an explicit `missingClass`: legitimate
+  absent personal relationship/traits/faction/community/bond, engine-only native
+  Player tail fields, unsupported-format/provider failure paths where applicable,
+  and rehydration failures remain distinct from ordinary absence.
+- Real compact-save audit for `npcWilberDowns_R4XY` now reports no unclassified
+  important `MISSING` path; the remaining saved `player.traits` absence is marked
+  `LEGITIMATE_ABSENCE`, and native `worn`/`equipped` gaps are marked `ENGINE_ONLY`.
+- Developer/Test fixture mode remains explicitly labeled `FIXTURE`; it does not
+  claim SAVE provenance for social context or production faction registries.
+- No source-save mutation or live Project Zomboid mutation was introduced.
+
+Focused evidence:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_missing_state_audit_p14e tools.semantic_harness.tests.test_production_rehydration_p14a tools.semantic_harness.tests.test_production_inventory_rehydration_p14b tools.semantic_harness.tests.test_production_faction_rehydration_p14c tools.semantic_harness.tests.test_production_social_context_p14d tools.semantic_harness.tests.test_save_import_p12c tools.semantic_harness.tests.test_player_engine_state_p13b tools.semantic_harness.tests.test_cli_parity_p13f
+```
+
+All listed checks pass. P14E is accepted; continue with P14F.
+
+## Current Exact Next Chunk — P14F
 
 On the existing local `main`:
 
-1. audit important `SAVE`, `FIXTURE`, `LIVE`, `DERIVED`, and `MISSING` values
-   across the normal save-backed execution path;
-2. classify every important `MISSING` as `LEGITIMATE_ABSENCE`, `ENGINE_ONLY`,
-   `UNSUPPORTED_FORMAT`, `PROVIDER_OMISSION`, or `REHYDRATION_FAILURE`;
-3. remove false MISSING values caused by remaining harness shortcuts without
-   adding Python relationship, bond, faction, or inventory policy;
+1. exercise real saved companion/follower, neutral NPC, hostile raider, and
+   trader/provider actors through production rehydration;
+2. cover persisted and absent personal relationships, BASELINE_DELTA inventory,
+   faction relation present/absent, Talk, semantic hello, inventory, gift where
+   supported, relationship/faction context, mutation, and reset;
+3. prove GUI result equals CLI result, source save bytes remain unchanged, and
+   working-world reset restores the imported production baseline;
 4. run focused Python, Lua, Tk/Xvfb, CLI, Kahlua, and diff checks, then update
-   this ledger and continue automatically to P14F.
+   this ledger and close P14 only when the real-save production-runtime path is
+   evidenced.
 
 ## P14A acceptance
 

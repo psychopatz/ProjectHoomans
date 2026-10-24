@@ -318,12 +318,21 @@ def _read_native_blob(
 
 
 def _missing(reason: str, *, save_path: Path, player_uuid: str | None = None) -> dict[str, Any]:
+    if reason in {"players_db_missing", "world_dictionary_missing"}:
+        missing_class = "ENGINE_ONLY"
+    elif reason.startswith("unsupported"):
+        missing_class = "UNSUPPORTED_FORMAT"
+    elif reason in {"player_identity_not_found", "player_identity_ambiguous"}:
+        missing_class = "PROVIDER_OMISSION"
+    else:
+        missing_class = "PROVIDER_OMISSION"
     return {
         "schema": "semantic.player_engine_state.v1",
         "schemaVersion": 1,
         "available": False,
         "source": "MISSING",
         "reason": reason,
+        "missingClass": missing_class,
         "savePath": str(save_path),
         "playerUUID": player_uuid,
         "inventory": {
@@ -332,11 +341,20 @@ def _missing(reason: str, *, save_path: Path, player_uuid: str | None = None) ->
             "containers": [],
             "source": "MISSING",
         },
-        "worn": {"source": "MISSING", "reason": "native_tail_not_projected"},
-        "equipped": {"source": "MISSING", "reason": "native_tail_not_projected"},
+        "worn": {
+            "source": "MISSING",
+            "reason": "native_tail_not_projected",
+            "missingClass": "ENGINE_ONLY",
+        },
+        "equipped": {
+            "source": "MISSING",
+            "reason": "native_tail_not_projected",
+            "missingClass": "ENGINE_ONLY",
+        },
         "provenance": {
             "source": "MISSING",
             "reason": reason,
+            "missingClass": missing_class,
             "path": "players.db.localPlayers",
         },
     }
@@ -452,8 +470,16 @@ class OfflinePlayerEngineStateProvider:
             "worldVersion": int(world_version),
             "isDead": bool(is_dead),
             "inventory": inventory,
-            "worn": {"source": "MISSING", "reason": "native_tail_not_projected"},
-            "equipped": {"source": "MISSING", "reason": "native_tail_not_projected"},
+            "worn": {
+                "source": "MISSING",
+                "reason": "native_tail_not_projected",
+                "missingClass": "ENGINE_ONLY",
+            },
+            "equipped": {
+                "source": "MISSING",
+                "reason": "native_tail_not_projected",
+                "missingClass": "ENGINE_ONLY",
+            },
             "provenance": {
                 "source": "SAVE",
                 "table": "players.db.localPlayers",

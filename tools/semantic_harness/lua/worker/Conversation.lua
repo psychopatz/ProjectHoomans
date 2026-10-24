@@ -104,6 +104,11 @@ local function canonicalTacticalHostility(context, npc, audience, copy)
         source = source,
         owner = owner,
         reason = reason,
+        missingClass = sourceKind == "SAVE"
+            and hostility.mode == nil
+            and hostility.attackPlayers == nil
+            and "LEGITIMATE_ABSENCE"
+            or nil,
     }
 end
 
@@ -127,6 +132,8 @@ local function canonicalPersonalRelationship(context, relationship, copy)
             and "explicit Developer/Test relationship fixture"
             or hasRecord and "persisted NPC-to-Player relationship"
             or "no persisted NPC-to-Player relationship",
+        missingClass = sourceKind == "SAVE" and not hasRecord
+            and "LEGITIMATE_ABSENCE" or nil,
         approval = relationship.approval,
         respect = relationship.respect,
         familiarity = relationship.familiarity,
@@ -1152,6 +1159,7 @@ function Conversation.contextSnapshot(harnessContext, view)
                 status = "absent",
                 source = "MISSING",
                 reason = "no production faction/community registry",
+                missingClass = "LEGITIMATE_ABSENCE",
             },
         tacticalHostility = Values.copy(actorContext.tacticalHostility),
         conversationAudience = Values.copy(
@@ -1162,6 +1170,7 @@ function Conversation.contextSnapshot(harnessContext, view)
             class = "none",
             source = "MISSING",
             reason = "no persisted durable bond",
+            missingClass = "LEGITIMATE_ABSENCE",
         },
         speechStyle = Values.copy(speechStyle),
         provenance = {

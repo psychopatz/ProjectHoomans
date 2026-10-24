@@ -104,6 +104,11 @@ def _saved_inventory(record: dict[str, Any]) -> tuple[dict[str, Any], str]:
     value = record.get("inventory")
     if isinstance(value, dict) and isinstance(value.get("items"), (dict, list)):
         return deepcopy(value), "SAVE"
+    # A compact production envelope is persisted state even though it is not
+    # an offline runtime projection. Transport it as SAVE provenance and let
+    # production Lua deserialize/hydrate it; Python must not decode its mode.
+    if isinstance(value, list):
+        return _empty_inventory(), "SAVE"
     return _empty_inventory(), "MISSING"
 
 
@@ -466,6 +471,11 @@ class SaveBackedImporter:
                 },
                 "npc.relationship": {
                     "source": relationship_source,
+                    "missingClass": (
+                        "LEGITIMATE_ABSENCE"
+                        if relationship_source == "MISSING"
+                        else None
+                    ),
                     "table": npc_table,
                     "recordKey": player_entity_key,
                 },
@@ -484,6 +494,11 @@ class SaveBackedImporter:
                     "source": "SAVE"
                     if isinstance(player_record.get("traits"), (list, dict))
                     else "MISSING",
+                    "missingClass": (
+                        "LEGITIMATE_ABSENCE"
+                        if not isinstance(player_record.get("traits"), (list, dict))
+                        else None
+                    ),
                     "table": player_table,
                     "recordKey": selected_uuid,
                 },
@@ -491,6 +506,11 @@ class SaveBackedImporter:
                     "source": "SAVE"
                     if isinstance(player_record.get("socialProfile"), dict)
                     else "MISSING",
+                    "missingClass": (
+                        "LEGITIMATE_ABSENCE"
+                        if not isinstance(player_record.get("socialProfile"), dict)
+                        else None
+                    ),
                     "table": player_table,
                     "recordKey": selected_uuid,
                 },
@@ -499,6 +519,11 @@ class SaveBackedImporter:
                     "source": "SAVE"
                     if isinstance(npc_record.get("npcTraits"), (list, dict))
                     else "MISSING",
+                    "missingClass": (
+                        "LEGITIMATE_ABSENCE"
+                        if not isinstance(npc_record.get("npcTraits"), (list, dict))
+                        else None
+                    ),
                     "table": npc_table,
                     "recordKey": selected_npc_id,
                 },
@@ -509,11 +534,21 @@ class SaveBackedImporter:
                 },
                 "npc.faction": {
                     "source": "SAVE" if "factions" in raw_registries else "MISSING",
+                    "missingClass": (
+                        "LEGITIMATE_ABSENCE"
+                        if "factions" not in raw_registries
+                        else None
+                    ),
                     "table": "PNC_Factions",
                     "recordKey": actor_projection["factionID"],
                 },
                 "npc.community": {
                     "source": "SAVE" if "communities" in raw_registries else "MISSING",
+                    "missingClass": (
+                        "LEGITIMATE_ABSENCE"
+                        if "communities" not in raw_registries
+                        else None
+                    ),
                     "table": "PNC_Communities",
                     "recordKey": actor_projection["communityID"],
                 },
@@ -523,6 +558,17 @@ class SaveBackedImporter:
                 },
                 "npc.inventory": {
                     "source": npc_inventory_source,
+                    "owner": (
+                        "PNC.Persistence.DeserializeRecord"
+                        " -> PNC.Inventory.EnsureRecordInventory"
+                        if npc_inventory_source == "SAVE"
+                        else None
+                    ),
+                    "missingClass": (
+                        "LEGITIMATE_ABSENCE"
+                        if npc_inventory_source == "MISSING"
+                        else None
+                    ),
                     "table": npc_table,
                     "recordKey": selected_npc_id,
                 },

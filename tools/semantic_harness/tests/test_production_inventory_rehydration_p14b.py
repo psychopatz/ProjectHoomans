@@ -146,7 +146,11 @@ class ProductionInventoryRehydrationP14BTests(unittest.TestCase):
         # save envelope is not a legacy runtime inventory projection.
         self.assertEqual(
             selection.provenance["paths"]["npc.inventory"]["source"],
-            "MISSING",
+            "SAVE",
+        )
+        self.assertIn(
+            "PNC.Inventory.EnsureRecordInventory",
+            selection.provenance["paths"]["npc.inventory"]["owner"],
         )
 
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
