@@ -19,6 +19,7 @@ def conversation_first(value: Any) -> str:
     sections = (
         ("UNDERSTANDING", value.get("understanding", {})),
         ("CONTEXT", value.get("context", {})),
+        ("SOCIAL CONTEXT", value.get("socialContext", {})),
         ("PERSONA + CHOICES", value.get("personaChoices", {})),
         ("FACTS AND PROVENANCE", value.get("facts", {})),
         ("DIALOGUE PLANNING", value.get("dialoguePlanning", {})),

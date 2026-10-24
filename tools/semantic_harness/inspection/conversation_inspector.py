@@ -440,6 +440,21 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
     fact_provider = diagnostics.get("factProvider") or facts_view["providers"]
     if isinstance(fact_provider, str):
         fact_provider = [fact_provider]
+    social_context = context.get("socialContext")
+    if not isinstance(social_context, dict):
+        actor_context = context.get("actorConversationContext")
+        actor_context = actor_context if isinstance(actor_context, dict) else {}
+        social_context = {
+            "personalRelationship": actor_context.get(
+                "personalRelationship", actor_context.get("relationship")
+            ),
+            "factionRelationship": actor_context.get("factionRelationship"),
+            "tacticalHostility": actor_context.get("tacticalHostility"),
+            "conversationAudience": actor_context.get("conversationAudience"),
+            "durableBond": actor_context.get("bond"),
+            "speechStyle": context.get("speechStyleContext"),
+            "provenance": actor_context.get("provenance"),
+        }
     translation_view = record.get("translation", {})
     translation_view = (
         translation_view if isinstance(translation_view, dict) else {}
@@ -522,6 +537,7 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
         },
         "understanding": _bounded(understanding, limit=16),
         "facts": _bounded(facts_view, limit=32),
+        "socialContext": _bounded(social_context, limit=48),
         "acceptanceChain": acceptance_chain,
         "dialoguePlanning": _bounded(dialogue_planning, limit=24),
         "finalResponse": _bounded({

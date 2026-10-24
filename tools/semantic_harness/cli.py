@@ -581,6 +581,7 @@ def cli(arguments: argparse.Namespace) -> int:
                 arguments.inspect_npc,
                 arguments.inspect_inventories,
                 arguments.inspect_relationship,
+                arguments.inspect_social_context,
             )
             if any(inspection_flags):
                 current = _bounded_actor_state(worker.inspect_actor_state())
@@ -601,6 +602,10 @@ def cli(arguments: argparse.Namespace) -> int:
                 if arguments.inspect_relationship:
                     inspection["relationship"] = current["npc"].get(
                         "relationship", {}
+                    )
+                if arguments.inspect_social_context:
+                    inspection["socialContext"] = current["npc"].get(
+                        "socialContext", {}
                     )
                 _print_result(inspection, arguments.jsonl)
                 emit_activity()
@@ -798,6 +803,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--inspect-npc", action="store_true")
     parser.add_argument("--inspect-inventories", action="store_true")
     parser.add_argument("--inspect-relationship", action="store_true")
+    parser.add_argument(
+        "--inspect-social-context",
+        action="store_true",
+        help="show production personal/faction/tactical/audience/bond/speech layers",
+    )
     parser.add_argument(
         "--gift",
         action="append",

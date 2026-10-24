@@ -268,6 +268,9 @@ function Style.Resolve(source)
         schemaVersion = Style.VERSION,
         schema = Style.SCHEMA,
         variant = variant(values),
+        reason = variant(values) == "guarded"
+            and "hostile_or_defensive_context"
+            or "actor_context_style_resolution",
         dimensions = values,
         bond = {
             class = bond.class,
@@ -290,6 +293,11 @@ function Style.PublicView(value)
         schemaVersion = value.schemaVersion,
         schema = value.schema,
         variant = value.variant or "neutral",
+        dimensions = value.dimensions,
+        provenance = value.provenance,
+        reason = value.variant == "guarded"
+            and "hostile_or_defensive_context"
+            or "actor_context_style_resolution",
         revisions = value.revisions,
         bond = {
             class = value.bond and value.bond.class or nil,

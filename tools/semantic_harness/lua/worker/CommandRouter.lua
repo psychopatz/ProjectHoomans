@@ -235,6 +235,24 @@ local function actorStateProjection(context)
     local scenario = context.Runtime.scenario or {}
     local player = scenario.player or {}
     local npc = scenario.npc or {}
+    local conversationSnapshot = context.Conversation
+        and context.Conversation.contextSnapshot
+        and context.Conversation.contextSnapshot(
+            context,
+            context.Runtime.view
+        ) or {}
+    local socialContext = type(conversationSnapshot.socialContext) == "table"
+        and context.Values.copy(conversationSnapshot.socialContext)
+        or nil
+    local actorConversationContext = type(
+        conversationSnapshot.actorConversationContext
+    ) == "table" and context.Values.copy(
+        conversationSnapshot.actorConversationContext
+    ) or nil
+    local speechStyleContext = type(conversationSnapshot.speechStyleContext)
+        == "table" and context.Values.copy(
+            conversationSnapshot.speechStyleContext
+        ) or nil
     local function traits(value)
         local output = {}
         if type(value) ~= "table" then return output end
@@ -275,6 +293,9 @@ local function actorStateProjection(context)
                 inventory = boundedInventory(context, context.npcInventory
                     or npc.inventory),
                 relationship = boundedRelationship(context),
+                socialContext = socialContext,
+                actorConversationContext = actorConversationContext,
+                speechStyleContext = speechStyleContext,
             },
         },
     }

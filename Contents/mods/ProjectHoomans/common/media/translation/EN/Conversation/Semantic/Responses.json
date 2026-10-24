@@ -138,7 +138,7 @@
   "UI_PNC_Conversation_Semantic_RealizationGreetingNeutral": "Hello. Good to see you.",
   "UI_PNC_Conversation_Semantic_RealizationGreetingWarm": "Hey! It is good to see you.",
   "UI_PNC_Conversation_Semantic_RealizationGreetingTerse": "Hello.",
-  "UI_PNC_Conversation_Semantic_RealizationGreetingGuarded": "Hello. What is it?",
+  "UI_PNC_Conversation_Semantic_RealizationGreetingGuarded": "State your business. Keep your distance.",
   "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionNeutral": "How have you been?",
   "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionWarm": "How have you been holding up?",
   "UI_PNC_Conversation_Semantic_RealizationGreetingQuestionTerse": "You okay?",

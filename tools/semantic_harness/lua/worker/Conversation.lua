@@ -20,6 +20,122 @@ local function numbersFor(source, keys, number)
     return values
 end
 
+local function productionAudience(context, npc, player, relationship, copy)
+    local Runtime = context.Runtime
+    local hostility = type(npc.hostility) == "table" and npc.hostility or {}
+    local entry = {
+        id = npc.npcID or npc.id or "semantic-lab-npc",
+        relationship = copy(relationship),
+        tacticalClass = npc.tacticalClass,
+        snapshot = {
+            activeBehavior = npc.activeBehavior,
+            followState = copy(npc.followState),
+            hostility = copy(hostility),
+            role = npc.role,
+            recruited = npc.recruited,
+            companion = npc.companion,
+            ownedByPlayer = npc.ownedByPlayer,
+            orderSpec = copy(npc.orderSpec),
+            tacticalClass = npc.tacticalClass,
+        },
+        record = Runtime.hydratedNpcRecord,
+    }
+    local talkStart = PNC.Conversation
+        and PNC.Conversation.TalkStart or nil
+    if talkStart and type(talkStart.Project) == "function" then
+        local ok, projection = pcall(
+            talkStart.Project,
+            entry,
+            player,
+            { source = "semantic_lab_context" }
+        )
+        if ok and type(projection) == "table" then
+            return {
+                audience = projection.audience,
+                reason = projection.audienceReason,
+                source = "PNC.Conversation.TalkStart.Project",
+                relationshipID = projection.relationshipID,
+                tacticalClass = projection.tacticalClass,
+                playerHostile = projection.hostile == true,
+                route = projection.route,
+                routeReason = projection.routeReason,
+            }
+        end
+    end
+    return {
+        audience = nil,
+        reason = "production_talk_start_unavailable",
+        source = "PNC.Conversation.TalkStart.Project",
+        relationshipID = nil,
+        tacticalClass = npc.tacticalClass,
+        playerHostile = hostility.attackPlayers == true,
+    }
+end
+
+local function canonicalTacticalHostility(context, npc, audience, copy)
+    local Runtime = context.Runtime
+    local hostility = type(npc.hostility) == "table" and npc.hostility or {}
+    local sourceKind = tostring(
+        Runtime.sourceMetadata and Runtime.sourceMetadata.sourceKind
+            or "FIXTURE"
+    ):upper()
+    local production = Runtime.hydratedNpcRecord ~= nil
+    local source = sourceKind == "SAVE" and "SAVE" or "FIXTURE"
+    local owner = production
+        and "PNC.Persistence.DeserializeRecord"
+        or "Developer/Test fixture"
+    local reason
+    if hostility.attackPlayers == true then
+        reason = production
+            and "persisted hostility.attackPlayers"
+            or "explicit fixture hostility.attackPlayers"
+    elseif hostility.mode ~= nil then
+        reason = production
+            and "persisted hostility.mode"
+            or "explicit fixture hostility.mode"
+    else
+        reason = "no persisted tactical hostility"
+    end
+    return {
+        mode = hostility.mode,
+        attackPlayers = hostility.attackPlayers == true,
+        tacticalClass = audience and audience.tacticalClass or npc.tacticalClass,
+        activeBehavior = npc.activeBehavior,
+        source = source,
+        owner = owner,
+        reason = reason,
+    }
+end
+
+local function canonicalPersonalRelationship(context, relationship, copy)
+    relationship = type(relationship) == "table" and relationship or {}
+    local state = relationship.state or relationship.relationshipState or "unknown"
+    local sourceKind = tostring(
+        context.Runtime.sourceMetadata
+            and context.Runtime.sourceMetadata.sourceKind or "FIXTURE"
+    ):upper()
+    local hasRecord = relationship.record ~= nil
+        or relationship.productionGraph ~= nil
+        or relationship.approval ~= nil
+        or relationship.respect ~= nil
+        or relationship.familiarity ~= nil
+    return {
+        state = state,
+        source = sourceKind ~= "SAVE" and "FIXTURE"
+            or hasRecord and "PNC.Relationships.Get" or "MISSING",
+        reason = sourceKind ~= "SAVE"
+            and "explicit Developer/Test relationship fixture"
+            or hasRecord and "persisted NPC-to-Player relationship"
+            or "no persisted NPC-to-Player relationship",
+        approval = relationship.approval,
+        respect = relationship.respect,
+        familiarity = relationship.familiarity,
+        identityTrust = relationship.identityTrust,
+        revision = relationship.revision,
+        bond = copy(relationship.bond),
+    }
+end
+
 function Conversation.buildContext(context)
     local Runtime = context.Runtime
     local Values = context.Values
@@ -35,6 +151,27 @@ function Conversation.buildContext(context)
     local relationship = context.SemanticAdapters.relationshipFor(
         context, npc.npcID
     )
+    local audience = productionAudience(
+        context,
+        npc,
+        player,
+        relationship,
+        copy
+    )
+    local tacticalHostility = canonicalTacticalHostility(
+        context,
+        npc,
+        audience,
+        copy
+    )
+    local personalRelationship = canonicalPersonalRelationship(
+        context,
+        relationship,
+        copy
+    )
+    local factionContext = type(npc.factionContext) == "table"
+        and npc.factionContext
+        or Runtime.productionFactionContext
     local npcName = context.SemanticAdapters.identityName(context, npc)
     -- The world-level fields remain a legacy scenario fallback. An explicit
     -- npc.needs/conditionStats table is authoritative even when empty (unknown).
@@ -91,6 +228,7 @@ function Conversation.buildContext(context)
             activeBehavior = npc.activeBehavior,
             followState = copy(npc.followState or { mode = "idle" }),
             hostility = copy(npc.hostility),
+            tacticalHostility = copy(tacticalHostility),
             role = npc.role,
             bodyHealth = bodyHealth,
             hpCurrent = hpCurrent,
@@ -102,6 +240,10 @@ function Conversation.buildContext(context)
             or npc.relationshipState or "unknown",
         identityTrust = relationship.identityTrust,
         relationship = copy(relationship),
+        personalRelationship = copy(personalRelationship),
+        factionRelationship = copy(factionContext),
+        tacticalHostility = copy(tacticalHostility),
+        conversationAudience = copy(audience),
         startingRelationship = copy(npc.startingRelationship),
         actorAuthority = {
             eligible = authorityEligible == true,
@@ -158,7 +300,12 @@ function Conversation.buildContext(context)
                 hpMax = hpMax,
                 needs = snapshotNeeds,
                 conditionStats = copy(conditions),
+                tacticalClass = npc.tacticalClass,
             },
+            relationship = copy(relationship),
+            tacticalClass = npc.tacticalClass,
+            id = npc.npcID,
+            record = Runtime.hydratedNpcRecord,
         },
     }
     -- Preserve the production composer projection across a worker context
@@ -988,6 +1135,49 @@ function Conversation.contextSnapshot(harnessContext, view)
         })
         engineFacts[factID] = Values.copy(record)
     end
+    local speechStyle = SpeechStyleContext.Resolve(
+        view and view.spec and view.spec.context or {}
+    )
+    local actorContext = Values.copy(
+        view and view.spec and view.spec.context
+            and view.spec.context.actorConversationContext
+    ) or {}
+    local socialContext = {
+        schema = "semantic.social.context.v1",
+        personalRelationship = Values.copy(
+            actorContext.personalRelationship or actorContext.relationship
+        ),
+        factionRelationship = Values.copy(actorContext.factionRelationship)
+            or {
+                status = "absent",
+                source = "MISSING",
+                reason = "no production faction/community registry",
+            },
+        tacticalHostility = Values.copy(actorContext.tacticalHostility),
+        conversationAudience = Values.copy(
+            actorContext.conversationAudience
+        ),
+        durableBond = Values.copy(actorContext.bond) or {
+            status = "absent",
+            class = "none",
+            source = "MISSING",
+            reason = "no persisted durable bond",
+        },
+        speechStyle = Values.copy(speechStyle),
+        provenance = {
+            personalRelationship = actorContext.provenance
+                and actorContext.provenance.relationship,
+            factionRelationship = actorContext.factionRelationship
+                and actorContext.factionRelationship.source,
+            tacticalHostility = actorContext.tacticalHostility
+                and actorContext.tacticalHostility.owner,
+            conversationAudience = actorContext.conversationAudience
+                and actorContext.conversationAudience.source,
+            durableBond = actorContext.provenance
+                and actorContext.provenance.bond,
+            speechStyle = speechStyle.provenance,
+        },
+    }
     return {
         -- This is the filtered player-character projection, suitable for the
         -- Inspector and Dossier preview. It is never reconstructed from the
@@ -1020,13 +1210,9 @@ function Conversation.contextSnapshot(harnessContext, view)
             view and view.spec and view.spec.context
                 and view.spec.context.conversationBlock
         ),
-        actorConversationContext = Values.copy(
-            view and view.spec and view.spec.context
-                and view.spec.context.actorConversationContext
-        ),
-        speechStyleContext = SpeechStyleContext.Resolve(
-            view and view.spec and view.spec.context or {}
-        ),
+        actorConversationContext = actorContext,
+        speechStyleContext = speechStyle,
+        socialContext = socialContext,
     }
 end
 

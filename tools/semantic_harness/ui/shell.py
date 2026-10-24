@@ -3118,6 +3118,51 @@ class SemanticHarnessApp:
                 ):
                     if actor.get(key) not in (None, ""):
                         identity_lines.append(f"{label}: {actor.get(key)}")
+                response = self.last_response if isinstance(
+                    self.last_response, dict
+                ) else {}
+                context = response.get("contextAfter") or response.get(
+                    "context"
+                ) or {}
+                social = context.get("socialContext") if isinstance(
+                    context, dict
+                ) else None
+                if isinstance(social, dict):
+                    personal = social.get("personalRelationship") or {}
+                    faction = social.get("factionRelationship") or {}
+                    effective = faction.get("effective") or faction
+                    tactical = social.get("tacticalHostility") or {}
+                    audience = social.get("conversationAudience") or {}
+                    bond = social.get("durableBond") or {}
+                    speech = social.get("speechStyle") or {}
+                    identity_lines.extend(
+                        [
+                            "",
+                            "Canonical social context",
+                            "Personal relationship: "
+                            f"{personal.get('state') or 'unknown'} · "
+                            f"source {personal.get('source') or 'MISSING'} · "
+                            f"reason {personal.get('reason') or 'MISSING'}",
+                            "Faction relationship: "
+                            f"{effective.get('state') or 'unknown'} · "
+                            f"standing {effective.get('standing', 'MISSING')} · "
+                            f"source {effective.get('source') or 'MISSING'}",
+                            "Tactical hostility: "
+                            f"{tactical.get('mode') or 'unknown'} · "
+                            f"attackPlayers={tactical.get('attackPlayers', 'MISSING')} · "
+                            f"source {tactical.get('source') or 'MISSING'}",
+                            "Conversation audience: "
+                            f"{audience.get('audience') or 'unknown'} · "
+                            f"reason {audience.get('reason') or 'MISSING'} · "
+                            f"source {audience.get('source') or 'MISSING'}",
+                            "Durable bond: "
+                            f"{bond.get('class') or 'none'} · "
+                            f"source {bond.get('source') or 'MISSING'}",
+                            "Speech style: "
+                            f"{speech.get('variant') or 'unknown'} · "
+                            f"reason {speech.get('reason') or 'MISSING'}",
+                        ]
+                    )
             identity_lines.append(
                 f"source save: {metadata.get('sourceID') or 'developer/test fixture'}"
             )

@@ -330,6 +330,18 @@ end
 function Context.Build(source)
     local context = type(source) == "table" and source or {}
     local relationship = relationshipProjection(context)
+    local personalRelationship = type(context.personalRelationship) == "table"
+        and copy(context.personalRelationship)
+        or copy(relationship)
+    local factionRelationship = type(context.factionRelationship) == "table"
+        and copy(context.factionRelationship)
+        or nil
+    local tacticalHostility = type(context.tacticalHostility) == "table"
+        and copy(context.tacticalHostility)
+        or nil
+    local conversationAudience = type(context.conversationAudience) == "table"
+        and copy(context.conversationAudience)
+        or nil
     local personality = publicPersonality(context)
     local roles = actorRoles(context)
     local situation = situationProjection(context)
@@ -344,6 +356,10 @@ function Context.Build(source)
         traits = traits,
         personality = personality,
         relationship = relationship,
+        personalRelationship = personalRelationship,
+        factionRelationship = factionRelationship,
+        tacticalHostility = tacticalHostility,
+        conversationAudience = conversationAudience,
         bond = bond,
         roles = roles,
         situation = situation,
@@ -356,6 +372,14 @@ function Context.Build(source)
             personality = context.npcPersonality and "social_profile_projection"
                 or "personality_unavailable",
             relationship = context.relationship and "directed_relationship",
+            personalRelationship = personalRelationship
+                and personalRelationship.source or "MISSING",
+            factionRelationship = factionRelationship
+                and factionRelationship.source,
+            tacticalHostility = tacticalHostility
+                and tacticalHostility.owner,
+            conversationAudience = conversationAudience
+                and conversationAudience.source,
             bond = bond and "starting_companion_relationship_kind" or
                 "bond_unavailable",
             roles = context.actorAuthority and "actor_authority",
@@ -378,10 +402,22 @@ function Context.PublicView(value)
     local roles = type(value.roles) == "table" and value.roles or {}
     local situation = type(value.situation) == "table" and value.situation or {}
     local bond = type(value.bond) == "table" and value.bond or nil
+    local personalRelationship = type(value.personalRelationship) == "table"
+        and value.personalRelationship or value.relationship
+    local factionRelationship = type(value.factionRelationship) == "table"
+        and value.factionRelationship or nil
+    local tacticalHostility = type(value.tacticalHostility) == "table"
+        and value.tacticalHostility or nil
+    local conversationAudience = type(value.conversationAudience) == "table"
+        and value.conversationAudience or nil
     return {
         schemaVersion = value.schemaVersion,
         actorID = value.actorID,
         identity = { state = identity.state },
+        personalRelationship = copy(personalRelationship),
+        factionRelationship = copy(factionRelationship),
+        tacticalHostility = copy(tacticalHostility),
+        conversationAudience = copy(conversationAudience),
         roles = {
             role = roles.role,
             companion = roles.companion == true,

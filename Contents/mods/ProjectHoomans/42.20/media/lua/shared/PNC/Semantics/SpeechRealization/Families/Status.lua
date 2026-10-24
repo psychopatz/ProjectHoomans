@@ -20,7 +20,7 @@ return {
         },
         guarded = {
             key = "UI_PNC_Conversation_Semantic_RealizationGreetingGuarded",
-            fallback = "Hello. What is it?",
+            fallback = "State your business. Keep your distance.",
         },
     },
     ["semantic.flow.greeting.opening.friendly"] = {
@@ -38,7 +38,7 @@ return {
         },
         guarded = {
             key = "UI_PNC_Conversation_Semantic_RealizationGreetingGuarded",
-            fallback = "Hello. What is it?",
+            fallback = "State your business. Keep your distance.",
         },
     },
     ["semantic.flow.greeting.opening.question.default"] = {

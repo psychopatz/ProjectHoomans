@@ -185,19 +185,52 @@ xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_actor_inspecto
 
 All listed checks pass. P14C is accepted; continue with P14D.
 
-## Current Exact Next Chunk — P14D
+## Completed P14D — canonical social context + hostile speech parity
+
+Evidence recorded on 2026-10-24:
+
+- Production `ActorConversationContext` now exposes separate personal relationship,
+  faction relationship, tactical hostility, conversation audience, and durable-bond
+  layers. The worker derives these projections from the hydrated production record
+  and production registries; it does not infer personal enemy state from faction war.
+- Saved hostile Talk context calls production `PNC.Conversation.TalkStart.Project`,
+  which calls the production audience/relationship path. The typed `hello` semantic
+  response and native hostile/parley Talk projection both resolve `audience=hostile`,
+  `reason=player_hostile`, and `route=hostile_full_conversation`.
+- Canonical GUI/CLI projections include source and reason for each layer, including
+  legitimate personal-relationship absence and explicit durable-bond absence.
+- Production speech style now carries dimensions/provenance/reason. The production
+  guarded greeting localization was corrected from a neutral-sounding
+  `Hello. What is it?` to `State your business. Keep your distance.` without creating
+  a personal enemy relationship.
+- Synthetic saved hostile actor coverage proves faction war, tactical hostility,
+  hostile audience, guarded speech, CLI/GUI inspection, reset restoration, source
+  snapshot equality, and source-save byte immutability. Developer/Test fixture mode
+  remains supported.
+
+Focused evidence:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_production_social_context_p14d tools.semantic_harness.tests.test_contextual_talk_parity_p11j tools.semantic_harness.tests.test_contextual_speech_style_p3 tools.semantic_harness.tests.test_contextual_speech_behavior_p8b tools.semantic_harness.tests.test_conversation_inspector
+python3 -m unittest tools.semantic_harness.tests.test_production_rehydration_p14a tools.semantic_harness.tests.test_production_inventory_rehydration_p14b tools.semantic_harness.tests.test_production_faction_rehydration_p14c tools.semantic_harness.tests.test_production_social_context_p14d tools.semantic_harness.tests.test_protocol tools.semantic_harness.tests.test_cli_parity_p13f tools.semantic_harness.tests.test_conversation_inspector
+xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_actor_inspectors_p13c tools.semantic_harness.tests.test_inventory_gift_workbench_p13e tools.semantic_harness.tests.test_operational_acceptance_p13g tools.semantic_harness.tests.test_contextual_talk_parity_p11j
+```
+
+All listed checks pass. Changed Lua files pass `luac5.3 -p` and `pz-verify`
+Kahlua ERROR+ checks. P14D is accepted; continue with P14E.
+
+## Current Exact Next Chunk — P14E
 
 On the existing local `main`:
 
-1. expose personal relationship, faction relationship, tactical hostility,
-   conversation audience, durable bond, and speech style as separate canonical
-   GUI/CLI fields with production provenance/reasons;
-2. audit typed `hello` and normal hostile/parley Talk through the same
-   authoritative production context;
-3. fix production speech realization/audience policy if hostile semantic
-   greeting remains too polite, without fabricating a personal enemy record;
+1. audit important `SAVE`, `FIXTURE`, `LIVE`, `DERIVED`, and `MISSING` values
+   across the normal save-backed execution path;
+2. classify every important `MISSING` as `LEGITIMATE_ABSENCE`, `ENGINE_ONLY`,
+   `UNSUPPORTED_FORMAT`, `PROVIDER_OMISSION`, or `REHYDRATION_FAILURE`;
+3. remove false MISSING values caused by remaining harness shortcuts without
+   adding Python relationship, bond, faction, or inventory policy;
 4. run focused Python, Lua, Tk/Xvfb, CLI, Kahlua, and diff checks, then update
-   this ledger and continue automatically to P14E.
+   this ledger and continue automatically to P14F.
 
 ## P14A acceptance
 
