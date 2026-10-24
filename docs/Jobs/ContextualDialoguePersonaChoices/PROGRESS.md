@@ -2,8 +2,8 @@
 
 **Updated:** 2026-10-24  
 **Parent status:** REOPENED — P12/P13 save-backed operational workbench retained; P14 production rehydration parity is mandatory.  
-**Current mandatory phase:** P14C — Production faction/diplomacy rehydration.
-**Current local baseline audited:** ProjectHoomans `main` at `2308e5a8` before the P14B evidence commit.
+**Current mandatory phase:** P14D — Canonical social context + hostile speech parity.
+**Current local baseline audited:** ProjectHoomans `main` at `f887bff8` before the P14C evidence commit.
 **Normal Semantic Lab runtime requirement:** Project Zomboid may remain CLOSED/OFFLINE.  
 **Source save mutation:** FORBIDDEN.
 
@@ -66,9 +66,7 @@ FULL
 
 Production Lua owns rehydration.
 
-Current Python save import still expects an already-expanded `inventory.items` shape. Therefore a valid compact persisted inventory can be reported as MISSING.
-
-This is a confirmed harness rehydration defect.
+P14B closed this false-negative path: Python transports the compact envelope and production Lua rehydrates `SEED_ONLY`, `BASELINE_DELTA`, and `FULL` through the real persistence/inventory owners.
 
 ### Incomplete faction diplomacy import
 
@@ -152,20 +150,54 @@ xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_operational_ac
 
 All listed checks pass. P14B is accepted; continue with P14C.
 
-## Current Exact Next Chunk — P14C
+## Completed P14C — production faction/diplomacy rehydration
+
+Evidence recorded on 2026-10-24:
+
+- Python now transports raw `PNC_Factions` and `PNC_Communities` registries in
+  `ProjectHoomans.rawRegistries`; it does not derive faction standing,
+  diplomacy state, or membership policy.
+- The Lua worker installs those bounded raw registries through production-owned
+  `PNC.Factions.LoadRaw` and `PNC.Communities.LoadRaw`, which call the real
+  `PNC.FactionTypes.NormalizeFactionRegistry` and
+  `PNC.CommunityTypes.NormalizeRegistry` paths.
+- The detached load seam preserves saved relation maps, war/alliance/truce
+  fields, standing, trust, fear, grievance, faction membership, community
+  membership, and leader references without running the full-world live-NPC
+  reconciliation pass.
+- Production `PNC.Factions.GetDiplomacyFactionForPlayerKey` and
+  `PNC.Factions.GetRelation` resolve the selected Player key and directed
+  NPC-faction relation. The result is exposed as a separate production
+  faction context; personal relationship and tactical hostility remain
+  separate fields.
+- Synthetic raw-save coverage proves production load owners, directed war
+  standing, community leader/member preservation, reset isolation, fixture
+  mode, and source immutability. A real local save also resolves a non-player
+  NPC faction against the selected Player diplomacy faction.
+
+Focused evidence:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_production_faction_rehydration_p14c
+python3 -m unittest tools.semantic_harness.tests.test_production_inventory_rehydration_p14b tools.semantic_harness.tests.test_production_rehydration_p14a tools.semantic_harness.tests.test_protocol tools.semantic_harness.tests.test_cli_parity_p13f
+xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_actor_inspectors_p13c tools.semantic_harness.tests.test_inventory_gift_workbench_p13e tools.semantic_harness.tests.test_operational_acceptance_p13g
+```
+
+All listed checks pass. P14C is accepted; continue with P14D.
+
+## Current Exact Next Chunk — P14D
 
 On the existing local `main`:
 
-1. trace and transport the raw saved faction/diplomacy state needed by the
-   production faction owners;
-2. invoke production faction/community load and relationship services to
-   resolve NPC faction → selected Player real/provisional diplomacy faction;
-3. preserve war, alliance, truce, pacification, trust/fear/grievance, and
-   membership/leader state without adding Python diplomacy policy;
-4. keep personal relationship, faction relationship, tactical hostility, and
-   conversation audience as separate production-owned layers;
-5. run focused Python, Lua, Tk/Xvfb, CLI, Kahlua, and diff checks, then update
-   this ledger and continue automatically to P14D.
+1. expose personal relationship, faction relationship, tactical hostility,
+   conversation audience, durable bond, and speech style as separate canonical
+   GUI/CLI fields with production provenance/reasons;
+2. audit typed `hello` and normal hostile/parley Talk through the same
+   authoritative production context;
+3. fix production speech realization/audience policy if hostile semantic
+   greeting remains too polite, without fabricating a personal enemy record;
+4. run focused Python, Lua, Tk/Xvfb, CLI, Kahlua, and diff checks, then update
+   this ledger and continue automatically to P14E.
 
 ## P14A acceptance
 

@@ -19,7 +19,7 @@ local function hasEntries(value)
 end
 
 local capabilities = {
-    "CONFIG", "IMPORT_SOURCE", "RESET", "RESET_TURN", "RESET_CONVERSATION",
+    "CONFIG", "IMPORT_SOURCE", "INSTALL_PRODUCTION_REGISTRIES", "RESET", "RESET_TURN", "RESET_CONVERSATION",
     "RESET_ACTOR_MUTATIONS", "RESET_WORLD", "INPUT", "LANGUAGE", "TOOL_REPLY",
     "PREVIEW", "SNAPSHOT", "CONVERSATION_GRAPH", "FLOW_CATALOG", "FLOW_VALIDATE",
     "INSPECT_ACTOR_STATE",
@@ -1268,6 +1268,21 @@ function CommandRouter.dispatch(context, request)
             context,
             context.ScenarioSession.reset(context, payload)
         )
+    elseif command == "INSTALL_PRODUCTION_REGISTRIES" then
+        if type(payload) ~= "table" then
+            return nil, "production_registries_must_be_object"
+        end
+        Runtime.pendingProductionRawRegistries = Values.productionCopy(
+            payload
+        )
+        return {
+            ok = true,
+            type = "production_registries_installed",
+            registryNames = {
+                factions = type(payload.factions) == "table",
+                communities = type(payload.communities) == "table",
+            },
+        }
     elseif command == "IMPORT_SOURCE" then
         if type(payload) ~= "table"
             or type(payload.scenario) ~= "table"

@@ -51,6 +51,19 @@ function Factions.Load()
     return true, Factions.Dirty
 end
 
+-- Detached semantic runtimes transport the persisted registry directly and
+-- do not have the complete live NPC registry available for the normal
+-- world-load reconciliation pass.  Keep normalization and ownership here,
+-- while preserving the saved membership/index state until live records are
+-- available to the normal server lifecycle.
+function Factions.LoadRaw(raw)
+    if not Internal.authority() then return false, "not_authority" end
+    Factions.Registry = Types.NormalizeFactionRegistry(raw)
+    Factions.Loaded = true
+    Factions.Dirty = false
+    return true, "loaded_raw"
+end
+
 function Factions.EnsureLoaded()
     if not Factions.Loaded then return Factions.Load() end
     return true

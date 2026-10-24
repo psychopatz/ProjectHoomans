@@ -52,6 +52,18 @@ function Communities.Load()
     return true, Communities.Dirty
 end
 
+-- Detached semantic runtimes do not carry the complete live NPC registry.
+-- Use the production normalizer and preserve the persisted member/leader
+-- references; the normal server loader remains responsible for full-world
+-- reconciliation once live records are present.
+function Communities.LoadRaw(raw)
+    if not authority() then return false, "not_authority" end
+    Communities.Registry = Types.NormalizeRegistry(raw)
+    Communities.Loaded = true
+    Communities.Dirty = false
+    return true, "loaded_raw"
+end
+
 function Communities.EnsureLoaded()
     if not Communities.Loaded then
         return Communities.Load()

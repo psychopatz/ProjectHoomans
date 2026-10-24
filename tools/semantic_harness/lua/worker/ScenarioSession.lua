@@ -299,11 +299,11 @@ ScenarioSession.initialScenario = {
 
 function ScenarioSession.configureRuntime(context)
     InventoryFixtures.restoreProduction(context)
+    RuntimeEnvironment.configure(context)
     local rehydrated, reason = ProductionRehydration.configure(context)
     if not rehydrated then
         error("production_rehydration_failed:" .. tostring(reason))
     end
-    RuntimeEnvironment.configure(context)
     SemanticAdapters.configure(context)
     InventoryFixtures.configure(context)
 end
@@ -331,6 +331,22 @@ function ScenarioSession.importSource(
     -- uncapped production copy here; the diagnostic copy would truncate Core
     -- FULL inventory envelopes before the production deserializer sees them.
     Runtime.sourceProviderPayloads = Values.productionCopy(providerPayloads or {})
+    local providerHoomans = Runtime.sourceProviderPayloads.ProjectHoomans
+    local transportedRegistries = type(providerHoomans) == "table"
+        and providerHoomans.rawRegistries or nil
+    if type(transportedRegistries) ~= "table"
+        and type(Runtime.pendingProductionRawRegistries) == "table"
+    then
+        providerHoomans = type(providerHoomans) == "table"
+            and providerHoomans or {}
+        providerHoomans.rawRegistries = Values.productionCopy(
+            Runtime.pendingProductionRawRegistries
+        )
+        Runtime.sourceProviderPayloads.ProjectHoomans = providerHoomans
+    end
+    Runtime.pendingProductionRawRegistries = nil
+    Runtime.productionRawRegistries = type(providerHoomans) == "table"
+        and Values.productionCopy(providerHoomans.rawRegistries) or nil
     Runtime.sourceWorkingBaseline = nil
     Runtime.captureWorkingBaseline = true
     Runtime.workingResetCount = 0
@@ -438,6 +454,12 @@ function ScenarioSession.reset(context, scenario)
         scenario = Values.copy(Runtime.scenario),
         sourceSnapshot = sourceSnapshotProjection(context),
         productionRehydration = Values.copy(Runtime.productionRehydration),
+        productionFactionRehydration = Values.copy(
+            Runtime.productionFactionRehydration
+        ),
+        productionFactionContext = Values.copy(
+            Runtime.productionFactionContext
+        ),
         workingWorld = workingWorldProjection(context),
         loadedModules = Runtime.loadedModules,
         moduleManifest = Values.copy(Runtime.moduleManifest),
@@ -521,6 +543,12 @@ function ScenarioSession.snapshot(context)
         scenario = Values.copy(Runtime.scenario),
         sourceSnapshot = sourceSnapshotProjection(context),
         productionRehydration = Values.copy(Runtime.productionRehydration),
+        productionFactionRehydration = Values.copy(
+            Runtime.productionFactionRehydration
+        ),
+        productionFactionContext = Values.copy(
+            Runtime.productionFactionContext
+        ),
         workingWorld = workingWorldProjection(context),
         transcript = Values.copy(Runtime.transcript),
         queued = Values.copy(Runtime.queued),

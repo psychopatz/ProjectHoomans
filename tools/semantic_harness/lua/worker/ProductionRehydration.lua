@@ -34,6 +34,16 @@ local function rawRecordFor(context, npcID)
     return hoomans["PNC_" .. tostring(npcID)]
 end
 
+local function rawRegistriesFor(context)
+    local payloads = context.Runtime.sourceProviderPayloads or {}
+    local hoomans = payloads.ProjectHoomans
+    local registries = type(hoomans) == "table"
+        and hoomans.rawRegistries or nil
+    registries = type(registries) == "table" and registries
+        or context.Runtime.productionRawRegistries
+    return type(registries) == "table" and registries or {}
+end
+
 local function playerEntityKey(context)
     local player = context.Runtime.scenario
         and context.Runtime.scenario.player or {}
@@ -73,6 +83,196 @@ local function hasEntries(value)
         return true
     end
     return false
+end
+
+local function countKeys(value)
+    local count = 0
+    for _ in pairs(type(value) == "table" and value or {}) do
+        count = count + 1
+    end
+    return count
+end
+
+local function factionSummary(faction)
+    if type(faction) ~= "table" then return nil end
+    return {
+        id = faction.id,
+        name = faction.name,
+        archetypeID = faction.archetypeID,
+        status = faction.status,
+        leaderNPCID = faction.leaderNPCID,
+        ownerPlayerKey = faction.ownerPlayerKey,
+        provisionalPlayerFaction = PNC.Factions
+            and type(PNC.Factions.IsProvisionalPlayerFaction) == "function"
+            and PNC.Factions.IsProvisionalPlayerFaction(faction) or false,
+        memberCount = countKeys(faction.memberIDs),
+        playerMemberCount = countKeys(faction.playerMemberKeys),
+    }
+end
+
+local function communitySummary(community)
+    if type(community) ~= "table" then return nil end
+    return {
+        id = community.id,
+        name = community.name,
+        factionID = community.factionID,
+        status = community.status,
+        leaderNPCID = community.leaderNPCID,
+        memberCount = countKeys(community.memberIDs),
+    }
+end
+
+local function resetOrganizationState()
+    if PNC and PNC.Factions and PNC.FactionTypes
+        and type(PNC.FactionTypes.NewFactionRegistry) == "function"
+    then
+        PNC.Factions.Registry = PNC.FactionTypes.NewFactionRegistry()
+        PNC.Factions.Loaded = true
+        PNC.Factions.Dirty = false
+    end
+    if PNC and PNC.Communities and PNC.CommunityTypes
+        and type(PNC.CommunityTypes.NewRegistry) == "function"
+    then
+        PNC.Communities.Registry = PNC.CommunityTypes.NewRegistry()
+        PNC.Communities.Loaded = true
+        PNC.Communities.Dirty = false
+    end
+end
+
+local function loadProductionOrganizations(context)
+    local Values = context.Values
+    local registries = rawRegistriesFor(context)
+    local factions = registries.factions
+    local communities = registries.communities
+    local status = {
+        schema = "semantic.production_faction_rehydration.v1",
+        source = "ProjectHoomans.rawRegistries",
+        status = "NO_REGISTRIES",
+        factionRegistry = "MISSING",
+        communityRegistry = "MISSING",
+    }
+
+    resetOrganizationState()
+    if type(factions) == "table"
+        and PNC.Factions
+        and type(PNC.Factions.LoadRaw) == "function"
+    then
+        local ok, loaded, reason = pcall(
+            PNC.Factions.LoadRaw,
+            Values.productionCopy(factions)
+        )
+        if not ok or loaded ~= true then
+            return nil, "faction_load_failed:" .. tostring(
+                ok and reason or loaded
+            )
+        end
+        status.factionRegistry = "HYDRATED"
+        status.factionLoadOwner = "PNC.Factions.LoadRaw"
+    elseif type(factions) == "table" then
+        return nil, "production_faction_loader_unavailable"
+    end
+
+    if type(communities) == "table"
+        and PNC.Communities
+        and type(PNC.Communities.LoadRaw) == "function"
+    then
+        local ok, loaded, reason = pcall(
+            PNC.Communities.LoadRaw,
+            Values.productionCopy(communities)
+        )
+        if not ok or loaded ~= true then
+            return nil, "community_load_failed:" .. tostring(
+                ok and reason or loaded
+            )
+        end
+        status.communityRegistry = "HYDRATED"
+        status.communityLoadOwner = "PNC.Communities.LoadRaw"
+    elseif type(communities) == "table" then
+        return nil, "production_community_loader_unavailable"
+    end
+
+    if status.factionRegistry == "HYDRATED"
+        or status.communityRegistry == "HYDRATED"
+    then
+        status.status = "HYDRATED"
+    end
+    return status
+end
+
+local function productionFactionContext(context, record)
+    local Values = context.Values
+    local affiliation = type(record and record.affiliation) == "table"
+        and record.affiliation or {}
+    local npcFactionID = affiliation.factionID
+    local playerKey = playerEntityKey(context)
+    local npcFaction
+    local playerFaction
+    local directedRelation
+    local factionReason
+    local playerReason
+    if PNC.Factions and type(PNC.Factions.Get) == "function"
+        and npcFactionID
+    then
+        npcFaction, factionReason = PNC.Factions.Get(npcFactionID)
+    end
+    if PNC.Factions
+        and type(PNC.Factions.GetDiplomacyFactionForPlayerKey)
+            == "function"
+    then
+        playerFaction, playerReason =
+            PNC.Factions.GetDiplomacyFactionForPlayerKey(playerKey)
+    end
+    if npcFaction and playerFaction
+        and npcFaction.id ~= playerFaction.id
+        and type(PNC.Factions.GetRelation) == "function"
+    then
+        directedRelation = PNC.Factions.GetRelation(
+            npcFaction.id,
+            playerFaction.id
+        )
+    end
+
+    local community
+    local communityReason
+    if PNC.Communities
+        and type(PNC.Communities.Get) == "function"
+        and affiliation.communityID
+    then
+        community, communityReason = PNC.Communities.Get(
+            affiliation.communityID
+        )
+    end
+
+    local effective = directedRelation and {
+        state = directedRelation.state,
+        standing = directedRelation.standing,
+        trust = directedRelation.trust,
+        fear = directedRelation.fear,
+        grievance = directedRelation.grievance,
+        source = "PNC.Factions.GetRelation",
+    } or npcFaction and playerFaction
+        and npcFaction.id == playerFaction.id and {
+            state = "same_faction",
+            source = "PNC.Factions.GetDiplomacyFactionForPlayerKey",
+        } or {
+            state = "unknown",
+            source = "PNC.Factions.GetRelation",
+        }
+
+    return {
+        schema = "semantic.production_faction_context.v1",
+        source = "PRODUCTION",
+        playerKey = playerKey,
+        npcFaction = factionSummary(npcFaction),
+        npcFactionReason = factionReason,
+        playerDiplomacyFaction = factionSummary(playerFaction),
+        playerDiplomacyFactionReason = playerReason,
+        directedRelation = Values.copy(directedRelation),
+        effective = effective,
+        community = communitySummary(community),
+        communityReason = communityReason,
+        affiliation = Values.copy(affiliation),
+    }
 end
 
 function ProductionRehydration.installEngineItemTypeFixture(context, fixture)
@@ -173,6 +373,9 @@ local function scenarioProjection(context, record, original)
         and record.generation.source or ""):lower() == "dynamic_trading"
         or tostring(affiliation.originArchetypeID or ""):lower() == "trader"
     projection.role = projection.isTrader and "trader" or nil
+    projection.factionContext = Values.copy(
+        context.Runtime.productionFactionContext
+    )
     projection.traits = Values.copy(record.npcTraits or {})
     projection.social = nil
     projection.personality = Values.copy(
@@ -204,6 +407,14 @@ function ProductionRehydration.configure(context)
     local Values = context.Values
     if sourceKind(context) ~= "SAVE" then
         Runtime.hydratedNpcRecord = nil
+        Runtime.productionFactionContext = nil
+        Runtime.productionFactionRehydration = {
+            schema = "semantic.production_faction_rehydration.v1",
+            source = sourceKind(context),
+            status = "NOT_APPLICABLE",
+            mode = "developer_test",
+        }
+        resetOrganizationState()
         Runtime.productionRehydration = {
             schema = "semantic.production_rehydration.v1",
             source = sourceKind(context),
@@ -258,9 +469,28 @@ function ProductionRehydration.configure(context)
 
     PNC.Registry = PNC.Registry or {}
     PNC.Registry.Data = PNC.Registry.Data or {}
+    -- Organization production loaders query the isolated registry while they
+    -- normalize persisted faction/community references.  The semantic
+    -- adapter later adds its conversation-specific lease seam on top.
+    PNC.Registry.Get = function(id)
+        return PNC.Registry.Data[tostring(id)]
+            or PNC.Registry.Data[id]
+    end
     PNC.Registry.Data[npcID] = record
     PNC.Registry.Loaded = true
     Runtime.hydratedNpcRecord = record
+    local organizationStatus, organizationReason =
+        loadProductionOrganizations(context)
+    if not organizationStatus then
+        return fail(context, "production_faction_rehydration:" .. tostring(
+            organizationReason
+        ))
+    end
+    Runtime.productionFactionRehydration = organizationStatus
+    Runtime.productionFactionContext = productionFactionContext(
+        context,
+        record
+    )
     scenario.npc = scenarioProjection(context, record, original)
     Runtime.scenario = scenario
     Runtime.productionRehydration = {

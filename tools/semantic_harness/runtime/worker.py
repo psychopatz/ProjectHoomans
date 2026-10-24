@@ -141,6 +141,19 @@ class LuaSemanticWorker:
         )
         snapshot_data = snapshot.to_dict()
         wire_provider_payloads = deepcopy(snapshot_data["providerPayloads"])
+        project_hoomans = wire_provider_payloads.get("ProjectHoomans")
+        raw_registries = (
+            project_hoomans.get("rawRegistries")
+            if isinstance(project_hoomans, dict)
+            else None
+        )
+        if isinstance(raw_registries, dict) and raw_registries:
+            # Faction/community registries are persisted source state, not a
+            # Python projection. Install them through a bounded side request
+            # so the selected NPC record and registry do not exceed the
+            # worker's JSON-lines message limit together.
+            self._request("INSTALL_PRODUCTION_REGISTRIES", raw_registries)
+            project_hoomans.pop("rawRegistries", None)
         project_zomboid = wire_provider_payloads.get("ProjectZomboid")
         item_type_fixture = (
             project_zomboid.get("itemTypeRegistry")
@@ -157,10 +170,20 @@ class LuaSemanticWorker:
             self._request("INSTALL_ENGINE_ITEM_TYPES", item_type_fixture)
             if isinstance(project_zomboid, dict):
                 project_zomboid.pop("itemTypeRegistry", None)
+        wire_scenario = snapshot_data["data"]
+        if str(snapshot_data["metadata"].get("sourceKind")) == "SAVE":
+            # The selected NPC's persisted social graph is already carried in
+            # ProjectHoomans.rawRecords and is consumed by production Lua.
+            # Keep the detached request bounded when raw faction/community
+            # registries are transported alongside it; the Python source
+            # snapshot above remains complete for provenance and reset.
+            wire_scenario = deepcopy(wire_scenario)
+            if isinstance(wire_scenario.get("npc"), dict):
+                wire_scenario["npc"].pop("social", None)
         response = self._request(
             "IMPORT_SOURCE",
             {
-                "scenario": snapshot_data["data"],
+                "scenario": wire_scenario,
                 "metadata": snapshot_data["metadata"],
                 "provenance": snapshot_data["provenance"],
                 "providerPayloads": wire_provider_payloads,

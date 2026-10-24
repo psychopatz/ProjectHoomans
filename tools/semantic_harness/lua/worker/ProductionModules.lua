@@ -89,6 +89,16 @@ function ProductionModules.load(context)
     )
     load(
         "ProjectHoomans", "shared",
+        "PNC/Core/Factions/PNC_FactionDiplomacyMath.lua", "persistence"
+    )
+    -- FactionTypes captures EntityRef at module load time; load the real
+    -- player/NPC key owner before its normalization functions are defined.
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_EntityRef.lua", "persistence"
+    )
+    load(
+        "ProjectHoomans", "shared",
         "PNC/Core/Factions/PNC_FactionTypes.lua", "persistence"
     )
     load(

@@ -255,6 +255,20 @@ class SaveBackedImporter:
                 if npc_table not in set(catalog_entry.npc_tables):
                     raise SaveImportError(f"saved NPC not found: {selected_npc_id}")
                 npc_record = self._read_full(reader, npc_table)
+                table_names = {
+                    str(entry.get("name"))
+                    for entry in catalog_entry.tables
+                    if isinstance(entry, dict) and entry.get("name")
+                }
+                raw_registries: dict[str, dict[str, Any]] = {}
+                for table_name, registry_name in (
+                    ("PNC_Factions", "factions"),
+                    ("PNC_Communities", "communities"),
+                ):
+                    if table_name in table_names:
+                        raw_registries[registry_name] = self._read_full(
+                            reader, table_name
+                        )
         except SaveImportError:
             raise
         except Exception as error:
@@ -493,6 +507,16 @@ class SaveBackedImporter:
                     "table": npc_table,
                     "recordKey": selected_npc_id,
                 },
+                "npc.faction": {
+                    "source": "SAVE" if "factions" in raw_registries else "MISSING",
+                    "table": "PNC_Factions",
+                    "recordKey": actor_projection["factionID"],
+                },
+                "npc.community": {
+                    "source": "SAVE" if "communities" in raw_registries else "MISSING",
+                    "table": "PNC_Communities",
+                    "recordKey": actor_projection["communityID"],
+                },
                 "player.inventory": {
                     "source": player_inventory_source,
                     **player_inventory_provenance,
@@ -517,6 +541,10 @@ class SaveBackedImporter:
                     "player": deepcopy(player_record),
                     "npc": deepcopy(npc_record),
                 },
+                # These are raw persisted registries.  The Lua worker passes
+                # them to production faction/community owners; Python does
+                # not normalize, reconcile, or derive diplomacy state.
+                "rawRegistries": deepcopy(raw_registries),
                 "selection": {
                     "playerTable": player_table,
                     "playerUUID": selected_uuid,
