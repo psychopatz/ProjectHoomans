@@ -6,55 +6,54 @@
 
 This is the developer-side evidence record. Native Project Zomboid SP/MP launch and final live acceptance remain user-owned.
 
-## Production-Lua and worker scenarios
+## Production-Lua worker scenarios
 
 | Required behavior | Evidence |
 | --- | --- |
-| Typed/button/emote/headless meaning converges | `pnc_semantic_interaction_lifecycle_smoke.lua`, `test_semantic_interaction_lifecycle_p1.py`, and `test_semantic_interaction_lifecycle_acceptance.py` |
-| NPC speech creates a reply beat with provenance | Lifecycle smoke, greeting/social-event/emote smokes, worker snapshot acceptance |
-| Topic interruption and resume | Lifecycle smoke and P1 worker test |
-| UI transcript rows are not semantic state | Worker response-window/export tests assert bounded semantic fields and no transcript/raw/rendered text |
-| Meaningful multi-day suspend/rehydration | P1 worker close/resume at hour 120 and production P14 rehydration test |
-| Trivial interaction leaves no pair | Lifecycle smoke and worker acceptance |
-| Significant facts/commitments/memories remain compact | P1 worker promotion assertions and response-window inspectors |
-| 200-turn conversation remains bounded | P1 worker test asserts 12 recent turns and capsule below 12,000 bytes |
-| Multiple players isolate the same NPC | P1 sparse multiplayer test and Lua private projection assertion |
-| Hundreds of NPCs do not allocate Player × NPC state | P1 stress test: 400 NPC identities and 2,000 trivial turns leave zero pair records |
-| Shared events are referenced once | P1 shared-event test and social/Project A-Life bridges |
-| Dormant NPC lifecycle work is zero | Lua and worker metrics assert `dormantTickWork == 0`; `Advance` performs no scan |
-| Network/private context remains bounded and isolated | Server projection path, private projection smoke, authority guards and full regression suite |
-| P14 source save remains immutable | `test_production_faction_rehydration_p14c.py` compares the source snapshot before/after working-world lifecycle operations |
+| Typed/button/emote/headless meaning converges | Lifecycle smoke, focused P1 worker tests, and acceptance worker tests |
+| NPC speech creates reply-beat provenance | Lifecycle smoke plus greeting, social-event, emote, and worker snapshot acceptance |
+| Topic interruption and resume | P1 lifecycle worker tests |
+| UI transcript rows are not semantic state | Response-window/export assertions inspect bounded semantic fields without transcript/raw/rendered text |
+| Meaningful multi-day suspend and rehydration | Close/resume at hour 120 plus production P14 rehydration coverage |
+| Trivial interaction leaves no pair state | Lifecycle acceptance worker test |
+| Significant facts, commitments, and memories remain compact | Promotion assertions and response-window inspectors |
+| 200-turn conversation remains bounded | Lifecycle worker test asserts bounded recent-turn capsule and compact export |
+| Multiple players isolate the same NPC | Sparse multiplayer private-projection assertions |
+| Hundreds of NPCs do not allocate Player × NPC state | 400-NPC/2,000-trivial-turn stress assertion |
+| Shared events are referenced once | Canonical shared-event and social/Project A-Life bridge assertions |
+| Dormant NPC lifecycle work is zero | Worker metrics assert `dormantTickWork == 0`; `Advance` performs no scan |
+| Network/private context remains bounded and isolated | Server projection, private projection, and authority-guard coverage |
+| P14 source save remains immutable | Save-backed rehydration test compares source bytes before and after working-world operations |
 
 ## Commands and results
 
 ```text
-lua tests/pnc_semantic_interaction_lifecycle_smoke.lua                         PASS
-lua tests/pnc_semantic_interaction_persistence_smoke.lua                       PASS
-lua tests/pnc_social_greeting_smoke.lua                                        PASS
-PZ_TEST_CORE_RUNTIME=42.20 lua tests/pnc_social_events_smoke.lua               PASS
-lua tests/pnc_conversation_farewell_smoke.lua                                  PASS
-lua tests/pnc_vanilla_emote_interactions_smoke.lua                              PASS
-lua tests/pnc_llm_tool_reply_catalog_smoke.lua                                  PASS
 python3 -m unittest tools.semantic_harness.tests.test_semantic_interaction_lifecycle_p1 \
     tools.semantic_harness.tests.test_semantic_interaction_lifecycle_acceptance -q
-python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q
-python3 tests/run_tests.py
-```
+PASS: 10 tests
 
-Recorded results: focused lifecycle worker tests passed 10/10; the full Lua suite passed 873/873 in 5.26 seconds; and the full Python suite exited successfully. Focused P14 rehydration coverage is included in the full Python suite and was also run directly during verification.
+XDG_STATE_HOME=<temporary> xvfb-run -a \
+    python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q
+PASS: 517 tests, 0 failures, 0 errors
 
-```text
-python3 /home/psychopatz/Desktop/Projects/Zomboid-devSkills/.agents/skills/pz-verify/scripts/pz_verify.py \
+python3 tests/run_tests.py --lua lua5.3 --jobs 4 --timeout 30
+PASS: 873/873 in 5.46s (4 workers)
+
+find Contents/mods/ProjectHoomans/42.20/media/lua -type f -name '*.lua' \
+    -print0 | xargs -0 -n1 luac5.3 -p
+PASS
+
+python3 /home/psychopatz/Desktop/Projects/Zomboid-devSkills/skills/pz-verify/scripts/pz_verify.py \
     --mod-dir Contents/mods/ProjectHoomans --kahlua \
-    --severity ERROR --no-snippets                                         PASS
+    --severity ERROR --no-snippets
+PASS: 3,094 files scanned; 0 Kahlua errors and 0 warnings
+
+git diff --check
+PASS
 ```
 
-The verifier scanned 3,094 files, reported zero Kahlua errors and zero warnings. `luac -p` passed for the changed production Lua files, and `git diff --check` passed.
-
-## Authority and fixture boundary
-
-The Semantic Lab worker invokes production Lua for envelope construction, lifecycle mutation, compaction, expiry, projection, persistence import/export and metrics. Python provides transport, isolation, scenario driving and presentation only. No Python gameplay interpreter or replacement memory model was introduced.
+The full Python suite includes the P14 save-backed immutability coverage and the production-Lua lifecycle acceptance. The Semantic Lab uses production Lua for envelope construction, lifecycle mutation, compaction, expiry, projection, persistence import/export, and metrics; Python supplies transport, isolation, scenario driving, and presentation only.
 
 ## Intentionally unrun
 
-Codex did not launch or restart Project Zomboid, perform native SP/MP acceptance, mutate the user's source save, or publish to Steam Workshop. Those are the final user-owned acceptance actions.
+Codex did not launch or restart Project Zomboid, perform native SP/MP acceptance, mutate the user's source save, or publish to Steam Workshop. Those are final user-owned acceptance actions.

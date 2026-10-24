@@ -148,6 +148,21 @@ def apply_simulation_settings(
                     app._append("TOOL/ACTION", format_tool_call(call))
                 app._append_production_action(step_response)
             app.input_var.set("")
+            replay_suggestions = (
+                response.get("observation", {}).get("suggestions", {})
+                if isinstance(response, dict)
+                else {}
+            )
+            replay_group_id = replay_suggestions.get("currentGroupID")
+            app.suggestion_group_override_id = (
+                replay_group_id
+                if any(
+                    isinstance(group, dict)
+                    and group.get("id") == replay_group_id
+                    for group in replay_suggestions.get("groups", []) or []
+                )
+                else None
+            )
             app._show_response(response)
             app._append(
                 "SYSTEM",

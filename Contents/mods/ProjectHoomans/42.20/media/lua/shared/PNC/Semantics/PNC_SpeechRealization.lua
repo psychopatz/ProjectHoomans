@@ -163,6 +163,9 @@ function Realization.Apply(response, context)
     if type(response) ~= "table" then return response end
     local style = Style.Resolve(context)
     local output = copy(response)
+    local semanticPlan = type(response.plan) == "table"
+        and copy(response.plan) or nil
+    local renderPlan = output.plan
     local applications = 0
     local fallbackCount = 0
     local first
@@ -176,9 +179,9 @@ function Realization.Apply(response, context)
     end
 
     output.speechStyleContext = Style.PublicView(style)
-    if type(output.plan) == "table" and type(output.plan.turns) == "table" then
-        for index = 1, math.min(#output.plan.turns, 4) do
-            turn = output.plan.turns[index]
+    if type(renderPlan) == "table" and type(renderPlan.turns) == "table" then
+        for index = 1, math.min(#renderPlan.turns, 4) do
+            turn = renderPlan.turns[index]
             for segmentIndex = 1, math.min(#(turn.segments or {}), 6) do
                 segment, resolved = applySegment(
                     turn.segments[segmentIndex], style, blocked
@@ -218,6 +221,13 @@ function Realization.Apply(response, context)
         neutralFallbackCount = fallbackCount,
         maxApplications = Realization.MAX_FAMILY_APPLICATIONS,
     }
+    -- Keep the semantic response plan canonical while the renderer uses the
+    -- realized copy. Queued payloads and decision results then share one
+    -- stable plan identity without losing style-specific rendering.
+    if semanticPlan then
+        output.renderPlan = output.plan
+        output.plan = semanticPlan
+    end
     return output
 end
 

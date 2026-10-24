@@ -9,7 +9,8 @@ local capabilities = {
     "CONFIG", "IMPORT_SOURCE", "INSTALL_PRODUCTION_REGISTRIES",
     "INSTALL_PRODUCTION_KNOWLEDGE", "RESET", "RESET_TURN", "RESET_CONVERSATION",
     "RESET_ACTOR_MUTATIONS", "RESET_WORLD", "INPUT", "LANGUAGE", "TOOL_REPLY",
-    "PREVIEW", "SNAPSHOT", "CONVERSATION_GRAPH", "FLOW_CATALOG", "FLOW_VALIDATE",
+    "PREVIEW", "SNAPSHOT", "MUTATION_PROJECTION", "CONVERSATION_GRAPH",
+    "FLOW_CATALOG", "FLOW_VALIDATE",
     "INSPECT_ACTOR_STATE", "INSPECT_NPC_DOSSIER",
     "RELATIONSHIP_PROPOSAL", "RELATIONSHIP_PREVIEW",
     "APPLY_RUNTIME_RELATIONSHIP_BASELINE",
@@ -129,9 +130,14 @@ function Session.handle(context, command, payload)
             context.ScenarioSession.resetWorld(context)
         )
     elseif command == "SNAPSHOT" then
+        -- SNAPSHOT is the explicit inspector boundary. Preserve its
+        -- immutable source/provider projection; only mutation responses use
+        -- the compact transport projection below.
+        return context.ScenarioSession.snapshot(context)
+    elseif command == "MUTATION_PROJECTION" then
         return context.ScenarioSession.compactTransportResponse(
             context,
-            context.ScenarioSession.snapshot(context)
+            context.ScenarioSession.mutationProjection(context)
         )
     elseif command == "PING" then
         return {

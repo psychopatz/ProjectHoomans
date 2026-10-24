@@ -225,8 +225,9 @@ class FlowEditorTests(unittest.TestCase):
         coverage = catalog["generation"]["coverage"]
         summary = coverage_summary(coverage)
         lines = coverage_lines(coverage)
-        self.assertEqual(sum(summary.values()), 18)
+        self.assertEqual(sum(summary.values()), 20)
         self.assertEqual(summary["generated"], 17)
+        self.assertEqual(summary["recognition_only"], 3)
         self.assertEqual(summary.get("unsupported_workflow", 0), 0)
         self.assertTrue(
             any(line.startswith("GIFT: generated") for line in lines)

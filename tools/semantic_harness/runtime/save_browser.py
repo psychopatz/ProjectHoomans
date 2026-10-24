@@ -264,13 +264,20 @@ def _build_world_hierarchy(
     add_persisted_groups(factions, "faction")
     add_persisted_groups(communities, "community")
 
-    def add_overlay(group_id: str, kind: str, label: str, rows: list[dict[str, Any]]) -> None:
+    def add_overlay(
+        group_id: str,
+        kind: str,
+        label: str,
+        rows: list[dict[str, Any]],
+        *,
+        include_empty: bool = False,
+    ) -> None:
         members = [
             _actor_reference(actor, provider_by_id.get(str(actor.get("id"))))
             for actor in rows
             if isinstance(actor, dict) and actor.get("id")
         ]
-        if members:
+        if members or include_empty:
             groups.append(
                 {
                     "id": group_id,
@@ -310,6 +317,7 @@ def _build_world_hierarchy(
         "provider_overlay",
         "Known Traders",
         [actor for actor in actors if str(actor.get("id")) in provider_by_id],
+        include_empty=True,
     )
     return {"schema": "semantic.save_world_hierarchy.v1", "groups": groups}
 

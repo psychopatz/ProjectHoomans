@@ -309,11 +309,11 @@ class SemanticHarnessTests(unittest.TestCase):
         self.assertEqual(result["relationshipAfter"]["identityTrust"], "untrustworthy")
         self.assertLess(result["relationshipAfter"]["respect"], 0)
         self.assertTrue(any(
-            "isn't your exact name" in (message.get("payload", {}).get("fallback") or "")
+            message.get("payload", {}).get("text") == "I don't believe you."
             for message in result["messages"]
         ))
         self.assertFalse(any(
-            "Mara" in (message.get("payload", {}).get("fallback") or "")
+            "Mara" in (message.get("payload", {}).get("text") or "")
             for message in result["messages"]
         ))
 

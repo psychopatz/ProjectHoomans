@@ -24,6 +24,14 @@ local function relationshipProposalCandidate(context, relationship, bond, groupI
         return nil
     end
     local actor = context.actorConversationContext or {}
+    local situation = actor.situation or {}
+    local healthState = string.lower(tostring(situation.healthState or ""))
+    local activeBehavior = string.lower(
+        tostring(situation.activeBehavior or "")
+    )
+    if healthState == "critical" or activeBehavior == "fleeing" then
+        return nil
+    end
     local npcID = context.npcID or actor.npcID or actor.id
     if not npcID then return nil end
     local ok, evaluation = pcall(service.EvaluateProposal, npcID)

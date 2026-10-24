@@ -77,7 +77,8 @@ class WorkerConversationOperations:
     def mutation_response(self, response: dict[str, Any]) -> dict[str, Any]:
         """Attach the authoritative post-mutation worker projection."""
 
-        snapshot = self.snapshot()
+        snapshot = self._host._request("MUTATION_PROJECTION")
+        self._host._sync_effective_scenario(snapshot)
         if not isinstance(response, dict):
             return snapshot
         merged = deepcopy(response)

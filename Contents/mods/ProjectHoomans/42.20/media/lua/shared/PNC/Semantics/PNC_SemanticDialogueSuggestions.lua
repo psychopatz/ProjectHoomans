@@ -51,8 +51,13 @@ local function copyValue(value, depth)
     local count = 0
     local key
     local item
+    -- Semantic click frames carry the executable meaning contract (intent,
+    -- slots, provenance extensions, and presentation keys).  A twelve-field
+    -- arbitrary pairs() cap could silently drop one of those fields and made
+    -- valid provider frames depend on Lua table iteration order. Keep the
+    -- copy bounded while leaving room for the complete frame contract.
     for key, item in pairs(value) do
-        if count >= 12 then break end
+        if count >= 32 then break end
         if type(key) == "string" or type(key) == "number" then
             if type(item) ~= "function" then
                 output[key] = copyValue(item, depth + 1)
@@ -783,6 +788,12 @@ local function addBranchOfferCandidate(
             predicateContextFor(context, ir, offer)
         )
         for _, traceRow in ipairs(eligibility.trace or {}) do
+            -- Branch offers are the active response surface. Preserve their
+            -- exact predicate evidence when the bounded trace already holds
+            -- lower-priority capability rows.
+            while #predicateTrace >= Predicates.MAX_TRACE do
+                table.remove(predicateTrace, 1)
+            end
             if #predicateTrace < Predicates.MAX_TRACE then
                 predicateTrace[#predicateTrace + 1] = {
                     candidateID = offer.id,
@@ -1460,6 +1471,9 @@ local function appendLandingShortcuts(
             reason = "conversation_landing_shortcut",
         }
     end
+    candidate = normalizeCandidate(
+        candidate, "conversation_root", #output + 1
+    )
     output[#output + 1] = candidate
     seen[candidateID] = candidate
 end
@@ -1487,7 +1501,7 @@ local function appendTalkAgainAbout(
     local source = sourceRecord(
         "conversation_root", revision, "conversation_context_index"
     )
-    output[#output + 1] = {
+    local candidate = {
         id = candidateID,
         groupID = Suggestions.ROOT_GROUP_ID,
         rank = #output + 1,
@@ -1507,6 +1521,10 @@ local function appendTalkAgainAbout(
             reason = "conversation_context_history",
         },
     }
+    candidate = normalizeCandidate(
+        candidate, "conversation_root", #output + 1
+    )
+    output[#output + 1] = candidate
     if #predicateTrace < Predicates.MAX_TRACE then
         predicateTrace[#predicateTrace + 1] = {
             candidateID = candidateID,

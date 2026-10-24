@@ -150,6 +150,20 @@ local function submitLifecycleEnvelope(view, result, actionResult)
     then
         return false, "lifecycle_transport_unavailable"
     end
+    -- Ordinary authored deterministic turns still belong to the existing
+    -- parser/router/ConversationBlocks path.  The lifecycle command is only
+    -- needed when an NPC semantic beat or response-plan provenance is
+    -- present; otherwise this adapter would create a generic network side
+    -- effect for commands and proposal turns that already have their own
+    -- authoritative route.
+    local provenance = interaction.provenance or {}
+    if not provenance.beatID
+        and not provenance.responsePlanID
+        and not provenance.flowID
+        and not provenance.poolID
+    then
+        return false, "lifecycle_context_unavailable"
+    end
     -- Directed hostility already enters the authoritative SocialEvent route;
     -- sending a second generic lifecycle mutation would duplicate its event.
     local act = string.upper(tostring(interaction.act or ""))

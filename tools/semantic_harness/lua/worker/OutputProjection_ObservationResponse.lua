@@ -8,7 +8,8 @@ local function initial(Values, response)
     return {
         templateID = response.templateID,
         renderTemplateID = response.renderTemplateID,
-        sourcePoolID = response.sourcePoolID,
+        sourcePoolID = response.sourcePoolID
+            or response.plan and response.plan.sourcePoolID,
         fallback = response.fallback,
         text = response.fallback,
         key = response.templateID,

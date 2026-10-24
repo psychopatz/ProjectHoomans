@@ -2,6 +2,21 @@
 
 local RuntimeState = {}
 
+local OBSERVATION_LIMITS = {
+    transcript = 16,
+    queued = 8,
+    trace = 16,
+    transport = 16,
+    translationLookups = 32,
+}
+
+local function trim(list, limit)
+    if type(list) ~= "table" then return end
+    while #list > limit do
+        table.remove(list, 1)
+    end
+end
+
 function RuntimeState.new()
     return {
         scenario = nil,
@@ -57,6 +72,19 @@ function RuntimeState.resetTurn(runtime)
     runtime.queued = {}
     runtime.transport = {}
     runtime.trace = {}
+end
+
+-- Worker diagnostics are presentation-only and must not grow with a long
+-- conversation.  The semantic lifecycle owns compact meaning separately;
+-- this trims only the worker's transient inspection collections.
+function RuntimeState.compactDiagnostics(runtime)
+    if type(runtime) ~= "table" then return false end
+    trim(runtime.transcript, OBSERVATION_LIMITS.transcript)
+    trim(runtime.queued, OBSERVATION_LIMITS.queued)
+    trim(runtime.trace, OBSERVATION_LIMITS.trace)
+    trim(runtime.transport, OBSERVATION_LIMITS.transport)
+    trim(runtime.translationLookups, OBSERVATION_LIMITS.translationLookups)
+    return true
 end
 
 return RuntimeState

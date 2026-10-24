@@ -317,6 +317,26 @@ local function interactionProjection(context)
     if not Lifecycle or not store then return nil end
     local playerUUID = Runtime.interactionLifecyclePlayerUUID
     local npcID = Runtime.interactionLifecycleNPCID
+    local pairKey = tostring(playerUUID or "") .. "|" .. tostring(npcID or "")
+    local hasThread = store.active and store.active[pairKey]
+        or store.pairs and store.pairs[pairKey]
+    if not hasThread then
+        return {
+            schema = Lifecycle.SCHEMA,
+            playerUUID = playerUUID,
+            npcID = npcID,
+            thread = nil,
+            responseWindow = {
+                schema = Lifecycle.SCHEMA,
+                status = "EMPTY",
+                topic = nil,
+                activeBeat = nil,
+                openQuestions = {},
+                commitments = {},
+            },
+            metrics = Lifecycle.Metrics(store),
+        }
+    end
     local projected = Lifecycle.Project(store, playerUUID, npcID)
     local window = Lifecycle.ResponseWindow(store, playerUUID, npcID)
     return {
@@ -384,7 +404,12 @@ function ScenarioSession.importSource(
     Runtime.captureWorkingBaseline = true
     Runtime.workingResetCount = 0
     Runtime.workingWorldRevision = (Runtime.workingWorldRevision or 0) + 1
-    return ScenarioSession.reset(context, Values.copy(Runtime.sourceSnapshot))
+    Runtime.replaceProductionDurableState = true
+    local response = ScenarioSession.reset(
+        context, Values.copy(Runtime.sourceSnapshot)
+    )
+    Runtime.replaceProductionDurableState = false
+    return response
 end
 
 function ScenarioSession.reset(context, scenario)
@@ -596,6 +621,11 @@ end
 function ScenarioSession.snapshot(context)
     local Runtime = context.Runtime
     local Values = context.Values
+    if context.RuntimeState
+        and type(context.RuntimeState.compactDiagnostics) == "function"
+    then
+        context.RuntimeState.compactDiagnostics(Runtime)
+    end
     ProductionRehydration.refreshProjection(context)
     ProductionRehydration.refreshDiagnostics(context)
     return {
@@ -666,6 +696,51 @@ function ScenarioSession.snapshot(context)
                 and Runtime.view.session.choicePresentationState
         ),
         simulationProjection = simulationProjection(context),
+    }
+end
+
+-- Mutating worker commands need the authoritative working-world projection so
+-- the host can synchronize its detached fixture, but they do not need to
+-- resend the full diagnostics transcript, module manifest, graph, and
+-- transport history on every turn. Keep this projection Lua-owned and
+-- bounded; callers that need the complete inspector state still use SNAPSHOT.
+function ScenarioSession.mutationProjection(context)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    if context.RuntimeState
+        and type(context.RuntimeState.compactDiagnostics) == "function"
+    then
+        context.RuntimeState.compactDiagnostics(Runtime)
+    end
+    ProductionRehydration.refreshProjection(context)
+    ProductionRehydration.refreshDiagnostics(context)
+    return {
+        ok = true,
+        type = "mutation_projection",
+        scenario = Values.copy(Runtime.scenario),
+        sourceSnapshot = sourceSnapshotProjection(context),
+        productionRehydration = Values.copy(Runtime.productionRehydration),
+        productionFactionRehydration = Values.copy(
+            Runtime.productionFactionRehydration
+        ),
+        productionPlayerRehydration = Values.copy(
+            Runtime.productionPlayerRehydration
+        ),
+        productionKnowledgeRehydration = Values.copy(
+            Runtime.productionKnowledgeRehydration
+        ),
+        runtimeRelationshipOverrides = Values.copy(
+            Runtime.runtimeRelationshipOverrides
+        ),
+        productionFactionContext = Values.copy(
+            Runtime.productionFactionContext
+        ),
+        workingWorld = workingWorldProjection(context),
+        context = context.Conversation.contextSnapshot(
+            context, Runtime.view
+        ),
+        simulationProjection = simulationProjection(context),
+        provenance = Values.productionCopy(Runtime.sourceProvenance),
     }
 end
 

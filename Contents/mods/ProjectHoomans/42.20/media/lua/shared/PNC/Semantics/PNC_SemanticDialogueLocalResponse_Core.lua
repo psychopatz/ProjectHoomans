@@ -30,19 +30,9 @@ local function identityKnown(context)
     local identity = type(actor.identity) == "table"
         and actor.identity or {}
     if identity.state == "known" then return true end
-    local roles = type(actor.roles) == "table" and actor.roles or {}
-    if roles.companion == true and roles.owned == true
-        and roles.authorityEligible == true
-    then
-        return true
-    end
-    local authority = type(context.actorAuthority) == "table"
-        and context.actorAuthority or {}
-    if authority.companion == true and authority.owned == true
-        and authority.eligible == true
-    then
-        return true
-    end
+    -- Companion authority does not disclose NPC identity. Identity is a
+    -- player-scoped knowledge fact and becomes known only through the
+    -- authoritative identity presentation below.
     local clientState = PNC.Network and PNC.Network.ClientState or nil
     local presentations = clientState and clientState.npcPresentations
         or nil

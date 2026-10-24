@@ -394,23 +394,24 @@ end
 
 local function payloadsForResponse(response)
     response = type(response) == "table" and response or {}
-    if type(response.plan) == "table"
+    local renderPlan = response.renderPlan or response.plan
+    if type(renderPlan) == "table"
         and ResponsePlan
         and type(ResponsePlan.RenderDetailed) == "function"
         and type(ResponsePlan.Validate) == "function"
     then
-        local valid = ResponsePlan.Validate(response.plan)
+        local valid = ResponsePlan.Validate(renderPlan)
         if valid then
             local payloads = {}
             local index
-            for index = 1, #response.plan.turns do
+            for index = 1, #renderPlan.turns do
                 local rendered = ResponsePlan.RenderDetailed(
-                    response.plan,
+                    renderPlan,
                     localizedSegment,
                     index
                 )
                 local fallbackRendered = ResponsePlan.RenderDetailed(
-                    response.plan,
+                    renderPlan,
                     fallbackSegment,
                     index
                 )

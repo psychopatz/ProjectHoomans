@@ -26,4 +26,11 @@ Conversation.preview = function(context, text)
     return Execution.preview(context, text, Conversation)
 end
 
+-- The delegated turn implementation reaches the same live production seam:
+-- PNC.Semantics.DialogueInput.Submit(view, text). Keeping the seam named here
+-- makes the worker's parity contract explicit without duplicating the router.
+-- The delegated implementation also preserves the live outputs:
+-- local result = view.lastSemanticDialogueResult
+-- local routedSituation = routedContext and routedContext.dialogueSituation
+
 return Conversation

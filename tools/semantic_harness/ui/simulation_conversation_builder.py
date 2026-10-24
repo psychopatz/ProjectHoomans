@@ -12,7 +12,12 @@ def build_conversation_panel(
 
     transcript_frame = ttk.LabelFrame(conversation_pane, text="Conversation")
     transcript_frame.grid(row=0, column=0, sticky="nsew")
-    transcript_frame.rowconfigure(0, weight=1)
+    # Keep a small non-zero viewport when the suggestion surface is larger
+    # than the minimum-height window.  Tk's grid manager otherwise collapses
+    # this row completely, which also prevents the ScrolledText frame from
+    # receiving its horizontal sticky allocation and pushes the runtime
+    # toolbar outside the visible conversation pane.
+    transcript_frame.rowconfigure(0, minsize=24, weight=1)
     transcript_frame.columnconfigure(0, weight=1)
     app.transcript = scrolled_text(transcript_frame, wrap="word", state="disabled")
     app.transcript.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)

@@ -8,11 +8,13 @@ local function configureDeveloperRuntime(context, helpers, source)
     Runtime.productionPlayerRehydration = nil
     Runtime.productionKnowledgeRehydration = nil
     Runtime.modData = Runtime.modData or {}
-    Runtime.modData.PNC_NPCKnowledge = nil
-    if PNC and PNC.NPCKnowledge then
-        PNC.NPCKnowledge.Registry = nil
-        PNC.NPCKnowledge.Loaded = false
-        PNC.NPCKnowledge.Dirty = false
+    if Runtime.replaceProductionDurableState == true then
+        Runtime.modData.PNC_NPCKnowledge = nil
+        if PNC and PNC.NPCKnowledge then
+            PNC.NPCKnowledge.Registry = nil
+            PNC.NPCKnowledge.Loaded = false
+            PNC.NPCKnowledge.Dirty = false
+        end
     end
     Runtime.productionNpcDossier = {
         schema = "semantic.production_npc_dossier.v1",
