@@ -290,7 +290,11 @@ class SemanticHarnessApp:
             Path(arguments.scenario).expanduser() if arguments.scenario else None,
             getattr(arguments, "ui_state", None),
         )
-        self._ui_state = load_ui_state(self.ui_state_path)
+        self._ui_state = (
+            {}
+            if getattr(arguments, "reset_ui_state", False)
+            else load_ui_state(self.ui_state_path)
+        )
         self.root.title("Project Hoomans Semantic Lab")
         self.root.minsize(1080, 700)
         # Keep the initial window inside a typical desktop work area.  Users
@@ -494,7 +498,13 @@ class SemanticHarnessApp:
             text="Hide advanced",
             command=self._toggle_advanced_controls,
         )
-        self.advanced_toggle_button.grid(row=0, column=3, sticky="e")
+        self.advanced_toggle_button.grid(row=0, column=3, sticky="e", padx=(0, 4))
+        self.reset_layout_button = ttk.Button(
+            simulation_toolbar,
+            text="Reset layout",
+            command=self._reset_ui_state,
+        )
+        self.reset_layout_button.grid(row=0, column=4, sticky="e")
         self.simulation_toolbar = simulation_toolbar
 
         container = ttk.Frame(simulation_tab)
@@ -1194,6 +1204,7 @@ class SemanticHarnessApp:
             self.saved_world_discover_button,
             self.saved_world_inspect_button,
             self.saved_world_import_button,
+            self.reset_layout_button,
         ):
             button.configure(state=state)
         if hasattr(self, "saved_world_save_box"):
@@ -1669,10 +1680,27 @@ class SemanticHarnessApp:
                         ]
                     )
                 self._restore_workbench_tabs()
+                self._restore_panel_state()
             except (self._tk.TclError, TypeError, ValueError):
                 pass
 
         self.root.after_idle(restore)
+
+    def _restore_panel_state(self) -> None:
+        """Restore visibility choices without restoring scenario contents."""
+
+        saved_trace = self._ui_state.get("trace_panel_visible")
+        if isinstance(saved_trace, bool) and saved_trace != self.trace_panel_visible:
+            self._toggle_trace_panel()
+        saved_advanced = self._ui_state.get("advanced_controls_visible")
+        if (
+            isinstance(saved_advanced, bool)
+            and saved_advanced != self.advanced_controls_visible
+        ):
+            self._toggle_advanced_controls()
+        saved_workbench = self._ui_state.get("workbench_expanded")
+        if isinstance(saved_workbench, bool) and saved_workbench != self.workbench_expanded:
+            self.toggle_simulation_workbench()
 
     def _restore_splitters(self) -> None:
         if self.closed or self.main_tabs.select() != str(self.simulation_tab):
@@ -1764,11 +1792,36 @@ class SemanticHarnessApp:
                 self.studio_notebook.select()
             )
             state["trace_tab"] = self.trace_tabs.index(self.trace_tabs.select())
+            state["trace_panel_visible"] = self.trace_panel_visible
+            state["advanced_controls_visible"] = self.advanced_controls_visible
+            state["workbench_expanded"] = self.workbench_expanded
             selected_talk = self.talk_target_ids_by_label.get(
                 self.talk_target_var.get(), "current"
             )
             state["talk_target"] = selected_talk
             state["talk_utterance"] = self.talk_utterance_var.get()
+            selected_save = self._selected_saved_world_entry()
+            if isinstance(selected_save, dict):
+                state["saved_world_save_path"] = str(
+                    selected_save.get("path") or ""
+                )
+            selected_player = (
+                getattr(self, "saved_world_player_labels", {}).get(
+                    self.saved_world_player_var.get(), {}
+                )
+                if hasattr(self, "saved_world_player_var")
+                else {}
+            )
+            state["saved_world_player_id"] = str(
+                selected_player.get("uuid")
+                or selected_player.get("id")
+                or ""
+            )
+            state["saved_world_npc_id"] = str(
+                self.saved_world_npc_var.get()
+                if hasattr(self, "saved_world_npc_var")
+                else ""
+            )
             if self.trace_panel_visible and self.simulation_panes.winfo_width() > 10:
                 state["simulation_sash"] = self.simulation_panes.sashpos(0)
             if self.workflow_pane_split.winfo_height() > 10:
@@ -2091,7 +2144,18 @@ class SemanticHarnessApp:
             self.saved_world_target_var.set("No saved Player/NPC pair loaded")
             self._render_saved_world_tree()
             if labels:
-                self.saved_world_save_var.set(labels[0])
+                preferred_path = str(
+                    self._ui_state.get("saved_world_save_path") or ""
+                )
+                preferred_label = next(
+                    (
+                        label
+                        for label, entry in self.saved_world_save_labels.items()
+                        if str(entry.get("path") or "") == preferred_path
+                    ),
+                    labels[0],
+                )
+                self.saved_world_save_var.set(preferred_label)
                 self.saved_world_status_var.set(
                     f"{len(labels)} validated save(s); choose a save to browse its world."
                 )
@@ -2139,12 +2203,25 @@ class SemanticHarnessApp:
             }
             self.saved_world_player_box.configure(values=tuple(player_labels))
             if player_labels:
-                self.saved_world_player_var.set(player_labels[0])
+                preferred_player = str(
+                    self._ui_state.get("saved_world_player_id") or ""
+                )
+                preferred_label = next(
+                    (
+                        label
+                        for label, row in self.saved_world_player_labels.items()
+                        if str(row.get("uuid") or row.get("id") or "")
+                        == preferred_player
+                    ),
+                    player_labels[0],
+                )
+                self.saved_world_player_var.set(preferred_label)
             self.saved_world_search_var.set("")
             self.saved_world_npc_var.set("")
             self.saved_world_selected_actor = {}
             self.saved_world_selected_group = {}
             self._render_saved_world_tree()
+            self._restore_saved_world_tree_selection()
             counts = self.saved_world_browser.get("counts") or {}
             self.saved_world_status_var.set(
                 "Browsed save: "
@@ -2232,6 +2309,23 @@ class SemanticHarnessApp:
                 )
                 self.saved_world_tree_actor_rows[actor_iid] = member
                 self.saved_world_tree_actor_groups[actor_iid] = group_iid
+
+    def _restore_saved_world_tree_selection(self) -> None:
+        """Restore the last NPC selection without importing it automatically."""
+
+        wanted = str(self._ui_state.get("saved_world_npc_id") or "")
+        if not wanted:
+            return
+        for actor_iid, actor in self.saved_world_tree_actor_rows.items():
+            if str(actor.get("id") or "") != wanted:
+                continue
+            group_iid = self.saved_world_tree_actor_groups.get(actor_iid)
+            if group_iid:
+                self.saved_world_tree.item(group_iid, open=True)
+            self.saved_world_tree.selection_set(actor_iid)
+            self.saved_world_tree.focus(actor_iid)
+            self._on_saved_world_tree_select()
+            return
 
     def _render_saved_world_group_details(
         self, group: dict[str, Any] | None
@@ -3027,6 +3121,53 @@ class SemanticHarnessApp:
             self.workbench_footer.grid()
             self.advanced_controls_visible = True
             self.advanced_toggle_button.configure(text="Hide advanced")
+
+    def _reset_ui_state(self) -> None:
+        """Reset layout preferences without changing the working scenario."""
+
+        self._ui_state = {}
+        try:
+            self.root.state("normal")
+            screen_width = self.root.winfo_screenwidth()
+            screen_height = self.root.winfo_screenheight()
+            width = min(1320, max(1080, screen_width - 48))
+            height = min(860, max(700, screen_height - 96))
+            self.root.geometry(f"{width}x{height}")
+            self.main_tabs.select(self.simulation_tab)
+            self.studio_notebook.select(self.studio_notebook.tabs()[0])
+            self.trace_tabs.select(self.trace_tabs.tabs()[0])
+            if self.workbench_notebook.tabs():
+                self.workbench_notebook.select(self.workbench_notebook.tabs()[0])
+            for notebook in self.workbench_panel_notebooks.values():
+                if notebook.tabs():
+                    notebook.select(notebook.tabs()[0])
+            if not self.trace_panel_visible:
+                self._toggle_trace_panel()
+            if not self.advanced_controls_visible:
+                self._toggle_advanced_controls()
+            if not self.workbench_expanded:
+                self.toggle_simulation_workbench()
+            self.talk_utterance_var.set("hello")
+            if "current" in self.talk_target_ids_by_label.values():
+                self.talk_target_var.set(
+                    next(
+                        label
+                        for label, target_id in self.talk_target_ids_by_label.items()
+                        if target_id == "current"
+                    )
+                )
+            if hasattr(self, "saved_world_search_var"):
+                self.saved_world_search_var.set("")
+            self._save_ui_state()
+            self._set_status("Ready · UI layout reset")
+            self._append(
+                "SYSTEM",
+                "UI layout reset. Working scenario and imported save were unchanged.",
+            )
+        except (self._tk.TclError, TypeError, ValueError, IndexError):
+            self.activity_log.record(
+                "ui", "state_reset_error", message="could not reset window state"
+            )
 
     def _refresh_simulation_context(self) -> None:
         """Render the readable save-backed target context above the workbench."""
@@ -4373,9 +4514,17 @@ class SemanticHarnessApp:
             self.npc_profile_label.grid_remove()
             self.npc_profile_box.grid_remove()
             self.developer_test_frame.grid_remove()
-            if self.trace_panel_visible:
+            preferred_trace = self._ui_state.get("trace_panel_visible")
+            if isinstance(preferred_trace, bool):
+                if preferred_trace != self.trace_panel_visible:
+                    self._toggle_trace_panel()
+            elif self.trace_panel_visible:
                 self._toggle_trace_panel()
-            if self.advanced_controls_visible:
+            preferred_advanced = self._ui_state.get("advanced_controls_visible")
+            if isinstance(preferred_advanced, bool):
+                if preferred_advanced != self.advanced_controls_visible:
+                    self._toggle_advanced_controls()
+            elif self.advanced_controls_visible:
                 self._toggle_advanced_controls()
             self._schedule_splitter_restore()
         else:

@@ -133,6 +133,12 @@ compatible saves automatically. `Source FIXTURE` means that no saved actor is
 loaded yet; fixture relationship controls do not represent persisted NPC
 state.
 
+Window geometry, tabs, splitters, panel visibility, talk target, and the last
+saved-world selection are restored on the next launch. Use the visible
+`Reset layout` button, or add `--reset-ui-state`, when a deterministic clean
+layout is needed for testing. Resetting layout does not alter the scenario or
+source save.
+
 Run headlessly from any directory:
 
 ```bash

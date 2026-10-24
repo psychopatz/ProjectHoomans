@@ -656,6 +656,11 @@ def _parser() -> argparse.ArgumentParser:
         help="override the user-owned Semantic Lab window-state file",
     )
     parser.add_argument(
+        "--reset-ui-state",
+        action="store_true",
+        help="ignore saved GUI layout state for this run and start from defaults",
+    )
+    parser.add_argument(
         "--activity-log",
         help="override the shared GUI/CLI activity JSONL file",
     )
