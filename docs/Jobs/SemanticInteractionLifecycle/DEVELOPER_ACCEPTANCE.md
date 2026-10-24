@@ -122,3 +122,22 @@ was attempted separately, but its oversized terminal report was not retained;
 the P10/P11-scoped production-worker modules above are the relevant corrective
 regression gates and are green. Native Project Zomboid SP/MP acceptance remains
 user-owned.
+
+
+## P12 supersession
+
+Do not use the former P10/P11 READY conclusion as current acceptance.
+
+P12 requires new evidence for:
+
+- actual Conversation close after semantic Farewell;
+- actual warning/confirmation/departure and close for Leave Group;
+- visible exactly-once semantic emote reply delivery;
+- no player-facing `Unknown survivor` leakage;
+- contextual semantic address variants;
+- mutually exclusive Follow/Wait capability projection;
+- Camp and Go Home under the Companion Orders hub;
+- dynamic Camp room/campfire selection with server revalidation;
+- real authoritative command mutation and capability reprojection.
+
+Frame acceptance, semantic plan selection, or harness row parity alone do not satisfy these end-effect gates.

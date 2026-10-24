@@ -8,7 +8,7 @@ A phase is not the goal.
 
 Do not report the parent complete after an audit, one migration family, one passing stress test or one harness improvement.
 
-P0–P9 are retained implementation foundation, but developer acceptance was reopened by user native/harness evidence. Continue through mandatory P10, mandatory P11, and any later user-approved corrective phases before handing back READY FOR USER LIVE TEST, unless a genuine blocker prevents safe progress.
+P0–P11 are retained foundation, but developer acceptance is reopened by newer native action evidence. Continue through mandatory P12 and any later mandatory corrections before handing back READY FOR USER LIVE TEST, unless a genuine blocker prevents safe progress.
 
 ## Required read order
 
@@ -175,3 +175,60 @@ Not blockers:
 - GUI display is unavailable when worker/Xvfb evidence is still possible;
 - a later user live test remains pending.
 
+
+
+## P12 operating rules — semantic capabilities, realizations and addresses
+
+### Capabilities describe; existing owners execute
+
+Do not implement Goodbye, departure, Camp, Return Home, Follow/Wait or other gameplay effects a second time inside semantics.
+
+Expose/adapt the existing authored/gameplay action as a semantic capability and invoke the existing authoritative executor once.
+
+### Preserve authored Core behavior
+
+When adapting an authored Conversation choice, preserve all behaviorally relevant fields/hooks including response, next, close, closeReason, action and highlight behavior.
+
+Do not call Core Session:selectChoice recursively from one selected synthetic choice into another original choice.
+
+### Prove end effects
+
+A passing frame/click/receipt is insufficient.
+
+Tests must assert the real expected end effect such as:
+
+- Conversation closed;
+- departure warning/confirmation/state mutation occurred;
+- command/order changed;
+- semantic reply was visibly delivered;
+- capability menu reprojected to the new state.
+
+### Resolved speech is delivered, not reinterpreted
+
+Once semantic realization has selected resolved text/family/ID, send it through the common presentation path exactly once.
+
+Do not feed it back into legacy Flavor response selection.
+
+### Addressing
+
+Do not use raw internal identity placeholders as speech.
+
+Use the semantic address resolver.
+
+Gendered address forms require authoritative/appropriate information. Unknown or unsuitable data falls back to neutral forms.
+
+Variation must remain contextual and bounded; do not choose address terms randomly without persona/tone constraints.
+
+### Companion Orders
+
+Do not expose Follow, Stay and Wait At as three permanent independent root rows.
+
+Use the semantic Companion Orders hub and authoritative state to expose one Follow/Wait toggle plus Camp/Go Home when eligible.
+
+### Dynamic Camp
+
+Reuse existing CampSite room enumeration, semantic labels, hints and server validation.
+
+Client discovery never grants authority.
+
+Do not persist engine room objects or create a second camp command.

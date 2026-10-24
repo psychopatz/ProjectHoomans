@@ -510,3 +510,172 @@ Useful old pure classifiers may survive only after being moved/refactored into n
 Existing authored SocialFlavor/CompanionCommand/VanillaEmote/Combat/Medical/LeaderDeath lines are migration assets. Do not multiply semantic intents for every wording variant.
 
 Compatibility modules may translate external facts and supply provider-specific authored wording, but must feed the common semantic realization authority rather than create another planner.
+
+
+## 25. Semantic capability standardization
+
+A semantic capability is the canonical conversational representation of an action that an existing authoritative owner can perform.
+
+It is not a duplicate gameplay implementation.
+
+Conceptual contract:
+
+~~~lua
+{
+    capabilityID = "companion.camp",
+    groupID = "companion_orders",
+    act = "REQUEST",
+    action = "CAMP",
+
+    eligibility = {...},
+    requiredSlots = {...},
+    presentation = {...},
+
+    executor = {
+        owner = "PNC.CompanionCommands",
+        commandID = "camp",
+    },
+
+    lifecycle = {
+        close = false,
+        next = "...",
+    },
+}
+~~~
+
+The exact implementation should reuse existing capability/adapter/choice contracts where possible.
+
+### Capability source adapters
+
+Existing authored/gameplay systems may expose semantic capability descriptors:
+
+- Core/Conversation authored root choices;
+- CompanionCommands registry;
+- ConversationBlocks when representing an eligible authored action;
+- recruitment/departure/trade/quest services;
+- Camp/world-target providers.
+
+They remain authoritative for effects.
+
+### No recursive choice execution
+
+A semantic presentation row for an authored choice must not execute the authored choice by recursively invoking `Session:selectChoice(original)` from a synthetic selected choice.
+
+Instead the standardized capability/choice bridge must preserve or delegate the original action contract once.
+
+The semantic layer may decorate a choice with provenance, grouping and alternate natural-language realizations, but it must not create a nested Core session transition.
+
+## 26. Semantic realization standard
+
+A semantic realization is selected only after meaning/action/context are known.
+
+It may use:
+
+- semantic act/topic;
+- active beat/thread;
+- response plan;
+- persona;
+- relationship;
+- situation;
+- language;
+- bounded anti-repeat history.
+
+It produces a realization family/ID plus localized content.
+
+Authored legacy lines are content assets and may be migrated/addressed through this contract.
+
+Resolved semantic speech then crosses one delivery boundary. Delivery must not reinterpret meaning.
+
+## 27. Semantic address standard
+
+Actor reference in speech is semantic realization, not raw identity transport.
+
+Required layers:
+
+~~~text
+authoritative identity / disclosure state
+        |
+        v
+address eligibility/context
+        |
+        +-- known name/title/role when allowed
+        +-- unknown-address family
+        |
+        v
+constrained address realization
+~~~
+
+Internal/debug placeholders such as `Unknown survivor` are not conversational address forms.
+
+Unknown-address realization may consider authoritative/appropriate sex/gender information, familiarity, relationship, persona, tone, language and recent address-form history.
+
+Seed English forms may include:
+
+- stranger;
+- mate;
+- pal;
+- bro — male + very casual style;
+- mister — male + formal/neutral style;
+- miss — female + formal/neutral style.
+
+If sex/gender is unavailable or unsuitable, use gender-neutral forms.
+
+Do not randomly alternate incompatible registers. Address selection uses semantic/style constraints and bounded repetition avoidance.
+
+Do not invent names, titles or personal facts.
+
+## 28. Companion Orders semantic navigation
+
+Root Conversation should not permanently expose contradictory movement capabilities.
+
+Use one semantic navigation hub:
+
+~~~text
+I need you to do something...
+    -> Follow me OR Wait here
+    -> Let's camp...
+    -> Go home.
+    -> Back
+~~~
+
+The Follow/Wait row derives from authoritative current movement/order state.
+
+Destination-specific WAIT_AT remains a semantic capability for natural-language/world-target requests but is not a permanent generic menu row.
+
+After a command mutates state, capability projection must refresh from authoritative truth.
+
+## 29. Dynamic Camp capability projection
+
+Camp destinations are dynamic semantic capability slots over existing production CampSite infrastructure.
+
+Client may enumerate bounded valid-looking loaded rooms/campfires for presentation.
+
+Each row carries a primitive stable target/hint, never retained Java engine objects.
+
+Server independently re-resolves/revalidates the requested target before committing `CompanionCommands.camp`.
+
+The capability list should:
+
+- include only valid discovered sites;
+- use semantic room labels;
+- bound duplicate room types/results;
+- provide generic safe-site fallback only when production resolution supports it;
+- reject stale/invalid targets safely.
+
+## 30. End-effect acceptance
+
+For action capabilities, semantic acceptance is not `accepted=true`.
+
+Required chain:
+
+~~~text
+presentation
+-> semantic capability/frame
+-> authoritative executor
+-> real gameplay/lifecycle mutation
+-> semantic acknowledgement realization
+-> visible delivery
+-> capability/session reprojection
+~~~
+
+Tests and Semantic Lab diagnostics must be able to distinguish each stage.

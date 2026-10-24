@@ -300,3 +300,103 @@ Add focused acceptance for:
 - cleanup/relocation of obsolete duplicate harness modules after dependency verification.
 
 The project cannot return to READY FOR USER LIVE TEST until P10 proves native Conversation parity and P11 proves that mirrored production behavior has one semantic conversational-intelligence owner.
+
+
+## P12 — native action & semantic capability acceptance
+
+### V. Authored action execution
+
+Exercise production-presented authored capabilities through the same session used by native Conversation.
+
+Farewell acceptance must prove:
+
+- row is presented;
+- one capability/action dispatch occurs;
+- NPC response is delivered when defined;
+- close flag/reason survives semantic decoration;
+- production Conversation lifecycle becomes closed;
+- presented rows clear appropriately.
+
+Departure acceptance must prove:
+
+- initial row executes;
+- warning/preview state is reached;
+- confirm/cancel semantics are preserved;
+- confirm calls the existing server-authoritative departure service once;
+- successful departure closes the Conversation;
+- relationship/faction consequences remain owned by the existing service.
+
+### W. Semantic speech delivery
+
+For semantic emote and other resolved NPC speech:
+
+- realization family/ID selected once;
+- resolved text delivered once;
+- active Conversation receives/logs it when appropriate;
+- world nameplate/bubble delivery works when no active Conversation owns the exchange;
+- TTS remains downstream;
+- diary/debug recording is not accepted as a substitute for visible delivery.
+
+### X. Semantic address
+
+Test unrevealed identity through all player-facing speech paths.
+
+Require:
+
+- no ordinary speech leakage of `Unknown survivor`;
+- neutral `stranger`-family fallback;
+- constrained variation such as mate/pal and gendered forms only when eligible;
+- no invented identity;
+- recent-address repetition remains bounded;
+- EN/TL/localization path remains valid.
+
+### Y. Companion Orders
+
+Native/harness capability projection must show one root navigation row for Companion Orders rather than independent Follow/Stay/Wait root rows.
+
+Inside the group:
+
+- authoritative following state -> Wait here;
+- non-following commandable state -> Follow me;
+- Camp shown only when capability is meaningful;
+- Go Home shown only when eligible;
+- Back/navigation works.
+
+After execution, reproject from authoritative state and verify the toggle changes.
+
+### Z. Dynamic Camp
+
+Using production CampSite adapters:
+
+1. enumerate bounded loaded valid rooms/campfires;
+2. present semantic labels;
+3. choose one;
+4. send primitive site identity/hint;
+5. server revalidates;
+6. authoritative camp order commits the selected validated site.
+
+Also test stale/invalid hint rejection and generic fallback behavior.
+
+### AA. Equivalent capability invocation
+
+Where semantically equivalent, typed text, semantic button and headless request must resolve to the same capability ID and authoritative executor.
+
+Example:
+
+- button: Camp in the living room
+- typed: "Make camp in the living room."
+- headless semantic frame: CAMP + living-room target
+
+No duplicate gameplay path is allowed.
+
+### AB. Native end-effect regression fixture
+
+The user-reported 2026-10-25 failures are mandatory regression tests:
+
+- Goodbye previously failed to close.
+- Leave Group previously failed to complete expected behavior.
+- emote semantic response previously was not visibly delivered.
+- unknown-name placeholder previously leaked into speech.
+- companion movement rows were structurally contradictory/overexposed.
+
+Do not mark P12 accepted until those regressions are covered by production-Lua/session tests and the harness reflects the resulting production state.
