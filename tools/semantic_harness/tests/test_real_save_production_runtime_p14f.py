@@ -321,8 +321,30 @@ class RealSaveProductionRuntimeP14FTests(unittest.TestCase):
             insult = worker.input("fuck you")
             action = (insult.get("result") or {}).get("actionResult") or {}
             self.assertEqual(action.get("eventType"), "player_dialogue_insult")
+            self.assertEqual(action.get("status"), "applied")
+            self.assertEqual(action.get("reason"), "relationship_clamped")
+            self.assertTrue(action.get("memoryRecorded"))
+            self.assertFalse(action.get("visibleRelationshipChange"))
+            self.assertLess(
+                action["requestedEffects"]["approval"],
+                0,
+            )
+            self.assertLess(
+                action["requestedEffects"]["respect"],
+                0,
+            )
+            self.assertEqual(
+                action["relationshipDelta"],
+                {"approval": 0, "respect": 0, "familiarity": 0},
+            )
 
             after = worker.inspect_npc_dossier()
+            history_snapshot = after["relationshipHistory"]["snapshot"]
+            self.assertEqual(
+                history_snapshot["actionResult"]["reason"],
+                "relationship_clamped",
+            )
+            self.assertEqual(history_snapshot["actionResult"]["status"], "applied")
             journal_after = after["relationshipHistory"]["snapshot"].get(
                 "interactionJournal"
             ) or []

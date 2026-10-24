@@ -49,6 +49,7 @@ function RuntimeState.resetContainers(runtime)
     runtime.semanticClickReceipts = {}
     runtime.relationships = {}
     runtime.runtimeRelationshipOverrides = {}
+    runtime.lastSemanticActionResult = nil
     runtime.playerModData = {}
 end
 

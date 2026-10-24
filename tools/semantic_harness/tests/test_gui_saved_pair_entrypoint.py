@@ -214,8 +214,15 @@ class GuiSavedPairEntrypointTests(unittest.TestCase):
             wait_until(
                 lambda: not app.busy
                 and "player_dialogue_insult" in app.npc_interaction_summary.get("1.0", "end")
+                and "Last semantic action" in app.npc_interaction_summary.get("1.0", "end")
             )
-            self.assertIn("applied=", app.npc_interaction_summary.get("1.0", "end"))
+            interaction_text = app.npc_interaction_summary.get("1.0", "end")
+            self.assertIn("result: APPLIED", interaction_text)
+            self.assertIn("Current relationship: Approval", interaction_text)
+            self.assertIn("Saved baseline:", interaction_text)
+            self.assertIn("Last semantic action", interaction_text)
+            self.assertIn("status=APPLIED", interaction_text)
+            self.assertIn("Requested effect:", interaction_text)
             self.assertEqual(sha256(REAL_SAVE.read_bytes()).digest(), source_before)
         finally:
             try:

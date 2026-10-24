@@ -171,14 +171,26 @@ local function actionSnapshot(value)
         }
     end
     return {
-        ok = value.ok == true,
+        ok = value.ok == true or value.accepted == true,
+        accepted = value.accepted == true,
+        authority = value.authority,
+        status = value.status,
         reason = value.reason,
+        requestID = value.requestID,
+        npcID = value.npcID,
+        speechAct = value.speechAct,
         eventID = value.eventID,
         eventType = value.eventType,
         memoriesCreated = value.memoriesCreated or 0,
         relationshipsChanged = value.relationshipsChanged or 0,
         conductEvidenceCreated =
             value.conductEvidenceCreated or 0,
+        memoryRecorded = value.memoryRecorded == true,
+        visibleRelationshipChange = value.visibleRelationshipChange == true,
+        requestedEffects = copy(value.requestedEffects),
+        baseEffects = copy(value.baseEffects),
+        saturationBefore = copy(value.saturationBefore),
+        saturationAfter = copy(value.saturationAfter),
         details = details,
         conductDetails = conductDetails,
     }

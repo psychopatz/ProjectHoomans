@@ -11,11 +11,34 @@ local H = Authority.Internal and Authority.Internal.SemanticSocial
 if not H then return Authority end
 
 local SocialEvents = H.SocialEvents
+local Core = PNC.Core
 local rejected = H.rejected
 local relationshipDelta = H.relationshipDelta
 local relationshipSummary = H.relationshipSummary
 local detailFor = H.detailFor
 local sendRelationship = H.sendRelationship
+
+local function copy(value)
+    return Core and Core.DeepCopy and Core.DeepCopy(value) or value
+end
+
+local function effectSummary(value)
+    value = type(value) == "table" and value or {}
+    return {
+        approval = tonumber(value.approvalEffect) or 0,
+        respect = tonumber(value.respectEffect) or 0,
+        familiarity = tonumber(value.familiarityGain) or 0,
+    }
+end
+
+local function hasVisibleRelationshipChange(delta)
+    return type(delta) == "table"
+        and (
+            (tonumber(delta.approval) or 0) ~= 0
+            or (tonumber(delta.respect) or 0) ~= 0
+            or (tonumber(delta.familiarity) or 0) ~= 0
+        )
+end
 
 function H.ApplySocialEvent(context)
     context = type(context) == "table" and context or {}
@@ -74,12 +97,17 @@ function H.ApplySocialEvent(context)
         true,
         npcID
     ) or nil
+    local delta = relationshipDelta(beforeSummary, afterSummary)
+    local memoryRecorded = (tonumber(processed.relationshipsChanged) or 0) > 0
+    local visibleChange = hasVisibleRelationshipChange(delta)
     local accepted = (tonumber(processed.relationshipsChanged) or 0) > 0
     return {
         accepted = accepted,
         authority = "server",
         status = accepted and "applied" or "rejected",
-        reason = accepted and nil or "relationship_not_changed",
+        reason = accepted
+            and (visibleChange and nil or "relationship_clamped")
+            or "relationship_not_changed",
         requestID = requestID,
         npcID = npcID,
         speechAct = speechAct,
@@ -87,7 +115,13 @@ function H.ApplySocialEvent(context)
         eventType = eventType,
         relationshipBefore = beforeSummary,
         relationshipAfter = afterSummary,
-        relationshipDelta = relationshipDelta(beforeSummary, afterSummary),
+        relationshipDelta = delta,
+        memoryRecorded = memoryRecorded,
+        visibleRelationshipChange = visibleChange,
+        requestedEffects = effectSummary(detail and detail.modifiedEffects),
+        baseEffects = effectSummary(detail and detail.baseEffects),
+        saturationBefore = copy(detail and detail.saturationBefore),
+        saturationAfter = copy(detail and detail.saturationAfter),
     }
 end
 

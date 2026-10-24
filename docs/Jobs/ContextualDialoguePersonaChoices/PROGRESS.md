@@ -466,3 +466,38 @@ git diff --check
 
 This follow-up is accepted on the existing local `main`. Current exact Next
 Chunk: none for this requested inspector slice.
+
+## Completed relationship projection diagnostics follow-up
+
+Evidence recorded on 2026-10-24:
+
+- Saved Wilber Downs rehydration was audited against the raw persisted record.
+  Production Lua restores `baselineApproval=75`, `baselineRespect=65`, and the
+  current saved aggregate `approval=100`, `respect=100`, `familiarity=100`.
+- A real production insult now reports its requested negative effects,
+  `memoryRecorded=true`, `visibleRelationshipChange=false`, and
+  `reason=relationship_clamped` when the authoritative production aggregate is
+  already saturated. The harness does not subtract relationship values in
+  Python or invent a personal enemy relationship.
+- The saved-world GUI relationship context now presents current values, saved
+  baseline, saturation budgets, readable interaction before/after/delta rows,
+  and the latest production action. Structured worker/CLI output retains the
+  same explicit fields for agents and automation.
+- Production action snapshots retain accepted/status/authority/request identity
+  alongside requested effects, saturation, memory recording, and visible
+  relationship change. Reset and source-save immutability remain covered.
+
+Focused evidence:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_production_rehydration_p14a tools.semantic_harness.tests.test_production_inventory_rehydration_p14b tools.semantic_harness.tests.test_production_faction_rehydration_p14c tools.semantic_harness.tests.test_production_social_context_p14d tools.semantic_harness.tests.test_missing_state_audit_p14e tools.semantic_harness.tests.test_real_save_production_runtime_p14f tools.semantic_harness.tests.test_contextual_social_reactions tools.semantic_harness.tests.test_tool_call_formatting tools.semantic_harness.tests.test_cli_parity_p13f -v
+python3 -m unittest tools.semantic_harness.tests.test_real_save_production_runtime_p14f -v
+xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_gui_saved_pair_entrypoint -v
+python3 -m compileall -q tools/semantic_harness
+luac -p Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerSemanticSocialInteractionCommandHandler.lua Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerSemanticSocialInteractionCommandHandler_ApplySocialEvent.lua Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/RelationshipDebug/PNC_RelationshipDebug_SnapshotParts.lua tools/semantic_harness/lua/worker/Conversation.lua tools/semantic_harness/lua/worker/ProductionRehydration.lua tools/semantic_harness/lua/worker/RuntimeState.lua
+git diff --check
+```
+
+The 33-test focused production/CLI suite, 3-test real-save regression, and
+4-test saved GUI suite pass. This follow-up is accepted on the existing local
+`main`. Current exact Next Chunk: none for this requested diagnostics slice.

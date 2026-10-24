@@ -137,8 +137,12 @@ local function canonicalPersonalRelationship(context, relationship, copy)
         approval = relationship.approval,
         respect = relationship.respect,
         familiarity = relationship.familiarity,
+        baselineApproval = relationship.baselineApproval,
+        baselineRespect = relationship.baselineRespect,
+        previousState = relationship.previousState,
         identityTrust = relationship.identityTrust,
         revision = relationship.revision,
+        interactionRevision = relationship.interactionRevision,
         bond = copy(relationship.bond),
     }
 end
@@ -1294,6 +1298,7 @@ function Conversation.turn(context, text)
         newTranslations[#newTranslations + 1] = Values.copy(Runtime.translationLookups[index])
     end
     local actionResult = view.lastSemanticActionResult
+    Runtime.lastSemanticActionResult = Values.copy(actionResult)
     local toolCalls = context.OutputProjection.normalizedToolCalls(
         context, newTrace, newTransport, result, actionResult
     )

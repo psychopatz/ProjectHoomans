@@ -754,7 +754,8 @@ function ProductionRehydration.refreshDiagnostics(context)
             {
                 observerNPCID = npcID,
                 targetKind = "current_player",
-            }
+            },
+            Runtime.lastSemanticActionResult
         )
         if ok and type(snapshot) == "table" then
             history = snapshot

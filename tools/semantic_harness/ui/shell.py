@@ -3644,11 +3644,15 @@ class SemanticHarnessApp:
         audience = social.get("conversationAudience") or {}
         bond = social.get("durableBond") or {}
         speech = social.get("speechStyle") or {}
-        return [
+        lines = [
             "Personal relationship",
             f"  {personal.get('state') or 'unknown'} · "
             f"source {personal.get('source') or 'MISSING'} · "
             f"reason {personal.get('reason') or 'MISSING'}",
+            "  current: "
+            f"Approval {SemanticHarnessApp._format_number(personal.get('approval'))} · "
+            f"Respect {SemanticHarnessApp._format_number(personal.get('respect'))} · "
+            f"Familiarity {SemanticHarnessApp._format_number(personal.get('familiarity'))}",
             "Faction relationship",
             f"  {effective.get('state') or 'unknown'} · "
             f"standing {effective.get('standing', 'MISSING')} · "
@@ -3668,6 +3672,15 @@ class SemanticHarnessApp:
             f"  {speech.get('variant') or 'unknown'} · "
             f"reason {speech.get('reason') or 'MISSING'}",
         ]
+        if personal.get("baselineApproval") is not None \
+                or personal.get("baselineRespect") is not None:
+            lines.insert(
+                3,
+                "  saved baseline: "
+                f"Approval {SemanticHarnessApp._format_number(personal.get('baselineApproval'))} · "
+                f"Respect {SemanticHarnessApp._format_number(personal.get('baselineRespect'))}",
+            )
+        return lines
 
     def _refresh_social_context_summary(self) -> None:
         if self.relationship_context_summary is None:
@@ -3836,13 +3849,27 @@ class SemanticHarnessApp:
             f"Status: {projection.get('status') or 'MISSING'} · "
             f"owner: {projection.get('owner') or 'MISSING'}",
             "Current relationship: " + self._relationship_evidence(relationship),
+            "Saved baseline: "
+            f"Approval {self._format_number(relationship.get('baselineApproval'))} · "
+            f"Respect {self._format_number(relationship.get('baselineRespect'))}",
             f"memory count: {relationship.get('memoryCount', 0)} · "
-            f"interaction revision: {relationship.get('interactionRevision', 'MISSING')}",
-            f"saturation: {self._dossier_value(snapshot.get('saturation') or {})}",
-            f"cooldowns: {self._dossier_value(snapshot.get('cooldowns') or {})}",
+            f"relationship revision: {self._format_number(relationship.get('revision'))}",
+            "Saturation budgets:",
             "",
             "Recorded interactions",
         ]
+        saturation = snapshot.get("saturation")
+        saturation = saturation if isinstance(saturation, dict) else {}
+        for event_type, budget in sorted(saturation.items()):
+            if not isinstance(budget, dict):
+                continue
+            lines.append(
+                f"  {event_type}: approval {self._format_signed(budget.get('approval'))} · "
+                f"respect {self._format_signed(budget.get('respect'))}"
+            )
+        if not saturation:
+            lines.append("  none recorded")
+        lines.append(f"Cooldowns: {self._dossier_value(snapshot.get('cooldowns') or {})}")
         journal = snapshot.get("interactionJournal")
         journal = journal if isinstance(journal, list) else []
         for entry in reversed(journal[-64:]):
@@ -3851,15 +3878,21 @@ class SemanticHarnessApp:
             before = entry.get("before") or {}
             after = entry.get("after") or {}
             delta = entry.get("delta") or {}
+            event_id = str(entry.get("eventID") or "MISSING")
+            if len(event_id) > 96:
+                event_id = event_id[:93] + "..."
             lines.extend(
                 [
-                    f"  {entry.get('sequence', '?')}. "
-                    f"{entry.get('eventType') or entry.get('kind') or 'interaction'} · "
-                    f"applied={entry.get('applied', 'MISSING')} · "
-                    f"event={entry.get('eventID') or 'MISSING'}",
+                    f"  Interaction {entry.get('sequence', '?')} · "
+                    f"{entry.get('eventType') or entry.get('kind') or 'interaction'}",
+                    f"     result: {'APPLIED' if entry.get('applied') is True else entry.get('applied', 'MISSING')} · "
+                    f"event ID: {event_id}",
                     f"     before: {self._relationship_evidence(before)}",
                     f"     after:  {self._relationship_evidence(after)}",
-                    f"     delta:  {self._dossier_value(delta)}",
+                    "     change: "
+                    f"Approval {self._format_signed(delta.get('approval'))} · "
+                    f"Respect {self._format_signed(delta.get('respect'))} · "
+                    f"Familiarity {self._format_signed(delta.get('familiarity'))}",
                 ]
             )
         if not journal:
@@ -3877,6 +3910,27 @@ class SemanticHarnessApp:
                 )
         if not memories:
             lines.append("  none recorded")
+        action = snapshot.get("actionResult")
+        if isinstance(action, dict):
+            lines.extend(["", "Last semantic action"])
+            lines.append(
+                f"  {action.get('eventType') or 'social action'} · "
+                f"status={str(action.get('status') or 'unknown').upper()} · "
+                f"memory recorded={action.get('memoryRecorded', 'MISSING')}"
+            )
+            lines.append(
+                "  visible standing change: "
+                f"{action.get('visibleRelationshipChange', 'MISSING')} · "
+                f"reason={action.get('reason') or 'none'}"
+            )
+            requested = action.get('requestedEffects')
+            if isinstance(requested, dict):
+                lines.append(
+                    "  Requested effect: "
+                    f"Approval {self._format_signed(requested.get('approval'))} · "
+                    f"Respect {self._format_signed(requested.get('respect'))} · "
+                    f"Familiarity {self._format_signed(requested.get('familiarity'))}"
+                )
         self._set_text(self.npc_interaction_summary, "\n".join(lines))
 
     def _on_actor_panel_tab_changed(self, panel_name: str) -> None:
@@ -4987,11 +5041,32 @@ class SemanticHarnessApp:
         return "\n".join(lines[:24]) or "no inventory delta"
 
     @staticmethod
-    def _relationship_evidence(value: Any) -> str:
+    def _format_number(value: Any) -> str:
+        if isinstance(value, bool):
+            return str(value)
+        try:
+            return f"{float(value):.2f}"
+        except (TypeError, ValueError):
+            return "MISSING"
+
+    @classmethod
+    def _format_signed(cls, value: Any) -> str:
+        rendered = cls._format_number(value)
+        if rendered == "MISSING":
+            return rendered
+        return f"{float(rendered):+0.2f}"
+
+    @classmethod
+    def _relationship_evidence(cls, value: Any) -> str:
         relationship = value if isinstance(value, dict) else {}
         return " · ".join(
-            f"{key}={relationship.get(key, 'MISSING')}"
-            for key in ("approval", "respect", "familiarity", "state", "revision")
+            [
+                f"Approval {cls._format_number(relationship.get('approval'))}",
+                f"Respect {cls._format_number(relationship.get('respect'))}",
+                f"Familiarity {cls._format_number(relationship.get('familiarity'))}",
+                f"State {relationship.get('state') or 'unknown'}",
+                f"Revision {cls._format_number(relationship.get('revision'))}",
+            ]
         )
 
     def _gift_result_text(
@@ -5293,21 +5368,35 @@ class SemanticHarnessApp:
         action = result.get("actionResult") if isinstance(result, dict) else None
         if not isinstance(action, dict):
             return
-        self._append(
-            "TOOL/ACTION",
-            format_tool_call(
-                {
-                    "label": "Production social action",
-                    "name": action.get("eventType")
-                    or action.get("action")
-                    or action.get("speechAct")
-                    or "social_action",
-                    "authority": action.get("authority") or "production",
-                    "accepted": action.get("accepted"),
-                    "arguments": action,
-                }
-            ),
-        )
+        requested = action.get("requestedEffects")
+        requested = requested if isinstance(requested, dict) else {}
+        delta = action.get("relationshipDelta")
+        delta = delta if isinstance(delta, dict) else {}
+        before = action.get("relationshipBefore")
+        before = before if isinstance(before, dict) else {}
+        after = action.get("relationshipAfter")
+        after = after if isinstance(after, dict) else {}
+        lines = [
+            "Production social action",
+            f"  Event: {action.get('eventType') or action.get('action') or action.get('speechAct') or 'social_action'}",
+            f"  Status: {str(action.get('status') or 'UNKNOWN').upper()} · "
+            f"authority={action.get('authority') or 'production'}",
+            f"  Result: {'accepted' if action.get('accepted') is True else 'rejected'} · "
+            f"reason={action.get('reason') or 'none'}",
+            "  Requested effect: "
+            f"Approval {self._format_signed(requested.get('approval'))} · "
+            f"Respect {self._format_signed(requested.get('respect'))} · "
+            f"Familiarity {self._format_signed(requested.get('familiarity'))}",
+            "  Visible change: "
+            f"Approval {self._format_signed(delta.get('approval'))} · "
+            f"Respect {self._format_signed(delta.get('respect'))} · "
+            f"Familiarity {self._format_signed(delta.get('familiarity'))}",
+            f"  Memory recorded: {action.get('memoryRecorded', 'MISSING')} · "
+            f"standing changed: {action.get('visibleRelationshipChange', 'MISSING')}",
+            "  Before: " + self._relationship_evidence(before),
+            "  After:  " + self._relationship_evidence(after),
+        ]
+        self._append("TOOL/ACTION", "\n".join(lines))
 
     def submit(self) -> None:
         value = self.input_var.get().strip()
