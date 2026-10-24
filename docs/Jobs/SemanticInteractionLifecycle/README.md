@@ -1,6 +1,6 @@
 # Semantic Interaction Lifecycle
 
-**Status:** ACTIVE — P0–P9 lifecycle foundation retained; developer acceptance REOPENED for mandatory P10 native Conversation parity and P11 no-split semantic authority consolidation.  
+**Status:** ACTIVE — P0–P11 retained foundation; developer acceptance REOPENED for mandatory P12 native action/capability standardization.  
 **Audit baseline:** ProjectHoomans main at 6aa9493aa6df0a48b2dd148a247a742d8fb38e5d on 2026-10-24.  
 **Native Project Zomboid SP/MP:** user-owned final acceptance; not a Codex implementation blocker.  
 **Goal prompt:** chat-only by repository policy; do not create GOAL_PROMPT.md.
@@ -11,7 +11,8 @@ Turn Project Hoomans dialogue into one scalable semantic interaction lifecycle.
 
 The completed system must:
 
-- migrate legacy flavor-text speech such as greetings, farewells, emote replies, combat/medical/social/world-event reactions and similar spontaneous dialogue into the existing semantic response architecture;\n- eliminate split conversational intelligence: legacy Flavor/SocialFlavor code may remain only as content/presentation/transport/compatibility below the semantic realization boundary, never as a second response-planning or relationship/audience/need classifier;
+- migrate legacy flavor-text speech such as greetings, farewells, emote replies, combat/medical/social/world-event reactions and similar spontaneous dialogue into the existing semantic response architecture;
+- eliminate split conversational intelligence: legacy Flavor/SocialFlavor code may remain only as content/presentation/transport/compatibility below the semantic realization boundary, never as a second response-planning or relationship/audience/need classifier;
 - let typed Talk input, semantic buttons, emotes and headless/Semantic Lab input participate in the same conversation context;
 - preserve appropriate context when an NPC speaks first and the player answers by any supported input surface;
 - support Façade-like conversational continuity across interruptions, UI closes, hours and in-game days;
@@ -20,9 +21,11 @@ The completed system must:
 - keep multiplayer gameplay and persistence server-authoritative;
 - use the existing Semantic Lab and production Lua worker as the main agent test/debug surface;
 - make the Semantic Lab primary Conversation surface a behavioral mirror of the native production Conversation session, while keeping broader candidates/diagnostics in a separate debug sidecar;
-- retain the current offline deterministic semantic path; PBrainZ/LLM realization remains optional.
+- retain the current offline deterministic semantic path; PBrainZ/LLM realization remains optional;
+- standardize authored/gameplay actions as semantic capabilities while preserving their existing authoritative executors;
+- standardize semantic realization and actor addressing so gameplay actions, dialogue wording, and conversational names do not form separate parallel systems.
 
-The parent goal is not complete when one migration family or one phase passes. P0–P9 implementation is retained foundation, but user native/harness evidence on 2026-10-25 reopened developer acceptance. Completion now requires both P10 native Conversation parity and P11 legacy semantic authority consolidation, plus any additional user-approved corrective phases added before final handoff.
+The parent goal is not complete when one migration family or one phase passes. P0–P9 implementation is retained foundation, but user native/harness evidence on 2026-10-25 reopened developer acceptance. P10/P11 are retained foundation, but the 2026-10-25 native action test reopened developer acceptance. Completion now also requires P12 native action/capability standardization and its real-effect acceptance.
 
 ## Why this is a new roadmap
 
@@ -46,7 +49,10 @@ This job removes that split without replacing the working parser, response catal
 7. **Bound every collection.** Turns, open beats, suspended threads, commitments, pair memories, NPC episodes, recent realization IDs and diagnostic traces all have explicit limits.
 8. **Deduplicate shared truth.** Shared world events are stored once and referred to by compact knowledge/memory references.
 9. **Gameplay domains still own truth.** Semantics interprets and realizes facts; it does not duplicate inventory, relationship, faction, quest, Knowledge, health or world state.
-10. **ConversationBlocks keep branching/effect authority.** Their wording may later use common realization, but their authored branching, gates, weighted outcomes, repeat rules and server effects are not replaced by a flavor system.\n11. **One conversational intelligence owner.** Semantic context/flows/response plans choose meaning and realization. Legacy Flavor/SocialFlavor may render/deliver an already-selected realization but may not independently classify relationship/audience/need/grief or choose reply families.
+10. **ConversationBlocks keep branching/effect authority.** Their wording may later use common realization, but their authored branching, gates, weighted outcomes, repeat rules and server effects are not replaced by a flavor system.
+11. **One conversational intelligence owner.** Semantic context/flows/response plans choose meaning and realization. Legacy Flavor/SocialFlavor may render/deliver an already-selected realization but may not independently classify relationship/audience/need/grief or choose reply families.
+12. **Capabilities are semantic; effects stay authoritative.** Authored Conversation choices, CompanionCommands and other gameplay systems expose/register semantic capabilities instead of maintaining separate dialogue action menus. Semantics describes and routes the capability; the existing gameplay/domain owner executes it.
+13. **Addressing is semantic realization.** Internal identity placeholders must not leak into ordinary speech. One semantic address resolver selects bounded context-appropriate address forms without inventing identity facts.
 
 ## Preserve
 

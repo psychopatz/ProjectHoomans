@@ -1,6 +1,6 @@
 # Roadmap — Semantic Interaction Lifecycle
 
-**Parent status:** ACTIVE — P0–P9 lifecycle foundation retained; P10 native Conversation parity and P11 no-split semantic authority consolidation are mandatory.  
+**Parent status:** ACTIVE — P0–P11 retained foundation; P12 native action/capability standardization is mandatory after native user regression evidence.  
 **Foundation:** Contextual Dialogue Persona & Choices P14 accepted.  
 **Completion rule:** phases organize work; completing a phase never completes the parent goal. Continue autonomously through every mandatory phase until developer-side acceptance or a genuine blocker.
 
@@ -210,6 +210,25 @@ Mandatory subphases:
 
 P10 and P11 are both mandatory and may be interleaved by dependency.
 
+## P12 — Native action & semantic capability standardization
+
+**Status:** MANDATORY.
+
+Native testing after the P10/P11 developer handoff exposed real action/delivery regressions and a structural command-menu mismatch. See `NATIVE_ACTION_CAPABILITY_STANDARDIZATION.md`.
+
+Mandatory subphases:
+
+- P12A — freeze native regression evidence and capability inventory;
+- P12B — authored action/capability execution bridge;
+- P12C — resolved semantic speech delivery;
+- P12D — semantic address resolver;
+- P12E — Companion Orders semantic hub;
+- P12F — dynamic Camp destinations;
+- P12G — stateful capability refresh;
+- P12H — native-effect + harness acceptance.
+
+**Gate:** authored/gameplay actions are represented as standardized semantic capabilities, execute through their existing authoritative owners without recursive/duplicate selection, deliver their semantic acknowledgements visibly, expose contextual command hierarchy, and pass native end-effect acceptance.
+
 ## Stop condition
 
 Do not stop because:
@@ -220,5 +239,5 @@ Do not stop because:
 - one long-thread test passes;
 - the harness is green for a partial slice.
 
-Stop only when P0–P11 and any later user-approved mandatory corrective phases have developer-side acceptance, or a genuine external/technical blocker prevents further safe progress. P0–P9 passing alone is no longer sufficient, and attaching semantic provenance to a legacy-selected reply does not count as semantic migration.
+Stop only when P0–P12 and any later user-approved mandatory corrective phases have developer-side acceptance, or a genuine external/technical blocker prevents further safe progress. Prior P10/P11 completion claims do not override newer native regression evidence.
 

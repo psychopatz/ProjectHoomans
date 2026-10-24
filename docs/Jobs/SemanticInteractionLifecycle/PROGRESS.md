@@ -2,16 +2,47 @@
 
 **Updated:** 2026-10-25
 
-**Developer status:** P0A–P9 lifecycle/persistence implementation is retained
-foundation. P10 native Conversation parity and P11 single-authority
-consolidation are complete for the current production scope; developer-side
-acceptance is complete and the remaining native SP/MP step is user-owned.
+**Developer status:** REOPENED. P0–P11 remain valuable foundation, but the 2026-10-25 native test after the prior handoff exposed production action/delivery regressions and a semantic capability-structure gap. P12 is mandatory before another READY FOR USER LIVE TEST handoff.
 
 **Accepted predecessor foundation:** Contextual Dialogue Persona & Choices P14. Its save-backed production rehydration architecture remains intact.
 
-**Current parity-audit baseline:** `7833214e0eb0f52467caa8749b6bc8c5333d1f64`
+**Current parity-audit baseline:** `bc13d3775cb03816d34dafce6e676d278de5997e`
 
 **Checkout:** existing `main` only. No branch, source-save mutation, Workshop upload, or native game launch was performed.
+
+## P12 — native action & semantic capability standardization
+
+**Status:** ACTIVE. P12A planning/audit is complete; implementation has not yet corrected the native defects.
+
+Native user evidence and source audit show:
+
+- **That's all. Stay safe.** is presented but does not close the native Conversation UI.
+- **Tell them to leave the group** does not complete the expected authored departure behavior.
+- semantic emote `resolvedText` can be selected without being visibly enqueued/spoken.
+- internal `Unknown survivor` identity can leak into conversational address outside the normal Conversation identity adapter.
+- root semantic capability projection exposes Follow / Stay / Wait independently instead of a contextual companion-order hierarchy.
+- existing authoritative Camp and Return Home commands already exist but are not represented in the desired semantic command hub.
+- existing CampSite room vocabulary, room enumeration/projection, client hints and server resolver already support dynamic validated room/campfire targets and should be reused.
+- the semantic authored-choice bridge can execute an original authored choice through nested/re-entrant `Session:selectChoice`, which risks overwriting `response`, `next`, `close`, `closeReason`, highlight and pending lifecycle state.
+
+Detailed P12 design is in `NATIVE_ACTION_CAPABILITY_STANDARDIZATION.md`.
+
+### Exact Next Chunk — P12B
+
+Implement the smallest canonical authored-action/capability execution bridge.
+
+Requirements:
+
+1. eliminate re-entrant synthetic-choice -> original-choice `Session:selectChoice` execution;
+2. preserve authored Core choice behavior including action, response, next, close, closeReason and highlight hooks while adding semantic capability identity/provenance;
+3. keep existing authoritative executors for departure and other gameplay actions;
+4. prove **Goodbye** actually closes the production Conversation session/UI lifecycle;
+5. prove **Leave Group** reaches its existing warning/confirmation/departure flow without duplicate execution;
+6. update focused production-Lua/harness tests to assert end effects, not merely frame acceptance.
+
+Do not start by redesigning Camp menus or address variants before this action bridge is stable.
+
+After P12B continue autonomously through P12C–P12H.
 
 ## P0A — source-level migration and state-ownership inventory
 
@@ -330,9 +361,7 @@ still a historical broad-suite diagnostic rather than a P10/P11 gate; all
 P10/P11 scoped production-worker modules are green. A read-only production save
 selection for `/home/psychopatz/Zomboid/Saves/Sandbox/2026-10-22_08-59-28`
 opened with a 64,285-byte response, six native-presented rows, and no duplicated
-snapshot payload. No developer-implementable mandatory work remains. Native
-SP/MP acceptance remains user-owned; the next handoff is `READY FOR USER LIVE
-TEST`.
+snapshot payload. That prior no-work/READY conclusion is superseded by P12 native evidence. Preserve the old test results as historical evidence; do not use them to skip P12.
 
 ## Post-acceptance P10 usability correction — saved opening projection
 
