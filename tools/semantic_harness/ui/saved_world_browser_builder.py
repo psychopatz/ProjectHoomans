@@ -186,6 +186,13 @@ def build_saved_world_browser(self, parent: Any) -> None:
     self.saved_world_tree.bind(
         "<Double-1>", lambda _event: self._import_saved_world_target()
     )
+    self.saved_world_tree.bind(
+        "<<TreeviewOpen>>", lambda _event: self._save_ui_state()
+    )
+    self.saved_world_tree.bind(
+        "<<TreeviewClose>>", lambda _event: self._save_ui_state()
+    )
+    self.saved_world_tree_root_iid = "world-root"
     self.saved_world_tree_actor_rows: dict[str, dict[str, Any]] = {}
     self.saved_world_tree_group_nodes: dict[str, dict[str, Any]] = {}
     self.saved_world_tree_actor_groups: dict[str, str] = {}

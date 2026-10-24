@@ -41,6 +41,7 @@ def build_conversation_panel(
     app.suggestion_response: dict[str, Any] = {}
     app.suggestion_revision: Any = None
     app.suggestion_group_ids_by_display: dict[str, str] = {}
+    app.suggestion_group_override_id: str | None = None
     app.suggestion_status = ttk.Label(
         suggestion_frame,
         text="Run a production preview or turn to inspect suggestions.",
@@ -73,4 +74,3 @@ def build_conversation_panel(
     app.preview_button.grid(row=0, column=1, sticky="e", padx=(0, 4))
     app.send_button = ttk.Button(input_actions, text="Send", command=app.submit)
     app.send_button.grid(row=0, column=2, sticky="e")
-

@@ -66,7 +66,9 @@ class ActorInspectorsP13CTests(unittest.TestCase):
                 if str(row.get("id")) == native_player_uuid
             )
             app.saved_world_player_box.set(player_label)
-            groups = app.saved_world_tree.get_children("")
+            groups = app.saved_world_tree.get_children(
+                app.saved_world_tree_root_iid
+            )
             group = next(
                 group_id
                 for group_id in groups
@@ -92,7 +94,17 @@ class ActorInspectorsP13CTests(unittest.TestCase):
                 notebook = app.workbench_panel_notebooks[panel_name]
                 self.assertEqual(
                     [notebook.tab(tab_id, "text") for tab_id in notebook.tabs()],
-                    ["Overview", "Needs", "Personality & Traits", "Inventory"],
+                    [
+                        "Overview",
+                        "Needs",
+                        "Personality & Traits",
+                        "Inventory",
+                    ]
+                    + (
+                        ["Dossier", "Interactions"]
+                        if panel_name == "NPC Target"
+                        else []
+                    ),
                 )
                 self.assertIn(
                     "Source:",

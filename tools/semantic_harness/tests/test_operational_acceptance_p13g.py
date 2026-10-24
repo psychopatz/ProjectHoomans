@@ -207,7 +207,7 @@ class OperationalAcceptanceP13GTests(unittest.TestCase):
                     selected_entry = next(
                         entry
                         for entry in app.saved_world_entries
-                        if provider.project(Path(str(entry["path"]))).get("available")
+                        if Path(str(entry["path"])).resolve() == SAVE.resolve()
                     )
                     source_path = Path(str(selected_entry["path"]))
                     source_hash = sha256(source_path.read_bytes()).hexdigest()

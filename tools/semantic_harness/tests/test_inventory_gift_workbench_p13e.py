@@ -17,6 +17,12 @@ from tools.semantic_harness.runtime.player_engine_state import (
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 
 
+SAVE = Path(
+    "/home/psychopatz/Zomboid/Saves/Apocalypse/"
+    "2026-10-14_13-57-03/global_mod_data.bin"
+)
+
+
 class InventoryGiftWorkbenchP13ETests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_real_save_gift_uses_production_route_and_resets_working_world(self) -> None:
@@ -41,7 +47,7 @@ class InventoryGiftWorkbenchP13ETests(unittest.TestCase):
             selected_entry = next(
                 entry
                 for entry in app.saved_world_entries
-                if provider.project(Path(str(entry["path"]))).get("available")
+                if Path(str(entry["path"])).resolve() == SAVE.resolve()
             )
             source_path = Path(str(selected_entry["path"]))
             before_hash = sha256(source_path.read_bytes()).hexdigest()

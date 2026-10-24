@@ -35,8 +35,21 @@ def render_suggestions(
             row=1, column=2, sticky="e", padx=3, pady=(0, 2)
         )
     revision = suggestions.get("revision")
+    override_id = getattr(self, "suggestion_group_override_id", None)
+    display_group_id = suggestions.get("currentGroupID")
+    conversation_graph = (
+        (response.get("observation") or {}).get("conversationGraph")
+        if isinstance(response, dict)
+        else None
+    )
+    if (
+        override_id is None
+        and isinstance(conversation_graph, dict)
+        and "conversation_branch" in group_ids
+    ):
+        display_group_id = "conversation_branch"
     selected_group_id = (
-        suggestions.get("currentGroupID")
+        display_group_id
         if self.suggestion_revision != revision
         else self.suggestion_group_ids_by_display.get(
             self.suggestion_group_box.get(),
@@ -44,13 +57,18 @@ def render_suggestions(
         )
     )
     if selected_group_id not in group_ids:
-        selected_group_id = suggestions.get("currentGroupID") or (
+        selected_group_id = display_group_id or (
             group_ids[0] if group_ids else ""
         )
     self.suggestion_group_box.set(group_display_by_id.get(selected_group_id, ""))
     self.suggestion_revision = revision
+    if override_id not in group_ids:
+        override_id = None
+        self.suggestion_group_override_id = None
     self.suggestion_rows = semantic_suggestion_rows(
-        suggestions, selected_group_id or None
+        suggestions,
+        override_id,
+        use_global_candidates=override_id is None,
     )
     self._ensure_suggestion_buttons(len(self.suggestion_rows))
     self.suggestion_interactive = (

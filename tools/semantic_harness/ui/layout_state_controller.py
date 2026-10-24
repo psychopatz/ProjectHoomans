@@ -1,0 +1,236 @@
+"""Restore and schedule the semantic harness window layout."""
+
+from __future__ import annotations
+
+from typing import Any
+
+
+def restore_ui_state(app: Any) -> None:
+    """Restore non-scenario UI state after the widget tree exists."""
+
+    def restore() -> None:
+        try:
+            saved_window_state = app._ui_state.get("window_state")
+            if saved_window_state in {"normal", "zoomed"}:
+                app.root.state(saved_window_state)
+            main_index = int(app._ui_state.get("main_tab", 0))
+            tabs = app.main_tabs.tabs()
+            if tabs:
+                app.main_tabs.select(tabs[min(max(main_index, 0), len(tabs) - 1)])
+            studio_index = int(app._ui_state.get("studio_tab", 0))
+            studio_tabs = app.studio_notebook.tabs()
+            if studio_tabs:
+                app.studio_notebook.select(
+                    studio_tabs[min(max(studio_index, 0), len(studio_tabs) - 1)]
+                )
+            trace_index = int(app._ui_state.get("trace_tab", 0))
+            trace_tabs = app.trace_tabs.tabs()
+            if trace_tabs:
+                app.trace_tabs.select(
+                    trace_tabs[min(max(trace_index, 0), len(trace_tabs) - 1)]
+                )
+            app._restore_splitters()
+            workbench_tabs = app.workbench_notebook.tabs()
+            if workbench_tabs:
+                workbench_index = int(app._ui_state.get("workbench_panel", 0))
+                app.workbench_notebook.select(
+                    workbench_tabs[
+                        min(max(workbench_index, 0), len(workbench_tabs) - 1)
+                    ]
+                )
+            app._restore_workbench_tabs()
+            app._restore_panel_state()
+        except (app._tk.TclError, TypeError, ValueError):
+            pass
+
+    app.root.after_idle(restore)
+
+
+def restore_panel_state(app: Any) -> None:
+    """Restore visibility choices without restoring scenario contents."""
+
+    saved_trace = app._ui_state.get("trace_panel_visible")
+    if isinstance(saved_trace, bool) and saved_trace != app.trace_panel_visible:
+        app._toggle_trace_panel()
+    saved_advanced = app._ui_state.get("advanced_controls_visible")
+    if (
+        isinstance(saved_advanced, bool)
+        and saved_advanced != app.advanced_controls_visible
+    ):
+        app._toggle_advanced_controls()
+    saved_workbench = app._ui_state.get("workbench_expanded")
+    if isinstance(saved_workbench, bool) and saved_workbench != app.workbench_expanded:
+        app.toggle_simulation_workbench()
+
+
+def restore_splitters(app: Any) -> None:
+    if app.closed or app.main_tabs.select() != str(app.simulation_tab):
+        return
+    workflow_height = max(1, app.workflow_pane_split.winfo_height())
+    if workflow_height <= 10:
+        app._schedule_splitter_restore(100)
+        return
+    workflow_minimum = 340 if app.save_backed_mode else 240
+    workflow_maximum = max(
+        workflow_minimum,
+        workflow_height - (220 if app.save_backed_mode else 260),
+    )
+    workflow_value = app._ui_state.get("workflow_sash")
+    if workflow_value is None:
+        workflow_value = min(
+            max(workflow_minimum, int(workflow_height * 0.50)),
+            workflow_maximum,
+        )
+    else:
+        workflow_value = min(
+            max(workflow_minimum, int(workflow_value)),
+            workflow_maximum,
+        )
+    try:
+        app.workflow_pane_split.sashpos(0, int(workflow_value))
+    except (app._tk.TclError, TypeError, ValueError):
+        pass
+    if not app.trace_panel_visible:
+        return
+    simulation_width = max(1, app.simulation_panes.winfo_width())
+    if simulation_width <= 10:
+        app._schedule_splitter_restore(100)
+        return
+    simulation_value = app._ui_state.get("simulation_sash")
+    if simulation_value is None:
+        simulation_value = min(
+            max(620, int(simulation_width * 0.60)),
+            max(420, simulation_width - 420),
+        )
+    else:
+        simulation_value = min(
+            max(620, int(simulation_value)),
+            max(620, simulation_width - 420),
+        )
+    try:
+        app.simulation_panes.sashpos(0, int(simulation_value))
+    except (app._tk.TclError, TypeError, ValueError):
+        pass
+
+
+def schedule_splitter_restore(app: Any, delay_ms: int = 250) -> None:
+    if app.closed:
+        return
+    if app._splitter_restore_after is not None:
+        try:
+            app.root.after_cancel(app._splitter_restore_after)
+        except app._tk.TclError:
+            pass
+    app._splitter_restore_after = app.root.after(
+        delay_ms, app._restore_splitters
+    )
+
+
+def on_main_tab_changed(app: Any) -> None:
+    if app.closed or app.main_tabs.select() != str(app.simulation_tab):
+        return
+    app._schedule_splitter_restore()
+
+
+def restore_workbench_tabs(app: Any) -> None:
+    selections = app._ui_state.get("workbench_tabs") or {}
+    if not isinstance(selections, dict):
+        return
+    for panel_name, notebook in app.workbench_panel_notebooks.items():
+        selected = selections.get(panel_name)
+        tabs = notebook.tabs()
+        if selected is None or not tabs:
+            continue
+        try:
+            notebook.select(tabs[min(max(int(selected), 0), len(tabs) - 1)])
+        except (TypeError, ValueError, app._tk.TclError):
+            continue
+
+
+def reset_ui_state(app: Any) -> None:
+    """Reset layout preferences without changing the working scenario."""
+
+    app._ui_state = {}
+    try:
+        app.root.state("normal")
+        screen_width = app.root.winfo_screenwidth()
+        screen_height = app.root.winfo_screenheight()
+        width = min(1320, max(1080, screen_width - 48))
+        height = min(860, max(700, screen_height - 96))
+        app.root.geometry(f"{width}x{height}")
+        app.main_tabs.select(app.simulation_tab)
+        app.studio_notebook.select(app.studio_notebook.tabs()[0])
+        app.trace_tabs.select(app.trace_tabs.tabs()[0])
+        if app.workbench_notebook.tabs():
+            app.workbench_notebook.select(app.workbench_notebook.tabs()[0])
+        for notebook in app.workbench_panel_notebooks.values():
+            if notebook.tabs():
+                notebook.select(notebook.tabs()[0])
+        if not app.trace_panel_visible:
+            app._toggle_trace_panel()
+        if not app.advanced_controls_visible:
+            app._toggle_advanced_controls()
+        if not app.workbench_expanded:
+            app.toggle_simulation_workbench()
+        app.talk_utterance_var.set("hello")
+        if "current" in app.talk_target_ids_by_label.values():
+            app.talk_target_var.set(
+                next(
+                    label
+                    for label, target_id in app.talk_target_ids_by_label.items()
+                    if target_id == "current"
+                )
+            )
+        if hasattr(app, "saved_world_search_var"):
+            app.saved_world_search_var.set("")
+        app._save_ui_state()
+        app._set_status("Ready · UI layout reset")
+        app._append(
+            "SYSTEM",
+            "UI layout reset. Working scenario and imported save were unchanged.",
+        )
+    except (app._tk.TclError, TypeError, ValueError, IndexError):
+        app.activity_log.record(
+            "ui", "state_reset_error", message="could not reset window state"
+        )
+
+
+def toggle_simulation_workbench(app: Any) -> None:
+    app.workbench_expanded = not app.workbench_expanded
+    if app.workbench_expanded:
+        app.workbench_content.grid()
+        app.workbench_toggle_button.configure(text="Hide controls")
+    else:
+        app.workbench_content.grid_remove()
+        app.workbench_toggle_button.configure(text="Show controls")
+
+
+def toggle_trace_panel(app: Any) -> None:
+    """Show diagnostics on demand so the normal conversation gets the width."""
+
+    if app.trace_panel_visible:
+        app.simulation_panes.forget(app.trace_pane)
+        app.simulation_panes.pane(app.simulation_workflow_pane, weight=1)
+        app.trace_panel_visible = False
+        app.diagnostics_toggle_button.configure(text="Show diagnostics")
+    else:
+        app.simulation_panes.add(app.trace_pane, weight=2)
+        app.simulation_panes.pane(app.simulation_workflow_pane, weight=3)
+        app.trace_panel_visible = True
+        app.diagnostics_toggle_button.configure(text="Hide diagnostics")
+        app._schedule_splitter_restore()
+
+
+def toggle_advanced_controls(app: Any) -> None:
+    """Collapse low-frequency reset/fixture/replay controls."""
+
+    if app.advanced_controls_visible:
+        app.advanced_controls.grid_remove()
+        app.workbench_footer.grid_remove()
+        app.advanced_controls_visible = False
+        app.advanced_toggle_button.configure(text="Show advanced")
+    else:
+        app.advanced_controls.grid()
+        app.workbench_footer.grid()
+        app.advanced_controls_visible = True
+        app.advanced_toggle_button.configure(text="Hide advanced")

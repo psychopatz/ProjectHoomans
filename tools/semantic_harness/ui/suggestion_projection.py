@@ -15,7 +15,10 @@ def npc_message_text(message: dict[str, Any]) -> str:
 
 
 def semantic_suggestion_rows(
-    suggestions: dict[str, Any], group_id: str | None = None
+    suggestions: dict[str, Any],
+    group_id: str | None = None,
+    *,
+    use_global_candidates: bool = False,
 ) -> list[dict[str, Any]]:
     """Build the bounded visual slice from the production projection."""
 
@@ -24,7 +27,7 @@ def semantic_suggestion_rows(
     # the old five-slot prototype cannot silently discard safe choices.
     groups = suggestions.get("groups") or []
     selected = None
-    if groups:
+    if groups and not use_global_candidates:
         requested = group_id or suggestions.get("currentGroupID")
         selected = next(
             (group for group in groups if group.get("id") == requested),
@@ -212,4 +215,3 @@ __all__ = [
     "semantic_suggestion_title",
     "semantic_hub_diagnostic_projection",
 ]
-

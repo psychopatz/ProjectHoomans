@@ -20,6 +20,41 @@ def render_saved_world_tree(self) -> None:
     query = self.saved_world_search_var.get().strip().casefold()
     if not isinstance(groups, list):
         groups = []
+    root_iid = getattr(self, "saved_world_tree_root_iid", "world-root")
+    root_open = self._ui_state.get("saved_world_root_open", True) is not False
+    source = str(
+        self.saved_world_browser.get("source")
+        or self.saved_world_browser.get("sourceKind")
+        or "MISSING"
+    ).upper()
+    visible_actor_count = 0
+    for group in groups:
+        if not isinstance(group, dict):
+            continue
+        members = [
+            row for row in (group.get("members") or []) if isinstance(row, dict)
+        ]
+        if not query:
+            visible_actor_count += len(members)
+            continue
+        group_label = str(group.get("label") or group.get("id") or "World")
+        visible_actor_count += sum(
+            1
+            for row in members
+            if query in group_label.casefold()
+            or query in str(row.get("label") or "").casefold()
+            or query in str(row.get("id") or "").casefold()
+            or query in str(row.get("affiliationLabel") or "").casefold()
+            or query in str(row.get("relationshipBadge") or "").casefold()
+        )
+    self.saved_world_tree.insert(
+        "",
+        "end",
+        iid=root_iid,
+        text=f"Saved world ({visible_actor_count})",
+        values=("world", source, "all actors"),
+        open=root_open,
+    )
     open_group_ids = {
         str(value)
         for value in (self._ui_state.get("saved_world_open_groups") or [])
@@ -49,7 +84,7 @@ def render_saved_world_tree(self) -> None:
         group_tag = str(group.get("relationshipTag") or "")
         group_tags = (group_tag,) if group_tag else ()
         self.saved_world_tree.insert(
-            "",
+            root_iid,
             "end",
             iid=group_iid,
             text=f"{group_label} ({len(matching_members) if query else len(members)})",
@@ -114,11 +149,13 @@ def _restore_saved_world_tree_selection(self) -> None:
     wanted = str(self._ui_state.get("saved_world_npc_id") or "")
     if not wanted:
         return
+    root_iid = getattr(self, "saved_world_tree_root_iid", "world-root")
     for actor_iid, actor in self.saved_world_tree_actor_rows.items():
         if str(actor.get("id") or "") != wanted:
             continue
         group_iid = self.saved_world_tree_actor_groups.get(actor_iid)
         if group_iid:
+            self.saved_world_tree.item(root_iid, open=True)
             self.saved_world_tree.item(group_iid, open=True)
         self.saved_world_tree.selection_set(actor_iid)
         self.saved_world_tree.focus(actor_iid)

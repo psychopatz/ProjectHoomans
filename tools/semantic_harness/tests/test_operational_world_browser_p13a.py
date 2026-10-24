@@ -60,7 +60,23 @@ class OperationalWorldBrowserP13ATests(unittest.TestCase):
 
                     player_label = app.saved_world_player_box["values"][0]
                     app.saved_world_player_box.set(player_label)
-                    all_groups = app.saved_world_tree.get_children("")
+                    app._ui_state.pop("saved_world_root_open", None)
+                    app._render_saved_world_tree()
+                    root_iid = app.saved_world_tree_root_iid
+                    self.assertEqual(
+                        app.saved_world_tree.get_children(""), (root_iid,)
+                    )
+                    self.assertTrue(
+                        app.saved_world_tree.item(root_iid, "open")
+                    )
+                    app.saved_world_tree.item(root_iid, open=False)
+                    app._save_ui_state()
+                    app._render_saved_world_tree()
+                    self.assertFalse(
+                        app.saved_world_tree.item(root_iid, "open")
+                    )
+                    app.saved_world_tree.item(root_iid, open=True)
+                    all_groups = app.saved_world_tree.get_children(root_iid)
                     all_actor_items = [
                         item
                         for group_item in all_groups
@@ -78,7 +94,7 @@ class OperationalWorldBrowserP13ATests(unittest.TestCase):
                     )
                     app.saved_world_search_var.set("")
                     app._render_saved_world_tree()
-                    groups = app.saved_world_tree.get_children("")
+                    groups = app.saved_world_tree.get_children(root_iid)
                     group = next(
                         item
                         for item in groups
