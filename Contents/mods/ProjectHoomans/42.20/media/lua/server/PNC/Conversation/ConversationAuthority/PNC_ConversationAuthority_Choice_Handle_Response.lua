@@ -9,6 +9,8 @@ PNC.Conversation.Authority = PNC.Conversation.Authority or {}
 local Authority = PNC.Conversation.Authority
 local Internal = Authority.Internal
 local ChoiceResponse = {}
+local InteractionPersistence = PNC.Conversation
+    and PNC.Conversation.InteractionLifecyclePersistence or nil
 
 local send = Internal.Send
 
@@ -30,6 +32,27 @@ function ChoiceResponse.Send(state)
         state.payload
     )
     if state.payload.close then
+        if InteractionPersistence
+            and type(InteractionPersistence.Close) == "function"
+        then
+            local playerUUID = state.context
+                and (state.context.playerEntityKey
+                    or state.context.characterUUID
+                    or state.context.playerUUID)
+            local closed, closeReason = InteractionPersistence.Close(
+                playerUUID,
+                state.record and state.record.id,
+                { worldHour = state.context.worldAgeHours }
+            )
+            if not closed and PNC.Core
+                and type(PNC.Core.LogWarn) == "function"
+            then
+                PNC.Core.LogWarn(
+                    "conversation lifecycle close failed reason="
+                        .. tostring(closeReason or "unknown")
+                )
+            end
+        end
         state.lease.conversationState = nil
     end
     return true, state.outcome.id

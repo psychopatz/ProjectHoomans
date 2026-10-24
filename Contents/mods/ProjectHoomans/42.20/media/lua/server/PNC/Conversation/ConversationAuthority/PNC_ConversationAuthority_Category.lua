@@ -11,6 +11,8 @@ local Internal = Authority.Internal
 local Registry = PNC.Conversation.Registry
 local Selector = PNC.Conversation.Selector
 local History = PNC.Conversation.History
+local InteractionPersistence = PNC.Conversation
+    and PNC.Conversation.InteractionLifecyclePersistence or nil
 local validateLease = Internal.ValidateLease
 local requestIsCurrent = Internal.RequestIsCurrent
 local send = Internal.Send
@@ -59,6 +61,22 @@ function Authority.HandleCategory(player, args)
             npcID = tostring(args.npcID or ""),
         })
         return false, reason
+    end
+    if context.interactionLifecycle
+        and context.interactionLifecycle.status == "SUSPENDED"
+        and InteractionPersistence
+        and type(InteractionPersistence.Resume) == "function"
+    then
+        local resumed, resumeReason = InteractionPersistence.Resume(
+            context.playerEntityKey,
+            record.id,
+            { worldHour = context.worldAgeHours }
+        )
+        if resumed and resumed.thread then
+            context.interactionLifecycle = resumed.thread
+        elseif resumeReason == "thread_expired" then
+            context.interactionLifecycle = nil
+        end
     end
     local categoryEligible
     categoryEligible, reason = Selector.IsCategoryEligible(
@@ -111,6 +129,7 @@ function Authority.HandleCategory(player, args)
         categoryID = block.category,
         registryFingerprint = Registry.GetFingerprint(),
         selection = selection,
+        interactionLifecycle = context.interactionLifecycle,
     })
     return true, block.id
 end

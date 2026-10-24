@@ -43,6 +43,7 @@ function Presentation.HandleSocialGreeting(greeting)
         speakerName = targetName(snapshot),
         seed = eventID,
         eventID = eventID,
+        interaction = greeting.interaction,
     }
     if greeting.eventType == "corpse_reaction"
         and type(greeting.gossipPacket) == "table"
@@ -166,6 +167,7 @@ function Presentation.HandleSocialGreeting(greeting)
             corpseName = greeting.corpseName,
             factionName = greeting.factionName,
             relationshipKind = greeting.relationshipKind,
+            interaction = greeting.interaction,
         })
     end
     return text ~= nil and text ~= ""

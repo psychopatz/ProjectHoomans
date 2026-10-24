@@ -17,6 +17,17 @@ local relationshipSummary = Internal.RelationshipSummary
 local relationshipDelta = Internal.RelationshipDelta
 local effectFor = Internal.EffectFor
 local playerKey = Internal.PlayerKey
+local InteractionLifecycle = PNC.Semantics
+    and PNC.Semantics.InteractionLifecycle or nil
+local InteractionPersistence = PNC.Conversation
+    and PNC.Conversation.InteractionLifecyclePersistence or nil
+
+local function greetingFactRefs(details)
+    local refs = {}
+    if details and details.memoryID then refs[#refs + 1] = details.memoryID end
+    if details and details.memoryType then refs[#refs + 1] = details.memoryType end
+    return refs
+end
 
 function Service.TryGreet(player, target, at, actorKey)
     local npcID = tostring(target and target.id or "")
@@ -127,6 +138,50 @@ function Service.TryGreet(player, target, at, actorKey)
     after = relationshipSummary(afterRelationship, true, npcID)
     delta = relationshipDelta(before, after)
     presentationEventID = details and details.eventID or eventID
+    local interaction
+    if InteractionLifecycle
+        and type(InteractionLifecycle.Envelope) == "table"
+        and type(InteractionLifecycle.Envelope.NPCSpeech) == "function"
+        and InteractionPersistence
+        and type(InteractionPersistence.RecordNPCSpeech) == "function"
+    then
+        interaction = InteractionLifecycle.Envelope.NPCSpeech({
+            npcID = npcID,
+            targetID = actorKey,
+            playerUUID = actorKey,
+            act = "GREET",
+            topic = "greeting",
+            eventRef = presentationEventID,
+            flowID = "social_greeting",
+            poolID = flavorID,
+            factRefs = greetingFactRefs(details),
+            worldHour = at,
+        })
+        if interaction then
+            local recorded, recordReason =
+                InteractionPersistence.RecordNPCSpeech({
+                    npcID = npcID,
+                    targetID = actorKey,
+                    playerUUID = actorKey,
+                    act = "GREET",
+                    topic = "greeting",
+                    eventRef = presentationEventID,
+                    flowID = "social_greeting",
+                    poolID = flavorID,
+                    factRefs = greetingFactRefs(details),
+                    worldHour = at,
+                    meaningful = true,
+                })
+            if not recorded and PNC.Core
+                and type(PNC.Core.LogWarn) == "function"
+            then
+                PNC.Core.LogWarn(
+                    "social greeting lifecycle failed reason="
+                        .. tostring(recordReason or "unknown")
+                )
+            end
+        end
+    end
     if PresentationAnimations and PresentationAnimations.Request then
         -- This greeting is authoritative but has no conversation lease, so
         -- keep it on the server-owned presentation path.
@@ -172,6 +227,7 @@ function Service.TryGreet(player, target, at, actorKey)
             memoryType = details and details.memoryType
                 or definition.targetMemory.type,
             interactionType = definition.id,
+            interaction = interaction,
         })
     end
     return true, {

@@ -8,6 +8,7 @@ require "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
 require "PNC/Conversation/PNC_SocialFlavorDefinitions"
 require "PNC/Audio/PNC_PlayerSpeech"
 require "PNC/Conversation/PNC_ConversationFarewellContext"
+pcall(require, "PNC/Semantics/PNC_SemanticInteractionLifecycle")
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
@@ -18,6 +19,8 @@ PNC.Conversation.Farewell = Farewell
 local pending = {}
 local recent = {}
 local Context = PNC.Conversation.FarewellContext
+local InteractionLifecycle = PNC.Semantics
+    and PNC.Semantics.InteractionLifecycle or nil
 
 Farewell.CHANCE_PERCENT = Farewell.CHANCE_PERCENT or 55
 Farewell.NPC_DELAY_MS = Farewell.NPC_DELAY_MS or 1900
@@ -124,6 +127,7 @@ local function deliver(item, current)
             eventType = "conversation_farewell",
             socialRole = item.role,
             contextEligible = false,
+            interaction = item.interaction,
         },
     })
     if accepted == true then
@@ -142,6 +146,7 @@ function Farewell.Schedule(spec, state, reason)
     local playerID
     local seed
     local playerText
+    local interaction
     if not state or state.farewellEvaluated then
         return false, "already_evaluated"
     end
@@ -157,6 +162,20 @@ function Farewell.Schedule(spec, state, reason)
     end
     role = Context.ResolveSocialRole(spec)
     farewellContext, player, playerID = Context.Build(spec, role, npcID)
+    if InteractionLifecycle
+        and type(InteractionLifecycle.Envelope) == "table"
+        and type(InteractionLifecycle.Envelope.Lifecycle) == "function"
+    then
+        interaction = InteractionLifecycle.Envelope.Lifecycle(
+            "conversation_close",
+            {
+                actorID = playerID,
+                targetID = npcID,
+                playerUUID = playerID,
+                topic = context.currentTopic or context.conversationTopic,
+            }
+        )
+    end
     seed = "conversation-farewell:" .. npcID .. ":"
         .. tostring(state.token or current)
     local flavor = socialFlavor()
@@ -182,6 +201,7 @@ function Farewell.Schedule(spec, state, reason)
         playerID = playerID,
         role = role,
         context = farewellContext,
+        interaction = interaction,
         seed = seed,
         dueAt = current + Farewell.NPC_DELAY_MS,
         expiresAt = current + Farewell.PENDING_TTL_MS,

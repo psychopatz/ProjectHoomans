@@ -585,6 +585,7 @@ load(
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticCatalog.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticEngineFacts.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticEngineEvents.lua", "semantic")
+    load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua", "semantic_lifecycle")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticDialoguePolicy.lua", "semantic")
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticCommandAdapter.lua", "semantic_adapter")
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticTaskAdapter.lua", "semantic_adapter")

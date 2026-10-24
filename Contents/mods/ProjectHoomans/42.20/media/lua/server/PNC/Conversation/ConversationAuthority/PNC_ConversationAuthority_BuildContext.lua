@@ -14,6 +14,8 @@ local Internal = Authority.Internal
 local Registry = PNC.Conversation.Registry
 local History = PNC.Conversation.History
 local TextLoader = PNC.Conversation.TextLoader
+local InteractionPersistence = PNC.Conversation
+    and PNC.Conversation.InteractionLifecyclePersistence or nil
 local personalRelationshipQueries = Internal.PersonalRelationshipQueries
 local relationshipCategory = Internal.RelationshipCategory
 local audienceMap = Internal.AudienceMap
@@ -99,6 +101,18 @@ function Authority.BuildContext(player, record, token)
                 worldAgeHours()
             ) or nil,
     }
+    if InteractionPersistence
+        and type(InteractionPersistence.Project) == "function"
+    then
+        -- A targeted semantic capsule is enough to resume an interrupted
+        -- beat; rendered conversation rows never enter this context.
+        local lifecycle = InteractionPersistence.Project(
+            playerEntityKey,
+            record.id
+        )
+        context.interactionLifecycle = lifecycle
+            and lifecycle.thread or nil
+    end
     context.historyLookup = function(subjectID, scope)
         return History.Get(subjectID, { scope = scope }, context)
     end

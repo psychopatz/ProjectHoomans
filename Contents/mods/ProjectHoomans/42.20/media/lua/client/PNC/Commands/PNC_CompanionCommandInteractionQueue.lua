@@ -140,6 +140,8 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
         names = flavorContext.names,
         count = flavorContext.count,
         player = flavorContext.player,
+        interaction = type(context) == "table"
+            and context.interaction or nil,
     }
     source = {
         kind = "emote_interaction",
@@ -176,6 +178,8 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
         context = queueContext,
         presentationState = presentationState,
         source = source,
+        interaction = type(context) == "table"
+            and context.interaction or nil,
         ttlMs = 15000,
         holdMs = 1200,
     })

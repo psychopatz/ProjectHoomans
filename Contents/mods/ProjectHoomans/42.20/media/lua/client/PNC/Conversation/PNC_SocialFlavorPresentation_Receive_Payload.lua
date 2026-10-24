@@ -33,6 +33,8 @@ function H.BuildReceivePayload(receive)
         relationshipState = receive.relationshipState,
         relationshipTier = receive.relationshipTier,
         context = context,
+        interaction = ambientFlavor.interaction
+            or context.interaction,
         seed = receive.eventID,
         mergeKey = ambientFlavor.mergeKey
             or receive.npcID .. ":" .. tostring(ambientFlavor.family or "ambient"),

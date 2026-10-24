@@ -9,6 +9,7 @@ local Knowledge = require "worker/CommandRouter_Knowledge"
 local Persona = require "worker/CommandRouter_Persona"
 local Simulation = require "worker/CommandRouter_Simulation"
 local Talk = require "worker/CommandRouter_Talk"
+local InteractionLifecycle = require "worker/CommandRouter_InteractionLifecycle"
 
 local Handlers = {
     Session,
@@ -19,6 +20,7 @@ local Handlers = {
     Persona,
     Simulation,
     Talk,
+    InteractionLifecycle,
 }
 
 function CommandRouter.hello(context)

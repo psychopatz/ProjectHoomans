@@ -1,50 +1,28 @@
 # Migration Matrix — Legacy Flavor to Semantic Lifecycle
 
-This matrix is the required scope inventory. P0 must verify and expand it from current source before runtime migration.
+This is the P0A source-level migration inventory. A row is not retired until its production semantic route has parity and regression evidence.
 
-| Family | Current verified/known owner | Target | Retirement rule |
-| --- | --- | --- | --- |
-| Conversation greeting | semantic greeting flow already exists; other greeting/social presentation paths also exist | conversation-open lifecycle act -> existing semantic greeting flow/response plan | remove duplicate text-generation owner only after parity |
-| Conversation farewell | PNC_ConversationFarewell + SocialFlavor definitions/context | conversation-close lifecycle act -> semantic farewell flow/plan | preserve close eligibility/cooldown behavior; retire duplicate farewell prose authority after parity |
-| Vanilla/player emote replies | Conversation/Flavor/VanillaEmote translations + command/social flavor adapters | typed semantic gesture act -> common response planning/realization | migrate authored lines as seed variants; no separate emote intelligence |
-| Companion command/social emotes | PNC_CompanionCommandFlavorDefinitions_Typed* and related presentation | typed semantic act/capability result -> realization | keep gameplay command authority outside semantics |
-| Combat reactions | SocialFlavor/event definitions such as witnessed player kill | grounded world/combat event -> semantic REACT act | event owner remains Combat; flavor prose owner retires after parity |
-| Medical/hurt/downed reactions | SocialFlavor + FlavorTextResolver + medical/social adapters | grounded Health/Combat fact -> semantic reaction | Health/Combat remain authoritative |
-| Gift/social reaction speech | existing gift/social event paths | authoritative result -> semantic reaction/realization | no duplicate gift/inventory state |
-| World/faction/gossip reactions | mixed current event/gossip providers | canonical shared fact/event ref -> semantic reaction | integrate existing gossip/world-event ownership; no duplicate world history |
-| Compatibility flavor | Bandits/Necroa/other compatibility adapters | adapter emits typed semantic event when safe | addon/provider remains owner of source fact |
-| Contextual reply buttons | current semantic suggestion/provider/branch offer system | unchanged shared semantic-frame path | extend with active beat/thread context; do not add callback execution |
-| Typed Talk/headless input | current NLU/router | unchanged NLU -> semantic act | preserve parser/candidate compatibility |
-| ConversationBlocks | authored graph registry and server authority | preserve graph/effects; optional common realization later | never replace branching/effects with spontaneous flavor |
-| TTS / nameplate / conversation presentation | existing presentation/audio queues | consume common realized output | presentation remains presentation; no semantic ownership |
+| Family / IDs | Current verified owner and evidence | Target route | State/effect owner | Parity / retirement gate |
+| --- | --- | --- | --- | --- |
+| Conversation greeting; `social_greeting_npc_*`, `vanilla_emote_wavehi_npc_*` | `PNC_VanillaEmoteInteractions.lua`, companion flavor definition shards, `PNC_SemanticDialogueFlow_Greeting.lua`, greeting response catalog | `conversation_open` / `GREET` envelope into existing greeting flow and response plan | Relationship, context, ConversationBlocks, presentation/TTS | Match first/returning state and relationship tier; one output; retire duplicate prose only after parity |
+| Farewell; `social.conversation_farewell` | `PNC_ConversationFarewell.lua`, `PNC_ConversationFarewellContext.lua`, GroupA definitions; 55% chance, 1.9s delay, 7s TTL, 12s client cooldown | `conversation_close` / `FAREWELL` envelope | Existing close eligibility and presentation; lifecycle persistence owns meaningful residue | Preserve excluded close reasons, role resolution and delayed presentation; add server lifecycle parity before retirement |
+| Vanilla/player emotes; `insult`, `thumbsdown`, `wavehi`, `wavebye`, `thankyou`, `thumbsup`, `clap`, `salute` | `PNC_VanillaEmoteInteractions.lua`, `PNC_ServerPlayerEmoteInteractionCommandHandler.lua`, companion command flavor definitions | `emote` envelope with canonical act and gesture | Server relationship/social-event authority; animation remains engine/command owner | Typed/button/emote meaning converges; preserve daily, cooldown, memory and relationship behavior |
+| Companion commands and social replies | `PNC_CompanionCommandFlavor.lua`, `PNC_CompanionCommandFlavorDefinitions_TypedA/B.lua`, command presentation | `semantic_choice`, `emote`, or `npc_speech` envelope after command/result resolution | Companion command registry and existing gameplay domains | Do not move permission/effects; reuse EN/TL lines as realization variants; parity before retirement |
+| Combat kill/hurt witnesses; `social.witnessed_player_kill`, `social.witnessed_teammate_hurt` | `PNC_SocialEventHooks_CombatAdapter_Witnesses.lua`, damage/treatment adapters, GroupA definitions | Grounded `world_event` / `REACT` with canonical event/fact refs | Combat, Health, SocialEvents, Relationships, Knowledge | No fake prose parse; bounded witness arbitration; preserve event refs and effect ownership |
+| Medical/incapacitated; `social.incapacitated_call`, `social.incapacitated_update`, `social.incapacitated_repeat` | Incapacitated flavor definitions and health/damage/treatment adapters | Grounded `world_event` / request or `REACT` act | Health, Task, Relationship owners | Preserve call/update/repeat merge lanes and task effects; parity fixtures before prose retirement |
+| Follower abandonment; `social.follower_abandoned_zombie`, `social.follower_abandoned_hostile_npc` | `PNC_FollowerAbandonmentService.lua`, GroupB definitions, persisted abandonment marker | Grounded `world_event` / `REACT` with compact event ref | Follower, relationship and faction owners | Keep one persisted marker and one relationship mutation; no duplicate large payload |
+| Player speech and safety; `social.player_spoke`, `social.conversation_safety_danger` | `PNC_SocialFlavorPresentation_Speech.lua`, GroupB/C definitions | Typed semantic input and lifecycle interruption/context | Existing input and safety owners; presentation/TTS | Active beat wins; no ambient reparse; one output lane |
+| Horde/retreat; `social.zombie_horde_detected`, `social.zombie_stamina_retreat` | `PNC_SocialEventHooks_CombatAdapter_Awareness.lua`, GroupC definitions | Grounded combat `world_event` / `REACT` | Combat awareness, relationship memory and client arbitration | Preserve thresholds, clear interval, cooldown and bounded speaker selection; no per-tick dialogue scan |
+| Leader loss; `social.witnessed_leader_death` | `PNC_SocialEventHooks_LeaderLoss.lua`, LeaderDeath definition shards | Grounded faction `world_event` / `REACT` | Faction succession and relationship owners | Preserve grief/succession context and faction effects |
+| Project A-Life world/gossip; `projectalife.*` | `PNC_ProjectALife_EventPresenter.lua`, `PNC_ProjectALife_FlavorDefinitions.lua` | Adapter to canonical world event ref and `REACT` | Project A-Life and World Knowledge remain fact owners | One canonical event reference; no duplicated payload per witness |
+| Compatibility; `compat.bandits.hooman_hurt`, `compat.necroa.mask_warning`, `compat.necroa.player_mask_removed` | Bandits/Necroa compatibility adapters and flavor definition shards | Narrow grounded compatibility event when safe | Provider/addon remains source owner | Adapter throttle/seen state and parity test before retirement |
+| Contextual reply buttons | `PNC_SemanticDialogueSuggestions.lua` providers and `Input.SubmitSemanticFrame` | Existing semantic-frame path plus lifecycle context | Existing router and ConversationBlocks | Keep stale/duplicate guards; no callback execution or second parser |
+| Typed Talk/headless input | `PNC_SemanticDialogueInput.lua`, existing parser/router/policy | Typed text -> NLU -> envelope | Existing parser/router and authoritative domains | Preserve parser/candidate contracts and deterministic offline route |
+| ConversationBlocks | Registry/composer and server `ConversationAuthority` | Existing authored branch/effect route, with common lifecycle meaning | ConversationBlocks and server authority | Never replace gates, effects or repeat rules with spontaneous flavor |
+| Presentation/TTS/nameplate | `PNC_SocialFlavorPresentation*`, `PNC_PlayerSpeech`, existing conversation renderers | Common realization output consumed by existing sinks | Presentation/audio queues | Visible history remains bounded presentation state, not durable transcript |
 
-## Migration rules
+## Required row fields
 
-1. Do not delete existing flavor content before the corresponding semantic path demonstrates behavioral parity and regression coverage.
-2. Existing authored lines are valuable content and should be migrated as realization variants where semantically valid.
-3. Do not copy old role buckets mechanically if better authoritative ActorConversationContext already exists.
-4. Semantic IDs describe meaning, not every wording variant.
-5. Player and NPC realizations may differ, but they use the same semantic lifecycle and context owners.
-6. Known events enter after NLU.
-7. No migration may bypass server gameplay authority.
-8. No phase is complete merely because source strings moved directories; actual production routing must use the new path.
+Every discovered family must have a stable ID, source files, trigger owner, speaker/target, context inputs, text/translation source, presentation/TTS route, effects, cooldown/chance/dedupe behavior, multiplayer authority, target act/topic/event type, migration phase, parity test, and retirement status.
 
-## P0 required inventory fields
-
-For every discovered legacy speech family, record:
-
-- stable family/event ID;
-- source files;
-- trigger owner;
-- speaker/target;
-- current context inputs;
-- current text pool/translation source;
-- current presentation/TTS route;
-- relationship/gameplay effects, if any;
-- cooldown/chance/dedupe behavior;
-- multiplayer authority;
-- target semantic act/topic/event type;
-- migration phase;
-- parity tests/harness scenario;
-- retirement status.
-
+Known events enter after NLU only when they are freeform language; events already known to gameplay enter as grounded semantic events. No migration bypasses server gameplay authority.

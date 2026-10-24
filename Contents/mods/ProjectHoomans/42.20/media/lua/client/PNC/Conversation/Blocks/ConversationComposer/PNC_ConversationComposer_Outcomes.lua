@@ -47,6 +47,20 @@ function Composer.ReceiveBlock(args)
         notifyFailure(view, "status.block_unavailable", "block_unavailable")
         return false, "block_unavailable"
     end
+    if type(args.interactionLifecycle) == "table" then
+        local lifecycle = args.interactionLifecycle
+        view.session.semanticInteractionLifecycle = lifecycle
+        view.spec.context.interactionLifecycle = lifecycle
+        context.interactionLifecycle = lifecycle
+        local beat = lifecycle.activeBeat
+        local topic = beat and beat.topic or lifecycle.topic
+        local dialogueContext = view.session.semanticDialogueContext
+        if topic and dialogueContext
+            and type(dialogueContext.SetTopic) == "function"
+        then
+            dialogueContext:SetTopic(topic, false)
+        end
+    end
     local attached, nodeID = Composer.AttachBlock(view.spec, block, context)
     if not attached then
         notifyFailure(view, "status.block_unavailable", nodeID)

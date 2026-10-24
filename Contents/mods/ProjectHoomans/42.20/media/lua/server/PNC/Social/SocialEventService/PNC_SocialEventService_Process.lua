@@ -12,6 +12,11 @@ local enabled = Internal.Enabled
 local isAuthority = Internal.IsAuthority
 local observerSpecs = Internal.ObserverSpecs
 local preflightObserver = Internal.PreflightObserver
+local EntityRef = PNC.EntityRef
+local InteractionLifecycle = PNC.Semantics
+    and PNC.Semantics.InteractionLifecycle or nil
+local InteractionPersistence = PNC.Conversation
+    and PNC.Conversation.InteractionLifecyclePersistence or nil
 
 require "PNC/Social/SocialEventService/PNC_SocialEventService_Process_Bridges"
 
@@ -25,6 +30,73 @@ local function rejected(reason, fields, definition)
         PNC.SocialEventDebug.LogRejected(output, definition)
     end
     return output
+end
+
+local function recordLifecycleEvent(event, output)
+    if not InteractionPersistence or type(event) ~= "table"
+        or type(output) ~= "table"
+    then
+        return
+    end
+    if type(InteractionPersistence.RegisterSharedEvent) == "function" then
+        local _, sharedReason = InteractionPersistence.RegisterSharedEvent({
+            id = event.id,
+            type = event.type,
+            occurredAt = event.occurredAt,
+            source = event.sourceSystem,
+        })
+        if sharedReason == "shared_event_budget_exhausted"
+            and PNC.Core and type(PNC.Core.LogWarn) == "function"
+        then
+            PNC.Core.LogWarn(
+                "interaction shared event budget exhausted event="
+                    .. tostring(event.id)
+            )
+        end
+    end
+    if not InteractionLifecycle
+        or type(InteractionLifecycle.Envelope) ~= "table"
+        or type(InteractionPersistence.Apply) ~= "function"
+    then
+        return
+    end
+    local actor = EntityRef and EntityRef.Parse
+        and EntityRef.Parse(event.actorKey) or nil
+    if not actor or actor.kind ~= "player" then return end
+    for _, detail in ipairs(output.details or {}) do
+        local envelope = InteractionLifecycle.Envelope.WorldEvent({
+            id = event.id,
+            type = event.type,
+            eventType = event.type,
+            occurredAt = event.occurredAt,
+            factRefs = detail.memoryID and { detail.memoryID } or nil,
+        }, {
+            actorID = event.actorKey,
+            targetID = detail.observerNPCID,
+            playerUUID = event.actorKey,
+            topic = event.type,
+            worldHour = event.occurredAt,
+        })
+        local applied, reason = InteractionPersistence.Apply(envelope, {
+            meaningful = true,
+            eventRef = event.id,
+            memory = detail.memoryID,
+            worldHour = event.occurredAt,
+        })
+        -- Keep the exact grounded provenance beside the observer result so
+        -- the existing presentation bridge can carry meaning without ever
+        -- reparsing the rendered flavor line.
+        detail.interaction = envelope
+        if not applied and PNC.Core
+            and type(PNC.Core.LogWarn) == "function"
+        then
+            PNC.Core.LogWarn(
+                "social event lifecycle apply failed event="
+                    .. tostring(event.id)
+                    .. " reason=" .. tostring(reason or "unknown")
+            )
+        end
+    end
 end
 
 function SocialEvents.Process(eventSpec)
@@ -112,7 +184,9 @@ function SocialEvents.Process(eventSpec)
         conductEvidenceCreated = transactionDetails.conductEvidenceCreated,
         conductDetails = transactionDetails.conductDetails,
     })
-    return Internal.ApplyPostProcess(event, output, definition)
+    output = Internal.ApplyPostProcess(event, output, definition)
+    recordLifecycleEvent(event, output)
+    return output
 end
 
 return SocialEvents

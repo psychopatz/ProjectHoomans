@@ -10,6 +10,8 @@ local isTravelConversation = Internal.IsTravelConversation
 local playerOwnsLease = Internal.PlayerOwnsLease
 local log = Internal.LeaseLog
 local recordConversationTopics = Internal.RecordConversationTopics
+local InteractionPersistence = PNC.Conversation
+    and PNC.Conversation.InteractionLifecyclePersistence or nil
 
 function Scene.End(record, zombie, token, reason, options)
     local runtime = record and record.runtime or nil
@@ -33,6 +35,27 @@ function Scene.End(record, zombie, token, reason, options)
         and options.memoryTopicMask ~= nil
     then
         recordConversationTopics(record, player, options.memoryTopicMask)
+    end
+    if player and InteractionPersistence
+        and type(InteractionPersistence.Close) == "function"
+    then
+        local playerUUID = Internal.PlayerKey(
+            player,
+            "conversation_lifecycle_close"
+        )
+        local closed, closeReason = InteractionPersistence.Close(
+            playerUUID,
+            record and record.id,
+            { worldHour = Internal.WorldAgeHours() }
+        )
+        if not closed and closeReason ~= "no_thread"
+            and PNC.Core and type(PNC.Core.LogWarn) == "function"
+        then
+            PNC.Core.LogWarn(
+                "conversation lifecycle UI close failed reason="
+                    .. tostring(closeReason or "unknown")
+            )
+        end
     end
     if requestID ~= "" then
         local reserved, reserveReason = Scene.ReserveLLMRequest(

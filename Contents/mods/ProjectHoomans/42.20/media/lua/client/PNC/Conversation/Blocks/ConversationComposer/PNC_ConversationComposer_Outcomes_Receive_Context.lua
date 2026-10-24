@@ -28,6 +28,28 @@ function ReceiveContext.Build(args)
         context = contextRoot.conversationBlockContext,
         session = view.session,
     }
+    if type(args.interactionLifecycle) == "table" then
+        -- The server projection is semantic state only. Keep it mounted on
+        -- the live context after visible rows are later discarded.
+        local lifecycle = args.interactionLifecycle
+        if state.session then
+            state.session.semanticInteractionLifecycle = lifecycle
+        end
+        contextRoot.interactionLifecycle = lifecycle
+        if state.context then
+            state.context.interactionLifecycle = lifecycle
+        end
+        local thread = lifecycle
+        local beat = thread.activeBeat
+        local topic = beat and beat.topic or thread.topic
+        local dialogueContext = state.session
+            and state.session.semanticDialogueContext or nil
+        if topic and dialogueContext
+            and type(dialogueContext.SetTopic) == "function"
+        then
+            dialogueContext:SetTopic(topic, false)
+        end
+    end
     if args.success ~= true then return state end
 
     state.block = Registry.GetBlock(args.blockID)

@@ -20,6 +20,19 @@ local function onDelivered(payload)
     local source = item.source or {}
     local context = type(item.context) == "table" and item.context or {}
     local npcID = tostring(item.speakerID or "")
+    local interaction = item.interaction or source.interaction
+    if type(interaction) == "table" then
+        local conversation = PsychopatzCore and PsychopatzCore.Conversation
+        local view = conversation and conversation.instance or nil
+        if view and view.session and view.spec
+            and tostring(view.spec.npcID or "") == npcID
+        then
+            -- Keep provenance available to the next semantic input while
+            -- leaving the visible history and durable state presentation-only.
+            view.lastNPCSemanticInteraction = interaction
+            view.session.semanticNPCProvenance = interaction
+        end
+    end
     -- Interaction speech has its own exchange/diary owner.  The ambient
     -- listener must not reinterpret player lines or command replies as new
     -- proximity commentary when they share Core's arbitration queue.

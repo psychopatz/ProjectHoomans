@@ -112,6 +112,21 @@ function Projection.Build(view, getProviderStatus)
         or source.conversationBlockContext
         and source.conversationBlockContext.conversationTopic
     local session = view and view.session or nil
+    local interactionLifecycle = session
+        and session.semanticInteractionLifecycle
+        or source.interactionLifecycle
+    if type(interactionLifecycle) == "table" then
+        -- This is the bounded semantic capsule delivered for this player.
+        -- It intentionally contains no rendered NPC/player transcript text.
+        output.interactionLifecycle = interactionLifecycle
+        local thread = interactionLifecycle
+        local beat = thread.activeBeat
+        if beat and beat.topic then
+            output.currentTopic = beat.topic
+        elseif thread.topic and not output.currentTopic then
+            output.currentTopic = thread.topic
+        end
+    end
     local memoryTargetID = session and session.semanticMemoryTargetID
         or source.semanticMemoryTargetID
     local cognitionClient = PNC.Semantics
@@ -139,6 +154,15 @@ function Projection.Build(view, getProviderStatus)
             session.semanticDialogueContext:ToContext()
         output.currentTopic = session.semanticDialogueContext.currentTopic
             or output.currentTopic
+    end
+    if type(interactionLifecycle) == "table" then
+        local thread = interactionLifecycle
+        local beat = thread.activeBeat
+        if beat and beat.topic then
+            output.currentTopic = beat.topic
+        elseif thread.topic and not output.currentTopic then
+            output.currentTopic = thread.topic
+        end
     end
     local composer = PNC.Conversation and PNC.Conversation.Composer
     if composer and type(composer.BuildSemanticBlockProjection) == "function" then

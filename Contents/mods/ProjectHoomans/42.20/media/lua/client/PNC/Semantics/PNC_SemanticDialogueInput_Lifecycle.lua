@@ -23,6 +23,12 @@ if type(Suggestions) ~= "table" then
     Suggestions = PNC.Semantics.DialogueSuggestions
 end
 Suggestions = type(Suggestions) == "table" and Suggestions or {}
+local InteractionLifecycle = PNC.Semantics.InteractionLifecycle
+if type(InteractionLifecycle) ~= "table" then
+    local loaded = require
+        "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+    InteractionLifecycle = type(loaded) == "table" and loaded or nil
+end
 
 local function suggestionText(row)
     local display = row and row.display or {}
@@ -58,6 +64,66 @@ local function suggestionTooltip(row)
             }) or "Unavailable in the current situation."
     end
     return nil
+end
+
+local function interactionContext(view, context)
+    context = type(context) == "table" and context or {}
+    local session = view and view.session or nil
+    local spec = view and view.spec or nil
+    local playerUUID = context.characterUUID or context.playerUUID
+        or session and session.characterUUID
+        or spec and spec.characterUUID
+    local lifecycle = context.interactionLifecycle
+        or session and session.semanticInteractionLifecycle
+    local thread = type(lifecycle) == "table" and lifecycle or nil
+    local beat = thread and thread.activeBeat or nil
+    local npcEnvelope = view and view.lastNPCSemanticInteraction
+        or session and session.semanticNPCProvenance
+    local provenance = beat and {
+        beatID = beat.id,
+        responsePlanID = beat.responsePlanID,
+        flowID = beat.flowID,
+        poolID = beat.poolID,
+        factRefs = beat.factRefs,
+    } or npcEnvelope and npcEnvelope.provenance or nil
+    return {
+        actorID = playerUUID or context.actorID,
+        targetID = spec and spec.npcID or context.targetID,
+        playerUUID = playerUUID,
+        topic = beat and beat.topic or npcEnvelope and npcEnvelope.topic
+            or context.currentTopic
+            or context.authoredTopic
+            or context.conversationTopic,
+        worldHour = context.worldHour or context.occurredAt,
+        provenance = provenance,
+    }
+end
+
+local function attachInteractionEnvelope(
+    view, result, source, ir, context, frame
+)
+    if not InteractionLifecycle
+        or type(InteractionLifecycle.Envelope) ~= "table"
+    then
+        return nil
+    end
+    local Envelope = InteractionLifecycle.Envelope
+    local envelope
+    if source == "semantic_choice"
+        and type(Envelope.SemanticChoice) == "function"
+    then
+        envelope = Envelope.SemanticChoice(
+            frame or {}, interactionContext(view, context)
+        )
+    elseif type(Envelope.TypedText) == "function" then
+        envelope = Envelope.TypedText(
+            ir or {}, interactionContext(view, context)
+        )
+    end
+    if not envelope then return nil end
+    if type(result) == "table" then result.interaction = envelope end
+    if view then view.lastSemanticInteractionEnvelope = envelope end
+    return envelope
 end
 
 local function restoreSemanticChoices(view)
@@ -858,6 +924,15 @@ function Internal.SubmitSingle(view, value, part)
         end
     end
 
+    attachInteractionEnvelope(
+        view,
+        preview,
+        semanticFrame and "semantic_choice" or "typed_text",
+        preview.ir,
+        context,
+        semanticFrame
+    )
+
     if Internal.RequestCognitionForIR then
         cognitionAccepted, _, cognitionRequestID, cognitionPending =
             Internal.RequestCognitionForIR(view, preview.ir)
@@ -913,6 +988,9 @@ function Internal.SubmitSingle(view, value, part)
         view.session.semanticMemoryTargetID = nil
     end
     view.lastSemanticDialogueResult = result
+    if type(result) == "table" and preview.interaction then
+        result.interaction = preview.interaction
+    end
 
     local finalDecision = result and result.decision or {}
     local deferGossipResponse = cognitionPending == true

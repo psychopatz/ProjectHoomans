@@ -5,6 +5,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 then return end
 
 PNC = PNC or {}
+pcall(require, "PNC/Semantics/PNC_SemanticInteractionLifecycle")
 PNC.PlayerEmoteInteractionAuthority =
     PNC.PlayerEmoteInteractionAuthority or {}
 
@@ -18,6 +19,10 @@ local Relationships = PNC.Relationships
 local RelationshipPresentation = PNC.RelationshipPresentation
 local Network = PNC.Network
 local Authority = PNC.PlayerEmoteInteractionAuthority
+local InteractionLifecycle = PNC.Semantics
+    and PNC.Semantics.InteractionLifecycle or nil
+local InteractionPersistence = PNC.Conversation
+    and PNC.Conversation.InteractionLifecyclePersistence or nil
 
 local MAX_REQUEST_ID = 64
 local MAX_TARGETS = 8
@@ -180,6 +185,32 @@ local function summaryFor(player, npcID, relationship, exists)
     return summary or relationshipSummary(relationship, exists, npcID)
 end
 
+local function persistInteraction(entry, at)
+    if not InteractionPersistence
+        or type(InteractionPersistence.Apply) ~= "function"
+        or type(entry) ~= "table"
+        or entry.interaction == nil
+    then
+        return true
+    end
+    local persisted, reason = InteractionPersistence.Apply(
+        entry.interaction,
+        {
+            meaningful = true,
+            eventRef = entry.eventID,
+            memory = entry.memoryType,
+            worldHour = at,
+        }
+    )
+    if not persisted and Core and type(Core.LogWarn) == "function" then
+        Core.LogWarn(
+            "interaction lifecycle apply failed reason="
+                .. tostring(reason or "unknown")
+        )
+    end
+    return persisted ~= nil
+end
+
 local function targetResult(target, definition, eventID, state)
     local before = state.relationshipBefore
     local after = state.relationshipAfter
@@ -203,6 +234,7 @@ local function targetResult(target, definition, eventID, state)
         relationshipTier = state.relationshipTier,
         greetingState = state.greetingState,
         greetingDay = state.greetingDay,
+        interaction = state.interaction,
         replyFlavorID = accepted and Interactions.ReplyFlavorID(
             definition,
             before,
@@ -227,6 +259,21 @@ local function processTarget(
 )
     local eventID = "conversation:vanilla_emote:" .. tostring(actorKey) .. ":"
         .. requestID .. ":" .. tostring(target.id)
+    local interaction
+    if InteractionLifecycle
+        and type(InteractionLifecycle.Envelope) == "table"
+        and type(InteractionLifecycle.Envelope.Emote) == "function"
+    then
+        interaction = InteractionLifecycle.Envelope.Emote(
+            { id = definition.id, eventType = definition.eventType },
+            {
+                actorID = actorKey,
+                targetID = target.id,
+                playerUUID = actorKey,
+                worldHour = at,
+            }
+        )
+    end
     local beforeRelationship = Relationships.Get
         and Relationships.Get(target.id, actorKey) or nil
     local before = relationshipSummary(
@@ -328,6 +375,7 @@ local function processTarget(
         greetingState = greetingState,
         greetingDay = greetingState
             and Interactions.DayIndex(at) or nil,
+        interaction = interaction,
         moraleDelta = applied == true
             and (tonumber(effect.morale) or 0) or 0,
     })
@@ -405,6 +453,9 @@ function Authority.Handle(player, args)
         if entry.accepted == true then
             acceptedCount = acceptedCount + 1
             result.eventID = result.eventID or entry.eventID
+            if entry.applied == true then
+                persistInteraction(entry, at)
+            end
             if Network and Network.SendConversationRelationship then
                 Network.SendConversationRelationship(
                     player,

@@ -229,6 +229,8 @@ local function publishNPCMessage(actor, text, context)
             channel = "ambient_social",
             contextEligible = false,
             eventID = eventID,
+            interaction = type(context) == "table"
+                and context.interaction or nil,
         },
         presentationState = {
             conversationUI = false,

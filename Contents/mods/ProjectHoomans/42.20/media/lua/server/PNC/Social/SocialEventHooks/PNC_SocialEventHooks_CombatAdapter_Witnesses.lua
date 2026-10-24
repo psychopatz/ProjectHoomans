@@ -201,6 +201,8 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
                                 socialRole = role,
                                 relationshipState = state,
                                 relationshipTier = relationshipTier(before),
+                                interaction = detail
+                                    and detail.interaction or nil,
                                 mergeKey = tostring(npcID)
                                     .. ":combat_commentary",
                                 context = {

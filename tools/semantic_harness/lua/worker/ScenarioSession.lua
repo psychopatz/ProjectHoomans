@@ -378,6 +378,23 @@ function ScenarioSession.reset(context, scenario)
         Runtime.captureWorkingBaseline = false
     end
     local runtime = Runtime.scenario.runtime or {}
+    local lifecycle = PNC.Semantics
+        and PNC.Semantics.InteractionLifecycle or nil
+    if lifecycle and type(lifecycle.New) == "function" then
+        local player = Runtime.scenario.player or {}
+        local npc = Runtime.scenario.npc or {}
+        Runtime.interactionLifecycle = lifecycle.New({
+            authoritative = true,
+            worldHour = Runtime.scenario.world
+                and Runtime.scenario.world.worldAgeHours or 0,
+        })
+        Runtime.interactionLifecyclePlayerUUID = tostring(
+            player.characterUUID or player.playerUUID or "player-one"
+        )
+        Runtime.interactionLifecycleNPCID = tostring(
+            npc.npcID or npc.id or "harness-npc"
+        )
+    end
     SemanticDialogueRuntime.SetHarnessOverride(
         runtime.semanticDialogueEnabled ~= false
     )
@@ -520,6 +537,14 @@ function ScenarioSession.reset(context, scenario)
         translation = context.OutputProjection.translationSnapshot(context),
         dynamicTradingLoad = Values.copy(Runtime.dynamicTradingLoad),
         simulationProjection = simulationProjection(context),
+        interactionLifecycle = PNC.Semantics
+            and PNC.Semantics.InteractionLifecycle
+            and Runtime.interactionLifecycle
+            and {
+                metrics = PNC.Semantics.InteractionLifecycle.Metrics(
+                    Runtime.interactionLifecycle
+                ),
+            } or nil,
     }
 end
 
@@ -593,6 +618,14 @@ function ScenarioSession.snapshot(context)
         translation = context.OutputProjection.translationSnapshot(context),
         dynamicTradingLoad = Values.copy(Runtime.dynamicTradingLoad),
         llmCalls = Runtime.llmCalls,
+        interactionLifecycle = PNC.Semantics
+            and PNC.Semantics.InteractionLifecycle
+            and Runtime.interactionLifecycle
+            and {
+                metrics = PNC.Semantics.InteractionLifecycle.Metrics(
+                    Runtime.interactionLifecycle
+                ),
+            } or nil,
         loadedModules = Runtime.loadedModules,
         moduleManifest = Values.copy(Runtime.moduleManifest),
         headlessRequires = Values.copy(Runtime.headlessRequires),

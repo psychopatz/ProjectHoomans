@@ -305,6 +305,44 @@ class LuaSemanticWorker:
 
         return self._conversation.tool_reply(results, context)
 
+    def interaction_envelope(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Build a canonical envelope in the production Lua lifecycle."""
+
+        return self._request("INTERACTION_ENVELOPE", payload)
+
+    def interaction_apply(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Apply one semantic interaction through production Lua."""
+
+        return self._request("INTERACTION_APPLY", payload)
+
+    def interaction_npc_speech(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Record NPC semantic speech provenance without rendered transcript."""
+
+        return self._request("INTERACTION_NPC_SPEECH", payload)
+
+    def interaction_close(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self._request("INTERACTION_CLOSE", payload or {})
+
+    def interaction_resume(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self._request("INTERACTION_RESUME", payload or {})
+
+    def interaction_compact(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self._request("INTERACTION_COMPACT", payload or {})
+
+    def interaction_advance_time(self, world_hour: float) -> dict[str, Any]:
+        return self._request("INTERACTION_ADVANCE_TIME", {"worldHour": world_hour})
+
+    def interaction_metrics(self) -> dict[str, Any]:
+        return self._request("INTERACTION_METRICS")
+
+    def interaction_project(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self._request("INTERACTION_PROJECT", payload or {})
+
+    def interaction_register_event(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Register one canonical shared event in production Lua."""
+
+        return self._request("INTERACTION_REGISTER_EVENT", payload)
+
     def snapshot(self) -> dict[str, Any]:
         return self._conversation.snapshot()
 

@@ -1,78 +1,51 @@
 # Semantic Interaction Lifecycle — Current Progress
 
-**Updated:** 2026-10-24  
-**Parent status:** ACTIVE — planning approved; no production migration has been claimed yet.  
-**Accepted predecessor foundation:** Contextual Dialogue Persona & Choices P14 complete.  
-**Current mandatory phase:** P0 — Migration inventory + performance/persistence baseline.  
-**Audit baseline:** ProjectHoomans main at 6aa9493aa6df0a48b2dd148a247a742d8fb38e5d before this documentation commit.  
-**Native Project Zomboid:** not required for developer execution; final user-owned acceptance only.
+**Updated:** 2026-10-24
 
-## Verified foundation
+**Parent status:** ACTIVE — P0A is complete; P1 is complete; P2/P3 implementation is in progress.
 
-Current source already provides:
+**Accepted predecessor foundation:** Contextual Dialogue Persona & Choices P14 complete. Preserve its save-backed production rehydration architecture.
 
-- semantic greeting flow and conditioned greeting response plans;
-- typed/headless semantic input path;
-- semantic shortcut/button re-entry through the existing Input.Submit route;
-- response-plan branch offers;
-- ActorConversationContext / SpeechStyleContext;
-- production ResponseCatalog;
-- save-backed real-Lua Semantic Lab;
-- P14 production rehydration and layered social context.
+**Audit baseline:** `e8c04b4fb2139be315253f12e0f06a5dfa3fc70f5`
 
-Current source also still contains legacy separate speech authority including:
+**Checkout:** existing `main` only; no branch or source-save mutation.
 
-- PNC_ConversationFarewell + FarewellContext;
-- SocialFlavor definitions for farewell and event reactions;
-- VanillaEmote flavor translations;
-- CompanionCommand flavor definitions;
-- FlavorTextResolver and related spontaneous-social paths.
+**Native Project Zomboid:** user-owned final acceptance only; not a developer-side blocker.
 
-## Actual product gap
+## P0A — complete
 
-Project Hoomans does not yet have one lifecycle that:
+`SOURCE_INVENTORY.md` records the production flavor/spontaneous-speech families, real source files and IDs, trigger/context/resolver/presentation ownership, cooldown/chance/dedupe behavior, multiplayer authority, gameplay effects, persistence dependencies, duplicate greeting/emote paths, and migration gates.
 
-- receives typed/button/emote/lifecycle/event semantic acts;
-- preserves NPC-output semantic provenance;
-- resolves replies against active beats/threads;
-- suspends/compacts/resumes meaningful conversations across in-game time;
-- promotes only important facts/commitments/memories;
-- keeps pair persistence sparse and bounded in multiplayer;
-- exposes lifecycle/memory budgets through the existing Semantic Lab.
+`MIGRATION_MATRIX.md` now cites actual production source owners and IDs rather than broad family descriptions. Existing characterization coverage is recorded for farewell, greeting/emote, social-event transport, incapacitated/leader-loss flavor, and typed/headless production-worker paths. No legacy flavor authority was deleted during P0A.
 
-## Exact Next Chunk — P0A
+## P1 — complete
 
-Perform the source-level migration and state-ownership inventory before changing runtime behavior.
+Production Lua now owns a bounded `semantic.interaction.envelope.v1` and `semantic.interaction.lifecycle.v1` contract. The envelope carries source, actor/target/player identity, canonical act/topic, gesture or grounded event reference, bounded fact references/modifiers, world hour, and NPC semantic provenance. It never stores rendered prose and never grants gameplay authority.
 
-Required deliverables:
+The existing typed NLU result and semantic-frame path attach the envelope after parsing/IR conversion. Existing parser, candidate, router, semantic-suggestion, ConversationBlocks, response-plan, and authoritative-domain contracts remain in place. Server emote, social greeting, ConversationBlocks choice, NPC response, and farewell adapters now expose the same bounded meaning without reparsing presentation text.
 
-1. enumerate all production flavor/spontaneous-speech families and their trigger/presentation/TTS/authority paths;
-2. fill MIGRATION_MATRIX with the actual files and IDs, including duplicate greeting/emote paths;
-3. map every persistent/read dependency to its authoritative owner;
-4. record which paths currently create ModData/network state versus presentation-only output;
-5. establish representative Semantic Lab baseline scenarios for:
-   - greeting;
-   - farewell;
-   - one social emote;
-   - one combat/event reaction;
-   - typed contextual reply;
-6. establish initial state-size/pair-count diagnostics available today, without inventing Python gameplay semantics;
-7. add characterization tests only where required to make later migration safe.
+`PNC_InteractionLifecyclePersistence` is a server-only sparse ModData owner coordinated by the existing persistence commit boundary. Import is bounded and version-checked; pair state is created only for meaningful durable deltas; shared event references are canonicalized; expiry is lazy or explicitly bounded; no lifecycle OnTick scan was added.
 
-**Do not implement the new thread/persistence model in P0A.**
+The production Semantic Lab worker exposes envelope, apply, NPC speech, close/resume, compaction, time, event, projection, metrics, export, and import commands. Python remains transport/presentation only.
 
-## P0A completion gate
+Verified developer-side evidence:
 
-P0A is complete only when the migration inventory and baseline evidence are precise enough to answer for every first-wave family:
+- `lua tests/pnc_semantic_interaction_lifecycle_smoke.lua`
+- `lua tests/pnc_semantic_interaction_persistence_smoke.lua`
+- `python3 -m unittest tools.semantic_harness.tests.test_semantic_interaction_lifecycle_p1 -v` — 5 tests pass, including a 200-turn bounded conversation, two isolated players sharing one NPC, one canonical shared event reference, 400 trivial NPC identities, and 2,000 trivial turns.
+- `luac -p` and `pz_verify --kahlua --severity ERROR` pass for changed lifecycle, adapter, persistence, and authority files.
+- `git diff --check` passes.
 
-- what triggers it;
-- who owns the underlying truth;
-- how speech is currently selected;
-- how it is presented;
-- what state/effects it commits;
-- what semantic target will replace it;
-- how parity will be tested;
-- when its legacy authority can be retired.
+P1 does not retire duplicate legacy flavor authority and does not claim full P2–P9 completion. General UI-close transport, all grounded combat/medical/world-event adapters, full durable memory promotion policy, network projection audits, and the remaining legacy parity matrix are still open.
 
-After P0A, continue directly to the next P0/P1 chunk without asking the user for another goal prompt.
+## Exact Next Chunk
 
+**P2/P3A — production greeting/farewell/emote parity and lifecycle provenance.**
+
+- complete parity coverage for every accepted greeting, farewell, vanilla emote, companion/social reply, and NPC reply variant;
+- ensure NPC speech retains act/topic/beat/response-plan/fact/event provenance and later typed/button/emote replies resolve against that beat;
+- preserve existing greeting/day/cooldown/chance/dedupe, relationship, ConversationBlocks, animation, TTS, and gameplay-effect ownership;
+- add focused production-Lua worker and source-level characterization tests for equivalent typed/button/emote meaning, interruption/resume, and UI-close suspension;
+- do not delete or disable legacy flavor authority until semantic parity and regression evidence are recorded.
+
+After P2/P3A passes, continue automatically to grounded event migration, bounded thread/beat continuity, compaction and durable memory promotion, multiplayer/network sparsity, worker stress/diagnostics, and final legacy retirement gates. Do not request another `/goal`.

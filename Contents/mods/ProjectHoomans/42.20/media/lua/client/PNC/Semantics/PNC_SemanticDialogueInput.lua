@@ -45,6 +45,41 @@ local Diagnostics = PNC.Semantics.SemanticDiagnostics
 local Input = PNC.Semantics.DialogueInput or {}
 PNC.Semantics.DialogueInput = Input
 
+local InteractionLifecycle = PNC.Semantics.InteractionLifecycle
+if type(InteractionLifecycle) ~= "table" then
+    local loaded = require
+        "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+    InteractionLifecycle = type(loaded) == "table" and loaded or nil
+end
+
+local function recordSemanticChoiceEnvelope(view, frame)
+    if not InteractionLifecycle
+        or type(InteractionLifecycle.Envelope) ~= "table"
+        or type(InteractionLifecycle.Envelope.SemanticChoice) ~= "function"
+    then
+        return nil
+    end
+    local spec = view and view.spec or {}
+    local session = view and view.session or {}
+    local context = spec.context or {}
+    local playerUUID = session.characterUUID
+        or spec.characterUUID
+        or context.characterUUID
+        or context.playerUUID
+    local envelope = InteractionLifecycle.Envelope.SemanticChoice(frame, {
+        actorID = playerUUID,
+        targetID = spec.npcID,
+        playerUUID = playerUUID,
+        topic = context.currentTopic or context.authoredTopic
+            or context.conversationTopic,
+        worldHour = context.worldHour,
+    })
+    if envelope and view then
+        view.lastSemanticInteractionEnvelope = envelope
+    end
+    return envelope
+end
+
 if LocalResponse and type(LocalResponse.RegisterTextFallbacks) == "function" then
     LocalResponse.RegisterTextFallbacks()
 end
@@ -163,6 +198,10 @@ function Input.SubmitSemanticFrame(view, frame)
     if not DialogueRuntime.IsEnabled() then
         return false, "semantic_dialogue_disabled"
     end
+    -- A frame is already semantic state; retain its bounded meaning for
+    -- lifecycle adapters without reparsing its presentation text. Existing
+    -- branches still own acceptance, ConversationBlocks, authority/effects.
+    recordSemanticChoiceEnvelope(view, frame)
     if type(Suggestions.IsBackFrame) == "function"
         and Suggestions.IsBackFrame(frame)
     then
