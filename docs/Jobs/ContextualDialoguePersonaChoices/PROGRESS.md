@@ -1,9 +1,10 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
 **Updated:** 2026-10-24  
-**Parent status:** REOPENED — P12/P13 save-backed operational workbench retained; P14 production rehydration parity is mandatory.  
-**Current mandatory phase:** P14D — Canonical social context + hostile speech parity.
-**Current local baseline audited:** ProjectHoomans `main` at `f887bff8` before the P14C evidence commit.
+**Parent status:** P14 ACCEPTED — P12/P13 save-backed operational workbench retained; production rehydration parity and runtime-only controls are verified.
+**Current mandatory phase:** P14 complete — production rehydration parity and runtime-only workbench controls accepted.
+**Current exact Next Chunk:** None — P14 is complete; the next phase requires a new roadmap decision.
+**Current local baseline audited:** ProjectHoomans `main` at `4f8592c4` before this regression-repair commit.
 **Normal Semantic Lab runtime requirement:** Project Zomboid may remain CLOSED/OFFLINE.  
 **Source save mutation:** FORBIDDEN.
 
@@ -26,6 +27,51 @@ P12/P13 materially provide:
 - operational Tk/Xvfb acceptance.
 
 Do not replay P12/P13 unless a regression is demonstrated.
+
+## 2026-10-24 runtime-control regression repair
+
+The saved-pair GUI audit found two regressions after the production parity work:
+
+- importing a saved NPC projected the canonical social context only after a
+  conversation response, so the Relationship workbench showed midpoint slider
+  values or stale `unknown` state;
+- save-backed `CONFIG` rehydrated from the immutable source and discarded a
+  user’s runtime-only relationship slider draft, while production social action
+  results were not visible as `TOOL/ACTION` transcript entries.
+
+The repair preserves the production ownership boundary:
+
+- the raw `PNC_PlayerCharacters` registry is transported to Lua and loaded by
+  `PNC.PlayerCharacters.Load` / `PNC.PlayerCharacters.NormalizeRegistry`;
+- the headless player fixture exposes only the engine identity/mod-data
+  boundary needed for production identity binding, including canonical
+  `sp_slot_N` save identities;
+- relationship slider edits use the new worker command
+  `APPLY_RUNTIME_RELATIONSHIP_BASELINE`, which invokes production
+  `PNC.Relationships.SetDebugBaseline` in the isolated working world;
+- Reset clears the runtime override and reprojects the imported baseline;
+- GUI social context now shows personal relationship, faction relationship,
+  tactical hostility, conversation audience, durable bond, speech style, and
+  runtime-override provenance separately;
+- diagnostics/advanced visibility continues from the user’s persisted UI
+  state, while a fresh UI keeps useful tools visible;
+- production social actions are rendered in the transcript from the returned
+  production `actionResult`, without inventing a Python gameplay action.
+
+Focused regression evidence:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_production_rehydration_p14a tools.semantic_harness.tests.test_save_import_p12c tools.semantic_harness.tests.test_production_inventory_rehydration_p14b tools.semantic_harness.tests.test_production_faction_rehydration_p14c tools.semantic_harness.tests.test_production_social_context_p14d tools.semantic_harness.tests.test_real_save_production_runtime_p14f tools.semantic_harness.tests.test_missing_state_audit_p14e
+xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_gui_saved_pair_entrypoint tools.semantic_harness.tests.test_ui_state_persistence tools.semantic_harness.tests.test_operational_acceptance_p13g
+python3 -m py_compile tools/semantic_harness/runtime/save_import.py tools/semantic_harness/runtime/worker.py tools/semantic_harness/ui/dialogs/catalog_control.py tools/semantic_harness/ui/shell.py
+luac5.3 -p tools/semantic_harness/lua/worker.lua tools/semantic_harness/lua/worker/CommandRouter.lua tools/semantic_harness/lua/worker/ProductionModules.lua tools/semantic_harness/lua/worker/ProductionRehydration.lua tools/semantic_harness/lua/worker/RuntimeEnvironment.lua tools/semantic_harness/lua/worker/RuntimeState.lua tools/semantic_harness/lua/worker/ScenarioSession.lua tools/semantic_harness/lua/worker/SemanticAdapters_Core.lua
+git diff --check
+```
+
+All focused checks pass. The full unwrapped discovery suite was started but
+interrupted after it stalled in an existing Tk subprocess smoke test; no
+failure was emitted by that run. The focused Xvfb GUI/CLI acceptance suites
+remain the authoritative evidence for this repair. P14 remains accepted.
 
 ## 2026-10-24 real-save parity audit
 

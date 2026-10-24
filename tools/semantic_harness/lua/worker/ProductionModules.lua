@@ -360,6 +360,24 @@ load(
         "PNC/Core/Conduct/PNC_ConductTypes.lua",
         "social_authority"
     )
+    -- SAVE-backed identity rehydration uses the production player registry.
+    -- Load its complete owner before the social services capture their
+    -- PlayerCharacters reference; the worker supplies only isolated ModData.
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Identity/PNC_PlayerCharacterConstants.lua",
+        "persistence"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Identity/PNC_PlayerCharacterTypes.lua",
+        "persistence"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Player/PNC_PlayerCharacterService.lua",
+        "persistence"
+    )
     load(
         "ProjectHoomans", "shared",
         "PNC/Core/Conduct/PNC_ConductMath.lua",

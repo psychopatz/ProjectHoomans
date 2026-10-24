@@ -90,6 +90,12 @@ for _, method in ipairs({
         Runtime.productionRelationshipService[method] = PNC.Relationships[method]
     end
 end
+Runtime.productionPlayerCharactersService = {
+    GetEntityKey = PNC.PlayerCharacters
+        and PNC.PlayerCharacters.GetEntityKey,
+    GetRegistryRecord = PNC.PlayerCharacters
+        and PNC.PlayerCharacters.GetRegistryRecord,
+}
 ScenarioSession.importSource(
     Context,
     ScenarioSession.initialScenario,

@@ -236,8 +236,19 @@ function RuntimeEnvironment.configure(context)
             return playerData.gender == "female"
         end,
         getUsername = function()
-            return playerData.username or playerData.displayName
+            return playerData.username or playerData.accountKey
+                or playerData.displayName
                 or "harness-player"
+        end,
+        getPlayerNum = function()
+            return playerData.playerNum
+        end,
+        getPlayerIndex = function()
+            return playerData.playerNum
+        end,
+        getModData = function()
+            Runtime.playerModData = Runtime.playerModData or {}
+            return Runtime.playerModData
         end,
         getOnlineID = function()
             return playerData.onlineID or 1

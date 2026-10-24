@@ -61,6 +61,9 @@ class CatalogControlField:
         self.variable: Any | None = None
         self.widget: Any | None = None
         self.value_widget: Any | None = None
+        self.label_widget: Any | None = None
+        self.slider_display: Any | None = None
+        self._update_slider_display: Any | None = None
         self.option_map: dict[str, Any] = {}
         self.listbox_values: list[Any] = []
         self.editor: StructuredInventoryEditor | None = None
@@ -71,6 +74,8 @@ class CatalogControlField:
         self.value_padx = value_padx
         self.value_sticky = value_sticky
         self.dirty = False
+        self.missing = False
+        self._base_label = str(control.get("label") or control.get("id") or "")
         self._suppress_dirty = False
         self.derived = bool(control.get("derivedFrom"))
 
@@ -99,13 +104,14 @@ class CatalogControlField:
             )
             return
 
-        label = str(control.get("label") or control.get("id") or "")
+        label = self._base_label
         if self.derived:
             label += " (derived)"
-        ttk.Label(
+        self.label_widget = ttk.Label(
             parent,
             text=label,
-        ).grid(
+        )
+        self.label_widget.grid(
             row=row,
             column=label_column,
             columnspan=self.label_columnspan,
@@ -168,6 +174,9 @@ class CatalogControlField:
             display.grid(row=0, column=1, padx=(4, 0))
 
             def update_display(*_args: Any) -> None:
+                if self.missing:
+                    display.configure(text="MISSING")
+                    return
                 try:
                     number = float(self.variable.get())
                 except (TypeError, ValueError):
@@ -183,6 +192,8 @@ class CatalogControlField:
 
             self.variable.trace_add("write", update_display)
             update_display()
+            self.slider_display = display
+            self._update_slider_display = update_display
             self.value_widget = holder
         elif self.kind in {"integer", "spinbox"}:
             value_type = str(control.get("valueType") or "number")
@@ -312,6 +323,15 @@ class CatalogControlField:
 
     def _mark_dirty(self, *_args: Any) -> None:
         if not self._suppress_dirty:
+            if self.missing:
+                self.missing = False
+                if self.label_widget is not None:
+                    label = self._base_label
+                    if self.derived:
+                        label += " (derived)"
+                    self.label_widget.configure(text=label)
+                if callable(self._update_slider_display):
+                    self._update_slider_display()
             self.dirty = True
             callback = getattr(self.host, "_on_workbench_field_dirty", None)
             if callable(callback):
@@ -404,5 +424,28 @@ class CatalogControlField:
             self.widget.configure(state=state)
         except self.tk.TclError:
             pass
+        finally:
+            self._suppress_dirty = False
+
+    def set_missing_state(self, missing: bool) -> None:
+        """Mark a slider as an explicit runtime-only draft when SAVE data is absent."""
+
+        if self.kind != "slider":
+            return
+        self._suppress_dirty = True
+        try:
+            self.missing = bool(missing)
+            if self.label_widget is not None:
+                label = self._base_label
+                if self.missing:
+                    label += " (runtime-only draft; source MISSING)"
+                elif self.derived:
+                    label += " (derived)"
+                self.label_widget.configure(text=label)
+            if self.missing and self.variable is not None:
+                self.variable.set(0)
+            if callable(self._update_slider_display):
+                self._update_slider_display()
+            self.dirty = False
         finally:
             self._suppress_dirty = False

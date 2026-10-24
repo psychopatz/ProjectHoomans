@@ -266,6 +266,11 @@ class SaveBackedImporter:
                     if isinstance(entry, dict) and entry.get("name")
                 }
                 raw_registries: dict[str, dict[str, Any]] = {}
+                # Keep the complete persisted player registry available to the
+                # Lua worker.  This is transport only; production
+                # PNC.PlayerCharacters.Load remains the owner of registry
+                # normalization, migration, and identity binding.
+                raw_registries["playerCharacters"] = deepcopy(player_data)
                 for table_name, registry_name in (
                     ("PNC_Factions", "factions"),
                     ("PNC_Communities", "communities"),
@@ -359,6 +364,14 @@ class SaveBackedImporter:
             else "unknown"
         )
         fixtures = deepcopy(engine_fixtures or {})
+        player_num = None
+        if account_key.startswith("sp_slot_"):
+            try:
+                player_num = int(account_key.rsplit("_", 1)[1])
+            except (TypeError, ValueError):
+                player_num = None
+        if player_num is None:
+            player_num = native_player_state.get("localPlayerID")
         scenario = merge(
             DEFAULT_SCENARIO,
             {
@@ -368,7 +381,9 @@ class SaveBackedImporter:
                     "surname": player_record.get("surname") or "",
                     "displayName": player_display,
                     "accountKey": account_key,
+                    "accountIdentity": player_record.get("accountIdentity"),
                     "entityKey": player_entity_key,
+                    "playerNum": player_num,
                     "gender": player_record.get("gender")
                     or fixtures.get("playerGender", "unknown"),
                     "traits": deepcopy(player_record.get("traits") or []),
@@ -511,6 +526,12 @@ class SaveBackedImporter:
                         if not isinstance(player_record.get("socialProfile"), dict)
                         else None
                     ),
+                    "table": player_table,
+                    "recordKey": selected_uuid,
+                },
+                "player.registry": {
+                    "source": "SAVE",
+                    "owner": "PNC.PlayerCharacters.Load",
                     "table": player_table,
                     "recordKey": selected_uuid,
                 },

@@ -325,6 +325,28 @@ class LuaSemanticWorker:
             payload["npcID"] = npc_id
         return self._request("RELATIONSHIP_PREVIEW", payload)
 
+    def apply_runtime_relationship_baseline(
+        self,
+        relationship: dict[str, Any],
+        npc_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Apply a production-owned relationship baseline to the working world.
+
+        This command is deliberately separate from ``configure``.  SAVE
+        configuration rehydrates from the immutable source; this operation
+        asks the production relationship service to mutate only the isolated
+        runtime record, which reset can later discard.
+        """
+
+        payload: dict[str, Any] = {"relationship": dict(relationship)}
+        if npc_id:
+            payload["npcID"] = npc_id
+        response = self._request(
+            "APPLY_RUNTIME_RELATIONSHIP_BASELINE", payload
+        )
+        self._sync_effective_scenario(response)
+        return response
+
     def conversation_graph(self) -> dict[str, Any]:
         """Return the developer-only full selected ConversationBlock graph."""
 

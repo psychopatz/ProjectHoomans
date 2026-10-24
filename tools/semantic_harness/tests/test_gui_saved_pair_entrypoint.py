@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from hashlib import sha256
 import os
 from pathlib import Path
 import time
@@ -63,6 +64,83 @@ class GuiSavedPairEntrypointTests(unittest.TestCase):
             self.assertIn("Target:", app.simulation_context_var.get())
             self.assertIn("Save-backed mode active", app.fixture_mode_var.get())
             self.assertNotIn("synthetic", app.transcript.get("1.0", "end").lower())
+        finally:
+            try:
+                app.close()
+            except tk.TclError:
+                pass
+
+    def test_relationship_sliders_are_runtime_only_production_overrides(self) -> None:
+        if not REAL_SAVE.is_file():
+            self.skipTest("real local save is unavailable")
+        source_before = sha256(REAL_SAVE.read_bytes()).digest()
+        root = tk.Tk()
+        app = SemanticHarnessApp(
+            root,
+            _parser().parse_args(
+                [
+                    "--gui",
+                    "--load-saved-pair",
+                    "--save",
+                    str(REAL_SAVE),
+                    "--player",
+                    PLAYER_UUID,
+                    "--npc",
+                    NPC_ID,
+                ]
+            ),
+        )
+
+        def wait_until(predicate: object, timeout: float = 45.0) -> None:
+            deadline = time.monotonic() + timeout
+            while not predicate() and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertTrue(predicate(), "timed out waiting for saved GUI startup")
+
+        try:
+            wait_until(
+                lambda: not app.busy
+                and app.source_snapshot_projection.get("metadata", {}).get(
+                    "sourceKind"
+                )
+                == "SAVE"
+            )
+            relationship_summary = app.relationship_context_summary.get("1.0", "end")
+            self.assertIn("Personal relationship", relationship_summary)
+            self.assertIn("source MISSING", relationship_summary)
+
+            app.input_var.set("fuck you")
+            app.submit()
+            wait_until(lambda: not app.busy and "TOOL/ACTION:" in app.transcript.get("1.0", "end"))
+            self.assertIn("player_dialogue_insult", app.transcript.get("1.0", "end"))
+
+            app.workbench_control_fields["relationship.approval"].variable.set(-20)
+            app.workbench_control_fields["relationship.respect"].variable.set(-10)
+            app.workbench_control_fields["relationship.familiarity"].variable.set(12)
+            wait_until(
+                lambda: not app.busy
+                and isinstance(
+                    app.scenario.get("npc", {}).get("relationship"), dict
+                )
+                and app.scenario["npc"]["relationship"].get("approval") == -20
+            )
+            override = app.runtime_relationship_override_projection.get(NPC_ID)
+            self.assertEqual(override["owner"], "PNC.Relationships.SetDebugBaseline")
+            self.assertEqual(override["source"], "HARNESS_RUNTIME_OVERRIDE")
+            self.assertIn("Runtime-only relationship override", app.relationship_context_summary.get("1.0", "end"))
+            self.assertEqual(sha256(REAL_SAVE.read_bytes()).digest(), source_before)
+
+            app.reset()
+            wait_until(lambda: not app.busy and not app.runtime_relationship_override_projection)
+            self.assertIn("source MISSING", app.relationship_context_summary.get("1.0", "end"))
+            self.assertIn(
+                "MISSING",
+                app.workbench_control_fields["relationship.approval"].slider_display.cget(
+                    "text"
+                ),
+            )
+            self.assertEqual(sha256(REAL_SAVE.read_bytes()).digest(), source_before)
         finally:
             try:
                 app.close()

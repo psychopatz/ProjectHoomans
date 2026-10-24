@@ -48,6 +48,8 @@ function RuntimeState.resetContainers(runtime)
     runtime.lastSuggestionRevision = nil
     runtime.semanticClickReceipts = {}
     runtime.relationships = {}
+    runtime.runtimeRelationshipOverrides = {}
+    runtime.playerModData = {}
 end
 
 function RuntimeState.resetTurn(runtime)

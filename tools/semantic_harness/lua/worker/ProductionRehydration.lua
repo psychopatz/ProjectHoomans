@@ -44,6 +44,11 @@ local function rawRegistriesFor(context)
     return type(registries) == "table" and registries or {}
 end
 
+local function rawPlayerRegistryFor(context)
+    local registries = rawRegistriesFor(context)
+    return registries.playerCharacters
+end
+
 local function playerEntityKey(context)
     local player = context.Runtime.scenario
         and context.Runtime.scenario.player or {}
@@ -195,6 +200,98 @@ local function loadProductionOrganizations(context)
         or status.communityRegistry == "HYDRATED"
     then
         status.status = "HYDRATED"
+    end
+    return status
+end
+
+local function loadProductionPlayerCharacters(context)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local raw = rawPlayerRegistryFor(context)
+    local status = {
+        schema = "semantic.production_player_rehydration.v1",
+        source = "ProjectHoomans.rawRegistries.playerCharacters",
+        status = "MISSING",
+        loadOwner = "PNC.PlayerCharacters.Load",
+    }
+    if not PNC or not PNC.PlayerCharacters
+        or type(PNC.PlayerCharacters.Load) ~= "function"
+    then
+        return nil, "production_player_loader_unavailable"
+    end
+
+    -- ModData is the production persistence boundary.  This table belongs to
+    -- the isolated worker runtime; it is never connected to the source save.
+    Runtime.playerModData = {}
+    local key = PNC.PlayerCharacterConstants
+        and PNC.PlayerCharacterConstants.REGISTRY_MODDATA_KEY
+        or "PNC_PlayerCharacters"
+    Runtime.modData[key] = type(raw) == "table"
+        and Values.productionCopy(raw) or nil
+    PNC.PlayerCharacters.Loaded = false
+    PNC.PlayerCharacters.Dirty = false
+    if type(PNC.PlayerCharacters.ResetRuntimeBindings) == "function" then
+        PNC.PlayerCharacters.ResetRuntimeBindings("harness_rehydration")
+    end
+
+    local ok = pcall(PNC.PlayerCharacters.Load)
+    if not ok then
+        return nil, "production_player_load_failed"
+    end
+
+    -- Older/compact saved registries may omit derived indexes.  Let the
+    -- production normalizer repair that persisted shape after the real Load
+    -- owner has inspected the raw ModData; Python never builds these indexes.
+    local registry = PNC.PlayerCharacters.Registry
+    local needsProductionNormalization = type(raw) == "table"
+        and type(raw.byUUID) == "table"
+        and (type(registry) ~= "table"
+            or type(registry.byUUID) ~= "table"
+            or not hasEntries(registry.byUUID))
+    if needsProductionNormalization
+        and type(PNC.PlayerCharacters.NormalizeRegistry) == "function"
+    then
+        local normalized = PNC.PlayerCharacters.NormalizeRegistry(
+            Values.productionCopy(raw)
+        )
+        if type(normalized) ~= "table"
+            or type(normalized.byUUID) ~= "table"
+        then
+            return nil, "production_player_normalization_failed"
+        end
+        PNC.PlayerCharacters.Registry = normalized
+        PNC.PlayerCharacters.Loaded = true
+        PNC.PlayerCharacters.Dirty = false
+        if type(PNC.PlayerCharacters.ResetRuntimeBindings) == "function" then
+            PNC.PlayerCharacters.ResetRuntimeBindings(
+                "harness_rehydration_normalized"
+            )
+        end
+        status.normalizer = "PNC.PlayerCharacters.NormalizeRegistry"
+    end
+    if type(raw) == "table" and type(raw.byUUID) == "table"
+        and type(PNC.PlayerCharacters.Registry) == "table"
+        and type(PNC.PlayerCharacters.Registry.byUUID) == "table"
+        and hasEntries(PNC.PlayerCharacters.Registry.byUUID)
+    then
+        status.status = "HYDRATED"
+        status.recordCount = countKeys(PNC.PlayerCharacters.Registry.byUUID)
+    elseif type(raw) ~= "table" then
+        status.status = "MISSING"
+        status.missingClass = "LEGITIMATE_ABSENCE"
+    else
+        return nil, "production_player_registry_empty"
+    end
+    local productionPlayers = Runtime.productionPlayerCharactersService
+    if context.player and productionPlayers
+        and type(productionPlayers.GetEntityKey) == "function"
+    then
+        local entityKey, identityReason = productionPlayers.GetEntityKey(
+            context.player,
+            { callback = "semantic_lab_rehydration", worldAgeHours = Runtime.now }
+        )
+        status.entityKey = entityKey
+        status.identityReason = identityReason
     end
     return status
 end
@@ -407,6 +504,7 @@ function ProductionRehydration.configure(context)
     local Values = context.Values
     if sourceKind(context) ~= "SAVE" then
         Runtime.hydratedNpcRecord = nil
+        Runtime.productionPlayerRehydration = nil
         Runtime.productionFactionContext = nil
         Runtime.productionFactionRehydration = {
             schema = "semantic.production_faction_rehydration.v1",
@@ -479,6 +577,13 @@ function ProductionRehydration.configure(context)
     PNC.Registry.Data[npcID] = record
     PNC.Registry.Loaded = true
     Runtime.hydratedNpcRecord = record
+    local playerStatus, playerReason = loadProductionPlayerCharacters(context)
+    if not playerStatus then
+        return fail(context, "production_player_rehydration:" .. tostring(
+            playerReason
+        ))
+    end
+    Runtime.productionPlayerRehydration = playerStatus
     local organizationStatus, organizationReason =
         loadProductionOrganizations(context)
     if not organizationStatus then
@@ -506,10 +611,70 @@ function ProductionRehydration.configure(context)
         inventoryRuntimeType = type(record.inventory),
         registry = "isolated PNC.Registry",
         sourceRecord = "ProjectHoomans.rawRecords.npc",
+        playerRegistry = Values.copy(Runtime.productionPlayerRehydration),
         engineItemTypeFixtureCount = itemTypeFixtureCount > 0
             and itemTypeFixtureCount or nil,
     }
     return true
+end
+
+function ProductionRehydration.applyRuntimeRelationshipBaseline(
+    context, payload
+)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    if sourceKind(context) ~= "SAVE" then
+        return nil, "runtime_relationship_override_requires_save"
+    end
+    payload = type(payload) == "table" and payload or {}
+    local relationship = type(payload.relationship) == "table"
+        and payload.relationship or payload
+    local npcID = tostring(payload.npcID
+        or context.npcData and (context.npcData.npcID or context.npcData.id)
+        or "")
+    if npcID == "" then return nil, "npc_id_missing" end
+    local targetKey = Runtime.relationshipTargetKey
+        or playerEntityKey(context)
+    local setter = Runtime.productionRelationshipService
+        and Runtime.productionRelationshipService.SetDebugBaseline
+    if type(setter) ~= "function" then
+        return nil, "production_relationship_baseline_unavailable"
+    end
+    local standing = {
+        approval = Values.number(relationship.approval, 0),
+        respect = Values.number(relationship.respect, 0),
+        familiarity = Values.number(relationship.familiarity, 0),
+    }
+    local ok, result, reason = pcall(
+        setter,
+        npcID,
+        targetKey,
+        standing,
+        tonumber(Runtime.now) or 0
+    )
+    if not ok or type(result) ~= "table" then
+        return nil, ok and tostring(reason or "baseline_rejected")
+            or "baseline_error:" .. tostring(result)
+    end
+    Runtime.runtimeRelationshipOverrides =
+        Runtime.runtimeRelationshipOverrides or {}
+    Runtime.runtimeRelationshipOverrides[npcID] = {
+        source = "HARNESS_RUNTIME_OVERRIDE",
+        owner = "PNC.Relationships.SetDebugBaseline",
+        resettable = true,
+        relationship = Values.copy(result),
+    }
+    ProductionRehydration.refreshProjection(context)
+    if context.Conversation
+        and type(context.Conversation.refreshViewContext) == "function"
+    then
+        context.Conversation.refreshViewContext(context)
+    end
+    local snapshot = context.ScenarioSession.snapshot(context)
+    snapshot.runtimeRelationshipOverride = Values.copy(
+        Runtime.runtimeRelationshipOverrides[npcID]
+    )
+    return snapshot
 end
 
 function ProductionRehydration.refreshProjection(context)

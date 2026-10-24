@@ -24,6 +24,7 @@ local capabilities = {
     "PREVIEW", "SNAPSHOT", "CONVERSATION_GRAPH", "FLOW_CATALOG", "FLOW_VALIDATE",
     "INSPECT_ACTOR_STATE",
     "RELATIONSHIP_PROPOSAL", "RELATIONSHIP_PREVIEW",
+    "APPLY_RUNTIME_RELATIONSHIP_BASELINE",
     "SUGGESTION_PREDICATE", "SUGGESTION_CLICK",
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
@@ -1373,6 +1374,16 @@ function CommandRouter.dispatch(context, request)
             simulationProjection = context.ScenarioSession
                 .simulationProjection(context),
         }
+    elseif command == "APPLY_RUNTIME_RELATIONSHIP_BASELINE" then
+        if type(payload) ~= "table" then
+            return nil, "relationship_baseline_required"
+        end
+        local response, reason = context.ProductionRehydration
+            .applyRuntimeRelationshipBaseline(context, payload)
+        if not response then return nil, reason end
+        return context.ScenarioSession.compactTransportResponse(
+            context, response
+        )
     elseif command == "RELATIONSHIP_PREVIEW" then
         local npcID = type(payload) == "table" and payload.npcID
             or context.npcData.npcID

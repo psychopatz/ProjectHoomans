@@ -117,6 +117,47 @@ class ProductionRehydrationP14ATests(unittest.TestCase):
                 "NOT_APPLICABLE",
             )
 
+    def test_runtime_relationship_override_uses_production_and_resets(self) -> None:
+        source_bytes = self.save_path.read_bytes()
+        selection = SaveBackedImporter(
+            core_repository=CORE_REPOSITORY,
+        ).load(self.save_path, player_uuid="char_p14a", npc_id="npcP14A")
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            imported = worker.import_saved_selection(
+                self.save_path,
+                player_uuid="char_p14a",
+                npc_id="npcP14A",
+            )
+            self.assertEqual(
+                imported["productionPlayerRehydration"]["entityKey"],
+                selection.player_entity_key,
+            )
+            source_snapshot = deepcopy(worker.source_snapshot.to_dict())
+
+            overridden = worker.apply_runtime_relationship_baseline(
+                {"approval": 77, "respect": 66, "familiarity": 55},
+                npc_id="npcP14A",
+            )
+            self.assertEqual(
+                overridden["runtimeRelationshipOverride"]["owner"],
+                "PNC.Relationships.SetDebugBaseline",
+            )
+            self.assertEqual(
+                overridden["runtimeRelationshipOverride"]["source"],
+                "HARNESS_RUNTIME_OVERRIDE",
+            )
+            relationship = worker.snapshot()["scenario"]["npc"]["relationship"]
+            self.assertEqual(relationship["approval"], 77)
+            self.assertEqual(relationship["respect"], 66)
+            self.assertEqual(relationship["familiarity"], 55)
+            self.assertEqual(worker.source_snapshot.to_dict(), source_snapshot)
+
+            reset = worker.reset_working_world()
+            self.assertFalse(reset.get("runtimeRelationshipOverrides"))
+            self.assertEqual(worker.source_snapshot.to_dict(), source_snapshot)
+
+        self.assertEqual(self.save_path.read_bytes(), source_bytes)
+
 
 if __name__ == "__main__":
     unittest.main()

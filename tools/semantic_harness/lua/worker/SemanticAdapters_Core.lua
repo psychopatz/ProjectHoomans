@@ -12,6 +12,11 @@ function Provider.configure(context, SemanticAdapters)
     local conversationToken = tostring(conversationData.token or "")
     local sourceKind = Runtime.sourceMetadata
         and Runtime.sourceMetadata.sourceKind or "FIXTURE"
+    local productionPlayers = Runtime.productionPlayerCharactersService
+    local productionGetEntityKey = productionPlayers
+        and productionPlayers.GetEntityKey
+    local productionGetRegistryRecord = productionPlayers
+        and productionPlayers.GetRegistryRecord
 
     npcData.id = npcData.id or npcData.npcID
     npcData.runtime = type(npcData.runtime) == "table"
@@ -169,19 +174,35 @@ function Provider.configure(context, SemanticAdapters)
         return tostring(id) == tostring(npcData.id) and {} or nil
     end
     PNC.PlayerCharacters = PNC.PlayerCharacters or {}
-    PNC.PlayerCharacters.GetEntityKey = function()
-        return playerData.entityKey
+    PNC.PlayerCharacters.GetEntityKey = function(player, identityContext)
+        if sourceKind == "SAVE"
+            and type(productionGetEntityKey) == "function"
+        then
+            local key, reason = productionGetEntityKey(
+                player, identityContext
+            )
+            if key then return key, reason end
+        end
+        return sourceKind == "SAVE" and playerData.entityKey
+            or playerData.entityKey
             or ("player:harness:" .. tostring(playerData.characterUUID)),
             "harness_resolved"
     end
     PNC.PlayerCharacters.GetRegistryRecord = function(characterUUID)
+        if sourceKind == "SAVE"
+            and type(productionGetRegistryRecord) == "function"
+        then
+            local record = productionGetRegistryRecord(characterUUID)
+            if type(record) == "table" then return record end
+        end
         if tostring(characterUUID) ~= tostring(playerData.characterUUID) then
             return nil
         end
         return {
             uuid = playerData.characterUUID,
-            accountKey = "harness",
-            accountIdentity = "harness",
+            accountKey = playerData.accountKey or "harness",
+            accountIdentity = playerData.accountIdentity
+                or playerData.accountKey or "harness",
             displayName = playerData.displayName,
             forename = playerData.forename,
             surname = playerData.surname,

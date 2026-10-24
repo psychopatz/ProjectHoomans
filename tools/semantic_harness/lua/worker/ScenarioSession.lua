@@ -457,6 +457,12 @@ function ScenarioSession.reset(context, scenario)
         productionFactionRehydration = Values.copy(
             Runtime.productionFactionRehydration
         ),
+        productionPlayerRehydration = Values.copy(
+            Runtime.productionPlayerRehydration
+        ),
+        runtimeRelationshipOverrides = Values.copy(
+            Runtime.runtimeRelationshipOverrides
+        ),
         productionFactionContext = Values.copy(
             Runtime.productionFactionContext
         ),
@@ -545,6 +551,12 @@ function ScenarioSession.snapshot(context)
         productionRehydration = Values.copy(Runtime.productionRehydration),
         productionFactionRehydration = Values.copy(
             Runtime.productionFactionRehydration
+        ),
+        productionPlayerRehydration = Values.copy(
+            Runtime.productionPlayerRehydration
+        ),
+        runtimeRelationshipOverrides = Values.copy(
+            Runtime.runtimeRelationshipOverrides
         ),
         productionFactionContext = Values.copy(
             Runtime.productionFactionContext

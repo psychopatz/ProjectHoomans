@@ -344,6 +344,8 @@ class SemanticHarnessApp:
         self.talk_catalog: dict[str, Any] = {}
         self.talk_target_ids_by_label: dict[str, str] = {}
         self.simulation_projection: dict[str, Any] = {}
+        self.social_context_projection: dict[str, Any] = {}
+        self.runtime_relationship_override_projection: dict[str, Any] = {}
         self.source_snapshot_projection: dict[str, Any] = {}
         self.working_world_projection: dict[str, Any] = {}
         self.provenance_projection: dict[str, Any] = {}
@@ -357,6 +359,7 @@ class SemanticHarnessApp:
         self.last_test_utterance = ""
         self.workbench_status_var: Any | None = None
         self.relationship_preview_var: Any | None = None
+        self.relationship_context_summary: Any | None = None
         self.trait_effects_var: Any | None = None
         self.trait_effects_widget: Any | None = None
         self.trait_effects_widgets: dict[str, Any] = {}
@@ -3002,6 +3005,10 @@ class SemanticHarnessApp:
             page.finish()
         relationship_page = pages.get(("Relationship", "Overview"))
         if relationship_page is not None:
+            self.relationship_context_summary = relationship_page.add_summary(
+                "Canonical social context · production layers",
+                height=14,
+            )
             self.proposal_button = self._ttk.Button(
                 relationship_page.content,
                 text="Propose relationship",
@@ -3266,6 +3273,113 @@ class SemanticHarnessApp:
             return info
         return {"source": fallback}
 
+    @staticmethod
+    def _social_context_from_response(response: Any) -> dict[str, Any]:
+        if not isinstance(response, dict):
+            return {}
+        candidates = [
+            response.get("contextAfter"),
+            response.get("context"),
+            response.get("socialContext"),
+        ]
+        observation = response.get("observation")
+        if isinstance(observation, dict):
+            candidates.extend(
+                [observation.get("contextAfter"), observation.get("context")]
+            )
+        for candidate in candidates:
+            if not isinstance(candidate, dict):
+                continue
+            social = candidate.get("socialContext")
+            if isinstance(social, dict):
+                return deepcopy(social)
+            if {
+                "personalRelationship",
+                "factionRelationship",
+                "tacticalHostility",
+            }.intersection(candidate):
+                return deepcopy(candidate)
+        return {}
+
+    @staticmethod
+    def _social_context_lines(social: dict[str, Any]) -> list[str]:
+        personal = social.get("personalRelationship") or {}
+        faction = social.get("factionRelationship") or {}
+        effective = faction.get("effective") or faction
+        tactical = social.get("tacticalHostility") or {}
+        audience = social.get("conversationAudience") or {}
+        bond = social.get("durableBond") or {}
+        speech = social.get("speechStyle") or {}
+        return [
+            "Personal relationship",
+            f"  {personal.get('state') or 'unknown'} · "
+            f"source {personal.get('source') or 'MISSING'} · "
+            f"reason {personal.get('reason') or 'MISSING'}",
+            "Faction relationship",
+            f"  {effective.get('state') or 'unknown'} · "
+            f"standing {effective.get('standing', 'MISSING')} · "
+            f"source {effective.get('source') or 'MISSING'}",
+            "Tactical hostility",
+            f"  {tactical.get('mode') or 'unknown'} · "
+            f"attackPlayers={tactical.get('attackPlayers', 'MISSING')} · "
+            f"source {tactical.get('source') or 'MISSING'}",
+            "Conversation audience",
+            f"  {audience.get('audience') or 'unknown'} · "
+            f"reason {audience.get('reason') or 'MISSING'} · "
+            f"source {audience.get('source') or 'MISSING'}",
+            "Durable bond",
+            f"  {bond.get('class') or 'none'} · "
+            f"source {bond.get('source') or 'MISSING'}",
+            "Speech style",
+            f"  {speech.get('variant') or 'unknown'} · "
+            f"reason {speech.get('reason') or 'MISSING'}",
+        ]
+
+    def _refresh_social_context_summary(self) -> None:
+        if self.relationship_context_summary is None:
+            return
+        social = self.social_context_projection
+        if not isinstance(social, dict) or not social:
+            self._set_text(
+                self.relationship_context_summary,
+                "No production social context has been projected yet.",
+            )
+            return
+        lines = self._social_context_lines(social)
+        overrides = self.runtime_relationship_override_projection
+        if isinstance(overrides, dict) and overrides:
+            override = next(
+                (
+                    item
+                    for item in overrides.values()
+                    if isinstance(item, dict)
+                ),
+                None,
+            )
+            if isinstance(override, dict):
+                lines.extend(
+                    [
+                        "Runtime-only relationship override",
+                        f"  source {override.get('source') or 'MISSING'} · "
+                        f"owner {override.get('owner') or 'MISSING'} · "
+                        f"resettable={override.get('resettable', 'MISSING')}",
+                    ]
+                )
+        self._set_text(self.relationship_context_summary, "\n".join(lines))
+
+    def _refresh_relationship_missing_state(self) -> None:
+        personal = self.social_context_projection.get("personalRelationship")
+        personal = personal if isinstance(personal, dict) else {}
+        missing = self.save_backed_mode and personal.get("source") == "MISSING"
+        for control_id in (
+            "relationship.approval",
+            "relationship.respect",
+            "relationship.familiarity",
+        ):
+            field = self.workbench_control_fields.get(control_id)
+            if field is not None:
+                field.set_missing_state(missing)
+
     def _refresh_actor_inspectors(self) -> None:
         """Refresh the shared read-only Player/NPC actor inspector family."""
 
@@ -3353,49 +3467,13 @@ class SemanticHarnessApp:
                 ):
                     if actor.get(key) not in (None, ""):
                         identity_lines.append(f"{label}: {actor.get(key)}")
-                response = self.last_response if isinstance(
-                    self.last_response, dict
-                ) else {}
-                context = response.get("contextAfter") or response.get(
-                    "context"
-                ) or {}
-                social = context.get("socialContext") if isinstance(
-                    context, dict
-                ) else None
+                social = self.social_context_projection
                 if isinstance(social, dict):
-                    personal = social.get("personalRelationship") or {}
-                    faction = social.get("factionRelationship") or {}
-                    effective = faction.get("effective") or faction
-                    tactical = social.get("tacticalHostility") or {}
-                    audience = social.get("conversationAudience") or {}
-                    bond = social.get("durableBond") or {}
-                    speech = social.get("speechStyle") or {}
                     identity_lines.extend(
                         [
                             "",
                             "Canonical social context",
-                            "Personal relationship: "
-                            f"{personal.get('state') or 'unknown'} · "
-                            f"source {personal.get('source') or 'MISSING'} · "
-                            f"reason {personal.get('reason') or 'MISSING'}",
-                            "Faction relationship: "
-                            f"{effective.get('state') or 'unknown'} · "
-                            f"standing {effective.get('standing', 'MISSING')} · "
-                            f"source {effective.get('source') or 'MISSING'}",
-                            "Tactical hostility: "
-                            f"{tactical.get('mode') or 'unknown'} · "
-                            f"attackPlayers={tactical.get('attackPlayers', 'MISSING')} · "
-                            f"source {tactical.get('source') or 'MISSING'}",
-                            "Conversation audience: "
-                            f"{audience.get('audience') or 'unknown'} · "
-                            f"reason {audience.get('reason') or 'MISSING'} · "
-                            f"source {audience.get('source') or 'MISSING'}",
-                            "Durable bond: "
-                            f"{bond.get('class') or 'none'} · "
-                            f"source {bond.get('source') or 'MISSING'}",
-                            "Speech style: "
-                            f"{speech.get('variant') or 'unknown'} · "
-                            f"reason {speech.get('reason') or 'MISSING'}",
+                            *self._social_context_lines(social),
                         ]
                     )
             identity_lines.append(
@@ -3452,6 +3530,7 @@ class SemanticHarnessApp:
             )
         self._refresh_faction_context()
         self._refresh_simulation_context()
+        self._refresh_social_context_summary()
 
     def _refresh_faction_context(self) -> None:
         """Render group membership and standing without confusing it with NPC affinity."""
@@ -3680,6 +3759,14 @@ class SemanticHarnessApp:
         except (TypeError, ValueError, self._tk.TclError) as error:
             self._messagebox.showerror("Simulation workbench", str(error))
             return
+        relationship_dirty = bool(
+            self._workbench_dirty_ids
+            & {
+                "relationship.approval",
+                "relationship.respect",
+                "relationship.familiarity",
+            }
+        )
         self.activity_log.record(
             "ui",
             "apply_started",
@@ -3690,11 +3777,26 @@ class SemanticHarnessApp:
 
         def operation(worker: LuaSemanticWorker) -> dict[str, Any]:
             configured = worker.configure(updated)
+            runtime_override = None
+            if self.save_backed_mode and relationship_dirty:
+                relationship = updated.get("npc", {}).get("relationship", {})
+                runtime_override = worker.apply_runtime_relationship_baseline(
+                    {
+                        key: relationship.get(key)
+                        for key in ("approval", "respect", "familiarity")
+                    },
+                    npc_id=updated.get("npc", {}).get("npcID"),
+                )
+                configured = runtime_override
             if not replay:
                 # CONFIG resets the production conversation view. Fetch that
                 # same view once so automatic edits cannot leave stale
                 # suggestions, graph nodes, or projection text on screen.
-                return {"configured": configured, "snapshot": worker.snapshot()}
+                return {
+                    "configured": configured,
+                    "runtimeOverride": runtime_override,
+                    "snapshot": worker.snapshot(),
+                }
             step_results: list[dict[str, Any]] = []
             for step in steps:
                 response = self._replay_step(worker, step)
@@ -3703,6 +3805,7 @@ class SemanticHarnessApp:
                     break
             return {
                 "configured": configured,
+                "runtimeOverride": runtime_override,
                 "steps": step_results,
                 "snapshot": worker.snapshot(),
             }
@@ -3767,6 +3870,7 @@ class SemanticHarnessApp:
                             self._append("NPC", npc_message_text(message))
                     for call in step_response.get("toolCalls", []):
                         self._append("TOOL/ACTION", format_tool_call(call))
+                    self._append_production_action(step_response)
                 self.input_var.set("")
                 self._show_response(response)
                 self._append(
@@ -3965,6 +4069,9 @@ class SemanticHarnessApp:
                 "patchCount": len(patches),
             },
             "fields": fields,
+            "runtimeRelationshipOverrides": self._provenance_value(
+                response.get("runtimeRelationshipOverrides")
+            ),
         }
         simulation = response.get("simulationProjection")
         projected_relationship = (
@@ -3986,15 +4093,31 @@ class SemanticHarnessApp:
                 ),
             }
         if getattr(self, "provenance_status_var", None) is not None:
+            runtime_overrides = response.get("runtimeRelationshipOverrides")
+            runtime_override_count = (
+                len(runtime_overrides)
+                if isinstance(runtime_overrides, dict)
+                else 0
+            )
             self.provenance_status_var.set(
                 f"Source: {metadata.get('sourceKind', 'MISSING')} · "
-                f"working overrides: {len(patches)} · immutable source snapshot"
+                f"working overrides: {len(patches)} · "
+                f"runtime relationship overrides: {runtime_override_count} · "
+                "immutable source snapshot"
             )
         if hasattr(self, "provenance_inspector"):
             self._set_text(self.provenance_inspector, pretty(self.provenance_projection))
         self._refresh_actor_inspectors()
 
     def _update_simulation_projection(self, response: dict[str, Any]) -> None:
+        social = self._social_context_from_response(response)
+        if social:
+            self.social_context_projection = social
+        overrides = response.get("runtimeRelationshipOverrides") if isinstance(response, dict) else None
+        if isinstance(overrides, dict):
+            self.runtime_relationship_override_projection = deepcopy(overrides)
+        elif isinstance(overrides, list):
+            self.runtime_relationship_override_projection = {}
         self._update_source_provenance(response)
         projection = response.get("simulationProjection") if isinstance(response, dict) else None
         if isinstance(projection, dict):
@@ -4023,6 +4146,8 @@ class SemanticHarnessApp:
                     field.set_value(self._scenario_control_value(control, self.scenario))
             self._set_relationship_preview_from_projection()
             self._update_generated_personality_controls()
+        self._refresh_social_context_summary()
+        self._refresh_relationship_missing_state()
 
     def _set_relationship_preview_from_projection(self) -> None:
         if self.relationship_preview_var is None:
@@ -4506,6 +4631,7 @@ class SemanticHarnessApp:
         """Demote synthetic fixture controls after a real save import."""
 
         self.save_backed_mode = active
+        self._refresh_relationship_missing_state()
 
         if active:
             self.fixture_mode_var.set(
@@ -4518,14 +4644,10 @@ class SemanticHarnessApp:
             if isinstance(preferred_trace, bool):
                 if preferred_trace != self.trace_panel_visible:
                     self._toggle_trace_panel()
-            elif self.trace_panel_visible:
-                self._toggle_trace_panel()
             preferred_advanced = self._ui_state.get("advanced_controls_visible")
             if isinstance(preferred_advanced, bool):
                 if preferred_advanced != self.advanced_controls_visible:
                     self._toggle_advanced_controls()
-            elif self.advanced_controls_visible:
-                self._toggle_advanced_controls()
             self._schedule_splitter_restore()
         else:
             self.fixture_mode_var.set(
@@ -4540,6 +4662,27 @@ class SemanticHarnessApp:
                 self._toggle_advanced_controls()
         self._refresh_simulation_context()
         self._refresh_suggestion_controls(self.session.ready and not self.busy)
+
+    def _append_production_action(self, response: dict[str, Any]) -> None:
+        result = response.get("result") if isinstance(response, dict) else None
+        action = result.get("actionResult") if isinstance(result, dict) else None
+        if not isinstance(action, dict):
+            return
+        self._append(
+            "TOOL/ACTION",
+            format_tool_call(
+                {
+                    "label": "Production social action",
+                    "name": action.get("eventType")
+                    or action.get("action")
+                    or action.get("speechAct")
+                    or "social_action",
+                    "authority": action.get("authority") or "production",
+                    "accepted": action.get("accepted"),
+                    "arguments": action,
+                }
+            ),
+        )
 
     def submit(self) -> None:
         value = self.input_var.get().strip()
@@ -4556,6 +4699,7 @@ class SemanticHarnessApp:
                     self._append("NPC", npc_message_text(message))
             for call in response.get("toolCalls", []):
                 self._append("TOOL/ACTION", format_tool_call(call))
+            self._append_production_action(response)
             if response.get("accepted") is True:
                 self._record_replay_step({"kind": "input", "text": value})
             self._show_response(response)
@@ -4587,6 +4731,7 @@ class SemanticHarnessApp:
                         self._append("NPC", npc_message_text(message))
                 for call in response.get("toolCalls", []):
                     self._append("TOOL/ACTION", format_tool_call(call))
+                self._append_production_action(response)
                 self._append("SYSTEM", f"Clicked semantic suggestion: {label}")
                 self._record_replay_step(
                     {
@@ -4622,6 +4767,7 @@ class SemanticHarnessApp:
                         self._append("NPC", npc_message_text(message))
                 for call in response.get("toolCalls", []):
                     self._append("TOOL/ACTION", format_tool_call(call))
+                self._append_production_action(response)
                 self._record_replay_step(
                     {
                         "kind": "suggestion_click",
@@ -4680,6 +4826,7 @@ class SemanticHarnessApp:
                 self.hub_diagnostics,
                 pretty(semantic_hub_diagnostic_projection({})),
             )
+            self._show_response(response)
             self.suggestion_rows = []
             self.suggestion_interactive = False
             self._refresh_workbench_feedback("Scenario reset; replay macro cleared.")
