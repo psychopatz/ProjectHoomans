@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import importlib.util
 import os
+import re
 from pathlib import Path
 import sys
 from typing import Any, Iterable
@@ -22,6 +23,9 @@ REQUIRED_TABLES = ("PNC_PlayerCharacters", "PNC_Core_Global")
 CORE_SCHEMA_VERSION = 16
 PLAYER_SCHEMA_VERSION = 6
 NPC_SCHEMA_VERSION = 16
+_SAVE_NAME_TIMESTAMP = re.compile(
+    r"^(?P<stamp>\d{4}-\d{2}-\d{2}[_-]\d{2}-\d{2}-\d{2})"
+)
 
 
 class SaveCatalogError(ValueError):
@@ -151,6 +155,29 @@ def _save_location(path: Path, root: Path) -> tuple[str | None, str]:
     return mode, save_name
 
 
+def _save_discovery_sort_key(value: dict[str, Any]) -> tuple[int, str, int, str]:
+    """Return a deterministic newest-first key for a catalog entry.
+
+    Project Zomboid normally names save directories with a sortable timestamp
+    (``YYYY-MM-DD_HH-MM-SS``). Prefer that save identity over file mtime,
+    which can change when a save is copied. Non-timestamped saves fall back
+    to their validated file mtime.
+    """
+    save_name = str(value.get("saveName") or "")
+    match = _SAVE_NAME_TIMESTAMP.match(save_name)
+    stamp = match.group("stamp") if match else ""
+    try:
+        file_mtime_ms = int(value.get("fileMtimeMs") or 0)
+    except (TypeError, ValueError):
+        file_mtime_ms = 0
+    return (
+        1 if stamp else 0,
+        stamp,
+        file_mtime_ms,
+        str(value.get("path") or ""),
+    )
+
+
 class SaveCatalog:
     """Discover and validate persisted saves without opening Project Zomboid."""
 
@@ -257,6 +284,7 @@ class SaveCatalog:
                     "status": "rejected",
                     "reason": str(error),
                 })
+        accepted.sort(key=_save_discovery_sort_key, reverse=True)
         return {
             "schema": "semantic.save_catalog.v1",
             "schemaVersion": 1,

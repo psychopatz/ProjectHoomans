@@ -58,7 +58,15 @@ class SaveCatalogTests(unittest.TestCase):
         self.save_path = self.root / "Apocalypse" / "P12Slot" / "global_mod_data.bin"
         self.save_path.parent.mkdir(parents=True)
 
-    def write_save(self, *, world_version: int = 249, tables=None) -> Path:
+    def write_save(
+        self,
+        path: Path | None = None,
+        *,
+        world_version: int = 249,
+        tables=None,
+    ) -> Path:
+        path = path or self.save_path
+        path.parent.mkdir(parents=True, exist_ok=True)
         tables = tables or [
             ("PNC_PlayerCharacters", [("schemaVersion", 6), ("players", {})]),
             ("PNC_Core_Global", [("schemaVersion", 16)]),
@@ -67,10 +75,10 @@ class SaveCatalogTests(unittest.TestCase):
                 [("schemaVersion", 16), ("social", {"relationships": {"player": 73}})],
             ),
         ]
-        self.save_path.write_bytes(
+        path.write_bytes(
             pz_file(tables, world_version=world_version)
         )
-        return self.save_path
+        return path
 
     def catalog(self) -> SaveCatalog:
         return SaveCatalog(
@@ -120,6 +128,21 @@ class SaveCatalogTests(unittest.TestCase):
 
         with self.assertRaises(SaveCatalogError):
             self.catalog().inspect(self.save_path)
+
+    def test_discovery_orders_timestamped_saves_newest_first(self) -> None:
+        older = self.root / "Apocalypse" / "2026-10-22_15-18-56" / "global_mod_data.bin"
+        newer = self.root / "Sandbox" / "2026-10-24_12-26-00" / "global_mod_data.bin"
+        legacy = self.root / "Apocalypse" / "Legacy" / "global_mod_data.bin"
+        self.write_save(older)
+        self.write_save(newer)
+        self.write_save(legacy)
+
+        result = self.catalog().discover()
+
+        self.assertEqual(
+            [entry["saveName"] for entry in result["saves"]],
+            ["2026-10-24_12-26-00", "2026-10-22_15-18-56", "Legacy"],
+        )
 
     def test_invalid_project_hoomans_schema_fails_closed(self) -> None:
         self.write_save(
