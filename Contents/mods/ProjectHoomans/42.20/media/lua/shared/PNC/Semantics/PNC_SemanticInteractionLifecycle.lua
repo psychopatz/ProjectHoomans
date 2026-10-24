@@ -687,6 +687,7 @@ function Lifecycle.Resume(store, playerUUID, npcID, options)
     thread.lastHour = hour
     thread.revision = (tonumber(thread.revision) or 0) + 1
     store.active[key] = thread
+    store.pairs[key] = copyThread(thread)
     store.metrics.hydrationCount = store.metrics.hydrationCount + 1
     return { accepted = true, persisted = true, reason = "resumed", thread = copyThread(thread) }
 end

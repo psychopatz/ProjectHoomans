@@ -58,4 +58,28 @@ T.truthy(projection.thread,
 T.equal(projection.thread.activeBeat.id, "beat:water",
     "rehydration preserves semantic beat provenance")
 
+local closed = Persistence.Close("player-one", "npc-mara", {
+    worldHour = 101,
+})
+T.equal(closed.reason, "suspended",
+    "closing a meaningful pair suspends its semantic capsule")
+Persistence.Save(false)
+Persistence.Loaded = false
+Persistence.Load(true)
+projection = Persistence.Project("player-one", "npc-mara")
+T.equal(projection.thread.status, "SUSPENDED",
+    "save-backed rehydration preserves suspension status")
+
+local resumed = Persistence.Resume("player-one", "npc-mara", {
+    worldHour = 120,
+})
+T.equal(resumed.reason, "resumed",
+    "server persistence resumes a non-expired semantic capsule")
+Persistence.Save(false)
+Persistence.Loaded = false
+Persistence.Load(true)
+projection = Persistence.Project("player-one", "npc-mara")
+T.equal(projection.thread.status, "ACTIVE",
+    "resume status is written to the authoritative pair capsule")
+
 return T.finish("pnc_semantic_interaction_persistence_smoke")

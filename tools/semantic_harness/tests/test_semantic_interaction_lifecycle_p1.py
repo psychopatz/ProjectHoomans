@@ -74,6 +74,48 @@ class SemanticInteractionLifecycleP1Tests(unittest.TestCase):
                 window["result"]["activeBeat"]["id"], "beat:water"
             )
             self.assertNotIn("rawText", str(window["result"]))
+            worker.interaction_npc_speech(
+                {
+                    "npcID": "npc_mara",
+                    "act": "REQUEST",
+                    "topic": "shelter",
+                    "beatID": "beat:shelter",
+                }
+            )
+            interrupted = worker.interaction_response_window()
+            self.assertEqual(
+                interrupted["result"]["topicStack"][0]["id"],
+                "beat:water",
+            )
+            worker.interaction_apply(
+                {
+                    "source": "typed_text",
+                    "ir": {"speechAct": "ACK", "topic": "water"},
+                    "options": {"resumeTopic": True, "meaningful": True},
+                }
+            )
+            resumed_window = worker.interaction_response_window()
+            self.assertEqual(
+                resumed_window["result"]["activeBeat"]["id"], "beat:water"
+            )
+            worker.interaction_apply(
+                {
+                    "source": "typed_text",
+                    "ir": {"speechAct": "QUESTION", "topic": "water"},
+                    "options": {
+                        "meaningful": True,
+                        "openQuestion": "question:water",
+                        "commitment": "commitment:bring-water",
+                        "memory": "memory:water-plan",
+                    },
+                }
+            )
+            window = worker.interaction_response_window()
+            self.assertIn("question:water", window["result"]["openQuestions"])
+            self.assertIn(
+                "commitment:bring-water",
+                window["result"]["commitments"],
+            )
 
             closed = worker.interaction_close({"worldHour": 51.0})
             self.assertEqual(closed["result"]["reason"], "suspended")
@@ -94,6 +136,7 @@ class SemanticInteractionLifecycleP1Tests(unittest.TestCase):
         self.assertEqual(metrics["pairRecords"], 1)
         self.assertLess(metrics["pairCapsuleBytes"], 12000)
         self.assertEqual(metrics["dormantTickWork"], 0)
+        self.assertGreaterEqual(metrics["promotions"], 1)
 
     def test_trivial_interaction_does_not_materialize_pair_state(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
