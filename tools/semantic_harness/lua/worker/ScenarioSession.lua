@@ -327,7 +327,10 @@ function ScenarioSession.importSource(
         defaultSource = sourceMetadata.sourceKind,
         paths = {},
     })
-    Runtime.sourceProviderPayloads = Values.copy(providerPayloads or {})
+    -- Provider payloads include raw production save records.  Keep the
+    -- uncapped production copy here; the diagnostic copy would truncate Core
+    -- FULL inventory envelopes before the production deserializer sees them.
+    Runtime.sourceProviderPayloads = Values.productionCopy(providerPayloads or {})
     Runtime.sourceWorkingBaseline = nil
     Runtime.captureWorkingBaseline = true
     Runtime.workingResetCount = 0

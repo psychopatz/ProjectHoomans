@@ -307,3 +307,28 @@ def search_item_catalog(
         "hasMore": len(matches) > limit,
         "results": matches[:limit],
     }
+
+
+def item_type_registry_fixture() -> dict[str, Any]:
+    """Return the installed PZ item-type order as an engine fixture.
+
+    PsychopatzCore persists item type IDs as a compact numeric registry.  The
+    detached worker has no Java ScriptManager, so the installed game's script
+    catalog is transported as an engine fixture.  The current save format is
+    zero-based for this registry; the first sorted type is therefore omitted
+    from the one-based Lua table passed to ``Registry.load``.
+    """
+
+    values: dict[str, dict[str, str]] = {}
+    for root in discover_item_script_roots():
+        for item in _load_script_items(root):
+            values[item["fullType"]] = item
+    full_types = sorted(values, key=str.casefold)
+    return {
+        "schema": "semantic.engine.item_type_registry.v1",
+        "source": "Project Zomboid media/scripts",
+        "sourceAvailable": bool(full_types),
+        "idBase": 0,
+        "types": full_types[1:] if full_types else [],
+        "typeCount": len(full_types),
+    }

@@ -139,13 +139,31 @@ class LuaSemanticWorker:
             provenance=effective_provenance,
             provider_payloads=effective_payloads,
         )
+        snapshot_data = snapshot.to_dict()
+        wire_provider_payloads = deepcopy(snapshot_data["providerPayloads"])
+        project_zomboid = wire_provider_payloads.get("ProjectZomboid")
+        item_type_fixture = (
+            project_zomboid.get("itemTypeRegistry")
+            if isinstance(project_zomboid, dict)
+            else None
+        )
+        if (
+            isinstance(item_type_fixture, dict)
+            and isinstance(item_type_fixture.get("types"), list)
+        ):
+            # The engine item registry is a genuine offline PZ fixture. Install
+            # it through its own bounded worker request so the raw save record
+            # and registry do not compete for the single JSON-line size limit.
+            self._request("INSTALL_ENGINE_ITEM_TYPES", item_type_fixture)
+            if isinstance(project_zomboid, dict):
+                project_zomboid.pop("itemTypeRegistry", None)
         response = self._request(
             "IMPORT_SOURCE",
             {
-                "scenario": snapshot.to_dict()["data"],
-                "metadata": snapshot.to_dict()["metadata"],
-                "provenance": snapshot.to_dict()["provenance"],
-                "providerPayloads": snapshot.to_dict()["providerPayloads"],
+                "scenario": snapshot_data["data"],
+                "metadata": snapshot_data["metadata"],
+                "provenance": snapshot_data["provenance"],
+                "providerPayloads": wire_provider_payloads,
             },
         )
         # Keep provider projections available to the Python/UI read model. Lua

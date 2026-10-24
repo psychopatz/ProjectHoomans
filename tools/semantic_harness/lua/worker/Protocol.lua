@@ -196,6 +196,14 @@ local function jsonDecode(source)
         end
         while true do
             local key = parseString()
+            -- JSON object keys are strings, but production Core inventory
+            -- records use sparse numeric keys. Restore canonical integer keys
+            -- at the transport boundary so raw persisted records retain their
+            -- production shape after a worker round trip.
+            local numericKey = tonumber(key)
+            if numericKey ~= nil and tostring(numericKey) == key then
+                key = numericKey
+            end
             skipWhitespace()
             if string.sub(source, index, index) ~= ":" then
                 error("expected_object_separator")

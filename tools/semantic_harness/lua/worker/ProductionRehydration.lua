@@ -75,6 +75,38 @@ local function hasEntries(value)
     return false
 end
 
+function ProductionRehydration.installEngineItemTypeFixture(context, fixture)
+    local existingCount = tonumber(
+        context.Runtime.engineItemTypeFixtureCount
+    ) or 0
+    if type(fixture) ~= "table" then
+        local payloads = context.Runtime.sourceProviderPayloads or {}
+        local projectZomboid = payloads.ProjectZomboid
+        fixture = type(projectZomboid) == "table"
+            and projectZomboid.itemTypeRegistry or nil
+    end
+    local types = fixture and fixture.types or nil
+    local coreInventory = PsychopatzCore and PsychopatzCore.Inventory or nil
+    local registry = coreInventory and coreInventory.ItemTypeRegistry or nil
+    if type(types) ~= "table" or not registry
+        or type(registry.load) ~= "function"
+    then
+        return existingCount
+    end
+    local persistedTypes = {}
+    for index = 1, #types do
+        persistedTypes[index] = types[index]
+    end
+    registry.load({
+        schemaVersion = 1,
+        revision = #persistedTypes,
+        nextId = #persistedTypes + 1,
+        types = persistedTypes,
+    })
+    context.Runtime.engineItemTypeFixtureCount = #persistedTypes
+    return #persistedTypes
+end
+
 local function scenarioProjection(context, record, original)
     local Values = context.Values
     -- Keep the public scenario/UI view bounded. The complete hydrated record
@@ -190,6 +222,8 @@ function ProductionRehydration.configure(context)
     if type(raw) ~= "table" then
         return fail(context, "raw_npc_record_missing")
     end
+    local itemTypeFixtureCount = ProductionRehydration
+        .installEngineItemTypeFixture(context)
     if not PNC or not PNC.Persistence
         or type(PNC.Persistence.DeserializeRecord) ~= "function"
     then
@@ -203,7 +237,7 @@ function ProductionRehydration.configure(context)
 
     local ok, record = pcall(
         PNC.Persistence.DeserializeRecord,
-        Values.copy(raw),
+        Values.productionCopy(raw),
         npcID
     )
     if not ok or type(record) ~= "table"
@@ -242,6 +276,8 @@ function ProductionRehydration.configure(context)
         inventoryRuntimeType = type(record.inventory),
         registry = "isolated PNC.Registry",
         sourceRecord = "ProjectHoomans.rawRecords.npc",
+        engineItemTypeFixtureCount = itemTypeFixtureCount > 0
+            and itemTypeFixtureCount or nil,
     }
     return true
 end

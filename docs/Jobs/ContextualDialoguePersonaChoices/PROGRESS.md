@@ -2,8 +2,8 @@
 
 **Updated:** 2026-10-24  
 **Parent status:** REOPENED — P12/P13 save-backed operational workbench retained; P14 production rehydration parity is mandatory.  
-**Current mandatory phase:** P14B — Production NPC inventory rehydration.
-**Current local baseline audited:** ProjectHoomans `main` at `25b51c07`.
+**Current mandatory phase:** P14C — Production faction/diplomacy rehydration.
+**Current local baseline audited:** ProjectHoomans `main` at `2308e5a8` before the P14B evidence commit.
 **Normal Semantic Lab runtime requirement:** Project Zomboid may remain CLOSED/OFFLINE.  
 **Source save mutation:** FORBIDDEN.
 
@@ -116,23 +116,56 @@ python3 -m unittest tools.semantic_harness.tests.test_save_import_p12c tools.sem
 xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_actor_inspectors_p13c tools.semantic_harness.tests.test_inventory_gift_workbench_p13e tools.semantic_harness.tests.test_operational_acceptance_p13g
 ```
 
-All listed checks pass. P14A is accepted; continue with P14B.
+All listed checks pass. P14A is accepted.
 
-## Current Exact Next Chunk — P14B
+## Completed P14B — production NPC inventory rehydration
+
+Evidence recorded on 2026-10-24:
+
+- Production Lua generated and reserialized `SEED_ONLY`, `BASELINE_DELTA`, and
+  `FULL` records through `PNC.Persistence.SerializeRecord`; Python only
+  transported the raw record.
+- Lua rehydrated every mode through `PNC.Persistence.DeserializeRecord` and
+  `PNC.Inventory.EnsureRecordInventory`, with the hydrated record installed in
+  the isolated registry and consumed by the semantic inventory query.
+- Core sparse numeric inventory keys survive JSON-lines transport; Core reader
+  `_entries` shapes are restored as generic transport data, not interpreted as
+  Project Hoomans gameplay state.
+- Real saved `npcWilberDowns_R4XY` previously reported
+  `npc.inventory = MISSING` in the Python projection. Its persisted
+  `BASELINE_DELTA` now rehydrates as `BASELINE_DELTA` with eight production
+  inventory items, using a read-only Project Zomboid item-type engine fixture.
+- GUI/CLI operational parity, semantic inventory display, source-save SHA,
+  immutable source snapshots, reset isolation, and Developer/Test fixture mode
+  remain passing.
+
+Focused evidence:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_production_inventory_rehydration_p14b
+python3 -m unittest tools.semantic_harness.tests.test_production_rehydration_p14a
+python3 -m unittest tools.semantic_harness.tests.test_save_import_p12c tools.semantic_harness.tests.test_save_backed_conversation_p12j tools.semantic_harness.tests.test_save_backed_snapshot_p12a tools.semantic_harness.tests.test_cli_parity_p13f
+python3 -m unittest tools.semantic_harness.tests.test_protocol
+xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_actor_inspectors_p13c tools.semantic_harness.tests.test_inventory_gift_workbench_p13e
+xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_operational_acceptance_p13g
+```
+
+All listed checks pass. P14B is accepted; continue with P14C.
+
+## Current Exact Next Chunk — P14C
 
 On the existing local `main`:
 
-1. prove production inventory hydration for `SEED_ONLY`, `BASELINE_DELTA`,
-   and `FULL` records through the actual inventory persistence owner;
-2. add a real compact `BASELINE_DELTA` regression with deterministic seed and
-   delta replay; do not implement delta logic in Python;
-3. ensure hydrated inventory is displayed consistently in GUI and CLI;
-4. exercise production gift mutation against the hydrated record and verify
-   reset restores the imported baseline;
-5. keep source saves immutable and preserve explicit Developer/Test fixture
-   mode;
-6. run focused Python, Lua, Tk/Xvfb, CLI, Kahlua, and diff checks, then update
-   this ledger and continue automatically to P14C.
+1. trace and transport the raw saved faction/diplomacy state needed by the
+   production faction owners;
+2. invoke production faction/community load and relationship services to
+   resolve NPC faction → selected Player real/provisional diplomacy faction;
+3. preserve war, alliance, truce, pacification, trust/fear/grievance, and
+   membership/leader state without adding Python diplomacy policy;
+4. keep personal relationship, faction relationship, tactical hostility, and
+   conversation audience as separate production-owned layers;
+5. run focused Python, Lua, Tk/Xvfb, CLI, Kahlua, and diff checks, then update
+   this ledger and continue automatically to P14D.
 
 ## P14A acceptance
 

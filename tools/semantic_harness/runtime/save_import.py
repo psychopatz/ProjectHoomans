@@ -9,6 +9,7 @@ from typing import Any
 
 from .scenario import DEFAULT_SCENARIO, merge
 from .save_catalog import SaveCatalog, SaveCatalogError, _load_core_reader
+from .item_catalog import item_type_registry_fixture
 from .player_engine_state import OfflinePlayerEngineStateProvider
 
 
@@ -35,6 +36,39 @@ class SavedSelection:
 
 def _as_dict(value: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
+
+
+def _restore_reader_shape(value: Any) -> Any:
+    """Restore Core reader table shape without interpreting mod semantics.
+
+    The read-only Core ModData reader uses ``_entries`` when a table has
+    sparse numeric keys, because JSON object keys cannot retain Lua numbers.
+    Rebuilding those keys is transport normalization only; production Lua
+    remains the owner of persistence, migration, and gameplay meaning.
+    """
+
+    if isinstance(value, list):
+        return [_restore_reader_shape(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+    entries = value.get("_entries")
+    if (
+        isinstance(entries, list)
+        and set(value) == {"_entries"}
+        and all(
+            isinstance(entry, dict)
+            and "key" in entry
+            and "value" in entry
+            for entry in entries
+        )
+    ):
+        return {
+            _restore_reader_shape(entry["key"]): _restore_reader_shape(
+                entry["value"]
+            )
+            for entry in entries
+        }
+    return {key: _restore_reader_shape(item) for key, item in value.items()}
 
 
 def _first_name(identity: dict[str, Any]) -> tuple[str, str, str]:
@@ -156,7 +190,7 @@ class SaveBackedImporter:
         value = report.get("data")
         if not isinstance(value, dict):
             raise SaveImportError(f"saved table {table_name} is not an object")
-        return value
+        return _restore_reader_shape(value)
 
     def load(
         self,
@@ -246,6 +280,21 @@ class SaveBackedImporter:
             save_path,
             player_uuid=selected_uuid,
         )
+        raw_inventory = npc_record.get("inventory")
+        compact_inventory = (
+            isinstance(raw_inventory, list)
+            and len(raw_inventory) > 1
+            and str(raw_inventory[1]) in {
+                "SEED_ONLY",
+                "BASELINE_DELTA",
+                "FULL",
+            }
+        )
+        if compact_inventory:
+            native_player_state = deepcopy(native_player_state)
+            native_player_state["itemTypeRegistry"] = (
+                item_type_registry_fixture()
+            )
         native_save_root = save_path if save_path.is_dir() else save_path.parent
         if native_player_state.get("available"):
             player_inventory = deepcopy(native_player_state["inventory"])
