@@ -1,6 +1,6 @@
 # Roadmap — Semantic Interaction Lifecycle
 
-**Parent status:** ACTIVE — P0–P9 retained foundation; P10 native Conversation parity correction is mandatory.  
+**Parent status:** ACTIVE — P0–P9 lifecycle foundation retained; P10 native Conversation parity and P11 no-split semantic authority consolidation are mandatory.  
 **Foundation:** Contextual Dialogue Persona & Choices P14 accepted.  
 **Completion rule:** phases organize work; completing a phase never completes the parent goal. Continue autonomously through every mandatory phase until developer-side acceptance or a genuine blocker.
 
@@ -187,6 +187,29 @@ Mandatory subphases:
 
 P10 is intentionally extensible while the user continues the current planning/audit pass. Additional approved corrective subphases may be appended before final goal generation.
 
+## P11 — Legacy semantic authority consolidation
+
+**Status:** MANDATORY.
+
+A post-P10 audit found that several migrated families still use old Flavor/SocialFlavor classifiers or reply-ID selectors to choose the response before attaching semantic lifecycle provenance. This is a split system.
+
+See `LEGACY_SEMANTIC_AUTHORITY_CONSOLIDATION.md`.
+
+Mandatory subphases:
+
+- P11A — remaining authority inventory;
+- P11B — canonical semantic realization boundary;
+- P11C — greeting/farewell authority migration;
+- P11D — emote/companion/social reply authority migration;
+- P11E — combat/medical/distress/leader-loss classifier migration;
+- P11F — reduce SocialFlavor to content/presentation backend;
+- P11G — remove misleading/dead remnants and sanitize execution docs;
+- P11H — no-split-system acceptance.
+
+**Gate:** semantic context/flows/response plans are the only conversational intelligence authority. Flavor/SocialFlavor may retain authored content and low-level delivery only.
+
+P10 and P11 are both mandatory and may be interleaved by dependency.
+
 ## Stop condition
 
 Do not stop because:
@@ -197,5 +220,5 @@ Do not stop because:
 - one long-thread test passes;
 - the harness is green for a partial slice.
 
-Stop only when P0–P10 and any later user-approved mandatory corrective phases have developer-side acceptance, or a genuine external/technical blocker prevents further safe progress. P0–P9 passing alone is no longer sufficient for READY FOR USER LIVE TEST.
+Stop only when P0–P11 and any later user-approved mandatory corrective phases have developer-side acceptance, or a genuine external/technical blocker prevents further safe progress. P0–P9 passing alone is no longer sufficient, and attaching semantic provenance to a legacy-selected reply does not count as semantic migration.
 

@@ -477,3 +477,36 @@ The harness must not treat a generic capability/suggestion snapshot after import
 The Semantic Lab may use a desktop-efficient layout rather than visually reproducing Project Zomboid's skin.
 
 Behavioral parity is mandatory; pixel/theme parity is not.
+
+
+## 22. Single conversational-intelligence authority
+
+The semantic lifecycle is not complete if an old flavor module chooses the response and semantics merely records it afterward.
+
+Forbidden:
+
+~~~text
+legacy role/tier/need/grief classifier
+    -> legacy reply/flavor ID
+    -> semantic envelope attached afterward
+~~~
+
+Required:
+
+~~~text
+authoritative facts
+    -> semantic act/topic/active beat
+    -> ActorConversationContext + semantic providers
+    -> ResponsePlan / flow
+    -> realization family + realization ID
+    -> content/localization
+    -> delivery/TTS/UI
+~~~
+
+Retained Flavor/SocialFlavor may store authored content, format exact tokens, choose meaning-equivalent wording inside an already-selected semantic realization, and deliver bounded speech. It may not infer relationship role/audience/need/grief to choose a response family, choose act/topic/plan/eligibility, or override thread/beat meaning.
+
+Useful old pure classifiers may survive only after being moved/refactored into neutral semantic/context providers with explicit authoritative inputs.
+
+Existing authored SocialFlavor/CompanionCommand/VanillaEmote/Combat/Medical/LeaderDeath lines are migration assets. Do not multiply semantic intents for every wording variant.
+
+Compatibility modules may translate external facts and supply provider-specific authored wording, but must feed the common semantic realization authority rather than create another planner.

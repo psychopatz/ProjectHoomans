@@ -8,7 +8,7 @@ A phase is not the goal.
 
 Do not report the parent complete after an audit, one migration family, one passing stress test or one harness improvement.
 
-P0–P9 are retained implementation foundation, but developer acceptance was reopened by user native/harness evidence. Continue through mandatory P10 and any later user-approved corrective phases before handing back READY FOR USER LIVE TEST, unless a genuine blocker prevents safe progress.
+P0–P9 are retained implementation foundation, but developer acceptance was reopened by user native/harness evidence. Continue through mandatory P10, mandatory P11, and any later user-approved corrective phases before handing back READY FOR USER LIVE TEST, unless a genuine blocker prevents safe progress.
 
 ## Required read order
 
@@ -123,6 +123,18 @@ The harness is an agent development tool, so usability is part of acceptance.
 - Ordinary worker operations must not overwrite user splitter/dock positions.
 - Tests must exercise workflows, not merely assert that widgets have non-zero dimensions.
 - World Browser role and affiliation projections must remain discoverable.
+
+### Single semantic authority
+
+Do not count a path as migrated merely because it carries a semantic envelope, beat ID, pool ID or provenance after an old classifier has already chosen the response.
+
+For every dialogue family, semantics must choose act/topic, response plan, dialogue stance/classification, realization family/ID and continuation offers.
+
+Legacy Flavor/SocialFlavor may remain only for authored content, exact realization rendering, localization/token formatting, bounded queue/dedupe/TTL and TTS/nameplate/conversation delivery.
+
+Direct `ReplyFlavorID`, `GreetingReplyFlavorID`, Flavor-only audience/need/grief response classification, or comparable logic is a migration blocker for the affected family.
+
+Do not delete valuable authored lines. Migrate their ownership/addressing.
 
 ### Legacy retirement
 

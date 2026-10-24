@@ -273,3 +273,30 @@ The harness must reproduce the production-presented semantic state for that same
 Earlier P0–P9 automated evidence remains useful implementation evidence, but it did not prove native Conversation-surface parity.
 
 Therefore the previous READY FOR USER LIVE TEST conclusion is superseded until P10 passes.
+
+
+## No-split semantic authority acceptance
+
+For representative greeting, farewell, emote, command acknowledgement, combat reaction, medical/distress reaction and leader-loss reaction, diagnostics must show:
+
+~~~text
+grounded facts
+-> semantic act/topic
+-> active beat/thread
+-> response plan
+-> realization family/ID
+-> renderer/delivery
+~~~
+
+The renderer must not be the first component that decides relationship stance, need/grief bucket or response family.
+
+Add focused acceptance for:
+
+- equivalent typed/button/emote meaning converging before realization selection where appropriate;
+- renderer substitution not changing semantic response plan/realization family;
+- static guards against legacy reply-family selection before semantic planning;
+- guards against Flavor-only audience/need/grief classifiers controlling migrated response families;
+- one unmistakable current active goal in root execution policy;
+- cleanup/relocation of obsolete duplicate harness modules after dependency verification.
+
+The project cannot return to READY FOR USER LIVE TEST until P10 proves native Conversation parity and P11 proves that mirrored production behavior has one semantic conversational-intelligence owner.

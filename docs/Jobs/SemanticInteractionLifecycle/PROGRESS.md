@@ -2,7 +2,7 @@
 
 **Updated:** 2026-10-25
 
-**Developer status:** P0A–P9 implementation is retained foundation, but developer acceptance is REOPENED. User-supplied native/harness evidence on 2026-10-25 proves the Semantic Lab primary Conversation surface is not yet faithful to native production presentation. P10 is mandatory before READY FOR USER LIVE TEST.
+**Developer status:** P0A–P9 lifecycle/persistence implementation is retained foundation, but developer acceptance is REOPENED. P10 is mandatory for native Conversation parity. A follow-up source audit also proved that several legacy Flavor/SocialFlavor paths still choose response families before semantic provenance is attached, so P11 is mandatory to eliminate split conversational intelligence before READY FOR USER LIVE TEST.
 
 **Accepted predecessor foundation:** Contextual Dialogue Persona & Choices P14. Its save-backed production rehydration architecture remains intact.
 
@@ -47,6 +47,28 @@ Complete. The existing production Lua worker exposes envelope, apply, NPC speech
 ## P9 — legacy authority retirement boundary
 
 Complete for the audited families. Legacy registries, EN/TL lines, timing gates, and compatibility shims remain only where they are still the correct realization/provider or external-domain boundary. Duplicate lifecycle/state authority and prose-reparse paths are retired; ConversationBlocks, gameplay domains, network authority, and existing presentation/TTS ownership remain authoritative in their existing locations.
+
+## P11 — legacy semantic authority consolidation
+
+**Status:** MANDATORY, planning/audit accepted; implementation not started.
+
+Verified remaining split-authority examples:
+
+- proximity greeting still selects `GreetingReplyFlavorID(...)` before semantic NPC-speech recording;
+- vanilla emotes still use `ResolveNPCType`, `ResolveRelationshipTier`, `GreetingReplyFlavorID`, `ReplyFlavorID` and role/tier reply tables;
+- farewell still routes legacy social-role conditioned `social.conversation_farewell` realization;
+- `PNC_FlavorTextResolver.lua` still derives Flavor-specific threat/audience/need/grief buckets used by response definitions;
+- companion/social presentation still contains direct Flavor resolution;
+- P0–P9 migration largely attached lifecycle/provenance around existing flavor selection instead of moving all response selection above the semantic authority line;
+- stale execution/docs and duplicate-looking harness remnants can mislead autonomous agents.
+
+See `LEGACY_SEMANTIC_AUTHORITY_CONSOLIDATION.md`.
+
+Any P9 statement that legacy semantic authority was fully retired is superseded. P9 remains accepted for lifecycle/provenance/persistence integration only.
+
+Immediate implementation Next Chunk remains P10B. After the minimum P10B–P10E production/session parity seam is stable, execute P11A–P11F; P10F/P10G may interleave when independent; finish with P11G and combined P10H/P11H acceptance.
+
+Attaching a semantic envelope to an already legacy-selected flavor ID does **not** satisfy P11.
 
 ## P10 — native Conversation parity correction
 
@@ -95,4 +117,4 @@ See `DEVELOPER_ACCEPTANCE.md` for the exact command log and scenario mapping. Ve
 
 ## Previous P0–P9 handoff status
 
-The former "no further developer-implementable chunk remains" conclusion is superseded by P10. Preserve the recorded P0–P9 verification as historical implementation evidence; do not use it to skip the active native-parity correction.
+The former "no further developer-implementable chunk remains" conclusion is superseded by P10 and P11. Preserve the recorded P0–P9 verification as historical implementation evidence; do not use it to skip the active native-parity correction.
