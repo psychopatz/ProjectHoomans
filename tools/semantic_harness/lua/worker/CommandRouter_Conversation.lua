@@ -161,6 +161,21 @@ function Conversation.handle(context, command, payload)
                 context.Runtime and context.Runtime.view
             ),
         }
+    elseif command == "CONVERSATION_PROJECTION"
+        or command == "TALK_PROJECTION"
+    then
+        local projection = context.Conversation.presentationProjection(
+            context,
+            context.Runtime and context.Runtime.view
+        )
+        if type(projection) ~= "table" then
+            return nil, "conversation_projection_unavailable"
+        end
+        return {
+            ok = true,
+            type = "conversation_projection",
+            presentation = Values.copy(projection),
+        }
     end
     return false
 end

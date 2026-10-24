@@ -3,6 +3,15 @@
 require "PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_FlavorDefinitions"
 
 local Client = PNC.Compatibility.ProjectALifeEvents.Client
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if type(SocialReactions) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
 
 local function flavorFor(event)
     if event.category == "meta" then
@@ -139,26 +148,46 @@ local function receive(event)
     local speakerID = Client.CleanText(target and target.id, 96)
     if not speakerID then return false end
 
+    local eventType = "projectalife_" .. event.category
+    local semanticContext = {
+        eventType = eventType,
+        projectALifeKind = event.metaKind or event.category,
+        projectALifeStance = event.stance,
+        projectALifeConflictDirection = event.direction,
+        projectALifeConflictDamage = event.damage,
+        factionName = event.factionName or "that faction",
+    }
+    local semantic = SocialReactions and SocialReactions.Resolve and
+        SocialReactions.Resolve({
+            eventType = eventType,
+            eventID = event.eventID,
+            npcID = speakerID,
+            context = semanticContext,
+        }) or nil
+    if not semantic then return false end
+    semanticContext.responsePlanID = semantic.responsePlanID
+    semanticContext.realizationFamily = semantic.realizationFamily
+    semanticContext.realizationID = semantic.realizationID
+    semanticContext.factRefs = semantic.groundedFactRefs
+
     local accepted = presentation.Receive({
         npcID = speakerID,
         eventID = "projectalife:" .. event.eventID .. ":" .. speakerID,
         eventRef = event.eventID,
         flavorID = flavorID,
         family = "projectalife_world_event",
-        eventType = "projectalife_" .. event.category,
+        eventType = eventType,
+        resolvedText = semantic.fallback,
+        responsePlanID = semantic.responsePlanID,
+        realizationFamily = semantic.realizationFamily,
+        realizationID = semantic.realizationID,
+        factRefs = semantic.groundedFactRefs,
         socialRole = target.source and (
             target.source.socialRole or target.source.npcType) or "colonist",
         priority = 38,
         llmEligible = false,
         memoryEligible = false,
-        context = {
-            eventType = "projectalife_" .. event.category,
-            projectALifeKind = event.metaKind or event.category,
-            projectALifeStance = event.stance,
-            projectALifeConflictDirection = event.direction,
-            projectALifeConflictDamage = event.damage,
-            factionName = event.factionName or "that faction",
-        },
+        context = semanticContext,
         source = {
             kind = "social_flavor",
             channel = "projectalife",

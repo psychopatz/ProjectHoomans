@@ -10,6 +10,15 @@ local H = PNC.SocialEventHooksInternal
 local EntityRef = PNC.EntityRef
 local Core = PNC.Core
 local Network = PNC.Network
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if not SocialReactions then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
 
 local function relationshipDelta(before, after)
     return {
@@ -95,6 +104,22 @@ function Hooks.OnTreatmentCompleted(
         and Network and Network.SendConversationRelationshipForNPC
     then
         firstDetail = output.details and output.details[1] or nil
+        local reactionContext = {
+            eventType = "treated_wound",
+            downedNeed = "bandage",
+            woundType = context and context.woundType or nil,
+            npcID = targetRecord.id,
+        }
+        local realization = SocialReactions
+            and type(SocialReactions.Resolve) == "function"
+            and SocialReactions.Resolve({
+                eventType = "treated_wound",
+                act = "ACK",
+                topic = "medical",
+                context = reactionContext,
+                eventID = output.eventID,
+                npcID = targetRecord.id,
+            }) or nil
         Network.SendConversationRelationshipForNPC(
             player,
             targetRecord.id,
@@ -108,6 +133,25 @@ function Hooks.OnTreatmentCompleted(
                     firstDetail and firstDetail.relationshipBefore or nil,
                     firstDetail and firstDetail.relationshipAfter or nil
                 ),
+                ambientFlavor = {
+                    flavorID = "social.witnessed_teammate_hurt",
+                    text = realization and realization.fallback or nil,
+                    eventType = "treated_wound",
+                    act = realization and realization.semanticAct or "ACK",
+                    topic = realization and realization.topic or "medical",
+                    responsePlanID = realization
+                        and realization.responsePlanID or nil,
+                    poolID = realization
+                        and realization.realizationFamily or nil,
+                    realizationFamily = realization
+                        and realization.realizationFamily or nil,
+                    realizationID = realization
+                        and realization.realizationID or nil,
+                    factRefs = realization
+                        and realization.groundedFactRefs or nil,
+                    npcID = targetRecord.id,
+                    context = reactionContext,
+                },
             }
         )
     end

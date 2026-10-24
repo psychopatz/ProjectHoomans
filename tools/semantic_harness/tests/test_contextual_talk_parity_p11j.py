@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
 import os
 from pathlib import Path
 import time
@@ -14,9 +15,121 @@ from tools.semantic_harness.runtime.npc_profiles import apply_npc_profile
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.ui.suggestion_projection import (
+    conversation_presented_rows,
+    npc_message_text,
+)
 
 
 class ContextualTalkParityP11JTests(unittest.TestCase):
+    def test_p10h_production_native_conversation_parity_record(self) -> None:
+        """Compare the complete primary surface to one production session.
+
+        This deliberately compares production Lua's presentation projection
+        with the thin Tk adapter.  It must not derive a choice group or
+        candidate policy from the diagnostic/global suggestion projection.
+        """
+
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            opened = worker.open_conversation()
+            production = opened["presentation"]
+            channel = production["responseChannel"]
+            relation = production["relationPresentation"]
+            typed = production["semanticInput"]
+            adapter_rows = conversation_presented_rows(production)
+            production_rows = channel["rows"]
+
+            self.assertEqual(
+                production["schema"], "semantic.native_conversation_view.v1"
+            )
+            self.assertEqual(production["source"], "PNC.Conversation.TalkParity")
+            self.assertEqual(production["talkStart"]["schema"], "semantic.talk.start.projection.v1")
+            self.assertEqual(production["opening"]["nodeID"], "greeting")
+            self.assertTrue(production["opening"]["messages"])
+            opening_message = production["opening"]["messages"][0]
+            self.assertTrue(opening_message.get("text"))
+            self.assertEqual(
+                npc_message_text(opening_message), opening_message["text"]
+            )
+            self.assertEqual(relation["source"], "PNC.Conversation.Relationship")
+            self.assertTrue(relation["visible"])
+            self.assertTrue(typed["available"])
+            self.assertEqual(
+                channel["choiceSurface"]["revision"], channel["revision"]
+            )
+            self.assertEqual(
+                channel["choiceSurface"]["presentedCount"], len(production_rows)
+            )
+            self.assertEqual(
+                [row["id"] for row in adapter_rows],
+                [row["id"] for row in production_rows],
+            )
+            self.assertEqual(
+                [row["text"] for row in adapter_rows],
+                [row["text"] for row in production_rows],
+            )
+            self.assertEqual(
+                [row["enabled"] for row in adapter_rows],
+                [row["enabled"] for row in production_rows],
+            )
+            self.assertEqual(
+                [row["semanticFrame"] for row in adapter_rows],
+                [row["semanticFrame"] for row in production_rows],
+            )
+
+            clicked_row = next(row for row in production_rows if row["enabled"])
+            clicked = worker.suggestion_click(clicked_row["semanticFrame"])
+            next_presentation = clicked["conversationPresentation"]
+            next_channel = next_presentation["responseChannel"]
+            self.assertTrue(clicked["accepted"])
+            self.assertEqual(
+                clicked["choiceSurface"], next_channel["choiceSurface"]
+            )
+            self.assertEqual(
+                clicked["conversationPresentation"],
+                worker.snapshot()["conversationPresentation"],
+            )
+            self.assertNotEqual(
+                [row["id"] for row in production_rows],
+                [row["id"] for row in next_channel["rows"]],
+            )
+
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            worker.open_conversation()
+            before = worker.snapshot()["conversationPresentation"]
+            suspended = worker.suspend_conversation()["presentation"]
+            self.assertEqual(suspended["lifecycle"]["state"], "suspended")
+            self.assertEqual(suspended["responseChannel"]["rows"], [])
+            self.assertEqual(
+                suspended["responseChannel"]["groupID"],
+                before["responseChannel"]["groupID"],
+            )
+            resumed = worker.resume_conversation()["presentation"]
+            self.assertEqual(resumed["lifecycle"]["state"], "active")
+            self.assertEqual(
+                resumed["responseChannel"]["groupID"],
+                before["responseChannel"]["groupID"],
+            )
+            self.assertEqual(
+                resumed["responseChannel"]["revision"],
+                before["responseChannel"]["revision"],
+            )
+            goodbye = next(
+                row
+                for row in resumed["responseChannel"]["rows"]
+                if row["id"].endswith(":goodbye")
+            )
+            closed = worker.suggestion_click(goodbye["semanticFrame"])
+            self.assertTrue(closed["accepted"])
+            self.assertEqual(
+                closed["conversationPresentation"]["lifecycle"]["state"],
+                "closed",
+            )
+            self.assertEqual(
+                closed["conversationPresentation"]["responseChannel"]["rows"],
+                [],
+            )
+
     def test_catalog_is_production_owned_and_truthful(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.talk_catalog()
@@ -88,6 +201,251 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
         self.assertEqual(projection["targetType"], "hostile")
         self.assertEqual(projection["tacticalClass"], "hostile")
         self.assertEqual(projection["opening"]["nodeID"], "greeting")
+
+    def test_production_projection_exposes_exact_presented_session_rows(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            loaded = worker.snapshot()
+            opened = worker.open_conversation()
+            snapshot = worker.snapshot()
+            response = worker.conversation_projection()
+
+        self.assertEqual(
+            loaded["conversationPresentation"]["lifecycle"]["state"],
+            "loaded",
+        )
+        self.assertEqual(
+            loaded["conversationPresentation"]["responseChannel"]["rows"],
+            [],
+        )
+        self.assertEqual(opened["type"], "conversation_open")
+
+        presentation = snapshot["conversationPresentation"]
+        self.assertEqual(
+            presentation["schema"],
+            "semantic.native_conversation_view.v1",
+        )
+        self.assertEqual(
+            response["presentation"],
+            presentation,
+        )
+        rows = presentation["responseChannel"]["rows"]
+        choice_surface = snapshot["choiceSurface"]
+        suggestions = snapshot["suggestions"]
+        self.assertEqual(
+            len(rows),
+            choice_surface["presentedCount"],
+        )
+        self.assertEqual(
+            presentation["responseChannel"]["groupID"],
+            suggestions["currentGroupID"],
+        )
+        self.assertEqual(
+            presentation["responseChannel"]["revision"],
+            choice_surface["revision"],
+        )
+        self.assertTrue(presentation["opening"]["messages"])
+        self.assertTrue(presentation["semanticInput"]["available"])
+        self.assertIn(
+            presentation["lifecycle"]["state"],
+            {"opening", "active"},
+        )
+        self.assertEqual(
+            [row["id"] for row in rows],
+            [row["id"] for row in rows if row["semanticFrame"] is not None],
+        )
+        self.assertTrue(all("enabled" in row for row in rows))
+
+    def test_open_returns_bounded_projection_for_large_saved_world(self) -> None:
+        scenario = deepcopy(DEFAULT_SCENARIO)
+        scenario.setdefault("world", {})["saveBackedDiagnostic"] = "x" * 120_000
+        with LuaSemanticWorker(scenario) as worker:
+            opened = worker.open_conversation()
+
+        encoded = json.dumps(
+            opened, ensure_ascii=False, separators=(",", ":")
+        ).encode("utf-8")
+        self.assertLess(len(encoded), 256 * 1024)
+        self.assertNotIn("configured", opened)
+        self.assertNotIn("snapshot", opened)
+        self.assertEqual(
+            opened["presentation"]["schema"],
+            "semantic.native_conversation_view.v1",
+        )
+
+    def test_primary_renderer_adapter_preserves_production_row_order_and_frames(
+        self,
+    ) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            worker.open_conversation()
+            presentation = worker.snapshot()["conversationPresentation"]
+
+        rows = conversation_presented_rows(presentation)
+        production_rows = presentation["responseChannel"]["rows"]
+        self.assertEqual(
+            [row["id"] for row in rows],
+            [row["id"] for row in production_rows],
+        )
+        self.assertEqual(
+            [row["frame"] for row in rows],
+            [row["semanticFrame"] for row in production_rows],
+        )
+        self.assertEqual(
+            [row["enabled"] for row in rows],
+            [row["enabled"] for row in production_rows],
+        )
+
+    def test_primary_click_uses_exact_production_frame_and_reprojects(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            opened = worker.open_conversation()
+            before = opened["presentation"]
+            row = next(
+                row for row in before["responseChannel"]["rows"]
+                if row["enabled"] is True
+            )
+            clicked = worker.suggestion_click(row["semanticFrame"])
+            after = worker.snapshot()["conversationPresentation"]
+
+        self.assertTrue(clicked["accepted"])
+        self.assertEqual(clicked["type"], "semantic_click")
+        self.assertEqual(
+            clicked["conversationPresentation"],
+            after,
+        )
+        self.assertNotEqual(
+            before["responseChannel"]["rows"],
+            after["responseChannel"]["rows"],
+        )
+        self.assertEqual(
+            clicked["choiceSurface"],
+            after["responseChannel"]["choiceSurface"],
+        )
+
+    def test_production_frame_rejection_is_stale_or_replayed_without_mutation(
+        self,
+    ) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            opened = worker.open_conversation()
+            frame = next(
+                row["semanticFrame"]
+                for row in opened["presentation"]["responseChannel"]["rows"]
+                if row["enabled"] is True
+            )
+            accepted = worker.suggestion_click(frame)
+            before_duplicate = worker.snapshot()
+            duplicate = worker.suggestion_click(frame)
+            after_duplicate = worker.snapshot()
+
+        self.assertTrue(accepted["accepted"])
+        self.assertFalse(duplicate["accepted"])
+        self.assertEqual(duplicate["reason"], "suggestion_click_replayed")
+        self.assertEqual(
+            before_duplicate["transcript"], after_duplicate["transcript"]
+        )
+        self.assertEqual(
+            before_duplicate["conversationPresentation"],
+            after_duplicate["conversationPresentation"],
+        )
+
+    def test_unpresented_production_frame_is_rejected_without_mutation(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            opened = worker.open_conversation()
+            frame = deepcopy(
+                next(
+                    row["semanticFrame"]
+                    for row in opened["presentation"]["responseChannel"]["rows"]
+                    if row["enabled"] is True
+                )
+            )
+            frame["candidateID"] = "conversation.root:menu:not-presented"
+            before = worker.snapshot()
+            rejected = worker.suggestion_click(frame)
+            after = worker.snapshot()
+
+        self.assertFalse(rejected["accepted"])
+        self.assertEqual(rejected["reason"], "suggestion_not_presented")
+        self.assertEqual(before["transcript"], after["transcript"])
+        self.assertEqual(
+            before["conversationPresentation"],
+            after["conversationPresentation"],
+        )
+
+    def test_close_and_explicit_reopen_follow_the_same_production_session(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            opened = worker.open_conversation()
+            goodbye = next(
+                row for row in opened["presentation"]["responseChannel"]["rows"]
+                if row["id"].endswith(":goodbye")
+            )
+            closed_response = worker.suggestion_click(
+                goodbye["semanticFrame"]
+            )
+            closed = worker.snapshot()["conversationPresentation"]
+            reopened_response = worker.open_conversation()
+            reopened = worker.snapshot()["conversationPresentation"]
+
+        self.assertTrue(closed_response["accepted"])
+        self.assertEqual(closed["lifecycle"]["state"], "closed")
+        self.assertTrue(closed["lifecycle"]["closed"])
+        self.assertFalse(closed["semanticInput"]["available"])
+        self.assertEqual(closed["responseChannel"]["rows"], [])
+        self.assertEqual(reopened_response["type"], "conversation_open")
+        self.assertIn(reopened["lifecycle"]["state"], {"opening", "active"})
+        self.assertTrue(reopened["semanticInput"]["available"])
+        self.assertTrue(reopened["responseChannel"]["rows"])
+
+    def test_typed_emote_suspend_resume_share_the_production_semantic_state(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            opened = worker.open_conversation()
+            typed = worker.input("What's up?")
+            before = worker.snapshot()["conversationPresentation"]
+            speech = worker.interaction_npc_speech(
+                {
+                    "npcID": DEFAULT_SCENARIO["npc"]["npcID"],
+                    "act": "REQUEST",
+                    "topic": "water",
+                    "beatID": "beat:water",
+                    "responsePlanID": "plan:water",
+                }
+            )
+            emote = worker.conversation_emote(
+                "thumbsup", topic="water", meaningful=True
+            )
+            suspended = worker.suspend_conversation()
+            resumed = worker.resume_conversation()
+
+        self.assertTrue(typed["accepted"])
+        self.assertTrue(speech["result"]["accepted"])
+        self.assertTrue(emote["accepted"])
+        self.assertEqual(emote["envelope"]["source"], "emote")
+        self.assertEqual(emote["envelope"]["act"], "ACK")
+        self.assertEqual(
+            emote["interaction"]["thread"]["activeBeat"]["id"],
+            "beat:water",
+        )
+        self.assertEqual(suspended["type"], "conversation_suspend")
+        self.assertEqual(
+            suspended["presentation"]["lifecycle"]["state"],
+            "suspended",
+        )
+        self.assertEqual(
+            suspended["presentation"]["responseChannel"]["groupID"],
+            before["responseChannel"]["groupID"],
+        )
+        self.assertEqual(
+            suspended["presentation"]["responseChannel"]["rows"],
+            [],
+        )
+        self.assertEqual(resumed["type"], "conversation_resume")
+        self.assertEqual(
+            resumed["presentation"]["responseChannel"]["groupID"],
+            before["responseChannel"]["groupID"],
+        )
+        self.assertTrue(resumed["presentation"]["responseChannel"]["rows"])
+        self.assertEqual(
+            resumed["snapshot"]["interactionLifecycle"]["thread"]
+            ["activeBeat"]["id"],
+            "beat:water",
+        )
 
     def test_landing_projection_keeps_shortcut_and_back_target_after_hub_turn(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:

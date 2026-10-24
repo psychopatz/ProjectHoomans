@@ -112,6 +112,8 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
     local source
     local presentationState
     options = type(options) == "table" and options or {}
+    local realization = options.semanticRealization
+    local compatibilityFlavorID
     speaker = tostring(speaker or "npc")
     if speakerID == nil or tostring(speakerID) == "" then
         return false, "speaker_identity_unavailable"
@@ -121,9 +123,25 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
         or type(context) == "table" and (context.seed
             or context.requestID or context.eventID)
         or tostring(currentTime())
-    text = Flavor and Flavor.Resolve
-        and Flavor.Resolve(flavorID, speaker, seed, flavorContext)
-        or nil
+    text = options.resolvedText
+    compatibilityFlavorID = realization
+        and (realization.compatibilityFlavorID or flavorID) or nil
+    if realization and compatibilityFlavorID
+        and Flavor and type(Flavor.Resolve) == "function"
+    then
+        local authoredText = Flavor.Resolve(
+            compatibilityFlavorID, speaker, seed, flavorContext
+        )
+        if authoredText and authoredText ~= "" then
+            text = authoredText
+        end
+    end
+    if not text and not realization then
+        text = Flavor and Flavor.Resolve
+            and Flavor.Resolve(flavorID, speaker, seed, flavorContext)
+            or nil
+    end
+    if not text and realization then text = realization.fallback end
     if not text or text == "" then return false, "flavor_unavailable" end
     eventID = interactionEventID(flavorID, speaker, speakerID, context,
         options)
@@ -150,6 +168,18 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
         channel = "player_npc_interaction",
         commandID = type(context) == "table" and context.commandID or nil,
         origin = type(context) == "table" and context.origin or nil,
+        semanticAct = realization and realization.semanticAct
+            or type(context) == "table" and context.semanticAct or nil,
+        topic = realization and realization.topic
+            or type(context) == "table" and context.topic or nil,
+        responsePlanID = realization and realization.responsePlanID
+            or type(context) == "table" and context.responsePlanID or nil,
+        realizationFamily = realization and realization.realizationFamily
+            or type(context) == "table" and context.realizationFamily or nil,
+        realizationID = realization and realization.realizationID
+            or type(context) == "table" and context.realizationID or nil,
+        factRefs = realization and realization.groundedFactRefs
+            or type(context) == "table" and context.factRefs or nil,
         contextEligible = false,
     }
     presentationState = {
@@ -186,6 +216,13 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
         source = source,
         interaction = type(context) == "table"
             and context.interaction or nil,
+        semanticAct = realization and realization.semanticAct or nil,
+        topic = realization and realization.topic or nil,
+        responsePlanID = realization and realization.responsePlanID or nil,
+        realizationFamily = realization
+            and realization.realizationFamily or nil,
+        realizationID = realization and realization.realizationID or nil,
+        factRefs = realization and realization.groundedFactRefs or nil,
         ttlMs = 15000,
         holdMs = 1200,
     })

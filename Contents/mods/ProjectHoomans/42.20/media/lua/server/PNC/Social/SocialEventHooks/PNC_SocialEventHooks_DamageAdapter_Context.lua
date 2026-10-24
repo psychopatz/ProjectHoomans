@@ -14,6 +14,15 @@ local EntityRef = PNC.EntityRef
 local Registry = PNC.Registry
 local Network = PNC.Network
 local Factions = PNC.Factions
+local ContextProviders = PNC.Semantics
+    and PNC.Semantics.ContextProviders or nil
+if type(ContextProviders) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Core/Social/PNC_FlavorTextResolver"
+    )
+    ContextProviders = ok and loaded or nil
+end
 
 local POLL_INTERVAL_MS = 100
 local VANILLA_MARKER_WINDOW_MS = 500
@@ -296,9 +305,8 @@ local function factionIDForMember(member)
 end
 
 local function socialRole(record)
-    local interactions = PNC.VanillaEmoteInteractions
-    if interactions and type(interactions.ResolveNPCType) == "function" then
-        local ok, value = pcall(interactions.ResolveNPCType, record)
+    if ContextProviders and type(ContextProviders.ResolveNPCType) == "function" then
+        local ok, value = pcall(ContextProviders.ResolveNPCType, record)
         if ok and value then return tostring(value) end
     end
     if record and record.recruited == true then return "colonist" end

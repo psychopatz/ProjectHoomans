@@ -179,6 +179,11 @@ def import_saved_world_target(app: Any) -> None:
             "SYSTEM",
             f"Imported saved target {npc.get('label')} from read-only source save.",
         )
+        app._append(
+            "SYSTEM",
+            "Saved target loaded; click Open conversation to start the native "
+            "Conversation session. Preview is optional and does not send input.",
+        )
         app.main_tabs.select(app.simulation_tab)
 
     app._start_operation(

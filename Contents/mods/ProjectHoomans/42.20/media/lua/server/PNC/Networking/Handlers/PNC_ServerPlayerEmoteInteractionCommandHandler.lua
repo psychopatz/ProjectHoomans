@@ -23,6 +23,24 @@ local InteractionLifecycle = PNC.Semantics
     and PNC.Semantics.InteractionLifecycle or nil
 local InteractionPersistence = PNC.Conversation
     and PNC.Conversation.InteractionLifecyclePersistence or nil
+local RealizationAuthority = PNC.Semantics
+    and PNC.Semantics.RealizationAuthority or nil
+if not RealizationAuthority then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+    )
+    RealizationAuthority = ok and loaded or nil
+end
+local ContextProviders = PNC.Semantics
+    and PNC.Semantics.ContextProviders or nil
+if type(ContextProviders) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Core/Social/PNC_FlavorTextResolver"
+    )
+    ContextProviders = ok and loaded or nil
+end
 
 local MAX_REQUEST_ID = 64
 local MAX_TARGETS = 8
@@ -209,9 +227,14 @@ local function buildReplyInteraction(entry, at)
         act = replyAct,
         topic = interaction.topic or interaction.eventType,
         beatID = "beat:emote:" .. tostring(eventID or "unknown"),
-        responsePlanID = entry.replyFlavorID
+        responsePlanID = entry.responsePlanID
             or "social.emote." .. tostring(interaction.eventType or "reply"),
-        poolID = entry.replyFlavorID,
+        poolID = entry.realizationFamily,
+        provenance = {
+            responsePlanID = entry.responsePlanID,
+            realizationFamily = entry.realizationFamily,
+            realizationID = entry.realizationID,
+        },
         eventType = interaction.eventType,
         eventRef = eventID,
         factRefs = entry.memoryID and { entry.memoryID } or nil,
@@ -314,15 +337,15 @@ local function targetResult(target, definition, eventID, state)
         greetingDay = state.greetingDay,
         interaction = state.interaction,
         replyInteraction = state.replyInteraction,
-        replyFlavorID = accepted and Interactions.ReplyFlavorID(
-            definition,
-            before,
-            {
-                npcType = state.npcType,
-                relationshipTier = state.relationshipTier,
-                greetingState = state.greetingState,
-            }
-        ) or nil,
+        -- Compatibility alias only. It is not consulted to choose the
+        -- semantic response; the resolved text/plan above is authoritative.
+        replyFlavorID = accepted and (state.compatibilityFlavorID
+            or state.realizationID) or nil,
+        resolvedText = accepted and state.resolvedText or nil,
+        responsePlanID = accepted and state.responsePlanID or nil,
+        realizationFamily = accepted and state.realizationFamily or nil,
+        realizationID = accepted and state.realizationID or nil,
+        factRefs = accepted and state.factRefs or nil,
     }
 end
 
@@ -360,29 +383,102 @@ local function processTarget(
         beforeRelationship ~= nil,
         target.id
     )
-    local npcType = Interactions.ResolveNPCType(target.record)
-    local relationshipTier = Interactions.ResolveRelationshipTier(
-        beforeRelationship
-    )
-    local greetingState = Interactions.GreetingState(
-        definition,
-        beforeRelationship,
-        at
-    )
+    local npcType = ContextProviders and ContextProviders.ResolveNPCType
+        and ContextProviders.ResolveNPCType(target.record) or "neutral"
+    local relationshipTier = ContextProviders
+        and ContextProviders.ResolveRelationshipTier
+        and ContextProviders.ResolveRelationshipTier(beforeRelationship)
+        or "reserved"
+    local greetingState
+    if definition.dayGate == "greeting" then
+        greetingState = Interactions.HasGreetingToday
+            and Interactions.HasGreetingToday(beforeRelationship, at)
+            and "returning" or "first"
+    end
     local cooldownActive = cooldownFor(
         beforeRelationship,
         socialDefinition,
         at
     )
-    local replyFlavorID = Interactions.ReplyFlavorID(
-        definition,
-        beforeRelationship,
-        {
+    local activeBeat
+    local activeProjection
+    local semanticContext
+    local realization
+    if InteractionPersistence
+        and type(InteractionPersistence.Project) == "function"
+    then
+        activeProjection = InteractionPersistence.Project(actorKey, target.id)
+        activeBeat = activeProjection and activeProjection.thread
+            and activeProjection.thread.activeBeat or nil
+    end
+    semanticContext = {
+        action = definition.id,
+        currentTopic = activeBeat and activeBeat.topic
+            or definition.eventType,
+        previousTopic = activeBeat and activeBeat.topic or nil,
+        relationshipState = beforeRelationship
+            and beforeRelationship.state or nil,
+        socialStyle = beforeRelationship
+            and (beforeRelationship.state == "friend"
+                or (tonumber(beforeRelationship.approval) or 0) >= 30)
+            and "friendly" or nil,
+        npcID = tostring(target.id or ""),
+    }
+    if not RealizationAuthority
+        or type(RealizationAuthority.Resolve) ~= "function"
+    then
+        return {
+            npcID = target.id,
+            accepted = false,
+            applied = false,
+            reason = "semantic_realization_unavailable",
+            eventID = eventID,
+            interactionID = eventID,
+            interactionType = definition.eventType,
+            relationshipBefore = before,
+            relationshipAfter = before,
             npcType = npcType,
             relationshipTier = relationshipTier,
             greetingState = greetingState,
+            interaction = interaction,
+        }, before
+    end
+    realization = RealizationAuthority.Resolve({
+        poolID = "semantic.emote.reply",
+        responsePlanID = "semantic.emote.reply",
+        realizationFamily = "emote_reply",
+        act = interaction and interaction.act or "REACT",
+        topic = activeBeat and activeBeat.topic or definition.eventType,
+        context = semanticContext,
+        salt = eventID,
+    })
+    if not realization then
+        return {
+            npcID = target.id,
+            accepted = false,
+            applied = false,
+            reason = "semantic_emote_plan_unavailable",
+            eventID = eventID,
+            interactionID = eventID,
+            interactionType = definition.eventType,
+            relationshipBefore = before,
+            relationshipAfter = before,
+            npcType = npcType,
+            relationshipTier = relationshipTier,
+            greetingState = greetingState,
+            interaction = interaction,
+        }, before
+    end
+    if interaction then
+        interaction.provenance = {
+            beatID = "beat:emote:" .. tostring(eventID),
+            responsePlanID = realization.responsePlanID,
+            realizationFamily = realization.realizationFamily,
+            realizationID = realization.realizationID,
+            poolID = realization.realizationFamily,
+            factRefs = realization.groundedFactRefs,
         }
-    )
+    end
     local applied = false
     local reason
     local details
@@ -405,7 +501,12 @@ local function processTarget(
                     interactionType = definition.eventType,
                     emote = definition.id,
                     playerFlavorID = definition.flavorID,
-                    npcFlavorID = replyFlavorID,
+                    npcFlavorID = realization.realizationID,
+                    semanticAct = realization.semanticAct,
+                    semanticTopic = realization.topic,
+                    responsePlanID = realization.responsePlanID,
+                    realizationFamily = realization.realizationFamily,
+                    realizationID = realization.realizationID,
                     npcType = npcType,
                     relationshipTier = relationshipTier,
                     greetingState = greetingState,
@@ -455,6 +556,12 @@ local function processTarget(
         greetingDay = greetingState
             and Interactions.DayIndex(at) or nil,
         interaction = interaction,
+        resolvedText = realization.fallback,
+        compatibilityFlavorID = realization.compatibilityFlavorID,
+        responsePlanID = realization.responsePlanID,
+        realizationFamily = realization.realizationFamily,
+        realizationID = realization.realizationID,
+        factRefs = realization.groundedFactRefs,
         moraleDelta = applied == true
             and (tonumber(effect.morale) or 0) or 0,
     })

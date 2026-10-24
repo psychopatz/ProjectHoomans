@@ -319,7 +319,7 @@ local function identityChoiceCandidates(context)
     end
     local realFrame = frameFor(
         "identity.choice.real_name", "INFORM", "real_name", "canonical",
-        nil, "My real name.", nil
+    source.playerName, "My real name.", nil
     )
     local rudeFrame = frameFor(
         "identity.choice.refuse_name", "REFUSE", "refuse_name", nil, nil,

@@ -39,9 +39,9 @@ class ActorInventoryView:
             height=10,
         )
         for column, title, width in (
-            ("fullType", "Item", 270),
-            ("quantity", "Stack", 90),
-            ("source", "Origin", 150),
+            ("fullType", "Item", 170),
+            ("quantity", "Stack", 64),
+            ("source", "Origin", 96),
         ):
             self.tree.heading(column, text=title)
             self.tree.column(column, width=width, stretch=column != "quantity")
@@ -134,10 +134,14 @@ class InventoryGiftWorkbench:
         self.frame.columnconfigure(1, minsize=20)
         self.frame.columnconfigure(2, weight=1)
         self.frame.rowconfigure(1, weight=1)
+        self.frame.rowconfigure(2, weight=1)
         self.player_view = ActorInventoryView(self.frame, host, "gift-player")
         self.npc_view = ActorInventoryView(self.frame, host, "gift-npc")
-        self.player_view.frame.grid(row=1, column=0, sticky="nsew")
-        self.npc_view.frame.grid(row=1, column=2, sticky="nsew")
+        # The Relationship page lives in the narrow context dock. Stack the
+        # two read-only inventories so they do not impose a side-by-side
+        # 900px minimum on the conversation surface.
+        self.player_view.frame.grid(row=1, column=0, columnspan=3, sticky="nsew")
+        self.npc_view.frame.grid(row=2, column=0, columnspan=3, sticky="nsew")
         self.ttk.Label(self.frame, text="Player → NPC").grid(
             row=0, column=0, columnspan=3, sticky="w", pady=(0, 4)
         )
@@ -145,7 +149,7 @@ class InventoryGiftWorkbench:
             "<<TreeviewSelect>>", lambda _event: self._on_player_select()
         )
         action = self.ttk.Frame(self.frame)
-        action.grid(row=2, column=0, columnspan=3, sticky="ew", pady=(6, 2))
+        action.grid(row=3, column=0, columnspan=3, sticky="ew", pady=(6, 2))
         action.columnconfigure(1, weight=1)
         self.selected_var = self.tk.StringVar(value="Selected: none")
         self.ttk.Label(action, textvariable=self.selected_var, anchor="w").grid(
@@ -182,14 +186,15 @@ class InventoryGiftWorkbench:
             anchor="w",
             justify="left",
             wraplength=760,
-        ).grid(row=3, column=0, columnspan=3, sticky="ew", pady=(2, 4))
+        ).grid(row=4, column=0, columnspan=3, sticky="ew", pady=(2, 4))
         self.result = host._ScrolledText(
             self.frame,
+            width=40,
             wrap="word",
             height=8,
             state="disabled",
         )
-        self.result.grid(row=4, column=0, columnspan=3, sticky="ew")
+        self.result.grid(row=5, column=0, columnspan=3, sticky="ew")
         self.selected_item: dict[str, Any] | None = None
 
     def _on_player_select(self) -> None:
@@ -281,10 +286,10 @@ class WorkbenchPage:
         self.scrollbar.grid(row=0, column=1, sticky="ns")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
         self.content = ttk.Frame(self.canvas, padding=(6, 4))
-        self.content.columnconfigure(0, minsize=124)
-        self.content.columnconfigure(1, weight=1, minsize=110)
-        self.content.columnconfigure(2, minsize=124)
-        self.content.columnconfigure(3, weight=1, minsize=110)
+        self.content.columnconfigure(0, minsize=90)
+        self.content.columnconfigure(1, weight=1, minsize=80)
+        self.content.columnconfigure(2, minsize=90)
+        self.content.columnconfigure(3, weight=1, minsize=80)
         self._canvas_window = self.canvas.create_window(
             (0, 0),
             window=self.content,
@@ -401,7 +406,7 @@ class WorkbenchPage:
         title: str,
         *,
         height: int = 4,
-        width: int = 72,
+        width: int = 36,
     ) -> Any:
         """Add a bounded read-only summary below the current field row."""
 

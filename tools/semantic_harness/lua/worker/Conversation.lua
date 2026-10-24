@@ -14,6 +14,18 @@ Conversation.graphProjection = Projection.graphProjection
 Conversation.buildView = function(context)
     return Projection.buildView(context, Conversation)
 end
+Conversation.presentationProjection = function(context, view)
+    local parity = PNC.Conversation
+        and PNC.Conversation.TalkParity or nil
+    if not parity
+        or type(parity.BuildPresentationProjection) ~= "function"
+    then
+        return nil
+    end
+    return parity.BuildPresentationProjection(
+        context, view or context.Runtime and context.Runtime.view
+    )
+end
 Conversation.relationshipSnapshot = Projection.relationshipSnapshot
 Conversation.contextSnapshot = Projection.contextSnapshot
 Conversation.turn = function(context, text)

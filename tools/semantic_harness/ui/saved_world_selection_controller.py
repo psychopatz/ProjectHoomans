@@ -5,6 +5,8 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 
+from .saved_world_relationship_projection import RELATIONSHIP_CATEGORY_LABELS
+
 
 def on_saved_world_player(app: Any) -> None:
     """Reclassify the read-only actor lens for the selected Player."""
@@ -26,6 +28,33 @@ def on_saved_world_view(app: Any) -> None:
         "Saved affiliations",
     }:
         app.saved_world_view_var.set("Relationship to Player")
+    if app.saved_world_view_var.get() == "Saved affiliations":
+        app.saved_world_relationship_category_var.set(
+            "Saved affiliations / overlays"
+        )
+    else:
+        app.saved_world_relationship_category_var.set(
+            "All relationship categories"
+        )
+    app._render_saved_world_tree()
+    app._restore_saved_world_tree_selection()
+    app._save_ui_state()
+
+
+def select_saved_world_relationship_category(app: Any, category: str) -> None:
+    """Make relationship navigation explicit without changing save authority."""
+
+    if category == "Saved affiliations / overlays":
+        app.saved_world_view_var.set("Saved affiliations")
+        app.saved_world_relationship_category_var.set(category)
+    else:
+        valid = {
+            "All relationship categories",
+            *RELATIONSHIP_CATEGORY_LABELS,
+        }
+        selected = category if category in valid else "All relationship categories"
+        app.saved_world_view_var.set("Relationship to Player")
+        app.saved_world_relationship_category_var.set(selected)
     app._render_saved_world_tree()
     app._restore_saved_world_tree_selection()
     app._save_ui_state()

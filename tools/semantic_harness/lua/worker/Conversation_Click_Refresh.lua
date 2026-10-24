@@ -13,6 +13,28 @@ function Refresh.apply(context, state)
     local composer = PNC.Conversation and PNC.Conversation.Composer
     local mode = Runtime.scenario and Runtime.scenario.runtime
         and Runtime.scenario.runtime.mode or "singleplayer"
+    if accepted ~= true then
+        -- Core may clear a row before invoking its semantic action. A busy,
+        -- disabled, stale, replayed, or otherwise rejected frame must restore
+        -- the exact current production projection without rebuilding context
+        -- or mutating the conversation menu.
+        local internal = Input.Internal
+        if internal and type(internal.ApplySemanticChoices) == "function"
+            and view.semanticSuggestions
+        then
+            internal.ApplySemanticChoices(view, view.semanticSuggestions)
+        end
+        return accepted, reason, state.Conversation.blockProjection(view)
+    end
+    if view.lifecycleFinished == true
+        or view.closed == true
+        or view.session and (
+            view.session.lifecycleFinished == true
+                or view.session.closed == true
+        )
+    then
+        return accepted, reason, state.Conversation.blockProjection(view)
+    end
     if accepted == true and mode ~= "multiplayer"
         and composer and type(composer.PumpLocalRequests) == "function"
     then

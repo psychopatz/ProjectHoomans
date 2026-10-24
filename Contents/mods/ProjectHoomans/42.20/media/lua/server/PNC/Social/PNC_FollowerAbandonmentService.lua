@@ -22,6 +22,24 @@ local Relationships = PNC.Relationships
 local Network = PNC.Network
 local Meeting = PNC.SocialMeeting
     or PNC.SocialGreeting
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if not SocialReactions then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
+local ContextProviders = PNC.Semantics
+    and PNC.Semantics.ContextProviders or nil
+if type(ContextProviders) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Core/Social/PNC_FlavorTextResolver"
+    )
+    ContextProviders = ok and loaded or nil
+end
 
 Service.FLAVOR_ZOMBIE = "social.follower_abandoned_zombie"
 Service.FLAVOR_HOSTILE_NPC = "social.follower_abandoned_hostile_npc"
@@ -128,11 +146,10 @@ local function eventIDFor(record, at)
 end
 
 local function roleFor(record)
-    local interactions = PNC.VanillaEmoteInteractions
     local ok
     local role
-    if interactions and interactions.ResolveNPCType then
-        ok, role = pcall(interactions.ResolveNPCType, record)
+    if ContextProviders and ContextProviders.ResolveNPCType then
+        ok, role = pcall(ContextProviders.ResolveNPCType, record)
         if ok and role then return tostring(role) end
     end
     if record and record.recruited == true then return "colonist" end
@@ -140,9 +157,8 @@ local function roleFor(record)
 end
 
 local function relationshipTier(relationship)
-    local interactions = PNC.VanillaEmoteInteractions
-    if interactions and interactions.ResolveRelationshipTier then
-        return interactions.ResolveRelationshipTier(relationship)
+    if ContextProviders and ContextProviders.ResolveRelationshipTier then
+        return ContextProviders.ResolveRelationshipTier(relationship)
     end
     return "reserved"
 end
@@ -350,6 +366,18 @@ function Service.TryDeliver(player, record, body, occurredAt, meeting)
         relationshipState = relationshipState(relationship),
         relationshipTier = tier,
     }
+    local realization = SocialReactions
+        and type(SocialReactions.Resolve) == "function"
+        and SocialReactions.Resolve({
+            eventType = marker.hostileKind == "zombie"
+                and "follower_abandoned_zombie"
+                or "follower_abandoned_hostile_npc",
+            act = "REACT",
+            topic = "companion_relationship",
+            context = context,
+            eventID = marker.eventID,
+            npcID = tostring(record.id),
+        }) or nil
     if not Network or not Network.SendConversationRelationshipForNPC then
         return false, "relationship_transport_unavailable"
     end
@@ -363,7 +391,20 @@ function Service.TryDeliver(player, record, body, occurredAt, meeting)
             npcID = tostring(record.id),
             ambientFlavor = {
                 flavorID = flavorID,
+                text = realization and realization.fallback or nil,
                 eventType = "abandoned_in_combat",
+                act = realization and realization.semanticAct or "REACT",
+                topic = realization and realization.topic
+                    or "companion_relationship",
+                responsePlanID = realization
+                    and realization.responsePlanID or nil,
+                poolID = realization and realization.realizationFamily or nil,
+                realizationFamily = realization
+                    and realization.realizationFamily or nil,
+                realizationID = realization and realization.realizationID
+                    or nil,
+                factRefs = realization and realization.groundedFactRefs
+                    or nil,
                 family = "relationship_commentary",
                 priority = 75,
                 llmEligible = false,

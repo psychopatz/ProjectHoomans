@@ -7,9 +7,29 @@ from typing import Any
 from .state import save as persist_ui_state
 
 
+def schedule_save(app: Any, delay_ms: int = 250) -> None:
+    """Debounce geometry/state writes while the user drags or switches panes."""
+
+    pending = getattr(app, "_ui_state_save_after", None)
+    if pending is not None:
+        try:
+            app.root.after_cancel(pending)
+        except app._tk.TclError:
+            pass
+    app._ui_state_save_after = app.root.after(
+        delay_ms, lambda: _flush_scheduled_save(app)
+    )
+
+
+def _flush_scheduled_save(app: Any) -> None:
+    app._ui_state_save_after = None
+    app._save_ui_state()
+
+
 def save_ui_state(app: Any) -> None:
     try:
         state = dict(app._ui_state)
+        state["layout_state_version"] = 2
         state["geometry"] = app.root.geometry()
         state["window_state"] = app.root.state()
         state["main_tab"] = app.main_tabs.index(app.main_tabs.select())
@@ -52,6 +72,11 @@ def save_ui_state(app: Any) -> None:
             if hasattr(app, "saved_world_view_var")
             else "Relationship to Player"
         )
+        state["saved_world_relationship_category"] = str(
+            app.saved_world_relationship_category_var.get()
+            if hasattr(app, "saved_world_relationship_category_var")
+            else "All relationship categories"
+        )
         state["saved_world_lens_revision"] = 2
         state["saved_world_search"] = str(
             app.saved_world_search_var.get()
@@ -76,7 +101,10 @@ def save_ui_state(app: Any) -> None:
             )
         if app.trace_panel_visible and app.simulation_panes.winfo_width() > 10:
             state["simulation_sash"] = app.simulation_panes.sashpos(0)
-        if app.workflow_pane_split.winfo_height() > 10:
+        if (
+            len(app.workflow_pane_split.panes()) > 1
+            and app.workflow_pane_split.winfo_width() > 10
+        ):
             state["workflow_sash"] = app.workflow_pane_split.sashpos(0)
         if app.workbench_notebook.tabs():
             state["workbench_panel"] = app.workbench_notebook.index(

@@ -44,6 +44,11 @@ function Presentation.HandleSocialGreeting(greeting)
         seed = eventID,
         eventID = eventID,
         interaction = greeting.interaction,
+        resolvedText = greeting.resolvedText or greeting.text,
+        realizationFamily = greeting.realizationFamily,
+        realizationID = greeting.realizationID,
+        responsePlanID = greeting.responsePlanID,
+        factRefs = greeting.factRefs,
     }
     if greeting.eventType == "corpse_reaction"
         and type(greeting.gossipPacket) == "table"
@@ -82,6 +87,10 @@ function Presentation.HandleSocialGreeting(greeting)
                 eventID = eventID,
                 npcID = npcID,
                 flavorID = greeting.flavorID,
+                responsePlanID = greeting.responsePlanID,
+                realizationFamily = greeting.realizationFamily,
+                realizationID = greeting.realizationID,
+                factRefs = greeting.factRefs,
                 family = "corpse_reaction",
                 eventType = "corpse_reaction",
                 socialRole = snapshot.socialRole or snapshot.npcType
@@ -112,6 +121,10 @@ function Presentation.HandleSocialGreeting(greeting)
                     memoryID = greeting.memoryID,
                     memoryType = greeting.memoryType,
                     interactionType = greeting.interactionType,
+                    responsePlanID = greeting.responsePlanID,
+                    realizationFamily = greeting.realizationFamily,
+                    realizationID = greeting.realizationID,
+                    factRefs = greeting.factRefs,
                 },
                 ttlMs = 4000,
                 holdMs = 1500,

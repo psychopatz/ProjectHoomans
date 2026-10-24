@@ -5,6 +5,16 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 
+RELATIONSHIP_CATEGORY_LABELS = (
+    "Player faction / companions",
+    "Settlers / communities",
+    "Hostile / looters",
+    "Traders / providers",
+    "Neutral / unaffiliated",
+    "Other faction members",
+    "Unknown / unsupported",
+)
+
 def relationship_world_groups(self) -> list[dict[str, Any]]:
     """Return mutually exclusive, player-relative browser categories.
 
@@ -55,13 +65,13 @@ def relationship_world_groups(self) -> list[dict[str, Any]]:
                     all_actors.append(deepcopy(actor))
 
     bucket_specs = [
-        ("player", "Player faction / companions", "relationship_companion"),
-        ("settlers", "Settlers / communities", "relationship_settler"),
-        ("hostile", "Hostile / looters", "relationship_hostile"),
-        ("traders", "Traders / providers", "relationship_trader"),
-        ("neutral", "Neutral / unaffiliated", "relationship_neutral"),
-        ("other", "Other faction members", "relationship_other"),
-        ("unknown", "Unknown / unsupported", "relationship_unknown"),
+        ("player", RELATIONSHIP_CATEGORY_LABELS[0], "relationship_companion"),
+        ("settlers", RELATIONSHIP_CATEGORY_LABELS[1], "relationship_settler"),
+        ("hostile", RELATIONSHIP_CATEGORY_LABELS[2], "relationship_hostile"),
+        ("traders", RELATIONSHIP_CATEGORY_LABELS[3], "relationship_trader"),
+        ("neutral", RELATIONSHIP_CATEGORY_LABELS[4], "relationship_neutral"),
+        ("other", RELATIONSHIP_CATEGORY_LABELS[5], "relationship_other"),
+        ("unknown", RELATIONSHIP_CATEGORY_LABELS[6], "relationship_unknown"),
     ]
     buckets: dict[str, dict[str, Any]] = {
         key: {
@@ -158,4 +168,4 @@ def relationship_world_groups(self) -> list[dict[str, Any]]:
     ]
 
 
-__all__ = ["relationship_world_groups"]
+__all__ = ["RELATIONSHIP_CATEGORY_LABELS", "relationship_world_groups"]

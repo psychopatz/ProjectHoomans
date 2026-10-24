@@ -11,6 +11,7 @@ PNC.Conversation = PNC.Conversation or {}
 
 local TalkParity = PNC.Conversation.TalkParity or {}
 PNC.Conversation.TalkParity = TalkParity
+local Conversation = PNC.Conversation
 local TalkStart = PNC.Conversation.TalkStart
     or require "PNC/Conversation/PNC_ConversationTalkStart"
 
@@ -215,6 +216,15 @@ end
 local function resolvedText(value)
     if type(value) == "string" then return value end
     if type(value) ~= "table" then return tostring(value or "") end
+    local core = PsychopatzCore
+        and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.Text or nil
+    if core and type(core.Resolve) == "function" then
+        local resolved = core.Resolve(value)
+        if resolved ~= nil and resolved ~= "" then
+            return tostring(resolved)
+        end
+    end
     return tostring(value.text or value.fallback or value.key or "")
 end
 
@@ -291,6 +301,188 @@ function TalkParity.StartProjection(context, value, view)
                 view and view.semanticSuggestions
             ),
             graph = context.Values.copy(graph),
+        },
+    }
+end
+
+local function presentationRows(view)
+    local session = view and view.session
+    local source = session and session.choices or {}
+    local rows = {}
+    for _, choice in ipairs(source) do
+        if type(choice) == "table" then
+            local choiceSource = type(choice.source) == "table"
+                and choice.source or {}
+            local frame = choiceSource.semanticFrame
+            rows[#rows + 1] = {
+                id = choice.id,
+                text = resolvedText(choice.text),
+                enabled = choice.enabled ~= false,
+                -- Keep both names during the projection migration. The
+                -- worker's established diagnostic spelling is frame; the
+                -- semantic authority contract calls it semanticFrame.
+                frame = copy(frame),
+                semanticFrame = copy(frame),
+                source = {
+                    kind = choiceSource.source
+                        and choiceSource.source.kind or nil,
+                    groupID = choiceSource.groupID,
+                },
+            }
+        end
+    end
+    return rows
+end
+
+local function compactProjectionMessages(messages)
+    local result = {}
+    local values = type(messages) == "table" and messages or {}
+    local first = #values > 64 and #values - 63 or 1
+    for index = first, #values do
+        local message = values[index]
+        if type(message) == "table" then
+            result[#result + 1] = {
+                id = message.id or message.messageID,
+                speaker = message.speaker,
+                text = resolvedText(message.payload or message.value),
+                kind = message.kind,
+            }
+        end
+    end
+    return result
+end
+
+local function lifecycleState(view, session)
+    if view and view.lifecycleFinished == true
+        or session and (session.closed == true
+            or session.lifecycleFinished == true)
+    then
+        return "closed"
+    end
+    if view and view.suspended == true then return "suspended" end
+    if view and view.closing == true then return "closing" end
+    if session and session.busy == true then return "busy" end
+    if session and (session.pendingChoices ~= nil
+        or session.pendingNext ~= nil
+        or session.pendingClose == true)
+    then
+        return "pending"
+    end
+    if session and session.currentNodeID == "greeting"
+        and view and view.opened ~= true
+    then
+        return "opening"
+    end
+    return "active"
+end
+
+-- Export the exact production-facing Conversation projection used by native
+-- Core after choicePresentation/buildCoreChoices. This is intentionally a
+-- projection of the live session rows, not a rebuild from semanticSuggestions.
+function TalkParity.BuildPresentationProjection(context, view)
+    local Runtime = context and context.Runtime or {}
+    local Values = context and context.Values
+    local session = view and view.session or nil
+    local spec = view and view.spec or {}
+    local semantic = view and view.semanticSuggestions or {}
+    local state = session and session.choicePresentationState or {}
+    local suspended = Runtime.conversationSuspended == true
+        or view and view.suspended == true
+    local opened = Runtime.conversationOpened == true and not suspended
+    local rows = opened and presentationRows(view) or {}
+    local talkStart = spec.talkStartProjection
+    if not talkStart then
+        local scenario = Runtime.scenario or {}
+        local targetID = scenario.runtime
+            and scenario.runtime.semanticLabTalkTarget or "current"
+        talkStart = TalkParity.Resolve(
+            scenario, targetID, context and context.player
+        )
+    end
+    local relationship = Conversation.Relationship
+        and Conversation.Relationship.GetPresentation
+        and Conversation.Relationship.GetPresentation(spec.npcID)
+        or nil
+    local relationshipVisible = Conversation.Relationship
+        and Conversation.Relationship.IsPresentationVisible
+        and Conversation.Relationship.IsPresentationVisible()
+        or false
+    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local closed = view and (
+        view.closed == true
+            or view.lifecycleFinished == true
+            or session and (
+                session.closed == true
+                    or session.lifecycleFinished == true
+            )
+    ) or false
+    local inputAvailable = not closed
+        and opened
+        and input ~= nil
+        and type(input.Submit) == "function"
+    local copyValue = Values and Values.copy or copy
+    local life = suspended and "suspended"
+        or opened and lifecycleState(view, session) or "loaded"
+    return {
+        schema = "semantic.native_conversation_view.v1",
+        version = 1,
+        source = "PNC.Conversation.TalkParity",
+        talkStart = copyValue(talkStart),
+        opening = {
+            nodeID = session and session.currentNodeID,
+            messages = (opened or suspended)
+                and compactProjectionMessages(Runtime.transcript or {})
+                or {},
+        },
+        relationPresentation = {
+            visible = relationshipVisible == true,
+            value = copyValue(relationship),
+            source = "PNC.Conversation.Relationship",
+        },
+        lifecycle = {
+            state = life,
+            busy = session and session.busy == true or false,
+            pending = session and (
+                session.pendingChoices ~= nil
+                    or session.pendingNext ~= nil
+                    or session.pendingClose == true
+            ) or false,
+            closing = view and view.closing == true or false,
+            closed = closed == true,
+            currentNodeID = session and session.currentNodeID,
+        },
+        responseChannel = {
+            revision = (opened or suspended) and (
+                state.revision
+                or view and view.semanticSuggestionRevision
+                or semantic.revision or 0
+            ) or 0,
+            groupID = (opened or suspended)
+                and semantic.currentGroupID or nil,
+            rows = rows,
+            choiceSurface = opened and copyValue(state)
+                or suspended and {
+                source = "conversation_suspended",
+                presentedCount = 0,
+                busy = false,
+                pending = false,
+                revision = state.revision
+                    or view and view.semanticSuggestionRevision
+                    or semantic.revision or 0,
+            } or {
+                source = "conversation_not_open",
+                presentedCount = 0,
+                busy = false,
+                pending = false,
+            },
+        },
+        semanticInput = {
+            available = inputAvailable == true,
+            reason = inputAvailable and "production_input_ready"
+                or suspended and "conversation_suspended"
+                or not opened and "conversation_not_open"
+                or closed and "conversation_closed"
+                or "production_input_unavailable",
         },
     }
 end
@@ -509,6 +701,9 @@ function TalkParity.Start(context, value, utterance)
     )
     if not scenario then return nil, targetOrReason end
     local configured = context.ScenarioSession.reset(context, scenario)
+    Runtime.conversationOpened = true
+    Runtime.conversationSuspended = false
+    if Runtime.view then Runtime.view.opened = true end
     local start, reason = TalkParity.StartProjection(
         context, targetOrReason, Runtime.view
     )
@@ -547,6 +742,205 @@ function TalkParity.Start(context, value, utterance)
         start = start,
         turn = compactTurn(context, turn),
         observation = compactObservation(context, start, turn, snapshot),
+        conversationPresentation = Values.copy(
+            snapshot.conversationPresentation
+        ),
+        snapshot = snapshot,
+    }
+end
+
+function TalkParity.Open(context, value)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local scenario, targetOrReason = TalkParity.ApplyTarget(
+        Values.copy(Runtime.scenario), value
+    )
+    if not scenario then return nil, targetOrReason end
+    context.ScenarioSession.reset(context, scenario)
+    Runtime.conversationOpened = true
+    Runtime.conversationSuspended = false
+    if Runtime.view then Runtime.view.opened = true end
+    local start, reason = TalkParity.StartProjection(
+        context, targetOrReason, Runtime.view
+    )
+    if not start then return nil, reason end
+    local snapshot = context.ScenarioSession.snapshot(context)
+    -- Open is the primary Conversation presentation boundary. Do not return
+    -- configured inspector data or a second full snapshot here: saved-world
+    -- imports can contain large source/working-world payloads, and duplicating
+    -- them can exceed the worker transport limit before the bounded
+    -- Conversation projection is delivered. SNAPSHOT remains the explicit
+    -- inspector boundary.
+    return {
+        schema = TalkParity.SCHEMA,
+        type = "conversation_open",
+        start = start,
+        presentation = Values.copy(snapshot.conversationPresentation),
+    }
+end
+
+function TalkParity.Suspend(context)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local view = Runtime.view
+    local session = view and view.session or nil
+    if not view or not session or Runtime.conversationOpened ~= true then
+        return nil, "conversation_not_open"
+    end
+    if view.closed == true or session.closed == true
+        or session.lifecycleFinished == true
+    then
+        return nil, "conversation_closed"
+    end
+    local pendingRequest = view.spec and view.spec.context
+        and view.spec.context.pendingConversationRequest or nil
+    if session.busy == true or pendingRequest ~= nil then
+        return nil, "conversation_pending"
+    end
+    Runtime.conversationSuspended = true
+    view.suspended = true
+    view.opened = false
+    session.pendingChoices = nil
+    session.pendingNext = nil
+    session.pendingClose = nil
+    session.pendingCloseReason = nil
+    session.busy = false
+    if type(session.clearChoices) == "function" then
+        session:clearChoices("conversation_suspended")
+    end
+    local snapshot = context.ScenarioSession.snapshot(context)
+    return {
+        schema = TalkParity.SCHEMA,
+        type = "conversation_suspend",
+        presentation = Values.copy(snapshot.conversationPresentation),
+        snapshot = snapshot,
+    }
+end
+
+function TalkParity.Resume(context)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local view = Runtime.view
+    local session = view and view.session or nil
+    if not view or not session or view.suspended ~= true
+        or Runtime.conversationSuspended ~= true
+    then
+        return nil, "conversation_not_suspended"
+    end
+    if view.closed == true or session.closed == true
+        or session.lifecycleFinished == true
+    then
+        return nil, "conversation_closed"
+    end
+    Runtime.conversationSuspended = false
+    view.suspended = false
+    view.opened = true
+    Runtime.conversationOpened = true
+    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local internal = input and input.Internal or nil
+    if internal and type(internal.ApplySemanticChoices) == "function"
+        and view.semanticSuggestions
+    then
+        internal.ApplySemanticChoices(view, view.semanticSuggestions)
+    end
+    local snapshot = context.ScenarioSession.snapshot(context)
+    return {
+        schema = TalkParity.SCHEMA,
+        type = "conversation_resume",
+        presentation = Values.copy(snapshot.conversationPresentation),
+        snapshot = snapshot,
+    }
+end
+
+function TalkParity.Close(context, reason)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local view = Runtime.view
+    local session = view and view.session or nil
+    if not view or not session or Runtime.conversationOpened ~= true then
+        return nil, "conversation_not_open"
+    end
+    if view.closed == true or session.closed == true then
+        return nil, "conversation_closed"
+    end
+    Runtime.conversationOpened = false
+    Runtime.conversationSuspended = false
+    view.opened = false
+    view.suspended = false
+    view.closed = true
+    session.closed = true
+    session.conversationMemoryClosed = true
+    if type(session.clearChoices) == "function" then
+        session:clearChoices(reason or "conversation_closed")
+    end
+    local snapshot = context.ScenarioSession.snapshot(context)
+    return {
+        schema = TalkParity.SCHEMA,
+        type = "conversation_close",
+        reason = tostring(reason or "conversation_closed"),
+        presentation = Values.copy(snapshot.conversationPresentation),
+        snapshot = snapshot,
+    }
+end
+
+function TalkParity.Emote(context, payload)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local view = Runtime.view
+    local session = view and view.session or nil
+    if not view or not session or Runtime.conversationOpened ~= true then
+        return nil, "conversation_not_open"
+    end
+    if Runtime.conversationSuspended == true or view.suspended == true then
+        return nil, "conversation_suspended"
+    end
+    if view.closed == true or session.closed == true
+        or session.lifecycleFinished == true
+    then
+        return nil, "conversation_closed"
+    end
+    payload = type(payload) == "table" and payload or {}
+    local lifecycle = PNC.Semantics
+        and PNC.Semantics.InteractionLifecycle or nil
+    local store = Runtime.interactionLifecycle
+    if not lifecycle or not store or type(lifecycle.Envelope) ~= "table"
+        or type(lifecycle.Envelope.Emote) ~= "function"
+        or type(lifecycle.Apply) ~= "function"
+    then
+        return nil, "interaction_lifecycle_unavailable"
+    end
+    local scenario = Runtime.scenario or {}
+    local player = scenario.player or {}
+    local npc = scenario.npc or {}
+    local envelope = lifecycle.Envelope.Emote(
+        payload.emote or payload,
+        {
+            actorID = payload.actorID
+                or player.characterUUID or player.playerUUID or "player-one",
+            targetID = payload.targetID or npc.npcID or npc.id,
+            playerUUID = payload.playerUUID
+                or player.characterUUID or player.playerUUID or "player-one",
+            topic = payload.topic
+                or scenario.conversation and scenario.conversation.topic,
+            worldHour = payload.worldHour
+                or scenario.world and scenario.world.worldAgeHours,
+            provenance = payload.provenance,
+        }
+    )
+    local value, reason = lifecycle.Apply(
+        store,
+        envelope,
+        payload.options or { meaningful = payload.meaningful == true }
+    )
+    local snapshot = context.ScenarioSession.snapshot(context)
+    return {
+        schema = TalkParity.SCHEMA,
+        type = "conversation_emote",
+        accepted = value ~= nil,
+        reason = reason,
+        envelope = Values.copy(envelope),
+        interaction = Values.copy(snapshot.interactionLifecycle),
+        presentation = Values.copy(snapshot.conversationPresentation),
         snapshot = snapshot,
     }
 end

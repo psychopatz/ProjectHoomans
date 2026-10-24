@@ -12,6 +12,24 @@ local Social = {}
 local EntityRef = PNC.EntityRef
 local Network = PNC.Network
 local Hooks = PNC.SocialEventHooks
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if type(SocialReactions) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
+local ContextProviders = PNC.Semantics
+    and PNC.Semantics.ContextProviders or nil
+if type(ContextProviders) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Core/Social/PNC_FlavorTextResolver"
+    )
+    ContextProviders = ok and loaded or nil
+end
 
 local function worldAgeHours()
     if getGameTime and getGameTime()
@@ -38,9 +56,8 @@ local function relationshipDelta(before, after)
 end
 
 function Social.Role(record)
-    local interactions = PNC.VanillaEmoteInteractions
-    if interactions and interactions.ResolveNPCType then
-        local ok, role = pcall(interactions.ResolveNPCType, record)
+    if ContextProviders and ContextProviders.ResolveNPCType then
+        local ok, role = pcall(ContextProviders.ResolveNPCType, record)
         if ok and role then return tostring(role) end
     end
     return "neutral"
@@ -62,6 +79,9 @@ function Social.Emit(observerRecord, actorKey, eventType, eventID,
     local ok
     local processed
     local detail
+    local semantic
+    local semanticContext
+    local semanticAmbient
     if not targetKey or not actorKey or not PNC.SocialEvents
         or not PNC.SocialEvents.Emit
     then
@@ -84,6 +104,31 @@ function Social.Emit(observerRecord, actorKey, eventType, eventID,
     }
     ok, processed = pcall(PNC.SocialEvents.Emit, event)
     if not ok or not processed or processed.ok ~= true then return false end
+    semanticContext = type(ambient) == "table"
+        and type(ambient.context) == "table" and ambient.context or {}
+    semanticContext.eventType = eventType
+    semanticContext.source = "necroa_airborne_exposure"
+    semantic = SocialReactions and SocialReactions.Resolve and
+        SocialReactions.Resolve({
+            eventType = eventType,
+            eventID = processed.eventID,
+            npcID = observerRecord.id,
+            context = semanticContext,
+        }) or nil
+    if semantic then
+        semanticAmbient = {}
+        for key, value in pairs(ambient or {}) do
+            semanticAmbient[key] = value
+        end
+        semanticAmbient.resolvedText = semantic.fallback
+        semanticAmbient.responsePlanID = semantic.responsePlanID
+        semanticAmbient.realizationFamily = semantic.realizationFamily
+        semanticAmbient.realizationID = semantic.realizationID
+        semanticAmbient.factRefs = semantic.groundedFactRefs
+        semanticAmbient.context = semanticContext
+    else
+        semanticAmbient = ambient
+    end
     if player and Network and Network.SendConversationRelationshipForNPC then
         detail = processed.details and processed.details[1] or nil
         Network.SendConversationRelationshipForNPC(
@@ -99,7 +144,7 @@ function Social.Emit(observerRecord, actorKey, eventType, eventID,
                     detail and detail.relationshipBefore or nil,
                     detail and detail.relationshipAfter or nil
                 ),
-                ambientFlavor = ambient,
+                ambientFlavor = semanticAmbient,
             }
         )
     end

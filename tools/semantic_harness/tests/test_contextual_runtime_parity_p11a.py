@@ -81,6 +81,9 @@ class RuntimeParityP11ATests(unittest.TestCase):
             root.geometry("1080x700")
             app.main_tabs.select(app.simulation_tab)
             wait_until(lambda: app.worker_ready)
+            app.main_tabs.select(app.simulation_tab)
+            if not app.trace_panel_visible:
+                app._toggle_trace_panel()
             root.update_idletasks()
 
             panels = [
@@ -198,9 +201,16 @@ class RuntimeParityP11ATests(unittest.TestCase):
                 app.studio_notebook.select(app.studio_notebook.tabs()[-1])
                 app.trace_tabs.select(talk_tab)
                 app.workbench_notebook.select(app.workbench_notebook.tabs()[1])
+                # Exercise the real visible topology before switching context;
+                # setting a hidden PanedWindow sash is not a user workflow and
+                # can leave Tk with an invalid geometry during teardown.
+                app.main_tabs.select(app.simulation_tab)
+                root.update_idletasks()
                 app.simulation_panes.sashpos(0, 700)
+                root.update_idletasks()
                 app.workflow_pane_split.sashpos(0, 280)
                 root.update_idletasks()
+                app.main_tabs.select(app.log_tab)
             finally:
                 app.close()
                 del app

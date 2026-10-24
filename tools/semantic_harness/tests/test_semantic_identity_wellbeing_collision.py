@@ -162,6 +162,10 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
             candidates[0]["frame"]["extensions"]["identityClaimMode"],
             "canonical",
         )
+        self.assertEqual(
+            candidates[0]["frame"]["slots"]["identityClaim"]["name"],
+            "Patrick Patz",
+        )
         self.assertEqual(candidates[1]["frame"]["intent"], "REFUSE")
         self.assertEqual(
             candidates[1]["frame"]["extensions"]["identityResponseStyle"],
@@ -186,6 +190,71 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
             turn["contextAfter"]["dialogue"]["pendingIdentityExchange"],
             {"kind": "PLAYER_NAME", "requestedAt": 1},
         )
+
+    def test_real_name_choice_submits_canonical_name_for_authoritative_check(self) -> None:
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            worker.input("who are you")
+            suggestions = worker.snapshot()["suggestions"]
+            group = next(
+                group
+                for group in suggestions["groups"]
+                if group["id"] == suggestions["currentGroupID"]
+            )
+            real_name = next(
+                candidate
+                for candidate in group["candidates"]
+                if candidate["id"] == "identity.choice.real_name"
+            )
+            result = worker.suggestion_click(real_name["frame"])
+
+        request = next(
+            event
+            for event in result["transport"]
+            if event.get("command") == "SemanticIdentityRequest"
+        )
+        identity_result = next(
+            event
+            for event in result["transport"]
+            if event.get("command") == "SemanticIdentityResult"
+        )
+        self.assertTrue(result["accepted"])
+        self.assertEqual(request["payload"]["claimedName"], "Patrick Patz")
+        self.assertTrue(identity_result["payload"]["accepted"])
+        self.assertTrue(identity_result["payload"]["truthful"])
+        self.assertIn("Mara", self.message_text(result))
+
+    def test_native_conversation_identity_choice_submits_canonical_name(self) -> None:
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            opened = worker.open_conversation()
+            root_row = next(
+                row
+                for row in opened["presentation"]["responseChannel"]["rows"]
+                if row["id"] == "conversation.root:menu:ask_name"
+            )
+            asked = worker.suggestion_click(root_row["semanticFrame"])
+            real_name_row = next(
+                row
+                for row in asked["conversationPresentation"]["responseChannel"]["rows"]
+                if row["id"] == "identity.choice.real_name"
+            )
+            result = worker.suggestion_click(real_name_row["semanticFrame"])
+
+        request = next(
+            event
+            for event in result["transport"]
+            if event.get("command") == "SemanticIdentityRequest"
+        )
+        identity_result = next(
+            event
+            for event in result["transport"]
+            if event.get("command") == "SemanticIdentityResult"
+        )
+        self.assertTrue(asked["accepted"])
+        self.assertTrue(result["accepted"])
+        self.assertEqual(request["payload"]["claimedName"], "Patrick Patz")
+        self.assertTrue(identity_result["payload"]["accepted"])
+        self.assertTrue(identity_result["payload"]["truthful"])
+        self.assertIn("Mara", self.message_text(result))
 
     def test_false_explicit_name_claim_remains_authoritatively_rejected(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:

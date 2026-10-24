@@ -13,6 +13,15 @@ local H = PNC.SocialEventHooksInternal
 local Core = PNC.Core
 local Registry = PNC.Registry
 local Network = PNC.Network
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if not SocialReactions then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
 local audit = H.DamageAudit
 local nowMillis = H.DamageNowMillis
 local isAuthority = H.DamageIsAuthority
@@ -169,6 +178,16 @@ local function deliverTeammateDamageFlavor(
                 context.medicalBandageRequired = true
                 context.medicalBandageStatus = "missing"
             end
+            local realization = SocialReactions
+                and type(SocialReactions.Resolve) == "function"
+                and SocialReactions.Resolve({
+                    eventType = eventType,
+                    act = "REACT",
+                    topic = "medical_distress",
+                    context = context,
+                    eventID = eventID,
+                    npcID = observer.id,
+                }) or nil
             attempted = attempted + 1
             local sent, reason = false, nil
             if Network
@@ -185,7 +204,23 @@ local function deliverTeammateDamageFlavor(
                         npcID = observer.id,
                         ambientFlavor = {
                             flavorID = flavorID,
+                            text = realization
+                                and realization.fallback or nil,
                             eventType = eventType,
+                            act = realization
+                                and realization.semanticAct or "REACT",
+                            topic = realization
+                                and realization.topic or "medical_distress",
+                            responsePlanID = realization
+                                and realization.responsePlanID or nil,
+                            poolID = realization
+                                and realization.realizationFamily or nil,
+                            realizationFamily = realization
+                                and realization.realizationFamily or nil,
+                            realizationID = realization
+                                and realization.realizationID or nil,
+                            factRefs = realization
+                                and realization.groundedFactRefs or nil,
                             family = "combat_commentary",
                             priority = 55,
                             -- Keep the supply-shortage line grounded in the

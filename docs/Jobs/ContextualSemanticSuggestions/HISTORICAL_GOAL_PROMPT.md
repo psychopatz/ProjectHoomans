@@ -1,4 +1,8 @@
-# /goal — Contextual Semantic Suggestions
+# HISTORICAL / DO NOT EXECUTE — Contextual Semantic Suggestions /goal
+
+This file preserves an older prompt as evidence only. The sole active ProjectHoomans
+semantic execution goal is `docs/Jobs/SemanticInteractionLifecycle/`; do not resume
+the instructions below.
 
 ```text
 /goal

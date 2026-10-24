@@ -50,7 +50,9 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
             )
             local replyText
             local playerText
-            if target.replyFlavorID then
+            if target.resolvedText then
+                replyText = target.resolvedText
+            elseif target.replyFlavorID then
                 _, _, replyText = Presentation.EnqueueFlavor(
                     target.replyFlavorID,
                     "npc",

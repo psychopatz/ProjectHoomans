@@ -1,5 +1,5 @@
 --[[
-    PNC Flavor Text Resolver
+    Semantic social context providers
     Pure, deterministic mapping from "downed NPC context" to a bounded set of
     flavor variant keys.  It owns no state, performs no world scans, and never
     touches the presentation queue, so it is safe to share between client and
@@ -24,9 +24,13 @@
 require "PNC/Core/Social/PNC_FlavorTextResolver_Constants"
 
 PNC = PNC or {}
-PNC.FlavorText = PNC.FlavorText or {}
+PNC.Semantics = PNC.Semantics or {}
+PNC.Semantics.ContextProviders = PNC.Semantics.ContextProviders or {}
+-- Compatibility alias for old event adapters. Semantic callers use the
+-- neutral provider table directly; it never selects prose or a renderer.
+PNC.FlavorText = PNC.Semantics.ContextProviders
 
-local FlavorText = PNC.FlavorText
+local FlavorText = PNC.Semantics.ContextProviders
 local Const = PNC.FlavorTextConst
 
 local function clean(value, fallback)
@@ -327,6 +331,54 @@ function FlavorText.BuildLeaderDeathContext(input)
         leaderSuccessorName = clean(input.successorName, nil),
         leaderGroupName = clean(input.groupName, nil),
     }
+end
+
+-- Neutral identity/relationship context providers. These values are derived
+-- from authoritative records and may be used to ground a semantic plan or a
+-- compatibility/content alias. They never select Flavor/SocialFlavor lines.
+function FlavorText.ResolveNPCType(record)
+    local generation = record and record.generation or {}
+    local relationshipKind = lower(
+        generation.relationshipKind
+            or record and record.relationshipKind
+            or record and record.conversationRelationship
+            or record and record.relationshipCategory
+    )
+    local tacticalClass = PNC.Types
+        and PNC.Types.ResolveTacticalClass
+        and PNC.Types.ResolveTacticalClass(record)
+        or lower(record and record.tacticalClass)
+    local hostility = record and record.hostility or {}
+    if tacticalClass == "hostile" or hostility.attackPlayers == true then
+        return "hostile"
+    end
+    if relationshipKind == "lover"
+        or relationshipKind == "partner"
+        or relationshipKind == "spouse"
+    then
+        return "lover"
+    end
+    if inList(relationshipKind, { "family", "parent", "sibling" }) then
+        return "family"
+    end
+    if tacticalClass == "colonist"
+        or record and (record.recruited == true
+            or record.ownerUsername ~= nil
+            or record.ownerOnlineID ~= nil)
+    then
+        return "colonist"
+    end
+    return "neutral"
+end
+
+function FlavorText.ResolveRelationshipTier(relationship)
+    local approval = tonumber(relationship and relationship.approval) or 0
+    local familiarity = tonumber(relationship and relationship.familiarity) or 0
+    local state = lower(relationship and relationship.state)
+    if state == "enemy" or state == "rival" then return "reserved" end
+    if state == "friend" or approval >= 30 then return "warm" end
+    if approval >= 10 or familiarity >= 5 then return "familiar" end
+    return "reserved"
 end
 
 return FlavorText

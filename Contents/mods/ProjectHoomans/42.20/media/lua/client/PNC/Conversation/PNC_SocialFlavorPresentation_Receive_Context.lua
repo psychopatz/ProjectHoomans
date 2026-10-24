@@ -34,7 +34,11 @@ local function presentationInteraction(ambientFlavor, context, npcID,
     local playerUUID = H.PlayerUUID and H.PlayerUUID() or nil
     if not Envelope or type(Envelope.NPCSpeech) ~= "function"
         or not playerUUID
+        or not ambientFlavor.responsePlanID
+        or not ambientFlavor.realizationID
     then
+        -- Flavor-only compatibility packets remain presentation/transport
+        -- data. Never manufacture semantic provenance after their selection.
         return nil
     end
     return Envelope.NPCSpeech({
@@ -46,8 +50,7 @@ local function presentationInteraction(ambientFlavor, context, npcID,
         beatID = ambientFlavor.beatID
             or "beat:" .. tostring(eventType) .. ":"
                 .. tostring(ambientFlavor.eventRef or eventID),
-        responsePlanID = ambientFlavor.responsePlanID
-            or "social.reaction." .. tostring(eventType),
+        responsePlanID = ambientFlavor.responsePlanID,
         flowID = ambientFlavor.flowID
             or "social:" .. tostring(eventType),
         poolID = ambientFlavor.poolID or ambientFlavor.flavorID,
@@ -169,6 +172,15 @@ function H.EnrichReceiveContext(receive)
             receive.eventID,
             eventType
         )
+    context.act = context.act or ambientFlavor.act
+    context.topic = context.topic or ambientFlavor.topic
+    context.responsePlanID = context.responsePlanID
+        or ambientFlavor.responsePlanID
+    context.realizationFamily = context.realizationFamily
+        or ambientFlavor.realizationFamily
+    context.realizationID = context.realizationID
+        or ambientFlavor.realizationID
+    context.factRefs = context.factRefs or ambientFlavor.factRefs
     ambientFlavor.interaction = ambientFlavor.interaction
         or context.interaction
     -- Downed distress lines may address the attacker by name. The server

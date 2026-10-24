@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from .saved_world_relationship_projection import RELATIONSHIP_CATEGORY_LABELS
+
 def build_saved_world_browser(self, parent: Any) -> None:
     """Build the save-backed world browser as a full-width Lab surface."""
 
@@ -23,6 +25,12 @@ def build_saved_world_browser(self, parent: Any) -> None:
         )
     )
     self.saved_world_category_var = self._tk.StringVar(value="")
+    self.saved_world_relationship_category_var = self._tk.StringVar(
+        value=str(
+            self._ui_state.get("saved_world_relationship_category")
+            or "All relationship categories"
+        )
+    )
     self.saved_world_npc_var = self._tk.StringVar(value="")
     self.saved_world_status_var = self._tk.StringVar(
         value="Discover compatible saves to browse the persisted world."
@@ -98,18 +106,49 @@ def build_saved_world_browser(self, parent: Any) -> None:
         command=self._import_saved_world_target,
     )
     self.saved_world_import_button.grid(row=1, column=5, sticky="w", pady=(8, 0))
+    navigation = ttk.LabelFrame(header, text="Top-level world navigation", padding=(4, 3))
+    navigation.grid(row=2, column=0, columnspan=6, sticky="ew", pady=(8, 0))
+    navigation.columnconfigure(1, weight=1)
+    ttk.Label(navigation, text="Relationship categories").grid(
+        row=0, column=0, sticky="nw", padx=(0, 8)
+    )
+    self.saved_world_relationship_nav_buttons = {}
+    all_categories = ("All relationship categories",) + RELATIONSHIP_CATEGORY_LABELS
+    for index, label in enumerate(all_categories):
+        button = ttk.Button(
+            navigation,
+            text=label,
+            command=lambda value=label: self._select_saved_world_relationship_category(value),
+        )
+        button.grid(
+            row=index // 3,
+            column=1 + (index % 3),
+            sticky="ew",
+            padx=(0 if index % 3 == 0 else 4, 0),
+            pady=(0 if index < 3 else 3, 0),
+        )
+        self.saved_world_relationship_nav_buttons[label] = button
+    saved_button = ttk.Button(
+        navigation,
+        text="Saved affiliations / overlays",
+        command=lambda: self._select_saved_world_relationship_category(
+            "Saved affiliations / overlays"
+        ),
+    )
+    saved_button.grid(row=3, column=1, columnspan=3, sticky="ew", pady=(3, 0))
+    self.saved_world_relationship_nav_buttons["Saved affiliations / overlays"] = saved_button
     ttk.Label(
         header,
         textvariable=self.saved_world_target_var,
         anchor="w",
-    ).grid(row=2, column=0, columnspan=6, sticky="ew", pady=(8, 0))
+    ).grid(row=3, column=0, columnspan=6, sticky="ew", pady=(8, 0))
     ttk.Label(
         header,
         textvariable=self.saved_world_status_var,
         anchor="w",
         justify="left",
         wraplength=1000,
-    ).grid(row=3, column=0, columnspan=6, sticky="ew", pady=(4, 0))
+    ).grid(row=4, column=0, columnspan=6, sticky="ew", pady=(4, 0))
 
     browser_frame = ttk.LabelFrame(parent, text="World", padding=6)
     browser_frame.grid(row=1, column=0, sticky="nsew")

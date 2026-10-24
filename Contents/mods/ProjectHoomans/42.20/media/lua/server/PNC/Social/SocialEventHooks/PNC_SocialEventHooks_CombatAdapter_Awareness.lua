@@ -15,6 +15,24 @@ local Registry = PNC.Registry
 local Perception = PNC.Perception
 local Const = PNC.Const
 local Network = PNC.Network
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if not SocialReactions then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
+local ContextProviders = PNC.Semantics
+    and PNC.Semantics.ContextProviders or nil
+if type(ContextProviders) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Core/Social/PNC_FlavorTextResolver"
+    )
+    ContextProviders = ok and loaded or nil
+end
 local WITNESS_RADIUS = tonumber(Const and Const.ZOMBIE_TARGET_RADIUS) or 12
 local ZOMBIE_HORDE_CLEAR_MS = 3000
 local ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS = 12000
@@ -103,9 +121,8 @@ local function relationshipTier(relationship)
 end
 
 local function socialRole(record)
-    local interactions = PNC.VanillaEmoteInteractions
-    if interactions and type(interactions.ResolveNPCType) == "function" then
-        local value = interactions.ResolveNPCType(record)
+    if ContextProviders and type(ContextProviders.ResolveNPCType) == "function" then
+        local value = ContextProviders.ResolveNPCType(record)
         if value then return tostring(value) end
     end
     return "neutral"
@@ -353,6 +370,16 @@ local function emitZombieAwareness(
             relationshipState = state,
             relationshipTier = tier,
         }
+        local realization = SocialReactions
+            and type(SocialReactions.Resolve) == "function"
+            and SocialReactions.Resolve({
+                eventType = eventType,
+                act = "REACT",
+                topic = "combat",
+                context = context,
+                eventID = eventID,
+                npcID = npcID,
+            }) or nil
         result = {
             source = eventType,
             eventID = eventID,
@@ -360,7 +387,19 @@ local function emitZombieAwareness(
             ambientFlavor = {
                 eventID = eventID,
                 flavorID = flavorID,
+                text = realization and realization.fallback or nil,
                 eventType = eventType,
+                act = realization and realization.semanticAct or "REACT",
+                topic = realization and realization.topic or "combat",
+                responsePlanID = realization
+                    and realization.responsePlanID or nil,
+                poolID = realization and realization.realizationFamily or nil,
+                realizationFamily = realization
+                    and realization.realizationFamily or nil,
+                realizationID = realization and realization.realizationID
+                    or nil,
+                factRefs = realization and realization.groundedFactRefs
+                    or nil,
                 family = "zombie_awareness",
                 priority = 12,
                 weight = 0.25,

@@ -25,6 +25,14 @@ function Click.run(context, frame, Conversation)
 
     local revision = tonumber(frame.requestRevision)
     local currentRevision = tonumber(Runtime.lastSuggestionRevision)
+    local receiptKey = Validation.receiptKey(frame, revision)
+    if Validation.wasReplayed(Runtime, receiptKey) then
+        return Validation.rejected(
+            frame,
+            "suggestion_click_replayed",
+            currentRevision or 0
+        )
+    end
     if revision == nil or currentRevision == nil
         or revision ~= currentRevision
     then
@@ -35,17 +43,6 @@ function Click.run(context, frame, Conversation)
         )
     end
 
-    local receiptKey = Validation.receiptKey(frame, revision)
-    if Validation.wasReplayed(Runtime, receiptKey) then
-        return Validation.rejected(
-            frame,
-            "suggestion_click_replayed",
-            currentRevision
-        )
-    end
-
-    Runtime.turn = Runtime.turn + 1
-    Runtime.now = Runtime.now + 1
     local state = {
         Runtime = Runtime,
         Values = Values,
@@ -70,6 +67,10 @@ function Click.run(context, frame, Conversation)
     }
     state.accepted, state.reason, state.projection =
         Refresh.apply(context, state)
+    if state.accepted == true then
+        Runtime.turn = Runtime.turn + 1
+        Runtime.now = Runtime.now + 1
+    end
     return Response.build(context, state)
 end
 

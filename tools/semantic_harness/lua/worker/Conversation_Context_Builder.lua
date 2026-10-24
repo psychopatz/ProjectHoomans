@@ -142,7 +142,13 @@ function Builder.build(context)
             traitFingerprint = context.playerTraitFingerprint,
         },
         playerNameKnown = true,
-        playerName = context.SemanticAdapters.playerName(context, player),
+        -- The production adapter accepts the normalized player record. The
+        -- headless engine object deliberately exposes names through its
+        -- descriptor, so passing the proxy here leaves playerName empty and
+        -- makes the semantic "say your real name" choice unverifiable.
+        playerName = context.SemanticAdapters.playerName(
+            context, context.playerData or player
+        ),
         playerGender = player.gender,
         playerIdentitySeed = player.characterUUID,
         characterUUID = player.characterUUID,

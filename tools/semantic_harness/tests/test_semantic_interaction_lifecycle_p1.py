@@ -177,6 +177,12 @@ class SemanticInteractionLifecycleP1Tests(unittest.TestCase):
 
         self.assertIsNotNone(first["result"]["thread"])
         self.assertIsNotNone(second["result"]["thread"])
+        self.assertEqual(
+            first["result"]["thread"]["playerUUID"], "player-one"
+        )
+        self.assertEqual(
+            second["result"]["thread"]["playerUUID"], "player-two"
+        )
         self.assertEqual(metrics["pairRecords"], 2)
         self.assertEqual(metrics["sharedEventRefs"], 1)
 

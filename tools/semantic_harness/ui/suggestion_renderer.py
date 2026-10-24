@@ -5,13 +5,87 @@ from __future__ import annotations
 from typing import Any
 
 from ..inspection.rendering import pretty
-from .suggestion_projection import semantic_suggestion_rows, semantic_suggestion_title
+from .suggestion_projection import (
+    conversation_presented_rows,
+    semantic_suggestion_rows,
+    semantic_suggestion_title,
+)
 
 def render_suggestions(
     self, response: dict[str, Any], suggestions: dict[str, Any]
 ) -> None:
     self.suggestion_projection = suggestions
     self.suggestion_response = response
+    observation = response.get("observation") or {}
+    presentation = (
+        response.get("conversationPresentation")
+        or observation.get("conversationPresentation")
+    )
+    if (
+        isinstance(presentation, dict)
+        and presentation.get("schema")
+        == "semantic.native_conversation_view.v1"
+    ):
+        channel = presentation.get("responseChannel") or {}
+        lifecycle = presentation.get("lifecycle") or {}
+        self.suggestion_primary_projection = presentation
+        self.suggestion_group_override_id = None
+        self.suggestion_group_ids_by_display = {}
+        self.suggestion_group_box.grid_remove()
+        self.suggestion_revision = channel.get("revision")
+        self.suggestion_rows = conversation_presented_rows(presentation)
+        self._ensure_suggestion_buttons(len(self.suggestion_rows))
+        self.suggestion_interactive = (
+            lifecycle.get("state") not in {
+                "busy",
+                "pending",
+                "closing",
+                "closed",
+            }
+            and (presentation.get("semanticInput") or {}).get(
+                "available", True
+            )
+        )
+        for index, button in enumerate(self.suggestion_buttons):
+            row = (
+                self.suggestion_rows[index]
+                if index < len(self.suggestion_rows)
+                else None
+            )
+            if row:
+                button.configure(text=semantic_suggestion_title(row))
+                button.grid()
+            else:
+                button.configure(text="")
+                button.grid_remove()
+        self.suggestion_status.configure(
+            text=(
+                f"Response Channel · "
+                f"Group {channel.get('groupID') or '—'} · "
+                f"Revision {channel.get('revision', '—')} · "
+                f"{len(self.suggestion_rows)} presented"
+            )
+        )
+        self._set_text(
+            self.suggestion_inspector,
+            pretty(
+                {
+                    "productionPresentation": presentation,
+                    "diagnosticProjection": suggestions,
+                    "visualRows": [
+                        {
+                            "id": row.get("id"),
+                            "label": semantic_suggestion_title(row),
+                            "enabled": row.get("enabled"),
+                            "semanticFrame": row.get("semanticFrame"),
+                        }
+                        for row in self.suggestion_rows
+                    ],
+                }
+            ),
+        )
+        return
+    self.suggestion_primary_projection = None
     groups = suggestions.get("groups") or []
     group_ids: list[str] = []
     group_display_by_id: dict[str, str] = {}

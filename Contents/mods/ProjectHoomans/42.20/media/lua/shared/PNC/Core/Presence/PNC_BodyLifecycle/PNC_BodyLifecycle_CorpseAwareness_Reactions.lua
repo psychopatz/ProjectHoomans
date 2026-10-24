@@ -23,6 +23,15 @@ if type(InteractionLifecycle) ~= "table" then
 end
 local InteractionPersistence = PNC.Conversation
     and PNC.Conversation.InteractionLifecyclePersistence or nil
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if type(SocialReactions) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
 
 local function copyGreeting(greeting, interaction)
     local payload = {}
@@ -70,12 +79,15 @@ local function interactionForPlayer(observer, greeting, player)
         topic = greeting.relationshipKind or eventType,
         beatID = "beat:" .. tostring(eventType) .. ":"
             .. tostring(eventID),
-        responsePlanID = "social.reaction." .. tostring(eventType),
+        responsePlanID = greeting.responsePlanID
+            or "social.reaction." .. tostring(eventType),
         flowID = "social:" .. tostring(eventType),
-        poolID = greeting.flavorID,
+        poolID = greeting.poolID or greeting.responsePlanID,
         eventType = eventType,
         eventRef = eventID,
         factRefs = greeting.memoryID and { greeting.memoryID } or nil,
+        realizationFamily = greeting.realizationFamily,
+        realizationID = greeting.realizationID,
         expectedReplies = { "ACK", "THANK", "REACT" },
         worldHour = worldAgeHours(),
         meaningful = true,
@@ -229,6 +241,8 @@ local function speak(
     local npcID = tostring(observer.id or "")
     local memoryID = deathMemoryID(token)
     local flavorID = "corpse_seen_" .. category
+    local semantic
+    local revengeMeaning = revenge and knownKillerName(attribution) ~= nil
     local arguments = {
         subject = identity.name,
         faction = identity.factionName ~= ""
@@ -241,7 +255,20 @@ local function speak(
     then
         return false
     end
-    if revenge and knownKillerName(attribution) then
+    semantic = SocialReactions and SocialReactions.Resolve and
+        SocialReactions.Resolve({
+            eventType = "corpse_reaction",
+            eventID = "corpse-reaction:" .. tostring(npcID) .. ":"
+                .. tostring(memoryID),
+            npcID = npcID,
+            context = {
+                eventType = "corpse_reaction",
+                corpseRevenge = revengeMeaning,
+            },
+            groundedFactRefs = { memoryID },
+        }) or nil
+    if not semantic then return false end
+    if revengeMeaning then
         flavorID = "corpse_seen_revenge_" .. category
         arguments.killer = safeDisplayText(attribution.killerName, "")
         if arguments.faction == "an unknown faction" then
@@ -264,6 +291,13 @@ local function speak(
         ),
         npcID = npcID,
         flavorID = flavorID,
+        poolID = semantic.responsePlanID,
+        responsePlanID = semantic.responsePlanID,
+        responsePlan = semantic.responsePlan,
+        realizationFamily = semantic.realizationFamily,
+        realizationID = semantic.realizationID,
+        resolvedText = semantic.fallback,
+        factRefs = semantic.groundedFactRefs,
         eventType = "corpse_reaction",
         gossipPacket = gossipPacket,
         corpseNPCID = identity.npcID,

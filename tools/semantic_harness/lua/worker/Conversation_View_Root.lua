@@ -29,6 +29,13 @@ local function productionRoot(workerContext, spec, scenario, player)
             and type(definition.nodes) == "table"
             and type(definition.nodes.greeting) == "table"
         then
+            -- Keep the production definition's presentation metadata beside
+            -- the headless spec. The projection is later built from the live
+            -- session rows, while these fields preserve native Talk/opening
+            -- and TYPE TO TALK availability without Python reconstruction.
+            spec.productionDefinition = definition
+            spec.talkStartProjection = definition.talkStartProjection
+            spec.extensionParts = definition.extensionParts
             return definition.nodes.greeting
         end
     end

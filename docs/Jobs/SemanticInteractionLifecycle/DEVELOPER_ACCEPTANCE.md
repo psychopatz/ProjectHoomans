@@ -57,3 +57,68 @@ The full Python suite includes the P14 save-backed immutability coverage and the
 ## Intentionally unrun
 
 Codex did not launch or restart Project Zomboid, perform native SP/MP acceptance, mutate the user's source save, or publish to Steam Workshop. Those are final user-owned acceptance actions.
+
+## P10/P11 corrective acceptance — 2026-10-25
+
+The corrective implementation evidence is separate from the historical P0–P9
+record above:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j -q
+PASS: 22 tests, including the large saved-world Open-response bound
+
+The Open response now contains only the bounded production Conversation
+projection and no duplicated configured/inspector snapshot. The regression
+keeps a 120 KiB save-backed payload below the 256 KiB worker boundary.
+
+python3 -m unittest tools.semantic_harness.tests.test_legacy_semantic_authority_p11 -q
+PASS: 11 tests
+
+python3 -m unittest \
+    tools.semantic_harness.tests.test_contextual_runtime_parity_p11a \
+    tools.semantic_harness.tests.test_contextual_runtime_parity_p11b \
+    tools.semantic_harness.tests.test_contextual_runtime_parity_p11c \
+    tools.semantic_harness.tests.test_contextual_runtime_parity_p11d \
+    tools.semantic_harness.tests.test_contextual_runtime_parity_p11e \
+    tools.semantic_harness.tests.test_contextual_runtime_graph_p11f \
+    tools.semantic_harness.tests.test_contextual_runtime_speech_p11g -q
+PASS: 29 tests
+
+python3 -m unittest tools.semantic_harness.tests.test_semantic_dialogue_flows \
+    tools.semantic_harness.tests.test_contextual_speech_behavior_p8b \
+    tools.semantic_harness.tests.test_semantic_interaction_lifecycle_p1 \
+    tools.semantic_harness.tests.test_semantic_interaction_lifecycle_acceptance -q
+PASS: 34 tests
+
+python3 tests/run_tests.py --lua lua5.3 --jobs 4 --timeout 30
+PASS: 874/874
+
+changed Lua syntax validation
+PASS: 44 changed Lua files parsed with luac5.3
+
+changed Python compilation
+PASS: 27 changed Python files passed py_compile
+
+python3 /home/psychopatz/Desktop/Projects/Zomboid-devSkills/.agents/skills/pz-verify/scripts/pz_verify.py \
+    --mod-dir Contents/mods/ProjectHoomans --kahlua \
+    --severity ERROR --no-snippets
+PASS: 3,096 files scanned; 0 Kahlua errors and 0 warnings
+
+git diff --check
+PASS
+
+final codebase-memory coverage
+PASS: refreshed full index has zero skipped/partial parses; all 78 changed/
+      untracked source, worker, test, and active-goal documentation paths
+      report no_recorded_issue
+```
+
+These checks prove the semantic authority boundary and native Conversation
+projection with production Lua. A read-only production save selection at
+`/home/psychopatz/Zomboid/Saves/Sandbox/2026-10-22_08-59-28` opened through the
+same worker seam with a 64,285-byte response, six exact production-presented
+rows, and no duplicated snapshot payload. The broad historical discovery suite
+was attempted separately, but its oversized terminal report was not retained;
+the P10/P11-scoped production-worker modules above are the relevant corrective
+regression gates and are green. Native Project Zomboid SP/MP acceptance remains
+user-owned.

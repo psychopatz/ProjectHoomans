@@ -39,6 +39,9 @@ local CONDITION_FIELDS = {
     "needType", "needUrgency", "relationshipAttitude", "healthState",
     "socialStyle", "emotionType", "emotionUrgency", "hostilityCount",
     "insultCount", "lastSpeechAct",
+    "eventType", "commandID", "commandReason",
+    "downedAudience", "downedNeed", "downedThreat",
+    "leaderGrief", "leaderSuccession", "corpseRevenge",
 }
 
 local function copy(value, depth)
@@ -133,6 +136,9 @@ local function conditionContext(context)
         action = context.action,
         subject = context.subject,
         pattern = context.pattern,
+        eventType = context.eventType,
+        commandID = context.commandID,
+        commandReason = context.commandReason,
         relationshipState = context.relationshipState,
         identityTrust = context.identityTrust,
         timeBand = world.timeBand or time.band or context.timeBand,
@@ -161,6 +167,12 @@ local function conditionContext(context)
             or state.socialContext and state.socialContext.insultCount,
         lastSpeechAct = context.lastSpeechAct
             or state.socialContext and state.socialContext.lastSpeechAct,
+        downedAudience = context.downedAudience,
+        downedNeed = context.downedNeed,
+        downedThreat = context.downedThreat,
+        leaderGrief = context.leaderGrief,
+        leaderSuccession = context.leaderSuccession,
+        corpseRevenge = context.corpseRevenge,
     }
 end
 
@@ -202,6 +214,7 @@ local function normalizedVariant(poolID, index, value)
         id = id,
         templateID = tostring(value.templateID or id),
         fallback = fallback,
+        compatibilityFlavorID = value.compatibilityFlavorID,
         plan = plan,
         dialogueAct = value.dialogueAct,
         topic = value.topic,
@@ -367,6 +380,7 @@ function Catalog.Select(id, context, salt)
         id = variant.id,
         templateID = variant.templateID,
         fallback = variant.fallback,
+        compatibilityFlavorID = variant.compatibilityFlavorID,
         plan = variant.plan,
         dialogueAct = variant.dialogueAct,
         topic = variant.topic,

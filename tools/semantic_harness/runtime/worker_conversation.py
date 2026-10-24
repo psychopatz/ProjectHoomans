@@ -95,6 +95,7 @@ class WorkerConversationOperations:
             "productionFactionContext",
             "simulationProjection",
             "provenance",
+            "conversationPresentation",
         ):
             if key in snapshot:
                 merged[key] = deepcopy(snapshot[key])
@@ -152,6 +153,16 @@ class WorkerConversationOperations:
 
         return self._host._request("CONVERSATION_GRAPH")
 
+    def conversation_projection(self) -> dict[str, Any]:
+        """Return the production-owned native Conversation presentation."""
+
+        return self._host._request("CONVERSATION_PROJECTION")
+
+    def talk_projection(self) -> dict[str, Any]:
+        """Compatibility alias for the production Talk presentation seam."""
+
+        return self.conversation_projection()
+
     def persona_catalog(
         self, register_relationship_kind: dict[str, Any] | None = None
     ) -> dict[str, Any]:
@@ -194,6 +205,51 @@ class WorkerConversationOperations:
         if isinstance(scenario, dict):
             self._host.scenario = scenario
         return result
+
+    def open_conversation(self, target_id: str = "current") -> dict[str, Any]:
+        """Open the production Conversation session without submitting speech."""
+
+        result = self._host._request(
+            "CONVERSATION_OPEN", {"targetID": str(target_id or "current")}
+        )
+        scenario = result.get("scenario")
+        if isinstance(scenario, dict):
+            self._host.scenario = scenario
+        return result
+
+    def suspend_conversation(self) -> dict[str, Any]:
+        """Suspend the live production session without resetting semantic state."""
+
+        return self._host._request("CONVERSATION_SUSPEND")
+
+    def resume_conversation(self) -> dict[str, Any]:
+        """Resume a production session suspended by the Lua lifecycle seam."""
+
+        return self._host._request("CONVERSATION_RESUME")
+
+    def close_conversation(self, reason: str = "conversation_closed") -> dict[str, Any]:
+        """Close the live production presentation through its Lua session."""
+
+        return self._host._request(
+            "CONVERSATION_CLOSE", {"reason": str(reason or "conversation_closed")}
+        )
+
+    def conversation_emote(
+        self,
+        emote_id: str,
+        *,
+        topic: str | None = None,
+        meaningful: bool = False,
+    ) -> dict[str, Any]:
+        """Submit an emote through the production semantic lifecycle seam."""
+
+        payload: dict[str, Any] = {
+            "emote": {"id": str(emote_id or "")},
+            "meaningful": bool(meaningful),
+        }
+        if topic:
+            payload["topic"] = str(topic)
+        return self._host._request("CONVERSATION_EMOTE", payload)
 
     def talk_matrix(
         self,

@@ -14,6 +14,15 @@ local flavorConst = H.FlavorConst
 local callFlavorID = H.CallFlavorID
 local updateFlavorID = H.UpdateFlavorID
 local repeatFlavorID = H.RepeatFlavorID
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if not SocialReactions then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
 local now = H.Now
 local clean = H.Clean
 local playerCanHear = H.PlayerCanHear
@@ -61,11 +70,34 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
         end
         local input, threat = buildInput(record, player, needInputs)
         local context = resolver.BuildContext(input)
+        local planningContext = {}
+        local realization
+        local key
+        for key, value in pairs(input or {}) do
+            planningContext[key] = value
+        end
+        for key, value in pairs(context or {}) do
+            planningContext[key] = value
+        end
         context.eventType = flavorID
         context.downedAttackerName = recordAttackerName(threat)
         context.attackerKind = context.downedThreat
         context.downedReason = reason
         context.victimNPCID = npcID
+        planningContext.eventType = flavorID
+        planningContext.npcID = npcID
+        planningContext.downedAttackerName = context.downedAttackerName
+        planningContext.downedReason = reason
+        if SocialReactions and type(SocialReactions.Resolve) == "function" then
+            realization = SocialReactions.Resolve({
+                eventType = flavorID,
+                act = "REQUEST",
+                topic = "medical_distress",
+                context = planningContext,
+                eventID = eventID,
+                npcID = npcID,
+            })
+        end
         local result = {
             source = flavorID,
             eventID = eventID,
@@ -73,7 +105,20 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
             ambientFlavor = {
                 eventID = eventID,
                 flavorID = flavorID,
+                text = realization and realization.fallback or nil,
                 eventType = flavorID,
+                act = realization and realization.semanticAct or "REQUEST",
+                topic = realization and realization.topic
+                    or "medical_distress",
+                responsePlanID = realization
+                    and realization.responsePlanID or nil,
+                poolID = realization and realization.realizationFamily or nil,
+                realizationFamily = realization
+                    and realization.realizationFamily or nil,
+                realizationID = realization and realization.realizationID
+                    or nil,
+                factRefs = realization and realization.groundedFactRefs
+                    or nil,
                 family = (flavorConst().FAMILY or "incapacitated_distress"),
                 priority = (flavorConst().PRIORITY or 70),
                 weight = (flavorConst().WEIGHT or 3),

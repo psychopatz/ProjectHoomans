@@ -87,7 +87,7 @@ from .layout_state_controller import (
     toggle_simulation_workbench,
     toggle_trace_panel,
 )
-from .ui_state_persistence import save_ui_state
+from .ui_state_persistence import save_ui_state, schedule_save
 from .saved_world_controller import (
     discover_saved_worlds,
     import_saved_world_target,
@@ -117,6 +117,7 @@ from .talk_surface_renderer import (
 )
 from .talk_action_controller import (
     click_talk_choice,
+    open_conversation,
     run_talk_matrix,
     selected_talk_target,
     start_talk_parity,
@@ -180,6 +181,7 @@ from .saved_world_selection_controller import (
     on_saved_world_player,
     on_saved_world_tree_select,
     on_saved_world_view,
+    select_saved_world_relationship_category,
 )
 from .provenance_utils import provenance_value, value_at_path
 from .world_knowledge_controller import inspect_world_knowledge
@@ -285,6 +287,9 @@ class SemanticHarnessApp:
     def _save_ui_state(self) -> None:
         save_ui_state(self)
 
+    def _schedule_ui_state_save(self, delay_ms: int = 250) -> None:
+        schedule_save(self, delay_ms)
+
     def _append(self, speaker: str, text: str) -> None:
         self.activity_log.record(
             "ui",
@@ -362,6 +367,9 @@ class SemanticHarnessApp:
     def _on_saved_world_view(self) -> None:
         on_saved_world_view(self)
 
+    def _select_saved_world_relationship_category(self, category: str) -> None:
+        select_saved_world_relationship_category(self, category)
+
     def _relationship_world_groups(self) -> list[dict[str, Any]]:
         return relationship_world_groups(self)
     def _inspect_saved_world(self) -> None:
@@ -395,6 +403,9 @@ class SemanticHarnessApp:
 
     def start_talk_parity(self) -> None:
         start_talk_parity(self)
+
+    def open_conversation(self) -> None:
+        open_conversation(self)
 
     def run_talk_matrix(self) -> None:
         run_talk_matrix(self)

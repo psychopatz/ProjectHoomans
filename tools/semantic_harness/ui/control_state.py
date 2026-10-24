@@ -11,6 +11,7 @@ def set_controls(app: Any, enabled: bool) -> None:
     state = "normal" if enabled and not app.busy else "disabled"
     for button in (
         app.send_button,
+        app.open_conversation_button,
         app.reset_button,
         app.load_button,
         app.settings_button,
@@ -27,9 +28,13 @@ def set_controls(app: Any, enabled: bool) -> None:
         app.saved_world_discover_button,
         app.saved_world_inspect_button,
         app.saved_world_import_button,
-        app.reset_layout_button,
     ):
         button.configure(state=state)
+    # Layout recovery must remain available while the worker is starting,
+    # busy, or has failed. It only changes Tk state and does not require a
+    # semantic worker round-trip.
+    for button in (app.advanced_toggle_button, app.reset_layout_button):
+        button.configure(state="normal")
     if hasattr(app, "saved_world_save_box"):
         combo_state = "readonly" if enabled and not app.busy else "disabled"
         app.saved_world_save_box.configure(
@@ -74,9 +79,6 @@ def set_controls(app: Any, enabled: bool) -> None:
         field.set_enabled(enabled and not app.busy)
     if enabled and not app.busy:
         app._update_generated_personality_controls()
-        if app.main_tabs.select() == str(app.simulation_tab):
-            app._restore_splitters()
-            app._schedule_splitter_restore(0)
     app.matrix_dimension_box.configure(
         state="readonly" if enabled and not app.busy else "disabled"
     )

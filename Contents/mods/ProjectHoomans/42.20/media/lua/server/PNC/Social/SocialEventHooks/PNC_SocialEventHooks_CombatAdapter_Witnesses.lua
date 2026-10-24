@@ -12,6 +12,15 @@ local Core = PNC.Core
 local EntityRef = PNC.EntityRef
 local Registry = PNC.Registry
 local Network = PNC.Network
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if not SocialReactions then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
 local Factions = PNC.Factions
 local Const = PNC.Const
 local WITNESS_RADIUS = tonumber(Const and Const.ZOMBIE_TARGET_RADIUS) or 12
@@ -168,6 +177,22 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
             local after = detail and detail.relationshipAfter or nil
             local role = socialRole(record)
             local state = relationshipState(before)
+            local realization = SocialReactions
+                and type(SocialReactions.Resolve) == "function"
+                and SocialReactions.Resolve({
+                    eventType = "witnessed_player_kill",
+                    act = "REACT",
+                    topic = "combat",
+                    context = {
+                        eventType = "witnessed_player_kill",
+                        npcID = tostring(npcID),
+                        relationshipState = state,
+                        socialStyle = state == "friend"
+                            and "friendly" or nil,
+                    },
+                    eventID = processed.eventID or eventID,
+                    npcID = tostring(npcID),
+                }) or nil
             if Network
                 and type(Network.SendConversationRelationshipForNPC)
                     == "function"
@@ -190,7 +215,23 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
                             ),
                             ambientFlavor = {
                                 flavorID = "social.witnessed_player_kill",
+                                text = realization
+                                    and realization.fallback or nil,
                                 eventType = "witnessed_player_kill",
+                                act = realization
+                                    and realization.semanticAct or "REACT",
+                                topic = realization
+                                    and realization.topic or "combat",
+                                responsePlanID = realization
+                                    and realization.responsePlanID or nil,
+                                poolID = realization
+                                    and realization.realizationFamily or nil,
+                                realizationFamily = realization
+                                    and realization.realizationFamily or nil,
+                                realizationID = realization
+                                    and realization.realizationID or nil,
+                                factRefs = realization
+                                    and realization.groundedFactRefs or nil,
                                 family = "combat_commentary",
                                 priority = 35,
                                 llmEligible = true,

@@ -39,7 +39,7 @@ def click_suggestion(app: Any, index: int) -> None:
     if index < 0 or index >= len(app.suggestion_rows):
         return
     row = app.suggestion_rows[index]
-    frame = row.get("frame")
+    frame = row.get("semanticFrame") or row.get("frame")
     if not isinstance(frame, dict) or row.get("enabled") is not True:
         return
     label = semantic_suggestion_title(row)

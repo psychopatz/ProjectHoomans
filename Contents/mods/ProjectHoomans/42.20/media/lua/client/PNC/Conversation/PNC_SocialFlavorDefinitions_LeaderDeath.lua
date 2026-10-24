@@ -8,7 +8,8 @@
     carries on either way: a surviving player inherits it, or it converts to
     refugees under an NPC leader as a mobile group.
 
-    Context keys (from PNC.FlavorText.BuildLeaderDeathContext):
+    Context keys (from the neutral semantic context provider
+    `PNC.Semantics.ContextProviders.BuildLeaderDeathContext`):
         leaderGrief       devoted, close, colonist, distant, dissent
         leaderSuccession  promoted, player, none
         leaderDied        true

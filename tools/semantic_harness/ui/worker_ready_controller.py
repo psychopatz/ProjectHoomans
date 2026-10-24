@@ -41,7 +41,14 @@ def worker_ready(app: Any, result: WorkerReady) -> None:
     initial_suggestions = result.capabilities.get("suggestions") or {}
     if initial_suggestions:
         app._render_suggestions(
-            {"type": "turn", "accepted": True}, initial_suggestions
+            {
+                "type": "turn",
+                "accepted": True,
+                "conversationPresentation": result.capabilities.get(
+                    "conversationPresentation"
+                ),
+            },
+            initial_suggestions,
         )
     capabilities = result.capabilities or {}
     flow_catalog = capabilities.get("flowCatalog", {})

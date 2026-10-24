@@ -156,6 +156,43 @@ local function beginDirectFrame(view, frame)
     then
         return false, "conversation_request_pending"
     end
+    local requiresPresentedChoice = false
+    if Suggestions then
+        requiresPresentedChoice = (
+            type(Suggestions.IsConversationCategoryFrame) == "function"
+                and Suggestions.IsConversationCategoryFrame(frame)
+        ) or (
+            type(Suggestions.IsConversationChoiceFrame) == "function"
+                and Suggestions.IsConversationChoiceFrame(frame)
+        ) or (
+            type(Suggestions.IsConversationRootChoiceFrame) == "function"
+                and Suggestions.IsConversationRootChoiceFrame(frame)
+        )
+    end
+    if requiresPresentedChoice then
+        local presentedChoice
+        for _, choice in ipairs(view.session.choices or {}) do
+            local source = type(choice) == "table"
+                and type(choice.source) == "table" and choice.source or nil
+            local presented = source and source.semanticFrame or nil
+            if type(presented) == "table"
+                and tostring(presented.candidateID or "")
+                    == tostring(frame and frame.candidateID or "")
+                and tonumber(presented.requestRevision)
+                    == tonumber(frame and frame.requestRevision)
+            then
+                presentedChoice = choice
+                break
+            end
+        end
+        if not presentedChoice then
+            return false, "suggestion_not_presented"
+        end
+        if presentedChoice.enabled == false then
+            return false, "conversation_choice_disabled"
+        end
+    end
+    recordSemanticChoiceEnvelope(view, frame)
     local router = type(Internal.RouterFor) == "function"
         and Internal.RouterFor(view) or nil
     if not router then return false, "semantic_router_unavailable" end
@@ -201,7 +238,6 @@ function Input.SubmitSemanticFrame(view, frame)
     -- A frame is already semantic state; retain its bounded meaning for
     -- lifecycle adapters without reparsing its presentation text. Existing
     -- branches still own acceptance, ConversationBlocks, authority/effects.
-    recordSemanticChoiceEnvelope(view, frame)
     if type(Suggestions.IsBackFrame) == "function"
         and Suggestions.IsBackFrame(frame)
     then
@@ -341,10 +377,12 @@ function Input.SubmitSemanticFrame(view, frame)
         return false, "suggestion_frame_unavailable"
     end
     if group and type(group.Submit) == "function" then
+        recordSemanticChoiceEnvelope(view, frame)
         return group:Submit(Suggestions.ResolveFrameText(frame), {
             semanticFrame = frame,
         })
     end
+    recordSemanticChoiceEnvelope(view, frame)
     return Internal.SubmitSingle(
         view,
         Suggestions.ResolveFrameText(frame),

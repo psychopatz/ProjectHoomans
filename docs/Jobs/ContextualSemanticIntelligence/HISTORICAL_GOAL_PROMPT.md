@@ -1,4 +1,8 @@
-# Contextual Semantic Intelligence — job-local /goal
+# HISTORICAL / DO NOT EXECUTE — Contextual Semantic Intelligence job-local /goal
+
+This file preserves an older prompt as evidence only. The sole active ProjectHoomans
+semantic execution goal is `docs/Jobs/SemanticInteractionLifecycle/`; do not resume
+the instructions below.
 
 ```text
 /goal

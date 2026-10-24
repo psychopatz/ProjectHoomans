@@ -22,9 +22,7 @@ def build_conversation_panel(
     app.transcript = scrolled_text(transcript_frame, wrap="word", state="disabled")
     app.transcript.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
 
-    suggestion_frame = ttk.LabelFrame(
-        transcript_frame, text="Contextual semantic suggestions"
-    )
+    suggestion_frame = ttk.LabelFrame(transcript_frame, text="Response Channel")
     suggestion_frame.grid(row=1, column=0, sticky="ew", padx=6, pady=(0, 6))
     # Let the panel size itself to the visible rows.  The old fixed
     # height reserved five button slots even when a topic had one choice,
@@ -43,13 +41,17 @@ def build_conversation_panel(
     app.suggestion_rows: list[dict[str, Any]] = []
     app.suggestion_interactive = False
     app.suggestion_projection: dict[str, Any] = {}
+    app.suggestion_primary_projection: dict[str, Any] = {}
     app.suggestion_response: dict[str, Any] = {}
     app.suggestion_revision: Any = None
     app.suggestion_group_ids_by_display: dict[str, str] = {}
     app.suggestion_group_override_id: str | None = None
     app.suggestion_status = ttk.Label(
         suggestion_frame,
-        text="Run a production preview or turn to inspect suggestions.",
+        text=(
+            "Load a target, then Open conversation to start the native session. "
+            "Preview is optional and does not send input."
+        ),
     )
     app.suggestion_status.grid(
         row=1, column=0, columnspan=2, sticky="w", padx=4, pady=(0, 2)
@@ -73,8 +75,14 @@ def build_conversation_panel(
     input_actions = ttk.Frame(transcript_frame)
     input_actions.grid(row=3, column=0, sticky="ew", padx=6, pady=(0, 6))
     input_actions.columnconfigure(0, weight=1)
+    app.open_conversation_button = ttk.Button(
+        input_actions,
+        text="Open conversation",
+        command=app.open_conversation,
+    )
+    app.open_conversation_button.grid(row=0, column=0, sticky="w")
     app.preview_button = ttk.Button(
-        input_actions, text="Preview", command=app.preview
+        input_actions, text="Preview (no send)", command=app.preview
     )
     app.preview_button.grid(row=0, column=1, sticky="e", padx=(0, 4))
     app.send_button = ttk.Button(input_actions, text="Send", command=app.submit)

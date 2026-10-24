@@ -7,7 +7,8 @@
     (it just went down, or its wound picture changed while down), but delivery
     is per nearby player because a flavor line has to reach a client.
 
-    Every line is attributed, per listener, through PNC.FlavorText, so the
+    Every line is attributed, per listener, through the semantic context
+    providers, so the
     downed NPC addresses whoever is there in the correct register:
 
         own follower / faction member -> "I need patching"    (ally)
@@ -40,7 +41,8 @@ local Network = PNC.Network
 -- have run when this module is required.  Resolve it at call time so load
 -- order can never break the server tree.
 local function flavorText()
-    return PNC.FlavorText
+    if not PNC.FlavorText then return nil end
+    return PNC.Semantics and PNC.Semantics.ContextProviders
 end
 
 -- Never return nil: callers read fields straight off the result, and a nil

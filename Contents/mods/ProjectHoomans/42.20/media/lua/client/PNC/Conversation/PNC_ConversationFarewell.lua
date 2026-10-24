@@ -23,6 +23,15 @@ local recent = {}
 local Context = PNC.Conversation.FarewellContext
 local InteractionLifecycle = PNC.Semantics
     and PNC.Semantics.InteractionLifecycle or nil
+local RealizationAuthority = PNC.Semantics
+    and PNC.Semantics.RealizationAuthority or nil
+if not RealizationAuthority then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+    )
+    RealizationAuthority = ok and loaded or nil
+end
 
 Farewell.CHANCE_PERCENT = Farewell.CHANCE_PERCENT or 55
 Farewell.NPC_DELAY_MS = Farewell.NPC_DELAY_MS or 1900
@@ -45,10 +54,6 @@ local function socialClient()
     )
     return ok and loaded or PsychopatzCore
         and PsychopatzCore.SocialFlavorClient or nil
-end
-
-local function socialFlavor()
-    return PsychopatzCore and PsychopatzCore.SocialFlavor or nil
 end
 
 local function now()
@@ -106,7 +111,8 @@ local function deliver(item, current)
     )
     local accepted, enqueueReason = client.Enqueue({
         eventID = item.eventID,
-        flavorID = "social.conversation_farewell",
+        flavorID = item.realizationID or "social.conversation_farewell",
+        text = item.resolvedText,
         family = "conversation_farewell",
         priority = 100,
         weight = 1,
@@ -132,6 +138,12 @@ local function deliver(item, current)
             kind = "conversation_farewell",
             eventType = "conversation_farewell",
             socialRole = item.role,
+            semanticAct = item.semanticAct,
+            topic = item.topic,
+            responsePlanID = item.responsePlanID,
+            realizationFamily = item.realizationFamily,
+            realizationID = item.realizationID,
+            factRefs = item.factRefs,
             contextEligible = false,
             interaction = item.interaction,
         },
@@ -153,6 +165,7 @@ function Farewell.Schedule(spec, state, reason)
     local seed
     local playerText
     local interaction
+    local realization
     if not state or state.farewellEvaluated then
         return false, "already_evaluated"
     end
@@ -168,6 +181,29 @@ function Farewell.Schedule(spec, state, reason)
     end
     role = Context.ResolveSocialRole(spec)
     farewellContext, player, playerID = Context.Build(spec, role, npcID)
+    if role == "hostile" then
+        farewellContext.socialStyle = "withdrawn"
+    elseif role == "lover" or role == "family" or role == "colonist" then
+        farewellContext.socialStyle = "friendly"
+    end
+    if not RealizationAuthority
+        or type(RealizationAuthority.Resolve) ~= "function"
+    then
+        return false, "semantic_realization_unavailable"
+    end
+    realization = RealizationAuthority.Resolve({
+        poolID = "semantic.flow.farewell",
+        responsePlanID = "semantic.flow.farewell",
+        realizationFamily = "farewell",
+        act = "FAREWELL",
+        topic = context.currentTopic or context.conversationTopic
+            or "farewell",
+        context = farewellContext,
+        salt = tostring(npcID) .. ":" .. tostring(state.token or current),
+    })
+    if not realization then
+        return false, "semantic_farewell_plan_unavailable"
+    end
     if InteractionLifecycle
         and type(InteractionLifecycle.Envelope) == "table"
         and type(InteractionLifecycle.Envelope.Lifecycle) == "function"
@@ -179,19 +215,17 @@ function Farewell.Schedule(spec, state, reason)
                 targetID = npcID,
                 playerUUID = playerID,
                 topic = context.currentTopic or context.conversationTopic,
+                provenance = {
+                    responsePlanID = realization.responsePlanID,
+                    realizationFamily = realization.realizationFamily,
+                    realizationID = realization.realizationID,
+                },
             }
         )
     end
     seed = "conversation-farewell:" .. npcID .. ":"
         .. tostring(state.token or current)
-    local flavor = socialFlavor()
-    playerText = flavor and flavor.Resolve
-        and flavor.Resolve(
-            "social.conversation_farewell",
-            "player",
-            seed,
-            farewellContext
-        ) or nil
+    playerText = realization.fallback
     if playerText and player then
         PNC.PlayerSpeech.Speak(player, playerText, {
             commandID = "conversation_farewell",
@@ -208,6 +242,13 @@ function Farewell.Schedule(spec, state, reason)
         role = role,
         context = farewellContext,
         interaction = interaction,
+        resolvedText = realization.fallback,
+        semanticAct = realization.semanticAct,
+        topic = realization.topic,
+        responsePlanID = realization.responsePlanID,
+        realizationFamily = realization.realizationFamily,
+        realizationID = realization.realizationID,
+        factRefs = realization.groundedFactRefs,
         seed = seed,
         dueAt = current + Farewell.NPC_DELAY_MS,
         expiresAt = current + Farewell.PENDING_TTL_MS,

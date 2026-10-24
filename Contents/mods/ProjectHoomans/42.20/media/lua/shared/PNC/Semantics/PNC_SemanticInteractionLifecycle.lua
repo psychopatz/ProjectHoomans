@@ -155,6 +155,14 @@ local function provenance(input, act, topic, factRefs)
         ),
         flowID = clean(source.flowID or input.flowID, 128),
         poolID = clean(source.poolID or input.poolID, 128),
+        realizationFamily = clean(
+            source.realizationFamily or input.realizationFamily,
+            128
+        ),
+        realizationID = clean(
+            source.realizationID or input.realizationID,
+            128
+        ),
         factRefs = factRefs,
     }
     if not result.beatID then result.beatID = nil end

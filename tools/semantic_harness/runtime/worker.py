@@ -422,6 +422,16 @@ class LuaSemanticWorker:
 
         return self._conversation.conversation_graph()
 
+    def conversation_projection(self) -> dict[str, Any]:
+        """Return the production-owned native Conversation presentation."""
+
+        return self._conversation.conversation_projection()
+
+    def talk_projection(self) -> dict[str, Any]:
+        """Compatibility alias for the production Talk presentation seam."""
+
+        return self._conversation.talk_projection()
+
     def persona_catalog(
         self, register_relationship_kind: dict[str, Any] | None = None
     ) -> dict[str, Any]:
@@ -450,6 +460,31 @@ class LuaSemanticWorker:
         """Start the native Talk parity projection for one target type."""
 
         return self._conversation.talk_start(target_id, utterance)
+
+    def open_conversation(self, target_id: str = "current") -> dict[str, Any]:
+        """Open the production Conversation session without submitting speech."""
+
+        return self._conversation.open_conversation(target_id)
+
+    def suspend_conversation(self) -> dict[str, Any]:
+        return self._conversation.suspend_conversation()
+
+    def resume_conversation(self) -> dict[str, Any]:
+        return self._conversation.resume_conversation()
+
+    def close_conversation(self, reason: str = "conversation_closed") -> dict[str, Any]:
+        return self._conversation.close_conversation(reason)
+
+    def conversation_emote(
+        self,
+        emote_id: str,
+        *,
+        topic: str | None = None,
+        meaningful: bool = False,
+    ) -> dict[str, Any]:
+        return self._conversation.conversation_emote(
+            emote_id, topic=topic, meaningful=meaningful
+        )
 
     def talk_matrix(
         self,

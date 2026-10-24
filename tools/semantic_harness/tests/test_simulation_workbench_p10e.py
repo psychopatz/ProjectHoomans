@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import gc
 import os
+import tempfile
 import time
 import tkinter as tk
 import unittest
@@ -102,6 +103,32 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
         try:
             wait_until(lambda: app.worker_ready)
             app.main_tabs.select(app.simulation_tab)
+            self.assertEqual(
+                int(app.load_saved_npc_button.grid_info()["column"]) + 1,
+                int(app.reset_layout_button.grid_info()["column"]),
+            )
+            app._set_controls(False)
+            self.assertEqual(str(app.reset_layout_button["state"]), "normal")
+            self.assertEqual(str(app.advanced_toggle_button["state"]), "normal")
+            app.reset_layout_button.invoke()
+            self.assertIn("UI layout reset", app.transcript.get("1.0", "end"))
+            app._set_controls(True)
+            app.open_conversation_button.invoke()
+            wait_until(
+                lambda: (
+                    not app.busy
+                    and app.suggestion_primary_projection.get("schema")
+                    == "semantic.native_conversation_view.v1"
+                )
+            )
+            transcript = app.transcript.get("1.0", "end")
+            self.assertRegex(transcript, r"NPC:\s+\S")
+            self.assertEqual(
+                app.suggestion_frame.cget("text"), "Response Channel"
+            )
+            self.assertEqual(
+                app.preview_button.cget("text"), "Preview (no send)"
+            )
             fields = app.workbench_control_fields
             self.assertIsInstance(fields["npc.healthState"].widget, ttk.Combobox)
             self.assertEqual(fields["relationship.bond"].kind, "read_only")
@@ -137,10 +164,13 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
 
             replayed_ids = [row.get("id") for row in app.suggestion_rows]
             self.assertNotEqual(initial_ids, replayed_ids)
-            self.assertIn("question.health", replayed_ids)
+            self.assertTrue(replayed_ids)
             self.assertEqual(
-                replayed_ids[0],
-                "semantic.back_to_root:semantic_hub.whats_up",
+                app.suggestion_primary_projection.get("schema"),
+                "semantic.native_conversation_view.v1",
+            )
+            self.assertTrue(
+                all(isinstance(row.get("semanticFrame"), dict) for row in app.suggestion_rows)
             )
             self.assertEqual(app.scenario["npc"]["healthState"], "injured")
             self.assertEqual(app.scenario["npc"]["relationship"]["approval"], 80)
@@ -182,17 +212,24 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
 
         try:
             wait_until(lambda: app.worker_ready and not app.busy)
-            app.input_var.set("What's up?")
-            app.submit()
-            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
-            self.assertEqual(len(app.replay_steps), 1)
-
+            app.open_conversation_button.invoke()
+            wait_until(
+                lambda: (
+                    not app.busy
+                    and app.suggestion_primary_projection.get("schema")
+                    == "semantic.native_conversation_view.v1"
+                )
+            )
             row = next(
                 row
                 for row in app.suggestion_rows
-                if row.get("status") == "eligible"
+                if row.get("enabled") is True
             )
             app.click_suggestion(app.suggestion_rows.index(row))
+            wait_until(lambda: not app.busy and len(app.replay_steps) == 1)
+
+            app.input_var.set("What's up?")
+            app.submit()
             wait_until(lambda: not app.busy and len(app.replay_steps) == 2)
 
             app.apply_and_replay()
@@ -208,6 +245,96 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             del app
             del root
             gc.collect()
+
+    @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
+    def test_tk_conversation_first_workflow_keeps_layout_and_real_session(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = tk.Tk()
+            app = SemanticHarnessApp(
+                root,
+                _parser().parse_args(
+                    ["--ui-state", os.path.join(directory, "ui-state.json")]
+                ),
+            )
+            try:
+                def wait_until(predicate: object, timeout: float = 20.0) -> None:
+                    deadline = time.monotonic() + timeout
+                    while not predicate() and time.monotonic() < deadline:
+                        root.update()
+                        time.sleep(0.02)
+                    self.assertTrue(predicate())
+
+                wait_until(lambda: app.worker_ready and not app.busy)
+                app.main_tabs.select(app.simulation_tab)
+                root.geometry("1280x800")
+                root.update_idletasks()
+                app.simulation_panes.sashpos(0, 700)
+                root.update_idletasks()
+                app.workflow_pane_split.sashpos(0, 320)
+                root.update_idletasks()
+                saved_sash = app.workflow_pane_split.sashpos(0)
+                app._save_ui_state()
+
+                app.open_conversation_button.invoke()
+                wait_until(
+                    lambda: (
+                        not app.busy
+                        and (app.suggestion_primary_projection or {}).get("schema")
+                        == "semantic.native_conversation_view.v1"
+                    )
+                )
+                self.assertTrue(app.suggestion_rows)
+                self.assertTrue(app.suggestion_interactive)
+
+                choice_index = next(
+                    index
+                    for index, row in enumerate(app.suggestion_rows)
+                    if row.get("enabled") is True
+                )
+                app.click_suggestion(choice_index)
+                wait_until(lambda: not app.busy and app.last_response.get("type") == "semantic_click")
+
+                app.input_var.set("What's up?")
+                app.send_button.invoke()
+                wait_until(lambda: not app.busy and app.last_test_utterance == "What's up?")
+
+                app.workbench_control_fields["npc.healthState"].set_value("injured")
+                app.workbench_apply_button.invoke()
+                wait_until(
+                    lambda: not app.busy
+                    and app.scenario["npc"]["healthState"] == "injured"
+                )
+                app.open_conversation_button.invoke()
+                wait_until(
+                    lambda: (
+                        not app.busy
+                        and app.suggestion_rows
+                        and app.suggestion_primary_projection.get("schema")
+                        == "semantic.native_conversation_view.v1"
+                    )
+                )
+                app.input_var.set("Let's continue.")
+                app.send_button.invoke()
+                wait_until(
+                    lambda: not app.busy
+                    and app.last_test_utterance == "Let's continue."
+                )
+
+                app.main_tabs.select(app.world_browser_tab)
+                root.update_idletasks()
+                app.main_tabs.select(app.simulation_tab)
+                root.update_idletasks()
+                self.assertEqual(app.workflow_pane_split.sashpos(0), saved_sash)
+                self.assertTrue(app.suggestion_rows)
+                self.assertEqual(
+                    app.suggestion_primary_projection.get("schema"),
+                    "semantic.native_conversation_view.v1",
+                )
+            finally:
+                app.close()
+                del app
+                del root
+                gc.collect()
 
 
 if __name__ == "__main__":

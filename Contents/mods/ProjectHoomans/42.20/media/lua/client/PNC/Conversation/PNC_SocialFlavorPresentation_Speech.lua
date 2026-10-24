@@ -22,6 +22,15 @@ local InteractionPresentationRegistry = require
 local MAX_PLAYER_SPEECH_RECIPIENTS = 8
 
 require "PNC/Conversation/PNC_SocialFlavorPresentation_Receive"
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if type(SocialReactions) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
 
 local function speechTargets(player, context)
     local explicit = type(context) == "table" and context.targets or nil
@@ -70,6 +79,7 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
             local playerIdentityValue = playerAddress(npcID, player)
             local interaction = context.interaction
                 or view and view.lastSemanticInteractionEnvelope
+            local semantic
             local eventID = "player-speech:" .. tostring(playerIDValue)
                 .. ":" .. tostring(nowValue) .. ":" .. tostring(index)
             local targetContext = {
@@ -103,10 +113,27 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
                 speechScope = "owned_colonists",
                 sourceCommandID = context.commandID,
             }
-            InteractionPresentationRegistry.Remember(eventID, interaction)
-            local ok = Client.Enqueue({
+            semantic = SocialReactions and SocialReactions.Resolve and
+                SocialReactions.Resolve({
+                    eventType = "player_spoke",
+                    eventID = eventID,
+                    npcID = npcID,
+                    context = targetContext,
+                }) or nil
+            if semantic then
+                targetContext.responsePlanID = semantic.responsePlanID
+                targetContext.realizationFamily = semantic.realizationFamily
+                targetContext.realizationID = semantic.realizationID
+                targetContext.factRefs = semantic.groundedFactRefs
+                InteractionPresentationRegistry.Remember(eventID, interaction)
+                local ok = Client.Enqueue({
                 eventID = eventID,
                 flavorID = "social.player_spoke",
+                resolvedText = semantic.fallback,
+                responsePlanID = semantic.responsePlanID,
+                realizationFamily = semantic.realizationFamily,
+                realizationID = semantic.realizationID,
+                factRefs = semantic.groundedFactRefs,
                 family = "player_speech_reaction",
                 priority = 35,
                 llmPriority = 90,
@@ -139,8 +166,9 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
                     contextEligible = false,
                     speechScope = "owned_colonists",
                 },
-            })
-            if ok == true then accepted = accepted + 1 end
+                })
+                if ok == true then accepted = accepted + 1 end
+            end
         end
     end
     return accepted > 0
@@ -163,6 +191,7 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
     local eventID
     local safetyContext
     local interaction
+    local semantic
     local accepted
     local enqueueReason
     if tostring(reason or "") ~= "danger" then
@@ -208,10 +237,27 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
         relationshipState = context.relationshipState,
         relationshipTier = context.relationshipTier,
     }
+    semantic = SocialReactions and SocialReactions.Resolve and
+        SocialReactions.Resolve({
+            eventType = "conversation_safety",
+            eventID = eventID,
+            npcID = npcID,
+            context = safetyContext,
+        }) or nil
+    if not semantic then return false, "semantic_reaction_unavailable" end
+    safetyContext.responsePlanID = semantic.responsePlanID
+    safetyContext.realizationFamily = semantic.realizationFamily
+    safetyContext.realizationID = semantic.realizationID
+    safetyContext.factRefs = semantic.groundedFactRefs
     InteractionPresentationRegistry.Remember(eventID, interaction)
     accepted, enqueueReason = Client.Enqueue({
         eventID = eventID,
         flavorID = "social.conversation_safety_danger",
+        resolvedText = semantic.fallback,
+        responsePlanID = semantic.responsePlanID,
+        realizationFamily = semantic.realizationFamily,
+        realizationID = semantic.realizationID,
+        factRefs = semantic.groundedFactRefs,
         family = "conversation_safety",
         priority = Client.CRITICAL_PRIORITY or 100,
         -- Safety speech must win over ordinary ambient commentary, even when

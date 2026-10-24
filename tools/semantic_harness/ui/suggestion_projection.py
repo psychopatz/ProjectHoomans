@@ -8,6 +8,9 @@ from typing import Any
 def npc_message_text(message: dict[str, Any]) -> str:
     """Return rendered production text before its English fallback."""
 
+    direct = message.get("text")
+    if isinstance(direct, str) and direct:
+        return direct
     payload = message.get("payload") or message.get("value") or {}
     if isinstance(payload, str):
         return payload
@@ -96,10 +99,43 @@ def semantic_suggestion_title(row: dict[str, Any]) -> str:
         or display.get("labelFallback")
         or display.get("utterance")
         or display.get("utteranceFallback")
+        or row.get("text")
         or row.get("id")
         or row.get("action")
         or "Suggestion"
     )
+
+
+def conversation_presented_rows(
+    presentation: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    """Adapt the production Conversation rows for the primary button surface.
+
+    Lua owns the selected group, ordering, eligibility and semantic frames.
+    This adapter only supplies the renderer's established row shape.
+    """
+
+    presentation = presentation if isinstance(presentation, dict) else {}
+    channel = presentation.get("responseChannel") or {}
+    rows: list[dict[str, Any]] = []
+    for row in channel.get("rows") or []:
+        if not isinstance(row, dict):
+            continue
+        text = str(row.get("text") or row.get("id") or "Choice")
+        frame = row.get("semanticFrame") or row.get("frame")
+        rows.append(
+            {
+                "id": row.get("id"),
+                "text": text,
+                "display": {"label": text, "labelFallback": text},
+                "frame": deepcopy(frame),
+                "semanticFrame": deepcopy(frame),
+                "enabled": row.get("enabled") is True,
+                "source": deepcopy(row.get("source") or {}),
+                "groupID": channel.get("groupID"),
+            }
+        )
+    return rows
 
 
 def semantic_hub_diagnostic_projection(
@@ -213,5 +249,6 @@ __all__ = [
     "npc_message_text",
     "semantic_suggestion_rows",
     "semantic_suggestion_title",
+    "conversation_presented_rows",
     "semantic_hub_diagnostic_projection",
 ]

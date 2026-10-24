@@ -416,6 +416,8 @@ function ScenarioSession.reset(context, scenario)
     local Runtime = context.Runtime
     local Values = context.Values
     Runtime.scenario = Values.copy(scenario or {})
+    Runtime.conversationOpened = false
+    Runtime.conversationSuspended = false
     Runtime.workingWorldRevision = (Runtime.workingWorldRevision or 0) + 1
     context.RuntimeState.resetContainers(Runtime)
     ScenarioSession.configureRuntime(context)
@@ -580,6 +582,11 @@ function ScenarioSession.reset(context, scenario)
             Runtime.view and Runtime.view.session
                 and Runtime.view.session.choicePresentationState
         ),
+        conversationPresentation = Values.copy(
+            context.Conversation.presentationProjection(
+                context, Runtime.view
+            )
+        ),
         translation = context.OutputProjection.translationSnapshot(context),
         dynamicTradingLoad = Values.copy(Runtime.dynamicTradingLoad),
         simulationProjection = simulationProjection(context),
@@ -695,6 +702,11 @@ function ScenarioSession.snapshot(context)
             Runtime.view and Runtime.view.session
                 and Runtime.view.session.choicePresentationState
         ),
+        conversationPresentation = Values.copy(
+            context.Conversation.presentationProjection(
+                context, Runtime.view
+            )
+        ),
         simulationProjection = simulationProjection(context),
     }
 end
@@ -738,6 +750,11 @@ function ScenarioSession.mutationProjection(context)
         workingWorld = workingWorldProjection(context),
         context = context.Conversation.contextSnapshot(
             context, Runtime.view
+        ),
+        conversationPresentation = Values.copy(
+            context.Conversation.presentationProjection(
+                context, Runtime.view
+            )
         ),
         simulationProjection = simulationProjection(context),
         provenance = Values.productionCopy(Runtime.sourceProvenance),

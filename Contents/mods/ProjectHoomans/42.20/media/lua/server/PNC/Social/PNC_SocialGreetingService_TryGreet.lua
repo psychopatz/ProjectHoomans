@@ -21,6 +21,24 @@ local InteractionLifecycle = PNC.Semantics
     and PNC.Semantics.InteractionLifecycle or nil
 local InteractionPersistence = PNC.Conversation
     and PNC.Conversation.InteractionLifecyclePersistence or nil
+local RealizationAuthority = PNC.Semantics
+    and PNC.Semantics.RealizationAuthority or nil
+if not RealizationAuthority then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+    )
+    RealizationAuthority = ok and loaded or nil
+end
+local ContextProviders = PNC.Semantics
+    and PNC.Semantics.ContextProviders or nil
+if type(ContextProviders) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Core/Social/PNC_FlavorTextResolver"
+    )
+    ContextProviders = ok and loaded or nil
+end
 
 local function greetingFactRefs(details)
     local refs = {}
@@ -48,6 +66,9 @@ function Service.TryGreet(player, target, at, actorKey)
     local presentationEventID
     local greetingState
     local flavorID
+    local compatibilityFlavorID
+    local realization
+    local semanticContext
     local beatID
     local meetingOK
     local meetingReason
@@ -72,8 +93,8 @@ function Service.TryGreet(player, target, at, actorKey)
     at = worldAgeHours(at)
     relationship = Relationships and Relationships.Get
         and Relationships.Get(npcID, actorKey) or nil
-    npcType = Interactions and Interactions.ResolveNPCType
-        and Interactions.ResolveNPCType(record) or "neutral"
+    npcType = ContextProviders and ContextProviders.ResolveNPCType
+        and ContextProviders.ResolveNPCType(record) or "neutral"
     if not Interactions
         or not Interactions.IsAutomaticGreetingEligible
         or not Interactions.IsAutomaticGreetingEligible(
@@ -97,14 +118,40 @@ function Service.TryGreet(player, target, at, actorKey)
     end
     day = Interactions.DayIndex(at)
     greetingState = "first"
-    tier = Interactions.ResolveRelationshipTier(relationship)
-    flavorID = Interactions.GreetingReplyFlavorID(
-        npcType,
-        tier,
-        greetingState
-    )
+    tier = ContextProviders and ContextProviders.ResolveRelationshipTier
+        and ContextProviders.ResolveRelationshipTier(relationship)
+        or "reserved"
     eventID = "conversation:proximity_greeting:" .. actorKey .. ":"
         .. npcID .. ":day:" .. tostring(day)
+    semanticContext = {
+        npcID = npcID,
+        relationshipState = relationship and relationship.state,
+        relationshipAttitude = relationship and relationship.attitude,
+        socialStyle = relationship and relationship.state == "friend"
+            and "friendly" or nil,
+    }
+    if not RealizationAuthority
+        or type(RealizationAuthority.Resolve) ~= "function"
+    then
+        return false, "semantic_realization_unavailable"
+    end
+    realization = RealizationAuthority.Resolve({
+        poolID = "semantic.flow.greeting.opening",
+        responsePlanID = "semantic.flow.greeting.opening",
+        realizationFamily = "greeting",
+        act = "GREET",
+        topic = "greeting",
+        context = semanticContext,
+        salt = eventID,
+    })
+    if not realization then
+        return false, "semantic_greeting_plan_unavailable"
+    end
+    -- This legacy ID is a content/transport alias only. The semantic plan and
+    -- resolved text above are authoritative for conversational meaning.
+    compatibilityFlavorID = "social_greeting_npc_" .. tostring(npcType)
+        .. "_" .. tostring(tier) .. "_" .. tostring(greetingState)
+    flavorID = compatibilityFlavorID
     before = relationshipSummary(relationship, true, npcID)
     applied, reason, details = Relationships.ApplyConversationEffect(
         npcID,
@@ -123,6 +170,11 @@ function Service.TryGreet(player, target, at, actorKey)
                 source = "proximity_greeting",
                 interactionType = definition.id,
                 npcFlavorID = flavorID,
+                semanticAct = realization.semanticAct,
+                semanticTopic = realization.topic,
+                responsePlanID = realization.responsePlanID,
+                realizationFamily = realization.realizationFamily,
+                realizationID = realization.realizationID,
                 npcType = npcType,
                 relationshipTier = tier,
                 greetingState = greetingState,
@@ -157,8 +209,13 @@ function Service.TryGreet(player, target, at, actorKey)
             responsePlanID = "social.greeting",
             eventRef = presentationEventID,
             flowID = "social_greeting",
-            poolID = flavorID,
+            poolID = realization.realizationFamily,
             factRefs = greetingFactRefs(details),
+            provenance = {
+                responsePlanID = realization.responsePlanID,
+                realizationFamily = realization.realizationFamily,
+                realizationID = realization.realizationID,
+            },
             worldHour = at,
         })
         if interaction then
@@ -173,8 +230,13 @@ function Service.TryGreet(player, target, at, actorKey)
                     responsePlanID = "social.greeting",
                     eventRef = presentationEventID,
                     flowID = "social_greeting",
-                    poolID = flavorID,
+                    poolID = realization.realizationFamily,
                     factRefs = greetingFactRefs(details),
+                    provenance = {
+                        responsePlanID = realization.responsePlanID,
+                        realizationFamily = realization.realizationFamily,
+                        realizationID = realization.realizationID,
+                    },
                     expectedReplies = { "GREET", "ACK", "THANK" },
                     worldHour = at,
                     meaningful = true,
@@ -222,6 +284,13 @@ function Service.TryGreet(player, target, at, actorKey)
             eventID = presentationEventID,
             npcID = npcID,
             flavorID = flavorID,
+            resolvedText = realization.fallback,
+            semanticAct = realization.semanticAct,
+            topic = realization.topic,
+            responsePlanID = realization.responsePlanID,
+            realizationFamily = realization.realizationFamily,
+            realizationID = realization.realizationID,
+            factRefs = realization.groundedFactRefs,
             npcType = npcType,
             relationshipTier = tier,
             greetingState = greetingState,
@@ -241,6 +310,13 @@ function Service.TryGreet(player, target, at, actorKey)
         npcID = npcID,
         eventID = details and details.eventID or eventID,
         flavorID = flavorID,
+        resolvedText = realization.fallback,
+        semanticAct = realization.semanticAct,
+        topic = realization.topic,
+        responsePlanID = realization.responsePlanID,
+        realizationFamily = realization.realizationFamily,
+        realizationID = realization.realizationID,
+        factRefs = realization.groundedFactRefs,
         npcType = npcType,
         relationshipTier = tier,
         greetingState = greetingState,

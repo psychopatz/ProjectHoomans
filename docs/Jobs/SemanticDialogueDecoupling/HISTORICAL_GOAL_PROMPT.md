@@ -1,4 +1,8 @@
-# /goal — unified semantic dialogue implementation, harness-first
+# HISTORICAL / DO NOT EXECUTE — unified semantic dialogue implementation /goal
+
+This file preserves an older prompt as evidence only. The sole active ProjectHoomans
+semantic execution goal is `docs/Jobs/SemanticInteractionLifecycle/`; do not resume
+the instructions below.
 
 ```text
 /goal

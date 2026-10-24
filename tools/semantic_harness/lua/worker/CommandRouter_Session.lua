@@ -23,7 +23,12 @@ local capabilities = {
     "WORLD_KNOWLEDGE_INSPECT", "WORLD_KNOWLEDGE_PROPAGATE",
     "PERSONA_CATALOG", "PERSONA_PREVIEW",
     "SIMULATION_CONTROL_CATALOG",
-    "TALK_CATALOG", "TALK_START", "TALK_MATRIX",
+    "TALK_CATALOG", "TALK_START", "TALK_OPEN", "CONVERSATION_OPEN",
+    "TALK_SUSPEND", "CONVERSATION_SUSPEND", "TALK_RESUME",
+    "CONVERSATION_RESUME", "TALK_CLOSE", "CONVERSATION_CLOSE",
+    "TALK_EMOTE", "CONVERSATION_EMOTE",
+    "TALK_MATRIX",
+    "CONVERSATION_PROJECTION", "TALK_PROJECTION",
 }
 
 function Session.hello(context)
@@ -41,6 +46,9 @@ function Session.hello(context)
         talkCatalog = Talk.catalog(),
         simulationProjection = context.ScenarioSession
             .simulationProjection(context),
+        conversationPresentation = context.Conversation.presentationProjection(
+            context, Runtime.view
+        ),
         suggestions = context.Values.copy(
             Runtime.view and Runtime.view.semanticSuggestions
         ),
@@ -160,6 +168,9 @@ function Session.handle(context, command, payload)
             talkCatalog = Talk.catalog(),
             simulationProjection = context.ScenarioSession
                 .simulationProjection(context),
+            conversationPresentation = context.Conversation.presentationProjection(
+                context, Runtime.view
+            ),
             suggestions = context.Values.copy(
                 Runtime.view and Runtime.view.semanticSuggestions
             ),

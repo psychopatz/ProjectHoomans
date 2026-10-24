@@ -10,6 +10,15 @@ require "PNC/Commands/PNC_CompanionCommandInteractionQueue"
 
 local Presentation = PNC.CompanionCommandPresentation
 local Registry = PNC.Registry
+local RealizationAuthority = PNC.Semantics
+    and PNC.Semantics.RealizationAuthority or nil
+if type(RealizationAuthority) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+    )
+    RealizationAuthority = ok and loaded or nil
+end
 
 Presentation.CommandAckSuppressions =
     Presentation.CommandAckSuppressions or {}
@@ -82,6 +91,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
     local queued
     local currentTarget
     local targetList = {}
+    local npcRealization
     options = type(options) == "table" and options or {}
     commandID = tostring(commandID or "")
     outcome = tostring(outcome or "")
@@ -150,6 +160,32 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
         return playerShown == true
     end
     responseID = outcome == "invalid" and "camp_rejected" or commandID
+    if RealizationAuthority
+        and type(RealizationAuthority.Resolve) == "function"
+    then
+        npcRealization = RealizationAuthority.Resolve({
+            poolID = "semantic.companion.reaction",
+            responsePlanID = "semantic.companion.reaction",
+            realizationFamily = "companion_command_reply",
+            act = outcome == "invalid" and "REACT" or "ACK",
+            topic = "companion_command",
+            context = {
+                eventType = outcome == "invalid"
+                    and "companion_command_rejection"
+                    or "companion_command_acknowledgement",
+                npcID = respondent and respondent.id,
+                commandID = commandID,
+                commandReason = context and context.commandReason or nil,
+                currentTopic = "companion_command",
+                relationshipState = context
+                    and context.relationshipState or nil,
+                socialStyle = context and context.socialStyle or nil,
+                action = commandID,
+            },
+            salt = tostring(context and (context.requestID
+                or context.eventID) or commandID),
+        })
+    end
     for _, value in ipairs(targetList) do
         currentTarget = value
         actor = Registry and Registry.GetLiveZombie and currentTarget.id
@@ -159,10 +195,28 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
         npcContext = copyContext(context)
         npcContext.playerActor = player
         npcContext.commandID = commandID
+        npcContext.eventType = outcome == "invalid"
+            and "companion_command_rejection"
+            or "companion_command_acknowledgement"
         npcContext.target = currentTarget
         npcContext.targets = { currentTarget }
         npcContext.npcID = currentTarget.id
         npcContext.seed = npcContext.seed or npcContext.requestID
+        npcContext.semanticRealization = npcRealization
+        npcContext.resolvedText = npcRealization
+            and npcRealization.fallback or nil
+        npcContext.semanticAct = npcRealization
+            and npcRealization.semanticAct or nil
+        npcContext.topic = npcRealization and npcRealization.topic
+            or "companion_command"
+        npcContext.responsePlanID = npcRealization
+            and npcRealization.responsePlanID or nil
+        npcContext.realizationFamily = npcRealization
+            and npcRealization.realizationFamily or nil
+        npcContext.realizationID = npcRealization
+            and npcRealization.realizationID or nil
+        npcContext.factRefs = npcRealization
+            and npcRealization.groundedFactRefs or nil
         queued = Presentation.EnqueueFlavor(
             responseID,
             "npc",
@@ -173,6 +227,8 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
                     and (context.requestID or context.eventID) or commandID)
                     .. ":npc:" .. tostring(currentTarget.id or ""),
                 family = "emote_interaction",
+                resolvedText = npcContext.resolvedText,
+                semanticRealization = npcRealization,
             }
         )
         if queued == true then npcShown = true end

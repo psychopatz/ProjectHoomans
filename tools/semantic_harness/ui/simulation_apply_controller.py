@@ -21,6 +21,7 @@ def apply_simulation_settings(
         return
     current_text = app.input_var.get().strip()
     value = current_text or app.last_test_utterance.strip()
+    target_id = app._selected_talk_target()
     steps = deepcopy(app.replay_steps)
     if replay and current_text:
         if not steps or steps[-1].get("text") != current_text:
@@ -73,6 +74,11 @@ def apply_simulation_settings(
                 "runtimeOverride": runtime_override,
                 "snapshot": worker.snapshot(),
             }
+        # Replays are a production Conversation session, not a shortcut
+        # through the broad diagnostic candidate projection. Re-open the
+        # native session after CONFIG so recorded input/click frames execute
+        # against the same presentation boundary as the primary UI.
+        opened = worker.open_conversation(target_id)
         step_results: list[dict[str, Any]] = []
         for step in steps:
             response = app._replay_step(worker, step)
@@ -82,6 +88,7 @@ def apply_simulation_settings(
         return {
             "configured": configured,
             "runtimeOverride": runtime_override,
+            "opened": opened,
             "steps": step_results,
             "snapshot": worker.snapshot(),
         }

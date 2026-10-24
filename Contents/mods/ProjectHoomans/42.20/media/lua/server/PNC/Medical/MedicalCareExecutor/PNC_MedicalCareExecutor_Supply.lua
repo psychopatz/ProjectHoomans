@@ -21,6 +21,15 @@ local lastSupplyAttemptAt = Internal.LastSupplyAttemptAt
 local SUPPLY_PREFLIGHT_MS = Internal.SUPPLY_PREFLIGHT_MS
 local SUPPLY_NOTICE_RADIUS = Internal.SUPPLY_NOTICE_RADIUS
 local SUPPLY_NOTICE_REPEAT_MS = Internal.SUPPLY_NOTICE_REPEAT_MS
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if type(SocialReactions) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
 
 local function requesterForTask(task, doctors)
     if task and task.supplyRequesterId then
@@ -160,6 +169,7 @@ local function sendSupplyState(task, state)
         local playerKey
         local context
         local ambientFlavor
+        local semantic
         local ok
         local sent
         local lastSentAt
@@ -187,11 +197,28 @@ local function sendSupplyState(task, state)
             medicalSupplyTaskID = tostring(task.id),
             medicalSupplyRequesterID = tostring(requester.id),
             victimNPCID = tostring(patient.id),
+            downedNeed = state == "needed" and "rescue" or nil,
             socialRole = role,
             npcType = role,
         }
+        semantic = SocialReactions and SocialReactions.Resolve and
+            SocialReactions.Resolve({
+                eventType = "medical_bandage_request",
+                eventID = eventID,
+                npcID = tostring(requester.id),
+                context = context,
+                groundedFactRefs = {
+                    tostring(task.id), tostring(requester.id),
+                },
+            }) or nil
+        if not semantic then return end
         ambientFlavor = {
             flavorID = "social.witnessed_teammate_hurt",
+            resolvedText = semantic.fallback,
+            responsePlanID = semantic.responsePlanID,
+            realizationFamily = semantic.realizationFamily,
+            realizationID = semantic.realizationID,
+            factRefs = semantic.groundedFactRefs,
             eventType = "medical_bandage_request",
             family = "medical_support",
             priority = 78,

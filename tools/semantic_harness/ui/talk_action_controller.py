@@ -68,7 +68,11 @@ def start_talk_parity(app: Any) -> None:
                 app._append("NPC", npc_message_text(message))
         turn = result.get("turn") or {}
         if isinstance(turn, dict):
-            app._show_response(turn)
+            display_turn = dict(turn)
+            display_turn["conversationPresentation"] = result.get(
+                "conversationPresentation"
+            )
+            app._show_response(display_turn)
         observation = result.get("observation") or {}
         app._render_talk_choices(
             observation.get("choices") or opening.get("choices") or []
@@ -90,6 +94,39 @@ def start_talk_parity(app: Any) -> None:
 
     app._start_operation(
         lambda worker: worker.talk_start(target_id, utterance), finish
+    )
+
+
+def open_conversation(app: Any) -> None:
+    """Open the production Conversation session for the primary surface."""
+
+    if not app.session.ready or app.busy:
+        return
+    target_id = app._selected_talk_target()
+
+    def finish(result: dict[str, Any]) -> None:
+        scenario = result.get("scenario")
+        if isinstance(scenario, dict):
+            app.scenario = scenario
+            app._sync_workbench_from_scenario(scenario)
+        presentation = result.get("presentation") or {}
+        opening = presentation.get("opening") or {}
+        for message in opening.get("messages") or []:
+            if isinstance(message, dict) and message.get("speaker") == "npc":
+                app._append("NPC", npc_message_text(message))
+        turn = {
+            "type": "conversation_open",
+            "accepted": True,
+            "scenario": scenario,
+            "conversationPresentation": presentation,
+            "snapshot": result.get("snapshot"),
+        }
+        app._show_response(turn)
+        app._set_text(app.talk_output, "Conversation open\n\n" + pretty(result))
+        app._append("SYSTEM", f"Conversation opened: {target_id}")
+
+    app._start_operation(
+        lambda worker: worker.open_conversation(target_id), finish
     )
 
 

@@ -10,12 +10,21 @@ local InteractionPresentationRegistry = require
     "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
 local InteractionLifecycle = PNC.Semantics
     and PNC.Semantics.InteractionLifecycle or nil
+local RealizationAuthority = PNC.Semantics
+    and PNC.Semantics.RealizationAuthority or nil
 if type(InteractionLifecycle) ~= "table" then
     local ok, loaded = pcall(
         require,
         "PNC/Semantics/PNC_SemanticInteractionLifecycle"
     )
     InteractionLifecycle = ok and loaded or nil
+end
+if type(RealizationAuthority) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+    )
+    RealizationAuthority = ok and loaded or nil
 end
 
 local Presentation = PNC.CompanionCommandPresentation
@@ -25,6 +34,15 @@ local Identity = PNC.NPCIdentityPresentation
 local FlavorAddress = PNC.FlavorAddress
 local Registry = PNC.Registry
 local PlayerSpeech = PNC.PlayerSpeech
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if type(SocialReactions) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
 local Message = PsychopatzCore and PsychopatzCore.Conversation
     and PsychopatzCore.Conversation.Message or nil
 
@@ -74,7 +92,12 @@ end
 
 local function ensureAmbientInteraction(context, npcID, player)
     context = type(context) == "table" and context or {}
-    if context.interaction then return context.interaction end
+    if context.interaction then
+        if context.responsePlanID and context.realizationID then
+            return context.interaction
+        end
+        return nil
+    end
     local Envelope = InteractionLifecycle
         and InteractionLifecycle.Envelope or nil
     local state = PNC.Network and PNC.Network.ClientState or {}
@@ -86,7 +109,11 @@ local function ensureAmbientInteraction(context, npcID, player)
     local eventType = context.eventType or context.source or "social_flavor"
     if not Envelope or type(Envelope.NPCSpeech) ~= "function"
         or not npcID or not eventID or not playerUUID
+        or not context.responsePlanID or not context.realizationID
     then
+        -- A legacy/compatibility presentation may still carry a Flavor ID,
+        -- but it is not allowed to synthesize semantic provenance after the
+        -- renderer has selected its wording.
         return nil
     end
     context.interaction = Envelope.NPCSpeech({
@@ -274,6 +301,14 @@ local function publishNPCMessage(actor, text, context)
         payload = {
             text = text,
             flavorID = type(context) == "table" and context.flavorID or nil,
+            responsePlanID = type(context) == "table"
+                and context.responsePlanID or nil,
+            realizationFamily = type(context) == "table"
+                and context.realizationFamily or nil,
+            realizationID = type(context) == "table"
+                and context.realizationID or nil,
+            factRefs = type(context) == "table"
+                and context.factRefs or nil,
         },
         text = text,
         source = {
@@ -283,6 +318,17 @@ local function publishNPCMessage(actor, text, context)
             eventID = eventID,
             interaction = type(context) == "table"
                 and context.interaction or nil,
+            semanticAct = type(context) == "table"
+                and context.semanticAct or nil,
+            topic = type(context) == "table" and context.topic or nil,
+            responsePlanID = type(context) == "table"
+                and context.responsePlanID or nil,
+            realizationFamily = type(context) == "table"
+                and context.realizationFamily or nil,
+            realizationID = type(context) == "table"
+                and context.realizationID or nil,
+            factRefs = type(context) == "table"
+                and context.factRefs or nil,
         },
         presentationState = {
             conversationUI = false,
@@ -308,6 +354,7 @@ function Presentation.ShowAmbientNPCFlavor(actor, flavorID, context)
     local seed
     local text
     local published
+    local semantic
     local resolvedText = type(context) == "table"
         and context.resolvedText or nil
     if not flavorID then return false end
@@ -315,14 +362,43 @@ function Presentation.ShowAmbientNPCFlavor(actor, flavorID, context)
     if type(resolvedText) == "string" and resolvedText ~= "" then
         text = resolvedText
     else
-        flavorContext = Presentation.BuildFlavorContext(player, context)
-        seed = type(context) == "table" and context.seed or nil
-        -- The server event id is the stable flavor seed. Do not include the
-        -- local presentation counter or replays could choose another line.
-        seed = tostring(seed or "")
-        text = Flavor and Flavor.Resolve
-            and Flavor.Resolve(flavorID, "npc", seed, flavorContext)
-            or nil
+        if type(context) ~= "table" then context = {} end
+        semantic = context.realizationID and context.responsePlanID
+            and {
+                responsePlanID = context.responsePlanID,
+                realizationFamily = context.realizationFamily,
+                realizationID = context.realizationID,
+                fallback = context.resolvedText,
+                groundedFactRefs = context.factRefs,
+            }
+        if not semantic and SocialReactions
+            and type(SocialReactions.Resolve) == "function"
+        then
+            semantic = SocialReactions.Resolve({
+                eventType = context.eventType or flavorID,
+                eventID = context.eventID or context.eventRef or flavorID,
+                npcID = context.npcID,
+                context = context,
+                groundedFactRefs = context.factRefs,
+            })
+        end
+        if semantic then
+            context.responsePlanID = semantic.responsePlanID
+            context.realizationFamily = semantic.realizationFamily
+            context.realizationID = semantic.realizationID
+            context.factRefs = semantic.groundedFactRefs
+            text = semantic.fallback
+        else
+            -- Compatibility/content-only adapter. This branch must not create
+            -- semantic lifecycle provenance; migrated event producers always
+            -- provide the semantic result above.
+            flavorContext = Presentation.BuildFlavorContext(player, context)
+            seed = type(context) == "table" and context.seed or nil
+            seed = tostring(seed or "")
+            text = Flavor and Flavor.Resolve
+                and Flavor.Resolve(flavorID, "npc", seed, flavorContext)
+                or nil
+        end
     end
     if not text or text == "" then return false end
     if type(context) ~= "table" then context = {} end
@@ -408,18 +484,38 @@ function Presentation.SyncAcknowledgement(zombie, snapshot, modData)
         return false
     end
     if not isLocalOwner(snapshot, player) then return false end
-    local flavorContext = Presentation.BuildFlavorContext(player, {
+    local acknowledgementContext = {
         npcID = snapshot and snapshot.id,
         target = snapshot,
-    })
-    text = Flavor and Flavor.Resolve
-        and Flavor.Resolve(
-            feedback.id,
-            "npc",
-            tostring(snapshot.id or "") .. ":" .. tostring(revision),
-            flavorContext
+        eventType = "companion_command_acknowledgement",
+        commandID = feedback.id,
+        commandReason = feedback.reason,
+    }
+    local semantic = SocialReactions and SocialReactions.Resolve and
+        SocialReactions.Resolve({
+            eventType = "companion_command_acknowledgement",
+            eventID = tostring(snapshot.id or "") .. ":" .. tostring(revision),
+            npcID = snapshot and snapshot.id,
+            context = acknowledgementContext,
+        }) or nil
+    if semantic then
+        text = semantic.fallback
+    else
+        -- Compatibility/content-only fallback for partial compositions that
+        -- do not load the semantic reaction catalog.
+        local flavorContext = Presentation.BuildFlavorContext(
+            player,
+            acknowledgementContext
         )
-        or nil
+        text = Flavor and Flavor.Resolve
+            and Flavor.Resolve(
+                feedback.id,
+                "npc",
+                tostring(snapshot.id or "") .. ":" .. tostring(revision),
+                flavorContext
+            )
+            or nil
+    end
     return speak(zombie, text)
 end
 

@@ -11,6 +11,9 @@ def restore_ui_state(app: Any) -> None:
     def restore() -> None:
         try:
             saved_window_state = app._ui_state.get("window_state")
+            saved_geometry = app._ui_state.get("geometry")
+            if isinstance(saved_geometry, str) and saved_geometry:
+                app.root.geometry(saved_geometry)
             if saved_window_state in {"normal", "zoomed"}:
                 app.root.state(saved_window_state)
             main_index = int(app._ui_state.get("main_tab", 0))
@@ -66,19 +69,61 @@ def restore_panel_state(app: Any) -> None:
 def restore_splitters(app: Any) -> None:
     if app.closed or app.main_tabs.select() != str(app.simulation_tab):
         return
-    workflow_height = max(1, app.workflow_pane_split.winfo_height())
-    if workflow_height <= 10:
-        app._schedule_splitter_restore(100)
-        return
-    workflow_minimum = 340 if app.save_backed_mode else 240
+    # Ignore absolute sash values written by the pre-dock topology. They can
+    # otherwise shrink the conversation pane on the first launch after the
+    # layout migration; the corrected defaults are persisted on the next save.
+    sashes_compatible = app._ui_state.get("layout_state_version") == 2
+    if not app.trace_panel_visible:
+        workflow_width = max(1, app.workflow_pane_split.winfo_width())
+        if workflow_width <= 10:
+            app._schedule_splitter_restore(100)
+            return
+    else:
+        simulation_width = max(1, app.simulation_panes.winfo_width())
+        if simulation_width <= 10:
+            app._schedule_splitter_restore(100)
+            return
+        simulation_value = (
+            app._ui_state.get("simulation_sash") if sashes_compatible else None
+        )
+        if simulation_value is None:
+            simulation_value = min(
+                max(620, int(simulation_width * 0.60)),
+                max(420, simulation_width - 420),
+            )
+        else:
+            simulation_value = min(
+                max(620, int(simulation_value)),
+                max(620, simulation_width - 420),
+            )
+        try:
+            app.simulation_panes.sashpos(0, int(simulation_value))
+            # The outer sash changes the width available to the conversation
+            # split. Let Tk settle that geometry before restoring the inner
+            # conversation/context sash, otherwise the outer resize can
+            # proportionally overwrite the user's inner position.
+            app.root.update_idletasks()
+        except (app._tk.TclError, TypeError, ValueError):
+            pass
+
+        workflow_width = max(1, app.workflow_pane_split.winfo_width())
+        if workflow_width <= 10:
+            app._schedule_splitter_restore(100)
+            return
+    # Preserve user-saved sash values across the topology migration. The
+    # default proportion gives Conversation the large pane; a user may still
+    # intentionally choose a narrower context dock.
+    workflow_minimum = 280
     workflow_maximum = max(
         workflow_minimum,
-        workflow_height - (220 if app.save_backed_mode else 260),
+        workflow_width - (360 if app.save_backed_mode else 320),
     )
-    workflow_value = app._ui_state.get("workflow_sash")
+    workflow_value = (
+        app._ui_state.get("workflow_sash") if sashes_compatible else None
+    )
     if workflow_value is None:
         workflow_value = min(
-            max(workflow_minimum, int(workflow_height * 0.50)),
+            max(workflow_minimum, int(workflow_width * 0.68)),
             workflow_maximum,
         )
     else:
@@ -88,27 +133,6 @@ def restore_splitters(app: Any) -> None:
         )
     try:
         app.workflow_pane_split.sashpos(0, int(workflow_value))
-    except (app._tk.TclError, TypeError, ValueError):
-        pass
-    if not app.trace_panel_visible:
-        return
-    simulation_width = max(1, app.simulation_panes.winfo_width())
-    if simulation_width <= 10:
-        app._schedule_splitter_restore(100)
-        return
-    simulation_value = app._ui_state.get("simulation_sash")
-    if simulation_value is None:
-        simulation_value = min(
-            max(620, int(simulation_width * 0.60)),
-            max(420, simulation_width - 420),
-        )
-    else:
-        simulation_value = min(
-            max(620, int(simulation_value)),
-            max(620, simulation_width - 420),
-        )
-    try:
-        app.simulation_panes.sashpos(0, int(simulation_value))
     except (app._tk.TclError, TypeError, ValueError):
         pass
 
@@ -172,6 +196,13 @@ def reset_ui_state(app: Any) -> None:
             app._toggle_advanced_controls()
         if not app.workbench_expanded:
             app.toggle_simulation_workbench()
+        # Resetting the persisted state must also reset the live sashes before
+        # saving again. Otherwise save_ui_state immediately captures the
+        # user's broken splitter positions and makes Reset appear ineffective
+        # on the next startup.
+        app.root.update_idletasks()
+        app._restore_splitters()
+        app.root.update_idletasks()
         app.talk_utterance_var.set("hello")
         if "current" in app.talk_target_ids_by_label.values():
             app.talk_target_var.set(
@@ -198,16 +229,27 @@ def reset_ui_state(app: Any) -> None:
 def toggle_simulation_workbench(app: Any) -> None:
     app.workbench_expanded = not app.workbench_expanded
     if app.workbench_expanded:
+        panes = app.workflow_pane_split.panes()
+        if str(app.context_dock_pane) not in panes:
+            app.workflow_pane_split.add(app.context_dock_pane, weight=2)
         app.workbench_content.grid()
         app.workbench_toggle_button.configure(text="Hide controls")
     else:
+        if str(app.context_dock_pane) in app.workflow_pane_split.panes():
+            app.workflow_pane_split.forget(app.context_dock_pane)
         app.workbench_content.grid_remove()
         app.workbench_toggle_button.configure(text="Show controls")
+    app._schedule_splitter_restore(0)
 
 
 def toggle_trace_panel(app: Any) -> None:
     """Show diagnostics on demand so the normal conversation gets the width."""
 
+    # The outer topology changes when diagnostics is added/removed. Absolute
+    # sash positions captured in the other topology are not reusable and can
+    # collapse the conversation pane after a reset or restart.
+    app._ui_state.pop("simulation_sash", None)
+    app._ui_state.pop("workflow_sash", None)
     if app.trace_panel_visible:
         app.simulation_panes.forget(app.trace_pane)
         app.simulation_panes.pane(app.simulation_workflow_pane, weight=1)

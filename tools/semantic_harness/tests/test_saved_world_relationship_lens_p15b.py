@@ -130,6 +130,72 @@ class SavedWorldRelationshipLensP15BTests(unittest.TestCase):
                 except tk.TclError:
                     pass
 
+    def test_top_level_relationship_navigation_keeps_saved_overlays_reachable(self) -> None:
+        if not REAL_SAVE.is_file():
+            self.skipTest("real local save is unavailable")
+        root = tk.Tk()
+        with tempfile.TemporaryDirectory() as directory:
+            app = SemanticHarnessApp(
+                root,
+                _parser().parse_args(
+                    ["--ui-state", str(Path(directory) / "ui-state.json")]
+                ),
+            )
+            try:
+                self._wait_for_worker(root, app)
+                browser = SavedWorldBrowser(CORE_REPOSITORY).browse(REAL_SAVE)
+                app.saved_world_browser = browser
+                app.saved_world_player_labels = {
+                    str(row.get("label") or row.get("id")): row
+                    for row in browser["players"]
+                }
+                app.saved_world_player_var.set(browser["players"][0]["label"])
+                app._render_saved_world_tree()
+
+                expected = {
+                    "All relationship categories",
+                    "Player faction / companions",
+                    "Settlers / communities",
+                    "Hostile / looters",
+                    "Traders / providers",
+                    "Neutral / unaffiliated",
+                    "Other faction members",
+                    "Unknown / unsupported",
+                    "Saved affiliations / overlays",
+                }
+                self.assertTrue(
+                    expected.issubset(set(app.saved_world_relationship_nav_buttons))
+                )
+
+                app._select_saved_world_relationship_category("Hostile / looters")
+                self.assertEqual(
+                    app.saved_world_view_var.get(), "Relationship to Player"
+                )
+                self.assertEqual(
+                    {
+                        str(group.get("label"))
+                        for group in app.saved_world_tree_group_nodes.values()
+                    },
+                    {"Hostile / looters"},
+                )
+
+                app._select_saved_world_relationship_category(
+                    "Saved affiliations / overlays"
+                )
+                self.assertEqual(app.saved_world_view_var.get(), "Saved affiliations")
+                self.assertTrue(
+                    any(
+                        str(group.get("kind")) in {"faction", "community", "overlay", "provider_overlay"}
+                        for group in app.saved_world_tree_group_nodes.values()
+                    )
+                )
+            finally:
+                app.close()
+        try:
+            root.destroy()
+        except tk.TclError:
+            pass
+
 
 if __name__ == "__main__":
     unittest.main()

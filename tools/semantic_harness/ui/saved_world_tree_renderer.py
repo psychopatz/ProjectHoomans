@@ -17,6 +17,17 @@ def render_saved_world_tree(self) -> None:
         if relationship_view
         else hierarchy.get("groups") if isinstance(hierarchy, dict) else []
     )
+    relationship_category = str(
+        getattr(self, "saved_world_relationship_category_var", None).get()
+        if hasattr(self, "saved_world_relationship_category_var")
+        else "All relationship categories"
+    )
+    if relationship_view and relationship_category != "All relationship categories":
+        groups = [
+            group for group in groups
+            if isinstance(group, dict)
+            and str(group.get("label") or "") == relationship_category
+        ]
     query = self.saved_world_search_var.get().strip().casefold()
     if not isinstance(groups, list):
         groups = []

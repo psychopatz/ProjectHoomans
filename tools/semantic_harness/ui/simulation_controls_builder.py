@@ -23,7 +23,7 @@ def build_workbench_controls(
     workbench_header.columnconfigure(4, weight=1)
     ttk.Label(
         workbench_header,
-        text="Simulation workbench",
+        text="Context / tools",
         font=("TkDefaultFont", 10, "bold"),
     ).grid(row=0, column=0, sticky="w", padx=(2, 10))
     ttk.Label(workbench_header, text="NPC profile").grid(
@@ -61,13 +61,12 @@ def build_workbench_controls(
     app.workbench_footer = workbench_footer
     workbench_footer.grid(row=1, column=0, sticky="ew", pady=(3, 0))
     workbench_footer.columnconfigure(0, weight=1)
-    workbench_footer.columnconfigure(1, weight=1)
     ttk.Label(
         workbench_footer,
         textvariable=app.workbench_status_var,
         anchor="w",
         justify="left",
-        wraplength=620,
+        wraplength=320,
     ).grid(row=0, column=0, sticky="ew", pady=(0, 3))
     app.provenance_status_var = app._tk.StringVar(
         value="Source provenance: FIXTURE · isolated working world"
@@ -77,10 +76,10 @@ def build_workbench_controls(
         textvariable=app.provenance_status_var,
         anchor="w",
         justify="left",
-        wraplength=620,
-    ).grid(row=0, column=1, sticky="ew", padx=(12, 0), pady=(0, 3))
+        wraplength=320,
+    ).grid(row=1, column=0, sticky="ew", pady=(0, 3))
     workbench_actions = ttk.Frame(workbench_footer)
-    workbench_actions.grid(row=1, column=0, sticky="ew")
+    workbench_actions.grid(row=2, column=0, sticky="ew")
     app.workbench_apply_button = ttk.Button(
         workbench_actions,
         text="Apply",

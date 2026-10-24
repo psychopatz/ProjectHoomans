@@ -33,6 +33,15 @@ local H = PNC.SocialEventHooksInternal
 local Core = PNC.Core
 local Const = PNC.Const
 local Network = PNC.Network
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if not SocialReactions then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
 local HEAR_RADIUS = tonumber(Const and Const.ZOMBIE_TARGET_RADIUS) or 12
 -- A few voices, not a chorus.  Chosen by grief priority below.
 local MAX_MOURNERS = 3
@@ -47,7 +56,8 @@ local function flavorConstants()
 end
 
 local function flavorText()
-    return PNC.FlavorText
+    if not PNC.FlavorText then return nil end
+    return PNC.Semantics and PNC.Semantics.ContextProviders
 end
 
 local function factionCooldownMs()
@@ -308,6 +318,16 @@ function Hooks.OnLeaderLost(faction, deadPlayerKey, succession, successorNPCID)
         context.deadLeaderKey = deadPlayerKey
         local eventID = "leader_loss:" .. factionID .. ":"
             .. tostring(math.floor(at)) .. ":" .. npcID
+        local realization = SocialReactions
+            and type(SocialReactions.Resolve) == "function"
+            and SocialReactions.Resolve({
+                eventType = flavorID(),
+                act = "REACT",
+                topic = "leader_loss",
+                context = context,
+                eventID = eventID,
+                npcID = npcID,
+            }) or nil
         Core.ForEachPlayer(function(player)
             if not player or not playerCanHear(player, record, radiusSq) then
                 return
@@ -319,7 +339,19 @@ function Hooks.OnLeaderLost(faction, deadPlayerKey, succession, successorNPCID)
                 ambientFlavor = {
                     eventID = eventID,
                     flavorID = flavorID(),
+                text = realization and realization.fallback or nil,
                     eventType = flavorID(),
+                act = realization and realization.semanticAct or "REACT",
+                topic = realization and realization.topic or "leader_loss",
+                responsePlanID = realization
+                    and realization.responsePlanID or nil,
+                poolID = realization and realization.realizationFamily or nil,
+                realizationFamily = realization
+                    and realization.realizationFamily or nil,
+                realizationID = realization and realization.realizationID
+                    or nil,
+                factRefs = realization and realization.groundedFactRefs
+                    or nil,
                     family = familyID(),
                     priority = priorityValue(),
                     weight = weightValue(),

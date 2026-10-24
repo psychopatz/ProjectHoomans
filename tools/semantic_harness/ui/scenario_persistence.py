@@ -34,10 +34,7 @@ def reset(app: Any) -> None:
         app.suggestion_interactive = False
         app._refresh_workbench_feedback("Scenario reset; replay macro cleared.")
         app.compare_utterance_var.set("hello")
-        app._render_suggestions(
-            {"type": "turn", "accepted": True},
-            response.get("suggestions") or {},
-        )
+        app._render_suggestions(response, response.get("suggestions") or {})
         app._append("SYSTEM", "Scenario reset.")
 
     app._start_operation(lambda worker: worker.reset(), finish)
