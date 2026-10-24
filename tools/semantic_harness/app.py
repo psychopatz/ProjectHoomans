@@ -34,9 +34,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             request_timeout=arguments.timeout,
             json_output=arguments.doctor_json,
         )
-    if arguments.no_gui or any(
-        getattr(arguments, operation, None)
-        for operation in (*AUTHORING_OPERATIONS, *CLI_OPERATIONS)
+    if not arguments.gui and (
+        arguments.no_gui
+        or any(
+            getattr(arguments, operation, None)
+            for operation in (*AUTHORING_OPERATIONS, *CLI_OPERATIONS)
+        )
     ):
         return cli(arguments)
     return run_gui(arguments)

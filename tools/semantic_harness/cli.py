@@ -664,7 +664,18 @@ def _parser() -> argparse.ArgumentParser:
         default="cli",
         help="client label written to the shared activity timeline (default: cli)",
     )
-    parser.add_argument("--no-gui", "--cli", dest="no_gui", action="store_true", help="run inputs and print JSON")
+    parser.add_argument(
+        "--no-gui",
+        "--cli",
+        dest="no_gui",
+        action="store_true",
+        help="run inputs and print JSON",
+    )
+    parser.add_argument(
+        "--gui",
+        action="store_true",
+        help="force the Tk GUI, including when a saved pair is supplied",
+    )
     parser.add_argument("--interactive", action="store_true", help="read one conversation input per stdin line")
     parser.add_argument("--jsonl", action="store_true", help="emit compact one-record-per-line JSON")
     parser.add_argument("--audit", action="store_true", help="emit a bounded conflict audit after turns")

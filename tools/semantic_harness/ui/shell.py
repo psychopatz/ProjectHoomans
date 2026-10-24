@@ -461,7 +461,10 @@ class SemanticHarnessApp:
         simulation_toolbar.grid(row=0, column=0, sticky="ew", pady=(0, 6))
         simulation_toolbar.columnconfigure(0, weight=1)
         self.simulation_context_var = self._tk.StringVar(
-            value="Developer/Test source · select a saved target from World Browser"
+            value=(
+                "Source FIXTURE · no saved target loaded · "
+                "click Load saved NPC to run production rehydration"
+            )
         )
         self.simulation_context_label = ttk.Label(
             simulation_toolbar,
@@ -475,8 +478,8 @@ class SemanticHarnessApp:
         )
         ttk.Button(
             simulation_toolbar,
-            text="World Browser",
-            command=lambda: self.main_tabs.select(self.world_browser_tab),
+            text="Load saved NPC",
+            command=self._open_saved_world_browser,
         ).grid(row=0, column=1, sticky="e", padx=(0, 4))
         self.diagnostics_toggle_button = ttk.Button(
             simulation_toolbar,
@@ -718,7 +721,7 @@ class SemanticHarnessApp:
         ttk.Button(
             developer_test,
             text="Open World Browser",
-            command=lambda: self.main_tabs.select(self.world_browser_tab),
+            command=self._open_saved_world_browser,
         ).grid(row=1, column=2, sticky="w", padx=(12, 0), pady=(3, 0))
         self.language_var = self._tk.StringVar(
             value=self.scenario.get("runtime", {}).get("language", "EN")
@@ -1908,6 +1911,17 @@ class SemanticHarnessApp:
         self._clear_workbench_pending()
         self._workbench_initializing = False
         self._append("SYSTEM", "Lua worker ready. Production semantic modules are loaded.")
+        if not self.save_backed_mode and self._initial_saved_pair_requested():
+            self._append(
+                "SYSTEM",
+                "Explicit saved pair requested. Loading the read-only source save…",
+            )
+        elif not self.save_backed_mode:
+            self._append(
+                "SYSTEM",
+                "Fixture mode is active. Load a saved Player/NPC pair from "
+                "Load saved NPC to exercise production rehydration.",
+            )
         initial_suggestions = result.capabilities.get("suggestions") or {}
         if initial_suggestions:
             self._render_suggestions(
@@ -1934,6 +1948,8 @@ class SemanticHarnessApp:
         self.block_registry.set_catalog(flow_catalog)
         self._production_catalog = flow_catalog
         self.workflow_pane.set_production_catalog(flow_catalog)
+        if self._initial_saved_pair_requested():
+            self.root.after_idle(self._load_initial_saved_pair)
 
     def _set_talk_catalog(self) -> None:
         """Populate the Talk parity selector from the production catalog."""
@@ -1966,6 +1982,84 @@ class SemanticHarnessApp:
             labels[0],
         )
         self.talk_target_var.set(selected)
+
+    def _initial_saved_pair_requested(self) -> bool:
+        return bool(
+            getattr(self.arguments, "gui", False)
+            and self.arguments.save
+            and self.arguments.player
+            and self.arguments.npc
+        )
+
+    def _open_saved_world_browser(self) -> None:
+        """Open the saved-world surface and discover saves on first use."""
+
+        self.main_tabs.select(self.world_browser_tab)
+        if not self.worker_ready or self.busy or self.saved_world_entries:
+            return
+        self._discover_saved_worlds()
+
+    def _load_initial_saved_pair(self) -> None:
+        """Load an explicit GUI ``--save --player --npc`` pair."""
+
+        if not self._initial_saved_pair_requested() or not self.worker_ready:
+            return
+        save_path = Path(str(self.arguments.save)).expanduser().resolve()
+        if save_path.is_dir():
+            save_path = save_path / "global_mod_data.bin"
+        player_uuid = str(self.arguments.player)
+        npc_id = str(self.arguments.npc)
+        self.saved_world_target_var.set(
+            f"Loading saved Player {player_uuid} → NPC {npc_id}"
+        )
+
+        def finish(result: dict[str, Any]) -> None:
+            scenario = result.get("scenario") if isinstance(result, dict) else None
+            if isinstance(scenario, dict):
+                self.scenario = scenario
+                self._sync_workbench_from_scenario(scenario)
+            self._update_simulation_projection(result)
+            self._set_save_backed_mode(True)
+            player = self.scenario.get("player", {})
+            npc = self.scenario.get("npc", {})
+            player_label = (
+                str(
+                    player.get("displayName")
+                    or player.get("characterUUID")
+                    or player_uuid
+                )
+                if isinstance(player, dict)
+                else player_uuid
+            )
+            npc_label = (
+                str(npc.get("displayName") or npc.get("npcID") or npc_id)
+                if isinstance(npc, dict)
+                else npc_id
+            )
+            self.saved_world_target_var.set(
+                f"Loaded Player {player_label} → NPC {npc_label}"
+            )
+            source = (result.get("sourceSnapshot") or {}).get("metadata", {})
+            self.saved_world_status_var.set(
+                "Imported saved target: "
+                f"{player_label} → {npc_label} · "
+                f"source {source.get('sourceKind', 'SAVE')}"
+            )
+            self._set_text(self.trace, pretty(result))
+            self._append(
+                "SYSTEM",
+                f"Imported saved target {npc_label} from read-only source save.",
+            )
+            self.main_tabs.select(self.simulation_tab)
+
+        self._start_operation(
+            lambda worker: worker.import_saved_selection(
+                save_path,
+                player_uuid=player_uuid,
+                npc_id=npc_id,
+            ),
+            finish,
+        )
 
     def _discover_saved_worlds(self) -> None:
         """Discover validated offline saves without starting Project Zomboid."""

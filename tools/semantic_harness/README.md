@@ -117,6 +117,22 @@ The portable launcher creates and reuses `tools/semantic_harness/.venv`:
 tools/semantic_harness/run_harness.sh
 ```
 
+The normal blank GUI starts in explicit `FIXTURE` mode. To exercise a real
+saved Project Hoomans actor immediately, force the GUI and provide the saved
+pair:
+
+```bash
+tools/semantic_harness/run_harness.sh --gui --load-saved-pair \
+  --save /home/psychopatz/Zomboid/Saves/Apocalypse/<save>/global_mod_data.bin \
+  --player <player-uuid> --npc <npc-id>
+```
+
+The Simulation header must then show `Source SAVE` and the selected NPC. From
+the blank GUI, `Load saved NPC` opens the read-only World Browser and discovers
+compatible saves automatically. `Source FIXTURE` means that no saved actor is
+loaded yet; fixture relationship controls do not represent persisted NPC
+state.
+
 Run headlessly from any directory:
 
 ```bash
