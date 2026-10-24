@@ -145,6 +145,14 @@ function Handler.handle(context, command, payload)
             payload.npcID or d.targetID
         )
         return result(context, "project", value)
+    elseif command == "INTERACTION_RESPONSE_WINDOW" then
+        local d = defaults(context, payload)
+        local value = module.ResponseWindow(
+            store,
+            payload.playerUUID or d.playerUUID,
+            payload.npcID or d.targetID
+        )
+        return result(context, "response_window", value)
     elseif command == "INTERACTION_METRICS" then
         return result(context, "metrics", module.Metrics(store))
     elseif command == "INTERACTION_EXPORT" then

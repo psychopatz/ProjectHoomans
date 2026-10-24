@@ -338,6 +338,13 @@ class LuaSemanticWorker:
     def interaction_project(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
         return self._request("INTERACTION_PROJECT", payload or {})
 
+    def interaction_response_window(
+        self, payload: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
+        """Inspect the bounded production response window, not a transcript."""
+
+        return self._request("INTERACTION_RESPONSE_WINDOW", payload or {})
+
     def interaction_register_event(self, payload: dict[str, Any]) -> dict[str, Any]:
         """Register one canonical shared event in production Lua."""
 

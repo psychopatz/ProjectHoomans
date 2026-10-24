@@ -69,6 +69,11 @@ class SemanticInteractionLifecycleP1Tests(unittest.TestCase):
             thread = speech["result"]["thread"]
             self.assertEqual(thread["activeBeat"]["id"], "beat:water")
             self.assertNotIn("renderedText", thread)
+            window = worker.interaction_response_window()
+            self.assertEqual(
+                window["result"]["activeBeat"]["id"], "beat:water"
+            )
+            self.assertNotIn("rawText", str(window["result"]))
 
             closed = worker.interaction_close({"worldHour": 51.0})
             self.assertEqual(closed["result"]["reason"], "suspended")

@@ -770,6 +770,32 @@ function Lifecycle.Project(store, playerUUID, npcID)
     }
 end
 
+function Lifecycle.ResponseWindow(store, playerUUID, npcID)
+    local key = pairKey(playerUUID, npcID)
+    local thread = key and activeThread(store, key) or nil
+    if not thread then
+        return {
+            schema = Lifecycle.SCHEMA,
+            status = "EMPTY",
+            topic = nil,
+            activeBeat = nil,
+            openQuestions = {},
+            commitments = {},
+        }
+    end
+    return {
+        schema = Lifecycle.SCHEMA,
+        status = thread.status,
+        topic = thread.topic,
+        activeBeat = thread.activeBeat and boundedCopy(
+            thread.activeBeat, 0
+        ) or nil,
+        openQuestions = boundedCopy(thread.openQuestions or {}, 0),
+        commitments = boundedCopy(thread.openCommitments or {}, 0),
+        topicStack = boundedCopy(thread.topicStack or {}, 0),
+    }
+end
+
 function Lifecycle.Export(store)
     return {
         schema = Lifecycle.SCHEMA,

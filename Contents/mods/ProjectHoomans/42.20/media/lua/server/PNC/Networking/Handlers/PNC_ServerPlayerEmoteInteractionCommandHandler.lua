@@ -193,14 +193,36 @@ local function persistInteraction(entry, at)
     then
         return true
     end
+    local interaction = entry.interaction
+    local options = {
+        meaningful = true,
+        eventRef = entry.eventID,
+        memory = entry.memoryType,
+        worldHour = at,
+    }
+    local projection = type(InteractionPersistence.Project) == "function"
+        and InteractionPersistence.Project(
+            interaction.playerUUID,
+            entry.npcID
+        ) or nil
+    local beat = projection and projection.thread
+        and projection.thread.activeBeat or nil
+    if beat and type(beat.expectedReplies) == "table" then
+        for _, expected in ipairs(beat.expectedReplies) do
+            expected = string.upper(tostring(expected or ""))
+            if expected == string.upper(tostring(interaction.act or ""))
+                or expected == string.upper(
+                    tostring(interaction.gesture or "")
+                )
+            then
+                options.resolveBeat = true
+                break
+            end
+        end
+    end
     local persisted, reason = InteractionPersistence.Apply(
-        entry.interaction,
-        {
-            meaningful = true,
-            eventRef = entry.eventID,
-            memory = entry.memoryType,
-            worldHour = at,
-        }
+        interaction,
+        options
     )
     if not persisted and Core and type(Core.LogWarn) == "function" then
         Core.LogWarn(

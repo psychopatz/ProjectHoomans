@@ -116,6 +116,7 @@ local function sendRelationship(player, npcID, requestID, eventID,
             requestID = requestID,
             eventID = eventID,
             eventType = eventType,
+            interaction = detail and detail.interaction or nil,
             relationshipBefore = relationshipSummary(before, true, npcID),
             relationshipDelta = relationshipDelta(
                 before,

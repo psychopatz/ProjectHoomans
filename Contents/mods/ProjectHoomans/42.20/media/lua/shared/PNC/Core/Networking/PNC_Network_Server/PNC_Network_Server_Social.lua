@@ -4,6 +4,95 @@ local Network = PNC.Network
 local Core = PNC.Core
 local Const = PNC.Const
 local Presentation = PNC.RelationshipPresentation
+local InteractionLifecycle = PNC.Semantics
+    and PNC.Semantics.InteractionLifecycle or nil
+
+local function interactionFactRefs(context, ambient)
+    local refs = {}
+    local ambientContext = ambient and ambient.context or nil
+    local memoryID = context.memoryID or ambientContext
+        and ambientContext.memoryID
+    if memoryID then refs[#refs + 1] = memoryID end
+    local memoryType = context.memoryType or ambientContext
+        and ambientContext.memoryType
+    if memoryType then refs[#refs + 1] = memoryType end
+    return refs
+end
+
+local function ensureNPCSpeechInteraction(
+    targetPlayer, npcID, reason, context
+)
+    local ambient = context.ambientFlavor
+    local existing = context.interaction
+        or type(ambient) == "table" and ambient.interaction or nil
+    if existing then return existing end
+    if context.source == "proximity_greeting"
+        or reason == "proximity_greeting"
+    then
+        return nil
+    end
+    if not isServer or not isServer() then return nil end
+    if not PNC.Conversation
+        or not PNC.Conversation.InteractionLifecyclePersistence
+    then
+        pcall(require, "PNC/Conversation/PNC_InteractionLifecyclePersistence")
+    end
+    if not InteractionLifecycle then
+        pcall(require, "PNC/Semantics/PNC_SemanticInteractionLifecycle")
+        InteractionLifecycle = PNC.Semantics
+            and PNC.Semantics.InteractionLifecycle or nil
+    end
+    local persistence = PNC.Conversation
+        and PNC.Conversation.InteractionLifecyclePersistence or nil
+    local envelopeBuilder = InteractionLifecycle
+        and InteractionLifecycle.Envelope or nil
+    if not persistence or type(persistence.RecordNPCSpeech) ~= "function"
+        or type(envelopeBuilder) ~= "table"
+        or type(envelopeBuilder.NPCSpeech) ~= "function"
+        or not PNC.PlayerCharacters
+        or type(PNC.PlayerCharacters.GetEntityKey) ~= "function"
+    then
+        return nil
+    end
+    local playerKey = PNC.PlayerCharacters.GetEntityKey(targetPlayer, {
+        callback = "relationship_presentation_interaction",
+        worldAgeHours = context.worldAgeHours,
+    })
+    if not playerKey then return nil end
+    local eventID = context.eventID or context.eventRef
+    if not eventID then return nil end
+    local eventType = context.eventType or reason or "social_reaction"
+    local envelope = envelopeBuilder.NPCSpeech({
+        npcID = npcID,
+        targetID = playerKey,
+        playerUUID = playerKey,
+        act = context.act or "REACT",
+        topic = context.topic or eventType,
+        eventRef = eventID,
+        flowID = context.flowID or "social:" .. tostring(eventType),
+        poolID = ambient and ambient.flavorID,
+        factRefs = interactionFactRefs(context, ambient),
+        worldHour = context.worldAgeHours,
+    })
+    if not envelope then return nil end
+    local recorded = persistence.RecordNPCSpeech({
+        npcID = npcID,
+        targetID = playerKey,
+        playerUUID = playerKey,
+        act = context.act or "REACT",
+        topic = context.topic or eventType,
+        eventRef = eventID,
+        flowID = context.flowID or "social:" .. tostring(eventType),
+        poolID = ambient and ambient.flavorID,
+        factRefs = interactionFactRefs(context, ambient),
+        worldHour = context.worldAgeHours,
+        meaningful = true,
+    })
+    if not recorded then return nil end
+    context.interaction = envelope
+    if type(ambient) == "table" then ambient.interaction = envelope end
+    return envelope
+end
 
 function Network.SendPlayerEmoteInteractionResult(targetPlayer, result)
     local payload = type(result) == "table" and result or {}
@@ -60,6 +149,7 @@ function Network.SendConversationRelationshipForNPC(
     local buildReason
     local context = type(relationshipContext) == "table"
         and relationshipContext or {}
+    ensureNPCSpeechInteraction(targetPlayer, npcID, reason, context)
     if Presentation and Presentation.BuildForConversation then
         summary, buildReason = Presentation.BuildForConversation(
             targetPlayer,
