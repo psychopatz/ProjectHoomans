@@ -1511,7 +1511,10 @@ function CommandRouter.dispatch(context, request)
     elseif command == "INSPECT_ACTOR_STATE" then
         return actorStateProjection(context)
     elseif command == "SNAPSHOT" then
-        return context.ScenarioSession.snapshot(context)
+        return context.ScenarioSession.compactTransportResponse(
+            context,
+            context.ScenarioSession.snapshot(context)
+        )
     elseif command == "CONVERSATION_GRAPH" then
         return {
             ok = true,

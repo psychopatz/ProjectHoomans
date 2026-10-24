@@ -394,3 +394,48 @@ ownership boundary and must not reintroduce parallel Python Hoomans
 persistence or gameplay policy.
 
 Native Project Zomboid remains user-owned final acceptance.
+
+## Completed P15 — Semantic Lab authoritative interaction projection and saved-world lens
+
+Evidence recorded on 2026-10-24:
+
+- Mutating worker calls (`INPUT`, semantic suggestion clicks, and relationship
+  proposals) now merge the authoritative post-action production snapshot into
+  the bounded action response. GUI and CLI therefore render the same
+  production-owned relationship/inventory/context state while retaining the
+  existing transcript, tool, and action evidence.
+- The worker `SNAPSHOT` route now uses the established Lua compact transport
+  boundary. Large real-save inventory envelopes no longer exceed the JSON-line
+  message limit; Python preserves the already-imported immutable diagnostic
+  source/provider copy and working baseline when compact snapshots omit those
+  duplicated fields.
+- Real saved `npcJordanMcLane_0LBN` proves a typed insult updates production
+  approval, respect, and familiarity in the GUI sliders (`-3.62`, `-2.71`,
+  `1.0`), retains `TOOL/ACTION` evidence, resets to the imported baseline, and
+  leaves the source save SHA-256 unchanged.
+- The Saved World Browser defaults to a player-relative, mutually exclusive
+  lens with roots for Player faction/companions, settlers/communities,
+  hostile/looters, traders/providers, neutral/unaffiliated, other faction
+  members, and unknown/unsupported actors. `Saved affiliations` remains
+  available for persisted faction/community inspection.
+- Actor affiliation is now a dedicated tree column instead of a duplicate name
+  suffix. Color tags and textual badges are derived from bounded SAVE/provider
+  facts; the browser explicitly documents that this presentation lens does not
+  fabricate personal enemy relationships or replace production diplomacy.
+- UI state persists the saved-world view, search, selected save/player/NPC, open
+  roots, tabs, sashes, diagnostics/advanced visibility, geometry, and existing
+  conversation choices. Developer/Test fixture mode remains available.
+
+Focused evidence:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_real_save_production_runtime_p14f tools.semantic_harness.tests.test_save_backed_snapshot_p12a tools.semantic_harness.tests.test_production_rehydration_p14a tools.semantic_harness.tests.test_production_faction_rehydration_p14c
+xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_gui_saved_pair_entrypoint tools.semantic_harness.tests.test_saved_world_relationship_lens_p15b tools.semantic_harness.tests.test_faction_community_workbench_p13d tools.semantic_harness.tests.test_operational_acceptance_p13g tools.semantic_harness.tests.test_ui_organization tools.semantic_harness.tests.test_ui_state_persistence tools.semantic_harness.tests.test_inventory_gift_workbench_p13e
+python3 -m unittest tools.semantic_harness.tests.test_contextual_runtime_parity_p11c tools.semantic_harness.tests.test_contextual_runtime_parity_p11d tools.semantic_harness.tests.test_cli_parity_p13f tools.semantic_harness.tests.test_save_backed_conversation_p12j
+python3 /home/psychopatz/Desktop/Projects/Zomboid-devSkills/.agents/skills/pz-kahlua-lint/scripts/pz_kahlua_lint.py lint tools/semantic_harness/lua/worker/CommandRouter.lua --severity=ERROR --stats
+python3 /home/psychopatz/Desktop/Projects/Zomboid-devSkills/.agents/skills/pz-verify/scripts/pz_verify.py --file tools/semantic_harness/lua/worker/CommandRouter.lua --kahlua --severity ERROR --no-snippets
+git diff --check
+```
+
+All listed checks pass. P15 interaction projection and saved-world browser
+slice accepted. Next Chunk: none for this requested slice.

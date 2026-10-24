@@ -23,6 +23,15 @@ class SemanticLabUIOrganizationTests(unittest.TestCase):
     def _assert_save_backed_layout(self, geometry: str) -> None:
         root = tk.Tk()
         app = SemanticHarnessApp(root, _parser().parse_args([]))
+        # The product intentionally restores the user's diagnostics choice;
+        # make this compact-layout test deterministic instead of depending on
+        # the desktop's persisted preference.
+        app._ui_state["trace_panel_visible"] = False
+        app._ui_state["advanced_controls_visible"] = False
+        if app.trace_panel_visible:
+            app._toggle_trace_panel()
+        if app.advanced_controls_visible:
+            app._toggle_advanced_controls()
         root.geometry(geometry)
 
         def wait_until(predicate: object, timeout: float = 45.0) -> None:
@@ -42,6 +51,8 @@ class SemanticLabUIOrganizationTests(unittest.TestCase):
             app.saved_world_save_box.set(save_label)
             app.saved_world_save_box.event_generate("<<ComboboxSelected>>")
             wait_until(lambda: not app.busy and bool(app.saved_world_browser.get("saveName")))
+            app.saved_world_view_box.set("Saved affiliations")
+            app.saved_world_view_box.event_generate("<<ComboboxSelected>>")
             self.assertTrue(app.saved_world_player_box["values"])
             app.saved_world_player_box.set(app.saved_world_player_box["values"][0])
 

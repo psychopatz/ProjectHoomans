@@ -19,6 +19,7 @@ REAL_SAVE = Path(
 )
 PLAYER_UUID = "char_1791957489838_240087"
 NPC_ID = "npcBarneyYamamoto_2OXA"
+JORDAN_NPC_ID = "npcJordanMcLane_0LBN"
 
 
 @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
@@ -134,6 +135,85 @@ class GuiSavedPairEntrypointTests(unittest.TestCase):
             app.reset()
             wait_until(lambda: not app.busy and not app.runtime_relationship_override_projection)
             self.assertIn("source MISSING", app.relationship_context_summary.get("1.0", "end"))
+            self.assertIn(
+                "MISSING",
+                app.workbench_control_fields["relationship.approval"].slider_display.cget(
+                    "text"
+                ),
+            )
+            self.assertEqual(sha256(REAL_SAVE.read_bytes()).digest(), source_before)
+        finally:
+            try:
+                app.close()
+            except tk.TclError:
+                pass
+
+    def test_saved_production_action_refreshes_relationship_sliders(self) -> None:
+        """A production social action must repaint the authoritative values."""
+
+        if not REAL_SAVE.is_file():
+            self.skipTest("real local save is unavailable")
+        source_before = sha256(REAL_SAVE.read_bytes()).digest()
+        root = tk.Tk()
+        app = SemanticHarnessApp(
+            root,
+            _parser().parse_args(
+                [
+                    "--gui",
+                    "--load-saved-pair",
+                    "--save",
+                    str(REAL_SAVE),
+                    "--player",
+                    PLAYER_UUID,
+                    "--npc",
+                    JORDAN_NPC_ID,
+                ]
+            ),
+        )
+
+        def wait_until(predicate: object, timeout: float = 45.0) -> None:
+            deadline = time.monotonic() + timeout
+            while not predicate() and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertTrue(predicate(), "timed out waiting for saved GUI startup")
+
+        try:
+            wait_until(
+                lambda: not app.busy
+                and app.source_snapshot_projection.get("metadata", {}).get(
+                    "sourceKind"
+                )
+                == "SAVE"
+            )
+            app.input_var.set("fuck you")
+            app.submit()
+            wait_until(
+                lambda: not app.busy
+                and "player_dialogue_insult" in app.transcript.get("1.0", "end")
+            )
+
+            relationship = app.scenario["npc"]["relationship"]
+            self.assertAlmostEqual(relationship["approval"], -3.62, places=2)
+            self.assertAlmostEqual(relationship["respect"], -2.71, places=2)
+            self.assertAlmostEqual(relationship["familiarity"], 1.0, places=2)
+            for key, expected in (
+                ("approval", -3.62),
+                ("respect", -2.71),
+                ("familiarity", 1.0),
+            ):
+                field = app.workbench_control_fields[f"relationship.{key}"]
+                self.assertAlmostEqual(float(field.get_value()), expected, places=2)
+                self.assertNotIn("MISSING", field.slider_display.cget("text"))
+            self.assertIn("TOOL/ACTION:", app.transcript.get("1.0", "end"))
+            self.assertEqual(sha256(REAL_SAVE.read_bytes()).digest(), source_before)
+
+            app.reset()
+            wait_until(lambda: not app.busy and not app.runtime_relationship_override_projection)
+            self.assertEqual(
+                app.workbench_control_fields["relationship.approval"].get_value(),
+                0,
+            )
             self.assertIn(
                 "MISSING",
                 app.workbench_control_fields["relationship.approval"].slider_display.cget(

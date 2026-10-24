@@ -260,7 +260,7 @@ class LuaSemanticWorker:
             self.scenario = self.working_world.data
 
     def input(self, text: str) -> dict[str, Any]:
-        return self._request("INPUT", str(text))
+        return self._mutation_response(self._request("INPUT", str(text)))
 
     def preview(self, text: str) -> dict[str, Any]:
         """Preview a production semantic turn without recording or dispatching it."""
@@ -275,7 +275,9 @@ class LuaSemanticWorker:
     def suggestion_click(self, frame: dict[str, Any]) -> dict[str, Any]:
         """Submit one canonical suggestion frame through the production input path."""
 
-        return self._request("SUGGESTION_CLICK", {"frame": frame})
+        return self._mutation_response(
+            self._request("SUGGESTION_CLICK", {"frame": frame})
+        )
 
     def set_language(self, language: str) -> dict[str, Any]:
         """Change the production translation manager language in this session."""
@@ -302,6 +304,39 @@ class LuaSemanticWorker:
         self._sync_effective_scenario(response)
         return response
 
+    def _mutation_response(self, response: dict[str, Any]) -> dict[str, Any]:
+        """Attach the authoritative post-mutation worker projection.
+
+        Production conversation/action responses intentionally stay bounded and
+        focus on the turn, action, and tool evidence.  The full simulation
+        projection is owned by the worker snapshot, however, and is what the
+        Lab workbench and CLI must render after a mutating command.  Merge that
+        projection here so every caller observes the same production state
+        without teaching Python any Project Hoomans gameplay semantics.
+        """
+
+        snapshot = self.snapshot()
+        if not isinstance(response, dict):
+            return snapshot
+        merged = deepcopy(response)
+        for key in (
+            "scenario",
+            "context",
+            "sourceSnapshot",
+            "workingWorld",
+            "runtimeRelationshipOverrides",
+            "productionRehydration",
+            "productionFactionRehydration",
+            "productionPlayerRehydration",
+            "productionFactionContext",
+            "simulationProjection",
+            "provenance",
+        ):
+            if key in snapshot:
+                merged[key] = deepcopy(snapshot[key])
+        self._sync_effective_scenario(snapshot)
+        return merged
+
     def inspect_actor_state(self) -> dict[str, Any]:
         """Return bounded production actor state after an isolated mutation."""
 
@@ -311,7 +346,9 @@ class LuaSemanticWorker:
         """Submit the canonical proposal action to the server-authority seam."""
 
         payload = {"npcID": npc_id} if npc_id else None
-        return self._request("RELATIONSHIP_PROPOSAL", payload)
+        return self._mutation_response(
+            self._request("RELATIONSHIP_PROPOSAL", payload)
+        )
 
     def relationship_preview(
         self,

@@ -226,6 +226,10 @@ class OperationalAcceptanceP13GTests(unittest.TestCase):
                         and app.saved_world_browser.get("saveName")
                         == selected_entry["saveName"]
                     )
+                    app.saved_world_view_box.set("Saved affiliations")
+                    app.saved_world_view_box.event_generate(
+                        "<<ComboboxSelected>>"
+                    )
 
                     player_label = next(
                         label

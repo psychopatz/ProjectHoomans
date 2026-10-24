@@ -48,6 +48,8 @@ class FactionCommunityWorkbenchP13DTests(unittest.TestCase):
                 and app.saved_world_browser.get("saveName")
                 == selected_entry["saveName"]
             )
+            app.saved_world_view_box.set("Saved affiliations")
+            app.saved_world_view_box.event_generate("<<ComboboxSelected>>")
 
             group_rows = app.saved_world_tree_group_nodes
             kinds = {

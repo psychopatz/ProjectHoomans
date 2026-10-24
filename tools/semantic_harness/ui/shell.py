@@ -1049,7 +1049,15 @@ class SemanticHarnessApp:
 
         self.saved_world_save_var = self._tk.StringVar(value="")
         self.saved_world_player_var = self._tk.StringVar(value="")
-        self.saved_world_search_var = self._tk.StringVar(value="")
+        self.saved_world_search_var = self._tk.StringVar(
+            value=str(self._ui_state.get("saved_world_search") or "")
+        )
+        self.saved_world_view_var = self._tk.StringVar(
+            value=str(
+                self._ui_state.get("saved_world_view")
+                or "Relationship to Player"
+            )
+        )
         self.saved_world_category_var = self._tk.StringVar(value="")
         self.saved_world_npc_var = self._tk.StringVar(value="")
         self.saved_world_status_var = self._tk.StringVar(
@@ -1088,6 +1096,9 @@ class SemanticHarnessApp:
             width=28,
         )
         self.saved_world_player_box.grid(row=0, column=4, sticky="ew", padx=(0, 8))
+        self.saved_world_player_box.bind(
+            "<<ComboboxSelected>>", lambda _event: self._on_saved_world_player()
+        )
         self.saved_world_inspect_button = ttk.Button(
             header,
             text="Refresh world",
@@ -1099,8 +1110,24 @@ class SemanticHarnessApp:
             row=1, column=0, sticky="w", padx=(0, 6), pady=(8, 0)
         )
         search_entry = ttk.Entry(header, textvariable=self.saved_world_search_var)
-        search_entry.grid(row=1, column=1, columnspan=4, sticky="ew", pady=(8, 0))
+        search_entry.grid(row=1, column=1, sticky="ew", pady=(8, 0))
         search_entry.bind("<KeyRelease>", lambda _event: self._render_saved_world_tree())
+        ttk.Label(header, text="View").grid(
+            row=1, column=2, sticky="w", padx=(12, 6), pady=(8, 0)
+        )
+        self.saved_world_view_box = ttk.Combobox(
+            header,
+            textvariable=self.saved_world_view_var,
+            values=("Relationship to Player", "Saved affiliations"),
+            state="readonly",
+            width=28,
+        )
+        self.saved_world_view_box.grid(
+            row=1, column=3, columnspan=2, sticky="ew", pady=(8, 0)
+        )
+        self.saved_world_view_box.bind(
+            "<<ComboboxSelected>>", lambda _event: self._on_saved_world_view()
+        )
         self.saved_world_import_button = ttk.Button(
             header,
             text="Load selected NPC",
@@ -1127,16 +1154,28 @@ class SemanticHarnessApp:
         browser_frame.columnconfigure(2, weight=1, minsize=300)
         self.saved_world_tree = ttk.Treeview(
             browser_frame,
-            columns=("kind", "source"),
+            columns=("kind", "source", "group"),
             show="tree headings",
             selectmode="browse",
         )
         self.saved_world_tree.heading("#0", text="Saved actors")
-        self.saved_world_tree.heading("kind", text="Group")
+        self.saved_world_tree.heading("kind", text="Type")
         self.saved_world_tree.heading("source", text="Source")
+        self.saved_world_tree.heading("group", text="Affiliation / lens")
         self.saved_world_tree.column("#0", minwidth=260, width=520, stretch=True)
         self.saved_world_tree.column("kind", minwidth=110, width=150, stretch=False)
         self.saved_world_tree.column("source", minwidth=90, width=110, stretch=False)
+        self.saved_world_tree.column("group", minwidth=160, width=220, stretch=False)
+        for tag, foreground in {
+            "relationship_companion": "#18794e",
+            "relationship_hostile": "#b42318",
+            "relationship_trader": "#8a5a00",
+            "relationship_settler": "#2457a6",
+            "relationship_neutral": "#5b6470",
+            "relationship_other": "#6b3f8f",
+            "relationship_unknown": "#7a7a7a",
+        }.items():
+            self.saved_world_tree.tag_configure(tag, foreground=foreground)
         self.saved_world_tree.grid(row=0, column=0, sticky="nsew")
         tree_scroll = ttk.Scrollbar(
             browser_frame, orient="vertical", command=self.saved_world_tree.yview
@@ -1145,14 +1184,14 @@ class SemanticHarnessApp:
         self.saved_world_tree.configure(yscrollcommand=tree_scroll.set)
         group_frame = ttk.LabelFrame(
             browser_frame,
-            text="Faction / Community context · read-only",
+            text="World context · read-only",
             padding=6,
         )
         group_frame.grid(row=0, column=2, sticky="nsew", padx=(8, 0))
         group_frame.rowconfigure(2, weight=1)
         group_frame.columnconfigure(0, weight=1)
         self.saved_world_group_title_var = self._tk.StringVar(
-            value="Select a faction, community, or overlay"
+            value="Select a relationship category, faction, community, or overlay"
         )
         self.saved_world_group_source_var = self._tk.StringVar(value="Source: MISSING")
         ttk.Label(
@@ -1825,6 +1864,24 @@ class SemanticHarnessApp:
                 if hasattr(self, "saved_world_npc_var")
                 else ""
             )
+            state["saved_world_view"] = str(
+                self.saved_world_view_var.get()
+                if hasattr(self, "saved_world_view_var")
+                else "Relationship to Player"
+            )
+            state["saved_world_search"] = str(
+                self.saved_world_search_var.get()
+                if hasattr(self, "saved_world_search_var")
+                else ""
+            )
+            state["saved_world_open_groups"] = [
+                str(group.get("id") or "")
+                for item, group in self.saved_world_tree_group_nodes.items()
+                if hasattr(self, "saved_world_tree")
+                and self.saved_world_tree.item(item, "open")
+                and isinstance(group, dict)
+                and group.get("id")
+            ] if hasattr(self, "saved_world_tree") else []
             if self.trace_panel_visible and self.simulation_panes.winfo_width() > 10:
                 state["simulation_sash"] = self.simulation_panes.sashpos(0)
             if self.workflow_pane_split.winfo_height() > 10:
@@ -2181,6 +2238,181 @@ class SemanticHarnessApp:
         if self.saved_world_save_var.get():
             self._inspect_saved_world()
 
+    def _on_saved_world_player(self) -> None:
+        """Reclassify the read-only actor lens for the selected Player."""
+
+        if not self.saved_world_browser:
+            return
+        self.saved_world_selected_actor = {}
+        self.saved_world_selected_group = {}
+        self._render_saved_world_tree()
+        self._restore_saved_world_tree_selection()
+        self._save_ui_state()
+
+    def _on_saved_world_view(self) -> None:
+        """Switch between player-relative and persisted-affiliation views."""
+
+        if self.saved_world_view_var.get() not in {
+            "Relationship to Player",
+            "Saved affiliations",
+        }:
+            self.saved_world_view_var.set("Relationship to Player")
+        self._render_saved_world_tree()
+        self._restore_saved_world_tree_selection()
+        self._save_ui_state()
+
+    def _relationship_world_groups(self) -> list[dict[str, Any]]:
+        """Return mutually exclusive, player-relative browser categories.
+
+        This is a presentation lens over persisted provider projections. It
+        never writes relationship, faction, hostility, or diplomacy state.
+        """
+
+        browser = self.saved_world_browser
+        hierarchy = browser.get("worldHierarchy") or {}
+        raw_groups = hierarchy.get("groups") if isinstance(hierarchy, dict) else []
+        raw_groups = raw_groups if isinstance(raw_groups, list) else []
+        faction_groups = {
+            str(group.get("group", {}).get("id")): group
+            for group in raw_groups
+            if isinstance(group, dict)
+            and group.get("kind") == "faction"
+            and isinstance(group.get("group"), dict)
+            and group.get("group", {}).get("id")
+        }
+        player = getattr(self, "saved_world_player_labels", {}).get(
+            self.saved_world_player_var.get(), {}
+        )
+        player_key = str(player.get("entityKey") or "").strip()
+        player_faction_ids: set[str] = set()
+        for group in faction_groups.values():
+            persisted = group.get("group") or {}
+            if not player_key or not isinstance(persisted, dict):
+                continue
+            if str(persisted.get("ownerPlayerKey") or "") == player_key:
+                player_faction_ids.add(str(persisted.get("id")))
+                continue
+            player_member_keys = persisted.get("playerMemberKeys")
+            if isinstance(player_member_keys, dict) and player_member_keys.get(player_key):
+                player_faction_ids.add(str(persisted.get("id")))
+
+        all_actors = (browser.get("categories") or {}).get("All NPCs")
+        if not isinstance(all_actors, list):
+            all_actors = []
+            seen: set[str] = set()
+            for group in raw_groups:
+                members = group.get("members") or [] if isinstance(group, dict) else []
+                for actor in members:
+                    if not isinstance(actor, dict):
+                        continue
+                    actor_id = str(actor.get("id") or "")
+                    if actor_id and actor_id not in seen:
+                        seen.add(actor_id)
+                        all_actors.append(deepcopy(actor))
+
+        bucket_specs = [
+            ("player", "Player faction / companions", "relationship_companion"),
+            ("settlers", "Settlers / communities", "relationship_settler"),
+            ("hostile", "Hostile / looters", "relationship_hostile"),
+            ("traders", "Traders / providers", "relationship_trader"),
+            ("neutral", "Neutral / unaffiliated", "relationship_neutral"),
+            ("other", "Other faction members", "relationship_other"),
+            ("unknown", "Unknown / unsupported", "relationship_unknown"),
+        ]
+        buckets: dict[str, dict[str, Any]] = {
+            key: {
+                "id": f"relationship:{key}",
+                "kind": "relationship_category",
+                "label": label,
+                "source": "DERIVED",
+                "membershipSource": "DERIVED",
+                "relationshipTag": tag,
+                "group": {
+                    "lens": "Relationship to Player",
+                    "category": label,
+                    "playerKey": player_key or "MISSING",
+                    "classificationSource": "SAVE provider facts + derived presentation lens",
+                },
+                "memberIDs": [],
+                "members": [],
+            }
+            for key, label, tag in bucket_specs
+        }
+
+        for source_actor in all_actors:
+            if not isinstance(source_actor, dict):
+                continue
+            actor = deepcopy(source_actor)
+            actor_id = str(actor.get("id") or "").strip()
+            faction_id = str(actor.get("factionID") or "").strip()
+            community_id = str(actor.get("communityID") or "").strip()
+            faction_group = faction_groups.get(faction_id, {})
+            persisted_faction = faction_group.get("group") or {}
+            archetype = str(
+                persisted_faction.get("archetypeID")
+                or actor.get("archetypeID")
+                or ""
+            ).casefold()
+            hostile = actor.get("isHostile") is True or archetype in {
+                "looter", "raider", "hostile",
+            }
+            trader = actor.get("isTrader") is True or archetype in {
+                "trader", "provider",
+            }
+            companion = actor.get("isFollower") is True
+            player_faction_member = faction_id in player_faction_ids
+            if not actor_id or not actor.get("source"):
+                bucket_key, badge, reason = (
+                    "unknown", "unknown", "actor identity/source is incomplete"
+                )
+            elif hostile:
+                bucket_key, badge, reason = (
+                    "hostile", "hostile / looter", "SAVE hostility or faction archetype"
+                )
+            elif companion or player_faction_member:
+                bucket_key = "player"
+                badge = "companion" if companion else "player faction member"
+                reason = "SAVE follower flag or selected Player faction membership"
+            elif trader:
+                bucket_key, badge, reason = (
+                    "traders", "trader / provider", "SAVE provider or faction archetype"
+                )
+            elif community_id or archetype in {"settler", "refugee", "community"}:
+                bucket_key, badge, reason = (
+                    "settlers", "settler / community", "SAVE community or faction archetype"
+                )
+            elif faction_id:
+                bucket_key, badge, reason = (
+                    "other", "other faction member", "SAVE faction membership"
+                )
+            elif not faction_id and not community_id:
+                bucket_key, badge, reason = (
+                    "neutral", "neutral / unaffiliated", "SAVE has no faction or community"
+                )
+            else:
+                bucket_key, badge, reason = (
+                    "unknown", "unknown", "persisted affiliation is unsupported"
+                )
+
+            actor["relationshipCategory"] = buckets[bucket_key]["label"]
+            actor["relationshipBadge"] = badge
+            actor["relationshipReason"] = reason
+            actor["relationshipTag"] = buckets[bucket_key]["relationshipTag"]
+            actor["affiliationLabel"] = str(
+                actor.get("factionLabel")
+                or actor.get("communityLabel")
+                or "unaffiliated"
+            )
+            buckets[bucket_key]["members"].append(actor)
+            if actor_id:
+                buckets[bucket_key]["memberIDs"].append(actor_id)
+
+        return [
+            buckets[key]
+            for key, _label, _tag in bucket_specs
+            if buckets[key]["members"]
+        ]
+
     def _inspect_saved_world(self) -> None:
         entry = self._selected_saved_world_entry()
         if entry is None:
@@ -2219,7 +2451,19 @@ class SemanticHarnessApp:
                     player_labels[0],
                 )
                 self.saved_world_player_var.set(preferred_label)
-            self.saved_world_search_var.set("")
+            self.saved_world_search_var.set(
+                str(self._ui_state.get("saved_world_search") or "")
+            )
+            if self.saved_world_view_var.get() not in {
+                "Relationship to Player",
+                "Saved affiliations",
+            }:
+                self.saved_world_view_var.set(
+                    str(
+                        self._ui_state.get("saved_world_view")
+                        or "Relationship to Player"
+                    )
+                )
             self.saved_world_npc_var.set("")
             self.saved_world_selected_actor = {}
             self.saved_world_selected_group = {}
@@ -2251,10 +2495,20 @@ class SemanticHarnessApp:
         self.saved_world_tree_group_nodes = {}
         self.saved_world_tree_actor_groups = {}
         hierarchy = self.saved_world_browser.get("worldHierarchy") or {}
-        groups = hierarchy.get("groups") if isinstance(hierarchy, dict) else []
+        relationship_view = self.saved_world_view_var.get() == "Relationship to Player"
+        groups = (
+            self._relationship_world_groups()
+            if relationship_view
+            else hierarchy.get("groups") if isinstance(hierarchy, dict) else []
+        )
         query = self.saved_world_search_var.get().strip().casefold()
         if not isinstance(groups, list):
             groups = []
+        open_group_ids = {
+            str(value)
+            for value in (self._ui_state.get("saved_world_open_groups") or [])
+            if value
+        }
         for group_index, group in enumerate(groups):
             if not isinstance(group, dict):
                 continue
@@ -2267,6 +2521,8 @@ class SemanticHarnessApp:
                 if not query
                 or query in str(row.get("label") or "").casefold()
                 or query in str(row.get("id") or "").casefold()
+                or query in str(row.get("affiliationLabel") or "").casefold()
+                or query in str(row.get("relationshipBadge") or "").casefold()
             ]
             group_label = str(group.get("label") or group.get("id") or "World")
             if query and query not in group_label.casefold() and not matching_members:
@@ -2274,41 +2530,64 @@ class SemanticHarnessApp:
             group_iid = f"world-group-{group_index}"
             kind = str(group.get("kind") or "group")
             source = str(group.get("membershipSource") or group.get("source") or "MISSING")
+            group_tag = str(group.get("relationshipTag") or "")
+            group_tags = (group_tag,) if group_tag else ()
             self.saved_world_tree.insert(
                 "",
                 "end",
                 iid=group_iid,
                 text=f"{group_label} ({len(matching_members) if query else len(members)})",
-                values=(kind, source),
-                open=False,
+                values=(
+                    kind,
+                    source,
+                    "player-relative" if relationship_view else "",
+                ),
+                open=str(group.get("id") or "") in open_group_ids,
+                tags=group_tags,
             )
             self.saved_world_tree_group_nodes[group_iid] = group
             for member_index, member in enumerate(matching_members):
                 actor_iid = f"{group_iid}-actor-{member_index}"
                 flags: list[str] = []
-                if member.get("isFollower") is True:
-                    flags.append("follower")
-                if member.get("isHostile") is True:
-                    flags.append("hostile")
-                if member.get("isTrader") is True:
-                    flags.append("trader")
+                badge = str(member.get("relationshipBadge") or "").strip()
+                if badge:
+                    flags.append(badge)
+                else:
+                    if member.get("isFollower") is True:
+                        flags.append("follower")
+                    if member.get("isHostile") is True:
+                        flags.append("hostile")
+                    if member.get("isTrader") is True:
+                        flags.append("trader")
                 label = str(member.get("label") or member.get("id") or "NPC")
                 group_affiliation = str(
-                    member.get("factionLabel")
+                    member.get("affiliationLabel")
+                    or member.get("factionLabel")
                     or member.get("communityLabel")
-                    or ""
+                    or "unaffiliated"
                 ).strip()
-                if group_affiliation:
-                    label = f"{label}: {group_affiliation}"
                 if flags:
                     label = f"{label} · {', '.join(flags)}"
+                tag = str(member.get("relationshipTag") or "")
+                if not tag:
+                    if member.get("isHostile") is True:
+                        tag = "relationship_hostile"
+                    elif member.get("isTrader") is True:
+                        tag = "relationship_trader"
+                    elif member.get("isFollower") is True:
+                        tag = "relationship_companion"
                 self.saved_world_tree.insert(
                     group_iid,
                     "end",
                     iid=actor_iid,
                     text=label,
-                    values=("NPC", str(member.get("source") or "MISSING")),
+                    values=(
+                        "NPC",
+                        str(member.get("source") or "MISSING"),
+                        group_affiliation,
+                    ),
                     open=False,
+                    tags=(tag,) if tag else (),
                 )
                 self.saved_world_tree_actor_rows[actor_iid] = member
                 self.saved_world_tree_actor_groups[actor_iid] = group_iid
@@ -2357,6 +2636,32 @@ class SemanticHarnessApp:
         self.saved_world_group_source_var.set(
             f"Source: {source} · membership: {membership_source}"
         )
+        if kind == "relationship_category":
+            lens = persisted.get("lens") or "Relationship to Player"
+            classification_source = persisted.get("classificationSource") or "MISSING"
+            player_label = (
+                getattr(self, "saved_world_player_var", None).get()
+                if getattr(self, "saved_world_player_var", None) is not None
+                else "MISSING"
+            )
+            lines = [
+                f"Lens: {lens}",
+                f"Player: {player_label or 'MISSING'}",
+                f"Classification: {persisted.get('category') or label}",
+                f"Facts: {classification_source}",
+                f"members: {len(group.get('members') or [])}",
+                "",
+                "Members",
+            ]
+            for member in (group.get("members") or [])[:48]:
+                if not isinstance(member, dict):
+                    continue
+                member_line = str(member.get("label") or member.get("id") or "NPC")
+                member_line += f" · {member.get('relationshipBadge') or 'unknown'}"
+                member_line += f" · {member.get('affiliationLabel') or 'unaffiliated'}"
+                lines.append(f"  • {member_line}")
+            self._set_text(self.saved_world_group_inspector, "\n".join(lines))
+            return
         lines = [
             f"ID: {persisted.get('id') or group.get('id') or 'MISSING'}",
             f"status: {persisted.get('status') or 'MISSING'}",
@@ -3553,6 +3858,23 @@ class SemanticHarnessApp:
         membership_source = str(
             group.get("membershipSource") or "MISSING"
         ).upper()
+        if str(group.get("kind") or "") == "relationship_category":
+            self._set_text(
+                self.faction_context_summary,
+                "\n".join(
+                    [
+                        f"Player-relative category: {label}",
+                        f"Source: {source} · membership: {membership_source}",
+                        "This lens is a derived presentation grouping over SAVE "
+                        "provider facts.",
+                        "",
+                        "It does not assert a personal enemy relationship or "
+                        "replace production faction diplomacy.",
+                        f"Members: {len(group.get('members') or [])}",
+                    ]
+                ),
+            )
+            return
         member_rows = [
             row for row in (group.get("members") or []) if isinstance(row, dict)
         ]
@@ -3983,9 +4305,25 @@ class SemanticHarnessApp:
         source = response.get("sourceSnapshot")
         working = response.get("workingWorld")
         if isinstance(source, dict):
-            self.source_snapshot_projection = deepcopy(source)
+            previous_source = self.source_snapshot_projection
+            merged_source = deepcopy(previous_source)
+            merged_source.update(deepcopy(source))
+            # Compact worker snapshots deliberately omit the duplicated raw
+            # save/provider payloads. Keep the already-imported diagnostic
+            # copy available to the UI when a later mutation is rendered.
+            for key in ("data", "providerPayloads"):
+                if key not in source and key in previous_source:
+                    merged_source[key] = deepcopy(previous_source[key])
+            self.source_snapshot_projection = merged_source
         if isinstance(working, dict):
-            self.working_world_projection = deepcopy(working)
+            previous_working = self.working_world_projection
+            merged_working = deepcopy(previous_working)
+            merged_working.update(deepcopy(working))
+            # The working-world baseline is immutable for this import and is
+            # intentionally omitted by the compact transport boundary.
+            if "baseline" not in working and "baseline" in previous_working:
+                merged_working["baseline"] = deepcopy(previous_working["baseline"])
+            self.working_world_projection = merged_working
         source = self.source_snapshot_projection
         working = self.working_world_projection
         if not isinstance(source, dict) or not isinstance(working, dict):
@@ -4128,7 +4466,22 @@ class SemanticHarnessApp:
                 self.scenario.setdefault("npc", {}).setdefault("relationship", {})[
                     "bond"
                 ] = deepcopy(bond)
+            relationship_projection = projection.get("relationship")
+            relationship_projection = (
+                relationship_projection
+                if isinstance(relationship_projection, dict)
+                else {}
+            )
+            relationship_record = relationship_projection.get("record")
+            relationship_record = (
+                relationship_record
+                if isinstance(relationship_record, dict)
+                else relationship_projection
+            )
             for control_id in (
+                "relationship.approval",
+                "relationship.respect",
+                "relationship.familiarity",
                 "relationship.state",
                 "relationship.bond",
                 "relationship.friendBondProgress",
@@ -4143,7 +4496,18 @@ class SemanticHarnessApp:
                     None,
                 )
                 if field is not None and control is not None:
-                    field.set_value(self._scenario_control_value(control, self.scenario))
+                    if control_id.startswith("relationship.") and control_id.split(".")[-1] in {
+                        "approval",
+                        "respect",
+                        "familiarity",
+                    }:
+                        relationship_key = control_id.split(".")[-1]
+                        if relationship_key in relationship_record:
+                            field.set_value(relationship_record[relationship_key])
+                            continue
+                    field.set_value(
+                        self._scenario_control_value(control, self.scenario)
+                    )
             self._set_relationship_preview_from_projection()
             self._update_generated_personality_controls()
         self._refresh_social_context_summary()
