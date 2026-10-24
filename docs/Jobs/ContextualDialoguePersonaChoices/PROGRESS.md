@@ -245,22 +245,51 @@ Focused evidence:
 python3 -m unittest tools.semantic_harness.tests.test_missing_state_audit_p14e tools.semantic_harness.tests.test_production_rehydration_p14a tools.semantic_harness.tests.test_production_inventory_rehydration_p14b tools.semantic_harness.tests.test_production_faction_rehydration_p14c tools.semantic_harness.tests.test_production_social_context_p14d tools.semantic_harness.tests.test_save_import_p12c tools.semantic_harness.tests.test_player_engine_state_p13b tools.semantic_harness.tests.test_cli_parity_p13f
 ```
 
-All listed checks pass. P14E is accepted; continue with P14F.
+All listed checks pass. P14E is accepted.
 
-## Current Exact Next Chunk — P14F
+## Completed P14F — real-save production-runtime regression
 
-On the existing local `main`:
+Evidence recorded on 2026-10-24:
 
-1. exercise real saved companion/follower, neutral NPC, hostile raider, and
-   trader/provider actors through production rehydration;
-2. cover persisted and absent personal relationships, BASELINE_DELTA inventory,
-   faction relation present/absent, Talk, semantic hello, inventory, gift where
-   supported, relationship/faction context, mutation, and reset;
-3. prove GUI result equals CLI result, source save bytes remain unchanged, and
-   working-world reset restores the imported production baseline;
-4. run focused Python, Lua, Tk/Xvfb, CLI, Kahlua, and diff checks, then update
-   this ledger and close P14 only when the real-save production-runtime path is
-   evidenced.
+- The real save
+  `Saves/Apocalypse/2026-10-14_13-57-03/global_mod_data.bin` was exercised
+  through the normal importer, Lua worker, production rehydration, Talk,
+  semantic hello, inspection, mutation, and reset path without a native
+  Project Zomboid process.
+- The actor matrix covered `npcKentLangley_OWOJ` as a saved
+  companion/follower with a persisted personal friendship and gift transfer,
+  `npcAdrianMedina_8J7W` as a neutral actor with absent personal and directed
+  faction standing, `npcBarneyYamamoto_2OXA` as a hostile raider with absent
+  personal relationship, and `npcBrendonOakes_2ZOW` as a trader/provider.
+  It also selected `npcNicolasHarris_5V0Z` from the saved directed faction
+  relation and verified the production faction relation path.
+- Every selected NPC used a saved `BASELINE_DELTA` inventory envelope and
+  hydrated production inventory items through
+  `PNC.Persistence.DeserializeRecord -> PNC.Inventory.EnsureRecordInventory`.
+- Production social context remained layered: personal relationship,
+  production faction relationship, tactical hostility, conversation audience,
+  durable bond, and speech style were inspected independently. Hostile Talk
+  and semantic hello consumed the same production audience context without
+  fabricating a personal enemy relationship.
+- The GUI inspector, CLI `--inspect-social-context`, and worker context agree
+  for the real hostile actor. Reset restored the imported bounded NPC/player
+  baseline after Talk, semantic input, and gifting. The source snapshot and
+  source-save SHA-256 remained unchanged for each exercised actor.
+- Developer/Test fixture mode remains available and explicitly labeled
+  `FIXTURE`; it is not used as real-save evidence.
+
+Focused evidence:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_real_save_production_runtime_p14f
+xvfb-run -a python3 -m unittest tools.semantic_harness.tests.test_actor_inspectors_p13c tools.semantic_harness.tests.test_inventory_gift_workbench_p13e tools.semantic_harness.tests.test_operational_acceptance_p13g tools.semantic_harness.tests.test_contextual_talk_parity_p11j
+python3 -m py_compile tools/semantic_harness/runtime/save_import.py tools/semantic_harness/runtime/player_engine_state.py tools/semantic_harness/tests/test_missing_state_audit_p14e.py tools/semantic_harness/tests/test_real_save_production_runtime_p14f.py
+luac5.3 -p tools/semantic_harness/lua/worker/Conversation.lua
+python3 /home/psychopatz/Desktop/Projects/Zomboid-devSkills/.agents/skills/pz-verify/scripts/pz_verify.py --file tools/semantic_harness/lua/worker/Conversation.lua --kahlua --severity ERROR --no-snippets
+git diff --check
+```
+
+All listed checks pass. P14F is accepted; P14 is complete.
 
 ## P14A acceptance
 
@@ -280,13 +309,22 @@ production conversation/semantic systems
 
 A Python-generated runtime approximation is not acceptance.
 
-## Ordered remaining P14 milestones
+## P14 completion
 
-- **P14B:** production NPC inventory rehydration, including BASELINE_DELTA;
-- **P14C:** production faction/diplomacy rehydration;
-- **P14D:** canonical social context + hostile speech parity;
-- **P14E:** MISSING-state audit/provider cleanup;
-- **P14F:** real-save production-runtime regression.
+P14A through P14F are complete on the existing local `main`. The normal
+Semantic Lab path is now:
+
+```text
+real saved Project Hoomans state
+        ↓
+production Lua deserialize / migrate / normalize / hydrate
+        ↓
+isolated production registries and working world
+        ↓
+production Project Hoomans services
+        ↓
+conversation / semantics / gameplay mutations
+```
 
 See `PRODUCTION_REHYDRATION_AND_MOD_CODE_PARITY.md`.
 
@@ -305,6 +343,8 @@ P14 only ensures the harness architecture will later allow such engine/world dat
 
 ## Handoff rule
 
-Do not report the Semantic Lab parity goal complete until P14F proves that real saved Hoomans state is interpreted by production Lua rather than parallel Python policy.
+P14 acceptance is complete. Future work must preserve the production Lua
+ownership boundary and must not reintroduce parallel Python Hoomans
+persistence or gameplay policy.
 
 Native Project Zomboid remains user-owned final acceptance.
