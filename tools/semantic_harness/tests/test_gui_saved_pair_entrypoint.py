@@ -148,6 +148,81 @@ class GuiSavedPairEntrypointTests(unittest.TestCase):
             except tk.TclError:
                 pass
 
+    def test_saved_production_dossier_and_interactions_are_visible_on_demand(self) -> None:
+        if not REAL_SAVE.is_file():
+            self.skipTest("real local save is unavailable")
+        source_before = sha256(REAL_SAVE.read_bytes()).digest()
+        root = tk.Tk()
+        app = SemanticHarnessApp(
+            root,
+            _parser().parse_args(
+                [
+                    "--gui",
+                    "--load-saved-pair",
+                    "--save",
+                    str(REAL_SAVE),
+                    "--player",
+                    PLAYER_UUID,
+                    "--npc",
+                    "npcKentLangley_OWOJ",
+                ]
+            ),
+        )
+
+        def wait_until(predicate: object, timeout: float = 45.0) -> None:
+            deadline = time.monotonic() + timeout
+            while not predicate() and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertTrue(predicate(), "timed out waiting for saved GUI startup")
+
+        try:
+            wait_until(
+                lambda: not app.busy
+                and app.source_snapshot_projection.get("metadata", {}).get(
+                    "sourceKind"
+                )
+                == "SAVE"
+            )
+            notebook = app.workbench_panel_notebooks["NPC Target"]
+            dossier_tab = next(
+                tab for tab in notebook.tabs()
+                if notebook.tab(tab, "text") == "Dossier"
+            )
+            notebook.select(dossier_tab)
+            wait_until(
+                lambda: not app.busy
+                and app.npc_dossier_projection.get("status") == "HYDRATED"
+            )
+            dossier_text = app.npc_dossier_summary.get("1.0", "end")
+            self.assertIn("Knowledge revision", dossier_text)
+            self.assertIn("Known information", dossier_text)
+
+            interactions_tab = next(
+                tab for tab in notebook.tabs()
+                if notebook.tab(tab, "text") == "Interactions"
+            )
+            notebook.select(interactions_tab)
+            wait_until(
+                lambda: not app.busy
+                and app.relationship_history_projection.get("status") == "HYDRATED"
+            )
+            self.assertIn("Recorded interactions", app.npc_interaction_summary.get("1.0", "end"))
+
+            app.input_var.set("fuck you")
+            app.submit()
+            wait_until(
+                lambda: not app.busy
+                and "player_dialogue_insult" in app.npc_interaction_summary.get("1.0", "end")
+            )
+            self.assertIn("applied=", app.npc_interaction_summary.get("1.0", "end"))
+            self.assertEqual(sha256(REAL_SAVE.read_bytes()).digest(), source_before)
+        finally:
+            try:
+                app.close()
+            except tk.TclError:
+                pass
+
     def test_saved_production_action_refreshes_relationship_sliders(self) -> None:
         """A production social action must repaint the authoritative values."""
 

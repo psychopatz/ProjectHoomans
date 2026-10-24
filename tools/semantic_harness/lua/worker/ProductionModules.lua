@@ -421,12 +421,20 @@ load(
         "PNC/Core/Relationships/PNC_RelationshipGraph.lua",
         "recruitment_authority"
     )
-    load(
-        "ProjectHoomans", "shared",
-        "PNC/Core/Relationships/PNC_RelationshipPresentation.lua",
-        "social_authority"
-    )
-    load(
+load(
+    "ProjectHoomans", "shared",
+    "PNC/Core/Relationships/PNC_RelationshipPresentation.lua",
+    "social_authority"
+)
+-- Reuse the production relationship-debug snapshot owner for the headless
+-- inspector. It projects persisted memories, saturation, cooldowns, and the
+-- directed relationship state without creating a harness social model.
+load(
+    "ProjectHoomans", "server",
+    "PNC/Social/PNC_RelationshipDebug.lua",
+    "diagnostics"
+)
+load(
         "ProjectHoomans", "shared",
         "PNC/Core/Factions/PNC_FactionConstants.lua",
         "recruitment_authority"

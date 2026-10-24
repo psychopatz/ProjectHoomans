@@ -152,7 +152,15 @@ class LuaSemanticWorker:
             # Python projection. Install them through a bounded side request
             # so the selected NPC record and registry do not exceed the
             # worker's JSON-lines message limit together.
-            self._request("INSTALL_PRODUCTION_REGISTRIES", raw_registries)
+            raw_registries = deepcopy(raw_registries)
+            raw_knowledge = raw_registries.pop("npcKnowledge", None)
+            if raw_registries:
+                self._request("INSTALL_PRODUCTION_REGISTRIES", raw_registries)
+            if isinstance(raw_knowledge, dict):
+                # Knowledge is a separate persisted registry and can be much
+                # larger than the faction/community transport. Keep the raw
+                # record intact while giving it its own bounded request.
+                self._request("INSTALL_PRODUCTION_KNOWLEDGE", raw_knowledge)
             project_hoomans.pop("rawRegistries", None)
         project_zomboid = wire_provider_payloads.get("ProjectZomboid")
         item_type_fixture = (
@@ -328,6 +336,7 @@ class LuaSemanticWorker:
             "productionRehydration",
             "productionFactionRehydration",
             "productionPlayerRehydration",
+            "productionKnowledgeRehydration",
             "productionFactionContext",
             "simulationProjection",
             "provenance",
@@ -341,6 +350,11 @@ class LuaSemanticWorker:
         """Return bounded production actor state after an isolated mutation."""
 
         return self._request("INSPECT_ACTOR_STATE")
+
+    def inspect_npc_dossier(self) -> dict[str, Any]:
+        """Return the production player-scoped NPC dossier and social history."""
+
+        return self._request("INSPECT_NPC_DOSSIER")
 
     def relationship_proposal(self, npc_id: str | None = None) -> dict[str, Any]:
         """Submit the canonical proposal action to the server-authority seam."""

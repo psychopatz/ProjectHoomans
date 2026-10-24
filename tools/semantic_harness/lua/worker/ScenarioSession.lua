@@ -306,6 +306,7 @@ function ScenarioSession.configureRuntime(context)
     end
     SemanticAdapters.configure(context)
     InventoryFixtures.configure(context)
+    ProductionRehydration.refreshDiagnostics(context)
 end
 
 function ScenarioSession.importSource(
@@ -344,7 +345,18 @@ function ScenarioSession.importSource(
         )
         Runtime.sourceProviderPayloads.ProjectHoomans = providerHoomans
     end
+    if type(Runtime.pendingProductionKnowledgeRegistry) == "table" then
+        providerHoomans = type(providerHoomans) == "table"
+            and providerHoomans or {}
+        providerHoomans.rawRegistries = type(providerHoomans.rawRegistries)
+            == "table" and providerHoomans.rawRegistries or {}
+        providerHoomans.rawRegistries.npcKnowledge = Values.productionCopy(
+            Runtime.pendingProductionKnowledgeRegistry
+        )
+        Runtime.sourceProviderPayloads.ProjectHoomans = providerHoomans
+    end
     Runtime.pendingProductionRawRegistries = nil
+    Runtime.pendingProductionKnowledgeRegistry = nil
     Runtime.productionRawRegistries = type(providerHoomans) == "table"
         and Values.productionCopy(providerHoomans.rawRegistries) or nil
     Runtime.sourceWorkingBaseline = nil
@@ -460,6 +472,9 @@ function ScenarioSession.reset(context, scenario)
         productionPlayerRehydration = Values.copy(
             Runtime.productionPlayerRehydration
         ),
+        productionKnowledgeRehydration = Values.copy(
+            Runtime.productionKnowledgeRehydration
+        ),
         runtimeRelationshipOverrides = Values.copy(
             Runtime.runtimeRelationshipOverrides
         ),
@@ -543,6 +558,7 @@ function ScenarioSession.snapshot(context)
     local Runtime = context.Runtime
     local Values = context.Values
     ProductionRehydration.refreshProjection(context)
+    ProductionRehydration.refreshDiagnostics(context)
     return {
         ok = true,
         type = "snapshot",
@@ -554,6 +570,9 @@ function ScenarioSession.snapshot(context)
         ),
         productionPlayerRehydration = Values.copy(
             Runtime.productionPlayerRehydration
+        ),
+        productionKnowledgeRehydration = Values.copy(
+            Runtime.productionKnowledgeRehydration
         ),
         runtimeRelationshipOverrides = Values.copy(
             Runtime.runtimeRelationshipOverrides

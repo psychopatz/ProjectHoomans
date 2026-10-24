@@ -19,10 +19,11 @@ local function hasEntries(value)
 end
 
 local capabilities = {
-    "CONFIG", "IMPORT_SOURCE", "INSTALL_PRODUCTION_REGISTRIES", "RESET", "RESET_TURN", "RESET_CONVERSATION",
+    "CONFIG", "IMPORT_SOURCE", "INSTALL_PRODUCTION_REGISTRIES",
+    "INSTALL_PRODUCTION_KNOWLEDGE", "RESET", "RESET_TURN", "RESET_CONVERSATION",
     "RESET_ACTOR_MUTATIONS", "RESET_WORLD", "INPUT", "LANGUAGE", "TOOL_REPLY",
     "PREVIEW", "SNAPSHOT", "CONVERSATION_GRAPH", "FLOW_CATALOG", "FLOW_VALIDATE",
-    "INSPECT_ACTOR_STATE",
+    "INSPECT_ACTOR_STATE", "INSPECT_NPC_DOSSIER",
     "RELATIONSHIP_PROPOSAL", "RELATIONSHIP_PREVIEW",
     "APPLY_RUNTIME_RELATIONSHIP_BASELINE",
     "SUGGESTION_PREDICATE", "SUGGESTION_CLICK",
@@ -224,7 +225,8 @@ local function boundedRelationship(context)
     for _, key in ipairs({
         "baselineApproval", "baselineRespect", "approval", "respect",
         "familiarity", "state", "previousState", "revision",
-        "interactionRevision", "saturation", "cooldownUntil",
+        "interactionRevision", "lastInteractionAt", "memoryCount",
+        "saturation", "cooldownUntil",
     }) do
         output[key] = relationship[key]
     end
@@ -299,6 +301,9 @@ local function actorStateProjection(context)
                 speechStyleContext = speechStyleContext,
             },
         },
+        productionKnowledgeRehydration = context.Values.copy(
+            context.Runtime.productionKnowledgeRehydration
+        ),
     }
 end
 
@@ -812,17 +817,17 @@ local function simulationControlCatalog(context, payload)
         workbenchSection = "Generated personality",
     })
     add("relationship.approval", "npc.relationship.approval", "Persona", "Relationship", "Approval", "slider", "number", {
-        min = -100, max = 100, step = 1, format = "%.0f",
+        min = -100, max = 100, step = 0.01, format = "%.2f",
         workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
         workbenchSection = "Context",
     })
     add("relationship.respect", "npc.relationship.respect", "Persona", "Relationship", "Respect", "slider", "number", {
-        min = -100, max = 100, step = 1, format = "%.0f",
+        min = -100, max = 100, step = 0.01, format = "%.2f",
         workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
         workbenchSection = "Context",
     })
     add("relationship.familiarity", "npc.relationship.familiarity", "Persona", "Relationship", "Familiarity", "slider", "number", {
-        min = 0, max = 100, step = 1, format = "%.0f",
+        min = 0, max = 100, step = 0.01, format = "%.2f",
         workbench = true, workbenchPanel = "Relationship", workbenchTab = "Overview",
         workbenchSection = "Context",
     })
@@ -1305,6 +1310,18 @@ function CommandRouter.dispatch(context, request)
                 communities = type(payload.communities) == "table",
             },
         }
+    elseif command == "INSTALL_PRODUCTION_KNOWLEDGE" then
+        if type(payload) ~= "table" then
+            return nil, "production_knowledge_must_be_object"
+        end
+        Runtime.pendingProductionKnowledgeRegistry = Values.productionCopy(
+            payload
+        )
+        return {
+            ok = true,
+            type = "production_knowledge_installed",
+            registry = "PNC_NPCKnowledge",
+        }
     elseif command == "IMPORT_SOURCE" then
         if type(payload) ~= "table"
             or type(payload.scenario) ~= "table"
@@ -1510,6 +1527,26 @@ function CommandRouter.dispatch(context, request)
         }
     elseif command == "INSPECT_ACTOR_STATE" then
         return actorStateProjection(context)
+    elseif command == "INSPECT_NPC_DOSSIER" then
+        if context.ProductionRehydration
+            and type(context.ProductionRehydration.refreshDiagnostics)
+                == "function"
+        then
+            context.ProductionRehydration.refreshDiagnostics(context)
+        end
+        return {
+            ok = true,
+            type = "npc_dossier",
+            npcDossier = context.Values.copy(
+                context.Runtime.productionNpcDossier
+            ),
+            relationshipHistory = context.Values.copy(
+                context.Runtime.productionRelationshipHistory
+            ),
+            productionKnowledgeRehydration = context.Values.copy(
+                context.Runtime.productionKnowledgeRehydration
+            ),
+        }
     elseif command == "SNAPSHOT" then
         return context.ScenarioSession.compactTransportResponse(
             context,

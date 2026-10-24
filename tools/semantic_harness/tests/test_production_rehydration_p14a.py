@@ -44,6 +44,67 @@ class ProductionRehydrationP14ATests(unittest.TestCase):
                     ),
                     ("PNC_Core_Global", [("schemaVersion", 16)]),
                     (
+                        "PNC_NPCKnowledge",
+                        [
+                            ("schemaVersion", 1),
+                            ("revision", 7),
+                            (
+                                "byCharacter",
+                                {
+                                    "char_p14a": {
+                                        "byNPC": {
+                                            "npcP14A": {
+                                                "npcID": "npcP14A",
+                                                "revision": 3,
+                                                "firstMetAt": 12,
+                                                "lastInteractionAt": 18,
+                                                "discovered": {
+                                                    "identity.name": {
+                                                        "descriptorID": "identity.name",
+                                                        "status": "confirmed",
+                                                        "value": "Lua Rehydrated NPC",
+                                                        "confidence": 1,
+                                                        "primarySource": "save_test",
+                                                    },
+                                                    "identity.archetype": {
+                                                        "descriptorID": "identity.archetype",
+                                                        "status": "confirmed",
+                                                        "value": "General",
+                                                        "confidence": 0.9,
+                                                        "primarySource": "save_test",
+                                                    },
+                                                },
+                                                "journalEntries": {
+                                                    1: {
+                                                        "id": "journal_p14a",
+                                                        "type": "save_test",
+                                                        "translationKey": "UI_PNC_SaveTest",
+                                                        "params": {"source": "raw"},
+                                                        "createdAt": 18,
+                                                    }
+                                                },
+                                                "manualNotes": {
+                                                    1: {
+                                                        "id": "note_p14a",
+                                                        "text": "Recorded by the save-backed test.",
+                                                        "createdAt": 18,
+                                                    }
+                                                },
+                                                "giftPreferences": {
+                                                    "Base.Bandage": {
+                                                        "disposition": "like",
+                                                        "sourceType": "gift_reaction",
+                                                        "createdAt": 18,
+                                                    }
+                                                },
+                                            }
+                                        }
+                                    }
+                                },
+                            ),
+                        ],
+                    ),
+                    (
                         "PNC_npcP14A",
                         [
                             ("schemaVersion", 16),
@@ -108,6 +169,64 @@ class ProductionRehydrationP14ATests(unittest.TestCase):
                 hashlib.sha256(self.save_path.read_bytes()).digest(),
                 source_bytes,
             )
+
+    def test_raw_knowledge_registry_is_rehydrated_by_production_inspector(self) -> None:
+        source_bytes = hashlib.sha256(self.save_path.read_bytes()).digest()
+        selection = SaveBackedImporter(
+            core_repository=CORE_REPOSITORY,
+        ).load(self.save_path, player_uuid="char_p14a", npc_id="npcP14A")
+        raw_knowledge = selection.provider_payloads["ProjectHoomans"][
+            "rawRegistries"
+        ]["npcKnowledge"]
+        self.assertEqual(raw_knowledge["revision"], 7)
+
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            imported = worker.import_saved_selection(
+                self.save_path,
+                player_uuid="char_p14a",
+                npc_id="npcP14A",
+            )
+            self.assertEqual(
+                imported["productionKnowledgeRehydration"]["status"],
+                "HYDRATED",
+            )
+            self.assertEqual(
+                imported["productionKnowledgeRehydration"]["loadOwner"],
+                "PNC.NPCKnowledge.Load",
+            )
+
+            inspection = worker.inspect_npc_dossier()
+            dossier = inspection["npcDossier"]
+            snapshot = dossier["snapshot"]
+            self.assertEqual(dossier["status"], "HYDRATED")
+            self.assertEqual(snapshot["npcID"], "npcP14A")
+            self.assertEqual(snapshot["revision"], 3)
+            self.assertEqual(len(snapshot["journalEntries"]), 1)
+            self.assertEqual(len(snapshot["manualNotes"]), 1)
+            self.assertEqual(
+                snapshot["giftPreferences"]["Base.Bandage"],
+                "like",
+            )
+            descriptor_values = {
+                descriptor.get("descriptorID"): descriptor.get("value")
+                for category in snapshot["categories"]
+                for descriptor in category.get("descriptors", [])
+            }
+            self.assertEqual(
+                descriptor_values["identity.name"],
+                "Lua Rehydrated NPC",
+            )
+
+            source_snapshot = deepcopy(worker.source_snapshot.to_dict())
+            worker.reset_working_world()
+            reset = worker.inspect_npc_dossier()
+            self.assertEqual(reset["npcDossier"], dossier)
+            self.assertEqual(worker.source_snapshot.to_dict(), source_snapshot)
+
+        self.assertEqual(
+            hashlib.sha256(self.save_path.read_bytes()).digest(),
+            source_bytes,
+        )
 
     def test_developer_fixture_mode_remains_explicit(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:

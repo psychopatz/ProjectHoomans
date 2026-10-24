@@ -49,6 +49,11 @@ local function rawPlayerRegistryFor(context)
     return registries.playerCharacters
 end
 
+local function rawKnowledgeRegistryFor(context)
+    local registries = rawRegistriesFor(context)
+    return registries.npcKnowledge
+end
+
 local function playerEntityKey(context)
     local player = context.Runtime.scenario
         and context.Runtime.scenario.player or {}
@@ -296,6 +301,53 @@ local function loadProductionPlayerCharacters(context)
     return status
 end
 
+local function loadProductionKnowledge(context)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    local raw = rawKnowledgeRegistryFor(context)
+    local status = {
+        schema = "semantic.production_knowledge_rehydration.v1",
+        source = "ProjectHoomans.rawRegistries.npcKnowledge",
+        status = "MISSING",
+        loadOwner = "PNC.NPCKnowledge.Load",
+        table = "PNC_NPCKnowledge",
+    }
+    if not PNC or not PNC.NPCKnowledge
+        or type(PNC.NPCKnowledge.Load) ~= "function"
+    then
+        if type(raw) ~= "table" then
+            status.missingClass = "LEGITIMATE_ABSENCE"
+            return status
+        end
+        return nil, "production_knowledge_loader_unavailable"
+    end
+
+    -- Knowledge persistence uses the canonical ModData reset/load owner. The
+    -- ModData table belongs to this worker and is replaced on every import;
+    -- it is never backed by the source save after transport.
+    Runtime.modData = Runtime.modData or {}
+    Runtime.modData.PNC_NPCKnowledge = type(raw) == "table"
+        and Values.productionCopy(raw) or nil
+    PNC.NPCKnowledge.Loaded = false
+    PNC.NPCKnowledge.Dirty = false
+    local ok, loaded = pcall(PNC.NPCKnowledge.Load)
+    if not ok or loaded ~= true then
+        return nil, "production_knowledge_load_failed"
+    end
+
+    if type(raw) == "table" then
+        status.status = "HYDRATED"
+        status.characterCount = countKeys(
+            PNC.NPCKnowledge.Registry
+                and PNC.NPCKnowledge.Registry.byCharacter
+        )
+    else
+        status.status = "MISSING"
+        status.missingClass = "LEGITIMATE_ABSENCE"
+    end
+    return status
+end
+
 local function productionFactionContext(context, record)
     local Values = context.Values
     local affiliation = type(record and record.affiliation) == "table"
@@ -505,6 +557,26 @@ function ProductionRehydration.configure(context)
     if sourceKind(context) ~= "SAVE" then
         Runtime.hydratedNpcRecord = nil
         Runtime.productionPlayerRehydration = nil
+        Runtime.productionKnowledgeRehydration = nil
+        Runtime.modData = Runtime.modData or {}
+        Runtime.modData.PNC_NPCKnowledge = nil
+        if PNC and PNC.NPCKnowledge then
+            PNC.NPCKnowledge.Registry = nil
+            PNC.NPCKnowledge.Loaded = false
+            PNC.NPCKnowledge.Dirty = false
+        end
+        Runtime.productionNpcDossier = {
+            schema = "semantic.production_npc_dossier.v1",
+            source = sourceKind(context),
+            status = "NOT_APPLICABLE",
+            mode = "developer_test",
+        }
+        Runtime.productionRelationshipHistory = {
+            schema = "semantic.production_relationship_history.v1",
+            source = sourceKind(context),
+            status = "NOT_APPLICABLE",
+            mode = "developer_test",
+        }
         Runtime.productionFactionContext = nil
         Runtime.productionFactionRehydration = {
             schema = "semantic.production_faction_rehydration.v1",
@@ -584,6 +656,13 @@ function ProductionRehydration.configure(context)
         ))
     end
     Runtime.productionPlayerRehydration = playerStatus
+    local knowledgeStatus, knowledgeReason = loadProductionKnowledge(context)
+    if not knowledgeStatus then
+        return fail(context, "production_knowledge_rehydration:" .. tostring(
+            knowledgeReason
+        ))
+    end
+    Runtime.productionKnowledgeRehydration = knowledgeStatus
     local organizationStatus, organizationReason =
         loadProductionOrganizations(context)
     if not organizationStatus then
@@ -612,10 +691,91 @@ function ProductionRehydration.configure(context)
         registry = "isolated PNC.Registry",
         sourceRecord = "ProjectHoomans.rawRecords.npc",
         playerRegistry = Values.copy(Runtime.productionPlayerRehydration),
+        knowledgeRegistry = Values.copy(Runtime.productionKnowledgeRehydration),
         engineItemTypeFixtureCount = itemTypeFixtureCount > 0
             and itemTypeFixtureCount or nil,
     }
     return true
+end
+
+function ProductionRehydration.refreshDiagnostics(context)
+    local Runtime = context.Runtime
+    local Values = context.Values
+    if sourceKind(context) ~= "SAVE" then
+        return false
+    end
+
+    local scenario = Runtime.scenario or {}
+    local npc = scenario.npc or {}
+    local npcID = tostring(npc.npcID or npc.id or "")
+    if npcID == "" or not context.player then
+        return false
+    end
+
+    local knowledge = PNC and PNC.NPCKnowledge or nil
+    local dossier = nil
+    local dossierReason = "production_knowledge_snapshot_unavailable"
+    if knowledge
+        and type(knowledge.BuildPlayerSnapshotForPlayer) == "function"
+    then
+        local ok, snapshot, reason = pcall(
+            knowledge.BuildPlayerSnapshotForPlayer,
+            context.player,
+            npcID
+        )
+        if ok and type(snapshot) == "table" then
+            dossier = snapshot
+            dossierReason = nil
+        elseif not ok then
+            dossierReason = tostring(snapshot)
+        else
+            dossierReason = tostring(reason or dossierReason)
+        end
+    end
+    Runtime.productionNpcDossier = {
+        schema = "semantic.production_npc_dossier.v1",
+        source = "PRODUCTION",
+        status = dossier and "HYDRATED" or "UNAVAILABLE",
+        npcID = npcID,
+        playerUUID = (Runtime.sourceMetadata or {}).playerUUID,
+        owner = "PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer",
+        rehydration = Values.copy(Runtime.productionKnowledgeRehydration),
+        snapshot = Values.copy(dossier),
+        reason = dossierReason,
+    }
+
+    local debug = PNC and PNC.RelationshipDebug or nil
+    local history = nil
+    local historyReason = "production_relationship_debug_unavailable"
+    if debug and type(debug.BuildSnapshotForRequest) == "function" then
+        local ok, snapshot, reason = pcall(
+            debug.BuildSnapshotForRequest,
+            context.player,
+            {
+                observerNPCID = npcID,
+                targetKind = "current_player",
+            }
+        )
+        if ok and type(snapshot) == "table" then
+            history = snapshot
+            historyReason = nil
+        elseif not ok then
+            historyReason = tostring(snapshot)
+        else
+            historyReason = tostring(reason or historyReason)
+        end
+    end
+    Runtime.productionRelationshipHistory = {
+        schema = "semantic.production_relationship_history.v1",
+        source = "PRODUCTION",
+        status = history and "HYDRATED" or "UNAVAILABLE",
+        npcID = npcID,
+        playerKey = Runtime.relationshipTargetKey,
+        owner = "PNC.RelationshipDebug.BuildSnapshotForRequest",
+        snapshot = Values.copy(history),
+        reason = historyReason,
+    }
+    return dossier ~= nil or history ~= nil
 end
 
 function ProductionRehydration.applyRuntimeRelationshipBaseline(

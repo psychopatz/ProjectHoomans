@@ -52,6 +52,8 @@ CLI_OPERATIONS = (
     "inspect_npc",
     "inspect_inventories",
     "inspect_relationship",
+    "inspect_dossier",
+    "inspect_interaction_history",
     "gift",
     "recruit",
     "propose",
@@ -582,6 +584,8 @@ def cli(arguments: argparse.Namespace) -> int:
                 arguments.inspect_inventories,
                 arguments.inspect_relationship,
                 arguments.inspect_social_context,
+                arguments.inspect_dossier,
+                arguments.inspect_interaction_history,
             )
             if any(inspection_flags):
                 current = _bounded_actor_state(worker.inspect_actor_state())
@@ -607,6 +611,16 @@ def cli(arguments: argparse.Namespace) -> int:
                     inspection["socialContext"] = current["npc"].get(
                         "socialContext", {}
                     )
+                if arguments.inspect_dossier or arguments.inspect_interaction_history:
+                    dossier_result = worker.inspect_npc_dossier()
+                    if arguments.inspect_dossier:
+                        inspection["dossier"] = dossier_result.get(
+                            "npcDossier", {}
+                        )
+                    if arguments.inspect_interaction_history:
+                        inspection["interactionHistory"] = dossier_result.get(
+                            "relationshipHistory", {}
+                        )
                 _print_result(inspection, arguments.jsonl)
                 emit_activity()
             if arguments.working_world_diff:
@@ -819,6 +833,16 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--inspect-npc", action="store_true")
     parser.add_argument("--inspect-inventories", action="store_true")
     parser.add_argument("--inspect-relationship", action="store_true")
+    parser.add_argument(
+        "--inspect-dossier",
+        action="store_true",
+        help="show the production player-scoped NPC dossier and knowledge journal",
+    )
+    parser.add_argument(
+        "--inspect-interaction-history",
+        action="store_true",
+        help="show production relationship memories and bounded interaction journal",
+    )
     parser.add_argument(
         "--inspect-social-context",
         action="store_true",

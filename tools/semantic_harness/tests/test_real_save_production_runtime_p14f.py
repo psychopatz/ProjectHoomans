@@ -284,6 +284,72 @@ class RealSaveProductionRuntimeP14FTests(unittest.TestCase):
             _layer_signature(gui_social),
         )
 
+    def test_production_dossier_and_interaction_history_are_explicitly_rehydratable(
+        self,
+    ) -> None:
+        """Large player-scoped knowledge stays on the explicit inspector path."""
+
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            imported = worker.import_saved_selection(
+                REAL_SAVE,
+                player_uuid="char_1791957489838_240087",
+                npc_id="npcKentLangley_OWOJ",
+            )
+            self.assertEqual(
+                imported["productionKnowledgeRehydration"]["status"],
+                "HYDRATED",
+            )
+            source_snapshot = deepcopy(worker.source_snapshot.to_dict())
+
+            before = worker.inspect_npc_dossier()
+            dossier_before = before["npcDossier"]
+            history_before = before["relationshipHistory"]
+            self.assertEqual(dossier_before["status"], "HYDRATED")
+            self.assertEqual(history_before["status"], "HYDRATED")
+            self.assertEqual(
+                dossier_before["snapshot"]["npcID"],
+                "npcKentLangley_OWOJ",
+            )
+            self.assertGreater(
+                len(history_before["snapshot"].get("interactionJournal") or []),
+                0,
+            )
+            journal_before = len(
+                history_before["snapshot"].get("interactionJournal") or []
+            )
+
+            insult = worker.input("fuck you")
+            action = (insult.get("result") or {}).get("actionResult") or {}
+            self.assertEqual(action.get("eventType"), "player_dialogue_insult")
+
+            after = worker.inspect_npc_dossier()
+            journal_after = after["relationshipHistory"]["snapshot"].get(
+                "interactionJournal"
+            ) or []
+            self.assertGreater(len(journal_after), journal_before)
+            self.assertEqual(
+                journal_after[-1].get("eventType")
+                or journal_after[-1].get("kind"),
+                "player_dialogue_insult",
+            )
+
+            worker.reset_working_world()
+            reset = worker.inspect_npc_dossier()
+            self.assertEqual(
+                reset["npcDossier"],
+                dossier_before,
+            )
+            self.assertEqual(
+                reset["relationshipHistory"],
+                history_before,
+            )
+            self.assertEqual(worker.source_snapshot.to_dict(), source_snapshot)
+
+        self.assertEqual(
+            hashlib.sha256(REAL_SAVE.read_bytes()).digest(),
+            self.source_hash,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

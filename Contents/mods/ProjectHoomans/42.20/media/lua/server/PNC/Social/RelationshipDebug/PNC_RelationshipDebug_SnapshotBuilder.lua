@@ -36,6 +36,7 @@ function Debug.BuildSnapshot(
     local reverseExists
     local reverseKey
     local memories = {}
+    local interactionJournal = {}
     local observerFactionSnapshot
     local targetFactionSnapshot
     local factionRelation
@@ -73,6 +74,11 @@ function Debug.BuildSnapshot(
         end
         return tostring(left.id) < tostring(right.id)
     end)
+    local journal = relationship.interactionJournal or {}
+    local journalStart = math.max(1, #journal - 79)
+    for index = journalStart, #journal do
+        interactionJournal[#interactionJournal + 1] = copy(journal[index])
+    end
     if target and target.kind == "npc" then
         reverseKey = EntityRef.ForNPC(observer.id)
         reverse = Relationships.Get(target.npcID, reverseKey)
@@ -179,6 +185,8 @@ function Debug.BuildSnapshot(
             exists
         ),
         memories = memories,
+        interactionJournal = interactionJournal,
+        latestInteraction = interactionJournal[#interactionJournal],
         saturation = copy(relationship.saturation or {}),
         cooldowns = copy(relationship.cooldowns or {}),
         reverse = reverse and summarizeRelationship(

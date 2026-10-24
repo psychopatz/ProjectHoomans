@@ -346,6 +346,8 @@ class SemanticHarnessApp:
         self.simulation_projection: dict[str, Any] = {}
         self.social_context_projection: dict[str, Any] = {}
         self.runtime_relationship_override_projection: dict[str, Any] = {}
+        self.npc_dossier_projection: dict[str, Any] = {}
+        self.relationship_history_projection: dict[str, Any] = {}
         self.source_snapshot_projection: dict[str, Any] = {}
         self.working_world_projection: dict[str, Any] = {}
         self.provenance_projection: dict[str, Any] = {}
@@ -360,6 +362,8 @@ class SemanticHarnessApp:
         self.workbench_status_var: Any | None = None
         self.relationship_preview_var: Any | None = None
         self.relationship_context_summary: Any | None = None
+        self.npc_dossier_summary: Any | None = None
+        self.npc_interaction_summary: Any | None = None
         self.trait_effects_var: Any | None = None
         self.trait_effects_widget: Any | None = None
         self.trait_effects_widgets: dict[str, Any] = {}
@@ -2133,6 +2137,7 @@ class SemanticHarnessApp:
                 self._sync_workbench_from_scenario(scenario)
             self._update_simulation_projection(result)
             self._set_save_backed_mode(True)
+            self._refresh_npc_dossier_if_selected()
             player = self.scenario.get("player", {})
             npc = self.scenario.get("npc", {})
             player_label = (
@@ -2755,6 +2760,7 @@ class SemanticHarnessApp:
                 self._sync_workbench_from_scenario(scenario)
             self._update_simulation_projection(result)
             self._set_save_backed_mode(True)
+            self._refresh_npc_dossier_if_selected()
             self.saved_world_target_var.set(
                 f"Loaded Player {player.get('label')} → NPC {npc.get('label')}"
             )
@@ -3215,7 +3221,15 @@ class SemanticHarnessApp:
                 notebook = self._ttk.Notebook(panel)
                 notebook.grid(row=0, column=0, sticky="nsew")
                 self.workbench_panel_notebooks[panel_name] = notebook
-                for tab_name in actor_tabs:
+                notebook.bind(
+                    "<<NotebookTabChanged>>",
+                    lambda _event, selected_panel=panel_name: (
+                        self._on_actor_panel_tab_changed(selected_panel)
+                    ),
+                )
+                panel_tabs = actor_tabs + (("Dossier", "Interactions")
+                    if panel_name == "NPC Target" else ())
+                for tab_name in panel_tabs:
                     page = WorkbenchPage(
                         notebook,
                         self._tk,
@@ -3271,6 +3285,21 @@ class SemanticHarnessApp:
             inventory.add_widget(inventory_view.frame, sticky="nsew")
             self.actor_inventory_views[panel_name] = inventory_view
             inventory.finish()
+
+        dossier_page = pages.get(("NPC Target", "Dossier"))
+        if dossier_page is not None:
+            self.npc_dossier_summary = dossier_page.add_summary(
+                "Production dossier / known information",
+                height=18,
+            )
+            dossier_page.finish()
+        interaction_page = pages.get(("NPC Target", "Interactions"))
+        if interaction_page is not None:
+            self.npc_interaction_summary = interaction_page.add_summary(
+                "Production relationship history",
+                height=18,
+            )
+            interaction_page.finish()
 
         for control in self.workbench_controls:
             panel_name = str(control.get("workbenchPanel") or "World")
@@ -3685,6 +3714,211 @@ class SemanticHarnessApp:
             if field is not None:
                 field.set_missing_state(missing)
 
+    @staticmethod
+    def _dossier_value(value: Any) -> str:
+        if isinstance(value, (dict, list)):
+            return pretty(value).replace("\n", " ")
+        return str(value)
+
+    def _refresh_npc_dossier(self) -> None:
+        if self.npc_dossier_summary is None:
+            return
+        projection = self.npc_dossier_projection
+        if not isinstance(projection, dict) or not projection:
+            self._set_text(
+                self.npc_dossier_summary,
+                "No production NPC dossier has been projected yet.",
+            )
+            return
+        snapshot = projection.get("snapshot")
+        snapshot = snapshot if isinstance(snapshot, dict) else {}
+        rehydration = projection.get("rehydration")
+        rehydration = rehydration if isinstance(rehydration, dict) else {}
+        lines = [
+            f"Source: {str(projection.get('source') or 'MISSING').upper()}",
+            f"Status: {projection.get('status') or 'MISSING'} · "
+            f"owner: {projection.get('owner') or 'MISSING'}",
+            f"NPC: {projection.get('npcID') or snapshot.get('npcID') or 'MISSING'} · "
+            f"knowledge load: {rehydration.get('status') or 'MISSING'}",
+            f"Knowledge revision: {snapshot.get('revision', 0)} · "
+            f"first met: {snapshot.get('firstMetAt', 'MISSING')} · "
+            f"last interaction: {snapshot.get('lastInteractionAt', 'MISSING')}",
+            "",
+            "Known information",
+        ]
+        identity = snapshot.get("identity")
+        if isinstance(identity, dict):
+            lines.append(
+                "  identity: "
+                + " · ".join(
+                    f"{key}={identity.get(key, 'MISSING')}"
+                    for key in ("displayName", "archetypeLabel", "factionName", "factionRole")
+                    if identity.get(key) not in (None, "")
+                )
+            )
+        categories = snapshot.get("categories")
+        categories = categories if isinstance(categories, list) else []
+        descriptor_count = 0
+        for category in categories[:64]:
+            if not isinstance(category, dict):
+                continue
+            lines.append(f"  [{category.get('id') or 'category'}]")
+            descriptors = category.get("descriptors")
+            descriptors = descriptors if isinstance(descriptors, list) else []
+            for descriptor in descriptors[:128]:
+                if not isinstance(descriptor, dict):
+                    continue
+                descriptor_count += 1
+                presentation = descriptor.get("presentation")
+                presentation = presentation if isinstance(presentation, dict) else {}
+                label = presentation.get("label") or presentation.get("labelKey")
+                lines.append(
+                    f"    {label or descriptor.get('descriptorID')}: "
+                    f"{self._dossier_value(descriptor.get('value'))} · "
+                    f"{descriptor.get('status') or 'unknown'} · "
+                    f"confidence={descriptor.get('confidence', 'MISSING')} · "
+                    f"source={descriptor.get('primarySource') or 'MISSING'}"
+                )
+        if descriptor_count == 0:
+            lines.append("  no known descriptors")
+
+        journal = snapshot.get("journalEntries")
+        journal = journal if isinstance(journal, list) else []
+        lines.extend(["", f"Knowledge journal ({len(journal)})"])
+        for entry in journal[-32:]:
+            if isinstance(entry, dict):
+                lines.append(
+                    f"  {entry.get('type') or 'knowledge'} · "
+                    f"{entry.get('translationKey') or 'untranslated'} · "
+                    f"at {entry.get('createdAt', 'MISSING')} · "
+                    f"params={self._dossier_value(entry.get('params') or {})}"
+                )
+        if not journal:
+            lines.append("  none recorded")
+
+        notes = snapshot.get("manualNotes")
+        notes = notes if isinstance(notes, list) else []
+        lines.extend(["", f"Manual notes ({len(notes)})"])
+        for note in notes[-16:]:
+            if isinstance(note, dict):
+                lines.append(
+                    f"  {note.get('createdAt', 'MISSING')}: "
+                    f"{note.get('text') or ''}"
+                )
+        if not notes:
+            lines.append("  none recorded")
+
+        gift_preferences = snapshot.get("giftPreferences")
+        gift_preferences = gift_preferences if isinstance(gift_preferences, dict) else {}
+        lines.extend(["", f"Gift preferences ({len(gift_preferences)})"])
+        for item_type, disposition in sorted(gift_preferences.items())[:64]:
+            lines.append(f"  {item_type}: {disposition}")
+        if not gift_preferences:
+            lines.append("  none recorded")
+        self._set_text(self.npc_dossier_summary, "\n".join(lines))
+
+    def _refresh_npc_interaction_history(self) -> None:
+        if self.npc_interaction_summary is None:
+            return
+        projection = self.relationship_history_projection
+        if not isinstance(projection, dict) or not projection:
+            self._set_text(
+                self.npc_interaction_summary,
+                "No production relationship history has been projected yet.",
+            )
+            return
+        snapshot = projection.get("snapshot")
+        snapshot = snapshot if isinstance(snapshot, dict) else {}
+        relationship = snapshot.get("relationship")
+        relationship = relationship if isinstance(relationship, dict) else {}
+        lines = [
+            f"Source: {str(projection.get('source') or 'MISSING').upper()}",
+            f"Status: {projection.get('status') or 'MISSING'} · "
+            f"owner: {projection.get('owner') or 'MISSING'}",
+            "Current relationship: " + self._relationship_evidence(relationship),
+            f"memory count: {relationship.get('memoryCount', 0)} · "
+            f"interaction revision: {relationship.get('interactionRevision', 'MISSING')}",
+            f"saturation: {self._dossier_value(snapshot.get('saturation') or {})}",
+            f"cooldowns: {self._dossier_value(snapshot.get('cooldowns') or {})}",
+            "",
+            "Recorded interactions",
+        ]
+        journal = snapshot.get("interactionJournal")
+        journal = journal if isinstance(journal, list) else []
+        for entry in reversed(journal[-64:]):
+            if not isinstance(entry, dict):
+                continue
+            before = entry.get("before") or {}
+            after = entry.get("after") or {}
+            delta = entry.get("delta") or {}
+            lines.extend(
+                [
+                    f"  {entry.get('sequence', '?')}. "
+                    f"{entry.get('eventType') or entry.get('kind') or 'interaction'} · "
+                    f"applied={entry.get('applied', 'MISSING')} · "
+                    f"event={entry.get('eventID') or 'MISSING'}",
+                    f"     before: {self._relationship_evidence(before)}",
+                    f"     after:  {self._relationship_evidence(after)}",
+                    f"     delta:  {self._dossier_value(delta)}",
+                ]
+            )
+        if not journal:
+            lines.append("  none recorded")
+
+        memories = snapshot.get("memories")
+        memories = memories if isinstance(memories, list) else []
+        lines.extend(["", f"Memories ({len(memories)})"])
+        for memory in memories[:32]:
+            if isinstance(memory, dict):
+                lines.append(
+                    f"  {memory.get('type') or 'memory'} · "
+                    f"strength={memory.get('currentStrength', memory.get('strength', 'MISSING'))} · "
+                    f"source={memory.get('knowledgeSource') or memory.get('sourceKey') or 'MISSING'}"
+                )
+        if not memories:
+            lines.append("  none recorded")
+        self._set_text(self.npc_interaction_summary, "\n".join(lines))
+
+    def _on_actor_panel_tab_changed(self, panel_name: str) -> None:
+        """Load large production dossier projections only when requested."""
+
+        if panel_name != "NPC Target" or self.save_backed_mode is not True:
+            return
+        notebook = self.workbench_panel_notebooks.get(panel_name)
+        if notebook is None:
+            return
+        try:
+            tab_name = str(notebook.tab(notebook.select(), "text"))
+        except Exception:
+            return
+        if tab_name in {"Dossier", "Interactions"}:
+            self._request_npc_dossier_projection()
+
+    def _request_npc_dossier_projection(self) -> None:
+        """Refresh the explicit, bounded inspector projection from production Lua."""
+
+        if (
+            self.closed
+            or self.save_backed_mode is not True
+            or not self.session.ready
+            or self.busy
+        ):
+            return
+
+        def finish(response: dict[str, Any]) -> None:
+            self._update_simulation_projection(response)
+
+        self._start_operation(
+            lambda worker: worker.inspect_npc_dossier(),
+            finish,
+        )
+
+    def _refresh_npc_dossier_if_selected(self) -> None:
+        """Honor a restored Dossier/Interactions tab after save import."""
+
+        if self._npc_dossier_tab_selected():
+            self._request_npc_dossier_projection()
+
     def _refresh_actor_inspectors(self) -> None:
         """Refresh the shared read-only Player/NPC actor inspector family."""
 
@@ -3836,6 +4070,8 @@ class SemanticHarnessApp:
         self._refresh_faction_context()
         self._refresh_simulation_context()
         self._refresh_social_context_summary()
+        self._refresh_npc_dossier()
+        self._refresh_npc_interaction_history()
 
     def _refresh_faction_context(self) -> None:
         """Render group membership and standing without confusing it with NPC affinity."""
@@ -4448,6 +4684,13 @@ class SemanticHarnessApp:
         self._refresh_actor_inspectors()
 
     def _update_simulation_projection(self, response: dict[str, Any]) -> None:
+        if isinstance(response, dict):
+            dossier = response.get("npcDossier")
+            if isinstance(dossier, dict):
+                self.npc_dossier_projection = deepcopy(dossier)
+            history = response.get("relationshipHistory")
+            if isinstance(history, dict):
+                self.relationship_history_projection = deepcopy(history)
         social = self._social_context_from_response(response)
         if social:
             self.social_context_projection = social
@@ -4686,6 +4929,24 @@ class SemanticHarnessApp:
             self.trace_tabs.select(self.dialogue_graph_frame)
         elif hub_diagnostics.get("activeHub") is not None:
             self.trace_tabs.select(self.hub_diagnostics_frame)
+        if (
+            self.save_backed_mode is True
+            and "npcDossier" not in response
+            and self._npc_dossier_tab_selected()
+        ):
+            self._request_npc_dossier_projection()
+
+    def _npc_dossier_tab_selected(self) -> bool:
+        notebook = self.workbench_panel_notebooks.get("NPC Target")
+        if notebook is None:
+            return False
+        try:
+            return str(notebook.tab(notebook.select(), "text")) in {
+                "Dossier",
+                "Interactions",
+            }
+        except Exception:
+            return False
 
     @staticmethod
     def _inventory_item_map(inventory: Any) -> dict[str, dict[str, Any]]:

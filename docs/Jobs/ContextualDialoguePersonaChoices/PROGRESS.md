@@ -439,3 +439,30 @@ git diff --check
 
 All listed checks pass. P15 interaction projection and saved-world browser
 slice accepted. Next Chunk: none for this requested slice.
+
+## Completed P15 follow-up — production NPC dossier and interaction history inspector
+
+Evidence recorded on 2026-10-24:
+
+- Save import now transports the raw `PNC_NPCKnowledge` registry separately from the bounded faction/community request. Python retains selection, source provenance, and immutable snapshot ownership; it does not interpret knowledge, journal, gift preference, or relationship policy.
+- The isolated Lua worker installs the raw registry into worker-local `PNC_NPCKnowledge` ModData and invokes the production `PNC.NPCKnowledge.Load` owner. The dossier is projected through production `BuildPlayerSnapshotForPlayer`; relationship history is projected through production `PNC.RelationshipDebug.BuildSnapshotForRequest` with a bounded interaction journal.
+- Normal Talk and snapshot responses remain compact. The large dossier/history projection is available through the explicit worker/CLI inspector path and is requested by the NPC Target `Dossier` and `Interactions` tabs. When Interactions is already selected, a production action refreshes the same projection so recorded event type, applied state, before/after values, and delta are visible.
+- Relationship sliders now preserve and display production decimal values to two places, so a real social action such as `-3.62`, `-2.71`, and `1.00` is visible as the authoritative runtime result rather than being rounded to integer text.
+- CLI supports `--inspect-dossier` and `--inspect-interaction-history`. Developer/Test fixture mode remains explicit and marks these production projections `NOT_APPLICABLE` rather than importing saved knowledge.
+- Synthetic raw-save coverage proves descriptors, knowledge journal, manual note, gift preference, production rehydration owner, reset equality, and source-byte immutability. Real-save coverage proves Kent's production dossier/history, a typed insult appending `player_dialogue_insult`, reset restoration, and unchanged source-save bytes.
+
+Focused evidence:
+
+```text
+python3 -m unittest tools.semantic_harness.tests.test_production_rehydration_p14a
+python3 -m unittest tools.semantic_harness.tests.test_real_save_production_runtime_p14f
+python3 -m unittest tools.semantic_harness.tests.test_production_inventory_rehydration_p14b tools.semantic_harness.tests.test_production_faction_rehydration_p14c tools.semantic_harness.tests.test_production_social_context_p14d tools.semantic_harness.tests.test_missing_state_audit_p14e
+timeout 90s python3 -m unittest tools.semantic_harness.tests.test_gui_saved_pair_entrypoint.GuiSavedPairEntrypointTests.test_saved_production_dossier_and_interactions_are_visible_on_demand
+python3 -m compileall -q tools/semantic_harness
+luac -p tools/semantic_harness/lua/worker/CommandRouter.lua tools/semantic_harness/lua/worker/ProductionModules.lua tools/semantic_harness/lua/worker/ProductionRehydration.lua tools/semantic_harness/lua/worker/ScenarioSession.lua
+python3 /home/psychopatz/Desktop/Projects/Zomboid-devSkills/.agents/skills/pz-verify/scripts/pz_verify.py --file tools/semantic_harness/lua/worker/CommandRouter.lua --kahlua --severity ERROR --no-snippets
+git diff --check
+```
+
+This follow-up is accepted on the existing local `main`. Current exact Next
+Chunk: none for this requested inspector slice.

@@ -274,6 +274,7 @@ class SaveBackedImporter:
                 for table_name, registry_name in (
                     ("PNC_Factions", "factions"),
                     ("PNC_Communities", "communities"),
+                    ("PNC_NPCKnowledge", "npcKnowledge"),
                 ):
                     if table_name in table_names:
                         raw_registries[registry_name] = self._read_full(
@@ -552,6 +553,22 @@ class SaveBackedImporter:
                     "source": "SAVE" if saved_personality else "DERIVED",
                     "table": npc_table,
                     "recordKey": selected_npc_id,
+                },
+                "npc.knowledge": {
+                    "source": "SAVE" if "npcKnowledge" in raw_registries else "MISSING",
+                    "owner": (
+                        "PNC.NPCKnowledge.Load -> "
+                        "PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer"
+                        if "npcKnowledge" in raw_registries
+                        else None
+                    ),
+                    "missingClass": (
+                        "LEGITIMATE_ABSENCE"
+                        if "npcKnowledge" not in raw_registries
+                        else None
+                    ),
+                    "table": "PNC_NPCKnowledge",
+                    "recordKey": selected_uuid,
                 },
                 "npc.faction": {
                     "source": "SAVE" if "factions" in raw_registries else "MISSING",
