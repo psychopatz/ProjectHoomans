@@ -8,7 +8,7 @@ A phase is not the goal.
 
 Do not report the parent complete after an audit, one migration family, one passing stress test or one harness improvement.
 
-Continue through all mandatory P0–P9 developer-side gates before handing back READY FOR USER LIVE TEST, unless a genuine blocker prevents safe progress.
+P0–P9 are retained implementation foundation, but developer acceptance was reopened by user native/harness evidence. Continue through mandatory P10 and any later user-approved corrective phases before handing back READY FOR USER LIVE TEST, unless a genuine blocker prevents safe progress.
 
 ## Required read order
 
@@ -19,9 +19,10 @@ Continue through all mandatory P0–P9 developer-side gates before handing back 
 5. ARCHITECTURE.md
 6. MIGRATION_MATRIX.md
 7. PERSISTENCE_AND_SCALING.md
-8. ROADMAP.md
-9. HARNESS_ACCEPTANCE.md
-10. PROGRESS.md last
+8. NATIVE_CONVERSATION_PARITY_CORRECTION.md
+9. ROADMAP.md
+10. HARNESS_ACCEPTANCE.md
+11. PROGRESS.md last
 
 Also inspect current source and relevant predecessor job docs rather than treating these documents as proof of implementation.
 
@@ -99,6 +100,29 @@ Do not replicate one player's private relationship/Knowledge/thread context to u
 Keep authored graph/gates/effects/repetition authoritative.
 
 Only speech realization may converge where safe.
+
+### Native Conversation parity
+
+The Semantic Lab primary Conversation surface must mirror the production Conversation session.
+
+- Production Lua owns opening/lifecycle state and presented choices.
+- Render the exact production-selected choice group/rows in the main response surface.
+- Keep full/global candidate projections in diagnostics only.
+- Do not infer click validity from worker response type.
+- Loading an NPC is not the same as opening a Conversation.
+- Do not create Python/Tk replacements for \`buildCoreChoices\`, session choice authority, relationship presentation semantics or lifecycle policy.
+- Treat user native screenshots/runtime observations as acceptance evidence that can reopen a falsely-complete developer gate.
+
+### Harness UX correctness
+
+The harness is an agent development tool, so usability is part of acceptance.
+
+- Conversation gets primary visual space.
+- Context/debug controls belong in a sidecar/dock where practical.
+- Hiding controls must reclaim space.
+- Ordinary worker operations must not overwrite user splitter/dock positions.
+- Tests must exercise workflows, not merely assert that widgets have non-zero dimensions.
+- World Browser role and affiliation projections must remain discoverable.
 
 ### Legacy retirement
 

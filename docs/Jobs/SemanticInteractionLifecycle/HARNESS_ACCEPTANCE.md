@@ -159,3 +159,117 @@ Use the existing worker/CLI/Xvfb routes for developer evidence when necessary, b
 
 Final native Project Zomboid SP/MP remains user-owned after all developer gates are complete.
 
+
+
+## Native Conversation parity acceptance
+
+The primary Simulation Conversation surface is now an acceptance target, not merely a convenient UI.
+
+### K. Presented-choice parity
+
+For one fixed save-backed Player/NPC state:
+
+1. obtain the production headless Conversation presentation;
+2. render the Semantic Lab primary Response Channel from that projection;
+3. compare against native user evidence when available.
+
+Require parity for:
+
+- current semantic group;
+- choice IDs/frames;
+- resolved labels/text;
+- ordering semantics;
+- enabled/disabled state;
+- revision;
+- navigation/back rows;
+- intentional root owned actions.
+
+The main surface must not render unrelated global candidates. Full candidate sets belong in diagnostics.
+
+### L. Opening parity
+
+Loading a saved target must not itself masquerade as an opened conversation.
+
+Explicitly open/start Talk and verify:
+
+- production Talk route;
+- staged opening/greeting;
+- conversation log state;
+- lifecycle/busy state;
+- relation presentation;
+- first Response Channel projection;
+- TYPE TO TALK availability.
+
+### M. Click/session parity
+
+For a displayed row verify:
+
+- exact production frame submission;
+- busy guard;
+- disabled guard;
+- revision/stale rejection;
+- duplicate receipt rejection;
+- rejected-choice reprojection/restoration;
+- next production-presented choices.
+
+Do not use worker response type as the semantic validity rule.
+
+### N. Layout stability workflow
+
+At supported desktop geometries perform:
+
+~~~text
+load saved NPC
+-> open conversation
+-> drag layout
+-> click response
+-> type response
+-> change/apply a workbench setting
+-> continue conversation
+-> switch context tab
+-> return
+~~~
+
+Verify:
+
+- user splitter/dock position does not snap back after ordinary operations;
+- hiding controls reclaims their space;
+- conversation/transcript remains the dominant readable surface;
+- response channel remains usable with variable row counts.
+
+A non-zero transcript height is not sufficient acceptance.
+
+### O. World Browser navigation parity
+
+Verify role/relationship navigation exposes at least:
+
+- companions/player faction;
+- settlers/communities;
+- hostile/looters;
+- traders/providers;
+- neutral/unaffiliated.
+
+Also preserve saved affiliations/factions, communities and overlays as explicit alternate navigation, without a persisted lens making the primary classification appear missing.
+
+### P. State-specific native fixture
+
+The user-supplied 2026-10-25 native screenshot provides one concrete parity fixture:
+
+~~~text
+NPC: Pete Patz
+opening: "Hey. Need a hand before we wrap up?"
+presented choices:
+- Tell them to leave the group
+- That's all. Stay safe.
+- What's up?
+typed input: available
+native current-relation presentation: visible
+~~~
+
+The harness must reproduce the production-presented semantic state for that same saved pair/state when the corresponding save is available. This fixture does not hard-code those choices globally.
+
+## Acceptance reopening
+
+Earlier P0–P9 automated evidence remains useful implementation evidence, but it did not prove native Conversation-surface parity.
+
+Therefore the previous READY FOR USER LIVE TEST conclusion is superseded until P10 passes.

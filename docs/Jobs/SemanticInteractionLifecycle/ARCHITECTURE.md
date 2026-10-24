@@ -410,3 +410,70 @@ Work is triggered by:
 - meaningful grounded game event;
 - bounded save/load maintenance.
 
+
+
+## 21. Native Conversation presentation parity
+
+The Semantic Lab has two different responsibilities and must keep them separate.
+
+### Player-facing Conversation mirror
+
+The primary Conversation surface must consume a production-Lua presentation projection derived from the same Conversation definition/session path used by native Core.
+
+It must not flatten the broader semantic candidate projection.
+
+Canonical ownership:
+
+~~~text
+Conversation.BuildDefinition
+    -> choicePresentation
+    -> DialogueInput.Internal.PresentSemanticChoices
+    -> buildCoreChoices
+    -> Session:setPresentedChoices
+    -> production presented rows
+         |                    |
+         v                    v
+     native Core UI       Semantic Lab mirror
+~~~
+
+For the same production state, the two surfaces must agree on semantic row identity/frame, group/revision, ordering and enabled/disabled state.
+
+### Debug sidecar
+
+The Semantic Lab may separately expose:
+
+- all safe candidates;
+- groups/providers;
+- hidden/eligibility diagnostics;
+- response plans;
+- lifecycle/thread/memory state;
+- persistence/scaling metrics.
+
+These diagnostics are not player-presented choices.
+
+### No Python presentation policy
+
+Python/Tk may render and transport the production presentation projection.
+
+Python must not recreate:
+
+- selected semantic group policy;
+- Core choice eligibility;
+- conversation busy/pending validity;
+- stale/duplicate semantic frame authority;
+- opening/lifecycle state;
+- relationship presentation meaning.
+
+### Load versus Open
+
+Loading/rehydrating a saved NPC is state selection.
+
+Opening a conversation is a lifecycle action.
+
+The harness must not treat a generic capability/suggestion snapshot after import/configure as proof of the native opened Conversation state.
+
+### Layout is not authority
+
+The Semantic Lab may use a desktop-efficient layout rather than visually reproducing Project Zomboid's skin.
+
+Behavioral parity is mandatory; pixel/theme parity is not.

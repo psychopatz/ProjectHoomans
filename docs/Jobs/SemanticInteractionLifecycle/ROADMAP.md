@@ -1,6 +1,6 @@
 # Roadmap — Semantic Interaction Lifecycle
 
-**Parent status:** ACTIVE.  
+**Parent status:** ACTIVE — P0–P9 retained foundation; P10 native Conversation parity correction is mandatory.  
 **Foundation:** Contextual Dialogue Persona & Choices P14 accepted.  
 **Completion rule:** phases organize work; completing a phase never completes the parent goal. Continue autonomously through every mandatory phase until developer-side acceptance or a genuine blocker.
 
@@ -166,6 +166,27 @@ Required:
 
 **Gate:** one production semantic interaction lifecycle owns migrated spontaneous dialogue, bounded continuity and sparse persistence. Only final native user acceptance remains.
 
+## P10 — Native Conversation parity correction
+
+**Status:** ACTIVE.
+
+The first user native/harness comparison after P0–P9 exposed a developer-side acceptance gap. See \`NATIVE_CONVERSATION_PARITY_CORRECTION.md\` for the detailed source audit, architecture and chunk sequence.
+
+Mandatory subphases:
+
+- P10A — reopen acceptance + freeze parity evidence;
+- P10B — headless production Conversation presentation projection;
+- P10C — Semantic Lab primary Conversation consumes the native projection;
+- P10D — click/session parity;
+- P10E — opening/close/suspend/resume parity;
+- P10F — conversation-first Simulation desktop UX redesign;
+- P10G — World Browser navigation repair;
+- P10H — native-versus-harness parity acceptance.
+
+**Gate:** the Semantic Lab main Conversation surface is a trustworthy behavioral mirror of the production native Conversation session for the same state. Broader candidates remain diagnostics only, layout remains stable through real workflows, and World Browser role/affiliation navigation is explicit.
+
+P10 is intentionally extensible while the user continues the current planning/audit pass. Additional approved corrective subphases may be appended before final goal generation.
+
 ## Stop condition
 
 Do not stop because:
@@ -176,5 +197,5 @@ Do not stop because:
 - one long-thread test passes;
 - the harness is green for a partial slice.
 
-Stop only when P0–P9 developer-side gates are complete, or a genuine external/technical blocker prevents further safe progress.
+Stop only when P0–P10 and any later user-approved mandatory corrective phases have developer-side acceptance, or a genuine external/technical blocker prevents further safe progress. P0–P9 passing alone is no longer sufficient for READY FOR USER LIVE TEST.
 

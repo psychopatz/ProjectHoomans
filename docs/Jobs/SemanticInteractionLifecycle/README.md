@@ -1,6 +1,6 @@
 # Semantic Interaction Lifecycle
 
-**Status:** ACTIVE — approved successor semantic roadmap after Contextual Dialogue Persona & Choices P14 acceptance.  
+**Status:** ACTIVE — P0–P9 retained foundation; developer acceptance REOPENED for P10 native Conversation parity correction.  
 **Audit baseline:** ProjectHoomans main at 6aa9493aa6df0a48b2dd148a247a742d8fb38e5d on 2026-10-24.  
 **Native Project Zomboid SP/MP:** user-owned final acceptance; not a Codex implementation blocker.  
 **Goal prompt:** chat-only by repository policy; do not create GOAL_PROMPT.md.
@@ -19,9 +19,10 @@ The completed system must:
 - remain sparse and bounded for hundreds of NPCs and multiple simultaneous players;
 - keep multiplayer gameplay and persistence server-authoritative;
 - use the existing Semantic Lab and production Lua worker as the main agent test/debug surface;
+- make the Semantic Lab primary Conversation surface a behavioral mirror of the native production Conversation session, while keeping broader candidates/diagnostics in a separate debug sidecar;
 - retain the current offline deterministic semantic path; PBrainZ/LLM realization remains optional.
 
-The parent goal is not complete when one migration family or one phase passes. It is complete only after the full roadmap has developer-side acceptance through the existing production Lua path.
+The parent goal is not complete when one migration family or one phase passes. P0–P9 implementation is retained foundation, but user native/harness evidence on 2026-10-25 reopened developer acceptance. Completion now also requires P10 native Conversation parity and any additional user-approved corrective phases added before final handoff.
 
 ## Why this is a new roadmap
 
@@ -85,7 +86,8 @@ This job builds on and must not duplicate:
 5. ARCHITECTURE.md
 6. MIGRATION_MATRIX.md
 7. PERSISTENCE_AND_SCALING.md
-8. ROADMAP.md
-9. HARNESS_ACCEPTANCE.md
-10. PROGRESS.md **last** for current truth and the exact Next Chunk
+8. NATIVE_CONVERSATION_PARITY_CORRECTION.md
+9. ROADMAP.md
+10. HARNESS_ACCEPTANCE.md
+11. PROGRESS.md **last** for current truth and the exact Next Chunk
 

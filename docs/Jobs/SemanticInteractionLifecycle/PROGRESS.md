@@ -1,12 +1,12 @@
 # Semantic Interaction Lifecycle — Current Progress
 
-**Updated:** 2026-10-24
+**Updated:** 2026-10-25
 
-**Developer status:** P0A–P9 implementation and all developer-side acceptance gates are complete. Final native Project Zomboid SP/MP acceptance remains user-owned and was not run by Codex.
+**Developer status:** P0A–P9 implementation is retained foundation, but developer acceptance is REOPENED. User-supplied native/harness evidence on 2026-10-25 proves the Semantic Lab primary Conversation surface is not yet faithful to native production presentation. P10 is mandatory before READY FOR USER LIVE TEST.
 
 **Accepted predecessor foundation:** Contextual Dialogue Persona & Choices P14. Its save-backed production rehydration architecture remains intact.
 
-**Audit baseline:** `e8c04b4fb2139be315253f12e0f06a5dfa3fc70f5`
+**Current parity-audit baseline:** `7833214e0eb0f52467caa8749b6bc8c5333d1f64`
 
 **Checkout:** existing `main` only. No branch, source-save mutation, Workshop upload, or native game launch was performed.
 
@@ -48,10 +48,51 @@ Complete. The existing production Lua worker exposes envelope, apply, NPC speech
 
 Complete for the audited families. Legacy registries, EN/TL lines, timing gates, and compatibility shims remain only where they are still the correct realization/provider or external-domain boundary. Duplicate lifecycle/state authority and prose-reparse paths are retired; ConversationBlocks, gameplay domains, network authority, and existing presentation/TTS ownership remain authoritative in their existing locations.
 
+## P10 — native Conversation parity correction
+
+**Status:** ACTIVE.
+
+The first user native/harness comparison supersedes the previous final handoff.
+
+Verified mismatches:
+
+- native production showed the staged Pete Patz opening and a three-row Response Channel for the captured state;
+- Semantic Lab exposed a much broader candidate surface;
+- production \`buildCoreChoices\` selects the current semantic group, while current Tk suggestion rendering can use the global candidate projection when no explicit group override exists;
+- harness clickability is gated by worker response type instead of the production presented-choice/session validity contract;
+- normal control re-enable paths call splitter restoration and can overwrite a user's current drag with persisted sash state;
+- hiding workbench contents can leave the bottom PanedWindow allocation in place, producing large wasted space;
+- World Browser relationship/role classification still exists in code but can appear absent because the persisted "Saved affiliations" lens replaces the visible hierarchy.
+
+Detailed corrective architecture and acceptance are in \`NATIVE_CONVERSATION_PARITY_CORRECTION.md\`.
+
+P10A (reopen acceptance + freeze parity evidence) is complete as audit/documentation.
+
+### Exact Next Chunk — P10B
+
+Implement the smallest **production-Lua headless Conversation presentation projection** that answers what native Core would present for the current conversation state.
+
+It must expose, without Python reconstruction:
+
+- production Talk/opening state;
+- staged/opening NPC messages;
+- relation presentation;
+- lifecycle/busy state;
+- current semantic group/revision;
+- exact production-presented choice rows generated from the same \`PresentSemanticChoices\` / \`buildCoreChoices\` policy;
+- enabled/disabled state and semantic frames;
+- typed semantic input availability.
+
+Do not redesign the Tk layout in P10B yet.
+
+Do not remove global candidate diagnostics; move/keep them as diagnostics in later P10C/P10F work.
+
+P10B gate: the real worker can answer "what would the native Conversation session present now?" from production Lua state, and tests prove the result uses the production presentation path rather than a Python duplicate.
+
 ## Developer-side evidence
 
 See `DEVELOPER_ACCEPTANCE.md` for the exact command log and scenario mapping. Verified results are: focused lifecycle tests 10/10; full Python semantic-harness suite 517 tests with 0 failures and 0 errors; full Lua suite 873/873; Lua syntax validation passed; full-mod Kahlua verification reported zero errors and zero warnings across 3,094 scanned files; and `git diff --check` passed.
 
-## Exact Next Chunk
+## Previous P0–P9 handoff status
 
-No further developer-implementable P0–P9 chunk remains. The next action is the user-owned native Project Zomboid SP/MP acceptance pass described in `HARNESS_ACCEPTANCE.md`; Codex did not launch or mutate a native game or source save.
+The former "no further developer-implementable chunk remains" conclusion is superseded by P10. Preserve the recorded P0–P9 verification as historical implementation evidence; do not use it to skip the active native-parity correction.
