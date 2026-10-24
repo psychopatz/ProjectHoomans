@@ -9,14 +9,15 @@ from typing import Any
 from .config import HarnessConfig
 from .fixture_provider import OfflineEngineFixtureProvider
 from .item_catalog import search_item_catalog
-from .live_profiler_provider import LiveProfilerProvider
 from .process import HarnessError, LuaProcess
 from .scenario import load_scenario, validate_scenario
-from .save_browser import SavedWorldBrowser
-from .save_catalog import SaveCatalog
-from .save_import import SaveBackedImporter
 from .state import HarnessWorkingWorld, ImportedSourceSnapshot, Provenance
 from .activity import ActivityLog, default_activity_path
+from .worker_authoring import WorkerAuthoringOperations
+from .worker_conversation import WorkerConversationOperations
+from .worker_knowledge import WorkerKnowledgeOperations
+from .worker_matrix import WorkerMatrixOperations
+from .worker_sources import WorkerSourceOperations
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
@@ -64,6 +65,11 @@ class LuaSemanticWorker:
             client="api",
         )
         self.runtime = LuaProcess(self.config, activity_log=self.activity_log)
+        self._authoring = WorkerAuthoringOperations(self)
+        self._conversation = WorkerConversationOperations(self)
+        self._knowledge = WorkerKnowledgeOperations(self)
+        self._matrix = WorkerMatrixOperations(self)
+        self._sources = WorkerSourceOperations(self)
         try:
             self.runtime.start()
             self.import_source(scenario)
@@ -268,32 +274,27 @@ class LuaSemanticWorker:
             self.scenario = self.working_world.data
 
     def input(self, text: str) -> dict[str, Any]:
-        return self._mutation_response(self._request("INPUT", str(text)))
+        return self._conversation.input(text)
 
     def preview(self, text: str) -> dict[str, Any]:
         """Preview a production semantic turn without recording or dispatching it."""
 
-        return self._request("PREVIEW", str(text))
+        return self._conversation.preview(text)
 
     def suggestion_predicate(self, predicate: dict[str, Any]) -> dict[str, Any]:
         """Evaluate one production suggestion predicate against the public scenario projection."""
 
-        return self._request("SUGGESTION_PREDICATE", {"predicate": predicate})
+        return self._conversation.suggestion_predicate(predicate)
 
     def suggestion_click(self, frame: dict[str, Any]) -> dict[str, Any]:
         """Submit one canonical suggestion frame through the production input path."""
 
-        return self._mutation_response(
-            self._request("SUGGESTION_CLICK", {"frame": frame})
-        )
+        return self._conversation.suggestion_click(frame)
 
     def set_language(self, language: str) -> dict[str, Any]:
         """Change the production translation manager language in this session."""
 
-        value = str(language or "EN").strip().upper()
-        response = self._request("LANGUAGE", value)
-        self.scenario.setdefault("runtime", {})["language"] = value
-        return response
+        return self._conversation.set_language(language)
 
     def tool_reply(
         self,
@@ -302,15 +303,10 @@ class LuaSemanticWorker:
     ) -> dict[str, Any]:
         """Resolve a production dedicated tool reply through the real catalog."""
 
-        return self._request(
-            "TOOL_REPLY",
-            {"results": results, "context": context or {}},
-        )
+        return self._conversation.tool_reply(results, context)
 
     def snapshot(self) -> dict[str, Any]:
-        response = self._request("SNAPSHOT")
-        self._sync_effective_scenario(response)
-        return response
+        return self._conversation.snapshot()
 
     def _mutation_response(self, response: dict[str, Any]) -> dict[str, Any]:
         """Attach the authoritative post-mutation worker projection.
@@ -323,46 +319,22 @@ class LuaSemanticWorker:
         without teaching Python any Project Hoomans gameplay semantics.
         """
 
-        snapshot = self.snapshot()
-        if not isinstance(response, dict):
-            return snapshot
-        merged = deepcopy(response)
-        for key in (
-            "scenario",
-            "context",
-            "sourceSnapshot",
-            "workingWorld",
-            "runtimeRelationshipOverrides",
-            "productionRehydration",
-            "productionFactionRehydration",
-            "productionPlayerRehydration",
-            "productionKnowledgeRehydration",
-            "productionFactionContext",
-            "simulationProjection",
-            "provenance",
-        ):
-            if key in snapshot:
-                merged[key] = deepcopy(snapshot[key])
-        self._sync_effective_scenario(snapshot)
-        return merged
+        return self._conversation.mutation_response(response)
 
     def inspect_actor_state(self) -> dict[str, Any]:
         """Return bounded production actor state after an isolated mutation."""
 
-        return self._request("INSPECT_ACTOR_STATE")
+        return self._conversation.inspect_actor_state()
 
     def inspect_npc_dossier(self) -> dict[str, Any]:
         """Return the production player-scoped NPC dossier and social history."""
 
-        return self._request("INSPECT_NPC_DOSSIER")
+        return self._conversation.inspect_npc_dossier()
 
     def relationship_proposal(self, npc_id: str | None = None) -> dict[str, Any]:
         """Submit the canonical proposal action to the server-authority seam."""
 
-        payload = {"npcID": npc_id} if npc_id else None
-        return self._mutation_response(
-            self._request("RELATIONSHIP_PROPOSAL", payload)
-        )
+        return self._conversation.relationship_proposal(npc_id)
 
     def relationship_preview(
         self,
@@ -371,10 +343,7 @@ class LuaSemanticWorker:
     ) -> dict[str, Any]:
         """Resolve staged relationship scores without mutating the scenario."""
 
-        payload: dict[str, Any] = {"relationship": dict(relationship)}
-        if npc_id:
-            payload["npcID"] = npc_id
-        return self._request("RELATIONSHIP_PREVIEW", payload)
+        return self._conversation.relationship_preview(relationship, npc_id)
 
     def apply_runtime_relationship_baseline(
         self,
@@ -389,62 +358,43 @@ class LuaSemanticWorker:
         runtime record, which reset can later discard.
         """
 
-        payload: dict[str, Any] = {"relationship": dict(relationship)}
-        if npc_id:
-            payload["npcID"] = npc_id
-        response = self._request(
-            "APPLY_RUNTIME_RELATIONSHIP_BASELINE", payload
+        return self._conversation.apply_runtime_relationship_baseline(
+            relationship, npc_id
         )
-        self._sync_effective_scenario(response)
-        return response
 
     def conversation_graph(self) -> dict[str, Any]:
         """Return the developer-only full selected ConversationBlock graph."""
 
-        return self._request("CONVERSATION_GRAPH")
+        return self._conversation.conversation_graph()
 
     def persona_catalog(
         self, register_relationship_kind: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """Return the bounded catalog owned by the production Lua registries."""
 
-        payload = None
-        if register_relationship_kind is not None:
-            payload = {"registerRelationshipKind": register_relationship_kind}
-        return self._request("PERSONA_CATALOG", payload)
+        return self._conversation.persona_catalog(register_relationship_kind)
 
     def persona_preview(self, scenario: dict[str, Any]) -> dict[str, Any]:
         """Preview generated NPC personality for a staged scenario."""
 
-        validate_scenario(scenario)
-        return self._request("PERSONA_PREVIEW", {"scenario": scenario})
+        return self._conversation.persona_preview(scenario)
 
     def simulation_control_catalog(self) -> dict[str, Any]:
         """Return the worker-owned, bounded Semantic Lab control metadata."""
 
-        return self._request("SIMULATION_CONTROL_CATALOG")
+        return self._conversation.simulation_control_catalog()
 
     def talk_catalog(self) -> dict[str, Any]:
         """Return the production-owned native Talk target catalog."""
 
-        return self._request("TALK_CATALOG")
+        return self._conversation.talk_catalog()
 
     def talk_start(
         self, target_id: str = "current", utterance: str = "hello"
     ) -> dict[str, Any]:
         """Start the native Talk parity projection for one target type."""
 
-        result = self._request(
-            "TALK_START",
-            {
-                "targetID": str(target_id or "current"),
-                "utterance": str(utterance or "hello"),
-            },
-        )
-        scenario = result.get("scenario")
-        if isinstance(scenario, dict):
-            self.scenario = scenario
-        return result
+        return self._conversation.talk_start(target_id, utterance)
 
     def talk_matrix(
         self,
@@ -454,31 +404,20 @@ class LuaSemanticWorker:
     ) -> dict[str, Any]:
         """Compare native Talk startup and the first turn across target types."""
 
-        payload: dict[str, Any] = {
-            "utterance": str(text or "hello"),
-            "maximum": int(maximum),
-        }
-        if target_types is not None:
-            payload["targetIDs"] = [str(value) for value in target_types]
-        return self._request("TALK_MATRIX", payload)
+        return self._conversation.talk_matrix(target_types, text, maximum)
 
     def item_catalog(self, query: str = "", limit: int = 50) -> dict[str, Any]:
         """Search installed Project Zomboid item definitions for the Lab editor."""
 
-        return search_item_catalog(query, limit, self.scenario)
+        return self._conversation.item_catalog(query, limit)
 
     def save_catalog(self, roots: list[Path] | None = None) -> dict[str, Any]:
-        """Discover validated offline saves through PsychopatzCore's reader."""
-
-        return SaveCatalog(
-            roots,
-            core_repository=self.config.core_repository,
-        ).discover()
+        return self._sources.save_catalog(roots)
 
     def offline_fixture_catalog(self) -> dict[str, Any]:
         """Describe editable engine-only values and their fixture provenance."""
 
-        return OfflineEngineFixtureProvider().catalog(self.scenario)
+        return self._sources.offline_fixture_catalog()
 
     def live_profiler_catalog(
         self,
@@ -488,14 +427,12 @@ class LuaSemanticWorker:
         config_path: Path | None = None,
         npc_id: str | None = None,
     ) -> dict[str, Any]:
-        """Describe the optional read-only live snapshot provider."""
-
-        return LiveProfilerProvider(
-            core_repository=self.config.core_repository,
+        return self._sources.live_profiler_catalog(
+            enabled=enabled,
             snapshot_path=snapshot_path,
             config_path=config_path,
-            enabled=enabled,
-        ).catalog(npc_id=npc_id)
+            npc_id=npc_id,
+        )
 
     def enrich_from_live_profiler(
         self,
@@ -506,72 +443,16 @@ class LuaSemanticWorker:
         player_id: str | None = None,
         npc_id: str | None = None,
     ) -> dict[str, Any]:
-        """Explicitly copy live engine values into the isolated source world.
-
-        Only paths owned by ``OfflineEngineFixtureProvider`` are eligible for
-        enrichment.  The existing imported source save/fixture is never
-        reopened or written; a new immutable in-memory snapshot is installed
-        for the detached worker only, with LIVE provenance on each copied
-        path.
-        """
-
-        provider = LiveProfilerProvider(
-            core_repository=self.config.core_repository,
+        return self._sources.enrich_from_live_profiler(
+            enabled=enabled,
             snapshot_path=snapshot_path,
             config_path=config_path,
-            enabled=enabled,
-        )
-        projection = provider.project(
-            operation="GET_SNAPSHOT",
             player_id=player_id,
             npc_id=npc_id,
         )
-        enrichment, live_paths = provider.fixture_enrichment(projection)
-        if not enrichment:
-            return {"ok": False, "liveProfiler": projection, "imported": False}
-
-        def merge_overlay(target: dict[str, Any], overlay: dict[str, Any]) -> None:
-            for key, value in overlay.items():
-                if isinstance(value, dict) and isinstance(target.get(key), dict):
-                    merge_overlay(target[key], value)
-                else:
-                    target[key] = deepcopy(value)
-
-        source = self.source_snapshot.to_dict()
-        enriched_data = deepcopy(source["data"])
-        merge_overlay(enriched_data, enrichment)
-        metadata = deepcopy(source["metadata"])
-        metadata["liveProfiler"] = {
-            "providerID": provider.provider_id,
-            "snapshotPath": str(provider.snapshot_path),
-            "configPath": str(provider.config_path),
-            "snapshot": deepcopy(projection.get("snapshot")),
-        }
-        provenance = deepcopy(source["provenance"])
-        provenance.setdefault("schema", "semantic.provenance.v1")
-        provenance.setdefault("paths", {}).update(live_paths)
-        provider_payloads = deepcopy(source["providerPayloads"])
-        provider_payloads[provider.provider_id] = projection
-        response = self.import_source(
-            enriched_data,
-            source=metadata.get("sourceKind", self.source_snapshot.source),
-            source_id=str(metadata.get("sourceID") or "live-enriched-source"),
-            mode=str(metadata.get("mode") or "offline_save"),
-            metadata=metadata,
-            provenance=provenance,
-            provider_payloads=provider_payloads,
-        )
-        response["liveProfiler"] = projection
-        response["imported"] = True
-        response["enrichedPaths"] = sorted(live_paths)
-        return response
 
     def save_browser(self, save_path: Path) -> dict[str, Any]:
-        """Return a bounded read-only actor/world projection for one save."""
-
-        return SavedWorldBrowser(
-            core_repository=self.config.core_repository,
-        ).browse(Path(save_path))
+        return self._sources.save_browser(save_path)
 
     def import_saved_selection(
         self,
@@ -581,49 +462,11 @@ class LuaSemanticWorker:
         npc_id: str | None = None,
         engine_fixtures: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Import one saved Player/NPC pair into the detached worker world."""
-
-        selection = SaveBackedImporter(
-            core_repository=self.config.core_repository,
-        ).load(
-            Path(save_path),
+        return self._sources.import_saved_selection(
+            save_path,
             player_uuid=player_uuid,
             npc_id=npc_id,
             engine_fixtures=engine_fixtures,
-        )
-        # The selected raw records are transported in the explicit
-        # ProjectHoomans.rawRecords envelope. Do not send a second copy of
-        # those same records through the legacy provider keys: large real-save
-        # NPC records can otherwise exceed the Lua worker's bounded protocol
-        # message size before production rehydration begins.
-        provider_payloads = deepcopy(selection.provider_payloads)
-        hoomans_payload = provider_payloads.get("ProjectHoomans")
-        raw_records = (
-            hoomans_payload.get("rawRecords")
-            if isinstance(hoomans_payload, dict)
-            else None
-        )
-        if isinstance(hoomans_payload, dict) and isinstance(raw_records, dict):
-            npc_record = raw_records.get("npc")
-            player_record = raw_records.get("player")
-            if isinstance(npc_record, dict):
-                npc_id_value = str(
-                    npc_record.get("id")
-                    or selection.scenario.get("npc", {}).get("npcID")
-                    or ""
-                )
-                if npc_id_value:
-                    hoomans_payload.pop("PNC_" + npc_id_value, None)
-            if isinstance(player_record, dict):
-                hoomans_payload.pop("PNC_PlayerCharacters", None)
-        return self.import_source(
-            selection.scenario,
-            source=Provenance.SAVE,
-            source_id=selection.metadata["sourceID"],
-            mode="offline_save",
-            metadata=selection.metadata,
-            provenance=selection.provenance,
-            provider_payloads=provider_payloads,
         )
 
     def context_matrix(
@@ -632,225 +475,49 @@ class LuaSemanticWorker:
         text: str = "hello",
         maximum: int = 8,
     ) -> dict[str, Any]:
-        """Run bounded scenario A/B rows through this same real Lua worker."""
-
-        original = self.scenario
-        rows: list[dict[str, Any]] = []
-        try:
-            for index, scenario in enumerate(scenarios[: max(1, int(maximum))]):
-                validate_scenario(scenario)
-                configured = self.configure(scenario)
-                turn = self.input(text)
-                snapshot = self.snapshot()
-                observation = turn.get("observation", {})
-                observation = observation if isinstance(observation, dict) else {}
-                response = observation.get("response", {})
-                response = response if isinstance(response, dict) else {}
-                queued = (response.get("queued") or [response])[0]
-                queued = queued if isinstance(queued, dict) else response
-                suggestions = observation.get("suggestions") or {}
-                context = snapshot.get("context") or {}
-                actor_context = context.get("actorConversationContext") or {}
-                actor_relationship = actor_context.get("relationship") or {}
-                speech_style = (
-                    context.get("speechStyleContext")
-                    or response.get("speechStyleContext")
-                    or {}
-                )
-                flow = observation.get("flow") or {}
-                rows.append(
-                    {
-                        "index": index,
-                        "label": scenario.get("runtime", {}).get(
-                            "semanticLabMatrixLabel", f"case-{index + 1}"
-                        ),
-                        "configured": {
-                            "accepted": configured.get("ok") is True,
-                            "dynamicTradingLoad": configured.get(
-                                "dynamicTradingLoad"
-                            ),
-                        },
-                        "context": snapshot.get("context", {}),
-                        "npcResponse": queued.get("text") or response.get("text"),
-                        "semanticHubChoices": [
-                            {
-                                "id": candidate.get("id"),
-                                "action": candidate.get("action"),
-                                "label": (candidate.get("display") or {}).get("label")
-                                or candidate.get("labelFallback"),
-                                "status": candidate.get("status"),
-                            }
-                            for candidate in (suggestions.get("candidates") or [])[:24]
-                            if isinstance(candidate, dict)
-                        ],
-                        "speechStyleContext": speech_style,
-                        "relationship": {
-                            "standing": actor_relationship.get("state")
-                            or actor_relationship.get("standing")
-                            or "unknown",
-                            "bond": deepcopy(
-                                actor_relationship.get("bond")
-                                or (snapshot.get("simulationProjection") or {})
-                                .get("npc", {})
-                                .get("bond")
-                                or {}
-                            ),
-                            "approval": actor_relationship.get("approval"),
-                            "respect": actor_relationship.get("respect"),
-                            "familiarity": actor_relationship.get("familiarity"),
-                        },
-                        "runtimeGraphPath": {
-                            "kind": "semantic_flow" if flow.get("flowId") else "semantic_hub",
-                            "flow": flow,
-                            "graph": observation.get("conversationGraph")
-                            or response.get("conversationGraph"),
-                        },
-                        "response": {
-                            "semanticTemplateID": response.get("templateID"),
-                            "renderTemplateID": response.get("renderTemplateID"),
-                            "key": queued.get("key") or response.get("templateID"),
-                            "text": queued.get("text") or response.get("text"),
-                            "fallback": queued.get("fallback") or response.get("fallback"),
-                            "translationKey": queued.get("translationKey"),
-                            "realizationFamily": queued.get("realizationFamily")
-                            or response.get("realizationFamily"),
-                            "realizationVariant": queued.get("realizationVariant")
-                            or response.get("realizationVariant"),
-                            "realizationFallbackReason": queued.get(
-                                "realizationFallbackReason"
-                            ) or response.get("realizationFallbackReason"),
-                            "familyAddress": (queued.get("args") or {}).get(
-                                "familyAddress"
-                            ),
-                        },
-                        "suggestions": {
-                            "revision": suggestions.get("revision"),
-                            "candidateOrder": [
-                                row.get("id")
-                                for row in (suggestions.get("candidates") or [])[:24]
-                            ],
-                            "candidates": [
-                                {
-                                    "id": row.get("id"),
-                                    "providerID": row.get("providerID"),
-                                    "source": row.get("source"),
-                                    "ranking": row.get("ranking"),
-                                    "display": row.get("display"),
-                                }
-                                for row in (suggestions.get("candidates") or [])[:24]
-                            ],
-                        },
-                    }
-                )
-        finally:
-            self.configure(original)
-        return {"schema": "semantic.persona.matrix.v1", "rows": rows}
+        return self._matrix.context_matrix(scenarios, text, maximum)
 
     def capture_baseline(self, text: str) -> dict[str, Any]:
-        """Capture a non-mutating production baseline for the current scenario."""
-
-        value = str(text or "").strip()
-        if not value:
-            raise ValueError("baseline utterance must not be empty")
-        preview = self.preview(value)
-        return {
-            "schema": "semantic.persona.baseline.v1",
-            "utterance": value,
-            "preview": preview,
-        }
+        return self._matrix.capture_baseline(text)
 
     def apply_and_replay(self, text: str) -> dict[str, Any]:
-        """Reapply the current scenario and replay one utterance in production Lua."""
-
-        value = str(text or "").strip()
-        if not value:
-            raise ValueError("replay utterance must not be empty")
-        configured = self.configure(self.scenario)
-        turn = self.input(value)
-        return {
-            "schema": "semantic.persona.apply_replay.v1",
-            "utterance": value,
-            "configured": configured,
-            "turn": turn,
-        }
+        return self._matrix.apply_and_replay(text)
 
     def knowledge_bootstrap(
         self, request_id: str = "harness-knowledge-bootstrap"
     ) -> dict[str, Any]:
-        """Hydrate the real player-scoped Knowledge projection after reload."""
-
-        return self._request(
-            "KNOWLEDGE_BOOTSTRAP", {"requestID": str(request_id)}
-        )
+        return self._knowledge.knowledge_bootstrap(request_id)
 
     def knowledge_metrics(
         self, synthetic_npcs: int = 0, facts_per_npc: int = 1
     ) -> dict[str, Any]:
-        """Measure serialized production NPC and player Knowledge records."""
-
-        return self._request(
-            "KNOWLEDGE_METRICS",
-            {
-                "syntheticNPCs": int(synthetic_npcs),
-                "factsPerNPC": int(facts_per_npc),
-            },
-        )
+        return self._knowledge.knowledge_metrics(synthetic_npcs, facts_per_npc)
 
     def world_knowledge_inspect(
         self, actor_id: str | None = None, fact_id: str | None = None,
         max_facts: int = 32,
     ) -> dict[str, Any]:
-        """Inspect the production World Knowledge ledger and actor explanations."""
-
-        return self._request(
-            "WORLD_KNOWLEDGE_INSPECT",
-            {
-                "actorID": actor_id,
-                "factID": fact_id,
-                "maxFacts": int(max_facts),
-            },
-        )
+        return self._knowledge.world_knowledge_inspect(actor_id, fact_id, max_facts)
 
     def world_knowledge_propagate(
         self, from_actor_id: str, to_actor_id: str,
         channel: str = "conversation", authorized: bool = True,
         now: float = 1000,
     ) -> dict[str, Any]:
-        """Exercise one authorized production propagation opportunity."""
-
-        return self._request(
-            "WORLD_KNOWLEDGE_PROPAGATE",
-            {
-                "fromActorID": str(from_actor_id),
-                "toActorID": str(to_actor_id),
-                "channel": str(channel),
-                "authorized": bool(authorized),
-                "now": float(now),
-            },
+        return self._knowledge.world_knowledge_propagate(
+            from_actor_id, to_actor_id, channel, authorized, now
         )
 
     def knowledge_discover(
         self, topic_id: str, npc_id: str | None = None
     ) -> dict[str, Any]:
-        """Use the production direct-disclosure Knowledge path for a topic."""
-
-        return self._request(
-            "KNOWLEDGE_DISCOVER",
-            {
-                "topicID": str(topic_id),
-                "npcID": str(npc_id) if npc_id is not None else None,
-            },
-        )
+        return self._knowledge.knowledge_discover(topic_id, npc_id)
 
     def replay_quest_request(self, request: dict[str, Any]) -> dict[str, Any]:
-        """Replay a captured request through the production server router."""
-
-        return self._request("REPLAY_SEMANTIC_QUEST", request)
+        return self._knowledge.replay_quest_request(request)
 
     def commitment(self, payload: dict[str, Any]) -> dict[str, Any]:
-        """Exercise the production NPC Knowledge commitment boundary."""
-
-        return self._request("COMMITMENT", payload)
+        return self._knowledge.commitment(payload)
 
     def backstory(
         self,
@@ -859,18 +526,8 @@ class LuaSemanticWorker:
         npc_id: str = "harness-backstory-npc",
         save_seed: str | int | None = None,
     ) -> dict[str, Any]:
-        """Read a bounded seed-derived backstory projection from production Lua."""
-
-        payload: dict[str, Any] = {
-            "identitySeed": identity_seed,
-            "tacticalClass": tactical_class,
-            "npcID": npc_id,
-        }
-        if save_seed is not None:
-            payload["saveSeed"] = save_seed
-        return self._request(
-            "BACKSTORY",
-            payload,
+        return self._knowledge.backstory(
+            identity_seed, tactical_class, npc_id, save_seed
         )
 
     def backstory_fact(
@@ -882,56 +539,30 @@ class LuaSemanticWorker:
         npc_id: str = "harness-backstory-npc",
         save_seed: str | int | None = None,
     ) -> dict[str, Any]:
-        """Resolve one authoritative offline backstory fact in production Lua."""
-
-        payload: dict[str, Any] = {
-            "identitySeed": identity_seed,
-            "kind": kind,
-            "tacticalClass": tactical_class,
-            "language": language,
-            "npcID": npc_id,
-        }
-        if save_seed is not None:
-            payload["saveSeed"] = save_seed
-        return self._request(
-            "BACKSTORY_FACT",
-            payload,
+        return self._knowledge.backstory_fact(
+            identity_seed, kind, tactical_class, language, npc_id, save_seed
         )
 
     def flow_catalog(self) -> dict[str, Any]:
-        """Read normalized production flow definitions from the Lua registry."""
-
-        return self._request("FLOW_CATALOG")
+        return self._authoring.flow_catalog()
 
     def fact_catalog(self) -> list[dict[str, Any]]:
-        """Read typed engine facts exposed to semantic gates and context."""
-
-        return self._request("FACT_CATALOG").get("facts", [])
+        return self._authoring.fact_catalog()
 
     def event_catalog(self) -> list[dict[str, Any]]:
-        """Read bounded engine notification types."""
-
-        return self._request("EVENT_CATALOG").get("events", [])
+        return self._authoring.event_catalog()
 
     def validate_flow(self, definition: dict[str, Any]) -> dict[str, Any]:
-        """Validate a draft through the production Lua flow registry."""
-
-        return self._request("FLOW_VALIDATE", definition)
+        return self._authoring.validate_flow(definition)
 
     def register_flow(self, definition: dict[str, Any]) -> dict[str, Any]:
-        """Register a validated draft in this worker's production registry."""
-
-        return self._request("FLOW_REGISTER", definition)
+        return self._authoring.register_flow(definition)
 
     def generate_flows(self) -> dict[str, Any]:
-        """Regenerate registered production flows from live capability metadata."""
-
-        return self._request("FLOW_GENERATE")
+        return self._authoring.generate_flows()
 
     def flow_coverage(self) -> list[dict[str, Any]]:
-        """Return the live capability generation classification report."""
-
-        return self._request("FLOW_COVERAGE").get("capabilityCoverage", [])
+        return self._authoring.flow_coverage()
 
     def ping(self) -> dict[str, Any]:
         return self._request("PING")

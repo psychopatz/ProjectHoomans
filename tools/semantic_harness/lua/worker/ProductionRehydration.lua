@@ -6,6 +6,7 @@
 -- isolated registry.
 
 local ProductionRehydration = {}
+local Configuration = require "worker/ProductionRehydration_Configure"
 
 local function sourceKind(context)
     local metadata = context.Runtime.sourceMetadata or {}
@@ -552,150 +553,20 @@ local function scenarioProjection(context, record, original)
 end
 
 function ProductionRehydration.configure(context)
-    local Runtime = context.Runtime
-    local Values = context.Values
-    if sourceKind(context) ~= "SAVE" then
-        Runtime.hydratedNpcRecord = nil
-        Runtime.productionPlayerRehydration = nil
-        Runtime.productionKnowledgeRehydration = nil
-        Runtime.modData = Runtime.modData or {}
-        Runtime.modData.PNC_NPCKnowledge = nil
-        if PNC and PNC.NPCKnowledge then
-            PNC.NPCKnowledge.Registry = nil
-            PNC.NPCKnowledge.Loaded = false
-            PNC.NPCKnowledge.Dirty = false
-        end
-        Runtime.productionNpcDossier = {
-            schema = "semantic.production_npc_dossier.v1",
-            source = sourceKind(context),
-            status = "NOT_APPLICABLE",
-            mode = "developer_test",
-        }
-        Runtime.productionRelationshipHistory = {
-            schema = "semantic.production_relationship_history.v1",
-            source = sourceKind(context),
-            status = "NOT_APPLICABLE",
-            mode = "developer_test",
-        }
-        Runtime.productionFactionContext = nil
-        Runtime.productionFactionRehydration = {
-            schema = "semantic.production_faction_rehydration.v1",
-            source = sourceKind(context),
-            status = "NOT_APPLICABLE",
-            mode = "developer_test",
-        }
-        resetOrganizationState()
-        Runtime.productionRehydration = {
-            schema = "semantic.production_rehydration.v1",
-            source = sourceKind(context),
-            status = "NOT_APPLICABLE",
-            mode = "developer_test",
-        }
-        return true
-    end
-
-    local scenario = Runtime.scenario or {}
-    local original = scenario.npc or {}
-    local npcID = tostring(original.npcID or original.id
-        or (Runtime.sourceMetadata or {}).npcID or "")
-    if npcID == "" then return fail(context, "npc_id_missing") end
-    local raw = rawRecordFor(context, npcID)
-    if type(raw) ~= "table" then
-        return fail(context, "raw_npc_record_missing")
-    end
-    local itemTypeFixtureCount = ProductionRehydration
-        .installEngineItemTypeFixture(context)
-    if not PNC or not PNC.Persistence
-        or type(PNC.Persistence.DeserializeRecord) ~= "function"
-    then
-        return fail(context, "production_deserializer_unavailable")
-    end
-    if not PNC.Inventory
-        or type(PNC.Inventory.EnsureRecordInventory) ~= "function"
-    then
-        return fail(context, "production_inventory_hydrator_unavailable")
-    end
-
-    local ok, record = pcall(
-        PNC.Persistence.DeserializeRecord,
-        Values.productionCopy(raw),
-        npcID
-    )
-    if not ok or type(record) ~= "table"
-        or tostring(record.id or "") ~= npcID
-    then
-        return fail(context, ok and "production_deserializer_rejected_record"
-            or "production_deserializer_error:" .. tostring(record))
-    end
-
-    local hydratedOK, inventory = pcall(
-        PNC.Inventory.EnsureRecordInventory,
-        record
-    )
-    if not hydratedOK or type(inventory) ~= "table" then
-        return fail(context, hydratedOK and "production_inventory_hydration_failed"
-            or "production_inventory_hydration_error")
-    end
-
-    PNC.Registry = PNC.Registry or {}
-    PNC.Registry.Data = PNC.Registry.Data or {}
-    -- Organization production loaders query the isolated registry while they
-    -- normalize persisted faction/community references.  The semantic
-    -- adapter later adds its conversation-specific lease seam on top.
-    PNC.Registry.Get = function(id)
-        return PNC.Registry.Data[tostring(id)]
-            or PNC.Registry.Data[id]
-    end
-    PNC.Registry.Data[npcID] = record
-    PNC.Registry.Loaded = true
-    Runtime.hydratedNpcRecord = record
-    local playerStatus, playerReason = loadProductionPlayerCharacters(context)
-    if not playerStatus then
-        return fail(context, "production_player_rehydration:" .. tostring(
-            playerReason
-        ))
-    end
-    Runtime.productionPlayerRehydration = playerStatus
-    local knowledgeStatus, knowledgeReason = loadProductionKnowledge(context)
-    if not knowledgeStatus then
-        return fail(context, "production_knowledge_rehydration:" .. tostring(
-            knowledgeReason
-        ))
-    end
-    Runtime.productionKnowledgeRehydration = knowledgeStatus
-    local organizationStatus, organizationReason =
-        loadProductionOrganizations(context)
-    if not organizationStatus then
-        return fail(context, "production_faction_rehydration:" .. tostring(
-            organizationReason
-        ))
-    end
-    Runtime.productionFactionRehydration = organizationStatus
-    Runtime.productionFactionContext = productionFactionContext(
-        context,
-        record
-    )
-    scenario.npc = scenarioProjection(context, record, original)
-    Runtime.scenario = scenario
-    Runtime.productionRehydration = {
-        schema = "semantic.production_rehydration.v1",
-        source = "SAVE",
-        status = "HYDRATED",
-        recordID = npcID,
-        deserializer = "PNC.Persistence.DeserializeRecord",
-        inventoryHydrator = "PNC.Inventory.EnsureRecordInventory",
-        inventoryMode = record.inventoryPersistenceMode
-            or inventory.persistenceMode or "SEED_ONLY",
-        inventoryItemCount = countItems(inventory),
-        inventoryRuntimeType = type(record.inventory),
-        registry = "isolated PNC.Registry",
-        sourceRecord = "ProjectHoomans.rawRecords.npc",
-        playerRegistry = Values.copy(Runtime.productionPlayerRehydration),
-        knowledgeRegistry = Values.copy(Runtime.productionKnowledgeRehydration),
-        engineItemTypeFixtureCount = itemTypeFixtureCount > 0
-            and itemTypeFixtureCount or nil,
-    }
-    return true
+    return Configuration.run(context, {
+        sourceKind = sourceKind,
+        fail = fail,
+        rawRecordFor = rawRecordFor,
+        countItems = countItems,
+        resetOrganizationState = resetOrganizationState,
+        installEngineItemTypeFixture =
+            ProductionRehydration.installEngineItemTypeFixture,
+        loadProductionPlayerCharacters = loadProductionPlayerCharacters,
+        loadProductionKnowledge = loadProductionKnowledge,
+        loadProductionOrganizations = loadProductionOrganizations,
+        productionFactionContext = productionFactionContext,
+        scenarioProjection = scenarioProjection,
+    })
 end
 
 function ProductionRehydration.refreshDiagnostics(context)
