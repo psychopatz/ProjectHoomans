@@ -62,12 +62,17 @@ local function ensureNPCSpeechInteraction(
     local eventID = context.eventID or context.eventRef
     if not eventID then return nil end
     local eventType = context.eventType or reason or "social_reaction"
+    local beatID = "beat:" .. tostring(eventType) .. ":"
+        .. tostring(eventID)
     local envelope = envelopeBuilder.NPCSpeech({
         npcID = npcID,
         targetID = playerKey,
         playerUUID = playerKey,
         act = context.act or "REACT",
         topic = context.topic or eventType,
+        beatID = context.beatID or beatID,
+        responsePlanID = context.responsePlanID
+            or "social.reaction." .. tostring(eventType),
         eventType = eventType,
         eventRef = eventID,
         flowID = context.flowID or "social:" .. tostring(eventType),
@@ -82,11 +87,15 @@ local function ensureNPCSpeechInteraction(
         playerUUID = playerKey,
         act = context.act or "REACT",
         topic = context.topic or eventType,
+        beatID = context.beatID or beatID,
+        responsePlanID = context.responsePlanID
+            or "social.reaction." .. tostring(eventType),
         eventType = eventType,
         eventRef = eventID,
         flowID = context.flowID or "social:" .. tostring(eventType),
         poolID = ambient and ambient.flavorID,
         factRefs = interactionFactRefs(context, ambient),
+        expectedReplies = context.expectedReplies,
         worldHour = context.worldAgeHours,
         meaningful = true,
     })

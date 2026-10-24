@@ -185,6 +185,40 @@ local function summaryFor(player, npcID, relationship, exists)
     return summary or relationshipSummary(relationship, exists, npcID)
 end
 
+local function buildReplyInteraction(entry, at)
+    local interaction = entry and entry.interaction or nil
+    local Envelope = InteractionLifecycle
+        and InteractionLifecycle.Envelope or nil
+    if not interaction or not Envelope
+        or type(Envelope.NPCSpeech) ~= "function"
+    then
+        return nil
+    end
+    local act = string.upper(tostring(interaction.act or "REACT"))
+    local replyAct = act == "GREET" and "GREET"
+        or act == "FAREWELL" and "FAREWELL"
+        or act == "THANK" and "ACK"
+        or act == "ACK" and "ACK"
+        or act == "PRAISE" and "ACK"
+        or "REACT"
+    local eventID = entry.eventID or entry.interactionID
+    return Envelope.NPCSpeech({
+        npcID = entry.npcID,
+        targetID = interaction.actorID,
+        playerUUID = interaction.playerUUID,
+        act = replyAct,
+        topic = interaction.topic or interaction.eventType,
+        beatID = "beat:emote:" .. tostring(eventID or "unknown"),
+        responsePlanID = entry.replyFlavorID
+            or "social.emote." .. tostring(interaction.eventType or "reply"),
+        poolID = entry.replyFlavorID,
+        eventType = interaction.eventType,
+        eventRef = eventID,
+        factRefs = entry.memoryID and { entry.memoryID } or nil,
+        worldHour = at,
+    })
+end
+
 local function persistInteraction(entry, at)
     if not InteractionPersistence
         or type(InteractionPersistence.Apply) ~= "function"
@@ -230,7 +264,29 @@ local function persistInteraction(entry, at)
                 .. tostring(reason or "unknown")
         )
     end
-    return persisted ~= nil
+    if not persisted then return false end
+    if type(InteractionPersistence.RecordNPCSpeech) == "function" then
+        local replyInteraction = buildReplyInteraction(entry, at)
+        if not replyInteraction then return true end
+        local recorded = InteractionPersistence.RecordNPCSpeech({
+            npcID = entry.npcID,
+            targetID = interaction.actorID,
+            playerUUID = interaction.playerUUID,
+            act = replyInteraction.act,
+            topic = replyInteraction.topic,
+            beatID = replyInteraction.provenance.beatID,
+            responsePlanID = replyInteraction.provenance.responsePlanID,
+            poolID = replyInteraction.provenance.poolID,
+            eventType = replyInteraction.eventType,
+            eventRef = replyInteraction.eventRef,
+            factRefs = replyInteraction.factRefs,
+            expectedReplies = { interaction.act, "ACK", "THANK" },
+            worldHour = at,
+            meaningful = true,
+        })
+        if recorded then entry.replyInteraction = replyInteraction end
+    end
+    return true
 end
 
 local function targetResult(target, definition, eventID, state)
@@ -257,6 +313,7 @@ local function targetResult(target, definition, eventID, state)
         greetingState = state.greetingState,
         greetingDay = state.greetingDay,
         interaction = state.interaction,
+        replyInteraction = state.replyInteraction,
         replyFlavorID = accepted and Interactions.ReplyFlavorID(
             definition,
             before,
@@ -477,6 +534,11 @@ function Authority.Handle(player, args)
             result.eventID = result.eventID or entry.eventID
             if entry.applied == true then
                 persistInteraction(entry, at)
+            elseif entry.interaction then
+                -- A cooldown/no-op emote still receives the authored reply,
+                -- but must not materialize a durable pair capsule. Carry the
+                -- semantic reply beat only through the private result.
+                entry.replyInteraction = buildReplyInteraction(entry, at)
             end
             if Network and Network.SendConversationRelationship then
                 Network.SendConversationRelationship(

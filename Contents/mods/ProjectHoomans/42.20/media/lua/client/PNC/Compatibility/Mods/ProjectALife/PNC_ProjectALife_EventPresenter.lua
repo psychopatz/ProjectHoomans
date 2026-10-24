@@ -142,6 +142,7 @@ local function receive(event)
     local accepted = presentation.Receive({
         npcID = speakerID,
         eventID = "projectalife:" .. event.eventID .. ":" .. speakerID,
+        eventRef = event.eventID,
         flavorID = flavorID,
         family = "projectalife_world_event",
         eventType = "projectalife_" .. event.category,

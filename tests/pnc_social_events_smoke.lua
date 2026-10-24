@@ -96,6 +96,29 @@ PNC.Registry = {
     DirtyDomains = {},
 }
 
+local Lifecycle = T.load(
+    T.path(
+        "ProjectHoomans",
+        "shared",
+        "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+    )
+)
+local lifecycleStore = Lifecycle.New({ worldHour = 0 })
+PNC.Semantics = { InteractionLifecycle = Lifecycle }
+PNC.Conversation = {
+    InteractionLifecyclePersistence = {
+        RegisterSharedEvent = function(event)
+            return Lifecycle.RegisterSharedEvent(lifecycleStore, event)
+        end,
+        Apply = function(envelope, options)
+            return Lifecycle.Apply(lifecycleStore, envelope, options)
+        end,
+        RecordNPCSpeech = function(spec)
+            return Lifecycle.RecordNPCSpeech(lifecycleStore, spec)
+        end,
+    },
+}
+
 local identityGlobalData = {
     PNC_PlayerCharacters =
         PNC.PlayerCharacterTypes.NewRegistry(),
@@ -286,6 +309,20 @@ local treated = event(
 )
 local first = PNC.SocialEvents.Emit(treated)
 T.truthy(first.ok, "treatment event accepted")
+local treatedLifecycle = Lifecycle.Project(
+    lifecycleStore,
+    playerKey,
+    bob.id
+)
+T.truthy(
+    treatedLifecycle.thread and treatedLifecycle.thread.activeBeat,
+    "grounded event speech creates a response beat"
+)
+T.equal(
+    treatedLifecycle.thread.activeBeat.responsePlanID,
+    "social.reaction.treated_wound",
+    "grounded event beat retains its semantic response plan"
+)
 T.truthy(string.find(
     PNC.SocialEventDebug.FormatProcessed(
         first,
@@ -542,9 +579,28 @@ local witnessedKill = PNC.SocialEvents.Emit(event(
     "witnessed_player_kill",
     playerKey,
     aliceKey,
-    82
+    216
 ))
 T.truthy(witnessedKill.ok, "witnessed player kill accepted")
+local witnessedLifecycle = Lifecycle.Project(
+    lifecycleStore,
+    playerKey,
+    witnessedKill.details[1].observerNPCID
+)
+T.equal(
+    witnessedLifecycle.thread.activeBeat.responsePlanID,
+    "social.reaction.witnessed_player_kill",
+    "witnessed combat retains its semantic response plan"
+)
+local witnessedEventRef = false
+for _, eventRef in ipairs(witnessedLifecycle.thread.eventRefs or {}) do
+    if eventRef == "social:witnessed_player_kill:1" then
+        witnessedEventRef = true
+        break
+    end
+end
+T.truthy(witnessedEventRef,
+    "witnessed combat retains a canonical event reference")
 T.equal(memoryCount(
     PNC.Relationships.Get(alice.id, playerKey),
     "witnessed_player_kill"
@@ -587,7 +643,7 @@ local witnessedKillSecond = PNC.SocialEvents.Emit(event(
     "witnessed_player_kill",
     playerKey,
     aliceKey,
-    82.1
+    216.1
 ))
 T.truthy(witnessedKillSecond.ok,
     "second witnessed player kill is not cooldown blocked")

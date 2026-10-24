@@ -17,6 +17,8 @@ local playerUUID = H.PlayerUUID
 local playerAddress = H.PlayerAddress
 local npcIdentity = H.NPCIdentity
 local activeConversationFor = H.ActiveConversationFor
+local InteractionPresentationRegistry = require
+    "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
 local MAX_PLAYER_SPEECH_RECIPIENTS = 8
 
 require "PNC/Conversation/PNC_SocialFlavorPresentation_Receive"
@@ -63,13 +65,16 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
         local target = targets[index]
         local npcID = speechTargetID(target)
         if npcID then
-            local active = activeConversationFor(npcID)
+            local active, view = activeConversationFor(npcID)
             local speaker = npcIdentity(npcID, target.name)
             local playerIdentityValue = playerAddress(npcID, player)
+            local interaction = context.interaction
+                or view and view.lastSemanticInteractionEnvelope
             local eventID = "player-speech:" .. tostring(playerIDValue)
                 .. ":" .. tostring(nowValue) .. ":" .. tostring(index)
             local targetContext = {
                 eventType = "player_spoke",
+                interaction = interaction,
                 playerMessage = text,
                 npcID = npcID,
                 socialRole = clean(
@@ -98,6 +103,7 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
                 speechScope = "owned_colonists",
                 sourceCommandID = context.commandID,
             }
+            InteractionPresentationRegistry.Remember(eventID, interaction)
             local ok = Client.Enqueue({
                 eventID = eventID,
                 flavorID = "social.player_spoke",
@@ -156,6 +162,7 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
     local speaker
     local eventID
     local safetyContext
+    local interaction
     local accepted
     local enqueueReason
     if tostring(reason or "") ~= "danger" then
@@ -172,10 +179,14 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
         "neutral"
     )
     speaker = npcIdentity(npcID, "Companion")
+    local _, activeView = activeConversationFor(npcID)
+    interaction = context.interaction
+        or activeView and activeView.lastSemanticInteractionEnvelope
     eventID = "conversation-safety:" .. npcID .. ":"
         .. tostring(state and state.token or currentTime())
     safetyContext = {
         eventType = "conversation_safety",
+        interaction = interaction,
         reason = "danger",
         npcID = npcID,
         npcType = role,
@@ -197,6 +208,7 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
         relationshipState = context.relationshipState,
         relationshipTier = context.relationshipTier,
     }
+    InteractionPresentationRegistry.Remember(eventID, interaction)
     accepted, enqueueReason = Client.Enqueue({
         eventID = eventID,
         flavorID = "social.conversation_safety_danger",

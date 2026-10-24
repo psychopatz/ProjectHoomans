@@ -1,59 +1,75 @@
-# P0A — Production flavor and state-ownership inventory
+# P0A — Production Flavor and State-Ownership Inventory
 
-**Evidence checkout:** existing `main`, baseline commit `e8c04b4fb2139be315253f12e0f06a5dfa3fc70f5`
+**Evidence checkout:** existing `main` checkout
 
-**Scope:** Build 42.20 production Lua and the existing Semantic Lab worker. This inventory does not claim legacy retirement.
+**Baseline:** `e8c04b4fb2139be315253f12e0f06a5dfa3fc70f5`
+
+**Scope:** Build 42.20 production Lua, existing Semantic Lab worker, and the real source/test files in this repository. P0A did not delete legacy content or replace P14 save rehydration.
 
 ## Authority map
 
-| Concern | Trigger / resolver owner | Durable state and authority | Presentation path |
+| Concern | Trigger/context/resolver owner | Durable state and authority | Presentation/TTS path |
 | --- | --- | --- | --- |
-| Freeform typed/headless Talk | `PNC/Semantics/PNC_SemanticDialogueInput.lua`, existing parser/router/policy | ConversationBlocks and existing authoritative domains; input itself is not gameplay authority | Response plan, suggestions, TTS/nameplate |
-| Semantic buttons | `PNC_SemanticDialogueSuggestions.lua` -> `Input.SubmitSemanticFrame` | Existing input/ConversationBlocks authority; frame receipts are bounded runtime state | Same response-plan path as typed input |
-| Conversation open/close | `PNC_ConversationLifecycle.lua`, conversation definition lifecycle | Conversation lease and block effects are authoritative; ordinary farewell remains client-presentation owned | Conversation UI plus `PNC_ConversationFarewell.lua` |
-| Farewell | `PNC_ConversationFarewell.lua`, `PNC_ConversationFarewellContext.lua`, GroupA definitions | Client pending queue, `farewellEvaluated`, chance/cooldown/TTL; no old path ModData write | SocialFlavor client enqueue, delayed NPC line, player speech, TTS/nameplate |
-| Vanilla emotes | `PNC_VanillaEmoteInteractions.lua`, `PNC_ServerPlayerEmoteInteractionCommandHandler.lua` | Server social definitions and relationship/memory mutation | Companion command/emote animation and result presentation |
-| Companion/social replies | Companion flavor definitions and command presentation | Command/action registry and existing gameplay domains | Flavor realization, nameplate, TTS |
-| Combat/health/social events | Social event hooks, social event service, health/treatment adapters | Server SocialEvents, Relationships, Knowledge, Faction, Health and Task owners | Compact network projection and existing flavor presentation |
-| World/gossip | Project A-Life compatibility presenter and World Knowledge | Addon/fact owner plus existing knowledge/event domains | Client category/speaker/cooldown/TTS presentation |
+| Typed/headless Talk | `PNC/Semantics/PNC_SemanticDialogueInput.lua`, existing parser/router/policy | ConversationBlocks and existing authoritative domains; input itself has no gameplay authority | Response plans, suggestions, TTS/nameplate |
+| Semantic buttons | `PNC_SemanticDialogueSuggestions.lua` -> `Input.SubmitSemanticFrame` | Existing semantic-frame and ConversationBlocks authority | Same response-plan path as typed input |
+| Conversation open/close | `PNC_ConversationLifecycle.lua`, scene lease and ConversationAuthority | Server lease, lifecycle persistence and authored branch effects | Conversation UI and farewell presentation |
+| Greetings | `PNC_SocialGreetingService_TryGreet.lua`, greeting flow/catalog and vanilla emote registry | Relationship/social event services; greeting cadence, LOS, presence and budget remain owners | SocialFlavor presentation, TTS/nameplate |
+| Farewell | `PNC_ConversationFarewell.lua` and `PNC_ConversationFarewellContext.lua` | Existing close eligibility/chance/cooldown/TTL policy; meaningful lifecycle close is server-owned | Bounded pending queue, SocialFlavor, player speech, TTS |
+| Emotes | `PNC_VanillaEmoteInteractions.lua`, server emote handler and result presentation | Server identity/radius/cooldown/relationship/gameplay authority | Engine animation, companion result and SocialFlavor |
+| Companion/social replies | Companion command flavor definitions and presentation queue | Command/action registry and authoritative domains | Flavor realization, nameplate and TTS |
+| Combat/medical/social events | Social event hooks, transaction service, health/treatment/awareness/faction services | SocialEvents, Relationships, Knowledge, Faction, Health and Task owners | Bounded network projection and existing flavor sinks |
+| Corpse awareness | Corpse lifecycle reaction module and body/identity services | Corpse/relationship/knowledge owners; one canonical event, sparse player projections | Nearby-player social flavor |
+| Project A-Life | Shared adapter, server event observers/reputation hooks, client normalizer/presenter | Project A-Life event/reputation owner; shared lifecycle reference only | Nearby companion flavor, cooldown and TTS presentation |
+| Bandits/Necroa | Compatibility adapters and social bridges | External provider plus existing social/medical owners | Compatibility flavor definitions and network presentation |
 
 ## Registered legacy family and ID inventory
 
-- Greeting/emote overlap: `social_greeting_npc_*`, `vanilla_emote_wavehi_npc_*`, and semantic greeting flow/response-catalog variants.
+- Greeting/emote overlap: `social_greeting_npc_*`, `vanilla_emote_wavehi_npc_*`, semantic greeting flow and response-catalog variants.
 - Farewell: `social.conversation_farewell`.
-- Social speech/events: `social.player_spoke`, `social.conversation_safety_danger`, `social.witnessed_player_kill`, `social.witnessed_teammate_hurt`, `social.follower_abandoned_zombie`, `social.follower_abandoned_hostile_npc`, `social.zombie_horde_detected`, `social.zombie_stamina_retreat`, `social.incapacitated_call`, `social.incapacitated_update`, `social.incapacitated_repeat`, and `social.witnessed_leader_death`.
+- Social events: `social.player_spoke`, `social.conversation_safety_danger`, `social.witnessed_player_kill`, `social.witnessed_teammate_hurt`, `social.follower_abandoned_zombie`, `social.follower_abandoned_hostile_npc`, `social.zombie_horde_detected`, `social.zombie_stamina_retreat`, `social.incapacitated_call`, `social.incapacitated_update`, `social.incapacitated_repeat`, and `social.witnessed_leader_death`.
+- Medical/relationship event definitions: `treated_wound`, `saved_from_incapacitation`, `faction_member_attacked`, `survived_horde_attack`, `necroa_player_mask_removed` and the registered social-event definition set.
 - Project A-Life: `projectalife.meta_gunfire`, `projectalife.meta_aircraft`, `projectalife.meta_crash`, `projectalife.meta_ambience`, `projectalife.encounter_friendly`, `projectalife.encounter_hostile`, `projectalife.encounter_unknown`, `projectalife.faction_hostile`, `projectalife.faction_conflict_incoming`, and `projectalife.faction_conflict_outgoing`.
 - Compatibility: `compat.bandits.hooman_hurt`, `compat.necroa.mask_warning`, and `compat.necroa.player_mask_removed`.
-- Vanilla/player emote IDs: `insult`, `thumbsdown`, `wavehi`, `wavebye`, `thankyou`, `thumbsup`, `clap`, and `salute`, with aliases defined by the interaction registry.
+- Registered player gestures: `insult`, `thumbsdown`, `wavehi`, `wavebye`, `thankyou`, `thumbsup`, `clap`, and `salute`.
 
-## Trigger, selection, presentation and authority evidence
+## Trigger and selection evidence
 
-### Farewell
+### Greeting and farewell
 
-`PNC_ConversationFarewell.Schedule` filters close reasons, guards `farewellEvaluated`, checks a 12-second per-NPC client cooldown, rolls a 55% chance, resolves social role/context, resolves the player realization, and queues the NPC realization for a 1.9-second delay with a 7-second TTL. `Pump` scans only the bounded pending queue on tick and skips active conversations. It is client-only and presentation-only in the legacy route.
+Greeting uses candidate discovery, spatial/LOS and presence checks, a one-hour pump interval and a four-greeting-per-pump budget. Relationship and social-event services own effects; the flavor queue does not. Farewell preserves the existing close-reason filter, `farewellEvaluated` guard, 12-second per-NPC cooldown, 55% roll, role/context resolver, 1.9-second NPC delay, 7-second pending TTL and active-conversation guard. The semantic lifecycle envelope is carried through presentation, while server scene/authority close owns durable suspension.
 
-### Emotes and greetings
+### Emotes and companion responses
 
-`PNC_VanillaEmoteInteractions` maps emote IDs to event definitions, typed replies, daily greeting state and relationship tiers. The server emote handler validates authority, identity, live targets, radius, cooldown and relationship effects before sending a bounded result. `PNC_SocialGreetingService` uses spatial/registry candidates, meeting/LOS checks, per-player presence edges, a one-hour pump interval and a four-greeting-per-pump budget. Relationship and social event services own effects; animation and flavor queues do not.
+The vanilla interaction registry maps gestures to canonical acts and typed replies. The server handler validates identity, target, radius, cooldown and relationship effects before sending the result. The result presentation and companion queue preserve the semantic envelope through a bounded registry because the existing Core transport intentionally strips nested payloads. A cooldown/no-op emote may show a reply realization but does not create a new pair capsule.
 
-### Combat, medical and world reactions
+### Grounded events and compatibility
 
-Witness hooks and health/treatment adapters emit grounded events only after their source-domain checks. Awareness keeps threshold, clear-interval, cooldown, speaker and per-player budget logic. Project A-Life normalizes addon events and applies seen/category/speaker/family/ambient cooldowns. These paths must retain canonical event/fact identity rather than parse generated prose.
+Combat, treatment, incapacitation, abandonment, awareness, leader-loss, faction and compatibility adapters enter `PNC.SocialEvents.Emit` only after their source-domain checks. The social transaction owns memory/relationship/conduct mutation. The lifecycle bridge then records the canonical event reference and NPC reaction provenance. NPC-to-NPC events retain only shared canonical references unless a player-specific durable delta exists.
+
+### Project A-Life
+
+Server encounter/reputation hooks publish validated external events. The server lifecycle persistence registers the source event once when it is published. Client normalization chooses the existing realization and keeps the speaker-specific transport event separate from the canonical `eventRef`; no client-only ambient presentation creates gameplay ModData.
 
 ## Persistence and network findings
 
-- Ordinary farewell, player-speech reaction, safety feedback, emote rendering and Project A-Life TTS are legacy presentation/runtime state; inspected paths do not create a new durable pair record.
-- Server social events enter `PNC.SocialEvents.Emit` only after authority/source validation. Relationship memories, cooldowns, knowledge evidence and faction incidents remain owned by existing server services.
-- Existing directed relationship persistence is keyed by player/NPC entity identity and is bounded by its relationship memory/bond services.
-- The new lifecycle owner is separate and sparse: NPC-global truth remains in existing registries, pair capsules are created only after meaningful deltas, shared event payloads are canonicalized once, and unrelated clients receive no private thread projection.
-- The worker’s lifecycle metrics provide the initial pair-count, recent-turn, capsule-size, shared-event and dormant-work baseline without adding Python gameplay semantics.
+- Ordinary visible text, TTS, nameplates, farewell pending items, emote animations and client ambient queues are presentation/runtime state, not durable transcripts.
+- Server social events and the lifecycle persistence module are authority-checked. Existing Relationship, Knowledge, Faction, Health, Task, ConversationBlocks and Project A-Life stores remain their own state owners.
+- Pair state is keyed by the actual player/NPC identity and is absent until meaningful lifecycle state exists. Resolved trivial capsules are removed.
+- Shared event payloads are stored once by canonical reference. Private pair/thread projections are not broadcast to unrelated clients.
+- Expiry, residue cleanup and anti-repeat eviction are lazy or bounded; lifecycle `Advance` reports zero dormant per-tick work and performs no global scan.
 
-## Characterization baselines
+## Characterization baseline
 
-Existing focused tests cover farewell eligibility, vanilla emote definitions and presentation, social greeting, social-event transport, combat/damage flavor, incapacitated IDs/emission, leader loss, and typed/headless production-worker routes. The new lifecycle baselines are:
+The representative production-Lua baselines are:
 
 - `tests/pnc_semantic_interaction_lifecycle_smoke.lua`;
 - `tests/pnc_semantic_interaction_persistence_smoke.lua`;
-- `tools/semantic_harness/tests/test_semantic_interaction_lifecycle_p1.py`.
+- `tests/pnc_social_greeting_smoke.lua`;
+- `tests/pnc_conversation_farewell_smoke.lua`;
+- `tests/pnc_vanilla_emote_interactions_smoke.lua`;
+- `tests/pnc_social_events_smoke.lua`;
+- `tools/semantic_harness/tests/test_semantic_interaction_lifecycle_p1.py`;
+- `tools/semantic_harness/tests/test_semantic_interaction_lifecycle_acceptance.py`;
+- `tools/semantic_harness/tests/test_production_faction_rehydration_p14c.py`.
 
-P0A establishes the source migration inventory and characterization baseline. It does not claim that legacy flavor authority has been deleted or that P0–P9 is complete.
+These cover equivalent input meaning, NPC provenance, interruption/resume, UI-independent compact state, multi-day rehydration, trivial-pair removal, significant promotion, 200-turn bounds, sparse multiplayer pairs, shared refs, dormant work, registry/source immutability, greeting/farewell/emote/social-event transport and compatibility regression paths.

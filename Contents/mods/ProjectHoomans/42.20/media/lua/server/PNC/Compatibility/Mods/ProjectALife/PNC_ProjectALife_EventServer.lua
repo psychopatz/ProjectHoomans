@@ -10,6 +10,8 @@ PNC.Compatibility.ProjectALifeEvents =
 
 local Server = PNC.Compatibility.ProjectALifeEvents.Server or {}
 PNC.Compatibility.ProjectALifeEvents.Server = Server
+local InteractionPersistence = PNC.Conversation
+    and PNC.Conversation.InteractionLifecyclePersistence or nil
 Server.COMMAND = "projectalife_flavor"
 Server.eventSequence = tonumber(Server.eventSequence) or 0
 
@@ -208,10 +210,20 @@ function Server.Publish(eventName, source)
         payload.targetFaction = Server.CleanText(source.targetFaction, 64)
     end
 
-    return publishToPlayers(
+    local published = publishToPlayers(
         payload,
         Server.CleanText(source.recipientUsername, 64),
         radius)
+    if published and InteractionPersistence
+        and type(InteractionPersistence.RegisterSharedEvent) == "function"
+    then
+        InteractionPersistence.RegisterSharedEvent({
+            id = eventID,
+            type = "projectalife_" .. kind,
+            source = "ProjectALifeNPCs",
+        })
+    end
+    return published
 end
 
 function Server.Emit(eventName, payload)

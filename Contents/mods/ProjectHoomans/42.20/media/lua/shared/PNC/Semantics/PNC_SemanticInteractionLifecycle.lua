@@ -22,6 +22,7 @@ Lifecycle.LIMITS = {
     openQuestions = 8,
     commitments = 8,
     eventRefs = 16,
+    realizations = 8,
     sharedEvents = 64,
     pairs = 4096,
 }
@@ -98,12 +99,13 @@ local function boundedCopy(value, depth, budget)
         return nil
     end
     depth = tonumber(depth) or 0
-    budget = budget or { count = 0 }
+    budget = budget or { count = 0, limit = 64 }
+    budget.limit = tonumber(budget.limit) or 64
     if depth >= 3 then return nil end
     local result = {}
     for key, item in pairs(value) do
         budget.count = budget.count + 1
-        if budget.count > 64 then break end
+        if budget.count > budget.limit then break end
         if type(key) == "string" or type(key) == "number" then
             local copied = boundedCopy(item, depth + 1, budget)
             if copied ~= nil then result[key] = copied end
@@ -222,6 +224,7 @@ end
 Envelope.SCHEMA = Lifecycle.ENVELOPE_SCHEMA
 
 function Envelope.TypedText(ir, context)
+    ir = type(ir) == "table" and ir or {}
     context = type(context) == "table" and context or {}
     return Envelope.Build({
         source = "typed_text",
@@ -229,7 +232,11 @@ function Envelope.TypedText(ir, context)
         actorID = context.actorID,
         targetID = context.targetID,
         playerUUID = context.playerUUID,
-        topic = type(ir) == "table" and ir.topic or context.topic,
+        topic = ir.topic or context.topic,
+        eventType = ir.eventType,
+        eventRef = ir.eventRef or ir.eventID,
+        factRefs = ir.factRefs,
+        modifiers = ir.modifiers,
         worldHour = context.worldHour,
         provenance = context.provenance,
     })
@@ -386,6 +393,7 @@ local function newThread(playerUUID, npcID, hour)
         residue = {},
         eventRefs = {},
         memories = {},
+        recentRealizations = {},
         startedHour = hour,
         lastHour = hour,
         expiresHour = hour + 72,
@@ -394,7 +402,37 @@ local function newThread(playerUUID, npcID, hour)
 end
 
 local function copyThread(thread)
-    return boundedCopy(thread, 0)
+    if type(thread) ~= "table" then return nil end
+    local result = {
+        id = clean(thread.id, 192),
+        playerUUID = clean(thread.playerUUID, 96),
+        npcID = clean(thread.npcID, 96),
+        status = clean(thread.status, 24),
+        topic = clean(thread.topic, 96),
+        startedHour = finite(thread.startedHour),
+        lastHour = finite(thread.lastHour),
+        expiresHour = finite(thread.expiresHour),
+        residueExpiresHour = finite(thread.residueExpiresHour),
+        revision = finite(thread.revision) or 0,
+        topicStack = boundedCopy(thread.topicStack or {}, 0, { count = 0 }),
+        activeBeat = boundedCopy(thread.activeBeat, 0, { count = 0 }),
+        openQuestions = boundedCopy(
+            thread.openQuestions or {}, 0, { count = 0 }
+        ),
+        openCommitments = boundedCopy(
+            thread.openCommitments or {}, 0, { count = 0 }
+        ),
+        recentTurns = boundedCopy(
+            thread.recentTurns or {}, 0, { count = 0, limit = 512 }
+        ),
+        residue = boundedCopy(thread.residue or {}, 0, { count = 0 }),
+        eventRefs = boundedCopy(thread.eventRefs or {}, 0, { count = 0 }),
+        memories = boundedCopy(thread.memories or {}, 0, { count = 0 }),
+        recentRealizations = boundedCopy(
+            thread.recentRealizations or {}, 0, { count = 0 }
+        ),
+    }
+    return result
 end
 
 local function hasDurableMeaning(thread)
@@ -413,6 +451,36 @@ local function activeThread(store, key)
     return store.active[key] or store.pairs[key]
 end
 
+local removePair
+
+local function expireResidue(thread, hour)
+    if not thread or not thread.residueExpiresHour then return false end
+    if (tonumber(hour) or 0) <= tonumber(thread.residueExpiresHour) then
+        return false
+    end
+    thread.residue = {}
+    thread.residueExpiresHour = nil
+    return true
+end
+
+local function expireThreadIfNeeded(store, key, hour)
+    local thread = activeThread(store, key)
+    if thread and thread.expiresHour
+        and (tonumber(hour) or 0) > tonumber(thread.expiresHour)
+    then
+        removePair(store, key)
+        store.metrics.expirations = store.metrics.expirations + 1
+        return nil
+    end
+    if thread and expireResidue(thread, hour)
+        and store.pairs[key] and store.pairs[key] ~= thread
+    then
+        store.pairs[key].residue = {}
+        store.pairs[key].residueExpiresHour = nil
+    end
+    return thread
+end
+
 local function topicStackIndex(thread, topic)
     if not thread or not topic then return nil end
     for index = #thread.topicStack, 1, -1 do
@@ -424,7 +492,7 @@ local function topicStackIndex(thread, topic)
     return nil
 end
 
-local function removePair(store, key)
+removePair = function(store, key)
     if store.pairs[key] then
         store.pairs[key] = nil
         store.metrics.pairRecordsDeleted = store.metrics.pairRecordsDeleted + 1
@@ -445,6 +513,8 @@ local function capThread(thread, store)
         and thread.eventRefs or {}
     thread.memories = type(thread.memories) == "table"
         and thread.memories or {}
+    thread.recentRealizations = type(thread.recentRealizations) == "table"
+        and thread.recentRealizations or {}
     thread.residue = type(thread.residue) == "table"
         and thread.residue or {}
     local limits = store.limits
@@ -457,6 +527,9 @@ local function capThread(thread, store)
     while #thread.openCommitments > limits.commitments do table.remove(thread.openCommitments, 1) end
     while #thread.eventRefs > limits.eventRefs do table.remove(thread.eventRefs, 1) end
     while #thread.memories > limits.eventRefs do table.remove(thread.memories, 1) end
+    while #thread.recentRealizations > limits.realizations do
+        table.remove(thread.recentRealizations, 1)
+    end
 end
 
 function Lifecycle.New(options)
@@ -487,6 +560,9 @@ function Lifecycle.RegisterSharedEvent(store, event)
     if type(store) ~= "table" or type(event) ~= "table" then
         return nil, "lifecycle_store_required"
     end
+    if store.authoritative ~= true then
+        return nil, "lifecycle_not_authoritative"
+    end
     local eventID = clean(event.eventRef or event.eventID or event.id, 128)
     if not eventID then return nil, "event_reference_required" end
     if not store.sharedEvents[eventID] then
@@ -515,14 +591,33 @@ local function threadTurn(envelope, options, hour)
         eventType = envelope.eventType,
         eventRef = envelope.eventRef,
         factRefs = boundedList(envelope.factRefs, Lifecycle.LIMITS.factRefs),
-        beatID = clean(options and options.beatID, 96),
+        beatID = clean(
+            options and options.beatID or envelope.provenance.beatID,
+            96
+        ),
         provenance = boundedCopy(envelope.provenance, 0),
         worldHour = hour,
     }
 end
 
+local function recordRealization(thread, realizationID, limit)
+    realizationID = clean(realizationID, 128)
+    if not realizationID then return false end
+    return appendUnique(
+        thread.recentRealizations,
+        realizationID,
+        limit
+    )
+end
+
 function Lifecycle.Apply(store, rawEnvelope, options)
     options = type(options) == "table" and options or {}
+    if type(store) ~= "table" then
+        return nil, "lifecycle_store_required"
+    end
+    if store.authoritative ~= true then
+        return nil, "lifecycle_not_authoritative"
+    end
     local envelope, reason = Envelope.Build(rawEnvelope)
     if not envelope then return nil, reason end
     if not envelope.eventRef and options.eventRef then
@@ -535,10 +630,11 @@ function Lifecycle.Apply(store, rawEnvelope, options)
         and envelope.actorID or envelope.targetID
     local key = pairKey(envelope.playerUUID, npcID)
     if not key then return nil, "pair_identity_required" end
-    local thread = activeThread(store, key)
+    local thread = expireThreadIfNeeded(store, key, hour)
     if not thread then
         thread = newThread(envelope.playerUUID, npcID, hour)
     end
+    expireResidue(thread, hour)
     local previousTopic = thread.topic
     local topic = envelope.topic or options.topic
     local resumeIndex = options.resumeTopic == true
@@ -583,7 +679,14 @@ function Lifecycle.Apply(store, rawEnvelope, options)
     end
     if options.residue and type(options.residue) == "table" then
         thread.residue = boundedCopy(options.residue, 0)
+        thread.residueExpiresHour = hour
+            + (finite(options.residueTTLHours) or 72)
     end
+    recordRealization(
+        thread,
+        options.realizationID or envelope.provenance.poolID,
+        store.limits.realizations
+    )
     local beatID = clean(options.beatID or envelope.provenance.beatID, 96)
     if beatID then
         thread.activeBeat = {
@@ -612,9 +715,6 @@ function Lifecycle.Apply(store, rawEnvelope, options)
     capThread(thread, store)
     store.metrics.applied = store.metrics.applied + 1
     local durable = options.meaningful == true or hasDurableMeaning(thread)
-    if not store.authoritative and durable and options.preview ~= true then
-        return nil, "lifecycle_not_authoritative"
-    end
     if not durable and options.resolveBeat ~= true then
         removePair(store, key)
         return {
@@ -645,6 +745,7 @@ function Lifecycle.RecordNPCSpeech(store, spec)
     options.beatID = spec.beatID or spec.activeBeat
     options.meaningful = spec.meaningful ~= false
     options.expectedReplies = spec.expectedReplies
+    options.realizationID = spec.realizationID
     options.worldHour = spec.worldHour
     options.preview = spec.preview
     return Lifecycle.Apply(store, envelope, options)
@@ -652,13 +753,18 @@ end
 
 function Lifecycle.Close(store, playerUUID, npcID, options)
     options = type(options) == "table" and options or {}
-    local key = pairKey(playerUUID, npcID)
-    local thread = key and activeThread(store, key) or nil
-    if not thread then return { accepted = true, persisted = false, reason = "no_thread" } end
-    if not store.authoritative and options.preview ~= true then
+    if type(store) ~= "table" then
+        return nil, "lifecycle_store_required"
+    end
+    if store.authoritative ~= true then
         return nil, "lifecycle_not_authoritative"
     end
-    thread.lastHour = finite(options.worldHour) or store.worldHour or 0
+    local key = pairKey(playerUUID, npcID)
+    local hour = finite(options.worldHour) or store.worldHour or 0
+    local thread = key and expireThreadIfNeeded(store, key, hour) or nil
+    if not thread then return { accepted = true, persisted = false, reason = "no_thread" } end
+    thread.lastHour = hour
+    expireResidue(thread, hour)
     if hasDurableMeaning(thread) and options.destroy ~= true then
         thread.status = "SUSPENDED"
         thread.expiresHour = thread.lastHour + (finite(options.ttlHours) or 72)
@@ -673,6 +779,12 @@ end
 
 function Lifecycle.Resume(store, playerUUID, npcID, options)
     options = type(options) == "table" and options or {}
+    if type(store) ~= "table" then
+        return nil, "lifecycle_store_required"
+    end
+    if store.authoritative ~= true then
+        return nil, "lifecycle_not_authoritative"
+    end
     local key = pairKey(playerUUID, npcID)
     if not key then return nil, "pair_identity_required" end
     local thread = activeThread(store, key)
@@ -681,6 +793,11 @@ function Lifecycle.Resume(store, playerUUID, npcID, options)
     if thread.expiresHour and hour > thread.expiresHour then
         removePair(store, key)
         store.metrics.expirations = store.metrics.expirations + 1
+        return nil, "thread_expired"
+    end
+    expireResidue(thread, hour)
+    if not hasDurableMeaning(thread) then
+        removePair(store, key)
         return nil, "thread_expired"
     end
     thread.status = "ACTIVE"
@@ -694,8 +811,18 @@ end
 
 function Lifecycle.Compact(store, playerUUID, npcID, options)
     options = type(options) == "table" and options or {}
+    if type(store) ~= "table" then
+        return nil, "lifecycle_store_required"
+    end
+    if store.authoritative ~= true then
+        return nil, "lifecycle_not_authoritative"
+    end
     local key = pairKey(playerUUID, npcID)
-    local thread = key and activeThread(store, key) or nil
+    local thread = key and expireThreadIfNeeded(
+        store,
+        key,
+        finite(options.worldHour) or store.worldHour or 0
+    ) or nil
     if not thread then return { accepted = true, persisted = false, reason = "no_thread" } end
     local before = #thread.recentTurns
     capThread(thread, store)
@@ -705,15 +832,18 @@ function Lifecycle.Compact(store, playerUUID, npcID, options)
         store.metrics.compactions = store.metrics.compactions + 1
         return { accepted = true, persisted = false, reason = "empty_after_compaction" }
     end
-    if not store.authoritative and options.preview ~= true then
-        return nil, "lifecycle_not_authoritative"
-    end
     store.pairs[key] = copyThread(thread)
     store.metrics.compactions = store.metrics.compactions + 1
     return { accepted = true, persisted = true, reason = "compacted", thread = copyThread(thread) }
 end
 
 function Lifecycle.Advance(store, worldHour)
+    if type(store) ~= "table" then
+        return nil, "lifecycle_store_required"
+    end
+    if store.authoritative ~= true then
+        return nil, "lifecycle_not_authoritative"
+    end
     worldHour = finite(worldHour)
     if worldHour and worldHour > (store.worldHour or 0) then
         store.worldHour = worldHour
@@ -724,6 +854,12 @@ function Lifecycle.Advance(store, worldHour)
 end
 
 function Lifecycle.Maintenance(store, limit)
+    if type(store) ~= "table" then
+        return nil, "lifecycle_store_required"
+    end
+    if store.authoritative ~= true then
+        return nil, "lifecycle_not_authoritative"
+    end
     limit = math.max(0, math.floor(tonumber(limit) or 8))
     local inspected = 0
     local expired = 0
@@ -758,12 +894,19 @@ function Lifecycle.Metrics(store)
     local suspended = 0
     local turnCount = 0
     local maximumTurns = 0
+    local realizationCount = 0
+    local memoryRefCount = 0
+    local eventRefCount = 0
     for _, thread in pairs(store.active) do
         active = active + 1
         if thread.status == "SUSPENDED" then suspended = suspended + 1 end
         local count = #(thread.recentTurns or {})
         turnCount = turnCount + count
         maximumTurns = math.max(maximumTurns, count)
+        realizationCount = realizationCount
+            + #(thread.recentRealizations or {})
+        memoryRefCount = memoryRefCount + #(thread.memories or {})
+        eventRefCount = eventRefCount + #(thread.eventRefs or {})
     end
     local output = boundedCopy(store.metrics, 0)
     output.activeThreads = active
@@ -772,6 +915,9 @@ function Lifecycle.Metrics(store)
     for _ in pairs(store.pairs) do output.pairRecords = output.pairRecords + 1 end
     output.recentTurnCount = turnCount
     output.maxRecentTurns = maximumTurns
+    output.recentRealizationCount = realizationCount
+    output.memoryRefCount = memoryRefCount
+    output.eventRefCount = eventRefCount
     output.pairCapsuleBytes = approximateSize(store.pairs)
     output.sharedEventRefs = 0
     for _ in pairs(store.sharedEvents) do output.sharedEventRefs = output.sharedEventRefs + 1 end
@@ -782,7 +928,7 @@ end
 
 function Lifecycle.Project(store, playerUUID, npcID)
     local key = pairKey(playerUUID, npcID)
-    local thread = key and activeThread(store, key) or nil
+    local thread = key and expireThreadIfNeeded(store, key, store.worldHour) or nil
     return {
         schema = Lifecycle.SCHEMA,
         playerUUID = clean(playerUUID, 96),
@@ -794,7 +940,7 @@ end
 
 function Lifecycle.ResponseWindow(store, playerUUID, npcID)
     local key = pairKey(playerUUID, npcID)
-    local thread = key and activeThread(store, key) or nil
+    local thread = key and expireThreadIfNeeded(store, key, store.worldHour) or nil
     if not thread then
         return {
             schema = Lifecycle.SCHEMA,
@@ -815,21 +961,48 @@ function Lifecycle.ResponseWindow(store, playerUUID, npcID)
         openQuestions = boundedCopy(thread.openQuestions or {}, 0),
         commitments = boundedCopy(thread.openCommitments or {}, 0),
         topicStack = boundedCopy(thread.topicStack or {}, 0),
+        residue = boundedCopy(thread.residue or {}, 0),
+        eventRefs = boundedCopy(thread.eventRefs or {}, 0),
+        memories = boundedCopy(thread.memories or {}, 0),
+        recentTurns = boundedCopy(
+            thread.recentTurns or {}, 0, { count = 0, limit = 512 }
+        ),
+        recentRealizations = boundedCopy(thread.recentRealizations or {}, 0),
     }
 end
 
 function Lifecycle.Export(store)
+    local pairCapsules = {}
+    local sharedEventCapsules = {}
+    local pairCount = 0
+    local sharedEventCount = 0
+    for key, thread in pairs(store.pairs) do
+        if pairCount >= store.limits.pairs then break end
+        pairCapsules[key] = copyThread(thread)
+        pairCount = pairCount + 1
+    end
+    for key, event in pairs(store.sharedEvents) do
+        if sharedEventCount >= store.limits.sharedEvents then break end
+        sharedEventCapsules[key] = boundedCopy(event, 0, { count = 0 })
+        sharedEventCount = sharedEventCount + 1
+    end
     return {
         schema = Lifecycle.SCHEMA,
         schemaVersion = Lifecycle.VERSION,
         worldHour = store.worldHour,
-        pairs = boundedCopy(store.pairs, 0),
-        sharedEvents = boundedCopy(store.sharedEvents, 0),
+        pairs = pairCapsules,
+        sharedEvents = sharedEventCapsules,
         metrics = Lifecycle.Metrics(store),
     }
 end
 
 function Lifecycle.Import(store, payload)
+    if type(store) ~= "table" then
+        return false, "lifecycle_store_required"
+    end
+    if store.authoritative ~= true then
+        return false, "lifecycle_not_authoritative"
+    end
     if type(payload) ~= "table" or payload.schema ~= Lifecycle.SCHEMA then
         return false, "lifecycle_snapshot_invalid"
     end
@@ -842,7 +1015,7 @@ function Lifecycle.Import(store, payload)
                 and type(thread.playerUUID) == "string"
                 and type(thread.npcID) == "string"
             then
-                local imported = boundedCopy(thread, 0)
+                local imported = copyThread(thread)
                 capThread(imported, store)
                 store.pairs[key] = imported
                 pairCount = pairCount + 1

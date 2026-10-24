@@ -9,6 +9,8 @@ PNC.CompanionCommandPresentation = PNC.CompanionCommandPresentation or {}
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 pcall(require, "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient")
 pcall(require, "PsychopatzCore/Events/PC_EventBus")
+local InteractionPresentationRegistry = require
+    "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
 
 local Presentation = PNC.CompanionCommandPresentation
 local Flavor = PNC.CompanionCommandFlavor
@@ -158,6 +160,10 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
         -- adapter; NPC canned replies must remain eligible for PBrainZ TTS.
         tts = true,
     }
+    InteractionPresentationRegistry.Remember(
+        eventID,
+        type(context) == "table" and context.interaction or nil
+    )
     accepted, reason = SocialFlavorClient.Enqueue({
         eventID = eventID,
         flavorID = flavorID,

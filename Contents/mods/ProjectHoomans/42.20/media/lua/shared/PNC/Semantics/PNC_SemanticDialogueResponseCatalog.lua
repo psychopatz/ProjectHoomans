@@ -25,8 +25,10 @@ Catalog.VERSION = 1
 -- production capability without silently truncating generated flows.
 Catalog.MAX_POOLS = 128
 Catalog.MAX_VARIANTS = 16
+Catalog.MAX_LAST_VARIANTS = 256
 Catalog.POOLS = Catalog.POOLS or {}
 Catalog.LAST_VARIANTS = Catalog.LAST_VARIANTS or {}
+Catalog.LAST_VARIANT_ORDER = Catalog.LAST_VARIANT_ORDER or {}
 
 local CONDITION_FIELDS = {
     "topic", "previousTopic", "previousAction", "lastIntent", "lastAction", "lastSpeaker",
@@ -351,6 +353,14 @@ function Catalog.Select(id, context, salt)
             ]
         end
     end
+    if Catalog.LAST_VARIANTS[selectionKey] == nil then
+        while #Catalog.LAST_VARIANT_ORDER >= Catalog.MAX_LAST_VARIANTS do
+            local oldest = table.remove(Catalog.LAST_VARIANT_ORDER, 1)
+            Catalog.LAST_VARIANTS[oldest] = nil
+        end
+        Catalog.LAST_VARIANT_ORDER[#Catalog.LAST_VARIANT_ORDER + 1] =
+            selectionKey
+    end
     Catalog.LAST_VARIANTS[selectionKey] = selectedIndex
     variant = pool.variants[selectedIndex]
     return {
@@ -370,6 +380,7 @@ end
 
 function Catalog.ResetSelections()
     Catalog.LAST_VARIANTS = {}
+    Catalog.LAST_VARIANT_ORDER = {}
     return true
 end
 

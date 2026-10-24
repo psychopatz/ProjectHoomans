@@ -138,6 +138,25 @@ T.load(SHARED .. "PNC/Core/Commands/PNC_VanillaEmoteInteractions.lua")
 T.load(SHARED .. "PNC/Core/Relationships/PNC_SocialEventDefinitions.lua")
 T.load(SHARED .. "PNC/Core/Conduct/PNC_ConductDefinitions.lua")
 
+local Lifecycle = T.load(
+    SHARED .. "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+)
+local lifecycleStore = Lifecycle.New({ worldHour = 0 })
+PNC.Semantics = { InteractionLifecycle = Lifecycle }
+PNC.Conversation = {
+    InteractionLifecyclePersistence = {
+        Apply = function(envelope, options)
+            return Lifecycle.Apply(lifecycleStore, envelope, options)
+        end,
+        Project = function(playerUUID, npcID)
+            return Lifecycle.Project(lifecycleStore, playerUUID, npcID)
+        end,
+        RecordNPCSpeech = function(spec)
+            return Lifecycle.RecordNPCSpeech(lifecycleStore, spec)
+        end,
+    },
+}
+
 local Interactions = PNC.VanillaEmoteInteractions
 local Flavor = PNC.CompanionCommandFlavor
 local all = Interactions.List()
@@ -286,6 +305,18 @@ T.equal(result.targets[1].npcType, "neutral",
 T.equal(result.targets[1].replyFlavorID,
     "vanilla_emote_insult_npc_neutral",
     "authority selects a neutral-specific reply")
+T.equal(result.targets[1].interaction.source, "emote",
+    "authority preserves the canonical player emote meaning")
+T.equal(result.targets[1].replyInteraction.source, "npc_speech",
+    "authority gives the NPC reply its own semantic provenance")
+T.truthy(
+    Lifecycle.Project(
+        lifecycleStore,
+        "player:slot:character-1",
+        "npc-neutral"
+    ).thread.activeBeat,
+    "accepted emote creates a bounded NPC response beat"
+)
 T.equal(#relationshipBroadcasts, 1,
     "authority broadcasts the live relationship presentation")
 
@@ -306,6 +337,8 @@ T.equal(repeatedGreeting.targets[1].applied, false,
     "same-day greeting does not apply a second relationship effect")
 T.equal(repeatedGreeting.targets[1].greetingState, "returning",
     "same-day greeting is marked as already greeted")
+T.equal(repeatedGreeting.targets[1].replyInteraction.source, "npc_speech",
+    "cooldown reply retains presentation-only NPC provenance")
 T.equal(#appliedEffects, 2,
     "same-day greeting does not duplicate the relationship mutation")
 

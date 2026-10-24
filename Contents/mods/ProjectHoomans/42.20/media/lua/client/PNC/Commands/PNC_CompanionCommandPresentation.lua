@@ -6,6 +6,17 @@ PNC.CompanionCommandPresentation = PNC.CompanionCommandPresentation or {}
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 require "PNC/Core/Identity/PNC_FlavorAddress"
 require "PNC/Audio/PNC_PlayerSpeech"
+local InteractionPresentationRegistry = require
+    "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
+local InteractionLifecycle = PNC.Semantics
+    and PNC.Semantics.InteractionLifecycle or nil
+if type(InteractionLifecycle) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+    )
+    InteractionLifecycle = ok and loaded or nil
+end
 
 local Presentation = PNC.CompanionCommandPresentation
 local Commands = PNC.CompanionCommands
@@ -59,6 +70,43 @@ local function formatTargetNames(targets)
     return targetName(targets[1])
         .. ", " .. targetName(targets[2])
         .. ", and " .. tostring(count - 2) .. " more"
+end
+
+local function ensureAmbientInteraction(context, npcID, player)
+    context = type(context) == "table" and context or {}
+    if context.interaction then return context.interaction end
+    local Envelope = InteractionLifecycle
+        and InteractionLifecycle.Envelope or nil
+    local state = PNC.Network and PNC.Network.ClientState or {}
+    local playerContext = state.playerContext or {}
+    local playerUUID = context.playerUUID
+        or playerContext.characterUUID or playerContext.playerUUID
+        or player and player.getUsername and player:getUsername() or nil
+    local eventID = context.eventID or context.eventRef
+    local eventType = context.eventType or context.source or "social_flavor"
+    if not Envelope or type(Envelope.NPCSpeech) ~= "function"
+        or not npcID or not eventID or not playerUUID
+    then
+        return nil
+    end
+    context.interaction = Envelope.NPCSpeech({
+        npcID = npcID,
+        targetID = playerUUID,
+        playerUUID = playerUUID,
+        act = context.act or "REACT",
+        topic = context.topic or eventType,
+        beatID = context.beatID
+            or "beat:" .. tostring(eventType) .. ":" .. tostring(eventID),
+        responsePlanID = context.responsePlanID
+            or "social.reaction." .. tostring(eventType),
+        flowID = context.flowID
+            or "social:" .. tostring(eventType),
+        poolID = context.poolID or context.flavorID,
+        eventType = eventType,
+        eventRef = eventID,
+        factRefs = context.factRefs,
+    })
+    return context.interaction
 end
 
 function Presentation.BuildFlavorContext(player, context)
@@ -205,6 +253,10 @@ local function publishNPCMessage(actor, text, context)
     end
     npcID = tostring(npcID or "")
     if npcID == "" or tostring(text or "") == "" then return false end
+    InteractionPresentationRegistry.Remember(
+        eventID,
+        type(context) == "table" and context.interaction or nil
+    )
     message = Message.New({
         messageID = eventID and ("social-greeting:" .. tostring(eventID))
             or Message.NewID("social-greeting"),
@@ -276,6 +328,8 @@ function Presentation.ShowAmbientNPCFlavor(actor, flavorID, context)
     if type(context) ~= "table" then context = {} end
     context.playerActor = player
     context.flavorID = flavorID
+    ensureAmbientInteraction(context, context.npcID
+        or context.target and (context.target.id or context.target.npcID), player)
     published = publishNPCMessage(actor, text, context)
     if not published then speak(actor, text) end
     return true, text

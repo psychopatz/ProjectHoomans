@@ -50,6 +50,23 @@ T.equal(bounded.act, "REACT", "known events bypass NLU")
 T.falsy(Envelope.Build({ source = "typed_text" }),
     "malformed envelope without an act is rejected")
 
+local nonAuthoritative = Lifecycle.New({ authoritative = false })
+local rejected, rejectedReason = Lifecycle.Apply(
+    nonAuthoritative,
+    typed,
+    { meaningful = true }
+)
+T.falsy(rejected, "non-authoritative stores cannot mutate lifecycle state")
+T.equal(rejectedReason, "lifecycle_not_authoritative",
+    "non-authoritative mutation is rejected explicitly")
+local rejectedEvent, rejectedEventReason = Lifecycle.RegisterSharedEvent(
+    nonAuthoritative,
+    { id = "world:client-only:1", type = "test" }
+)
+T.falsy(rejectedEvent, "non-authoritative stores cannot register events")
+T.equal(rejectedEventReason, "lifecycle_not_authoritative",
+    "event registration requires lifecycle authority")
+
 local store = Lifecycle.New({ worldHour = 100 })
 local npcSpeech = Lifecycle.RecordNPCSpeech(store, {
     npcID = "npc:mara",

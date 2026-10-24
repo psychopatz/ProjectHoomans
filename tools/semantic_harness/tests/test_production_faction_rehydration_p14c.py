@@ -235,6 +235,22 @@ class ProductionFactionRehydrationP14CTests(unittest.TestCase):
                 "war",
             )
             source_before = deepcopy(worker.source_snapshot.to_dict())
+            lifecycle_turn = worker.interaction_npc_speech(
+                {
+                    "npcID": "npcP14C",
+                    "act": "QUESTION",
+                    "topic": "faction",
+                    "beatID": "beat:save:faction",
+                    "responsePlanID": "plan:save:faction",
+                    "meaningful": True,
+                }
+            )
+            self.assertTrue(lifecycle_turn["result"]["persisted"])
+            self.assertEqual(
+                worker.snapshot()["interactionLifecycle"]["responseWindow"]
+                    ["activeBeat"]["id"],
+                "beat:save:faction",
+            )
             worker.reset_working_world()
             reset = worker.snapshot()
             self.assertEqual(reset["workingWorld"]["patches"], [])

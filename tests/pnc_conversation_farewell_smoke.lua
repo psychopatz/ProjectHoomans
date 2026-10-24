@@ -50,6 +50,8 @@ local Farewell = T.load(
     "client",
     "PNC/Conversation/PNC_ConversationFarewell.lua"
 )
+local InteractionRegistry = require
+    "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
 
 EventBus.subscribe(Message.EVENT_TYPE, function(message)
     messages[#messages + 1] = message
@@ -105,6 +107,15 @@ T.equal(messages[1].presentationState.conversationUI, false,
     "NPC farewell stays out of the conversation UI")
 T.equal(messages[1].source.eventType, "conversation_farewell",
     "farewell remains an ambient client event")
+local farewellInteraction = InteractionRegistry.Peek(
+    messages[1].source.eventID
+)
+T.truthy(farewellInteraction,
+    "farewell carries a semantic lifecycle envelope")
+T.equal(farewellInteraction.act, "FAREWELL",
+    "farewell envelope retains its canonical act")
+T.equal(farewellInteraction.source, "conversation_lifecycle",
+    "farewell envelope retains its lifecycle source")
 
 local hostile = spec("npc-hostile", {
     id = "npc-hostile",

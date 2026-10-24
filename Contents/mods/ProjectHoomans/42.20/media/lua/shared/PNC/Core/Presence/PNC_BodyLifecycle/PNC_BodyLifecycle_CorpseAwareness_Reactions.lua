@@ -12,6 +12,82 @@ local knownKillerName = Deps.knownKillerName
 local MEMORY_TYPE = Deps.MEMORY_TYPE
 local MEMORY_LIMIT_PER_NPC = Deps.MEMORY_LIMIT_PER_NPC
 local DETECTION_RADIUS_SQ = Deps.DETECTION_RADIUS_SQ
+local InteractionLifecycle = PNC.Semantics
+    and PNC.Semantics.InteractionLifecycle or nil
+if type(InteractionLifecycle) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+    )
+    InteractionLifecycle = ok and loaded or nil
+end
+local InteractionPersistence = PNC.Conversation
+    and PNC.Conversation.InteractionLifecyclePersistence or nil
+
+local function copyGreeting(greeting, interaction)
+    local payload = {}
+    for key, value in pairs(greeting or {}) do payload[key] = value end
+    payload.interaction = interaction or greeting and greeting.interaction
+    return payload
+end
+
+local function interactionForPlayer(observer, greeting, player)
+    local Envelope = InteractionLifecycle
+        and InteractionLifecycle.Envelope or nil
+    local PlayerCharacters = PNC.PlayerCharacters
+    local playerKey
+    local eventID = greeting and greeting.eventID
+    local eventType = greeting and greeting.eventType
+        or "corpse_reaction"
+    local spec
+    if not Envelope or type(Envelope.NPCSpeech) ~= "function"
+        or not PlayerCharacters
+        or type(PlayerCharacters.GetEntityKey) ~= "function"
+        or not eventID
+    then
+        return nil
+    end
+    playerKey = PlayerCharacters.GetEntityKey(player, {
+        callback = "corpse_reaction_interaction",
+        worldAgeHours = worldAgeHours(),
+    })
+    if not playerKey then return nil end
+    if InteractionPersistence
+        and type(InteractionPersistence.RegisterSharedEvent) == "function"
+    then
+        InteractionPersistence.RegisterSharedEvent({
+            id = eventID,
+            type = eventType,
+            occurredAt = worldAgeHours(),
+            source = "corpse_awareness",
+        })
+    end
+    spec = {
+        npcID = observer and observer.id,
+        targetID = playerKey,
+        playerUUID = playerKey,
+        act = "REACT",
+        topic = greeting.relationshipKind or eventType,
+        beatID = "beat:" .. tostring(eventType) .. ":"
+            .. tostring(eventID),
+        responsePlanID = "social.reaction." .. tostring(eventType),
+        flowID = "social:" .. tostring(eventType),
+        poolID = greeting.flavorID,
+        eventType = eventType,
+        eventRef = eventID,
+        factRefs = greeting.memoryID and { greeting.memoryID } or nil,
+        expectedReplies = { "ACK", "THANK", "REACT" },
+        worldHour = worldAgeHours(),
+        meaningful = true,
+    }
+    if InteractionPersistence
+        and type(InteractionPersistence.RecordNPCSpeech) == "function"
+    then
+        local recorded = InteractionPersistence.RecordNPCSpeech(spec)
+        if recorded and recorded.envelope then return recorded.envelope end
+    end
+    return Envelope.NPCSpeech(spec)
+end
 
 local function rememberWitness(
     observer,
@@ -124,9 +200,13 @@ local function sendToNearbyPlayers(observer, actor, greeting)
         return false
     end
     core.ForEachPlayer(function(player)
-        if playerCanHear(player, x, y, z)
-            and network.SendSocialGreeting(player, greeting) == true
-        then
+        local payload
+        local interaction
+        if playerCanHear(player, x, y, z) then
+            interaction = interactionForPlayer(observer, greeting, player)
+            payload = copyGreeting(greeting, interaction)
+        end
+        if payload and network.SendSocialGreeting(player, payload) == true then
             sent = true
         end
     end)

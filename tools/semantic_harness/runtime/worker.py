@@ -350,6 +350,16 @@ class LuaSemanticWorker:
 
         return self._request("INTERACTION_REGISTER_EVENT", payload)
 
+    def interaction_export(self) -> dict[str, Any]:
+        """Export the bounded production lifecycle capsule, without text."""
+
+        return self._request("INTERACTION_EXPORT")
+
+    def interaction_import(self, snapshot: dict[str, Any]) -> dict[str, Any]:
+        """Import a lifecycle capsule through production Lua validation."""
+
+        return self._request("INTERACTION_IMPORT", {"snapshot": snapshot})
+
     def snapshot(self) -> dict[str, Any]:
         return self._conversation.snapshot()
 

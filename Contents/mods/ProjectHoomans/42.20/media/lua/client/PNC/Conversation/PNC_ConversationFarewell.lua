@@ -9,6 +9,8 @@ require "PNC/Conversation/PNC_SocialFlavorDefinitions"
 require "PNC/Audio/PNC_PlayerSpeech"
 require "PNC/Conversation/PNC_ConversationFarewellContext"
 pcall(require, "PNC/Semantics/PNC_SemanticInteractionLifecycle")
+local InteractionPresentationRegistry = require
+    "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
@@ -98,6 +100,10 @@ local function deliver(item, current)
     if not client or type(client.Enqueue) ~= "function" then
         return false, "social_client_unavailable"
     end
+    InteractionPresentationRegistry.Remember(
+        item.eventID,
+        item.interaction
+    )
     local accepted, enqueueReason = client.Enqueue({
         eventID = item.eventID,
         flavorID = "social.conversation_farewell",

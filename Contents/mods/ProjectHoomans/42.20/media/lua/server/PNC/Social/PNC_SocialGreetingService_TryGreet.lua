@@ -48,6 +48,7 @@ function Service.TryGreet(player, target, at, actorKey)
     local presentationEventID
     local greetingState
     local flavorID
+    local beatID
     local meetingOK
     local meetingReason
     if npcID == "" or not record or not player then
@@ -138,6 +139,7 @@ function Service.TryGreet(player, target, at, actorKey)
     after = relationshipSummary(afterRelationship, true, npcID)
     delta = relationshipDelta(before, after)
     presentationEventID = details and details.eventID or eventID
+    beatID = "beat:social_greeting:" .. tostring(presentationEventID)
     local interaction
     if InteractionLifecycle
         and type(InteractionLifecycle.Envelope) == "table"
@@ -151,6 +153,8 @@ function Service.TryGreet(player, target, at, actorKey)
             playerUUID = actorKey,
             act = "GREET",
             topic = "greeting",
+            beatID = beatID,
+            responsePlanID = "social.greeting",
             eventRef = presentationEventID,
             flowID = "social_greeting",
             poolID = flavorID,
@@ -165,10 +169,13 @@ function Service.TryGreet(player, target, at, actorKey)
                     playerUUID = actorKey,
                     act = "GREET",
                     topic = "greeting",
+                    beatID = beatID,
+                    responsePlanID = "social.greeting",
                     eventRef = presentationEventID,
                     flowID = "social_greeting",
                     poolID = flavorID,
                     factRefs = greetingFactRefs(details),
+                    expectedReplies = { "GREET", "ACK", "THANK" },
                     worldHour = at,
                     meaningful = true,
                 })

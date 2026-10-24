@@ -7,6 +7,8 @@ PNC.SocialFlavorPresentationInternal =
 
 local Presentation = PNC.SocialFlavorPresentation
 local H = PNC.SocialFlavorPresentationInternal
+local InteractionPresentationRegistry = require
+    "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
 if not H.Clean then return Presentation end
 
 local Client = PsychopatzCore.SocialFlavorClient
@@ -23,6 +25,11 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
     )
     if not receive then return false, reason end
     H.EnrichReceiveContext(receive)
+    InteractionPresentationRegistry.Remember(
+        receive.eventID,
+        receive.ambientFlavor.interaction
+            or receive.context and receive.context.interaction
+    )
     local accepted, enqueueReason = Client.Enqueue(
         H.BuildReceivePayload(receive)
     )

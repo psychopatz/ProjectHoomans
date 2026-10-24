@@ -14,6 +14,48 @@ local currentPlayer = H.CurrentPlayer
 local updateMedicalSupplyRequest = H.UpdateMedicalSupplyRequest
 local playerAddress = H.PlayerAddress
 local npcIdentity = H.NPCIdentity
+local InteractionLifecycle = PNC.Semantics
+    and PNC.Semantics.InteractionLifecycle or nil
+if type(InteractionLifecycle) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+    )
+    InteractionLifecycle = ok and loaded or nil
+end
+
+local function presentationInteraction(ambientFlavor, context, npcID,
+    eventID, eventType)
+    local existing = ambientFlavor.interaction
+        or context and context.interaction
+    if existing then return existing end
+    local Envelope = InteractionLifecycle
+        and InteractionLifecycle.Envelope or nil
+    local playerUUID = H.PlayerUUID and H.PlayerUUID() or nil
+    if not Envelope or type(Envelope.NPCSpeech) ~= "function"
+        or not playerUUID
+    then
+        return nil
+    end
+    return Envelope.NPCSpeech({
+        npcID = npcID,
+        targetID = playerUUID,
+        playerUUID = playerUUID,
+        act = ambientFlavor.act or "REACT",
+        topic = ambientFlavor.topic or eventType,
+        beatID = ambientFlavor.beatID
+            or "beat:" .. tostring(eventType) .. ":"
+                .. tostring(ambientFlavor.eventRef or eventID),
+        responsePlanID = ambientFlavor.responsePlanID
+            or "social.reaction." .. tostring(eventType),
+        flowID = ambientFlavor.flowID
+            or "social:" .. tostring(eventType),
+        poolID = ambientFlavor.poolID or ambientFlavor.flavorID,
+        eventType = eventType,
+        eventRef = ambientFlavor.eventRef or eventID,
+        factRefs = ambientFlavor.factRefs or context and context.factRefs,
+    })
+end
 
 function H.BuildReceiveContext(ambientFlavor, summary, networkArgs)
     if type(ambientFlavor) ~= "table" then
@@ -118,6 +160,17 @@ function H.EnrichReceiveContext(receive)
         or receive.relationshipState
     context.relationshipTier = context.relationshipTier
         or receive.relationshipTier
+    context.interaction = context.interaction
+        or ambientFlavor.interaction
+        or presentationInteraction(
+            ambientFlavor,
+            context,
+            npcID,
+            receive.eventID,
+            eventType
+        )
+    ambientFlavor.interaction = ambientFlavor.interaction
+        or context.interaction
     -- Downed distress lines may address the attacker by name. The server
     -- sends the authoritative display name; use a neutral noun as fallback.
     if context.downedAttackerName == nil then

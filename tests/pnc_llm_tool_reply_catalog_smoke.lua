@@ -138,4 +138,21 @@ local secondAdmire = Replies.Build({
 T.truthy(secondAdmire ~= admire,
     "successive replies avoid immediately repeating a variant")
 
+Replies.Reset()
+for index = 1, 300 do
+    Replies.Build({
+        {
+            id = "bounded-" .. tostring(index),
+            name = "social_react",
+            accepted = true,
+            authoritative = true,
+            reason = "applied",
+            reaction = "admire",
+            subtype = "bounded_" .. tostring(index),
+        },
+    }, context)
+end
+T.equal(#Replies.lastVariantOrder, Replies.MAX_LAST_VARIANTS,
+    "tool reply anti-repeat state remains bounded")
+
 T.finish("pnc_llm_tool_reply_catalog_smoke")

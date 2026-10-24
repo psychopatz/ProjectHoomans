@@ -60,7 +60,7 @@ for name, _ in pairs(publicFunctions) do
     T.equal(type(PNC.Communities[name]), "function",
         "entry point should preserve Communities." .. name)
 end
-T.equal(publicCount, 40, "public function declaration count")
+T.equal(publicCount, 41, "public function declaration count")
 T.equal(type(PNC.Communities.IsInsideHomeArea), "function",
     "inside-home alias")
 T.equal(type(PNC.Communities.GetDistanceFromHome), "function",

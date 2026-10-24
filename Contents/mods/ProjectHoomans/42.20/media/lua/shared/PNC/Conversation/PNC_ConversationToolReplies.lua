@@ -15,9 +15,12 @@ local Replies = PNC.Conversation.ToolReplies
 local CATALOG = PNC.Conversation.ToolReplyCatalog or {}
 
 Replies.VERSION = 2
+Replies.MAX_LAST_VARIANTS = 256
 
 local lastVariant = Replies.lastVariant or {}
 Replies.lastVariant = lastVariant
+local lastVariantOrder = Replies.lastVariantOrder or {}
+Replies.lastVariantOrder = lastVariantOrder
 
 Replies.CATALOG = CATALOG
 
@@ -43,6 +46,13 @@ local function choose(key, values, salt)
     local previous = lastVariant[key]
     if count > 1 and previous == index then
         index = index % count + 1
+    end
+    if previous == nil then
+        while #lastVariantOrder >= Replies.MAX_LAST_VARIANTS do
+            local oldest = table.remove(lastVariantOrder, 1)
+            lastVariant[oldest] = nil
+        end
+        lastVariantOrder[#lastVariantOrder + 1] = key
     end
     lastVariant[key] = index
     return values[index], index
@@ -212,6 +222,9 @@ end
 
 function Replies.Reset()
     for key, _ in pairs(lastVariant) do lastVariant[key] = nil end
+    for index = #lastVariantOrder, 1, -1 do
+        lastVariantOrder[index] = nil
+    end
 end
 
 return Replies

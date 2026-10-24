@@ -113,6 +113,16 @@ local function handle(player, args)
     if not playerKey then
         return rejected(requestID, npcID, "player_identity_unavailable")
     end
+    local projection = Persistence.Project(playerKey, npcID)
+    local thread = projection and projection.thread or nil
+    local beat = thread and thread.activeBeat or nil
+    local provenance = beat and {
+        beatID = beat.id,
+        responsePlanID = beat.responsePlanID,
+        flowID = beat.flowID,
+        poolID = beat.poolID,
+        factRefs = beat.factRefs,
+    } or nil
     local envelope = Lifecycle.Envelope.Build({
         source = "typed_text",
         actorID = playerKey,
@@ -121,14 +131,15 @@ local function handle(player, args)
         act = interaction.act or interaction.speechAct
             or interaction.intent,
         topic = interaction.topic,
-        provenance = interaction.provenance,
+        -- The client may report the already-parsed act/topic, but the
+        -- server derives beat provenance from its private capsule. A client
+        -- cannot invent NPC response-plan identity.
+        provenance = provenance,
         modifiers = interaction.modifiers,
     })
     if not envelope then
         return rejected(requestID, npcID, "interaction_envelope_invalid")
     end
-    local projection = Persistence.Project(playerKey, npcID)
-    local thread = projection and projection.thread or nil
     local at = worldAgeHours()
     local options = {
         meaningful = durableAct(envelope.act),

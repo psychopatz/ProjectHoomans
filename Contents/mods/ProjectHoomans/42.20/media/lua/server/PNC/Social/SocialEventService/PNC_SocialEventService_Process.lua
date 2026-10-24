@@ -83,10 +83,54 @@ local function recordLifecycleEvent(event, output)
             memory = detail.memoryID,
             worldHour = event.occurredAt,
         })
+        local speechEnvelope
+        if applied and type(InteractionPersistence.RecordNPCSpeech)
+            == "function"
+        then
+            local beatID = "beat:" .. tostring(event.type) .. ":"
+                .. tostring(event.id)
+            speechEnvelope = InteractionLifecycle.Envelope.NPCSpeech({
+                npcID = detail.observerNPCID,
+                targetID = event.actorKey,
+                playerUUID = event.actorKey,
+                act = "REACT",
+                topic = event.type,
+                beatID = beatID,
+                responsePlanID = "social.reaction." .. tostring(event.type),
+                eventType = event.type,
+                eventRef = event.id,
+                factRefs = detail.memoryID and { detail.memoryID } or nil,
+                worldHour = event.occurredAt,
+                meaningful = true,
+            })
+            local recorded, speechReason = InteractionPersistence.RecordNPCSpeech({
+                npcID = detail.observerNPCID,
+                targetID = event.actorKey,
+                playerUUID = event.actorKey,
+                act = "REACT",
+                topic = event.type,
+                beatID = beatID,
+                responsePlanID = "social.reaction." .. tostring(event.type),
+                eventType = event.type,
+                eventRef = event.id,
+                factRefs = detail.memoryID and { detail.memoryID } or nil,
+                worldHour = event.occurredAt,
+                meaningful = true,
+            })
+            if not recorded and PNC.Core
+                and type(PNC.Core.LogWarn) == "function"
+            then
+                PNC.Core.LogWarn(
+                    "social event speech provenance failed event="
+                        .. tostring(event.id) .. " reason="
+                        .. tostring(speechReason or "unknown")
+                )
+            end
+        end
         -- Keep the exact grounded provenance beside the observer result so
         -- the existing presentation bridge can carry meaning without ever
         -- reparsing the rendered flavor line.
-        detail.interaction = envelope
+        detail.interaction = speechEnvelope or envelope
         if not applied and PNC.Core
             and type(PNC.Core.LogWarn) == "function"
         then

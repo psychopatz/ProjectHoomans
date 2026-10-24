@@ -12,6 +12,8 @@ local EventBus = PsychopatzCore.Events
 local Diary = PNC.Conversation.Diary
 local OWNER_TOKEN = Presentation
 local log = H.Log
+local InteractionPresentationRegistry = require
+    "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
 
 local function onDelivered(payload)
     if type(payload) ~= "table" then return end
@@ -21,6 +23,11 @@ local function onDelivered(payload)
     local context = type(item.context) == "table" and item.context or {}
     local npcID = tostring(item.speakerID or "")
     local interaction = item.interaction or source.interaction
+    if not interaction then
+        interaction = InteractionPresentationRegistry.Take(item.eventID)
+    else
+        InteractionPresentationRegistry.Take(item.eventID)
+    end
     if type(interaction) == "table" then
         local conversation = PsychopatzCore and PsychopatzCore.Conversation
         local view = conversation and conversation.instance or nil

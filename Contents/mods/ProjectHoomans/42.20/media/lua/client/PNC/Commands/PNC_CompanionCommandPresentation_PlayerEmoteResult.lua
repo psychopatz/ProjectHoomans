@@ -59,7 +59,8 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
                         target = snapshot,
                         targets = { snapshot },
                         npcID = npcID,
-                        interaction = target.interaction,
+                        interaction = target.replyInteraction
+                            or target.interaction,
                         playerActor = player,
                         commandID = "vanilla_emote_"
                             .. tostring(result.emote),

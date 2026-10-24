@@ -85,6 +85,7 @@ PNC = {
         ForEachPlayer = function(callback) callback(player) end,
     },
     Const = {},
+    Conversation = {},
     Registry = {
         GetLiveZombie = function(id) return bodies[id] end,
     },
@@ -156,6 +157,20 @@ PNC = {
     },
 }
 
+local Lifecycle = T.load(
+    SHARED .. "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+)
+local lifecycleStore = Lifecycle.New({ worldHour = 0 })
+PNC.Semantics = { InteractionLifecycle = Lifecycle }
+PNC.Conversation.InteractionLifecyclePersistence = {
+    RecordNPCSpeech = function(spec)
+        return Lifecycle.RecordNPCSpeech(lifecycleStore, spec)
+    end,
+    Project = function(playerUUID, npcID)
+        return Lifecycle.Project(lifecycleStore, playerUUID, npcID)
+    end,
+}
+
 T.load(SHARED .. "PNC/Core/Relationships/PNC_SocialEventDefinitions.lua")
 T.load(SHARED .. "PNC/Core/Commands/PNC_VanillaEmoteInteractions.lua")
 T.load(SERVER .. "PNC/Social/PNC_SocialMeetingService.lua")
@@ -171,6 +186,18 @@ T.equal(Service.Pump(24), 1, "first proximity entry greets the player")
 T.equal(#applied, 1, "proximity greeting uses one relationship mutation")
 T.equal(#relationshipBroadcasts, 1, "proximity greeting uses central relationship transport")
 T.equal(#speechBroadcasts, 1, "proximity greeting sends NPC speech")
+T.truthy(speechBroadcasts[1].interaction,
+    "proximity greeting carries NPC semantic provenance")
+T.equal(speechBroadcasts[1].interaction.provenance.flowID,
+    "social_greeting",
+    "greeting provenance identifies the production flow")
+local greetingProjection = Lifecycle.Project(
+    lifecycleStore,
+    "player:slot:character-1",
+    "npc-good"
+)
+T.truthy(greetingProjection.thread and greetingProjection.thread.activeBeat,
+    "greeting creates a bounded response beat")
 T.equal(#presentationRequests, 1,
     "proximity greeting requests one live presentation animation")
 T.equal(presentationRequests[1].animationID, "greeting.wavehi",

@@ -2,50 +2,62 @@
 
 **Updated:** 2026-10-24
 
-**Parent status:** ACTIVE — P0A is complete; P1 is complete; P2/P3 implementation is in progress.
+**Developer status:** P0A–P9 implementation and developer-side acceptance gates are complete. Final native Project Zomboid SP/MP acceptance remains user-owned and was not run by Codex.
 
-**Accepted predecessor foundation:** Contextual Dialogue Persona & Choices P14 complete. Preserve its save-backed production rehydration architecture.
+**Accepted predecessor foundation:** Contextual Dialogue Persona & Choices P14. Its save-backed production rehydration architecture remains intact.
 
 **Audit baseline:** `e8c04b4fb2139be315253f12e0f06a5dfa3fc70f5`
 
-**Checkout:** existing `main` only; no branch or source-save mutation.
+**Checkout:** existing `main` only. No branch, source-save mutation, Workshop upload, or native game launch was performed.
 
-**Native Project Zomboid:** user-owned final acceptance only; not a developer-side blocker.
+## P0A — source-level inventory
 
-## P0A — complete
+Complete. `SOURCE_INVENTORY.md` and `MIGRATION_MATRIX.md` enumerate the production flavor families, real source owners and IDs, trigger/context/resolver paths, presentation/TTS sinks, cooldown/chance/dedupe behavior, authority, effects, persistence dependencies, duplicate paths, and characterization coverage.
 
-`SOURCE_INVENTORY.md` records the production flavor/spontaneous-speech families, real source files and IDs, trigger/context/resolver/presentation ownership, cooldown/chance/dedupe behavior, multiplayer authority, gameplay effects, persistence dependencies, duplicate greeting/emote paths, and migration gates.
+The inventory distinguishes authoritative gameplay/domain state from presentation-only flavor state. No legacy authored line was deleted; migrated lines remain available as bounded realization variants where applicable.
 
-`MIGRATION_MATRIX.md` now cites actual production source owners and IDs rather than broad family descriptions. Existing characterization coverage is recorded for farewell, greeting/emote, social-event transport, incapacitated/leader-loss flavor, and typed/headless production-worker paths. No legacy flavor authority was deleted during P0A.
+## P1 — common semantic envelope and lifecycle owner
 
-## P1 — complete
+Complete. Production Lua owns `semantic.interaction.envelope.v1` and `semantic.interaction.lifecycle.v1`. Typed/headless input remains NLU-driven; semantic choices, emotes, lifecycle events, grounded events, and NPC speech enter through the same bounded envelope contract. The envelope stores meaning and provenance, never rendered prose or gameplay permission.
 
-Production Lua now owns a bounded `semantic.interaction.envelope.v1` and `semantic.interaction.lifecycle.v1` contract. The envelope carries source, actor/target/player identity, canonical act/topic, gesture or grounded event reference, bounded fact references/modifiers, world hour, and NPC semantic provenance. It never stores rendered prose and never grants gameplay authority.
+Server-only `PNC_InteractionLifecyclePersistence` owns the sparse ModData boundary and uses the existing persistence coordinator. Pair capsules are created only for meaningful state, shared events are canonical references, imports/exports are bounded, and no lifecycle OnTick scan was added.
 
-The existing typed NLU result and semantic-frame path attach the envelope after parsing/IR conversion. Existing parser, candidate, router, semantic-suggestion, ConversationBlocks, response-plan, and authoritative-domain contracts remain in place. Server emote, social greeting, ConversationBlocks choice, NPC response, and farewell adapters now expose the same bounded meaning without reparsing presentation text.
+## P2/P3 — greeting, farewell, emote, companion and social-reply parity
 
-`PNC_InteractionLifecyclePersistence` is a server-only sparse ModData owner coordinated by the existing persistence commit boundary. Import is bounded and version-checked; pair state is created only for meaningful durable deltas; shared event references are canonicalized; expiry is lazy or explicitly bounded; no lifecycle OnTick scan was added.
+Complete. Greeting and NPC-reply adapters retain beat, flow, response-plan, pool, act, topic, fact and event provenance. Farewell retains its existing eligibility, chance, delay, TTL and cooldown policy while conversation close is persisted through the server lease boundary. Registered vanilla emotes, companion command replies, social replies and their presentation/TTS sinks now carry the common semantic interaction envelope.
 
-The production Semantic Lab worker exposes envelope, apply, NPC speech, close/resume, compaction, time, event, projection, metrics, export, and import commands. Python remains transport/presentation only.
+Legacy flavor definitions remain realization sources. They no longer create a competing lifecycle state or reparse generated prose. Accepted cooldown/no-op emotes remain presentation-only and do not materialize a new durable pair.
 
-Verified developer-side evidence:
+## P4 — grounded combat, medical, corpse, compatibility and world-event routes
 
-- `lua tests/pnc_semantic_interaction_lifecycle_smoke.lua`
-- `lua tests/pnc_semantic_interaction_persistence_smoke.lua`
-- `python3 -m unittest tools.semantic_harness.tests.test_semantic_interaction_lifecycle_p1 -v` — 5 tests pass, including a 200-turn bounded conversation, two isolated players sharing one NPC, one canonical shared event reference, 400 trivial NPC identities, and 2,000 trivial turns.
-- `luac -p` and `pz_verify --kahlua --severity ERROR` pass for changed lifecycle, adapter, persistence, and authority files.
-- `git diff --check` passes.
+Complete. The social-event transaction bridges grounded events into canonical world-event and NPC-speech provenance after source-domain validation. Combat witness, treatment, incapacitation, abandonment, horde, leader-loss, faction and compatibility adapters retain their existing domain owners and effects. Corpse-awareness reactions register one shared event and create bounded per-player NPC-speech context only for the player who can receive it.
 
-P1 does not retire duplicate legacy flavor authority and does not claim full P2–P9 completion. General UI-close transport, all grounded combat/medical/world-event adapters, full durable memory promotion policy, network projection audits, and the remaining legacy parity matrix are still open.
+Project A-Life server events register a canonical shared event reference once; the client uses a speaker-specific transport ID while preserving the canonical `eventRef` for semantic presentation. Client-only ambient routes are explicitly presentation-only and do not fabricate durable gameplay state.
+
+## P5 — bounded thread and beat continuity
+
+Complete. Active beats, suspended topic stacks, response windows, open questions, commitments, recent semantic turns, event references, and NPC speech provenance are bounded. Topic interruption/resume works independently of visible transcript rows. Closing the UI suspends meaningful context; it does not destroy it.
+
+## P6 — compaction, expiry and promotion
+
+Complete. Resolved trivial interactions remove their pair capsule. Long conversations retain at most the configured semantic turn bound; residue and realization history expire lazily; significant facts, commitments, memories and event references are promoted as compact references. Anti-repetition history is bounded and is not autobiographical transcript memory.
+
+## P7 — sparse multiplayer persistence and isolation
+
+Complete. The lifecycle does not pre-create Player × NPC records, has bounded pair/shared-event budgets, keeps pair projections private, and leaves dormant actors at zero lifecycle tick work. Shared event payloads are registered once and referenced by ID. Server authority guards reject non-authoritative lifecycle mutation.
+
+## P8 — production Semantic Lab and acceptance worker
+
+Complete. The existing production Lua worker exposes envelope, apply, NPC speech, close/resume, compaction, time, event, projection, response-window, metrics, export and import operations. Python only transports, isolates, drives and presents production-Lua state. Save-backed P14 rehydration tests confirm the source snapshot remains immutable.
+
+## P9 — legacy authority retirement boundary
+
+Complete for the audited families. Legacy registries, EN/TL lines, timing gates and compatibility shims remain only where they are still the correct realization/provider or external-domain boundary. Duplicate lifecycle/state authority and prose-reparse paths are retired; ConversationBlocks, gameplay domains, network authority and existing presentation/TTS ownership remain authoritative in their existing locations.
+
+## Developer-side evidence
+
+See `DEVELOPER_ACCEPTANCE.md` for the command log and scenario mapping. The final checks include 873/873 Lua tests, the full Python semantic-harness suite, production-Lua lifecycle acceptance, save-backed P14 immutability, full-mod Kahlua verification with zero errors across 3,094 files, syntax validation, and a clean diff check.
 
 ## Exact Next Chunk
 
-**P2/P3A — production greeting/farewell/emote parity and lifecycle provenance.**
-
-- complete parity coverage for every accepted greeting, farewell, vanilla emote, companion/social reply, and NPC reply variant;
-- ensure NPC speech retains act/topic/beat/response-plan/fact/event provenance and later typed/button/emote replies resolve against that beat;
-- preserve existing greeting/day/cooldown/chance/dedupe, relationship, ConversationBlocks, animation, TTS, and gameplay-effect ownership;
-- add focused production-Lua worker and source-level characterization tests for equivalent typed/button/emote meaning, interruption/resume, and UI-close suspension;
-- do not delete or disable legacy flavor authority until semantic parity and regression evidence are recorded.
-
-After P2/P3A passes, continue automatically to grounded event migration, bounded thread/beat continuity, compaction and durable memory promotion, multiplayer/network sparsity, worker stress/diagnostics, and final legacy retirement gates. Do not request another `/goal`.
+No further developer-implementable P0–P9 chunk remains. The next action is the user-owned native Project Zomboid SP/MP acceptance pass described in `HARNESS_ACCEPTANCE.md`; Codex did not launch or mutate a native game or source save.
