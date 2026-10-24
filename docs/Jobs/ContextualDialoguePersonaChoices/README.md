@@ -1,6 +1,6 @@
 # Contextual Dialogue Persona & Choices
 
-**Status:** REOPENED — P12/P13 save-backed operational workbench retained; P14 Production Rehydration & Mod-Code Execution Parity is the current mandatory phase.  
+**Status:** ACCEPTED FOUNDATION — P14 complete; successor semantic roadmap is docs/Jobs/SemanticInteractionLifecycle/.
 **Current source-audit baseline:** ProjectHoomans remote main at d3c6c2018b4a074bdf6178b7f060f18832ed2344 (2026-10-24).  
 **Dynamic Trading provider baseline:** psychopatz/DynamicTrading at 5db64cbcc764f035146f044fdc34e930ce47d7c8.  
 **Native Project Zomboid SP/MP:** untested; user-owned acceptance.

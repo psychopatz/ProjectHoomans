@@ -1,9 +1,9 @@
 # Contextual Dialogue Persona & Choices — Current Progress
 
 **Updated:** 2026-10-24  
-**Parent status:** P14 ACCEPTED — P12/P13 save-backed operational workbench retained; production rehydration parity and runtime-only controls are verified.
-**Current mandatory phase:** P14 complete — production rehydration parity and runtime-only workbench controls accepted.
-**Current exact Next Chunk:** None — P14 is complete; the next phase requires a new roadmap decision.
+**Parent status:** ACCEPTED FOUNDATION — P14 complete; successor roadmap approved under docs/Jobs/SemanticInteractionLifecycle/. 
+**Current mandatory phase:** None in this job; preserve P14 as accepted foundation. 
+**Current exact Next Chunk:** Follow the active SemanticInteractionLifecycle job; do not reopen P14 without a demonstrated regression.
 **Current local baseline audited:** ProjectHoomans `main` at `4f8592c4` before this regression-repair commit.
 **Normal Semantic Lab runtime requirement:** Project Zomboid may remain CLOSED/OFFLINE.  
 **Source save mutation:** FORBIDDEN.

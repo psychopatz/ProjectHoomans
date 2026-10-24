@@ -1,6 +1,6 @@
 # Roadmap — Contextual Dialogue Persona & Choices
 
-**Parent status:** REOPENED — P0-P13 save-backed operational workbench retained; P14 Production Rehydration & Mod-Code Execution Parity is mandatory.  
+**Parent status:** ACCEPTED FOUNDATION — P0-P14 retained; new semantic lifecycle work continues under docs/Jobs/SemanticInteractionLifecycle/.
 Phases are organization and acceptance checkpoints; completing one phase never completes the parent objective.
 
 ## P0 — Current-path contract baseline
