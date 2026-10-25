@@ -610,6 +610,19 @@ load(
     load("ProjectHoomans", "shared", "PNC/Conversation/PNC_ConversationToolReplyCatalog.lua", "tool_catalog")
     load("ProjectHoomans", "shared", "PNC/Conversation/PNC_ConversationToolReplies.lua", "tool_replies")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticCatalog.lua", "semantic")
+    for _, spoke in ipairs({
+        "PNC_SemanticCatalog_QuestionPatterns_ContextQuestions_Environment.lua",
+        "PNC_SemanticCatalog_QuestionPatterns_ContextQuestions_Medical.lua",
+        "PNC_SemanticCatalog_QuestionPatterns_ContextQuestions_Knowledge.lua",
+        "PNC_SemanticCatalog_QuestionPatterns_ContextQuestions_FollowUps.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "shared",
+            "PNC/Semantics/SemanticCatalog/" .. spoke,
+            "semantic_catalog_question_spoke"
+        )
+    end
+
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticEngineFacts.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticEngineEvents.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticAddressResolver.lua", "semantic")
@@ -624,6 +637,18 @@ load(
         "PNC/Semantics/PNC_SemanticInteractionLifecycle_State.lua",
         "semantic_lifecycle_spoke"
     )
+    for _, spoke in ipairs({
+        "PNC_SemanticInteractionLifecycle_State_Storage.lua",
+        "PNC_SemanticInteractionLifecycle_State_Transitions.lua",
+        "PNC_SemanticInteractionLifecycle_State_Projections.lua",
+        "PNC_SemanticInteractionLifecycle_State_Persistence.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "shared",
+            "PNC/Semantics/" .. spoke,
+            "semantic_lifecycle_state_spoke"
+        )
+    end
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticDialoguePolicy.lua", "semantic")
     registerEntryPointModule(
         "ProjectHoomans", "shared",
@@ -665,7 +690,31 @@ load(
             "semantic_response_catalog_questions_spoke"
         )
     end
+    for _, spoke in ipairs({
+        "PNC_SemanticDialogueResponseCatalog_Social_Core.lua",
+        "PNC_SemanticDialogueResponseCatalog_Social_Conflict.lua",
+        "PNC_SemanticDialogueResponseCatalog_Social_Reactions.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "shared",
+            "PNC/Semantics/SemanticDialogueResponseCatalog/" .. spoke,
+            "semantic_response_catalog_social_spoke"
+        )
+    end
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticCommandAdapter.lua", "semantic_adapter")
+    for _, spoke in ipairs({
+        "PNC_SemanticCommandAdapter_Registry.lua",
+        "PNC_SemanticCommandAdapter_CompanionActions.lua",
+        "PNC_SemanticCommandAdapter_QuestOperations.lua",
+        "PNC_SemanticCommandAdapter_ContextualResponses.lua",
+        "PNC_SemanticCommandAdapter_Dispatch.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "client",
+            "PNC/Semantics/" .. spoke,
+            "semantic_command_adapter_spoke"
+        )
+    end
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticTaskAdapter.lua", "semantic_adapter")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticCapabilityCatalog.lua", "semantic")
     load(
@@ -683,6 +732,18 @@ load(
         "PNC/Semantics/PNC_SemanticDialogueSuggestions_Capabilities.lua",
         "semantic_suggestions_spoke"
     )
+    for _, spoke in ipairs({
+        "PNC_SemanticDialogueSuggestions_Capabilities_Core.lua",
+        "PNC_SemanticDialogueSuggestions_Capabilities_Companion.lua",
+        "PNC_SemanticDialogueSuggestions_Capabilities_Camp.lua",
+        "PNC_SemanticDialogueSuggestions_Capabilities_Rows.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "shared",
+            "PNC/Semantics/" .. spoke,
+            "semantic_suggestions_capability_spoke"
+        )
+    end
     registerEntryPointModule(
         "ProjectHoomans", "shared",
         "PNC/Semantics/PNC_SemanticDialogueSuggestions_Branches.lua",
@@ -698,6 +759,18 @@ load(
         "PNC/Semantics/PNC_SemanticDialogueSuggestions_Projection.lua",
         "semantic_suggestions_spoke"
     )
+    for _, spoke in ipairs({
+        "PNC_SemanticDialogueSuggestions_Projection_Offers.lua",
+        "PNC_SemanticDialogueSuggestions_Projection_Root.lua",
+        "PNC_SemanticDialogueSuggestions_Projection_Landing.lua",
+        "PNC_SemanticDialogueSuggestions_Projection_Groups.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "shared",
+            "PNC/Semantics/" .. spoke,
+            "semantic_suggestions_projection_spoke"
+        )
+    end
     registerEntryPointModule(
         "ProjectHoomans", "shared",
         "PNC/Semantics/PNC_SemanticDialogueSuggestions_Build.lua",
@@ -715,6 +788,17 @@ load(
     )
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticDialogueInput_Context.lua", "semantic")
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticDialogueInput_Presentation.lua", "semantic")
+    for _, spoke in ipairs({
+        "PNC_SemanticDialogueInput_Presentation_Responses_Translation.lua",
+        "PNC_SemanticDialogueInput_Presentation_Responses_Payloads.lua",
+        "PNC_SemanticDialogueInput_Presentation_Responses_Actions.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "client",
+            "PNC/Semantics/" .. spoke,
+            "semantic_presentation_response_spoke"
+        )
+    end
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticDialogueInput_Actions.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticIdentityExchange.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticIdentityNetwork.lua", "semantic")
@@ -792,6 +876,18 @@ load(
             .. ": " .. reason)
     end
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticDialogueInput.lua", "semantic_entry")
+    for _, spoke in ipairs({
+        "PNC_SemanticDialogueInput_FrameSupport.lua",
+        "PNC_SemanticDialogueInput_NavigationFrames.lua",
+        "PNC_SemanticDialogueInput_SubmissionFrames.lua",
+        "PNC_SemanticDialogueInput_State.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "client",
+            "PNC/Semantics/" .. spoke,
+            "semantic_input_spoke"
+        )
+    end
     registerEntryPointModule(
         "ProjectHoomans", "client",
         "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation.lua",
@@ -807,6 +903,18 @@ load(
         "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission.lua",
         "semantic_lifecycle_spoke"
     )
+    for _, spoke in ipairs({
+        "PNC_SemanticDialogueInput_Lifecycle_Submission_Receipts.lua",
+        "PNC_SemanticDialogueInput_Lifecycle_Submission_Compound.lua",
+        "PNC_SemanticDialogueInput_Lifecycle_Submission_Single.lua",
+        "PNC_SemanticDialogueInput_Lifecycle_Submission_Gossip.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "client",
+            "PNC/Semantics/" .. spoke,
+            "semantic_lifecycle_submission_spoke"
+        )
+    end
     load(
         "ProjectHoomans", "client",
         "PNC/Semantics/PNC_SemanticCognitionClient.lua",

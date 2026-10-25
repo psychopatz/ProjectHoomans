@@ -148,6 +148,30 @@ T.load(
     "client",
     "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission.lua"
 )
+for _, spoke in ipairs({
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Receipts.lua",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Compound.lua",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single.lua",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Gossip.lua",
+}) do
+    T.load(
+        "ProjectHoomans",
+        "client",
+        spoke
+    )
+end
+for _, spoke in ipairs({
+    "PNC/Semantics/PNC_SemanticDialogueInput_FrameSupport.lua",
+    "PNC/Semantics/PNC_SemanticDialogueInput_NavigationFrames.lua",
+    "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames.lua",
+    "PNC/Semantics/PNC_SemanticDialogueInput_State.lua",
+}) do
+    T.load(
+        "ProjectHoomans",
+        "client",
+        spoke
+    )
+end
 require = originalRequire
 
 local session = {

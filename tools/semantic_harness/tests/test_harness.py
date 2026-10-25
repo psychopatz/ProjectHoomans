@@ -504,6 +504,18 @@ class SemanticHarnessTests(unittest.TestCase):
             manifest_paths,
         )
         for spoke in (
+            "PNC_SemanticCatalog_QuestionPatterns_ContextQuestions_Environment.lua",
+            "PNC_SemanticCatalog_QuestionPatterns_ContextQuestions_Medical.lua",
+            "PNC_SemanticCatalog_QuestionPatterns_ContextQuestions_Knowledge.lua",
+            "PNC_SemanticCatalog_QuestionPatterns_ContextQuestions_FollowUps.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:shared:PNC/Semantics/SemanticCatalog/" + spoke,
+                    manifest_paths,
+                )
+
+        for spoke in (
             "PNC_SemanticDialogueFlowKernel_Storage.lua",
             "PNC_SemanticDialogueFlowKernel_Matching.lua",
             "PNC_SemanticDialogueFlowKernel_Preview.lua",
@@ -539,6 +551,18 @@ class SemanticHarnessTests(unittest.TestCase):
                     manifest_paths,
                 )
         for spoke in (
+            "PNC_SemanticDialogueResponseCatalog_Social_Core.lua",
+            "PNC_SemanticDialogueResponseCatalog_Social_Conflict.lua",
+            "PNC_SemanticDialogueResponseCatalog_Social_Reactions.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:shared:PNC/Semantics/SemanticDialogueResponseCatalog/"
+                    + spoke,
+                    manifest_paths,
+                )
+
+        for spoke in (
             "PNC_SemanticInteractionLifecycle_Envelope.lua",
             "PNC_SemanticInteractionLifecycle_State.lua",
         ):
@@ -547,6 +571,42 @@ class SemanticHarnessTests(unittest.TestCase):
                     "ProjectHoomans:shared:PNC/Semantics/" + spoke,
                     manifest_paths,
                 )
+        for spoke in (
+            "PNC_SemanticInteractionLifecycle_State_Storage.lua",
+            "PNC_SemanticInteractionLifecycle_State_Transitions.lua",
+            "PNC_SemanticInteractionLifecycle_State_Projections.lua",
+            "PNC_SemanticInteractionLifecycle_State_Persistence.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:shared:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
+
+        for spoke in (
+            "PNC_SemanticDialogueSuggestions_Capabilities_Core.lua",
+            "PNC_SemanticDialogueSuggestions_Capabilities_Companion.lua",
+            "PNC_SemanticDialogueSuggestions_Capabilities_Camp.lua",
+            "PNC_SemanticDialogueSuggestions_Capabilities_Rows.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:shared:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
+
+        for spoke in (
+            "PNC_SemanticDialogueSuggestions_Projection_Offers.lua",
+            "PNC_SemanticDialogueSuggestions_Projection_Root.lua",
+            "PNC_SemanticDialogueSuggestions_Projection_Landing.lua",
+            "PNC_SemanticDialogueSuggestions_Projection_Groups.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:shared:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
+
         for spoke in (
             "PNC_SemanticDialogueSuggestions_Capabilities.lua",
             "PNC_SemanticDialogueSuggestions_Branches.lua",
@@ -570,6 +630,50 @@ class SemanticHarnessTests(unittest.TestCase):
                     manifest_paths,
                 )
         self.assertEqual(capabilities["translation"]["language"], "EN")
+        for spoke in (
+            "PNC_SemanticDialogueInput_FrameSupport.lua",
+            "PNC_SemanticDialogueInput_NavigationFrames.lua",
+            "PNC_SemanticDialogueInput_SubmissionFrames.lua",
+            "PNC_SemanticDialogueInput_State.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:client:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
+        for spoke in (
+            "PNC_SemanticDialogueInput_Lifecycle_Submission_Receipts.lua",
+            "PNC_SemanticDialogueInput_Lifecycle_Submission_Compound.lua",
+            "PNC_SemanticDialogueInput_Lifecycle_Submission_Single.lua",
+            "PNC_SemanticDialogueInput_Lifecycle_Submission_Gossip.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:client:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
+        for spoke in (
+            "PNC_SemanticCommandAdapter_Registry.lua",
+            "PNC_SemanticCommandAdapter_CompanionActions.lua",
+            "PNC_SemanticCommandAdapter_QuestOperations.lua",
+            "PNC_SemanticCommandAdapter_ContextualResponses.lua",
+            "PNC_SemanticCommandAdapter_Dispatch.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:client:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
+        for spoke in (
+            "PNC_SemanticDialogueInput_Presentation_Responses_Translation.lua",
+            "PNC_SemanticDialogueInput_Presentation_Responses_Payloads.lua",
+            "PNC_SemanticDialogueInput_Presentation_Responses_Actions.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:client:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
         self.assertIn("PNC/Translation/PNC_TranslationBootstrap.lua", capabilities["loadedModules"])
 
     @staticmethod
