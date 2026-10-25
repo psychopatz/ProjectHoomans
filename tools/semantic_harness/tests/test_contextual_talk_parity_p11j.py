@@ -199,10 +199,14 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
             project
             / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkParity.lua"
         ).read_text()
+        targets = (
+            project
+            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkParity_Targets.lua"
+        ).read_text()
 
         self.assertIn("TalkStart.Project(entry, player", lifecycle)
         self.assertIn("TalkStart.Project(entry, player", builder)
-        self.assertIn("TalkStart.Project(", parity)
+        self.assertIn("TalkStart.Project(", parity + targets)
         self.assertNotIn("palette.ResolveType", parity)
         self.assertNotIn("audience.Resolve", parity)
 

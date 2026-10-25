@@ -52,6 +52,9 @@ class SemanticLiveParityTests(unittest.TestCase):
         entrypoint = read(
             LIVE_SEMANTICS / "PNC_SemanticDialogueInput.lua"
         )
+        submission_frames = read(
+            LIVE_SEMANTICS / "PNC_SemanticDialogueInput_SubmissionFrames.lua"
+        )
 
         for required_module in (
             "PsychopatzCore/Semantics/PsychopatzSemanticDialogueRouter",
@@ -66,7 +69,7 @@ class SemanticLiveParityTests(unittest.TestCase):
 
         self.assertIn(
             "return Internal.SubmitSingle(view, value, part)",
-            entrypoint,
+            submission_frames,
         )
 
     def test_worker_does_not_replace_semantic_modules_with_boundary_stubs(self) -> None:

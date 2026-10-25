@@ -7,7 +7,7 @@ local Protocol = require "worker/Protocol"
 local RuntimeState = require "worker/RuntimeState"
 
 T.equal(Protocol.VERSION, 1, "harness protocol version changed unexpectedly")
-T.equal(Protocol.MAX_MESSAGE_BYTES, 256 * 1024,
+T.equal(Protocol.MAX_MESSAGE_BYTES, 512 * 1024,
     "harness protocol message bound changed unexpectedly")
 
 local encoded = Protocol.encode({

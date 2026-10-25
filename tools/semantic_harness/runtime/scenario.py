@@ -79,6 +79,7 @@ DEFAULT_SCENARIO: dict[str, Any] = {
             "boredom": 0.0,
             "panic": 0.0,
         },
+        "orderKind": "idle",
         "followState": {"mode": "idle"},
         "actorAuthority": {
             "companion": True,
@@ -130,6 +131,7 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "zombieKills": 0,
         "weatherTransition": None,
     },
+    "baseEstablished": True,
     "conversation": {
         "topic": "greeting",
         "token": "harness-lease",
@@ -151,6 +153,7 @@ DEFAULT_SCENARIO: dict[str, Any] = {
                 "state": {
                     "npc": {
                         "activeBehavior": "following",
+                        "orderKind": "follow",
                         "followState": {"mode": "following"},
                     }
                 },
@@ -161,6 +164,7 @@ DEFAULT_SCENARIO: dict[str, Any] = {
                 "state": {
                     "npc": {
                         "activeBehavior": "idle",
+                        "orderKind": "idle",
                         "followState": {"mode": "staying"},
                     }
                 },

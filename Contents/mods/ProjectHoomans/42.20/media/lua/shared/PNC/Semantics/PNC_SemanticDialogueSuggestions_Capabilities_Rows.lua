@@ -86,8 +86,15 @@ local function capabilityRows(revision, currentAction, context, ir)
                 local hideIneligibleOrder = isCompanionOrderAction(action)
                     and eligibility.allowed ~= true
                     and definition.showWhenUnavailable ~= true
+                local activeBehavior = type(context.npcState) == "table"
+                    and tostring(context.npcState.activeBehavior or "")
+                    or ""
+                local hideCompletedHomeOrder = action == "GO"
+                    and (activeBehavior == "AtHome"
+                        or activeBehavior == "AtHome:returning")
                 if eligibility.status ~= "private"
                     and not hideIneligibleOrder
+                    and not hideCompletedHomeOrder
                 then
                     local binding = type(row.binding) == "table" and row.binding or {}
                     local bindingView = {

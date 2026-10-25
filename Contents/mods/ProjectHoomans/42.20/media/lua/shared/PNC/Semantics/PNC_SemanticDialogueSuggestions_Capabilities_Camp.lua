@@ -196,6 +196,17 @@ local function appendCampSiteCapabilityRows(rows, revision, context, ir)
     local candidates = campSiteCandidates(context)
     if type(candidates) ~= "table" then return end
     local stateEligible = companionOrderStateEligible(context)
+    local state = type(context.npcState) == "table" and context.npcState or {}
+    local behavior = string.lower(tostring(state.activeBehavior or ""))
+    -- Busy/combat companions do not expose stale destination choices. Keep
+    -- incapacitated/dead rows inspectable so the UI can explain why they are
+    -- disabled, matching the bounded availability contract.
+    if not stateEligible
+        and (behavior == "busy" or behavior == "combat"
+            or behavior == "hostile")
+    then
+        return
+    end
     local unavailable = not stateEligible
         and companionUnavailableReason(context) or nil
     local disabledCode = unavailable and unavailable.code

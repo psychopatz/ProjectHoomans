@@ -107,6 +107,9 @@ function Builder.build(context)
             identityState = effectiveIdentityState,
             healthState = npc.healthState,
             activeBehavior = npc.activeBehavior,
+            orderKind = npc.orderKind
+                or (type(npc.orderSpec) == "table" and npc.orderSpec.kind)
+                or "idle",
             followState = copy(npc.followState or { mode = "idle" }),
             hostility = copy(npc.hostility),
             tacticalHostility = copy(tacticalHostility),
@@ -154,6 +157,7 @@ function Builder.build(context)
             traitFingerprint = context.playerTraitFingerprint,
         },
         playerNameKnown = true,
+        baseEstablished = scenario.baseEstablished == true,
         -- The production adapter accepts the normalized player record. The
         -- headless engine object deliberately exposes names through its
         -- descriptor, so passing the proxy here leaves playerName empty and
