@@ -19,7 +19,7 @@ if __package__ in {None, ""}:
         DEFAULT_ALLOWLIST,
         compile_wordnet,
         load_allowlist,
-        render_lua,
+        render_lua_shards,
     )
     from tools.semantic_harness.codebuilder.dialogue_contract import (
         load_dialogue_dataset,
@@ -45,7 +45,7 @@ else:
         DEFAULT_ALLOWLIST,
         compile_wordnet,
         load_allowlist,
-        render_lua,
+        render_lua_shards,
     )
     from .dialogue_contract import load_dialogue_dataset
     from .dialogue_dataset import compile_dialogue_dataset
@@ -78,6 +78,27 @@ CANONICAL_SOURCE_ROOT = (
 )
 DEFAULT_SEMANTIC_SOURCE = CANONICAL_SOURCE_ROOT / "semantic_definitions.json"
 DEFAULT_SEMANTIC_OUTPUT_ROOT = ROOT
+
+
+def write_lexicon_output(output: Path, compiled) -> list[Path]:
+    """Write the stable lexicon hub and bounded generated data shards."""
+    output.parent.mkdir(parents=True, exist_ok=True)
+    module_prefix = "PNC/Semantics/" + output.stem
+    stale_paths = list(output.parent.glob(output.stem + "_Aliases.lua"))
+    stale_paths.extend(output.parent.glob(output.stem + "_VerbForms*.lua"))
+    for stale in stale_paths:
+        stale.unlink()
+
+    paths: list[Path] = []
+    for module, source in render_lua_shards(compiled, module_prefix):
+        path = (
+            output
+            if module == module_prefix
+            else output.parent / (Path(module).name + ".lua")
+        )
+        path.write_text(source, encoding="utf-8", newline="\n")
+        paths.append(path)
+    return paths
 
 
 def write_semantic_output(output_root: Path, compiled: dict) -> list[Path]:
@@ -320,14 +341,13 @@ def main(arguments: list[str] | None = None) -> int:
 
     if compiled_lexicon is not None:
         output = options.output.expanduser().resolve()
-        output.parent.mkdir(parents=True, exist_ok=True)
-        with output.open("w", encoding="utf-8", newline="\n") as stream:
-            stream.write(render_lua(compiled_lexicon))
+        paths = write_lexicon_output(output, compiled_lexicon)
         alias_count = sum(
             len(aliases) for aliases in compiled_lexicon.aliases_by_concept.values())
         form_count = len(compiled_lexicon.verb_forms_by_surface)
         print(
-            f"wrote {output} ({alias_count} aliases, {form_count} inflected forms "
+            f"wrote {output} plus {len(paths) - 1} data shards "
+            f"({alias_count} aliases, {form_count} inflected forms "
             f"across {len(compiled_lexicon.aliases_by_concept)} concepts)"
         )
 

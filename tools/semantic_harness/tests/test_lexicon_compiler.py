@@ -12,6 +12,7 @@ from tools.semantic_harness.codebuilder.lexicon_compiler import (
     compile_wordnet,
     load_allowlist,
     render_lua,
+    render_lua_shards,
 )
 
 
@@ -161,6 +162,46 @@ class SemanticCompilerTests(unittest.TestCase):
         invalid["concepts"]["FETCH"]["synsets"][0]["offset"] = "99999999"
         with self.assertRaisesRegex(CompileError, "was not found"):
             compile_wordnet(self.home, invalid)
+
+    def test_shards_preserve_the_runtime_lexicon_contract(self) -> None:
+        compiled = compile_wordnet(self.home, self.allowlist)
+        rendered = render_lua_shards(
+            compiled,
+            "PNC/Semantics/PNC_SemanticGeneratedLexicon",
+        )
+        modules = {module: source for module, source in rendered}
+
+        self.assertIn(
+            "PNC/Semantics/PNC_SemanticGeneratedLexicon",
+            modules,
+        )
+        self.assertIn(
+            "PNC/Semantics/PNC_SemanticGeneratedLexicon_Aliases",
+            modules,
+        )
+        self.assertIn(
+            "PNC/Semantics/PNC_SemanticGeneratedLexicon_VerbForms",
+            modules,
+        )
+        self.assertIn(
+            "PNC/Semantics/PNC_SemanticGeneratedLexicon_VerbForms_FETCH",
+            modules,
+        )
+        self.assertIn(
+            'local aliasesByConcept = require '
+            '"PNC/Semantics/PNC_SemanticGeneratedLexicon_Aliases"',
+            modules["PNC/Semantics/PNC_SemanticGeneratedLexicon"],
+        )
+        self.assertIn('["FETCH"] = {', modules[
+            "PNC/Semantics/PNC_SemanticGeneratedLexicon_Aliases"
+        ])
+        self.assertIn(
+            'PNC/Semantics/PNC_SemanticGeneratedLexicon_VerbForms_FETCH',
+            modules["PNC/Semantics/PNC_SemanticGeneratedLexicon_VerbForms"],
+        )
+        self.assertIn('["grabbing"] = {', modules[
+            "PNC/Semantics/PNC_SemanticGeneratedLexicon_VerbForms_FETCH"
+        ])
 
     def test_source_hashes_are_pinned(self) -> None:
         invalid = copy.deepcopy(self.allowlist)
