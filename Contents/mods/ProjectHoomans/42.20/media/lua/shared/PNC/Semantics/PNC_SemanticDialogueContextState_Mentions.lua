@@ -4,27 +4,14 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Context = PNC.Semantics.DialogueContextState
 local Internal = Context.Internal
+local ValueBounds = require "PNC/Semantics/PNC_SemanticValueBounds"
 
 local function copyValue(value, depth)
-    if type(value) ~= "table" then return value end
-    depth = tonumber(depth) or 0
-    if depth >= Context.MAX_METADATA_DEPTH then return nil end
-    local output = {}
-    local key
-    local item
-    for key, item in pairs(value) do
-        if type(key) ~= "function" and type(item) ~= "function" then
-            output[key] = copyValue(item, depth + 1)
-        end
-    end
-    return output
+    return ValueBounds.Copy(value, depth, Context.MAX_METADATA_DEPTH)
 end
 
 local function textValue(value, maximum)
-    value = tostring(value or "")
-    maximum = tonumber(maximum) or Context.MAX_TEXT
-    if #value > maximum then return string.sub(value, 1, maximum) end
-    return value
+    return ValueBounds.Text(value, maximum, Context.MAX_TEXT)
 end
 
 local function symbolValue(value)

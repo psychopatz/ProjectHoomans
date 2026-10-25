@@ -9,6 +9,7 @@ local Registry = PNC.Semantics.DialogueFlowRegistry or {}
 PNC.Semantics.DialogueFlowRegistry = Registry
 local BranchOffers = PNC.Semantics.DialogueBranchOffers
     or require "PNC/Semantics/PNC_SemanticDialogueBranchOffers"
+local ValueBounds = require "PNC/Semantics/PNC_SemanticValueBounds"
 
 Registry.VERSION = 1
 Registry.DEFAULT_MAX_FLOWS = 32
@@ -65,20 +66,7 @@ local ACTION_FIELDS = {
     dispatchCount = true,
 }
 
-local function copyValue(value, depth)
-    if type(value) ~= "table" then return value end
-    depth = tonumber(depth) or 0
-    if depth >= 10 then return nil end
-    local output = {}
-    local key
-    local item
-    for key, item in pairs(value) do
-        if type(key) ~= "function" and type(item) ~= "function" then
-            output[key] = copyValue(item, depth + 1)
-        end
-    end
-    return output
-end
+local copyValue = ValueBounds.Copy
 
 local function stringValue(value)
     value = tostring(value or "")

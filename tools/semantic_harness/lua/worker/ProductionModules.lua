@@ -614,7 +614,57 @@ load(
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticEngineEvents.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticAddressResolver.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua", "semantic_lifecycle")
+    registerEntryPointModule(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticInteractionLifecycle_Envelope.lua",
+        "semantic_lifecycle_spoke"
+    )
+    registerEntryPointModule(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticInteractionLifecycle_State.lua",
+        "semantic_lifecycle_spoke"
+    )
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticDialoguePolicy.lua", "semantic")
+    registerEntryPointModule(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticValueBounds.lua",
+        "semantic_shared_mechanism"
+    )
+    for _, spoke in ipairs({
+        "PNC_SemanticDialogueFlowKernel_Storage.lua",
+        "PNC_SemanticDialogueFlowKernel_Matching.lua",
+        "PNC_SemanticDialogueFlowKernel_Preview.lua",
+        "PNC_SemanticDialogueFlowKernel_Commit.lua",
+        "PNC_SemanticDialogueFlowKernel_Results.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "shared", "PNC/Semantics/" .. spoke,
+            "semantic_flow_kernel_spoke"
+        )
+    end
+    for _, spoke in ipairs({
+        "PNC_SemanticDialogueLocalResponse_Questions_Observations.lua",
+        "PNC_SemanticDialogueLocalResponse_Questions_Facts.lua",
+        "PNC_SemanticDialogueLocalResponse_Questions_Context.lua",
+        "PNC_SemanticDialogueLocalResponse_Questions_Conversation.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "shared", "PNC/Semantics/" .. spoke,
+            "semantic_response_questions_spoke"
+        )
+    end
+    for _, spoke in ipairs({
+        "PNC_SemanticDialogueResponseCatalog_Questions_IdentityActivity.lua",
+        "PNC_SemanticDialogueResponseCatalog_Questions_WellbeingMedical.lua",
+        "PNC_SemanticDialogueResponseCatalog_Questions_Needs.lua",
+        "PNC_SemanticDialogueResponseCatalog_Questions_FollowUps.lua",
+    }) do
+        registerEntryPointModule(
+            "ProjectHoomans", "shared",
+            "PNC/Semantics/SemanticDialogueResponseCatalog/" .. spoke,
+            "semantic_response_catalog_questions_spoke"
+        )
+    end
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticCommandAdapter.lua", "semantic_adapter")
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticTaskAdapter.lua", "semantic_adapter")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticCapabilityCatalog.lua", "semantic")

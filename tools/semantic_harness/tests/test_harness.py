@@ -499,6 +499,54 @@ class SemanticHarnessTests(unittest.TestCase):
             "ProjectHoomans:shared:PNC/Gifts/PNC_GiftMarketSenseAdapter.lua",
             manifest_paths,
         )
+        self.assertIn(
+            "ProjectHoomans:shared:PNC/Semantics/PNC_SemanticValueBounds.lua",
+            manifest_paths,
+        )
+        for spoke in (
+            "PNC_SemanticDialogueFlowKernel_Storage.lua",
+            "PNC_SemanticDialogueFlowKernel_Matching.lua",
+            "PNC_SemanticDialogueFlowKernel_Preview.lua",
+            "PNC_SemanticDialogueFlowKernel_Commit.lua",
+            "PNC_SemanticDialogueFlowKernel_Results.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:shared:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
+        for spoke in (
+            "PNC_SemanticDialogueLocalResponse_Questions_Observations.lua",
+            "PNC_SemanticDialogueLocalResponse_Questions_Facts.lua",
+            "PNC_SemanticDialogueLocalResponse_Questions_Context.lua",
+            "PNC_SemanticDialogueLocalResponse_Questions_Conversation.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:shared:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
+        for spoke in (
+            "PNC_SemanticDialogueResponseCatalog_Questions_IdentityActivity.lua",
+            "PNC_SemanticDialogueResponseCatalog_Questions_WellbeingMedical.lua",
+            "PNC_SemanticDialogueResponseCatalog_Questions_Needs.lua",
+            "PNC_SemanticDialogueResponseCatalog_Questions_FollowUps.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:shared:PNC/Semantics/SemanticDialogueResponseCatalog/"
+                    + spoke,
+                    manifest_paths,
+                )
+        for spoke in (
+            "PNC_SemanticInteractionLifecycle_Envelope.lua",
+            "PNC_SemanticInteractionLifecycle_State.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:shared:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
         for spoke in (
             "PNC_SemanticDialogueSuggestions_Capabilities.lua",
             "PNC_SemanticDialogueSuggestions_Branches.lua",
