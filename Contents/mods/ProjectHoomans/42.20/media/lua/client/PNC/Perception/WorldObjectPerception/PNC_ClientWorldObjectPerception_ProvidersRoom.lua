@@ -33,7 +33,7 @@ local function roomProvider(object, square, record, context)
     end
     local identity = context.roomCache[key]
     if type(identity) ~= "table" then return nil end
-    local label = CampSite.RoomLabel(identity.roomType, identity.roomName)
+    local label = CampSite.DisplayLabel(identity)
     return {
         indoor = true,
         validCampZone = true,

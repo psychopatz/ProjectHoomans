@@ -101,6 +101,18 @@ local CampSite = T.load("ProjectHoomans", "shared",
 
 T.equal(CampSite.RoomLabel("UNKNOWN_ROOM", "custom_room"),
     "room", "unclassified rooms use the generic camp label")
+T.equal(CampSite.DisplayLabel({
+    scope = CampSite.SCOPES.ROOM,
+    roomName = "hallway",
+}), "hallway", "room display labels use a recognized room name")
+T.equal(CampSite.DisplayLabel({
+    scope = CampSite.SCOPES.ROOM,
+    roomName = "Custom Back Room",
+}), "Custom Back Room",
+    "room display labels retain a bounded concrete room name")
+T.equal(CampSite.DisplayLabel({
+    scope = CampSite.SCOPES.CAMPFIRE,
+}), "campfire", "campfire display labels remain explicit")
 local normalizedHere = CampSite.NormalizeTarget({
     kind = CampSite.KIND, scope = "room", query = "here",
 })

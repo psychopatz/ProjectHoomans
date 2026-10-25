@@ -93,6 +93,16 @@ function ActionTargetHints.AttachCampSiteHint(
     if actionIntent and actionIntent.action == "CAMP"
         and type(target) == "table"
         and target.kind == "camp_site"
+        and type(target.clientHint) == "table"
+    then
+        -- The menu's automatic choice already carries the bounded best-site
+        -- observation. Preserve it and let the server perform the final
+        -- authoritative validation instead of scanning the same area again.
+        return normalizedAction
+    end
+    if actionIntent and actionIntent.action == "CAMP"
+        and type(target) == "table"
+        and target.kind == "camp_site"
         and type(target.clientHint) ~= "table"
         and (x ~= nil or y ~= nil or target.siteID ~= nil
             or target.campfireID ~= nil)

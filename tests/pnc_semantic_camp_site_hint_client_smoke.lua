@@ -220,6 +220,33 @@ T.equal(refreshCalls, 1,
 T.equal(refreshedAction.target.clientHint.x, 11,
     "camp click sends the freshly resolved primitive")
 
+local reusedCalls = 0
+local reusedAction = ActionTargetHints.AttachCampSiteHint({
+    action = "CAMP",
+    target = {
+        kind = "camp_site",
+        scope = "here",
+        clientHint = {
+            kind = "camp_site",
+            scope = "room",
+            siteID = "site:best",
+            roomID = "room:best",
+            x = 12,
+            y = 12,
+            z = 0,
+        },
+    },
+}, { npcID = "npc-auto" }, PNC.Semantics.CampSite, {
+    Resolve = function()
+        reusedCalls = reusedCalls + 1
+        return nil, "should_not_resolve"
+    end,
+}, function() end)
+T.equal(reusedCalls, 0,
+    "automatic camp selection reuses its bounded hint without rescanning")
+T.equal(reusedAction.target.clientHint.siteID, "site:best",
+    "automatic camp selection preserves the observed best-site identity")
+
 Hints.ClearCache()
 local missingOrigin, missingReason = Hints.Resolve({
     kind = "camp_site",

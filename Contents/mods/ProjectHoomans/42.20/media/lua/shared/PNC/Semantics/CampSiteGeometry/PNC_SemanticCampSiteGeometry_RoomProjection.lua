@@ -120,7 +120,11 @@ function Geometry.DescribeRoom(roomLike, building, cell, origin, options)
         movementX = anchor.x,
         movementY = anchor.y,
         movementZ = anchor.z,
-        label = CampSite.RoomLabel(roomType, name),
+        label = CampSite.DisplayLabel({
+            scope = CampSite.SCOPES.ROOM,
+            roomType = roomType,
+            roomName = name,
+        }),
         labelKey = "semantic.camp.room",
         risk = "sheltered",
         mode = "walk",

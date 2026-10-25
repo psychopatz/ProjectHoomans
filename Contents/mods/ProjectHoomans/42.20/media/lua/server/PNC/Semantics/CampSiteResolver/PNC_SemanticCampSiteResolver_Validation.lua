@@ -106,7 +106,11 @@ local function validateRoomHint(hint, context)
         movementY = number(anchor.movementY) or number(anchor.y),
         movementZ = number(anchor.movementZ) or number(anchor.z)
             or number(identity.z) or number(hint.z) or 0,
-        label = CampSite.RoomLabel(identity.roomType, identity.roomName),
+        label = CampSite.DisplayLabel({
+            scope = CampSite.SCOPES.ROOM,
+            roomType = identity.roomType,
+            roomName = identity.roomName,
+        }),
         labelKey = "semantic.camp.room",
         risk = "sheltered",
         mode = "walk",

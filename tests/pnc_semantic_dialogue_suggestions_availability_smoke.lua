@@ -139,12 +139,66 @@ for _, group in ipairs(projection.groups or {}) do
     end
 end
 T.truthy(campGroup, "camp group is projected for an owned companion")
-T.equal(#campGroup.capabilities, 1,
-    "a discovered room becomes a camp capability row")
+T.equal(#campGroup.capabilities, 2,
+    "a discovered room produces an automatic and a specific camp row")
+T.equal(campGroup.capabilities[1].display.label, "Let's camp here.",
+    "the automatic camp row is presented first")
+T.equal(campGroup.capabilities[1].capability.selectionMode, "auto",
+    "the automatic camp row retains auto selection semantics")
 T.equal(campGroup.capabilities[1].status, "eligible",
-    "dynamic room capability exposes its top-level eligible status")
+    "automatic camp capability exposes its top-level eligible status")
 T.truthy(campGroup.capabilities[1].enabled,
-    "dynamic room capability remains enabled for the UI adapter")
+    "automatic camp capability remains enabled for the UI adapter")
+T.truthy(campGroup.capabilities[1].frame.target.clientHint,
+    "automatic camp capability carries the bounded best-site hint")
+T.equal(campGroup.capabilities[2].display.label, "Let's camp in the bedroom.",
+    "the specific room row exposes the concrete room type")
+T.equal(campGroup.capabilities[2].capability.selectionMode, "specific",
+    "the specific camp row retains explicit selection semantics")
+T.truthy(campGroup.capabilities[2].enabled,
+    "the specific room capability remains enabled for the UI adapter")
+
+local campfireProjection = Suggestions.Build({
+    accepted = true,
+    sequence = 8,
+    ir = {},
+    decision = {},
+}, {
+    baseEstablished = true,
+    actorAuthority = {
+        eligible = true,
+        owned = true,
+        companion = true,
+    },
+    npcState = {
+        activeBehavior = "idle",
+        healthState = "healthy",
+        orderKind = "idle",
+        followState = { mode = "idle" },
+    },
+    campSiteCandidates = {
+        {
+            id = "action.camp_site:fire",
+            kind = "campfire",
+            campfireID = "fire:1",
+            scope = "campfire",
+            x = 12,
+            y = 11,
+            z = 0,
+        },
+    },
+})
+local campfireGroup
+for _, group in ipairs(campfireProjection.groups or {}) do
+    if group.id == Suggestions.COMPANION_CAMP_GROUP_ID then
+        campfireGroup = group
+        break
+    end
+end
+T.truthy(campfireGroup, "campfire candidate projects into the camp group")
+T.equal(campfireGroup.capabilities[2].display.label,
+    "Let's camp by the campfire.",
+    "specific campfire row exposes the concrete campfire type")
 
 local goHome
 for _, capability in ipairs(projection.permittedCapabilities or {}) do
@@ -360,5 +414,21 @@ T.equal(campNavigation.status, "unavailable_no_camp_site",
     "camp navigation exposes the empty-location status")
 T.equal(campNavigation.reasonCode, "no_camp_site",
     "camp navigation carries the stable empty-location reason")
+local emptyCampGroup
+for _, group in ipairs(emptyProjection.groups or {}) do
+    if group.id == Suggestions.COMPANION_CAMP_GROUP_ID then
+        emptyCampGroup = group
+        break
+    end
+end
+T.truthy(emptyCampGroup,
+    "camp group remains inspectable when no location is available")
+T.equal(emptyCampGroup.capabilities[1].display.label,
+    "Let's camp here.",
+    "automatic camp choice remains visible without a valid location")
+T.falsy(emptyCampGroup.capabilities[1].enabled,
+    "automatic camp choice is disabled without a valid location")
+T.equal(emptyCampGroup.capabilities[1].reasonCode, "no_camp_site",
+    "automatic camp choice explains the missing-location rejection")
 
 T.finish("pnc_semantic_dialogue_suggestions_availability_smoke")

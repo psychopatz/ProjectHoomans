@@ -1,5 +1,9 @@
 -- Pure camp-site result projection and response wording.
 local CampResponses = {}
+local PNC = PNC or {}
+PNC.Semantics = PNC.Semantics or {}
+local CampSite = PNC.Semantics.CampSite
+    or require "PNC/Semantics/PNC_SemanticCampSite"
 
 local function textValue(value)
     local valueType = type(value)
@@ -25,6 +29,8 @@ end
 -- retained in the pending request.
 function CampResponses.CampSiteDetails(primary, secondary)
     local output = {}
+    local roomName
+    local kind
 
     local function read(value)
         if type(value) ~= "table" then return end
@@ -44,6 +50,15 @@ function CampResponses.CampSiteDetails(primary, secondary)
             and intent.target or nil
         local hint = target and type(target.clientHint) == "table"
             and target.clientHint or nil
+
+        roomName = roomName or firstValue(
+            site and site.roomName,
+            hint and hint.roomName
+        )
+        kind = kind or firstValue(
+            site and site.kind,
+            hint and hint.kind
+        )
 
         output.label = output.label or firstValue(
             value.siteLabel,
@@ -84,6 +99,16 @@ function CampResponses.CampSiteDetails(primary, secondary)
 
     read(primary)
     read(secondary)
+    if not output.label and CampSite
+        and type(CampSite.DisplayLabel) == "function"
+    then
+        output.label = CampSite.DisplayLabel({
+            scope = output.scope,
+            roomType = output.roomType,
+            roomName = roomName,
+            kind = kind,
+        })
+    end
     if not output.label and not output.scope and not output.siteID
         and not output.roomType and not output.risk
     then

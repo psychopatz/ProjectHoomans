@@ -23,6 +23,8 @@ local ChoiceRanking = PNC.Semantics.DialogueChoiceRanking
     or require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_Ranking"
 local Identity = PNC.Identity
     or require "PNC/Core/Identity/PNC_Identity"
+local CampSite = PNC.Semantics.CampSite
+    or require "PNC/Semantics/PNC_SemanticCampSite"
 
 Suggestions.VERSION = 1
 Suggestions.ROOT_GROUP_ID = "conversation_landing"
@@ -36,6 +38,13 @@ Suggestions.MAX_CAMP_DESTINATIONS = 6
 Suggestions.MAX_CANDIDATES = 24
 Suggestions.MAX_TRACE = 12
 Suggestions.MAX_SOURCES = 4
+
+local CAMP_HERE_TEXT_KEY =
+    "UI_PNC_Conversation_Suggestion_CompanionCampHere_Utterance"
+local CAMP_CAMPFIRE_TEXT_KEY =
+    "UI_PNC_Conversation_Suggestion_CompanionCampfire_Utterance"
+local CAMP_ROOM_TEXT_KEY =
+    "UI_PNC_Conversation_Suggestion_CompanionCampRoom_Utterance"
 
 local TEXT_CACHE = {}
 
@@ -639,14 +648,50 @@ local function companionOrderReason(action, context)
     return nil
 end
 
-local function campSiteCandidateCount(context)
-    local candidates = type(context) == "table"
+local function campSiteCandidates(context)
+    return type(context) == "table"
         and (context.campSiteCandidates
             or context.semanticCampSiteCandidates
             or (context.npcState and context.npcState.campSiteCandidates))
-        or nil
+        or {}
+end
+
+local function campCandidateTarget(candidate)
+    local target = type(candidate) == "table"
+        and (candidate.target or candidate) or nil
+    return type(target) == "table" and target or nil
+end
+
+local function campCandidateUsable(candidate)
+    local target = campCandidateTarget(candidate)
+    return target ~= nil
+        and (target.campfireID ~= nil
+            or target.siteID ~= nil
+            or target.roomID ~= nil)
+end
+
+local function firstCampSiteCandidate(candidates)
+    if type(candidates) ~= "table" then return nil end
+    for index = 1, math.min(#candidates,
+        Suggestions.MAX_CAMP_DESTINATIONS) do
+        if campCandidateUsable(candidates[index]) then
+            return candidates[index]
+        end
+    end
+    return nil
+end
+
+local function campSiteCandidateCount(context)
+    local candidates = campSiteCandidates(context)
     if type(candidates) ~= "table" then return 0 end
-    return math.min(#candidates, Suggestions.MAX_CAMP_DESTINATIONS)
+    local count = 0
+    for index = 1, math.min(#candidates,
+        Suggestions.MAX_CAMP_DESTINATIONS) do
+        if campCandidateUsable(candidates[index]) then
+            count = count + 1
+        end
+    end
+    return count
 end
 
 local function navigationDetails(groupID, context)
@@ -806,11 +851,182 @@ local function appendCompanionCampNavigation(
     )
 end
 
+local function campTargetForCandidate(candidate)
+    local target = copyValue(campCandidateTarget(candidate))
+    local campfire
+    if type(target) ~= "table" then return nil, false end
+    campfire = target.campfireID ~= nil or target.kind == "campfire"
+    if campfire then
+        target.kind = "camp_site"
+        target.scope = target.scope or "campfire"
+        target.siteScope = target.siteScope or target.scope
+    end
+    return target, campfire
+end
+
+local function campDisplayLabel(candidate, target, campfire)
+    local label
+    if campfire then return "campfire" end
+    if CampSite and type(CampSite.DisplayLabel) == "function" then
+        label = CampSite.DisplayLabel(target or candidate)
+        if label and label ~= "" then return label end
+    end
+    return candidate and (candidate.label or candidate.roomName
+        or candidate.roomType) or "room"
+end
+
+local function campDisplayText(candidate, target, campfire, automatic)
+    local label
+    local text
+    if automatic then
+        return resolvedText(CAMP_HERE_TEXT_KEY, "Let's camp here.")
+    end
+    if candidate and (candidate.utterance or candidate.displayText) then
+        return candidate.utterance or candidate.displayText
+    end
+    label = campDisplayLabel(candidate, target, campfire)
+    if campfire then
+        return resolvedText(
+            CAMP_CAMPFIRE_TEXT_KEY,
+            "Let's camp by the campfire."
+        )
+    end
+    text = resolvedText(
+        CAMP_ROOM_TEXT_KEY,
+        "Let's camp in the %1."
+    )
+    return string.gsub(text, "%%1", function()
+        return tostring(label)
+    end, 1)
+end
+
+local function appendCampCapabilityRow(
+    rows, revision, context, candidate, stateEligible,
+    disabledCode, disabledKey, disabledFallback, automatic
+)
+    local target
+    local campfire
+    local targetKey
+    local candidateID
+    local displayText
+    local definition
+    local frame
+    local rowAvailable
+    local rowStatus
+    local rowReasonCode
+    local rowReasonKey
+    local rowReasonFallback
+    if automatic then
+        target = {
+            kind = CampSite.KIND or "camp_site",
+            scope = CampSite.SCOPES.HERE or "here",
+            siteScope = CampSite.SCOPES.HERE or "here",
+        }
+        if campCandidateUsable(candidate) then
+            local candidateTarget = campCandidateTarget(candidate)
+            local hint = candidateTarget.clientHint or candidateTarget
+            if type(hint) == "table" then
+                target.clientHint = copyValue(hint)
+            end
+        end
+        candidateID = "action.camp_here"
+        targetKey = "auto"
+    else
+        target, campfire = campTargetForCandidate(candidate)
+        if not target then return false end
+        if campfire then
+            targetKey = target.campfireID
+        elseif target.siteID ~= nil and target.roomID ~= nil then
+            targetKey = tostring(target.siteID) .. "|"
+                .. tostring(target.roomID)
+        else
+            targetKey = target.roomID or target.siteID
+        end
+        candidateID = candidate.id
+            or ("action.camp_site:" .. tostring(targetKey or "unknown"))
+    end
+    displayText = campDisplayText(candidate, target, campfire, automatic)
+    rowAvailable = stateEligible and campCandidateUsable(candidate)
+    if rowAvailable then
+        rowStatus = "eligible"
+        rowReasonCode = "valid_client_camp_site_hint"
+    elseif automatic and not campCandidateUsable(candidate)
+        and stateEligible
+    then
+        rowStatus = "unavailable_no_camp_site"
+        rowReasonCode = "no_camp_site"
+        rowReasonKey = "UI_PNC_Conversation_Suggestion_NoCampSite_Tooltip"
+        rowReasonFallback = "No valid camp location is currently available."
+    else
+        rowStatus = "unavailable_companion"
+        rowReasonCode = disabledCode
+        rowReasonKey = disabledKey
+        rowReasonFallback = disabledFallback
+    end
+    definition = {
+        id = candidateID,
+        topic = "movement",
+        groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
+        labelFallback = displayText,
+        utteranceFallback = displayText,
+        target = target,
+        slots = {
+            npcID = { kind = "conversation_actor", ref = "npc" },
+        },
+    }
+    frame = capabilityFrame("CAMP", definition, revision)
+    if not frame then return false end
+    rows[#rows + 1] = {
+        id = candidateID,
+        topic = "movement",
+        groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
+        rank = #rows + 1,
+        enabled = rowAvailable,
+        status = rowStatus,
+        reasonCode = rowReasonCode,
+        reasonKey = rowReasonKey,
+        reasonFallback = rowReasonFallback,
+        frame = frame,
+        semanticFrame = frame,
+        source = {
+            groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
+            kind = automatic and "automatic_camp_capability"
+                or "permitted_capability",
+        },
+        text = displayText,
+        display = {
+            label = displayText,
+            utterance = displayText,
+            visibility = "player",
+        },
+        visibility = "player",
+        eligibility = {
+            status = rowAvailable and "allowed" or "rejected",
+            allowed = rowAvailable,
+            reasonCode = rowReasonCode,
+            reason = rowReasonCode,
+            reasonKey = rowReasonKey,
+            reasonFallback = rowReasonFallback,
+        },
+        capability = {
+            id = candidateID,
+            action = "CAMP",
+            source = automatic and "automatic_camp_site"
+                or "production_camp_site",
+            status = rowStatus,
+            groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
+            selectionMode = automatic and "auto" or "specific",
+            targetKey = targetKey,
+        },
+    }
+    rows[#rows] = normalizeCandidate(
+        rows[#rows], "permitted_capability", #rows
+    )
+    return true
+end
+
 local function appendCampSiteCapabilityRows(rows, revision, context, ir)
-    local candidates = context.campSiteCandidates
-        or context.semanticCampSiteCandidates
-        or (context.npcState and context.npcState.campSiteCandidates)
-        or {}
+    local candidates = campSiteCandidates(context)
     if type(candidates) ~= "table" then return end
     local stateEligible = companionOrderStateEligible(context)
     local unavailable = not stateEligible
@@ -824,97 +1040,35 @@ local function appendCampSiteCapabilityRows(rows, revision, context, ir)
 
     local seen = {}
     local count = 0
+
+    -- The generic action is intentionally first.  It carries the best
+    -- observed primitive as a hint, while the target remains scope="here" so
+    -- the normal camp resolver owns the final room/campfire choice.
+    appendCampCapabilityRow(
+        rows, revision, context, firstCampSiteCandidate(candidates),
+        stateEligible,
+        disabledCode, disabledKey, disabledFallback, true
+    )
+
     for _, candidate in ipairs(candidates) do
         if count >= Suggestions.MAX_CAMP_DESTINATIONS then break end
-        if type(candidate) == "table" then
-            local target = copyValue(candidate.target or candidate)
-            local campfire = target.campfireID ~= nil or target.kind == "campfire"
-            if campfire then
-                target.kind = "camp_site"
-                target.scope = target.scope or "campfire"
-            end
+        if campCandidateUsable(candidate) then
+            local target, campfire = campTargetForCandidate(candidate)
             local targetKey
-            if campfire then
-                targetKey = target.campfireID
-            elseif target.siteID ~= nil and target.roomID ~= nil then
+            if campfire then targetKey = target and target.campfireID
+            elseif target and target.siteID ~= nil and target.roomID ~= nil then
                 targetKey = tostring(target.siteID) .. "|"
                     .. tostring(target.roomID)
-            else
-                targetKey = target.roomID or target.siteID
-            end
+            else targetKey = target and (target.roomID or target.siteID) end
             local candidateID = candidate.id
                 or ("action.camp_site:" .. tostring(targetKey or count + 1))
-            local label = candidate.label or candidate.roomName or candidate.roomType
-                or (campfire and "campfire" or "somewhere safe")
-            local displayText = candidate.utterance or candidate.displayText
-            if not displayText then
-                displayText = campfire
-                    and "Camp near the campfire."
-                    or "Camp in the " .. tostring(label) .. "."
-            end
-            local dedupeKey = tostring(candidateID) .. "|" .. tostring(targetKey or "")
+            local dedupeKey = tostring(candidateID) .. "|"
+                .. tostring(targetKey or "")
             if targetKey ~= nil and not seen[dedupeKey] then
                 seen[dedupeKey] = true
-                local definition = {
-                    id = candidateID,
-                    topic = "movement",
-                    groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
-                    labelFallback = displayText,
-                    utteranceFallback = displayText,
-                    target = target,
-                    slots = {
-                        npcID = { kind = "conversation_actor", ref = "npc" },
-                    },
-                }
-                local frame = capabilityFrame("CAMP", definition, revision)
-                rows[#rows + 1] = {
-                    id = candidateID,
-                    topic = "movement",
-                    groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
-                    rank = #rows + 1,
-                    enabled = stateEligible,
-                    status = stateEligible and "eligible"
-                        or "unavailable_companion",
-                    reasonCode = stateEligible
-                        and "valid_client_camp_site_hint" or disabledCode,
-                    reasonKey = stateEligible and nil or disabledKey,
-                    reasonFallback = stateEligible and nil or disabledFallback,
-                    frame = frame,
-                    semanticFrame = frame,
-                    source = {
-                        groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
-                        kind = "permitted_capability",
-                    },
-                    text = displayText,
-                    display = {
-                        label = displayText,
-                        utterance = displayText,
-                        visibility = "player",
-                    },
-                    visibility = "player",
-                    eligibility = {
-                        status = stateEligible and "allowed"
-                            or "rejected",
-                        allowed = stateEligible,
-                        reasonCode = stateEligible
-                            and "valid_client_camp_site_hint" or disabledCode,
-                        reason = stateEligible
-                            and "valid_client_camp_site_hint" or disabledCode,
-                        reasonKey = stateEligible and nil or disabledKey,
-                        reasonFallback = stateEligible and nil
-                            or disabledFallback,
-                    },
-                    capability = {
-                        id = candidateID,
-                        action = "CAMP",
-                        source = "production_camp_site",
-                        status = stateEligible and "eligible"
-                            or "unavailable_companion",
-                        groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
-                    },
-                }
-                rows[#rows] = normalizeCandidate(
-                    rows[#rows], "permitted_capability", #rows
+                appendCampCapabilityRow(
+                    rows, revision, context, candidate, stateEligible,
+                    disabledCode, disabledKey, disabledFallback, false
                 )
                 count = count + 1
             end

@@ -39,7 +39,7 @@ local function roomZone(site, distance)
         return nil
     end
     local label = text(site.label, 64)
-        or CampSite.RoomLabel(site.roomType, site.roomName)
+        or CampSite.DisplayLabel(site)
         or "room"
     return {
         kind = "room",
@@ -118,8 +118,7 @@ local function collectZones(cell, origin, originX, originY, originZ, radius,
                 buildingID = identity.buildingID,
                 roomType = identity.roomType,
                 roomName = identity.roomName,
-                label = CampSite.RoomLabel(identity.roomType,
-                    identity.roomName),
+                label = CampSite.DisplayLabel(identity),
                 roomBounds = identity.roomBounds,
                 x = identity.x, y = identity.y, z = identity.z,
             }, distance, "observed_current_room")
@@ -143,8 +142,7 @@ local function collectZones(cell, origin, originX, originY, originZ, radius,
                 buildingID = identity.buildingID,
                 roomType = identity.roomType,
                 roomName = identity.roomName,
-                label = CampSite.RoomLabel(identity.roomType,
-                    identity.roomName),
+                label = CampSite.DisplayLabel(identity),
                 roomBounds = identity.roomBounds,
                 x = identity.x, y = identity.y, z = identity.z,
             }

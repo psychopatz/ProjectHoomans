@@ -273,6 +273,54 @@ function CampSite.RoomLabel(roomType, roomName)
     return "room"
 end
 
+-- Presentation-only label for a concrete camp site.  RoomLabel deliberately
+-- keeps unknown engine RoomDef identifiers generic; the dialogue surface still
+-- needs to use a bounded, human-readable room name when the type is missing.
+-- Keep the authoritative roomType/roomName fields separate so this helper
+-- cannot change validation or room identity semantics.
+function CampSite.DisplayLabel(site)
+    local scope
+    local roomType
+    local roomName
+    local resolvedType
+    local label
+    local safeName
+    local normalizedName
+    if type(site) ~= "table" then
+        return CampSite.RoomLabel(site)
+    end
+    scope = CampSite.NormalizeScope(site.scope or site.siteScope)
+    if scope == CampSite.SCOPES.CAMPFIRE
+        or tostring(site.kind or "") == "campfire"
+    then
+        return "campfire"
+    end
+    roomType = site.roomType
+    roomName = site.roomName
+    resolvedType = CampSite.ResolveRoomType(roomType)
+        or CampSite.ResolveRoomType(roomName)
+    label = CampSite.RoomLabel(resolvedType, roomName)
+    if label ~= "room" then return label end
+
+    safeName = tostring(roomName or "")
+    safeName = string.gsub(safeName, "[%c]", " ")
+    safeName = string.gsub(safeName, "[_%-]+", " ")
+    safeName = string.gsub(safeName, "%s+", " ")
+    safeName = string.gsub(safeName, "^%s+", "")
+    safeName = string.gsub(safeName, "%s+$", "")
+    safeName = string.sub(safeName, 1, 64)
+    normalizedName = normalizeText(safeName)
+    if safeName ~= ""
+        and normalizedName ~= "room"
+        and normalizedName ~= "other"
+        and normalizedName ~= "unknown"
+        and not string.find(normalizedName, "^room%s*%d*$")
+    then
+        return safeName
+    end
+    return "room"
+end
+
 function CampSite.NormalizeScope(value)
     value = string.lower(tostring(value or ""))
     if value == "inside" or value == "building" then return "room" end
