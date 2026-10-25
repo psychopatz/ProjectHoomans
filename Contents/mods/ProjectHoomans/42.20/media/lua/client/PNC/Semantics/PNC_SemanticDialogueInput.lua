@@ -1,6 +1,9 @@
 -- Hybrid conversation input. Lua handles deterministic utterances first;
 -- only the policy's explicit fallback route may call PBrainZ.
-require "PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationLLMInput"
+-- The widget is an optional client presentation integration. Semantic parsing,
+-- policy, and conversation browsing must remain loadable in headless previews
+-- and deterministic tests when the native UI package is unavailable.
+pcall(require, "PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationLLMInput")
 require "PsychopatzCore/Semantics/PsychopatzSemanticDialogueRouter"
 require "PNC/Semantics/PNC_SemanticDiagnostics"
 local DialogueRuntime = PNC and PNC.Semantics

@@ -71,6 +71,9 @@ T.load(CLIENT .. "PNC/UI/PNC_NPCTypePalette.lua")
 PNC.Conversation.Lifecycle = {
     Create = function() return { kind = "conversation_lifecycle" } end,
     RequestCeasefire = function() return true end,
+    Internal = {
+        RefreshNow = function() return true end,
+    },
 }
 for _, value in ipairs({ "Dawn", "Sunrise", "Sunset", "Dusk", "Twilight" }) do
     T.load(COMMON_CLIENT .. "PNC/Conversation/PortraitBackgrounds/PNC_Background"

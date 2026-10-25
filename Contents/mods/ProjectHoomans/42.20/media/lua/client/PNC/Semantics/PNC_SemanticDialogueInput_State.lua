@@ -36,7 +36,13 @@ function Input.ResolveText(key, fallback)
     }, fallback)
 end
 
+function Input.IsAvailable()
+    return type(PsychopatzConversationLLMInput) == "table"
+        and type(PsychopatzConversationLLMInput.new) == "function"
+end
+
 function Input.CreatePart(bounds, options)
+    if not Input.IsAvailable() then return nil end
     options = options or {}
     local definition = options.definition
     local definitionPartID = type(definition) == "table"

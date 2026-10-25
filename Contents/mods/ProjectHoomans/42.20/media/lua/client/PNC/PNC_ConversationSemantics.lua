@@ -17,8 +17,11 @@ local Adapter = PNC.ConversationSemantics or {}
 PNC.ConversationSemantics = Adapter
 
 local function inputAvailable()
-    return type(Input) == "table"
-        and type(Input.CreatePart) == "function"
+    if type(Input) ~= "table" then return false end
+    if type(Input.IsAvailable) == "function" then
+        return Input.IsAvailable() == true
+    end
+    return type(Input.CreatePart) == "function"
 end
 
 function Adapter.HasSemanticDialogueInput()

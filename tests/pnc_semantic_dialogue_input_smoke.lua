@@ -302,6 +302,9 @@ T.load(
 for _, spoke in ipairs({
     "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Receipts.lua",
     "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Compound.lua",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Preflight.lua",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Interpretation.lua",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Commit.lua",
     "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single.lua",
     "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Gossip.lua",
 }) do
@@ -314,6 +317,8 @@ end
 for _, spoke in ipairs({
     "PNC/Semantics/PNC_SemanticDialogueInput_FrameSupport.lua",
     "PNC/Semantics/PNC_SemanticDialogueInput_NavigationFrames.lua",
+    "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames_Conversation.lua",
+    "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames_Navigation.lua",
     "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames.lua",
     "PNC/Semantics/PNC_SemanticDialogueInput_State.lua",
 }) do
