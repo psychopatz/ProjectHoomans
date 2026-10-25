@@ -178,16 +178,22 @@ class LegacySemanticAuthorityP11Tests(unittest.TestCase):
                 json.loads(semantic.read_text()),
             )
 
-    def test_repository_has_one_active_goal_and_no_executable_goal_prompt(self) -> None:
-        active_marker = "ACTIVE SEMANTIC INTERACTION LIFECYCLE GOAL"
+    def test_repository_policy_is_durable_and_no_executable_goal_prompt(self) -> None:
         root_policy = (PROJECT / "AGENTS.md").read_text()
-        self.assertEqual(
-            1,
-            root_policy.count(active_marker),
-            "root AGENTS.md must identify exactly one active semantic goal",
+        forbidden_goal_state = (
+            "ACTIVE SEMANTIC INTERACTION LIFECYCLE GOAL",
+            "Current exact Next Chunk",
+            "HISTORICAL / SUPERSEDED",
+            "P10 and P11 implementation chunks are complete",
         )
-        self.assertIn("HISTORICAL / SUPERSEDED", root_policy)
-        self.assertIn("P10 and P11 implementation chunks are complete", root_policy)
+        for token in forbidden_goal_state:
+            self.assertNotIn(
+                token,
+                root_policy,
+                "root AGENTS.md must contain durable repository policy, not goal state",
+            )
+        self.assertIn("Repository instruction-file hygiene", root_policy)
+        self.assertIn("docs/Jobs/<Goal>/", root_policy)
 
         active_goal = PROJECT / "docs/Jobs/SemanticInteractionLifecycle"
         progress = (active_goal / "PROGRESS.md").read_text()
