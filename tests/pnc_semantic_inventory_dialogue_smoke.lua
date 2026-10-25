@@ -133,6 +133,21 @@ T.load(
     "client",
     "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle.lua"
 )
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Navigation.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission.lua"
+)
 require = originalRequire
 
 local session = {

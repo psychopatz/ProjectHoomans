@@ -499,6 +499,28 @@ class SemanticHarnessTests(unittest.TestCase):
             "ProjectHoomans:shared:PNC/Gifts/PNC_GiftMarketSenseAdapter.lua",
             manifest_paths,
         )
+        for spoke in (
+            "PNC_SemanticDialogueSuggestions_Capabilities.lua",
+            "PNC_SemanticDialogueSuggestions_Branches.lua",
+            "PNC_SemanticDialogueSuggestions_Frames.lua",
+            "PNC_SemanticDialogueSuggestions_Projection.lua",
+            "PNC_SemanticDialogueSuggestions_Build.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:shared:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
+        for spoke in (
+            "PNC_SemanticDialogueInput_Lifecycle_Presentation.lua",
+            "PNC_SemanticDialogueInput_Lifecycle_Navigation.lua",
+            "PNC_SemanticDialogueInput_Lifecycle_Submission.lua",
+        ):
+            with self.subTest(spoke=spoke):
+                self.assertIn(
+                    "ProjectHoomans:client:PNC/Semantics/" + spoke,
+                    manifest_paths,
+                )
         self.assertEqual(capabilities["translation"]["language"], "EN")
         self.assertIn("PNC/Translation/PNC_TranslationBootstrap.lua", capabilities["loadedModules"])
 

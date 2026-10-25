@@ -37,6 +37,19 @@ function ProductionModules.load(context)
         return value
     end
 
+    -- Semantic entry points require these spokes in order. They are loaded by
+    -- their public entry point rather than by separate Test.load
+    -- calls, so record the real ownership in the worker manifest without
+    -- executing each file a second time.
+    local function registerEntryPointModule(mod, layer, relative, role)
+        Runtime.moduleManifest[#Runtime.moduleManifest + 1] = {
+            path = mod .. ":" .. layer .. ":" .. relative,
+            role = role or "entrypoint_dependency",
+            status = "loaded_by_entrypoint",
+        }
+        Runtime.loadedModules[#Runtime.loadedModules + 1] = relative
+    end
+
     PsychopatzConversationLLMInput = {
         new = function(_, x, y, width, height, options)
             return { x = x, y = y, width = width, height = height, options = options }
@@ -615,6 +628,31 @@ load(
         "PNC/Semantics/PNC_SemanticDialogueSuggestions.lua",
         "semantic_suggestions"
     )
+    registerEntryPointModule(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticDialogueSuggestions_Capabilities.lua",
+        "semantic_suggestions_spoke"
+    )
+    registerEntryPointModule(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticDialogueSuggestions_Branches.lua",
+        "semantic_suggestions_spoke"
+    )
+    registerEntryPointModule(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticDialogueSuggestions_Frames.lua",
+        "semantic_suggestions_spoke"
+    )
+    registerEntryPointModule(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticDialogueSuggestions_Projection.lua",
+        "semantic_suggestions_spoke"
+    )
+    registerEntryPointModule(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticDialogueSuggestions_Build.lua",
+        "semantic_suggestions_spoke"
+    )
     load(
         "ProjectHoomans", "shared",
         "PNC/Semantics/PNC_SemanticAutomaticFlowManifest.lua",
@@ -704,6 +742,21 @@ load(
             .. ": " .. reason)
     end
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticDialogueInput.lua", "semantic_entry")
+    registerEntryPointModule(
+        "ProjectHoomans", "client",
+        "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation.lua",
+        "semantic_lifecycle_spoke"
+    )
+    registerEntryPointModule(
+        "ProjectHoomans", "client",
+        "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Navigation.lua",
+        "semantic_lifecycle_spoke"
+    )
+    registerEntryPointModule(
+        "ProjectHoomans", "client",
+        "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission.lua",
+        "semantic_lifecycle_spoke"
+    )
     load(
         "ProjectHoomans", "client",
         "PNC/Semantics/PNC_SemanticCognitionClient.lua",

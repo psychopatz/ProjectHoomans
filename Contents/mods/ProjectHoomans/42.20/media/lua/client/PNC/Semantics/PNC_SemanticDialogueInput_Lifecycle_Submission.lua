@@ -1,0 +1,712 @@
+-- Internal implementation spoke for semantic dialogue input lifecycle.
+-- The public entry point remains PNC_SemanticDialogueInput_Lifecycle.lua.
+PNC = PNC or {}
+PNC.Semantics = PNC.Semantics or {}
+local Input = PNC.Semantics.DialogueInput
+local Internal = Input.Internal
+
+local CampSiteHints = Internal.CampSiteHints
+local LocationObservation = Internal.LocationObservation
+local DialogueInputTrace = Internal.DialogueInputTrace
+local audit = Internal.audit
+local traceTurn = Internal.traceTurn
+local Suggestions = Internal.Suggestions
+local InteractionLifecycle = Internal.InteractionLifecycle
+
+local suggestionText = Internal.suggestionText
+local suggestionTooltip = Internal.suggestionTooltip
+local interactionContext = Internal.interactionContext
+local attachInteractionEnvelope = Internal.attachInteractionEnvelope
+local restoreSemanticChoices = Internal.restoreSemanticChoices
+local submitLifecycleEnvelope = Internal.submitLifecycleEnvelope
+local recordSemanticChoiceClick = Internal.recordSemanticChoiceClick
+local clearSemanticTopicFocus = Internal.clearSemanticTopicFocus
+local LocationObservation = Internal.LocationObservation
+
+local function applyGeneratedFlowResult(view, result, actionResult)
+    local flow = result and result.flow or nil
+    local policy = PNC.Semantics and PNC.Semantics.DialoguePolicy or nil
+    local kernel = policy and policy.Internal and policy.Internal.FlowKernel
+    local state = view and view.session
+        and view.session.semanticDialogueState or nil
+    if type(flow) ~= "table" or flow.generated ~= true
+        or type(actionResult) ~= "table"
+        or not kernel or type(kernel.ApplyActionResult) ~= "function"
+        or not state or type(Internal.ShallowContext) ~= "function"
+    then
+        return false
+    end
+    local updated, reason = kernel.ApplyActionResult(
+        flow,
+        actionResult,
+        state,
+        Internal.ShallowContext(view),
+        { maxFlowStack = 4 }
+    )
+    if type(updated) ~= "table" then
+        audit("semantic.generated_flow.result_unapplied", {
+            flowID = flow.flowId,
+            reason = reason,
+            status = actionResult.status,
+        })
+        return false
+    end
+    result.flow = updated
+    if type(result.decision) == "table" then
+        result.decision.flow = updated
+    end
+    return true
+end
+
+local function groupMemberShouldHandle(view, result, value)
+    local group = view and view.groupConversation
+    if not group or type(group.MemberForHost) ~= "function"
+        or type(group.ShouldRespond) ~= "function"
+    then
+        return true
+    end
+    local member = group:MemberForHost(view)
+    return not member or group:ShouldRespond(member, result, value)
+end
+
+local function giftConsentResponseView(view, result)
+    local consent = result and result.decision
+        and result.decision.giftConsent or nil
+    local group = view and view.groupConversation or nil
+    if type(consent) ~= "table" or not consent.recipientID
+        or not group or type(group.ViewFor) ~= "function"
+    then
+        return view
+    end
+    return group:ViewFor(consent.recipientID) or view
+end
+
+local function finishLocalSubmit(view, value, result, options)
+    options = type(options) == "table" and options or {}
+    local inputMessage = options.skipInputPresentation == true
+        and true or Internal.AppendPlayerInput(
+            view, options.inputValue or value, result
+        )
+    if not inputMessage then return false, "input_presentation_failed" end
+    local actionResult
+    local queued = false
+    view.lastSemanticActionResult = nil
+    if groupMemberShouldHandle(view, result, value) then
+        actionResult = Internal.DispatchAction(view, result, value)
+        view.lastSemanticActionResult = actionResult
+        applyGeneratedFlowResult(view, result, actionResult)
+        submitLifecycleEnvelope(view, result, actionResult)
+        if Internal.ClearPendingGiftConsent then
+            Internal.ClearPendingGiftConsent(view)
+        end
+        if options.deferResponse ~= true then
+            queued = Internal.QueueDeterministicResponse(
+                giftConsentResponseView(view, result),
+                value,
+                result,
+                actionResult
+            )
+        end
+    else
+        audit("semantic.group.member_skipped", {
+            groupID = view.groupConversation
+                and view.groupConversation.id,
+            turnID = view.groupConversation
+                and view.groupConversation.activeTurn
+                and view.groupConversation.activeTurn.id,
+            npcID = view.spec and view.spec.npcID,
+            reason = "not_addressed",
+        })
+    end
+    audit("semantic.response.queued", {
+        npcID = view.spec and view.spec.npcID,
+        conversationID = view.session.conversationID,
+        requestID = result.sequence,
+        route = result.decision and result.decision.route,
+        branch = result.decision and result.decision.branch,
+        action = result.ir and result.ir.action,
+        actionStatus = actionResult and actionResult.status,
+        actionReason = actionResult and actionResult.reason,
+        queued = queued == true,
+        deferred = options.deferResponse == true,
+    }, { requestID = result.sequence })
+    return true
+end
+
+local SemanticTelemetryPrompt = require
+    "PNC/Semantics/PNC_SemanticTelemetryPrompt"
+
+local function recordAcceptedContextTurn(view, result, options)
+    if not Internal.RecordContextTurn or not result
+        or result.accepted ~= true or not result.ir
+    then
+        return false, "context_recording_skipped"
+    end
+    local recorded, event = Internal.RecordContextTurn(view, result.ir, options)
+    audit("semantic.context.recorded", {
+        npcID = view.spec and view.spec.npcID,
+        conversationID = view.session.conversationID,
+        requestID = result.sequence,
+        recorded = recorded == true,
+        reason = type(event) == "string" and event or nil,
+        contextSequence = view.session.semanticDialogueContext
+            and view.session.semanticDialogueContext.sequence or nil,
+    }, { requestID = result.sequence })
+    return recorded, event
+end
+
+local function recordConversationTopics(view, result, rawText)
+    local session = view and view.session
+    local events = PNC.Conversation and PNC.Conversation.Memory
+        and PNC.Conversation.Memory.Events or nil
+    if not session or not result or result.accepted ~= true
+        or type(result.ir) ~= "table"
+        or not events or type(events.AccumulateConversationTopics) ~= "function"
+    then
+        return false
+    end
+    local ok, recorded = pcall(
+        events.AccumulateConversationTopics,
+        session,
+        result.ir,
+        rawText
+    )
+    return ok and recorded == true
+end
+
+function Internal.SubmitCompound(view, value, parts, sourcePart)
+    if type(parts) ~= "table" or #parts < 2 then
+        return false, "compound_turn_invalid"
+    end
+    local index
+    local part
+    local submitted = true
+    local reason
+    local receipts = {}
+    view.lastSemanticCompound = {
+        schemaVersion = 1,
+        rawText = value,
+        parts = receipts,
+    }
+    for index = 1, #parts do
+        part = parts[index]
+        submitted, reason = Internal.SubmitSingle(view, part.text, {
+            compoundPart = true,
+            compoundRoot = value,
+            compoundIndex = index,
+            compoundCount = #parts,
+            sourcePart = sourcePart,
+        })
+        receipts[index] = {
+            index = index,
+            text = part.text,
+            accepted = submitted == true,
+            reason = reason,
+            pattern = view.lastSemanticDialogueResult
+                and view.lastSemanticDialogueResult.ir
+                and view.lastSemanticDialogueResult.ir.provenance
+                and view.lastSemanticDialogueResult.ir.provenance.pattern,
+            intent = view.lastSemanticDialogueResult
+                and view.lastSemanticDialogueResult.ir
+                and view.lastSemanticDialogueResult.ir.intent,
+            subject = view.lastSemanticDialogueResult
+                and view.lastSemanticDialogueResult.ir
+                and view.lastSemanticDialogueResult.ir.subject,
+            flow = view.lastSemanticDialogueResult
+                and view.lastSemanticDialogueResult.decision
+                and view.lastSemanticDialogueResult.decision.flow
+                and view.lastSemanticDialogueResult.decision.flow.transition,
+        }
+        if not submitted then return false, reason end
+    end
+    return true
+end
+
+function Internal.SubmitSingle(view, value, part)
+    if not view or not view.session then
+        return false, "conversation_unavailable"
+    end
+    if view.session.llmPending
+        or view.session.semanticDialoguePending
+    then
+        return false, "conversation_busy"
+    end
+    if not (type(part) == "table" and part.compoundPart == true) then
+        view.lastSemanticCompound = nil
+    end
+    local semanticFrame = type(part) == "table"
+        and part.semanticFrame or nil
+    -- Keep the submitting host available to asynchronous local projections.
+    -- Full-screen conversations are discoverable through Core's singleton,
+    -- while compact/headless conversations are deliberately not global.  The
+    -- reference is runtime-only and is never serialized or sent over the
+    -- network.
+    Input.ActiveView = view
+    view.lastSemanticActionResult = nil
+    if not Internal.Interactive(view) then return false, "conversation_busy" end
+    value = tostring(value or "")
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    if value == "" then return false, "empty_message" end
+    value = string.sub(value, 1, Input.MAX_INPUT_LENGTH)
+
+    if not semanticFrame
+        and not (type(part) == "table" and part.compoundPart == true)
+        and type(Internal.ParseTurn) == "function"
+    then
+        local turn = Internal.ParseTurn(value, nil, view)
+        if type(turn) == "table" and turn.compound == true then
+            return Internal.SubmitCompound(view, value, turn.parts, part)
+        end
+    end
+
+    audit("semantic.input.received", {
+        npcID = view.spec and view.spec.npcID,
+        conversationID = view.session.conversationID,
+        rawText = value,
+    })
+
+    local router, routerReason = Internal.RouterFor(view)
+    if not router then
+        audit("semantic.input.rejected", {
+            npcID = view.spec and view.spec.npcID,
+            conversationID = view.session.conversationID,
+            rawText = value,
+            reason = routerReason,
+        })
+        return false, routerReason
+    end
+    local service = Internal.ActorConversationService
+        and Internal.ActorConversationService(view) or nil
+    local context = Internal.ShallowContext(view)
+    local options = {
+        timestamp = Internal.Now(),
+    }
+    local preview
+    local cognitionAccepted
+    local cognitionRequestID
+    local cognitionPending
+    local clearSemanticMemoryTarget = false
+    local frameIR
+    if semanticFrame then
+        local frameReason
+        local expectedRevision = tonumber(semanticFrame.requestRevision)
+        local receiptKey = tostring(view.session.conversationID or "")
+            .. ":" .. tostring(expectedRevision)
+            .. ":" .. tostring(semanticFrame.candidateID or "")
+        view.session.semanticSuggestionReceipts =
+            view.session.semanticSuggestionReceipts or {}
+        if view.session.semanticSuggestionReceipts[receiptKey] then
+            return false, "duplicate_suggestion"
+        end
+        local currentRevision = tonumber(router.state and router.state.sequence) or 0
+        if expectedRevision == nil or expectedRevision ~= currentRevision then
+            return false, "stale_suggestion"
+        end
+        frameIR, frameReason = Suggestions.FrameToIR(semanticFrame, view)
+        if not frameIR then return false, frameReason end
+        local eligible, eligibilityReason = Suggestions.CheckFrame(
+            semanticFrame, context, frameIR
+        )
+        if eligible ~= true then return false, eligibilityReason end
+        preview = {
+            schemaVersion = 1,
+            kind = "semantic_dialogue_preview",
+            accepted = true,
+            ir = frameIR,
+            decision = router:Decide(frameIR, context, options),
+            state = router.state,
+            sequence = router.state and router.state.sequence,
+        }
+    elseif service and type(service.Preview) == "function" then
+        preview = service:Preview(value, context, options)
+    elseif type(router.Preview) == "function" then
+        preview = router:Preview(value, context, options)
+    else
+        preview = router:Process(value, context, options)
+    end
+    if preview.accepted ~= true then
+        audit("semantic.input.rejected", {
+            npcID = view.spec and view.spec.npcID,
+            conversationID = view.session.conversationID,
+            rawText = value,
+            reason = preview.reason,
+        })
+        return false, preview.reason or "semantic_input_rejected"
+    end
+
+    -- Recover only a bounded, question-shaped no-match when the current
+    -- conversation supplies a single safe topic. The recovered IR is then
+    -- routed through the same production policy and ProcessIR path as an
+    -- authored pattern; actions still cannot be created by this spoke.
+    if not semanticFrame
+        and preview.ir and type(Internal.Recover) == "function"
+    then
+        local recovered = Internal.Recover(preview.ir, context, options)
+        if recovered then
+            preview.ir = recovered
+            preview.decision = router:Decide(
+                recovered,
+                context,
+                options
+            )
+            audit("semantic.input.recovered", {
+                npcID = view.spec and view.spec.npcID,
+                conversationID = view.session.conversationID,
+                rawText = value,
+                pattern = recovered.provenance
+                    and recovered.provenance.pattern,
+                topic = recovered.subject,
+                confidence = recovered.confidence,
+            }, { requestID = preview.sequence })
+        end
+    end
+
+    attachInteractionEnvelope(
+        view,
+        preview,
+        semanticFrame and "semantic_choice" or "typed_text",
+        preview.ir,
+        context,
+        semanticFrame
+    )
+
+    if Internal.RequestCognitionForIR then
+        cognitionAccepted, _, cognitionRequestID, cognitionPending =
+            Internal.RequestCognitionForIR(view, preview.ir)
+        if preview.ir and preview.ir.intent == "GOSSIP"
+            and cognitionAccepted == true
+            and cognitionPending ~= true
+        then
+            -- Single-player/server-hosted cognition can finish synchronously.
+            -- Rebuild the snapshot after the server fills its memory cache so
+            -- this same turn can use the returned gossip.
+            context = Internal.ShallowContext(view)
+            clearSemanticMemoryTarget = true
+        end
+    end
+    local identityRequest = Internal.PrepareIdentityRequest
+        and Internal.PrepareIdentityRequest(view, preview.ir, context)
+
+    local decision = preview.decision or {}
+    local isIdentityClaim = identityRequest
+        and identityRequest.kind == "identity_claim"
+    local isBackstoryDisclosure = identityRequest
+        and identityRequest.kind == "backstory_disclosure"
+    if decision.route == "llm_fallback"
+        and not isIdentityClaim and not isBackstoryDisclosure
+    then
+        if Internal.ClearPendingGiftConsent then
+            Internal.ClearPendingGiftConsent(view)
+        end
+        if Internal.SubmitProviderFallback then
+            local submitted = Internal.SubmitProviderFallback(
+                view, value, part, preview, decision, context, options
+            )
+            if submitted then
+                if service and type(service.ObserveResult) == "function" then
+                    service:ObserveResult(preview)
+                end
+                recordConversationTopics(view, preview, value)
+                if clearSemanticMemoryTarget and view.session then
+                    view.session.semanticMemoryTargetID = nil
+                end
+                return true
+            end
+        end
+    end
+
+    local result = preview
+    if service and type(service.ProcessIR) == "function" then
+        result = service:ProcessIR(preview.ir, context, options)
+    elseif type(router.Preview) == "function" then
+        result = router:ProcessIR(preview.ir, context, options)
+    end
+    if clearSemanticMemoryTarget and view.session then
+        view.session.semanticMemoryTargetID = nil
+    end
+    view.lastSemanticDialogueResult = result
+    if type(result) == "table" and preview.interaction then
+        result.interaction = preview.interaction
+    end
+
+    local finalDecision = result and result.decision or {}
+    local deferGossipResponse = cognitionPending == true
+        and cognitionRequestID ~= nil
+        and preview.ir and preview.ir.intent == "GOSSIP"
+        and finalDecision.branch == "GOSSIP_RECEIVED"
+        and not view.groupConversation
+    if deferGossipResponse then
+        view.session.semanticGossipRequestID = tostring(cognitionRequestID)
+        view.session.semanticGossipRequestValue = value
+        view.session.semanticGossipRequestResult = result
+        view.session.semanticDialoguePending = {
+            kind = "semantic_gossip",
+            requestID = tostring(cognitionRequestID),
+        }
+    end
+    if finalDecision.branch == "ASK_CLARIFICATION"
+        and type(SemanticTelemetryPrompt) == "table"
+        and type(SemanticTelemetryPrompt.Offer) == "function"
+    then
+        SemanticTelemetryPrompt.Offer(view, value, result, "local")
+    end
+
+    recordAcceptedContextTurn(view, result, options)
+    recordConversationTopics(view, result, value)
+
+    -- A deterministic parser result that already names an authored
+    -- conversation category must use the same category authority lane as a
+    -- typed semantic-click frame.  The parser owns recognition only; the
+    -- composer/server path still owns block selection, node entry, effects,
+    -- and all revalidation.  Do this before the generic semantic response is
+    -- queued so the player never receives a redundant "ask the same thing"
+    -- suggestion or acknowledgement.
+    if not semanticFrame
+        and type(Suggestions.BuildConversationCategoryFrame) == "function"
+    then
+        local categoryFrame = Suggestions.BuildConversationCategoryFrame(
+            result and result.ir or nil,
+            result and result.sequence
+                or router.state and router.state.sequence or 0
+        )
+        if categoryFrame then
+            local categoryVisible = true
+            local categoryReason = "category_preflight"
+            if type(Suggestions.IsConversationCategoryAvailable)
+                == "function"
+            then
+                categoryVisible, categoryReason =
+                    Suggestions.IsConversationCategoryAvailable(
+                        categoryFrame, context
+                    )
+            end
+            if categoryVisible then
+                local accepted, routeReason =
+                    Input.SubmitSemanticFrame(view, categoryFrame)
+                if accepted ~= true then
+                    traceTurn(view, value, result, "semantic_category_route", {
+                        route = "conversation_category",
+                        categoryID = categoryFrame.extensions.categoryID,
+                        responseSubmitted = false,
+                        responseReason = routeReason,
+                    })
+                    return false, routeReason or categoryReason
+                end
+                if service and type(service.ObserveResult) == "function" then
+                    service:ObserveResult(result)
+                end
+                if type(Internal.AppendPlayerInput) == "function" then
+                    Internal.AppendPlayerInput(
+                        view,
+                        Suggestions.ResolveFrameText(categoryFrame),
+                        result
+                    )
+                end
+                traceTurn(view, value, result, "semantic_category_route", {
+                    route = "conversation_category",
+                    categoryID = categoryFrame.extensions.categoryID,
+                    responseSubmitted = true,
+                    responseReason = routeReason,
+                })
+                return true, routeReason or "accepted"
+            end
+        end
+    end
+
+    -- Claimed identity and targeted preference disclosures are authoritative
+    -- server responses. Do not also queue a local reply for those turns.
+    local deferIdentityResponse = identityRequest
+        and (identityRequest.kind == "identity_claim"
+            or identityRequest.kind == "identity_evasion"
+            or identityRequest.kind == "gift_preference_disclosure"
+            or identityRequest.kind == "backstory_disclosure")
+    local compoundPart = type(part) == "table"
+        and part.compoundPart == true
+    local compoundIndex = compoundPart and tonumber(part.compoundIndex) or nil
+    local compoundCount = compoundPart and tonumber(part.compoundCount) or nil
+    local deferCompoundResponse = compoundPart
+        and compoundIndex ~= nil and compoundCount ~= nil
+        and compoundIndex < compoundCount
+    local submitted, submitReason = finishLocalSubmit(
+        view,
+        value,
+        result,
+        { deferResponse = deferIdentityResponse == true
+            or deferGossipResponse == true
+            or deferCompoundResponse == true,
+            skipInputPresentation = compoundPart and compoundIndex ~= 1,
+            inputValue = compoundPart and compoundIndex == 1
+                and part.compoundRoot or value }
+    )
+    if submitted == true and service
+        and type(service.ObserveResult) == "function"
+    then
+        service:ObserveResult(result)
+    end
+    if submitted == true and semanticFrame then
+        local revision = tonumber(semanticFrame.requestRevision) or 0
+        local receiptKey = tostring(view.session.conversationID or "")
+            .. ":" .. tostring(revision)
+            .. ":" .. tostring(semanticFrame.candidateID or "")
+        view.session.semanticSuggestionReceipts =
+            view.session.semanticSuggestionReceipts or {}
+        view.session.semanticSuggestionReceipts[receiptKey] = {
+            status = "accepted",
+            sequence = result and result.sequence,
+        }
+    end
+    if submitted == true then
+        Internal.RefreshSuggestions(view, result)
+    end
+    traceTurn(view, value, result, "semantic_input_local", {
+        providerAvailable = context.llmAvailable == true,
+        providerUsed = false,
+        actionStatus = view.lastSemanticActionResult
+            and view.lastSemanticActionResult.status,
+        actionAccepted = view.lastSemanticActionResult
+            and view.lastSemanticActionResult.accepted,
+        actionReason = view.lastSemanticActionResult
+            and view.lastSemanticActionResult.reason,
+        responseSubmitted = submitted == true,
+        responseReason = submitReason,
+        compoundRoot = compoundPart and part.compoundRoot or nil,
+        compoundIndex = compoundIndex,
+        compoundCount = compoundCount,
+    })
+    if identityRequest then
+        local dispatched = false
+        local dispatchReason
+        local requestID
+        if Internal.DispatchIdentityRequest then
+            dispatched, dispatchReason, requestID =
+                Internal.DispatchIdentityRequest(identityRequest)
+        end
+        if identityRequest.kind == "identity_claim"
+            or identityRequest.kind == "identity_evasion"
+        then
+            audit("semantic.identity.request_dispatched", {
+                requestID = requestID or result.sequence,
+                inputSequence = result.sequence,
+                npcID = tostring(identityRequest.npcID or ""),
+                conversationID = view.session
+                    and view.session.conversationID or nil,
+                kind = tostring(identityRequest.kind or ""),
+                accepted = dispatched == true,
+                reason = tostring(dispatchReason or ""),
+                claimedNamePresent = identityRequest.claimedName ~= nil
+                    and tostring(identityRequest.claimedName) ~= "",
+                conversationTokenPresent = identityRequest.conversationToken
+                    ~= nil
+                    and tostring(identityRequest.conversationToken) ~= "",
+            }, { requestID = requestID or result.sequence })
+        end
+        if identityRequest.kind == "identity_claim" and dispatched ~= true
+            and Internal.IdentityExchangeUnavailableResponse
+            and Internal.QueueDeterministicResponse
+        then
+            Internal.QueueDeterministicResponse(
+                view,
+                value,
+                result,
+                nil,
+                {
+                    response = Internal.IdentityExchangeUnavailableResponse(),
+                }
+            )
+        end
+    end
+    return submitted, submitReason
+end
+
+function Input.CompleteGossipRequest(request)
+    local view = request and request.view or nil
+    local session = request and request.session or nil
+    local requestID = tostring(request and request.requestID or "")
+    local result
+    local decision
+    local localResponse
+    local context
+    local value
+    if not view or not session or requestID == ""
+        or view.session ~= session or session.closed == true
+        or view.closed == true or view.closing == true
+        or tostring(session.semanticGossipRequestID or "") ~= requestID
+        or type(session.semanticDialoguePending) ~= "table"
+        or tostring(session.semanticDialoguePending.requestID or "")
+            ~= requestID
+    then
+        return false, "stale_gossip_request"
+    end
+    result = session.semanticGossipRequestResult
+    value = session.semanticGossipRequestValue
+    decision = result and result.decision or nil
+    if not result or not result.ir or not decision then
+        return false, "gossip_response_unavailable"
+    end
+    context = Internal.ShallowContext(view)
+    local groundedGossip = context and context.npcGossip or nil
+    if not groundedGossip
+        or groundedGossip.source ~= "world_knowledge"
+    then
+        local clientState = PNC.Network and PNC.Network.ClientState or nil
+        local clientGossip = clientState
+            and clientState.semanticWorldKnowledgeGossip or nil
+        local npcID = view.spec and tostring(view.spec.npcID or "") or ""
+        groundedGossip = clientGossip and clientGossip[npcID] or nil
+    end
+    if groundedGossip and groundedGossip.source == "world_knowledge"
+        and type(groundedGossip.factRefs) == "table"
+        and #groundedGossip.factRefs > 0
+    then
+        local response = result.decision.response
+        if type(response) == "table" then
+            response.groundedFactRefs = {}
+            for index = 1, math.min(#groundedGossip.factRefs, 4) do
+                response.groundedFactRefs[#response.groundedFactRefs + 1] =
+                    groundedGossip.factRefs[index]
+            end
+            response.selectionSource = "world_knowledge"
+            if type(response.plan) == "table" then
+                response.plan.groundedFactRefs = response.groundedFactRefs
+                response.plan.sourcePoolID = "world_knowledge"
+            end
+        end
+    end
+    localResponse = PNC.Semantics and PNC.Semantics.LocalResponse or nil
+    if localResponse and type(localResponse.Resolve) == "function" then
+        decision.response = localResponse.Resolve(
+            result.ir,
+            session.semanticDialogueState,
+            context,
+            decision.branch
+        ) or decision.response
+    end
+    if groundedGossip and groundedGossip.source == "world_knowledge"
+        and type(groundedGossip.factRefs) == "table"
+        and #groundedGossip.factRefs > 0
+        and type(decision.response) == "table"
+    then
+        decision.response.groundedFactRefs = {}
+        for index = 1, math.min(#groundedGossip.factRefs, 4) do
+            decision.response.groundedFactRefs[#decision.response.groundedFactRefs + 1] =
+                groundedGossip.factRefs[index]
+        end
+        decision.response.selectionSource = "world_knowledge"
+        if type(decision.response.plan) == "table" then
+            decision.response.plan.groundedFactRefs =
+                decision.response.groundedFactRefs
+            decision.response.plan.sourcePoolID = "world_knowledge"
+        end
+    end
+    session.semanticMemoryTargetID = nil
+    session.semanticGossipRequestID = nil
+    session.semanticGossipRequestResult = nil
+    session.semanticGossipRequestValue = nil
+    session.semanticDialoguePending = nil
+    if type(Internal.QueueDeterministicResponse) ~= "function" then
+        return false, "response_queue_unavailable"
+    end
+    return Internal.QueueDeterministicResponse(view, value, result, nil)
+end
+
