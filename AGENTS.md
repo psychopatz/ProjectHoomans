@@ -1,67 +1,46 @@
-> **ACTIVE SEMANTIC INTERACTION LIFECYCLE GOAL — P12 STANDARDIZATION (2026-10-25):** The only current ProjectHoomans semantic execution goal is docs/Jobs/SemanticInteractionLifecycle/. P0–P11 are retained foundation, but the prior READY FOR USER LIVE TEST conclusion is superseded by new native evidence: Goodbye does not close, Leave Group does not complete correctly, semantic emote replies are not visibly delivered, internal unknown-name placeholders leak into speech, and companion commands need one standardized semantic capability hierarchy. Mandatory P12 standardizes Semantic Capability, Semantic Realization and Semantic Address while preserving existing authoritative gameplay executors. Read README.md -> AGENT_RUNBOOK.md -> AUDIT.md -> ARCHITECTURE.md -> MIGRATION_MATRIX.md -> PERSISTENCE_AND_SCALING.md -> NATIVE_CONVERSATION_PARITY_CORRECTION.md -> LEGACY_SEMANTIC_AUTHORITY_CONSOLIDATION.md -> NATIVE_ACTION_CAPABILITY_STANDARDIZATION.md -> ROADMAP.md -> HARNESS_ACCEPTANCE.md -> PROGRESS.md last. Current exact Next Chunk is P12B in PROGRESS.md. Existing main only; no new branch; no checked-in GOAL_PROMPT.md; no Workshop/native-agent action; no source-save mutation; fixture the engine, never fixture the mod.
-
-> **ACCEPTED CONTEXTUAL DIALOGUE PERSONA & CHOICES FOUNDATION (2026-10-24 P14):** docs/Jobs/ContextualDialoguePersonaChoices/ P14 is accepted. Its save-backed operational workbench, production rehydration parity, layered social context and runtime-only controls are retained as dependencies for the active Semantic Interaction Lifecycle goal.
-
-> **HISTORICAL / SUPERSEDED CROSS-MOD PORTABLE CONVERSATION GOAL — DO NOT EXECUTE (2026-10-21):** PsychopatzCore `Docs/portable_npc_conversation/` owns C1–C6, with Hoomans integration contract `docs/Jobs/ContextualDialogueQuestFramework/CORE_CONVERSATION_ADOPTION.md`. Hoomans V1–V5 developer work and PR #4 merge already occurred. Do NOT replay old unmerged-branch/bootstrap/V1-current instructions found below; they are historical. Read Core's `PROGRESS.md` LAST and continue one safe chunk at a time through all C phases. Never create a branch or a checked-in /goal prompt, and never perform native PZ or Workshop actions.
-
-> **HISTORICAL / SUPERSEDED Semantic Lab override — DO NOT EXECUTE (2026-10-20):** ProjectHoomans `main` already contains the former B0–B6/H0–H4/F1–F4 implementation and prior PR #4 is MERGED. Any older paragraphs below claiming that PR #4 is unmerged/CodeBuilder source lives only on an old branch are OBSOLETE and must not trigger a merge/rebase/pull. Approved new product goal is `docs/Jobs/ContextualDialogueQuestFramework/V1_V5_VISUAL_AUTHORING_AND_RUNTIME_CONSOLIDATION.md`; `PROGRESS.md` current V1 execution chunk, then autonomously through V5. **No new Git branches**, new work on safely-checked existing `main` only, **no checked-in GOAL_PROMPT.md**, no native PZ/Workshop action by Codex.
-
 # Project Hoomans working rules
+
+## Repository instruction-file hygiene
+
+`AGENTS.md` is always-loaded repository policy. Keep it small, durable, and useful across unrelated goals.
+
+- Never put the active goal, current phase, current Next Chunk, implementation progress, accepted-phase history, migration status, audit findings, or superseded instructions in this file.
+- Goal-specific execution truth belongs under `docs/Jobs/<Goal>/`: use that job's roadmap for the full objective and gates, progress ledger for current state, and runbook/architecture documents for job-specific procedure and contracts.
+- Do not preserve obsolete instructions here as `HISTORICAL`, `SUPERSEDED`, or `DO NOT EXECUTE`. Git history and job-local historical documents are the archive.
+- The executable `/goal` bootstrap is delivered in ChatGPT. Do not create or update checked-in `GOAL_PROMPT.md` files unless the user explicitly changes this repository-wide policy.
+- A phase or bounded implementation chunk is an execution unit, not the completion boundary for the parent goal.
 
 ## Project Zomboid mod layout
 
-- Treat `Contents/mods/ProjectHoomans/42.20/` as the current
-  Project Zomboid runtime layer. Executable Lua, lifecycle services, UI
-  integrations, registries, and engine/API adapters belong under its `media/`
-  tree.
-- Treat `Contents/mods/ProjectHoomans/common/` as version-agnostic packaged
-  content. Keep reusable declarative definitions, translations, animations,
-  clothing, sounds, textures, and similar shared assets under its `media/`
-  tree.
-- Keep Build 42 JSON translations at
-  `common/media/lua/shared/Translate/<LANG>/*.json`. Do not create a
-  repository-root translation source tree outside the Project Zomboid mod.
+- Treat `Contents/mods/ProjectHoomans/42.20/` as the current Project Zomboid runtime layer. Executable Lua, lifecycle services, UI integrations, registries, and engine/API adapters belong under its `media/` tree.
+- Treat `Contents/mods/ProjectHoomans/common/` as version-agnostic packaged content. Keep reusable declarative definitions, translations, animations, clothing, sounds, textures, and similar shared assets under its `media/` tree.
+- Keep Build 42 JSON translations at `common/media/lua/shared/Translate/<LANG>/*.json`. Do not create a repository-root translation source tree outside the Project Zomboid mod.
 
-- Do not use `pcall` or `xpcall` for normal control flow, input validation, or
-  engine-bug workarounds. Prefer explicit guards and direct fixes.
-- Use a protected call only when an external or addon-owned callback is an
-  unavoidable failure boundary after ordinary validation, and document that
-  reason beside the call.
+## Protected calls
 
-## Never stage a write through a temporary directory under `media/`
+- Do not use `pcall` or `xpcall` for normal control flow, input validation, or engine-bug workarounds. Prefer explicit guards and direct fixes.
+- Use a protected call only when an external or addon-owned callback is an unavoidable failure boundary after ordinary validation, and document that reason beside the call.
 
-Project Zomboid recursively watches every loaded mod's `media/` tree with
-`DebugFileWatcher`. On a directory `ENTRY_CREATE` it walks that directory; if
-the directory is already gone it logs `NoSuchFileException`, sets its internal
-`WatchService` to `null`, and every later `update()` throws
-`NullPointerException: ... "this.watcher" is null` for the rest of the session.
-The engine never re-initializes the watcher, so mod hot-reload stays dead until
-the game is restarted.
+## Never stage a temporary directory under watched `media/`
 
-- While `ProjectZomboid64`/`ProjectZomboid` is running, only write or replace
-  files under `Contents/mods/**/media/` in ways that create a *file* or rename
-  a file into place.
-- Never create a staging *directory* inside a watched `media/` tree, e.g.
-  `.Foo.lua.<pid>.<uuid>.tmpdir` next to the target file. Such a directory
-  lives for about a millisecond and is exactly what trips the engine.
-- `git checkout`, `git stash`, `rsync`, `unzip`, and tooling that stages
-  directory swaps (agent file writers, sync tools) are the same hazard.
-- If a staging directory is required, keep it outside `media/`, or stop
-  Project Zomboid first. Restarting the game is the only way to re-arm the
-  watcher.
+Project Zomboid recursively watches every loaded mod's `media/` tree with `DebugFileWatcher`. A short-lived staging directory can break the watcher for the rest of the running session.
 
-## No-new-branches and safe main integration (user rule, 2026-10-20)
+- While `ProjectZomboid64`/`ProjectZomboid` is running, only write or replace files under `Contents/mods/**/media/` in ways that create a file or rename a file into place.
+- Never create a staging directory inside a watched `media/` tree, including `.Foo.lua.<pid>.<uuid>.tmpdir`-style directories.
+- Treat `git checkout`, `git stash`, `rsync`, `unzip`, and tooling that stages directory swaps as potentially unsafe while the watched tree is live.
+- If a staging directory is required, keep it outside `media/` or stop Project Zomboid first. Restarting the game is the only reliable way to re-arm a broken watcher.
 
-**NEVER CREATE A NEW GIT BRANCH** for implementation, test, audit, documentation, agent work or pull request. Do not use `git checkout -b`, `git switch -c`, `git branch <new>`, a scratch worktree branch, or agent automatic branch creation. This rule also applies when coordinating PsychopatzCore and DynamicTrading.
+## Git and concurrent-work policy
 
-For new authorized work use **existing `main`**, after checking local and remote HEAD/upstream and concurrent changes. Do not assume existing PR history is present in main. As of 2026-10-20, existing `docs/contextual-dialogue-quest-framework-20261018` branch / PR #4 is 144 commits ahead and 1 behind main; preserve it and reconcile safely using `fetch`/`merge-base`/`merge-tree`/source diff, then merge onto existing main only when conflicts, dependencies and tests are resolved. No new integration branch, blind pull, force push, destructive reset/rebase/stash or overwritten agent/user work. If safe integration cannot be proven, report the precise conflict and continue independent work on an already existing checked-out ref; do NOT create another branch.
+- Never create a new Git branch for ProjectHoomans work. This standing user rule also applies when coordinating PsychopatzCore and DynamicTrading.
+- Use the existing `main` branch for authorized new work only after checking the actual local branch/HEAD, upstream/remote state, dirty worktree, worktrees, and concurrent edits.
+- Remote GitHub state does not prove the user's local worktree is clean.
+- Preserve unrelated user/agent work. Never use blind `git pull`, force-push, destructive reset, destructive rebase, automatic stash/discard, or conflict resolution that overwrites uncertain changes.
+- If safe integration cannot be proven, report the concrete conflict or ownership ambiguity rather than creating another branch or discarding work.
 
-Root `AGENTS.md` is durable policy, not authority to publish Steam Workshop content or launch native Project Zomboid. For the ongoing personal NPC dialogue/backstory goal, detailed documentation currently lives on the **preexisting** Hoomans PR #4 branch at `docs/Jobs/ContextualDialogueQuestFramework/`. Full developer B0–B6 acceptance, not a passing B0 subphase, determines the parent goal handoff. Review that goal's `GIT_INTEGRATION_AND_NO_NEW_BRANCHES.md` before any integration.
+## Native runtime and publication authority
 
-## HISTORICAL / SUPERSEDED Semantic Lab goal and chat-only /goal policy (2026-10-20) — DO NOT EXECUTE
-
-For `docs/Jobs/ContextualDialogueQuestFramework/`, the current canonical goal documentation is on **existing main**. The prior B0–B6 implementation history remains on an already-existing divergent development branch and is NOT yet integrated into main. Preserve all code. Review the job's `PROGRESS.md`, `ROADMAP.md`, `AGENT_RUNBOOK.md`, `HARNESS_FIRST_CODEBUILDER_TRANSLATION_RECOVERY.md`, and `GIT_INTEGRATION_AND_NO_NEW_BRANCHES.md`. No new Git branches; do not continue writing new feature commits to the old branch as a workaround. If safe in-place reconciliation cannot be proven, report exact conflicts rather than force/pull/rebase/reset.
-
-**Do not create or update a checked-in `GOAL_PROMPT.md` or store the full assistant-provided `/goal` invocation in any repository document.** User wants goal prompts delivered in ChatGPT only. Durable docs contain architecture, acceptance, next chunk, rules and source evidence; bootstrap prompt is conversational only.
-
-The current product assignment is **complete harness-first grounded personal dialogue**: existing CodeBuilder emits production Lua and EN/TL catalog assets, real Semantic Lab Lua worker runs meaningful end-to-end conversation scenarios, all NPC fact/disclosure/dossier/PBrainZ outputs remain server-authorized, and translations use existing PsychopatzCore CustomTranslationManager and ProjectHoomans registrations. B0–B6 ledger acceptance is historical developer evidence, not acceptance of this new full tool/translation/integration gate. Work one safe chunk at a time but continue automatically through all mandatory corrective phases before reporting developer READY FOR USER LIVE TEST.
+- A Git commit or GitHub push is not Steam Workshop publication.
+- Do not publish or republish Workshop content unless the user explicitly authorizes that action.
+- Do not launch, drive, or require native Project Zomboid as part of ordinary developer-side acceptance unless the active user request explicitly assigns that work.
+- When live SP/MP validation is user-owned, complete every developer-implementable code, harness, and regression gate before handing off the remaining live test.
