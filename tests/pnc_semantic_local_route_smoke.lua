@@ -128,6 +128,16 @@ T.load(
 T.load(
     "ProjectHoomans",
     "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation_Interaction.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation_Choices.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "client",
     "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Navigation.lua"
 )
 T.load(
