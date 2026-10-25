@@ -228,6 +228,7 @@ local function refreshForNPC(npcID)
         "pendingConversationAutoChoice",
         "activeConversationBlockID",
         "lastConversationError",
+        "semanticSuggestionGroupID",
     }) do
         if context[key] ~= nil then updatedContext[key] = context[key] end
     end

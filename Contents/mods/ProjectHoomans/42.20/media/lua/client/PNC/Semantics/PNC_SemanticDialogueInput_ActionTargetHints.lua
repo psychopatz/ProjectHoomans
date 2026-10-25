@@ -90,6 +90,61 @@ function ActionTargetHints.AttachCampSiteHint(
         x = target and number(target.x or target.targetX)
         y = target and number(target.y or target.targetY)
     end
+    if actionIntent and actionIntent.action == "CAMP"
+        and type(target) == "table"
+        and target.kind == "camp_site"
+        and type(target.clientHint) ~= "table"
+        and (x ~= nil or y ~= nil or target.siteID ~= nil
+            or target.campfireID ~= nil)
+        and type(campSiteHints) == "table"
+        and type(campSiteHints.Resolve) == "function"
+    then
+        -- Re-resolve a selected primitive immediately before dispatch. The
+        -- menu candidate is bounded and short-lived, but the player can move
+        -- or the room can unload between projection and click. Resolve uses
+        -- the existing short cache and one bounded local lookup; it does not
+        -- scan the world or grant server authority.
+        local resolveTarget = {}
+        for key, value in pairs(target) do resolveTarget[key] = value end
+        resolveTarget.requireExact = true
+        local hintCopy, resolveReason = campSiteHints.Resolve(
+            resolveTarget, context
+        )
+        if not hintCopy then
+            audit("semantic.camp_site.client_hint", {
+                npcID = context.npcID,
+                conversationID = context.conversationID,
+                requestID = context.requestID,
+                scope = target.scope or target.siteScope,
+                siteID = target.siteID,
+                roomID = target.roomID,
+                campfireID = target.campfireID,
+                reason = resolveReason or "camp_site_hint_stale",
+                attached = false,
+                source = "selected_primitive",
+            }, { requestID = context.requestID })
+            return normalizedAction
+        end
+        local targetCopy = {}
+        for key, value in pairs(target) do targetCopy[key] = value end
+        targetCopy.clientHint = hintCopy
+        audit("semantic.camp_site.client_hint", {
+            npcID = context.npcID,
+            conversationID = context.conversationID,
+            requestID = context.requestID,
+            scope = target.scope or target.siteScope,
+            siteID = target.siteID,
+            roomID = target.roomID,
+            roomType = target.roomType,
+            campfireID = target.campfireID,
+            x = hintCopy.x,
+            y = hintCopy.y,
+            z = hintCopy.z,
+            attached = true,
+            source = "refreshed_selected_primitive",
+        }, { requestID = context.requestID })
+        return copyActionWithTarget(normalizedAction, targetCopy)
+    end
     if not actionIntent or actionIntent.action ~= "CAMP"
         or type(target) ~= "table"
         or target.kind ~= "camp_site"

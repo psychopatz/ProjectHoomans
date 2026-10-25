@@ -26,6 +26,8 @@ mergePack(require "PNC/Semantics/SpeechRealization/Families/Status")
 mergePack(require "PNC/Semantics/SpeechRealization/Families/Social")
 mergePack(require "PNC/Semantics/SpeechRealization/Families/Knowledge")
 mergePack(require "PNC/Semantics/SpeechRealization/Families/Actions")
+mergePack(require "PNC/Semantics/SpeechRealization/Families/Navigation")
+mergePack(require "PNC/Semantics/SpeechRealization/Families/Conversation")
 
 local COVERAGE = {
     { family = "greeting", supported = { "neutral", "warm", "terse", "guarded" } },

@@ -161,9 +161,23 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
         self.assertEqual(rows["hostile"]["target"]["audience"], "hostile")
         self.assertEqual(rows["hostile"]["target"]["route"], "hostile_full_conversation")
         self.assertEqual(rows["hostile"]["runtimeGraphPath"]["kind"], "semantic_flow")
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as navigation_worker:
+            navigation_worker.open_conversation()
+            root_channel = navigation_worker.conversation_projection()["presentation"]["responseChannel"]
+            orders = navigation_worker.suggestion_click(
+                next(
+                    choice
+                    for choice in root_channel["rows"]
+                    if choice["id"] == "companion.orders:open"
+                )["frame"]
+            )
+            order_ids = {
+                choice["id"]
+                for choice in orders["conversationPresentation"]["responseChannel"]["rows"]
+            }
         self.assertIn(
             "action.follow",
-            {choice["id"] for choice in rows["colonist"]["start"]["opening"]["choices"]},
+            order_ids,
         )
         self.assertIn(
             "conversation.root:menu:ceasefire",
@@ -407,6 +421,9 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
                     "responsePlanID": "plan:water",
                 }
             )
+            transcript_before_emote = len(
+                worker.snapshot()["transcript"]
+            )
             emote = worker.conversation_emote(
                 "thumbsup", topic="water", meaningful=True
             )
@@ -418,6 +435,19 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
         self.assertTrue(emote["accepted"])
         self.assertEqual(emote["envelope"]["source"], "emote")
         self.assertEqual(emote["envelope"]["act"], "ACK")
+        self.assertEqual(
+            emote["realization"]["realizationID"],
+            "semantic.emote.reply.thumbsup.active",
+        )
+        self.assertTrue(emote["speech"]["accepted"])
+        delivered = [
+            message for message in emote["snapshot"]["transcript"]
+            [transcript_before_emote:]
+            if message.get("speaker") == "npc"
+        ]
+        self.assertEqual(len(delivered), 1)
+        self.assertEqual(delivered[0]["payload"]["text"],
+                         "Good. Let's keep moving on this.")
         self.assertEqual(
             emote["interaction"]["thread"]["activeBeat"]["id"],
             "beat:water",
@@ -514,24 +544,29 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
             frame = group["navigation"][0]["frame"]
             before = worker.snapshot()
             clicked = worker.suggestion_click(frame)
-            after = worker.snapshot()
 
-        self.assertTrue(clicked["accepted"])
-        self.assertEqual(after["suggestions"]["currentGroupID"], "conversation_landing")
-        self.assertEqual(
-            len(after["transcript"]),
-            len(before["transcript"]) + 1,
-        )
-        self.assertEqual(after["transcript"][-1]["speaker"], "player")
-        self.assertTrue(after["transcript"][-1]["value"])
-        self.assertEqual(
-            after["transcript"][-1]["value"],
-            frame["textFallback"],
-        )
-        self.assertEqual(
-            after["scenario"]["conversation"].get("turn", 0),
-            before["scenario"]["conversation"].get("turn", 0),
-        )
+            self.assertTrue(clicked["accepted"])
+            self.assertEqual(
+                clicked["observation"]["suggestions"]["currentGroupID"],
+                "conversation_landing",
+            )
+            self.assertEqual(len(clicked["transcriptMessages"]), 2)
+            self.assertEqual(clicked["transcriptMessages"][0]["speaker"], "player")
+            self.assertEqual(
+                clicked["transcriptMessages"][0]["value"],
+                frame["textFallback"],
+            )
+            self.assertEqual(clicked["transcriptMessages"][1]["speaker"], "npc")
+            self.assertEqual(len(clicked["messages"]), 1)
+            self.assertEqual(clicked["messages"][0]["speaker"], "npc")
+            self.assertIn(
+                "talk",
+                str(clicked["messages"][0]["payload"].get("text", "")).lower(),
+            )
+            self.assertGreater(
+                clicked["contextAfter"]["dialogue"]["sequence"],
+                before["context"]["dialogue"]["sequence"],
+            )
 
     def test_cli_exposes_the_same_talk_operations(self) -> None:
         arguments = _parser().parse_args(["--no-gui", "--talk-matrix"])

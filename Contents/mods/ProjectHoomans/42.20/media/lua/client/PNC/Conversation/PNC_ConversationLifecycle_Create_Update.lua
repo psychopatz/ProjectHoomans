@@ -10,6 +10,7 @@ local currentTime = H.CurrentTime
 local isNameplateConversation = H.IsNameplateConversation
 local requestNameplateFallback = H.RequestNameplateFallback
 local refresh = H.Refresh
+local refreshNow = H.RefreshNow
 local logAvailability = H.LogAvailability
 local NAMEPLATE_UNAVAILABLE_GRACE_MS = H.NameplateUnavailableGraceMs
 
@@ -52,8 +53,13 @@ local function update(view, spec, state)
         return state.cachedSafetyReason
     end
     if time - (tonumber(state.lastHeartbeatAt) or 0) >= 1000 then
-        refresh(state, spec)
-        state.lastHeartbeatAt = time
+        if type(refreshNow) == "function" then
+            local renewed, reason = refreshNow(view, spec, state)
+            if not renewed then return reason end
+        else
+            refresh(state, spec)
+            state.lastHeartbeatAt = time
+        end
     end
     return nil
 end

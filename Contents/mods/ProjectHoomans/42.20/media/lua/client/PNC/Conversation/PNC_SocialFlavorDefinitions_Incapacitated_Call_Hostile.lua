@@ -130,6 +130,42 @@ return {
             },
         },
         {
+            id = "dehydration",
+            when = cell(nil, "dehydration"),
+            npc = {
+                line("UI_PNC_IncapCall_Dehydration_1",
+                    "I'm severely dehydrated and too weak to move. I need water!"),
+                line("UI_PNC_IncapCall_Dehydration_2",
+                    "I can't keep going without water. Please get me a drink."),
+                line("UI_PNC_IncapCall_Dehydration_3",
+                    "I'm down from dehydration. Water, please!"),
+            },
+        },
+        {
+            id = "starvation",
+            when = cell(nil, "starvation"),
+            npc = {
+                line("UI_PNC_IncapCall_Starvation_1",
+                    "I'm starving and too weak to move. I need food!"),
+                line("UI_PNC_IncapCall_Starvation_2",
+                    "I can't keep going on an empty stomach. Please find me something to eat."),
+                line("UI_PNC_IncapCall_Starvation_3",
+                    "I'm down from hunger. I need food before I can get up."),
+            },
+        },
+        {
+            id = "exhaustion",
+            when = cell(nil, "exhaustion"),
+            npc = {
+                line("UI_PNC_IncapCall_Exhaustion_1",
+                    "I'm completely spent. I can't keep up or get up without help!"),
+                line("UI_PNC_IncapCall_Exhaustion_2",
+                    "My legs are gone. Give me a moment to recover."),
+                line("UI_PNC_IncapCall_Exhaustion_3",
+                    "I pushed too far. I need rest before I can move again."),
+            },
+        },
+        {
             id = "help",
             when = cell(nil, "help"),
             npc = {

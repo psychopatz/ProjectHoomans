@@ -11,6 +11,9 @@ require "PNC/Conversation/Definitions/Memory/ConversationTopics/00_PNC_Conversat
 
 local Input = PNC.Semantics.DialogueInput or {}
 PNC.Semantics.DialogueInput = Input
+local CampSiteHints = require "PNC/Semantics/PNC_SemanticCampSiteHints"
+local LocationObservation = PNC.Semantics.LocationObservation
+    or require "PNC/Semantics/PNC_SemanticLocationObservation"
 
 local Internal = Input.Internal or {}
 Input.Internal = Internal
@@ -43,8 +46,9 @@ local function suggestionText(row)
 end
 
 local function suggestionTooltip(row)
-    local status = row and row.status or row and row.eligibility
-        and row.eligibility.status or ""
+    local eligibility = row and row.eligibility or nil
+    local status = row and row.status or eligibility
+        and eligibility.status or ""
     local text = PsychopatzCore and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.Text or nil
     if status == "requires_destination"
@@ -57,6 +61,19 @@ local function suggestionTooltip(row)
             }) or "Choose a destination first."
     end
     if status ~= "" and string.sub(status, 1, 12) == "unavailable_" then
+        local reasonKey = row and row.reasonKey
+            or eligibility and eligibility.reasonKey
+        local reasonFallback = row and row.reasonFallback
+            or eligibility and eligibility.reasonFallback
+        if reasonKey then
+            return text and type(text.Resolve) == "function"
+                and text.Resolve({
+                    key = reasonKey,
+                    fallback = reasonFallback
+                        or "Unavailable in the current situation.",
+                }) or reasonFallback
+                or "Unavailable in the current situation."
+        end
         return text and type(text.Resolve) == "function"
             and text.Resolve({
                 key = "UI_PNC_Conversation_Suggestion_Unavailable_Tooltip",
@@ -86,9 +103,17 @@ local function interactionContext(view, context)
         poolID = beat.poolID,
         factRefs = beat.factRefs,
     } or npcEnvelope and npcEnvelope.provenance or nil
+    local campSiteCandidates = context.campSiteCandidates
+    if type(campSiteCandidates) ~= "table" and type(CampSiteHints.Enumerate) == "function" then
+        local discovered = CampSiteHints.Enumerate(context, { maxRooms = 8 })
+        if type(discovered) == "table" and #discovered > 0 then
+            campSiteCandidates = discovered
+        end
+    end
     return {
         actorID = playerUUID or context.actorID,
         targetID = spec and spec.npcID or context.targetID,
+        campSiteCandidates = campSiteCandidates,
         playerUUID = playerUUID,
         topic = beat and beat.topic or npcEnvelope and npcEnvelope.topic
             or context.currentTopic
@@ -211,10 +236,43 @@ local function recordSemanticChoiceClick(view, frame, eventName, reason)
     })
 end
 
+local function authoredRootChoice(authoredChoices, frame)
+    local extensions = type(frame) == "table"
+        and type(frame.extensions) == "table" and frame.extensions or nil
+    if not extensions or extensions.origin ~= "conversation_root" then
+        return nil
+    end
+    local requestedID = tostring(
+        extensions.rootChoiceID or extensions.actionID
+            or extensions.choiceID or ""
+    )
+    if requestedID == "" then return nil end
+    for _, authoredChoice in ipairs(authoredChoices or {}) do
+        if type(authoredChoice) == "table"
+            and tostring(authoredChoice.id or "") == requestedID
+        then
+            return authoredChoice
+        end
+    end
+    return nil
+end
+
+local function preserveAuthoredValue(value, authoredChoice)
+    if type(value) ~= "function" then return value end
+    return function(context, _, session)
+        return value(
+            context,
+            authoredChoice and authoredChoice.source,
+            session
+        )
+    end
+end
+
 -- Build rows for Core's native choice list. This is a data adapter only: Core
 -- still owns layout, scrolling, hover, click gating, and session ordering; the
--- canonical semantic input path owns the click frame.
-local function buildCoreChoices(view, projection)
+-- canonical semantic input path owns the click frame. Authored choices are
+-- retained only as the current runtime normalization, never as persistence.
+local function buildCoreChoices(view, projection, authoredChoices)
     projection = type(projection) == "table" and projection or {}
     local selectedGroup
     local requestedGroup = projection.currentGroupID
@@ -232,21 +290,46 @@ local function buildCoreChoices(view, projection)
     local function append(row, enabled)
         local frame = row and row.frame or nil
         if type(frame) ~= "table" then return end
+        local authoredChoice = authoredRootChoice(authoredChoices, frame)
+        local rowEnabled = enabled == true
+            and (not authoredChoice or authoredChoice.enabled ~= false)
+        local semanticSource = {
+            semanticFrame = frame,
+            source = row.source,
+            groupID = selectedGroup and selectedGroup.id
+                or row.groupID,
+        }
         rows[#rows + 1] = {
             id = row.id or row.action or ("semantic:" .. tostring(#rows + 1)),
             text = suggestionText(row),
-            enabled = enabled == true,
-            tooltip = suggestionTooltip(row),
-            -- The Core row is a typed semantic click adapter. Its action
-            -- owns the one canonical submission path, so Core must not also
-            -- append the display text as an authored player turn.
-            log = false,
-            source = {
-                semanticFrame = frame,
-                source = row.source,
-                groupID = selectedGroup and selectedGroup.id
-                    or row.groupID,
-            },
+            enabled = rowEnabled,
+            tooltip = authoredChoice and authoredChoice.tooltip
+                or suggestionTooltip(row),
+            -- Root rows preserve Core's normalized authored behavior. Other
+            -- semantic rows remain typed semantic adapters and do not create
+            -- a second authored player turn.
+            log = authoredChoice and authoredChoice.log ~= false or false,
+            response = authoredChoice
+                and preserveAuthoredValue(authoredChoice.response, authoredChoice)
+                or nil,
+            next = authoredChoice
+                and preserveAuthoredValue(authoredChoice.next, authoredChoice)
+                or nil,
+            close = authoredChoice
+                and preserveAuthoredValue(authoredChoice.close, authoredChoice)
+                or nil,
+            closeReason = authoredChoice
+                and preserveAuthoredValue(
+                    authoredChoice.closeReason, authoredChoice
+                ) or nil,
+            onHighlightChanged = authoredChoice
+                and type(authoredChoice.onHighlightChanged) == "function"
+                and function(_, highlighted)
+                    return authoredChoice.onHighlightChanged(
+                        authoredChoice, highlighted
+                    )
+                end or nil,
+            source = semanticSource,
             action = function()
                 local input = PNC.Semantics
                     and PNC.Semantics.DialogueInput or nil
@@ -266,9 +349,17 @@ local function buildCoreChoices(view, projection)
                     )
                     return false
                 end
+                local previousCoreFrame = view.semanticCoreChoiceFrame
+                view.semanticCoreChoiceFrame = frame
                 local accepted, reason = input.SubmitSemanticFrame(
-                    view, frame
+                    view,
+                    frame,
+                    authoredChoice and {
+                        coreAuthoredChoice = true,
+                        authoredChoice = authoredChoice,
+                    } or nil
                 )
+                view.semanticCoreChoiceFrame = previousCoreFrame
                 view.lastSemanticSuggestionReason = reason
                 if accepted ~= true then
                     view.lastSemanticSuggestionFailure = {
@@ -344,8 +435,9 @@ local function buildCoreChoices(view, projection)
         or projection.permittedCapabilities or {}
     for _, capability in ipairs(capabilities) do
         append(capability,
-            capability.status == "eligible"
+            (capability.status == "eligible"
                 or capability.status == "selected_for_preflight")
+                and capability.enabled ~= false)
     end
     -- Owned companion actions are real landing actions, not a topic browser.
     -- Keep them beside the landing choices while leaving unrelated groups
@@ -355,8 +447,9 @@ local function buildCoreChoices(view, projection)
             if group.id == "owned_actions" then
                 for _, capability in ipairs(group.capabilities or {}) do
                     append(capability,
-                        capability.status == "eligible"
+                        (capability.status == "eligible"
                             or capability.status == "selected_for_preflight")
+                            and capability.enabled ~= false)
                 end
                 break
             end
@@ -373,6 +466,7 @@ end
 local function presentSemanticChoices(view, authoredChoices)
     local projection = view and view.semanticSuggestions or nil
     if type(projection) ~= "table" then return nil end
+    if view then view.semanticAuthoredChoices = authoredChoices end
     if view and view.session and view.session.busy == true then
         -- Do not replace Core's authored/pending surface while the opening or
         -- a response is still being delivered. Core rejects clicks in this
@@ -380,7 +474,9 @@ local function presentSemanticChoices(view, authoredChoices)
         view.semanticPresentationPending = projection
         return nil
     end
-    local rows = buildCoreChoices(view, projection)
+    local rows = buildCoreChoices(
+        view, projection, view and view.semanticAuthoredChoices
+    )
     if #rows > 0 then
         view.semanticPresentationPending = nil
         return rows
@@ -388,12 +484,14 @@ local function presentSemanticChoices(view, authoredChoices)
     return nil
 end
 
-local function applyCoreChoices(view, projection)
+local function applyCoreChoices(view, projection, authoredChoices)
     local session = view and view.session or nil
     if not session or type(session.setPresentedChoices) ~= "function" then
         return false, "core_choices_unavailable"
     end
-    local rows = buildCoreChoices(view, projection)
+    authoredChoices = authoredChoices
+        or view and view.semanticAuthoredChoices
+    local rows = buildCoreChoices(view, projection, authoredChoices)
     if session.busy == true then
         -- Session:finishPending will call setChoices after the queued NPC
         -- response, at which point the presentation callback will apply the
@@ -453,12 +551,48 @@ function Internal.RefreshSuggestions(view, result)
     then
         return nil
     end
-    local projection = Suggestions.Build(
-        result,
-        type(Internal.ShallowContext) == "function"
-            and Internal.ShallowContext(view) or {},
-        nil
-    )
+    local semanticContext = type(Internal.ShallowContext) == "function"
+        and Internal.ShallowContext(view) or {}
+    local existingGroupID = view.semanticSuggestions
+        and view.semanticSuggestions.currentGroupID or nil
+    local preservedGroupID = existingGroupID
+        and existingGroupID ~= Suggestions.ROOT_GROUP_ID
+        and existingGroupID or nil
+    semanticContext.activeSuggestionGroupID = preservedGroupID
+        or view.session and view.session.semanticSuggestionGroupID
+        or semanticContext.semanticSuggestionGroupID
+        or view.semanticSuggestionGroupID
+    if preservedGroupID and view.spec and view.spec.context then
+        view.spec.context.semanticSuggestionGroupID = preservedGroupID
+    end
+    local campSiteCandidates = result.campSiteCandidates
+        or (result.npcState and result.npcState.campSiteCandidates)
+        or semanticContext.campSiteCandidates
+    if LocationObservation
+        and type(LocationObservation.Observe) == "function"
+    then
+        local locationObservation = LocationObservation.Observe({
+            locationObservation = result.locationObservation
+                or semanticContext.locationObservation,
+            player = result.player or semanticContext.player,
+            origin = result.selectionOrigin or semanticContext.selectionOrigin,
+            selectionOrigin = result.selectionOrigin
+                or semanticContext.selectionOrigin,
+            cell = result.cell or semanticContext.cell,
+            campSiteCandidates = campSiteCandidates,
+            campfireCandidates = result.campfireCandidates
+                or semanticContext.campfireCandidates,
+        }, { maxCampSites = 8 })
+        if type(locationObservation) == "table" then
+            semanticContext.locationObservation = locationObservation
+            local discovered = locationObservation.campSiteCandidates
+            if type(discovered) == "table" and #discovered > 0 then
+                campSiteCandidates = discovered
+            end
+        end
+    end
+    semanticContext.campSiteCandidates = campSiteCandidates
+    local projection = Suggestions.Build(result, semanticContext, nil)
     view.semanticSuggestions = projection
     view.semanticSuggestionRevision = projection
         and projection.revision or nil
@@ -483,7 +617,39 @@ function Internal.RefreshRootSuggestions(view)
         return nil
     end
     local context = Internal.ShallowContext(view)
+    if LocationObservation
+        and type(LocationObservation.Observe) == "function"
+    then
+        local observation = LocationObservation.Observe(context, {
+            maxCampSites = 8,
+        })
+        if type(observation) == "table" then
+            context.locationObservation = observation
+            if type(observation.campSiteCandidates) == "table"
+                and #observation.campSiteCandidates > 0
+            then
+                context.campSiteCandidates = observation.campSiteCandidates
+            end
+        end
+    end
     if type(context.conversationRoot) ~= "table" then return nil end
+    if view.semanticSuggestionGroupID == nil
+        and view.session and view.session.semanticSuggestionGroupID == nil
+    then
+        view.semanticSuggestionGroupID = Suggestions.ROOT_GROUP_ID
+    end
+    view.semanticSuggestionGroupID = view.session
+        and view.session.semanticSuggestionGroupID
+        or view.semanticSuggestionGroupID
+    context.activeSuggestionGroupID = view.semanticSuggestionGroupID
+    context.semanticSuggestionGroupID = view.semanticSuggestionGroupID
+    if view.spec and view.spec.context then
+        view.spec.context.semanticSuggestionGroupID =
+            view.semanticSuggestionGroupID
+    end
+    if view.session then
+        view.session.semanticSuggestionGroupID = view.semanticSuggestionGroupID
+    end
     -- Do not create the semantic router merely to paint the initial menu.
     -- RouterFor owns turn state initialization, and doing that here changes
     -- the authoritative contextBefore snapshot before the first input. Reuse
@@ -528,6 +694,11 @@ function Internal.SelectSemanticGroup(view, frame)
         end
     end
     if not selected then return false, "semantic_group_unknown" end
+    view.semanticSuggestionGroupID = selected.id
+    view.session.semanticSuggestionGroupID = selected.id
+    if view.spec and view.spec.context then
+        view.spec.context.semanticSuggestionGroupID = selected.id
+    end
     projection.currentGroupID = selected.id
     local applied, reason = applyCoreChoices(view, projection)
     if not applied then return false, reason end
@@ -560,7 +731,8 @@ local function clearSemanticTopicFocus(view)
     end
 end
 
-function Internal.SelectSemanticRoot(view, frame)
+function Internal.SelectSemanticRoot(view, frame, options)
+    options = type(options) == "table" and options or {}
     if not view or not view.session
         or type(Suggestions.IsBackFrame) ~= "function"
         or not Suggestions.IsBackFrame(frame)
@@ -578,10 +750,11 @@ function Internal.SelectSemanticRoot(view, frame)
         return false, "semantic_back_disabled"
     end
     local rootID = tostring(projection.rootGroupID or "")
-    if rootID == "" or tostring(frame.groupID or "") ~= rootID then
+    local targetGroupID = tostring(frame.groupID or "")
+    if rootID == "" or targetGroupID == "" then
         return false, "semantic_root_unknown"
     end
-    if tostring(projection.currentGroupID or "") == rootID then
+    if tostring(projection.currentGroupID or "") == targetGroupID then
         return false, "semantic_root_already_selected"
     end
     for _, group in ipairs(projection.groups or {}) do
@@ -594,26 +767,33 @@ function Internal.SelectSemanticRoot(view, frame)
             break
         end
     end
-    local root
+    local target
     for _, group in ipairs(projection.groups or {}) do
-        if tostring(group.id or "") == rootID then
-            root = group
+        if tostring(group.id or "") == targetGroupID then
+            target = group
             break
         end
     end
-    if not root then return false, "semantic_root_unknown" end
+    if not target then return false, "semantic_root_unknown" end
     local fromGroupID = tostring(frame.fromGroupID or "")
     if fromGroupID ~= ""
         and tostring(projection.currentGroupID or "") ~= fromGroupID
     then
         return false, "stale_suggestion"
     end
-    clearSemanticTopicFocus(view)
-    projection.currentGroupID = rootID
+    if targetGroupID == rootID then clearSemanticTopicFocus(view) end
+    view.semanticSuggestionGroupID = targetGroupID
+    view.session.semanticSuggestionGroupID = targetGroupID
+    if view.spec and view.spec.context then
+        view.spec.context.semanticSuggestionGroupID = targetGroupID
+    end
+    projection.currentGroupID = targetGroupID
     local applied, reason = applyCoreChoices(view, projection)
     if not applied then return false, reason end
     local reply = frame.utterance or frame.textFallback
-    if frame.playerReply == true and type(reply) == "string"
+    if frame.playerReply == true
+        and options.skipPlayerReply ~= true
+        and type(reply) == "string"
         and reply ~= ""
     then
         local group = view.groupConversation

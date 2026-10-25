@@ -14,6 +14,9 @@ PNC.Conversation.TalkParity = TalkParity
 local Conversation = PNC.Conversation
 local TalkStart = PNC.Conversation.TalkStart
     or require "PNC/Conversation/PNC_ConversationTalkStart"
+local SpeechDelivery = PNC.Semantics
+    and PNC.Semantics.SemanticSpeechDelivery
+    or require "PNC/Semantics/PNC_SemanticSpeechDelivery"
 
 TalkParity.VERSION = 1
 TalkParity.SCHEMA = "semantic.talk.parity.v1"
@@ -900,6 +903,11 @@ function TalkParity.Emote(context, payload)
         return nil, "conversation_closed"
     end
     payload = type(payload) == "table" and payload or {}
+    local emote = type(payload.emote) == "table"
+        and payload.emote or payload
+    local gesture = tostring(
+        emote.gesture or emote.id or emote.emoteID or ""
+    )
     local lifecycle = PNC.Semantics
         and PNC.Semantics.InteractionLifecycle or nil
     local store = Runtime.interactionLifecycle
@@ -912,19 +920,74 @@ function TalkParity.Emote(context, payload)
     local scenario = Runtime.scenario or {}
     local player = scenario.player or {}
     local npc = scenario.npc or {}
-    local envelope = lifecycle.Envelope.Emote(
-        payload.emote or payload,
+    local actorID = payload.actorID
+        or player.characterUUID or player.playerUUID or "player-one"
+    local targetID = payload.targetID or npc.npcID or npc.id
+    local playerUUID = payload.playerUUID or actorID
+    local previous = type(lifecycle.Project) == "function"
+        and lifecycle.Project(store, playerUUID, targetID) or nil
+    local activeBeat = previous and previous.thread
+        and previous.thread.activeBeat or nil
+    local topic = payload.topic
+        or activeBeat and activeBeat.topic
+        or scenario.conversation and scenario.conversation.topic
+    local eventRef = payload.eventRef or payload.eventID or payload.requestID
+    eventRef = eventRef or "conversation:semantic_emote:" .. actorID
+        .. ":" .. tostring(targetID or "unknown") .. ":"
+        .. gesture .. ":" .. tostring(
+            payload.worldHour
+                or scenario.world and scenario.world.worldAgeHours or 0
+        )
+    local baseEnvelope = lifecycle.Envelope.Emote(
+        emote,
         {
-            actorID = payload.actorID
-                or player.characterUUID or player.playerUUID or "player-one",
-            targetID = payload.targetID or npc.npcID or npc.id,
-            playerUUID = payload.playerUUID
-                or player.characterUUID or player.playerUUID or "player-one",
-            topic = payload.topic
-                or scenario.conversation and scenario.conversation.topic,
+            actorID = actorID,
+            targetID = targetID,
+            playerUUID = playerUUID,
+            topic = topic,
+            eventRef = eventRef,
             worldHour = payload.worldHour
                 or scenario.world and scenario.world.worldAgeHours,
-            provenance = payload.provenance,
+        }
+    )
+    local realizationAuthority = PNC.Semantics
+        and PNC.Semantics.RealizationAuthority
+        or require "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+    local realization = realizationAuthority
+        and type(realizationAuthority.Resolve) == "function"
+        and realizationAuthority.Resolve({
+            poolID = "semantic.emote.reply",
+            responsePlanID = "semantic.emote.reply",
+            realizationFamily = "emote_reply",
+            act = baseEnvelope and baseEnvelope.act or emote.act,
+            topic = topic or "social_reaction",
+            context = {
+                action = gesture,
+                currentTopic = topic,
+                previousTopic = activeBeat and activeBeat.topic,
+                npcID = targetID,
+            },
+            salt = eventRef,
+        }) or nil
+    local provenance = Values.copy(payload.provenance or {})
+    if realization then
+        provenance.responsePlanID = realization.responsePlanID
+        provenance.realizationFamily = realization.realizationFamily
+        provenance.realizationID = realization.realizationID
+        provenance.poolID = realization.realizationFamily
+        provenance.factRefs = realization.groundedFactRefs
+    end
+    local envelope = lifecycle.Envelope.Emote(
+        emote,
+        {
+            actorID = actorID,
+            targetID = targetID,
+            playerUUID = playerUUID,
+            topic = topic,
+            eventRef = eventRef,
+            worldHour = payload.worldHour
+                or scenario.world and scenario.world.worldAgeHours,
+            provenance = provenance,
         }
     )
     local value, reason = lifecycle.Apply(
@@ -932,6 +995,31 @@ function TalkParity.Emote(context, payload)
         envelope,
         payload.options or { meaningful = payload.meaningful == true }
     )
+    local speech
+    if value and realization and realization.fallback then
+        speech = { accepted = false, reason = "speech_not_delivered" }
+        local delivered, deliveryReason = SpeechDelivery.NPC({
+            session = session,
+            dedupeStore = Runtime.semanticSpeechDelivery,
+            eventID = eventRef,
+            npcID = targetID,
+            target = npc,
+            speakerName = npc.displayName or npc.name,
+            playerActor = context.player,
+            text = realization.fallback,
+            semanticAct = realization.semanticAct,
+            topic = realization.topic or topic,
+            responsePlanID = realization.responsePlanID,
+            realizationFamily = realization.realizationFamily,
+            realizationID = realization.realizationID,
+            factRefs = realization.groundedFactRefs,
+            compatibilityFlavorID = realization.compatibilityFlavorID,
+            interaction = envelope,
+        })
+        speech.accepted = delivered == true
+        speech.reason = deliveryReason
+        speech.text = realization.fallback
+    end
     local snapshot = context.ScenarioSession.snapshot(context)
     return {
         schema = TalkParity.SCHEMA,
@@ -939,6 +1027,8 @@ function TalkParity.Emote(context, payload)
         accepted = value ~= nil,
         reason = reason,
         envelope = Values.copy(envelope),
+        realization = Values.copy(realization),
+        speech = Values.copy(speech),
         interaction = Values.copy(snapshot.interactionLifecycle),
         presentation = Values.copy(snapshot.conversationPresentation),
         snapshot = snapshot,

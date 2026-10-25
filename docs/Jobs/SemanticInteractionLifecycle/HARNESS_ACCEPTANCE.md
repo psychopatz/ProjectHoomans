@@ -1,5 +1,19 @@
 # Semantic Lab Acceptance — Interaction Lifecycle
 
+## Latest P12 regression evidence — 2026-10-25
+
+The production worker now preserves a typed landing shortcut frame through the
+native/group submission boundary. A direct click of
+`conversation.landing:whats_up` resolves through the semantic response and
+realization catalogs rather than the generic `Let me think about that.`
+fallback. The companion authority context also accepts a native target entry
+whose bounded replicated snapshot is present without a local record, so the
+Orders hub is projected from the same authoritative client facts used by the
+command affordance gate.
+
+The P12 harness suite is **29/29** and the focused production Lua suite is
+**12/12**. Native SP/MP execution remains user-owned.
+
 The existing Semantic Lab and its production Lua worker are the primary development/debug surface for this job.
 
 P14's rule remains mandatory:
@@ -328,6 +342,8 @@ Departure acceptance must prove:
 
 ### W. Semantic speech delivery
 
+The emote regression must cover the production queue boundary: the selected NPC reply is not dropped by player-emote/ambient family arbitration, is pumped when the native interaction requires immediate feedback, and is visibly delivered exactly once. The harness must inspect the production delivery seam and ownership metadata rather than treating a result or diary record as speech delivery.
+
 For semantic emote and other resolved NPC speech:
 
 - realization family/ID selected once;
@@ -364,7 +380,11 @@ Inside the group:
 
 After execution, reproject from authoritative state and verify the toggle changes.
 
+Opening Orders, opening Camp, and returning with Back are semantic conversational exchanges. Each accepted navigation frame must produce exactly one player transcript line and exactly one contextual NPC acknowledgement before the requested group is shown. A Camp branch with no currently valid sites must speak a bounded fallback and show no fabricated destination rows.
+
 ### Z. Dynamic Camp
+
+The harness fixtures the production `semantic_location_observation` primitive contract when exercising dynamic destinations. Production Lua owns the client observation adapter and the server remains the authority; Python may provide bounded primitive room/campfire observations but must not scan the map or choose a destination. Native and headless projections therefore consume the same `campSiteCandidates` shape and stable `siteID`/`roomID`/`campfireID` identity.
 
 Using production CampSite adapters:
 
@@ -376,6 +396,10 @@ Using production CampSite adapters:
 6. authoritative camp order commits the selected validated site.
 
 Also test stale/invalid hint rejection and generic fallback behavior.
+
+The dynamic discovery regression must assert that an unspecified Camp menu query does not become the literal room-name filter `"room"`; valid rooms such as `HALLWAY` must remain eligible for projection.
+
+Opening the Camp branch itself must also be covered: valid destinations are projected dynamically only after the semantic acknowledgement, and every destination selection must deliver the authoritative Camp acknowledgement/result rather than merely toggling a UI row.
 
 ### AA. Equivalent capability invocation
 

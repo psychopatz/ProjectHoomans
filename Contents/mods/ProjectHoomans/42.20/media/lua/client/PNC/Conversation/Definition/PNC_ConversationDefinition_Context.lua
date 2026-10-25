@@ -6,6 +6,9 @@ local Conversation = PNC.Conversation
 local Context = {}
 local FlavorAddress = PNC.FlavorAddress
 local IdentityPresentation = PNC.NPCIdentityPresentation
+local AddressResolver = PNC.Semantics
+    and PNC.Semantics.AddressResolver
+    or require "PNC/Semantics/PNC_SemanticAddressResolver"
 local Loader = Conversation.TextLoader
 
 if type(FlavorAddress) ~= "table"
@@ -97,8 +100,39 @@ local function visibleIdentityArguments(
     local npcFull, npcFirst, npcLast = npcIdentity(
         entry, projection, npcName
     )
-    if not npcKnown then
-        npcFull, npcFirst, npcLast = stranger, stranger, stranger
+    local address = AddressResolver.Resolve({
+        target = entry,
+        identityKnown = npcKnown,
+        knownName = npcKnown and npcFull or nil,
+        relationshipKind = entry and (
+            entry.relationshipKind or entry.relationshipCategory
+        ),
+        familiarity = entry and entry.familiarity,
+        tone = entry and (entry.tone or entry.beatTone),
+        persona = entry and (entry.persona or entry.personaStyle),
+        seed = npcID,
+        recentAddresses = clientState and clientState.semanticAddressHistory
+            and clientState.semanticAddressHistory[npcID] or nil,
+    })
+    if clientState and not address.known then
+        clientState.semanticAddressHistory =
+            clientState.semanticAddressHistory or {}
+        clientState.semanticAddressHistory[npcID] =
+            clientState.semanticAddressHistory[npcID] or {}
+        AddressResolver.Remember(
+            clientState.semanticAddressHistory[npcID], address
+        )
+    end
+    local displayAddress = address.address
+    if not address.known and address.id == "stranger" then
+        -- Preserve the existing localized Conversation identity label while
+        -- keeping the semantic address value itself lowercase and contextual.
+        displayAddress = stranger
+    end
+    npcFull = displayAddress
+    if not address.known then
+        npcFirst = displayAddress
+        npcLast = ""
     end
     return {
         playerName = playerAddress.addressName,
@@ -115,6 +149,9 @@ local function visibleIdentityArguments(
         npcFirstName = npcFirst or npcFull or stranger,
         npcLastName = npcLast or "",
         npcSurname = npcLast or "",
+        npcAddress = address.address,
+        npcAddressID = address.id,
+        npcIdentityKnown = address.known,
     }
 end
 

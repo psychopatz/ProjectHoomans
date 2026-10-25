@@ -1,0 +1,13 @@
+{
+  "UI_PNC_Conversation_Suggestion_GoHome_NoBase_Tooltip": "Hindi magagamit ang pag-uwi dahil wala pang naitayong base.",
+  "UI_PNC_Conversation_Suggestion_NoCampSite_Tooltip": "Walang valid na lugar para magkampo sa ngayon.",
+  "UI_PNC_Conversation_Suggestion_AlreadyFollowing_Tooltip": "Sinusundan ka na.",
+  "UI_PNC_Conversation_Suggestion_NotFollowing_Tooltip": "Magagamit ang paghihintay habang sinusundan ka ng kasama.",
+  "UI_PNC_Conversation_Suggestion_AlreadyStaying_Tooltip": "Nananatili na sa puwesto.",
+  "UI_PNC_Conversation_Suggestion_CompanionIncapacitated_Tooltip": "Hindi magagamit dahil walang malay o hindi makagalaw ang kasama.",
+  "UI_PNC_Conversation_Suggestion_CompanionBusy_Tooltip": "Hindi magagamit habang abala o nakikipaglaban ang kasama.",
+  "UI_PNC_Conversation_Suggestion_CompanionDead_Tooltip": "Hindi magagamit dahil patay na ang kasama.",
+  "UI_PNC_Conversation_Suggestion_CompanionUnavailable_Tooltip": "Hindi magagamit dahil hindi makatanggap ng utos ang kasama ngayon.",
+  "UI_PNC_Conversation_Suggestion_CampSiteOutOfRange_Tooltip": "Masyadong malayo ang lugar ng kampo sa ngayon.",
+  "UI_PNC_Conversation_Suggestion_CampSiteStale_Tooltip": "Hindi na available ang lugar; pumili ng bagong lokasyon."
+}

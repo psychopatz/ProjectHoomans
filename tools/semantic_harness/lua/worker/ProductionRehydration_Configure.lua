@@ -36,6 +36,26 @@ local function configureDeveloperRuntime(context, helpers, source)
         mode = "developer_test",
     }
     helpers.resetOrganizationState()
+    -- A developer fixture may deliberately carry a bounded production
+    -- faction/community registry so an authority acceptance test can exercise
+    -- the real server executor. Load it through the same production owner;
+    -- never create a harness-side faction shadow or mutate the source table.
+    local rawRegistries = Runtime.productionRawRegistries
+    if type(rawRegistries) == "table"
+        and (type(rawRegistries.factions) == "table"
+            or type(rawRegistries.communities) == "table")
+    then
+        local organizationStatus, organizationReason =
+            helpers.loadProductionOrganizations(context)
+        if not organizationStatus then
+            return helpers.fail(
+                context,
+                "production_faction_rehydration:"
+                    .. tostring(organizationReason)
+            )
+        end
+        Runtime.productionFactionRehydration = organizationStatus
+    end
     Runtime.productionRehydration = {
         schema = "semantic.production_rehydration.v1",
         source = source,

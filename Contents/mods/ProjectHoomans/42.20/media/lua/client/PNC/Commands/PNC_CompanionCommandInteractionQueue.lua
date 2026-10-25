@@ -209,6 +209,7 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
         speakerName = speaker == "player"
             and tostring(player and player.getUsername
                 and player:getUsername() or speakerID)
+            or flavorContext.name
             or targetName(type(context) == "table" and context.target or {}),
         playerUUID = playerID(player),
         context = queueContext,

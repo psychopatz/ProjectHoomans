@@ -141,7 +141,7 @@ local function semanticFrameKey(view, frame)
         .. ":" .. tostring(frame and frame.candidateID or "")
 end
 
-local function beginDirectFrame(view, frame)
+local function beginDirectFrame(view, frame, options)
     if not view or not view.session then
         return false, "conversation_unavailable"
     end
@@ -169,7 +169,9 @@ local function beginDirectFrame(view, frame)
                 and Suggestions.IsConversationRootChoiceFrame(frame)
         )
     end
-    if requiresPresentedChoice then
+    local coreAuthoredChoice = type(options) == "table"
+        and options.coreAuthoredChoice == true
+    if requiresPresentedChoice and not coreAuthoredChoice then
         local presentedChoice
         for _, choice in ipairs(view.session.choices or {}) do
             local source = type(choice) == "table"
@@ -220,6 +222,94 @@ local function finishDirectFrame(view, key)
     }
 end
 
+local function navigationFrameMatchesProjection(view, frame)
+    local projection = view and view.semanticSuggestions or nil
+    if type(projection) ~= "table" then
+        return false, "semantic_suggestions_unavailable"
+    end
+    local currentGroupID = tostring(projection.currentGroupID or "")
+    if Suggestions.IsBackFrame(frame) then
+        if currentGroupID ~= tostring(frame.fromGroupID or "") then
+            return false, "stale_suggestion"
+        end
+    elseif Suggestions.IsGroupFrame(frame) then
+        local parentGroupID = tostring(
+            frame.parentGroupID or Suggestions.ROOT_GROUP_ID
+        )
+        if currentGroupID ~= parentGroupID then
+            return false, "stale_suggestion"
+        end
+    end
+    return true, "navigation_frame_current"
+end
+
+local function navigationFrameAtCurrentRevision(view, frame)
+    local router = Internal.RouterFor(view)
+    local output = {}
+    for key, value in pairs(frame or {}) do
+        output[key] = value
+    end
+    output.requestRevision = router
+        and router.state and tonumber(router.state.sequence)
+        or output.requestRevision
+    return output
+end
+
+local function applyNavigationProjection(view, frame)
+    local projection = view and view.semanticSuggestions or nil
+    if type(projection) == "table"
+        and tostring(projection.currentGroupID or "")
+            == tostring(frame.groupID or "")
+    then
+        return true, "already_projected"
+    end
+    local currentFrame = navigationFrameAtCurrentRevision(view, frame)
+    -- The navigation utterance has just advanced the semantic router. The
+    -- old projection still carries the pre-turn revision, so selecting the
+    -- group directly would reject an otherwise valid native click as stale.
+    -- Rebuild the same bounded projection at the new revision and requested
+    -- group; this is presentation state only and does not execute gameplay.
+    if type(projection) == "table"
+        and tonumber(projection.revision)
+            ~= tonumber(currentFrame.requestRevision)
+        and type(Internal.ShallowContext) == "function"
+        and type(Suggestions.Build) == "function"
+    then
+        local context = Internal.ShallowContext(view) or {}
+        context.activeSuggestionGroupID = frame.groupID
+        context.semanticSuggestionGroupID = frame.groupID
+        local rebuilt = Suggestions.Build({
+            accepted = false,
+            sequence = tonumber(currentFrame.requestRevision) or 0,
+            state = {
+                sequence = tonumber(currentFrame.requestRevision) or 0,
+            },
+            ir = {},
+            decision = {},
+        }, context, nil)
+        if type(rebuilt) ~= "table" then
+            return false, "semantic_navigation_projection_failed"
+        end
+        view.semanticSuggestions = rebuilt
+        view.semanticSuggestionRevision = rebuilt.revision
+        if view.session then
+            view.session.semanticSuggestionGroupID = frame.groupID
+        end
+        if view.spec and view.spec.context then
+            view.spec.context.semanticSuggestionGroupID = frame.groupID
+        end
+        projection = rebuilt
+    end
+    if Suggestions.IsBackFrame(currentFrame) then
+        return Internal.SelectSemanticRoot(
+            view,
+            currentFrame,
+            { skipPlayerReply = true }
+        )
+    end
+    return Internal.SelectSemanticGroup(view, currentFrame)
+end
+
 function Input.Submit(view, value, part)
     if not DialogueRuntime.IsEnabled() then
         return false, "semantic_dialogue_disabled"
@@ -231,9 +321,81 @@ function Input.Submit(view, value, part)
     return Internal.SubmitSingle(view, value, part)
 end
 
-function Input.SubmitSemanticFrame(view, frame)
+function Input.SubmitSemanticFrame(view, frame, options)
     if not DialogueRuntime.IsEnabled() then
         return false, "semantic_dialogue_disabled"
+    end
+    -- Core has already cleared the presented row before invoking its action.
+    -- Execute the exact normalized authored action inline and let that same
+    -- Core selection continue through response/next/close evaluation.  This
+    -- is intentionally not Session:selectChoice(originalChoice): doing so
+    -- would re-enter the session while the semantic row is still executing
+    -- and can overwrite Core's pending lifecycle fields.
+    if type(options) == "table"
+        and options.coreAuthoredChoice == true
+    then
+        local allowed, receiptOrReason = beginDirectFrame(
+            view, frame, options
+        )
+        if not allowed then return false, receiptOrReason end
+        local authoredChoice = options.authoredChoice
+        if type(authoredChoice) ~= "table" then
+            return false, "conversation_root_choice_unavailable"
+        end
+        Input.ActiveView = view
+        if type(authoredChoice.action) == "function" then
+            local context = view and view.session
+                and view.session.context
+                or view and view.spec and view.spec.context or {}
+            authoredChoice.action(
+                context,
+                authoredChoice.source,
+                view and view.session
+            )
+        end
+        finishDirectFrame(view, receiptOrReason)
+        return true, "accepted"
+    end
+    if type(Suggestions.IsNavigationFrame) == "function"
+        and Suggestions.IsNavigationFrame(frame)
+    then
+        local allowed, receiptOrReason = beginDirectFrame(view, frame)
+        if not allowed then return false, receiptOrReason end
+        local current, currentReason = navigationFrameMatchesProjection(
+            view, frame
+        )
+        if not current then return false, currentReason end
+        local value = Suggestions.ResolveFrameText(frame)
+        if value == "" then return false, "navigation_frame_text_missing" end
+
+        local group = view and view.groupConversation
+        local accepted
+        local submitReason
+        if group
+            and type(group.SubmitSemanticNavigationFrame) == "function"
+        then
+            accepted, submitReason = group:SubmitSemanticNavigationFrame(
+                frame, value
+            )
+        else
+            accepted, submitReason = Internal.SubmitSingle(
+                view,
+                value,
+                { semanticFrame = frame, navigationFrame = true }
+            )
+        end
+        if accepted ~= true then
+            return false, submitReason or "navigation_frame_rejected"
+        end
+
+        local projected, projectionReason = applyNavigationProjection(
+            view, frame
+        )
+        if projected ~= true then
+            return false, projectionReason or "navigation_projection_failed"
+        end
+        finishDirectFrame(view, receiptOrReason)
+        return true, "accepted"
     end
     -- A frame is already semantic state; retain its bounded meaning for
     -- lifecycle adapters without reparsing its presentation text. Existing
@@ -259,10 +421,14 @@ function Input.SubmitSemanticFrame(view, frame)
         if not allowed then return false, receiptOrReason end
         local value = Suggestions.ResolveFrameText(frame)
         if value == "" then return false, "suggestion_frame_unavailable" end
-        -- A shortcut is presentation-only. Submit its canonical utterance
-        -- through the same raw parser path as the text box so semantic hub
-        -- routing, authority, history, and response handling stay shared.
-        local accepted, submitReason = Input.Submit(view, value)
+        -- Keep the canonical shortcut frame attached to the submission. A
+        -- native group host must not reparse the display label and turn a
+        -- topic shortcut such as "What's up?" into a generic navigation
+        -- acknowledgement.
+        local accepted, submitReason = Input.Submit(view, value, {
+            semanticFrame = frame,
+            semanticShortcut = true,
+        })
         if accepted == true then
             finishDirectFrame(view, receiptOrReason)
         end
@@ -368,6 +534,22 @@ function Input.SubmitSemanticFrame(view, frame)
         if accepted == true then finishDirectFrame(view, receiptOrReason) end
         return accepted, accepted == true and "accepted"
             or "conversation_choice_rejected"
+    end
+    -- Capability rows carry their semantic parent group so an authoritative
+    -- action can refresh the same contextual Orders hub after execution even
+    -- when Core has rebuilt the authored menu during response delivery.
+    if type(frame) == "table"
+        and frame.kind == "semantic_click_frame"
+        and type(frame.groupID) == "string"
+        and frame.groupID ~= ""
+    then
+        view.semanticSuggestionGroupID = frame.groupID
+        if view.session then
+            view.session.semanticSuggestionGroupID = frame.groupID
+        end
+        if view.spec and view.spec.context then
+            view.spec.context.semanticSuggestionGroupID = frame.groupID
+        end
     end
     local group = view and view.groupConversation
     if group and type(group.SubmitSemanticFrame) == "function" then

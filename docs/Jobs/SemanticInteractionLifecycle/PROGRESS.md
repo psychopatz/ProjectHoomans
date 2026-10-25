@@ -1,8 +1,66 @@
 # Semantic Interaction Lifecycle — Current Progress
 
+## Current regression status — READY FOR USER LIVE TEST (2026-10-25)
+
+The newer native screenshots supersede the earlier READY conclusion. The
+developer-side repair now covers request-time native lease renewal, semantic
+root reprojection after rejected/stale requests, a bounded grounded `What's
+up?` response/realization path, and preservation of typed landing shortcut
+frames through native/group submission. Native companion authority projection
+also now falls back to the replicated conversation snapshot when a target
+entry has no local `record`; this keeps the semantic Orders hub eligible for
+the same native companion shape that can still expose authored departure and
+farewell rows.
+
+Current evidence:
+
+- `python3 -m unittest discover -s tools/semantic_harness/tests -p '*p12*.py' -v`: **29/29** passed, including a direct `conversation.landing:whats_up` click and the Companion Orders hub.
+- Focused production Lua semantic/lifecycle/address/speech/emote/location suite: **12/12** passed.
+- `pz_verify --kahlua --severity ERROR`: **3,103** Lua files scanned, **0** errors.
+- `git diff --check`: passed.
+- No source save was mutated and no native Project Zomboid session was launched by this agent.
+
+The isolated `pnc_conversation_smoke` run still reaches its known separately
+supplied-Core failure at the legacy Ask About assertion because
+`PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationLLMInput` is not
+present in that test environment; the new snapshot-only companion authority
+assertions execute before that dependency-bound failure.
+
+Exact Next Chunk: **native SP/MP user-owned acceptance** of the repaired root
+projection and end effects: `What's up?` semantic response variants,
+Companion Orders, Farewell close, Leave Group warning/confirm/departure, emote
+speech delivery, unknown-address variation, mutually exclusive Follow/Wait,
+Go Home, and dynamic Camp destinations. No further developer-implementable
+mandatory P12B–P12H change is identified by the current production-Lua and
+harness evidence.
+
+**Current developer status (2026-10-25): READY FOR USER LIVE TEST.** Newer native evidence showed that the companion Orders/Camp click could enter the semantic router but then be rejected as stale by the native projection (`requestRevision=0`, `currentRevision=1`), leaving only `Let's talk something else` visible. The production navigation bridge now rebuilds the bounded semantic projection at the post-navigation revision before applying the requested group, so the native Core surface does not compare a new semantic turn against the pre-turn menu.
+
+**P12 location observation correction (2026-10-25):** Dynamic Camp and future location/navigation dialogue now share `PNC.Semantics.LocationObservation`. The client adapter reuses existing `CampSiteHints`/`CampSiteGeometry`, returns only bounded primitive location/CampSite observations, caches the loaded-cell read briefly, and re-observes generated snapshots rather than treating them as durable state. If the loaded room index omits the player's current room, dynamic Camp reuses the existing nearest-room resolver before campfire fallback. The harness fixtures this same compact observation contract; Python still does not discover maps, select capabilities, or execute Camp authority.
+
+**P12F/P12G/P12H developer evidence (2026-10-25):** Production worker P12 acceptance is 39/39, including Orders/Camp navigation, location-observation Camp fixtures, authoritative Follow/Wait/Go Home/Camp refresh, and native-effect mutation routes. Focused production Lua tests are green, including the location-observation and Camp fallback regressions. `pz_verify` scans 2,992 Lua files with 0 Kahlua errors and `git diff --check` passes. No developer-implementable mandatory P12 work remains. **Exact Next Chunk:** Native SP/MP user-owned acceptance. No source save was mutated, no native game session was launched by this agent, and no Workshop operation was performed.
+
+**Native dynamic Camp discovery correction (2026-10-25):** Native evidence showed the authoritative `camp here` path could resolve the nearby hallway and commit Camp, while the Orders menu produced no destination rows. The client enumeration adapter was passing the literal fallback query `"room"` into room description; that became a room-name filter and rejected valid room types such as `HALLWAY`. Dynamic enumeration now leaves the query unset unless the player supplied one, so it projects all valid bounded loaded rooms while preserving stable primitive targets and server revalidation.
+
+**Developer status:** READY FOR USER LIVE TEST. P12F native-menu discovery correction is complete developer-side; native SP/MP execution remains user-owned.
+
+**Native emote delivery correction (2026-10-25):** New native evidence showed the semantic NPC reply was selected but dropped before visible delivery. The player emote occupied Core's critical `emote_interaction` queue path while the already-resolved NPC reply used the default ambient priority/family arbitration, so the reply could be discarded by family/cadence suppression. The shared semantic speech seam now protects selected semantic speech at interaction priority, gives player-emote replies a distinct `emote_interaction_reply` family, pumps that reply immediately, and marks the player-emote result as the single diary owner. Focused emote/speech tests, the broader P12 acceptance suites, and full Lua Kahlua validation pass after this correction.
+
+**Developer status:** READY FOR USER LIVE TEST. P0–P11 remain retained foundation; P12B–P12H developer-side acceptance is complete after the native emote delivery correction. Native SP/MP execution remains user-owned.
+
+**Current Next Chunk:** Native SP/MP user-owned acceptance. No developer-implementable mandatory P12 chunk remains.
+
+**Post-handoff correction (2026-10-25):** Player-emote target formatting routes unrevealed NPCs through the shared semantic address resolver, so the internal `Unknown survivor` transport placeholder cannot appear in rendered emote speech. The player-emote speech path now also selects `semantic.emote.player` response-plan/realization provenance before the existing authored Flavor content alias renders localized wording. Known names remain unchanged, bounded per-NPC address history is preserved, and the native gesture/gameplay dispatch remains unchanged. Focused presentation/address/realization tests, production semantic-Lua tests, and the 31-test P12 harness pass after the correction.
+
+**Native companion-root correction (2026-10-25):** The P12E Orders hub was present in the shared semantic projection and Semantic Lab, but native Conversation definitions were leaving `actorAuthority` and the bounded companion state nested under the authored composer context. Native semantic eligibility therefore hid `companion.orders:open` even for an owned companion. The production Conversation context now promotes the authoritative authority/follow/health snapshot to the semantic projection, with a compatibility promotion for older nested contexts. The native-shaped Conversation regression and the full 31-test P12 harness pass after this correction.
+
+**Semantic navigation exchange correction (2026-10-25):** Companion Orders, dynamic Camp, and Back navigation were still being treated as presentation-only group clicks. They now enter the same semantic input/policy/realization path as other selected meanings: the player navigation utterance is recorded once, one contextual NPC acknowledgement is delivered, and the target group is reprojected from current authoritative state. `Let's camp...` consequently opens the bounded valid-site branch, an empty site set produces a spoken fallback, and `Let's talk something else` returns to the landing group with an appropriate reply.
+
 **Updated:** 2026-10-25
 
-**Developer status:** REOPENED. P0–P11 remain valuable foundation, but the 2026-10-25 native test after the prior handoff exposed production action/delivery regressions and a semantic capability-structure gap. P12 is mandatory before another READY FOR USER LIVE TEST handoff.
+**Developer status:** READY FOR USER LIVE TEST. P0–P11 remain retained foundation; P12B–P12H developer-side acceptance is complete, including the native companion-root and semantic-navigation exchange corrections above. Native SP/MP execution remains user-owned.
+
+**Current Next Chunk:** Native SP/MP user-owned acceptance. No developer-implementable mandatory P12 chunk remains.
 
 **Accepted predecessor foundation:** Contextual Dialogue Persona & Choices P14. Its save-backed production rehydration architecture remains intact.
 
@@ -12,9 +70,9 @@
 
 ## P12 — native action & semantic capability standardization
 
-**Status:** ACTIVE. P12A planning/audit is complete; implementation has not yet corrected the native defects.
+**Status:** COMPLETE developer-side. P12B–P12H have no remaining developer-implementable mandatory work; native SP/MP acceptance remains the next user-owned step.
 
-Native user evidence and source audit show:
+Initial native user evidence and source audit identified:
 
 - **That's all. Stay safe.** is presented but does not close the native Conversation UI.
 - **Tell them to leave the group** does not complete the expected authored departure behavior.
@@ -27,22 +85,130 @@ Native user evidence and source audit show:
 
 Detailed P12 design is in `NATIVE_ACTION_CAPABILITY_STANDARDIZATION.md`.
 
-### Exact Next Chunk — P12B
+### P12B — authored action/capability execution bridge
 
-Implement the smallest canonical authored-action/capability execution bridge.
+**Status:** COMPLETE developer-side. The native semantic root row now maps to the current normalized authored Core choice, executes its authored action inline exactly once, and leaves the same Core selection responsible for response, next, close, closeReason, logging, enabled state, and highlight hooks. The bridge does not call `Session:selectChoice(originalChoice)` from inside the semantic row execution. Authored normalized choices are retained only as runtime presentation state; semantic persistence remains bounded and frame-based.
 
-Requirements:
+Existing gameplay/domain executors remain authoritative. The worker now loads the production ColonistDeparture service for this acceptance surface, and optional raw faction/community fixture registries hydrate through the production owners without a harness-side gameplay implementation.
 
-1. eliminate re-entrant synthetic-choice -> original-choice `Session:selectChoice` execution;
-2. preserve authored Core choice behavior including action, response, next, close, closeReason and highlight hooks while adding semantic capability identity/provenance;
-3. keep existing authoritative executors for departure and other gameplay actions;
-4. prove **Goodbye** actually closes the production Conversation session/UI lifecycle;
-5. prove **Leave Group** reaches its existing warning/confirmation/departure flow without duplicate execution;
-6. update focused production-Lua/harness tests to assert end effects, not merely frame acceptance.
+Developer evidence:
 
-Do not start by redesigning Camp menus or address variants before this action bridge is stable.
+- `lua tests/pnc_semantic_dialogue_input_smoke.lua`: focused native-shaped bridge regression passes; Goodbye action/response/close/highlight execute once and `Session:selectChoice` is entered once.
+- `lua tests/pnc_conversation_authority_smoke.lua`: departure warning/confirm path passes; warning does not mutate, confirmation delegates once, forwards relationship penalty, and returns `colonist_departed` close reason.
+- `lua tests/pnc_colonist_departure_conversion_smoke.lua`: existing authoritative departure service performs the real ownership/faction conversion.
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j`: production worker parity and Goodbye session closure pass.
+- focused P14 rehydration tests and the P12B Lua set pass after worker production-service hydration; `pz_verify` reports zero Kahlua errors for changed production Lua; `git diff --check` passes.
 
-After P12B continue autonomously through P12C–P12H.
+No source save was mutated, no native Project Zomboid session was launched, and no Workshop operation was performed.
+
+### Exact Next Chunk — P12C
+
+### P12C — semantic speech delivery
+
+**Native evidence correction:** The first delivery implementation proved only that a result/diary record existed; native Core arbitration could still suppress the visible NPC line after the player emote. The shared delivery seam now carries explicit interaction priority and zero interaction cooldowns for already-selected semantic speech. Player-emote NPC replies use a distinct queue family, immediate pumping, and explicit delivery ownership so the reply is visible once without a second ambient diary write.
+
+**Status:** COMPLETE developer-side. Already-selected semantic NPC speech now has one bounded delivery seam. Active Conversation sessions receive one NPC message directly; otherwise the existing social presentation receiver routes the same selected text to world nameplate/bubble and shared TTS. The seam carries response-plan, realization, beat/topic, fact-reference, and interaction provenance without selecting legacy Flavor content.
+
+Developer evidence:
+
+- `lua tests/pnc_semantic_speech_delivery_smoke.lua`: active-session and world-presentation routes accept the same resolved text, preserve semantic realization provenance, and deliver once.
+- `lua tests/pnc_semantic_emote_result_delivery_smoke.lua`: native-shaped authoritative emote result with `resolvedText` is visibly delivered once, recorded once, and does not call NPC Flavor resolution; duplicate result delivery is suppressed.
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j`: production worker selects the active-beat `semantic.emote.reply.thumbsup.active` realization and projects exactly one newly delivered NPC line with the resolved text.
+- focused P12B/P12C Lua suite, P14 rehydration/faction tests, `pz_verify` Kahlua checks, and `git diff --check` pass.
+
+No source save was mutated, no native Project Zomboid session was launched, and no Workshop operation was performed.
+
+### Exact Next Chunk — P12D
+
+### P12D — semantic address resolver
+
+**Status:** COMPLETE developer-side. `PNC.Semantics.AddressResolver` now separates transport/debug identity from player-facing address. Known names are returned only when the existing identity-knowledge projection authorizes them; unknown or placeholder values produce constrained localized terms. Relationship, gender when authoritative, formal/casual/slang tone, and bounded recent-term history control the result. No names, titles, or identity facts are invented, and only compact address IDs are retained for anti-repeat behavior.
+
+The resolver is applied to semantic Conversation identity arguments and farewell context. The internal `Unknown survivor` value is rejected before it can enter normal dialogue; unknown surnames remain empty rather than fabricating identity. Existing player-address behavior remains separate and unchanged.
+
+Developer evidence:
+
+- `lua tests/pnc_semantic_address_resolver_smoke.lua`: unknown, known, gender-neutral, formal, friendly/slang, hostile, placeholder-rejection, and bounded anti-repeat cases pass.
+- `lua tests/pnc_conversation_smoke.lua`: known identity remains `Morgan Hale`; unrevealed identity projects `Stranger` without leaking `Unknown survivor` and without inventing a surname.
+- `lua tests/pnc_conversation_farewell_smoke.lua` and `lua tests/pnc_semantic_identity_knowledge_mirror_smoke.lua` pass with the resolver integrated.
+- production Lua `pz_verify` Kahlua checks and `git diff --check` pass.
+
+No source save was mutated, no native Project Zomboid session was launched, and no Workshop operation was performed.
+
+### P12E — Companion Orders semantic hub
+
+Status: complete. The production semantic projection now exposes one contextual `companion.orders` navigation capability at the native Conversation root, with `Follow me.` and `Wait here.` mutually exclusive from authoritative movement state. Native Conversation definitions now promote the authoritative companion authority/follow/health snapshot into the semantic context so the root is not silently filtered; the shared/headless projection and native Core presentation use the same row. `Let's camp...` opens the bounded `companion.camp` branch, and `Go home.` routes through the existing `return_home` capability/command adapter. Generic `WAIT_AT` remains available for explicit destination requests but is not a permanent menu row. The active orders group is preserved through capability refresh and Back navigation; no gameplay executor was duplicated.
+
+The post-handoff correction makes Orders, Camp, and Back navigation semantic exchanges rather than local toggles. Each accepted navigation frame uses the existing semantic group submission path, produces one contextual NPC acknowledgement, and then reprojects the requested group. This prevents the native Conversation log from showing a silent player-only click.
+
+Evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_companion_orders_hub_p12e`: 3/3 passed, including root flattening, real Follow/Wait command mutations and reprojection, Camp branch navigation, and Go Home transport/state mutation.
+- `python3 -m unittest tools.semantic_harness.tests.test_follow_action_binding tools.semantic_harness.tests.test_stay_wait_at_binding`: 7/7 passed.
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j`: 22/22 passed after the native parity assertion was routed through the production Companion Orders hub.
+- The corrected navigation assertions cover one player line plus one NPC acknowledgement for Orders, Camp, Back, and empty-Camp fallback; the combined P12 acceptance run is 31/31.
+- `python3 tests/run_tests.py --jobs 1 --max-output-lines 200 --verbose pnc_conversation_smoke pnc_semantic_response_catalog_smoke pnc_semantic_realization_authority_smoke pnc_semantic_player_emote_realization_smoke pnc_vanilla_emote_presentation_smoke`: passed; the production Conversation definition regression verifies native `actorAuthority`, `npcState.followState`, and `npcState.healthState` promotion, so the native semantic root can retain the eligible Orders hub row.
+- The focused production-Lua Conversation/semantic suite passed; the separate broad `pnc_companion_command_interaction_smoke` invocation remains blocked by the supplied checkout's missing `PsychopatzCore/Events/PC_EventBus` dependency and is not counted as a P12E failure.
+- `pz_verify --kahlua --severity ERROR --no-snippets` passed for the changed P12E suggestion, capability-provider, input, lifecycle, and native Conversation lifecycle Lua files; `git diff --check` passed.
+
+### Exact Next Chunk — P12F
+
+Project dynamic Camp destinations into the existing `companion.camp` semantic branch using production CampSite/CampSiteGeometry/client hints/server resolver/authoritative `CompanionCommands.camp`. Present only valid bounded rooms/campfires; send a primitive stable target/hint; server re-resolves and revalidates it; commit the actual Camp order; reject stale or invalid selections safely.
+
+### P12F — Dynamic Camp destinations
+
+**Native menu correction evidence:** `ClientCampSiteHints.Enumerate` now discovers all valid loaded rooms when no specific room query is requested. The previous `room` fallback was incorrectly interpreted as a name filter, hiding valid `HALLWAY`/other room types from the dynamic `Let's camp...` branch. The direct `camp here` path remains unchanged and continues to send a primitive hint for server re-resolution.
+
+Focused evidence after correction: Camp production Lua smokes 7/7; Camp/Orders/native-effect harness subset 9/9; full P12 effect/refresh/Camp/Orders/parity 31/31; lifecycle/mutation/fixture 8/8; full Lua Kahlua validation 2,991 files with 0 errors; `git diff --check` passes.
+
+**Status:** COMPLETE developer-side. The semantic camp branch now projects bounded dynamic room/campfire destinations from the existing production CampSite stack. `CampSiteGeometry.EnumerateRooms`, `Geometry.DescribeRoom`, client CampSite hints, the stable primitive target, server `CampSiteResolver`, and authoritative `CompanionCommands.camp` remain the execution chain; no second Camp executor or Java room object was introduced. Dynamic rows remain inside `companion.camp`, never on the root or Orders landing surface. Duplicate room types are bounded and keyed by stable site/room identity. A selected primitive is carried as `campSiteHint`; the existing server-side resolver remains responsible for independent re-resolution and stale/invalid rejection before order mutation.
+
+Developer evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_dynamic_camp_destinations_p12f`: 3/3 passed. Production Lua projected only the supplied living-room and kitchen destinations, omitted an unfurnished bedroom, transported the selected `siteID`/`roomID` primitive through `PNC.Client.SendCompanionCommand`, applied the simulated real camp-order state patch, delivered one NPC acknowledgement, and preserved stale-result rejection without mutation; an empty valid-site set receives a spoken fallback rather than fabricated rows.
+- `PZ_TEST_CORE_REPOSITORY=/home/psychopatz/Zomboid-devSkills python3 tests/run_tests.py --jobs 1 --verbose pnc_companion_camp_site_hint_smoke pnc_semantic_camp_site_hint_client_smoke pnc_semantic_camp_task_smoke`: 3/3 passed. These cover client primitive hint behavior and production server CampSite validation/task handling.
+- `PZ_TEST_CORE_REPOSITORY=/home/psychopatz/Zomboid-devSkills python3 tests/run_tests.py --jobs 1 --verbose pnc_semantic_dialogue_input_smoke`: passed.
+- Lua syntax checks, focused `pz_verify --kahlua --severity ERROR --no-snippets` checks for the changed CampSite/suggestion/action-target/lifecycle Lua files, and `git diff --check` passed.
+- The existing broad `pnc_conversation_smoke` and `pnc_companion_command_interaction_smoke` invocations remain environment-blocked by missing `CustomTranslationManager` / `PsychopatzCore/Events/PC_EventBus` in the separately supplied core checkout; no P12F failure was inferred from those unrelated dependency gaps.
+
+No source save was mutated, no native Project Zomboid session was launched, and no Workshop operation was performed.
+
+### Exact Next Chunk — P12G
+
+Implement stateful capability refresh after every action/command: re-read authoritative movement and CampSite truth, update the Follow/Wait toggle, Camp eligibility, and Go Home eligibility, remove stale or contradictory rows, preserve the active semantic thread/beat, and keep the existing `return_home` command/task-cancellation behavior authoritative.
+
+### P12G — Stateful capability refresh
+
+**Status:** COMPLETE developer-side. Capability refresh now re-enumerates bounded CampSite presentation assistance after actions, applies authoritative companion-state eligibility to dynamic Camp destinations, hides Go Home once the authoritative state is already returning home, and preserves the existing Follow/Wait mutual-exclusion projection. The semantic thread/beat remains owned by the lifecycle/session state; no action-specific gameplay mutation was added to Conversation.
+
+Developer evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_stateful_capability_refresh_p12g`: 2/2 passed. Go Home uses the existing `return_home` path and the resulting `AtHome:returning` state removes the no-longer-meaningful GO capability; an authoritative busy state projects no Camp destination rows.
+- `python3 -m unittest tools.semantic_harness.tests.test_companion_orders_hub_p12e tools.semantic_harness.tests.test_dynamic_camp_destinations_p12f`: 5/5 passed after the refresh changes.
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_talk_parity_p11j`: 22/22 passed after the refresh changes.
+- Focused production-Lua CampSite, action, speech, address, authored lifecycle, and companion authority smoke tests pass where the supplied core checkout provides their dependencies; changed Lua syntax and Kahlua checks report zero errors, and `git diff --check` passes.
+
+No source save was mutated, no native Project Zomboid session was launched, and no Workshop operation was performed.
+
+### P12H — Native-effect and harness acceptance
+
+**Native emote correction evidence:** The player-emote semantic NPC reply now survives the shared SocialFlavor queue's family/speaker/ambient arbitration, is pumped immediately, and has one explicit delivery owner. Focused production checks pass: 6/6 semantic/native-shaped Lua smokes; P12 effect/refresh/Camp/Orders/parity 31/31; lifecycle/mutation/fixture 8/8; full production-Lua Kahlua validation 2,991 files with 0 errors; `git diff --check` passes.
+
+**Status:** COMPLETE developer-side. The P12 acceptance chain is green across the production Lua authority seams and the real production worker. Farewell closes the native-shaped session, Leave Group delegates warning/confirm/departure to the existing authority path, semantic emote speech is delivered once, unknown identity uses the shared address resolver without exposing `Unknown survivor`, Follow/Wait remains mutually exclusive after real command state changes, Go Home uses the existing `return_home` command and refreshes eligibility, and dynamic Camp carries a selected primitive through the existing server-validation/task path. Typed Follow input and semantic Follow button input converge on the same `pnc:companion.follow` capability and `PNC.Client.SendCompanionCommand` executor.
+
+Developer evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_p12h_native_effect_acceptance tools.semantic_harness.tests.test_stateful_capability_refresh_p12g tools.semantic_harness.tests.test_dynamic_camp_destinations_p12f tools.semantic_harness.tests.test_companion_orders_hub_p12e tools.semantic_harness.tests.test_contextual_talk_parity_p11j`: 31/31 passed.
+- `python3 -m unittest tools.semantic_harness.tests.test_semantic_interaction_lifecycle_acceptance tools.semantic_harness.tests.test_production_mutations_p12h tools.semantic_harness.tests.test_fixture_provider_p12f`: 8/8 passed, including compact lifecycle/source-save immutability and production mutation-route coverage.
+- `python3 tests/run_tests.py --jobs 1 --max-output-lines 120 --verbose pnc_semantic_dialogue_input_smoke pnc_conversation_authority_smoke pnc_colonist_departure_conversion_smoke pnc_semantic_address_resolver_smoke pnc_semantic_emote_result_delivery_smoke pnc_semantic_speech_delivery_smoke pnc_semantic_group_smoke pnc_semantic_command_adapter_smoke pnc_semantic_camp_client_request_smoke pnc_semantic_camp_task_smoke pnc_companion_camp_site_hint_smoke pnc_semantic_camp_site_hint_client_smoke pnc_semantic_interaction_lifecycle_smoke pnc_semantic_realization_authority_smoke pnc_semantic_navigation_smoke pnc_semantic_response_catalog_smoke`: 16/16 passed.
+- `pnc_semantic_nlu_smoke`, `pnc_semantic_wait_at_smoke`, `pnc_conversation_smoke`, and `pnc_companion_command_interaction_smoke` were dependency-blocked by the separately supplied core checkout (`PsychopatzSemantic.lua`, `CustomTranslationManager`, or `PC_EventBus` unavailable); their failures were not treated as P12 regressions. The corresponding P12 typed/action/Camp authority paths are covered by the passing production-worker and focused Lua tests above.
+- Full production-Lua Kahlua validation scanned 2,991 files and reported zero errors; final `git diff --check` passes. No source save was mutated, no native Project Zomboid session was launched, and no Workshop operation was performed.
+
+There is no remaining developer-implementable mandatory P12B–P12H work recorded in this progress ledger. Native SP/MP live acceptance remains user-owned.
+
+### Final Handoff — native SP/MP user-owned
+
+No developer-implementable mandatory P12 work remains; native SP/MP live acceptance is the next user-owned step.
 
 ## P0A — source-level migration and state-ownership inventory
 
@@ -475,3 +641,8 @@ The former “no further developer-implementable chunk remains” conclusion is
 superseded by P10/P11. Preserve the recorded P0–P9 verification as historical
 implementation evidence; do not use it to skip the active native-parity and
 single-authority acceptance.
+## Current regression status — IN PROGRESS (2026-10-25)
+
+Newer native evidence supersedes the previous READY conclusion. An active native conversation can still lose its lease before a root capability click (`Work / Orders` rejected with `invalid_lease`), authored root rows can reappear after rejection, and `What's up?` still falls through to the generic `Let me think about that.` response. P12H regression repair is reopened.
+
+Exact Next Chunk: P12H regression repair — make active-conversation lease renewal authoritative at request time, route `What's up?` through a grounded semantic response/realization pool, and restore the semantic root projection after rejected or stale requests; then run native-shaped and focused production evidence.

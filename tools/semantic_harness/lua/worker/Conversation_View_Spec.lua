@@ -51,9 +51,19 @@ local function attachCategoryDiagnostics(spec)
 end
 
 function Spec.build(workerContext, Conversation, scenario, npc)
+    local builtContext = Conversation.buildContext(workerContext)
+    if type(scenario.campSiteCandidates) == "table" then
+        builtContext.campSiteCandidates = scenario.campSiteCandidates
+    end
+    if type(scenario.campfireCandidates) == "table" then
+        builtContext.campfireCandidates = scenario.campfireCandidates
+    end
+    if type(scenario.locationObservation) == "table" then
+        builtContext.locationObservation = scenario.locationObservation
+    end
     local spec = {
         npcID = npc.npcID,
-        context = Conversation.buildContext(workerContext),
+        context = builtContext,
         nodes = { greeting = { choices = {} }, menu = { choices = {} } },
         choicePresentation = choicePresentation,
         choiceInteractionGuard = choiceInteractionGuard,

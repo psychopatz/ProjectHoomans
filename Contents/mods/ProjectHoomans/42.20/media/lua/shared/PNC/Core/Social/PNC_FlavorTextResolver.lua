@@ -198,11 +198,33 @@ function FlavorText.ClassifyNeed(input)
     if input.bleeding == true or (tonumber(input.bleedingRate) or 0) > 0 then
         return Const.Need.BLEEDOUT
     end
+    -- Whole-body needs are more useful to a downed survivor than the generic
+    -- low-health flag. Prefer the stronger of the two active basic needs so a
+    -- starving/dehydrated NPC does not incorrectly ask for a bandage.
+    local thirst = tonumber(input.thirst) or 0
+    local hunger = tonumber(input.hunger) or 0
+    local dehydration = input.dehydration == true or thirst >= 0.84
+    local starvation = input.starvation == true or hunger >= 0.70
+    if dehydration and starvation then
+        if thirst >= hunger then return Const.Need.DEHYDRATION end
+        return Const.Need.STARVATION
+    end
+    if dehydration then return Const.Need.DEHYDRATION end
+    if starvation then return Const.Need.STARVATION end
     if input.treatableWoundCount and input.treatableWoundCount > 0 then
         return Const.Need.BANDAGE
     end
     if input.needsRescue == true then return Const.Need.RESCUE end
     if input.infected == true then return Const.Need.RESCUE end
+    local staminaState = string.lower(tostring(input.staminaState or ""))
+    local staminaRatio = tonumber(input.staminaRatio)
+    if input.exhausted == true or input.exhaustion == true
+        or staminaState == "exhausted" or staminaState == "winded"
+        or (staminaRatio ~= nil and staminaRatio <= 0.40)
+        or (tonumber(input.fatigue) or 0) >= 0.90
+    then
+        return Const.Need.EXHAUSTION
+    end
     if input.critical == true then return Const.Need.HELP end
     return Const.Need.HELP
 end

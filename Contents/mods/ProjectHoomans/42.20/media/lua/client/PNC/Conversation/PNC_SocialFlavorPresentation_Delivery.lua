@@ -45,6 +45,7 @@ local function onDelivered(payload)
     -- proximity commentary when they share Core's arbitration queue.
     if item.speakerKind == "player"
         or source.kind == "emote_interaction"
+        or source.deliveryOwner == "player_emote"
     then
         return
     end

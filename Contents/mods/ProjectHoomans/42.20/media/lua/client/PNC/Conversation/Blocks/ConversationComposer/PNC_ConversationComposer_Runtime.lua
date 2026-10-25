@@ -137,6 +137,23 @@ local function lifecycleState(view)
         and view.spec.context.conversationLifecycleState or nil
 end
 
+local function ensureLease(view)
+    local state = lifecycleState(view)
+    if not state then return false, "conversation_not_ready" end
+    -- Headless production-worker sessions carry the same authority token in
+    -- their request payload, but intentionally do not create a Java-backed
+    -- animation scene. Their server-shaped worker authority is the lease
+    -- seam; only native views need a client-side scene renewal here.
+    if view and view.headless == true then return true end
+    local lifecycle = Conversation.Lifecycle
+    local internal = lifecycle and lifecycle.Internal or nil
+    local refreshNow = internal and internal.RefreshNow or nil
+    if type(refreshNow) ~= "function" then
+        return false, "conversation_lease_unavailable"
+    end
+    return refreshNow(view, view and view.spec, state)
+end
+
 local function sendRequest(command, payloadValue)
     if isClient and isClient() == true then
         if not sendClientCommand then return false, "transport_unavailable" end
@@ -158,17 +175,19 @@ local function sendRequest(command, payloadValue)
 end
 
 local function restoreCurrentChoices(view)
-    local session = view and view.session
-    if session and session.currentNode then
-        session:setChoices(session.currentNode.choices or {})
-    end
     local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
     local semanticInternal = input and input.Internal or nil
     if semanticInternal
         and type(semanticInternal.RefreshRootSuggestions) == "function"
     then
-        semanticInternal.RefreshRootSuggestions(view)
+        local projection = semanticInternal.RefreshRootSuggestions(view)
+        if projection ~= nil then return true end
     end
+    local session = view and view.session
+    if session and session.currentNode then
+        session:setChoices(session.currentNode.choices or {})
+    end
+    return false
 end
 
 local function notifyFailure(view, key, reason)
@@ -233,6 +252,7 @@ Internal.ConversationDebugEnabled = conversationDebugEnabled
 Internal.SelectedTextKey = selectedTextKey
 Internal.RequestID = requestID
 Internal.LifecycleState = lifecycleState
+Internal.EnsureLease = ensureLease
 Internal.SendRequest = sendRequest
 Internal.RestoreCurrentChoices = restoreCurrentChoices
 Internal.NotifyFailure = notifyFailure

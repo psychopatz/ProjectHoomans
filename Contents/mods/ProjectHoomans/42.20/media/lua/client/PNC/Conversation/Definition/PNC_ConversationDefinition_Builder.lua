@@ -208,6 +208,12 @@ local function buildConversationContext(
             and talkStartProjection.availability or nil,
         settlementVisit = blockContext.settlementVisit,
         ambientVisitPreview = blockContext.ambientVisitPreview,
+        -- Semantic capability eligibility reads this bounded projection from
+        -- the native Conversation context. Keep it outside the authored
+        -- composer payload so the native semantic projector receives the
+        -- same authority/state shape as the headless worker.
+        actorAuthority = blockContext.actorAuthority,
+        npcState = blockContext.npcState,
         conversationBlockContext = blockContext,
         npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
     }

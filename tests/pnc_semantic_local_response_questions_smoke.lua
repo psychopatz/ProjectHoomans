@@ -89,6 +89,20 @@ T.equal(weather.response.fallback, "It's raining and foggy out.",
 T.equal(weather.response.args.weather.foggy, true,
     "weather response preserves the source snapshot for localization")
 
+local whatsUpIR = Semantic.Parser.Parse("What's up?")
+T.equal(whatsUpIR.subject, "CONVERSATION_TOPIC",
+    "what's up parses as a conversation topic")
+T.equal(whatsUpIR.extensions.topic, "whats_up",
+    "what's up keeps its semantic topic extension")
+local whatsUp = Policy.Decide(whatsUpIR, nil, {
+    llmEnabled = false,
+    worldContext = { weather = { raining = false } },
+})
+T.truthy(whatsUp.response,
+    "what's up produces a semantic NPC response")
+T.falsy(whatsUp.response.fallback == "Let me think about that.",
+    "what's up does not fall through to the generic question response")
+
 local unavailableTime = decide("TIME", {
     time = { available = false, hour = 21, minute = 5 },
 })

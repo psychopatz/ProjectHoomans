@@ -60,6 +60,9 @@ local needs = {
     Const.Need.MERCY,
     Const.Need.HELP,
     Const.Need.FAINT,
+    Const.Need.DEHYDRATION,
+    Const.Need.STARVATION,
+    Const.Need.EXHAUSTION,
 }
 local threats = {
     Const.Threat.ZOMBIE,
@@ -134,6 +137,16 @@ local allyZombieBleed = pick("social.incapacitated_call", {
 })
 T.equal(allyZombieBleed.variantID, "ally_bleedout_zombie",
     "the most specific ally/zombie/bleedout lane wins")
+
+local allyDehydrated = pick("social.incapacitated_call", {
+    downedAudience = Const.Audience.ALLY,
+    downedNeed = Const.Need.DEHYDRATION,
+    downedThreat = Const.Threat.ZOMBIE,
+})
+T.equal(allyDehydrated.variantID, "ally_dehydration",
+    "a dehydrated ally gets a water-specific incapacitation line")
+T.truthy(string.find(allyDehydrated.text, "water", 1, true),
+    "the dehydration line names water rather than generic healing")
 
 local strangerNeutral = pick("social.incapacitated_call", {
     downedAudience = Const.Audience.STRANGER,

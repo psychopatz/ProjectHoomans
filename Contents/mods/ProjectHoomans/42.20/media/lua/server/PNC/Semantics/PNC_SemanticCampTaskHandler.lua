@@ -192,7 +192,7 @@ function Handler.Submit(request, context)
             npcID = npcID,
             request = request,
             reason = submitted or "camp_plan_rejected",
-            details = { site = site },
+            details = { site = site, planReason = submitted },
         }
     end
     return {

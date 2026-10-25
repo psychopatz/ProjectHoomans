@@ -27,6 +27,9 @@ local Identity = PNC.Identity
 Suggestions.VERSION = 1
 Suggestions.ROOT_GROUP_ID = "conversation_landing"
 Suggestions.CONTEXT_INDEX_GROUP_ID = "conversation_context_index"
+Suggestions.COMPANION_ORDERS_GROUP_ID = "companion.orders"
+Suggestions.COMPANION_CAMP_GROUP_ID = "companion.camp"
+Suggestions.MAX_CAMP_DESTINATIONS = 6
 -- The visual part keeps five rows per selected group. The projection itself
 -- is bounded separately so a dynamic root can expose every safe topic through
 -- the existing group selector without pretending that five is a global cap.
@@ -439,6 +442,43 @@ local function capabilityDefinitionFor(id)
     return nil, nil
 end
 
+local function projectedCapabilityFor(id, view)
+    local projection = view and view.semanticSuggestions or nil
+    if type(projection) ~= "table" then return nil, nil end
+    local function inspect(rows)
+        for _, row in ipairs(rows or {}) do
+            if type(row) == "table"
+                and tostring(row.id or "") == tostring(id or "")
+            then
+                local frame = row.frame or row.semanticFrame
+                local action = row.action
+                    or row.capability and row.capability.action
+                    or frame and frame.action
+                if type(frame) == "table" and action ~= nil then
+                    return normalized(action), {
+                        id = id,
+                        topic = frame.topic,
+                        utteranceKey = frame.textKey,
+                        utteranceFallback = frame.textFallback
+                            or row.text,
+                        target = copyValue(frame.target),
+                        destination = copyValue(frame.destination),
+                        slots = copyValue(frame.slots) or {},
+                    }
+                end
+            end
+        end
+        return nil, nil
+    end
+    local action, definition = inspect(projection.permittedCapabilities)
+    if action then return action, definition end
+    for _, group in ipairs(projection.groups or {}) do
+        action, definition = inspect(group.capabilities)
+        if action then return action, definition end
+    end
+    return nil, nil
+end
+
 local function definitionForSubject(subject, followUp)
     subject = normalized(subject)
     if followUp == true and subject == "WELLBEING" then
@@ -488,15 +528,398 @@ local function capabilityFrame(action, definition, revision)
         intent = "REQUEST",
         speechAct = "REQUEST",
         action = action,
+        groupID = definition.groupID,
         textKey = definition.utteranceKey,
         textFallback = definition.utteranceFallback,
         labelKey = definition.labelKey,
-        target = { kind = "conversation_actor", ref = "npc" },
+        target = copyValue(definition.target)
+            or { kind = "conversation_actor", ref = "npc" },
+        destination = copyValue(definition.destination),
         slots = {
             npcID = { kind = "conversation_actor", ref = "npc" },
         },
         requestRevision = revision,
     }
+end
+
+local function isCompanionOrderAction(action)
+    action = normalized(action)
+    return action == "FOLLOW"
+        or action == "STAY"
+        or action == "GO"
+        or action == "CAMP"
+        or action == "WAIT_AT"
+end
+
+local function companionAuthorityEligible(context)
+    local authority = type(context) == "table"
+        and context.actorAuthority or nil
+    return type(authority) == "table"
+        and authority.eligible == true
+        and authority.companion == true
+        and authority.owned == true
+end
+
+local function companionOrderStateEligible(context)
+    if not companionAuthorityEligible(context) then return false end
+    local state = type(context) == "table"
+        and type(context.npcState) == "table" and context.npcState or {}
+    local behavior = tostring(state.activeBehavior or "")
+    if behavior == "hostile" or behavior == "combat"
+        or behavior == "busy" or behavior == "dead"
+    then
+        return false
+    end
+    local health = tostring(state.healthState or "")
+    return health ~= "dead" and health ~= "incapacitated"
+end
+
+local function companionUnavailableReason(context)
+    if not companionAuthorityEligible(context) then return nil end
+    local state = type(context) == "table"
+        and type(context.npcState) == "table" and context.npcState or {}
+    local behavior = string.lower(tostring(state.activeBehavior or ""))
+    local health = string.lower(tostring(state.healthState or ""))
+    if health == "dead" or behavior == "dead" then
+        return {
+            code = "companion_dead",
+            key = "UI_PNC_Conversation_Suggestion_CompanionDead_Tooltip",
+            fallback = "Unavailable because the companion is dead.",
+        }
+    end
+    if health == "incapacitated" then
+        return {
+            code = "companion_incapacitated",
+            key = "UI_PNC_Conversation_Suggestion_CompanionIncapacitated_Tooltip",
+            fallback = "Unavailable because the companion is incapacitated.",
+        }
+    end
+    if behavior == "hostile" or behavior == "combat"
+        or behavior == "busy"
+    then
+        return {
+            code = "companion_busy",
+            key = "UI_PNC_Conversation_Suggestion_CompanionBusy_Tooltip",
+            fallback = "Unavailable while the companion is busy or in combat.",
+        }
+    end
+    return nil
+end
+
+local function companionOrderReason(action, context)
+    local unavailable = companionUnavailableReason(context)
+    if unavailable then return unavailable end
+    local state = type(context) == "table"
+        and type(context.npcState) == "table" and context.npcState or {}
+    local orderKind = string.lower(tostring(state.orderKind or ""))
+    action = normalized(action)
+    if action == "FOLLOW" and orderKind == "follow" then
+        return {
+            code = "already_following",
+            key = "UI_PNC_Conversation_Suggestion_AlreadyFollowing_Tooltip",
+            fallback = "Already following you.",
+        }
+    end
+    if action == "STAY" and orderKind ~= "follow" then
+        if orderKind == "guard" or orderKind == "camp"
+            or orderKind == "patrol"
+        then
+            return {
+                code = "already_staying",
+                key = "UI_PNC_Conversation_Suggestion_AlreadyStaying_Tooltip",
+                fallback = "Already holding position.",
+            }
+        end
+        return {
+            code = "not_following",
+            key = "UI_PNC_Conversation_Suggestion_NotFollowing_Tooltip",
+            fallback = "Stay is available while the companion is following you.",
+        }
+    end
+    return nil
+end
+
+local function campSiteCandidateCount(context)
+    local candidates = type(context) == "table"
+        and (context.campSiteCandidates
+            or context.semanticCampSiteCandidates
+            or (context.npcState and context.npcState.campSiteCandidates))
+        or nil
+    if type(candidates) ~= "table" then return 0 end
+    return math.min(#candidates, Suggestions.MAX_CAMP_DESTINATIONS)
+end
+
+local function navigationDetails(groupID, context)
+    if groupID == Suggestions.COMPANION_ORDERS_GROUP_ID then
+        return "companion_orders", "COMPANION_ORDERS"
+    end
+    if groupID == Suggestions.COMPANION_CAMP_GROUP_ID then
+        if campSiteCandidateCount(context) > 0 then
+            return "companion_camp", "COMPANION_CAMP"
+        end
+        return "companion_camp", "COMPANION_CAMP_EMPTY"
+    end
+    return "topic", "CONVERSATION_TOPIC"
+end
+
+local function addGroupNavigationCandidate(
+    output,
+    seen,
+    context,
+    revision,
+    predicateTrace,
+    groupID,
+    parentGroupID,
+    candidateID,
+    labelKey,
+    labelFallback,
+    reason,
+    availability
+)
+    if seen[candidateID] or #output >= Suggestions.MAX_CANDIDATES then
+        return
+    end
+    local frame = Suggestions.BuildGroupFrame({
+        id = groupID,
+        labelKey = labelKey,
+        label = resolvedText(labelKey, labelFallback),
+        allowBack = true,
+        parentGroupID = parentGroupID,
+        navigationKind = navigationDetails(groupID, context),
+        navigationSubject = select(2, navigationDetails(groupID, context)),
+        utterance = labelFallback,
+    }, revision)
+    if not frame then return end
+    local available = not availability
+        or availability.allowed ~= false
+    local status = available and "eligible"
+        or "unavailable_" .. tostring(availability.status or "unavailable")
+    local availabilityReason = availability and availability.reason or reason
+    local source = sourceRecord("conversation_root", revision, reason)
+    local candidate = {
+        id = candidateID,
+        topic = "movement",
+        groupID = parentGroupID,
+        rank = #output + 1,
+        source = source,
+        sources = { source },
+        frame = frame,
+        enabled = available,
+        status = status,
+        reasonCode = availability and availability.reasonCode or nil,
+        reasonKey = availability and availability.reasonKey or nil,
+        reasonFallback = availability and availability.reasonFallback or nil,
+        display = {
+            labelKey = labelKey,
+            labelFallback = labelFallback,
+            label = resolvedText(labelKey, labelFallback),
+        },
+        visibility = "player",
+        eligibility = {
+            status = available and "allowed" or "rejected",
+            allowed = available,
+            reason = availabilityReason,
+            reasonCode = availability and availability.reasonCode or nil,
+            reasonKey = availability and availability.reasonKey or nil,
+            reasonFallback = availability
+                and availability.reasonFallback or nil,
+        },
+    }
+    candidate = normalizeCandidate(candidate, "conversation_root", #output + 1)
+    output[#output + 1] = candidate
+    seen[candidateID] = candidate
+    if #predicateTrace < Predicates.MAX_TRACE then
+        predicateTrace[#predicateTrace + 1] = {
+            candidateID = candidateID,
+            source = "conversation_root",
+            path = "actorAuthority.eligible",
+            status = "allowed",
+            reason = reason,
+        }
+    end
+end
+
+local function appendCompanionOrderNavigation(
+    output, seen, context, revision, predicateTrace
+)
+    if not companionAuthorityEligible(context) then return end
+    addGroupNavigationCandidate(
+        output,
+        seen,
+        context,
+        revision,
+        predicateTrace,
+        Suggestions.COMPANION_ORDERS_GROUP_ID,
+        Suggestions.ROOT_GROUP_ID,
+        "companion.orders:open",
+        "UI_PNC_Conversation_Suggestion_CompanionOrders_Label",
+        "I need you to do something...",
+        "companion_orders_hub"
+    )
+end
+
+local function appendCompanionCampNavigation(
+    output, seen, context, revision, predicateTrace
+)
+    if not companionAuthorityEligible(context) then return end
+    local stateEligible = companionOrderStateEligible(context)
+    local available = stateEligible and campSiteCandidateCount(context) > 0
+    local availability
+    if not available then
+        local unavailable = companionUnavailableReason(context)
+        availability = stateEligible and {
+            allowed = false,
+            status = "no_camp_site",
+            reason = "no_camp_site",
+            reasonCode = "no_camp_site",
+            reasonKey =
+                "UI_PNC_Conversation_Suggestion_NoCampSite_Tooltip",
+            reasonFallback =
+                "No valid camp location is currently available.",
+        } or {
+            allowed = false,
+            status = unavailable and unavailable.code
+                or "companion_unavailable",
+            reason = unavailable and unavailable.code
+                or "companion_unavailable",
+            reasonCode = unavailable and unavailable.code
+                or "companion_unavailable",
+            reasonKey = unavailable and unavailable.key or
+                "UI_PNC_Conversation_Suggestion_CompanionUnavailable_Tooltip",
+            reasonFallback = unavailable and unavailable.fallback
+                or "Unavailable because this companion cannot receive orders right now.",
+        }
+    end
+    addGroupNavigationCandidate(
+        output,
+        seen,
+        context,
+        revision,
+        predicateTrace,
+        Suggestions.COMPANION_CAMP_GROUP_ID,
+        Suggestions.COMPANION_ORDERS_GROUP_ID,
+        "companion.orders:camp",
+        "UI_PNC_Conversation_Suggestion_CompanionCamp_Label",
+        "Let's camp...",
+        "companion_camp_branch",
+        availability
+    )
+end
+
+local function appendCampSiteCapabilityRows(rows, revision, context, ir)
+    local candidates = context.campSiteCandidates
+        or context.semanticCampSiteCandidates
+        or (context.npcState and context.npcState.campSiteCandidates)
+        or {}
+    if type(candidates) ~= "table" then return end
+    local stateEligible = companionOrderStateEligible(context)
+    local unavailable = not stateEligible
+        and companionUnavailableReason(context) or nil
+    local disabledCode = unavailable and unavailable.code
+        or "companion_unavailable"
+    local disabledKey = unavailable and unavailable.key
+        or "UI_PNC_Conversation_Suggestion_CompanionUnavailable_Tooltip"
+    local disabledFallback = unavailable and unavailable.fallback
+        or "Unavailable because this companion cannot receive orders right now."
+
+    local seen = {}
+    local count = 0
+    for _, candidate in ipairs(candidates) do
+        if count >= Suggestions.MAX_CAMP_DESTINATIONS then break end
+        if type(candidate) == "table" then
+            local target = copyValue(candidate.target or candidate)
+            local campfire = target.campfireID ~= nil or target.kind == "campfire"
+            if campfire then
+                target.kind = "camp_site"
+                target.scope = target.scope or "campfire"
+            end
+            local targetKey
+            if campfire then
+                targetKey = target.campfireID
+            elseif target.siteID ~= nil and target.roomID ~= nil then
+                targetKey = tostring(target.siteID) .. "|"
+                    .. tostring(target.roomID)
+            else
+                targetKey = target.roomID or target.siteID
+            end
+            local candidateID = candidate.id
+                or ("action.camp_site:" .. tostring(targetKey or count + 1))
+            local label = candidate.label or candidate.roomName or candidate.roomType
+                or (campfire and "campfire" or "somewhere safe")
+            local displayText = candidate.utterance or candidate.displayText
+            if not displayText then
+                displayText = campfire
+                    and "Camp near the campfire."
+                    or "Camp in the " .. tostring(label) .. "."
+            end
+            local dedupeKey = tostring(candidateID) .. "|" .. tostring(targetKey or "")
+            if targetKey ~= nil and not seen[dedupeKey] then
+                seen[dedupeKey] = true
+                local definition = {
+                    id = candidateID,
+                    topic = "movement",
+                    groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
+                    labelFallback = displayText,
+                    utteranceFallback = displayText,
+                    target = target,
+                    slots = {
+                        npcID = { kind = "conversation_actor", ref = "npc" },
+                    },
+                }
+                local frame = capabilityFrame("CAMP", definition, revision)
+                rows[#rows + 1] = {
+                    id = candidateID,
+                    topic = "movement",
+                    groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
+                    rank = #rows + 1,
+                    enabled = stateEligible,
+                    status = stateEligible and "eligible"
+                        or "unavailable_companion",
+                    reasonCode = stateEligible
+                        and "valid_client_camp_site_hint" or disabledCode,
+                    reasonKey = stateEligible and nil or disabledKey,
+                    reasonFallback = stateEligible and nil or disabledFallback,
+                    frame = frame,
+                    semanticFrame = frame,
+                    source = {
+                        groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
+                        kind = "permitted_capability",
+                    },
+                    text = displayText,
+                    display = {
+                        label = displayText,
+                        utterance = displayText,
+                        visibility = "player",
+                    },
+                    visibility = "player",
+                    eligibility = {
+                        status = stateEligible and "allowed"
+                            or "rejected",
+                        allowed = stateEligible,
+                        reasonCode = stateEligible
+                            and "valid_client_camp_site_hint" or disabledCode,
+                        reason = stateEligible
+                            and "valid_client_camp_site_hint" or disabledCode,
+                        reasonKey = stateEligible and nil or disabledKey,
+                        reasonFallback = stateEligible and nil
+                            or disabledFallback,
+                    },
+                    capability = {
+                        id = candidateID,
+                        action = "CAMP",
+                        source = "production_camp_site",
+                        status = stateEligible and "eligible"
+                            or "unavailable_companion",
+                        groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
+                    },
+                }
+                rows[#rows] = normalizeCandidate(
+                    rows[#rows], "permitted_capability", #rows
+                )
+                count = count + 1
+            end
+        end
+    end
 end
 
 local function capabilityRows(revision, currentAction, context, ir)
@@ -522,19 +945,24 @@ local function capabilityRows(revision, currentAction, context, ir)
         local action = normalized(row and row.id)
         local definition = CAPABILITY_DEFINITIONS[action]
         if definition and row.dispatchable == true then
-            local eligibility = Predicates.Evaluate(
-                definition.constraints, predicateContext
-            )
-            for _, traceRow in ipairs(eligibility.trace or {}) do
-                if #predicateTrace < Predicates.MAX_TRACE then
-                    predicateTrace[#predicateTrace + 1] = {
-                        capability = action,
-                        path = traceRow.path,
-                        status = traceRow.status,
-                        reason = traceRow.reason,
-                    }
+            local menuOnlyWhenDestination = definition.menuOnlyWhenDestination
+            local hideWithoutDestination = menuOnlyWhenDestination == false
+                and action == "WAIT_AT"
+                and type(context.suggestionDestination) ~= "table"
+            if not hideWithoutDestination then
+                local eligibility = Predicates.Evaluate(
+                    definition.constraints, predicateContext
+                )
+                for _, traceRow in ipairs(eligibility.trace or {}) do
+                    if #predicateTrace < Predicates.MAX_TRACE then
+                        predicateTrace[#predicateTrace + 1] = {
+                            capability = action,
+                            path = traceRow.path,
+                            status = traceRow.status,
+                            reason = traceRow.reason,
+                        }
+                    end
                 end
-            end
             local authorityEligible = not definition.requiresOwnedCompanion
                 or type(context.actorAuthority) == "table"
                 and context.actorAuthority.eligible == true
@@ -561,7 +989,12 @@ local function capabilityRows(revision, currentAction, context, ir)
                         destinationPending = true
                     end
                 end
-                if eligibility.status ~= "private" then
+                local hideIneligibleOrder = isCompanionOrderAction(action)
+                    and eligibility.allowed ~= true
+                    and definition.showWhenUnavailable ~= true
+                if eligibility.status ~= "private"
+                    and not hideIneligibleOrder
+                then
                     local binding = type(row.binding) == "table" and row.binding or {}
                     local bindingView = {
                         id = row.bindingID or binding.id,
@@ -583,6 +1016,38 @@ local function capabilityRows(revision, currentAction, context, ir)
                     else
                         status = "unavailable_" .. tostring(eligibility.status)
                     end
+                    local predicateReason = eligibility.reason
+                    local reasonCode = predicateReason
+                    local reasonKey
+                    local reasonFallback
+                    if definition.unavailableReasonCode
+                        and definition.unavailableReasonPath
+                    then
+                        for _, traceRow in ipairs(eligibility.trace or {}) do
+                            if traceRow.path
+                                    == definition.unavailableReasonPath
+                                and traceRow.status == "rejected"
+                            then
+                                reasonCode = definition.unavailableReasonCode
+                                reasonKey = definition.unavailableReasonKey
+                                reasonFallback =
+                                    definition.unavailableReasonFallback
+                                break
+                            end
+                        end
+                    end
+                    if eligibility.allowed ~= true
+                        and isCompanionOrderAction(action)
+                    then
+                        local orderReason = companionOrderReason(
+                            action, context
+                        )
+                        if orderReason then
+                            reasonCode = orderReason.code
+                            reasonKey = orderReason.key
+                            reasonFallback = orderReason.fallback
+                        end
+                    end
                     local capability = {
                         id = definition.id,
                         action = action,
@@ -590,14 +1055,26 @@ local function capabilityRows(revision, currentAction, context, ir)
                             "permitted_capability", revision, status
                         ),
                         status = status,
+                        enabled = status == "eligible"
+                            or status == "selected_for_preflight",
+                        reasonCode = reasonCode,
+                        reasonKey = reasonKey,
+                        reasonFallback = reasonFallback,
                         eligibility = {
                             status = eligibility.status,
-                            reason = eligibility.reason,
+                            reason = reasonCode,
+                            predicateReason = predicateReason,
+                            reasonCode = reasonCode,
+                            reasonKey = reasonKey,
+                            reasonFallback = reasonFallback,
                             trace = eligibility.trace,
                         },
                         binding = bindingView,
                         topic = definition.topic,
-                        groupID = "owned_actions",
+                        groupID = definition.groupID
+                            or (isCompanionOrderAction(action)
+                                and Suggestions.COMPANION_ORDERS_GROUP_ID
+                                or "owned_actions"),
                         frame = capabilityFrame(action, definition, revision),
                         display = {
                             labelKey = definition.labelKey,
@@ -620,6 +1097,7 @@ local function capabilityRows(revision, currentAction, context, ir)
                     rows[#rows + 1] = capability
                     allowed = allowed + 1
                 end
+            end
             end
         end
     end
@@ -974,6 +1452,7 @@ local function branchOfferIR(offer, origin, frame, view)
         action = source.action,
         subject = source.subject,
         target = target,
+            destination = copyValue(source.destination),
         slots = slots,
         socialContext = socialContext,
         confidence = 1,
@@ -994,6 +1473,42 @@ local function branchOfferIR(offer, origin, frame, view)
 end
 
 function Suggestions.FrameToIR(frame, view)
+    if Suggestions.IsNavigationFrame(frame) then
+        return Suggestions.NavigationFrameToIR(frame, view)
+    end
+    -- A landing shortcut is already a typed semantic frame. Preserve its
+    -- canonical topic/route when native Core submits it through a group
+    -- host; flattening it to display text lets the native parser reinterpret
+    -- "What's up?" as a generic navigation turn.
+    if Suggestions.IsShortcutFrame(frame) then
+        local value = Suggestions.ResolveFrameText(frame)
+        if value == "" then return nil, "shortcut_frame_text_missing" end
+        local extensions = copyValue(frame.extensions) or {}
+        if extensions.topic == nil and frame.topic ~= nil then
+            extensions.topic = frame.topic
+        end
+        return IR.New({
+            kind = "semantic_suggestion_frame",
+            rawText = value,
+            normalizedText = normalizedText(value),
+            intent = frame.intent or "QUESTION",
+            speechAct = frame.speechAct or "QUESTION",
+            subject = frame.subject or "CONVERSATION_TOPIC",
+            target = {
+                kind = "actor",
+                id = view and view.spec and view.spec.npcID or nil,
+                source = "conversation",
+            },
+            extensions = extensions,
+            confidence = 1,
+            provenance = {
+                provider = "suggestion",
+                parser = "semantic_click_frame",
+                pattern = "semantic_shortcut",
+                candidateID = frame.candidateID,
+            },
+        })
+    end
     if type(frame) ~= "table"
         or tonumber(frame.schemaVersion) ~= Suggestions.VERSION
         or frame.kind ~= "semantic_click_frame"
@@ -1036,6 +1551,7 @@ function Suggestions.FrameToIR(frame, view)
                     action = source.action,
                     subject = source.subject,
                     target = target,
+                    destination = copyValue(source.destination),
                     slots = copyValue(source.slots) or {},
                     modifiers = copyValue(source.modifiers) or {},
                     socialContext = copyValue(source.socialContext) or {},
@@ -1058,6 +1574,9 @@ function Suggestions.FrameToIR(frame, view)
     if not definition then
         action, definition = capabilityDefinitionFor(frame.candidateID)
     end
+    if not definition then
+        action, definition = projectedCapabilityFor(frame.candidateID, view)
+    end
     if not definition then return nil, "suggestion_candidate_unknown" end
 
     local actorID = view and view.spec and view.spec.npcID or nil
@@ -1075,8 +1594,13 @@ function Suggestions.FrameToIR(frame, view)
     )
     local slots = copyValue(definition.slots) or {}
     local target = copyValue(definition.target)
-    if isCapability then
+    if isCapability and (target == nil
+        or target.kind == "conversation_actor"
+        or target.ref == "npc")
+    then
         target = { kind = "actor", id = actorID, source = "conversation" }
+        slots.npcID = actorID
+    elseif isCapability then
         slots.npcID = actorID
     end
     local ir = IR.New({
@@ -1088,6 +1612,7 @@ function Suggestions.FrameToIR(frame, view)
         action = isCapability and action or nil,
         subject = isCapability and nil or definition.subject,
         target = target,
+        destination = copyValue(definition.destination),
         slots = slots,
         modifiers = copyValue(definition.modifiers) or {},
         socialContext = copyValue(definition.socialContext) or {},
@@ -1104,6 +1629,18 @@ function Suggestions.FrameToIR(frame, view)
 end
 
 function Suggestions.CheckFrame(frame, context, ir)
+    if Suggestions.IsNavigationFrame(frame) then
+        if type(ir) ~= "table"
+            or ir.intent ~= "NAVIGATE"
+            or ir.provenance.parser ~= "semantic_navigation_frame"
+        then
+            return false, "navigation_frame_invalid"
+        end
+        return true, "navigation_frame_eligible", {
+            status = "allowed",
+            trace = {},
+        }
+    end
     local provenance = type(ir) == "table"
         and type(ir.provenance) == "table" and ir.provenance or {}
     if provenance.branchOfferID == frame.candidateID then
@@ -1574,6 +2111,14 @@ local GROUP_LABELS = {
         key = "UI_PNC_Conversation_Suggestion_Group_Movement_Label",
         fallback = "Owned companion actions",
     },
+    companion_orders = {
+        key = "UI_PNC_Conversation_Suggestion_CompanionOrders_Label",
+        fallback = "I need you to do something...",
+    },
+    companion_camp = {
+        key = "UI_PNC_Conversation_Suggestion_CompanionCamp_Label",
+        fallback = "Let's camp...",
+    },
 }
 
 local function groupPresentation(id, topic)
@@ -1607,6 +2152,26 @@ local function groupPresentation(id, topic)
             topic = "whats_up",
             label = resolvedText(label.key, label.fallback),
             labelKey = label.key,
+        }
+    end
+    if id == Suggestions.COMPANION_ORDERS_GROUP_ID then
+        local label = GROUP_LABELS.companion_orders
+        return {
+            id = id,
+            topic = "movement",
+            label = resolvedText(label.key, label.fallback),
+            labelKey = label.key,
+            allowBack = true,
+        }
+    end
+    if id == Suggestions.COMPANION_CAMP_GROUP_ID then
+        local label = GROUP_LABELS.companion_camp
+        return {
+            id = id,
+            topic = "movement",
+            label = resolvedText(label.key, label.fallback),
+            labelKey = label.key,
+            allowBack = true,
         }
     end
     local label = GROUP_LABELS[topic]
@@ -1740,13 +2305,30 @@ local function buildGroups(
             if capability.allowBack == false then group.allowBack = false end
         end
     end
+    if byID[Suggestions.COMPANION_ORDERS_GROUP_ID] then
+        -- The camp branch is a semantic navigation surface even before its
+        -- dynamic site rows are projected. P12F fills it from live CampSite
+        -- discovery; no room or Java object is retained here.
+        ensure(Suggestions.COMPANION_CAMP_GROUP_ID, "movement")
+    end
+    context.semanticGroupParents = type(context.semanticGroupParents) == "table"
+        and context.semanticGroupParents or {}
+    context.semanticGroupParents[Suggestions.COMPANION_ORDERS_GROUP_ID] =
+        Suggestions.ROOT_GROUP_ID
+    context.semanticGroupParents[Suggestions.COMPANION_CAMP_GROUP_ID] =
+        Suggestions.COMPANION_ORDERS_GROUP_ID
     local rootGroupID = byID[Suggestions.ROOT_GROUP_ID]
         and Suggestions.ROOT_GROUP_ID or nil
     -- The authored greeting is the opening lifecycle state, not a selected
     -- semantic topic. Keep the first Talk surface on the landing page.
     local semanticTopicActive = currentTopic
         and tostring(currentTopic) ~= "greeting"
-    local currentGroupID = not semanticTopicActive and rootGroupID
+    local requestedGroupID = context and context.activeSuggestionGroupID
+    local requestedNonRootGroup = requestedGroupID
+        and requestedGroupID ~= Suggestions.ROOT_GROUP_ID
+    local currentGroupID = requestedNonRootGroup and byID[requestedGroupID]
+        and requestedGroupID
+        or not semanticTopicActive and rootGroupID
         or currentTopic == "whats_up"
         and byID["semantic_hub.whats_up"]
         and "semantic_hub.whats_up" or topicGroupID(currentTopic)
@@ -1776,9 +2358,7 @@ local function buildGroups(
             and group.allowBack ~= false
             and Suggestions.BuildBackFrame
         then
-            local frame = Suggestions.BuildBackFrame(
-                revision, group.id, context
-            )
+            local frame = Suggestions.BuildBackFrame(revision, group.id, context)
             if frame then
                 group.navigation[#group.navigation + 1] = {
                     id = frame.candidateID,
@@ -1837,21 +2417,30 @@ function Suggestions.IsConversationCategoryAvailable(frame, context)
     return false, "category_preflight_unknown"
 end
 
--- Topic navigation is a presentation-only semantic frame. It changes the
--- selected projection group through the existing Core choice surface; it is
--- not a parser input and it cannot dispatch a gameplay action.
 function Suggestions.BuildGroupFrame(group, revision)
     group = type(group) == "table" and group or {}
     local groupID = tostring(group.id or "")
     if groupID == "" then return nil end
+    local utterance = group.utterance
+        or group.textFallback
+        or group.label
+        or group.labelFallback
+        or groupID
     return {
         schemaVersion = Suggestions.VERSION,
         kind = "semantic_group_click_frame",
         candidateID = "semantic.group:" .. groupID,
         groupID = groupID,
+        parentGroupID = group.parentGroupID,
         topic = group.topic,
         labelKey = group.labelKey,
         labelFallback = group.label or groupID,
+        textFallback = utterance,
+        utteranceFallback = utterance,
+        utterance = utterance,
+        navigationExchange = true,
+        navigationKind = group.navigationKind or "topic",
+        navigationSubject = group.navigationSubject or "CONVERSATION_TOPIC",
         requestRevision = tonumber(revision) or 0,
     }
 end
@@ -1896,10 +2485,15 @@ end
 function Suggestions.BuildBackFrame(revision, fromGroupID, context)
     fromGroupID = tostring(fromGroupID or "")
     if fromGroupID == "" then return nil end
+    context = type(context) == "table" and context or {}
+    local parents = type(context.semanticGroupParents) == "table"
+        and context.semanticGroupParents or {}
+    local targetGroupID = tostring(
+        parents[fromGroupID] or Suggestions.ROOT_GROUP_ID
+    )
     local labelKey =
         "UI_PNC_Conversation_Suggestion_TalkSomethingElse_Label"
     local label = resolvedText(labelKey, "Let's talk something else")
-    context = type(context) == "table" and context or {}
     local seed = context.saveSeed
         or context.playerIdentitySeed
         or context.npcID
@@ -1923,12 +2517,16 @@ function Suggestions.BuildBackFrame(revision, fromGroupID, context)
         schemaVersion = Suggestions.VERSION,
         kind = "semantic_back_click_frame",
         candidateID = "semantic.back_to_root:" .. fromGroupID,
-        groupID = Suggestions.ROOT_GROUP_ID,
+        groupID = targetGroupID,
         fromGroupID = fromGroupID,
         utterance = reply,
         textFallback = reply,
+        utteranceFallback = reply,
         playerReply = true,
         navigationReply = true,
+        navigationExchange = true,
+        navigationKind = "subject_change",
+        navigationSubject = "CONVERSATION_TOPIC",
         labelKey = labelKey,
         labelFallback = label,
         requestRevision = tonumber(revision) or 0,
@@ -1948,6 +2546,51 @@ function Suggestions.IsGroupFrame(frame)
         and frame.kind == "semantic_group_click_frame"
         and tostring(frame.groupID or "") ~= ""
         and tonumber(frame.requestRevision) ~= nil
+end
+
+function Suggestions.IsNavigationFrame(frame)
+    return (Suggestions.IsBackFrame(frame)
+            or Suggestions.IsGroupFrame(frame))
+        and frame.navigationExchange ~= false
+end
+
+function Suggestions.NavigationFrameToIR(frame, view)
+    if not Suggestions.IsNavigationFrame(frame) then
+        return nil, "navigation_frame_invalid"
+    end
+    local actorID = view and view.spec and view.spec.npcID or nil
+    local value = Suggestions.ResolveFrameText(frame)
+    if value == "" then return nil, "navigation_frame_text_missing" end
+    return IR.New({
+        kind = "semantic_navigation_frame",
+        rawText = value,
+        normalizedText = normalizedText(value),
+        intent = "NAVIGATE",
+        speechAct = "NAVIGATE",
+        subject = frame.navigationSubject or "CONVERSATION_TOPIC",
+        target = {
+            kind = "actor",
+            id = actorID,
+            source = "conversation",
+        },
+        slots = {
+            npcID = actorID,
+        },
+        extensions = {
+            topic = frame.topic or "conversation_navigation",
+            navigationKind = frame.navigationKind or "topic",
+            fromGroupID = frame.fromGroupID or frame.parentGroupID,
+            toGroupID = frame.groupID,
+            candidateID = frame.candidateID,
+        },
+        confidence = 1,
+        provenance = {
+            provider = "suggestion",
+            parser = "semantic_navigation_frame",
+            pattern = frame.navigationKind or "semantic_navigation",
+            candidateID = frame.candidateID,
+        },
+    })
 end
 
 function Suggestions.IsConversationChoiceFrame(frame)
@@ -2073,6 +2716,12 @@ function Suggestions.Build(result, context, messages)
         candidates, seen, context, revision, predicateTrace
     )
     appendConversationChoices(
+        candidates, seen, context, revision, predicateTrace
+    )
+    appendCompanionOrderNavigation(
+        candidates, seen, context, revision, predicateTrace
+    )
+    appendCompanionCampNavigation(
         candidates, seen, context, revision, predicateTrace
     )
     if flowActive then
@@ -2287,6 +2936,35 @@ function Suggestions.Build(result, context, messages)
     local groups, currentGroupID, rootGroupID = buildGroups(
         candidates, capabilities, currentTopic, revision, context
     )
+    local dynamicCampCapabilities = {}
+    appendCampSiteCapabilityRows(
+        dynamicCampCapabilities, revision, context, ir
+    )
+    local campGroup
+    for _, group in ipairs(groups or {}) do
+        if group.id == Suggestions.COMPANION_CAMP_GROUP_ID then
+            campGroup = group
+            break
+        end
+    end
+    if campGroup then
+        for _, capability in ipairs(dynamicCampCapabilities) do
+            -- Keep dynamic destinations in the camp group and in the
+            -- authoritative capability projection, but add them after
+            -- ranking so they can never leak onto the landing surface.
+            capabilities[#capabilities + 1] = capability
+            campGroup.capabilities[#campGroup.capabilities + 1] = capability
+            campGroup.count = campGroup.count + 1
+        end
+    end
+    if isCompanionOrderAction(currentAction) then
+        for _, group in ipairs(groups or {}) do
+            if group.id == Suggestions.COMPANION_ORDERS_GROUP_ID then
+                currentGroupID = group.id
+                break
+            end
+        end
+    end
 
     return {
         schemaVersion = Suggestions.VERSION,

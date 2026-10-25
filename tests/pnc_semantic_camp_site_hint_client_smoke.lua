@@ -33,6 +33,7 @@ local worldHint = {
 }
 local lastRoomQuery
 local lastRoomOptions
+local lastEnumerationQuery = "unset"
 local lastCampfireTarget
 local origin = { x = 10, y = 10, z = 0 }
 local cell = {}
@@ -64,6 +65,14 @@ PNC = {
                 lastRoomOptions = options
                 if roomSite then return roomSite end
                 return nil, "room_not_found"
+            end,
+            EnumerateRooms = function(_, callback)
+                callback({}, {})
+                return 1
+            end,
+            DescribeRoom = function(_, _, _, _, options)
+                lastEnumerationQuery = options and options.query
+                return roomSite
             end,
         },
         ClientWorldTargetHints = {
@@ -114,6 +123,33 @@ local cachedRoom = Hints.Resolve({
 T.equal(cachedRoom.siteID, "site:bedroom", "repeated room query returns cache")
 T.equal(roomLookups, 1, "repeated room query does not rescan geometry")
 
+local enumerated = Hints.Enumerate({
+    selectionOrigin = origin,
+    cell = cell,
+}, { maxRooms = 8 })
+T.equal(#enumerated, 1,
+    "dynamic Camp discovery projects a valid loaded room")
+T.equal(enumerated[1].roomType, "bedroom",
+    "dynamic Camp discovery preserves the room identity")
+T.equal(lastEnumerationQuery, nil,
+    "dynamic Camp discovery does not filter rooms by the literal word room")
+
+local nearbyOnly = Hints.Enumerate({
+    selectionOrigin = origin,
+    cell = cell,
+    campfireCandidates = {
+        {
+            kind = "campfire",
+            campfireID = "far-fire",
+            x = 100,
+            y = 100,
+            z = 0,
+        },
+    },
+}, { maxRooms = 8 })
+T.equal(#nearbyOnly, 1,
+    "dynamic Camp discovery rejects candidates outside server admission range")
+
 local campfireHint, campfireReason = Hints.Resolve({
     kind = "camp_site",
     scope = "campfire",
@@ -138,6 +174,51 @@ T.truthy(fallbackHint, "explicit room may fall back to a nearby campfire")
 T.equal(fallbackReason, "campfire_fallback",
     "campfire fallback remains visible in the reason")
 T.equal(campfireLookups, 2, "explicit room fallback resolves one campfire")
+
+Hints.ClearCache()
+local exactHint, exactReason = Hints.Resolve({
+    kind = "camp_site",
+    scope = "room",
+    roomID = "room:explicit",
+    siteID = "site:explicit",
+    requireExact = true,
+}, { selectionOrigin = origin, cell = cell })
+T.falsy(exactHint,
+    "selected primitive refresh does not silently fall back to a campfire")
+T.equal(exactReason, "camp_site_hint_stale",
+    "selected primitive refresh reports a stale exact room")
+T.equal(campfireLookups, 2,
+    "exact selected-room refresh does not perform an extra campfire lookup")
+
+local ActionTargetHints = T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_ActionTargetHints.lua"
+)
+local refreshCalls = 0
+local refreshedAction = ActionTargetHints.AttachCampSiteHint({
+    action = "CAMP",
+    target = {
+        kind = "camp_site",
+        scope = "room",
+        roomID = "room:selected",
+        siteID = "site:selected",
+        x = 10,
+        y = 10,
+        z = 0,
+    },
+}, { npcID = "npc-refresh" }, PNC.Semantics.CampSite, {
+    Resolve = function(target)
+        refreshCalls = refreshCalls + 1
+        T.truthy(target.requireExact,
+            "selected primitive refresh requests exact identity")
+        return { kind = "camp_site", scope = "room", x = 11, y = 11, z = 0 }
+    end,
+}, function() end)
+T.equal(refreshCalls, 1,
+    "camp click refresh performs one bounded resolver call")
+T.equal(refreshedAction.target.clientHint.x, 11,
+    "camp click sends the freshly resolved primitive")
 
 Hints.ClearCache()
 local missingOrigin, missingReason = Hints.Resolve({

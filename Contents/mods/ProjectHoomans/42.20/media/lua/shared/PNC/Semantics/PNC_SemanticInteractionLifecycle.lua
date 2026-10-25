@@ -282,6 +282,7 @@ function Envelope.Emote(emote, context)
         targetID = context.targetID or emote.targetID,
         playerUUID = context.playerUUID or emote.playerUUID,
         topic = context.topic,
+        eventRef = context.eventRef or emote.eventRef or emote.eventID,
         worldHour = context.worldHour,
         factRefs = emote.factRefs,
         modifiers = emote.modifiers,

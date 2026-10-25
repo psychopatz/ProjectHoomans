@@ -82,6 +82,13 @@ function Builder.build(context)
         and Runtime.view.spec.context or nil
     local output = {
         npcID = npc.npcID,
+        campSiteCandidates = copy(
+            scenario.campSiteCandidates
+                or (priorContext and priorContext.campSiteCandidates)
+                or {}
+        ),
+        locationObservation = copy(scenario.locationObservation
+            or (priorContext and priorContext.locationObservation)),
         saveSeed = world.seedString or world.worldSeedString
             or world.worldSeed,
         identityState = effectiveIdentityState,
@@ -90,6 +97,11 @@ function Builder.build(context)
         npcFullName = npcName,
         npcFirstName = npc.forename,
         npcState = {
+            campSiteCandidates = copy(
+                scenario.campSiteCandidates
+                    or (priorContext and priorContext.npcState and priorContext.npcState.campSiteCandidates)
+                    or {}
+            ),
             traits = copy(npc.traits or {}),
             startingRelationship = copy(npc.startingRelationship),
             identityState = effectiveIdentityState,
@@ -195,6 +207,8 @@ function Builder.build(context)
         output.categoryDiagnostics = Values.copy(
             priorContext.categoryDiagnostics
         )
+        output.semanticSuggestionGroupID =
+            priorContext.semanticSuggestionGroupID
     end
     local session = Runtime.view and Runtime.view.session or nil
     local dialogueContext = session and session.semanticDialogueContext

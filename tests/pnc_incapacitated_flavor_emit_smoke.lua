@@ -231,6 +231,34 @@ T.falsy(Hooks.OnIncapacitated(follower, "damage"),
 T.equal(#sent, 1, "the debounce prevented a duplicate line")
 
 -- ---------------------------------------------------------------------------
+-- 2b. A whole-body need survives the incapacitation path and becomes the
+-- authored request instead of the generic healing fallback.
+-- ---------------------------------------------------------------------------
+
+reset()
+local dehydrated = npc("npc-dehydrated", "F1", 0, 0)
+local thirstyOwner = player("thirsty-owner", "F2", 1, 1)
+setPlayers({ thirstyOwner })
+ownerOf[dehydrated] = thirstyOwner
+dehydrated.needs = { hunger = 0.25, thirst = 1, fatigue = 0.5 }
+dehydrated.health.body = {
+    wholeBodyAilments = { dehydration = { severity = 1 } },
+}
+dehydrated.runtime.recentThreat = {
+    kind = "zombie", id = "z-dehydration", expiresAt = now + 5000,
+}
+
+Hooks.OnIncapacitated(dehydrated, "dehydration")
+T.equal(#sent, 1, "the dehydrated follower emits a distress line")
+T.equal(sent[1].context.downedNeed, Const.Need.DEHYDRATION,
+    "the incapacitation context preserves the dehydration cause")
+local dehydrationText = Flavor.Resolve(
+    Const.FLAVOR_CALL, "npc", sent[1].packet.eventID, sent[1].context
+)
+T.truthy(string.find(string.lower(dehydrationText or ""), "water", 1, true),
+    "the dehydrated follower asks for water instead of healing")
+
+-- ---------------------------------------------------------------------------
 -- 3. Hostile NPC attacker -> the downed NPC pleads for mercy.
 -- ---------------------------------------------------------------------------
 

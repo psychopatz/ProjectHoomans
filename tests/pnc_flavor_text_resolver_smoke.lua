@@ -45,6 +45,16 @@ T.equal(Resolver.ClassifyNeed({ bleedingRate = 2 }), Const.Need.BLEEDOUT,
     "active bleeding is the top-priority need")
 T.equal(Resolver.ClassifyNeed({ bleeding = true }), Const.Need.BLEEDOUT,
     "a bleeding flag is honored")
+T.equal(Resolver.ClassifyNeed({ thirst = 1 }), Const.Need.DEHYDRATION,
+    "critical thirst resolves to dehydration rather than generic healing")
+T.equal(Resolver.ClassifyNeed({ hunger = 1 }), Const.Need.STARVATION,
+    "critical hunger resolves to starvation rather than generic healing")
+T.equal(Resolver.ClassifyNeed({ staminaState = "exhausted" }),
+    Const.Need.EXHAUSTION,
+    "an exhausted survivor asks for recovery rather than generic healing")
+T.equal(Resolver.ClassifyNeed({ bleeding = true, thirst = 1 }),
+    Const.Need.BLEEDOUT,
+    "active bleeding still outranks a whole-body need")
 T.equal(Resolver.ClassifyNeed({ treatableWoundCount = 3 }),
     Const.Need.BANDAGE, "treatable wounds ask for a bandage")
 T.equal(Resolver.ClassifyNeed({ needsRescue = true }), Const.Need.RESCUE,

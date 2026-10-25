@@ -23,7 +23,11 @@ Catalog.VERSION = 1
 -- Automatic capability generation can register one bounded pool per result
 -- outcome. Keep the catalog bounded, but leave room for every compatible
 -- production capability without silently truncating generated flows.
-Catalog.MAX_POOLS = 128
+-- The static, generated, and capability-backed families share one bounded
+-- registry. P12 capability standardization now contributes more than the
+-- original 128-pool ceiling, so retain a finite cap with room for the
+-- current generated action set and future bounded additions.
+Catalog.MAX_POOLS = 256
 Catalog.MAX_VARIANTS = 16
 Catalog.MAX_LAST_VARIANTS = 256
 Catalog.POOLS = Catalog.POOLS or {}
@@ -405,6 +409,8 @@ require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueRespo
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_FlowWeather"
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Questions"
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Social"
+require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_PlayerEmote"
+require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Navigation"
 
 local generatedSources = { GeneratedDialogue, GeneratedPersonalDialogue }
 local generatedSourceIndex

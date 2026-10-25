@@ -265,6 +265,7 @@ function ISEmoteRadialMenu:emote(emote)
     local vanillaDefinition
     local socialRecipients
     local socialContext
+    local playerRealization
     if string.sub(emoteName, 1, #CLOSEST_GROUP_PREFIX)
         == CLOSEST_GROUP_PREFIX
     then
@@ -309,27 +310,39 @@ function ISEmoteRadialMenu:emote(emote)
                 targets = socialRecipients and socialRecipients.targets or {},
             }
             socialContext.playerActor = player
-            socialContext.commandID = vanillaDefinition.flavorID
+            socialContext.commandID = vanillaDefinition.id
             if socialContext.targets and #socialContext.targets > 0
                 and PNC.CompanionCommandPresentation
             then
+                if PNC.CompanionCommandPresentation
+                    .ResolvePlayerEmoteRealization
+                then
+                    playerRealization =
+                        PNC.CompanionCommandPresentation
+                            .ResolvePlayerEmoteRealization(
+                                vanillaDefinition.id,
+                                socialContext
+                            )
+                end
+                if playerRealization then
+                    socialContext.semanticRealization = playerRealization
+                    socialContext.semanticAct = playerRealization.semanticAct
+                    socialContext.topic = playerRealization.topic
+                end
                 if PNC.CompanionCommandPresentation.EnqueueFlavor then
-                    PNC.CompanionCommandPresentation.EnqueueFlavor(
-                        vanillaDefinition.flavorID,
-                        "player",
-                        player,
-                        socialContext,
-                        {
-                            eventID = socialContext.requestID,
-                            family = "emote_interaction",
-                        }
-                    )
-                elseif PNC.CompanionCommandPresentation.ShowPlayerFlavor then
-                    PNC.CompanionCommandPresentation.ShowPlayerFlavor(
-                        player,
-                        vanillaDefinition.flavorID,
-                        socialContext
-                    )
+                    if playerRealization then
+                        PNC.CompanionCommandPresentation.EnqueueFlavor(
+                            vanillaDefinition.flavorID,
+                            "player",
+                            player,
+                            socialContext,
+                            {
+                                eventID = socialContext.requestID,
+                                family = "emote_interaction",
+                                semanticRealization = playerRealization,
+                            }
+                        )
+                    end
                 end
             end
             if PNC.Client and PNC.Client.ExecutePlayerEmoteInteraction then

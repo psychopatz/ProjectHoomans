@@ -1,0 +1,13 @@
+{
+  "UI_PNC_Conversation_Suggestion_GoHome_NoBase_Tooltip": "Go Home is unavailable because no base has been established.",
+  "UI_PNC_Conversation_Suggestion_NoCampSite_Tooltip": "No valid camp location is currently available.",
+  "UI_PNC_Conversation_Suggestion_AlreadyFollowing_Tooltip": "Already following you.",
+  "UI_PNC_Conversation_Suggestion_NotFollowing_Tooltip": "Stay is available while the companion is following you.",
+  "UI_PNC_Conversation_Suggestion_AlreadyStaying_Tooltip": "Already holding position.",
+  "UI_PNC_Conversation_Suggestion_CompanionIncapacitated_Tooltip": "Unavailable because the companion is incapacitated.",
+  "UI_PNC_Conversation_Suggestion_CompanionBusy_Tooltip": "Unavailable while the companion is busy or in combat.",
+  "UI_PNC_Conversation_Suggestion_CompanionDead_Tooltip": "Unavailable because the companion is dead.",
+  "UI_PNC_Conversation_Suggestion_CompanionUnavailable_Tooltip": "Unavailable because this companion cannot receive orders right now.",
+  "UI_PNC_Conversation_Suggestion_CampSiteOutOfRange_Tooltip": "This camp location is too far away right now.",
+  "UI_PNC_Conversation_Suggestion_CampSiteStale_Tooltip": "This camp location is no longer available; choose a fresh location."
+}

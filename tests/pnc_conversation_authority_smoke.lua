@@ -433,6 +433,81 @@ T.equal(ambientReplayReason, "replayed_request",
 T.equal(ambientVisitCalls, 1,
     "ambient visit replay does not duplicate the lease")
 
+-- Departure must remain a server-authoritative warning/confirmation bridge.
+-- The gameplay mutation itself stays in the production ColonistDeparture
+-- service; this authority test verifies that the conversation path invokes it
+-- once and forwards its real result/close contract.
+record.recruited = true
+record.affiliation = { factionID = "player-faction" }
+local departureCalls = 0
+local departureEnded = 0
+PNC.ColonistDeparture = {
+    CanPlayerManage = function(_, managedRecord, playerKey)
+        T.equal(managedRecord, record,
+            "departure authority validates the current colonist record")
+        T.equal(playerKey, "player:account:character-1",
+            "departure authority passes the authoritative player key")
+        return true, nil, playerKey
+    end,
+    GetPreview = function()
+        return { eligible = true, approvalThreshold = -60 }
+    end,
+    Depart = function(_, cause, options)
+        departureCalls = departureCalls + 1
+        T.equal(cause, "manual",
+            "confirmed departure uses the existing manual executor cause")
+        T.equal(options.ownerKey, "player:account:character-1",
+            "confirmed departure uses the validated owner key")
+        return true, "colonist_departed", {
+            sourceFactionID = "player-faction",
+            factionID = "mobile-departed",
+            penalty = {
+                before = { approval = 25, respect = 20 },
+                after = { approval = -25, respect = -30 },
+                delta = { approval = -50, respect = -50 },
+            },
+        }
+    end,
+}
+PNC.ConversationScene.End = function()
+    departureEnded = departureEnded + 1
+end
+local departureFingerprint = Registry.GetFingerprint()
+local warningAccepted, warningReason = Authority.HandleDeparture(player, {
+    requestID = "departure-warning-1",
+    npcID = record.id,
+    token = "lease-token",
+    confirm = false,
+    registryFingerprint = departureFingerprint,
+})
+T.falsy(warningAccepted, "departure first presents a confirmation warning")
+T.equal(warningReason, "departure_confirmation_required",
+    "departure warning has the stable confirmation reason")
+T.equal(sent[#sent].payload.warning, true,
+    "departure warning is delivered by the authoritative result")
+T.equal(departureCalls, 0,
+    "departure warning does not mutate faction or relationship state")
+local confirmAccepted, confirmReason = Authority.HandleDeparture(player, {
+    requestID = "departure-confirm-1",
+    npcID = record.id,
+    token = "lease-token",
+    confirm = true,
+    registryFingerprint = departureFingerprint,
+})
+T.truthy(confirmAccepted, confirmReason)
+T.equal(confirmReason, "colonist_departed",
+    "confirmed departure returns the authoritative executor result")
+T.equal(departureCalls, 1,
+    "confirmed departure invokes the existing executor exactly once")
+T.equal(departureEnded, 1,
+    "successful departure ends the server conversation lease once")
+T.equal(sent[#sent].payload.success, true,
+    "confirmed departure returns success")
+T.equal(sent[#sent].payload.closeReason, "colonist_departed",
+    "confirmed departure carries the native close reason")
+T.equal(sent[#sent].payload.relationshipDelta.approval, -50,
+    "confirmed departure forwards the relationship penalty")
+
 T.finish("pnc_conversation_authority_smoke")
 
 T.finish("pnc_conversation_authority_smoke")

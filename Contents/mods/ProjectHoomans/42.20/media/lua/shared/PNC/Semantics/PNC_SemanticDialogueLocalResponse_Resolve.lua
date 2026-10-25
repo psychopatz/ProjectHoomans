@@ -102,6 +102,11 @@ function Response.Resolve(ir, state, context, branch)
             topic = state and state.currentTopic,
         })
     end
+    if branch == "SEMANTIC_NAVIGATION_RECEIVED" then
+        return catalogResponse(
+            "semantic.conversation.acknowledged", ir, state, context
+        )
+    end
     if branch == "COMPLIMENT_RECEIVED" then
         return catalogResponse("semantic.compliment", ir, state, context)
     end

@@ -34,6 +34,9 @@ local Identity = PNC.NPCIdentityPresentation
 local FlavorAddress = PNC.FlavorAddress
 local Registry = PNC.Registry
 local PlayerSpeech = PNC.PlayerSpeech
+local AddressResolver = PNC.Semantics
+    and PNC.Semantics.AddressResolver
+    or require "PNC/Semantics/PNC_SemanticAddressResolver"
 local SocialReactions = PNC.Semantics
     and PNC.Semantics.SocialReactions or nil
 if type(SocialReactions) ~= "table" then
@@ -77,17 +80,105 @@ local function normalizeTargets(context)
     return {}
 end
 
-local function formatTargetNames(targets)
-    local count = #targets
-    if count <= 0 then return "everyone" end
-    if count == 1 then return targetName(targets[1]) end
-    if count == 2 then
-        return targetName(targets[1])
-            .. " and " .. targetName(targets[2])
+local function targetSource(target)
+    if type(target) ~= "table" then return target end
+    return target.source or target.record or target.snapshot or target
+end
+
+local function targetID(target, source)
+    return target and (target.id or target.npcID)
+        or source and (source.id or source.npcID)
+        or nil
+end
+
+local function knownTargetName(target)
+    local known
+    if Identity and type(Identity.GetKnownName) == "function" then
+        known = Identity.GetKnownName(targetSource(target))
+        if known and not AddressResolver.IsPlaceholder(known) then
+            return known
+        end
+        return nil
     end
-    return targetName(targets[1])
-        .. ", " .. targetName(targets[2])
+    known = targetName(target)
+    if known and not AddressResolver.IsPlaceholder(known) then
+        return known
+    end
+    return nil
+end
+
+local function targetAddress(target, context, state)
+    local source = targetSource(target) or {}
+    local id = targetID(target, source)
+    local known = knownTargetName(target)
+    local history = state and state.semanticAddressHistory
+        and id and state.semanticAddressHistory[tostring(id)] or nil
+    local address
+    if known then return known end
+    address = AddressResolver.Resolve({
+        target = source,
+        identityKnown = false,
+        knownName = nil,
+        relationshipKind = target and (
+            target.relationshipKind or target.relationshipCategory
+                or target.relationshipState
+        ) or nil,
+        familiarity = target and target.familiarity or nil,
+        tone = target and (target.tone or target.beatTone) or nil,
+        persona = target and (target.persona or target.personaStyle) or nil,
+        gender = target and (target.gender or target.sex) or nil,
+        language = context and context.language or nil,
+        recentAddresses = history,
+    })
+    if state and id and address and not address.known then
+        state.semanticAddressHistory = state.semanticAddressHistory or {}
+        state.semanticAddressHistory[tostring(id)] =
+            state.semanticAddressHistory[tostring(id)] or {}
+        AddressResolver.Remember(
+            state.semanticAddressHistory[tostring(id)], address
+        )
+    end
+    return address and address.address or "stranger"
+end
+
+local function formatTargetNames(targets, context, state)
+    local count = #targets
+    local names = {}
+    local index
+    if count <= 0 then return "everyone" end
+    for index, target in ipairs(targets) do
+        names[index] = targetAddress(target, context, state)
+    end
+    if count == 1 then return names[1] end
+    if count == 2 then
+        return names[1] .. " and " .. names[2]
+    end
+    return names[1]
+        .. ", " .. names[2]
         .. ", and " .. tostring(count - 2) .. " more"
+end
+
+local PLAYER_EMOTE_ACTS = {
+    wavehi = "GREET",
+    wavebye = "FAREWELL",
+    thankyou = "THANK",
+    thumbsup = "ACK",
+    thumbsdown = "DISAPPROVE",
+    insult = "INSULT",
+    clap = "PRAISE",
+    salute = "ACK",
+}
+
+local function semanticPlayerID(player, state)
+    local playerContext = state and state.playerContext or {}
+    if player and player.getUsername then
+        local username = tostring(player:getUsername() or "")
+        if username ~= "" then return username end
+    end
+    return tostring(
+        playerContext.characterUUID or playerContext.playerUUID
+            or "local-player"
+    )
 end
 
 local function ensureAmbientInteraction(context, npcID, player)
@@ -138,8 +229,12 @@ end
 
 function Presentation.BuildFlavorContext(player, context)
     local targets = normalizeTargets(context)
-    local names = formatTargetNames(targets)
     local state = PNC.Network and PNC.Network.ClientState or {}
+    local names = formatTargetNames(
+        targets,
+        type(context) == "table" and context or {},
+        state
+    )
     local playerContext = state.playerContext or {}
     local npcID = type(context) == "table" and context.npcID
         or targets[1] and (targets[1].id or targets[1].npcID)
@@ -175,6 +270,48 @@ function Presentation.BuildFlavorContext(player, context)
         playerNicknameID = playerAddress.nicknameID,
         npcIdentitySeed = FlavorAddress.ResolveNPCSeed(targets[1], npcID),
     }
+end
+
+-- Select the player's emote speech meaning before the authored content
+-- renderer is reached. CompanionCommandFlavor remains the compatibility
+-- content source for localized wording variants only.
+function Presentation.ResolvePlayerEmoteRealization(emoteID, context)
+    context = type(context) == "table" and context or {}
+    local state = PNC.Network and PNC.Network.ClientState or {}
+    local player = context.playerActor
+        or getSpecificPlayer and getSpecificPlayer(0) or nil
+    local action = tostring(emoteID or "")
+    local actorID = semanticPlayerID(player, state)
+    local realization
+    local reason
+    if action == "" then return nil, "player_emote_action_required" end
+    if not RealizationAuthority
+        or type(RealizationAuthority.Resolve) ~= "function"
+    then
+        return nil, "semantic_realization_unavailable"
+    end
+    realization, reason = RealizationAuthority.Resolve({
+        poolID = "semantic.emote.player",
+        responsePlanID = "semantic.emote.player",
+        realizationFamily = "emote_player",
+        act = PLAYER_EMOTE_ACTS[action] or "REACT",
+        context = {
+            action = action,
+            eventType = context.eventType or "player_emote_" .. action,
+            npcID = "player:" .. actorID,
+            currentTopic = context.currentTopic or context.topic,
+            previousTopic = context.previousTopic,
+            socialStyle = context.socialStyle,
+        },
+        salt = context.requestID or context.eventID or action,
+    })
+    if not realization then
+        return nil, reason or "player_emote_realization_unavailable"
+    end
+    if type(RealizationAuthority.AttachProvenance) == "function" then
+        RealizationAuthority.AttachProvenance(context, realization)
+    end
+    return realization
 end
 
 function Presentation.ShowPlayerFlavor(player, commandID, context)

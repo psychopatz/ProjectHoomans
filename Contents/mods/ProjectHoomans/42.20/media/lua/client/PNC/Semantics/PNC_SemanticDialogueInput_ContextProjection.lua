@@ -7,6 +7,8 @@ local EntityCandidates = require
     "PNC/Semantics/PNC_SemanticDialogueInput_EntityCandidates"
 local ActorConversationContext = PNC.Semantics.ActorConversationContext
     or require "PNC/Semantics/PNC_ActorConversationContext"
+local LocationObservation = PNC.Semantics.LocationObservation
+    or require "PNC/Semantics/PNC_SemanticLocationObservation"
 
 local WorldContext
 local EntityResolver
@@ -57,6 +59,18 @@ function Projection.Build(view, getProviderStatus)
     local key
     local value
     for key, value in pairs(source) do output[key] = value end
+    -- Older/native definition callers keep the semantic authority snapshot
+    -- inside the authored composer context.  Promote the bounded projection
+    -- at this boundary so capability eligibility does not depend on the
+    -- authored menu's private nesting shape.
+    local composerContext = type(source.conversationBlockContext) == "table"
+        and source.conversationBlockContext or nil
+    if output.actorAuthority == nil and composerContext then
+        output.actorAuthority = composerContext.actorAuthority
+    end
+    if output.npcState == nil and composerContext then
+        output.npcState = composerContext.npcState
+    end
     local providerStatus = getProviderStatus()
     output.llmEnabled = providerStatus.ready == true
     output.llmAvailable = output.llmEnabled
@@ -177,12 +191,32 @@ function Projection.Build(view, getProviderStatus)
             output.conversationRoot = rootProjection
         end
     end
+    local enginePlayer = localPlayer(view, source)
     if WorldContext and type(WorldContext.Get) == "function" then
         output.worldContext = WorldContext.Get({
-            player = localPlayer(view, source),
+            player = enginePlayer,
         })
     end
-    local enginePlayer = localPlayer(view, source)
+    if LocationObservation
+        and type(LocationObservation.Observe) == "function"
+    then
+        local locationObservation = LocationObservation.Observe({
+            locationObservation = output.locationObservation,
+            player = enginePlayer,
+            origin = output.selectionOrigin or enginePlayer,
+            selectionOrigin = output.selectionOrigin or enginePlayer,
+            cell = output.cell,
+            campSiteCandidates = output.campSiteCandidates,
+            campfireCandidates = output.campfireCandidates,
+        })
+        if type(locationObservation) == "table" then
+            output.locationObservation = locationObservation
+            local candidates = locationObservation.campSiteCandidates
+            if type(candidates) == "table" and #candidates > 0 then
+                output.campSiteCandidates = candidates
+            end
+        end
+    end
     local nativeKills
     if enginePlayer and type(enginePlayer.getZombieKills) == "function" then
         local ok, value = pcall(enginePlayer.getZombieKills, enginePlayer)

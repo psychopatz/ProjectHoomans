@@ -31,6 +31,13 @@ return function(dependencies)
     return function(ir, state, context, giftOffer)
         local branch = "SOCIAL_ACKNOWLEDGED"
         local reason = "semantic_acknowledgement"
+        if ir.intent == "NAVIGATE"
+            and type(ir.provenance) == "table"
+            and ir.provenance.parser == "semantic_navigation_frame"
+        then
+            return "SEMANTIC_NAVIGATION_RECEIVED",
+                "recognized_semantic_navigation"
+        end
         -- A pending identity answer is a conversational obligation. Resolve
         -- a name claim or explicit refusal before generic intent routes can
         -- consume self-state reports, questions, or other social turns.

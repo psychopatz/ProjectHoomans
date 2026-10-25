@@ -195,22 +195,36 @@ local function refresh(state, spec)
     if isNetworkClient() then
         return send(Scene.CMD_BEGIN, state)
     end
-    return Scene and Scene.Begin
-        and Scene.Begin(
-            record,
-            zombie,
-            player,
-            state.token,
-            {
-                maximumDistance = Safety.GetMaximumDistance(),
-                dangerRadius = Safety.GetDangerRadius(),
-                enforceDistance = state.enforceDistance == true
-                    and state.started ~= true,
-                guardThreats = state.guardThreats ~= false,
-                allowHostileParley = state.allowHostileParley == true,
-            }
-        )
-        or false
+    if not Scene or type(Scene.Begin) ~= "function" then
+        return false, "conversation_scene_unavailable"
+    end
+    -- Keep the authoritative rejection reason. A boolean `and/or` return
+    -- expression would discard Scene.Begin's second return value in Lua,
+    -- turning an expired lease into an opaque generic failure.
+    return Scene.Begin(
+        record,
+        zombie,
+        player,
+        state.token,
+        {
+            maximumDistance = Safety.GetMaximumDistance(),
+            dangerRadius = Safety.GetDangerRadius(),
+            enforceDistance = state.enforceDistance == true
+                and state.started ~= true,
+            guardThreats = state.guardThreats ~= false,
+            allowHostileParley = state.allowHostileParley == true,
+        }
+    )
+end
+
+local function refreshNow(view, spec, state)
+    if not state then return false, "conversation_not_ready" end
+    local renewed, reason = refresh(state, spec)
+    if renewed ~= true then
+        return false, reason or "conversation_lease_unavailable"
+    end
+    state.lastHeartbeatAt = currentTime()
+    return true
 end
 
 local function presentSafetyFeedback(spec, state, reason)
@@ -287,6 +301,7 @@ Lifecycle.Internal.IsNameplateConversation = isNameplateConversation
 Lifecycle.Internal.RequestNameplateFallback = requestNameplateFallback
 Lifecycle.Internal.Send = send
 Lifecycle.Internal.Refresh = refresh
+Lifecycle.Internal.RefreshNow = refreshNow
 Lifecycle.Internal.PresentSafetyFeedback = presentSafetyFeedback
 Lifecycle.Internal.LogAvailability = logAvailability
 Lifecycle.Internal.ConversationTopicMask = conversationTopicMask

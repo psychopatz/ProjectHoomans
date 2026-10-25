@@ -425,6 +425,76 @@ T.equal(disbandPreviewRequirement, "inspect",
     "leaving disband clears the departure preview")
 PsychopatzCore.Conversation.instance = nil
 
+local savedCompanionAuthority = PNC.ClientCompanionAuthority
+PNC.ClientCompanionAuthority = {
+    IsCompanion = function() return true end,
+    IsOwnedByPlayer = function() return true end,
+}
+local nativeCompanionEntry = {
+    id = "npc-native-companion",
+    name = "Native Companion",
+    companion = true,
+    recruited = true,
+    ownedByPlayer = true,
+    followState = { mode = "idle" },
+    orderKind = "follow",
+    activeBehavior = "idle",
+    healthState = "healthy",
+    record = {
+        companion = true,
+        recruited = true,
+        ownedByPlayer = true,
+        followState = { mode = "idle" },
+        orderKind = "follow",
+        activeBehavior = "idle",
+        healthState = "healthy",
+    },
+    snapshot = {
+        displayName = "Native Companion",
+        companion = true,
+        recruited = true,
+        ownedByPlayer = true,
+        followState = { mode = "idle" },
+        activeBehavior = "idle",
+        healthState = "healthy",
+    },
+}
+local nativeCompanionDefinition = PNC.Conversation.BuildDefinition(
+    nativeCompanionEntry, player, "dawn"
+)
+T.equal(nativeCompanionDefinition.context.actorAuthority.eligible, true,
+    "native Conversation promotes companion authority to semantic context")
+T.equal(nativeCompanionDefinition.context.actorAuthority.companion, true,
+    "native Conversation preserves companion authority marker")
+T.equal(nativeCompanionDefinition.context.npcState.followState.mode, "idle",
+    "native Conversation promotes authoritative follow state")
+T.equal(nativeCompanionDefinition.context.npcState.orderKind, "follow",
+    "native Conversation promotes durable companion order kind")
+T.equal(nativeCompanionDefinition.context.npcState.healthState, "healthy",
+    "native Conversation promotes authoritative health state")
+
+local snapshotOnlyCompanionEntry = {
+    id = "npc-native-snapshot-only",
+    name = "Snapshot Companion",
+    snapshot = {
+        displayName = "Snapshot Companion",
+        companion = true,
+        recruited = true,
+        ownedByPlayer = true,
+        followState = { mode = "idle" },
+        activeBehavior = "idle",
+        healthState = "healthy",
+    },
+}
+local snapshotOnlyDefinition = PNC.Conversation.BuildDefinition(
+    snapshotOnlyCompanionEntry, player, "dawn"
+)
+T.equal(snapshotOnlyDefinition.context.actorAuthority.eligible, true,
+    "native snapshot-only entry retains semantic companion authority")
+T.truthy(snapshotOnlyDefinition.context.npcState.followState,
+    "native snapshot-only entry retains companion state")
+PNC.ClientCompanionAuthority = savedCompanionAuthority
+
 local savedNetwork = PNC.Network
 PNC.Network = { ClientState = { npcPresentations = {} } }
 local knownCompanionDefinition = PNC.Conversation.BuildDefinition(
@@ -799,7 +869,7 @@ T.equal(unknownDefinition.context.npcFullName, "Stranger",
     "unknown NPC full name is hidden")
 T.equal(unknownDefinition.context.npcFirstName, "Stranger",
     "unknown NPC first name is hidden")
-T.equal(unknownDefinition.context.npcLastName, "Stranger",
+T.equal(unknownDefinition.context.npcLastName, "",
     "unknown NPC last name is hidden")
 T.equal(unknownDefinition.context.playerNameKnown, false,
     "unknown player name remains undisclosed")

@@ -71,6 +71,61 @@ T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavor.lua")
 T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavorDefinitions.lua")
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandPresentation.lua")
 
+local playerEmoteRealization =
+    PNC.CompanionCommandPresentation.ResolvePlayerEmoteRealization(
+        "wavehi",
+        { requestID = "player-realization-one", playerActor = player }
+    )
+T.equal(playerEmoteRealization.responsePlanID, "semantic.emote.player",
+    "player emote presentation selects a semantic response plan")
+T.equal(playerEmoteRealization.realizationID,
+    "semantic.emote.player.wavehi",
+    "player emote presentation selects a gesture realization")
+T.equal(playerEmoteRealization.compatibilityFlavorID,
+    "vanilla_emote_wavehi",
+    "player emote presentation renders only through the selected content alias")
+
+local unknownTarget = {
+    id = "npc-unknown",
+    name = "Unknown survivor",
+    relationshipKind = "neutral",
+}
+local knownTarget = { id = "npc-one", name = "Mara" }
+state.semanticAddressHistory = nil
+local unknownAddressContext =
+    PNC.CompanionCommandPresentation.BuildFlavorContext(
+        player,
+        { targets = { unknownTarget, knownTarget } }
+    )
+T.equal(unknownAddressContext.names, "stranger and Mara",
+    "player emote replaces the internal unknown identity placeholder")
+T.equal(string.find(
+    unknownAddressContext.names,
+    "Unknown survivor",
+    1,
+    true
+), nil, "player emote target addresses do not leak the placeholder")
+local unknownAddressLine = PNC.CompanionCommandFlavor.Resolve(
+    "vanilla_emote_wavehi",
+    "player",
+    "unknown-address",
+    unknownAddressContext
+)
+T.truthy(string.find(unknownAddressLine, "stranger and Mara", 1, true),
+    "rendered emote speech uses semantic target addresses")
+T.truthy(state.semanticAddressHistory
+    and state.semanticAddressHistory["npc-unknown"],
+    "unknown target address history is bounded per NPC")
+T.equal(state.semanticAddressHistory["npc-unknown"][1], "stranger",
+    "first unknown target address is recorded")
+local nextUnknownAddress =
+    PNC.CompanionCommandPresentation.BuildFlavorContext(
+        player,
+        { targets = { unknownTarget } }
+    )
+T.equal(nextUnknownAddress.names, "mate",
+    "unknown target address advances within the bounded semantic family")
+
 local result = PNC.CompanionCommandPresentation
     .HandlePlayerEmoteInteractionResult({
         requestID = "request-one",

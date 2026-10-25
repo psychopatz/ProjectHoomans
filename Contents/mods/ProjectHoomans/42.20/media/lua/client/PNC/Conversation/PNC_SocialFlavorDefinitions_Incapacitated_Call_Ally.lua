@@ -78,6 +78,42 @@ return {
             },
         },
         {
+            id = "ally_dehydration",
+            when = cell("ally", "dehydration"),
+            npc = {
+                line("UI_PNC_IncapCall_Dehydration_1",
+                    "I'm severely dehydrated and too weak to move. I need water, {playerFirstName}!"),
+                line("UI_PNC_IncapCall_Dehydration_2",
+                    "I can't keep going without water. Please get me a drink, {playerFirstName}."),
+                line("UI_PNC_IncapCall_Dehydration_3",
+                    "I'm down from dehydration. Water, please!"),
+            },
+        },
+        {
+            id = "ally_starvation",
+            when = cell("ally", "starvation"),
+            npc = {
+                line("UI_PNC_IncapCall_Starvation_1",
+                    "I'm starving and too weak to move. I need food, {playerFirstName}!"),
+                line("UI_PNC_IncapCall_Starvation_2",
+                    "I can't keep going on an empty stomach. Please find me something to eat."),
+                line("UI_PNC_IncapCall_Starvation_3",
+                    "I'm down from hunger. I need food before I can get up."),
+            },
+        },
+        {
+            id = "ally_exhaustion",
+            when = cell("ally", "exhaustion"),
+            npc = {
+                line("UI_PNC_IncapCall_Exhaustion_1",
+                    "I'm completely spent. I can't keep up or get up without help!"),
+                line("UI_PNC_IncapCall_Exhaustion_2",
+                    "My legs are gone. Give me a moment and help me recover, {playerFirstName}."),
+                line("UI_PNC_IncapCall_Exhaustion_3",
+                    "I pushed too far. I need rest before I can move again."),
+            },
+        },
+        {
             id = "ally",
             when = cell("ally"),
             npc = {

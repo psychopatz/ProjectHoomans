@@ -132,6 +132,17 @@ end
 
 function CampResponses.FailureResponse(reason)
     reason = string.lower(tostring(reason or ""))
+    if reason == "camp_site_hint_out_of_range"
+        or string.find(reason, "out_of_range", 1, true)
+    then
+        return "That camp location is too far away right now."
+    end
+    if string.find(reason, "camp_site_hint_stale", 1, true)
+        or string.find(reason, "camp_room_hint_", 1, true)
+        or string.find(reason, "camp_site_hint_invalid", 1, true)
+    then
+        return "That camp location is no longer available; choose a fresh location."
+    end
     if reason == "camp_no_visible_site"
         or string.find(reason, "camp_site_hint", 1, true)
     then

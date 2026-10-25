@@ -74,6 +74,13 @@ It must not independently infer or choose semantic meaning.
 
 `PNC_VanillaEmoteInteractions.lua` still owns `ResolveNPCType`, `ResolveRelationshipTier`, `GreetingState`, `GreetingReplyFlavorID`, `ReplyFlavorID` and role/tier reply tables. Semantic Emote/NPCSpeech envelopes are created afterward.
 
+P12 follow-up resolution: the player-facing vanilla-emote speech path now
+selects the `semantic.emote.player` response plan and realization before the
+existing authored `vanilla_emote_*` Flavor groups render localized wording.
+Those Flavor groups remain compatibility/content aliases only; the native
+gesture, relationship effects, and NPC reply authority remain in their
+existing production owners.
+
 ### Farewell
 
 `PNC_ConversationFarewell.lua` still resolves legacy social role/context and feeds `social.conversation_farewell` into role-conditioned SocialFlavor definitions. Timing/cooldown/close eligibility may remain as lifecycle/presentation policy, but response-family selection must move above the authority line.

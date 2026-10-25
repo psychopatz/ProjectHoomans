@@ -1,4 +1,10 @@
 {
+  "UI_PNC_SemanticAddress_Unknown_Stranger": "stranger",
+  "UI_PNC_SemanticAddress_Unknown_Mate": "mate",
+  "UI_PNC_SemanticAddress_Unknown_Pal": "pal",
+  "UI_PNC_SemanticAddress_Unknown_Bro": "bro",
+  "UI_PNC_SemanticAddress_Unknown_Mister": "mister",
+  "UI_PNC_SemanticAddress_Unknown_Miss": "miss",
   "UI_PNC_FlavorAddress_Default_Buddy": "Buddy",
   "UI_PNC_FlavorAddress_Default_Friend": "Friend",
   "UI_PNC_FlavorAddress_Default_Pal": "Pal",

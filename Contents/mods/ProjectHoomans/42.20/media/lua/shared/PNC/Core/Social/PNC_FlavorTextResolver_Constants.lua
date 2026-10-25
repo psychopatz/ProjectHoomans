@@ -47,6 +47,9 @@ Const.Need = {
     MERCY = "mercy",
     HELP = "help",
     FAINT = "faint",
+    DEHYDRATION = "dehydration",
+    STARVATION = "starvation",
+    EXHAUSTION = "exhaustion",
 }
 
 Const.AllNeeds = {
@@ -56,6 +59,9 @@ Const.AllNeeds = {
     Const.Need.MERCY,
     Const.Need.HELP,
     Const.Need.FAINT,
+    Const.Need.DEHYDRATION,
+    Const.Need.STARVATION,
+    Const.Need.EXHAUSTION,
 }
 
 -- Relationship vocabulary.

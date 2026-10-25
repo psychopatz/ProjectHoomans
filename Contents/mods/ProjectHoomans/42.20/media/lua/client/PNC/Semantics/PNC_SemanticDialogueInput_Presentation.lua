@@ -173,10 +173,12 @@ function Internal.AppendPlayerInput(view, value, result)
     local provenance = ir.provenance or {}
     local topic = ir.extensions and ir.extensions.topic or nil
     topic = type(topic) == "table" and (topic.id or topic.key) or topic
+    local channel = provenance.parser == "semantic_navigation_frame"
+        and "navigation" or "input"
     return session:append("player", value, {
         source = {
             kind = "semantic",
-            channel = "input",
+            channel = channel,
             route = result.decision and result.decision.route,
             branch = result.decision and result.decision.branch,
         },

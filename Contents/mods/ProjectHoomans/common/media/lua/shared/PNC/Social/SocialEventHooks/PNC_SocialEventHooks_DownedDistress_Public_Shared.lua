@@ -167,25 +167,64 @@ end
 -- Wound picture -> resolver need inputs
 -- ---------------------------------------------------------------------------
 
+local function boundedPressure(value)
+    value = tonumber(value)
+    if value == nil or value ~= value then return 0 end
+    return math.max(0, math.min(1, value))
+end
+
+local function needStateFor(record)
+    local repository = PNC.NeedsRepository
+    if repository and type(repository.Get) == "function" then
+        local ok, state = pcall(repository.Get, record, false)
+        if ok and type(state) == "table" then
+            return type(state.needs) == "table" and state.needs or state
+        end
+    end
+    return record and type(record.needs) == "table" and record.needs or {}
+end
+
+local function activeAilment(body, id)
+    local ailments = body and body.wholeBodyAilments
+    local value = ailments and ailments[id]
+    if type(value) == "table" then
+        return boundedPressure(value.severity or value.value) > 0
+    end
+    return value == true or boundedPressure(value) > 0
+end
+
 local function woundInputs(record)
     local wounds = PNC.NPCWounds
-    if not wounds then return { critical = true } end
     local summary
-    if type(wounds.BuildStatusSummary) == "function" then
+    if wounds and type(wounds.BuildStatusSummary) == "function" then
         local ok, value = pcall(wounds.BuildStatusSummary, record)
         if ok then summary = value end
     end
     local treatable = {}
-    if type(wounds.GetTreatableWounds) == "function" then
+    if wounds and type(wounds.GetTreatableWounds) == "function" then
         local ok, value = pcall(wounds.GetTreatableWounds, record)
         if ok and type(value) == "table" then treatable = value end
     end
     local infected = false
-    if type(wounds.HasActiveInfection) == "function" then
+    if wounds and type(wounds.HasActiveInfection) == "function" then
         local ok, value = pcall(wounds.HasActiveInfection, record)
         if ok then infected = value == true end
     end
     local health = record.health or {}
+    local needs = needStateFor(record)
+    local body = type(health.body) == "table" and health.body or {}
+    local stamina = type(record.stamina) == "table" and record.stamina or {}
+    local thirst = boundedPressure(needs.thirst)
+    local hunger = boundedPressure(needs.hunger)
+    local fatigue = boundedPressure(needs.fatigue)
+    local staminaRatio = tonumber(stamina.ratio or record.staminaRatio)
+    if staminaRatio == nil then
+        local staminaCurrent = tonumber(stamina.current)
+        local staminaMax = tonumber(stamina.max)
+        if staminaCurrent ~= nil and staminaMax and staminaMax > 0 then
+            staminaRatio = staminaCurrent / staminaMax
+        end
+    end
     local current = tonumber(health.current)
     local max = tonumber(health.max)
     local critical = current == nil or max == nil or max <= 0
@@ -197,6 +236,13 @@ local function woundInputs(record)
         treatableWoundCount = #treatable,
         infected = infected,
         critical = critical,
+        thirst = thirst,
+        hunger = hunger,
+        fatigue = fatigue,
+        dehydration = activeAilment(body, "dehydration"),
+        starvation = activeAilment(body, "starvation"),
+        staminaState = stamina.state or record.staminaState,
+        staminaRatio = staminaRatio,
     }
 end
 

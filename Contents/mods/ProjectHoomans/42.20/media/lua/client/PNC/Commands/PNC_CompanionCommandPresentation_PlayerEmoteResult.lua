@@ -4,6 +4,22 @@ local Internal = Presentation.Internal
 local Registry = Internal.Registry
 local Flavor = Internal.Flavor
 local speak = Internal.speak
+local SpeechDelivery = PNC.Semantics
+    and PNC.Semantics.SemanticSpeechDelivery
+    or require "PNC/Semantics/PNC_SemanticSpeechDelivery"
+
+local function activeConversationSession(npcID)
+    local conversation = PsychopatzCore and PsychopatzCore.Conversation
+    local view = conversation and conversation.instance or nil
+    local session = view and view.session or nil
+    local activeNPC = view and view.spec and view.spec.npcID or nil
+    if session and type(session.queueMessage) == "function"
+        and tostring(activeNPC or "") == tostring(npcID or "")
+    then
+        return session
+    end
+    return nil
+end
 
 function Presentation.HandlePlayerEmoteInteractionResult(result)
     local state = PNC.Network and PNC.Network.ClientState or nil
@@ -50,8 +66,45 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
             )
             local replyText
             local playerText
+            local speechAccepted
+            local speechReason
             if target.resolvedText then
                 replyText = target.resolvedText
+                speechAccepted, speechReason = SpeechDelivery.NPC({
+                    session = activeConversationSession(npcID),
+                    dedupeStore = state.semanticSpeechDelivery,
+                    eventID = target.eventID or key,
+                    npcID = npcID,
+                    target = snapshot,
+                    speakerName = snapshot.name or snapshot.displayName,
+                    playerActor = player,
+                    text = target.resolvedText,
+                    semanticAct = target.replyInteraction
+                        and target.replyInteraction.act or "REACT",
+                    topic = target.replyInteraction
+                        and target.replyInteraction.topic
+                        or target.interactionType,
+                    responsePlanID = target.responsePlanID,
+                    realizationFamily = target.realizationFamily,
+                    realizationID = target.realizationID,
+                    factRefs = target.factRefs,
+                    compatibilityFlavorID = target.replyFlavorID,
+                    family = "emote_interaction_reply",
+                    priority = 100,
+                    weight = 100,
+                    cooldowns = {
+                        familyMs = 0,
+                        speakerMs = 0,
+                        ambientMs = 0,
+                        mergeWindowMs = 0,
+                    },
+                    pumpImmediately = true,
+                    deliveryOwner = "player_emote",
+                    interaction = target.replyInteraction
+                        or target.interaction,
+                    eventType = target.interactionType
+                        or "player_emote_reply",
+                })
             elseif target.replyFlavorID then
                 _, _, replyText = Presentation.EnqueueFlavor(
                     target.replyFlavorID,
@@ -142,6 +195,8 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
                     npcType = target.npcType,
                     greetingState = target.greetingState,
                     greetingDay = target.greetingDay,
+                    speechAccepted = speechAccepted,
+                    speechReason = speechReason,
                 })
             end
 

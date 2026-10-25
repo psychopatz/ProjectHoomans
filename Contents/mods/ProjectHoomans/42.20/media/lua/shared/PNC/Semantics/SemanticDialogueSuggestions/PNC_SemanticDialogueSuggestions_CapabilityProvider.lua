@@ -8,6 +8,32 @@ PNC.Semantics = PNC.Semantics or {}
 local Provider = PNC.Semantics.DialogueCapabilityChoiceProvider or {}
 PNC.Semantics.DialogueCapabilityChoiceProvider = Provider
 
+-- These rows share one contextual Orders hub.  The authoritative command
+-- registry and adapter still own the actual execution; this table only
+-- describes which semantic capability may be projected into the hub.
+local function companionOrderConstraints(extra)
+    local constraints = {
+        all = {
+            { path = "actorAuthority.owned", op = "eq", value = true },
+            { path = "actorAuthority.companion", op = "eq", value = true },
+            {
+                path = "npcState.activeBehavior",
+                op = "not_in",
+                values = { "hostile", "combat", "busy", "dead" },
+            },
+            {
+                path = "npcState.healthState",
+                op = "not_in",
+                values = { "dead", "incapacitated" },
+            },
+        },
+    }
+    for _, predicate in ipairs(extra or {}) do
+        constraints.all[#constraints.all + 1] = predicate
+    end
+    return constraints
+end
+
 Provider.id = "projecthoomans.capabilities"
 Provider.sourceKind = "permitted_capability"
 Provider.order = 80
@@ -18,60 +44,40 @@ Provider.Definitions = {
         topic = "movement",
         requiresOwnedCompanion = true,
         labelKey = "UI_PNC_Conversation_Suggestion_Follow_Label",
-        labelFallback = "Ask them to follow",
+        labelFallback = "Follow me.",
         utteranceKey = "UI_PNC_Conversation_Suggestion_Follow_Utterance",
         utteranceFallback = "Follow me.",
-        constraints = {
-            all = {
-                { path = "actorAuthority.owned", op = "eq", value = true },
-                { path = "actorAuthority.companion", op = "eq", value = true },
-                {
-                    path = "npcState.activeBehavior",
-                    op = "not_in",
-                    values = { "hostile", "combat", "busy", "dead" },
-                },
-                {
-                    path = "npcState.followState.mode",
-                    op = "not_in",
-                    values = { "following", "follow" },
-                },
-                {
-                    path = "npcState.healthState",
-                    op = "not_in",
-                    values = { "dead", "incapacitated" },
-                },
+        groupID = "companion.orders",
+        -- Follow/Stay are a toggle: expose only the actionable side of the
+        -- durable order, rather than rendering the opposite side disabled.
+        showWhenUnavailable = false,
+        constraints = companionOrderConstraints({
+            {
+                path = "npcState.orderKind",
+                op = "not_in",
+                values = { "follow" },
             },
-        },
+        }),
     },
     STAY = {
         id = "action.stay",
         topic = "movement",
         requiresOwnedCompanion = true,
         labelKey = "UI_PNC_Conversation_Suggestion_Stay_Label",
-        labelFallback = "Ask them to stay",
+        labelFallback = "Wait here.",
         utteranceKey = "UI_PNC_Conversation_Suggestion_Stay_Utterance",
-        utteranceFallback = "Stay here.",
-        constraints = {
-            all = {
-                { path = "actorAuthority.owned", op = "eq", value = true },
-                { path = "actorAuthority.companion", op = "eq", value = true },
-                {
-                    path = "npcState.activeBehavior",
-                    op = "not_in",
-                    values = { "hostile", "combat", "busy", "dead" },
-                },
-                {
-                    path = "npcState.followState.mode",
-                    op = "not_in",
-                    values = { "staying", "stay" },
-                },
-                {
-                    path = "npcState.healthState",
-                    op = "not_in",
-                    values = { "dead", "incapacitated" },
-                },
+        utteranceFallback = "Wait here.",
+        groupID = "companion.orders",
+        -- Follow/Stay are a toggle: expose only the actionable side of the
+        -- durable order, rather than rendering the opposite side disabled.
+        showWhenUnavailable = false,
+        constraints = companionOrderConstraints({
+            {
+                path = "npcState.orderKind",
+                op = "eq",
+                value = "follow",
             },
-        },
+        }),
     },
     WAIT_AT = {
         id = "action.wait_at",
@@ -81,23 +87,46 @@ Provider.Definitions = {
         labelFallback = "Ask them to wait there",
         utteranceKey = "UI_PNC_Conversation_Suggestion_WaitAt_Utterance",
         utteranceFallback = "Wait there.",
-        constraints = {
-            all = {
-                { path = "actorAuthority.owned", op = "eq", value = true },
-                { path = "actorAuthority.companion", op = "eq", value = true },
-                {
-                    path = "npcState.activeBehavior",
-                    op = "not_in",
-                    values = { "hostile", "combat", "busy", "dead" },
-                },
-                {
-                    path = "npcState.healthState",
-                    op = "not_in",
-                    values = { "dead", "incapacitated" },
-                },
-                { path = "suggestion.destination", op = "exists" },
+        -- WAIT_AT remains a typed/world-target capability.  It is never a
+        -- generic menu row; explicit destination requests are resolved by
+        -- the existing task adapter and authority path.
+        groupID = "companion.orders",
+        menuOnlyWhenDestination = false,
+        constraints = companionOrderConstraints({
+            { path = "suggestion.destination", op = "exists" },
+        }),
+    },
+    GO = {
+        id = "action.go_home",
+        topic = "movement",
+        requiresOwnedCompanion = true,
+        -- Keep this known owned action visible when no base exists so the
+        -- semantic UI can explain why it is unavailable.
+        showWhenUnavailable = true,
+        unavailableReasonCode = "base_required",
+        unavailableReasonPath = "baseEstablished",
+        unavailableReasonKey =
+            "UI_PNC_Conversation_Suggestion_GoHome_NoBase_Tooltip",
+        unavailableReasonFallback =
+            "Go Home is unavailable because no base has been established.",
+        labelKey = "UI_PNC_CommandReturnHome",
+        labelFallback = "Go home.",
+        utteranceKey = "UI_PNC_CommandReturnHome",
+        utteranceFallback = "Go home.",
+        destination = { category = "HOME" },
+        groupID = "companion.orders",
+        constraints = companionOrderConstraints({
+            {
+                path = "baseEstablished",
+                op = "eq",
+                value = true,
             },
-        },
+            {
+                path = "npcState.activeBehavior",
+                op = "not_in",
+                values = { "AtHome", "AtHome:returning" },
+            },
+        }),
     },
 }
 

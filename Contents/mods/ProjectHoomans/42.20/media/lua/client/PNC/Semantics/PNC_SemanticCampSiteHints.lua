@@ -95,12 +95,28 @@ local function cellFor(context)
     return getCell()
 end
 
-local function cacheKey(scope, query, origin, cell)
+local function withinServerRange(value, origin, radius)
+    local x, y, z = position(value)
+    local ox, oy, oz = position(origin)
+    if not x or not y or not ox or not oy then return false end
+    local maximum = math.min(40, math.max(4, tonumber(radius)
+        or Hints.MAX_RADIUS) + 4)
+    local dx = x - ox
+    local dy = y - oy
+    return dx * dx + dy * dy <= maximum * maximum
+        and math.abs((z or 0) - (oz or 0)) <= 1
+end
+
+local function cacheKey(scope, query, origin, cell, target)
     local x, y, z = position(origin)
     return tostring(scope) .. "|" .. tostring(query or "") .. "|"
         .. tostring(math.floor(x or 0)) .. ":"
         .. tostring(math.floor(y or 0)) .. ":" .. tostring(z or 0)
-        .. "|" .. tostring(cell)
+        .. "|" .. tostring(cell) .. "|"
+        .. tostring(target and target.siteID or "") .. "|"
+        .. tostring(target and target.roomID or "") .. "|"
+        .. tostring(target and target.campfireID or "") .. "|"
+        .. tostring(target and target.requireExact == true or false)
 end
 
 local function audit(scope, query, hint, reason, details)
@@ -137,6 +153,92 @@ function Hints.ClearCache()
     Hints.Cache = {}
 end
 
+-- Return only bounded primitive observations for semantic menu projection.
+-- Engine room/building objects never leave this client-side adapter.
+function Hints.Enumerate(context, options)
+    context = type(context) == "table" and context or {}
+    options = type(options) == "table" and options or {}
+    local cell = cellFor(context)
+    if not cell then return {}, "cell_unavailable" end
+
+    local origin = originFor(context)
+    if not origin or not position(origin) then
+        return {}, "world_origin_unavailable"
+    end
+    local timestamp = nowMs()
+    local output = {}
+    local seen = {}
+    local maxRooms = tonumber(options.maxRooms) or 8
+    if maxRooms < 1 then maxRooms = 1 end
+    if maxRooms > 16 then maxRooms = 16 end
+
+    local function appendRoom(site)
+        if not site or #output >= maxRooms then return end
+        if not withinServerRange(site, origin, Hints.MAX_RADIUS) then
+            return
+        end
+        local hint = Projection.Room(
+            site,
+            site.query or options.query or "room",
+            timestamp,
+            Hints,
+            CampSite
+        )
+        local key = hint and (hint.siteID or "") .. "|" .. (hint.roomID or "")
+        if hint and key ~= "|" and not seen[key] then
+            seen[key] = true
+            output[#output + 1] = hint
+        end
+    end
+
+    Geometry.EnumerateRooms(cell, function(room, building)
+        if #output >= maxRooms then return end
+        local site = Geometry.DescribeRoom(room, building, cell, origin, {
+            -- Dynamic Camp navigation discovers every valid loaded room.
+            -- The literal fallback "room" is a name filter and rejects
+            -- real room names such as HALLWAY when no query was supplied.
+            query = options.query,
+        })
+        appendRoom(site)
+    end, {
+        maxRooms = maxRooms,
+        maxBuildings = options.maxBuildings or 16,
+    })
+
+    -- The loaded cell's room/building index is presentation assistance only
+    -- and is not guaranteed to include the room containing the player. Reuse
+    -- the existing room-first resolver before falling back to campfires so a
+    -- valid current hallway/room is still offered in the semantic branch.
+    if #output == 0 and origin
+        and type(Geometry.FindNearestRoom) == "function"
+    then
+        local site = Geometry.FindNearestRoom(cell, origin, nil, {
+            radius = Hints.MAX_RADIUS,
+        })
+        appendRoom(site)
+    end
+
+    local campfireCandidates = context.campfireCandidates
+    if type(campfireCandidates) == "table" then
+        for _, candidate in ipairs(campfireCandidates) do
+            if #output >= maxRooms then break end
+            if type(candidate) == "table" then
+                local key = (candidate.siteID or "") .. "|" .. (candidate.campfireID or "")
+                if key ~= "|" and not seen[key]
+                    and withinServerRange(
+                        candidate, origin, candidate.radius or Hints.MAX_RADIUS
+                    )
+                then
+                    seen[key] = true
+                    output[#output + 1] = candidate
+                end
+            end
+        end
+    end
+
+    return output
+end
+
 function Hints.Resolve(target, context)
     context = type(context) == "table" and context or {}
     target = CampSite.NormalizeTarget(target)
@@ -148,7 +250,7 @@ function Hints.Resolve(target, context)
     local origin = originFor(context)
     local cell = cellFor(context)
     local timestamp = nowMs()
-    local key = cacheKey(scope, query, origin, cell)
+    local key = cacheKey(scope, query, origin, cell, target)
     local cached = Hints.Cache[key]
     local site
     local hint
@@ -192,7 +294,9 @@ function Hints.Resolve(target, context)
                 reason = "room_type_fallback"
             end
         end
-        if not hint and scope == CampSite.SCOPES.HERE then
+        if target.requireExact == true and not hint then
+            reason = reason or "camp_site_hint_stale"
+        elseif not hint and scope == CampSite.SCOPES.HERE then
             hint, fallbackReason = Projection.Campfire(
                 target, context, origin, timestamp, cell, Hints, CampSite,
                 WorldHints)

@@ -55,6 +55,18 @@ function Group:Submit(value, part)
     return accepted, reason
 end
 
+function Group:SubmitSemanticNavigationFrame(frame, value)
+    if type(frame) ~= "table" then
+        return false, "navigation_frame_invalid"
+    end
+    value = tostring(value or frame.utterance or frame.textFallback or "")
+    if value == "" then return false, "navigation_frame_text_missing" end
+    return self:Submit(value, {
+        semanticFrame = frame,
+        navigationFrame = true,
+    })
+end
+
 function Group.Create(primaryHost, hosts, entries, player, options)
     options = type(options) == "table" and options or {}
     local members = buildMembers(hosts, entries)

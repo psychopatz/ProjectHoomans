@@ -4,6 +4,9 @@ PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
 require "PNC/Core/Identity/PNC_FlavorAddress"
+local AddressResolver = PNC.Semantics
+    and PNC.Semantics.AddressResolver
+    or require "PNC/Semantics/PNC_SemanticAddressResolver"
 
 local Context = PNC.Conversation.FarewellContext or {}
 PNC.Conversation.FarewellContext = Context
@@ -115,12 +118,39 @@ function Context.Build(spec, role, npcID)
     local playerContext = state.playerContext or {}
     local npcName = source.npcName or entry.displayName
         or snapshot.displayName or snapshot.name or npcID
+    local identityKnown = false
     local identity = PNC.NPCIdentityPresentation
     if identity and type(identity.GetName) == "function" then
         local ok, resolved = pcall(identity.GetName, entry)
         if ok and clean(resolved, nil) then npcName = resolved end
     end
-    local npcFull, npcFirst = nameParts(npcName)
+    if identity and type(identity.IsNameKnown) == "function" then
+        identityKnown = identity.IsNameKnown(entry) == true
+    end
+    local address = AddressResolver.Resolve({
+        target = entry,
+        identityKnown = identityKnown,
+        knownName = identityKnown and npcName or nil,
+        relationshipKind = source.conversationRelationshipID
+            or source.relationshipState or role,
+        familiarity = source.familiarity,
+        tone = source.tone or source.beatTone,
+        persona = source.persona or source.personaStyle,
+        seed = npcID,
+        language = source.language,
+        recentAddresses = source.recentAddresses
+            or state.semanticAddressHistory
+            and state.semanticAddressHistory[npcID],
+    })
+    if not address.known then
+        state.semanticAddressHistory = state.semanticAddressHistory or {}
+        state.semanticAddressHistory[npcID] =
+            state.semanticAddressHistory[npcID] or {}
+        AddressResolver.Remember(
+            state.semanticAddressHistory[npcID], address
+        )
+    end
+    local npcFull, npcFirst = nameParts(address.address)
     local playerID = clean(
         playerContext.characterUUID or playerContext.playerUUID
             or call(player, "getUsername") or call(player, "getOnlineID"),
@@ -156,6 +186,9 @@ function Context.Build(spec, role, npcID)
         npcName = npcFull,
         npcFullName = npcFull,
         npcFirstName = npcFirst,
+        npcAddress = address.address,
+        npcAddressID = address.id,
+        npcIdentityKnown = address.known,
         playerUUID = playerID,
     }, player, playerID
 end

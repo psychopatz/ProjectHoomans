@@ -7,6 +7,7 @@ local activeView = Internal.ActiveView
 local lifecycleState = Internal.LifecycleState
 local notifyFailure = Internal.NotifyFailure
 local requestID = Internal.RequestID
+local ensureLease = Internal.EnsureLease
 local sendRequest = Internal.SendRequest
 
 function Composer.PumpLocalRequests()
@@ -59,6 +60,11 @@ function Composer.RequestSettlementAdmission(npcID)
         notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
         return false, "conversation_not_ready"
     end
+    local leaseReady, leaseReason = ensureLease(view)
+    if not leaseReady then
+        notifyFailure(view, "status.choice_rejected", leaseReason)
+        return false, leaseReason
+    end
     local id = requestID("settlement_admission")
     local context = view.spec.context.conversationBlockContext
     local visit = context and context.settlementVisit or nil
@@ -88,6 +94,11 @@ function Composer.RequestAmbientVisit(npcID)
         notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
         return false, "conversation_not_ready"
     end
+    local leaseReady, leaseReason = ensureLease(view)
+    if not leaseReady then
+        notifyFailure(view, "status.choice_rejected", leaseReason)
+        return false, leaseReason
+    end
     local id = requestID("ambient_visit")
     view.spec.context.pendingConversationRequest = id
     local sent, reason = sendRequest(
@@ -113,6 +124,11 @@ function Composer.RequestCategory(npcID, categoryID, autoChoiceID)
     if not lifecycle then
         notifyFailure(view, "status.block_unavailable", "conversation_not_ready")
         return false, "conversation_not_ready"
+    end
+    local leaseReady, leaseReason = ensureLease(view)
+    if not leaseReady then
+        notifyFailure(view, "status.block_unavailable", leaseReason)
+        return false, leaseReason
     end
     local id = requestID("category")
     view.spec.context.pendingConversationRequest = id
@@ -143,6 +159,11 @@ function Composer.RequestChoice(npcID, blockID, nodeID, choiceID)
         notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
         return false, "conversation_not_ready"
     end
+    local leaseReady, leaseReason = ensureLease(view)
+    if not leaseReady then
+        notifyFailure(view, "status.choice_rejected", leaseReason)
+        return false, leaseReason
+    end
     local id = requestID("choice")
     view.spec.context.pendingConversationRequest = id
     local sent, reason = sendRequest(PNC.Const.CMD_CONVERSATION_CHOICE_REQUEST, {
@@ -169,6 +190,11 @@ function Composer.RequestRecruit(npcID)
         notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
         return false, "conversation_not_ready"
     end
+    local leaseReady, leaseReason = ensureLease(view)
+    if not leaseReady then
+        notifyFailure(view, "status.choice_rejected", leaseReason)
+        return false, leaseReason
+    end
     local id = requestID("recruit")
     view.spec.context.pendingConversationRequest = id
     local sent, reason = sendRequest(
@@ -194,6 +220,11 @@ function Composer.RequestDeparture(npcID, confirm)
     if not lifecycle then
         notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
         return false, "conversation_not_ready"
+    end
+    local leaseReady, leaseReason = ensureLease(view)
+    if not leaseReady then
+        notifyFailure(view, "status.choice_rejected", leaseReason)
+        return false, leaseReason
     end
     local id = requestID("departure")
     view.spec.context.pendingConversationRequest = id

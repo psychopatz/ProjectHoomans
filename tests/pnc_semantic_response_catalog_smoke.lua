@@ -74,6 +74,48 @@ local unrelated = Catalog.Select(
 T.equal(unrelated.id, "test.topic.default",
     "unmatched conditions fall back to the default variant")
 
+local navigation = Catalog.Select(
+    "semantic.conversation.acknowledged",
+    { npcID = "mara", subject = "CONVERSATION_TOPIC" },
+    "navigation"
+)
+T.equal(navigation.templateID, "semantic.navigation.subject_change",
+    "semantic navigation uses its dedicated subject-change response")
+T.equal(navigation.fallback,
+    "All right. What did you want to talk about?",
+    "semantic navigation keeps a player-facing acknowledgement")
+
+Catalog.ResetSelections()
+local whatsUp = Catalog.Select(
+    "semantic.question.whats_up",
+    {
+        npcID = "mara",
+        subject = "CONVERSATION_TOPIC",
+        worldContext = {},
+    },
+    "whats_up"
+)
+T.truthy(whatsUp,
+    "what's up resolves through a dedicated semantic response pool")
+T.truthy(
+    whatsUp.id == "semantic.question.whats_up.default"
+        or whatsUp.id == "semantic.question.whats_up.default_alt",
+    "what's up uses a bounded conversational variant")
+T.falsy(whatsUp.fallback == "Let me think about that.",
+    "what's up does not use the generic question fallback")
+
+local rainyWhatsUp = Catalog.Select(
+    "semantic.question.whats_up",
+    {
+        npcID = "mara",
+        subject = "CONVERSATION_TOPIC",
+        worldContext = { weather = { raining = true } },
+    },
+    "rainy_whats_up"
+)
+T.equal(rainyWhatsUp.id, "semantic.question.whats_up.weather",
+    "what's up can use current weather as grounded context")
+
 T.falsy(Catalog.Select("missing_pool", {}, "missing"),
     "missing pools fail safely")
 

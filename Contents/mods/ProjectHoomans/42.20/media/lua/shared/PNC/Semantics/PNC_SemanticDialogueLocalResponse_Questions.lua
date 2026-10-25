@@ -117,6 +117,24 @@ local function resolveActivity(ir, state, context)
     )
 end
 
+local function resolveWhatsUp(ir, state, context)
+    local situation = context and context.dialogueSituation or nil
+    local npc = situation and situation.npc or nil
+    local activity = npc and npc.activity or nil
+    local weather = context and context.worldContext
+        and context.worldContext.weather or nil
+    local busy = npc and npc.busy == true
+        or activity and (activity.busy == true or activity.id == "working")
+    return catalogResponse(
+        "semantic.question.whats_up", ir, state, context, {
+            subject = "CONVERSATION_TOPIC",
+            activity = activity and activity.id or nil,
+            busy = busy == true,
+            raining = weather and weather.raining == true or false,
+        }
+    )
+end
+
 local function resolveWellbeing(ir, state, context)
     local extensions = type(ir.extensions) == "table" and ir.extensions or nil
     local followsWellbeingAnswer = Internal.FollowsWellbeingAnswer
@@ -1013,6 +1031,12 @@ return function(ir, state, context)
     end
     if ir.subject == "ACTIVITY" then
         return resolveActivity(ir, state, context)
+    end
+    if ir.subject == "CONVERSATION_TOPIC"
+        and ir.extensions
+        and ir.extensions.topic == "whats_up"
+    then
+        return resolveWhatsUp(ir, state, context)
     end
     if ir.subject == "WELLBEING" then
         return resolveWellbeing(ir, state, context)

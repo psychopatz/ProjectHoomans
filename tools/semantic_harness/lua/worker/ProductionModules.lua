@@ -484,6 +484,20 @@ load(
         "PNC/Factions/PNC_FactionCore.lua",
         "recruitment_authority"
     )
+    -- The native conversation departure authority delegates its gameplay
+    -- mutation to this existing server service. Keep the worker on that same
+    -- executor so Leave Group acceptance can prove the warning/confirm path
+    -- and the real ownership/faction mutation rather than a mock response.
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_ColonistDeparturePolicy.lua",
+        "departure_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Colonists/PNC_ColonistDepartureService.lua",
+        "departure_authority"
+    )
     -- CommunityService is a native server dependency of recruitment.  Load
     -- the same shared value objects that the native shared composition loads
     -- before entering the service, so the worker does not create a weaker
@@ -585,6 +599,7 @@ load(
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticCatalog.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticEngineFacts.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticEngineEvents.lua", "semantic")
+    load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticAddressResolver.lua", "semantic")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua", "semantic_lifecycle")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticDialoguePolicy.lua", "semantic")
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticCommandAdapter.lua", "semantic_adapter")

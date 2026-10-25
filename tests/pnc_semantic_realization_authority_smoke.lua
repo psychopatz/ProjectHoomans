@@ -140,6 +140,29 @@ representative("emote", "semantic.emote.reply", function()
     })
 end)
 
+local playerEmote = Authority.Resolve({
+    poolID = "semantic.emote.player",
+    responsePlanID = "semantic.emote.player",
+    realizationFamily = "emote_player",
+    act = "GREET",
+    context = {
+        npcID = "player:alice",
+        action = "wavehi",
+        eventType = "player_emote_wavehi",
+    },
+    salt = "authority-boundary-player-emote",
+})
+T.equal(playerEmote.responsePlanID, "semantic.emote.player",
+    "player emote speech resolves through the semantic response pool")
+T.equal(playerEmote.realizationFamily, "emote_player",
+    "player emote speech has a semantic realization family")
+T.equal(playerEmote.realizationID, "semantic.emote.player.wavehi",
+    "player emote selects the gesture-specific realization")
+T.equal(playerEmote.compatibilityFlavorID, "vanilla_emote_wavehi",
+    "player emote keeps Flavor only as an authored content alias")
+T.equal(playerEmote.responsePlan.dialogueAct, "GREET",
+    "player emote response plan preserves the semantic act")
+
 representative("companion acknowledgement", "semantic.companion.reaction", function()
     return Reactions.Resolve({
         eventType = "companion_command_acknowledgement",

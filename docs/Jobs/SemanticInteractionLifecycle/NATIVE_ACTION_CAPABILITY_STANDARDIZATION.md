@@ -6,6 +6,12 @@
 **Preserve:** P0–P11 lifecycle, persistence, native-presentation parity and single-authority foundations unless a P12 regression proves a defect.  
 **Product rule:** one semantic system owns conversational meaning and capability representation; existing authored/gameplay systems remain authoritative executors.
 
+**Latest developer evidence (2026-10-25):** P12B–P12H production-side
+regression coverage is green after preserving typed landing shortcut frames
+through native/group submission and using replicated native conversation
+snapshots as the bounded companion-authority fallback. The native SP/MP retest
+remains user-owned; prior native screenshots are pre-fix evidence.
+
 ## Why P12 exists
 
 After P10/P11 were marked complete, native Project Zomboid testing exposed production failures that the existing automated acceptance did not catch:
@@ -286,6 +292,8 @@ Only expose when the target is commandable and the command is currently meaningf
 
 ## Dynamic Camp subbranch
 
+The menu projection now consumes one bounded `PNC.Semantics.LocationObservation` adapter. It is client-side presentation assistance over the existing `CampSiteHints`/`CampSiteGeometry` stack, carries only primitive site identities and coordinates, and is briefly cached by loaded-cell/origin. Generated observations are re-read as the player moves; they are not treated as durable semantic state. If room enumeration omits the current loaded room, the adapter reuses the existing nearest-room resolver before campfire fallback. The Semantic Lab supplies the same compact observation as a fixture and does not implement map discovery.
+
 Reuse existing production infrastructure:
 
 - `PNC.Semantics.CampSite`;
@@ -347,6 +355,8 @@ Acceptance first-wave:
 
 ### P12C — Semantic speech delivery
 
+Native acceptance must include queue arbitration: an already-selected semantic NPC reply cannot be discarded by the player's emote family, speaker cooldown, or ambient cadence. Player-emote replies use the shared semantic speech seam with protected interaction priority, a distinct reply family, immediate pumping, and one delivery owner. This proves visible delivery, not merely a stored `resolvedText` or diary/result record.
+
 Create/reuse one semantic delivery seam for already-resolved NPC speech.
 
 Fix emote `resolvedText` delivery.
@@ -387,7 +397,11 @@ Inside it:
 
 Use actual capability eligibility and existing authoritative executors.
 
+Navigation rows are semantic exchanges, not presentation-only projection toggles. A selected Orders, Camp, or Back frame must enter the normal semantic input/policy/realization path, deliver one contextual NPC acknowledgement, and then reproject the requested group from current authoritative state. The player navigation utterance is recorded once; the implementation must not synthesize a second authored-choice selection from inside the same Core execution.
+
 ### P12F — Dynamic Camp destinations
+
+Dynamic menu discovery must call room description without a synthetic room-name query when the player has not specified one. A fallback such as `"room"` is not a generic category in the geometry adapter; it filters out valid engine room names such as `HALLWAY`. The menu may enumerate bounded valid rooms/campfires, while selected primitive identity still travels through the existing client hint and server resolver.
 
 Project bounded valid room/campfire choices from existing CampSite geometry/hints.
 
@@ -407,6 +421,8 @@ After any command/action:
 
 ### P12H — Native-effect + harness acceptance
 
+The emote acceptance chain is specifically: semantic reply selected -> resolved text enters the shared delivery seam -> Core queue admits it despite the player-emote interaction -> visible NPC speech/nameplate (and downstream TTS where enabled) occurs exactly once -> the active capability/session state remains correct. A result object or `accepted=true` without visible delivery is insufficient.
+
 For the same production state, prove both presentation and effect:
 
 - Goodbye closes;
@@ -416,6 +432,7 @@ For the same production state, prove both presentation and effect:
 - Follow/Wait toggles mutually exclusively and mutates the real order;
 - Go Home mutates the real authoritative command state;
 - Camp dynamic room choice reaches server validation and commits the selected valid site;
+- Orders/Camp/Back navigation produces one player line and one contextual NPC acknowledgement before the target group is reprojected;
 - typed input / semantic button / headless equivalent requests reach the same capability where appropriate;
 - Semantic Lab mirrors native capability/action state;
 - P10/P11 parity and no-split invariants remain green.

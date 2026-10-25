@@ -1,4 +1,10 @@
 {
+  "UI_PNC_SemanticAddress_Unknown_Stranger": "estranghero",
+  "UI_PNC_SemanticAddress_Unknown_Mate": "kaibigan",
+  "UI_PNC_SemanticAddress_Unknown_Pal": "kaibigan",
+  "UI_PNC_SemanticAddress_Unknown_Bro": "kuya",
+  "UI_PNC_SemanticAddress_Unknown_Mister": "ginoo",
+  "UI_PNC_SemanticAddress_Unknown_Miss": "binibini",
   "UI_PNC_FlavorAddress_Default_Buddy": "Kaibigan",
   "UI_PNC_FlavorAddress_Default_Friend": "kaibigan",
   "UI_PNC_FlavorAddress_Default_Pal": "Kaibigan",
