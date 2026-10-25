@@ -165,9 +165,10 @@ After dependency verification:
 
 - remove/relocate unused duplicate harness modules;
 - retire old semantic-decision APIs;
-- root `AGENTS.md` must have one unmistakable current active goal;
-- old READY/goal docs must be clearly historical/non-executable;
-- historical checked-in `GOAL_PROMPT.md` files must be renamed/moved or prominently marked HISTORICAL / DO NOT EXECUTE.
+- root `AGENTS.md` must contain durable repository-wide policy only and must not carry the current goal, phase, Next Chunk, implementation progress, or superseded goal history;
+- active execution state belongs in this job's `ROADMAP.md`/`PROGRESS.md` and the conversational ChatGPT `/goal` bootstrap;
+- old READY/goal docs must be clearly historical/non-executable when they remain useful as job-local archaeology;
+- historical checked-in `GOAL_PROMPT.md` files must remain renamed/moved so they cannot be mistaken for current marching orders.
 
 ### P11H — No-split-system acceptance
 
