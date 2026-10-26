@@ -1,6 +1,6 @@
 # Semantic Observatory & Dialogue Quality Harness — full developer roadmap
 
-**Parent goal: IN PROGRESS / NOT IMPLEMENTED.** These are **mandatory developer-side phases** P0–P7, not eight separate /goal assignments. A phase or Next Chunk passing is not completion of the parent goal. Preserve accepted Semantic Lab / CodeBuilder / native semantic work; audit before touching it.
+**Parent goal: IN PROGRESS / PARTIALLY IMPLEMENTED.** These are **mandatory developer-side phases** P0–P7, not eight separate /goal assignments. A phase or Next Chunk passing is not completion of the parent goal. Preserve accepted Semantic Lab / CodeBuilder / native semantic work; audit before touching it.
 
 ## P0 — Baseline and canonical contracts
 

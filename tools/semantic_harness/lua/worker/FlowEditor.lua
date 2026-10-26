@@ -186,6 +186,95 @@ local function poolFingerprint(pool)
     return "catalog-v1:" .. tostring(Core.hash(stableValue(pool)))
 end
 
+-- Registration evidence is recorded by the production Lua call site.
+-- Only exact, readable mod-relative paths are exposed as verified authored
+-- source; helpers and generated assembly are not canonical inputs.
+local function verifiedRegistrationOrigin(context, registeredSource)
+    if type(registeredSource) ~= "string"
+        or registeredSource == "UNKNOWN" then
+        return "UNKNOWN", "UNKNOWN"
+    end
+    local prefix = context.repository .. "/"
+    if string.sub(registeredSource, 1, #prefix) ~= prefix then
+        return "UNKNOWN", "UNKNOWN"
+    end
+    local relative = string.sub(registeredSource, #prefix + 1)
+    if string.find(relative, "..", 1, true)
+        or not string.match(relative,
+            "^Contents/mods/ProjectHoomans/[%w%.]+/media/lua/shared/PNC/Semantics/.*%.lua$")
+    then
+        return "UNKNOWN", "UNKNOWN"
+    end
+    local handle = io.open(registeredSource, "rb")
+    if not handle then return "UNKNOWN", "UNKNOWN" end
+    handle:close()
+    if string.find(relative, "/SemanticDialogueResponseCatalog/", 1, true) then
+        return "AUTHORED_LUA", relative
+    end
+    -- Automatic generator registration identifies the executed assembly
+    -- module only, never the canonical CodeBuilder edit input.
+    if string.find(relative, "/PNC_SemanticAutomaticFlowGenerator_", 1, true) then
+        return "GENERATED_REGISTRATION_SITE", relative
+    end
+    return "REGISTRATION_SITE", relative
+end
+
+-- Generated pool lineage is derived from the *loaded generated flows*
+-- and the registered command descriptor, not constructed from a pool ID.
+-- The registration-site file remains distinct from the actual action owner.
+local function generatedActionLineage(context, poolID)
+    local CapabilityCatalog = capabilityCatalog()
+    local generation = CapabilityCatalog.AutomaticFlowGeneration or {}
+    local capabilityID, flowID = nil, nil
+    for _, flow in ipairs(generation.flows or {}) do
+        for _, node in pairs(flow.nodes or {}) do
+            if node.responsePool == poolID then
+                if capabilityID and capabilityID ~= flow.capabilityID then
+                    return nil
+                end
+                capabilityID = flow.capabilityID
+                flowID = flow.id
+            end
+        end
+    end
+    if not capabilityID then return nil end
+    local Adapter = PNC.Semantics.CommandAdapter
+    local actionID, registeredPath = nil, nil
+    if type(Adapter) == "table" then
+        for id, definition in pairs(Adapter.Actions or {}) do
+            if type(definition) == "table"
+                and definition.capabilityID == capabilityID then
+                if actionID and actionID ~= id then return nil end
+                actionID = id
+                registeredPath = Adapter.ActionOrigins
+                    and Adapter.ActionOrigins[id]
+            end
+        end
+    end
+    local verifiedPath = "UNKNOWN"
+    if type(registeredPath) == "string" then
+        local prefix = context.repository .. "/"
+        if string.sub(registeredPath, 1, #prefix) == prefix then
+            local relative = string.sub(registeredPath, #prefix + 1)
+            if not string.find(relative, "..", 1, true)
+                and string.match(relative,
+                    "^Contents/mods/ProjectHoomans/[%w%.]+/media/lua/client/"
+                        .. "PNC/Semantics/PNC_SemanticCommandAdapter_[%w_]+%.lua$")
+            then
+                local file = io.open(registeredPath, "rb")
+                if file then file:close(); verifiedPath = relative end
+            end
+        end
+    end
+    return {
+        capabilityID = capabilityID,
+        generatedFlowID = flowID,
+        commandActionID = actionID,
+        verifiedCanonicalActionPath = verifiedPath,
+        canonicalOwnerVerified = verifiedPath ~= "UNKNOWN",
+    }
+end
+
 local function boundedPlanSummary(plan)
     if type(plan) ~= "table" then return {} end
     local turns = type(plan.turns) == "table" and plan.turns or {}
@@ -298,6 +387,54 @@ function FlowEditor.explainResponseSelection(context, request)
     return result
 end
 
+-- Find actual registered variant/template records by the *observed*
+-- response key. A template match alone does NOT prove the selector chose it.
+function FlowEditor.responseKeyLookup(context, request)
+    if type(request) ~= "table" or type(request.key) ~= "string"
+        or request.key == "" or #request.key > 128 then
+        return { ok = false, type = "response_key_lookup",
+            schemaVersion = 1, error = "invalid_response_key" }
+    end
+    local ResponseCatalog = PNC.Semantics.ResponseCatalog
+        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local matches = {}
+    local total = 0
+    for poolID, pool in pairs(ResponseCatalog.POOLS or {}) do
+        for index, variant in ipairs(pool.variants or {}) do
+            local direct = variant.id == request.key
+            local templateMatch = variant.templateID == request.key
+            if direct or templateMatch then
+                total = total + 1
+                if #matches < 16 then
+                    local origin = ResponseCatalog.REGISTRATION_ORIGINS
+                        and ResponseCatalog.REGISTRATION_ORIGINS[poolID]
+                    local sourceKind, sourcePath = verifiedRegistrationOrigin(
+                        context, origin and origin[variant.id]
+                    )
+                    matches[#matches + 1] = {
+                        poolID = poolID, variantID = variant.id,
+                        templateID = variant.templateID,
+                        matchKind = direct and "REGISTERED_VARIANT_ID"
+                            or "TEMPLATE_ID_ONLY",
+                        sourceKind = sourceKind, sourcePath = sourcePath,
+                        priority = variant.priority,
+                    }
+                end
+            end
+        end
+    end
+    table.sort(matches, function(a, b)
+        if a.poolID ~= b.poolID then return a.poolID < b.poolID end
+        return tostring(a.variantID) < tostring(b.variantID)
+    end)
+    return {
+        ok = true, type = "response_key_lookup", schemaVersion = 1,
+        observedKey = request.key, registryRevision = ResponseCatalog.REVISION or 0,
+        matchCount = total, truncated = total > #matches,
+        matches = matches,
+    }
+end
+
 function FlowEditor.responsePoolDetail(context, request)
     if type(request) ~= "table" or type(request.poolID) ~= "string"
         or #request.poolID == 0 or #request.poolID > 96
@@ -322,6 +459,11 @@ function FlowEditor.responsePoolDetail(context, request)
     local variants = {}
     for i = offset + 1, math.min(#pool.variants, offset + limit) do
         local v = pool.variants[i]
+        local origin = ResponseCatalog.REGISTRATION_ORIGINS
+            and ResponseCatalog.REGISTRATION_ORIGINS[pool.id]
+        local sourceKind, sourcePath = verifiedRegistrationOrigin(
+            context, origin and origin[v.id]
+        )
         variants[#variants + 1] = {
             id = v.id, templateID = v.templateID, fallback = v.fallback,
             when = context.Values.copy(v.when or {}), priority = v.priority,
@@ -329,16 +471,30 @@ function FlowEditor.responsePoolDetail(context, request)
             translationArgs = context.Values.copy(v.translationArgs or {}),
             dialogueAct = v.dialogueAct, topic = v.topic,
             groundedFactRefs = context.Values.copy(v.groundedFactRefs or {}),
-            sourceKind = "UNKNOWN", sourcePath = "UNKNOWN",
+            sourceKind = sourceKind, sourcePath = sourcePath,
         }
+    end
+    local singlePath = nil
+    local singleKind = nil
+    for index = 1, #variants do
+        local item = variants[index]
+        if index == 1 then
+            singlePath, singleKind = item.sourcePath, item.sourceKind
+        elseif item.sourcePath ~= singlePath or item.sourceKind ~= singleKind then
+            singlePath, singleKind = "MIXED", "MIXED"
+            break
+        end
     end
     return {
         ok = true, type = "response_pool_detail", schemaVersion = 1,
         poolID = pool.id, variantCount = #pool.variants,
         registryRevision = ResponseCatalog.REVISION or 0,
         contentFingerprint = poolFingerprint(pool),
+        generatedActionLineage = generatedActionLineage(context, pool.id),
         offset = offset, limit = limit, hasMore = offset + #variants < #pool.variants,
-        variants = variants, sourceKind = "UNKNOWN", sourcePath = "UNKNOWN",
+        variants = variants,
+        sourceKind = singleKind or "UNKNOWN",
+        sourcePath = singlePath or "UNKNOWN",
     }
 end
 

@@ -30,6 +30,8 @@ def build_studio_editors(
     app.observatory = SemanticObservatoryPane(
         observatory_tab, app._tk, ttk, scrolled_text,
         run_worker=app._start_operation,
+        repository=app.authoring_service.repository,
+        filedialog=app._filedialog,
     )
     editor_notebook = ttk.Notebook(editor_tab)
     editor_notebook.grid(row=0, column=0, sticky="nsew")

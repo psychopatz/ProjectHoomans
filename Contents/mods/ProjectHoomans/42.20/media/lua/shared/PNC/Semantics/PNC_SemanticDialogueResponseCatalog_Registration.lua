@@ -1,6 +1,23 @@
 -- Response-pool registration and bounded extension operations.
 
 return function(Catalog, Core)
+    -- Registration call-site instrumentation is optional on game runtimes
+    -- without debug.getinfo. It never changes selection or depends on paths
+    -- guessed by Python textual scanning.
+    local function registrationSource()
+        if type(debug) ~= "table"
+            or type(debug.getinfo) ~= "function" then
+            return nil
+        end
+        local info = debug.getinfo(3, "S")
+        local source = info and info.source
+        if type(source) == "string" and string.sub(source, 1, 1) == "@"
+            and #source < 1024 then
+            return string.sub(source, 2)
+        end
+        return nil
+    end
+
     function Catalog.Register(id, definition)
         local pool
         local variants
@@ -31,6 +48,12 @@ return function(Catalog, Core)
             end
         end
         Catalog.POOLS[id] = pool
+        local origin = registrationSource()
+        local origins = {}
+        for _, item in ipairs(pool.variants) do
+            origins[item.id] = origin or "UNKNOWN"
+        end
+        Catalog.REGISTRATION_ORIGINS[id] = origins
         Catalog.REVISION = (Catalog.REVISION or 0) + 1
         return true, pool
     end
@@ -71,9 +94,13 @@ return function(Catalog, Core)
             seenIDs[normalized.id] = true
             additions[#additions + 1] = normalized
         end
+        local origin = registrationSource()
+        local origins = Catalog.REGISTRATION_ORIGINS[id] or {}
         for index = 1, #additions do
             pool.variants[#pool.variants + 1] = additions[index]
+            origins[additions[index].id] = origin or "UNKNOWN"
         end
+        Catalog.REGISTRATION_ORIGINS[id] = origins
         Catalog.REVISION = (Catalog.REVISION or 0) + 1
         return true, pool
     end

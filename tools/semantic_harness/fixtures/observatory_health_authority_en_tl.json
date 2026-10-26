@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "label": "Injured wellbeing EN", "language": "EN", "utterance": "how are you",
+      "scenario": {"npc": {"healthState": "injured"}},
+      "expected": {"lastKey": "semantic.question.wellbeing.injured", "maxActions": 0}
+    },
+    {
+      "label": "Injured wellbeing TL", "language": "TL", "utterance": "how are you",
+      "scenario": {"npc": {"healthState": "injured"}},
+      "expected": {"lastKey": "semantic.question.wellbeing.injured", "maxActions": 0, "maxFallbackLookups": 0}
+    },
+    {
+      "label": "Healthy wellbeing EN", "language": "EN", "utterance": "how are you",
+      "scenario": {"npc": {"healthState": "healthy"}},
+      "expected": {"lastKeyPrefix": "semantic.question.wellbeing.", "maxActions": 0}
+    },
+    {
+      "label": "Healthy wellbeing TL", "language": "TL", "utterance": "how are you",
+      "scenario": {"npc": {"healthState": "healthy"}},
+      "expected": {"lastKeyPrefix": "semantic.question.wellbeing.", "maxActions": 0, "maxFallbackLookups": 0}
+    },
+    {
+      "label": "Companion Wait EN", "language": "EN", "utterance": "wait here",
+      "expected": {"lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayQueued", "minActions": 1}
+    },
+    {
+      "label": "Companion Wait TL", "language": "TL", "utterance": "wait here",
+      "expected": {"lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayQueued", "minActions": 1, "maxFallbackLookups": 0, "textContains": "Sige, mananatili ako rito."}
+    },
+    {
+      "label": "Hostile boundary EN", "language": "EN", "utterance": "fuck you",
+      "expected": {"lastKey": "semantic.social.hostile_boundary", "maxActions": 0}
+    },
+    {
+      "label": "Hostile boundary TL", "language": "TL", "utterance": "fuck you",
+      "expected": {"lastKey": "semantic.social.hostile_boundary", "maxActions": 0}
+    }
+  ]
+}

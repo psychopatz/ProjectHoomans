@@ -31,6 +31,25 @@ local function packagedReader(context, modID, relativePath)
     end
     local root = packagedRoot(context, modID)
     if not root then return nil end
+    local overlay = os.getenv("PNC_HARNESS_CANDIDATE_OVERLAY_ROOT")
+    if overlay and overlay ~= "" and modID == "ProjectHoomans"
+        and string.match(relativePath,
+            "^media/translation/[A-Z][A-Z]/Conversation/Semantic/[%w_]+%.json$")
+    then
+        local candidate = io.open(overlay .. "/" .. relativePath, "rb")
+        if candidate then
+            local closed = false
+            return {
+                readLine = function()
+                    if closed then return nil end
+                    return candidate:read("*l")
+                end,
+                close = function()
+                    if not closed then closed = true; candidate:close() end
+                end,
+            }
+        end
+    end
     local handle = io.open(root .. "/" .. relativePath, "rb")
     if not handle then return nil end
     local closed = false

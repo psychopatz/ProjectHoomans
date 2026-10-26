@@ -230,6 +230,7 @@ function Core.install(Catalog)
     Catalog.MAX_LAST_VARIANTS = 256
     Catalog.POOLS = Catalog.POOLS or {}
     Catalog.REVISION = Catalog.REVISION or 0
+    Catalog.REGISTRATION_ORIGINS = Catalog.REGISTRATION_ORIGINS or {}
     Catalog.LAST_VARIANTS = Catalog.LAST_VARIANTS or {}
     Catalog.LAST_VARIANT_ORDER = Catalog.LAST_VARIANT_ORDER or {}
 end

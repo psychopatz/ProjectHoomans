@@ -60,6 +60,11 @@ def run_quality_matrix(
         texts = [str(message.get("text") or "") for message in messages]
         effects = inspector.get("effects", {}).get("sideEffects", {})
         actions = effects.get("actionCount", 0)
+        lookups = (last.get("translation") or {}).get("lookups") or []
+        fallback_lookups = sum(
+            1 for item in lookups if isinstance(item, dict)
+            and item.get("fallbackUsed") is True
+        )
         expected = case.get("expected") or {}
         if not isinstance(expected, dict):
             raise ValueError("matrix expected must be an object")
@@ -72,6 +77,30 @@ def run_quality_matrix(
             checks["minActions"] = actions >= int(expected["minActions"])
         if "accepted" in expected:
             checks["accepted"] = last.get("accepted") is expected["accepted"]
+        if "firstKey" in expected:
+            checks["firstKey"] = bool(keys) and keys[0] == expected["firstKey"]
+        if "lastKeyPrefix" in expected:
+            checks["lastKeyPrefix"] = bool(keys) and keys[-1].startswith(
+                str(expected["lastKeyPrefix"])
+            )
+        if "maxFallbackLookups" in expected:
+            checks["maxFallbackLookups"] = (
+                fallback_lookups <= int(expected["maxFallbackLookups"])
+            )
+        if "minFallbackLookups" in expected:
+            checks["minFallbackLookups"] = (
+                fallback_lookups >= int(expected["minFallbackLookups"])
+            )
+        if "textNotContains" in expected:
+            forbidden = str(expected["textNotContains"])
+            checks["textNotContains"] = all(
+                forbidden.casefold() not in text.casefold() for text in texts
+            )
+        if "textContains" in expected:
+            required = str(expected["textContains"])
+            checks["textContains"] = any(
+                required.casefold() in text.casefold() for text in texts
+            )
         rows.append({
             "index": index, "label": str(case.get("label") or f"case-{index + 1}")[:96],
             "language": language, "sourceKind": "FIXTURE",
@@ -79,6 +108,7 @@ def run_quality_matrix(
             "responseKeys": keys[-4:], "responseTexts": texts[-4:],
             "actions": actions,
             "transportCount": effects.get("transportCount", 0),
+            "translationFallbackLookups": fallback_lookups,
             "accepted": last.get("accepted"),
             "checks": checks,
             "status": "PASS" if checks and all(checks.values())
@@ -116,6 +146,8 @@ def source_evidence_from_paths(
         repository / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Selection.lua",
         repository / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Core.lua",
         repository / "tools/semantic_harness/lua/worker/FlowEditor.lua",
+        repository / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCommandAdapter_Registry.lua",
+        repository / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCommandAdapter_CompanionActions.lua",
     )
     hashes = {}
     for path in files:
@@ -127,7 +159,8 @@ def source_evidence_from_paths(
         "repositoryHEAD": revision(repository),
         "coreHEAD": revision(core),
         "inspectedSeamSHA256": hashes,
-        "perPoolSourceOwnerVerified": False,
+        "registrationOriginInstrumentation": True,
+        "completePerPoolCanonicalOwnership": False,
     }
 
 
@@ -201,7 +234,13 @@ def review_variant_proposal(
         "poolID": pool_id, "contentFingerprint": expected,
         "errors": errors, "proposedChanges": diffs,
         "sourcePath": details.get("sourcePath", "UNKNOWN"),
-        "canonicalOwnerVerified": False,
+        "canonicalOwnerVerified": bool(
+            diffs and all(
+                by_id[row["variantID"]].get("sourceKind") == "AUTHORED_LUA"
+                and by_id[row["variantID"]].get("sourcePath") not in ("", "UNKNOWN")
+                for row in diffs
+            )
+        ),
         "semanticReviewRequired": True,
         "isolatedLuaReplayCompleted": False,
         "approved": False, "writes": 0,
@@ -246,7 +285,8 @@ def compare_quality_reports(
             continue
         changed = {}
         for field in ("responseKeys", "responseTexts", "actions",
-                      "transportCount", "accepted", "status"):
+                      "transportCount", "translationFallbackLookups",
+                      "accepted", "status"):
             if left.get(field) != right.get(field):
                 changed[field] = {
                     "baseline": left.get(field),

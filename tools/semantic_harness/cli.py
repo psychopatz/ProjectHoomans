@@ -10,6 +10,8 @@ import sys
 
 from .codebuilder.service import SemanticLabAuthoringService
 from .inspection.rendering import print_result as _print_result
+from .inspection.response_candidate import preview_authored_variant
+from .inspection.response_turn_trace import inspect_response_turn
 from .inspection.response_observatory import (
     run_quality_matrix, source_evidence, source_evidence_from_paths,
     review_variant_proposal, compare_quality_reports,
@@ -499,6 +501,16 @@ def cli(arguments: argparse.Namespace) -> int:
             emit_activity()
             # Observatory uses the same production Lua worker as Studio and
             # conversation replay; never scans or reinterprets Lua in Python.
+            if arguments.preview_response_proposal:
+                path = Path(arguments.preview_response_proposal).expanduser()
+                if path.stat().st_size > 16 * 1024:
+                    raise ValueError("candidate proposal exceeds 16 KiB")
+                proposal = json.loads(path.read_text(encoding="utf-8"))
+                result = preview_authored_variant(
+                    proposal, repository=authoring_service.repository,
+                )
+                _print_result(result, arguments.jsonl)
+                return 0 if result["ok"] else 3
             if arguments.review_response_proposal:
                 path = Path(arguments.review_response_proposal).expanduser()
                 if path.stat().st_size > 16 * 1024:
@@ -508,6 +520,15 @@ def cli(arguments: argparse.Namespace) -> int:
                 result["sourceEvidence"] = source_evidence(worker)
                 _print_result(result, arguments.jsonl)
                 return 0 if result["ok"] else 3
+            if arguments.inspect_response_turn:
+                if len(arguments.inspect_response_turn) > 200:
+                    raise ValueError("observed utterance exceeds 200 characters")
+                result = inspect_response_turn(
+                    worker, worker.input(arguments.inspect_response_turn),
+                )
+                result["sourceEvidence"] = source_evidence(worker)
+                _print_result(result, arguments.jsonl)
+                return 0
             if arguments.response_pools is not None:
                 result = worker.response_pool_list(
                     filter=arguments.response_pools,
@@ -799,6 +820,14 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--response-quality-matrix", metavar="PATH",
         help="run up to eight isolated production-Lua fixture cases from JSON",
+    )
+    observatory.add_argument(
+        "--inspect-response-turn", metavar="UTTERANCE",
+        help="run one fixture turn; join real Lua text with verified registry provenance and effects",
+    )
+    observatory.add_argument(
+        "--preview-response-proposal", metavar="PATH",
+        help="isolated real-Lua EN/TL candidate replay; no production edits",
     )
     observatory.add_argument(
         "--review-response-proposal", metavar="PATH",

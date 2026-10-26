@@ -105,3 +105,92 @@ until verified, semantic/translation safety requires review, and actual
 source-patched isolation/replay remains P6 work. No files are written, the
 worker registry is unchanged and the output records `approved=false` and
 `writes=0`. Do not interpret preflight success as authorization to generate.
+
+## Real isolated candidate replay (developer preview)
+
+Only an **existing hand-authored response variant** with runtime-confirmed
+registration source, a fresh content fingerprint, and unique manifest-listed
+EN/TL translation keys is eligible. Generated registration call sites are
+**not** canonical editable owners. No source files are changed by this command.
+
+Add a bounded real-worker case to the proposal above:
+
+```json
+{
+  "poolID": "semantic.flow.greeting.opening",
+  "expectedContentFingerprint": "catalog-v1:REPLACE_WITH_CURRENT_DETAIL_VALUE",
+  "variants": [{
+    "id": "semantic.flow.greeting.opening.default",
+    "EN": "Hey there. Good to see you.",
+    "TL": "Uy, mabuti at nakita kita."
+  }],
+  "case": {"utterance": "hello"}
+}
+```
+
+```bash
+tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jsonl --preview-response-proposal /tmp/greeting-proposal.json
+```
+
+The test spawns disposable *actual production Lua workers* for EN and TL;
+stages the narrowly patched authored Lua plus the two exact loaded translation
+assets in a `TemporaryDirectory` outside PZ watched media; then checks
+selected IDs, rendered EN/TL, normalized non-text metadata, action/transport
+counts, and source hashes. It emits bounded source/translation diffs and
+`approved=false`, `writesToProduction=0`,
+`candidateOverlayCleaned=true`. An unchanged, unsupported or ambiguous
+candidate **fails closed**. Other gameplay modules and Core still load
+from the real checkout. Lua syntax errors and worker failures are surfaced.
+
+The Studio Observatory **Review → Preview proposal file** action uses this
+same service. This is not an implicit generation or approval button. Approval,
+canonical production edit, fresh worker replay, final SP/MP test and full P7
+acceptance remain separate gates.
+
+## Bundled EN/TL grounded fixtures
+
+```bash
+tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jsonl --response-quality-matrix tools/semantic_harness/fixtures/observatory_core_en_tl.json
+tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jsonl --response-quality-matrix tools/semantic_harness/fixtures/observatory_health_authority_en_tl.json
+```
+
+These are two independent 8-case ENGINE-FIXTURE matrices rather than a
+single over-cap test. Follow and Stay acknowledgements use the canonical
+EN/TL Conversation translation manifest keys; duplicated keys across manifest
+files are invalid and cause the actual worker loader to reject startup. These
+fixture tests intentionally do not claim full native permission/farewell coverage.
+
+## Join observed turn, verified source and gameplay authority
+
+```bash
+tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jsonl --inspect-response-turn "hello"
+tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jsonl --inspect-response-turn "follow me"
+```
+
+This executes **one** real Lua fixture turn. Each bounded NPC message contains its
+actual visible text/translation key and a registration lookup, plus the
+Conversation Inspector's action/transport and execution summary. An exact
+unique emitted `variant.id` produces `EXACT_EMITTED_VARIANT_ID`. A match only
+on `templateID` (e.g. generated Follow) produces
+`TEMPLATE_CANDIDATES_ONLY` and **no claimed selected variant ID**. Missing
+registration/provenance remains UNKNOWN; plan-turn segments outside the pool
+registry cannot be assigned an invented source. This is an *observed* turn, not
+a preview/explain, so fixture-allowed gameplay commands may execute within
+the isolated worker.
+
+Registration source discovery uses the actual Lua Register/Extend caller. If
+the game interpreter does not expose the optional `debug.getinfo` source seam,
+the origin is UNKNOWN. Generated automatic registration is labeled a
+`GENERATED_REGISTRATION_SITE`, **never** an approved canonical edit source.
+For command pools, the loaded automatic flow's responsePool binding and
+CapabilityCatalog action registration are traced to the actual action
+descriptor caller (e.g. `PNC_SemanticCommandAdapter_CompanionActions.lua`);
+the result is exposed as `generatedActionLineage`. This establishes
+registered *descriptor* ownership, not arbitrary CodeBuilder reviewed-source
+ownership and not permission to patch the generator output.
+
+The production Conversation translation manifests are authoritative for asset
+lookup. Companion Follow/Stay default queued EN/TL keys now live in the existing
+manifest-listed `GeneratedTaskCommands.json`; contextual/rejected/failed keys
+remain in their existing files to prevent cross-file duplicate-key loader
+failure. No duplicate translator or generated response compiler was created.

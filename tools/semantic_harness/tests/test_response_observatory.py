@@ -22,7 +22,7 @@ class ResponseObservatoryTests(unittest.TestCase):
             self.assertGreater(first["registryRevision"], 0)
             self.assertTrue(first["contentFingerprint"].startswith("catalog-v1:"))
             self.assertIn("when", first["variants"][0])
-            self.assertEqual(first["sourcePath"], "UNKNOWN")
+            self.assertEqual(first["sourcePath"], first["variants"][0]["sourcePath"])
             again = worker.response_pool_detail(entry["id"], limit=1)
             self.assertEqual(first["poolID"], again["poolID"])
             self.assertEqual(first["variantCount"], again["variantCount"])
@@ -34,6 +34,71 @@ class ResponseObservatoryTests(unittest.TestCase):
             with self.assertRaisesRegex(HarnessError, "invalid_page"):
                 worker.response_pool_detail(entry["id"], limit=17)
 
+
+    def test_production_registration_origin_differs_from_generated_owner(self):
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            authored = worker.response_pool_detail(
+                "semantic.flow.greeting.opening", limit=16)
+            self.assertEqual(authored["sourceKind"], "AUTHORED_LUA")
+            self.assertIn("_FlowGreeting.lua", authored["sourcePath"])
+            self.assertTrue(all(v["sourcePath"] == authored["sourcePath"]
+                                for v in authored["variants"]))
+            generated = worker.response_pool_detail(
+                "semantic.generated.simple_command.follow.queued", limit=16)
+            self.assertEqual(generated["sourceKind"],
+                             "GENERATED_REGISTRATION_SITE")
+            self.assertIn("AutomaticFlowGenerator_Registration.lua",
+                          generated["sourcePath"])
+            self.assertNotEqual(generated["sourceKind"], "AUTHORED_LUA")
+            lineage = generated["generatedActionLineage"]
+            self.assertEqual(lineage["capabilityID"], "pnc:companion.follow")
+            self.assertEqual(lineage["commandActionID"], "FOLLOW")
+            self.assertTrue(lineage["canonicalOwnerVerified"])
+            self.assertTrue(lineage["verifiedCanonicalActionPath"].endswith(
+                "PNC_SemanticCommandAdapter_CompanionActions.lua"
+            ))
+            self.assertNotEqual(
+                lineage["verifiedCanonicalActionPath"], generated["sourcePath"]
+            )
+
+    def test_observed_lookup_does_not_invent_generated_selection(self):
+        from tools.semantic_harness.inspection.response_turn_trace import (
+            inspect_response_turn,
+        )
+        from tools.semantic_harness.runtime.scenario import merge
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            opening = inspect_response_turn(worker, worker.input("hello"))
+            first = opening["npcMessages"][0]
+            self.assertEqual(first["selectedVariantID"],
+                             "semantic.flow.greeting.opening.default")
+            self.assertEqual(first["selectionProvenance"],
+                             "EXACT_EMITTED_VARIANT_ID")
+            self.assertEqual(first["registeredVariants"][0]["sourceKind"],
+                             "AUTHORED_LUA")
+            self.assertEqual(opening["effects"]["actionCount"], 0)
+            follow = inspect_response_turn(worker, worker.input("follow me"))
+            reply = follow["npcMessages"][-1]
+            self.assertIsNone(reply["selectedVariantID"])
+            self.assertEqual(reply["selectionProvenance"],
+                             "TEMPLATE_CANDIDATES_ONLY")
+            self.assertEqual(reply["registeredVariants"][0]["sourceKind"],
+                             "GENERATED_REGISTRATION_SITE")
+            self.assertEqual(follow["effects"]["transportCount"], 1)
+            self.assertEqual(follow["effects"]["actionCount"], 1)
+            with self.assertRaisesRegex(HarnessError, "invalid_response_key"):
+                worker.response_key_lookup("")
+
+    def test_lookup_does_not_mutate_real_worker_actor_state(self):
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            before = worker.inspect_actor_state()
+            for _ in range(3):
+                worker.response_key_lookup(
+                    "semantic.flow.greeting.opening.default")
+            after = worker.inspect_actor_state()
+            for key in ("id", "protocolVersion"):
+                before.pop(key, None)
+                after.pop(key, None)
+            self.assertEqual(before, after)
 
     def test_pool_list_paging_and_invalid_limit(self):
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:

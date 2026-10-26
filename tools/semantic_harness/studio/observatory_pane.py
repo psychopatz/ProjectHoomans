@@ -2,6 +2,11 @@
 from __future__ import annotations
 
 from typing import Any, Callable
+from pathlib import Path
+import json
+
+from ..inspection.response_candidate import preview_authored_variant
+from ..inspection.response_turn_trace import inspect_response_turn
 
 from ..inspection.response_observatory import run_quality_matrix
 from ..runtime.worker import LuaSemanticWorker
@@ -13,9 +18,12 @@ class SemanticObservatoryPane:
     def __init__(
         self, parent: Any, tk: Any, ttk: Any, scrolled_text: Any,
         run_worker: Callable[[Callable, Callable], bool],
+        *, repository: Path | None = None, filedialog: Any | None = None,
     ) -> None:
         self._tk, self._ttk = tk, ttk
         self._run_worker = run_worker
+        self._repository = repository
+        self._filedialog = filedialog
         self.frame = ttk.Frame(parent, padding=6)
         self.frame.grid(row=0, column=0, sticky="nsew")
         self.frame.rowconfigure(1, weight=1)
@@ -100,8 +108,12 @@ class SemanticObservatoryPane:
                 ttk.Button(controls, text="Run EN/TL greeting + follow probes",
                            command=self.coverage).pack(side="left")
             elif name == "Review":
-                ttk.Label(controls, text="Read-only source / variant review").pack(
+                ttk.Label(controls, text="Read-only EN/TL candidate validation").pack(
                     side="left")
+                ttk.Button(
+                    controls, text="Preview proposal file",
+                    command=self.preview_proposal,
+                ).pack(side="right")
         content.add(right, weight=3)
         self._display("Review", "Candidate edits are not applied here. "
                       "Proposals must go through canonical Lua / CodeBuilder "
@@ -171,9 +183,19 @@ class SemanticObservatoryPane:
             f"Loaded variants: {result['variantCount']}",
             f"Registration revision: {result.get('registryRevision', '?')}",
             f"Registry content marker: {result.get('contentFingerprint', 'UNKNOWN')}",
-            f"Owning source: {result.get('sourcePath', 'UNKNOWN')}",
+            f"Registration source: {result.get('sourcePath', 'UNKNOWN')}",
             "",
         ]
+        lineage = result.get("generatedActionLineage") or {}
+        if lineage:
+            lines.extend((
+                f"Generated capability: {lineage.get('capabilityID', 'UNKNOWN')}",
+                f"Canonical action descriptor: "
+                f"{lineage.get('verifiedCanonicalActionPath', 'UNKNOWN')}",
+                f"Verified descriptor owner: "
+                f"{lineage.get('canonicalOwnerVerified', False)}",
+                "",
+            ))
         for variant in result.get("variants", []):
             checks = variant.get("when") or {}
             lines += [
@@ -241,20 +263,89 @@ class SemanticObservatoryPane:
         if not 1 <= len(utterance) <= 200:
             self.status_var.set("Enter 1–200 characters")
             return
-        self._submit(lambda worker: worker.input(utterance), self._on_test)
+        self._submit(
+            lambda worker: inspect_response_turn(worker, worker.input(utterance)),
+            self._on_test,
+        )
 
     def _on_test(self, result: dict[str, Any]) -> None:
-        npc = [
-            row.get("payload", {}) for row in result.get("messages", [])
-            if row.get("speaker") == "npc"
+        lines = [
+            "Actual production Lua, disposable fixture worker:",
+            f"Accepted: {result.get('accepted')}",
+            f"Effects: {result.get('effects', {}).get('actionCount', 0)} actions; "
+            f"{result.get('effects', {}).get('transportCount', 0)} transports",
+            "",
         ]
-        lines = ["Actual production Lua, disposable worker fixture:",
-                 f"Accepted: {result.get('accepted')}", ""]
-        for entry in npc[-4:]:
-            lines.extend((str(entry.get("key") or "UNKNOWN"),
-                          str(entry.get("text") or ""), ""))
+        for entry in result.get("npcMessages", []):
+            lines.extend((
+                str(entry.get("observedKey") or "UNKNOWN"),
+                str(entry.get("finalText") or ""),
+                f"  Provenance: {entry.get('selectionProvenance')}",
+            ))
+            for origin in entry.get("registeredVariants", [])[:4]:
+                lines.append(
+                    f"  Registry: {origin.get('poolID')} / {origin.get('variantID')}"
+                    f" ({origin.get('matchKind')}) from "
+                    f"{origin.get('sourcePath', 'UNKNOWN')}"
+                )
+            lines.append("")
         self._display("Test Lab", "\n".join(lines))
         self.tabs.select(1)
+
+    def preview_proposal(self) -> None:
+        if self._filedialog is None or self._repository is None:
+            self.status_var.set("No source/review dialog configured")
+            return
+        selected = self._filedialog.askopenfilename(
+            title="Select read-only EN/TL candidate proposal",
+            filetypes=[("JSON proposal", "*.json")],
+        )
+        if not selected:
+            return
+        path = Path(selected)
+        if not path.is_file() or path.stat().st_size > 16 * 1024:
+            self.status_var.set("Proposal missing or larger than 16 KiB")
+            return
+        try:
+            proposal = json.loads(path.read_text(encoding="utf-8"))
+        except (ValueError, UnicodeError, OSError) as error:
+            self.status_var.set(f"Proposal unreadable: {error}")
+            return
+        if not isinstance(proposal, dict):
+            self.status_var.set("Proposal must be a JSON object")
+            return
+        self._display("Review", "Running isolated production Lua replay; "
+                      "production files remain untouched.")
+        self._submit(
+            lambda worker: preview_authored_variant(
+                proposal, repository=self._repository,
+            ),
+            self._on_candidate_preview,
+        )
+
+    def _on_candidate_preview(self, report: dict[str, Any]) -> None:
+        lines = [
+            f"Isolated production Lua preview: {report['variantID']}",
+            f"Verified authored source: {report['sourcePath']}",
+            f"Original source SHA-256: {report['sourceSHA256']}",
+            "Approval: NOT GRANTED — review source and translations first.",
+            "Production writes: 0 · candidate overlay cleaned",
+            "",
+        ]
+        for row in report["languageCases"]:
+            original = row["baseline"]["messages"]
+            updated = row["candidate"]["messages"]
+            lines += [
+                f"{row['language']} — {row['status']}",
+                f"  Before: {original[0]['text'] if original else '(none)'}",
+                f"  After:  {updated[0]['text'] if updated else '(none)'}",
+                f"  Actions: {row['baseline']['actionCount']} -> "
+                f"{row['candidate']['actionCount']}",
+                "",
+            ]
+        lines += ["Lua source diff (preview only):", *report["sourceDiff"][:64]]
+        self._display("Review", "\n".join(lines))
+        self.tabs.select(3)
 
     def coverage(self) -> None:
         cases = [

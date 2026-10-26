@@ -20,6 +20,9 @@ class WorkerAuthoringOperations:
 
         return self._host._request("FLOW_CATALOG")
 
+    def response_key_lookup(self, key: str) -> dict[str, Any]:
+        return self._host._request("RESPONSE_KEY_LOOKUP", {"key": key})
+
     def response_pool_list(
         self, *, filter: str = "", offset: int = 0, limit: int = 32
     ) -> dict[str, Any]:

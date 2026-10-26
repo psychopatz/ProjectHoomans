@@ -93,6 +93,16 @@ class LuaProcess:
                 "PZ_TEST_CORE_REPOSITORY": str(self.config.core_repository),
             }
         )
+        if self.config.candidate_overlay_root is not None:
+            environment["PNC_HARNESS_CANDIDATE_OVERLAY_ROOT"] = str(
+                self.config.candidate_overlay_root
+            )
+            environment["PNC_HARNESS_CANDIDATE_OVERLAY_MODULE"] = (
+                self.config.candidate_overlay_module or ""
+            )
+        else:
+            environment.pop("PNC_HARNESS_CANDIDATE_OVERLAY_ROOT", None)
+            environment.pop("PNC_HARNESS_CANDIDATE_OVERLAY_MODULE", None)
         if self.config.hoomans_runtime is not None:
             environment["PZ_TEST_HOOMANS_RUNTIME"] = self.config.hoomans_runtime
         if self.config.core_runtime is not None:

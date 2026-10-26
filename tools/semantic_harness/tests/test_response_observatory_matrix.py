@@ -9,6 +9,7 @@ import tempfile
 import json
 import unittest
 
+from tools.semantic_harness.inspection.response_candidate import preview_authored_variant
 from tools.semantic_harness.inspection.response_observatory import (
     run_quality_matrix, compare_quality_reports, review_variant_proposal,
 )
@@ -69,7 +70,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
             self.assertTrue(good["ok"])
             self.assertFalse(good["approved"])
             self.assertEqual(good["writes"], 0)
-            self.assertFalse(good["canonicalOwnerVerified"])
+            self.assertTrue(good["canonicalOwnerVerified"])
             self.assertEqual(
                 original["contentFingerprint"],
                 worker.response_pool_detail(original["poolID"])["contentFingerprint"],
@@ -82,6 +83,125 @@ class ResponseQualityMatrixTests(unittest.TestCase):
             candidate["expectedContentFingerprint"] = "catalog-v1:0"
             self.assertEqual(review_variant_proposal(worker, candidate)["reason"],
                              "stale_baseline")
+
+    def test_isolated_candidate_changes_real_lua_in_en_tl_not_gameplay(self):
+        from tools.semantic_harness.runtime.worker import LuaSemanticWorker
+        from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
+        repository = Path(__file__).resolve().parents[3]
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            original = worker.response_pool_detail(
+                "semantic.flow.greeting.opening", limit=16)
+        proposal = {
+            "poolID": original["poolID"],
+            "expectedContentFingerprint": original["contentFingerprint"],
+            "variants": [{
+                "id": "semantic.flow.greeting.opening.default",
+                "EN": "Hey there. Good to see you.",
+                "TL": "Uy, mabuti at nakita kita.",
+            }],
+            "case": {"utterance": "hello"},
+        }
+        report = preview_authored_variant(proposal, repository=repository)
+        self.assertTrue(report["ok"])
+        self.assertTrue(report["canonicalOwnerVerified"])
+        self.assertTrue(report["candidateOverlayCleaned"])
+        self.assertFalse(report["approved"])
+        self.assertEqual(report["writesToProduction"], 0)
+        self.assertNotEqual(report["baselineFingerprint"],
+                            report["candidateFingerprint"])
+        self.assertEqual([case["language"] for case in report["languageCases"]],
+                         ["EN", "TL"])
+        self.assertTrue(all(case["status"] == "PASS"
+                            for case in report["languageCases"]))
+        self.assertEqual(report["sourcePath"], original["sourcePath"])
+        self.assertTrue(report["checks"]["unchangedGameplayEffects"])
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            after = worker.response_pool_detail(original["poolID"], limit=16)
+        self.assertEqual(original["contentFingerprint"],
+                         after["contentFingerprint"])
+
+        proposal["expectedContentFingerprint"] = "catalog-v1:stale"
+        with self.assertRaisesRegex(ValueError, "stale_baseline"):
+            preview_authored_variant(proposal, repository=repository)
+        proposal["expectedContentFingerprint"] = original["contentFingerprint"]
+        proposal["variants"][0]["id"] = "unregistered.fake.variant"
+        with self.assertRaisesRegex(ValueError, "preflight_rejected"):
+            preview_authored_variant(proposal, repository=repository)
+
+    def test_rejects_generated_owner_as_edit_source(self):
+        from tools.semantic_harness.runtime.worker import LuaSemanticWorker
+        from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
+        repository = Path(__file__).resolve().parents[3]
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            original = worker.response_pool_detail(
+                "semantic.generated.simple_command.follow.queued", limit=16)
+        proposal = {
+            "poolID": original["poolID"],
+            "expectedContentFingerprint": original["contentFingerprint"],
+            "variants": [{"id": original["variants"][0]["id"],
+                          "EN": "I can follow.", "TL": "Susunod ako."}],
+            "case": {"utterance": "follow me"},
+        }
+        with self.assertRaisesRegex(ValueError, "no verified canonical authored"):
+            preview_authored_variant(proposal, repository=repository)
+
+    def test_manifest_translation_keys_are_unique_after_follow_wait_fix(self):
+        root = Path(__file__).resolve().parents[3]
+        media = root / "Contents/mods/ProjectHoomans/common/media/translation"
+        manifest = json.loads((media / "manifests/Conversation.json").read_text())
+        for language in ("EN", "TL"):
+            with self.subTest(language=language):
+                occurrence = {}
+                for rel in manifest["languages"][language]:
+                    data = json.loads((media / rel).read_text(encoding="utf-8"))
+                    for key in data:
+                        occurrence.setdefault(key, []).append(rel)
+                for suffix in ("FollowQueued", "StayQueued", "FollowRejected",
+                               "StayRejected", "FollowFailed", "StayFailed"):
+                    key = "UI_PNC_Conversation_Semantic_Generated" + suffix
+                    self.assertEqual(len(occurrence.get(key, [])), 1,
+                                     (language, key, occurrence.get(key)))
+
+    def test_en_tl_follow_wait_use_production_catalog_not_english_fallback(self):
+        from tools.semantic_harness.runtime.worker import LuaSemanticWorker
+        from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
+        for language in ("EN", "TL"):
+            for utterance in ("follow me", "wait here"):
+                with self.subTest(language=language, utterance=utterance):
+                    scenario = merge(DEFAULT_SCENARIO, {
+                        "runtime": {"language": language},
+                    })
+                    with LuaSemanticWorker(scenario) as worker:
+                        turn = worker.input(utterance)
+                    npc = [message["payload"]["text"]
+                           for message in turn["messages"]
+                           if message.get("speaker") == "npc"]
+                    fallback = [
+                        item for item in turn.get("translation", {}).get(
+                            "lookups", [])
+                        if item.get("fallbackUsed") is True
+                    ]
+                    self.assertFalse(fallback, fallback)
+                    if language == "TL":
+                        self.assertTrue(any(
+                            "susundan" in text or "mananatili" in text
+                            for text in npc
+                        ), npc)
+
+    def test_bundled_real_lua_context_matrices(self):
+        from tools.semantic_harness.inspection.response_observatory import run_quality_matrix
+        root = Path(__file__).resolve().parents[3]
+        for filename in (
+            "observatory_core_en_tl.json",
+            "observatory_health_authority_en_tl.json",
+        ):
+            with self.subTest(matrix=filename):
+                path = root / "tools/semantic_harness/fixtures" / filename
+                result = run_quality_matrix(json.loads(path.read_text())["cases"])
+                self.assertEqual(result["caseCount"], 8)
+                self.assertEqual(result["passed"], 8, result["cases"])
+                self.assertEqual(result["failed"], 0)
+                self.assertFalse(result["truncated"])
 
     def test_comparison_flags_regressions_and_missing_cases(self):
         row = {
@@ -178,6 +298,56 @@ class ObservatoryTkTests(unittest.TestCase):
                     pane.views["Test Lab"].get("1.0", "end"))
         finally:
             root.destroy()
+
+    def test_review_widget_previews_isolated_real_lua_candidate(self):
+        import tkinter as tk
+        from tkinter import ttk
+        from tkinter.scrolledtext import ScrolledText
+        from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
+        from tools.semantic_harness.runtime.worker import LuaSemanticWorker
+        from tools.semantic_harness.studio.observatory_pane import (
+            SemanticObservatoryPane,
+        )
+        repository = Path(__file__).resolve().parents[3]
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            detail = worker.response_pool_detail(
+                "semantic.flow.greeting.opening", limit=16)
+        proposal = {
+            "poolID": detail["poolID"],
+            "expectedContentFingerprint": detail["contentFingerprint"],
+            "variants": [{
+                "id": "semantic.flow.greeting.opening.default",
+                "EN": "Hey there. Good to see you.",
+                "TL": "Uy, mabuti at nakita kita.",
+            }],
+            "case": {"utterance": "hello"},
+        }
+        with tempfile.TemporaryDirectory(prefix="observatory-ui-proposal-") as folder:
+            path = Path(folder) / "proposal.json"
+            path.write_text(json.dumps(proposal), encoding="utf-8")
+            class FileDialog:
+                @staticmethod
+                def askopenfilename(**_kwargs):
+                    return str(path)
+            root = tk.Tk()
+            root.withdraw()
+            try:
+                with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+                    def run(operation, callback):
+                        callback(operation(worker))
+                        return True
+                    pane = SemanticObservatoryPane(
+                        root, tk, ttk, ScrolledText, run,
+                        repository=repository, filedialog=FileDialog,
+                    )
+                    pane.preview_proposal()
+                    text = pane.views["Review"].get("1.0", "end")
+                    self.assertIn("EN — PASS", text)
+                    self.assertIn("TL — PASS", text)
+                    self.assertIn("Approval: NOT GRANTED", text)
+                    self.assertIn("Production writes: 0", text)
+            finally:
+                root.destroy()
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -41,6 +42,8 @@ class LuaSemanticWorker:
         shutdown_timeout: float = 1.0,
         config: HarnessConfig | None = None,
         activity_log: ActivityLog | None = None,
+        candidate_overlay_root: Path | None = None,
+        candidate_overlay_module: str | None = None,
     ) -> None:
         scenario = normalize_scenario(scenario)
         validate_scenario(scenario)
@@ -61,6 +64,16 @@ class LuaSemanticWorker:
             request_timeout=request_timeout,
             shutdown_timeout=shutdown_timeout,
         )
+        if candidate_overlay_root is not None:
+            root = Path(candidate_overlay_root).resolve(strict=True)
+            if not root.is_dir():
+                raise ValueError("candidate overlay must be a directory")
+            self.config = replace(
+                self.config, candidate_overlay_root=root,
+                candidate_overlay_module=candidate_overlay_module
+                    or ("PNC/Semantics/SemanticDialogueResponseCatalog/"
+                        "PNC_SemanticDialogueResponseCatalog_FlowGreeting"),
+            )
         self.activity_log = activity_log or ActivityLog(
             path=default_activity_path(self.config.repository),
             client="api",
@@ -638,6 +651,9 @@ class LuaSemanticWorker:
 
     def flow_catalog(self) -> dict[str, Any]:
         return self._authoring.flow_catalog()
+
+    def response_key_lookup(self, key: str) -> dict[str, Any]:
+        return self._authoring.response_key_lookup(key)
 
     def response_pool_list(
         self, *, filter: str = "", offset: int = 0, limit: int = 32

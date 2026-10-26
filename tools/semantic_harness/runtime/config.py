@@ -187,6 +187,8 @@ class HarnessConfig:
     request_timeout: float = 5.0
     shutdown_timeout: float = 1.0
     max_message_bytes: int = DEFAULT_MAX_MESSAGE_BYTES
+    candidate_overlay_root: Path | None = None
+    candidate_overlay_module: str | None = None
 
     @classmethod
     def discover(

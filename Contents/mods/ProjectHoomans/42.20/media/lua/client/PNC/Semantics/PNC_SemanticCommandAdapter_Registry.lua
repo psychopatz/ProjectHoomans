@@ -8,6 +8,7 @@ PNC.Semantics.CommandAdapter = Adapter
 
 Adapter.VERSION = 1
 Adapter.Actions = Adapter.Actions or {}
+Adapter.ActionOrigins = Adapter.ActionOrigins or {}
 Adapter.Internal = Adapter.Internal or {}
 
 local Internal = Adapter.Internal
@@ -23,6 +24,15 @@ function Adapter.RegisterAction(action, definition)
         return false, "invalid_action_definition"
     end
     Adapter.Actions[action] = definition
+    -- The real descriptor author, not an inferred generated Lua ownership.
+    if type(debug) == "table" and type(debug.getinfo) == "function" then
+        local info = debug.getinfo(2, "S")
+        if info and type(info.source) == "string"
+            and string.sub(info.source, 1, 1) == "@"
+            and #info.source < 1024 then
+            Adapter.ActionOrigins[action] = string.sub(info.source, 2)
+        end
+    end
     return true, definition
 end
 
