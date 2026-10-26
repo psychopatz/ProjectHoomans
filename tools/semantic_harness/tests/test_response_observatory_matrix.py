@@ -378,6 +378,13 @@ class ObservatoryTkTests(unittest.TestCase):
                     self.assertIn("6 fixture cases", coverage)
                     self.assertIn("Goodbye root choice TL", coverage)
                     self.assertIn("FAIL=0", coverage)
+                    pane.coverage_selection()
+                    selection_view = pane.views["Coverage"].get("1.0", "end")
+                    self.assertIn("Production Lua selector coverage", selection_view)
+                    self.assertIn("Not selected does NOT mean globally unreachable",
+                                  selection_view)
+                    self.assertIn("semantic.flow.greeting.opening.rain",
+                                  selection_view)
             finally:
                 root.destroy()
 

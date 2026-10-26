@@ -213,3 +213,18 @@ The final two cases intentionally retain sequential Follow → Wait history;
 they do not establish native mutually-exclusive movement beyond the
 worker's accepted request and reply. Studio's Coverage tab can execute the
 same lifecycle fixture set through the existing Lua session.
+
+## Production-Lua selection coverage in explicit contexts
+
+```bash
+tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jsonl --response-selection-coverage tools/semantic_harness/fixtures/observatory_greeting_selection.json
+```
+
+This reads one loaded pool and 1–16 bounded, explicit hypothetical response
+contexts. The existing Lua `ExplainSelection` owns eligible/mismatched,
+priority/specificity, hash-tie and history decisions. Reports summarize
+`eligibleCases`, `selectedCases`, `lowerRankedCases`, `tieCases`, and failed
+condition fields with real registry fingerprint/revision. An unselected
+variant is **not** declared globally unreachable; all verdicts refer only to
+the supplied contexts. Queries do not execute actions or consume selection
+history. The same four greeting contexts are runnable from Studio Coverage.

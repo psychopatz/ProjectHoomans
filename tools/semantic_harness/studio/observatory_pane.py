@@ -7,6 +7,7 @@ import json
 
 from ..inspection.response_candidate import preview_authored_variant
 from ..inspection.response_turn_trace import inspect_response_turn
+from ..inspection.response_selection_coverage import selection_coverage
 
 from ..inspection.response_observatory import run_quality_matrix
 from ..runtime.worker import LuaSemanticWorker
@@ -109,6 +110,9 @@ class SemanticObservatoryPane:
                            command=self.coverage).pack(side="left")
                 ttk.Button(controls, text="Run lifecycle + Goodbye probes",
                            command=self.coverage_lifecycle).pack(
+                               side="left", padx=6)
+                ttk.Button(controls, text="Explain greeting coverage",
+                           command=self.coverage_selection).pack(
                                side="left", padx=6)
             elif name == "Review":
                 ttk.Label(controls, text="Read-only EN/TL candidate validation").pack(
@@ -387,6 +391,47 @@ class SemanticObservatoryPane:
             ),
             self._on_coverage,
         )
+
+    def coverage_selection(self) -> None:
+        if self._repository is None:
+            self.status_var.set("Repository unavailable for coverage")
+            return
+        path = (self._repository / "tools/semantic_harness/fixtures"
+                / "observatory_greeting_selection.json")
+        scenario = json.loads(path.read_text(encoding="utf-8"))
+        self._submit(
+            lambda worker: selection_coverage(worker, scenario),
+            self._on_selection_coverage,
+        )
+
+    def _on_selection_coverage(self, report: dict[str, Any]) -> None:
+        lines = [
+            f"Production Lua selector coverage: {report['poolID']}",
+            f"Contexts tested: {report['caseCount']}",
+            f"Revision: {report['registryRevision']}",
+            "These outcomes apply ONLY to tested hypothetical contexts.",
+            "Not selected does NOT mean globally unreachable.",
+            "",
+        ]
+        for variant in report["variants"]:
+            lines.extend((
+                f"{variant['variantID']} · {variant['testedStatus']}",
+                f"  eligible={variant['eligibleCases']} "
+                f"selected={variant['selectedCases']} "
+                f"lower-score={variant['lowerRankedCases']} "
+                f"ties-not-selected={variant['tieCases']}",
+                "",
+            ))
+        for case in report["cases"]:
+            lines.append(f"{case['label']}: selected {case['selectedID']}")
+            for row in case["candidateEvidence"]:
+                if row["failedFields"]:
+                    lines.append(
+                        f"  {row['variantID']}: not eligible "
+                        f"({', '.join(row['failedFields'])})"
+                    )
+        self._display("Coverage", "\n".join(lines))
+        self.tabs.select(2)
 
     def _on_coverage(self, result: dict[str, Any]) -> None:
         lines = [

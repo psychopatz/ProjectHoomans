@@ -46,7 +46,11 @@
 
 - Full Lua smoke suite: 887/889 PASS, 2 FAIL (`pnc_conversation_safety_feedback_smoke.lua:77`, `pnc_social_flavor_presentation_smoke.lua:176`). These test SocialFlavor presentation directly, outside the changed Observatory bootstrap; root cause is not yet established. Full-suite acceptance remains open.
 - Kahlua-specific syntax verification was not available in the inspected local tooling. `luac -p` is not a Kahlua acceptance substitute.
-- Selection-coverage changes being developed concurrently remain intentionally unstaged and uncommitted by this chunk.
+
+## P4/P5 selection-coverage continuation
+
+- Adopted and validated the existing uncommitted `response_selection_coverage.py` and four-context greeting fixture: real Lua explains all registered variants with eligible, selected, lower-ranked and tie counts and explicitly avoids global unreachable claims. Worker test reports stable actor state/selection history and rejects 17 contexts or invalid context values. CLI fixture run selected default 1/4, friendly 1/4, rain 2/4 with `ok=true`; focused 10 Python worker tests and 2 real Tk/Xvfb tests PASSED. Added direct Studio Coverage action and the CLI usage guide.
+- These outcomes are *hypothetical response context fixtures*, not proof that the live engine produces the same distribution. Missing negative permissions, CodeBuilder canonical lineage, P6 explicit approval and full P7 suite remain mandatory.
 
 ## Current gap and immediate mandatory work
 

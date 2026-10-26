@@ -12,6 +12,7 @@ from .codebuilder.service import SemanticLabAuthoringService
 from .inspection.rendering import print_result as _print_result
 from .inspection.response_candidate import preview_authored_variant
 from .inspection.response_turn_trace import inspect_response_turn
+from .inspection.response_selection_coverage import selection_coverage
 from .inspection.response_observatory import (
     run_quality_matrix, source_evidence, source_evidence_from_paths,
     review_variant_proposal, compare_quality_reports,
@@ -520,6 +521,15 @@ def cli(arguments: argparse.Namespace) -> int:
                 result["sourceEvidence"] = source_evidence(worker)
                 _print_result(result, arguments.jsonl)
                 return 0 if result["ok"] else 3
+            if arguments.response_selection_coverage:
+                path = Path(arguments.response_selection_coverage).expanduser()
+                if path.stat().st_size > 16 * 1024:
+                    raise ValueError("selection coverage file exceeds 16 KiB")
+                request = json.loads(path.read_text(encoding="utf-8"))
+                result = selection_coverage(worker, request)
+                result["sourceEvidence"] = source_evidence(worker)
+                _print_result(result, arguments.jsonl)
+                return 0
             if arguments.inspect_response_turn:
                 if len(arguments.inspect_response_turn) > 200:
                     raise ValueError("observed utterance exceeds 200 characters")
@@ -820,6 +830,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--response-quality-matrix", metavar="PATH",
         help="run up to eight isolated production-Lua fixture cases from JSON",
+    )
+    observatory.add_argument(
+        "--response-selection-coverage", metavar="PATH",
+        help="actual Lua selector coverage for 1–16 explicit hypothetical contexts",
     )
     observatory.add_argument(
         "--inspect-response-turn", metavar="UTTERANCE",

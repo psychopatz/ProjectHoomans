@@ -88,6 +88,76 @@ class ResponseObservatoryTests(unittest.TestCase):
             with self.assertRaisesRegex(HarnessError, "invalid_response_key"):
                 worker.response_key_lookup("")
 
+    def test_production_lua_coverage_distinguishes_dominance_from_unreachable(self):
+        import json
+        from pathlib import Path
+        from tools.semantic_harness.inspection.response_selection_coverage import (
+            selection_coverage,
+        )
+        root = Path(__file__).resolve().parents[3]
+        fixture = json.loads(
+            (root / "tools/semantic_harness/fixtures"
+             / "observatory_greeting_selection.json").read_text()
+        )
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            before = worker.explain_response_selection(
+                "semantic.flow.greeting.opening",
+                {"npcID": "history-proof", "socialStyle": "friendly"}, "constant")
+            state = worker.inspect_actor_state()
+            report = selection_coverage(worker, fixture)
+            after = worker.explain_response_selection(
+                "semantic.flow.greeting.opening",
+                {"npcID": "history-proof", "socialStyle": "friendly"}, "constant")
+            actor = worker.inspect_actor_state()
+        self.assertEqual(before["selectedID"], after["selectedID"])
+        for key in ("id", "protocolVersion"):
+            state.pop(key, None)
+            actor.pop(key, None)
+        self.assertEqual(state, actor)
+        self.assertTrue(report["noRuntimeSelectionOrGameplayMutation"])
+        self.assertTrue(report["neverClaimsGloballyUnreachable"])
+        self.assertEqual(report["caseCount"], 4)
+        counts = {
+            row["variantID"].split(".")[-1]:
+                (row["eligibleCases"], row["selectedCases"])
+            for row in report["variants"]
+        }
+        self.assertEqual(counts, {
+            "default": (4, 1),
+            "friendly": (2, 1),
+            "rain": (2, 2),
+        })
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            only_rain = selection_coverage(worker, {
+                "poolID": "semantic.flow.greeting.opening",
+                "cases": [{"context": {
+                    "npcID": "rain-dominates",
+                    "worldContext": {"weather": {"raining": True}},
+                    "socialStyle": "friendly",
+                }}],
+            })
+        lower = {v["variantID"].split(".")[-1]: v for v in only_rain["variants"]}
+        self.assertEqual(lower["friendly"]["testedStatus"],
+                         "ELIGIBLE_BUT_NOT_SELECTED_IN_TESTED_CONTEXTS")
+        self.assertEqual(lower["friendly"]["lowerRankedCases"], 1)
+        self.assertNotIn("unreachable", str(lower).lower())
+
+    def test_selection_coverage_rejects_invalid_or_excess_contexts(self):
+        from tools.semantic_harness.inspection.response_selection_coverage import (
+            selection_coverage,
+        )
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            with self.assertRaisesRegex(ValueError, "1 to 16"):
+                selection_coverage(worker, {
+                    "poolID": "semantic.flow.greeting.opening",
+                    "cases": [{"context": {}}] * 17,
+                })
+            with self.assertRaisesRegex(ValueError, "explicit Lua context"):
+                selection_coverage(worker, {
+                    "poolID": "semantic.flow.greeting.opening",
+                    "cases": [{"context": "not a Lua table"}],
+                })
+
     def test_lookup_does_not_mutate_real_worker_actor_state(self):
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             before = worker.inspect_actor_state()
