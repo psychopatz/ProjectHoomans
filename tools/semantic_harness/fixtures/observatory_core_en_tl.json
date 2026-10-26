@@ -5,7 +5,7 @@
       "language": "EN",
       "utterance": "hello",
       "expected": {
-        "firstKey": "semantic.flow.greeting.opening.default",
+        "firstSemanticKey": "semantic.flow.greeting.opening.default",
         "maxActions": 0
       }
     },
@@ -14,7 +14,7 @@
       "language": "TL",
       "utterance": "hello",
       "expected": {
-        "firstKey": "semantic.flow.greeting.opening.default",
+        "firstSemanticKey": "semantic.flow.greeting.opening.default",
         "maxActions": 0,
         "maxFallbackLookups": 0
       }

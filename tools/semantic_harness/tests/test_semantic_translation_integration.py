@@ -67,8 +67,12 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                 ]
                 self.assertTrue(
                     greeting_payloads[0]["translationKey"].startswith(
-                        "UI_PNC_Conversation_Semantic_FlowGreetingOpening"
+                        "UI_PNC_Conversation_Content_GreetingOpeningDefaultNeutral"
                     )
+                )
+                self.assertEqual(
+                    greeting_payloads[0]["semanticTemplateID"],
+                    "semantic.flow.greeting.opening.default",
                 )
                 self.assertTrue(
                     greeting_payloads[1]["translationKey"].startswith(

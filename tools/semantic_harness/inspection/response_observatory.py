@@ -60,7 +60,8 @@ def run_quality_matrix(
         if not isinstance(expected, dict):
             raise ValueError("matrix expected must be an object")
         allowed_expectations = {
-            "lastKey", "firstKey", "lastKeyPrefix", "minActions",
+            "lastKey", "firstKey", "firstSemanticKey", "lastSemanticKey",
+            "lastKeyPrefix", "minActions",
             "maxActions", "accepted", "conversationClosed",
             "maxFallbackLookups", "minFallbackLookups",
             "textContains", "textNotContains",
@@ -83,7 +84,8 @@ def run_quality_matrix(
             if flag_name in expected and type(expected[flag_name]) is not bool:
                 raise ValueError("invalid boolean matrix expectation: " + flag_name)
         for text_name in (
-            "lastKey", "firstKey", "lastKeyPrefix", "textContains",
+            "lastKey", "firstKey", "firstSemanticKey", "lastSemanticKey",
+            "lastKeyPrefix", "textContains",
             "textNotContains", "executionStatus", "rejectionReason",
         ):
             if text_name in expected and (
@@ -125,6 +127,10 @@ def run_quality_matrix(
             and isinstance(message.get("payload"), dict)
         ]
         keys = [str(message.get("key") or "") for message in messages]
+        semantic_keys = [
+            str(message.get("semanticTemplateID") or message.get("key") or "")
+            for message in messages
+        ]
         texts = [str(message.get("text") or "") for message in messages]
         effects = inspector.get("effects", {}).get("sideEffects", {})
         actions = effects.get("actionCount", 0)
@@ -167,6 +173,16 @@ def run_quality_matrix(
             )
         if "firstKey" in expected:
             checks["firstKey"] = bool(keys) and keys[0] == expected["firstKey"]
+        if "firstSemanticKey" in expected:
+            checks["firstSemanticKey"] = (
+                bool(semantic_keys)
+                and semantic_keys[0] == expected["firstSemanticKey"]
+            )
+        if "lastSemanticKey" in expected:
+            checks["lastSemanticKey"] = (
+                bool(semantic_keys)
+                and semantic_keys[-1] == expected["lastSemanticKey"]
+            )
         if "lastKeyPrefix" in expected:
             checks["lastKeyPrefix"] = bool(keys) and keys[-1].startswith(
                 str(expected["lastKeyPrefix"])
@@ -196,6 +212,7 @@ def run_quality_matrix(
             "interaction": interaction,
             "conversationClosed": lifecycle.get("closed"),
             "responseKeys": keys[-4:], "responseTexts": texts[-4:],
+            "semanticResponseKeys": semantic_keys[-4:],
             # actionCount is *attempted request dispatch*, not verified game
             # execution. A server-declared rejection can still have one request
             # and one legitimate client->server transport in this fixture.

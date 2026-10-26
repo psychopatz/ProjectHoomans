@@ -262,7 +262,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                 selected = next(
                     message
                     for message in turn["messages"]
-                    if message.get("payload", {}).get("key")
+                    if message.get("payload", {}).get("semanticTemplateID")
                     == "semantic.flow.greeting.opening.default"
                 )
                 self.assertEqual(selected["payload"]["text"], expected[language])

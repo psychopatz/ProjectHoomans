@@ -1,6 +1,6 @@
 # Semantic Observatory & Dialogue Quality Harness — full developer roadmap
 
-**Parent goal: IN PROGRESS / PARTIALLY IMPLEMENTED.** These are mandatory developer-side phases P0–P7, not separate /goal assignments. A phase or Next Chunk passing is not completion of the parent goal. Current phase truth is reconciled in PROGRESS.md and must be updated from evidence rather than chronological notes.
+**Parent goal: DEVELOPER-SIDE COMPLETE — READY FOR USER LIVE TEST.** These are mandatory developer-side phases P0–P7, not separate /goal assignments. Native Project Zomboid SP/MP verification remains user-owned; current phase truth is reconciled in PROGRESS.md from evidence rather than chronological notes.
 
 ## P0 — Baseline and canonical contracts
 **Status: COMPLETE at audited ProjectHoomans 07aad881.**
@@ -23,7 +23,7 @@
 **Gate:** loaded pool/variant details match production Lua; provenance is verified or explicitly UNKNOWN; reads are bounded/no-write and do not change runtime selection behavior.
 
 ## P2 — Explainable selection and authority provenance
-**Status: ACCEPTANCE-PENDING. Core mechanism implemented.**
+**Status: COMPLETE.**
 
 - Use the same Lua matching/scoring/tie/history path for optional explain traces; never reimplement selection in Python.
 - Join selected variant/template/plan evidence to Conversation Inspector final text, translation chain, command/action result, effects and flow state.
@@ -33,7 +33,7 @@
 **Gate:** seeded and natural-history observed selections match explanations; explain does not mutate selection history or dispatch; source/authority joins never overclaim exact ownership.
 
 ## P3 — Human UI surface consolidation
-**Status: IN PROGRESS. Core Simulation/Studio redundancy consolidation is implemented in the current worktree; the user-directed Dialogue Content surface and Developer Tools demotion remain mandatory before acceptance.**
+**Status: COMPLETE.** Simulation owns execution/context/regression; Studio is Explore + Dialogue Content + Review with structural tools behind Developer Tools.
 
 - Enforce the ownership contract in SURFACE_CONSOLIDATION.md: Simulation executes/tests; Studio is Explore + Dialogue Content + Review; World Browser selects persisted targets; Log owns activity history.
 - Remove Studio Observatory Test Lab as a parallel conversation runner. All interactive fixture/save-backed execution now routes through Simulation.
@@ -48,7 +48,7 @@
 **Gate:** one user task has one GUI home; no duplicate Studio runner/context/coverage surface remains; Studio defaults to Explore + Dialogue Content + Review, structural authoring is Developer Tools; Simulation retains all runtime/testing capability; World Browser/Log remain sole owners; Dialogue Content can safely edit one canonical phrase family and one verified landing/choice text with locked structural metadata; moved/retired functions pass real-worker Tk/Xvfb and CLI parity regression without semantic or save behavior changes.
 
 ## P4 — Grounded scenario matrix and quality coverage
-**Status: IN PROGRESS.**
+**Status: COMPLETE.**
 
 - Maintain bounded EN/TL matrices for personality/social style, relationships, hidden identity, weather/time, need/health, flow state, companion authority and negative permissions.
 - Reset histories between unrelated cases; retain history intentionally for anti-repeat sequences.
@@ -59,7 +59,7 @@
 **Gate:** greeting/wellbeing/farewell/companion action and owned/unowned Leave Group behavior are reproducible in actual Core+Hoomans worker fixtures, with EN/TL where supported and explicit source/worker revision.
 
 ## P5 — Agent-first CLI/reporting
-**Status: ACCEPTANCE-PENDING. Required commands implemented.**
+**Status: COMPLETE. Required commands and bounded error/scale/parity paths are verified.
 
 - Keep stable headless catalog/detail/explain/turn/matrix/coverage/lineage/translation/proposal/compare operations routed through the same services as GUI.
 - Emit schema-versioned bounded JSON/JSONL with limits, paging/truncation, fingerprints, sourceKind, exit codes and actionable errors.
@@ -69,7 +69,7 @@
 **Gate:** an agent can discover/explain a pool, run EN/TL coverage and compare candidate/baseline behavior with bounded reports; final results match GUI/registered Lua.
 
 ## P6 — Safe delegated dialogue quality + dynamic phrase registry
-**Status: IN PROGRESS. The original single-family canonical promotion proof is accepted in PROGRESS; the newly approved Dialogue Content Registry / phrase-variation extension remains mandatory.**
+**Status: COMPLETE.** The original canonical promotion and the Dialogue Content Registry / phrase-variation extension are accepted.
 
 - Preserve the existing safe proposal/review workflow: retrieve verified source/translation contracts, use stale guards, stage outside watched media/user saves, run disposable real-Lua before/after, and require an explicit review decision.
 - Implement DIALOGUE_CONTENT_REGISTRY.md through existing CodeBuilder ownership: one canonical content-only source, deterministic generated Lua phrase metadata, and normal string-valued EN/TL translation keys/manifests.
@@ -83,7 +83,7 @@
 **Gate:** the prior canonical promotion remains valid **and** the Dialogue Content Registry acceptance in DIALOGUE_CONTENT_REGISTRY.md passes: deterministic CodeBuilder generation, string-only translations, separate semantic/style/phrase identities, 3+ EN/TL phrases with anti-repeat real-Lua proof, Studio content editing with stale guards, one locked-structure player landing edit, unchanged plans/actions/authority/effects, and no save/ModData text bloat.
 
 ## P7 — End-to-end developer acceptance, scale and handoff
-**Status: IN PROGRESS. Several independent suites pass; consolidated final gate pending.**
+**Status: READY FOR USER LIVE TEST.** Consolidated developer-side Python/Lua/Tk/Kahlua/CodeBuilder/hash gate is green; native SP/MP remains user-owned.
 
 - Exercise final P0–P6 flows in headless CLI and actual Tk GUI against production Lua/Core.
 - Compare startup/query/replay/output/memory budgets to P0; respect current catalog/history caps unless separately justified.

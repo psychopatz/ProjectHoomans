@@ -147,12 +147,16 @@ def restore_splitters(app: Any) -> None:
     # Keep enough width for the conversation pane even when a sash saved on a
     # larger desktop is restored at the 1080px acceptance-test floor. The
     # context dock remains usable at 180px and its notebook pages can scroll.
-    workflow_minimum = min(420, max(280, workflow_width - 180))
-    context_minimum = (
-        180
-        if workflow_width < 900
-        else (360 if app.save_backed_mode else 320)
-    )
+    context_minimum = 180 if workflow_width < 900 else 320
+    if not app.trace_panel_visible and app.save_backed_mode:
+        # Keep the primary Conversation/Response Channel readable at the
+        # supported 1080px window floor even when an older persisted sash is
+        # narrower. Larger windows still retain the user's proportional sash.
+        workflow_minimum = min(740, max(420, workflow_width - context_minimum))
+    else:
+        # Diagnostics/fixture layouts retain the established minimum so saved
+        # splitter parity remains stable across the two-pane topology.
+        workflow_minimum = min(420, max(280, workflow_width - 180))
     workflow_maximum = max(
         workflow_minimum,
         workflow_width - context_minimum,

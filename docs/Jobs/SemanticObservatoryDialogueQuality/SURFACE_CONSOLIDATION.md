@@ -1,6 +1,6 @@
 # Semantic Lab surface consolidation
 
-**Status: IN PROGRESS.** Core Simulation/Studio redundancy consolidation is implemented in the current worktree; the newly approved Dialogue Content primary surface and Developer Tools demotion remain required by P3/P7. This document replaces the earlier assumption that Studio should independently expose Catalog + Test Lab + Coverage + Review. The running Semantic Lab already has a mature Simulation workbench; duplicate user-facing runtime tools are consolidated rather than preserved.
+**Status: ACCEPTED — READY FOR USER LIVE TEST.** Simulation/Studio redundancy consolidation, the Dialogue Content primary surface and Developer Tools demotion are implemented and verified. This document replaces the earlier assumption that Studio should independently expose Catalog + Test Lab + Coverage + Review. The running Semantic Lab already has a mature Simulation workbench; duplicate user-facing runtime tools are consolidated rather than preserved.
 
 ## Product rule: one job, one home
 
