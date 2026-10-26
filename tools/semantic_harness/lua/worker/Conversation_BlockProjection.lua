@@ -24,6 +24,20 @@ function Block.project(view)
     local block = PNC.Conversation and PNC.Conversation.Registry
         and PNC.Conversation.Registry.GetBlock
         and PNC.Conversation.Registry.GetBlock(blockID) or nil
+    local ownership = PNC.Semantics
+        and PNC.Semantics.ConversationCategoryOwnership
+    if type(ownership) ~= "table" then
+        local ok, loaded = pcall(require,
+            "PNC/Semantics/PNC_SemanticConversationCategoryOwnership")
+        ownership = PNC.Semantics
+            and PNC.Semantics.ConversationCategoryOwnership
+        if type(ownership) ~= "table" and ok and type(loaded) == "table" then
+            ownership = loaded
+        end
+    end
+    local categoryOwnership = ownership
+        and type(ownership.ForBlock) == "function"
+        and ownership.ForBlock(block) or nil
     local topic = block and block.topic or nil
     if not topic and block
         and PNC.Semantics and PNC.Semantics.TopicCatalog
@@ -56,6 +70,9 @@ function Block.project(view)
         blockID = blockID,
         nodeID = nodeID,
         topic = topic or root.conversationTopic,
+        semanticOwner = categoryOwnership
+            and categoryOwnership.semanticOwner or nil,
+        ownership = categoryOwnership,
         npcText = Payload.resolve(node.npc),
         choices = choices,
     }

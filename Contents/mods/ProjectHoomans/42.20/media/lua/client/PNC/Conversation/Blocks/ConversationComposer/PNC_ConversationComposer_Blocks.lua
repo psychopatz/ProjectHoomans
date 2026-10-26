@@ -14,6 +14,16 @@ if type(TopicCatalog) ~= "table" then
 end
 Internal.TopicCatalog = TopicCatalog
 
+local CategoryOwnership = PNC.Semantics
+    and PNC.Semantics.ConversationCategoryOwnership
+if type(CategoryOwnership) ~= "table" then
+    pcall(require,
+        "PNC/Semantics/PNC_SemanticConversationCategoryOwnership")
+    CategoryOwnership = PNC.Semantics
+        and PNC.Semantics.ConversationCategoryOwnership
+end
+Internal.CategoryOwnership = CategoryOwnership
+
 -- Keep this path as the public composer entry point.  The spokes below are
 -- ordered because semantic projections depend on BuildBlockNode, while the
 -- graph projection depends on both the block and semantic projections.

@@ -57,6 +57,8 @@ local function appendConversationChoices(
         and type(context.conversationBlock) == "table"
         and context.conversationBlock or nil
     if not block or type(block.choices) ~= "table" then return end
+    local ownership = type(block.ownership) == "table"
+        and block.ownership or nil
     for _, choice in ipairs(block.choices) do
         if type(choice) == "table" and tostring(choice.id or "") ~= "" then
             local candidateID = table.concat({
@@ -123,6 +125,14 @@ local function appendConversationChoices(
                         reason = reason,
                     },
                 }
+                if ownership then
+                    frame.extensions.semanticOwner = ownership.semanticOwner
+                    frame.extensions.legacyRegistry =
+                        ownership.legacyRegistry
+                    frame.extensions.migrationPhase =
+                        ownership.migrationPhase
+                    frame.extensions.authority = ownership.authority
+                end
                 candidate = normalizeCandidate(
                     candidate, "conversation_registry", #output + 1
                 )

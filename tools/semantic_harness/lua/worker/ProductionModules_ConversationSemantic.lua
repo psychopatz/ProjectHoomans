@@ -38,6 +38,11 @@ local function loadConversationSemantic(load, registerEntryPointModule)
         "PNC/Semantics/PNC_SemanticTopicCatalog.lua",
         "semantic_topic_catalog"
     )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticConversationCategoryOwnership.lua",
+        "semantic_conversation_ownership"
+    )
     -- Keep category clicks on the production authority/composer seam. The
     -- worker does not load the full native conversation window, but it does
     -- load the same registry, authority, composer and inbound block handler

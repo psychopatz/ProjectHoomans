@@ -2,6 +2,7 @@ local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
 local Internal = Composer.Internal
 local TopicCatalog = Internal.TopicCatalog
+local CategoryOwnership = Internal.CategoryOwnership
 
 local function resolveProjectionText(value)
     if type(value) == "table" then
@@ -25,6 +26,15 @@ local function semanticProjection(choice)
         "route", "categoryID", "topic", "choiceID", "actionID", "groupID",
     }) do
         if semantic[key] ~= nil then output[key] = semantic[key] end
+    end
+    local ownership = CategoryOwnership
+        and type(CategoryOwnership.Get) == "function"
+        and CategoryOwnership.Get(semantic.categoryID) or nil
+    if ownership then
+        output.semanticOwner = ownership.semanticOwner
+        output.legacyRegistry = ownership.legacyRegistry
+        output.migrationPhase = ownership.migrationPhase
+        output.authority = ownership.authority
     end
     return output
 end
@@ -141,6 +151,9 @@ function Composer.BuildSemanticBlockProjection(view)
     local authoredTopic = topicCatalog
         and type(topicCatalog.AuthoredTopic) == "function"
         and topicCatalog.AuthoredTopic(block) or block.topic
+    local ownership = CategoryOwnership
+        and type(CategoryOwnership.ForBlock) == "function"
+        and CategoryOwnership.ForBlock(block) or nil
     local choices = {}
     for _, entry in ipairs(builtNode.choices or {}) do
         if type(entry) == "table" and tostring(entry.id or "") ~= "" then
@@ -169,6 +182,8 @@ function Composer.BuildSemanticBlockProjection(view)
         categoryID = block.category,
         blockID = block.id,
         topic = authoredTopic,
+        semanticOwner = ownership and ownership.semanticOwner or nil,
+        ownership = ownership,
         nodeID = nodeID,
         npcText = resolveProjectionText(builtNode.npc),
         choices = choices,
