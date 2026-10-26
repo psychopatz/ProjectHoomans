@@ -279,3 +279,9 @@ conversation-root Disband button for a recruited NPC without verified
 player-faction authority in EN/TL. The authoritative handler rejects, the
 conversation stays open and one attempted transport is recorded. This is a
 negative ownership test, not a successful departure or native PZ proof.
+
+## Loaded Lua response and canonical EN/TL manifest ownership
+
+Command: `tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jsonl --response-translation-coverage semantic.question.backstory.ambiguous`
+
+The query joins actual production-Lua variant template IDs to the canonical Conversation EN/TL manifests, retaining exact asset paths and manifest SHA-256. It reports BOTH_MANIFESTED, MISSING_EN, MISSING_TL, NOT_IN_CONVERSATION_MANIFEST and DUPLICATE_MANIFEST_KEY. Not manifested does not imply untranslated dialogue; authored variants may realize through other native or fallback routes. This is static readiness, not runtime fallback or native SP/MP proof. Studio uses the same read-only service.

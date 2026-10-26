@@ -14,6 +14,7 @@ from .inspection.response_candidate import preview_authored_variant
 from .inspection.response_turn_trace import inspect_response_turn
 from .inspection.response_selection_coverage import selection_coverage
 from .inspection.response_source_lineage import inspect_codebuilder_lineage
+from .inspection.response_translation_coverage import translation_coverage
 from .inspection.response_observatory import (
     run_quality_matrix, source_evidence, source_evidence_from_paths,
     review_variant_proposal, compare_quality_reports,
@@ -522,6 +523,14 @@ def cli(arguments: argparse.Namespace) -> int:
                 result["sourceEvidence"] = source_evidence(worker)
                 _print_result(result, arguments.jsonl)
                 return 0 if result["ok"] else 3
+            if arguments.response_translation_coverage:
+                result = translation_coverage(
+                    worker, arguments.response_translation_coverage,
+                    repository=authoring_service.repository,
+                )
+                result["sourceEvidence"] = source_evidence(worker)
+                _print_result(result, arguments.jsonl)
+                return 0 if result["ok"] else 3
             if arguments.response_codebuilder_lineage:
                 result = inspect_codebuilder_lineage(
                     worker, arguments.response_codebuilder_lineage,
@@ -839,6 +848,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--response-quality-matrix", metavar="PATH",
         help="run up to eight isolated production-Lua fixture cases from JSON",
+    )
+    observatory.add_argument(
+        "--response-translation-coverage", metavar="POOL_ID",
+        help="inspect EN/TL canonical manifest membership of loaded Lua variants",
     )
     observatory.add_argument(
         "--response-codebuilder-lineage", metavar="POOL_ID",

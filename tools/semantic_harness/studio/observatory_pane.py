@@ -9,6 +9,7 @@ from ..inspection.response_candidate import preview_authored_variant
 from ..inspection.response_turn_trace import inspect_response_turn
 from ..inspection.response_selection_coverage import selection_coverage
 from ..inspection.response_source_lineage import inspect_codebuilder_lineage
+from ..inspection.response_translation_coverage import translation_coverage
 
 from ..inspection.response_observatory import run_quality_matrix
 from ..runtime.worker import LuaSemanticWorker
@@ -92,6 +93,9 @@ class SemanticObservatoryPane:
                 ttk.Label(controls, text="Actual registered variant data").pack(side="left")
                 ttk.Button(controls, text="Explain selection",
                            command=self.explain).pack(side="right")
+                ttk.Button(controls, text="EN/TL manifest",
+                           command=self.verify_translation_manifest).pack(
+                               side="right", padx=4)
                 ttk.Button(controls, text="Verify CodeBuilder owner",
                            command=self.verify_source_lineage).pack(side="right", padx=4)
                 self.context_box = ttk.Combobox(
@@ -415,6 +419,35 @@ class SemanticObservatoryPane:
             ),
             self._on_coverage,
         )
+
+    def verify_translation_manifest(self) -> None:
+        if not self.selected_pool:
+            self.status_var.set("Select a registered pool first")
+            return
+        selected = self.selected_pool
+        self._submit(
+            lambda worker: translation_coverage(worker, selected),
+            self._on_translation_coverage,
+        )
+
+    def _on_translation_coverage(self, report: dict[str, Any]) -> None:
+        lines = [
+            f"Canonical EN/TL manifests: {report['poolID']}",
+            "Static manifest membership, not runtime translation evidence.",
+            "Not in manifest does not imply untranslated in actual dialogue.",
+            "",
+        ]
+        for variant in report.get("variants", []):
+            paths = variant.get("manifestAssets") or {}
+            lines.extend((
+                f"{variant['variantID']} · {variant['status']}",
+                f"  Template: {variant['templateID']}",
+                f"  EN: {', '.join(paths.get('EN', [])) or 'NOT MANIFESTED'}",
+                f"  TL: {', '.join(paths.get('TL', [])) or 'NOT MANIFESTED'}",
+                "",
+            ))
+        self._display("Review", "\n".join(lines))
+        self.tabs.select(3)
 
     def verify_source_lineage(self) -> None:
         if not self.selected_pool:
