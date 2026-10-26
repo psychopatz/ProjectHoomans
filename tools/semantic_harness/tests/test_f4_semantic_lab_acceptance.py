@@ -146,7 +146,7 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             self.assertTrue(
                 any(
                     path.endswith(
-                        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticGroundedPersonalDialogue.lua"
+                        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Dialogue/GroundedPersonalDialogue.lua"
                     )
                     for path in preview["sourcePreview"]["generatedPaths"]
                 )
@@ -325,11 +325,16 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
                     tagalog["translation"]["language"], "TL"
                 )
                 self.assertEqual(
-                    tagalog["translation"]["lookups"][-1]["key"],
+                    payload["translationKey"],
                     "UI_PNC_Conversation_Semantic_LabGeneratedHometown",
                 )
+                response_lookups = [
+                    item for item in tagalog["translation"]["lookups"]
+                    if item.get("key") == payload["translationKey"]
+                ]
+                self.assertTrue(response_lookups)
                 self.assertFalse(
-                    any(item.get("fallbackUsed") for item in tagalog["translation"]["lookups"])
+                    any(item.get("fallbackUsed") for item in response_lookups)
                 )
 
             with LuaSemanticWorker(

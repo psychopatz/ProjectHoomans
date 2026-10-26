@@ -30,7 +30,7 @@ class SemanticAuthoringCompilerWorkerTests(unittest.TestCase):
         self.assertTrue(report["effectFree"])
         self.assertEqual(report["writes"], [])
         self.assertIn(
-            "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticGeneratedDefinitions.lua",
+            "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/SemanticAuthoring/Catalog.lua",
             report["generatedPaths"],
         )
         self.assertIn(

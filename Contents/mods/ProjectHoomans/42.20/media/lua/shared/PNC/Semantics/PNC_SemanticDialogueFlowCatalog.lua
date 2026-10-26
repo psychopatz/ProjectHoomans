@@ -4,7 +4,7 @@ PNC.Semantics = PNC.Semantics or {}
 local Registry = require
     "PNC/Semantics/PNC_SemanticDialogueFlowRegistry"
 local GeneratedDefinitions = require
-    "PNC/Semantics/PNC_SemanticGeneratedDefinitions"
+    "PNC/Semantics/Generated/SemanticAuthoring/Catalog"
 
 local definitions = {
     require "PNC/Semantics/PNC_SemanticDialogueFlow_Identity",

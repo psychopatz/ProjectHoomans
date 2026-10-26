@@ -5,13 +5,13 @@ local Semantic = require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local Registry = Semantic.Registry
 local Normalizer = Semantic.Normalizer
 local GeneratedLexicon = require
-    "PNC/Semantics/PNC_SemanticGeneratedLexicon"
+    "PNC/Semantics/Generated/Lexicon/Catalog"
 local GeneratedDialogue = require
-    "PNC/Semantics/PNC_SemanticGeneratedDialogue"
+    "PNC/Semantics/Generated/Dialogue/CommonInteractions"
 local GeneratedPersonalDialogue = require
-    "PNC/Semantics/PNC_SemanticGroundedPersonalDialogue"
+    "PNC/Semantics/Generated/Dialogue/GroundedPersonalDialogue"
 local GeneratedDefinitions = require
-    "PNC/Semantics/PNC_SemanticGeneratedDefinitions"
+    "PNC/Semantics/Generated/SemanticAuthoring/Catalog"
 local CampSite = PNC.Semantics.CampSite
     or require "PNC/Semantics/PNC_SemanticCampSite"
 local Catalog = PNC.Semantics.Catalog or {}

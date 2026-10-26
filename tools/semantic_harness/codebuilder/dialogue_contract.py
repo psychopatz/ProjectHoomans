@@ -70,7 +70,7 @@ DIALOGUE_MAX_VARIANTS = 16
 DIALOGUE_MAX_PATTERN_TOKENS = 16
 DIALOGUE_MAX_BRANCH_OFFERS = 8
 DIALOGUE_MATCH_CONCEPTS = frozenset({"WEATHER"})
-DIALOGUE_LUA_CHUNK_MAX_CHARS = 14000
+DIALOGUE_LUA_CHUNK_MAX_CHARS = 10000
 DIALOGUE_BRANCH_FRAME_FIELDS = frozenset({
     "intent", "speechAct", "action", "subject", "target", "reference",
     "identityClaim", "selfDirected", "stateType", "stateValue", "pattern",

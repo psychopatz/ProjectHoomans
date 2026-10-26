@@ -13,11 +13,12 @@ from .blocks import SemanticBlockRegistry
 from .lexicon_compiler import CompileError
 from .dialogue_rendering import (
     render_dialogue_lua,
-    render_dialogue_lua_shards,
+    render_dialogue_lua_plan,
+    render_dialogue_manifest,
 )
 from .semantic_definition_compiler import (
     discover_registered_capability_ids,
-    render_semantic_lua_shards,
+    render_semantic_lua_plan,
     render_semantic_manifest,
 )
 from .dataset_catalog import WORKFLOW_DATASET_KINDS, SemanticDatasetCatalog
@@ -218,32 +219,37 @@ class SemanticInteractionAuthoring:
 
         source_text = json.dumps(source_document, ensure_ascii=False, indent=2) + "\n"
         source_relative = str(source_path.resolve().relative_to(self.repository))
-        rendered = render_semantic_lua_shards(
+        rendered, module_manifest = render_semantic_lua_plan(
             compiled,
-            "PNC/Semantics/PNC_SemanticGeneratedDefinitions",
+            "PNC/Semantics/Generated/SemanticAuthoring/Catalog",
         )
-        pattern_modules = [module for module, _source in rendered if "_Patterns_" in module]
-        flow_modules = [module for module, _source in rendered if "_Flows_" in module]
-        response_modules = [module for module, _source in rendered if "_Responses_" in module]
+        pattern_modules = [module for module, _source in rendered if "/Patterns/" in module]
+        flow_modules = [module for module, _source in rendered if "/Flows/" in module]
+        response_modules = [module for module, _source in rendered if "/Responses/" in module]
         translation_paths = {
             "EN": ["EN/Conversation/Semantic/Generated.json"],
             "TL": ["TL/Conversation/Semantic/Generated.json"],
         }
         semantic_root = Path(
-            "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics"
+            "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
+            "Semantics/Generated/SemanticAuthoring"
+        )
+        shared_root = Path(
+            "Contents/mods/ProjectHoomans/common/media/lua/shared"
         )
         expected_sources: dict[str, str] = {
-            str(semantic_root / "PNC_SemanticGeneratedDefinitions.lua"):
+            str(semantic_root / "Catalog.lua"):
                 render_semantic_manifest(
                     compiled,
                     pattern_modules,
                     flow_modules,
                     response_modules,
                     translation_paths,
+                    module_manifest,
                 ),
         }
         expected_sources.update({
-            str(semantic_root / (Path(module).name + ".lua")): source
+            str(shared_root / (module + ".lua")): source
             for module, source in rendered
         })
         translation_root = Path(
@@ -288,18 +294,36 @@ class SemanticInteractionAuthoring:
             source_path,
         )
         asset_stem = authoring._dialogue_asset_stem(source_path)
-        module_prefix = "PNC/Semantics/PNC_Semantic" + asset_stem
-        rendered = render_dialogue_lua_shards(compiled, module_prefix)
-        pattern_modules = [module for module, _source in rendered if "_Patterns_" in module]
-        response_modules = [module for module, _source in rendered if "_Responses_" in module]
+        module_prefix = "PNC/Semantics/Generated/Dialogue/" + asset_stem
+        rendered, module_manifest = render_dialogue_lua_plan(compiled, module_prefix)
+        pattern_modules = [module for module, _source in rendered if "/Patterns/" in module]
+        response_modules = [module for module, _source in rendered if "/Responses/" in module]
         entry_module = module_prefix
         generated_lua = [{
             "module": entry_module,
             "sha256": hashlib.sha256(
-                render_dialogue_lua(compiled, pattern_modules, response_modules).encode("utf-8")
+                render_dialogue_lua(
+                    compiled,
+                    pattern_modules,
+                    response_modules,
+                    module_manifest,
+                    module_prefix + "/Manifest",
+                ).encode("utf-8")
             ).hexdigest(),
-            "source": render_dialogue_lua(compiled, pattern_modules, response_modules),
+            "source": render_dialogue_lua(
+                compiled,
+                pattern_modules,
+                response_modules,
+                module_manifest,
+                module_prefix + "/Manifest",
+            ),
         }]
+        manifest_source = render_dialogue_manifest(module_manifest)
+        generated_lua.append({
+            "module": module_prefix + "/Manifest",
+            "sha256": hashlib.sha256(manifest_source.encode("utf-8")).hexdigest(),
+            "source": manifest_source,
+        })
         generated_lua.extend({
             "module": module,
             "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
@@ -365,9 +389,9 @@ class SemanticInteractionAuthoring:
         if not isinstance(compiled, dict):
             return report
         if source_spec["kind"] == "semantic":
-            rendered = render_semantic_lua_shards(
+            rendered, _module_manifest = render_semantic_lua_plan(
                 compiled,
-                "PNC/Semantics/PNC_SemanticGeneratedDefinitions",
+                "PNC/Semantics/Generated/SemanticAuthoring/Catalog",
             )
             report["generatedLua"] = [
                 {
@@ -518,9 +542,9 @@ class SemanticInteractionAuthoring:
         compiled = report.get("compiled")
         if not isinstance(compiled, dict):
             return report
-        rendered = render_semantic_lua_shards(
+        rendered, _module_manifest = render_semantic_lua_plan(
             compiled,
-            "PNC/Semantics/PNC_SemanticGeneratedDefinitions",
+            "PNC/Semantics/Generated/SemanticAuthoring/Catalog",
         )
         report["generatedLua"] = [
             {

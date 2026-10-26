@@ -167,40 +167,40 @@ class SemanticCompilerTests(unittest.TestCase):
         compiled = compile_wordnet(self.home, self.allowlist)
         rendered = render_lua_shards(
             compiled,
-            "PNC/Semantics/PNC_SemanticGeneratedLexicon",
+            "PNC/Semantics/Generated/Lexicon/Catalog",
         )
         modules = {module: source for module, source in rendered}
 
         self.assertIn(
-            "PNC/Semantics/PNC_SemanticGeneratedLexicon",
+            "PNC/Semantics/Generated/Lexicon/Catalog",
             modules,
         )
         self.assertIn(
-            "PNC/Semantics/PNC_SemanticGeneratedLexicon_Aliases",
+            "PNC/Semantics/Generated/Lexicon/Aliases",
             modules,
         )
         self.assertIn(
-            "PNC/Semantics/PNC_SemanticGeneratedLexicon_VerbForms",
+            "PNC/Semantics/Generated/Lexicon/VerbForms",
             modules,
         )
         self.assertIn(
-            "PNC/Semantics/PNC_SemanticGeneratedLexicon_VerbForms_FETCH",
+            "PNC/Semantics/Generated/Lexicon/VerbForms/Fetch",
             modules,
         )
         self.assertIn(
             'local aliasesByConcept = require '
-            '"PNC/Semantics/PNC_SemanticGeneratedLexicon_Aliases"',
-            modules["PNC/Semantics/PNC_SemanticGeneratedLexicon"],
+            '"PNC/Semantics/Generated/Lexicon/Aliases"',
+            modules["PNC/Semantics/Generated/Lexicon/Catalog"],
         )
         self.assertIn('["FETCH"] = {', modules[
-            "PNC/Semantics/PNC_SemanticGeneratedLexicon_Aliases"
+            "PNC/Semantics/Generated/Lexicon/Aliases"
         ])
         self.assertIn(
-            'PNC/Semantics/PNC_SemanticGeneratedLexicon_VerbForms_FETCH',
-            modules["PNC/Semantics/PNC_SemanticGeneratedLexicon_VerbForms"],
+            'PNC/Semantics/Generated/Lexicon/VerbForms/Fetch',
+            modules["PNC/Semantics/Generated/Lexicon/VerbForms"],
         )
         self.assertIn('["grabbing"] = {', modules[
-            "PNC/Semantics/PNC_SemanticGeneratedLexicon_VerbForms_FETCH"
+            "PNC/Semantics/Generated/Lexicon/VerbForms/Fetch"
         ])
 
     def test_source_hashes_are_pinned(self) -> None:

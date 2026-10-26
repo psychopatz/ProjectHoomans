@@ -374,7 +374,7 @@ class InteractionSpecTests(unittest.TestCase):
             )
             self.assertTrue(generated["ok"], generated)
             self.assertTrue(generated["generationApproved"])
-            self.assertTrue(any(path.endswith("PNC_SemanticGroundedPersonalDialogue.lua")
+            self.assertTrue(any(path.endswith("Generated/Dialogue/GroundedPersonalDialogue.lua")
                                 for path in generated["writes"]))
             self.assertTrue(any(path.endswith("EN/Conversation/Semantic/GroundedPersonalDialogue.json")
                                 for path in generated["writes"]))

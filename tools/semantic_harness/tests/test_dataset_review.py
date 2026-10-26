@@ -69,11 +69,11 @@ class DatasetReviewTests(unittest.TestCase):
             [row["status"] for row in first["artifactDiffs"]],
         )
         self.assertIn(
-            "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticGeneratedDialogue.lua",
+            "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Dialogue/CommonInteractions.lua",
             first["generatedPaths"],
         )
         self.assertIn(
-            "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/GeneratedDialogue.json",
+            "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/CommonInteractions.json",
             first["generatedPaths"],
         )
         self.assertIn(
@@ -84,8 +84,8 @@ class DatasetReviewTests(unittest.TestCase):
 
     def test_artifact_diff_view_is_bounded_and_does_not_write(self) -> None:
         entry = (
-            Path("Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics")
-            / "PNC_SemanticGeneratedDialogue.lua"
+            Path("Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Dialogue")
+            / "CommonInteractions.lua"
         )
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
@@ -117,7 +117,7 @@ class DatasetReviewTests(unittest.TestCase):
 
         self.assertTrue(first["ok"])
         self.assertTrue(first["generationApproved"])
-        self.assertEqual(len(first["writes"]), 10)
+        self.assertEqual(len(first["writes"]), 29)
         self.assertEqual(first_hashes, second_hashes)
         self.assertTrue(all(row["status"] == "unchanged" for row in second["artifactDiffs"]))
         self.assertEqual(second["reloadedBy"], "caller_restart_required")

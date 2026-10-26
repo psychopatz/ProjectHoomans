@@ -29,14 +29,15 @@ if __package__ in {None, ""}:
     )
     from tools.semantic_harness.codebuilder.dialogue_rendering import (
         render_dialogue_lua,
-        render_dialogue_lua_shards,
+        render_dialogue_lua_plan,
+        render_dialogue_manifest,
         render_dialogue_translation,
     )
     from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
         compile_semantic_definitions,
         load_semantic_source,
         discover_registered_capability_ids,
-        render_semantic_lua_shards,
+        render_semantic_lua_plan,
         render_semantic_manifest,
     )
 else:
@@ -51,27 +52,28 @@ else:
     from .dialogue_dataset import compile_dialogue_dataset
     from .dialogue_rendering import (
         render_dialogue_lua,
-        render_dialogue_lua_shards,
+        render_dialogue_lua_plan,
+        render_dialogue_manifest,
         render_dialogue_translation,
     )
     from .semantic_definition_compiler import (
         compile_semantic_definitions,
         load_semantic_source,
         discover_registered_capability_ids,
-        render_semantic_lua_shards,
+        render_semantic_lua_plan,
         render_semantic_manifest,
     )
 
 
 DEFAULT_OUTPUT = (
     ROOT
-    / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/"
-    / "PNC_SemanticGeneratedLexicon.lua"
+    / "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/"
+    / "Generated/Lexicon/Catalog.lua"
 )
 DEFAULT_DIALOGUE_OUTPUT = (
     ROOT
-    / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/"
-    / "PNC_SemanticGeneratedDialogue.lua"
+    / "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/"
+    / "Generated/Dialogue/CommonInteractions.lua"
 )
 CANONICAL_SOURCE_ROOT = (
     ROOT / "tools" / "semantic_harness" / "codebuilder" / "sources"
@@ -83,45 +85,36 @@ DEFAULT_SEMANTIC_OUTPUT_ROOT = ROOT
 def write_lexicon_output(output: Path, compiled) -> list[Path]:
     """Write the stable lexicon hub and bounded generated data shards."""
     output.parent.mkdir(parents=True, exist_ok=True)
-    module_prefix = "PNC/Semantics/" + output.stem
-    stale_paths = list(output.parent.glob(output.stem + "_Aliases.lua"))
-    stale_paths.extend(output.parent.glob(output.stem + "_VerbForms*.lua"))
-    for stale in stale_paths:
-        stale.unlink()
-
-    paths: list[Path] = []
-    for module, source in render_lua_shards(compiled, module_prefix):
-        path = (
-            output
-            if module == module_prefix
-            else output.parent / (Path(module).name + ".lua")
-        )
-        path.write_text(source, encoding="utf-8", newline="\n")
-        paths.append(path)
-    return paths
+    shared_root = _shared_lua_root(output)
+    module_prefix = output.relative_to(shared_root).with_suffix("").as_posix()
+    rendered = render_lua_shards(compiled, module_prefix)
+    # Keep the catalog's hub sibling directory clean while preserving any
+    # future generated catalogs beside it.
+    _clean_generated_tree(output.with_suffix(""))
+    return _write_modules(shared_root, rendered)
 
 
 def write_semantic_output(output_root: Path, compiled: dict) -> list[Path]:
-    semantic_dir = (
-        output_root
-        / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics"
+    semantic_dir = output_root / (
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
+        "Semantics/Generated/SemanticAuthoring"
     )
     semantic_dir.mkdir(parents=True, exist_ok=True)
-    base_name = "PNC_SemanticGeneratedDefinitions"
-    module_prefix = "PNC/Semantics/" + base_name
-    rendered = render_semantic_lua_shards(compiled, module_prefix)
-    stale = semantic_dir.glob(base_name + "_*.lua")
-    for path in stale:
-        path.unlink()
+    shared_root = output_root / "Contents/mods/ProjectHoomans/common/media/lua/shared"
+    module_prefix = "PNC/Semantics/Generated/SemanticAuthoring/Catalog"
+    rendered, module_manifest = render_semantic_lua_plan(compiled, module_prefix)
+    # Keep the shared SemanticAuthoring directory extensible for additional
+    # catalogs; only the Catalog hub's owned subtree is regenerated here.
+    _clean_generated_tree(semantic_dir / "Catalog")
     paths: list[Path] = []
-    pattern_modules = [module for module, _source in rendered if "_Patterns_" in module]
-    flow_modules = [module for module, _source in rendered if "_Flows_" in module]
-    response_modules = [module for module, _source in rendered if "_Responses_" in module]
+    pattern_modules = [module for module, _source in rendered if "/Patterns/" in module]
+    flow_modules = [module for module, _source in rendered if "/Flows/" in module]
+    response_modules = [module for module, _source in rendered if "/Responses/" in module]
     translation_paths = {
         "EN": ["EN/Conversation/Semantic/Generated.json"],
         "TL": ["TL/Conversation/Semantic/Generated.json"],
     }
-    manifest = semantic_dir / (base_name + ".lua")
+    manifest = semantic_dir / "Catalog.lua"
     manifest.write_text(
         render_semantic_manifest(
             compiled,
@@ -129,15 +122,13 @@ def write_semantic_output(output_root: Path, compiled: dict) -> list[Path]:
             flow_modules,
             response_modules,
             translation_paths,
+            module_manifest,
         ),
         encoding="utf-8",
         newline="\n",
     )
     paths.append(manifest)
-    for module, source in rendered:
-        path = semantic_dir / (Path(module).name + ".lua")
-        path.write_text(source, encoding="utf-8", newline="\n")
-        paths.append(path)
+    paths.extend(_write_modules(shared_root, rendered))
 
     translation_root = output_root / "Contents/mods/ProjectHoomans/common/media/translation"
     for language in ("EN", "TL"):
@@ -175,6 +166,41 @@ def write_semantic_output(output_root: Path, compiled: dict) -> list[Path]:
     return paths
 
 
+def _shared_lua_root(path: Path) -> Path:
+    parts = path.parts
+    for index in range(len(parts) - 2):
+        if parts[index:index + 3] == ("media", "lua", "shared"):
+            return Path(*parts[:index + 3])
+    raise ValueError("generated output must be under a media/lua/shared tree")
+
+
+def _clean_generated_tree(root: Path) -> None:
+    """Remove only Lua artifacts owned by one generated catalog directory."""
+    if root.exists():
+        for path in sorted(root.rglob("*.lua"), reverse=True):
+            path.unlink()
+        for directory in sorted(
+            (path for path in root.rglob("*") if path.is_dir()),
+            key=lambda path: len(path.parts),
+            reverse=True,
+        ):
+            try:
+                directory.rmdir()
+            except OSError:
+                pass
+    root.mkdir(parents=True, exist_ok=True)
+
+
+def _write_modules(shared_root: Path, rendered: list[tuple[str, str]]) -> list[Path]:
+    paths: list[Path] = []
+    for module, source in rendered:
+        path = shared_root / (module + ".lua")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source, encoding="utf-8", newline="\n")
+        paths.append(path)
+    return paths
+
+
 def _dialogue_module_prefix(output: Path) -> str:
     parts = output.parts
     for index in range(len(parts) - 2):
@@ -188,10 +214,10 @@ def _dialogue_module_prefix(output: Path) -> str:
 
 def _dialogue_translation_root(output: Path) -> Path | None:
     parts = output.parts
-    for index in range(len(parts) - 3):
+    for index in range(len(parts) - 4):
         if parts[index:index + 3] != ("Contents", "mods", "ProjectHoomans"):
             continue
-        if "42.20" not in parts[index + 3:]:
+        if parts[index + 3] not in {"common", "42.20"}:
             continue
         return Path(*parts[:index]) / (
             "Contents/mods/ProjectHoomans/common/media/translation"
@@ -201,34 +227,40 @@ def _dialogue_translation_root(output: Path) -> Path | None:
 
 def _dialogue_translation_stem(output: Path) -> str:
     """Return the stable translation shard name for one dialogue asset."""
-    stem = output.stem
-    prefix = "PNC_Semantic"
-    if stem.startswith(prefix):
-        stem = stem[len(prefix):]
-    return stem or "GeneratedDialogue"
+    return output.stem or "Dialogue"
 
 
 def write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
     module_prefix = _dialogue_module_prefix(output)
-    shards = render_dialogue_lua_shards(compiled, module_prefix)
-    pattern_modules = [
-        module for module, _ in shards if "_Patterns_" in module]
-    response_modules = [
-        module for module, _ in shards if "_Responses_" in module]
-    stale_patterns = output.parent.glob(output.stem + "_Patterns_*.lua")
-    stale_responses = output.parent.glob(output.stem + "_Responses_*.lua")
-    for stale in (*stale_patterns, *stale_responses):
-        stale.unlink()
-    output.write_text(
-        render_dialogue_lua(compiled, pattern_modules, response_modules),
+    shards, module_manifest = render_dialogue_lua_plan(compiled, module_prefix)
+    pattern_modules = [module for module, _ in shards if "/Patterns/" in module]
+    response_modules = [module for module, _ in shards if "/Responses/" in module]
+    # Each named catalog owns its hub sibling directory. Do not clean the
+    # shared Dialogue directory: multiple independently generated catalogs
+    # live beside one another there.
+    _clean_generated_tree(output.with_suffix(""))
+    shared_root = _shared_lua_root(output)
+    manifest_module = module_prefix + "/Manifest"
+    manifest_path = shared_root / (manifest_module + ".lua")
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        render_dialogue_manifest(module_manifest),
         encoding="utf-8",
         newline="\n",
     )
-    paths = [output]
-    for module, source in shards:
-        shard_path = output.parent / (Path(module).name + ".lua")
-        shard_path.write_text(source, encoding="utf-8", newline="\n")
-        paths.append(shard_path)
+    output.write_text(
+        render_dialogue_lua(
+            compiled,
+            pattern_modules,
+            response_modules,
+            module_manifest,
+            manifest_module,
+        ),
+        encoding="utf-8",
+        newline="\n",
+    )
+    paths = [output, manifest_path]
+    paths.extend(path for path in _write_modules(shared_root, shards) if path != output)
     translation_root = _dialogue_translation_root(output)
     if translation_root is not None:
         translation_stem = _dialogue_translation_stem(output)

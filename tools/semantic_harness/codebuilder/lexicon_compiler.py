@@ -424,9 +424,13 @@ def render_lua_shards(
     compiled: CompiledLexicon,
     module_prefix: str,
 ) -> list[tuple[str, str]]:
-    """Render a hub plus bounded alias and morphology data modules."""
-    aliases_module = module_prefix + "_Aliases"
-    forms_module = module_prefix + "_VerbForms"
+    """Render a readable hub plus bounded lexicon data modules."""
+    from .catalog_naming import ModuleNameRegistry, module_path
+
+    parent = module_prefix.rsplit("/", 1)[0]
+    registry = ModuleNameRegistry()
+    aliases_module = module_path(parent, ["Aliases"], "lexicon.aliases", registry)
+    forms_module = module_path(parent, ["VerbForms"], "lexicon.verb_forms", registry)
 
     hub = _render_provenance_header(compiled)
     hub.extend([
@@ -454,7 +458,15 @@ def render_lua_shards(
         forms_by_concept.setdefault(form[0], {})[surface] = form
 
     form_modules = [
-        (module_prefix + "_VerbForms_" + concept_id, forms)
+        (
+            module_path(
+                parent + "/VerbForms",
+                [concept_id],
+                "lexicon.verb_forms." + concept_id,
+                registry,
+            ),
+            forms,
+        )
         for concept_id, forms in sorted(forms_by_concept.items())
     ]
     forms = _render_data_shard_header("verb morphology aggregator")
@@ -478,7 +490,7 @@ def render_lua_shards(
     ]
     for module, concept_forms in form_modules:
         shard = _render_data_shard_header(
-            "verb morphology for " + module.rsplit("_", 1)[-1]
+            "verb morphology for " + module.rsplit("/", 1)[-1]
         )
         shard.extend(["return {"])
         shard.extend(_render_verb_form_entries(concept_forms, "    "))

@@ -124,13 +124,20 @@ class GroundedPersonalDialogueH3Tests(unittest.TestCase):
             "Nagtrabaho ako bilang magsasaka bago ang lahat ng ito.",
         )
         self.assertEqual(turn["translation"]["language"], "TL")
+        response_lookups = [
+            lookup for lookup in turn["translation"]["lookups"]
+            if lookup.get("key")
+            == "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob"
+        ]
+        self.assertTrue(response_lookups)
+        response_args = response_lookups[-1]["args"]
         self.assertIn(
             "magsasaka",
-            turn["translation"]["lookups"][-1]["args"],
+            response_args,
         )
         self.assertNotIn(
             "farmer",
-            turn["translation"]["lookups"][-1]["args"],
+            response_args,
         )
         self.assertTrue(
             all(

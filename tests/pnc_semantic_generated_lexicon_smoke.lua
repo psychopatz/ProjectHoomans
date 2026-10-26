@@ -16,8 +16,8 @@ local Catalog = T.load(
 )
 local GeneratedLexicon = T.load(
     "ProjectHoomans",
-    "shared",
-    "PNC/Semantics/PNC_SemanticGeneratedLexicon.lua"
+    "common_lua",
+    "PNC/Semantics/Generated/Lexicon/Catalog.lua"
 )
 local Policy = T.load(
     "ProjectHoomans",

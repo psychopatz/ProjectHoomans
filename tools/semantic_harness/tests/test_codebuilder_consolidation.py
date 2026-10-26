@@ -41,8 +41,8 @@ SEMANTIC_SOURCE = REPOSITORY / (
     "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
 )
 DIALOGUE_OUTPUT = Path(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/"
-    "PNC_SemanticGeneratedDialogue.lua"
+    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/"
+    "Generated/Dialogue/CommonInteractions.lua"
 )
 SEMANTIC_MANIFEST = Path(
     "Contents/mods/ProjectHoomans/common/media/translation/manifests/Conversation.json"

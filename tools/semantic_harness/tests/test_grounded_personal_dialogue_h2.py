@@ -38,8 +38,8 @@ class GroundedPersonalDialogueH2Tests(unittest.TestCase):
             {"approved": 7, "rejected": 0, "not_candidate": 13},
         )
         self.assertIn(
-            "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/"
-            "PNC_SemanticGroundedPersonalDialogue.lua",
+            "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/"
+            "Generated/Dialogue/GroundedPersonalDialogue.lua",
             report["generatedPaths"],
         )
         self.assertIn(
@@ -63,7 +63,7 @@ class GroundedPersonalDialogueH2Tests(unittest.TestCase):
         self.assertTrue(first["ok"])
         self.assertTrue(first["generationApproved"])
         self.assertEqual(first_bytes, second_bytes)
-        self.assertEqual(len(first["writes"]), 6)
+        self.assertEqual(len(first["writes"]), 24)
         self.assertEqual(
             json.loads(
                 first_bytes[

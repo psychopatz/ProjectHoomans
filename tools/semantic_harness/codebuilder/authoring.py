@@ -19,14 +19,16 @@ from tools.semantic_harness.codebuilder.dialogue_dataset import (
 )
 from tools.semantic_harness.codebuilder.dialogue_rendering import (
     render_dialogue_lua,
-    render_dialogue_lua_shards,
+    render_dialogue_lua_plan,
+    render_dialogue_manifest,
     render_dialogue_translation,
 )
 from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
     compile_semantic_definitions,
     discover_registered_capability_ids,
     load_semantic_source,
-    render_semantic_lua_shards,
+    render_semantic_lua_plan,
+    render_semantic_manifest,
 )
 from tools.semantic_harness.codebuilder.build import (
     write_dialogue_output,
@@ -36,33 +38,35 @@ from tools.semantic_harness.codebuilder.build import (
 
 REPOSITORY = Path(__file__).resolve().parents[3]
 SEMANTIC_RELATIVE_ROOT = Path(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics"
+    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
+    "Semantics/Generated/SemanticAuthoring"
 )
 TRANSLATION_RELATIVE_ROOT = Path(
     "Contents/mods/ProjectHoomans/common/media/translation"
 )
 DIALOGUE_RELATIVE_ROOT = Path(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics"
+    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
+    "Semantics/Generated/Dialogue"
 )
 DIALOGUE_TRANSLATION_RELATIVE_ROOT = Path(
     "Contents/mods/ProjectHoomans/common/media/translation"
 )
 DIALOGUE_OUTPUT_RELATIVE_PATH = (
-    DIALOGUE_RELATIVE_ROOT / "PNC_SemanticGeneratedDialogue.lua"
+    DIALOGUE_RELATIVE_ROOT / "CommonInteractions.lua"
 )
 
 
 def _dialogue_asset_stem(source_path: Path) -> str:
     """Map a canonical source name to a stable production asset stem."""
     if source_path.name == "common_interactions.json":
-        return "GeneratedDialogue"
+        return "CommonInteractions"
     words = [word for word in source_path.stem.split("_") if word]
     return "".join(word[:1].upper() + word[1:] for word in words)
 
 
 def _dialogue_output_path(source_path: Path, repository: Path) -> Path:
     return repository / DIALOGUE_RELATIVE_ROOT / (
-        "PNC_Semantic" + _dialogue_asset_stem(source_path) + ".lua"
+        _dialogue_asset_stem(source_path) + ".lua"
     )
 MAX_DATASET_REVIEW_ROWS = 64
 MAX_DATASET_COLLISIONS = 16
@@ -78,11 +82,12 @@ INTEGRATION_STATUS_FIELDS = (
 
 
 def _planned_paths(compiled: dict[str, Any]) -> list[str]:
-    base_name = "PNC_SemanticGeneratedDefinitions"
-    rendered = render_semantic_lua_shards(compiled, "PNC/Semantics/" + base_name)
-    paths = [str(SEMANTIC_RELATIVE_ROOT / (base_name + ".lua"))]
+    module_prefix = "PNC/Semantics/Generated/SemanticAuthoring/Catalog"
+    rendered, _module_manifest = render_semantic_lua_plan(compiled, module_prefix)
+    shared_root = Path("Contents/mods/ProjectHoomans/common/media/lua/shared")
+    paths = [str(SEMANTIC_RELATIVE_ROOT / "Catalog.lua")]
     paths.extend(
-        str(SEMANTIC_RELATIVE_ROOT / (Path(module).name + ".lua"))
+        str(shared_root / (module + ".lua"))
         for module, _source in rendered
     )
     paths.extend([
@@ -444,16 +449,26 @@ def _dialogue_preview_paths(
     source_path: Path,
 ) -> tuple[list[str], list[dict[str, Any]], list[dict[str, Any]]]:
     asset_stem = _dialogue_asset_stem(source_path)
-    module_stem = "PNC_Semantic" + asset_stem
-    module_prefix = "PNC/Semantics/" + module_stem
-    rendered = render_dialogue_lua_shards(compiled, module_prefix)
-    pattern_modules = [module for module, _source in rendered if "_Patterns_" in module]
-    response_modules = [module for module, _source in rendered if "_Responses_" in module]
-    entry = render_dialogue_lua(compiled, pattern_modules, response_modules)
-    entry_path = DIALOGUE_RELATIVE_ROOT / (module_stem + ".lua")
-    expected_sources: dict[str, str] = {str(entry_path): entry}
+    module_prefix = "PNC/Semantics/Generated/Dialogue/" + asset_stem
+    rendered, module_manifest = render_dialogue_lua_plan(compiled, module_prefix)
+    pattern_modules = [module for module, _source in rendered if "/Patterns/" in module]
+    response_modules = [module for module, _source in rendered if "/Responses/" in module]
+    entry = render_dialogue_lua(
+        compiled,
+        pattern_modules,
+        response_modules,
+        module_manifest,
+        module_prefix + "/Manifest",
+    )
+    entry_path = DIALOGUE_RELATIVE_ROOT / (asset_stem + ".lua")
+    shared_root = Path("Contents/mods/ProjectHoomans/common/media/lua/shared")
+    manifest_path = DIALOGUE_RELATIVE_ROOT / asset_stem / "Manifest.lua"
+    expected_sources: dict[str, str] = {
+        str(entry_path): entry,
+        str(manifest_path): render_dialogue_manifest(module_manifest),
+    }
     expected_sources.update({
-        str(DIALOGUE_RELATIVE_ROOT / (Path(module).name + ".lua")): source
+        str(shared_root / (module + ".lua")): source
         for module, source in rendered
     })
     expected_sources.update({

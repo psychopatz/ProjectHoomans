@@ -7,11 +7,11 @@ PNC.Semantics = PNC.Semantics or {}
 local Catalog = PNC.Semantics.ResponseCatalog or {}
 PNC.Semantics.ResponseCatalog = Catalog
 local GeneratedDialogue = require
-    "PNC/Semantics/PNC_SemanticGeneratedDialogue"
+    "PNC/Semantics/Generated/Dialogue/CommonInteractions"
 local GeneratedPersonalDialogue = require
-    "PNC/Semantics/PNC_SemanticGroundedPersonalDialogue"
+    "PNC/Semantics/Generated/Dialogue/GroundedPersonalDialogue"
 local GeneratedDefinitions = require
-    "PNC/Semantics/PNC_SemanticGeneratedDefinitions"
+    "PNC/Semantics/Generated/SemanticAuthoring/Catalog"
 
 local Core = require
     "PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Core"
