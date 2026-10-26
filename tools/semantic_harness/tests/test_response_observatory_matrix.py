@@ -39,6 +39,31 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         )
         self.assertEqual(result["cases"][2]["transportCount"], 1)
 
+    def test_goodbye_root_closes_while_typed_goodbye_does_not(self):
+        from tools.semantic_harness.inspection.response_observatory import (
+            run_quality_matrix,
+        )
+        cases = [
+            {"label": "root farewell", "language": "TL",
+             "interaction": {"kind": "conversation_root_choice",
+                             "choiceID": "goodbye"},
+             "expected": {"lastKey": "response.goodbye",
+                          "conversationClosed": True, "maxActions": 0}},
+            {"label": "typed ambiguity", "language": "TL",
+             "utterance": "goodbye",
+             "expected": {"lastKey": "semantic.ask_clarification",
+                          "conversationClosed": False, "maxActions": 0}},
+        ]
+        result = run_quality_matrix(cases)
+        self.assertEqual(result["passed"], 2, result)
+        self.assertTrue(result["cases"][0]["conversationClosed"])
+        self.assertFalse(result["cases"][1]["conversationClosed"])
+        with self.assertRaisesRegex(ValueError, "conversation root choice unavailable"):
+            run_quality_matrix([{
+                "interaction": {"kind": "conversation_root_choice",
+                                "choiceID": "not_a_registered_choice"},
+            }])
+
     def test_observation_is_not_falsely_accepted(self):
         result = run_quality_matrix([{"utterance": "goodbye"}])
         self.assertEqual(result["passed"], 0)
@@ -194,12 +219,14 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         for filename in (
             "observatory_core_en_tl.json",
             "observatory_health_authority_en_tl.json",
+            "observatory_lifecycle_en_tl.json",
         ):
             with self.subTest(matrix=filename):
                 path = root / "tools/semantic_harness/fixtures" / filename
                 result = run_quality_matrix(json.loads(path.read_text())["cases"])
-                self.assertEqual(result["caseCount"], 8)
-                self.assertEqual(result["passed"], 8, result["cases"])
+                expected = 6 if "lifecycle" in filename else 8
+                self.assertEqual(result["caseCount"], expected)
+                self.assertEqual(result["passed"], expected, result["cases"])
                 self.assertEqual(result["failed"], 0)
                 self.assertFalse(result["truncated"])
 
@@ -346,6 +373,11 @@ class ObservatoryTkTests(unittest.TestCase):
                     self.assertIn("TL — PASS", text)
                     self.assertIn("Approval: NOT GRANTED", text)
                     self.assertIn("Production writes: 0", text)
+                    pane.coverage_lifecycle()
+                    coverage = pane.views["Coverage"].get("1.0", "end")
+                    self.assertIn("6 fixture cases", coverage)
+                    self.assertIn("Goodbye root choice TL", coverage)
+                    self.assertIn("FAIL=0", coverage)
             finally:
                 root.destroy()
 

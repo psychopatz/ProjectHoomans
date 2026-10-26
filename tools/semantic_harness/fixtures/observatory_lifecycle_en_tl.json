@@ -1,0 +1,77 @@
+{
+  "cases": [
+    {
+      "label": "Goodbye root choice EN",
+      "language": "EN",
+      "interaction": {
+        "kind": "conversation_root_choice",
+        "choiceID": "goodbye"
+      },
+      "expected": {
+        "lastKey": "response.goodbye",
+        "conversationClosed": true,
+        "maxActions": 0,
+        "maxFallbackLookups": 0
+      }
+    },
+    {
+      "label": "Goodbye root choice TL",
+      "language": "TL",
+      "interaction": {
+        "kind": "conversation_root_choice",
+        "choiceID": "goodbye"
+      },
+      "expected": {
+        "lastKey": "response.goodbye",
+        "conversationClosed": true,
+        "maxActions": 0,
+        "maxFallbackLookups": 0
+      }
+    },
+    {
+      "label": "Bare typed goodbye EN separate route",
+      "language": "EN",
+      "utterance": "goodbye",
+      "expected": {
+        "lastKey": "semantic.ask_clarification",
+        "maxActions": 0,
+        "conversationClosed": false
+      }
+    },
+    {
+      "label": "Bare typed goodbye TL separate route",
+      "language": "TL",
+      "utterance": "goodbye",
+      "expected": {
+        "lastKey": "semantic.ask_clarification",
+        "maxActions": 0,
+        "conversationClosed": false
+      }
+    },
+    {
+      "label": "Follow then Wait EN",
+      "language": "EN",
+      "utterances": [
+        "follow me",
+        "wait here"
+      ],
+      "expected": {
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayQueued",
+        "minActions": 1
+      }
+    },
+    {
+      "label": "Follow then Wait TL",
+      "language": "TL",
+      "utterances": [
+        "follow me",
+        "wait here"
+      ],
+      "expected": {
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayQueued",
+        "minActions": 1,
+        "maxFallbackLookups": 0
+      }
+    }
+  ]
+}

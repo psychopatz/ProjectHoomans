@@ -194,3 +194,22 @@ lookup. Companion Follow/Stay default queued EN/TL keys now live in the existing
 manifest-listed `GeneratedTaskCommands.json`; contextual/rejected/failed keys
 remain in their existing files to prevent cross-file duplicate-key loader
 failure. No duplicate translator or generated response compiler was created.
+
+
+## Lifecycle-negative EN/TL scenario matrix
+
+```bash
+tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jsonl --response-quality-matrix tools/semantic_harness/fixtures/observatory_lifecycle_en_tl.json
+```
+
+The third independent matrix (6 ENGINE-FIXTURE cases) executes the actual
+`conversation.root:menu:goodbye` choice in an opened dialogue and confirms
+the returned presentation lifecycle is **closed**, the NPC says “You too.”
+or “Ikaw rin.”, and no gameplay actions are dispatched. In contrast a raw
+typed `goodbye` outside that root-choice path currently produces
+`semantic.ask_clarification` and does **not** close the conversation.
+This is observed behavior, not an assertion that every input form is equivalent.
+The final two cases intentionally retain sequential Follow → Wait history;
+they do not establish native mutually-exclusive movement beyond the
+worker's accepted request and reply. Studio's Coverage tab can execute the
+same lifecycle fixture set through the existing Lua session.

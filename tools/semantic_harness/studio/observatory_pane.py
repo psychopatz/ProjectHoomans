@@ -107,6 +107,9 @@ class SemanticObservatoryPane:
             elif name == "Coverage":
                 ttk.Button(controls, text="Run EN/TL greeting + follow probes",
                            command=self.coverage).pack(side="left")
+                ttk.Button(controls, text="Run lifecycle + Goodbye probes",
+                           command=self.coverage_lifecycle).pack(
+                               side="left", padx=6)
             elif name == "Review":
                 ttk.Label(controls, text="Read-only EN/TL candidate validation").pack(
                     side="left")
@@ -358,6 +361,23 @@ class SemanticObservatoryPane:
             {"label": "Follow TL", "language": "TL", "utterance": "follow me",
              "expected": {"minActions": 1}},
         ]
+        self._submit(
+            lambda worker: run_quality_matrix(
+                cases,
+                worker_factory=lambda scenario: LuaSemanticWorker(
+                    scenario, config=worker.config,
+                ),
+            ),
+            self._on_coverage,
+        )
+
+    def coverage_lifecycle(self) -> None:
+        if self._repository is None:
+            self.status_var.set("Repository unavailable for lifecycle fixture")
+            return
+        path = (self._repository / "tools/semantic_harness/fixtures"
+                / "observatory_lifecycle_en_tl.json")
+        cases = json.loads(path.read_text(encoding="utf-8"))["cases"]
         self._submit(
             lambda worker: run_quality_matrix(
                 cases,

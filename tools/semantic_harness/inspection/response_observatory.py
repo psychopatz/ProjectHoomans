@@ -38,18 +38,49 @@ def run_quality_matrix(
         language = str(case.get("language", "EN")).upper()
         if language not in ("EN", "TL"):
             raise ValueError("matrix language must be EN or TL")
-        utterances = case.get("utterances", [case.get("utterance", "hello")])
-        if not isinstance(utterances, list) or not 1 <= len(utterances) <= MAX_UTTERANCES:
-            raise ValueError("matrix requires 1 to 4 utterances per case")
-        if any(not isinstance(text, str) or not 1 <= len(text) <= 200
-               for text in utterances):
-            raise ValueError("matrix utterance length must be 1 to 200 characters")
+        interaction = case.get("interaction")
+        if interaction is not None:
+            if (not isinstance(interaction, dict)
+                or set(interaction) != {"kind", "choiceID"}
+                or interaction["kind"] != "conversation_root_choice"
+                or not isinstance(interaction["choiceID"], str)
+                or not 1 <= len(interaction["choiceID"]) <= 48
+                or "utterance" in case or "utterances" in case
+            ):
+                raise ValueError("invalid bounded conversation-root choice case")
+            utterances: list[str] = []
+        else:
+            utterances = case.get("utterances", [case.get("utterance", "hello")])
+            if not isinstance(utterances, list) or not 1 <= len(utterances) <= MAX_UTTERANCES:
+                raise ValueError("matrix requires 1 to 4 utterances per case")
+            if any(not isinstance(text, str) or not 1 <= len(text) <= 200
+                   for text in utterances):
+                raise ValueError("matrix utterance length must be 1 to 200 characters")
+        expected = case.get("expected") or {}
+        if not isinstance(expected, dict):
+            raise ValueError("matrix expected must be an object")
         scenario = merge(DEFAULT_SCENARIO, overrides)
         scenario.setdefault("runtime", {})["language"] = language
         with worker_factory(scenario) as worker:
             last = {}
-            for utterance in utterances:
-                last = worker.input(utterance)
+            if interaction:
+                worker.open_conversation()
+                view = worker.conversation_projection()
+                choice_rows = ((view.get("presentation") or {})
+                        .get("responseChannel") or {}).get("rows") or []
+                candidate_id = (
+                    "conversation.root:menu:" + interaction["choiceID"]
+                )
+                matched = [
+                    row for row in choice_rows if isinstance(row, dict)
+                    and row.get("id") == candidate_id
+                ]
+                if len(matched) != 1:
+                    raise ValueError("conversation root choice unavailable")
+                last = worker.suggestion_click(matched[0]["frame"])
+            else:
+                for utterance in utterances:
+                    last = worker.input(utterance)
             inspector = build_conversation_inspector(last)
         messages = [
             message["payload"] for message in last.get("messages", [])
@@ -65,9 +96,9 @@ def run_quality_matrix(
             1 for item in lookups if isinstance(item, dict)
             and item.get("fallbackUsed") is True
         )
-        expected = case.get("expected") or {}
-        if not isinstance(expected, dict):
-            raise ValueError("matrix expected must be an object")
+        lifecycle = (last.get("conversationPresentation") or {}).get(
+            "lifecycle"
+        ) or {}
         checks: dict[str, bool] = {}
         if "lastKey" in expected:
             checks["lastKey"] = bool(keys) and keys[-1] == expected["lastKey"]
@@ -77,6 +108,10 @@ def run_quality_matrix(
             checks["minActions"] = actions >= int(expected["minActions"])
         if "accepted" in expected:
             checks["accepted"] = last.get("accepted") is expected["accepted"]
+        if "conversationClosed" in expected:
+            checks["conversationClosed"] = (
+                lifecycle.get("closed") is expected["conversationClosed"]
+            )
         if "firstKey" in expected:
             checks["firstKey"] = bool(keys) and keys[0] == expected["firstKey"]
         if "lastKeyPrefix" in expected:
@@ -105,6 +140,8 @@ def run_quality_matrix(
             "index": index, "label": str(case.get("label") or f"case-{index + 1}")[:96],
             "language": language, "sourceKind": "FIXTURE",
             "workerKind": "production_lua", "utterances": utterances,
+            "interaction": interaction,
+            "conversationClosed": lifecycle.get("closed"),
             "responseKeys": keys[-4:], "responseTexts": texts[-4:],
             "actions": actions,
             "transportCount": effects.get("transportCount", 0),
