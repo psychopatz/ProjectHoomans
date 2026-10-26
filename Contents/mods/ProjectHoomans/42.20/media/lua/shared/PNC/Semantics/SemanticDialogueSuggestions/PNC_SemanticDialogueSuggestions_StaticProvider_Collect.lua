@@ -47,7 +47,9 @@ return function(Provider, Identity, Context, hubCandidate, IdentityAlias)
                         or "safe_gossip_unavailable"
                 end
                 if allowed then
-                    output[#output + 1] = hubCandidate(definition, contextReason)
+                    output[#output + 1] = hubCandidate(
+                        Provider, definition, contextReason
+                    )
                 end
             end
         end

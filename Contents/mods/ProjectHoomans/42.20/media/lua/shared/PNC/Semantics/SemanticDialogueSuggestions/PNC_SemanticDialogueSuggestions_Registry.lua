@@ -13,6 +13,7 @@ Registry.VERSION = 1
 Registry.CANDIDATE_SCHEMA = "semantic.choice.v1"
 Registry.MAX_PROVIDERS = 32
 Registry.MAX_CANDIDATES = 24
+Registry.MAX_COLLECTION_DIAGNOSTICS = 8
 
 -- Generic collection consumes the already-presented candidate contract. The
 -- legacy Project Hoomans static/capability providers remain registered for
@@ -26,6 +27,17 @@ end
 
 local providers = Registry._providers or {}
 Registry._providers = providers
+Registry._collectionDiagnostics = Registry._collectionDiagnostics or {}
+
+local function addCollectionDiagnostic(providerID, reason, index)
+    local diagnostics = Registry._collectionDiagnostics
+    if #diagnostics >= Registry.MAX_COLLECTION_DIAGNOSTICS then return end
+    diagnostics[#diagnostics + 1] = {
+        providerID = tostring(providerID or ""),
+        candidateIndex = tonumber(index) or nil,
+        reason = tostring(reason or "provider_collection_failed"),
+    }
+end
 
 local function validID(value)
     value = tostring(value or "")
@@ -149,18 +161,29 @@ function Registry.Collect(context, maximum)
     maximum = tonumber(maximum) or Registry.MAX_CANDIDATES
     local output = {}
     local seen = {}
+    Registry._collectionDiagnostics = {}
     local providersInOrder = Registry.ListProviders()
     for _, summary in ipairs(providersInOrder) do
         if #output >= maximum then break end
         local provider = Registry.GetProvider(summary.id)
-        local ok, candidates = pcall(provider.collect, context)
-        if ok and type(candidates) == "table" then
-            for index = 1, #candidates do
+        local ok, candidatesOrError = pcall(provider.collect, context)
+        if not ok then
+            addCollectionDiagnostic(
+                provider.id, candidatesOrError, nil
+            )
+        elseif type(candidatesOrError) ~= "table" then
+            addCollectionDiagnostic(
+                provider.id, "candidates_invalid", nil
+            )
+        else
+            for index = 1, #candidatesOrError do
                 if #output >= maximum then break end
-                local candidate = Registry.NormalizeCandidate(
-                    candidates[index], provider.id, index
+                local candidate, reason = Registry.NormalizeCandidate(
+                    candidatesOrError[index], provider.id, index
                 )
-                if candidate and isCanonicalCandidate(candidate)
+                if not candidate then
+                    addCollectionDiagnostic(provider.id, reason, index)
+                elseif isCanonicalCandidate(candidate)
                     and not seen[candidate.id]
                 then
                     seen[candidate.id] = true
@@ -168,6 +191,18 @@ function Registry.Collect(context, maximum)
                 end
             end
         end
+    end
+    return output
+end
+
+function Registry.CollectionDiagnostics()
+    local output = {}
+    for index, diagnostic in ipairs(Registry._collectionDiagnostics or {}) do
+        output[index] = {
+            providerID = diagnostic.providerID,
+            candidateIndex = diagnostic.candidateIndex,
+            reason = diagnostic.reason,
+        }
     end
     return output
 end
@@ -188,6 +223,7 @@ function Registry.Snapshot()
         schemaVersion = Registry.VERSION,
         candidateSchema = Registry.CANDIDATE_SCHEMA,
         providers = Registry.ListProviders(),
+        collectionDiagnostics = Registry.CollectionDiagnostics(),
     }
 end
 

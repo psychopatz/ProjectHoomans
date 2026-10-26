@@ -145,6 +145,7 @@ local function appendCampCapabilityRow(
     if not frame then return false end
     rows[#rows + 1] = {
         id = candidateID,
+        action = "CAMP",
         topic = "movement",
         groupID = Suggestions.COMPANION_CAMP_GROUP_ID,
         rank = #rows + 1,

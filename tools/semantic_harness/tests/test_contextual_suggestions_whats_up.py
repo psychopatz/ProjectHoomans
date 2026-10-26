@@ -51,7 +51,28 @@ class WhatsUpSemanticHubTests(unittest.TestCase):
                         suggestions["activeHub"],
                         {"id": "whats_up", "route": "semantic_hub"},
                     )
+                    self.assertEqual(
+                        suggestions["currentGroupID"],
+                        "semantic_hub.whats_up",
+                    )
+                    hub_candidates = {
+                        item["id"]
+                        for item in suggestions["candidates"]
+                        if item.get("groupID") == "semantic_hub.whats_up"
+                    }
+                    self.assertTrue(
+                        {
+                            "question.wellbeing",
+                            "question.activity",
+                            "question.weather",
+                        }
+                        <= hub_candidates
+                    )
                     self.assertTrue(suggestions["choiceRegistry"]["providers"])
+                    self.assertEqual(
+                        suggestions["choiceRegistry"]["collectionDiagnostics"],
+                        [],
+                    )
                     self.assertNotIn(
                         "semantic_hub.whats_up",
                         {item["id"] for item in suggestions["candidates"]},

@@ -72,15 +72,9 @@ class ContextualSuggestionsS2Tests(unittest.TestCase):
 
     def test_follow_stay_wait_at_constraints_fail_closed_for_npc_state(self) -> None:
         for behavior, expected in (
-            ("idle", {"FOLLOW": "eligible", "STAY": "eligible"}),
-            (
-                "hostile",
-                {"FOLLOW": "unavailable_rejected", "STAY": "unavailable_rejected"},
-            ),
-            (
-                "busy",
-                {"FOLLOW": "unavailable_rejected", "STAY": "unavailable_rejected"},
-            ),
+            ("idle", {"FOLLOW": "eligible", "GO": "eligible"}),
+            ("hostile", {"GO": "unavailable_rejected"}),
+            ("busy", {"GO": "unavailable_rejected"}),
         ):
             with self.subTest(behavior=behavior):
                 scenario = deepcopy(DEFAULT_SCENARIO)
@@ -96,12 +90,15 @@ class ContextualSuggestionsS2Tests(unittest.TestCase):
                 }
                 for action, status in expected.items():
                     self.assertEqual(capabilities[action]["status"], status)
-                self.assertEqual(
-                    capabilities["WAIT_AT"]["status"],
-                    "requires_destination"
-                    if behavior == "idle"
-                    else "unavailable_rejected",
-                )
+                self.assertNotIn("STAY", capabilities)
+                self.assertNotIn("WAIT_AT", capabilities)
+                if behavior == "idle":
+                    self.assertEqual(
+                        capabilities["CAMP"]["status"],
+                        "unavailable_no_camp_site",
+                    )
+                else:
+                    self.assertNotIn("CAMP", capabilities)
                 self.assertTrue(result["observation"]["sideEffects"]["none"])
 
         unknown_scenario = deepcopy(DEFAULT_SCENARIO)
@@ -114,9 +111,11 @@ class ContextualSuggestionsS2Tests(unittest.TestCase):
                 "permittedCapabilities"
             ]
         }
+        self.assertNotIn("FOLLOW", unknown_capabilities)
+        self.assertNotIn("STAY", unknown_capabilities)
+        self.assertNotIn("WAIT_AT", unknown_capabilities)
         self.assertEqual(
-            unknown_capabilities["FOLLOW"]["status"],
-            "unavailable_unknown",
+            unknown_capabilities["GO"]["status"], "unavailable_unknown"
         )
 
     def test_player_projection_has_no_private_or_romance_inference(self) -> None:

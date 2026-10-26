@@ -31,13 +31,14 @@ class ContextualSuggestionsS3Tests(unittest.TestCase):
         self.assertEqual(len(new_player_rows), 1)
         self.assertEqual(new_player_rows[0]["value"], "Do you need anything?")
 
-    def test_topic_group_click_reuses_core_surface_without_turn_or_effect(self) -> None:
+    def test_topic_group_click_reuses_core_surface_without_gameplay_effect(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            result = worker.input("what time is it")
+            worker.open_conversation()
+            presentation = worker.conversation_projection()["presentation"]
             group = next(
                 item
-                for item in result["observation"]["suggestions"]["groups"]
-                if item["id"] == "owned_actions"
+                for item in presentation["responseChannel"]["rows"]
+                if item["id"] == "companion.orders:open"
             )
             before = worker.snapshot()
             clicked = worker.suggestion_click(group["frame"])
@@ -46,12 +47,15 @@ class ContextualSuggestionsS3Tests(unittest.TestCase):
             after_duplicate = worker.snapshot()
 
         self.assertTrue(clicked["accepted"])
-        self.assertEqual(clicked["messages"], [])
+        self.assertEqual(len(clicked["messages"]), 1)
+        self.assertEqual(clicked["messages"][0]["speaker"], "npc")
         self.assertEqual(clicked["transport"], [])
-        self.assertEqual(before["transcript"], after["transcript"])
+        new_transcript = after["transcript"][len(before["transcript"]):]
+        self.assertEqual(new_transcript[0]["speaker"], "player")
+        self.assertEqual(new_transcript[1]["speaker"], "npc")
         self.assertEqual(
             clicked["observation"]["suggestions"]["currentGroupID"],
-            "owned_actions",
+            "companion.orders",
         )
         self.assertEqual(
             clicked["choiceSurface"]["source"],
@@ -194,24 +198,15 @@ class ContextualSuggestionsS3Tests(unittest.TestCase):
         wait_scenario = deepcopy(DEFAULT_SCENARIO)
         with LuaSemanticWorker(wait_scenario) as worker:
             result = worker.input("Are you okay?")
-            wait = next(
+            wait_rows = [
                 row
                 for row in result["observation"]["suggestions"][
                     "permittedCapabilities"
                 ]
-                if row["action"] == "WAIT_AT"
-            )
-            before = worker.snapshot()
-            rejected = worker.suggestion_click(wait["frame"])
-            after = worker.snapshot()
+                if row.get("action") == "WAIT_AT"
+            ]
 
-        self.assertFalse(rejected["accepted"])
-        self.assertEqual(
-            rejected["reason"],
-            "suggestion_click_ineligible_unknown",
-        )
-        self.assertEqual(before["transport"], after["transport"])
-        self.assertEqual(before["trace"], after["trace"])
+        self.assertEqual(wait_rows, [])
 
 
 if __name__ == "__main__":

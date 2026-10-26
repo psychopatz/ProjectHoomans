@@ -42,7 +42,11 @@ class ContextualSuggestionsS1Tests(unittest.TestCase):
             frame = candidate["frame"]
             self.assertIn(
                 frame["kind"],
-                {"semantic_click_frame", "semantic_shortcut_frame"},
+                {
+                    "semantic_click_frame",
+                    "semantic_shortcut_frame",
+                    "semantic_group_click_frame",
+                },
             )
             self.assertNotIn("callback", frame)
             self.assertNotIn("action", frame)
@@ -73,9 +77,16 @@ class ContextualSuggestionsS1Tests(unittest.TestCase):
             item["action"]: item
             for item in suggestions["permittedCapabilities"]
         }
+        self.assertTrue(
+            all(
+                isinstance(item.get("action"), str)
+                for item in suggestions["permittedCapabilities"]
+            )
+        )
         self.assertEqual(capabilities["FOLLOW"]["binding"]["id"], "pnc:companion.follow")
-        self.assertEqual(capabilities["STAY"]["binding"]["id"], "pnc:companion.stay")
-        self.assertEqual(capabilities["WAIT_AT"]["status"], "requires_destination")
+        self.assertEqual(capabilities["CAMP"]["id"], "action.camp_here")
+        self.assertNotIn("STAY", capabilities)
+        self.assertNotIn("WAIT_AT", capabilities)
         wellbeing_detail = next(
             item
             for item in suggestions["candidates"]
