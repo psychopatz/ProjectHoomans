@@ -15,8 +15,12 @@ local Network = PNC.Network or {}
 local ClientState = Network.ClientState or {}
 if Network.ClientState == nil then Network.ClientState = ClientState end
 local Core = PNC.Core
-require "PNC/Conversation/Memory/PNC_ConversationMemory"
-local Memory = PNC.Conversation and PNC.Conversation.Memory or nil
+local Memory = PNC.Semantics.ConversationMemoryProvider
+if type(Memory) ~= "table" then
+    Memory = require
+        "PNC/Semantics/PNC_SemanticConversationMemoryProvider"
+end
+if type(Memory) ~= "table" then Memory = nil end
 
 Client.VERSION = 1
 

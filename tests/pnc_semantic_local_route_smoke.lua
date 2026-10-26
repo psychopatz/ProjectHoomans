@@ -66,6 +66,13 @@ T.load(
     "shared",
     "PNC/Semantics/PNC_SemanticCatalog.lua"
 )
+-- Gate evaluation is a Conversation-owned provider. Load the authored rule
+-- implementation explicitly in this semantic-only composition test.
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Conversation/Blocks/PNC_ConversationRules.lua"
+)
 T.load(
     "ProjectHoomans",
     "shared",

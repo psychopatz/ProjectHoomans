@@ -6,11 +6,16 @@
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
-require "PNC/Conversation/Memory/PNC_ConversationMemory"
-require "PNC/Conversation/Definitions/Memory/ConversationTopics/00_PNC_ConversationMemoryTopics"
-
 local Input = PNC.Semantics.DialogueInput or {}
 PNC.Semantics.DialogueInput = Input
+local ConversationMemory = PNC.Semantics.ConversationMemoryProvider
+if type(ConversationMemory) ~= "table" then
+    ConversationMemory = require
+        "PNC/Semantics/PNC_SemanticConversationMemoryProvider"
+end
+if type(ConversationMemory) ~= "table" then
+    ConversationMemory = nil
+end
 local CampSiteHints = require "PNC/Semantics/PNC_SemanticCampSiteHints"
 local LocationObservation = PNC.Semantics.LocationObservation
     or require "PNC/Semantics/PNC_SemanticLocationObservation"
@@ -41,6 +46,7 @@ Internal.audit = audit
 Internal.traceTurn = traceTurn
 Internal.Suggestions = Suggestions
 Internal.InteractionLifecycle = InteractionLifecycle
+Internal.ConversationMemory = ConversationMemory
 
 require "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Navigation"

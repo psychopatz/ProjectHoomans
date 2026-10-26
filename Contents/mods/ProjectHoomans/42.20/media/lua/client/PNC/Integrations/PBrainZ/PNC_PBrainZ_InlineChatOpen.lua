@@ -25,7 +25,8 @@ local function reject(reason, details)
 end
 
 local function semanticInput()
-    pcall(require, "PNC/PNC_ConversationSemantics")
+    pcall(require,
+        "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime")
     local semantics = PNC.Semantics
     local input = semantics and semantics.DialogueInput or nil
     if input and type(input.Submit) == "function" then return input end

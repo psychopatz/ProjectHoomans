@@ -61,4 +61,8 @@ require "PNC/Conversation/Memory/PNC_ConversationMemory_BackstoryContext"
 require "PNC/Conversation/Memory/PNC_ConversationMemory_Gossip"
 require "PNC/Conversation/Memory/PNC_ConversationMemory_Events"
 
+local MemoryProvider = require
+    "PNC/Semantics/PNC_SemanticConversationMemoryProvider"
+MemoryProvider.Bind(Memory)
+
 return Memory

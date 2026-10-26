@@ -40,6 +40,21 @@ local function loadConversationSemantic(load, registerEntryPointModule)
     )
     load(
         "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticDialogueRuleProvider.lua",
+        "semantic_rule_contract"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticConversationMemoryProvider.lua",
+        "semantic_memory_contract"
+    )
+    load(
+        "ProjectHoomans", "client",
+        "PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua",
+        "semantic_speech_contract"
+    )
+    load(
+        "ProjectHoomans", "shared",
         "PNC/Semantics/PNC_SemanticConversationCategoryOwnership.lua",
         "semantic_conversation_ownership"
     )

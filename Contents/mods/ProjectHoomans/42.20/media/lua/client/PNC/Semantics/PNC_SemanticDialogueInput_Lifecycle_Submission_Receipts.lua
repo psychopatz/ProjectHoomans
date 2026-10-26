@@ -3,6 +3,14 @@ PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 local Input = PNC.Semantics.DialogueInput
 local Internal = Input.Internal
+local ConversationMemory = PNC.Semantics.ConversationMemoryProvider
+if type(ConversationMemory) ~= "table" then
+    ConversationMemory = require
+        "PNC/Semantics/PNC_SemanticConversationMemoryProvider"
+end
+if type(ConversationMemory) ~= "table" then
+    ConversationMemory = nil
+end
 local audit = Internal.audit
 local submitLifecycleEnvelope = Internal.submitLifecycleEnvelope
 
@@ -137,16 +145,16 @@ end
 
 local function recordConversationTopics(view, result, rawText)
     local session = view and view.session
-    local events = PNC.Conversation and PNC.Conversation.Memory
-        and PNC.Conversation.Memory.Events or nil
     if not session or not result or result.accepted ~= true
         or type(result.ir) ~= "table"
-        or not events or type(events.AccumulateConversationTopics) ~= "function"
+        or type(ConversationMemory) ~= "table"
+        or type(ConversationMemory.AccumulateConversationTopics)
+            ~= "function"
     then
         return false
     end
     local ok, recorded = pcall(
-        events.AccumulateConversationTopics,
+        ConversationMemory.AccumulateConversationTopics,
         session,
         result.ir,
         rawText

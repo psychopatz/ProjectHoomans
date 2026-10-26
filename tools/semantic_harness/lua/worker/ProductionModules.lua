@@ -92,6 +92,14 @@ function ProductionModules.load(context)
             .. ": " .. reason)
     end
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticDialogueInput.lua", "semantic_entry")
+    -- The Conversation semantic façade is loaded after the input entry point
+    -- so its lazy dependency seam observes the same worker-owned input table
+    -- without executing the entry point a second time through require.
+    load(
+        "ProjectHoomans", "client",
+        "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime.lua",
+        "conversation_semantic_runtime"
+    )
     for _, spoke in ipairs({
         "PNC_SemanticDialogueInput_FrameSupport.lua",
         "PNC_SemanticDialogueInput_NavigationFrames.lua",

@@ -14,15 +14,17 @@ require "PNC/Semantics/PNC_SemanticGiftContext"
 require "PNC/Compatibility/Mods/Bandits/PNC_Bandits_HoomansFlavorDefinitions"
 require "PNC/Compatibility/Mods/Necroa/PNC_Necroa_HoomansFlavorDefinitions"
 require "PNC/Conversation/Composition/PNC_ConversationClientComposition"
-require "PNC/PNC_ConversationSemantics"
+require "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime"
 
-local ConversationSemantics = PNC.ConversationSemantics
-local registrationReason = "adapter_unavailable"
-if ConversationSemantics
-    and type(ConversationSemantics.RegisterConversation) == "function"
+local Conversation = PNC.Conversation
+local SemanticRuntime = Conversation and Conversation.Semantic
+local registrationReason = "semantic_runtime_unavailable"
+if SemanticRuntime
+    and type(SemanticRuntime.Register) == "function"
 then
-    local _, reason = ConversationSemantics.RegisterConversation(
-        PNC.Conversation, PNC.Conversation.Group, PNC.Conversation.Time)
+    local _, reason = SemanticRuntime.Register(
+        Conversation, Conversation and Conversation.Group,
+        Conversation and Conversation.Time)
     registrationReason = reason
 end
 if not PNC.Conversation
@@ -43,13 +45,14 @@ require "PNC/Integrations/PBrainZ/PNC_PBrainZ_Bridge"
 require "PNC/Integrations/PBrainZ/PNC_PBrainZ_InlineChat"
 
 -- Inline integration loading can populate additional Conversation factories.
--- Re-register the semantic adapter after that boundary so any caller that
+-- Re-register the semantic runtime after that boundary so any caller that
 -- builds a definition immediately afterward sees the canonical input factory.
-if ConversationSemantics
-    and type(ConversationSemantics.RegisterConversation) == "function"
+if SemanticRuntime
+    and type(SemanticRuntime.Register) == "function"
 then
-    ConversationSemantics.RegisterConversation(
-        PNC.Conversation, PNC.Conversation.Group, PNC.Conversation.Time)
+    SemanticRuntime.Register(
+        Conversation, Conversation and Conversation.Group,
+        Conversation and Conversation.Time)
 end
 
 return PNC and PNC.Conversation

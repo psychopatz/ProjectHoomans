@@ -298,12 +298,12 @@ PNC = {}
 local conversationRuntimeCalls = capture(
     ROOT .. "client/PNC/Conversation/PNC_Conversation.lua"
 )
-local semanticInputIndex = indexOf(
+local semanticRuntimeIndex = indexOf(
     conversationRuntimeCalls,
-    "PNC/PNC_ConversationSemantics"
+    "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime"
 )
-T.falsy(semanticInputIndex,
-    "conversation runtime leaves semantic adapter wiring to composition")
+T.falsy(semanticRuntimeIndex,
+    "conversation runtime leaves semantic runtime wiring to composition")
 for _, dependency in ipairs(conversationRuntimeCalls) do
     T.falsy(string.sub(dependency, 1, 7) == "PNC/UI/",
         "Conversation runtime does not load PNC UI modules")
@@ -332,7 +332,7 @@ local expectedConversationComposition = {
     "PNC/Compatibility/Mods/Bandits/PNC_Bandits_HoomansFlavorDefinitions",
     "PNC/Compatibility/Mods/Necroa/PNC_Necroa_HoomansFlavorDefinitions",
     "PNC/Conversation/Composition/PNC_ConversationClientComposition",
-    "PNC/PNC_ConversationSemantics",
+    "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime",
     "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation",
     "PNC/Integrations/PBrainZ/PNC_PBrainZ",
     "PNC/Integrations/PBrainZ/PNC_PBrainZ_Bridge",

@@ -96,7 +96,7 @@ local function semanticInputFactory()
         return Conversation.CreateSemanticDialogueInput
     end
 
-    -- The composition root normally installs this adapter. BuildDefinition
+    -- The composition root normally installs this runtime. BuildDefinition
     -- is also called by preview/debug entry points, though, and those can
     -- arrive before the registration callback. The semantic input module is
     -- already the owner of the widget factory, so use it directly as a safe
@@ -117,15 +117,16 @@ local function semanticInputFactory()
     -- load guarded so those callers can use the base conversation input.
     require "PNC/Conversation/PNC_ConversationTime"
     require "PNC/Conversation/PNC_ConversationGroup"
-    local loaded, loadError = pcall(require, "PNC/PNC_ConversationSemantics")
-    local adapter = PNC.ConversationSemantics
-    if not loaded or not adapter
-        or type(adapter.RegisterConversation) ~= "function"
+    local loaded, loadError = pcall(require,
+        "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime")
+    local semanticRuntime = Conversation.Semantic
+    if not loaded or not semanticRuntime
+        or type(semanticRuntime.Register) ~= "function"
     then
-        warnSemanticInput(loadError or "adapter_unavailable")
+        warnSemanticInput(loadError or "semantic_runtime_unavailable")
         return nil
     end
-    local _, registrationReason = adapter.RegisterConversation(
+    local _, registrationReason = semanticRuntime.Register(
         Conversation, PNC.Conversation.Group, PNC.Conversation.Time)
     if type(Conversation.CreateSemanticDialogueInput) ~= "function" then
         warnSemanticInput(registrationReason or "factory_unavailable")

@@ -12,14 +12,15 @@ local options = { mode = "nearby" }
 local input = {
     Internal = {},
     CreatePart = function(actualBounds, actualOptions)
-        T.equal(actualBounds, bounds, "input factory preserves its bounds")
-        T.equal(actualOptions, options, "input factory preserves its options")
+        T.equal(actualBounds, bounds,
+            "input factory preserves its bounds")
+        T.equal(actualOptions, options,
+            "input factory preserves its options")
         return expectedInputPart
     end,
 }
 local diagnostics = { enabled = true }
 local entityResolver = { NormalizeName = function(value) return value end }
-local time = { Resolve = function() return "sunset" end }
 local worldContext = {
     SetTimeBandResolver = function(resolver)
         receivedTimeResolver = resolver
@@ -44,9 +45,19 @@ require = function(moduleName)
     return previousRequire(moduleName)
 end
 
-local Adapter = T.load(
-    "ProjectHoomans", "client", "PNC/PNC_ConversationSemantics.lua")
+local Runtime = T.load(
+    "ProjectHoomans", "client",
+    "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime.lua")
 require = previousRequire
+
+T.equal(Runtime, PNC.Conversation.Semantic,
+    "Conversation owns the semantic runtime façade")
+T.falsy(PNC.ConversationSemantics,
+    "legacy semantic namespace is not recreated")
+T.truthy(Runtime.HasDialogueInput(),
+    "Conversation façade exposes semantic input availability")
+T.equal(Runtime.CreateInput(bounds, options), expectedInputPart,
+    "Conversation façade delegates input creation")
 
 local conversation = {}
 local group = {
@@ -55,28 +66,25 @@ local group = {
         return expectedGroup
     end,
 }
-local registered = Adapter.RegisterConversation(conversation, group, time)
-T.equal(registered, true, "adapter registers the conversation coordinator")
-T.equal(conversation.CreateSemanticDialogueInput,
-    Adapter.CreateSemanticDialogueInput,
-    "adapter exposes the semantic input factory on Conversation")
+local time = { Resolve = function() return "sunset" end }
+T.truthy(Runtime.Register(conversation, group, time),
+    "Conversation façade registers the runtime")
+T.equal(conversation.CreateSemanticDialogueInput, Runtime.CreateInput,
+    "Conversation receives the canonical input factory")
 T.equal(receivedTimeResolver, time.Resolve,
-    "adapter registers the conversation time resolver")
-T.equal(Adapter.CreateSemanticDialogueInput(bounds, options), expectedInputPart,
-    "semantic input factory delegates to the input module")
-
-local created = Adapter.CreateGroup({}, {}, {}, {}, options)
-T.equal(created, expectedGroup, "adapter creates the group coordinator")
+    "Conversation registers the time resolver")
+local created = Runtime.CreateGroup({}, {}, {}, {}, options)
+T.equal(created, expectedGroup, "Conversation creates the group coordinator")
 T.equal(receivedGroupOptions.mode, "nearby",
-    "adapter preserves the caller's group mode")
+    "Conversation preserves the caller's group mode")
 T.equal(receivedGroupOptions.dialogueInput, input,
-    "adapter injects the dialogue input contract")
+    "Conversation injects the dialogue input contract")
 T.equal(receivedGroupOptions.semanticDiagnostics, diagnostics,
-    "adapter injects semantic diagnostics")
+    "Conversation injects semantic diagnostics")
 T.equal(receivedGroupOptions.entityResolver, entityResolver,
-    "adapter injects the entity resolver")
+    "Conversation injects the entity resolver")
 T.equal(options.dialogueInput, nil,
-    "adapter does not mutate the caller's group options")
+    "Conversation does not mutate the caller's group options")
 
 PNC = previousPNC
-T.finish("pnc_conversation_semantics_adapter_smoke")
+T.finish("pnc_conversation_semantic_runtime_smoke")

@@ -5,7 +5,8 @@
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
-local Rules = require "PNC/Conversation/Blocks/PNC_ConversationRules"
+local Rules = require
+    "PNC/Semantics/PNC_SemanticDialogueRuleProvider"
 local Registry = require
     "PNC/Semantics/PNC_SemanticDialogueFlowCatalog"
 local ValueBounds = require "PNC/Semantics/PNC_SemanticValueBounds"
@@ -21,6 +22,7 @@ Kernel.Internal = Kernel.Internal or {}
 
 local Internal = Kernel.Internal
 Internal.Rules = Rules
+Internal.RuleProvider = Rules
 Internal.Registry = Registry
 Internal.CopyValue = ValueBounds.Copy
 

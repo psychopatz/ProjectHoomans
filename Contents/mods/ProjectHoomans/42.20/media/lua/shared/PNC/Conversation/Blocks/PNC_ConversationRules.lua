@@ -14,4 +14,8 @@ require "PNC/Conversation/Blocks/PNC_ConversationRules/PNC_ConversationRules_Wor
 require "PNC/Conversation/Blocks/PNC_ConversationRules/PNC_ConversationRules_Evaluation"
 require "PNC/Conversation/Blocks/PNC_ConversationRules/PNC_ConversationRules_Effects"
 
+local RuleProvider = require
+    "PNC/Semantics/PNC_SemanticDialogueRuleProvider"
+RuleProvider.Bind(PNC.Conversation.Rules)
+
 return PNC.Conversation.Rules

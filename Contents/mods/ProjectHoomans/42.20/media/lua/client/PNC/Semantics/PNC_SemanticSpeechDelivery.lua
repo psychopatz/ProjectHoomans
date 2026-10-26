@@ -95,13 +95,12 @@ local function messageMetadata(options)
 end
 
 local function activeConversationPresentation()
-    local presentation = PNC.SocialFlavorPresentation
-    if type(presentation) == "table"
-        and type(presentation.Receive) == "function"
-    then
-        return presentation
+    local presentation = PNC.Semantics.ConversationSpeechProvider
+    if type(presentation) ~= "table" then
+        presentation = require
+            "PNC/Semantics/PNC_SemanticConversationSpeechProvider"
     end
-    return require "PNC/Conversation/PNC_SocialFlavorPresentation"
+    return presentation
 end
 
 local function deliverSession(options, text)

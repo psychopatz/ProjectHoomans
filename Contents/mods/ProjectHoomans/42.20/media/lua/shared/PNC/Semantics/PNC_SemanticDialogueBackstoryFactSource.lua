@@ -12,11 +12,8 @@ if type(Facts) ~= "table" then
     Facts = require "PNC/Semantics/PNC_SemanticDialogueFacts"
 end
 
-local Memory = PNC.Conversation
-    and PNC.Conversation.Memory or nil
-if type(Memory) ~= "table" then
-    Memory = require "PNC/Conversation/Memory/PNC_ConversationMemory"
-end
+local Memory = require
+    "PNC/Semantics/PNC_SemanticConversationMemoryProvider"
 
 local function topicValue(value)
     if type(value) == "table" then

@@ -15,10 +15,10 @@ semantic parser produces validated IR; the policy chooses a deterministic
 branch or an optional LLM fallback; the local response resolver formats a
 response from that IR and read-only context.
 
-Client Conversation receives these services through the
-`PNC_ConversationSemantics` registration adapter. The root client composition
-loads the semantic Conversation runtime before PBrainZ's UI and bridge
-integrations, keeping the Conversation package independent of those adapters.
+Client Conversation receives these services through its
+`PNC.Conversation.Semantic` runtime façade. The root client composition loads
+that Conversation-owned runtime before PBrainZ's UI and bridge integrations,
+keeping the Conversation package independent of those integrations.
 
 The LLM is only submitted for a preview routed to `llm_fallback`. A missing or
 rejected provider request becomes a deterministic clarification. An accepted

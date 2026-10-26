@@ -60,6 +60,10 @@ end
 
 getSpecificPlayer = function() return player end
 
+local SpeechProvider = T.load(
+    CLIENT .. "PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua")
+SpeechProvider.Bind(PNC.SocialFlavorPresentation)
+
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandPresentation_PlayerEmoteResult.lua")
 
 local result = {

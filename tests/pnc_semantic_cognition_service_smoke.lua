@@ -68,6 +68,11 @@ end
 T.load(
     "ProjectHoomans",
     "shared",
+    "PNC/Conversation/Memory/PNC_ConversationMemory.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "shared",
     "PNC/Semantics/PNC_SemanticCognitionProjection.lua"
 )
 T.load(
