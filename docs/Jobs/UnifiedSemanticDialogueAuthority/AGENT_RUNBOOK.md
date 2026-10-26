@@ -1,0 +1,91 @@
+# Agent Runbook — Unified Semantic Dialogue Authority
+
+## Operating rule
+
+The parent objective is complete only when Project Hoomans-owned conversational meaning has one semantic authority and the remaining legacy prose selectors are retired from production authority.
+
+A phase/chunk passing does not finish the parent goal. After each accepted chunk, update `PROGRESS.md` and continue automatically to the next mandatory roadmap phase unless a genuine blocker or explicitly user-owned native gate is reached.
+
+## Mandatory read order
+
+Read root `AGENTS.md`, then this job's `README.md`, `AUDIT.md`, `ARCHITECTURE.md`, `EVENT_FOLLOWUP_CONTRACT.md`, `MIGRATION_MATRIX.md`, `PERFORMANCE_AND_SCALING.md`, `HARNESS_ACCEPTANCE.md`, `ROADMAP.md`, and **`PROGRESS.md` last**.
+
+Re-read the relevant current source before editing; historical job prose is not runtime truth.
+
+## Hard invariants
+
+- **No split conversational intelligence.** Semantics chooses meaning; content realizes wording; presentation delivers it.
+- Do not add another response catalog, event-chat subsystem, follow-up registry, persistence database or parallel suggestion engine.
+- Known world/game events enter after NLU as typed semantic events. Do not stringify known events and reparse them.
+- Freeform typed player language remains on the existing NLU/parser/router path.
+- Gameplay/domain services remain authoritative for facts, permissions and effects.
+- ConversationBlocks retain authored branching/gates/effects/repeat authority.
+- Existing SocialFlavor delivery may remain for queueing, cooldown, priority, nameplate, Conversation, TTS and external compatibility, but Project Hoomans semantic-owned events must not depend on it to choose prose/meaning.
+- Existing authored text is migration source material. Preserve accepted EN/TL wording where useful by moving it into semantic response/content ownership; do not delete content before parity.
+- NPC-initiated event follow-up must reuse `SemanticInteractionLifecycle`, response windows/beats/event refs, `DialogueContextState`, Suggestions and ContextResolver.
+- No ordinary rendered text or transcript in NPC ModData.
+- No per-NPC/per-tick semantic work.
+- Preserve PBrainZ as optional downstream realization/context consumer; it does not become semantic truth authority.
+
+## Migration discipline
+
+For each legacy family:
+
+1. identify the authoritative event/game facts;
+2. identify exactly what the old Flavor/ToolReply/registry code currently decides;
+3. map/reuse the canonical semantic response pool/flow and context provider;
+4. move meaning-equivalent wording into Dialogue Content/translation ownership where appropriate;
+5. attach grounded fact refs, event refs, semantic plan/realization IDs and optional follow-up offers;
+6. route the producer through semantic selection **once**;
+7. deliver the already-selected realization through the existing presentation queue;
+8. add real-Lua/harness parity and no-fallback tests;
+9. retire the old decision API only after caller analysis proves no semantic-owned production dependency remains.
+
+Do not count “legacy chose a Flavor ID, then semantic provenance was attached afterward” as migrated.
+
+## Follow-up discipline
+
+A follow-up offer exists only when:
+
+- the NPC actually delivered a semantic event response;
+- the player/listener context is eligible;
+- authoritative facts exist to answer it;
+- the existing lifecycle response window/beat is still valid;
+- privacy/knowledge/disclosure policy permits the answer.
+
+Use response-plan offers / existing suggestion providers and existing pending-follow-up/context-reference resolution. Do not invent a second event-follow-up interpreter.
+
+Interruptions should preserve or expire the existing semantic beat according to lifecycle policy. Current-state questions must revalidate volatile facts when appropriate; historical event facts remain historical refs.
+
+## Performance discipline
+
+Follow `PERFORMANCE_AND_SCALING.md`.
+
+In particular:
+
+- resolve semantic meaning once at event time;
+- no render-time ResponseCatalog re-selection;
+- no broad catalog scans on conversation open;
+- no new global per-NPC polling;
+- use existing bounded lifecycle limits;
+- store compact IDs/refs/offers, not text;
+- profile worker startup/event resolution/follow-up projection before expanding caps.
+
+## Testing discipline
+
+Use production Lua through the existing worker. Python may drive/isolate/present and fixture engine boundaries; it must not implement gameplay or semantic authority.
+
+Add characterization tests before deleting old behavior. Acceptance must prove both positive migration and negative absence of legacy fallback.
+
+Use the split fast headless + focused Xvfb topology established by `SemanticObservatoryDialogueQuality/TEST_RUNTIME_PERFORMANCE.md`; do not normalize a slow suite by adding broad timeouts.
+
+## Git/safety
+
+- Existing `main` only.
+- Reconcile dirty/concurrent work before editing.
+- Never reset/stash/discard uncertain user or agent work.
+- Do not mutate source saves.
+- Do not launch native Project Zomboid.
+- Do not publish Steam Workshop content.
+- Do not add goal progress to root `AGENTS.md`.
+- Commit coherent slices only after validation.

@@ -1,5 +1,7 @@
 # Semantic Interaction Lifecycle — Current Progress
 
+> **Execution handoff:** the newer `docs/Jobs/UnifiedSemanticDialogueAuthority/` job is the sole active roadmap for residual first-party Flavor/ToolReply/legacy-registry prose retirement and NPC-initiated semantic event follow-up. The P11 statements below remain bounded historical evidence for the inventory accepted at that time and must not be used as a competing current migration plan.
+
 ## Current regression status — READY FOR USER LIVE TEST (2026-10-25)
 
 The newer native screenshots supersede the earlier READY conclusion. The

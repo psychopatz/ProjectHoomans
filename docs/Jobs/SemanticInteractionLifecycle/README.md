@@ -1,5 +1,7 @@
 # Semantic Interaction Lifecycle
 
+> **Follow-on semantic-authority migration:** residual first-party SocialFlavor/ToolReply/legacy-registry prose ownership and NPC-initiated event follow-up are now governed only by `docs/Jobs/UnifiedSemanticDialogueAuthority/`. This job remains accepted lifecycle/action foundation and historical evidence; do not reopen its P11 roadmap in parallel.
+
 **Status:** ACTIVE — P0–P11 retained foundation; developer acceptance REOPENED for mandatory P12 native action/capability standardization.  
 **Audit baseline:** ProjectHoomans main at 6aa9493aa6df0a48b2dd148a247a742d8fb38e5d on 2026-10-24.  
 **Native Project Zomboid SP/MP:** user-owned final acceptance; not a Codex implementation blocker.  
