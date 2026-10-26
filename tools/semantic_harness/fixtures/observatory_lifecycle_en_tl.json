@@ -72,6 +72,50 @@
         "minActions": 1,
         "maxFallbackLookups": 0
       }
+    },
+    {
+      "label": "Leave Group unowned/unknown faction EN",
+      "language": "EN",
+      "scenario": {
+        "npc": {
+          "recruited": true,
+          "identityState": "known"
+        }
+      },
+      "interaction": {
+        "kind": "conversation_root_choice",
+        "choiceID": "disband"
+      },
+      "expected": {
+        "lastKey": "response.departure.rejected",
+        "conversationClosed": false,
+        "maxActions": 0,
+        "minTransportCount": 1,
+        "maxTransportCount": 1,
+        "maxFallbackLookups": 0
+      }
+    },
+    {
+      "label": "Leave Group unowned/unknown faction TL",
+      "language": "TL",
+      "scenario": {
+        "npc": {
+          "recruited": true,
+          "identityState": "known"
+        }
+      },
+      "interaction": {
+        "kind": "conversation_root_choice",
+        "choiceID": "disband"
+      },
+      "expected": {
+        "lastKey": "response.departure.rejected",
+        "conversationClosed": false,
+        "maxActions": 0,
+        "minTransportCount": 1,
+        "maxTransportCount": 1,
+        "maxFallbackLookups": 0
+      }
     }
   ]
 }

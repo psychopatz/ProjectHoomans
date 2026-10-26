@@ -271,7 +271,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
             with self.subTest(matrix=filename):
                 path = root / "tools/semantic_harness/fixtures" / filename
                 result = run_quality_matrix(json.loads(path.read_text())["cases"])
-                expected = 6 if "lifecycle" in filename else 8
+                expected = 8
                 self.assertEqual(result["caseCount"], expected)
                 self.assertEqual(result["passed"], expected, result["cases"])
                 self.assertEqual(result["failed"], 0)
@@ -422,7 +422,7 @@ class ObservatoryTkTests(unittest.TestCase):
                     self.assertIn("Production writes: 0", text)
                     pane.coverage_lifecycle()
                     coverage = pane.views["Coverage"].get("1.0", "end")
-                    self.assertIn("6 fixture cases", coverage)
+                    self.assertIn("8 fixture cases", coverage)
                     self.assertIn("Goodbye root choice TL", coverage)
                     self.assertIn("FAIL=0", coverage)
                     pane.coverage_command_rejections()

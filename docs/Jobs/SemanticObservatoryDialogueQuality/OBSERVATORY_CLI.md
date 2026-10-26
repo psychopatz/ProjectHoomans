@@ -202,14 +202,14 @@ failure. No duplicate translator or generated response compiler was created.
 tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jsonl --response-quality-matrix tools/semantic_harness/fixtures/observatory_lifecycle_en_tl.json
 ```
 
-The third independent matrix (6 ENGINE-FIXTURE cases) executes the actual
+The third independent matrix (8 ENGINE-FIXTURE cases) executes the actual
 `conversation.root:menu:goodbye` choice in an opened dialogue and confirms
 the returned presentation lifecycle is **closed**, the NPC says “You too.”
 or “Ikaw rin.”, and no gameplay actions are dispatched. In contrast a raw
 typed `goodbye` outside that root-choice path currently produces
 `semantic.ask_clarification` and does **not** close the conversation.
 This is observed behavior, not an assertion that every input form is equivalent.
-The final two cases intentionally retain sequential Follow → Wait history;
+Two cases intentionally retain sequential Follow → Wait history;
 they do not establish native mutually-exclusive movement beyond the
 worker's accepted request and reply. Studio's Coverage tab can execute the
 same lifecycle fixture set through the existing Lua session.
@@ -272,3 +272,10 @@ Temporary Java reflection and generated classes stay outside watched media.
 The verifier does not launch PZ, execute Lua, or touch saves. It reports
 compiler success/failure as machine-readable JSON. The opt-in integration
 test uses the PZ_KAHLUA_GAME_ROOT environment variable.
+
+
+The expanded eight-case lifecycle fixture additionally tests the real
+conversation-root Disband button for a recruited NPC without verified
+player-faction authority in EN/TL. The authoritative handler rejects, the
+conversation stays open and one attempted transport is recorded. This is a
+negative ownership test, not a successful departure or native PZ proof.
