@@ -2,6 +2,23 @@
 
 The semantic consolidation must reduce duplicate work, not add another runtime layer.
 
+## P0 baseline measurements
+
+These are local comparison points, not universal hard limits. They were
+captured before semantic-owner migration from clean `main` at the goal
+baseline:
+
+| Measurement | Result | Method |
+| --- | ---: | --- |
+| Full semantic harness subset | `87/87`, `1.81s` wall clock | `tests/run_tests.py pnc_semantic --harness-report ...` |
+| Social/compatibility characterization subset | `24/24`, `0.63s` wall clock | focused Lua harness selection |
+| P0 authority characterization subset | `5/5`, `0.52s` wall clock | focused Lua harness selection |
+| Lifecycle state-size baseline | bounded by existing lifecycle/ResponsePlan limits | `pnc_social_events_smoke` and lifecycle projections; no transcript/phrase persistence observed |
+
+P1–P9 must report before/after wall clocks and any changed serialized state
+size. A timing regression requires measured product justification; increasing a
+test timeout is not a synchronization fix.
+
 ## Event-time rule
 
 For a known event:

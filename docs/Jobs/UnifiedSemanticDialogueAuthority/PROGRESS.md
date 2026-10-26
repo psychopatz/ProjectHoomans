@@ -1,35 +1,46 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — new parent goal initialized. No implementation phases are accepted yet under this roadmap.
+**Status:** IN PROGRESS — P0 accepted; P1 is the active implementation slice.
 
 ## Audited baseline
 
-- ProjectHoomans: `181b58bcc30dc65dc61d19a49d6238abca50ece9`, clean `main == origin/main` at goal creation.
-- PsychopatzCore: `cf28189c57f7810f31d25c46c11eb88080f47baa`, clean `main == origin/main`.
-- Semantic Observatory & Dialogue Quality developer acceptance is complete and becomes foundation.
-- Semantic Interaction Lifecycle P0–P12 implementation remains foundation/history; its earlier P11 “legacy authority complete” claim is superseded only for residual prose/content owners documented by this new audit.
-- No source save was mutated, native Project Zomboid was not launched, and no Workshop operation occurred while creating this goal.
+- ProjectHoomans: `f2390998d30dcab7ee1110a850c97b38f8fb1ee9` at goal creation;
+  P0 began from clean `main == origin/main`.
+- PsychopatzCore: `cf28189c57f7810f31d25c46c11eb88080f47baa`, clean
+  `main == origin/main`.
+- Semantic Observatory & Dialogue Quality developer acceptance is foundation.
+- Semantic Interaction Lifecycle P0–P12 remains foundation/history; its earlier
+  P11 “legacy authority complete” claim is superseded only by residual
+  prose/content owners documented in this active audit.
+- No source save was mutated, native Project Zomboid was not launched, and no
+  Workshop operation occurred while creating the goal or accepting P0.
 
 ## Verified starting facts
 
-- Semantic response/realization authority already exists and modern event producers often use it.
-- PsychopatzCore SocialFlavor client can still choose registered prose when selected text is absent.
+- Semantic response/realization authority already exists and modern event
+  producers often use it.
+- PsychopatzCore SocialFlavor client can still choose registered prose when
+  selected text is absent.
 - Project Hoomans still registers first-party SocialFlavor prose families.
-- `PNC_ConversationToolReplyCatalog.lua` remains a separate first-party wording owner.
-- wellbeing/small-talk/ask-about still advertise legacy conversation-registry authority.
-- generic compatibility Flavor registrations still exist.
-- `SemanticInteractionLifecycle` already records NPC speech, beats, event refs and response windows.
+- `PNC_ConversationToolReplyCatalog.lua` remains a separate first-party wording
+  owner.
+- Wellbeing/small-talk/ask-about still advertise legacy conversation-registry
+  authority.
+- Generic compatibility Flavor registrations still exist.
+- `SemanticInteractionLifecycle` already records NPC speech, beats, event refs,
+  and response windows.
 - `DialogueContextState` already owns bounded pending follow-up/agenda state.
 - `ResponsePlan` already owns bounded offers/fact refs.
 - Suggestions/ContextResolver already provide contextual follow-up machinery.
-- Therefore the new event-follow-up feature must **reuse the existing lifecycle**, not create another registry/system.
+- The event-follow-up feature must therefore reuse the existing lifecycle, not
+  create another registry or state system.
 
 ## Phase state
 
 | Phase | State |
 | --- | --- |
-| P0 — authority inventory/baseline | **NEXT / IN PROGRESS** |
-| P1 — standardized semantic event realization boundary | NOT STARTED |
+| P0 — authority inventory/baseline | **ACCEPTED** |
+| P1 — standardized semantic event realization boundary | **IN PROGRESS** |
 | P2 — NPC-initiated event follow-up bridge | NOT STARTED |
 | P3 — lower-risk native SocialFlavor migration | NOT STARTED |
 | P4 — complex medical/incapacitated migration | NOT STARTED |
@@ -39,24 +50,37 @@
 | P8 — retire first-party legacy prose authority | NOT STARTED |
 | P9 — scale/MP/final acceptance | NOT STARTED |
 
-## Immediate Next Chunk — P0
+## Accepted P0 — authority inventory and characterization
 
-Start with source-truth reconciliation, not deletion.
+- Re-enumerated every first-party `Flavor.Register` family, generic Flavor
+  resolve caller, ToolReply wording path, legacy registry category,
+  compatibility adapter, and semantic speech/presentation path.
+- Replaced `MIGRATION_MATRIX.md` with actual production callers, fact
+  ownership, target pools/flows, content owners, follow-up eligibility, tests,
+  and retirement disposition.
+- Added
+  `tests/pnc_unified_authority_p0_characterization_smoke.lua`, which locks the
+  observed `resolvedText` → legacy `flavorID` fallback gap before P1 closes it.
+- Baseline focused harness evidence: semantic `87/87` in `1.81s` wall clock;
+  social/compatibility selection `24/24` in `0.63s`; P0 characterization
+  selection `5/5` in `0.52s`.
+- P0 intentionally removed no selector and changed no semantic authority.
 
-1. Re-enumerate every production caller of:
-   - `Flavor.Register`;
-   - generic SocialFlavor `Resolve/ResolveDetailed`;
-   - `PNC_SocialFlavorDefinitions_*`;
-   - `PNC_ConversationToolReplyCatalog`;
-   - legacy conversation-registry category ownership;
-   - compatibility flavor adapters;
-   - semantic social/event realization and speech delivery.
-2. Update `MIGRATION_MATRIX.md` with actual file/caller, authoritative facts, semantic target pool/flow, content owner, follow-up eligibility and disposition.
-3. Add focused characterization tests for any family whose old behavior is not already covered.
-4. Capture baseline counts/timings/state sizes needed by `PERFORMANCE_AND_SCALING.md`.
-5. Do not remove a legacy selector in P0.
+## Immediate Next Chunk — P1
 
-After P0 gate passes, continue automatically through P1–P9.
+Close the semantic-owned presentation boundary without changing the generic
+PsychopatzCore compatibility contract:
+
+1. Project both `text` and the existing `resolvedText` producer field at the
+   native presentation seam.
+2. Mark semantic-owned packets explicitly and reject them when selected text
+   is absent, while preserving generic Core Flavor fallback for compatibility
+   packets.
+3. Fix receive-context provenance to use the normalized event type.
+4. Add negative tests proving a Project Hoomans semantic packet cannot invoke
+   `Flavor.ResolveDetailed`.
+
+After P1 gate passes, continue automatically through P2–P9.
 
 ## Stop conditions
 
@@ -65,6 +89,7 @@ Stop before developer-side completion only for:
 - genuine unsafe repository divergence/concurrent ownership conflict;
 - missing required dependency/toolchain with no accepted fallback;
 - a proven architecture conflict requiring user decision;
-- an explicit user-owned native acceptance gate after all developer work is complete.
+- an explicit user-owned native acceptance gate after all developer work is
+  complete.
 
 A phase/test passing is not a stop condition.
