@@ -13,6 +13,7 @@ local function initial(Values, response)
         fallback = response.fallback,
         text = response.fallback,
         key = response.templateID,
+        semanticTemplateID = response.semanticTemplateID,
         args = Values.copy(response.args),
         dialogueAct = response.dialogueAct
             or response.plan and response.plan.dialogueAct,
@@ -28,6 +29,14 @@ local function initial(Values, response)
         realization = Values.copy(response.realization),
         realizationFamily = response.realizationFamily,
         realizationVariant = response.realizationVariant,
+        semanticVariantID = response.semanticVariantID,
+        speechStyleVariant = response.speechStyleVariant,
+        phraseFamilyID = response.phraseFamilyID,
+        phraseID = response.phraseID,
+        phrasePoolSize = response.phrasePoolSize,
+        phraseAntiRepeatReason = response.phraseAntiRepeatReason,
+        phraseSemanticTemplateID = response.phraseSemanticTemplateID,
+        phraseSelection = Values.copy(response.phraseSelection),
         realizationFallbackReason = response.realizationFallbackReason,
         selectionID = response.selectionID,
         selectionSource = response.selectionSource,
@@ -48,6 +57,8 @@ local function queuedMessage(Values, payload, responseObservation, response)
         text = text,
         fallback = fallback,
         key = payload.key or payload.translationKey,
+        semanticTemplateID = payload.semanticTemplateID
+            or responseObservation.semanticTemplateID,
         args = Values.copy(payload.args),
         plan = Values.copy(plan),
         dialogueAct = plan and plan.dialogueAct,
@@ -64,6 +75,20 @@ local function queuedMessage(Values, payload, responseObservation, response)
             or response.realizationFamily,
         realizationVariant = payload.realizationVariant
             or response.realizationVariant,
+        semanticVariantID = payload.semanticVariantID
+            or response.semanticVariantID,
+        speechStyleVariant = payload.speechStyleVariant
+            or response.speechStyleVariant,
+        phraseFamilyID = payload.phraseFamilyID or response.phraseFamilyID,
+        phraseID = payload.phraseID or response.phraseID,
+        phrasePoolSize = payload.phrasePoolSize or response.phrasePoolSize,
+        phraseAntiRepeatReason = payload.phraseAntiRepeatReason
+            or response.phraseAntiRepeatReason,
+        phraseSemanticTemplateID = payload.phraseSemanticTemplateID
+            or response.phraseSemanticTemplateID,
+        phraseSelection = Values.copy(
+            payload.phraseSelection or response.phraseSelection
+        ),
         realizationFallbackReason = payload.realizationFallbackReason
             or response.realizationFallbackReason,
         translationKey = payload.translationKey,
@@ -81,6 +106,7 @@ local function applyFirstQueued(Values, responseObservation, queued, payload)
     responseObservation.text = queued.text
     responseObservation.fallback = queued.fallback
     responseObservation.key = queued.key
+    responseObservation.semanticTemplateID = queued.semanticTemplateID
     responseObservation.translationKey = queued.translationKey
     responseObservation.translationKeys = queued.translationKeys
     -- Keep the semantic response identity canonical. The queued key is the
@@ -106,6 +132,14 @@ local function applyFirstQueued(Values, responseObservation, queued, payload)
     responseObservation.realization = Values.copy(queued.realization)
     responseObservation.realizationFamily = queued.realizationFamily
     responseObservation.realizationVariant = queued.realizationVariant
+    responseObservation.semanticVariantID = queued.semanticVariantID
+    responseObservation.speechStyleVariant = queued.speechStyleVariant
+    responseObservation.phraseFamilyID = queued.phraseFamilyID
+    responseObservation.phraseID = queued.phraseID
+    responseObservation.phrasePoolSize = queued.phrasePoolSize
+    responseObservation.phraseAntiRepeatReason = queued.phraseAntiRepeatReason
+    responseObservation.phraseSemanticTemplateID = queued.phraseSemanticTemplateID
+    responseObservation.phraseSelection = Values.copy(queued.phraseSelection)
     responseObservation.realizationFallbackReason =
         queued.realizationFallbackReason
 end

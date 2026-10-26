@@ -32,15 +32,20 @@
 
 **Gate:** seeded and natural-history observed selections match explanations; explain does not mutate selection history or dispatch; source/authority joins never overclaim exact ownership.
 
-## P3 — Human Studio: observability-first
-**Status: ACCEPTANCE-PENDING. Catalog/Test/Coverage/Review surfaces implemented.**
+## P3 — Human UI surface consolidation
+**Status: IN PROGRESS. Core Simulation/Studio redundancy consolidation is implemented in the current worktree; the user-directed Dialogue Content surface and Developer Tools demotion remain mandatory before acceptance.**
 
-- Keep Catalog, Test Lab, Coverage and Review as the readable observability-first surfaces inside the existing Semantic Lab.
-- Search by topic/pool/flow/condition/owner and inspect actual variants, source/translation provenance and final rendered text.
-- Keep raw JSON as an advanced view, not the primary user workflow.
-- Preserve Advanced Flow graph/Build workflow/Dataset Library/Block palette/Interaction Composer.
+- Enforce the ownership contract in SURFACE_CONSOLIDATION.md: Simulation executes/tests; Studio is Explore + Dialogue Content + Review; World Browser selects persisted targets; Log owns activity history.
+- Remove Studio Observatory Test Lab as a parallel conversation runner. All interactive fixture/save-backed execution now routes through Simulation.
+- Move/consolidate human-facing Observatory Coverage/regression actions into Simulation Compare/Regression while preserving shared matrix services and headless CLI.
+- Merge read-only Observatory Catalog + Interaction Explorer + useful source-browser responsibilities into Studio **Explore**. Keep context-specific “why did this win?” inspection in Simulation; Explore shows static rules/source metadata.
+- Add Studio **Dialogue Content** using DIALOGUE_CONTENT_REGISTRY.md: edit canonical content-only EN/TL phrase families and verified player landing/choice wording while semantic/route/authority fields remain locked; preview only through Simulation.
+- Redesign Studio **Review** around human-readable candidate before/after, EN/TL, source owner, invariant/effect checks and explicit review decision; it may reuse disposable worker services without becoming another simulator.
+- Move Flow Graph editing, raw canonical JSON editing, Block Palette/contracts, Interaction Composer and Build Workflow behind **Developer Tools**, not a peer Studio workflow. Treat Build Workflow as Legacy/retirement candidate; remove dead duplicate UI only after proving no unique capability/caller remains.
+- Consolidate Simulation diagnostics toward **Inspect | Graph | Compare/Regression | World | Debug** using existing controllers/widgets; do not create replacement semantic inspectors.
+- Preserve safe UI-state migration and agent CLI parity.
 
-**Gate:** a user can locate a real dialogue, understand selected/overridden variants and run its production-Lua scenario without manual JSON authoring; final GUI and CLI values agree.
+**Gate:** one user task has one GUI home; no duplicate Studio runner/context/coverage surface remains; Studio defaults to Explore + Dialogue Content + Review, structural authoring is Developer Tools; Simulation retains all runtime/testing capability; World Browser/Log remain sole owners; Dialogue Content can safely edit one canonical phrase family and one verified landing/choice text with locked structural metadata; moved/retired functions pass real-worker Tk/Xvfb and CLI parity regression without semantic or save behavior changes.
 
 ## P4 — Grounded scenario matrix and quality coverage
 **Status: IN PROGRESS.**
@@ -63,17 +68,19 @@
 
 **Gate:** an agent can discover/explain a pool, run EN/TL coverage and compare candidate/baseline behavior with bounded reports; final results match GUI/registered Lua.
 
-## P6 — Safe delegated dialogue quality / variant workflow
-**Status: IN PROGRESS. Preview/replay safety implemented; canonical promotion proof pending.**
+## P6 — Safe delegated dialogue quality + dynamic phrase registry
+**Status: IN PROGRESS. The original single-family canonical promotion proof is accepted in PROGRESS; the newly approved Dialogue Content Registry / phrase-variation extension remains mandatory.**
 
-- Retrieve actual source/variants, eligibility/plan/translation contracts and measured quality gaps.
-- Treat generated language as a proposal. Preserve non-text metadata/side effects unless behavior change is separately authorized.
-- Validate IDs/limits, Kahlua, EN/TL placeholders and meaning, grounding/disclosure, duplicates and flow/authority regression.
-- Stage only outside watched media/user saves; run disposable real-Lua candidate replay and compare source fingerprints/effects.
-- Promote only through the verified canonical owner (hand-authored Lua or CodeBuilder reviewed input), never by overwriting derived artifacts.
-- Require an **explicit review decision** separate from proposal generation. The reviewer may be a human or authorized agent under this job, but must record why the text is semantically grounded/localized and cannot approve merely because it is grammatical.
+- Preserve the existing safe proposal/review workflow: retrieve verified source/translation contracts, use stale guards, stage outside watched media/user saves, run disposable real-Lua before/after, and require an explicit review decision.
+- Implement DIALOGUE_CONTENT_REGISTRY.md through existing CodeBuilder ownership: one canonical content-only source, deterministic generated Lua phrase metadata, and normal string-valued EN/TL translation keys/manifests.
+- Keep ResponseCatalog semantic/context variants separate from equivalent wording. Do not consume semantic variant slots merely for synonyms.
+- Extend the owned SpeechRealization seam so phrase selection occurs after semantic selection + style resolution, with bounded deterministic immediate-repeat avoidance and observable phrase ID/pool metadata.
+- Studio Dialogue Content edits canonical phrase content, not `when`, priority, plan, route, action or authority metadata. Raw generated Lua/translation artifacts are not the editing surface.
+- Migrate one low-risk response family first with behavior-equivalent generated output, then add 3+ EN/TL phrase variants and prove unchanged semantic selection/gameplay effects.
+- Add one verified player landing/choice content edit (for example the What's Up landing text) while candidate ID, route, hub/concept and eligibility remain locked and labels stay stable by default.
+- Audit old ToolReplies/SocialFlavor wording only for later consolidation opportunities; do not wholesale delete/migrate them without parity evidence.
 
-**Gate:** one low-risk real response family is improved in EN/TL, explicitly reviewed, promoted to canonical source, replayed fresh from checked-in source, and shown to preserve selection metadata/gameplay effects.
+**Gate:** the prior canonical promotion remains valid **and** the Dialogue Content Registry acceptance in DIALOGUE_CONTENT_REGISTRY.md passes: deterministic CodeBuilder generation, string-only translations, separate semantic/style/phrase identities, 3+ EN/TL phrases with anti-repeat real-Lua proof, Studio content editing with stale guards, one locked-structure player landing edit, unchanged plans/actions/authority/effects, and no save/ModData text bloat.
 
 ## P7 — End-to-end developer acceptance, scale and handoff
 **Status: IN PROGRESS. Several independent suites pass; consolidated final gate pending.**
@@ -88,10 +95,11 @@
 
 ## Closure order
 
-1. P4A — positive player-owned Leave Group production-worker lifecycle.
-2. P2/P3/P4/P5 — provenance/repeat/coverage and GUI↔CLI/error acceptance closeout without new feature creep.
-3. P6 — one explicitly reviewed canonical EN/TL dialogue improvement and fresh-worker proof.
-4. P7 — one consolidated developer acceptance pass and handoff.
+1. Preserve and validate the currently in-flight P3/P4A/P6 worktree; never overwrite accepted Leave Group or canonical-promotion evidence.
+2. Finish P3 surface ownership, then replace the peer Advanced workflow with Studio **Dialogue Content** plus bounded **Developer Tools** according to SURFACE_CONSOLIDATION.md.
+3. P6B Dialogue Content Registry — implement DIALOGUE_CONTENT_REGISTRY.md, migrate one low-risk family, add 3+ EN/TL phrases with deterministic anti-repeat, then prove one locked-structure landing/choice content edit.
+4. P2/P4/P5 closeout — provenance/repeat/coverage and GUI↔CLI/error acceptance without unrelated feature creep.
+5. P7 — one consolidated developer acceptance pass including UI ownership, phrase-registry/content-editing acceptance, performance/data safety and handoff.
 
 ## Continue / stop rule
 

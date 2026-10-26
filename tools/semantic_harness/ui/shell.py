@@ -170,12 +170,19 @@ from .authoring_actions import (
 from .scenario_persistence import load, reset, save
 from .runtime_actions import (
     capture_baseline,
+    explain_current_selection,
     preview,
     propose_relationship,
     reset_working_world,
     restart,
     set_language,
     show_snapshot,
+)
+from .regression_controller import (
+    run_regression,
+    run_regression_command_rejections,
+    run_regression_lifecycle,
+    run_regression_selection,
 )
 from .saved_world_selection_controller import (
     on_saved_world_player,
@@ -668,7 +675,9 @@ class SemanticHarnessApp:
         self, diagnostics: dict[str, Any]
     ) -> None:
         self._set_text(self.dialogue_diagnostics, pretty(diagnostics))
-        self.trace_tabs.select(self.dialogue_diagnostics_frame)
+        self.trace_tabs.select(self.graph_frame)
+        self.graph_tabs.select(self.graph_detail_frame)
+        self.graph_detail_tabs.select(self.dialogue_diagnostics_frame)
 
     def preview(self) -> None:
         preview(self)
@@ -687,6 +696,9 @@ class SemanticHarnessApp:
 
     def show_snapshot(self) -> None:
         show_snapshot(self)
+
+    def explain_current_selection(self) -> None:
+        explain_current_selection(self)
 
     def propose_relationship(self) -> None:
         propose_relationship(self)
@@ -711,6 +723,18 @@ class SemanticHarnessApp:
 
     def inspect_persona_matrix(self) -> None:
         inspect_persona_matrix(self)
+
+    def run_regression(self) -> None:
+        run_regression(self)
+
+    def run_regression_lifecycle(self) -> None:
+        run_regression_lifecycle(self)
+
+    def run_regression_command_rejections(self) -> None:
+        run_regression_command_rejections(self)
+
+    def run_regression_selection(self) -> None:
+        run_regression_selection(self)
 
     def _format_compare_result(self, result: dict[str, Any]) -> str:
         return format_compare_result(result)

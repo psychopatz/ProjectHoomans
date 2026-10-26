@@ -23,6 +23,16 @@ from tools.semantic_harness.codebuilder.dialogue_rendering import (
     render_dialogue_manifest,
     render_dialogue_translation,
 )
+from tools.semantic_harness.codebuilder.dialogue_content import (
+    CONTENT_RUNTIME_RELATIVE,
+    CONTENT_TRANSLATION_RELATIVE,
+    CONTENT_TRANSLATION_STEM,
+    compile_dialogue_content,
+    dialogue_content_artifact_paths,
+    load_dialogue_content_source,
+    source_fingerprint,
+    write_dialogue_content_output,
+)
 from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
     compile_semantic_definitions,
     discover_registered_capability_ids,
@@ -676,6 +686,110 @@ def generate_dialogue_source(
             "writes": [],
         }
     post_write = preview_dialogue_source(source_path, repository=repository)
+    return {
+        **post_write,
+        "generationApproved": True,
+        "writes": [str(path) for path in written],
+        "reloadedBy": "caller_restart_required",
+    }
+
+
+def _dialogue_content_artifacts(repository: Path) -> list[dict[str, Any]]:
+    artifacts: list[dict[str, Any]] = []
+    for path in dialogue_content_artifact_paths(repository):
+        try:
+            current = path.read_text(encoding="utf-8") if path.is_file() else None
+        except (OSError, UnicodeError) as error:
+            current = None
+            artifacts.append({
+                "path": str(path),
+                "status": "read_error",
+                "error": str(error),
+            })
+            continue
+        artifacts.append({
+            "path": str(path),
+            "status": "present" if current is not None else "missing",
+            "currentBytes": len(current.encode("utf-8")) if current is not None else 0,
+        })
+    return artifacts
+
+
+def preview_dialogue_content_source(
+    source_path: Path,
+    *,
+    repository: Path | None = None,
+) -> dict[str, Any]:
+    """Compile the bounded phrase/player-content source without writing files."""
+    repository = (repository or REPOSITORY).expanduser().resolve()
+    source_path = source_path.expanduser().resolve()
+    base: dict[str, Any] = {
+        "ok": False,
+        "type": "dialogue_content_compile_preview",
+        "schema": "pnc.semantic_dialogue_content.v1",
+        "repository": str(repository),
+        "sourcePath": str(source_path),
+        "previewOnly": True,
+        "effectFree": True,
+        "writes": [],
+        "generatedPaths": [str(path) for path in dialogue_content_artifact_paths(repository)],
+    }
+    try:
+        source = load_dialogue_content_source(source_path)
+        compiled = compile_dialogue_content(source)
+    except (CompileError, OSError, ValueError, TypeError) as error:
+        return {
+            **base,
+            "diagnostics": [{"severity": "error", "message": str(error)}],
+            "artifacts": _dialogue_content_artifacts(repository),
+        }
+    phrase_count = sum(
+        len(phrases)
+        for family in compiled["phraseFamilies"]
+        for phrases in family["styles"].values()
+    )
+    return {
+        **base,
+        "ok": True,
+        "diagnostics": [],
+        "sourceFingerprint": source_fingerprint(source_path),
+        "contentFingerprint": compiled["contentFingerprint"],
+        "phraseFamilyCount": len(compiled["phraseFamilies"]),
+        "phraseCount": phrase_count,
+        "playerChoiceCount": len(compiled["playerChoices"]),
+        "phraseFamilyIDs": [family["id"] for family in compiled["phraseFamilies"]],
+        "playerChoiceIDs": [choice["id"] for choice in compiled["playerChoices"]],
+        "translationKeys": {
+            language: sorted(values)
+            for language, values in compiled["translations"].items()
+        },
+        "artifacts": _dialogue_content_artifacts(repository),
+    }
+
+
+def generate_dialogue_content_source(
+    source_path: Path,
+    *,
+    repository: Path | None = None,
+) -> dict[str, Any]:
+    """Write approved phrase/player-content artifacts through CodeBuilder."""
+    repository = (repository or REPOSITORY).expanduser().resolve()
+    source_path = source_path.expanduser().resolve()
+    preview = preview_dialogue_content_source(source_path, repository=repository)
+    if preview.get("ok") is not True:
+        return preview
+    try:
+        compiled = compile_dialogue_content(load_dialogue_content_source(source_path))
+        written = write_dialogue_content_output(repository, compiled)
+    except (CompileError, OSError, ValueError, TypeError) as error:
+        return {
+            **preview,
+            "ok": False,
+            "generationApproved": True,
+            "diagnostics": [{"severity": "error", "message": str(error)}],
+            "writes": [],
+        }
+    post_write = preview_dialogue_content_source(source_path, repository=repository)
     return {
         **post_write,
         "generationApproved": True,

@@ -25,6 +25,7 @@ def set_controls(app: Any, enabled: bool) -> None:
         app.workbench_apply_button,
         app.replay_button,
         app.world_knowledge_button,
+        app.selection_explain_button,
         app.saved_world_discover_button,
         app.saved_world_inspect_button,
         app.saved_world_import_button,
@@ -82,11 +83,15 @@ def set_controls(app: Any, enabled: bool) -> None:
     app.matrix_dimension_box.configure(
         state="readonly" if enabled and not app.busy else "disabled"
     )
+    for button in getattr(app, "regression_buttons", ()):
+        button.configure(state=state)
     app.restart_button.configure(
         state="normal" if app.session.ready and not app.busy else "disabled"
     )
     app.flow_editor.set_enabled(enabled and not app.busy)
     app.interaction_explorer.set_enabled(enabled and not app.busy)
+    if hasattr(app, "source_explorer"):
+        app.source_explorer.set_enabled(enabled and not app.busy)
     app.interaction_composer.set_enabled(enabled and not app.busy)
     app.workflow_pane.set_enabled(enabled and not app.busy)
     app._refresh_suggestion_controls(enabled and not app.busy)

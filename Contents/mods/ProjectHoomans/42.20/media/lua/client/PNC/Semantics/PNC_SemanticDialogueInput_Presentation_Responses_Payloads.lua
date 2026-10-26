@@ -48,13 +48,25 @@ end
 
 local function payloadForPlanTurn(response, rendered, fallbackRendered)
     local firstSegment = rendered.segments[1] or {}
-    local key = firstSegment.templateID or response.templateID
-    if rendered.index > 1 and firstSegment.templateID then
-        key = firstSegment.templateID
+    -- Keep the rendered key for existing presentation consumers.  The
+    -- canonical semantic segment identity travels separately so lifecycle
+    -- and review diagnostics do not have to infer it from a phrase key.
+    local semanticKey = firstSegment.semanticTemplateID
+    if not semanticKey and type(response.plan) == "table"
+        and type(response.plan.turns) == "table"
+    then
+        local canonicalTurn = response.plan.turns[rendered.index] or {}
+        local canonicalSegment = canonicalTurn.segments
+            and canonicalTurn.segments[1]
+        semanticKey = type(canonicalSegment) == "table"
+            and canonicalSegment.templateID or nil
     end
+    local key = firstSegment.templateID
+        or response.templateID
     local translationKey = rendered.translationKeys[1]
     return {
         key = key,
+        semanticTemplateID = semanticKey,
         domain = "pnc.system.shared.categories",
         -- Keep the authored English fallback on every live payload. Text
         -- resolution still gives a registered translation precedence, but a
@@ -76,6 +88,16 @@ local function payloadForPlanTurn(response, rendered, fallbackRendered)
         realization = response.realization,
         realizationFamily = response.realizationFamily,
         realizationVariant = response.realizationVariant,
+        semanticVariantID = response.semanticVariantID,
+        speechStyleVariant = response.speechStyleVariant,
+        phraseFamilyID = firstSegment.phraseFamilyID or response.phraseFamilyID,
+        phraseID = firstSegment.phraseID or response.phraseID,
+        phrasePoolSize = firstSegment.phrasePoolSize or response.phrasePoolSize,
+        phraseAntiRepeatReason = firstSegment.phraseAntiRepeatReason
+            or response.phraseAntiRepeatReason,
+        phraseSemanticTemplateID = firstSegment.phraseSemanticTemplateID
+            or response.phraseSemanticTemplateID,
+        phraseSelection = response.phraseSelection,
         realizationFallbackReason = response.realizationFallbackReason,
         renderTemplateID = response.renderTemplateID,
     }
@@ -128,6 +150,8 @@ local function payloadsForResponse(response)
     return {
         {
             key = response.templateID,
+            semanticTemplateID = response.semanticVariantID
+                or response.templateID,
             domain = "pnc.system.shared.categories",
             text = text ~= "" and text or nil,
             fallback = fallback,
@@ -142,6 +166,14 @@ local function payloadsForResponse(response)
             realization = response.realization,
             realizationFamily = response.realizationFamily,
             realizationVariant = response.realizationVariant,
+            semanticVariantID = response.semanticVariantID,
+            speechStyleVariant = response.speechStyleVariant,
+            phraseFamilyID = response.phraseFamilyID,
+            phraseID = response.phraseID,
+            phrasePoolSize = response.phrasePoolSize,
+            phraseAntiRepeatReason = response.phraseAntiRepeatReason,
+            phraseSemanticTemplateID = response.phraseSemanticTemplateID,
+            phraseSelection = response.phraseSelection,
             realizationFallbackReason = response.realizationFallbackReason,
             renderTemplateID = renderTemplateID,
         },

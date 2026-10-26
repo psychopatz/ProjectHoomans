@@ -105,10 +105,10 @@ class RuntimeParityP11ATests(unittest.TestCase):
                     app.trace_tabs.tab(tab, "text")
                     for tab in app.trace_tabs.tabs()
                     if app.trace_tabs.tab(tab, "text") in {
-                        "Compare", "Diagnostics / Worker", "World Knowledge",
+                        "Compare / Regression", "Debug", "World",
                     }
                 ],
-                ["Compare", "Diagnostics / Worker", "World Knowledge"],
+                ["Compare / Regression", "World", "Debug"],
             )
             self.assertEqual(str(app.persona_matrix_button.cget("text")), "Run comparison")
             self.assertEqual(str(app.world_knowledge_button.cget("text")), "Refresh world knowledge")
@@ -117,13 +117,16 @@ class RuntimeParityP11ATests(unittest.TestCase):
 
             compare_tab = next(
                 tab for tab in app.trace_tabs.tabs()
-                if app.trace_tabs.tab(tab, "text") == "Compare"
+                if app.trace_tabs.tab(tab, "text") == "Compare / Regression"
             )
             app.trace_tabs.select(compare_tab)
+            app.compare_tabs.select(app.compare_context_frame)
             root.update_idletasks()
-            self.assertTrue(app.compare_utterance_box.winfo_ismapped())
-            self.assertTrue(app.matrix_dimension_box.winfo_ismapped())
-            self.assertTrue(app.persona_matrix_button.winfo_ismapped())
+            wait_until(
+                lambda: app.compare_utterance_box.winfo_ismapped()
+                and app.matrix_dimension_box.winfo_ismapped()
+                and app.persona_matrix_button.winfo_ismapped()
+            )
 
             world_tab = next(
                 tab for tab in app.workbench_notebook.tabs()
@@ -135,9 +138,10 @@ class RuntimeParityP11ATests(unittest.TestCase):
 
             diagnostics_tab = next(
                 tab for tab in app.trace_tabs.tabs()
-                if app.trace_tabs.tab(tab, "text") == "Diagnostics / Worker"
+                if app.trace_tabs.tab(tab, "text") == "Debug"
             )
             app.trace_tabs.select(diagnostics_tab)
+            app.debug_tabs.select(app.diagnostics_frame)
             root.update_idletasks()
             self.assertTrue(app.snapshot_button.winfo_ismapped())
             self.assertTrue(app.restart_button.winfo_ismapped())
@@ -194,12 +198,13 @@ class RuntimeParityP11ATests(unittest.TestCase):
 
                 talk_tab = next(
                     tab
-                    for tab in app.trace_tabs.tabs()
-                    if app.trace_tabs.tab(tab, "text") == "Talk parity"
+                    for tab in app.compare_tabs.tabs()
+                    if app.compare_tabs.tab(tab, "text") == "Talk parity"
                 )
                 app.main_tabs.select(app.log_tab)
                 app.studio_notebook.select(app.studio_notebook.tabs()[-1])
-                app.trace_tabs.select(talk_tab)
+                app.trace_tabs.select(app.compare_frame)
+                app.compare_tabs.select(talk_tab)
                 app.workbench_notebook.select(app.workbench_notebook.tabs()[1])
                 # Exercise the real visible topology before switching context;
                 # setting a hidden PanedWindow sash is not a user workflow and
@@ -240,7 +245,11 @@ class RuntimeParityP11ATests(unittest.TestCase):
                 restored_talk = app2.trace_tabs.tab(
                     app2.trace_tabs.select(), "text"
                 )
-                self.assertEqual(restored_talk, "Talk parity")
+                restored_inner_talk = app2.compare_tabs.tab(
+                    app2.compare_tabs.select(), "text"
+                )
+                self.assertEqual(restored_talk, "Compare / Regression")
+                self.assertEqual(restored_inner_talk, "Talk parity")
                 app2.main_tabs.select(app2.simulation_tab)
                 for _ in range(20):
                     root2.update()

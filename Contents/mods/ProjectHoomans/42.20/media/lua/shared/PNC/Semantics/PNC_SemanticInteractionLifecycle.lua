@@ -12,6 +12,12 @@ PNC.Semantics.InteractionLifecycle = Lifecycle
 Lifecycle.VERSION = 1
 Lifecycle.SCHEMA = "semantic.interaction.lifecycle.v1"
 Lifecycle.ENVELOPE_SCHEMA = "semantic.interaction.envelope.v1"
+-- Stable provenance names are kept on the composition hub so inspectors and
+-- legacy callers can discover the contract without loading mutable state.
+Lifecycle.PROVENANCE_FIELDS = {
+    "realizationFamily",
+    "realizationID",
+}
 Lifecycle.LIMITS = {
     factRefs = 8,
     modifiers = 12,

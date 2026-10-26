@@ -13,6 +13,69 @@ def show_snapshot(app: Any) -> None:
     app._start_operation(lambda worker: worker.snapshot(), app._show_response)
 
 
+def explain_current_selection(app: Any) -> None:
+    """Explain the active turn with the production selector's own seam."""
+
+    if not app.session.ready or app.busy:
+        return
+    response = app.last_response if isinstance(app.last_response, dict) else {}
+    observation = response.get("observation") or {}
+    result = response.get("result") or {}
+    decision = result.get("decision") or observation.get("decision") or {}
+    selected_response = decision.get("response") or observation.get("response") or {}
+    pool_id = (
+        selected_response.get("sourcePoolID")
+        or (response.get("plan") or {}).get("sourcePoolID")
+        or (response.get("dialoguePlanning") or {}).get("sourcePoolID")
+    )
+    if not pool_id:
+        app.selection_explain_status_var.set(
+            "No response pool is attached to the active turn."
+        )
+        return
+
+    scenario = app.scenario if isinstance(app.scenario, dict) else {}
+    npc = scenario.get("npc") if isinstance(scenario.get("npc"), dict) else {}
+    relationship = (
+        npc.get("relationship")
+        if isinstance(npc.get("relationship"), dict)
+        else {}
+    )
+    health = npc.get("health") if isinstance(npc.get("health"), dict) else {}
+    needs = npc.get("needs") if isinstance(npc.get("needs"), dict) else {}
+    personality = (
+        npc.get("personality")
+        if isinstance(npc.get("personality"), dict)
+        else {}
+    )
+    context = {
+        "npcID": npc.get("npcID") or "simulation-npc",
+        "socialStyle": personality.get("socialStyle") or npc.get("socialStyle"),
+        "healthState": health.get("state"),
+        "needType": needs.get("type"),
+        "needUrgency": needs.get("urgency"),
+        "relationshipState": relationship.get("state"),
+        "worldContext": scenario.get("world") if isinstance(scenario.get("world"), dict) else {},
+    }
+    context = {key: value for key, value in context.items() if value is not None}
+
+    def finish(explanation: dict[str, Any]) -> None:
+        app._set_text(app.provenance_inspector, pretty(explanation))
+        app.trace_tabs.select(app.inspect_frame)
+        app.inspect_tabs.select(app.provenance_frame)
+        app.selection_explain_status_var.set(
+            f"{explanation.get('selectedID', 'UNKNOWN')} · "
+            f"history unchanged · production matcher"
+        )
+
+    app._start_operation(
+        lambda worker: worker.explain_response_selection(
+            str(pool_id), context, str(context.get("npcID") or "simulation")
+        ),
+        finish,
+    )
+
+
 def preview(app: Any) -> None:
     """Inspect a production decision without recording or dispatching it."""
 

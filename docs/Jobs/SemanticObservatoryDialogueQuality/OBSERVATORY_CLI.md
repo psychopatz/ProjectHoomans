@@ -211,8 +211,8 @@ typed `goodbye` outside that root-choice path currently produces
 This is observed behavior, not an assertion that every input form is equivalent.
 Two cases intentionally retain sequential Follow → Wait history;
 they do not establish native mutually-exclusive movement beyond the
-worker's accepted request and reply. Studio's Coverage tab can execute the
-same lifecycle fixture set through the existing Lua session.
+worker's accepted request and reply. Simulation → Compare / Regression →
+Farewell lifecycle runs the same fixture set through the existing Lua session.
 
 ## Production-Lua selection coverage in explicit contexts
 
@@ -227,7 +227,8 @@ priority/specificity, hash-tie and history decisions. Reports summarize
 condition fields with real registry fingerprint/revision. An unselected
 variant is **not** declared globally unreachable; all verdicts refer only to
 the supplied contexts. Queries do not execute actions or consume selection
-history. The same four greeting contexts are runnable from Studio Coverage.
+history. The same four greeting contexts are runnable from Simulation →
+Compare / Regression → Explain selection matrix.
 
 ## Verified canonical CodeBuilder lineage (per loaded variant)
 
@@ -235,7 +236,7 @@ history. The same four greeting contexts are runnable from Studio Coverage.
 tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jsonl --response-codebuilder-lineage semantic.accept
 ```
 
-This reuses CodeBuilder's dataset catalog, validated compiler and read-only preview; it compares ID, template, fallback, conditions and priority to the loaded Lua variant. Dialogue sources also require unchanged generated-artifact diffs. Ownership is per variant; mixed pools must not inherit a guessed single owner. Semantic-definition preview does not expose artifact diffs, so that detail is reported as not available. Unmatched or ambiguous variants remain UNKNOWN. Studio's Catalog tab exposes the same lineage review.
+This reuses CodeBuilder's dataset catalog, validated compiler and read-only preview; it compares ID, template, fallback, conditions and priority to the loaded Lua variant. Dialogue sources also require unchanged generated-artifact diffs. Ownership is per variant; mixed pools must not inherit a guessed single owner. Semantic-definition preview does not expose artifact diffs, so that detail is reported as not available. Unmatched or ambiguous variants remain UNKNOWN. Studio → Explore → Responses exposes the same read-only lineage review.
 
 ## Optional source SHA pin for isolated candidate previews
 

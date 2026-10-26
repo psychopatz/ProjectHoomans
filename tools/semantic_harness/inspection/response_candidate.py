@@ -121,7 +121,8 @@ def _real_case(
     return {
         "accepted": turn.get("accepted"),
         "messages": [{
-            "id": m.get("key"), "translationKey": m.get("translationKey"),
+            "id": m.get("semanticTemplateID") or m.get("key"),
+            "translationKey": m.get("translationKey"),
             "text": m.get("text"),
         } for m in responses[-4:]],
         "actionCount": side.get("actionCount"),
@@ -264,7 +265,8 @@ def preview_authored_variant(
             candidate = {
                 "accepted": candidate_turn.get("accepted"),
                 "messages": [{
-                    "id": m.get("key"), "translationKey": m.get("translationKey"),
+                    "id": m.get("semanticTemplateID") or m.get("key"),
+                    "translationKey": m.get("translationKey"),
                     "text": m.get("text"),
                 } for m in candidate_messages[-4:]],
                 "actionCount": final_inspector.get("effects", {})
@@ -315,6 +317,14 @@ def preview_authored_variant(
         "poolID": proposal["poolID"], "variantID": variant_id,
         "baselineFingerprint": details["contentFingerprint"],
         "candidateFingerprint": selected_fingerprint,
+        "variantContract": {
+            "conditions": variant.get("when") or {},
+            "priority": variant.get("priority", 0),
+            "plan": variant.get("planSummary") or {},
+            "selectionSource": variant.get("selectionSource", "UNKNOWN"),
+            "sourceKind": variant.get("sourceKind", "UNKNOWN"),
+            "sourcePath": origin,
+        },
         "sourcePath": origin, "canonicalOwnerVerified": True,
         "sourceSHA256": original_hash,
         "sourceSHA256GuardMatched": expected_source_hash == original_hash
@@ -327,6 +337,7 @@ def preview_authored_variant(
         "translationDiff": translation_diff,
         "languageCases": result_cases, "checks": {
             "sameSelectedKey": True, "unchangedGameplayEffects": True,
+            "unchangedSelectionMetadata": True,
             "authoritativeWorkerRenderedENandTL": True,
             "productionSourceUnchanged": True,
         },

@@ -113,6 +113,8 @@ local function factionSummary(faction)
             and PNC.Factions.IsProvisionalPlayerFaction(faction) or false,
         memberCount = countKeys(faction.memberIDs),
         playerMemberCount = countKeys(faction.playerMemberKeys),
+        tags = faction.tags,
+        mobile = faction.mobile,
     }
 end
 

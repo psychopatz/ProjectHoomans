@@ -73,13 +73,27 @@ return function(Input, Internal, Support)
         context.generatedFlow = generatedFlow
         local actionIntent = ActionTargetHints.AttachCampSiteHint(
             decision.actionIntent, context, CampSite, CampSiteHints, Support.audit)
+        local campTarget = actionIntent and actionIntent.target
+        local campHint = campTarget and campTarget.clientHint
         if actionIntent and actionIntent.action == "CAMP"
-            and actionIntent.target
-            and type(actionIntent.target.clientHint) == "table"
+            and type(campTarget) == "table"
+            and type(campHint) ~= "table"
+            and campTarget.kind == "camp_site"
+        then
+            -- A selected primitive is already bounded by the semantic
+            -- suggestion frame. If the client-only resolver is unavailable
+            -- (as in the headless worker) or reports a stale observation,
+            -- preserve it as a non-authoritative hint so the server can
+            -- reject or resolve it explicitly instead of silently choosing a
+            -- different destination.
+            campHint = campTarget
+        end
+        if actionIntent and actionIntent.action == "CAMP"
+            and type(campHint) == "table"
         then
             -- Reuse the already-bounded observation for the command adapter.
             -- This avoids a second client scan in the same dialogue tick.
-            context.campSiteHint = actionIntent.target.clientHint
+            context.campSiteHint = campHint
         end
         actionIntent = ActionTargetHints.AttachWorldTargetHint(
             actionIntent, context, WorldTargetHints, Support.audit)

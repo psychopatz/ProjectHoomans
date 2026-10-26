@@ -21,29 +21,42 @@ def build_ui(app: Any) -> None:
 
     studio_tab = ttk.Frame(app.main_tabs, padding=6)
     simulation_tab = ttk.Frame(app.main_tabs, padding=8)
-    studio_tab.rowconfigure(0, weight=1)
+    studio_tab.rowconfigure(0, weight=0)
+    studio_tab.rowconfigure(1, weight=1)
+    studio_tab.rowconfigure(2, weight=0)
     studio_tab.columnconfigure(0, weight=1)
     simulation_tab.rowconfigure(0, weight=0)
     simulation_tab.rowconfigure(1, weight=1)
     simulation_tab.columnconfigure(0, weight=1)
     studio_notebook = ttk.Notebook(studio_tab)
     app.studio_notebook = studio_notebook
-    studio_notebook.grid(row=0, column=0, sticky="nsew")
-    observatory_tab = ttk.Frame(studio_notebook, padding=8)
-    workflow_tab = ttk.Frame(studio_notebook, padding=8)
-    editor_tab = ttk.Frame(studio_notebook, padding=8)
-    library_tab = ttk.Frame(studio_notebook, padding=8)
-    blocks_tab = ttk.Frame(studio_notebook, padding=8)
-    composer_tab = ttk.Frame(studio_notebook, padding=8)
-    for panel in (observatory_tab, workflow_tab, editor_tab, library_tab, blocks_tab, composer_tab):
+    studio_toolbar = ttk.Frame(studio_tab, padding=(0, 0, 0, 6))
+    studio_toolbar.grid(row=0, column=0, sticky="ew")
+    studio_toolbar.columnconfigure(0, weight=1)
+    studio_notebook.grid(row=1, column=0, sticky="nsew")
+    explore_tab = ttk.Frame(studio_notebook, padding=8)
+    dialogue_content_tab = ttk.Frame(studio_notebook, padding=8)
+    review_tab = ttk.Frame(studio_notebook, padding=8)
+    for panel in (explore_tab, dialogue_content_tab, review_tab):
         panel.rowconfigure(0, weight=1)
         panel.columnconfigure(0, weight=1)
-    studio_notebook.add(observatory_tab, text="Observatory")
-    studio_notebook.add(workflow_tab, text="Build workflow")
-    studio_notebook.add(editor_tab, text="Flow + interactions")
-    studio_notebook.add(library_tab, text="Dataset library")
-    studio_notebook.add(blocks_tab, text="Block palette")
-    studio_notebook.add(composer_tab, text="Interaction composer")
+    studio_notebook.add(explore_tab, text="Explore")
+    studio_notebook.add(dialogue_content_tab, text="Dialogue Content")
+    studio_notebook.add(review_tab, text="Review")
+    developer_tools_host = ttk.Frame(studio_tab, padding=(0, 6, 0, 0))
+    developer_tools_host.grid(row=2, column=0, sticky="nsew")
+    developer_tools_host.grid_remove()
+    developer_tools_host.rowconfigure(0, weight=1)
+    developer_tools_host.columnconfigure(0, weight=1)
+    app.developer_tools_host = developer_tools_host
+    app.developer_tools_button = ttk.Button(
+        studio_toolbar,
+        text="Developer Tools…",
+        command=lambda: developer_tools_host.grid()
+        if not developer_tools_host.winfo_ismapped()
+        else developer_tools_host.grid_remove(),
+    )
+    app.developer_tools_button.grid(row=0, column=1, sticky="e")
     log_tab = ttk.Frame(app.main_tabs, padding=8)
     log_tab.rowconfigure(1, weight=1)
     log_tab.columnconfigure(0, weight=1)
@@ -73,6 +86,11 @@ def build_ui(app: Any) -> None:
     app.main_tabs.add(log_tab, text="Log")
     app.main_tabs.add(world_browser_tab, text="World Browser")
     app.studio_tab = studio_tab
+    app.explore_tab = explore_tab
+    app.review_tab = review_tab
+    # Compatibility attribute: structural tools are hidden behind the
+    # Developer Tools… launcher rather than exposed as a Studio peer.
+    app.advanced_tab = developer_tools_host
     app.log_tab = log_tab
     app.world_browser_tab = world_browser_tab
     build_saved_world_browser(app, world_browser_tab)
@@ -94,12 +112,10 @@ def build_ui(app: Any) -> None:
     build_diagnostic_trace(app, ttk, scrolled_text)
     build_studio_editors(
         app,
-        observatory_tab=observatory_tab,
-        workflow_tab=workflow_tab,
-        editor_tab=editor_tab,
-        library_tab=library_tab,
-        blocks_tab=blocks_tab,
-        composer_tab=composer_tab,
+        explore_tab=explore_tab,
+        dialogue_content_tab=dialogue_content_tab,
+        review_tab=review_tab,
+        developer_tools_parent=developer_tools_host,
         ttk=ttk,
         scrolled_text=scrolled_text,
     )

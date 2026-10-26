@@ -748,7 +748,7 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
                 time.sleep(0.02)
             self.assertTrue(app.worker_ready)
             labels = [
-                app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()
+                app.compare_tabs.tab(tab, "text") for tab in app.compare_tabs.tabs()
             ]
             self.assertIn("Talk parity", labels)
             app.run_talk_matrix()
@@ -761,6 +761,10 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
             self.assertIn("Hostile / Enemy", output)
             self.assertEqual(
                 app.trace_tabs.tab(app.trace_tabs.select(), "text"),
+                "Compare / Regression",
+            )
+            self.assertEqual(
+                app.compare_tabs.tab(app.compare_tabs.select(), "text"),
                 "Talk parity",
             )
         finally:

@@ -23,7 +23,8 @@
       "EN/Conversation/Semantic/GroundedPersonalDialogue.json",
       "EN/Conversation/Semantic/Suggestions.json",
       "EN/Conversation/Semantic/Availability.json",
-      "EN/Conversation/Semantic/CommonInteractions.json"
+      "EN/Conversation/Semantic/CommonInteractions.json",
+      "EN/Conversation/Semantic/DialogueContent.json"
     ],
     "TL": [
       "TL/Conversation/Flavor/Address.json",
@@ -47,7 +48,8 @@
       "TL/Conversation/Semantic/GroundedPersonalDialogue.json",
       "TL/Conversation/Semantic/Suggestions.json",
       "TL/Conversation/Semantic/Availability.json",
-      "TL/Conversation/Semantic/CommonInteractions.json"
+      "TL/Conversation/Semantic/CommonInteractions.json",
+      "TL/Conversation/Semantic/DialogueContent.json"
     ]
   }
 }

@@ -156,8 +156,8 @@ class ResponseQualityMatrixTests(unittest.TestCase):
             "expectedContentFingerprint": original["contentFingerprint"],
             "variants": [{
                 "id": "semantic.flow.greeting.opening.default",
-                "EN": "Hey there. Good to see you.",
-                "TL": "Uy, mabuti at nakita kita.",
+                "EN": "Welcome back. Good to see you.",
+                "TL": "Maligayang balik. Mabuti at nakita kita.",
             }],
             "case": {"utterance": "hello"},
         }
@@ -199,6 +199,91 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         proposal["variants"][0]["id"] = "unregistered.fake.variant"
         with self.assertRaisesRegex(ValueError, "preflight_rejected"):
             preview_authored_variant(proposal, repository=repository)
+
+    def test_checked_in_greeting_promotion_changes_text_only(self):
+        from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
+        from tools.semantic_harness.runtime.worker import LuaSemanticWorker
+
+        expected = {
+            "EN": "Hey there. Good to see you.",
+            "TL": "Uy, mabuti at nakita kita.",
+        }
+        old = {
+            "EN": "Hello. Good to see you.",
+            "TL": "Kumusta. Mabuti at nakita kita.",
+        }
+        owner = (
+            "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/"
+            "Semantics/SemanticDialogueResponseCatalog/"
+            "PNC_SemanticDialogueResponseCatalog_FlowGreeting.lua"
+        )
+        for language in ("EN", "TL"):
+            with self.subTest(language=language), LuaSemanticWorker(
+                DEFAULT_SCENARIO
+            ) as worker:
+                detail = worker.response_pool_detail(
+                    "semantic.flow.greeting.opening", limit=16
+                )
+                variant = next(
+                    row
+                    for row in detail["variants"]
+                    if row["id"] == "semantic.flow.greeting.opening.default"
+                )
+                self.assertEqual(detail["sourceKind"], "AUTHORED_LUA")
+                self.assertEqual(detail["sourcePath"], owner)
+                self.assertEqual(variant["priority"], 0)
+                self.assertEqual(variant["when"], [])
+                self.assertEqual(
+                    variant["planSummary"],
+                    {
+                        "dialogueAct": "GREETING_OPENING",
+                        "firstTurnID": "greeting",
+                        "kind": "dialogue_act_plan",
+                        "offerCount": 1,
+                        "segmentCount": 2,
+                        "topic": "WELLBEING",
+                        "turnCount": 2,
+                    },
+                )
+                explanation = worker.explain_response_selection(
+                    "semantic.flow.greeting.opening",
+                    {"npcID": "p6-promoted", "socialStyle": "neutral"},
+                    "p6-promoted",
+                )
+                self.assertEqual(
+                    explanation["selectedID"],
+                    "semantic.flow.greeting.opening.default",
+                )
+                worker.set_language(language)
+                turn = worker.input("hello")
+                result = turn["result"]
+                decision = result["decision"]
+                response = decision["response"]
+                selected = next(
+                    message
+                    for message in turn["messages"]
+                    if message.get("payload", {}).get("key")
+                    == "semantic.flow.greeting.opening.default"
+                )
+                self.assertEqual(selected["payload"]["text"], expected[language])
+                self.assertNotEqual(selected["payload"]["text"], old[language])
+                self.assertTrue(result["accepted"])
+                self.assertEqual(decision["branch"], "GREET_ACKNOWLEDGED")
+                self.assertEqual(
+                    response["selectionID"],
+                    "semantic.flow.greeting.opening.default",
+                )
+                self.assertEqual(
+                    response["sourcePoolID"], "semantic.flow.greeting.opening"
+                )
+                self.assertEqual(
+                    response["templateID"],
+                    "semantic.flow.greeting.opening.default",
+                )
+                self.assertEqual(response["sourceFlowID"], "greeting")
+                self.assertEqual(response["flowTransition"], "start")
+                self.assertEqual(turn["transport"], [])
+                self.assertIsNone(result.get("actionResult"))
 
     def test_rejects_generated_owner_as_edit_source(self):
         from tools.semantic_harness.runtime.worker import LuaSemanticWorker
@@ -299,6 +384,55 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         candidate["cases"] = []
         self.assertEqual(len(compare_quality_reports(base, candidate)["skipped"]), 1)
 
+    def test_comparison_accepts_equivalent_complete_reports(self):
+        base = {
+            "type": "response_quality_matrix",
+            "schemaVersion": 1,
+            "sourceKind": "FIXTURE",
+            "truncated": False,
+            "cases": [
+                {
+                    "label": "Greeting EN",
+                    "language": "EN",
+                    "status": "PASS",
+                    "responseKeys": ["a"],
+                    "responseTexts": ["hi"],
+                    "actions": 0,
+                    "transportCount": 0,
+                    "accepted": True,
+                }
+            ],
+        }
+        equivalent = json.loads(json.dumps(base))
+        comparison = compare_quality_reports(base, equivalent)
+        self.assertTrue(comparison["ok"], comparison)
+        self.assertEqual(comparison["changes"], [])
+        self.assertEqual(comparison["regressions"], [])
+        self.assertEqual(comparison["skipped"], [])
+
+    def test_cli_reports_bounded_error_with_nonzero_exit(self):
+        root = Path(__file__).resolve().parents[3]
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "tools.semantic_harness",
+                "--no-gui",
+                "--jsonl",
+                "--response-pool",
+                "semantic.flow.greeting.opening",
+                "--response-limit",
+                "17",
+            ],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            timeout=20,
+        )
+        self.assertEqual(completed.returncode, 2)
+        self.assertIn("invalid_page", completed.stderr)
+        self.assertEqual(completed.stdout, "")
+
     def test_invalid_language_and_large_case_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "language"):
             run_quality_matrix([{"language": "XX"}])
@@ -337,7 +471,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
 
 @unittest.skipUnless(os.environ.get("DISPLAY"), "real Tk needs X11/Xvfb")
 class ObservatoryTkTests(unittest.TestCase):
-    def test_visible_widgets_against_live_lua_worker(self):
+    def test_explore_is_static_and_selection_belongs_to_simulation(self):
         import tkinter as tk
         from tkinter import ttk
         from tkinter.scrolledtext import ScrolledText
@@ -356,6 +490,16 @@ class ObservatoryTkTests(unittest.TestCase):
                     return True
                 pane = SemanticObservatoryPane(
                     root, tk, ttk, ScrolledText, run)
+                self.assertEqual(
+                    [pane.tabs.tab(tab, "text") for tab in pane.tabs.tabs()],
+                    ["Registered responses"],
+                )
+                self.assertFalse(hasattr(pane, "context_var"))
+                self.assertFalse(hasattr(pane, "test_utterance"))
+                self.assertIn(
+                    "Use Simulation → Inspect for context-specific selection explanations.",
+                    pane.views["Explore"].get("1.0", "end"),
+                )
                 pane.filter_var.set("greeting")
                 pane.refresh()
                 self.assertEqual(len(pane.pools.get_children()), 3)
@@ -363,13 +507,6 @@ class ObservatoryTkTests(unittest.TestCase):
                 pane._selected()
                 self.assertIn("semantic.flow.greeting.opening.rain",
                     pane.views["Catalog"].get("1.0", "end"))
-                pane.context_var.set("Rainy fixture")
-                pane.explain()
-                self.assertIn("sole_highest_score",
-                    pane.views["Catalog"].get("1.0", "end"))
-                pane.test_utterance()
-                self.assertIn("Hello. Good to see you.",
-                    pane.views["Test Lab"].get("1.0", "end"))
         finally:
             root.destroy()
 
@@ -391,8 +528,8 @@ class ObservatoryTkTests(unittest.TestCase):
             "expectedContentFingerprint": detail["contentFingerprint"],
             "variants": [{
                 "id": "semantic.flow.greeting.opening.default",
-                "EN": "Hey there. Good to see you.",
-                "TL": "Uy, mabuti at nakita kita.",
+                "EN": "Hello. Good to see you.",
+                "TL": "Kumusta. Mabuti at nakita kita.",
             }],
             "case": {"utterance": "hello"},
         }
@@ -406,6 +543,8 @@ class ObservatoryTkTests(unittest.TestCase):
             root = tk.Tk()
             root.withdraw()
             try:
+                review_parent = ttk.Frame(root)
+                review_parent.grid(row=0, column=0, sticky="nsew")
                 with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
                     def run(operation, callback):
                         callback(operation(worker))
@@ -413,6 +552,7 @@ class ObservatoryTkTests(unittest.TestCase):
                     pane = SemanticObservatoryPane(
                         root, tk, ttk, ScrolledText, run,
                         repository=repository, filedialog=FileDialog,
+                        review_parent=review_parent,
                     )
                     pane.preview_proposal()
                     text = pane.views["Review"].get("1.0", "end")
@@ -420,23 +560,10 @@ class ObservatoryTkTests(unittest.TestCase):
                     self.assertIn("TL — PASS", text)
                     self.assertIn("Approval: NOT GRANTED", text)
                     self.assertIn("Production writes: 0", text)
-                    pane.coverage_lifecycle()
-                    coverage = pane.views["Coverage"].get("1.0", "end")
-                    self.assertIn("8 fixture cases", coverage)
-                    self.assertIn("Goodbye root choice TL", coverage)
-                    self.assertIn("FAIL=0", coverage)
-                    pane.coverage_command_rejections()
-                    negative = pane.views["Coverage"].get("1.0", "end")
-                    self.assertIn("4 fixture cases", negative)
-                    self.assertIn("server-declared rejection TL", negative)
-                    self.assertIn("FAIL=0", negative)
-                    pane.coverage_selection()
-                    selection_view = pane.views["Coverage"].get("1.0", "end")
-                    self.assertIn("Production Lua selector coverage", selection_view)
-                    self.assertIn("Not selected does NOT mean globally unreachable",
-                                  selection_view)
-                    self.assertIn("semantic.flow.greeting.opening.rain",
-                                  selection_view)
+                    self.assertTrue(pane.approve_button.winfo_exists())
+                    self.assertTrue(pane.reject_button.winfo_exists())
+                    pane.approve_candidate()
+                    self.assertIn("Explicit review decision: APPROVE", pane.views["Review"].get("1.0", "end"))
             finally:
                 root.destroy()
 

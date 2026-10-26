@@ -38,6 +38,24 @@ Agent workflow: **discover → inspect → evidence-based coverage matrix → pr
 - Save-backed testing is read-only and labels source (SAVE vs FIXTURE). Never write sensitive saved NPC/private knowledge into committed artifacts or return unbounded actor records.
 - Measure catalog load/query, worker restart, replay throughput, memory/output size, and selection/translation regression before altering catalog caps or adding caches. No per-NPC persistent debug history and no runtime network inference.
 
-## Studio information architecture
 
-Default: Catalog (search/inspect) | Test Lab (real scenario replay) | Coverage (measured holes) | Review (candidate vs baseline). Advanced existing Flow graph, Build workflow, Dataset Library, Block palette and Interaction Composer remain reachable and unbroken; reorganization follows acceptance evidence, not arbitrary file moves.
+## Dialogue content ownership
+
+- **ResponseCatalog answers what the NPC means.** Conditions, priority, semantic variant identity, plans and gameplay-related metadata remain there.
+- **SpeechRealization answers how the NPC speaks.** Existing style resolution remains authoritative.
+- **Dialogue Content phrase registry answers which equivalent wording is rendered.** It runs after semantic/style choice, is deterministic/anti-repeat and cannot change actions, plans or authority.
+- **PsychopatzCore Translation remains string-valued.** Phrase arrays are never stored directly as translation values; CodeBuilder emits ordinary EN/TL keys plus bounded compiled phrase-family metadata.
+- **Canonical authoring is source-controlled, not ModData.** Studio edits a reviewed CodeBuilder content source with stale guards; generated Lua/translation artifacts are derived output.
+- **Player navigation wording is stable by default.** Studio may edit verified landing/choice EN/TL content, but route/hub/concept/eligibility fields are locked and labels do not reroll on every UI refresh.
+
+## Human surface ownership
+
+The GUI follows **one job, one home**. Detailed migration and acceptance are in [SURFACE_CONSOLIDATION.md](SURFACE_CONSOLIDATION.md).
+
+- **Simulation** is the sole GUI runtime workbench: conversation/Response Channel, fixture or save-backed context, active selection/authority/effects inspection, comparisons/regressions, dialogue graph and runtime/world/debug diagnostics. Studio must not own a second utterance runner or scenario context.
+- **Studio** is the source/content/change workbench: **Explore** (registered responses/interactions/flows/sources), **Dialogue Content** (content-only EN/TL phrase families and verified player-choice wording), and **Review** (candidate before/after and approval evidence). Structural flow/source/block/interaction mutation is relegated to Developer Tools, not a primary Studio workflow.
+- **World Browser** is the sole persisted save/target discovery surface. Simulation links to it and consumes the selected target; it does not recreate the browser.
+- **Log** is the sole complete activity timeline. Other surfaces expose bounded local status.
+- Headless CLI uses the same worker/services and remains the agent-facing parity interface. GUI consolidation must not fork or delete those contracts.
+
+The former Studio Test Lab and Coverage functionality now reuses the single Simulation execution path. Context-specific selection explanation belongs to Simulation Inspect; Studio Explore retains static variant/source metadata. Existing Flow Graph mutation, raw Dataset editor, Block Palette, Interaction Composer and Build Workflow move behind Developer Tools, with Build Workflow retained as a legacy/retirement candidate until unique capability ownership is fully proven.

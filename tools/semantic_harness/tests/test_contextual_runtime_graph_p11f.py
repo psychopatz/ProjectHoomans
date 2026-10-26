@@ -93,7 +93,10 @@ class ContextualRuntimeGraphP11FTests(unittest.TestCase):
                     time.sleep(0.02)
                 self.assertEqual(app.dialogue_graph_pane._draft["graphKind"], expected_kind)
                 self.assertEqual(
-                    app.trace_tabs.tab(app.trace_tabs.select(), "text"),
+                    app.trace_tabs.tab(app.trace_tabs.select(), "text"), "Graph"
+                )
+                self.assertEqual(
+                    app.graph_tabs.tab(app.graph_tabs.select(), "text"),
                     "Dialogue graph",
                 )
         finally:

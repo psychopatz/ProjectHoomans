@@ -5,10 +5,15 @@ local Internal = Suggestions.Internal
 
 local resolvedText = Internal.resolvedText
 local topicGroupID = Internal.topicGroupID
+local Content = PNC.Semantics.DialogueContentRegistry
+    or require "PNC/Semantics/Generated/DialogueContent/Registry"
+local WhatsUpContent = Content.PlayerChoice
+    and Content.PlayerChoice("conversation.landing:whats_up") or {}
 
 local GROUP_LABELS = {
     whats_up = {
-        key = "UI_PNC_Conversation_Suggestion_Group_WhatsUp_Label",
+        key = WhatsUpContent.labelKey
+            or "UI_PNC_Conversation_Suggestion_Group_WhatsUp_Label",
         fallback = "What's up",
     },
     wellbeing = {

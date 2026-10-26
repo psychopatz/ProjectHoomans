@@ -66,9 +66,12 @@ def show_response(self, response: dict[str, Any]) -> None:
     self._set_text(self.hub_diagnostics, pretty(hub_diagnostics))
     self._render_suggestions(response, suggestions)
     if isinstance(conversation_graph, dict):
-        self.trace_tabs.select(self.dialogue_graph_frame)
+        self.trace_tabs.select(self.graph_frame)
+        self.graph_tabs.select(self.dialogue_graph_frame)
     elif hub_diagnostics.get("activeHub") is not None:
-        self.trace_tabs.select(self.hub_diagnostics_frame)
+        self.trace_tabs.select(self.graph_frame)
+        self.graph_tabs.select(self.graph_detail_frame)
+        self.graph_detail_tabs.select(self.hub_diagnostics_frame)
     if (
         self.save_backed_mode is True
         and "npcDossier" not in response

@@ -78,7 +78,8 @@ def start_talk_parity(app: Any) -> None:
             observation.get("choices") or opening.get("choices") or []
         )
         app._set_text(app.talk_output, app._format_talk_start(result))
-        app.trace_tabs.select(app.talk_parity_frame)
+        app.trace_tabs.select(app.compare_frame)
+        app.compare_tabs.select(app.talk_parity_frame)
         target = (result.get("start") or {}).get("target") or {}
         app._append(
             "SYSTEM",
@@ -140,7 +141,8 @@ def run_talk_matrix(app: Any) -> None:
 
     def finish(result: dict[str, Any]) -> None:
         app._set_text(app.talk_output, app._format_talk_matrix(result))
-        app.trace_tabs.select(app.talk_parity_frame)
+        app.trace_tabs.select(app.compare_frame)
+        app.compare_tabs.select(app.talk_parity_frame)
         rows = result.get("rows") if isinstance(result, dict) else []
         app._append(
             "SYSTEM",

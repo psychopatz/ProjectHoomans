@@ -36,6 +36,26 @@ local function productionRoot(workerContext, spec, scenario, player)
             spec.productionDefinition = definition
             spec.talkStartProjection = definition.talkStartProjection
             spec.extensionParts = definition.extensionParts
+            -- BuildDefinition owns the canonical production composer context.
+            -- Keep that context on the headless view as well so an
+            -- authoritative response can rebuild the same menu closures
+            -- after a local worker pump. The worker must not reconstruct a
+            -- second departure selector or infer authority from its
+            -- diagnostic projection.
+            if type(definition.context) == "table" then
+                if type(definition.context.conversationBlockContext)
+                    == "table"
+                then
+                    spec.context.conversationBlockContext =
+                        definition.context.conversationBlockContext
+                end
+                if type(definition.context.conversationMenuOptions)
+                    == "table"
+                then
+                    spec.context.conversationMenuOptions =
+                        definition.context.conversationMenuOptions
+                end
+            end
             return definition.nodes.greeting
         end
     end

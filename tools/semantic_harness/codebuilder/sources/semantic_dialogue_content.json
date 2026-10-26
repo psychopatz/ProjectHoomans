@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "1",
+    "contentLicense": "Project Hoomans authored content"
+  },
+  "phraseFamilies": [
+    {
+      "id": "phrase.greeting.opening.default",
+      "semanticTemplateID": "semantic.flow.greeting.opening.default",
+      "canonicalConcept": "GREETING_OPENING",
+      "translationKeyPrefix": "UI_PNC_Conversation_Content_GreetingOpeningDefault",
+      "locked": {
+        "conditions": "ResponseCatalog semantic.flow.greeting.opening.default",
+        "priority": "ResponseCatalog-owned",
+        "plan": "GREETING_OPENING",
+        "authority": "SpeechRealization presentation copy only"
+      },
+      "styles": {
+        "neutral": [
+          {
+            "id": "phrase.greeting.opening.default.neutral.01",
+            "translations": {
+              "EN": "Hey there. Good to see you.",
+              "TL": "Uy, mabuti at nakita kita."
+            }
+          },
+          {
+            "id": "phrase.greeting.opening.default.neutral.02",
+            "translations": {
+              "EN": "Hello there. Good to see you.",
+              "TL": "Kumusta. Mabuti at nakita kita."
+            }
+          },
+          {
+            "id": "phrase.greeting.opening.default.neutral.03",
+            "translations": {
+              "EN": "Good to see you.",
+              "TL": "Mabuti at nakita kita."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "id": "phrase.greeting.opening.default.warm.01",
+            "translations": {
+              "EN": "Hey! It is good to see you.",
+              "TL": "Uy! Mabuti at nakita kita."
+            }
+          },
+          {
+            "id": "phrase.greeting.opening.default.warm.02",
+            "translations": {
+              "EN": "Hey, good to see you.",
+              "TL": "Uy, mabuti kang makita."
+            }
+          },
+          {
+            "id": "phrase.greeting.opening.default.warm.03",
+            "translations": {
+              "EN": "Glad to see you.",
+              "TL": "Masaya akong nakita kita."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "id": "phrase.greeting.opening.default.terse.01",
+            "translations": {
+              "EN": "Hello.",
+              "TL": "Kumusta."
+            }
+          },
+          {
+            "id": "phrase.greeting.opening.default.terse.02",
+            "translations": {
+              "EN": "Hi.",
+              "TL": "Hi."
+            }
+          },
+          {
+            "id": "phrase.greeting.opening.default.terse.03",
+            "translations": {
+              "EN": "Hey.",
+              "TL": "Uy."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "id": "phrase.greeting.opening.default.guarded.01",
+            "translations": {
+              "EN": "State your business. Keep your distance.",
+              "TL": "Sabihin mo ang pakay mo. Lumayo ka."
+            }
+          },
+          {
+            "id": "phrase.greeting.opening.default.guarded.02",
+            "translations": {
+              "EN": "Keep your distance.",
+              "TL": "Lumayo ka."
+            }
+          },
+          {
+            "id": "phrase.greeting.opening.default.guarded.03",
+            "translations": {
+              "EN": "State your business.",
+              "TL": "Sabihin mo ang pakay mo."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [
+    {
+      "id": "conversation.landing:whats_up",
+      "kind": "player_landing_choice",
+      "labelKey": "UI_PNC_Conversation_Content_WhatsUp_Landing_Label",
+      "choiceKey": "UI_PNC_Conversation_Content_WhatsUp_Choice_Label",
+      "labelTranslations": {
+        "EN": "What's up",
+        "TL": "Ano ang balita"
+      },
+      "choiceTranslations": {
+        "EN": "What's up?",
+        "TL": "Ano ang balita?"
+      },
+      "locked": {
+        "route": "semantic_hub",
+        "hubID": "whats_up",
+        "canonicalConcept": "WHATS_UP",
+        "eligibility": "root conversation landing",
+        "authority": "DialogueSuggestions navigation"
+      }
+    }
+  ]
+}

@@ -53,11 +53,13 @@ function CampResponses.CampSiteDetails(primary, secondary)
 
         roomName = roomName or firstValue(
             site and site.roomName,
-            hint and hint.roomName
+            hint and hint.roomName,
+            target and target.roomName
         )
         kind = kind or firstValue(
             site and site.kind,
-            hint and hint.kind
+            hint and hint.kind,
+            target and target.kind
         )
 
         output.label = output.label or firstValue(
@@ -65,35 +67,40 @@ function CampResponses.CampSiteDetails(primary, secondary)
             details and details.siteLabel,
             site and site.label,
             value.label,
-            hint and hint.label
+            hint and hint.label,
+            target and target.label
         )
         output.scope = output.scope or firstValue(
             value.siteScope,
             details and details.siteScope,
             site and (site.siteScope or site.scope),
             value.scope,
-            hint and (hint.siteScope or hint.scope)
+            hint and (hint.siteScope or hint.scope),
+            target and (target.siteScope or target.scope)
         )
         output.siteID = output.siteID or firstValue(
             value.siteID,
             details and details.siteID,
             site and site.siteID,
             value.campfireID,
-            hint and (hint.siteID or hint.campfireID)
+            hint and (hint.siteID or hint.campfireID),
+            target and (target.siteID or target.campfireID)
         )
         output.roomType = output.roomType or firstValue(
             value.siteRoomType,
             value.roomType,
             details and (details.siteRoomType or details.roomType),
             site and site.roomType,
-            hint and hint.roomType
+            hint and hint.roomType,
+            target and target.roomType
         )
         output.risk = output.risk or firstValue(
             value.siteRisk,
             value.risk,
             details and (details.siteRisk or details.risk),
             site and site.risk,
-            hint and hint.risk
+            hint and hint.risk,
+            target and target.risk
         )
     end
 

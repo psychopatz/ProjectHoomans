@@ -147,7 +147,10 @@ class HubDiagnosticsGraphHistoryP10FTests(unittest.TestCase):
                 .get("activeHub", {}).get("id") == "whats_up"
             )
             self.assertEqual(
-                app.trace_tabs.tab(app.trace_tabs.select(), "text"),
+                app.trace_tabs.tab(app.trace_tabs.select(), "text"), "Graph"
+            )
+            self.assertEqual(
+                app.graph_tabs.tab(app.graph_tabs.select(), "text"),
                 "Dialogue graph",
             )
             self.assertIn("question.wellbeing", app.hub_diagnostics.get("1.0", "end"))
@@ -169,7 +172,10 @@ class HubDiagnosticsGraphHistoryP10FTests(unittest.TestCase):
                 app.dialogue_graph_pane._draft["graphKind"], "semantic_hub"
             )
             self.assertEqual(
-                app.trace_tabs.tab(app.trace_tabs.select(), "text"),
+                app.trace_tabs.tab(app.trace_tabs.select(), "text"), "Graph"
+            )
+            self.assertEqual(
+                app.graph_tabs.tab(app.graph_tabs.select(), "text"),
                 "Dialogue graph",
             )
 

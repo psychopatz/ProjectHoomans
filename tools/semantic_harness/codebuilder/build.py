@@ -33,6 +33,11 @@ if __package__ in {None, ""}:
         render_dialogue_manifest,
         render_dialogue_translation,
     )
+    from tools.semantic_harness.codebuilder.dialogue_content import (
+        compile_dialogue_content,
+        load_dialogue_content_source,
+        write_dialogue_content_output,
+    )
     from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
         compile_semantic_definitions,
         load_semantic_source,
@@ -55,6 +60,11 @@ else:
         render_dialogue_lua_plan,
         render_dialogue_manifest,
         render_dialogue_translation,
+    )
+    from .dialogue_content import (
+        compile_dialogue_content,
+        load_dialogue_content_source,
+        write_dialogue_content_output,
     )
     from .semantic_definition_compiler import (
         compile_semantic_definitions,
@@ -79,6 +89,7 @@ CANONICAL_SOURCE_ROOT = (
     ROOT / "tools" / "semantic_harness" / "codebuilder" / "sources"
 )
 DEFAULT_SEMANTIC_SOURCE = CANONICAL_SOURCE_ROOT / "semantic_definitions.json"
+DEFAULT_CONTENT_SOURCE = CANONICAL_SOURCE_ROOT / "semantic_dialogue_content.json"
 DEFAULT_SEMANTIC_OUTPUT_ROOT = ROOT
 
 
@@ -337,18 +348,35 @@ def main(arguments: list[str] | None = None) -> int:
         default=ROOT,
         help="repository root used to discover existing capability registrations",
     )
+    parser.add_argument(
+        "--content-source",
+        type=Path,
+        default=None,
+        help="canonical phrase and player-facing dialogue content source",
+    )
+    parser.add_argument(
+        "--content-output-root",
+        type=Path,
+        default=ROOT,
+        help="repository root receiving generated dialogue content artifacts",
+    )
     options = parser.parse_args(arguments)
 
     if (
         options.wordnet_home is None
         and options.dialogue_source is None
         and options.semantic_source is None
+        and options.content_source is None
     ):
-        parser.error("provide --wordnet-home, --dialogue-source, --semantic-source, or a combination")
+        parser.error(
+            "provide --wordnet-home, --dialogue-source, --semantic-source, "
+            "--content-source, or a combination"
+        )
 
     compiled_lexicon = None
     compiled_dialogue = None
     compiled_semantic = None
+    compiled_content = None
 
     try:
         if options.wordnet_home is not None:
@@ -366,6 +394,10 @@ def main(arguments: list[str] | None = None) -> int:
                 registered_capability_ids=discover_registered_capability_ids(
                     options.semantic_runtime_root.expanduser().resolve()
                 ),
+            )
+        if options.content_source is not None:
+            compiled_content = compile_dialogue_content(
+                load_dialogue_content_source(options.content_source)
             )
     except CompileError as error:
         print(f"semantic compiler error: {error}", file=sys.stderr)
@@ -403,6 +435,19 @@ def main(arguments: list[str] | None = None) -> int:
             f"({len(compiled_semantic['patterns'])} patterns, "
             f"{len(compiled_semantic['flows'])} flows, "
             f"{sum(len(pool['variants']) for pool in compiled_semantic['responsePools'])} responses)"
+        )
+    if compiled_content is not None:
+        output_root = options.content_output_root.expanduser().resolve()
+        paths = write_dialogue_content_output(output_root, compiled_content)
+        phrase_count = sum(
+            len(phrases)
+            for family in compiled_content["phraseFamilies"]
+            for phrases in family["styles"].values()
+        )
+        print(
+            f"wrote dialogue content registry and {len(paths) - 1} translation artifacts "
+            f"({len(compiled_content['phraseFamilies'])} phrase families, "
+            f"{phrase_count} phrases, {len(compiled_content['playerChoices'])} player choices)"
         )
     return 0
 

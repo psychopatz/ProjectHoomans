@@ -13,6 +13,12 @@ Realization.MAX_FAMILY_APPLICATIONS = 8
 
 local Style = PNC.Semantics.SpeechStyleContext
     or require "PNC/Semantics/PNC_SpeechStyleContext"
+local phraseRegistry
+do
+    local ok, value = pcall(require,
+        "PNC/Semantics/Generated/DialogueContent/Registry")
+    if ok and type(value) == "table" then phraseRegistry = value end
+end
 local FAMILIES = {}
 
 local function mergePack(pack)
@@ -61,6 +67,103 @@ local function copy(value, depth)
         end
     end
     return output
+end
+
+local PHRASE_MAX_HISTORY = 128
+local phraseHistory = Realization.phraseHistory or {}
+Realization.phraseHistory = phraseHistory
+local phraseHistoryOrder = Realization.phraseHistoryOrder or {}
+Realization.phraseHistoryOrder = phraseHistoryOrder
+
+local function hash(value)
+    local output = 0
+    value = tostring(value or "")
+    for index = 1, #value do
+        output = (output * 31 + string.byte(value, index)) % 2147483647
+    end
+    return output
+end
+
+local function phraseActorID(context)
+    context = type(context) == "table" and context or {}
+    local npc = type(context.npcState) == "table" and context.npcState or {}
+    local npcData = type(context.npcData) == "table" and context.npcData or {}
+    return tostring(
+        context.npcID or context.actorID or npc.npcID or npc.id
+            or npcData.npcID or npcData.id or "semantic-actor"
+    )
+end
+
+local function selectPhrase(templateID, styleVariant, context, salt, localSelections)
+    if type(phraseRegistry) ~= "table"
+        or type(phraseRegistry.FamilyFor) ~= "function"
+    then
+        return nil
+    end
+    local family, phrases = phraseRegistry.FamilyFor(templateID, styleVariant)
+    if type(family) ~= "table" or type(phrases) ~= "table" or #phrases == 0 then
+        return nil
+    end
+    local familyID = tostring(family.id or templateID)
+    local style = tostring(styleVariant or "neutral")
+    local key = phraseActorID(context) .. ":" .. familyID .. ":" .. style
+    local existing = localSelections and localSelections[key]
+    if existing then return existing end
+
+    local previous = phraseHistory[key]
+    local index
+    local reason
+    if previous == nil then
+        -- The first migration turn is intentionally the accepted canonical
+        -- wording. Subsequent turns use the stable salt and anti-repeat rule.
+        index = 1
+        reason = "initial_canonical"
+    else
+        index = (hash(tostring(salt or "") .. ":" .. key) % #phrases) + 1
+        if #phrases > 1 and tostring(phrases[index].id) == tostring(previous) then
+            index = index % #phrases + 1
+            reason = "immediate_repeat_avoided"
+        else
+            reason = "deterministic_hash"
+        end
+    end
+    local selected = phrases[index]
+    if type(selected) ~= "table" then return nil end
+    if previous == nil then
+        while #phraseHistoryOrder >= PHRASE_MAX_HISTORY do
+            local oldest = table.remove(phraseHistoryOrder, 1)
+            phraseHistory[oldest] = nil
+        end
+        phraseHistoryOrder[#phraseHistoryOrder + 1] = key
+    end
+    phraseHistory[key] = selected.id
+    local result = {
+        familyID = familyID,
+        semanticTemplateID = tostring(templateID),
+        style = style,
+        phraseID = tostring(selected.id or ""),
+        translationKey = tostring(selected.key or ""),
+        fallback = tostring(selected.fallback or ""),
+        poolSize = #phrases,
+        antiRepeatReason = reason,
+    }
+    if localSelections then localSelections[key] = result end
+    return result
+end
+
+function Realization.PhraseCoverage()
+    if type(phraseRegistry) ~= "table" then return {} end
+    return copy({
+        schema = phraseRegistry.SCHEMA,
+        fingerprint = phraseRegistry.CONTENT_FINGERPRINT,
+        families = phraseRegistry.PHRASE_FAMILIES,
+        playerChoices = phraseRegistry.PLAYER_CHOICES,
+    })
+end
+
+function Realization.ResetPhraseHistory()
+    for key in pairs(phraseHistory) do phraseHistory[key] = nil end
+    for index = #phraseHistoryOrder, 1, -1 do phraseHistoryOrder[index] = nil end
 end
 
 function Realization.Register(templateID, family)
@@ -136,7 +239,7 @@ function Realization.Resolve(templateID, style, semanticFallback)
     }
 end
 
-local function applySegment(segment, style, blocked)
+local function applySegment(segment, style, blocked, context, salt, localSelections)
     if type(segment) ~= "table" or segment.kind ~= "translation" then
         return segment, nil
     end
@@ -155,6 +258,22 @@ local function applySegment(segment, style, blocked)
     output.realizationFamily = resolved.family
     output.realizationVariant = resolved.variant
     output.realizationFallbackReason = resolved.fallbackReason
+    local phrase = selectPhrase(
+        segment.templateID,
+        resolved.variant,
+        context,
+        salt,
+        localSelections
+    )
+    if phrase then
+        output.templateID = phrase.translationKey
+        output.fallback = phrase.fallback
+        output.phraseFamilyID = phrase.familyID
+        output.phraseID = phrase.phraseID
+        output.phrasePoolSize = phrase.poolSize
+        output.phraseAntiRepeatReason = phrase.antiRepeatReason
+        output.phraseSemanticTemplateID = phrase.semanticTemplateID
+    end
     if resolved.argument then
         output.args[resolved.argument] = relationshipArgument(style, resolved.argument)
     end
@@ -175,6 +294,8 @@ function Realization.Apply(response, context)
     local segment
     local turn
     local blocked = {}
+    local localSelections = {}
+    local phraseSalt = context and context.phraseSalt or response.selectionID
 
     if response.selectionID == "semantic.refuse.default" then
         blocked["semantic.social.acknowledged"] = true
@@ -186,7 +307,8 @@ function Realization.Apply(response, context)
             turn = renderPlan.turns[index]
             for segmentIndex = 1, math.min(#(turn.segments or {}), 6) do
                 segment, resolved = applySegment(
-                    turn.segments[segmentIndex], style, blocked
+                    turn.segments[segmentIndex], style, blocked,
+                    context, phraseSalt, localSelections
                 )
                 turn.segments[segmentIndex] = segment
                 if resolved then
@@ -202,7 +324,7 @@ function Realization.Apply(response, context)
         templateID = output.templateID,
         fallback = output.fallback,
         args = output.args,
-    }, style, blocked)
+    }, style, blocked, context, phraseSalt, localSelections)
     if resolved then
         output.args = segment.args
         output.semanticTemplateID = output.templateID
@@ -211,6 +333,20 @@ function Realization.Apply(response, context)
         output.realizationFamily = resolved.family
         output.realizationVariant = resolved.variant
         output.realizationFallbackReason = resolved.fallbackReason
+        output.phraseFamilyID = segment.phraseFamilyID
+        output.phraseID = segment.phraseID
+        output.phrasePoolSize = segment.phrasePoolSize
+        output.phraseAntiRepeatReason = segment.phraseAntiRepeatReason
+        output.phraseSemanticTemplateID = segment.phraseSemanticTemplateID
+        if output.phraseID then
+            output.phraseSelection = {
+                familyID = output.phraseFamilyID,
+                phraseID = output.phraseID,
+                style = style.variant,
+                poolSize = output.phrasePoolSize,
+                antiRepeatReason = output.phraseAntiRepeatReason,
+            }
+        end
         applications = applications + 1
         first = first or resolved
         if resolved.fallbackReason then fallbackCount = fallbackCount + 1 end
@@ -223,6 +359,8 @@ function Realization.Apply(response, context)
         neutralFallbackCount = fallbackCount,
         maxApplications = Realization.MAX_FAMILY_APPLICATIONS,
     }
+    output.semanticVariantID = output.selectionID
+    output.speechStyleVariant = style.variant
     -- Keep the semantic response plan canonical while the renderer uses the
     -- realized copy. Queued payloads and decision results then share one
     -- stable plan identity without losing style-specific rendering.

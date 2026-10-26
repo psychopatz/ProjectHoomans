@@ -169,6 +169,10 @@ function ProductionRehydration.refreshProjection(context)
     end
     local Runtime = context.Runtime
     local scenario = Runtime.scenario or {}
+    Runtime.productionFactionContext = Internal.ProductionFactionContext(
+        context,
+        Runtime.hydratedNpcRecord
+    )
     scenario.npc = Internal.ScenarioProjection(
         context,
         Runtime.hydratedNpcRecord,

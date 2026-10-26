@@ -122,7 +122,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
         {
             id = "semantic.flow.greeting.opening.default",
             templateID = "semantic.flow.greeting.opening.default",
-            fallback = "Hello. Good to see you.",
+            fallback = "Hey there. Good to see you.",
             plan = {
                 dialogueAct = "GREETING_OPENING",
                 sourcePoolID = "semantic.flow.greeting.opening",
@@ -136,7 +136,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
                                 kind = "translation",
                                 templateID =
                                     "semantic.flow.greeting.opening.default",
-                                fallback = "Hello. Good to see you.",
+                                fallback = "Hey there. Good to see you.",
                             },
                         },
                     },

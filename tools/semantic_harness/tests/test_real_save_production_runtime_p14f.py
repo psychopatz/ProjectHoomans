@@ -14,6 +14,7 @@ from tools.semantic_harness.cli import _parser, cli
 from tools.semantic_harness.inspection.conversation_inspector import (
     build_conversation_inspector,
 )
+from tools.semantic_harness.inspection.conversation_inspector_support import bounded
 from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
@@ -27,8 +28,12 @@ REAL_SAVE = Path(
 
 
 def _layer_signature(value: dict) -> dict:
+    bounded_value = bounded(deepcopy(value))
     return {
-        key: deepcopy(value.get(key))
+        # Compare at the same bounded inspector boundary used by the GUI;
+        # raw save-backed faction/mobile records are intentionally deeper than
+        # the public diagnostic projection.
+        key: bounded_value.get(key)
         for key in (
             "personalRelationship",
             "factionRelationship",

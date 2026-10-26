@@ -62,7 +62,7 @@ def worker_ready(app: Any, result: WorkerReady) -> None:
                 "engineFacts": len(flow_catalog.get("factCatalog", [])),
                 "engineEvents": len(flow_catalog.get("eventCatalog", [])),
                 "commands": len(flow_catalog.get("commandCatalog", [])),
-                "hint": "Use the Flow editor tab to build and validate production branches.",
+                "hint": "Use Studio → Advanced → Flow editor to build and validate production branches.",
             }
         ),
     )

@@ -29,7 +29,7 @@ def _flush_scheduled_save(app: Any) -> None:
 def save_ui_state(app: Any) -> None:
     try:
         state = dict(app._ui_state)
-        state["layout_state_version"] = 2
+        state["layout_state_version"] = 4
         state["geometry"] = app.root.geometry()
         state["window_state"] = app.root.state()
         state["main_tab"] = app.main_tabs.index(app.main_tabs.select())
@@ -37,8 +37,23 @@ def save_ui_state(app: Any) -> None:
             app.studio_notebook.select()
         )
         state["trace_tab"] = app.trace_tabs.index(app.trace_tabs.select())
+        for key, notebook in (
+            ("studio_explore_tab", getattr(app, "studio_explore_notebook", None)),
+            ("advanced_tab", getattr(app, "advanced_notebook", None)),
+            ("inspect_tab", getattr(app, "inspect_tabs", None)),
+            ("graph_tab", getattr(app, "graph_tabs", None)),
+            ("graph_detail_tab", getattr(app, "graph_detail_tabs", None)),
+            ("compare_tab", getattr(app, "compare_tabs", None)),
+            ("debug_tab", getattr(app, "debug_tabs", None)),
+        ):
+            if notebook is not None and notebook.tabs():
+                state[key] = notebook.index(notebook.select())
         state["trace_panel_visible"] = app.trace_panel_visible
         state["advanced_controls_visible"] = app.advanced_controls_visible
+        state["developer_tools_visible"] = bool(
+            getattr(app, "developer_tools_host", None)
+            and app.developer_tools_host.winfo_ismapped()
+        )
         state["workbench_expanded"] = app.workbench_expanded
         selected_talk = app.talk_target_ids_by_label.get(
             app.talk_target_var.get(), "current"

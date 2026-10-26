@@ -120,6 +120,7 @@ def inspect_persona_matrix(app: Any) -> None:
     def finish(result: dict[str, Any]) -> None:
         app._set_text(app.compare_output, format_compare_result(result))
         app.trace_tabs.select(app.compare_frame)
+        app.compare_tabs.select(app.compare_context_frame)
         app._append(
             "SYSTEM",
             f"Comparison by {dimension} completed through the real Lua worker: {value}",

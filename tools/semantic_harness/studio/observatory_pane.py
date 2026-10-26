@@ -6,13 +6,8 @@ from pathlib import Path
 import json
 
 from ..inspection.response_candidate import preview_authored_variant
-from ..inspection.response_turn_trace import inspect_response_turn
-from ..inspection.response_selection_coverage import selection_coverage
 from ..inspection.response_source_lineage import inspect_codebuilder_lineage
 from ..inspection.response_translation_coverage import translation_coverage
-
-from ..inspection.response_observatory import run_quality_matrix
-from ..runtime.worker import LuaSemanticWorker
 
 
 class SemanticObservatoryPane:
@@ -22,11 +17,13 @@ class SemanticObservatoryPane:
         self, parent: Any, tk: Any, ttk: Any, scrolled_text: Any,
         run_worker: Callable[[Callable, Callable], bool],
         *, repository: Path | None = None, filedialog: Any | None = None,
+        review_parent: Any | None = None,
     ) -> None:
         self._tk, self._ttk = tk, ttk
         self._run_worker = run_worker
         self._repository = repository
         self._filedialog = filedialog
+        self._review_parent = review_parent
         self.frame = ttk.Frame(parent, padding=6)
         self.frame.grid(row=0, column=0, sticky="nsew")
         self.frame.rowconfigure(1, weight=1)
@@ -34,8 +31,6 @@ class SemanticObservatoryPane:
         self.filter_var = tk.StringVar(value="")
         self.status_var = tk.StringVar(
             value="Production Lua catalog · choose Search to inspect")
-        self.context_var = tk.StringVar(value="Default (unknown conditions)")
-        self.utterance_var = tk.StringVar(value="hello")
         self.selected_pool = ""
         self._page_offset = 0
         self._has_more = False
@@ -79,63 +74,89 @@ class SemanticObservatoryPane:
         self.tabs = ttk.Notebook(right)
         self.tabs.grid(row=0, column=0, sticky="nsew")
         self.views: dict[str, Any] = {}
-        for name in ("Catalog", "Test Lab", "Coverage", "Review"):
-            panel = ttk.Frame(self.tabs, padding=6)
-            panel.rowconfigure(1, weight=1)
-            panel.columnconfigure(0, weight=1)
-            self.tabs.add(panel, text=name)
-            controls = ttk.Frame(panel)
-            controls.grid(row=0, column=0, sticky="ew", pady=(0, 4))
-            viewer = scrolled_text(panel, wrap="word", state="disabled", height=14)
-            viewer.grid(row=1, column=0, sticky="nsew")
-            self.views[name] = viewer
-            if name == "Catalog":
-                ttk.Label(controls, text="Actual registered variant data").pack(side="left")
-                ttk.Button(controls, text="Explain selection",
-                           command=self.explain).pack(side="right")
-                ttk.Button(controls, text="EN/TL manifest",
-                           command=self.verify_translation_manifest).pack(
-                               side="right", padx=4)
-                ttk.Button(controls, text="Verify CodeBuilder owner",
-                           command=self.verify_source_lineage).pack(side="right", padx=4)
-                self.context_box = ttk.Combobox(
-                    controls, textvariable=self.context_var, state="readonly",
-                    values=(
-                        "Default (unknown conditions)", "Rainy fixture",
-                        "Friendly fixture", "Injured fixture",
-                        "Thirsty fixture", "Trusted fixture",
-                    ), width=26)
-                self.context_box.pack(side="right", padx=4)
-            elif name == "Test Lab":
-                ttk.Label(controls, text="Fixture utterance").pack(side="left")
-                ttk.Entry(controls, textvariable=self.utterance_var,
-                          width=36).pack(side="left", padx=6)
-                ttk.Button(controls, text="Run real Lua",
-                           command=self.test_utterance).pack(side="left")
-            elif name == "Coverage":
-                ttk.Button(controls, text="Run EN/TL greeting + follow probes",
-                           command=self.coverage).pack(side="left")
-                ttk.Button(controls, text="Run lifecycle + Goodbye probes",
-                           command=self.coverage_lifecycle).pack(
-                               side="left", padx=6)
-                ttk.Button(
-                    controls, text="Run EN/TL server-declared rejections",
-                    command=self.coverage_command_rejections,
-                ).pack(side="left", padx=6)
-                ttk.Button(controls, text="Explain greeting coverage",
-                           command=self.coverage_selection).pack(
-                               side="left", padx=6)
-            elif name == "Review":
-                ttk.Label(controls, text="Read-only EN/TL candidate validation").pack(
-                    side="left")
-                ttk.Button(
-                    controls, text="Preview proposal file",
-                    command=self.preview_proposal,
-                ).pack(side="right")
+        response_panel = ttk.Frame(self.tabs, padding=6)
+        response_panel.rowconfigure(1, weight=1)
+        response_panel.columnconfigure(0, weight=1)
+        self.tabs.add(response_panel, text="Registered responses")
+        controls = ttk.Frame(response_panel)
+        controls.grid(row=0, column=0, sticky="ew", pady=(0, 4))
+        ttk.Label(
+            controls,
+            text="Static production registry metadata · selection context lives in Simulation",
+        ).pack(side="left")
+        ttk.Button(
+            controls, text="EN/TL coverage", command=self.verify_translation_manifest
+        ).pack(side="right", padx=4)
+        ttk.Button(
+            controls, text="Verify source owner", command=self.verify_source_lineage
+        ).pack(side="right", padx=4)
+        viewer = scrolled_text(
+            response_panel, wrap="word", state="disabled", height=14
+        )
+        viewer.grid(row=1, column=0, sticky="nsew")
+        self.views["Catalog"] = viewer
+        self.views["Explore"] = viewer
+
+        self._review_report: dict[str, Any] | None = None
+        self.review_decision_var = tk.StringVar(value="Decision: pending review")
+        self._review_decision_status = None
+        if review_parent is not None:
+            self._build_review_surface(review_parent, ttk, scrolled_text)
+        else:
+            self.views["Review"] = scrolled_text(
+                self.frame, wrap="word", state="disabled", height=14
+            )
         content.add(right, weight=3)
-        self._display("Review", "Candidate edits are not applied here. "
-                      "Proposals must go through canonical Lua / CodeBuilder "
-                      "review and isolated Lua replay.")
+        self._display(
+            "Explore",
+            "Registered responses are read-only production metadata.\n"
+            "Use Simulation → Inspect for context-specific selection explanations.\n"
+            "Use Studio → Review for isolated candidate before/after evidence.",
+        )
+
+    def _build_review_surface(self, parent: Any, ttk: Any, scrolled_text: Any) -> None:
+        """Build the human-readable candidate review home."""
+
+        parent.rowconfigure(0, weight=1)
+        parent.columnconfigure(0, weight=1)
+        self.review_frame = ttk.Frame(parent, padding=8)
+        self.review_frame.grid(row=0, column=0, sticky="nsew")
+        self.review_frame.rowconfigure(1, weight=1)
+        self.review_frame.columnconfigure(0, weight=1)
+        toolbar = ttk.Frame(self.review_frame)
+        toolbar.grid(row=0, column=0, sticky="ew", pady=(0, 6))
+        ttk.Label(
+            toolbar,
+            text="Candidate source review · isolated replay only",
+        ).pack(side="left")
+        ttk.Button(
+            toolbar, text="Open proposal…", command=self.preview_proposal
+        ).pack(side="right")
+        self.review_decision_status = ttk.Label(
+            toolbar, textvariable=self.review_decision_var
+        )
+        self.review_decision_status.pack(side="right", padx=(0, 12))
+        self.review_view = scrolled_text(
+            self.review_frame, wrap="word", state="disabled"
+        )
+        self.review_view.grid(row=1, column=0, sticky="nsew")
+        actions = ttk.Frame(self.review_frame)
+        actions.grid(row=2, column=0, sticky="ew", pady=(6, 0))
+        self.approve_button = ttk.Button(
+            actions, text="Approve decision", command=self.approve_candidate
+        )
+        self.approve_button.pack(side="left")
+        self.reject_button = ttk.Button(
+            actions, text="Reject decision", command=self.reject_candidate
+        )
+        self.reject_button.pack(side="left", padx=(6, 0))
+        self.views["Review"] = self.review_view
+        self._display(
+            "Review",
+            "Select a proposal to see exact source, current EN/TL, proposed EN/TL, "
+            "preserved runtime metadata, isolated Lua results, and effect parity.\n"
+            "No review action writes production files by itself.",
+        )
 
     def _display(self, view: str, value: str) -> None:
         widget = self.views[view]
@@ -143,6 +164,91 @@ class SemanticObservatoryPane:
         widget.delete("1.0", "end")
         widget.insert("1.0", value)
         widget.configure(state="disabled")
+
+    def _review_text(self) -> str:
+        if "Review" not in self.views:
+            return ""
+        return self.views["Review"].get("1.0", "end").strip()
+
+    def show_dialogue_content_review(self, report: dict[str, Any]) -> None:
+        """Show a content-only before/after review in the shared Review home."""
+
+        self._review_report = report
+        self.review_decision_var.set("Decision: pending review")
+        before = report.get("contentBefore") or {}
+        after = report.get("contentAfter") or {}
+        lines = [
+            f"Dialogue Content review: {report.get('contentID', 'UNKNOWN')}",
+            f"Content kind: {report.get('kind', before.get('kind', 'UNKNOWN'))}",
+            f"Canonical semantic owner: {before.get('semanticTemplateID', 'player-facing')}",
+            f"Canonical concept: {before.get('canonicalConcept', (before.get('locked') or {}).get('canonicalConcept', 'UNKNOWN'))}",
+            f"Source fingerprint: {report.get('sourceFingerprint', 'UNKNOWN')}",
+            f"Proposed content fingerprint: {report.get('contentFingerprint', report.get('newContentFingerprint', 'UNKNOWN'))}",
+            "Structural metadata: PRESERVED / LOCKED",
+            "Production writes: 0 · review decision does not publish by itself",
+            "",
+        ]
+        if before.get("kind") == "phraseFamily":
+            before_styles = before.get("styles") or {}
+            after_styles = after.get("styles") or {}
+            for style in sorted(before_styles):
+                before_by_id = {
+                    item.get("id"): item
+                    for item in before_styles.get(style, [])
+                    if isinstance(item, dict)
+                }
+                after_by_id = {
+                    item.get("id"): item
+                    for item in after_styles.get(style, [])
+                    if isinstance(item, dict)
+                }
+                for phrase_id in sorted(before_by_id):
+                    old = before_by_id[phrase_id].get("translations") or {}
+                    new = (after_by_id.get(phrase_id) or {}).get("translations") or {}
+                    lines.extend([
+                        f"{style} · {phrase_id}",
+                        f"  EN: {old.get('EN', '(missing)')} -> {new.get('EN', '(missing)')}",
+                        f"  TL: {old.get('TL', '(missing)')} -> {new.get('TL', '(missing)')}",
+                    ])
+        else:
+            for field in ("labelTranslations", "choiceTranslations"):
+                old = before.get(field) or {}
+                new = after.get(field) or {}
+                lines.extend([
+                    f"{field}",
+                    f"  EN: {old.get('EN', '(missing)')} -> {new.get('EN', '(missing)')}",
+                    f"  TL: {old.get('TL', '(missing)')} -> {new.get('TL', '(missing)')}",
+                ])
+        lines.extend([
+            "",
+            "Locked invariants:",
+            f"  {before.get('locked', {})}",
+            "",
+            "Approve or reject this wording proposal, then use the explicit",
+            "Dialogue Content source/compile actions when authorized.",
+        ])
+        self._display("Review", "\n".join(lines))
+
+    def _set_review_decision(self, decision: str) -> None:
+        if self._review_report is None:
+            self.review_decision_var.set("Decision: preview a candidate first")
+            return
+        self.review_decision_var.set(f"Decision: {decision}")
+        current = self._review_text()
+        suffix = f"\n\nExplicit review decision: {decision}\n"
+        if "Explicit review decision:" in current:
+            current = current.split("\n\nExplicit review decision:", 1)[0]
+        self._display("Review", current + suffix)
+
+    def approve_candidate(self) -> None:
+        """Record an explicit review decision without authoring a source."""
+
+        self._set_review_decision("APPROVE")
+
+    def reject_candidate(self) -> None:
+        """Record an explicit rejection without changing canonical sources."""
+
+        self._set_review_decision("REJECT")
 
     def _submit(self, operation: Callable, callback: Callable) -> None:
         if not self._run_worker(operation, callback):
@@ -224,91 +330,14 @@ class SemanticObservatoryPane:
                 f"  Plan: {variant.get('planSummary', {})}",
                 "",
             ]
-        self._display("Catalog", "\n".join(lines))
-        self._display("Review",
-                      "Source path: " + str(result.get("sourcePath", "UNKNOWN"))
-                      + "\nCanonical owner must be verified before any patch.\n"
-                      + "No edits or game commands are issued by inspection.")
-
-    def _context(self) -> dict[str, Any]:
-        label = self.context_var.get()
-        contexts = {
-            "Rainy fixture": {"worldContext": {"weather": {"raining": True}}},
-            "Friendly fixture": {"socialStyle": "friendly"},
-            "Injured fixture": {"healthState": "injured"},
-            "Thirsty fixture": {"needType": "thirst", "needUrgency": "severe"},
-            "Trusted fixture": {"relationshipState": "Trusted"},
-        }
-        return dict(contexts.get(label, {}), npcID="observatory-fixture")
-
-    def explain(self) -> None:
-        if not self.selected_pool:
-            self.status_var.set("Select a registered pool first")
-            return
-        pool = self.selected_pool
-        context = self._context()
-        self._submit(
-            lambda worker: worker.explain_response_selection(pool, context),
-            self._on_explain,
+        self._display("Explore", "\n".join(lines))
+        self._display(
+            "Review",
+            "Selected source context:\n"
+            + "Source path: " + str(result.get("sourcePath", "UNKNOWN"))
+            + "\nCanonical owner must be verified before any patch.\n"
+            + "No edits or game commands are issued by inspection.",
         )
-
-    def _on_explain(self, result: dict[str, Any]) -> None:
-        lines = [
-            f"Read-only production Lua explanation: {result.get('poolID')}",
-            f"Selected: {result.get('selectedID')} "
-            f"(score {result.get('bestScore')})",
-            f"Tie count: {result.get('tieCount', 0)} · "
-            f"Anti-repeat rotated: {result.get('rotated', False)}",
-            "",
-        ]
-        for row in result.get("candidates", []):
-            lines.append(
-                f"{'ELIGIBLE' if row.get('eligible') else 'EXCLUDED'} "
-                f"{row.get('id')}: {row.get('reason')} "
-                f"(score={row.get('score')})"
-            )
-            for check in row.get("checks", []):
-                lines.append(
-                    f"   {'✓' if check.get('matched') else '×'} "
-                    f"{check.get('field')}: expected={check.get('expected')!s}, "
-                    f"actual={'UNKNOWN' if not check.get('actualKnown') else check.get('actual')!s}"
-                )
-        self._display("Catalog", "\n".join(lines))
-        self.tabs.select(0)
-
-    def test_utterance(self) -> None:
-        utterance = self.utterance_var.get().strip()
-        if not 1 <= len(utterance) <= 200:
-            self.status_var.set("Enter 1–200 characters")
-            return
-        self._submit(
-            lambda worker: inspect_response_turn(worker, worker.input(utterance)),
-            self._on_test,
-        )
-
-    def _on_test(self, result: dict[str, Any]) -> None:
-        lines = [
-            "Actual production Lua, disposable fixture worker:",
-            f"Accepted: {result.get('accepted')}",
-            f"Effects: {result.get('effects', {}).get('actionCount', 0)} actions; "
-            f"{result.get('effects', {}).get('transportCount', 0)} transports",
-            "",
-        ]
-        for entry in result.get("npcMessages", []):
-            lines.extend((
-                str(entry.get("observedKey") or "UNKNOWN"),
-                str(entry.get("finalText") or ""),
-                f"  Provenance: {entry.get('selectionProvenance')}",
-            ))
-            for origin in entry.get("registeredVariants", [])[:4]:
-                lines.append(
-                    f"  Registry: {origin.get('poolID')} / {origin.get('variantID')}"
-                    f" ({origin.get('matchKind')}) from "
-                    f"{origin.get('sourcePath', 'UNKNOWN')}"
-                )
-            lines.append("")
-        self._display("Test Lab", "\n".join(lines))
-        self.tabs.select(1)
 
     def preview_proposal(self) -> None:
         if self._filedialog is None or self._repository is None:
@@ -342,14 +371,31 @@ class SemanticObservatoryPane:
         )
 
     def _on_candidate_preview(self, report: dict[str, Any]) -> None:
+        self._review_report = report
+        self.review_decision_var.set("Decision: pending review")
         lines = [
             f"Isolated production Lua preview: {report['variantID']}",
-            f"Verified authored source: {report['sourcePath']}",
-            f"Original source SHA-256: {report['sourceSHA256']}",
-            "Approval: NOT GRANTED — review source and translations first.",
+            f"Response family: {report.get('poolID', 'UNKNOWN')}",
+            f"Verified authored source: {report.get('sourcePath', 'UNKNOWN')}",
+            f"Original source SHA-256: {report.get('sourceSHA256', 'UNKNOWN')}",
+            f"Baseline fingerprint: {report.get('baselineFingerprint', 'UNKNOWN')}",
+            f"Candidate fingerprint: {report.get('candidateFingerprint', 'UNKNOWN')}",
+            "Approval: NOT GRANTED — record an explicit decision after review.",
             "Production writes: 0 · candidate overlay cleaned",
             "",
         ]
+        contract = report.get("variantContract") or {}
+        lines.extend([
+            "Static contract invariants:",
+            f"  Conditions: {contract.get('conditions', 'UNKNOWN')}",
+            f"  Priority: {contract.get('priority', 'UNKNOWN')}",
+            f"  Plan: {contract.get('plan', 'UNKNOWN')}",
+            f"  Selection / authority route: "
+            f"{contract.get('selectionSource', 'UNKNOWN')}",
+            f"  Source status: {contract.get('sourceKind', 'UNKNOWN')} · "
+            f"{contract.get('sourcePath', report.get('sourcePath', 'UNKNOWN'))}",
+            "",
+        ])
         for row in report["languageCases"]:
             original = row["baseline"]["messages"]
             updated = row["candidate"]["messages"]
@@ -359,66 +405,22 @@ class SemanticObservatoryPane:
                 f"  After:  {updated[0]['text'] if updated else '(none)'}",
                 f"  Actions: {row['baseline']['actionCount']} -> "
                 f"{row['candidate']['actionCount']}",
+                f"  Transport: {row['baseline'].get('transportCount', 0)} -> "
+                f"{row['candidate'].get('transportCount', 0)}",
                 "",
             ]
+        checks = report.get("checks") or {}
+        lines.extend([
+            "Preserved invariants / effect parity:",
+            f"  Gameplay effects unchanged: {checks.get('unchangedGameplayEffects', 'UNKNOWN')}",
+            f"  Selection metadata unchanged: {checks.get('unchangedSelectionMetadata', 'UNKNOWN')}",
+            f"  Selected key / authority unchanged: {checks.get('sameSelectedKey', 'UNKNOWN')}",
+            f"  Source SHA guard: {report.get('sourceSHA256GuardMatched', 'not supplied')}",
+            f"  Translation source hashes: {report.get('translationSourceSHA256', 'UNKNOWN')}",
+            "",
+        ])
         lines += ["Lua source diff (preview only):", *report["sourceDiff"][:64]]
         self._display("Review", "\n".join(lines))
-        self.tabs.select(3)
-
-    def coverage(self) -> None:
-        cases = [
-            {"label": "Greeting EN", "language": "EN", "utterance": "hello",
-             "expected": {"maxActions": 0}},
-            {"label": "Greeting TL", "language": "TL", "utterance": "hello",
-             "expected": {"maxActions": 0}},
-            {"label": "Follow EN", "language": "EN", "utterance": "follow me",
-             "expected": {"minActions": 1}},
-            {"label": "Follow TL", "language": "TL", "utterance": "follow me",
-             "expected": {"minActions": 1}},
-        ]
-        self._submit(
-            lambda worker: run_quality_matrix(
-                cases,
-                worker_factory=lambda scenario: LuaSemanticWorker(
-                    scenario, config=worker.config,
-                ),
-            ),
-            self._on_coverage,
-        )
-
-    def coverage_lifecycle(self) -> None:
-        if self._repository is None:
-            self.status_var.set("Repository unavailable for lifecycle fixture")
-            return
-        path = (self._repository / "tools/semantic_harness/fixtures"
-                / "observatory_lifecycle_en_tl.json")
-        cases = json.loads(path.read_text(encoding="utf-8"))["cases"]
-        self._submit(
-            lambda worker: run_quality_matrix(
-                cases,
-                worker_factory=lambda scenario: LuaSemanticWorker(
-                    scenario, config=worker.config,
-                ),
-            ),
-            self._on_coverage,
-        )
-
-    def coverage_command_rejections(self) -> None:
-        if self._repository is None:
-            self.status_var.set("Repository unavailable for rejection fixtures")
-            return
-        path = (self._repository / "tools/semantic_harness/fixtures"
-                / "observatory_permission_rejections_en_tl.json")
-        cases = json.loads(path.read_text(encoding="utf-8"))["cases"]
-        self._submit(
-            lambda worker: run_quality_matrix(
-                cases,
-                worker_factory=lambda scenario: LuaSemanticWorker(
-                    scenario, config=worker.config,
-                ),
-            ),
-            self._on_coverage,
-        )
 
     def verify_translation_manifest(self) -> None:
         if not self.selected_pool:
@@ -446,8 +448,9 @@ class SemanticObservatoryPane:
                 f"  TL: {', '.join(paths.get('TL', [])) or 'NOT MANIFESTED'}",
                 "",
             ))
+        self._display("Explore", "\n".join(lines))
         self._display("Review", "\n".join(lines))
-        self.tabs.select(3)
+
 
     def verify_source_lineage(self) -> None:
         if not self.selected_pool:
@@ -478,65 +481,8 @@ class SemanticObservatoryPane:
                 f"{source.get('generatedArtifactParity', 'UNKNOWN')}",
                 "",
             ))
+        self._display("Explore", "\n".join(lines))
         self._display("Review", "\n".join(lines))
-        self.tabs.select(3)
 
-    def coverage_selection(self) -> None:
-        if self._repository is None:
-            self.status_var.set("Repository unavailable for coverage")
-            return
-        path = (self._repository / "tools/semantic_harness/fixtures"
-                / "observatory_greeting_selection.json")
-        scenario = json.loads(path.read_text(encoding="utf-8"))
-        self._submit(
-            lambda worker: selection_coverage(worker, scenario),
-            self._on_selection_coverage,
-        )
 
-    def _on_selection_coverage(self, report: dict[str, Any]) -> None:
-        lines = [
-            f"Production Lua selector coverage: {report['poolID']}",
-            f"Contexts tested: {report['caseCount']}",
-            f"Revision: {report['registryRevision']}",
-            "These outcomes apply ONLY to tested hypothetical contexts.",
-            "Not selected does NOT mean globally unreachable.",
-            "",
-        ]
-        for variant in report["variants"]:
-            lines.extend((
-                f"{variant['variantID']} · {variant['testedStatus']}",
-                f"  eligible={variant['eligibleCases']} "
-                f"selected={variant['selectedCases']} "
-                f"lower-score={variant['lowerRankedCases']} "
-                f"ties-not-selected={variant['tieCases']}",
-                "",
-            ))
-        for case in report["cases"]:
-            lines.append(f"{case['label']}: selected {case['selectedID']}")
-            for row in case["candidateEvidence"]:
-                if row["failedFields"]:
-                    lines.append(
-                        f"  {row['variantID']}: not eligible "
-                        f"({', '.join(row['failedFields'])})"
-                    )
-        self._display("Coverage", "\n".join(lines))
-        self.tabs.select(2)
-
-    def _on_coverage(self, result: dict[str, Any]) -> None:
-        lines = [
-            f"Production Lua matrix: {result['caseCount']} fixture cases",
-            f"Assertions PASS={result['passed']} FAIL={result['failed']} "
-            f"OBSERVED={result['observedOnly']}",
-            "Not a native SP/MP test or global proof of reachability.",
-            "",
-        ]
-        for row in result["cases"]:
-            lines.extend((
-                f"{row['label']} · {row['status']} · {row['language']}",
-                f"  Selected keys: {', '.join(row['responseKeys'])}",
-                f"  Last NPC text: {row['responseTexts'][-1] if row['responseTexts'] else 'NONE'}",
-                f"  Action count: {row['actions']}",
-                "",
-            ))
-        self._display("Coverage", "\n".join(lines))
-        self.tabs.select(2)
+__all__ = ["SemanticObservatoryPane"]

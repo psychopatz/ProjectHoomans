@@ -106,7 +106,7 @@
   "UI_PNC_Conversation_Semantic_ThreatTrusted": "Don't make this personal. Step back.",
   "UI_PNC_Conversation_Semantic_ThreatWithdrawn": "Keep your distance. I'm not discussing this.",
   "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly": "Hey! Good to see you.",
-  "UI_PNC_Conversation_Semantic_FlowGreetingOpening": "Hello. Good to see you.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingOpening": "Hey there. Good to see you.",
   "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestionFriendly": "How have you been holding up?",
   "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestion": "How have you been?",
   "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly": "You're welcome. It's good to see you too.",

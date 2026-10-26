@@ -106,6 +106,8 @@ local function speechRealizationCatalog(context)
         coverage = type(realization.Coverage) == "function"
             and realization.Coverage() or {},
         families = families,
+        phraseContent = type(realization.PhraseCoverage) == "function"
+            and realization.PhraseCoverage() or {},
     }
 end
 

@@ -23,6 +23,13 @@ from .blocks import SemanticBlockRegistry
 from .codeblocks import validate_codeblock_document
 from .dataset_adapters import preview_dataset_adapter, promote_reviewed_candidates
 from .interaction_explorer import build_interaction_rows, search_interactions
+from .dialogue_content import (
+    CONTENT_SOURCE_RELATIVE,
+    compile_dialogue_content,
+    load_dialogue_content_source,
+    source_fingerprint,
+)
+from .lexicon_compiler import CompileError
 
 
 class SemanticLabAuthoringService:
@@ -94,6 +101,252 @@ class SemanticLabAuthoringService:
         document: dict[str, Any],
     ) -> dict[str, Any]:
         return self.dataset_catalog.write_dataset_document(source_id, document)
+
+    @property
+    def dialogue_content_source_path(self) -> Path:
+        return self.repository / CONTENT_SOURCE_RELATIVE
+
+    def preview_dialogue_content_source(self) -> dict[str, Any]:
+        return authoring.preview_dialogue_content_source(
+            self.dialogue_content_source_path,
+            repository=self.repository,
+        )
+
+    def generate_dialogue_content_source(self) -> dict[str, Any]:
+        return authoring.generate_dialogue_content_source(
+            self.dialogue_content_source_path,
+            repository=self.repository,
+        )
+
+    def _dialogue_content_document(self) -> dict[str, Any]:
+        return load_dialogue_content_source(self.dialogue_content_source_path)
+
+    @staticmethod
+    def _content_item(document: dict[str, Any], content_id: str) -> dict[str, Any] | None:
+        for family in document.get("phraseFamilies", []):
+            if isinstance(family, dict) and family.get("id") == content_id:
+                return {"kind": "phraseFamily", **family}
+        for choice in document.get("playerChoices", []):
+            if isinstance(choice, dict) and choice.get("id") == content_id:
+                return {"kind": "playerChoice", **choice}
+        return None
+
+    @staticmethod
+    def _content_structure(item: dict[str, Any]) -> dict[str, Any]:
+        """Return the fields that Dialogue Content is never allowed to edit."""
+        value = json.loads(json.dumps(item, ensure_ascii=False))
+        kind = value.get("kind")
+        value.pop("kind", None)
+        for metadata_key in ("sourcePath", "sourceFingerprint", "verifiedOwner"):
+            value.pop(metadata_key, None)
+        if kind == "phraseFamily":
+            for phrases in value.get("styles", {}).values():
+                for phrase in phrases:
+                    if isinstance(phrase, dict):
+                        phrase.pop("translations", None)
+        else:
+            value.pop("labelTranslations", None)
+            value.pop("choiceTranslations", None)
+        return value
+
+    def list_dialogue_content(self) -> list[dict[str, Any]]:
+        document = self._dialogue_content_document()
+        fingerprint = source_fingerprint(self.dialogue_content_source_path)
+        rows: list[dict[str, Any]] = []
+        for family in document.get("phraseFamilies", []):
+            if not isinstance(family, dict):
+                continue
+            rows.append({
+                "id": family.get("id"),
+                "kind": "phraseFamily",
+                "semanticTemplateID": family.get("semanticTemplateID"),
+                "canonicalConcept": family.get("canonicalConcept"),
+                "styles": sorted(family.get("styles", {})),
+                "sourcePath": str(self.dialogue_content_source_path),
+                "sourceFingerprint": fingerprint,
+                "verifiedOwner": "CodeBuilder → Dialogue Content Registry",
+            })
+        for choice in document.get("playerChoices", []):
+            if not isinstance(choice, dict):
+                continue
+            rows.append({
+                "id": choice.get("id"),
+                "kind": "playerChoice",
+                "canonicalConcept": (choice.get("locked") or {}).get("canonicalConcept"),
+                "route": (choice.get("locked") or {}).get("route"),
+                "hubID": (choice.get("locked") or {}).get("hubID"),
+                "sourcePath": str(self.dialogue_content_source_path),
+                "sourceFingerprint": fingerprint,
+                "verifiedOwner": "CodeBuilder → Dialogue Content Registry",
+            })
+        return rows
+
+    def load_dialogue_content(self, content_id: str) -> dict[str, Any]:
+        document = self._dialogue_content_document()
+        item = self._content_item(document, str(content_id))
+        if item is None:
+            raise KeyError(f"unknown dialogue content id: {content_id}")
+        item["sourcePath"] = str(self.dialogue_content_source_path)
+        item["sourceFingerprint"] = source_fingerprint(self.dialogue_content_source_path)
+        item["verifiedOwner"] = "CodeBuilder → Dialogue Content Registry"
+        return item
+
+    def _apply_dialogue_content_edit(
+        self,
+        content_id: str,
+        edited_item: dict[str, Any],
+        *,
+        expected_source_fingerprint: str | None = None,
+    ) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+        path = self.dialogue_content_source_path
+        actual_fingerprint = source_fingerprint(path)
+        if expected_source_fingerprint and expected_source_fingerprint != actual_fingerprint:
+            return None, {
+                "ok": False,
+                "type": "dialogue_content_edit_preview",
+                "contentID": content_id,
+                "stale": True,
+                "reason": "source_fingerprint_mismatch",
+                "expectedSourceFingerprint": expected_source_fingerprint,
+                "sourceFingerprint": actual_fingerprint,
+                "writes": [],
+            }
+        if not isinstance(edited_item, dict):
+            return None, {
+                "ok": False,
+                "type": "dialogue_content_edit_preview",
+                "contentID": content_id,
+                "diagnostics": [{"severity": "error", "message": "content edit must be an object"}],
+                "writes": [],
+            }
+        document = self._dialogue_content_document()
+        current = self._content_item(document, content_id)
+        if current is None:
+            return None, {
+                "ok": False,
+                "type": "dialogue_content_edit_preview",
+                "contentID": content_id,
+                "diagnostics": [{"severity": "error", "message": "unknown dialogue content id"}],
+                "writes": [],
+            }
+        if self._content_structure(current) != self._content_structure(edited_item):
+            return None, {
+                "ok": False,
+                "type": "dialogue_content_edit_preview",
+                "contentID": content_id,
+                "structuralChange": True,
+                "diagnostics": [{
+                    "severity": "error",
+                    "message": "structural fields are locked; edit phrase or verified player-facing wording only",
+                }],
+                "writes": [],
+            }
+        updated = json.loads(json.dumps(document, ensure_ascii=False))
+        if current.get("kind") == "phraseFamily":
+            target = next(item for item in updated["phraseFamilies"] if item["id"] == content_id)
+            edited_styles = edited_item.get("styles", {})
+            for style, phrases in target.get("styles", {}).items():
+                edited_by_id = {
+                    phrase.get("id"): phrase
+                    for phrase in edited_styles.get(style, [])
+                    if isinstance(phrase, dict)
+                }
+                for phrase in phrases:
+                    edited_phrase = edited_by_id.get(phrase.get("id"))
+                    if edited_phrase is not None:
+                        phrase["translations"] = edited_phrase.get("translations")
+        else:
+            target = next(item for item in updated["playerChoices"] if item["id"] == content_id)
+            target["labelTranslations"] = edited_item.get("labelTranslations")
+            target["choiceTranslations"] = edited_item.get("choiceTranslations")
+        return updated, {
+            "ok": True,
+            "type": "dialogue_content_edit_preview",
+            "contentID": content_id,
+            "kind": current.get("kind"),
+            "stale": False,
+            "structuralLocked": True,
+            "sourceFingerprint": actual_fingerprint,
+            "newContentFingerprint": compile_dialogue_content(updated)["contentFingerprint"],
+            "contentBefore": json.loads(json.dumps(current, ensure_ascii=False)),
+            "contentAfter": json.loads(json.dumps(edited_item, ensure_ascii=False)),
+            "writes": [],
+        }
+
+    def preview_dialogue_content_edit(
+        self,
+        content_id: str,
+        edited_item: dict[str, Any],
+        *,
+        expected_source_fingerprint: str | None = None,
+    ) -> dict[str, Any]:
+        try:
+            updated, report = self._apply_dialogue_content_edit(
+                content_id,
+                edited_item,
+                expected_source_fingerprint=expected_source_fingerprint,
+            )
+            if updated is None or report.get("ok") is not True:
+                return report
+            compiled = compile_dialogue_content(updated)
+        except (OSError, ValueError, TypeError, CompileError) as error:
+            return {
+                "ok": False,
+                "type": "dialogue_content_edit_preview",
+                "contentID": content_id,
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "writes": [],
+            }
+        return {
+            **report,
+            "diagnostics": [],
+            "contentFingerprint": compiled["contentFingerprint"],
+            "generatedPaths": [
+                str(self.repository / path)
+                for path in (
+                    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
+                    "Semantics/Generated/DialogueContent/Registry.lua",
+                    "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/DialogueContent.json",
+                    "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/DialogueContent.json",
+                )
+            ],
+        }
+
+    def write_dialogue_content_edit(
+        self,
+        content_id: str,
+        edited_item: dict[str, Any],
+        *,
+        expected_source_fingerprint: str | None = None,
+    ) -> dict[str, Any]:
+        updated, report = self._apply_dialogue_content_edit(
+            content_id,
+            edited_item,
+            expected_source_fingerprint=expected_source_fingerprint,
+        )
+        if updated is None or report.get("ok") is not True:
+            return report
+        try:
+            compile_dialogue_content(updated)
+            self.dialogue_content_source_path.write_text(
+                json.dumps(updated, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+                newline="\n",
+            )
+        except (OSError, ValueError, TypeError, CompileError) as error:
+            return {
+                **report,
+                "ok": False,
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "writes": [],
+            }
+        return {
+            **report,
+            "previewOnly": False,
+            "effectFree": False,
+            "writes": [str(self.dialogue_content_source_path)],
+            "reloadedBy": "caller_restart_required",
+        }
     def list_semantic_blocks(
         self,
         production_catalog: dict[str, Any] | None = None,

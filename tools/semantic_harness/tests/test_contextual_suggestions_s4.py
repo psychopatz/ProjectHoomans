@@ -401,8 +401,8 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 app.status_label,
             ):
                 self.assertTrue(widget.winfo_ismapped())
-            self.assertIn("Compare", [app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()])
-            self.assertIn("Diagnostics / Worker", [app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()])
+            self.assertIn("Compare / Regression", [app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()])
+            self.assertIn("Debug", [app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()])
 
             # Root semantic suggestions are intentionally visible before the
             # first typed turn, so this is a populated baseline rather than a
@@ -421,7 +421,10 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             root.update_idletasks()
 
             self.assertEqual(
-                app.trace_tabs.tab(app.trace_tabs.select(), "text"),
+                app.trace_tabs.tab(app.trace_tabs.select(), "text"), "Graph"
+            )
+            self.assertEqual(
+                app.graph_tabs.tab(app.graph_tabs.select(), "text"),
                 "Dialogue graph",
             )
             self.assertTrue(app.hub_diagnostics.winfo_exists())
@@ -499,7 +502,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 app.status_label,
             ):
                 self.assertTrue(widget.winfo_ismapped())
-            self.assertIn("Compare", [app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()])
+            self.assertIn("Compare / Regression", [app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()])
 
             app.input_var.set("What's up?")
             app.submit()
@@ -511,7 +514,10 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             )
             root.update_idletasks()
             self.assertEqual(
-                app.trace_tabs.tab(app.trace_tabs.select(), "text"),
+                app.trace_tabs.tab(app.trace_tabs.select(), "text"), "Graph"
+            )
+            self.assertEqual(
+                app.graph_tabs.tab(app.graph_tabs.select(), "text"),
                 "Dialogue graph",
             )
             self.assertTrue(app.hub_diagnostics.winfo_exists())

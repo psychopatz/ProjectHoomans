@@ -69,7 +69,11 @@ class ContextualDialoguePersonaChoicesP0Tests(unittest.TestCase):
         }
         self.assertEqual(capabilities["FOLLOW"]["status"], "eligible")
         self.assertEqual(capabilities["FOLLOW"]["frame"]["kind"], "semantic_click_frame")
-        self.assertEqual(capabilities["WAIT_AT"]["status"], "requires_destination")
+        # WAIT_AT remains a typed/world-target capability.  The generic
+        # capability projection deliberately omits it until a destination is
+        # present; explicit destination requests still use the production task
+        # adapter and authority path.
+        self.assertNotIn("WAIT_AT", capabilities)
 
     def test_label_and_utterance_keys_are_distinct_and_language_does_not_change_id(
         self,

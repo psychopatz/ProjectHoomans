@@ -199,8 +199,15 @@ class SaveBrowserTests(unittest.TestCase):
             )
             self.assertTrue(hasattr(app, "provenance_inspector"))
             self.assertIn(
-                "Provenance",
+                "Inspect",
                 {app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()},
+            )
+            self.assertIn(
+                "Provenance",
+                {
+                    app.inspect_tabs.tab(tab, "text")
+                    for tab in app.inspect_tabs.tabs()
+                },
             )
         finally:
             app.close()

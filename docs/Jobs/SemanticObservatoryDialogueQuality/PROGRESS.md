@@ -1,74 +1,72 @@
 # Semantic Observatory & Dialogue Quality Harness — current progress
 
-**Status:** IN PROGRESS — Observatory foundations are real and usable; remaining work is acceptance closure, one canonical dialogue-quality promotion, and final integrated developer validation. **Parent goal remains NOT COMPLETE.**
+**Status:** IN PROGRESS — the developer-side parent goal is not complete. Observatory/runtime foundations, P4A Leave Group proof and the first canonical dialogue promotion are accepted in the current worktree; the user has now added a mandatory Dialogue Content Registry / phrase-variation slice plus final acceptance closeout.
 
 **Current audited revisions (2026-10-26):**
-- ProjectHoomans: `07aad881a9058e777c6e3ad62bb46ad0ec1216c7` on existing `main`, clean and synchronized with `origin/main`.
-- PsychopatzCore: `cf28189c57f7810f31d25c46c11eb88080f47baa` on existing `main`, clean and synchronized with `origin/main`.
+
+- ProjectHoomans: `8cebde57161cb197b4ebbfd8e45544f1dd51c8b6` on existing `main`, matching `origin/main` before the current worktree changes.
+- PsychopatzCore: `cf28189c57f7810f31d25c46c11eb88080f47baa` on existing `main`, matching `origin/main`.
+- The current worktree is intentionally dirty with the in-flight P3 surface consolidation, accepted P4A worker/rehydration proof, accepted P6 greeting promotion, tests, and the newly approved documentation direction. Reconcile before writing; do not reset/stash/discard it. No source save, watched-media staging, native Project Zomboid launch, or Workshop operation is authorized by this goal.
 
 ## Phase reconciliation
 
 | Phase | Current state | Evidence / remaining gate |
 | --- | --- | --- |
-| P0 — Baseline/contracts | **COMPLETE** | Production source→registration→selection→translation/final-response chains, bounded query contracts, worker startup/query/memory baselines, no-write boundaries and real registered action evidence are established. |
-| P1 — Runtime catalog | **COMPLETE** | Loaded pools/variants, conditions, priority, revision, bounded paging, translation/source metadata and verified CodeBuilder lineage exist. Legitimate unresolved provenance remains explicitly `UNKNOWN`; UNKNOWN is a valid result, not unfinished work. |
-| P2 — Explain/provenance | **ACCEPTANCE-PENDING** | Production matcher/scorer/tie/history path owns explanation and does not consume selection history. Remaining closeout: response-plan/turn provenance must be exact where provable and explicitly UNKNOWN/template-only where not; rerun natural-history parity and negative cases as one acceptance slice. |
-| P3 — Studio observability | **ACCEPTANCE-PENDING** | Existing Semantic Lab now has Catalog/Test/Coverage/Review surfaces backed by the real worker; Tk/Xvfb tests have passed. Remaining closeout: explicit GUI↔CLI parity/regression acceptance across the final contracts. |
-| P4 — Grounded coverage | **IN PROGRESS** | EN/TL greeting, wellbeing/health, hidden identity, Follow/Stay, permission rejection, Goodbye and unowned Leave Group fixtures exist. Missing mandatory proof: positive player-owned Leave Group warning→confirm→departure through the production worker; deliberate repeat/dominance/equivalence coverage also needs final consolidation. |
-| P5 — Agent CLI | **ACCEPTANCE-PENDING** | Headless discover/detail/explain/turn/matrix/coverage/lineage/translation/proposal/compare paths exist with bounded JSON/JSONL. Remaining closeout: final wrong/stale/unknown/error/scale and GUI parity matrix; do not add new commands unless a remaining gate requires one. |
-| P6 — Delegated variant workflow | **IN PROGRESS** | Stale SHA/fingerprint checks, external staging, EN/TL isolated production-Lua replay, zero production writes and source/translation diffs are proven. Missing gate: one explicitly reviewed canonical response improvement promoted to its true source owner and replayed fresh with unchanged gameplay effects. |
-| P7 — Integrated acceptance | **IN PROGRESS** | Scale measurements, full Lua suite, Kahlua compilation and several Tk/worker suites have independently passed. Missing gate: one consolidated end-to-end acceptance over the final P0–P6 state, including save-read-only proof, GUI/CLI parity, CodeBuilder determinism and final performance comparison. |
+| P0 — Baseline/contracts | **COMPLETE** | Production source→registration→selection→translation/final-response chains, bounded query contracts, worker startup/query/memory baselines, and no-write boundaries are established. |
+| P1 — Runtime catalog | **COMPLETE** | Loaded pools/variants, conditions, priority, revision, bounded paging, translation/source metadata, and CodeBuilder lineage are verified. Legitimate unresolved provenance remains `UNKNOWN`; that is an accepted result. |
+| P2 — Explain/provenance | **ACCEPTANCE-PENDING** | Production matcher/scorer/tie/history owns explanation and does not consume selection history. Closeout still needs the final response-plan/turn provenance and natural-history negative acceptance slice; exact ownership must remain `UNKNOWN` where it cannot be proven. |
+| P3 — Human UI/content surface | **IN PROGRESS** | Simulation/Studio redundancy consolidation is implemented in the worktree, but the newly approved target is now `Explore + Dialogue Content + Review`; structural editors must move behind Developer Tools and the Dialogue Content surface still needs implementation/acceptance. |
+| P4 — Grounded scenario matrix | **ACCEPTANCE-PENDING** | Existing EN/TL, identity, wellbeing/health, follow/stay, permission, goodbye, and repeat/dominance/equivalence fixtures remain in scope. P4A is accepted below; final matrix consolidation remains. |
+| P5 — Agent CLI | **ACCEPTANCE-PENDING** | Existing bounded catalog/detail/explain/turn/matrix/coverage/lineage/translation/proposal/compare JSON/JSONL paths remain the authority. Closeout still needs final wrong/stale/unknown/error/scale and GUI-parity evidence; no new command is currently required. |
+| P6 — Delegated quality + phrase registry | **IN PROGRESS** | The original one-family authored greeting promotion is **accepted** and retained below. The newly approved Dialogue Content Registry / post-style phrase-variation capability is now mandatory and not yet implemented/accepted. |
+| P7 — Integrated acceptance | **IN PROGRESS** | Final Python/Lua/Kahlua/Tk/Xvfb/CLI/CodeBuilder/hash/performance acceptance is still pending after P2–P6 closure. |
 
-## Current verified evidence
+## Accepted P4A slice
 
-Fresh independent audit on ProjectHoomans `07aad881`:
+`tools/semantic_harness/tests/test_production_leave_group_p4a.py` now has **4/4 PASS** through the real production worker route using a disposable synthetic save:
 
-- **65 Python tests PASS, 2 SKIP** across Observatory, matrices, CodeBuilder lineage, translation coverage, scale, Kahlua verifier, Conversation Inspector, runtime graph, CodeBuilder consolidation and semantic response regression modules.
-- Bundled lifecycle matrix: **8/8 PASS** for EN/TL root Goodbye, typed-goodbye distinction, Follow→Wait and unowned/unknown-faction Leave Group rejection.
-- Production Lua focused authority/conversion smokes: **3/3 PASS** for conversation departure authority, colonist departure conversion and companion commands.
-- Worktree and upstream were clean/synchronized; `git diff --check` passed.
+- the production player registry resolves the player entity key;
+- `PNC.Factions.LoadRaw` rehydrates a non-mobile player-owned faction with matching `ownerPlayerKey`, and the recruited NPC is a member;
+- open conversation → Leave Group → production warning is mutation-free → confirmation reaches actual `PNC.ColonistDeparture`;
+- confirmation emits `response.departure.confirmed` / `colonist_departed`, closes once, clears recruited/player ownership, removes the NPC from the source faction, and places it in the real refugee/mobile destination;
+- relationship before/after/delta, permanent `colonist_expelled` memory, and interaction-journal evidence are retained;
+- EN and TL presentation are verified on the same route;
+- unowned and other-owner cases are rejected without mutation; source worker snapshots and temporary save bytes remain unchanged.
 
-Recorded implementation evidence already present in repository history (not rerun in the audit above):
+The production-worker adapter now carries the canonical production composer context into the headless conversation spec, and refreshed projections re-read the post-departure production faction so destination/mobile state is observable. Production Lua/Core remain semantic and gameplay authority.
 
-- Full Lua smoke suite **889/889 PASS** after fixture-bootstrap corrections.
-- Project Zomboid Kahlua compiler verification **119/119 PASS** for the bounded Observatory/semantic/social-flavor scope.
-- Real Tk/Xvfb Observatory Catalog/Review/Coverage tests passed against the production Lua worker.
-- Fresh worker catalog stabilized at **129 pools**, revision **205**; sampled startup about **824–844 ms**, RSS/HWM about **31.7–32.1 MB**.
-- Isolated greeting candidate preview demonstrated EN/TL before/after text through disposable real Lua workers with identical selected keys/action/transport counts and zero production writes.
-- Follow/Stay default EN/TL translation fallback defect was repaired in existing manifest-owned catalogs; this is localization correctness evidence, **not** the required P6 quality-promotion demonstration.
+## Accepted P6 promotion
 
-## Immediate Next Chunk — P4A positive owned-faction Leave Group worker lifecycle
+The reviewed family is `semantic.flow.greeting.opening.default`. The production catalog reports `AUTHORED_LUA` ownership at `Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_FlowGreeting.lua`; EN/TL text owners are the unique manifest-listed `Conversation/Semantic/Responses.json` assets.
 
-This is developer-side work and **must not be treated as blocked by a denied exploratory remote command**.
+The generated proposal changed only the greeting text: EN `Hello. Good to see you.` → `Hey there. Good to see you.` and TL `Kumusta. Mabuti at nakita kita.` → `Uy, mabuti at nakita kita.`. Review decision: **APPROVE**. The decision is grounded in the same neutral greeting context, preserves the meaning and friendly register in both languages, has no placeholders or fabricated facts, and leaves `when=[]`, priority `0`, the two-turn `GREETING_OPENING` plan, selected ID, authority route, actions, and transport unchanged. The isolated real-Lua preview passed EN/TL with `writesToProduction=0`, `candidateOverlayCleaned=true`, stale content/source guards, and `unchangedGameplayEffects=true`; a fresh checked-in worker replay passed the corresponding promotion test.
 
-Reuse the existing synthetic save / production rehydration infrastructure (including the patterns in `test_production_faction_rehydration_p14c.py`) to construct a disposable source where:
+## Newly approved dialogue-content direction
 
-1. production `PNC_PlayerCharacters.Load` resolves the worker player to a stable player entity key;
-2. production `PNC.Factions.LoadRaw` hydrates a non-mobile player faction whose `ownerPlayerKey` equals that entity key;
-3. the recruited NPC's persisted affiliation points to that same faction and membership is internally consistent;
-4. the real worker opens the conversation root and exercises the existing Leave Group / departure warning and confirmation route;
-5. the actual `PNC.ColonistDeparture` service performs the positive transition rather than a substituted executor seam.
+The product gap changed after the initial P6 promotion proved safe canonical text editing. Studio should no longer expose structural semantic authoring as the normal human workflow. The durable target is documented in `DIALOGUE_CONTENT_REGISTRY.md`:
 
-**P4A acceptance:**
-- warning path returns the production warning response and performs no departure mutation;
-- confirmation returns `response.departure.confirmed` / `colonist_departed`, closes the conversation exactly once, clears recruited/player ownership, removes the NPC from the source player faction, places it in the production departure destination/mobile faction, and preserves the real relationship-penalty audit;
-- EN and TL presentation are verified where the same production route supports them;
-- no source save bytes are modified; temporary fixture hash is unchanged; no watched-media staging, native PZ launch or Workshop action;
-- negative unowned/other-owner cases remain passing.
+- agents/code own semantic flows, conditions, priority, plans, actions and authority;
+- ResponseCatalog selects **semantic/context variants**;
+- SpeechRealization selects style;
+- a new bounded phrase layer selects equivalent wording with deterministic immediate-repeat avoidance;
+- phrase arrays are **not** stored directly in PsychopatzCore translation JSON — CodeBuilder emits ordinary string-valued EN/TL keys plus compiled phrase-family metadata;
+- Studio becomes `Explore + Dialogue Content + Review`; structural editors are Developer Tools;
+- NPC phrases may vary dynamically, while player landing/navigation labels remain stable by default and only their content is editable with route/hub/concept/eligibility locked.
 
-After P4A, **continue automatically** through the remaining acceptance slices below. Do not stop for another /goal.
+The first migration must prove one existing family is behavior-equivalent before adding 3+ EN/TL phrases, then expose semantic variant + style + phrase ID separately through the real worker/Simulation/CLI.
 
-## Required closure sequence after P4A
+## Required closure sequence
 
-1. **P2/P3/P4/P5 closeout:** consolidate plan-turn/source provenance, deliberate repeat/dominance/equivalence coverage, and final GUI↔CLI/error/scale parity. Legitimate UNKNOWN/template-only provenance is acceptable when evidence cannot identify a unique owner; never invent ownership to force a green gate.
-2. **P6 canonical proof:** choose one low-risk authored greeting/response family with verified ownership; produce an EN/TL improvement, run proposal review + stale guards + isolated real-Lua before/after, record an explicit review decision, edit the canonical source only, then fresh-worker replay the checked-in result. Preserve all `when`/priority/plan/authority metadata and prove gameplay effects are unchanged.
-3. **P7 integrated acceptance:** run the final relevant Python suites, full Lua suite, installed PZ Kahlua compiler, Tk/Xvfb Observatory surfaces, headless CLI parity/error cases, deterministic CodeBuilder writer checks, save/source hash safety, performance comparison and `git diff --check`.
-4. Only after all developer gates pass, set **READY FOR USER LIVE TEST** and hand the remaining native SP/MP verification to the user.
+1. Preserve and finish validating the current P3 surface-consolidation/P4A/P6 worktree; the accepted Leave Group and first greeting-promotion evidence must not be redone or lost.
+2. Implement the new P3/P6B content direction: Studio `Explore + Dialogue Content + Review`, structural Developer Tools, canonical Dialogue Content source/compiler, separate post-style phrase selection, and one behavior-equivalent greeting-family migration followed by 3+ EN/TL phrases with anti-repeat proof.
+3. Prove one verified player landing/choice content edit with route/hub/concept/eligibility locked and stable-label behavior.
+4. Close remaining P2/P4/P5 provenance/repeat/coverage and GUI↔CLI/error/scale gates. Do not eliminate legitimate `UNKNOWN` values.
+5. Run one consolidated P7 acceptance pass: final Python suites, full Lua suite, installed Project Zomboid Kahlua compiler, actual Tk/Xvfb surfaces, headless CLI parity/error paths, deterministic CodeBuilder/content generation, save/source hash safety, performance comparison, and `git diff --check`.
+6. Only when every developer-side gate passes, set **READY FOR USER LIVE TEST**. Native SP/MP verification remains explicitly user-owned.
 
 ## Scope and stop rules
 
-- Do **not** feature-creep the Observatory or add commands merely to create more evidence. Prefer closing written gates with the existing surfaces.
-- Do **not** chase every UNKNOWN source result. UNKNOWN is correct when ownership cannot be proven.
-- Do **not** append historical continuation sections to this file. Replace it with current truth when state changes; Git history is the archive.
-- Do not modify root `AGENTS.md`, create a new branch, launch native Project Zomboid, edit source saves, or publish Steam Workshop content.
-- Stop only when the entire developer-side parent goal is accepted, a genuine safety/authorization blocker prevents further work, or the only remaining gate is the explicitly user-owned native SP/MP test.
+- Do not feature-creep the Observatory or add commands unless a remaining written acceptance gate requires one.
+- Do not modify root `AGENTS.md`, create branches, launch native Project Zomboid, edit source saves, publish Workshop content, or overwrite concurrent changes.
+- Do not append chronological continuation sections; replace this current truth when status changes.
+- Stop only when the developer-side parent goal is accepted, a genuine technical/safety/authorization blocker prevents implementable work, or only the explicitly user-owned native SP/MP test remains.

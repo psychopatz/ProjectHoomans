@@ -72,6 +72,16 @@ local function severeNeeds(actor)
     local situation = type(actor.situation) == "table"
         and actor.situation or {}
     local needs = type(situation.needs) == "table" and situation.needs or {}
+    -- DialogueSituation deliberately exposes a bounded semantic summary to
+    -- the actor context.  Raw hunger/thirst/fatigue values may still be
+    -- present in fixture-only contexts, but production projections use
+    -- urgency/level so ranking does not require private need values.
+    local urgency = text(needs.urgency or needs.level)
+    if urgency == "severe" or urgency == "critical"
+        or urgency == "emergency"
+    then
+        return true
+    end
     return (tonumber(needs.hunger) or 0) >= 0.75
         or (tonumber(needs.thirst) or 0) >= 0.75
         or (tonumber(needs.fatigue) or 0) >= 0.75
@@ -125,7 +135,6 @@ local function contextFit(candidate, actor, style, currentTopic)
 
     local situation = actor.situation or {}
     local roles = actor.roles or {}
-    local needs = situation.needs or {}
     local healthState = text(situation.healthState)
     if topic == "medical"
         and (healthState == "injured" or healthState == "wounded"
@@ -133,13 +142,7 @@ local function contextFit(candidate, actor, style, currentTopic)
     then
         fit = fit + (currentTopic == "whats_up" and 12 or 6)
     end
-    if topic == "needs"
-        and (tonumber(needs.hunger) or 0) >= 0.75
-            or topic == "needs"
-            and (tonumber(needs.thirst) or 0) >= 0.75
-            or topic == "needs"
-            and (tonumber(needs.fatigue) or 0) >= 0.75
-    then
+    if topic == "needs" and severeNeeds(actor) then
         fit = fit + (currentTopic == "whats_up" and 8 or 6)
     end
     if roles.companion == true and candidate and candidate.action ~= nil then

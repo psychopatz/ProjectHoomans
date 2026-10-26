@@ -7,6 +7,10 @@ local Predicates = Internal.Predicates
 local resolvedText = Internal.resolvedText
 local normalizeCandidate = Internal.normalizeCandidate
 local sourceRecord = Internal.sourceRecord
+local Content = PNC.Semantics.DialogueContentRegistry
+    or require "PNC/Semantics/Generated/DialogueContent/Registry"
+local WhatsUpContent = Content.PlayerChoice
+    and Content.PlayerChoice("conversation.landing:whats_up") or {}
 
 local function hasConversationHistory(context)
     context = type(context) == "table" and context or {}
@@ -32,7 +36,8 @@ local function appendLandingShortcuts(
     if seen[candidateID] or #output >= Suggestions.MAX_CANDIDATES then
         return
     end
-    local labelKey = "UI_PNC_Conversation_Suggestion_WhatsUp_Label"
+    local labelKey = WhatsUpContent.choiceKey
+        or "UI_PNC_Conversation_Suggestion_WhatsUp_Label"
     local label = resolvedText(labelKey, "What's up?")
     local utterance = "What's up?"
     local frame = Suggestions.BuildShortcutFrame({

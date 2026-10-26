@@ -1,17 +1,19 @@
 # Semantic Observatory & Dialogue Quality Harness
 
-**Status: IN PROGRESS — P0/P1 accepted; P2/P3/P5 acceptance closeout, P4 owned-faction lifecycle proof, P6 canonical variant promotion, and P7 integrated acceptance remain.** Parent goal is not complete. Current audited ProjectHoomans revision: `07aad881a9058e777c6e3ad62bb46ad0ec1216c7` (2026-10-26).
+**Status: IN PROGRESS — P0/P1 foundations are accepted; current phase truth and in-flight P3/P4/P6 evidence live in PROGRESS.md. P3/P6 now additionally require the user-directed Dialogue Content Registry / phrase-variation workflow before P7 can pass.** Parent goal is not complete. Reverify the actual checkout/worktree before acting; do not rely on this overview for a current commit SHA.
 
 ## Complete goal
 
 Make the existing Project Hoomans Semantic Lab the trustworthy, agent-first observability and dialogue-quality workbench. Human users and agents (including ChatGPT through authorized repository/desktop access and Codex locally) must be able to discover the **actual loaded** semantic dialogue/response behavior, inspect why a choice or response won or failed, exercise it safely across grounded contexts and EN/TL, find coverage and repetition gaps, propose new variants, and prove those variants work through real production Lua without changing gameplay authority.
 
-**Agents author existing canonical source files; Studio observes, tests, reviews, and compares.** Do not build a competing manual dialogue editor, database, Python semantic policy, standalone app, or inference service.
+**Agents own semantic structure and gameplay logic. Simulation is the single GUI execution/test workbench; Studio becomes the human/agent content workbench: Explore + Dialogue Content + Review.** Phrase wording is edited through a reviewed canonical CodeBuilder source, while structural flow/block/interaction mutation moves to Developer Tools. Do not build a competing simulator, runtime dialogue database, Python semantic policy, standalone app, or inference service.
 
 ## Job documents
 
 - [AUDIT.md](AUDIT.md) — source-verified baseline, incomplete capabilities and risks.
 - [ARCHITECTURE.md](ARCHITECTURE.md) — durable runtime/catalog/provenance/agent contracts.
+- [SURFACE_CONSOLIDATION.md](SURFACE_CONSOLIDATION.md) — mandatory Simulation/Studio/World Browser/Log ownership and redundancy-removal design.
+- [DIALOGUE_CONTENT_REGISTRY.md](DIALOGUE_CONTENT_REGISTRY.md) — content-only phrase registry, EN/TL authoring, anti-repeat realization and Studio Dialogue Content design.
 - [ROADMAP.md](ROADMAP.md) — entire P0–P7 developer-side objective and acceptance gates.
 - [HARNESS_ACCEPTANCE.md](HARNESS_ACCEPTANCE.md) — required evidence for real Lua, EN/TL, safety, scale and GUI/CLI parity.
 - [AGENT_RUNBOOK.md](AGENT_RUNBOOK.md) — safe execution, test and Git procedure for unattended implementation.
@@ -31,7 +33,7 @@ No checked-in GOAL_PROMPT.md; provide the short executable /goal in ChatGPT only
 
 ## User-facing destination
 
-Default Studio: **Catalog → Test Lab → Coverage → Review**. Keep advanced graph authoring accessible but secondary. Agent CLI: bounded queries, targeted replay, comparison and review manifests over the **same** worker observations. Neither path may claim a dialogue worked merely because a JSON preview or synthetic-only test succeeded.
+Target UI ownership: **Simulation = execute/test/compare**, **Studio = Explore + Dialogue Content + Review**, **World Browser = saved-target discovery**, **Log = activity timeline**. The former Studio Test Lab/Coverage runner is now removed from the user-facing Studio surface; its shared matrices and selector coverage run from Simulation → Compare / Regression. See SURFACE_CONSOLIDATION.md. Agent CLI remains the bounded headless parity surface over the same worker/services.
 
 ## Scope boundary
 

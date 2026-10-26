@@ -19,7 +19,14 @@ def inspect_response_turn(
     ]
     result = []
     for message in npc[-4:]:
-        key = str(message.get("key") or "")
+        # A post-style phrase may be the rendered payload key.  Join
+        # registry provenance through the explicit semantic segment identity
+        # so phrase translation keys never masquerade as new semantic slots.
+        key = str(
+            message.get("semanticTemplateID")
+            or message.get("key")
+            or ""
+        )
         lookup = worker.response_key_lookup(key) if key else {
             "matches": [], "truncated": False, "matchCount": 0,
         }
@@ -34,8 +41,11 @@ def inspect_response_turn(
         )
         result.append({
             "observedKey": key,
+            "renderedKey": message.get("key"),
             "translationKey": message.get("translationKey"),
             "finalText": message.get("text"),
+            "semanticVariantID": message.get("semanticVariantID"),
+            "phraseID": message.get("phraseID"),
             "registrationMatchCount": lookup.get("matchCount", 0),
             "registeredVariants": matched[:8],
             "registrationTruncated": lookup.get("truncated", False)
