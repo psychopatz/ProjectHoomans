@@ -9,6 +9,7 @@ import unittest
 from tools.semantic_harness.runtime.config import (
     ConfigurationError,
     discover_newest_runtime,
+    discover_dynamic_trading_runtime,
 )
 
 
@@ -28,6 +29,16 @@ class RuntimeConfigTests(unittest.TestCase):
 
             with self.assertRaises(ConfigurationError):
                 discover_newest_runtime(root)
+
+    def test_dynamic_trading_uses_newest_shared_module_runtime(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for module in ("DTCommon", "DTHoomans"):
+                module_root = root / "Contents/mods" / module
+                (module_root / "42.20").mkdir(parents=True)
+            (root / "Contents/mods/DTCommon/42.21").mkdir()
+
+            self.assertEqual(discover_dynamic_trading_runtime(root), "42.20")
 
 
 if __name__ == "__main__":

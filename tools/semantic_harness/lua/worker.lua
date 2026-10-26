@@ -17,6 +17,7 @@ end
 local dynamicTradingRepository = os.getenv(
     "PNC_HARNESS_DYNAMIC_TRADING_REPOSITORY"
 ) or repository .. "/../DynamicTrading"
+local dynamicTradingRuntime = os.getenv("PZ_TEST_DYNAMIC_TRADING_RUNTIME")
 
 local function path(root, relative)
     return root .. "/" .. relative
@@ -32,12 +33,28 @@ local packagePaths = {
     path(coreRepository, "Contents/mods/PsychopatzCore/" .. coreRuntime .. "/media/lua/shared/?.lua"),
     path(coreRepository, "Contents/mods/PsychopatzCore/common/media/lua/client/?.lua"),
     path(coreRepository, "Contents/mods/PsychopatzCore/" .. coreRuntime .. "/media/lua/client/?.lua"),
-    path(dynamicTradingRepository, "Contents/mods/DTCommon/42.20/media/lua/shared/?.lua"),
-    path(dynamicTradingRepository, "Contents/mods/DTCommon/common/media/lua/shared/?.lua"),
-    path(dynamicTradingRepository, "Contents/mods/DTHoomans/42.20/media/lua/shared/?.lua"),
-    path(dynamicTradingRepository, "Contents/mods/DTHoomans/common/media/lua/shared/?.lua"),
     package.path,
 }
+if dynamicTradingRuntime then
+    packagePaths[#packagePaths + 1] = path(
+        dynamicTradingRepository,
+        "Contents/mods/DTCommon/" .. dynamicTradingRuntime
+            .. "/media/lua/shared/?.lua"
+    )
+    packagePaths[#packagePaths + 1] = path(
+        dynamicTradingRepository,
+        "Contents/mods/DTCommon/common/media/lua/shared/?.lua"
+    )
+    packagePaths[#packagePaths + 1] = path(
+        dynamicTradingRepository,
+        "Contents/mods/DTHoomans/" .. dynamicTradingRuntime
+            .. "/media/lua/shared/?.lua"
+    )
+    packagePaths[#packagePaths + 1] = path(
+        dynamicTradingRepository,
+        "Contents/mods/DTHoomans/common/media/lua/shared/?.lua"
+    )
+end
 package.path = table.concat(packagePaths, ";")
 
 local Protocol = require "worker/Protocol"
@@ -61,6 +78,7 @@ local Context = {
     repository = repository,
     coreRepository = coreRepository,
     dynamicTradingRepository = dynamicTradingRepository,
+    dynamicTradingRuntime = dynamicTradingRuntime,
     hoomansRuntime = hoomansRuntime,
     coreRuntime = coreRuntime,
     Runtime = Runtime,

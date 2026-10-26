@@ -38,6 +38,57 @@ def discover_newest_runtime(mod_root: str | Path) -> str:
     return max(versions)[1]
 
 
+def discover_dynamic_trading_repository(
+    repository: str | Path,
+) -> Path | None:
+    """Find the optional Dynamic Trading sibling without making it required."""
+
+    explicit = os.environ.get("PNC_HARNESS_DYNAMIC_TRADING_REPOSITORY")
+    candidates = [Path(explicit)] if explicit else []
+    candidates.append(
+        Path(repository).expanduser().resolve().parent / "DynamicTrading"
+    )
+    for candidate in candidates:
+        resolved = candidate.expanduser().resolve()
+        if (resolved / "Contents/mods/DTCommon").is_dir():
+            return resolved
+    return None
+
+
+def discover_dynamic_trading_runtime(
+    repository: str | Path,
+) -> str | None:
+    """Return a version shared by both optional Dynamic Trading modules."""
+
+    root = Path(repository).expanduser().resolve()
+    module_roots = [
+        root / "Contents/mods/DTCommon",
+        root / "Contents/mods/DTHoomans",
+    ]
+    if not all(path.is_dir() for path in module_roots):
+        return None
+
+    version_sets = []
+    for module_root in module_roots:
+        version_sets.append(
+            {
+                child.name
+                for child in module_root.iterdir()
+                if child.is_dir() and _RUNTIME_DIRECTORY.fullmatch(child.name)
+            }
+        )
+    compatible = set.intersection(*version_sets)
+    if not compatible:
+        raise ConfigurationError(
+            "Dynamic Trading modules do not share a numeric runtime under "
+            f"{root}"
+        )
+    return max(
+        compatible,
+        key=lambda value: tuple(int(part) for part in value.split(".")),
+    )
+
+
 def _looks_like_repository(path: Path) -> bool:
     return (path / "Contents/mods/ProjectHoomans").is_dir()
 
@@ -130,6 +181,8 @@ class HarnessConfig:
     worker_script: Path
     hoomans_runtime: str | None = None
     core_runtime: str | None = None
+    dynamic_trading_repository: Path | None = None
+    dynamic_trading_runtime: str | None = None
     startup_timeout: float = 8.0
     request_timeout: float = 5.0
     shutdown_timeout: float = 1.0
@@ -166,6 +219,14 @@ class HarnessConfig:
         core_runtime = os.environ.get("PZ_TEST_CORE_RUNTIME") or (
             discover_newest_runtime(core / "Contents/mods/PsychopatzCore")
         )
+        dynamic_trading_repository = discover_dynamic_trading_repository(repo)
+        dynamic_trading_runtime = os.environ.get(
+            "PZ_TEST_DYNAMIC_TRADING_RUNTIME"
+        )
+        if dynamic_trading_runtime is None and dynamic_trading_repository:
+            dynamic_trading_runtime = discover_dynamic_trading_runtime(
+                dynamic_trading_repository
+            )
         return cls(
             repository=repo,
             core_repository=core,
@@ -173,6 +234,8 @@ class HarnessConfig:
             worker_script=worker,
             hoomans_runtime=hoomans_runtime,
             core_runtime=core_runtime,
+            dynamic_trading_repository=dynamic_trading_repository,
+            dynamic_trading_runtime=dynamic_trading_runtime,
             startup_timeout=float(startup_timeout),
             request_timeout=float(request_timeout),
             shutdown_timeout=float(shutdown_timeout),

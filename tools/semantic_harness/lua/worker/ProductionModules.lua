@@ -233,15 +233,6 @@ function ProductionModules.loadOptional(context)
     local Runtime = context.Runtime
     local runtime = Runtime.scenario and Runtime.scenario.runtime or {}
     local mods = runtime.availableMods or {}
-    local repository = context.dynamicTradingRepository
-    local sharedRoot = repository
-        .. "/Contents/mods/DTCommon/42.20/media/lua/shared"
-    local hoomansRoot = repository
-        .. "/Contents/mods/DTHoomans/42.20/media/lua/shared"
-    local files = {
-        sharedRoot .. "/DTCommon/00_DTCommon_Init.lua",
-        hoomansRoot .. "/DTHoomans/00_DTHoomans_Init.lua",
-    }
     local index
     local handle
     local ok
@@ -254,6 +245,19 @@ function ProductionModules.loadOptional(context)
     if mods.DTHoomans ~= true then
         return false, "disabled"
     end
+    local runtimeVersion = context.dynamicTradingRuntime
+    if not runtimeVersion then
+        return false, "runtime_unavailable"
+    end
+    local repository = context.dynamicTradingRepository
+    local sharedRoot = repository
+        .. "/Contents/mods/DTCommon/" .. runtimeVersion .. "/media/lua/shared"
+    local hoomansRoot = repository
+        .. "/Contents/mods/DTHoomans/" .. runtimeVersion .. "/media/lua/shared"
+    local files = {
+        sharedRoot .. "/DTCommon/00_DTCommon_Init.lua",
+        hoomansRoot .. "/DTHoomans/00_DTHoomans_Init.lua",
+    }
     if Runtime.dynamicTradingLoaded then
         return true, "already_loaded"
     end

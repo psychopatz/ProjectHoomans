@@ -56,13 +56,19 @@ class ContextualDynamicTradingP5Tests(unittest.TestCase):
     def test_trade_click_uses_existing_category_authority_and_dt_block(self) -> None:
         scenario = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), "trader")
         with LuaSemanticWorker(scenario) as worker:
-            result = worker.input("hello")
+            opened = worker.open_conversation()
+            whats_up = next(
+                row
+                for row in opened["presentation"]["responseChannel"]["rows"]
+                if row["id"] == "conversation.landing:whats_up"
+            )
+            result = worker.suggestion_click(whats_up["semanticFrame"])
             candidate = next(
                 row
-                for row in result["observation"]["suggestions"]["candidates"]
+                for row in result["conversationPresentation"]["responseChannel"]["rows"]
                 if row["id"] == "dynamictrading.trade"
             )
-            clicked = worker.suggestion_click(candidate["frame"])
+            clicked = worker.suggestion_click(candidate["semanticFrame"])
 
         self.assertTrue(clicked["accepted"])
         self.assertEqual(clicked["reason"], "accepted")

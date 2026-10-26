@@ -97,6 +97,14 @@ class LuaProcess:
             environment["PZ_TEST_HOOMANS_RUNTIME"] = self.config.hoomans_runtime
         if self.config.core_runtime is not None:
             environment["PZ_TEST_CORE_RUNTIME"] = self.config.core_runtime
+        if self.config.dynamic_trading_repository is not None:
+            environment["PNC_HARNESS_DYNAMIC_TRADING_REPOSITORY"] = str(
+                self.config.dynamic_trading_repository
+            )
+        if self.config.dynamic_trading_runtime is not None:
+            environment["PZ_TEST_DYNAMIC_TRADING_RUNTIME"] = (
+                self.config.dynamic_trading_runtime
+            )
         try:
             self.process = subprocess.Popen(
                 [
