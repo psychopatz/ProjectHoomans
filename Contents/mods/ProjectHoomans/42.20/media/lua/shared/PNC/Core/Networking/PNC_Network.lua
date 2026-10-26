@@ -35,6 +35,7 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     conversationDiaryRevisions = {},
     conversationDiaryRevision = 0,
     lastConversationDeltas = {},
+    semanticHubPresentation = {},
     llmToolResults = {},
     llmToolResultOrder = {},
     playerEmoteInteractionResults = {},

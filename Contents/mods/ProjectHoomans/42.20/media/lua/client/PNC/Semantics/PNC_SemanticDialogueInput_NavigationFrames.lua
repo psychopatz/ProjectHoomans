@@ -63,6 +63,9 @@ local function applyNavigationProjection(view, frame)
         local context = Internal.ShallowContext(view) or {}
         context.activeSuggestionGroupID = frame.groupID
         context.semanticSuggestionGroupID = frame.groupID
+        if type(Internal.AttachSemanticHubPresentation) == "function" then
+            context = Internal.AttachSemanticHubPresentation(context, view)
+        end
         local rebuilt = Suggestions.Build({
             accepted = false,
             sequence = tonumber(currentFrame.requestRevision) or 0,

@@ -21,10 +21,17 @@ def render_suggestions(
         response.get("conversationPresentation")
         or observation.get("conversationPresentation")
     )
+    native_rows = (
+        conversation_presented_rows(presentation)
+        if isinstance(presentation, dict)
+        and presentation.get("schema") == "semantic.native_conversation_view.v1"
+        else []
+    )
     if (
         isinstance(presentation, dict)
         and presentation.get("schema")
         == "semantic.native_conversation_view.v1"
+        and native_rows
     ):
         channel = presentation.get("responseChannel") or {}
         lifecycle = presentation.get("lifecycle") or {}
@@ -84,8 +91,13 @@ def render_suggestions(
                 }
             ),
         )
+        self._refresh_suggestion_controls(
+            self.session.ready and not self.busy
+        )
         return
-    self.suggestion_primary_projection = None
+    self.suggestion_primary_projection = (
+        presentation if isinstance(presentation, dict) else None
+    )
     groups = suggestions.get("groups") or []
     group_ids: list[str] = []
     group_display_by_id: dict[str, str] = {}
@@ -186,6 +198,7 @@ def render_suggestions(
             }
         ),
     )
+    self._refresh_suggestion_controls(self.session.ready and not self.busy)
 
 
 __all__ = ["render_suggestions"]

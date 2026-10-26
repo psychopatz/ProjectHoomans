@@ -62,6 +62,13 @@ function Refresh.apply(context, state)
             then
                 local semanticContext = internal.ShallowContext(view) or {}
                 semanticContext.conversationBlock = projectedBlock
+                if type(internal.AttachSemanticHubPresentation)
+                    == "function"
+                then
+                    semanticContext = internal.AttachSemanticHubPresentation(
+                        semanticContext, view
+                    )
+                end
                 view.semanticSuggestions = state.Suggestions.Build({
                     accepted = false,
                     sequence = revision,

@@ -130,6 +130,7 @@ local function onResetLua()
     ClientState.conversationDiaryRevision = 0
     ClientState.lastConversationDelta = nil
     ClientState.lastConversationDeltas = {}
+    ClientState.semanticHubPresentation = {}
     if PNC.NameplateRelationshipFeedback
         and PNC.NameplateRelationshipFeedback.Reset
     then

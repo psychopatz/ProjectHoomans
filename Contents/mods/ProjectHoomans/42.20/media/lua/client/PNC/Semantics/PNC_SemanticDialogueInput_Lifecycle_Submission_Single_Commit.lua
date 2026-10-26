@@ -4,6 +4,11 @@ PNC.Semantics = PNC.Semantics or {}
 local Input = PNC.Semantics.DialogueInput
 local Internal = Input.Internal
 local Suggestions = Internal.Suggestions
+
+local function semanticHubPresentationState()
+    return Internal.SemanticHubPresentationState
+        or PNC.Semantics and PNC.Semantics.SemanticHubPresentationState
+end
 local audit = Internal.audit
 local traceTurn = Internal.traceTurn
 local SemanticTelemetryPrompt = require
@@ -179,6 +184,12 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
         service:ObserveResult(result)
     end
     if submitted == true and semanticFrame then
+        local presentationState = semanticHubPresentationState()
+        if presentationState
+            and type(presentationState.Mark) == "function"
+        then
+            presentationState.Mark(view, context, semanticFrame)
+        end
         local revision = tonumber(semanticFrame.requestRevision) or 0
         local receiptKey = tostring(view.session.conversationID or "")
             .. ":" .. tostring(revision)

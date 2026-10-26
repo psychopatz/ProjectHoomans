@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import gc
 import os
+import tempfile
 import time
 import tkinter as tk
 import unittest
@@ -14,12 +15,34 @@ from tools.semantic_harness.ui.shell import SemanticHarnessApp
 
 
 class ContextualSuggestionsS4Tests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._gui_state_dir = tempfile.TemporaryDirectory(
+            prefix="projecthoomans-s4-ui-"
+        )
+        self._gui_state_path = os.path.join(
+            self._gui_state_dir.name, "ui-state.json"
+        )
+
+    def tearDown(self) -> None:
+        self._gui_state_dir.cleanup()
+
+    def _gui_arguments(self):
+        """Keep GUI assertions isolated from the user's saved layout state."""
+
+        return _parser().parse_args(
+            [
+                "--ui-state",
+                self._gui_state_path,
+                "--reset-ui-state",
+            ]
+        )
+
     def test_topic_combobox_uses_the_worker_group_click_contract(self) -> None:
         if not os.environ.get("DISPLAY"):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(root, self._gui_arguments())
 
         def wait_until(predicate: object, timeout: float = 10.0) -> None:
             deadline = time.monotonic() + timeout
@@ -37,9 +60,9 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 and app.suggestion_group_box.get() == "Time and date"
             )
             owned_display = next(
-                value
-                for value in app.suggestion_group_box["values"]
-                if "Owned companion actions" in str(value)
+                display
+                for display, group_id in app.suggestion_group_ids_by_display.items()
+                if group_id == "companion.orders"
             )
             app.suggestion_group_box.set(owned_display)
             app._on_suggestion_group()
@@ -64,7 +87,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(root, self._gui_arguments())
 
         def wait_until(predicate: object, timeout: float = 10.0) -> None:
             deadline = time.monotonic() + timeout
@@ -156,7 +179,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(root, self._gui_arguments())
 
         def wait_until(predicate: object, timeout: float = 10.0) -> None:
             deadline = time.monotonic() + timeout
@@ -201,7 +224,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.skipTest("Tk display unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(root, self._gui_arguments())
 
         def wait_until(predicate: object, timeout: float = 10.0) -> None:
             deadline = time.monotonic() + timeout
@@ -302,7 +325,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(root, self._gui_arguments())
         errors: list[str] = []
         app._messagebox.showerror = lambda _title, message, **_kwargs: errors.append(str(message))
 
@@ -352,7 +375,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(root, self._gui_arguments())
 
         def wait_until(predicate: object, timeout: float = 10.0) -> None:
             deadline = time.monotonic() + timeout
@@ -421,7 +444,10 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.assertGreater(
                 app.send_button.winfo_rooty(), app.suggestion_frame.winfo_rooty()
             )
-            pane_right = app.transcript.winfo_rootx() + app.transcript.winfo_width()
+            pane_right = (
+                app.simulation_panes.winfo_rootx()
+                + app.simulation_panes.winfo_width()
+            )
             for button in (
                 app.reset_button,
                 app.load_button,
@@ -432,9 +458,14 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                     button.winfo_rootx() + button.winfo_width(),
                     pane_right,
                 )
-            self.assertLess(
-                app.npc_profile_box.winfo_x() + app.npc_profile_box.winfo_width(),
-                app.transcript.winfo_rootx() + app.transcript.winfo_width() + 80,
+            simulation_right = (
+                app.simulation_panes.winfo_rootx()
+                + app.simulation_panes.winfo_width()
+            )
+            self.assertLessEqual(
+                app.npc_profile_box.winfo_rootx()
+                + app.npc_profile_box.winfo_width(),
+                simulation_right,
             )
         finally:
             app.close()
@@ -445,7 +476,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_simulation_layout_at_normal_desktop_size(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(root, self._gui_arguments())
 
         def wait_until(predicate: object, timeout: float = 12.0) -> None:
             deadline = time.monotonic() + timeout

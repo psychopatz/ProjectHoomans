@@ -8,6 +8,8 @@ from pathlib import Path
 import re
 from typing import Any
 
+from .health import normalize_scenario, validate_npc_health
+
 
 DEFAULT_SCENARIO: dict[str, Any] = {
     "player": {
@@ -66,7 +68,20 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "forename": "Mara",
         "surname": "Vale",
         "identityState": "unknown",
-        "healthState": "healthy",
+        "health": {
+            "state": "normal",
+            "current": 100,
+            "max": 100,
+            "body": {
+                "bleedingRate": 0,
+                "openWoundCount": 0,
+                "bandagedWoundCount": 0,
+                "infected": False,
+                "wholeBodyAilments": {},
+                "wounds": {},
+                "overallPercent": 100,
+            },
+        },
         "activeBehavior": "idle",
         "gender": "female",
         "identitySeed": "npc_mara",
@@ -236,24 +251,25 @@ def merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
 
 def load_scenario(path: Path | None = None) -> dict[str, Any]:
     if path is None:
-        return merge({}, DEFAULT_SCENARIO)
+        return normalize_scenario(merge({}, DEFAULT_SCENARIO))
     with path.open("r", encoding="utf-8") as handle:
         authored = json.load(handle)
     if not isinstance(authored, dict):
         raise ValueError("scenario root must be a JSON object")
-    return merge(DEFAULT_SCENARIO, authored)
+    return normalize_scenario(merge(DEFAULT_SCENARIO, authored))
 
 
 def save_scenario(path: Path, scenario: dict[str, Any]) -> Path:
     """Validate and atomically persist a complete scenario JSON document."""
 
-    validate_scenario(scenario)
+    normalized = normalize_scenario(scenario)
+    validate_scenario(normalized)
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + ".tmp")
     try:
         with temporary.open("w", encoding="utf-8") as handle:
-            json.dump(scenario, handle, indent=2, ensure_ascii=False, sort_keys=True)
+            json.dump(normalized, handle, indent=2, ensure_ascii=False, sort_keys=True)
             handle.write("\n")
         temporary.replace(path)
     finally:
@@ -286,12 +302,17 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
         value = npc.get(field)
         if value is not None and not isinstance(value, (str, int, float)):
             raise ValueError(f"npc.{field} must be scalar or null")
-    # Nullable state fields permit deliberately unknown NPC facts. Legacy
-    # scenarios without explicit NPC needs still use world-level values.
-    for field in ("healthState", "activeBehavior"):
+    # Nullable behavior permits deliberately unknown NPC facts. Legacy health
+    # fields remain accepted here only so old authored fixtures can be folded
+    # by normalize_scenario at the worker/save boundary.
+    for field in ("activeBehavior",):
         value = npc.get(field)
         if value is not None and not isinstance(value, str):
             raise ValueError(f"npc.{field} must be a string or null")
+    legacy_health_state = npc.get("healthState")
+    if legacy_health_state is not None and not isinstance(legacy_health_state, str):
+        raise ValueError("npc.healthState must be a string or null")
+    validate_npc_health(npc)
     for field in ("needs", "conditionStats"):
         value = npc.get(field)
         if value is not None and not isinstance(value, dict):

@@ -10,7 +10,7 @@ from .config import HarnessConfig
 from .fixture_provider import OfflineEngineFixtureProvider
 from .item_catalog import search_item_catalog
 from .process import HarnessError, LuaProcess
-from .scenario import load_scenario, validate_scenario
+from .scenario import load_scenario, normalize_scenario, validate_scenario
 from .state import HarnessWorkingWorld, ImportedSourceSnapshot, Provenance
 from .activity import ActivityLog, default_activity_path
 from .worker_authoring import WorkerAuthoringOperations
@@ -42,6 +42,7 @@ class LuaSemanticWorker:
         config: HarnessConfig | None = None,
         activity_log: ActivityLog | None = None,
     ) -> None:
+        scenario = normalize_scenario(scenario)
         validate_scenario(scenario)
         self.source_snapshot = ImportedSourceSnapshot.from_scenario(
             scenario,
@@ -92,6 +93,7 @@ class LuaSemanticWorker:
     def configure(self, scenario: dict[str, Any]) -> dict[str, Any]:
         """Apply a working-world draft without replacing the imported source."""
 
+        scenario = normalize_scenario(scenario)
         validate_scenario(scenario)
         response = self._request("CONFIG", scenario)
         self.working_world.replace(scenario)
@@ -118,6 +120,7 @@ class LuaSemanticWorker:
     ) -> dict[str, Any]:
         """Install a new immutable source and derive a fresh working world."""
 
+        scenario = normalize_scenario(scenario)
         validate_scenario(scenario)
         fixture_provider = OfflineEngineFixtureProvider()
         effective_payloads = deepcopy(provider_payloads or {})

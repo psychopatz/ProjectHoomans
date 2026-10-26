@@ -64,7 +64,7 @@ class ContextualActorContextP2Tests(unittest.TestCase):
         self.assertEqual(context["relationship"]["state"], "friend")
         self.assertTrue(context["roles"]["trader"])
         self.assertTrue(context["roles"]["companion"])
-        self.assertEqual(context["situation"]["healthState"], "wounded")
+        self.assertEqual(context["situation"]["healthState"], "injured")
         self.assertEqual(context["situation"]["activeBehavior"], "searching")
         self.assertTrue(context["privacy"]["undiscoveredFactsExcluded"])
         self.assertEqual(

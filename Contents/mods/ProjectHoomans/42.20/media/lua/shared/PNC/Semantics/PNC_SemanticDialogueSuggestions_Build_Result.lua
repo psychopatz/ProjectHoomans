@@ -8,8 +8,21 @@ local appendCampSiteCapabilityRows = Internal.appendCampSiteCapabilityRows
 local isCompanionOrderAction = Internal.isCompanionOrderAction
 local buildGroups = Internal.buildGroups
 local ActorConversationContext = Internal.ActorConversationContext
+local HubPresentation = require
+    "PNC/Semantics/PNC_SemanticDialogueSuggestions_HubPresentation"
 
 function Internal.FinalizeSuggestionBuild(state)
+    -- Filter only the currently visible What's Up avenue rows. This happens
+    -- before ranking and grouping so counts, ordering, and native/harness
+    -- choice surfaces all agree while semantic input remains unrestricted.
+    local visibleCandidates =
+        HubPresentation.FilterCandidates(
+            state.candidates,
+            state.context,
+            state.activeHubID
+        )
+    state.candidates = visibleCandidates
+
     local ranking, orderedCandidates = ChoiceRanking.Apply(
         state.candidates,
         state.capabilities,

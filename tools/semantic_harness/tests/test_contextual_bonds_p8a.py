@@ -133,7 +133,7 @@ class ContextualBondsP8ATests(unittest.TestCase):
             "npc.gender": "female",
             "npc.role": "none",
             "persona.bondKind": "mother",
-            "npc.healthState": "healthy",
+            "npc.health.state": "normal",
             "npc.activeBehavior": "idle",
             "persona.traits": ["reserved"],
             "persona.socialStyle": "neutral",

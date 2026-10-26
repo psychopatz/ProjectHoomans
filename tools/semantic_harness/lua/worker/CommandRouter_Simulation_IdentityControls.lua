@@ -82,11 +82,52 @@ function IdentityControls.append(add, context, persona, roles, traits, playerTra
         workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
         workbenchSection = "Context",
     })
-    add("npc.healthState", "npc.healthState", "Actors", "NPC", "Health", "combobox", "enum", {
-        options = { "unknown", "healthy", "injured", "wounded", "critical", "dead" },
-        optionsSource = "semantic_lab.harness",
+    add("npc.health.state", "npc.health.state", "Actors", "NPC", "Health state", "combobox", "enum", {
+        options = { "normal", "incapacitated", "dead" },
+        optionsSource = "PNC.Health",
         workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
-        workbenchSection = "Context",
+        workbenchSection = "Health",
+    })
+    add("npc.health.current", "npc.health.current", "Actors", "NPC", "Current HP", "spinbox", "integer", {
+        min = 0, max = 1000, step = 1,
+        optionsSource = "PNC.Health",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Health",
+    })
+    add("npc.health.max", "npc.health.max", "Actors", "NPC", "Maximum HP", "spinbox", "integer", {
+        min = 1, max = 1000, step = 1,
+        optionsSource = "PNC.Health",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Health",
+    })
+    add("npc.health.body.overallPercent", "npc.health.body.overallPercent", "Actors", "NPC", "Body health %", "slider", "number", {
+        min = 0, max = 100, step = 1, format = "%.0f",
+        optionsSource = "PNC.NPCWounds.BuildSnapshot",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Health",
+    })
+    add("npc.health.body.openWoundCount", "npc.health.body.openWoundCount", "Actors", "NPC", "Open wounds", "integer", "integer", {
+        min = 0, max = 64, step = 1,
+        optionsSource = "PNC.NPCWounds.BuildSnapshot",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Health",
+    })
+    add("npc.health.body.bandagedWoundCount", "npc.health.body.bandagedWoundCount", "Actors", "NPC", "Bandaged wounds", "integer", "integer", {
+        min = 0, max = 64, step = 1,
+        optionsSource = "PNC.NPCWounds.BuildSnapshot",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Health",
+    })
+    add("npc.health.body.bleedingRate", "npc.health.body.bleedingRate", "Actors", "NPC", "Bleeding rate", "spinbox", "number", {
+        min = 0, max = 100, step = 0.1, format = "%.1f",
+        optionsSource = "PNC.NPCWounds.BuildSnapshot",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Health",
+    })
+    add("npc.health.body.infected", "npc.health.body.infected", "Actors", "NPC", "Active infection", "boolean", "boolean", {
+        optionsSource = "PNC.NPCWounds.BuildSnapshot",
+        workbench = true, workbenchPanel = "NPC Target", workbenchTab = "Overview",
+        workbenchSection = "Health",
     })
     add("npc.activeBehavior", "npc.activeBehavior", "Actors", "NPC", "Activity", "combobox", "enum", {
         options = { "idle", "following", "staying", "busy", "searching", "fleeing", "hostile", "combat" },

@@ -106,7 +106,18 @@ class ContextualSuggestionsFollowupTests(unittest.TestCase):
                 "permittedCapabilities"
             ]
         }
-        self.assertEqual(statuses["FOLLOW"], "unavailable_rejected")
+        suggestions = clicked["observation"]["suggestions"]
+        self.assertEqual(
+            suggestions["actorConversationContext"]["situation"][
+                "activeBehavior"
+            ],
+            "following",
+        )
+        self.assertEqual(suggestions["currentGroupID"], "companion.orders")
+        # FOLLOW/STAY are a toggle surface: once FOLLOW is accepted, the
+        # already-active action is omitted instead of rendered as a disabled
+        # duplicate, while STAY becomes the actionable alternative.
+        self.assertNotIn("FOLLOW", statuses)
         self.assertEqual(statuses["STAY"], "eligible")
 
 

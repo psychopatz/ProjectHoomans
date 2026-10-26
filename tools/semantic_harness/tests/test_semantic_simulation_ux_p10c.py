@@ -35,7 +35,7 @@ class SimulationControlCatalogP10CTests(unittest.TestCase):
             self.assertEqual((row["min"], row["max"], row["step"]), (0, 1, 0.05))
         self.assertEqual(by_id["world.zombieKills"]["control"], "integer")
         self.assertEqual(by_id["world.timeOfDay"]["control"], "slider")
-        self.assertEqual(by_id["npc.healthState"]["control"], "combobox")
+        self.assertEqual(by_id["npc.health.state"]["control"], "combobox")
         self.assertEqual(by_id["npc.activeBehavior"]["control"], "combobox")
         self.assertEqual(by_id["persona.traits"]["control"], "multi_select")
         self.assertEqual(by_id["persona.bondKind"]["optionsSource"], "PNC.RelationshipKinds")
@@ -71,7 +71,10 @@ class SimulationControlCatalogP10CTests(unittest.TestCase):
             "world.hunger": 0.65,
             "world.zombieKills": 14,
             "world.timeOfDay": 21.5,
-            "npc.healthState": "injured",
+            "npc.health.state": "normal",
+            "npc.health.current": 95,
+            "npc.health.max": 100,
+            "npc.health.body.overallPercent": 95,
             "npc.activeBehavior": "idle",
             "npc.role": "trader",
             "npc.gender": "female",
@@ -93,7 +96,9 @@ class SimulationControlCatalogP10CTests(unittest.TestCase):
         self.assertEqual(updated["world"]["hunger"], 0.65)
         self.assertEqual(updated["world"]["zombieKills"], 14)
         self.assertEqual(updated["world"]["timeOfDay"], 21.5)
-        self.assertEqual(updated["npc"]["healthState"], "injured")
+        self.assertEqual(updated["npc"]["health"]["state"], "normal")
+        self.assertEqual(updated["npc"]["health"]["current"], 95)
+        self.assertEqual(updated["npc"]["health"]["body"]["overallPercent"], 95)
         self.assertEqual(updated["npc"]["role"], "trader")
         self.assertEqual(updated["npc"]["gender"], "female")
         self.assertEqual(updated["npc"]["startingRelationship"]["kind"], "mother")
@@ -126,7 +131,7 @@ class SimulationControlCatalogP10CTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "world.hunger must use increments of 0.05"):
             collect_scenario_settings(deepcopy(DEFAULT_SCENARIO), invalid, catalog)
         invalid = dict(values)
-        invalid["npc.healthState"] = "made-up"
+        invalid["npc.health.state"] = "made-up"
         with self.assertRaisesRegex(ValueError, "not in the worker catalog"):
             collect_scenario_settings(deepcopy(DEFAULT_SCENARIO), invalid, catalog)
 
@@ -160,7 +165,7 @@ class SimulationControlCatalogP10CTests(unittest.TestCase):
             self.assertNotIn("world.hunger", widgets)
             self.assertNotIn("world.timeOfDay", widgets)
             self.assertIn("npc.needs.hunger", app.workbench_control_fields)
-            self.assertNotIn("npc.healthState", widgets)
+            self.assertNotIn("npc.health.state", widgets)
             self.assertNotIn("world.zombieKills", widgets)
             self.assertIsInstance(widgets["persona.bondKind"], ttk.Combobox)
             app.settings_variables["persona.bondKind"].set("mother")

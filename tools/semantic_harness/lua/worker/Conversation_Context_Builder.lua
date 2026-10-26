@@ -2,6 +2,7 @@
 
 local Builder = {}
 local Sources = require "worker/Conversation_Context_Sources"
+local Health = require "worker/Conversation_Context_Health"
 local ActorConversationContext = require
     "PNC/Semantics/PNC_ActorConversationContext"
 
@@ -15,6 +16,7 @@ function Builder.build(context)
     local world = scenario.world or {}
     local conversation = scenario.conversation or {}
     local player = scenario.player or {}
+    local worldAgeHours = number(world.worldAgeHours, 0)
     local playerNeedSource = type(player.needs) == "table"
         and player.needs or world
     local relationship = context.SemanticAdapters.relationshipFor(
@@ -49,10 +51,7 @@ function Builder.build(context)
         and npc.conditionStats or world
     local needs = Sources.numbersFor(needSource, Sources.NEED_KEYS, number)
     local conditions = Sources.numbersFor(conditionSource, Sources.CONDITION_KEYS, number)
-    local bodyHealth = type(npc.bodyHealth) == "table"
-        and copy(npc.bodyHealth) or nil
-    local hpCurrent = number(npc.hpCurrent, nil)
-    local hpMax = number(npc.hpMax, nil)
+    local health = Health.project(npc, copy, number)
     local snapshotNeeds = copy(needs)
     -- Preserve the old snapshot.needs condition fields for worker consumers,
     -- while exposing conditionStats to the real production situation resolver.
@@ -82,6 +81,10 @@ function Builder.build(context)
         and Runtime.view.spec.context or nil
     local output = {
         npcID = npc.npcID,
+        worldContext = {
+            worldAgeHours = worldAgeHours,
+            gameDay = math.floor(math.max(0, worldAgeHours) / 24),
+        },
         campSiteCandidates = copy(
             scenario.campSiteCandidates
                 or (priorContext and priorContext.campSiteCandidates)
@@ -105,7 +108,7 @@ function Builder.build(context)
             traits = copy(npc.traits or {}),
             startingRelationship = copy(npc.startingRelationship),
             identityState = effectiveIdentityState,
-            healthState = npc.healthState,
+            healthState = health.state,
             activeBehavior = npc.activeBehavior,
             orderKind = npc.orderKind
                 or (type(npc.orderSpec) == "table" and npc.orderSpec.kind)
@@ -114,9 +117,9 @@ function Builder.build(context)
             hostility = copy(npc.hostility),
             tacticalHostility = copy(tacticalHostility),
             role = npc.role,
-            bodyHealth = bodyHealth,
-            hpCurrent = hpCurrent,
-            hpMax = hpMax,
+            bodyHealth = health.body,
+            hpCurrent = health.current,
+            hpMax = health.maximum,
             needs = copy(needs),
             conditionStats = copy(conditions),
         },
@@ -182,13 +185,13 @@ function Builder.build(context)
                 followState = copy(npc.followState or { mode = "idle" }),
                 hostility = copy(npc.hostility),
                 role = npc.role,
-                healthState = npc.healthState,
-                bodyHealth = bodyHealth,
+                healthState = health.state,
+                bodyHealth = health.body,
                 residence = copy(npc.residence),
                 knowledge = copy(npc.knowledge),
                 inventorySummary = copy(npc.inventorySummary),
-                hpCurrent = hpCurrent,
-                hpMax = hpMax,
+                hpCurrent = health.current,
+                hpMax = health.maximum,
                 needs = snapshotNeeds,
                 conditionStats = copy(conditions),
                 tacticalClass = npc.tacticalClass,
@@ -225,7 +228,21 @@ function Builder.build(context)
         end
     end
     output.currentTopic = output.conversationTopic
+    -- Keep the worker on the same production projection seam as the client:
+    -- raw health is converted into the bounded semantic situation before
+    -- actor context and suggestion ranking consume it.
+    local situation = PNC.Semantics and PNC.Semantics.DialogueSituation or nil
+    if situation and type(situation.Build) == "function" then
+        output.dialogueSituation = situation.Build(output)
+    end
     output.actorConversationContext = ActorConversationContext.Build(output)
+    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local internal = input and input.Internal or nil
+    if internal and type(internal.AttachSemanticHubPresentation)
+        == "function"
+    then
+        output = internal.AttachSemanticHubPresentation(output, Runtime.view)
+    end
     return output
 end
 

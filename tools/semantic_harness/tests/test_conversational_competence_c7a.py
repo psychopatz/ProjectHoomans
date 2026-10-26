@@ -73,12 +73,12 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
         self.assertEqual(residence["transport"], [])
 
         self.assertEqual(bite["result"]["ir"]["subject"], "NPC_BITE_STATUS")
-        self.assertEqual(bite["result"]["ir"]["diagnostics"]["factStatus"], "unknown")
-        self.assertEqual(bite["result"]["decision"]["response"]["uncertainty"], "unknown")
-        self.assertIn("can't confirm", self.message_text(bite).lower())
+        self.assertEqual(bite["result"]["ir"]["diagnostics"]["factStatus"], "known")
+        self.assertEqual(bite["result"]["decision"]["response"]["uncertainty"], "known")
+        self.assertIn("recorded bite", self.message_text(bite).lower())
         self.assertEqual(
             bite["trace"][0]["data"]["classification"],
-            "recognized_question_unknown_fact",
+            "recognized_question",
         )
         self.assertEqual(bite["trace"][0]["data"]["responseClassification"], "grounded_npc_response")
         self.assertEqual(bite["transport"], [])
@@ -170,8 +170,10 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
         for label, body_health, value, template, expected_text in cases:
             with self.subTest(case=label):
                 scenario = deepcopy(DEFAULT_SCENARIO)
-                if body_health is not None:
-                    scenario["npc"]["bodyHealth"] = body_health
+                if body_health is None:
+                    scenario["npc"]["health"] = None
+                else:
+                    scenario["npc"]["health"]["body"] = body_health
                 with LuaSemanticWorker(scenario) as worker:
                     turn = worker.input("did a zombie bite you")
                 self.assert_offline_question(turn)
@@ -229,9 +231,9 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
         self.assertEqual(tl_turn["toolCalls"], [])
         self.assertEqual(
             tl_bite["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_QuestionMedicalBiteUnknown",
+            "UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative",
         )
-        self.assertIn("makumpirma", self.message_text(tl_bite))
+        self.assertIn("naitalang kagat", self.message_text(tl_bite))
         self.assertEqual(tl_bite["transport"], [])
         self.assertEqual(tl_bite["toolCalls"], [])
 

@@ -133,8 +133,7 @@ class ConversationalCompetenceC7CTests(unittest.TestCase):
     def test_topic_carryover_and_truthful_unknown_continuation(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
         scenario["npc"]["residence"] = {"label": "Riverside Camp"}
-        scenario["npc"]["healthState"] = None
-        scenario["npc"]["bodyHealth"] = None
+        scenario["npc"]["health"] = None
         with LuaSemanticWorker(scenario) as worker:
             residence = worker.input("where is your home")
             health = worker.input("what about your health")

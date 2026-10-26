@@ -76,6 +76,10 @@ local function relationshipProposalCandidate(context, relationship, bond, groupI
                 actionID = "relationship_proposal",
                 relationshipState = relationship.state,
                 bond = bond.class,
+                hubID = groupID == "semantic_hub.whats_up"
+                    and "whats_up" or nil,
+                hubAvenue = groupID == "semantic_hub.whats_up"
+                    or nil,
             },
             textKey =
                 "UI_PNC_Conversation_Suggestion_RelationshipProposal_Utterance",

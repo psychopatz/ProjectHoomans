@@ -47,26 +47,26 @@ class WellbeingProjectionTests(unittest.TestCase):
         neutral_needs = {"hunger": 0.05, "thirst": 0.05, "fatigue": 0.05}
         neutral_conditions = {"stress": 0.0, "panic": 0.0, "boredom": 0.0}
         cases = (
-            ("healthy", {"healthState": "healthy", "needs": neutral_needs,
+            ("normal", {"healthState": "normal", "needs": neutral_needs,
                          "conditionStats": neutral_conditions},
-             "healthy", "thirst", "normal",
+             "normal", "thirst", "normal",
              "semantic.question.wellbeing.default"),
             ("injured", {"healthState": "injured", "needs": neutral_needs,
                          "conditionStats": neutral_conditions},
              "injured", "thirst", "normal",
              "semantic.question.wellbeing.injured"),
-            ("thirst", {"healthState": "healthy",
+            ("thirst", {"healthState": "normal",
                         "needs": {"hunger": 0.05, "thirst": 0.95, "fatigue": 0.05},
                         "conditionStats": neutral_conditions},
-             "healthy", "thirst", None,
+             "normal", "thirst", None,
              "semantic.question.wellbeing.thirst"),
-            ("panic", {"healthState": "healthy", "needs": neutral_needs,
+            ("panic", {"healthState": "normal", "needs": neutral_needs,
                        "conditionStats": {"stress": 0.0, "panic": 95, "boredom": 0.0}},
-             "healthy", "thirst", "normal",
+             "normal", "thirst", "normal",
              "semantic.question.wellbeing.panic"),
-            ("stress", {"healthState": "healthy", "needs": neutral_needs,
+            ("stress", {"healthState": "normal", "needs": neutral_needs,
                          "conditionStats": {"stress": 95, "panic": 0.0, "boredom": 0.0}},
-             "healthy", "thirst", "normal",
+             "normal", "thirst", "normal",
              "semantic.question.wellbeing.stress"),
         )
         for label, npc, health, need, urgency, template_prefix in cases:
@@ -157,7 +157,7 @@ class WellbeingProjectionTests(unittest.TestCase):
         situation, _ = self.assert_offline_wellbeing(result)
         self.assertEqual(situation["activity"]["id"], "fishing")
         self.assertEqual(situation["needs"]["highest"], "thirst")
-        self.assertEqual(situation["healthState"], "healthy")
+        self.assertEqual(situation["healthState"], "normal")
 
     def test_live_health_snapshot_projects_minor_wound_as_injured(self) -> None:
         scenario = self.scenario({
@@ -181,6 +181,64 @@ class WellbeingProjectionTests(unittest.TestCase):
             response["templateID"],
             "semantic.question.wellbeing.injured",
         )
+
+    def test_canonical_health_record_drives_semantic_normal_and_injury(self) -> None:
+        normal = self.scenario({
+            "health": {
+                "state": "normal",
+                "current": 100,
+                "max": 100,
+                "body": {
+                    "openWoundCount": 0,
+                    "bandagedWoundCount": 0,
+                    "infected": False,
+                    "overallPercent": 100,
+                    "wounds": {},
+                },
+            },
+            "needs": {},
+            "conditionStats": {},
+        })
+        injured = self.scenario({
+            "health": {
+                "state": "normal",
+                "current": 95,
+                "max": 100,
+                "body": {
+                    "openWoundCount": 1,
+                    "bandagedWoundCount": 0,
+                    "infected": False,
+                    "overallPercent": 98,
+                    "wounds": {"Hand_L": {"type": "scratch"}},
+                },
+            },
+            "needs": {},
+            "conditionStats": {},
+        })
+        with LuaSemanticWorker(normal) as worker:
+            normal_turn = worker.input("Are you okay?")
+        with LuaSemanticWorker(injured) as worker:
+            injured_turn = worker.input("Are you okay?")
+
+        normal_situation, normal_response = self.assert_offline_wellbeing(normal_turn)
+        injured_situation, injured_response = self.assert_offline_wellbeing(injured_turn)
+        self.assertEqual(normal_situation["healthState"], "normal")
+        self.assertEqual(
+            normal_response["templateID"],
+            "semantic.question.wellbeing.default",
+        )
+        self.assertEqual(injured_situation["healthState"], "injured")
+        self.assertEqual(
+            injured_response["templateID"],
+            "semantic.question.wellbeing.injured",
+        )
+
+    def test_canonical_health_rejects_semantic_only_state_names(self) -> None:
+        scenario = self.scenario({
+            "health": {"state": "injured", "current": 95, "max": 100},
+        })
+        with self.assertRaisesRegex(ValueError, "npc.health.state"):
+            validate_scenario(scenario)
 
     def test_live_incapacitated_health_projects_to_injured_response(self) -> None:
         scenario = self.scenario({
@@ -209,7 +267,8 @@ class WellbeingProjectionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = save_scenario(Path(directory) / "npc-state.json", scenario)
             restored = load_scenario(path)
-        self.assertEqual(restored["npc"]["healthState"], "injured")
+        self.assertEqual(restored["npc"]["health"]["state"], "normal")
+        self.assertEqual(restored["npc"]["health"]["body"]["openWoundCount"], 1)
         self.assertEqual(restored["npc"]["activeBehavior"], "treatment")
         self.assertEqual(restored["npc"]["needs"]["thirst"], 0.93)
         self.assertEqual(restored["npc"]["conditionStats"]["stress"], 0.91)
@@ -265,13 +324,13 @@ class WellbeingProjectionTests(unittest.TestCase):
             ),
             (
                 "thirst",
-                {"healthState": "healthy", "needs": {"thirst": 0.95},
+                {"healthState": "normal", "needs": {"thirst": 0.95},
                  "conditionStats": {}},
                 "semantic.question.wellbeing.follow_up.thirst",
             ),
             (
                 "panic",
-                {"healthState": "healthy", "needs": {},
+                {"healthState": "normal", "needs": {},
                  "conditionStats": {"panic": 95}},
                 "semantic.question.wellbeing.follow_up.panic",
             ),

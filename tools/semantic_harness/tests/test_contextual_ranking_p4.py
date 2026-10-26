@@ -78,10 +78,10 @@ class ContextualRankingP4Tests(unittest.TestCase):
             self.assertTrue(clicked["accepted"], clicked.get("reason"))
 
     def test_private_fields_do_not_change_projection_or_ranking_trace(self) -> None:
-        public = self._turn({"healthState": "healthy"}, "Are you okay?")
+        public = self._turn({"healthState": "normal"}, "Are you okay?")
         private = self._turn(
             {
-                "healthState": "healthy",
+                "healthState": "normal",
                 "orientation": "private-orientation-sentinel",
                 "romanceStyle": "private-romance-sentinel",
                 "jealousyStyle": "private-jealousy-sentinel",

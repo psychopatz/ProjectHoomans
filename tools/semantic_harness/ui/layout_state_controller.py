@@ -11,9 +11,6 @@ def restore_ui_state(app: Any) -> None:
     def restore() -> None:
         try:
             saved_window_state = app._ui_state.get("window_state")
-            saved_geometry = app._ui_state.get("geometry")
-            if isinstance(saved_geometry, str) and saved_geometry:
-                app.root.geometry(saved_geometry)
             if saved_window_state in {"normal", "zoomed"}:
                 app.root.state(saved_window_state)
             main_index = int(app._ui_state.get("main_tab", 0))
@@ -113,10 +110,18 @@ def restore_splitters(app: Any) -> None:
     # Preserve user-saved sash values across the topology migration. The
     # default proportion gives Conversation the large pane; a user may still
     # intentionally choose a narrower context dock.
-    workflow_minimum = 280
+    # Keep enough width for the conversation pane even when a sash saved on a
+    # larger desktop is restored at the 1080px acceptance-test floor. The
+    # context dock remains usable at 180px and its notebook pages can scroll.
+    workflow_minimum = min(420, max(280, workflow_width - 180))
+    context_minimum = (
+        180
+        if workflow_width < 900
+        else (360 if app.save_backed_mode else 320)
+    )
     workflow_maximum = max(
         workflow_minimum,
-        workflow_width - (360 if app.save_backed_mode else 320),
+        workflow_width - context_minimum,
     )
     workflow_value = (
         app._ui_state.get("workflow_sash") if sashes_compatible else None

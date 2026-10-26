@@ -50,7 +50,7 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             "runtime.language",
             "runtime.DTHoomans",
             "npc.role",
-            "npc.healthState",
+            "npc.health.state",
             "npc.activeBehavior",
             "relationship.bond",
             "persona.socialStyle",
@@ -130,7 +130,7 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
                 app.preview_button.cget("text"), "Preview (no send)"
             )
             fields = app.workbench_control_fields
-            self.assertIsInstance(fields["npc.healthState"].widget, ttk.Combobox)
+            self.assertIsInstance(fields["npc.health.state"].widget, ttk.Combobox)
             self.assertEqual(fields["relationship.bond"].kind, "read_only")
             self.assertIsInstance(fields["relationship.approval"].widget, tk.Scale)
             self.assertIsInstance(fields["persona.personality.compassion"].widget, tk.Scale)
@@ -154,7 +154,8 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             self.assertTrue(initial_ids)
             self.assertEqual(app.last_test_utterance, "What's up?")
 
-            fields["npc.healthState"].set_value("injured")
+            fields["npc.health.current"].set_value(95)
+            fields["npc.health.body.overallPercent"].set_value(95)
             fields["relationship.approval"].variable.set(80)
             app.apply_and_replay()
             wait_until(
@@ -172,14 +173,16 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             self.assertTrue(
                 all(isinstance(row.get("semanticFrame"), dict) for row in app.suggestion_rows)
             )
-            self.assertEqual(app.scenario["npc"]["healthState"], "injured")
+            self.assertEqual(app.scenario["npc"]["health"]["state"], "normal")
+            self.assertEqual(app.scenario["npc"]["health"]["current"], 95)
             self.assertEqual(app.scenario["npc"]["relationship"]["approval"], 80)
             self.assertEqual(errors, [])
             self.assertIn("Applied simulation context and replayed", app.transcript.get("1.0", "end"))
 
-            fields["npc.healthState"].set_value("healthy")
+            fields["npc.health.current"].set_value(100)
+            fields["npc.health.body.overallPercent"].set_value(100)
             app.apply_simulation_settings()
-            wait_until(lambda: not app.busy and app.scenario["npc"]["healthState"] == "healthy")
+            wait_until(lambda: not app.busy and app.scenario["npc"]["health"]["current"] == 100)
             self.assertEqual(errors, [])
             self.assertIn("Applied simulation workbench settings", app.transcript.get("1.0", "end"))
 
@@ -298,11 +301,12 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
                 app.send_button.invoke()
                 wait_until(lambda: not app.busy and app.last_test_utterance == "What's up?")
 
-                app.workbench_control_fields["npc.healthState"].set_value("injured")
+                app.workbench_control_fields["npc.health.current"].set_value(95)
+                app.workbench_control_fields["npc.health.body.overallPercent"].set_value(95)
                 app.workbench_apply_button.invoke()
                 wait_until(
                     lambda: not app.busy
-                    and app.scenario["npc"]["healthState"] == "injured"
+                    and app.scenario["npc"]["health"]["current"] == 95
                 )
                 app.open_conversation_button.invoke()
                 wait_until(

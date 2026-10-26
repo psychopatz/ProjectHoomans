@@ -68,6 +68,11 @@ function Internal.RefreshSuggestions(view, result)
         end
     end
     semanticContext.campSiteCandidates = campSiteCandidates
+    if type(Internal.AttachSemanticHubPresentation) == "function" then
+        semanticContext = Internal.AttachSemanticHubPresentation(
+            semanticContext, view
+        )
+    end
     local projection = Suggestions.Build(result, semanticContext, nil)
     view.semanticSuggestions = projection
     view.semanticSuggestionRevision = projection
@@ -119,6 +124,9 @@ function Internal.RefreshRootSuggestions(view)
         or view.semanticSuggestionGroupID
     context.activeSuggestionGroupID = view.semanticSuggestionGroupID
     context.semanticSuggestionGroupID = view.semanticSuggestionGroupID
+    if type(Internal.AttachSemanticHubPresentation) == "function" then
+        context = Internal.AttachSemanticHubPresentation(context, view)
+    end
     if view.spec and view.spec.context then
         view.spec.context.semanticSuggestionGroupID =
             view.semanticSuggestionGroupID

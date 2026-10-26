@@ -54,6 +54,8 @@ end
 
 local ContextProjection = require
     "PNC/Semantics/PNC_SemanticDialogueInput_ContextProjection"
+local SemanticHubPresentationState = require
+    "PNC/Semantics/PNC_SemanticDialogueHubPresentationState"
 local Requests = require "PNC/Semantics/PNC_SemanticDialogueInput_Requests"
 local RouterLifecycle = require
     "PNC/Semantics/PNC_SemanticDialogueInput_RouterLifecycle"
@@ -74,6 +76,10 @@ Internal.Policy = Policy
 Internal.LLMEnabled = ContextProjection.LLMEnabled
 Internal.ProviderStatus = function()
     return ContextProjection.ProviderStatus(Internal.LLMEnabled)
+end
+Internal.SemanticHubPresentationState = SemanticHubPresentationState
+Internal.AttachSemanticHubPresentation = function(context, view)
+    return SemanticHubPresentationState.AttachContext(context, view)
 end
 Internal.ShallowContext = function(view)
     local output = ContextProjection.Build(view, Internal.ProviderStatus)

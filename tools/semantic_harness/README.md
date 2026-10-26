@@ -206,13 +206,18 @@ The Simulation tab exposes a collapsible workbench for the worker-catalog fields
 
 ## Per-NPC semantic wellbeing scenarios
 
-An editable scenario can set `npc.healthState`, `npc.activeBehavior`,
-`npc.needs` (hunger/thirst/fatigue), and `npc.conditionStats`
-(stress/boredom/panic). These fields are projected to the production Lua
-dialogue situation. If a dedicated NPC state table is absent, legacy
-`world` values continue to provide mock needs/conditions. An explicit
-empty table means the NPC fact is unknown; setting health/activity to
-`null` also removes the default assumption in the worker.
+An editable scenario uses the production-shaped `npc.health` record
+(`state`, `current`, `max`, and bounded `body` wound snapshot), plus
+`npc.activeBehavior`, `npc.needs` (hunger/thirst/fatigue), and
+`npc.conditionStats` (stress/boredom/panic). The harness sends that raw
+health boundary to the production Lua situation resolver, which derives the
+semantic `normal`/`injured` state. Older `npc.healthState`/`npc.hpCurrent`/
+`npc.hpMax`/`npc.bodyHealth` fixtures are accepted only by a temporary
+migration adapter and are not persisted by `save_scenario`. If a dedicated
+NPC state table is absent, legacy `world` values continue to provide mock
+needs/conditions. An explicit empty table means the NPC fact is unknown;
+setting health/activity to `null` also removes the default assumption in the
+worker.
 
 Turn output includes `routedSituation`, read from the actual production
 semantic router after input submission. Inspect its `npc` fields alongside
