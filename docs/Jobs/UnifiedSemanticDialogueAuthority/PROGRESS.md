@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 accepted; P1 is the active implementation slice.
+**Status:** IN PROGRESS — P0 and P1 accepted; P2 is the active implementation slice.
 
 ## Audited baseline
 
@@ -40,8 +40,8 @@
 | Phase | State |
 | --- | --- |
 | P0 — authority inventory/baseline | **ACCEPTED** |
-| P1 — standardized semantic event realization boundary | **IN PROGRESS** |
-| P2 — NPC-initiated event follow-up bridge | NOT STARTED |
+| P1 — standardized semantic event realization boundary | **ACCEPTED** |
+| P2 — NPC-initiated event follow-up bridge | **IN PROGRESS** |
 | P3 — lower-risk native SocialFlavor migration | NOT STARTED |
 | P4 — complex medical/incapacitated migration | NOT STARTED |
 | P5 — ToolReplies + legacy registry migration | NOT STARTED |
@@ -66,19 +66,33 @@
   selection `5/5` in `0.52s`.
 - P0 intentionally removed no selector and changed no semantic authority.
 
-## Immediate Next Chunk — P1
+## Accepted P1 — semantic presentation boundary
 
-Close the semantic-owned presentation boundary without changing the generic
-PsychopatzCore compatibility contract:
+- `PNC_SocialFlavorPresentation_Receive_Payload.lua` now normalizes the
+  existing producer `resolvedText` field into the native `text` field and marks
+  semantic-owned packets explicitly.
+- `PNC_SocialFlavorPresentation_Receive.lua` rejects semantic-owned packets
+  without selected text before Core queue admission, so they cannot silently
+  invoke `Flavor.ResolveDetailed`.
+- Receive provenance now passes the normalized event type into the lifecycle
+  envelope builder.
+- Focused boundary evidence: `pnc_unified_authority_p1_boundary_smoke` and
+  the P0 characterization/presentation regressions pass `6/6`.
+- Generic compatibility packets remain eligible for the generic Core Flavor
+  fallback contract.
 
-1. Project both `text` and the existing `resolvedText` producer field at the
-   native presentation seam.
-2. Mark semantic-owned packets explicitly and reject them when selected text
-   is absent, while preserving generic Core Flavor fallback for compatibility
-   packets.
-3. Fix receive-context provenance to use the normalized event type.
-4. Add negative tests proving a Project Hoomans semantic packet cannot invoke
-   `Flavor.ResolveDetailed`.
+## Immediate Next Chunk — P2
+
+Bridge grounded NPC-initiated event speech into the existing lifecycle and
+Suggestions path:
+
+1. Add bounded event follow-up offers to the existing semantic response plans.
+2. Carry plan offers/provenance through `RecordNPCSpeech` and the existing
+   response window without storing rendered text.
+3. Project only eligible offers for the active Player↔NPC target and accept
+   typed equivalents through the existing context/NLU route.
+4. Add click/typed parity, expiry, privacy, stale-fact, and no-facts negative
+   coverage.
 
 After P1 gate passes, continue automatically through P2–P9.
 

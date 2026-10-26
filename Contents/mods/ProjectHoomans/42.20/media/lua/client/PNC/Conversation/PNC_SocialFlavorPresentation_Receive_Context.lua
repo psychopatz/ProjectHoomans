@@ -170,7 +170,7 @@ function H.EnrichReceiveContext(receive)
             context,
             npcID,
             receive.eventID,
-            eventType
+            receive.eventType
         )
     context.act = context.act or ambientFlavor.act
     context.topic = context.topic or ambientFlavor.topic

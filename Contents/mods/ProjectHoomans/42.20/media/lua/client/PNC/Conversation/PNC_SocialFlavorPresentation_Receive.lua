@@ -25,13 +25,21 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
     )
     if not receive then return false, reason end
     H.EnrichReceiveContext(receive)
+    local payload = H.BuildReceivePayload(receive)
+    if payload.semanticOwned and type(payload.text) ~= "string"
+        or payload.semanticOwned and payload.text == ""
+    then
+        H.Log("rejected", "event=" .. tostring(receive.eventID)
+            .. " reason=semantic_realization_text_required")
+        return false, "semantic_realization_text_required"
+    end
     InteractionPresentationRegistry.Remember(
         receive.eventID,
         receive.ambientFlavor.interaction
             or receive.context and receive.context.interaction
     )
     local accepted, enqueueReason = Client.Enqueue(
-        H.BuildReceivePayload(receive)
+        payload
     )
     reason = enqueueReason
     if accepted == true and ambientFlavor.pumpImmediately == true

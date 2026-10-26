@@ -4,11 +4,10 @@ T.addPackagePaths({
     { "ProjectHoomans", "client" },
 })
 
--- P0 characterization: the native presentation adapter historically projected
--- only `text`. Several semantic-first producers supplied their selected
--- wording as `resolvedText`, leaving a legacy flavorID available to Core's
--- generic fallback resolver. Keep this test explicit until P1 closes the
--- boundary; it prevents the migration from being blind to the split owner.
+-- This characterization started by recording that the native presentation
+-- adapter projected only `text`. P1 now closes that observed split by
+-- normalizing the already-selected `resolvedText` field; keep the assertion
+-- here as a regression against the original authority defect.
 PNC = {
     SocialFlavorPresentationInternal = {
         Clean = function(value, fallback)
@@ -48,10 +47,10 @@ local payload = PNC.SocialFlavorPresentationInternal.BuildReceivePayload({
     eventType = "witnessed_player_kill",
 })
 
-T.equal(payload.text, nil,
-    "P0 records that resolvedText was not projected into the native payload")
+T.equal(payload.text, "The semantic selection was made here.",
+    "resolvedText is projected into the native payload")
 T.equal(payload.flavorID, "social.witnessed_player_kill",
-    "P0 records the legacy selector still remained available")
+    "the presentation alias remains available without owning semantic text")
 T.equal(payload.responsePlanID, "semantic.combat.reaction.plan",
     "semantic provenance already crossed the presentation boundary")
 T.equal(payload.realizationID, "semantic.combat.reaction.variant",

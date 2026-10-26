@@ -14,6 +14,15 @@ function H.BuildReceivePayload(receive)
     local presentationOverrides = receive.presentationOverrides
     local context = receive.context
     local speaker = receive.speaker
+    local semanticOwned = ambientFlavor.semanticOwned == true
+        or sourceOverrides.kind == "semantic_speech"
+        or ambientFlavor.responsePlanID ~= nil
+        or ambientFlavor.realizationID ~= nil
+    local selectedText = type(ambientFlavor.text) == "string"
+        and ambientFlavor.text
+        or type(ambientFlavor.resolvedText) == "string"
+            and ambientFlavor.resolvedText
+            or nil
     return {
         eventID = receive.eventID,
         flavorID = ambientFlavor.flavorID
@@ -22,8 +31,11 @@ function H.BuildReceivePayload(receive)
         priority = tonumber(ambientFlavor.priority) or 35,
         llmPriority = tonumber(ambientFlavor.llmPriority) or 90,
         weight = tonumber(ambientFlavor.weight) or 1,
-        text = type(ambientFlavor.text) == "string"
-            and ambientFlavor.text or nil,
+        -- Semantic producers historically called this field `resolvedText`.
+        -- Normalize it here so the presentation queue receives the already
+        -- selected wording and never has to resolve meaning again.
+        text = selectedText,
+        semanticOwned = semanticOwned,
         act = ambientFlavor.act,
         topic = ambientFlavor.topic,
         responsePlanID = ambientFlavor.responsePlanID,
@@ -77,6 +89,7 @@ function H.BuildReceivePayload(receive)
             realizationID = ambientFlavor.realizationID,
             factRefs = ambientFlavor.factRefs,
             contextEligible = sourceOverrides.contextEligible,
+            semanticOwned = semanticOwned,
         },
         ttlMs = ambientFlavor.ttlMs,
         holdMs = ambientFlavor.holdMs,
