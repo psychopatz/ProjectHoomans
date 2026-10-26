@@ -20,6 +20,15 @@ class WorkerAuthoringOperations:
 
         return self._host._request("FLOW_CATALOG")
 
+    def response_pool_detail(
+        self, pool_id: str, *, offset: int = 0, limit: int = 8
+    ) -> dict[str, Any]:
+        """Inspect loaded Lua variants, never simulate their selection in Python."""
+        return self._host._request(
+            "RESPONSE_POOL_DETAIL",
+            {"poolID": pool_id, "offset": offset, "limit": limit},
+        )
+
     def fact_catalog(self) -> list[dict[str, Any]]:
         """Read typed engine facts exposed to semantic gates and context."""
 

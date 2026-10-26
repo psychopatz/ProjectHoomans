@@ -8,6 +8,8 @@ function Authoring.handle(context, command, payload)
 
     if command == "FLOW_CATALOG" then
         return context.FlowEditor.catalog(context)
+    elseif command == "RESPONSE_POOL_DETAIL" then
+        return context.FlowEditor.responsePoolDetail(context, payload)
     elseif command == "FLOW_VALIDATE" then
         if type(payload) ~= "table" then
             return nil, "flow_definition_must_be_object"

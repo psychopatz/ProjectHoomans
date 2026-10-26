@@ -156,6 +156,50 @@ local function catalog(context)
     }
 end
 
+-- Lazy, read-only detail for an actual loaded production response pool.
+-- An owning source path is intentionally UNKNOWN unless registration itself
+-- provides trustworthy provenance; scanning Lua text is not provenance.
+function FlowEditor.responsePoolDetail(context, request)
+    if type(request) ~= "table" or type(request.poolID) ~= "string"
+        or #request.poolID == 0 or #request.poolID > 96
+    then
+        return { ok = false, type = "response_pool_detail",
+            schemaVersion = 1, error = "invalid_pool_id" }
+    end
+    local ResponseCatalog = PNC.Semantics.ResponseCatalog
+        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local pool = ResponseCatalog.Get(request.poolID)
+    if not pool then
+        return { ok = false, type = "response_pool_detail",
+            schemaVersion = 1, error = "response_pool_unavailable" }
+    end
+    local offset = tonumber(request.offset) or 0
+    local limit = tonumber(request.limit) or 8
+    if offset < 0 or offset % 1 ~= 0 or limit < 1
+        or limit % 1 ~= 0 or limit > 16 then
+        return { ok = false, type = "response_pool_detail",
+            schemaVersion = 1, error = "invalid_page" }
+    end
+    local variants = {}
+    for i = offset + 1, math.min(#pool.variants, offset + limit) do
+        local v = pool.variants[i]
+        variants[#variants + 1] = {
+            id = v.id, templateID = v.templateID, fallback = v.fallback,
+            when = context.Values.copy(v.when or {}), priority = v.priority,
+            plan = context.Values.copy(v.plan or {}),
+            translationArgs = context.Values.copy(v.translationArgs or {}),
+            dialogueAct = v.dialogueAct, topic = v.topic,
+            sourceKind = "UNKNOWN", sourcePath = "UNKNOWN",
+        }
+    end
+    return {
+        ok = true, type = "response_pool_detail", schemaVersion = 1,
+        poolID = pool.id, variantCount = #pool.variants,
+        offset = offset, limit = limit, hasMore = offset + #variants < #pool.variants,
+        variants = variants, sourceKind = "UNKNOWN", sourcePath = "UNKNOWN",
+    }
+end
+
 function FlowEditor.catalog(context)
     return catalog(context)
 end
