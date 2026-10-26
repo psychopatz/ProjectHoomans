@@ -18,6 +18,7 @@
 | J. End-to-end | Focused and relevant broad Python tests, production Lua smoke, Kahlua syntax, CodeBuilder deterministic artifacts, Git cleanliness of unrelated paths, log of actual PASS/FAIL/SKIP and clear user-owned live gate. |
 | K. Surface ownership / no redundancy | Simulation is the only GUI conversation/context/regression execution workbench; Studio contains Explore + Dialogue Content + Review without a second Test Lab/Coverage runner; structural authoring is Developer Tools; World Browser and Log retain sole browser/timeline roles. Moved functionality uses existing services and real-worker GUI tests pass. |
 | L. Dialogue content / phrase variation | A reviewed canonical content source compiles deterministic phrase families without changing semantic selection. Phrase variants are selected after style, avoid immediate repeat, remain separately observable, and compile to ordinary string-valued EN/TL translation keys. Studio edits one migrated NPC family plus one verified player landing/choice text while structural metadata remains locked; real Lua proves unchanged plans/actions/authority/effects. |
+| M. Startup/session parity | Fresh GUI startup renders zero native Response Channel rows until production conversation open; visible rows then exactly match `conversationPresentation.responseChannel`. The last active valid SAVE/player/NPC auto-restores across app recreation using existing read-only import; invalid remembered targets fall back safely; `--reset-ui-state` disables restoration. Studio Explore auto-populates a bounded first catalog page on worker-ready. |
 
 ## Minimum reusable scenario matrix
 
@@ -51,7 +52,7 @@ Historical passing tests are a starting baseline, not a pass for newly implement
 - Structural authoring is available only through Developer Tools; primary Studio navigation no longer exposes Build Workflow, Block Palette, Interaction Composer or raw JSON editing as peer everyday tasks.
 - World Browser remains the persisted target chooser and Simulation links to it; no second save browser is introduced.
 - Log remains the full activity timeline.
-- UI-state restore from older layouts does not crash, display removed duplicate panes, or lose the selected saved/fixture target; the consolidated nested selections persist under layout-state version 3.
+- UI-state restore from older layouts does not crash, display removed duplicate panes, or lose the selected saved/fixture target; the consolidated nested selections persist under the current layout-state version.
 
 ## Dialogue content registry checks
 
@@ -62,6 +63,16 @@ Historical passing tests are a starting baseline, not a pass for newly implement
 - CodeBuilder generation from the canonical content source is idempotent and stale-source guards reject outdated Studio edits.
 - A verified player landing/choice EN/TL text can be edited without changing candidate ID, route, hub ID, canonical concept or eligibility, and its visible label does not reroll on ordinary UI refresh.
 - No phrase text/history is persisted to NPC ModData or source saves.
+
+## Startup/session parity checks
+
+- Fresh fixture startup: worker may expose diagnostic semantic suggestions, but the visible Response Channel has zero clickable rows until production Conversation open.
+- After `Open conversation`, capture the worker's native presentation and assert GUI row IDs, labels and enabled state match exactly.
+- Import a real read-only saved Player/NPC pair, restart the Lua worker, and assert source kind/source ID/NPC remain unchanged.
+- Persist UI state, destroy the entire Semantic Lab app, recreate it, and assert the remembered active SAVE pair is re-imported automatically without opening World Browser manually.
+- Delete/rename or otherwise invalidate a copied remembered test source and assert safe FIXTURE fallback plus an explicit warning.
+- Recreate with `--reset-ui-state` and assert no remembered target is imported.
+- Worker-ready automatically populates Studio Explore's first bounded production response-pool page; Search is not required for initialization.
 
 ## User-owned final live checklist
 

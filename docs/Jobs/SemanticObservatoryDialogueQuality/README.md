@@ -1,6 +1,6 @@
 # Semantic Observatory & Dialogue Quality Harness
 
-**Status: IN PROGRESS — P0/P1 foundations are accepted; current phase truth and in-flight P3/P4/P6 evidence live in PROGRESS.md. P3/P6 now additionally require the user-directed Dialogue Content Registry / phrase-variation workflow before P7 can pass.** Parent goal is not complete. Reverify the actual checkout/worktree before acting; do not rely on this overview for a current commit SHA.
+**Status: IN PROGRESS — P3/P7 reopened for Startup & Session Parity after live Semantic Lab findings; P0/P1/P2/P4/P5/P6 remain accepted.** Parent goal is not complete. Reverify the actual checkout/worktree before acting; do not rely on this overview for a current commit SHA.
 
 ## Complete goal
 

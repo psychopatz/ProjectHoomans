@@ -1,6 +1,6 @@
 # Semantic Observatory & Dialogue Quality Harness — full developer roadmap
 
-**Parent goal: DEVELOPER-SIDE COMPLETE — READY FOR USER LIVE TEST.** These are mandatory developer-side phases P0–P7, not separate /goal assignments. Native Project Zomboid SP/MP verification remains user-owned; current phase truth is reconciled in PROGRESS.md from evidence rather than chronological notes.
+**Parent goal: IN PROGRESS — P3/P7 REOPENED by live startup/session parity findings.** These are mandatory developer-side phases P0–P7, not separate /goal assignments. Native Project Zomboid SP/MP verification remains user-owned only after the reopened developer-side gates pass; current phase truth is reconciled in PROGRESS.md from evidence rather than chronological notes.
 
 ## P0 — Baseline and canonical contracts
 **Status: COMPLETE at audited ProjectHoomans 07aad881.**
@@ -33,7 +33,7 @@
 **Gate:** seeded and natural-history observed selections match explanations; explain does not mutate selection history or dispatch; source/authority joins never overclaim exact ownership.
 
 ## P3 — Human UI surface consolidation
-**Status: COMPLETE.** Simulation owns execution/context/regression; Studio is Explore + Dialogue Content + Review with structural tools behind Developer Tools.
+**Status: REOPENED / IN PROGRESS.** Core ownership consolidation is accepted, but P3B Startup & Session Parity is mandatory after live use exposed false pre-conversation Response Channel rows, non-restored active SAVE targets, and empty Explore startup.
 
 - Enforce the ownership contract in SURFACE_CONSOLIDATION.md: Simulation executes/tests; Studio is Explore + Dialogue Content + Review; World Browser selects persisted targets; Log owns activity history.
 - Remove Studio Observatory Test Lab as a parallel conversation runner. All interactive fixture/save-backed execution now routes through Simulation.
@@ -47,6 +47,8 @@
 
 **Gate:** one user task has one GUI home; no duplicate Studio runner/context/coverage surface remains; Studio defaults to Explore + Dialogue Content + Review, structural authoring is Developer Tools; Simulation retains all runtime/testing capability; World Browser/Log remain sole owners; Dialogue Content can safely edit one canonical phrase family and one verified landing/choice text with locked structural metadata; moved/retired functions pass real-worker Tk/Xvfb and CLI parity regression without semantic or save behavior changes.
 
+**P3B startup/session addendum:** visible Response Channel rows must be empty before native conversation open and thereafter exactly match production `conversationPresentation.responseChannel`; remembered active SAVE source/player/NPC must auto-restore across Semantic Lab application launches using existing read-only import logic; Studio Explore must populate its first bounded catalog page automatically on worker-ready; stale remembered targets fall back safely to FIXTURE. See SURFACE_CONSOLIDATION.md.
+
 ## P4 — Grounded scenario matrix and quality coverage
 **Status: COMPLETE.**
 
@@ -54,12 +56,12 @@
 - Reset histories between unrelated cases; retain history intentionally for anti-repeat sequences.
 - Report tested/untested, eligible/selected/lower-ranked/tied, fallback, contextual dominance, repetition/equivalence, translation mismatch, disclosure and unintended effects.
 - Store compact fixtures/evidence; no unbounded NPC state or transcript duplication.
-- **Mandatory remaining lifecycle proof:** construct a disposable save-backed player-owned faction and exercise the real worker Leave Group warning→confirmation→production ColonistDeparture path end to end. Existing unowned rejection and server/service-positive smokes do not replace this worker-level proof.
+- **Accepted lifecycle proof:** the disposable save-backed player-owned faction fixture exercises the real worker Leave Group warning→confirmation→production ColonistDeparture path end to end; unowned/other-owner rejection remains covered.
 
 **Gate:** greeting/wellbeing/farewell/companion action and owned/unowned Leave Group behavior are reproducible in actual Core+Hoomans worker fixtures, with EN/TL where supported and explicit source/worker revision.
 
 ## P5 — Agent-first CLI/reporting
-**Status: COMPLETE. Required commands and bounded error/scale/parity paths are verified.
+**Status: COMPLETE.** Required commands and bounded error/scale/parity paths are verified.
 
 - Keep stable headless catalog/detail/explain/turn/matrix/coverage/lineage/translation/proposal/compare operations routed through the same services as GUI.
 - Emit schema-versioned bounded JSON/JSONL with limits, paging/truncation, fingerprints, sourceKind, exit codes and actionable errors.
@@ -83,7 +85,7 @@
 **Gate:** the prior canonical promotion remains valid **and** the Dialogue Content Registry acceptance in DIALOGUE_CONTENT_REGISTRY.md passes: deterministic CodeBuilder generation, string-only translations, separate semantic/style/phrase identities, 3+ EN/TL phrases with anti-repeat real-Lua proof, Studio content editing with stale guards, one locked-structure player landing edit, unchanged plans/actions/authority/effects, and no save/ModData text bloat.
 
 ## P7 — End-to-end developer acceptance, scale and handoff
-**Status: READY FOR USER LIVE TEST.** Consolidated developer-side Python/Lua/Tk/Kahlua/CodeBuilder/hash gate is green; native SP/MP remains user-owned.
+**Status: REOPENED / IN PROGRESS.** The prior broad suite was green but did not cover P3B startup/session lifecycle parity. Re-accept only after the new GUI lifecycle tests and another consolidated developer gate pass.
 
 - Exercise final P0–P6 flows in headless CLI and actual Tk GUI against production Lua/Core.
 - Compare startup/query/replay/output/memory budgets to P0; respect current catalog/history caps unless separately justified.
@@ -91,15 +93,14 @@
 - Verify no new source-of-truth duplication, watched-media staging, save writes or native/runtime publication side effects.
 - Prepare user native SP/MP checklist only after every developer-implementable gate passes.
 
-**Gate:** final real-Lua + GUI/headless parity + canonical source-patch regression + performance/data-safety evidence passes. Then set **READY FOR USER LIVE TEST**. Native SP/MP remains user-owned; after that acceptance the goal may become maintenance-ready.
+**Gate:** final real-Lua + GUI/headless parity + canonical source-patch regression + performance/data-safety evidence passes, **including P3B startup/session parity: no fake pre-conversation Response Channel, automatic active SAVE-target restoration, and automatic bounded Explore population**. Then set **READY FOR USER LIVE TEST**. Native SP/MP remains user-owned; after that acceptance the goal may become maintenance-ready.
 
 ## Closure order
 
-1. Preserve and validate the currently in-flight P3/P4A/P6 worktree; never overwrite accepted Leave Group or canonical-promotion evidence.
-2. Finish P3 surface ownership, then replace the peer Advanced workflow with Studio **Dialogue Content** plus bounded **Developer Tools** according to SURFACE_CONSOLIDATION.md.
-3. P6B Dialogue Content Registry — implement DIALOGUE_CONTENT_REGISTRY.md, migrate one low-risk family, add 3+ EN/TL phrases with deterministic anti-repeat, then prove one locked-structure landing/choice content edit.
-4. P2/P4/P5 closeout — provenance/repeat/coverage and GUI↔CLI/error acceptance without unrelated feature creep.
-5. P7 — one consolidated developer acceptance pass including UI ownership, phrase-registry/content-editing acceptance, performance/data safety and handoff.
+1. **P3B Startup & Session Parity** — fix production-native Response Channel startup behavior, active SAVE-target restoration across app launches, and automatic bounded Explore population using existing services.
+2. Add real-worker Tk/Xvfb lifecycle coverage for the exact three live defects plus safe invalid/reset cases.
+3. **P7 re-acceptance** — rerun the focused GUI lifecycle tests, existing surface/UI-state/World Browser suites, full Python harness, full native Lua suite, Kahlua verification, CodeBuilder/dialogue-content idempotence and `git diff --check`.
+4. Only after those developer gates pass may the goal return to **READY FOR USER LIVE TEST**. Preserve all accepted P0–P6 work; do not reopen unrelated architecture.
 
 ## Continue / stop rule
 

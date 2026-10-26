@@ -1,6 +1,6 @@
 # Semantic Lab surface consolidation
 
-**Status: ACCEPTED — READY FOR USER LIVE TEST.** Simulation/Studio redundancy consolidation, the Dialogue Content primary surface and Developer Tools demotion are implemented and verified. This document replaces the earlier assumption that Studio should independently expose Catalog + Test Lab + Coverage + Review. The running Semantic Lab already has a mature Simulation workbench; duplicate user-facing runtime tools are consolidated rather than preserved.
+**Status: REOPENED — P3B Startup & Session Parity repair required before acceptance.** Core Simulation/Studio consolidation remains accepted, but live use exposed startup/session defects not covered by the previous GUI acceptance. This document replaces the earlier assumption that Studio should independently expose Catalog + Test Lab + Coverage + Review.
 
 ## Product rule: one job, one home
 
@@ -137,11 +137,66 @@ Structural/manual authoring tools are maintenance surfaces, not a primary Studio
 6. **Preserve UI state safely.** Migrate/ignore obsolete tab/splitter keys without crashes or resurrecting removed duplicate panes.
 7. **Human-first wording.** Default surfaces answer “what exists?”, “what happens?”, “why?”, “what changed?” rather than requiring users to understand internal `InteractionSpec`, block or CodeBuilder terminology.
 
+## P3B Startup & Session Parity
+
+Live Semantic Lab use exposed startup/session behavior that was not covered by the previous surface tests. These are developer-side defects and are part of P3/P7 acceptance.
+
+### Response Channel authority
+
+The visible Simulation Response Channel must always represent the production-native conversation presentation.
+
+- `capabilities.suggestions` is a diagnostic semantic-suggestion projection. It must **not** be fabricated into an accepted turn or rendered as the player-visible Response Channel merely because the worker is ready.
+- Before `CONVERSATION_OPEN`, if native `conversationPresentation.responseChannel.rows` is empty, show no clickable conversation rows and a clear `No conversation open` state.
+- After open/turn/click responses, render the native `semantic.native_conversation_view.v1` Response Channel when present.
+- Diagnostic/contextual suggestion candidates remain available through Inspect/Debug and regression tooling, not as false native menu buttons.
+- GUI tests must compare visible button IDs/labels/enabled state directly to the worker's production presentation for the same state.
+
+### Active SAVE-target restoration
+
+World Browser selection persistence and active Simulation-source persistence are related but distinct.
+
+Persist only bounded source intent/identifiers: `active_source_kind = SAVE | FIXTURE` plus the existing save path, player ID and NPC ID.
+
+1. Never serialize mutable NPC/player records into UI state.
+2. If the prior active source was SAVE, wait for worker readiness, validate the remembered save/player/NPC, then reuse `import_saved_selection()` to rebuild the detached production-rehydrated source.
+3. Explicit CLI `--save --player --npc` overrides remembered state.
+4. `--reset-ui-state` disables remembered restoration.
+5. Missing/unreadable save, player or NPC falls back to FIXTURE with one explicit warning and no crash.
+6. After successful restoration, Simulation clearly shows source SAVE and the active player/NPC/save.
+7. `worker.restart()` continues to use the immutable imported source snapshot and must not force a disk reread.
+8. Choosing a new saved target updates the remembered active-source identifiers; intentionally returning to fixture mode updates/clears that preference.
+
+### Explore startup population
+
+Studio Explore is a browser, not a command prompt.
+
+- Once the production worker/catalog is ready, automatically request the first bounded response-pool page using the existing list service and an empty filter.
+- Search filters/refetches; it is not required to initialize the screen.
+- Preserve paging/limits and lazy detail loading.
+- A catalog error shows an actionable status without breaking Simulation.
+
+### Required P3B GUI tests
+
+Use real worker-backed Tk/Xvfb tests for:
+
+- startup with no conversation: zero visible native Response Channel rows;
+- open conversation: visible rows equal production presentation rows exactly;
+- diagnostic suggestions do not leak into native Response Channel;
+- remembered SAVE target auto-restores across full app destruction/recreation with the same UI-state file;
+- worker restart preserves imported SAVE source and NPC;
+- missing remembered source safely falls back to fixture;
+- reset UI state suppresses restoration;
+- Explore auto-populates after worker readiness without manually invoking Search.
+
 ## Acceptance
 
 P3 surface consolidation is accepted only when all are true:
 
 - Studio has no independent Test Lab/conversation runner and no separate scenario-context selector.
+- Simulation shows **no** clickable Response Channel rows before a native production conversation is open; diagnostic fixture suggestions never masquerade as native menu choices.
+- After conversation open, visible Response Channel IDs/labels/enabled state match the production native presentation for that exact worker state.
+- The last active valid SAVE player/NPC pair restores automatically across Semantic Lab application launches unless UI state is reset or a higher-priority explicit source is supplied.
+- Studio Explore automatically loads its first bounded production-catalog page when the worker is ready.
 - Studio coverage/regression execution is removed or navigates to the single Simulation regression surface.
 - Studio default workflow is Explore + Dialogue Content + Review; structural/manual authoring tools are under Developer Tools rather than a peer everyday tab.
 - Explore unifies response/interaction/source discovery without creating a parallel source database.
