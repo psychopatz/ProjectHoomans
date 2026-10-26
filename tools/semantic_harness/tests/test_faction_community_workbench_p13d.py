@@ -11,13 +11,14 @@ import unittest
 
 from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class FactionCommunityWorkbenchP13DTests(unittest.TestCase):
+class FactionCommunityWorkbenchP13DTests(SemanticLabGuiTestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_saved_groups_show_persisted_context_and_load_member_target(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
         root.geometry("1080x700")
 
         def wait_until(predicate: object, timeout: float = 45.0) -> None:

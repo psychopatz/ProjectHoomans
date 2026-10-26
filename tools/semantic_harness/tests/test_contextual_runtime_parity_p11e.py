@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 import os
+from pathlib import Path
+import tempfile
 import time
 import tkinter as tk
 import unittest
@@ -70,8 +72,15 @@ class ContextualRuntimeParityP11ETests(unittest.TestCase):
 
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_live_preview_and_compare_are_reachable_from_simulation(self) -> None:
+        state_dir = tempfile.TemporaryDirectory(prefix="projecthoomans-p11e-ui-")
+        state_path = Path(state_dir.name) / "ui-state.json"
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(
+            root,
+            _parser().parse_args(
+                ["--ui-state", str(state_path), "--reset-ui-state"]
+            ),
+        )
         app._messagebox.showerror = lambda *_args, **_kwargs: None
         deadline = time.monotonic() + 15
         try:
@@ -79,6 +88,11 @@ class ContextualRuntimeParityP11ETests(unittest.TestCase):
                 root.update()
                 time.sleep(0.02)
             self.assertTrue(app.worker_ready)
+            deadline = time.monotonic() + 15
+            while app.busy and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertFalse(app.busy)
 
             app.workbench_control_fields["relationship.approval"].variable.set(-100)
             app.workbench_control_fields["relationship.respect"].variable.set(-20)
@@ -109,6 +123,7 @@ class ContextualRuntimeParityP11ETests(unittest.TestCase):
             self.assertIn("Standing", output)
         finally:
             app.close()
+            state_dir.cleanup()
 
 
 if __name__ == "__main__":

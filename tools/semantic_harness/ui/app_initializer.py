@@ -81,6 +81,16 @@ def initialize_app(app: Any, root: Any, arguments: argparse.Namespace) -> None:
     )
     app.closed = False
     app.busy = False
+    app._background_busy = False
+    app._background_future = None
+    app._foreground_poll_after = None
+    app._background_poll_after = None
+    app._start_worker_after = None
+    app._startup_after = None
+    app._explore_retry_after = None
+    app._layout_restore_after = None
+    app._restore_workbench_tabs_after = None
+    app._restore_ui_state_after = None
     app._worker_initialized = False
     app._production_catalog: dict[str, Any] | None = None
     app.saved_catalog: dict[str, Any] = {}
@@ -152,4 +162,4 @@ def initialize_app(app: Any, root: Any, arguments: argparse.Namespace) -> None:
     app._build_ui()
     root.protocol("WM_DELETE_WINDOW", app.close)
     app._set_status("Starting Lua worker…")
-    root.after(20, app._start_worker)
+    app._start_worker_after = root.after(20, app._start_worker)

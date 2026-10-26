@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 
@@ -21,6 +22,10 @@ def refresh_simulation_context(app: Any) -> None:
         or ("SAVE" if app.save_backed_mode else "FIXTURE")
     ).upper()
     save_name = str(app.saved_world_browser.get("saveName") or "").strip()
+    if not save_name and source == "SAVE":
+        save_path = str(metadata.get("savePath") or "").strip()
+        if save_path:
+            save_name = Path(save_path).parent.name
     player = app.scenario.get("player", {})
     npc = app.scenario.get("npc", {})
     player = player if isinstance(player, dict) else {}

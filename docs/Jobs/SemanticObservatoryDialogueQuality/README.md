@@ -1,6 +1,6 @@
 # Semantic Observatory & Dialogue Quality Harness
 
-**Status: IN PROGRESS — P3/P7 reopened for Startup & Session Parity after live Semantic Lab findings; P0/P1/P2/P4/P5/P6 remain accepted.** Parent goal is not complete. Reverify the actual checkout/worktree before acting; do not rely on this overview for a current commit SHA.
+**Status: IN PROGRESS — P3B startup/session behavior is functionally accepted; P3C Test Isolation & Runtime Performance and P7 re-acceptance remain. P0/P1/P2/P4/P5/P6 remain accepted.** Parent goal is not complete. Reverify the actual checkout/worktree before acting; do not rely on this overview for a current commit SHA.
 
 ## Complete goal
 
@@ -14,6 +14,7 @@ Make the existing Project Hoomans Semantic Lab the trustworthy, agent-first obse
 - [ARCHITECTURE.md](ARCHITECTURE.md) — durable runtime/catalog/provenance/agent contracts.
 - [SURFACE_CONSOLIDATION.md](SURFACE_CONSOLIDATION.md) — mandatory Simulation/Studio/World Browser/Log ownership and redundancy-removal design.
 - [DIALOGUE_CONTENT_REGISTRY.md](DIALOGUE_CONTENT_REGISTRY.md) — content-only phrase registry, EN/TL authoring, anti-repeat realization and Studio Dialogue Content design.
+- [TEST_RUNTIME_PERFORMANCE.md](TEST_RUNTIME_PERFORMANCE.md) — P3C hermetic GUI-test state, startup/background-work ownership, split headless/Xvfb acceptance, and runtime budgets.
 - [ROADMAP.md](ROADMAP.md) — entire P0–P7 developer-side objective and acceptance gates.
 - [HARNESS_ACCEPTANCE.md](HARNESS_ACCEPTANCE.md) — required evidence for real Lua, EN/TL, safety, scale and GUI/CLI parity.
 - [AGENT_RUNBOOK.md](AGENT_RUNBOOK.md) — safe execution, test and Git procedure for unattended implementation.

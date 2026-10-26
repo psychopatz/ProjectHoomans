@@ -15,9 +15,10 @@ from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.dialogs.settings import collect_scenario_settings
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class SimulationControlCatalogP10CTests(unittest.TestCase):
+class SimulationControlCatalogP10CTests(SemanticLabGuiTestCase):
     def test_worker_provides_bounded_typed_controls_and_registry_options(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.simulation_control_catalog()
@@ -140,7 +141,7 @@ class SimulationControlCatalogP10CTests(unittest.TestCase):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
 
         def wait_until(predicate: object, timeout: float = 12.0) -> None:
             deadline = time.monotonic() + timeout

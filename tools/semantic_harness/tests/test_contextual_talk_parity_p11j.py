@@ -6,6 +6,7 @@ from copy import deepcopy
 import json
 import os
 from pathlib import Path
+import tempfile
 import time
 import tkinter as tk
 import unittest
@@ -737,8 +738,15 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
 
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_tk_talk_parity_surface_runs_the_real_worker(self) -> None:
+        state_dir = tempfile.TemporaryDirectory(prefix="projecthoomans-p11j-ui-")
+        state_path = Path(state_dir.name) / "ui-state.json"
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(
+            root,
+            _parser().parse_args(
+                ["--ui-state", str(state_path), "--reset-ui-state"]
+            ),
+        )
         app._messagebox.showerror = lambda *_args, **_kwargs: None
         root.geometry("1080x700")
         deadline = time.monotonic() + 15
@@ -747,6 +755,11 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
                 root.update()
                 time.sleep(0.02)
             self.assertTrue(app.worker_ready)
+            deadline = time.monotonic() + 15
+            while app.busy and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertFalse(app.busy)
             labels = [
                 app.compare_tabs.tab(tab, "text") for tab in app.compare_tabs.tabs()
             ]
@@ -769,6 +782,7 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
             )
         finally:
             app.close()
+            state_dir.cleanup()
 
 
 if __name__ == "__main__":

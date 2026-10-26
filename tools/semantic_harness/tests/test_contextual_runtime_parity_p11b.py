@@ -13,9 +13,10 @@ from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class RuntimeParityP11BTests(unittest.TestCase):
+class RuntimeParityP11BTests(SemanticLabGuiTestCase):
     def test_catalog_owns_needs_by_actor_and_exposes_real_trait_sources(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             catalog = worker.simulation_control_catalog()
@@ -63,7 +64,7 @@ class RuntimeParityP11BTests(unittest.TestCase):
     def test_tk_actor_needs_and_generated_personality_override_are_visible(self) -> None:
         root = tk.Tk()
         root.geometry("1080x700")
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
 
         def wait_until(predicate: object, timeout: float = 15.0) -> None:
             deadline = time.monotonic() + timeout

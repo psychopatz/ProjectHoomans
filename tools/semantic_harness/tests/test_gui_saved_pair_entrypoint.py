@@ -5,6 +5,7 @@ from __future__ import annotations
 from hashlib import sha256
 import os
 from pathlib import Path
+import tempfile
 import time
 import tkinter as tk
 import unittest
@@ -24,6 +25,15 @@ JORDAN_NPC_ID = "npcJordanMcLane_0LBN"
 
 @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
 class GuiSavedPairEntrypointTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._ui_state_dir = tempfile.TemporaryDirectory(
+            prefix="projecthoomans-gui-save-ui-"
+        )
+        self._ui_state_path = Path(self._ui_state_dir.name) / "ui-state.json"
+
+    def tearDown(self) -> None:
+        self._ui_state_dir.cleanup()
+
     def test_explicit_saved_pair_starts_in_production_mode(self) -> None:
         if not REAL_SAVE.is_file():
             self.skipTest("real local save is unavailable")
@@ -33,6 +43,8 @@ class GuiSavedPairEntrypointTests(unittest.TestCase):
             _parser().parse_args(
                 [
                     "--gui",
+                    "--ui-state",
+                    str(self._ui_state_path),
                     "--load-saved-pair",
                     "--save",
                     str(REAL_SAVE),
@@ -81,6 +93,8 @@ class GuiSavedPairEntrypointTests(unittest.TestCase):
             _parser().parse_args(
                 [
                     "--gui",
+                    "--ui-state",
+                    str(self._ui_state_path),
                     "--load-saved-pair",
                     "--save",
                     str(REAL_SAVE),
@@ -158,6 +172,8 @@ class GuiSavedPairEntrypointTests(unittest.TestCase):
             _parser().parse_args(
                 [
                     "--gui",
+                    "--ui-state",
+                    str(self._ui_state_path),
                     "--load-saved-pair",
                     "--save",
                     str(REAL_SAVE),
@@ -242,6 +258,8 @@ class GuiSavedPairEntrypointTests(unittest.TestCase):
             _parser().parse_args(
                 [
                     "--gui",
+                    "--ui-state",
+                    str(self._ui_state_path),
                     "--load-saved-pair",
                     "--save",
                     str(REAL_SAVE),

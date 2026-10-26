@@ -20,8 +20,11 @@ def poll_future(
     if app.closed:
         return
     if not future.done():
-        app.root.after(25, app._poll_future, future, callback)
+        app._foreground_poll_after = app.root.after(
+            25, app._poll_future, future, callback
+        )
         return
+    app._foreground_poll_after = None
     app.busy = False
     try:
         result = future.result()
@@ -48,6 +51,54 @@ def start_operation(
     app._set_controls(False)
     app._future = app.session.submit(operation)
     app._poll_future(app._future, operation_finished(app, callback))
+    return True
+
+
+def poll_background_future(
+    app: Any,
+    future: Future[Any],
+    callback: Callable[[Any], None],
+) -> None:
+    """Poll a read-only worker request without changing foreground UI state."""
+
+    if app.closed:
+        return
+    if not future.done():
+        app._background_poll_after = app.root.after(
+            25, app._poll_background_future, future, callback
+        )
+        return
+    app._background_poll_after = None
+    app._background_busy = False
+    app._background_future = None
+    try:
+        result = future.result()
+    except (HarnessError, ConfigurationError, OSError, ValueError) as error:
+        callback({"ok": False, "catalogError": str(error)[:400]})
+        return
+    callback(result.value)
+
+
+def start_background_operation(
+    app: Any,
+    operation: Callable[[LuaSemanticWorker], Any],
+    callback: Callable[[Any], None],
+) -> bool:
+    """Submit a serialized read-only request without redefining app readiness."""
+
+    if (
+        app.closed
+        or not app.session.ready
+        or app.busy
+        or getattr(app, "_background_busy", False)
+    ):
+        return False
+    app._background_busy = True
+    app._background_future = app.session.submit(operation)
+    app._poll_background_future(
+        app._background_future,
+        callback,
+    )
     return True
 
 

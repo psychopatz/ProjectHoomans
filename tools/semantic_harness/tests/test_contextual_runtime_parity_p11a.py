@@ -16,9 +16,10 @@ from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.runtime.activity import ActivityLog
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class RuntimeParityP11ATests(unittest.TestCase):
+class RuntimeParityP11ATests(SemanticLabGuiTestCase):
     def test_normal_relationship_catalog_matches_current_producers(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             persona = worker.persona_catalog()
@@ -68,7 +69,7 @@ class RuntimeParityP11ATests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_tk_simulation_exposes_actor_panels_and_named_diagnostics(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
 
         def wait_until(predicate: object, timeout: float = 12.0) -> None:
             deadline = time.monotonic() + timeout
@@ -175,7 +176,7 @@ class RuntimeParityP11ATests(unittest.TestCase):
                 self.assertTrue(predicate())
 
             try:
-                wait_until(lambda: app.worker_ready and not app.busy)
+                wait_until(lambda: app.worker_ready)
                 root.geometry("1080x700")
                 root.update_idletasks()
                 self.assertGreater(app.transcript.winfo_width(), 0)
@@ -235,7 +236,7 @@ class RuntimeParityP11ATests(unittest.TestCase):
                 self.assertTrue(predicate())
 
             try:
-                wait_until_reopened(lambda: app2.worker_ready and not app2.busy)
+                wait_until_reopened(lambda: app2.worker_ready)
                 root2.update()
                 self.assertEqual(app2.main_tabs.index(app2.main_tabs.select()), 2)
                 self.assertEqual(

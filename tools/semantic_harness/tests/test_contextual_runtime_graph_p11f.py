@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 import os
+from pathlib import Path
+import tempfile
 import time
 import tkinter as tk
 import unittest
@@ -75,8 +77,15 @@ class ContextualRuntimeGraphP11FTests(unittest.TestCase):
 
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_simulation_graph_pane_follows_hello_and_whats_up(self) -> None:
+        state_dir = tempfile.TemporaryDirectory(prefix="projecthoomans-p11f-ui-")
+        state_path = Path(state_dir.name) / "ui-state.json"
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(
+            root,
+            _parser().parse_args(
+                ["--ui-state", str(state_path), "--reset-ui-state"]
+            ),
+        )
         app._messagebox.showerror = lambda *_args, **_kwargs: None
         deadline = time.monotonic() + 15
         try:
@@ -84,6 +93,11 @@ class ContextualRuntimeGraphP11FTests(unittest.TestCase):
                 root.update()
                 time.sleep(0.02)
             self.assertTrue(app.worker_ready)
+            deadline = time.monotonic() + 15
+            while app.busy and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertFalse(app.busy)
             for utterance, expected_kind in (("hello", "semantic_flow"), ("What's up?", "semantic_hub")):
                 app.input_var.set(utterance)
                 app.submit()
@@ -101,6 +115,7 @@ class ContextualRuntimeGraphP11FTests(unittest.TestCase):
                 )
         finally:
             app.close()
+            state_dir.cleanup()
 
 
 if __name__ == "__main__":

@@ -15,12 +15,13 @@ from tools.semantic_harness.runtime.save_browser import SavedWorldBrowser
 from tools.semantic_harness.runtime.state_providers import SemanticStateCatalog
 from tools.semantic_harness.tests.test_save_catalog_p12b import pz_file
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
 CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
 
 
-class SaveBrowserTests(unittest.TestCase):
+class SaveBrowserTests(SemanticLabGuiTestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
@@ -182,7 +183,7 @@ class SaveBrowserTests(unittest.TestCase):
     def test_workbench_exposes_saved_world_browser_controls(self) -> None:
         root = tk.Tk()
         root.geometry("1280x860")
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
 
         try:
             deadline = time.monotonic() + 20

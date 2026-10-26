@@ -232,8 +232,10 @@ def build_simulation_workbench(self) -> None:
     self._set_relationship_preview_from_projection()
     self._set_controls(self.session.ready)
     self._clear_workbench_pending()
-    self.root.after_idle(self._restore_workbench_tabs)
-    self.root.after_idle(self._restore_ui_state)
+    self._restore_workbench_tabs_after = self.root.after_idle(
+        self._restore_workbench_tabs
+    )
+    self._restore_ui_state_after = self.root.after_idle(self._restore_ui_state)
     self._schedule_splitter_restore()
 
 

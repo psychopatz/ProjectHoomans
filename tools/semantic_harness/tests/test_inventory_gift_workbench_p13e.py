@@ -15,6 +15,7 @@ from tools.semantic_harness.runtime.player_engine_state import (
     OfflinePlayerEngineStateProvider,
 )
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
 SAVE = Path(
@@ -23,11 +24,11 @@ SAVE = Path(
 )
 
 
-class InventoryGiftWorkbenchP13ETests(unittest.TestCase):
+class InventoryGiftWorkbenchP13ETests(SemanticLabGuiTestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_real_save_gift_uses_production_route_and_resets_working_world(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
         root.geometry("1080x700")
 
         def wait_until(predicate: object, timeout: float = 45.0) -> None:

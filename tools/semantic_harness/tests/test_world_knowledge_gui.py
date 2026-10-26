@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 import tempfile
 import tkinter as tk
@@ -13,9 +14,11 @@ from tools.semantic_harness.tests.test_grounded_world_knowledge_gossip import (
     scenario_for,
 )
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class WorldKnowledgeGuiTests(unittest.TestCase):
+@unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
+class WorldKnowledgeGuiTests(SemanticLabGuiTestCase):
     def test_existing_semantic_lab_pane_renders_worker_inspection(self) -> None:
         scenario = scenario_for("alice", "EN", [
             {
@@ -27,6 +30,7 @@ class WorldKnowledgeGuiTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "world-knowledge.json"
             path.write_text(json.dumps(scenario), encoding="utf-8")
+            ui_state_path = self.new_ui_state_path("projecthoomans-wkg-ui-")
             arguments = argparse.Namespace(
                 repository=str(Path(__file__).resolve().parents[3]),
                 core_repository=str(Path(__file__).resolve().parents[4] / "psychopatzCore"),
@@ -36,6 +40,8 @@ class WorldKnowledgeGuiTests(unittest.TestCase):
                 shutdown_timeout=1.0,
                 scenario=str(path),
                 language=None,
+                ui_state=str(ui_state_path),
+                reset_ui_state=True,
             )
             root = tk.Tk()
             app = SemanticHarnessApp(root, arguments)
@@ -47,7 +53,7 @@ class WorldKnowledgeGuiTests(unittest.TestCase):
                 nonlocal requested
                 if app.closed:
                     return
-                if app.worker_ready and not app.busy and not requested:
+                if app.worker_ready and not requested:
                     requested = True
                     app.inspect_world_knowledge()
                 elif requested and not app.busy:

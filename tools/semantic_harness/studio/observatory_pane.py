@@ -30,10 +30,12 @@ class SemanticObservatoryPane:
         self.frame.columnconfigure(0, weight=1)
         self.filter_var = tk.StringVar(value="")
         self.status_var = tk.StringVar(
-            value="Production Lua catalog · choose Search to inspect")
+            value="Production Lua catalog · waiting for worker readiness")
         self.selected_pool = ""
         self._page_offset = 0
         self._has_more = False
+        self.loading = False
+        self.catalog_ready = False
         toolbar = ttk.Frame(self.frame)
         toolbar.grid(row=0, column=0, sticky="ew")
         ttk.Label(toolbar, text="Response pools").pack(side="left")
@@ -250,32 +252,73 @@ class SemanticObservatoryPane:
 
         self._set_review_decision("REJECT")
 
-    def _submit(self, operation: Callable, callback: Callable) -> None:
-        if not self._run_worker(operation, callback):
+    def _submit(self, operation: Callable, callback: Callable) -> bool:
+        if self.loading:
+            self.status_var.set("Loading catalog…")
+            return False
+        self.loading = True
+        self.status_var.set("Loading catalog…")
+
+        # Keep the loading state local to this read-only surface.  The worker
+        # adapter still runs through the serialized session queue, but no
+        # foreground Simulation status/control is changed by the request.
+        def finish(result: Any) -> None:
+            self.loading = False
+
+            callback(result)
+
+        if not self._run_worker(operation, finish):
+            self.loading = False
             self.status_var.set("Worker busy or not initialized")
+            return False
+        return True
 
     def search(self) -> None:
+        if self.loading:
+            return
         self._page_offset = 0
         self.refresh()
 
     def previous_page(self) -> None:
+        if self.loading:
+            return
         self._page_offset = max(0, self._page_offset - 64)
         self.refresh()
 
     def next_page(self) -> None:
-        if self._has_more:
+        if self._has_more and not self.loading:
             self._page_offset += 64
             self.refresh()
 
-    def refresh(self) -> None:
+    def refresh(self) -> bool:
         query = self.filter_var.get().strip()
-        self._submit(
-            lambda worker: worker.response_pool_list(
-                filter=query, offset=self._page_offset, limit=64),
-            self._on_list,
-        )
+
+        def request(worker: Any) -> dict[str, Any]:
+            try:
+                return worker.response_pool_list(
+                    filter=query, offset=self._page_offset, limit=64
+                )
+            except Exception as error:  # keep catalog failures out of Simulation
+                return {
+                    "ok": False,
+                    "catalogError": str(error)[:400],
+                }
+
+        return self._submit(request, self._on_list)
 
     def _on_list(self, result: dict[str, Any]) -> None:
+        if result.get("ok") is False or result.get("catalogError"):
+            self.catalog_ready = False
+            self._has_more = False
+            self._previous.configure(state="disabled")
+            self._next.configure(state="disabled")
+            self.status_var.set(
+                "Catalog unavailable: "
+                f"{result.get('catalogError') or 'production query failed'}. "
+                "Use Search to retry."
+            )
+            return
+        self.catalog_ready = True
         self._has_more = bool(result.get("hasMore"))
         self._previous.configure(
             state="normal" if self._page_offset > 0 else "disabled")

@@ -19,6 +19,7 @@ from tools.semantic_harness.runtime.scenario import (
 )
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
 def relationship_scenario(approval: float, respect: float, familiarity: float) -> dict:
@@ -32,7 +33,7 @@ def relationship_scenario(approval: float, respect: float, familiarity: float) -
     return scenario
 
 
-class RuntimeParityP11CTests(unittest.TestCase):
+class RuntimeParityP11CTests(SemanticLabGuiTestCase):
     def test_friend_gate_promotes_once_and_survives_standing_deterioration(self) -> None:
         below = relationship_scenario(79, 50, 60)
         with LuaSemanticWorker(below) as worker:
@@ -92,7 +93,7 @@ class RuntimeParityP11CTests(unittest.TestCase):
     def test_tk_relationship_panel_displays_durable_bond_after_apply(self) -> None:
         root = tk.Tk()
         root.geometry("1080x700")
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
 
         def wait_until(predicate: object, timeout: float = 15.0) -> None:
             deadline = time.monotonic() + timeout

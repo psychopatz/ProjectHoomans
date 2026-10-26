@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 import os
+from pathlib import Path
+import tempfile
 import time
 import tkinter as tk
 import unittest
@@ -84,8 +86,15 @@ class ContextualSemanticLabPersonaP8DTests(unittest.TestCase):
 
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_existing_lab_renders_p8d_controls_and_runs_matrix(self) -> None:
+        state_dir = tempfile.TemporaryDirectory(prefix="projecthoomans-p8d-ui-")
+        state_path = Path(state_dir.name) / "ui-state.json"
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(
+            root,
+            _parser().parse_args(
+                ["--ui-state", str(state_path), "--reset-ui-state"]
+            ),
+        )
 
         def wait_until(predicate: object, timeout: float = 15.0) -> None:
             deadline = time.monotonic() + timeout
@@ -123,6 +132,7 @@ class ContextualSemanticLabPersonaP8DTests(unittest.TestCase):
             self.assertIn("candidateOrder", trace)
         finally:
             app.close()
+            state_dir.cleanup()
             del app
 
 

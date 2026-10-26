@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from ..inspection.rendering import pretty
+from .ui_state_persistence import remember_active_source
 
 
 def discover_saved_worlds(app: Any) -> None:
@@ -164,6 +165,13 @@ def import_saved_world_target(app: Any) -> None:
             app._sync_workbench_from_scenario(scenario)
         app._update_simulation_projection(result)
         app._set_save_backed_mode(True)
+        remember_active_source(
+            app,
+            "SAVE",
+            save_path=str(entry.get("path") or ""),
+            player_id=str(player.get("uuid") or player.get("id") or ""),
+            npc_id=str(npc.get("id") or ""),
+        )
         app._refresh_npc_dossier_if_selected()
         app.saved_world_target_var.set(
             f"Loaded Player {player.get('label')} → NPC {npc.get('label')}"
@@ -184,6 +192,7 @@ def import_saved_world_target(app: Any) -> None:
             "Saved target loaded; click Open conversation to start the native "
             "Conversation session. Preview is optional and does not send input.",
         )
+        app._save_ui_state()
         app.main_tabs.select(app.simulation_tab)
 
     app._start_operation(

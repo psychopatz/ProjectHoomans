@@ -77,7 +77,7 @@ def restore_ui_state(app: Any) -> None:
         except (app._tk.TclError, TypeError, ValueError):
             pass
 
-    app.root.after_idle(restore)
+    app._layout_restore_after = app.root.after_idle(restore)
 
 
 def restore_panel_state(app: Any) -> None:

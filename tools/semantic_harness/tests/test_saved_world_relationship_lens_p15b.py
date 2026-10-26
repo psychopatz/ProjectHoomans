@@ -14,6 +14,7 @@ from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.runtime.save_browser import SavedWorldBrowser
 from tools.semantic_harness.runtime.worker import CORE_REPOSITORY
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
 REAL_SAVE = Path(
@@ -23,7 +24,7 @@ REAL_SAVE = Path(
 
 
 @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
-class SavedWorldRelationshipLensP15BTests(unittest.TestCase):
+class SavedWorldRelationshipLensP15BTests(SemanticLabGuiTestCase):
     def _wait_for_worker(self, root: tk.Tk, app: SemanticHarnessApp) -> None:
         deadline = time.monotonic() + 30.0
         while not app._worker_initialized and time.monotonic() < deadline:
@@ -37,11 +38,9 @@ class SavedWorldRelationshipLensP15BTests(unittest.TestCase):
         before = sha256(REAL_SAVE.read_bytes()).hexdigest()
         root = tk.Tk()
         with tempfile.TemporaryDirectory() as directory:
-            app = SemanticHarnessApp(
+            app = self.make_gui_app(
                 root,
-                _parser().parse_args(
-                    ["--ui-state", str(Path(directory) / "ui-state.json")]
-                ),
+                ui_state_path=Path(directory) / "ui-state.json",
             )
             try:
                 self._wait_for_worker(root, app)
@@ -102,7 +101,9 @@ class SavedWorldRelationshipLensP15BTests(unittest.TestCase):
             state_path = Path(directory) / "ui-state.json"
             arguments = _parser().parse_args(["--ui-state", str(state_path)])
             root = tk.Tk()
-            app = SemanticHarnessApp(root, arguments)
+            app = self.make_gui_app(
+                root, ui_state_path=state_path, reset=True
+            )
             try:
                 self._wait_for_worker(root, app)
                 app.saved_world_view_var.set("Saved affiliations")
@@ -116,7 +117,9 @@ class SavedWorldRelationshipLensP15BTests(unittest.TestCase):
                 pass
 
             restored_root = tk.Tk()
-            restored = SemanticHarnessApp(restored_root, arguments)
+            restored = self.make_gui_app(
+                restored_root, ui_state_path=state_path, reset=False
+            )
             try:
                 self._wait_for_worker(restored_root, restored)
                 self.assertEqual(
@@ -135,11 +138,9 @@ class SavedWorldRelationshipLensP15BTests(unittest.TestCase):
             self.skipTest("real local save is unavailable")
         root = tk.Tk()
         with tempfile.TemporaryDirectory() as directory:
-            app = SemanticHarnessApp(
+            app = self.make_gui_app(
                 root,
-                _parser().parse_args(
-                    ["--ui-state", str(Path(directory) / "ui-state.json")]
-                ),
+                ui_state_path=Path(directory) / "ui-state.json",
             )
             try:
                 self._wait_for_worker(root, app)

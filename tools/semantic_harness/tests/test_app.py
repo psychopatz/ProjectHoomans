@@ -9,6 +9,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -154,21 +155,24 @@ class AppEntryTests(unittest.TestCase):
         if not os.environ.get("DISPLAY"):
             self.skipTest("GUI display is unavailable")
 
-        probe = (
-            "import tkinter as tk; "
-            "from tools.semantic_harness.cli import _parser; "
-            "from tools.semantic_harness.ui.shell import SemanticHarnessApp; "
-            "root = tk.Tk(); "
-            "instance = SemanticHarnessApp(root, _parser().parse_args([])); "
-            "root.after(1, instance.close); "
-            "root.mainloop()"
-        )
-        result = subprocess.run(
-            [sys.executable, "-c", probe],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
+        with tempfile.TemporaryDirectory(prefix="projecthoomans-app-ui-") as directory:
+            state_path = os.path.join(directory, "ui-state.json")
+            probe = (
+                "import tkinter as tk; "
+                "from tools.semantic_harness.cli import _parser; "
+                "from tools.semantic_harness.ui.shell import SemanticHarnessApp; "
+                "root = tk.Tk(); "
+                f"arguments = _parser().parse_args(['--ui-state', {state_path!r}, '--reset-ui-state']); "
+                "instance = SemanticHarnessApp(root, arguments); "
+                "root.after(1, instance.close); "
+                "root.mainloop()"
+            )
+            result = subprocess.run(
+                [sys.executable, "-c", probe],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
         if result.returncode and "couldn't connect to display" in result.stderr:
             self.skipTest(result.stderr.strip())
         self.assertEqual(result.returncode, 0, result.stderr)

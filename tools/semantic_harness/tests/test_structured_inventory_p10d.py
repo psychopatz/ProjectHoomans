@@ -16,9 +16,10 @@ from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.dialogs.inventory_editor import StructuredInventoryEditor
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class StructuredInventoryP10DTests(unittest.TestCase):
+class StructuredInventoryP10DTests(SemanticLabGuiTestCase):
     def test_item_script_catalog_parses_definitions_without_tk_item_policy(self) -> None:
         parsed = _parse_script_text(
             "module Base\n{\n"
@@ -47,7 +48,7 @@ class StructuredInventoryP10DTests(unittest.TestCase):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
         errors: list[str] = []
         app._messagebox.showerror = lambda _title, message, **_kwargs: errors.append(str(message))
 

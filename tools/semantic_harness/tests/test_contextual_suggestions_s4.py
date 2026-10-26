@@ -4,45 +4,24 @@ from __future__ import annotations
 
 import gc
 import os
-import tempfile
 import time
 import tkinter as tk
 import unittest
 from copy import deepcopy
 
-from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.ui.suggestion_projection import semantic_suggestion_rows
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class ContextualSuggestionsS4Tests(unittest.TestCase):
-    def setUp(self) -> None:
-        self._gui_state_dir = tempfile.TemporaryDirectory(
-            prefix="projecthoomans-s4-ui-"
-        )
-        self._gui_state_path = os.path.join(
-            self._gui_state_dir.name, "ui-state.json"
-        )
-
-    def tearDown(self) -> None:
-        self._gui_state_dir.cleanup()
-
-    def _gui_arguments(self):
-        """Keep GUI assertions isolated from the user's saved layout state."""
-
-        return _parser().parse_args(
-            [
-                "--ui-state",
-                self._gui_state_path,
-                "--reset-ui-state",
-            ]
-        )
+class ContextualSuggestionsS4Tests(SemanticLabGuiTestCase):
 
     def test_topic_combobox_uses_the_worker_group_click_contract(self) -> None:
         if not os.environ.get("DISPLAY"):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, self._gui_arguments())
+        app = self.make_gui_app(root)
 
         def wait_until(predicate: object, timeout: float = 10.0) -> None:
             deadline = time.monotonic() + timeout
@@ -57,25 +36,17 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             app.submit()
             wait_until(
                 lambda: not app.busy
-                and app.suggestion_group_box.get() == "Time and date"
+                and bool(app.suggestion_projection.get("groups"))
             )
-            owned_display = next(
-                display
-                for display, group_id in app.suggestion_group_ids_by_display.items()
-                if group_id == "companion.orders"
+            diagnostic_rows = semantic_suggestion_rows(
+                app.suggestion_projection,
+                use_global_candidates=True,
             )
-            app.suggestion_group_box.set(owned_display)
-            app._on_suggestion_group()
-            wait_until(
-                lambda: not app.busy
-                and any(row.get("action") == "FOLLOW" for row in app.suggestion_rows)
-            )
-            self.assertEqual(app.suggestion_group_box.get(), owned_display)
-            self.assertIn(
-                "semantic_suggestions",
-                app.suggestion_response.get("choiceSurface", {}).get("source", ""),
-            )
-            self.assertEqual(app.suggestion_response.get("transport"), [])
+            self.assertEqual(app.suggestion_rows, [])
+            self.assertFalse(app.suggestion_group_box.winfo_ismapped())
+            self.assertTrue(diagnostic_rows)
+            self.assertIn("diagnosticRows", app.suggestion_inspector.get("1.0", "end"))
+            self.assertIn("diagnosticProjection", app.suggestion_inspector.get("1.0", "end"))
         finally:
             app.close()
             del app
@@ -87,7 +58,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, self._gui_arguments())
+        app = self.make_gui_app(root)
 
         def wait_until(predicate: object, timeout: float = 10.0) -> None:
             deadline = time.monotonic() + timeout
@@ -101,59 +72,33 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             app.main_tabs.select(app.simulation_tab)
             app.input_var.set("hello")
             app.submit()
-            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
+            wait_until(lambda: not app.busy and app.last_response is not None)
 
             self.assertEqual(
                 sum(button.winfo_ismapped() for button in app.suggestion_buttons),
-                len(app.suggestion_rows),
+                0,
             )
-            self.assertEqual(
-                str(app.suggestion_buttons[0].cget("state")), "normal"
-            )
-            self.assertIn(
-                "Thank them",
-                [
-                    str(button.cget("text"))
-                    for button in app.suggestion_buttons
-                ],
-            )
-            self.assertIn(
-                "Say you're doing fine",
-                [
-                    str(button.cget("text"))
-                    for button in app.suggestion_buttons
-                ],
-            )
-            self.assertTrue(
-                all(
-                    button.winfo_ismapped()
-                    for button in app.suggestion_buttons[: len(app.suggestion_rows)]
-                )
-            )
-            self.assertEqual(app.suggestion_group_box.get(), "Current conversation branch")
-            self.assertIn(
-                "predicateTrace",
-                app.suggestion_inspector.get("1.0", "end"),
-            )
+            self.assertEqual(app.suggestion_rows, [])
+            self.assertIn("predicateTrace", app.suggestion_inspector.get("1.0", "end"))
 
-            app.click_suggestion(0)
-            wait_until(lambda: not app.busy)
-            transcript = app.transcript.get("1.0", "end")
-            self.assertIn("PLAYER:", transcript)
-            self.assertIn(
-                "semantic_click_frame",
-                app.suggestion_inspector.get("1.0", "end"),
-            )
-
-            follow_index = next(
+            # Only the native production Conversation presentation is
+            # clickable in the Response Channel.
+            app.open_conversation_button.invoke()
+            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
+            orders_index = next(
                 index
                 for index, row in enumerate(app.suggestion_rows)
-                if row.get("action") == "FOLLOW"
+                if row.get("id") == "companion.orders:open"
             )
-            app.click_suggestion(follow_index)
+            app.click_suggestion(orders_index)
+            wait_until(
+                lambda: not app.busy
+                and any(row.get("id") == "action.follow" for row in app.suggestion_rows)
+            )
             wait_until(lambda: not app.busy)
-            self.assertIn("TOOL/ACTION:", app.transcript.get("1.0", "end"))
-            self.assertIn("follow", app.transcript.get("1.0", "end").lower())
+            transcript = app.transcript.get("1.0", "end")
+            self.assertIn("Clicked semantic suggestion", transcript)
+            self.assertIn("action.follow", app.suggestion_inspector.get("1.0", "end"))
 
             app.language_var.set("TL")
             app.set_language()
@@ -161,25 +106,23 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             app.input_var.set("Are you okay?")
             app.submit()
             wait_until(lambda: not app.busy and bool(app.suggestion_rows))
-            self.assertIn(
-                "Itanong ang kalagayan",
-                [
-                    str(button.cget("text"))
-                    for button in app.suggestion_buttons
-                ],
+            self.assertEqual(
+                app.suggestion_primary_projection.get("schema"),
+                "semantic.native_conversation_view.v1",
             )
+            self.assertIn("diagnosticProjection", app.suggestion_inspector.get("1.0", "end"))
         finally:
             app.close()
             del app
             del root
             gc.collect()
 
-    def test_identity_lie_choice_reaches_authoritative_worker(self) -> None:
+    def test_identity_lie_choice_stays_in_inspect_until_native_session(self) -> None:
         if not os.environ.get("DISPLAY"):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, self._gui_arguments())
+        app = self.make_gui_app(root)
 
         def wait_until(predicate: object, timeout: float = 10.0) -> None:
             deadline = time.monotonic() + timeout
@@ -197,22 +140,31 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 lambda: not app.busy
                 and any(
                     row.get("id") == "identity.choice.lie_name"
+                    for row in semantic_suggestion_rows(
+                        app.suggestion_projection,
+                        use_global_candidates=True,
+                    )
+                )
+            )
+            app.open_conversation_button.invoke()
+            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
+            app.input_var.set("who are you")
+            app.submit()
+            wait_until(
+                lambda: not app.busy
+                and any(
+                    row.get("id") == "identity.choice.lie_name"
                     for row in app.suggestion_rows
                 )
             )
-
             lie_index = next(
                 index
                 for index, row in enumerate(app.suggestion_rows)
                 if row.get("id") == "identity.choice.lie_name"
             )
-            app.click_suggestion(lie_index)
-            wait_until(lambda: not app.busy)
-
-            transcript = app.transcript.get("1.0", "end")
-            self.assertIn("PLAYER: I'll go by ", transcript)
-            self.assertIn("NPC: I don't believe you.", transcript)
-            self.assertNotIn("NPC: Understood.", transcript)
+            self.assertEqual(app.suggestion_rows[lie_index]["id"], "identity.choice.lie_name")
+            self.assertFalse(app.suggestion_interactive)
+            self.assertIn("identity.choice.lie_name", app.suggestion_inspector.get("1.0", "end"))
         finally:
             app.close()
             del app
@@ -224,7 +176,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.skipTest("Tk display unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, self._gui_arguments())
+        app = self.make_gui_app(root)
 
         def wait_until(predicate: object, timeout: float = 10.0) -> None:
             deadline = time.monotonic() + timeout
@@ -251,11 +203,11 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 observation["conversationGraph"]["graphKind"],
                 "semantic_hub",
             )
-            self.assertNotIn(
-                "semantic_hub.whats_up",
-                [row.get("id") for row in app.suggestion_rows],
+            diagnostic_rows = semantic_suggestion_rows(
+                app.suggestion_projection,
+                use_global_candidates=True,
             )
-            initial_ids = [row.get("id") for row in app.suggestion_rows]
+            initial_ids = [row.get("id") for row in diagnostic_rows]
             self.assertTrue(
                 {
                     "question.wellbeing",
@@ -264,7 +216,8 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 }
                 <= set(initial_ids)
             )
-            self.assertIn("What's up", app.suggestion_group_box.get())
+            self.assertEqual(app.suggestion_rows, [])
+            self.assertFalse(app.suggestion_group_box.winfo_ismapped())
 
             # Reconfigure the live worker through Tk, then replay the utterance
             # through the regular input surface. Apply + Replay is P10E work.
@@ -290,11 +243,24 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             wait_until(lambda: not app.busy and configured["done"])
             app.input_var.set("What's up?")
             app.submit()
-            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
+            wait_until(
+                lambda: not app.busy
+                and (app.last_response.get("observation") or {})
+                .get("suggestions", {})
+                .get("activeHub", {})
+                .get("id")
+                == "whats_up"
+            )
 
             observation = app.last_response.get("observation") or {}
             injured_suggestions = observation.get("suggestions") or {}
-            injured_ids = [row.get("id") for row in app.suggestion_rows]
+            injured_ids = [
+                row.get("id")
+                for row in semantic_suggestion_rows(
+                    app.suggestion_projection,
+                    use_global_candidates=True,
+                )
+            ]
             self.assertEqual(
                 injured_suggestions.get("activeHub", {}).get("id"),
                 "whats_up",
@@ -310,9 +276,16 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
 
             app.input_var.set("What's up?")
             app.submit()
-            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
+            wait_until(lambda: not app.busy and app.last_response is not None)
             self.assertEqual(
-                [row.get("id") for row in app.suggestion_rows], injured_ids
+                [
+                    row.get("id")
+                    for row in semantic_suggestion_rows(
+                        app.suggestion_projection,
+                        use_global_candidates=True,
+                    )
+                ],
+                injured_ids,
             )
         finally:
             app.close()
@@ -325,7 +298,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, self._gui_arguments())
+        app = self.make_gui_app(root)
         errors: list[str] = []
         app._messagebox.showerror = lambda _title, message, **_kwargs: errors.append(str(message))
 
@@ -356,13 +329,19 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
 
             app.input_var.set("hello")
             app.submit()
-            wait_until(lambda: not app.busy and bool(app.suggestion_rows))
+            wait_until(lambda: not app.busy and app.last_response is not None)
             self.assertNotIn(
                 "Owned companion actions",
                 [str(value) for value in app.suggestion_group_box["values"]],
             )
             self.assertFalse(
-                any(row.get("action") == "FOLLOW" for row in app.suggestion_rows)
+                any(
+                    row.get("action") == "FOLLOW"
+                    for row in semantic_suggestion_rows(
+                        app.suggestion_projection,
+                        use_global_candidates=True,
+                    )
+                )
             )
         finally:
             app.close()
@@ -375,7 +354,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.skipTest("Tk display is unavailable")
 
         root = tk.Tk()
-        app = SemanticHarnessApp(root, self._gui_arguments())
+        app = self.make_gui_app(root)
 
         def wait_until(predicate: object, timeout: float = 10.0) -> None:
             deadline = time.monotonic() + timeout
@@ -404,9 +383,6 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
             self.assertIn("Compare / Regression", [app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()])
             self.assertIn("Debug", [app.trace_tabs.tab(tab, "text") for tab in app.trace_tabs.tabs()])
 
-            # Root semantic suggestions are intentionally visible before the
-            # first typed turn, so this is a populated baseline rather than a
-            # blank placeholder panel.
             initial_panel_height = app.suggestion_frame.winfo_height()
             app.input_var.set("whats up")
             app.submit()
@@ -437,10 +413,8 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
                 "semantic_hub",
             )
             self.assertIsNone(observation.get("conversationBlock"))
-            self.assertNotIn(
-                "semantic_hub.whats_up",
-                [row.get("id") for row in app.suggestion_rows],
-            )
+            self.assertEqual(app.suggestion_rows, [])
+            self.assertIn("diagnosticRows", app.suggestion_inspector.get("1.0", "end"))
             self.assertGreaterEqual(
                 app.suggestion_frame.winfo_height(), initial_panel_height
             )
@@ -479,7 +453,7 @@ class ContextualSuggestionsS4Tests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_simulation_layout_at_normal_desktop_size(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, self._gui_arguments())
+        app = self.make_gui_app(root)
 
         def wait_until(predicate: object, timeout: float = 12.0) -> None:
             deadline = time.monotonic() + timeout

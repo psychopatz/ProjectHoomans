@@ -45,8 +45,10 @@ from .npc_dossier_renderer import refresh_npc_dossier
 from .npc_interaction_history_renderer import refresh_npc_interaction_history
 from .operation_lifecycle import (
     operation_finished,
+    poll_background_future,
     poll_future,
     show_operation_error,
+    start_background_operation,
     start_operation,
 )
 from .activity_log_view import (
@@ -87,7 +89,11 @@ from .layout_state_controller import (
     toggle_simulation_workbench,
     toggle_trace_panel,
 )
-from .ui_state_persistence import save_ui_state, schedule_save
+from .ui_state_persistence import (
+    remember_active_source,
+    save_ui_state,
+    schedule_save,
+)
 from .saved_world_controller import (
     discover_saved_worlds,
     import_saved_world_target,
@@ -97,6 +103,8 @@ from .saved_world_controller import (
 from .worker_ready_controller import (
     initial_saved_pair_requested,
     load_initial_saved_pair,
+    remembered_saved_pair_requested,
+    restore_remembered_saved_pair,
     set_talk_catalog,
     worker_ready,
 )
@@ -338,6 +346,11 @@ class SemanticHarnessApp:
     def _poll_future(self, future: Future[Any], callback: Callable[[Any], None]) -> None:
         poll_future(self, future, callback)
 
+    def _poll_background_future(
+        self, future: Future[Any], callback: Callable[[Any], None]
+    ) -> None:
+        poll_background_future(self, future, callback)
+
     def _worker_ready(self, result: WorkerReady) -> None:
         worker_ready(self, result)
 
@@ -346,6 +359,9 @@ class SemanticHarnessApp:
 
     def _initial_saved_pair_requested(self) -> bool:
         return initial_saved_pair_requested(self)
+
+    def _remembered_saved_pair_requested(self) -> bool:
+        return remembered_saved_pair_requested(self)
 
     def _open_saved_world_browser(self) -> None:
         """Open the saved-world surface and discover saves on first use."""
@@ -357,6 +373,30 @@ class SemanticHarnessApp:
 
     def _load_initial_saved_pair(self) -> None:
         load_initial_saved_pair(self)
+
+    def _restore_remembered_saved_pair(self) -> None:
+        restore_remembered_saved_pair(self)
+
+    def _populate_studio_explore(self) -> None:
+        from .worker_ready_controller import _populate_studio_explore
+
+        _populate_studio_explore(self)
+
+    def _remember_active_source(
+        self,
+        kind: str,
+        *,
+        save_path: str | None = None,
+        player_id: str | None = None,
+        npc_id: str | None = None,
+    ) -> None:
+        remember_active_source(
+            self,
+            kind,
+            save_path=save_path,
+            player_id=player_id,
+            npc_id=npc_id,
+        )
 
     def _discover_saved_worlds(self) -> None:
         discover_saved_worlds(self)
@@ -565,6 +605,13 @@ class SemanticHarnessApp:
         callback: Callable[[Any], None],
     ) -> bool:
         return start_operation(self, operation, callback)
+
+    def _start_background_operation(
+        self,
+        operation: Callable[[LuaSemanticWorker], Any],
+        callback: Callable[[Any], None],
+    ) -> bool:
+        return start_background_operation(self, operation, callback)
 
     def _operation_finished(self, callback: Callable[[Any], None]) -> Callable[[Any], None]:
         return operation_finished(self, callback)

@@ -22,6 +22,7 @@ from tools.semantic_harness.runtime.save_browser import SavedWorldBrowser
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
@@ -34,7 +35,7 @@ PLAYER = "char_1791957489838_240087"
 NPC = "npcAdamBloom_48G5"
 
 
-class OperationalAcceptanceP13GTests(unittest.TestCase):
+class OperationalAcceptanceP13GTests(SemanticLabGuiTestCase):
     def _run_cli(self, *arguments: str) -> list[dict[str, Any]]:
         environment = dict(os.environ)
         environment["XDG_STATE_HOME"] = "/tmp/projecthoomans-p13g-cli-state"
@@ -173,7 +174,7 @@ class OperationalAcceptanceP13GTests(unittest.TestCase):
         for geometry in ("1080x700", "1280x800"):
             with self.subTest(geometry=geometry):
                 root = tk.Tk()
-                app = SemanticHarnessApp(root, _parser().parse_args([]))
+                app = self.make_gui_app(root)
                 root.geometry(geometry)
 
                 def wait_until(

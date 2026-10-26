@@ -39,24 +39,9 @@ def show_response(self, response: dict[str, Any]) -> None:
         conversation_graph = response.get("conversationGraph")
     if isinstance(conversation_graph, dict):
         self.dialogue_graph_pane.set_graph(conversation_graph)
-    native_presentation = (
-        response.get("conversationPresentation")
-        or observation.get("conversationPresentation")
-    )
-    if (
-        isinstance(native_presentation, dict)
-        and native_presentation.get("schema")
-        == "semantic.native_conversation_view.v1"
-    ):
-        suggestion_title = "Response Channel"
-    else:
-        suggestion_title = (
-            "Current player choices"
-            if observation.get("conversationBlock")
-            or response.get("conversationBlock")
-            else "Contextual semantic suggestions"
-        )
-    self.suggestion_frame.configure(text=suggestion_title)
+    # The primary button surface is always the production-native Response
+    # Channel. Diagnostic/contextual projections are rendered in Inspect.
+    self.suggestion_frame.configure(text="Response Channel")
     suggestions = (
         observation.get("suggestions")
         or response.get("suggestions")

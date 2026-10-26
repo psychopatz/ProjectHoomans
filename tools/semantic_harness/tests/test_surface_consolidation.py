@@ -9,6 +9,7 @@ import unittest
 
 from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
 def _labels(notebook: object) -> list[str]:
@@ -19,7 +20,7 @@ def _labels(notebook: object) -> list[str]:
 
 
 @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
-class SurfaceConsolidationTkTests(unittest.TestCase):
+class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
     def _wait_until(self, root: tk.Misc, predicate: object, timeout: float = 20.0) -> None:
         deadline = time.monotonic() + timeout
         while not predicate() and time.monotonic() < deadline:
@@ -29,7 +30,7 @@ class SurfaceConsolidationTkTests(unittest.TestCase):
 
     def test_studio_and_simulation_have_one_home_per_job(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
         try:
             self.assertEqual(_labels(app.studio_notebook), [
                 "Explore", "Dialogue Content", "Review",
@@ -79,7 +80,7 @@ class SurfaceConsolidationTkTests(unittest.TestCase):
 
     def test_structural_studio_tools_are_hidden_behind_developer_launcher(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
         try:
             root.update()
             app.main_tabs.select(1)
@@ -104,7 +105,7 @@ class SurfaceConsolidationTkTests(unittest.TestCase):
 
     def test_dialogue_content_review_uses_shared_review_home(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
         try:
             root.update()
             family = app.authoring_service.load_dialogue_content(
@@ -133,10 +134,10 @@ class SurfaceConsolidationTkTests(unittest.TestCase):
 
     def test_regression_and_selection_explanation_stay_in_simulation(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
         app._messagebox.showerror = lambda *_args, **_kwargs: None
         try:
-            self._wait_until(root, lambda: app.worker_ready and not app.busy)
+            self._wait_until(root, lambda: app.worker_ready)
             app.input_var.set("hello")
             app.submit()
             self._wait_until(root, lambda: not app.busy)

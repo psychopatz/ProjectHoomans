@@ -1,120 +1,59 @@
 # Semantic Observatory & Dialogue Quality Harness — current progress
 
-**Status: IN PROGRESS — developer-side acceptance reopened by live Semantic Lab findings.** P0/P1/P2/P4/P5/P6 remain accepted. P3 and P7 are reopened for a bounded **P3B Startup & Session Parity** repair before the goal may return to `READY FOR USER LIVE TEST`.
+**Status: READY FOR USER LIVE TEST — P3C and all developer-side P7 gates pass.** P0/P1/P2/P4/P5/P6 remain accepted. P3B product behavior is preserved.
 
 ## Audited revisions
 
-- ProjectHoomans: `25fe2cb95eec238f264328cb478af819fc73285b` (`main` = `origin/main` before this documentation update).
-- PsychopatzCore: `cf28189c57f7810f31d25c46c11eb88080f47baa`.
-- The repository was clean at audit start.
-- No source save mutation, native Project Zomboid launch, or Workshop operation occurred during the audit.
+- ProjectHoomans baseline at this run: `95ccae5a61d2df422d4a38b54009ce6c9817c608` on `main`.
+- PsychopatzCore baseline recorded by the job docs: `cf28189c57f7810f31d25c46c11eb88080f47baa`.
+- No source-save mutation, native Project Zomboid launch, or Workshop operation occurred.
 
 ## Phase reconciliation
 
 | Phase | State | Current evidence |
 | --- | --- | --- |
-| P0 — Baseline/contracts | **COMPLETE** | Existing production source/registration/selection/translation contracts and no-write baselines remain accepted. |
+| P0 — Baseline/contracts | **COMPLETE** | Production source, registration, selection, translation, and no-write contracts remain accepted. |
 | P1 — Runtime catalog | **COMPLETE** | Catalog/detail/provenance/CodeBuilder lineage remain accepted. |
-| P2 — Explain/provenance | **COMPLETE** | Semantic identity, rendered phrase identity/style and provenance separation remain accepted. |
-| P3 — Human surfaces | **REOPENED / IN PROGRESS** | Core Simulation/Studio consolidation exists, but live use exposed three developer-side startup/session defects: empty Explore until manual Search, diagnostic fixture suggestions shown as Response Channel before a production conversation is open, and remembered save/player/NPC selection not automatically restored as the active Simulation source after app restart. |
-| P4 — Grounded scenarios | **COMPLETE** | P4A Leave Group and grounded EN/TL/authority coverage remain accepted. |
+| P2 — Explain/provenance | **COMPLETE** | Semantic identity and rendered phrase identity/style separation remain accepted. |
+| P3 — Human surfaces | **COMPLETE (P3C)** | P3B startup/session parity is preserved; GUI test state is hermetic; Explore loading is local to Studio; waits and acceptance topology are condition-specific. |
+| P4 — Grounded scenarios | **COMPLETE** | Leave Group and grounded EN/TL/authority coverage remain accepted. |
 | P5 — Agent CLI | **COMPLETE** | Existing bounded headless services remain accepted. |
-| P6 — Quality + phrase registry | **COMPLETE** | Canonical greeting promotion, Dialogue Content Registry and phrase identity split remain accepted; P3B must preserve them. |
-| P7 — Integrated acceptance | **REOPENED / IN PROGRESS** | The prior 624-Python / 889-Lua pass was real but insufficient: it did not test first-run Response Channel parity, auto-populated Explore, or active saved-target restoration across Semantic Lab application restarts. |
+| P6 — Quality + phrase registry | **COMPLETE** | Canonical promotion, Dialogue Content Registry, and phrase identity split remain accepted. |
+| P7 — Integrated acceptance | **COMPLETE (developer-side)** | Split Python, focused Xvfb, native Lua, installed-PZ Kahlua, CodeBuilder/content idempotence, data-safety, and diff checks pass. Only explicitly user-owned native SP/MP validation remains. |
 
-## Reproduced live defects
+## P3C acceptance evidence
 
-### 1. Response Channel startup parity
+- Shared `gui_test_support.py` constructs ordinary `SemanticHarnessApp` instances with temporary `--ui-state` and reset fixture intent, owns cleanup, and provides bounded worker/Explore/operation waits. No ordinary GUI test relies on the developer’s default state file.
+- `test_p3c_test_isolation.py` poisons an isolated default-state home with a remembered SAVE target and proves the ordinary helper still starts in FIXTURE mode. It also proves automatic Explore loading leaves foreground `app.busy` false.
+- Studio Explore uses the existing serialized `WorkerSession` through a background read-only lifecycle and reports local `Loading catalog…`; Simulation readiness and controls do not wait for catalog population. Search, paging bounds, lazy detail loading, and actionable catalog errors remain intact.
+- P3B real-worker lifecycle coverage remains green: fresh startup has zero fake Response Channel buttons, native open rows match production IDs/labels/enabled state/frames, SAVE continuity survives worker restart and app recreation, invalid/reset/explicit-source precedence is safe, and the first bounded Explore page auto-loads.
 
-Fresh fixture worker evidence:
+## Measured normal topology
 
-- `conversationPresentation.schema = semantic.native_conversation_view.v1`;
-- lifecycle state is `loaded`;
-- native production `responseChannel.rows = 0` before conversation open.
+- Fixture worker-ready: **1.403s**; fixture through bounded Explore: **1.424s**.
+- Remembered-SAVE worker-ready: **1.412s**; remembered-SAVE restoration: **3.744s**.
+- Full headless Python: **630 discovered; 574 PASS, 56 GUI SKIP, 0 FAIL; 964.02s**.
+- Focused Xvfb GUI Batch A: **65/65 PASS; 156.56s**. Batch B: **42/42 PASS; 89.43s**. Combined focused acceptance: **107/107 PASS; 245.99s** across two bounded interpreters.
+- The prior exhaustive Xvfb-all-tests run exceeding 16 minutes remains diagnostic regression evidence and is not counted as acceptance.
 
-However `worker_ready_controller.py` currently reads `capabilities.suggestions`, fabricates an accepted `{type="turn"}` response, and renders those diagnostic fixture suggestions as the visible Response Channel. That produces legacy/contextual buttons such as `Check in with them`, `How are you doing?`, `Follow me`, and `Go Home` before a conversation exists.
+## P7 re-acceptance evidence
 
-A real `CONVERSATION_OPEN` on the same worker produces only the production native root rows (currently Ask Name, Recruit, Goodbye, What's Up and Companion Orders for the audited fixture).
+- Full native Lua suite: **87/87 PASS**.
+- Installed Project Zomboid Kahlua verifier: **3/3 PASS**, including the negative syntax case; no game launch or Lua execution.
+- CodeBuilder / Dialogue Content / lineage idempotence set: **25/25 PASS**.
+- Source/save data-safety set: **18/18 PASS**; real-save hashes remained unchanged.
+- P3B focused lifecycle: **4/4 PASS; 15.99s** on the final rerun.
+- `git diff --check`: PASS after the final documentation and code review.
 
-**This is a parity bug.** Diagnostic semantic suggestions may remain inspectable, but only native production `conversationPresentation.responseChannel` may drive the visible Response Channel.
+## Retained product contracts
 
-### 2. Saved-target continuity
-
-The UI-state file already persists:
-
-- `saved_world_save_path`;
-- `saved_world_player_id`;
-- `saved_world_npc_id`.
-
-But `initialize_app()` always starts `save_backed_mode = False` with the default fixture, and `worker_ready()` only auto-imports a saved pair when explicit CLI `--save --player --npc` arguments were supplied.
-
-Therefore a normal app restart remembers the World Browser selection but does **not** restore that Player/NPC pair as the active Simulation source.
-
-The core Lua-worker restart path itself is correct: after importing a real SAVE pair, `worker.restart()` re-imports the immutable source snapshot and preserves source kind, source ID and NPC. The missing behavior is **application-session restoration**, not worker-source persistence.
-
-### 3. Studio Explore startup population
-
-`SemanticObservatoryPane` intentionally starts with an empty response tree and status `Production Lua catalog · choose Search to inspect`. The real production catalog is already available, so requiring a manual Search to initialize Explore is unnecessary and makes the primary browser appear broken.
-
-## Immediate Next Chunk — P3B Startup & Session Parity
-
-Implement the contract in `SURFACE_CONSOLIDATION.md` under **P3B Startup & Session Parity**.
-
-### P3B required changes
-
-1. **Production-authoritative Response Channel**
-   - On worker ready, do not render `capabilities.suggestions` as a fabricated accepted turn.
-   - Before a native conversation is open, Response Channel is empty/disabled with a clear `No conversation open` state.
-   - After `Open conversation`, visible rows come only from `semantic.native_conversation_view.v1.responseChannel`.
-   - Generic semantic/context suggestion projections remain diagnostic/Inspect data only.
-   - Clicking a visible Response Channel button must submit the exact native semantic frame/row it represents.
-
-2. **Restore the last active save-backed target across app launches**
-   - Persist an explicit active-source/session preference in addition to browser selection, e.g. `active_source_kind=SAVE` plus the existing save/player/NPC identifiers.
-   - When the previous active source was SAVE, after worker readiness validate the remembered save/player/NPC and automatically call the existing read-only `import_saved_selection()`.
-   - Show `Restoring saved target…` while doing so, then a clear SAVE banner with player/NPC/save identity.
-   - If the save/pair is missing or invalid, remain safely in FIXTURE mode, clear/disable the stale active-source marker, and show one actionable warning.
-   - `--reset-ui-state` must suppress restoration.
-   - Explicit CLI `--save --player --npc` remains higher priority than remembered UI state.
-   - A normal Lua `Restart worker` must continue restoring from the already-imported immutable source snapshot without rereading disk.
-
-3. **Auto-populate Studio Explore**
-   - When the production worker/catalog is ready, automatically request the first bounded response-pool page with an empty filter.
-   - Search remains a filter/refetch action, not the initialization action.
-   - Preserve bounds/paging and never eagerly dump all variant details.
-
-4. **Lifecycle acceptance tests**
-   - Fresh GUI startup: no fake Response Channel buttons before conversation open.
-   - Production conversation open: visible Response Channel IDs exactly equal the native production presentation rows.
-   - Fixture diagnostic suggestions remain available only in Inspect/Debug surfaces.
-   - Load save/player/NPC → `worker.restart()` → same SAVE source/NPC remains active.
-   - Load save/player/NPC → close Semantic Lab → recreate it using the same UI-state file → the same pair auto-restores as active Simulation source without manual World Browser reload.
-   - Invalid/missing remembered save or actor falls back safely to FIXTURE with an explicit warning.
-   - `--reset-ui-state` starts clean fixture mode.
-   - Studio Explore contains bounded registered pools automatically after worker-ready without pressing Search.
-   - Existing World Browser selection persistence, phrase registry, Studio Dialogue Content, Review, CLI and native Lua tests remain green.
-
-## P7 re-acceptance gate
-
-After P3B passes, rerun the integrated developer gate. At minimum:
-
-- focused new P3B Tk/Xvfb lifecycle tests;
-- existing surface consolidation + UI state persistence + operational World Browser tests;
-- full Python semantic-harness suite fail-fast;
-- full native Lua suite;
-- changed-Lua Kahlua verification;
-- CodeBuilder/dialogue-content idempotence;
-- `git diff --check`.
-
-Only then may `PROGRESS.md` return to **READY FOR USER LIVE TEST**.
+- Before native conversation open, visible Response Channel rows are empty with a clear `No conversation open` state; diagnostic suggestions remain Inspect/Debug data only.
+- After native conversation open, visible rows and submitted frames come exclusively from `semantic.native_conversation_view.v1.responseChannel`.
+- SAVE restoration persists only bounded source intent and identifiers, uses the existing read-only importer and immutable worker source snapshot, and falls back to fixture with one actionable warning when invalid.
+- Explore requests one bounded production response-pool page after worker readiness; it does not dump the registry or eagerly fetch variants.
 
 ## Scope / stop rules
 
-- Do not redesign the semantic architecture, phrase registry, Studio ownership, or World Browser.
-- Reuse existing `conversationPresentation`, `import_saved_selection`, source snapshot, UI-state and catalog services.
-- Do not create a second persistence database or duplicate saved-NPC records.
-- Remember identifiers/source intent, not a serialized mutable NPC copy.
-- Do not automatically mutate or rewrite source saves.
-- Do not launch native Project Zomboid or publish Workshop content.
-- Do not modify root `AGENTS.md`.
-- Continue automatically from P3B into P7 re-acceptance; a focused test passing is not the completion boundary.
+- Do not redesign the semantic architecture or introduce another save database, simulator, selector, worker, or persistence system.
+- Do not mutate source saves, launch native Project Zomboid, publish Workshop content, or modify root `AGENTS.md`.
+- The developer-side gate is complete. Only the explicitly user-owned native SP/MP validation remains.

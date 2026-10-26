@@ -5,6 +5,7 @@ from __future__ import annotations
 from hashlib import sha256
 import os
 from pathlib import Path
+import tempfile
 import time
 import tkinter as tk
 import unittest
@@ -19,8 +20,15 @@ from tools.semantic_harness.ui.shell import SemanticHarnessApp
 class ActorInspectorsP13CTests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_real_save_import_populates_shared_player_and_npc_inspectors(self) -> None:
+        state_dir = tempfile.TemporaryDirectory(prefix="projecthoomans-p13c-ui-")
+        state_path = Path(state_dir.name) / "ui-state.json"
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(
+            root,
+            _parser().parse_args(
+                ["--ui-state", str(state_path), "--reset-ui-state"]
+            ),
+        )
         root.geometry("1080x700")
 
         def wait_until(predicate: object, timeout: float = 45.0) -> None:
@@ -148,6 +156,7 @@ class ActorInspectorsP13CTests(unittest.TestCase):
                 app.close()
             except tk.TclError:
                 pass
+            state_dir.cleanup()
 
 
 if __name__ == "__main__":

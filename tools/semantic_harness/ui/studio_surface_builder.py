@@ -53,7 +53,7 @@ def build_studio_editors(
 
     app.observatory = SemanticObservatoryPane(
         response_frame, app._tk, ttk, scrolled_text,
-        run_worker=app._start_operation,
+        run_worker=app._start_background_operation,
         repository=app.authoring_service.repository,
         filedialog=app._filedialog,
         review_parent=review_tab,

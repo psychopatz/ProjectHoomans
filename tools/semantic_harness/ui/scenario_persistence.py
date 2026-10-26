@@ -56,6 +56,7 @@ def load(app: Any) -> None:
     def finish(response: dict[str, Any]) -> None:
         app.scenario = scenario
         app.scenario_path = Path(filename)
+        app._set_save_backed_mode(False)
         app.replay_steps.clear()
         app._sync_workbench_from_scenario(scenario)
         app._refresh_workbench_feedback("Scenario loaded; replay macro cleared.")

@@ -7,6 +7,30 @@ from typing import Any
 from .state import save as persist_ui_state
 
 
+def remember_active_source(
+    app: Any,
+    kind: str,
+    *,
+    save_path: str | None = None,
+    player_id: str | None = None,
+    npc_id: str | None = None,
+) -> None:
+    """Record bounded active-source intent in the existing UI-state mapping."""
+
+    source_kind = str(kind or "FIXTURE").upper()
+    if source_kind != "SAVE":
+        app._ui_state["active_source_kind"] = "FIXTURE"
+        return
+    app._ui_state["active_source_kind"] = "SAVE"
+    for key, value in (
+        ("saved_world_save_path", save_path),
+        ("saved_world_player_id", player_id),
+        ("saved_world_npc_id", npc_id),
+    ):
+        if value not in (None, ""):
+            app._ui_state[key] = str(value)
+
+
 def schedule_save(app: Any, delay_ms: int = 250) -> None:
     """Debounce geometry/state writes while the user drags or switches panes."""
 
@@ -61,10 +85,13 @@ def save_ui_state(app: Any) -> None:
         state["talk_target"] = selected_talk
         state["talk_utterance"] = app.talk_utterance_var.get()
         selected_save = app._selected_saved_world_entry()
+        selected_save_path = (
+            str(selected_save.get("path") or "")
+            if isinstance(selected_save, dict)
+            else ""
+        )
         if isinstance(selected_save, dict):
-            state["saved_world_save_path"] = str(
-                selected_save.get("path") or ""
-            )
+            state["saved_world_save_path"] = selected_save_path
         selected_player = (
             getattr(app, "saved_world_player_labels", {}).get(
                 app.saved_world_player_var.get(), {}
@@ -72,16 +99,46 @@ def save_ui_state(app: Any) -> None:
             if hasattr(app, "saved_world_player_var")
             else {}
         )
-        state["saved_world_player_id"] = str(
+        selected_player_id = str(
             selected_player.get("uuid")
             or selected_player.get("id")
             or ""
         )
-        state["saved_world_npc_id"] = str(
+        selected_npc_id = str(
             app.saved_world_npc_var.get()
             if hasattr(app, "saved_world_npc_var")
             else ""
         )
+        state["saved_world_player_id"] = selected_player_id
+        state["saved_world_npc_id"] = selected_npc_id
+        source_snapshot = getattr(app, "source_snapshot_projection", {})
+        metadata = (
+            source_snapshot.get("metadata", {})
+            if isinstance(source_snapshot, dict)
+            else {}
+        )
+        if app.save_backed_mode is True:
+            state["active_source_kind"] = "SAVE"
+            state["saved_world_save_path"] = str(
+                metadata.get("savePath")
+                or selected_save_path
+                or app._ui_state.get("saved_world_save_path")
+                or ""
+            )
+            state["saved_world_player_id"] = str(
+                metadata.get("playerUUID")
+                or selected_player_id
+                or app._ui_state.get("saved_world_player_id")
+                or ""
+            )
+            state["saved_world_npc_id"] = str(
+                metadata.get("npcID")
+                or selected_npc_id
+                or app._ui_state.get("saved_world_npc_id")
+                or ""
+            )
+        else:
+            state["active_source_kind"] = "FIXTURE"
         state["saved_world_view"] = str(
             app.saved_world_view_var.get()
             if hasattr(app, "saved_world_view_var")

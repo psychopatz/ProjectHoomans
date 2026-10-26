@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
+import tempfile
 import time
 import tkinter as tk
 import unittest
@@ -21,8 +23,15 @@ class SemanticLabUIOrganizationTests(unittest.TestCase):
         self._assert_save_backed_layout("1280x800")
 
     def _assert_save_backed_layout(self, geometry: str) -> None:
+        state_dir = tempfile.TemporaryDirectory(prefix="projecthoomans-ui-org-")
+        state_path = Path(state_dir.name) / "ui-state.json"
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = SemanticHarnessApp(
+            root,
+            _parser().parse_args(
+                ["--ui-state", str(state_path), "--reset-ui-state"]
+            ),
+        )
         # The product intentionally restores the user's diagnostics choice;
         # make this compact-layout test deterministic instead of depending on
         # the desktop's persisted preference.
@@ -42,7 +51,7 @@ class SemanticLabUIOrganizationTests(unittest.TestCase):
             self.assertTrue(predicate(), f"timed out at geometry {geometry}")
 
         try:
-            wait_until(lambda: app.worker_ready and not app.busy)
+            wait_until(lambda: app.worker_ready)
             app.main_tabs.select(app.world_browser_tab)
             app.saved_world_discover_button.invoke()
             wait_until(lambda: not app.busy and bool(app.saved_world_entries))
@@ -126,6 +135,7 @@ class SemanticLabUIOrganizationTests(unittest.TestCase):
                     root.destroy()
                 except tk.TclError:
                     pass
+            state_dir.cleanup()
 
 
 if __name__ == "__main__":

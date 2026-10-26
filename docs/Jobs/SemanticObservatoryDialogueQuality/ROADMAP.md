@@ -33,7 +33,7 @@
 **Gate:** seeded and natural-history observed selections match explanations; explain does not mutate selection history or dispatch; source/authority joins never overclaim exact ownership.
 
 ## P3 — Human UI surface consolidation
-**Status: REOPENED / IN PROGRESS.** Core ownership consolidation is accepted, but P3B Startup & Session Parity is mandatory after live use exposed false pre-conversation Response Channel rows, non-restored active SAVE targets, and empty Explore startup.
+**Status: REOPENED / IN PROGRESS (P3C).** Core ownership consolidation and P3B startup/session behavior are functionally accepted. P3C Test Isolation & Runtime Performance is now mandatory because P3B made persisted SAVE intent operational at startup and exposed non-hermetic GUI tests plus an impractically slow Xvfb acceptance loop.
 
 - Enforce the ownership contract in SURFACE_CONSOLIDATION.md: Simulation executes/tests; Studio is Explore + Dialogue Content + Review; World Browser selects persisted targets; Log owns activity history.
 - Remove Studio Observatory Test Lab as a parallel conversation runner. All interactive fixture/save-backed execution now routes through Simulation.
@@ -48,6 +48,8 @@
 **Gate:** one user task has one GUI home; no duplicate Studio runner/context/coverage surface remains; Studio defaults to Explore + Dialogue Content + Review, structural authoring is Developer Tools; Simulation retains all runtime/testing capability; World Browser/Log remain sole owners; Dialogue Content can safely edit one canonical phrase family and one verified landing/choice text with locked structural metadata; moved/retired functions pass real-worker Tk/Xvfb and CLI parity regression without semantic or save behavior changes.
 
 **P3B startup/session addendum:** visible Response Channel rows must be empty before native conversation open and thereafter exactly match production `conversationPresentation.responseChannel`; remembered active SAVE source/player/NPC must auto-restore across Semantic Lab application launches using existing read-only import logic; Studio Explore must populate its first bounded catalog page automatically on worker-ready; stale remembered targets fall back safely to FIXTURE. See SURFACE_CONSOLIDATION.md.
+
+**P3C performance/test-isolation addendum:** preserve all P3B behavior while making GUI tests hermetic from real user UI/SAVE state, keeping background Explore loading local rather than globally busy, using condition-specific bounded waits, and splitting full headless regression from focused Xvfb GUI acceptance. See TEST_RUNTIME_PERFORMANCE.md.
 
 ## P4 — Grounded scenario matrix and quality coverage
 **Status: COMPLETE.**
@@ -85,22 +87,23 @@
 **Gate:** the prior canonical promotion remains valid **and** the Dialogue Content Registry acceptance in DIALOGUE_CONTENT_REGISTRY.md passes: deterministic CodeBuilder generation, string-only translations, separate semantic/style/phrase identities, 3+ EN/TL phrases with anti-repeat real-Lua proof, Studio content editing with stale guards, one locked-structure player landing edit, unchanged plans/actions/authority/effects, and no save/ModData text bloat.
 
 ## P7 — End-to-end developer acceptance, scale and handoff
-**Status: REOPENED / IN PROGRESS.** The prior broad suite was green but did not cover P3B startup/session lifecycle parity. Re-accept only after the new GUI lifecycle tests and another consolidated developer gate pass.
+**Status: REOPENED / IN PROGRESS.** P3B functional lifecycle coverage is green, but P3C exposed non-hermetic GUI tests and an impractically slow Xvfb-all-tests loop. Re-accept only after TEST_RUNTIME_PERFORMANCE.md passes and the split headless + focused-GUI gate is measured.
 
 - Exercise final P0–P6 flows in headless CLI and actual Tk GUI against production Lua/Core.
-- Compare startup/query/replay/output/memory budgets to P0; respect current catalog/history caps unless separately justified.
+- Compare startup/query/replay/output/memory budgets to P0; respect current catalog/history caps unless separately justified. Test-suite wall-clock and GUI startup are acceptance properties under TEST_RUNTIME_PERFORMANCE.md, not unbounded implementation details.
 - Run final focused+broad Python suites, full Lua suite, installed Project Zomboid Kahlua compiler, deterministic CodeBuilder writer parity, save/source hash safety and git diff checks.
 - Verify no new source-of-truth duplication, watched-media staging, save writes or native/runtime publication side effects.
 - Prepare user native SP/MP checklist only after every developer-implementable gate passes.
 
-**Gate:** final real-Lua + GUI/headless parity + canonical source-patch regression + performance/data-safety evidence passes, **including P3B startup/session parity: no fake pre-conversation Response Channel, automatic active SAVE-target restoration, and automatic bounded Explore population**. Then set **READY FOR USER LIVE TEST**. Native SP/MP remains user-owned; after that acceptance the goal may become maintenance-ready.
+**Gate:** final real-Lua + GUI/headless parity + canonical source-patch regression + performance/data-safety evidence passes, **including P3B startup/session parity and P3C hermetic/practical test-runtime acceptance**. The full headless suite runs once; focused Xvfb GUI acceptance is bounded and measured; real user persistence cannot silently affect ordinary tests. Then set **READY FOR USER LIVE TEST**.
 
 ## Closure order
 
-1. **P3B Startup & Session Parity** — fix production-native Response Channel startup behavior, active SAVE-target restoration across app launches, and automatic bounded Explore population using existing services.
-2. Add real-worker Tk/Xvfb lifecycle coverage for the exact three live defects plus safe invalid/reset cases.
-3. **P7 re-acceptance** — rerun the focused GUI lifecycle tests, existing surface/UI-state/World Browser suites, full Python harness, full native Lua suite, Kahlua verification, CodeBuilder/dialogue-content idempotence and `git diff --check`.
-4. Only after those developer gates pass may the goal return to **READY FOR USER LIVE TEST**. Preserve all accepted P0–P6 work; do not reopen unrelated architecture.
+1. Preserve the accepted P3B product behavior; do not revert remembered SAVE restoration, native Response Channel authority, or Explore auto-load.
+2. **P3C Test Isolation & Runtime Performance** — introduce a shared hermetic GUI-test state fixture, migrate ordinary GUI tests off the real default UI-state path, separate Explore-local loading from global busy semantics, and replace broad generic waits with condition-specific helpers.
+3. Define and validate the split acceptance topology: full headless suite once + focused Xvfb GUI/lifecycle modules, with measured startup and wall-clock budgets.
+4. **P7 re-acceptance** — run the split Python gates, full native Lua suite, Kahlua verification, CodeBuilder/dialogue-content idempotence, data-safety checks and `git diff --check`.
+5. Only after those developer gates pass may the goal return to **READY FOR USER LIVE TEST**.
 
 ## Continue / stop rule
 

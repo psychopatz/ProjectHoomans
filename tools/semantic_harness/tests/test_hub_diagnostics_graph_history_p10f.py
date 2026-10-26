@@ -16,6 +16,7 @@ from tools.semantic_harness.ui.shell import (
     SemanticHarnessApp,
     semantic_hub_diagnostic_projection,
 )
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
 def _conversation_graph(graph_id: str) -> dict:
@@ -79,7 +80,7 @@ def _conversation_graph(graph_id: str) -> dict:
     }
 
 
-class HubDiagnosticsGraphHistoryP10FTests(unittest.TestCase):
+class HubDiagnosticsGraphHistoryP10FTests(SemanticLabGuiTestCase):
     def test_real_worker_hub_projection_has_safe_provider_owned_diagnostics(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             response = worker.input("What's up?")
@@ -124,7 +125,7 @@ class HubDiagnosticsGraphHistoryP10FTests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_tk_unifies_hub_graph_and_retains_authored_history(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
         errors: list[str] = []
         app._messagebox.showerror = lambda _title, message, **_kwargs: errors.append(str(message))
 

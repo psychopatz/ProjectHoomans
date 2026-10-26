@@ -19,6 +19,7 @@
 | K. Surface ownership / no redundancy | Simulation is the only GUI conversation/context/regression execution workbench; Studio contains Explore + Dialogue Content + Review without a second Test Lab/Coverage runner; structural authoring is Developer Tools; World Browser and Log retain sole browser/timeline roles. Moved functionality uses existing services and real-worker GUI tests pass. |
 | L. Dialogue content / phrase variation | A reviewed canonical content source compiles deterministic phrase families without changing semantic selection. Phrase variants are selected after style, avoid immediate repeat, remain separately observable, and compile to ordinary string-valued EN/TL translation keys. Studio edits one migrated NPC family plus one verified player landing/choice text while structural metadata remains locked; real Lua proves unchanged plans/actions/authority/effects. |
 | M. Startup/session parity | Fresh GUI startup renders zero native Response Channel rows until production conversation open; visible rows then exactly match `conversationPresentation.responseChannel`. The last active valid SAVE/player/NPC auto-restores across app recreation using existing read-only import; invalid remembered targets fall back safely; `--reset-ui-state` disables restoration. Studio Explore auto-populates a bounded first catalog page on worker-ready. |
+| N. Test isolation / runtime performance | Ordinary GUI tests use isolated temporary UI state and cannot inherit the user's real active SAVE/session. Explore auto-load does not extend global Simulation busy state. Full Python regression runs once headlessly; Xvfb runs a bounded GUI/lifecycle set rather than rediscovering the entire suite. Fixture/SAVE startup and focused GUI wall-clock are measured against a practical local budget. |
 
 ## Minimum reusable scenario matrix
 
@@ -73,6 +74,18 @@ Historical passing tests are a starting baseline, not a pass for newly implement
 - Delete/rename or otherwise invalidate a copied remembered test source and assert safe FIXTURE fallback plus an explicit warning.
 - Recreate with `--reset-ui-state` and assert no remembered target is imported.
 - Worker-ready automatically populates Studio Explore's first bounded production response-pool page; Search is not required for initialization.
+
+## Test isolation / runtime performance checks
+
+- All ordinary `SemanticHarnessApp` tests use a shared hermetic temporary UI-state fixture; only explicit persistence/restore tests opt into remembered SAVE state.
+- Running tests is invariant to the user's real default Semantic Lab state, including `active_source_kind=SAVE`, last save path, player ID and NPC ID.
+- No normal GUI test rehydrates the user's real save unless that real-save behavior is the explicit subject of the test.
+- Explore auto-population has its own bounded loading state and does not make unrelated Simulation tests wait for global `app.busy`.
+- Wait helpers target specific lifecycle conditions and do not hide regressions behind blanket 45–60 second ceilings.
+- Record measured fixture startup and remembered-SAVE startup samples after isolation repair; compare to the audited ~1.9 s fixture / ~6.0 s SAVE observations rather than hardcoding those numbers as universal thresholds.
+- Run the full Python suite once headlessly. Under Xvfb, run only the explicit GUI/lifecycle acceptance module set for the normal edit-test loop.
+- Record focused Xvfb suite wall-clock. An exhaustive all-tests-under-Xvfb run, if retained, is optional/CI-style and has an explicit runtime budget.
+- P3B functional assertions remain green after the performance/isolation changes.
 
 ## User-owned final live checklist
 

@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+from .ui_state_persistence import remember_active_source
+
 def set_save_backed_mode(self, active: bool) -> None:
     """Demote synthetic fixture controls after a real save import."""
 
     self.save_backed_mode = active
+    remember_active_source(self, "SAVE" if active else "FIXTURE")
     self._refresh_relationship_missing_state()
 
     if active:

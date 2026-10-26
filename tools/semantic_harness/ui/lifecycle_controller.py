@@ -23,6 +23,15 @@ def close_app(app: Any) -> None:
         app._auto_apply_after,
         app._splitter_restore_after,
         app._activity_after,
+        app._foreground_poll_after,
+        app._background_poll_after,
+        app._start_worker_after,
+        app._startup_after,
+        app._explore_retry_after,
+        app._layout_restore_after,
+        app._restore_workbench_tabs_after,
+        app._restore_ui_state_after,
+        getattr(app, "_ui_state_save_after", None),
     ):
         if after_id is not None:
             try:

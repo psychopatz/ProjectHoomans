@@ -15,9 +15,10 @@ from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class SimulationWorkbenchP10ETests(unittest.TestCase):
+class SimulationWorkbenchP10ETests(SemanticLabGuiTestCase):
     def test_semantic_dialogue_toggle_uses_worker_gate_and_saved_runtime(self) -> None:
         disabled = deepcopy(DEFAULT_SCENARIO)
         disabled["runtime"]["semanticDialogueEnabled"] = False
@@ -89,7 +90,7 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_tk_workbench_applies_and_replays_latest_hub_utterance(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
         errors: list[str] = []
         app._messagebox.showerror = lambda _title, message, **_kwargs: errors.append(str(message))
 
@@ -204,7 +205,7 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_tk_replay_reexecutes_recorded_semantic_steps_from_clean_view(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
 
         def wait_until(predicate: object, timeout: float = 12.0) -> None:
             deadline = time.monotonic() + timeout
@@ -214,7 +215,7 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
             self.assertTrue(predicate())
 
         try:
-            wait_until(lambda: app.worker_ready and not app.busy)
+            wait_until(lambda: app.worker_ready)
             app.open_conversation_button.invoke()
             wait_until(
                 lambda: (
@@ -267,13 +268,15 @@ class SimulationWorkbenchP10ETests(unittest.TestCase):
                         time.sleep(0.02)
                     self.assertTrue(predicate())
 
-                wait_until(lambda: app.worker_ready and not app.busy)
+                wait_until(lambda: app.worker_ready)
                 app.main_tabs.select(app.simulation_tab)
                 root.geometry("1280x800")
                 root.update_idletasks()
                 app.simulation_panes.sashpos(0, 700)
                 root.update_idletasks()
-                app.workflow_pane_split.sashpos(0, 320)
+                # Keep the saved position above the fixture-mode minimum
+                # enforced by the shared layout controller.
+                app.workflow_pane_split.sashpos(0, 500)
                 root.update_idletasks()
                 saved_sash = app.workflow_pane_split.sashpos(0)
                 app._save_ui_state()

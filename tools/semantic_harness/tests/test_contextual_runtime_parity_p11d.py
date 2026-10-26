@@ -12,9 +12,10 @@ from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 
 
-class ContextualRuntimeParityP11DTests(unittest.TestCase):
+class ContextualRuntimeParityP11DTests(SemanticLabGuiTestCase):
     def scenario(
         self,
         *,
@@ -164,7 +165,7 @@ class ContextualRuntimeParityP11DTests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_relationship_workbench_exposes_proposal_policy_and_action(self) -> None:
         root = tk.Tk()
-        app = SemanticHarnessApp(root, _parser().parse_args([]))
+        app = self.make_gui_app(root)
         app._messagebox.showerror = lambda *_args, **_kwargs: None
         deadline = time.monotonic() + 15
         try:
@@ -172,6 +173,11 @@ class ContextualRuntimeParityP11DTests(unittest.TestCase):
                 root.update()
                 time.sleep(0.02)
             self.assertTrue(app.worker_ready)
+            deadline = time.monotonic() + 15
+            while app.busy and time.monotonic() < deadline:
+                root.update()
+                time.sleep(0.02)
+            self.assertFalse(app.busy)
             for control_id in (
                 "relationship.romanceCompatibility",
                 "relationship.proposalThreshold",
