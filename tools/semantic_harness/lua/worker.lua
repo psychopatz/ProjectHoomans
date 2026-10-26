@@ -102,6 +102,17 @@ local Context = {
 
 ScenarioSession.configureRuntime(Context)
 ProductionModules.load(Context)
+-- After *all* production capability providers are loaded, bring the
+-- existing automatic generation registry to its final startup signature.
+-- Otherwise the first FLOW_CATALOG request adds pools that the read-only
+-- RESPONSE_POOL_LIST request could not see. This changes no gameplay
+-- authority, does not select dialogue, and stays in the fixture worker.
+local CapabilityCatalog = PNC.Semantics.CapabilityCatalog
+if CapabilityCatalog
+    and type(CapabilityCatalog.EnsureAutomaticGeneration) == "function"
+then
+    CapabilityCatalog.EnsureAutomaticGeneration()
+end
 Context.EngineFacts = PNC.Semantics.EngineFacts
 Context.EngineEvents = PNC.Semantics.EngineEvents
 Runtime.productionRelationshipService = {}
