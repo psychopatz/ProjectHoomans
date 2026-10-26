@@ -1,80 +1,98 @@
 # Semantic Observatory & Dialogue Quality Harness — full developer roadmap
 
-**Parent goal: IN PROGRESS / PARTIALLY IMPLEMENTED.** These are **mandatory developer-side phases** P0–P7, not eight separate /goal assignments. A phase or Next Chunk passing is not completion of the parent goal. Preserve accepted Semantic Lab / CodeBuilder / native semantic work; audit before touching it.
+**Parent goal: IN PROGRESS / PARTIALLY IMPLEMENTED.** These are mandatory developer-side phases P0–P7, not separate /goal assignments. A phase or Next Chunk passing is not completion of the parent goal. Current phase truth is reconciled in PROGRESS.md and must be updated from evidence rather than chronological notes.
 
 ## P0 — Baseline and canonical contracts
+**Status: COMPLETE at audited ProjectHoomans 07aad881.**
 
-- Reinspect working main, Core paired version, active registered sources and linked jobs; map all existing response/flow/translation/suggestion ownership.
+- Reinspect working main, Core paired version, active registered sources and linked jobs; map response/flow/translation/suggestion ownership.
 - Capture source/registry revisions; establish checked-in source versus generated artifact rules, current detail/trace gaps, production worker startup and no-write guarantees.
-- Run existing focused real-worker inspector/flow/CodeBuilder/response checks and measure catalog payload, initialization, query, replay and memory baselines; record exact failures/skips.
-- Define schema-versioned, bounded, source-provenance and side-effect-free query contracts that extend existing worker protocol rather than creating a second program.
+- Run focused real-worker inspector/flow/CodeBuilder/response checks and measure catalog payload, initialization, query, replay and memory baselines.
+- Define schema-versioned, bounded, source-provenance and side-effect-free query contracts extending the existing worker protocol.
 
-**Gate:** source-to-registration-to-render chain for one greeting, one contextual question and one real registered action is evidenced; representative baseline, performance budget measurements and contract are documented; no new API duplicates existing authority.
+**Gate:** source→registration→render is evidenced for greeting, contextual question and a real registered action; representative baseline/performance measurements and no-write contracts are documented; no competing semantic authority exists.
 
 ## P1 — Read-only runtime catalog introspection
+**Status: COMPLETE at audited ProjectHoomans 07aad881.**
 
-- Extend actual production Lua FlowEditor/ResponseCatalog observation to enumerate real registered pool variants, conditions, priorities, template/plan summaries, source kind and verified source provenance.
-- Keep broad catalogs IDs+counts only and request detailed records lazily; pagination, stable IDs, bounded sizes, revisions and explicit UNKNOWN source ownership.
-- Preserve generation/source kinds: authored Lua, canonical CodeBuilder-reviewed sources, generated artifacts and Core-backed translations. Never parse/execute arbitrary Lua in Python for semantic truth.
-- Expose same service to CLI and GUI, starting with one pool-detail query.
+- Enumerate actual loaded response pools/variants, conditions, priorities, template/plan summaries, revision and verified provenance from production Lua.
+- Keep broad catalogs IDs+counts only; request details lazily with pagination/bounds.
+- Preserve authored/generated/CodeBuilder/translation source distinctions. **Explicit UNKNOWN is an accepted provenance result when unique ownership cannot be proven.**
+- Expose the same service to CLI and GUI.
 
-**Gate:** selected actual loaded pool and variants exactly match production Lua; stable origin/translation metadata or explicit UNKNOWN; no writes, bounded response/worker startup, no runtime selection behavior change.
+**Gate:** loaded pool/variant details match production Lua; provenance is verified or explicitly UNKNOWN; reads are bounded/no-write and do not change runtime selection behavior.
 
 ## P2 — Explainable selection and authority provenance
+**Status: ACCEPTANCE-PENDING. Core mechanism implemented.**
 
-- Instrument or refactor the **same** Lua matching/scoring/tie/history path to produce optional read-only per-candidate evidence without modifying selection state; keep prior production outcomes.
-- Join selected variant/template/plan source to current Conversation Inspector final text, translation chain, action/command result, effect/delta and NPC/flow state.
-- Distinguish ineligible, lower-scoring, tied, anti-repeat rotation and unavailable; unknown context remains unknown rather than fabricated.
-- Include hostile, identity-hidden, invalid/stale, weather/personality and side-effect-free previews.
+- Use the same Lua matching/scoring/tie/history path for optional explain traces; never reimplement selection in Python.
+- Join selected variant/template/plan evidence to Conversation Inspector final text, translation chain, command/action result, effects and flow state.
+- Distinguish condition mismatch, lower score, tie/hash, anti-repeat rotation and unavailable cases.
+- For plan-turn/template-only responses, report exact source/variant only when proven; otherwise preserve bounded template candidates or UNKNOWN.
 
-**Gate:** observed actual selected variant equals explanation for seeded and natural-history worker turns; explain does not mutate last-variant history or execute actions; native-shaped authority and negative cases remain intact.
+**Gate:** seeded and natural-history observed selections match explanations; explain does not mutate selection history or dispatch; source/authority joins never overclaim exact ownership.
 
 ## P3 — Human Studio: observability-first
+**Status: ACCEPTANCE-PENDING. Catalog/Test/Coverage/Review surfaces implemented.**
 
-- Make Catalog, Test Lab, Coverage and Review readable primary surfaces inside **existing** Semantic Lab Tk UI. Reuse Interaction Explorer, current Flow view, worker/inspection controllers and reusable widgets.
-- Support search by topic/pool/flow/condition/owner, actual variant contents, source and EN/TL keys; from a result open a focused test and trace.
-- Display candidate reasons and contextual final text as human-readable summaries; raw JSON remains available as an advanced view.
-- Preserve Advanced Flow graph/Build workflow/Block palette/Interaction Composer without speculative migration or deletion.
+- Keep Catalog, Test Lab, Coverage and Review as the readable observability-first surfaces inside the existing Semantic Lab.
+- Search by topic/pool/flow/condition/owner and inspect actual variants, source/translation provenance and final rendered text.
+- Keep raw JSON as an advanced view, not the primary user workflow.
+- Preserve Advanced Flow graph/Build workflow/Dataset Library/Block palette/Interaction Composer.
 
-**Gate:** an operator can locate a real greeting, identify selected/overridden variants and run a corresponding Lua-backed scenario without authoring or editing JSON; UI/CLI show the same values.
+**Gate:** a user can locate a real dialogue, understand selected/overridden variants and run its production-Lua scenario without manual JSON authoring; final GUI and CLI values agree.
 
 ## P4 — Grounded scenario matrix and quality coverage
+**Status: IN PROGRESS.**
 
-- Define reusable, bounded matrix cases by EN/TL, personality/social style, trust/relationship, unknown name/privacy, weather/time, need/health, active flow, companion authority and negative permissions.
-- Run actual Core+Hoomans worker, reset histories between unrelated cases and deliberately retain history for anti-repeat sequences.
-- Produce measured outcomes: eligible/reached/selected, fallback, conditional dominance, potentially shadowed under tested contexts, repetition/equivalent meaning, translation fallback/placeholder mismatch, factual-disclosure and unintended effect deltas. Distinguish untested from unreachable.
-- Store compact summarized evidence and fixture definitions, not unbounded NPC state or large duplicate transcripts.
+- Maintain bounded EN/TL matrices for personality/social style, relationships, hidden identity, weather/time, need/health, flow state, companion authority and negative permissions.
+- Reset histories between unrelated cases; retain history intentionally for anti-repeat sequences.
+- Report tested/untested, eligible/selected/lower-ranked/tied, fallback, contextual dominance, repetition/equivalence, translation mismatch, disclosure and unintended effects.
+- Store compact fixtures/evidence; no unbounded NPC state or transcript duplication.
+- **Mandatory remaining lifecycle proof:** construct a disposable save-backed player-owned faction and exercise the real worker Leave Group warning→confirmation→production ColonistDeparture path end to end. Existing unowned rejection and server/service-positive smokes do not replace this worker-level proof.
 
-**Gate:** existing greeting/wellbeing/farewell/companion action scenarios reproducibly report both expected and negative behavior, EN/TL; deviations are actionable with exact source/worker revision.
+**Gate:** greeting/wellbeing/farewell/companion action and owned/unowned Leave Group behavior are reproducible in actual Core+Hoomans worker fixtures, with EN/TL where supported and explicit source/worker revision.
 
 ## P5 — Agent-first CLI/reporting
+**Status: ACCEPTANCE-PENDING. Required commands implemented.**
 
-- Add stable headless commands for catalog query, pool detail, selection explain, scenario coverage, case replay and candidate/baseline comparison, routed through the same inspection/query services as GUI.
-- Emit machine-readable versioned JSON/JSONL with limits, paging/cursors, truncation, fingerprints, sourceKind (FIXTURE/SAVE), exit codes and actionable errors.
-- Include a concise CLI guide for ChatGPT + authorized Desktop Commander/GitHub and local Codex; never require screenshots or force agent to dump whole Lua file trees for a single response pool.
-- Verify CLI/GUI parity, wrong/unknown IDs, invalid/stale revisions, worker crashes, heavy registries, missing Core and permission failures.
+- Keep stable headless catalog/detail/explain/turn/matrix/coverage/lineage/translation/proposal/compare operations routed through the same services as GUI.
+- Emit schema-versioned bounded JSON/JSONL with limits, paging/truncation, fingerprints, sourceKind, exit codes and actionable errors.
+- Maintain concise CLI documentation for ChatGPT via authorized desktop/repository access and local Codex.
+- Close remaining wrong/unknown/stale/error, heavy-registry and GUI-parity cases. **Do not add more CLI surfaces unless a written acceptance gate requires one.**
 
-**Gate:** an agent can find and explain one pool, exercise EN/TL context matrix and return a bounded report using only headless commands; same registered Lua outcomes as GUI.
+**Gate:** an agent can discover/explain a pool, run EN/TL coverage and compare candidate/baseline behavior with bounded reports; final results match GUI/registered Lua.
 
 ## P6 — Safe delegated dialogue quality / variant workflow
+**Status: IN PROGRESS. Preview/replay safety implemented; canonical promotion proof pending.**
 
-- Given a named response family, retrieve actual source/variants, eligibility/plan/translation contracts and measured gaps; generate *proposals* only, not implicit production policy.
-- Support reviewable targeted edits to hand-authored Lua or actual CodeBuilder canonical source (never overwriting generated artifacts directly); preserve non-text metadata/side effects unless separately authorized.
-- Validate candidate IDs and limits, syntax and Kahlua, EN/TL/translationArgs and placeholders, tone/semantic fidelity, fact/disclosure safety, duplicate meanings, flow/authority regression and deterministic output.
-- Stage outside watched media and user saves; run real Lua worker from an isolated candidate source tree or approved bounded worker overlay. Diff fingerprint + outputs + no-write verification before integrating. Fresh worker must demonstrate changed dialogue without altered game authority.
-- Human/agent may review and approve source changes under repo Git policy; do not auto-approve an LLM just because it produces grammatical text.
+- Retrieve actual source/variants, eligibility/plan/translation contracts and measured quality gaps.
+- Treat generated language as a proposal. Preserve non-text metadata/side effects unless behavior change is separately authorized.
+- Validate IDs/limits, Kahlua, EN/TL placeholders and meaning, grounding/disclosure, duplicates and flow/authority regression.
+- Stage only outside watched media/user saves; run disposable real-Lua candidate replay and compare source fingerprints/effects.
+- Promote only through the verified canonical owner (hand-authored Lua or CodeBuilder reviewed input), never by overwriting derived artifacts.
+- Require an **explicit review decision** separate from proposal generation. The reviewer may be a human or authorized agent under this job, but must record why the text is semantically grounded/localized and cannot approve merely because it is grammatical.
 
-**Gate:** demonstrate one real greeting/response family improved in both languages, with reproducible before/after worker dialogue, observed variant distribution, bounded source diff, unchanged gameplay effects and explicit approval.
+**Gate:** one low-risk real response family is improved in EN/TL, explicitly reviewed, promoted to canonical source, replayed fresh from checked-in source, and shown to preserve selection metadata/gameplay effects.
 
 ## P7 — End-to-end developer acceptance, scale and handoff
+**Status: IN PROGRESS. Several independent suites pass; consolidated final gate pending.**
 
-- Exercise all P0–P6 flows in both CLI and visible Tk GUI (or honestly mark UI unavailable, keep developer-side gate open), production module worker, EN/TL, registered command and refusal, saved selection read-only where safely available.
-- Verify startup and latency/memory/report budgets against P0, including catalog caps (256 pools, 16 variants per pool, 256 last selections); justify any later cap change through measured tests.
-- Run focused and broader relevant Python, Lua suites, Kahlua and deterministic CodeBuilder writer parity; inspect git diff, provenance, watcher safety and no new source-of-truth duplication.
-- Prepare user-facing acceptance checklist for native SP/MP only after all developer-implementable work passes. No native launch or Workshop operation by agent.
+- Exercise final P0–P6 flows in headless CLI and actual Tk GUI against production Lua/Core.
+- Compare startup/query/replay/output/memory budgets to P0; respect current catalog/history caps unless separately justified.
+- Run final focused+broad Python suites, full Lua suite, installed Project Zomboid Kahlua compiler, deterministic CodeBuilder writer parity, save/source hash safety and git diff checks.
+- Verify no new source-of-truth duplication, watched-media staging, save writes or native/runtime publication side effects.
+- Prepare user native SP/MP checklist only after every developer-implementable gate passes.
 
-**Gate:** real Lua + GUI/headless parity + source patch regression + performance and data-safety evidence; remaining native gameplay proof explicitly user-owned. Then and only then set parent status READY FOR USER LIVE TEST; after user acceptance, maintenance-ready.
+**Gate:** final real-Lua + GUI/headless parity + canonical source-patch regression + performance/data-safety evidence passes. Then set **READY FOR USER LIVE TEST**. Native SP/MP remains user-owned; after that acceptance the goal may become maintenance-ready.
 
-## Stop / continue rule
+## Closure order
 
-After any accepted phase: update PROGRESS with exact evidence/HEAD and immediate next mandatory chunk, then **continue automatically**. Do not stop at a phase boundary or ask for another /goal. Stop only for the fully completed developer objective, a genuine conflict/blocker, forbidden operation, or explicit user-owned native acceptance after all implementable work. Never invent completion.
+1. P4A — positive player-owned Leave Group production-worker lifecycle.
+2. P2/P3/P4/P5 — provenance/repeat/coverage and GUI↔CLI/error acceptance closeout without new feature creep.
+3. P6 — one explicitly reviewed canonical EN/TL dialogue improvement and fresh-worker proof.
+4. P7 — one consolidated developer acceptance pass and handoff.
+
+## Continue / stop rule
+
+After an accepted slice, update PROGRESS.md as concise current truth and continue automatically to the next mandatory closure slice. Do not append a historical diary and do not ask for a new /goal at phase boundaries. Stop only when the full developer objective is accepted, a genuine safety/authorization blocker prevents further work, or all implementable work is complete and only the user-owned native SP/MP gate remains.

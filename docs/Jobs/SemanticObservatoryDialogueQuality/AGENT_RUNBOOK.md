@@ -33,4 +33,10 @@ Deliver the **entire** approved Observatory-first system in the existing Semanti
 
 ## Progress and failure behavior
 
-Keep PROGRESS.md concise/current: status, exact revision, accepted evidence, known limitations, one Next Chunk, remaining mandatory phases. Link audits/roadmap instead of duplicating history. Continue through P0–P7 autonomously. If unrelated test/environment blocked, record it precisely and keep doing independently testable work. If real blocker/authorization conflict, report why no safe action can proceed. Final report includes files/code, evidence, remaining gaps, commit and explicit no-native/no-Workshop statement.
+Keep PROGRESS.md concise/current: exact revision, reconciled phase status, accepted evidence, known limitations, one Next Chunk and remaining mandatory closure slices. **Replace stale status instead of appending chronological “continuation” sections; Git history is the archive.** Mark a phase complete when its written gate is actually evidenced. Do not keep a phase open merely because some provenance is legitimately UNKNOWN when the architecture explicitly allows UNKNOWN.
+
+Continue through P0–P7 autonomously. A denied exploratory shell/remote command is not by itself a product blocker: use existing repository fixtures, safe test seams or another authorized developer-side path when the required behavior is still implementable. If a real safety/authorization blocker remains, report why no safe route exists and continue independently testable work.
+
+For P6, proposal generation and approval are separate acts. A human **or authorized agent** may record the explicit review decision, but approval requires evidence for grounding, EN/TL meaning, placeholders, non-text metadata preservation and authority/effect parity; grammatical text alone is insufficient. Do not stop all other acceptance work while awaiting a wording decision if independent gates remain.
+
+Final report includes files/code, evidence, remaining gaps, commit and explicit no-native/no-Workshop statement.

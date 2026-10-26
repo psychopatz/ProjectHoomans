@@ -1,6 +1,6 @@
 # Semantic Observatory & Dialogue Quality Harness
 
-**Status: PLANNED — documentation and implementation handoff only.** Parent goal is not complete. Base audit: ProjectHoomans main at 0e2d5a23a36badef3a61d35c4a6cdc2d1336f017 (2026-10-26).
+**Status: IN PROGRESS — P0/P1 accepted; P2/P3/P5 acceptance closeout, P4 owned-faction lifecycle proof, P6 canonical variant promotion, and P7 integrated acceptance remain.** Parent goal is not complete. Current audited ProjectHoomans revision: `07aad881a9058e777c6e3ad62bb46ad0ec1216c7` (2026-10-26).
 
 ## Complete goal
 
@@ -15,7 +15,7 @@ Make the existing Project Hoomans Semantic Lab the trustworthy, agent-first obse
 - [ROADMAP.md](ROADMAP.md) — entire P0–P7 developer-side objective and acceptance gates.
 - [HARNESS_ACCEPTANCE.md](HARNESS_ACCEPTANCE.md) — required evidence for real Lua, EN/TL, safety, scale and GUI/CLI parity.
 - [AGENT_RUNBOOK.md](AGENT_RUNBOOK.md) — safe execution, test and Git procedure for unattended implementation.
-- [PROGRESS.md](PROGRESS.md) — initial phase, observed baseline and immediate Next Chunk; read last.
+- [PROGRESS.md](PROGRESS.md) — reconciled current phase state, verified evidence and immediate Next Chunk; read last.
 
 No checked-in GOAL_PROMPT.md; provide the short executable /goal in ChatGPT only under root AGENTS.md policy.
 

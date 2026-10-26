@@ -1,99 +1,74 @@
 # Semantic Observatory & Dialogue Quality Harness — current progress
 
-**Status:** IN PROGRESS — P0–P6 code foundations strengthened, P6 source promotion and P7 end-to-end acceptance outstanding. **Parent goal remains NOT COMPLETE.**
-**Fresh checkout baseline:** ProjectHoomans main 923a8a3f1503588d35711b7465b1e914ea669f28; PsychopatzCore main cf28189c57f7810f31d25c46c11eb88080f47baa (2026-10-26). Local ProjectHoomans was 2 ahead of origin/main, clean at start of continuation; branch remained existing main. Reverify actual HEAD after the current commit.
+**Status:** IN PROGRESS — Observatory foundations are real and usable; remaining work is acceptance closure, one canonical dialogue-quality promotion, and final integrated developer validation. **Parent goal remains NOT COMPLETE.**
 
-## Accepted foundation (not acceptance of this new goal)
+**Current audited revisions (2026-10-26):**
+- ProjectHoomans: `07aad881a9058e777c6e3ad62bb46ad0ec1216c7` on existing `main`, clean and synchronized with `origin/main`.
+- PsychopatzCore: `cf28189c57f7810f31d25c46c11eb88080f47baa` on existing `main`, clean and synchronized with `origin/main`.
 
-- Existing production Core+Hoomans semantic worker, FlowEditor flow catalog, CodeBuilder approved writer, Studio Interaction Explorer/Flow graph, Conversation Inspector and headless --jsonl case replay are available in source.
-- Existing Lua ResponseCatalog provides registered conditional variants, priority/specificity selection and bounded no-immediate-repeat history. Existing FlowEditor responsePoolCatalog enumerates pool ID/count only.
-- Previous focused audit on the same HEAD: 23/23 Python tests passed via repository Python 3.12 virtual environment (Conversation Inspector, runtime graph, What's up, CodeBuilder consolidation); this is prior-run evidence, **not** fresh P0 or GUI acceptance. Shell-default Python 3.14 missing _tkinter is an environment limitation, not a semantic defect.
-- Existing ContextualDialogueQuestFramework developer-side authoring work and SemanticInteractionLifecycle developer-side repairs are preserved as predecessors; their native game acceptance is independent and user-owned.
+## Phase reconciliation
 
-## Fresh developer evidence (2026-10-26)
+| Phase | Current state | Evidence / remaining gate |
+| --- | --- | --- |
+| P0 — Baseline/contracts | **COMPLETE** | Production source→registration→selection→translation/final-response chains, bounded query contracts, worker startup/query/memory baselines, no-write boundaries and real registered action evidence are established. |
+| P1 — Runtime catalog | **COMPLETE** | Loaded pools/variants, conditions, priority, revision, bounded paging, translation/source metadata and verified CodeBuilder lineage exist. Legitimate unresolved provenance remains explicitly `UNKNOWN`; UNKNOWN is a valid result, not unfinished work. |
+| P2 — Explain/provenance | **ACCEPTANCE-PENDING** | Production matcher/scorer/tie/history path owns explanation and does not consume selection history. Remaining closeout: response-plan/turn provenance must be exact where provable and explicitly UNKNOWN/template-only where not; rerun natural-history parity and negative cases as one acceptance slice. |
+| P3 — Studio observability | **ACCEPTANCE-PENDING** | Existing Semantic Lab now has Catalog/Test/Coverage/Review surfaces backed by the real worker; Tk/Xvfb tests have passed. Remaining closeout: explicit GUI↔CLI parity/regression acceptance across the final contracts. |
+| P4 — Grounded coverage | **IN PROGRESS** | EN/TL greeting, wellbeing/health, hidden identity, Follow/Stay, permission rejection, Goodbye and unowned Leave Group fixtures exist. Missing mandatory proof: positive player-owned Leave Group warning→confirm→departure through the production worker; deliberate repeat/dominance/equivalence coverage also needs final consolidation. |
+| P5 — Agent CLI | **ACCEPTANCE-PENDING** | Headless discover/detail/explain/turn/matrix/coverage/lineage/translation/proposal/compare paths exist with bounded JSON/JSONL. Remaining closeout: final wrong/stale/unknown/error/scale and GUI parity matrix; do not add new commands unless a remaining gate requires one. |
+| P6 — Delegated variant workflow | **IN PROGRESS** | Stale SHA/fingerprint checks, external staging, EN/TL isolated production-Lua replay, zero production writes and source/translation diffs are proven. Missing gate: one explicitly reviewed canonical response improvement promoted to its true source owner and replayed fresh with unchanged gameplay effects. |
+| P7 — Integrated acceptance | **IN PROGRESS** | Scale measurements, full Lua suite, Kahlua compilation and several Tk/worker suites have independently passed. Missing gate: one consolidated end-to-end acceptance over the final P0–P6 state, including save-read-only proof, GUI/CLI parity, CodeBuilder determinism and final performance comparison. |
 
-- Work began at ProjectHoomans main `b14450d64f4578f8658b34dca1b6cf517bc3d276`, Core `cf28189c57f7810f31d25c46c11eb88080f47baa` (reverify HEAD after commit). Existing media/saves, root AGENTS and source generators untouched.
-- Confirmed the previous apparent changing variant IDs were **worker protocol request IDs** (`harness-N`); real variant records stayed stable. Production worker sampled startup 0.705 seconds; FLOW_CATALOG full payload 303,739 bytes, 129 pools.
-- Added lazy bounded Lua `RESPONSE_POOL_LIST`, `RESPONSE_POOL_DETAIL`, `RESPONSE_SELECTION_EXPLAIN` and isolated-worker sample/parity probe using actual `ResponseCatalog` selection/matching; registry revision updates after successful Register/Extend. Explain does not consume LAST_VARIANTS. Bounded `planSummary` replaces unbounded full-plan dumping; unverified source origins labeled UNKNOWN.
-- Added headless CLI switches (see OBSERVATORY_CLI.md), bounded isolated real-Lua fixture quality matrix and Observatory-first tab in the existing Tk Studio. Advanced Build/Flow/Library/Blocks/Composer remain present and unchanged.
-- Fresh focused real-worker tests: 5 Observatory selector/catalog tests PASSED; combined relevant regression run 32 tests PASSED (Flow Editor, Conversation Inspector, Semantic Interaction lifecycle, context graph, WhatsUp). Quality matrix/preflight/comparison tests 8 PASSED (Tk display-conditional), and explicit Xvfb/Tk real-Lua widget test 1 PASSED. Entire Tk Semantic Lab shell loaded the actual worker under Xvfb and Observatory live search returned 3 greeting pools, with temporary UI state outside user paths. Lua production smoke focused 9/9 PASS; changed Lua files passed `luac -p`. No native launch.
-- Bounded measured worker startup ~708ms; 129 loaded pools. Repeated target query sample: list 366 bytes/0.8–1.5ms, detail 1,736 bytes/2.0–3.5ms, explain 952 bytes/~1.1ms, prior full FLOW_CATALOG 303,740 bytes/267–273ms. These are small samples, not complete scale acceptance.
-- Added SHA-256 evidence for inspected Lua seams plus ProjectHoomans/Core local HEAD to CLI outputs; the complete per-pool verified owning-path mapping remains explicitly unavailable.
-- Added read-only EN/TL proposal preflight that rejects stale fingerprints, metadata edits, missing registered IDs, invalid placeholders and duplicated IDs. Valid preflight returns `approved=false`, `writes=0`, and `isolatedLuaReplayCompleted=false`. Added stored-real-Lua report comparison with missing-case/regression flags; neither substitutes for canonical source approval and isolated candidate replay.
-- EN baseline: `hello` produced opening.default + question.default, `how are you` produced a wellbeing dataset response with zero effects; `follow me` produced one accepted mock-authority CompanionCommand transport, `goodbye` alone yielded clarification. TL greeting/wellbeing resolved translated; TL `follow me` instead produced English fallback `Okay, I'll follow you.`. Bare `goodbye` requires separate lifecycle-context replay before diagnosing native farewell. These are *real Lua ENGINE-FIXTURE*, not PZ game proof.
-- Production source route: greeting authored in `PNC_SemanticDialogueResponseCatalog_FlowGreeting.lua`; wellbeing in `Questions_WellbeingMedical.lua`; Follow registered via `PNC_SemanticCommandAdapter_CompanionActions.lua` and client/server companion authority. The emitted Follow translation key is **not evidence** that the separately registered `semantic.generated.simple_command.follow.queued` variant was selected. This distinction remains to instrument.
-- The default Follow key is missing from the active EN/TL custom Conversation translation manifest catalogs even though the command descriptor supplies EN/TL inline fallbacks. Do not blindly edit CodeBuilder generated assets to fix it; verify actual canonical writer/owner first.
+## Current verified evidence
 
-## Latest continuation — verified Lua owner, isolated candidate replay, grounded localization
+Fresh independent audit on ProjectHoomans `07aad881`:
 
-- **CODE/WORKER:** actual production `ResponseCatalog.Register/Extend` caller source is now captured only when supported by Lua's optional debug API; `ResponsePoolDetail` reports verified existing mod-relative paths for directly authored greeting and wellbeing, and **registration-site only** for automatically generated Follow. Kahlua without debug info stays UNKNOWN. No guessed canonical CodeBuilder input.
-- **WORKER:** bounded `RESPONSE_KEY_LOOKUP` joins observed keys to real registered variants/templates; direct emitted variant IDs are exact, template-only matches are explicitly *not selection proof*. `--inspect-response-turn` joins final NPC text, EN/TL translation lookups and Conversation Inspector authority/effects. Generated Follow now traces its actual generated flow/capability through the registered action descriptor to the verified `PNC_SemanticCommandAdapter_CompanionActions.lua` call site, **separate** from generator registration. It is not automatically an authorized CodeBuilder edit target.
-- **WORKER/P6:** `--preview-response-proposal` validates a single verified authored variant and current content fingerprint, patches only proven fallback literals in a temporary file, stages exact EN/TL manifest-owned translations in an external temporary directory, then replays the **real production Lua + Core** in disposable workers. Greeting default demonstrated EN `Hello. Good to see you.` → `Hey there. Good to see you.`, TL `Kumusta. Mabuti at nakita kita.` → `Uy, mabuti at nakita kita.`, with identical selected keys/action/transport counts, source hashes stable after cleanup, explicit `approved=false` and zero production writes. Generated registration-site proposals and stale/unknown IDs reject.
-- **GUI:** Studio Review now previews the same external JSON proposal through the existing serialized worker operation; actual Tk/Xvfb widget test exercised both EN/TL comparisons, no approval and zero production writes. No replacement GUI or per-agent daemon.
-- **L10N:** loader actually failed with duplicate key when proposed Follow/Stay rejected/failed translations were inserted into the wrong manifest sibling; reverted *only those trial additions*, preserving canonical contextual keys, and added **only** the missing default `FollowQueued` and `StayQueued` EN/TL keys to manifest-listed `GeneratedTaskCommands.json`. Fresh TL Follow `Sige, susundan kita.` and Wait `Sige, mananatili ako rito.` show zero fallback lookups with one legitimate existing companion command transport. Added unique-key regression assertions.
-- **MATRIX:** checked-in independent `observatory_core_en_tl.json` and `observatory_health_authority_en_tl.json` (8 cases each, 16/16 measured assertions passed). Cover default/rain greetings, hidden identity, healthy/injured wellbeing, Follow/Stay, hostile boundary and translation-fallback assertions; no native SP/MP claims. Standalone typed `goodbye` still returns clarification and is **not** proof of the authored conversation-close lifecycle.
-- **LIFECYCLE:** third independent 8-case EN/TL fixture matrix now exercises the **real open conversation → root Goodbye choice** and sees `response.goodbye`, EN “You too.” / TL “Ikaw rin.”, lifecycle `closed=true` and zero action dispatches. It separately asserts bare typed `goodbye` returns clarification and does *not* close; sequential Follow→Wait yields one final queued Wait response per language. Studio Coverage exposes this fixture matrix without manual JSON editing; 8/8 production Lua ENGINE-FIXTURE assertions passed. The native player-owned SP/MP close test is still pending.
-- **VALIDATION:** continuation focused Observable source/provenance 8 tests PASSED, isolated proposal/review and matrix suite tests PASSED; combined semantic/translation/CodeBuilder/automatic-flow production worker suite 49 tests PASSED (75.132s); focused production Lua smoke 11/11 PASSED; real Tk/Xvfb Observatory Catalog/Review 2 tests PASSED. All tests are ENGINE-FIXTURE. See CLI guide for reproducible commands and safety limits.
+- **65 Python tests PASS, 2 SKIP** across Observatory, matrices, CodeBuilder lineage, translation coverage, scale, Kahlua verifier, Conversation Inspector, runtime graph, CodeBuilder consolidation and semantic response regression modules.
+- Bundled lifecycle matrix: **8/8 PASS** for EN/TL root Goodbye, typed-goodbye distinction, Follow→Wait and unowned/unknown-faction Leave Group rejection.
+- Production Lua focused authority/conversion smokes: **3/3 PASS** for conversation departure authority, colonist departure conversion and companion commands.
+- Worktree and upstream were clean/synchronized; `git diff --check` passed.
 
-## Additional P7 worker startup consistency acceptance (2026-10-26)
+Recorded implementation evidence already present in repository history (not rerun in the audit above):
 
-- Discovered a **read-only catalog ordering defect**: after initial startup, `RESPONSE_POOL_LIST` enumerated 124 pools whereas first `FLOW_CATALOG` triggered the production `EnsureAutomaticGeneration()` and then exposed 129. Registry output depended on query order, making agent audits incomplete.
-- Stabilized **only the fixture worker bootstrap** in `tools/semantic_harness/lua/worker.lua`: following final production capability provider loading, invoke the existing generator exactly once before accepting commands. No second generator, selector or gameplay authority. Fresh independent workers now report `129 → 129 → 129` pools and stable registry revision `205 → 205` before/after full catalog; repeated three times.
-- New `test_semantic_observatory_p7_scale.py` runs actual production Lua and verifies exhaustive paginated catalog/detail agreement, capped result sizes, source/media hash stability, actor-state identity under 270 read-only explanations, invalid request recovery, and no lazy registry drift. 3/3 PASSED. Broader 49 semantic/translation/Flow/Observatory Python tests PASSED (96.553s), 9/9 focused Lua smoke PASSED, changed worker Lua passed `luac -p`.
-- Independent pre-fix scale probe read 124 visible pools / 302 variants over four pages, worker RSS/HWM ~35 MB, query mean ~1.05ms over 100 explains, source hashes and actor state unchanged; **that earlier count is pre-fix and must not be used as the accepted fully initialized catalog baseline**. P7 broad memory/Kahlua/CodeBuilder/determinism/user-save gates remain unaccepted.
+- Full Lua smoke suite **889/889 PASS** after fixture-bootstrap corrections.
+- Project Zomboid Kahlua compiler verification **119/119 PASS** for the bounded Observatory/semantic/social-flavor scope.
+- Real Tk/Xvfb Observatory Catalog/Review/Coverage tests passed against the production Lua worker.
+- Fresh worker catalog stabilized at **129 pools**, revision **205**; sampled startup about **824–844 ms**, RSS/HWM about **31.7–32.1 MB**.
+- Isolated greeting candidate preview demonstrated EN/TL before/after text through disposable real Lua workers with identical selected keys/action/transport counts and zero production writes.
+- Follow/Stay default EN/TL translation fallback defect was repaired in existing manifest-owned catalogs; this is localization correctness evidence, **not** the required P6 quality-promotion demonstration.
 
-## Additional broad P7 regression evidence
+## Immediate Next Chunk — P4A positive owned-faction Leave Group worker lifecycle
 
-- Full Lua smoke suite: 887/889 PASS, 2 FAIL (`pnc_conversation_safety_feedback_smoke.lua:77`, `pnc_social_flavor_presentation_smoke.lua:176`). These test SocialFlavor presentation directly, outside the changed Observatory bootstrap; root cause is not yet established. Full-suite acceptance remains open.
-- Kahlua-specific syntax verification was not available in the inspected local tooling. `luac -p` is not a Kahlua acceptance substitute.
+This is developer-side work and **must not be treated as blocked by a denied exploratory remote command**.
 
-## P4/P5 selection-coverage continuation
+Reuse the existing synthetic save / production rehydration infrastructure (including the patterns in `test_production_faction_rehydration_p14c.py`) to construct a disposable source where:
 
-- Adopted and validated the existing uncommitted `response_selection_coverage.py` and four-context greeting fixture: real Lua explains all registered variants with eligible, selected, lower-ranked and tie counts and explicitly avoids global unreachable claims. Worker test reports stable actor state/selection history and rejects 17 contexts or invalid context values. CLI fixture run selected default 1/4, friendly 1/4, rain 2/4 with `ok=true`; focused 10 Python worker tests and 2 real Tk/Xvfb tests PASSED. Added direct Studio Coverage action and the CLI usage guide.
-- These outcomes are *hypothetical response context fixtures*, not proof that the live engine produces the same distribution. Missing negative permissions, full source lineage coverage, P6 explicit approval and full P7 suite remain mandatory.
+1. production `PNC_PlayerCharacters.Load` resolves the worker player to a stable player entity key;
+2. production `PNC.Factions.LoadRaw` hydrates a non-mobile player faction whose `ownerPlayerKey` equals that entity key;
+3. the recruited NPC's persisted affiliation points to that same faction and membership is internally consistent;
+4. the real worker opens the conversation root and exercises the existing Leave Group / departure warning and confirmation route;
+5. the actual `PNC.ColonistDeparture` service performs the positive transition rather than a substituted executor seam.
 
-## P1/P6 CodeBuilder source provenance continuation
+**P4A acceptance:**
+- warning path returns the production warning response and performs no departure mutation;
+- confirmation returns `response.departure.confirmed` / `colonist_departed`, closes the conversation exactly once, clears recruited/player ownership, removes the NPC from the source player faction, places it in the production departure destination/mobile faction, and preserves the real relationship-penalty audit;
+- EN and TL presentation are verified where the same production route supports them;
+- no source save bytes are modified; temporary fixture hash is unchanged; no watched-media staging, native PZ launch or Workshop action;
+- negative unowned/other-owner cases remain passing.
 
-- Added read-only `response_source_lineage.py` using only the existing CodeBuilder source catalog/compiler/preview, cross-checking compiled variant ID, template, fallback, conditions and priority with actually loaded Lua variants. For dialogue datasets the existing preview reported unchanged generated artifacts; semantic-definitions preview does not provide artifact diffs and this limitation is explicitly retained. Per-variant matches verified for `common_interactions`, `grounded_personal_dialogue` and `semantic_definitions`; mixed `semantic.accept` has 2/4 verified CodeBuilder variants (never falsely attributes its authored variants). Direct Lua greeting sources remain outside this CodeBuilder lineage rather than being guessed.
-- CLI `--response-codebuilder-lineage` and Studio Catalog `Verify CodeBuilder owner` expose the same read-only findings. Negative test with forged canonical fallback remains UNKNOWN. 5 Python tests passed (one GUI skipped without display); real Tk/Xvfb lineage review test 1 passed. Zero production writes; no approval or promotion performed.
+After P4A, **continue automatically** through the remaining acceptance slices below. Do not stop for another /goal.
 
-## P6 source-SHA guard continuation
+## Required closure sequence after P4A
 
-- Isolated EN/TL candidate preview now accepts optional `expectedSourceSHA256` of the verified authored Lua source; malformed or stale values reject before staging any candidate overlay. Results include canonical Lua SHA and both actual EN/TL translation-source SHA-256 hashes, plus whether the caller's SHA pin matched. Real-Lua test demonstrated stale rejection and matching-SHA replay with zero production writes. This is a **preview safety improvement only**, not authorization to promote an LLM's words or a completed P6 approval gate.
+1. **P2/P3/P4/P5 closeout:** consolidate plan-turn/source provenance, deliberate repeat/dominance/equivalence coverage, and final GUI↔CLI/error/scale parity. Legitimate UNKNOWN/template-only provenance is acceptable when evidence cannot identify a unique owner; never invent ownership to force a green gate.
+2. **P6 canonical proof:** choose one low-risk authored greeting/response family with verified ownership; produce an EN/TL improvement, run proposal review + stale guards + isolated real-Lua before/after, record an explicit review decision, edit the canonical source only, then fresh-worker replay the checked-in result. Preserve all `when`/priority/plan/authority metadata and prove gameplay effects are unchanged.
+3. **P7 integrated acceptance:** run the final relevant Python suites, full Lua suite, installed PZ Kahlua compiler, Tk/Xvfb Observatory surfaces, headless CLI parity/error cases, deterministic CodeBuilder writer checks, save/source hash safety, performance comparison and `git diff --check`.
+4. Only after all developer gates pass, set **READY FOR USER LIVE TEST** and hand the remaining native SP/MP verification to the user.
 
-## New continuation — full Lua suite, negative response, actual Kahlua
+## Scope and stop rules
 
-- Full Lua suite now 889/889 PASS: the prior two social-flavor failures were missing ProjectHoomans common_lua path and response-catalog initialization in their isolated fixtures; corrected test bootstrap only (no production behavior workaround).
-- Four fresh EN/TL Follow/Stay rejection fixtures use real Lua with CONFIGURED mock-network rejection replies. Selected rejection text/key, commandAccepted=false, rejectionReason=permission_denied and one attempted transport validated 4/4. Not native server authority. Unknown or malformed matrix assertions reject; Studio Coverage exposes the fixture.
-- P7 Kahlua: compiled 119 Observatory worker/semantic/social-flavor Lua files via installed Project Zomboid Kahlua LuaCompiler and bundled Java without launching the game, 119/119 PASS. Added reusable developer-side verifier and negative syntax/path tests (3/3 PASS). Syntax does not establish native gameplay parity.
-
-## Authoritative server rejection and latest regression evidence
-
-- Actual server PNC.CompanionCommands.Execute remains the authority: extended the production-Lua server smoke to reject unauthorized Follow and Stay for neutral and other-owner NPCs, preserving prior orders with zero dirty-record writes and broadcasts. Server smoke PASS. This independently complements (but does not turn into native proof) the EN/TL configured-network-reply worker matrix.
-- Post-change regressions: 47 focused Python tests PASS, 2 Tk/Xvfb tests PASS, 3 actual packaged Kahlua verifier tests PASS; full 889/889 Lua suite PASS. No native PZ runtime used.
-
-## Leave Group lifecycle: negative worker and positive authority evidence
-
-- Recruited headless NPC with no established authoritative player faction exposes the real conversation root Disband choice; clicking it causes the **production server-owned** departure handler to reject, with an EN/TL localized response.departure.rejected, one request transport and no conversation closure or gameplay action. Expanded the existing lifecycle matrix to 8 cases, 8/8 PASS. This is correct for an unowned/unknown faction, not evidence that a properly owned colonist cannot depart.
-- The separately exercised server authority smoke already covers a positive warning-before-confirmation and successful single departure call with closeReason=colonist_departed, plus the manual relationship delta, but uses its own deterministic executor seam. Full production-worker positive faction ownership and conversion remains to demonstrate before declaring this lifecycle accepted.
-
-## Per-variant EN/TL translation-source provenance
-
-- Added read-only `response_translation_coverage.py`, checking actual production-Lua loaded variant template IDs against canonical Conversation EN/TL manifests and manifest SHA-256. It preserves exact translation-owner filenames, explicit duplicate/missing/not-manifested states, and no source writes. Generated backstory template has one EN and TL canonical source; direct authored greeting variant IDs correctly classify as not direct manifest keys, **not** necessarily untranslated. Studio Review and headless `--response-translation-coverage` use the same service. Worker tests 4 PASS (one display-conditional skip) plus actual Tk/Xvfb test 1 PASS. Static provenance does not prove runtime text or fallback usage.
-
-## Latest P7 performance and validation evidence
-
-- On three newly initialized real production-Lua fixture workers, startup measured 824.3/834.5/844.3 ms. Each registered 129 pools at stable revision 205. Worker RSS/HWM measured 31.7–32.1 MB.
-- Targeted queries: selection explanation 1.23–1.45 ms (951 B); EN/TL canonical manifest lookup 9.74–17.22 ms (1,151 B); verified canonical CodeBuilder lineage 52.01–57.58 ms (2,117 B). Three local samples only, not a native PZ performance guarantee.
-- Latest broad targeted 60 semantic, CodeBuilder, dialogue and Observatory Python tests PASS (111.126 s). EN/TL manifest inspection now also rejects oversized manifest/translation source files; 4 focused tests PASS. Other recorded Lua/Kahlua/Tk suites remain independently passed, not one combined end-to-end run.
-- The remote commander denied the exploratory command for constructing an owned-faction positive departure fixture. The test was **not executed**; the native-shaped positive transaction remains pending. Do not replace that acceptance with the already-proven server-authority stub or an invented ownership result.
-
-## Current gap and immediate mandatory work
-
-The parent goal **remains IN PROGRESS**. P0: baseline cost, source registration, translation and real-workflow chain improved; formal complete P0 gate not accepted. P1: direct authored source and verified per-variant CodeBuilder input lineage work; runtime EN/TL fallback coverage and unverified/ambiguous generated variants remain outstanding. P2: explain/selection history and observed-turn registry/authority join implemented, but template-only matches cannot prove the selected variant and plan-turn provenance is incomplete. P3: actual Tk catalog/test/coverage/review surfaces available and measured; full GUI parity/regression gate remains pending. P4: two 8-case EN/TL real-Lua matrices accepted as fixture evidence; missing hostile permission denial, positive worker Leave Group faction ownership, broader farewell and native verification, deliberate repeats, broader context dominance/equivalence analysis. P5: CLI discover/detail/explain/observed turn/matrix/compare/preflight/candidate preview runs with typed bounds, but full error/scale parity acceptance not complete. P6: **isolated source-patched candidate EN/TL replay now implemented and proven**, but production edit, explicit wording approval, full CodeBuilder ownership and post-approval fresh-worker source replay remain incomplete. P7: focused scale, Kahlua compilation and full Lua smoke now pass; complete system-wide GUI/CLI, complete broad Python, positive production-worker departure, save safety and final end-to-end acceptance remain open.
-
-**Exact Next Chunk:** resume the positive worker Leave Group proof using authorized real faction rehydration after the remote execution restriction is resolved; then repeat/dominance/translation coverage and plan-turn source joins; audit remaining UNKNOWN generated variants and EN/TL translation provenance with current per-variant CodeBuilder evidence, then define an explicitly reviewed canonical variant change/approval + source SHA guard and fresh-worker replay without rewriting derived assets. Complete P7 full GUI/CLI parity, broad regression, memory/Kahlua/no-save-write and performance gates. Continue all mandatory P0–P7 work; only user native SP/MP is reserved.
-
-## External/user-only boundary
-
-Native PZ singleplayer/multiplayer acceptance remains user-owned after all code/harness/GUI/CLI/variant gates pass. No Workshop publication, native PZ launch or source-save edits are authorized by this goal. Do not claim READY FOR USER LIVE TEST while mandatory developer phases remain.
+- Do **not** feature-creep the Observatory or add commands merely to create more evidence. Prefer closing written gates with the existing surfaces.
+- Do **not** chase every UNKNOWN source result. UNKNOWN is correct when ownership cannot be proven.
+- Do **not** append historical continuation sections to this file. Replace it with current truth when state changes; Git history is the archive.
+- Do not modify root `AGENTS.md`, create a new branch, launch native Project Zomboid, edit source saves, or publish Steam Workshop content.
+- Stop only when the entire developer-side parent goal is accepted, a genuine safety/authorization blocker prevents further work, or the only remaining gate is the explicitly user-owned native SP/MP test.
