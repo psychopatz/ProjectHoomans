@@ -639,6 +639,23 @@ class LuaSemanticWorker:
     def flow_catalog(self) -> dict[str, Any]:
         return self._authoring.flow_catalog()
 
+    def response_pool_list(
+        self, *, filter: str = "", offset: int = 0, limit: int = 32
+    ) -> dict[str, Any]:
+        return self._authoring.response_pool_list(
+            filter=filter, offset=offset, limit=limit
+        )
+
+    def explain_response_selection(
+        self, pool_id: str, context: dict[str, Any], salt: str = ""
+    ) -> dict[str, Any]:
+        return self._authoring.explain_response_selection(pool_id, context, salt)
+
+    def sample_response_selection(
+        self, pool_id: str, context: dict[str, Any], salt: str = ""
+    ) -> dict[str, Any]:
+        return self._authoring.sample_response_selection(pool_id, context, salt)
+
     def response_pool_detail(
         self, pool_id: str, *, offset: int = 0, limit: int = 8
     ) -> dict[str, Any]:

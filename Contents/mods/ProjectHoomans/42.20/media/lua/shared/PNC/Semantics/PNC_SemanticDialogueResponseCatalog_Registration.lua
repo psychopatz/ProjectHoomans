@@ -31,6 +31,7 @@ return function(Catalog, Core)
             end
         end
         Catalog.POOLS[id] = pool
+        Catalog.REVISION = (Catalog.REVISION or 0) + 1
         return true, pool
     end
 
@@ -73,6 +74,7 @@ return function(Catalog, Core)
         for index = 1, #additions do
             pool.variants[#pool.variants + 1] = additions[index]
         end
+        Catalog.REVISION = (Catalog.REVISION or 0) + 1
         return true, pool
     end
 

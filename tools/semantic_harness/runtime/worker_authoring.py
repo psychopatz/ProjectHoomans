@@ -20,6 +20,31 @@ class WorkerAuthoringOperations:
 
         return self._host._request("FLOW_CATALOG")
 
+    def response_pool_list(
+        self, *, filter: str = "", offset: int = 0, limit: int = 32
+    ) -> dict[str, Any]:
+        return self._host._request(
+            "RESPONSE_POOL_LIST",
+            {"filter": filter, "offset": offset, "limit": limit},
+        )
+
+    def explain_response_selection(
+        self, pool_id: str, context: dict[str, Any], salt: str = ""
+    ) -> dict[str, Any]:
+        return self._host._request(
+            "RESPONSE_SELECTION_EXPLAIN",
+            {"poolID": pool_id, "context": context, "salt": salt},
+        )
+
+    def sample_response_selection(
+        self, pool_id: str, context: dict[str, Any], salt: str = ""
+    ) -> dict[str, Any]:
+        """Consume only disposable-worker selection history for parity testing."""
+        return self._host._request(
+            "RESPONSE_SELECTION_SAMPLE",
+            {"poolID": pool_id, "context": context, "salt": salt},
+        )
+
     def response_pool_detail(
         self, pool_id: str, *, offset: int = 0, limit: int = 8
     ) -> dict[str, Any]:

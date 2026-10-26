@@ -156,9 +156,148 @@ local function catalog(context)
     }
 end
 
+-- Stable, non-cryptographic registry-content change marker. Source Git
+-- SHA/provenance is a separate concept and remains UNKNOWN until verified.
+local function stableValue(value, depth)
+    depth = depth or 0
+    if depth > 16 then return "<bounded-depth>" end
+    if type(value) ~= "table" then
+        return type(value) .. ":" .. tostring(value)
+    end
+    local keys = {}
+    for key in pairs(value) do
+        if type(key) == "string" or type(key) == "number" then
+            keys[#keys + 1] = key
+        end
+    end
+    table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
+    local parts = {}
+    for index = 1, #keys do
+        local key = keys[index]
+        parts[#parts + 1] = tostring(key) .. "="
+            .. stableValue(value[key], depth + 1)
+    end
+    return "{" .. table.concat(parts, ";") .. "}"
+end
+
+local function poolFingerprint(pool)
+    local Core = require
+        "PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Core"
+    return "catalog-v1:" .. tostring(Core.hash(stableValue(pool)))
+end
+
+local function boundedPlanSummary(plan)
+    if type(plan) ~= "table" then return {} end
+    local turns = type(plan.turns) == "table" and plan.turns or {}
+    local offers = 0
+    local segments = 0
+    for i = 1, #turns do
+        local turn = turns[i]
+        if type(turn) == "table" then
+            offers = offers + #(type(turn.offers) == "table" and turn.offers or {})
+            segments = segments + #(type(turn.segments) == "table"
+                and turn.segments or {})
+        end
+    end
+    return {
+        kind = plan.kind, dialogueAct = plan.dialogueAct,
+        topic = plan.topic, turnCount = #turns,
+        segmentCount = segments, offerCount = offers,
+        firstTurnID = turns[1] and turns[1].id or nil,
+    }
+end
+
 -- Lazy, read-only detail for an actual loaded production response pool.
 -- An owning source path is intentionally UNKNOWN unless registration itself
 -- provides trustworthy provenance; scanning Lua text is not provenance.
+function FlowEditor.responsePoolList(context, request)
+    request = type(request) == "table" and request or {}
+    local offset = tonumber(request.offset) or 0
+    local limit = tonumber(request.limit) or 32
+    if offset < 0 or offset % 1 ~= 0 or limit < 1
+        or limit % 1 ~= 0 or limit > 64 then
+        return { ok = false, type = "response_pool_list",
+            schemaVersion = 1, error = "invalid_page" }
+    end
+    local filter = tostring(request.filter or "")
+    if #filter > 96 then
+        return { ok = false, type = "response_pool_list",
+            schemaVersion = 1, error = "invalid_filter" }
+    end
+    local ResponseCatalog = PNC.Semantics.ResponseCatalog
+        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local matches = {}
+    for id, pool in pairs(ResponseCatalog.POOLS or {}) do
+        if filter == "" or string.find(string.lower(id),
+            string.lower(filter), 1, true) then
+            matches[#matches + 1] = {
+                id = id, variantCount = #pool.variants,
+            }
+        end
+    end
+    table.sort(matches, function(a, b) return a.id < b.id end)
+    local page = {}
+    for i = offset + 1, math.min(#matches, offset + limit) do
+        page[#page + 1] = matches[i]
+    end
+    return { ok = true, type = "response_pool_list",
+        schemaVersion = 1, total = #matches,
+        registryRevision = ResponseCatalog.REVISION or 0, offset = offset,
+        limit = limit, hasMore = offset + #page < #matches,
+        pools = page }
+end
+
+-- This deliberately consumes selection history only inside the disposable
+-- developer worker; unlike EXPLAIN, it is not a read-only inspection command.
+function FlowEditor.sampleResponseSelection(context, request)
+    if type(request) ~= "table" or type(request.poolID) ~= "string"
+        or #request.poolID == 0 or #request.poolID > 96
+        or type(request.context or {}) ~= "table" then
+        return { ok = false, type = "response_selection_sample",
+            schemaVersion = 1, error = "invalid_request" }
+    end
+    local ResponseCatalog = PNC.Semantics.ResponseCatalog
+        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local selected, indexOrReason = ResponseCatalog.Select(
+        request.poolID, request.context or {}, request.salt
+    )
+    if not selected then
+        return { ok = false, type = "response_selection_sample",
+            schemaVersion = 1, error = indexOrReason }
+    end
+    return {
+        ok = true, type = "response_selection_sample", schemaVersion = 1,
+        poolID = request.poolID, selectedID = selected.id,
+        selectedIndex = indexOrReason, mutatedFixtureHistory = true,
+    }
+end
+
+function FlowEditor.explainResponseSelection(context, request)
+    if type(request) ~= "table" or type(request.poolID) ~= "string"
+        or #request.poolID == 0 or #request.poolID > 96 then
+        return { ok = false, type = "response_selection_explanation",
+            schemaVersion = 1, error = "invalid_pool_id" }
+    end
+    if type(request.salt) == "string" and #request.salt > 128 then
+        return { ok = false, schemaVersion = 1, error = "invalid_salt" }
+    end
+    local projected = request.context or {}
+    if type(projected) ~= "table" then
+        return { ok = false, type = "response_selection_explanation",
+            schemaVersion = 1, error = "invalid_context" }
+    end
+    local ResponseCatalog = PNC.Semantics.ResponseCatalog
+        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local result, reason = ResponseCatalog.ExplainSelection(
+        request.poolID, projected, request.salt
+    )
+    if not result then
+        return { ok = false, type = "response_selection_explanation",
+            schemaVersion = 1, error = reason }
+    end
+    return result
+end
+
 function FlowEditor.responsePoolDetail(context, request)
     if type(request) ~= "table" or type(request.poolID) ~= "string"
         or #request.poolID == 0 or #request.poolID > 96
@@ -186,15 +325,18 @@ function FlowEditor.responsePoolDetail(context, request)
         variants[#variants + 1] = {
             id = v.id, templateID = v.templateID, fallback = v.fallback,
             when = context.Values.copy(v.when or {}), priority = v.priority,
-            plan = context.Values.copy(v.plan or {}),
+            planSummary = boundedPlanSummary(v.plan),
             translationArgs = context.Values.copy(v.translationArgs or {}),
             dialogueAct = v.dialogueAct, topic = v.topic,
+            groundedFactRefs = context.Values.copy(v.groundedFactRefs or {}),
             sourceKind = "UNKNOWN", sourcePath = "UNKNOWN",
         }
     end
     return {
         ok = true, type = "response_pool_detail", schemaVersion = 1,
         poolID = pool.id, variantCount = #pool.variants,
+        registryRevision = ResponseCatalog.REVISION or 0,
+        contentFingerprint = poolFingerprint(pool),
         offset = offset, limit = limit, hasMore = offset + #variants < #pool.variants,
         variants = variants, sourceKind = "UNKNOWN", sourcePath = "UNKNOWN",
     }

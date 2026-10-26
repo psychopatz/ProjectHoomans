@@ -1,24 +1,21 @@
--- Deterministic response selection and bounded selection history.
-
+-- Production selector and optional read-only, explainable trace use the same
+-- matching, scoring, hash and anti-repeat code path.
 return function(Catalog, Core)
-    function Catalog.Select(id, context, salt)
+    local function evaluate(id, context, salt, explain)
         local pool = Catalog.Get(id)
-        local candidates = {}
-        local bestScore = nil
-        local index
-        local variant
-        local matched
-        local specificity
-        local score
-        local selectionKey
-        local selectedIndex
         if not pool then return nil, "response_pool_unavailable" end
+
+        local candidates = {}
+        local rows = explain and {} or nil
+        local bestScore = nil
         for index = 1, #pool.variants do
-            variant = pool.variants[index]
-            matched, specificity = Core.matches(variant, context)
+            local variant = pool.variants[index]
+            local matched, specificity, checks = Core.matches(
+                variant, context, explain
+            )
+            local score = nil
             if matched then
-                score = (tonumber(variant.priority) or 0) * 100
-                    + specificity
+                score = (tonumber(variant.priority) or 0) * 100 + specificity
                 if bestScore == nil or score > bestScore then
                     bestScore = score
                     candidates = { index }
@@ -26,37 +23,66 @@ return function(Catalog, Core)
                     candidates[#candidates + 1] = index
                 end
             end
+            if explain then
+                rows[#rows + 1] = {
+                    index = index, id = variant.id, eligible = matched,
+                    specificity = matched and specificity or 0, score = score,
+                    checks = checks or {},
+                }
+            end
         end
         if #candidates == 0 then
+            if explain then
+                return {
+                    ok = true, reason = "response_variant_unavailable",
+                    poolID = id, selectedID = nil, candidates = rows,
+                    bestScore = nil,
+                }
+            end
             return nil, "response_variant_unavailable"
         end
-        selectionKey = tostring(id) .. ":"
+
+        local selectionKey = tostring(id) .. ":"
             .. tostring(context and context.npcID or "")
-        selectedIndex = candidates[
-            (Core.hash(tostring(salt or "") .. ":" .. selectionKey)
+        local selectedPosition = (
+            Core.hash(tostring(salt or "") .. ":" .. selectionKey)
                 % #candidates) + 1
-        ]
-        if #candidates > 1
-            and Catalog.LAST_VARIANTS[selectionKey] == selectedIndex
-        then
-            -- Rotate relative to the previously selected candidate. Hashing a
-            -- second time is not sufficient: it can produce the same index
-            -- again for the same salt and make a response pool repetitive.
-            local previousPosition = nil
-            local candidatePosition
-            for candidatePosition = 1, #candidates do
-                if candidates[candidatePosition] == selectedIndex then
-                    previousPosition = candidatePosition
-                    break
+        local selectedIndex = candidates[selectedPosition]
+        local previousIndex = Catalog.LAST_VARIANTS[selectionKey]
+        local rotated = false
+        if #candidates > 1 and previousIndex == selectedIndex then
+            -- Identical rotation to the live path, using its actual history.
+            selectedPosition = (selectedPosition % #candidates) + 1
+            selectedIndex = candidates[selectedPosition]
+            rotated = true
+        end
+
+        if explain then
+            for _, row in ipairs(rows) do
+                if row.eligible then
+                    row.reason = row.score == bestScore
+                        and "highest_rank" or "lower_score"
+                else
+                    row.reason = "condition_mismatch"
+                end
+                if row.index == selectedIndex then
+                    row.reason = rotated and "anti_repeat_rotation"
+                        or (#candidates > 1 and "hash_tie_break"
+                            or "sole_highest_score")
                 end
             end
-            if previousPosition then
-                selectedIndex = candidates[
-                    (previousPosition % #candidates) + 1
-                ]
-            end
+            return {
+                ok = true, schemaVersion = 1,
+                type = "response_selection_explanation",
+                poolID = id, selectedID = pool.variants[selectedIndex].id,
+                selectedIndex = selectedIndex, previousIndex = previousIndex,
+                rotated = rotated, tieCount = #candidates,
+                bestScore = bestScore, candidates = rows,
+                reason = "selected",
+            }
         end
-        if Catalog.LAST_VARIANTS[selectionKey] == nil then
+
+        if previousIndex == nil then
             while #Catalog.LAST_VARIANT_ORDER >= Catalog.MAX_LAST_VARIANTS do
                 local oldest = table.remove(Catalog.LAST_VARIANT_ORDER, 1)
                 Catalog.LAST_VARIANTS[oldest] = nil
@@ -65,7 +91,7 @@ return function(Catalog, Core)
                 selectionKey
         end
         Catalog.LAST_VARIANTS[selectionKey] = selectedIndex
-        variant = pool.variants[selectedIndex]
+        local variant = pool.variants[selectedIndex]
         return {
             id = variant.id,
             templateID = variant.templateID,
@@ -80,6 +106,15 @@ return function(Catalog, Core)
             personalityStyle = variant.personalityStyle,
             translationArgs = Core.copy(variant.translationArgs),
         }, selectedIndex
+    end
+
+    function Catalog.Select(id, context, salt)
+        return evaluate(id, context, salt, false)
+    end
+
+    function Catalog.ExplainSelection(id, context, salt)
+        -- Never selects, rotates, dispatches actions or persists history.
+        return evaluate(id, context, salt, true)
     end
 
     function Catalog.ResetSelections()

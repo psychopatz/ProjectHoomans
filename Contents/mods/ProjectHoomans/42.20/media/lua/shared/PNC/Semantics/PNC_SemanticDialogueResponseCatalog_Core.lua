@@ -151,23 +151,39 @@ function Core.conditionContext(context)
     }
 end
 
-function Core.matches(variant, context)
+function Core.matches(variant, context, withTrace)
     local when = variant.when
     local actual
     local field
     local index
-    if type(when) ~= "table" then return true, 0 end
+    if type(when) ~= "table" then return true, 0, withTrace and {} or nil end
     context = Core.conditionContext(context)
     local specificity = 0
+    local checks = withTrace and {} or nil
     for index = 1, #Core.CONDITION_FIELDS do
         field = Core.CONDITION_FIELDS[index]
         actual = context[field]
         if when[field] ~= nil then
-            if not scalarMatches(when[field], actual) then return false, 0 end
-            specificity = specificity + 1
+            local passed = scalarMatches(when[field], actual)
+            if checks then
+                checks[#checks + 1] = {
+                    field = field,
+                    expected = Core.copy(when[field]),
+                    actual = Core.copy(actual),
+                    actualKnown = actual ~= nil,
+                    matched = passed,
+                }
+            end
+            if not passed and not withTrace then return false, 0 end
+            if passed then specificity = specificity + 1 end
         end
     end
-    return true, specificity
+    if checks then
+        for i = 1, #checks do
+            if not checks[i].matched then return false, 0, checks end
+        end
+    end
+    return true, specificity, checks
 end
 
 function Core.normalizedVariant(poolID, index, value)
@@ -213,6 +229,7 @@ function Core.install(Catalog)
     Catalog.MAX_VARIANTS = 16
     Catalog.MAX_LAST_VARIANTS = 256
     Catalog.POOLS = Catalog.POOLS or {}
+    Catalog.REVISION = Catalog.REVISION or 0
     Catalog.LAST_VARIANTS = Catalog.LAST_VARIANTS or {}
     Catalog.LAST_VARIANT_ORDER = Catalog.LAST_VARIANT_ORDER or {}
 end

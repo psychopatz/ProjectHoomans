@@ -8,6 +8,12 @@ function Authoring.handle(context, command, payload)
 
     if command == "FLOW_CATALOG" then
         return context.FlowEditor.catalog(context)
+    elseif command == "RESPONSE_POOL_LIST" then
+        return context.FlowEditor.responsePoolList(context, payload)
+    elseif command == "RESPONSE_SELECTION_SAMPLE" then
+        return context.FlowEditor.sampleResponseSelection(context, payload)
+    elseif command == "RESPONSE_SELECTION_EXPLAIN" then
+        return context.FlowEditor.explainResponseSelection(context, payload)
     elseif command == "RESPONSE_POOL_DETAIL" then
         return context.FlowEditor.responsePoolDetail(context, payload)
     elseif command == "FLOW_VALIDATE" then

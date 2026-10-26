@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import argparse
+import json
 from copy import deepcopy
 from pathlib import Path
 import sys
 
 from .codebuilder.service import SemanticLabAuthoringService
 from .inspection.rendering import print_result as _print_result
+from .inspection.response_observatory import (
+    run_quality_matrix, source_evidence, source_evidence_from_paths,
+    review_variant_proposal, compare_quality_reports,
+)
 from .testing.runner import ConflictLedger, load_case, run_case
 from .runtime.config import ConfigurationError
 from .runtime.scenario import load_scenario
@@ -450,6 +455,35 @@ def cli(arguments: argparse.Namespace) -> int:
             if records:
                 activity_seen = int(records[-1].get("sequence", activity_seen))
 
+        if arguments.compare_response_reports:
+            reports = []
+            for source in arguments.compare_response_reports:
+                path = Path(source).expanduser()
+                if path.stat().st_size > 64 * 1024:
+                    raise ValueError("comparison report exceeds 64 KiB")
+                reports.append(json.loads(path.read_text(encoding="utf-8")))
+            report = compare_quality_reports(*reports)
+            _print_result(report, arguments.jsonl)
+            return 0 if report["ok"] else 3
+        if arguments.response_quality_matrix:
+            path = Path(arguments.response_quality_matrix).expanduser()
+            if path.stat().st_size > 64 * 1024:
+                raise ValueError("quality matrix file exceeds 64 KiB")
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+            cases = loaded.get("cases") if isinstance(loaded, dict) else loaded
+            report = run_quality_matrix(
+                cases,
+                worker_factory=lambda scenario: LuaSemanticWorker(
+                    scenario, **worker_kwargs
+                ),
+            )
+            report["sourceEvidence"] = source_evidence_from_paths(
+                authoring_service.repository,
+                worker_kwargs.get("core_repository")
+                    or (authoring_service.repository.parent / "psychopatzCore"),
+            )
+            _print_result(report, arguments.jsonl)
+            return 3 if report["failed"] or report["truncated"] else 0
         if arguments.case:
             report = run_case(load_case(Path(arguments.case)), **worker_kwargs)
             _print_result(report.as_dict(), arguments.jsonl)
@@ -463,6 +497,53 @@ def cli(arguments: argparse.Namespace) -> int:
             **worker_kwargs,
         ) as worker:
             emit_activity()
+            # Observatory uses the same production Lua worker as Studio and
+            # conversation replay; never scans or reinterprets Lua in Python.
+            if arguments.review_response_proposal:
+                path = Path(arguments.review_response_proposal).expanduser()
+                if path.stat().st_size > 16 * 1024:
+                    raise ValueError("proposal file exceeds 16 KiB")
+                proposal = json.loads(path.read_text(encoding="utf-8"))
+                result = review_variant_proposal(worker, proposal)
+                result["sourceEvidence"] = source_evidence(worker)
+                _print_result(result, arguments.jsonl)
+                return 0 if result["ok"] else 3
+            if arguments.response_pools is not None:
+                result = worker.response_pool_list(
+                    filter=arguments.response_pools,
+                    offset=arguments.response_offset,
+                    limit=arguments.response_limit,
+                )
+                result["sourceEvidence"] = source_evidence(worker)
+                _print_result(result, arguments.jsonl)
+                return 0
+            if arguments.response_pool:
+                result = worker.response_pool_detail(
+                    arguments.response_pool,
+                    offset=arguments.response_offset,
+                    limit=arguments.response_limit,
+                )
+                result["sourceEvidence"] = source_evidence(worker)
+                _print_result(result, arguments.jsonl)
+                return 0
+            if arguments.explain_response_pool:
+                projected = {}
+                if arguments.response_context_file:
+                    path = Path(arguments.response_context_file).expanduser()
+                    if path.stat().st_size > 16 * 1024:
+                        raise ValueError("response context file exceeds 16 KiB")
+                    projected = json.loads(path.read_text(encoding="utf-8"))
+                    if not isinstance(projected, dict):
+                        raise ValueError("response context must be an object")
+                result = worker.explain_response_selection(
+                    arguments.explain_response_pool,
+                    projected,
+                    arguments.response_salt,
+                )
+                result["sourceEvidence"] = source_evidence(worker)
+                _print_result(result, arguments.jsonl)
+                return 0
+
             ledger = ConflictLedger() if arguments.audit else None
             if arguments.load_saved_pair and not arguments.save:
                 raise ValueError("--load-saved-pair requires --save")
@@ -698,6 +779,42 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--interactive", action="store_true", help="read one conversation input per stdin line")
     parser.add_argument("--jsonl", action="store_true", help="emit compact one-record-per-line JSON")
     parser.add_argument("--audit", action="store_true", help="emit a bounded conflict audit after turns")
+    observatory = parser.add_mutually_exclusive_group()
+    observatory.add_argument(
+        "--response-pools", nargs="?", const="", metavar="FILTER",
+        help="page through actual registered Lua response pools, optionally filtering IDs",
+    )
+    observatory.add_argument(
+        "--response-pool", metavar="POOL_ID",
+        help="inspect one registered response pool's normalized variants",
+    )
+    observatory.add_argument(
+        "--explain-response-pool", metavar="POOL_ID",
+        help="read-only production selector explanation, without consuming history",
+    )
+    parser.add_argument(
+        "--compare-response-reports", nargs=2, metavar=("BASELINE", "CANDIDATE"),
+        help="compare bounded saved production-Lua fixture reports without replay",
+    )
+    parser.add_argument(
+        "--response-quality-matrix", metavar="PATH",
+        help="run up to eight isolated production-Lua fixture cases from JSON",
+    )
+    observatory.add_argument(
+        "--review-response-proposal", metavar="PATH",
+        help="read-only EN/TL variant proposal preflight; never writes source",
+    )
+    parser.add_argument("--response-offset", type=int, default=0)
+    parser.add_argument("--response-limit", type=int, default=8)
+    parser.add_argument(
+        "--response-context-file", metavar="PATH",
+        help="JSON object containing projected Lua response context for explanation",
+    )
+    parser.add_argument(
+        "--response-salt", default="",
+        help="deterministic selection seed; does not execute any gameplay action",
+    )
+
     parser.add_argument(
         "--trace",
         action="store_true",

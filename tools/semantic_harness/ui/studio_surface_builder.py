@@ -9,12 +9,14 @@ from ..studio.dataset_library import DatasetLibraryPane
 from ..studio.interaction_explorer_pane import InteractionExplorerPane
 from ..studio.interaction_spec_pane import InteractionSpecPane
 from ..studio.workflow import SemanticLabWorkflowPane
+from ..studio.observatory_pane import SemanticObservatoryPane
 from .flow_editor.pane import FlowEditorPane
 
 
 def build_studio_editors(
     app: Any,
     *,
+    observatory_tab: Any,
     workflow_tab: Any,
     editor_tab: Any,
     library_tab: Any,
@@ -25,6 +27,10 @@ def build_studio_editors(
 ) -> None:
     """Create Studio panes and connect them to the shell's callbacks."""
 
+    app.observatory = SemanticObservatoryPane(
+        observatory_tab, app._tk, ttk, scrolled_text,
+        run_worker=app._start_operation,
+    )
     editor_notebook = ttk.Notebook(editor_tab)
     editor_notebook.grid(row=0, column=0, sticky="nsew")
     flow_frame = ttk.Frame(editor_notebook)

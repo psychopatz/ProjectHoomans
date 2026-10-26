@@ -29,14 +29,16 @@ def build_ui(app: Any) -> None:
     studio_notebook = ttk.Notebook(studio_tab)
     app.studio_notebook = studio_notebook
     studio_notebook.grid(row=0, column=0, sticky="nsew")
+    observatory_tab = ttk.Frame(studio_notebook, padding=8)
     workflow_tab = ttk.Frame(studio_notebook, padding=8)
     editor_tab = ttk.Frame(studio_notebook, padding=8)
     library_tab = ttk.Frame(studio_notebook, padding=8)
     blocks_tab = ttk.Frame(studio_notebook, padding=8)
     composer_tab = ttk.Frame(studio_notebook, padding=8)
-    for panel in (workflow_tab, editor_tab, library_tab, blocks_tab, composer_tab):
+    for panel in (observatory_tab, workflow_tab, editor_tab, library_tab, blocks_tab, composer_tab):
         panel.rowconfigure(0, weight=1)
         panel.columnconfigure(0, weight=1)
+    studio_notebook.add(observatory_tab, text="Observatory")
     studio_notebook.add(workflow_tab, text="Build workflow")
     studio_notebook.add(editor_tab, text="Flow + interactions")
     studio_notebook.add(library_tab, text="Dataset library")
@@ -92,6 +94,7 @@ def build_ui(app: Any) -> None:
     build_diagnostic_trace(app, ttk, scrolled_text)
     build_studio_editors(
         app,
+        observatory_tab=observatory_tab,
         workflow_tab=workflow_tab,
         editor_tab=editor_tab,
         library_tab=library_tab,

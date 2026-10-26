@@ -1,6 +1,6 @@
 # Semantic Observatory & Dialogue Quality Harness — current progress
 
-**Status:** IN PROGRESS — partial P0/P1 worker catalog read-only slice; P0 full acceptance pending. **Parent goal remains NOT COMPLETE.**
+**Status:** IN PROGRESS — partial P0–P6 Observatory foundation, not accepted end-to-end. **Parent goal remains NOT COMPLETE.**
 **Revision audited:** ProjectHoomans main 0e2d5a23a36badef3a61d35c4a6cdc2d1336f017 (2026-10-26). At doc creation, origin/main and local main matched after explicit fetch; original working tree was clean. Reverify before implementation.
 
 ## Accepted foundation (not acceptance of this new goal)
@@ -10,25 +10,25 @@
 - Previous focused audit on the same HEAD: 23/23 Python tests passed via repository Python 3.12 virtual environment (Conversation Inspector, runtime graph, What's up, CodeBuilder consolidation); this is prior-run evidence, **not** fresh P0 or GUI acceptance. Shell-default Python 3.14 missing _tkinter is an environment limitation, not a semantic defect.
 - Existing ContextualDialogueQuestFramework developer-side authoring work and SemanticInteractionLifecycle developer-side repairs are preserved as predecessors; their native game acceptance is independent and user-owned.
 
-## Fresh worker evidence (2026-10-26)
+## Fresh developer evidence (2026-10-26)
 
-- Inspected actual `FlowEditor.lua`, `CommandRouter_Authoring.lua`, response normalization/registration/selection and Python worker adapter on `d6b73fc4`. Normal selection updates `LAST_VARIANTS`; explanation must share selector seam but never update it.
-- Added `RESPONSE_POOL_DETAIL` as lazy request against the loaded production `ResponseCatalog.Get` registry with paginated variant fields and explicitly UNKNOWN provenance; surfaced via `LuaSemanticWorker.response_pool_detail`. It does **not** establish owning source path, revision, translation, explanations or scenario coverage.
-- Ran `tools/semantic_harness/.venv/bin/python -m unittest tools.semantic_harness.tests.test_response_observatory tools.semantic_harness.tests.test_flow_editor -q`: 12 tests passed (production worker). Unknown pool/bad limit exercise existing worker error contract.
-- Observed an unexpected differing variant ID across consecutive detail queries for an inspected pool (`...wellness-3` then `...wellness-4`); registry/generation stability remains to diagnose before claiming stable details or revisions. This is not a proven selector defect.
-- Native PZ, save-backed runtime, GUI and Workshop were not exercised. P0 performance and EN/TL effect baselines remain unmeasured.
+- Work began at ProjectHoomans main `b14450d64f4578f8658b34dca1b6cf517bc3d276`, Core `cf28189c57f7810f31d25c46c11eb88080f47baa` (reverify HEAD after commit). Existing media/saves, root AGENTS and source generators untouched.
+- Confirmed the previous apparent changing variant IDs were **worker protocol request IDs** (`harness-N`); real variant records stayed stable. Production worker sampled startup 0.705 seconds; FLOW_CATALOG full payload 303,739 bytes, 129 pools.
+- Added lazy bounded Lua `RESPONSE_POOL_LIST`, `RESPONSE_POOL_DETAIL`, `RESPONSE_SELECTION_EXPLAIN` and isolated-worker sample/parity probe using actual `ResponseCatalog` selection/matching; registry revision updates after successful Register/Extend. Explain does not consume LAST_VARIANTS. Bounded `planSummary` replaces unbounded full-plan dumping; unverified source origins labeled UNKNOWN.
+- Added headless CLI switches (see OBSERVATORY_CLI.md), bounded isolated real-Lua fixture quality matrix and Observatory-first tab in the existing Tk Studio. Advanced Build/Flow/Library/Blocks/Composer remain present and unchanged.
+- Fresh focused real-worker tests: 5 Observatory selector/catalog tests PASSED; combined relevant regression run 32 tests PASSED (Flow Editor, Conversation Inspector, Semantic Interaction lifecycle, context graph, WhatsUp). Quality matrix/preflight/comparison tests 8 PASSED (Tk display-conditional), and explicit Xvfb/Tk real-Lua widget test 1 PASSED. Entire Tk Semantic Lab shell loaded the actual worker under Xvfb and Observatory live search returned 3 greeting pools, with temporary UI state outside user paths. Lua production smoke focused 9/9 PASS; changed Lua files passed `luac -p`. No native launch.
+- Bounded measured worker startup ~708ms; 129 loaded pools. Repeated target query sample: list 366 bytes/0.8–1.5ms, detail 1,736 bytes/2.0–3.5ms, explain 952 bytes/~1.1ms, prior full FLOW_CATALOG 303,740 bytes/267–273ms. These are small samples, not complete scale acceptance.
+- Added SHA-256 evidence for inspected Lua seams plus ProjectHoomans/Core local HEAD to CLI outputs; the complete per-pool verified owning-path mapping remains explicitly unavailable.
+- Added read-only EN/TL proposal preflight that rejects stale fingerprints, metadata edits, missing registered IDs, invalid placeholders and duplicated IDs. Valid preflight returns `approved=false`, `writes=0`, and `isolatedLuaReplayCompleted=false`. Added stored-real-Lua report comparison with missing-case/regression flags; neither substitutes for canonical source approval and isolated candidate replay.
+- EN baseline: `hello` produced opening.default + question.default, `how are you` produced a wellbeing dataset response with zero effects; `follow me` produced one accepted mock-authority CompanionCommand transport, `goodbye` alone yielded clarification. TL greeting/wellbeing resolved translated; TL `follow me` instead produced English fallback `Okay, I'll follow you.`. Bare `goodbye` requires separate lifecycle-context replay before diagnosing native farewell. These are *real Lua ENGINE-FIXTURE*, not PZ game proof.
+- Production source route: greeting authored in `PNC_SemanticDialogueResponseCatalog_FlowGreeting.lua`; wellbeing in `Questions_WellbeingMedical.lua`; Follow registered via `PNC_SemanticCommandAdapter_CompanionActions.lua` and client/server companion authority. The emitted Follow translation key is **not evidence** that the separately registered `semantic.generated.simple_command.follow.queued` variant was selected. This distinction remains to instrument.
+- The default Follow key is missing from the active EN/TL custom Conversation translation manifest catalogs even though the command descriptor supplies EN/TL inline fallbacks. Do not blindly edit CodeBuilder generated assets to fix it; verify actual canonical writer/owner first.
 
-## Current gap
+## Current gap and immediate mandatory work
 
-No accurate, bounded per-variant runtime catalog + source provenance; no production-selector decision explanations; no common human/agent quality coverage/compare report; no verified isolated LLM-generated variant proposal workflow. Full P0–P7 remains mandatory.
+The parent goal **remains IN PROGRESS**. P0 partial: source-to-registration-to-realization/translation/authority trace, measured cost in multiple contexts and negative response cases incomplete. P1 partial: explicit UNKNOWN provenance is honest but lacks verified source mapping/content fingerprint and startup-payload optimization. P2 partial: production matching parity and read-only history proven, full observed-turn join/effects explain incomplete. P3 partial: Observatory primary Tk pane and dedicated Xvfb integration demonstrated, not full-shell accepted. P4 partial: fresh EN/TL and action fixture matrix works but needs privacy/hostile/health/negative and response-selection coverage reasons. P5 partial: catalog/detail/explain/matrix/compare CLI usable; full replay/diff case matrices, strict error paths and GUI parity still need full gates. P6 partial: proposal preflight only; verified canonical owner, isolated source overlay/replay, human approval, safe source edit and source-patched EN/TL demonstration **not implemented**. P7 end-to-end acceptance pending.
 
-## Current phase: P0 — baseline and contracts
-
-**Exact Next Chunk (P0A continuation):** On the actual current checkout, inspect the worker FLOW_CATALOG and response selection/registration/realization/translation seams, identify canonical owner for (1) greeting opening, (2) wellbeing response, (3) companion FOLLOW response, and record a **real worker** baseline trace for representative EN/TL, allowed/denied contexts. Benchmark startup, catalog payload and targeted query/replay. Draft the smallest schema-versioned, read-only pool detail and explanation contract using the existing worker request queue. Prove preview/explain cannot mutate selection history, commands, Knowledge, NPC state, save files or watched media. Do not implement a new editor or rewrite flows.
-
-**Immediate acceptance:** exact HEAD/Core SHA, commands and actual observed worker outputs for source→registered pool→selection→translation→final response/effects; documented side-effect boundary and baseline timings; focused existing tests reported honestly. If any prerequisite differs, update AUDIT/ARCHITECTURE and PROGRESS based on current code.
-
-**After P0A:** continue P0 gate and then P1–P7 without waiting for another /goal. The roadmap's complete parent outcome is the only developer-side completion boundary.
+**Exact Next Chunk:** close source-to-registration and translation provenance (especially companion Follow vs generated variant), add source revision/fingerprint to bounded inspection; use the existing CodeBuilder source model to avoid duplicate authorship, and expand EN/TL/negative real-Lua coverage before claiming P0–P5 acceptance. Then implement P6 safe candidate comparison and P7 complete GUI/headless/replay/performance/no-write acceptance. After each accepted chunk continue through the entire ROADMAP; do not stop at a phase boundary.
 
 ## External/user-only boundary
 
