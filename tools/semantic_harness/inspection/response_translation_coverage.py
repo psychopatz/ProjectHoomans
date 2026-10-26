@@ -14,6 +14,8 @@ from ..runtime.worker import LuaSemanticWorker
 
 LANGUAGES = ("EN", "TL")
 MAX_MANIFEST_ASSETS = 64
+MAX_TRANSLATION_ASSET_BYTES = 256 * 1024
+MAX_CONVERSATION_MANIFEST_BYTES = 64 * 1024
 
 
 def translation_coverage(
@@ -28,6 +30,8 @@ def translation_coverage(
         raise ValueError("translation coverage requires fully bounded pool")
     media = root / "Contents/mods/ProjectHoomans/common/media/translation"
     manifest_path = media / "manifests/Conversation.json"
+    if manifest_path.stat().st_size > MAX_CONVERSATION_MANIFEST_BYTES:
+        raise ValueError("oversized production Conversation manifest")
     manifest_bytes = manifest_path.read_bytes()
     manifest = json.loads(manifest_bytes.decode("utf-8"))
     if not isinstance(manifest, dict) or not isinstance(manifest.get("languages"), dict):
@@ -46,6 +50,8 @@ def translation_coverage(
             asset_path = (media / name).resolve(strict=True)
             if not asset_path.is_relative_to(media.resolve()):
                 raise ValueError("translation manifest escapes media owner")
+            if asset_path.stat().st_size > MAX_TRANSLATION_ASSET_BYTES:
+                raise ValueError("oversized manifest-backed translation catalog")
             contents = json.loads(asset_path.read_text(encoding="utf-8"))
             if not isinstance(contents, dict):
                 raise ValueError("invalid manifest-backed translation catalog")
