@@ -216,6 +216,16 @@ function Builder.build(context)
         )
         output.semanticSuggestionGroupID =
             priorContext.semanticSuggestionGroupID
+        -- Event response windows and their player-scoped authoritative fact
+        -- projection survive the worker's ordinary context rebuild.  These
+        -- are bounded lifecycle/presentation inputs, not a second transcript
+        -- or event registry.
+        output.interactionLifecycle = Values.copy(
+            priorContext.interactionLifecycle
+        )
+        output.semanticEventFacts = Values.copy(
+            priorContext.semanticEventFacts
+        )
     end
     local session = Runtime.view and Runtime.view.session or nil
     local dialogueContext = session and session.semanticDialogueContext

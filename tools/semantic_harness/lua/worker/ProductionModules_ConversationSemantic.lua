@@ -173,6 +173,15 @@ local function loadConversationSemantic(load, registerEntryPointModule)
             "semantic_response_catalog_social_spoke"
         )
     end
+    -- The game composition loads this semantic event resolver through the
+    -- shared foundation. The headless worker needs the same production
+    -- resolver explicitly so event lifecycle acceptance exercises the real
+    -- SocialReactions -> ResponseCatalog boundary.
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Semantics/PNC_SemanticSocialReaction.lua",
+        "semantic_event_resolver"
+    )
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticCommandAdapter.lua", "semantic_adapter")
     for _, spoke in ipairs({
         "PNC_SemanticCommandAdapter_Registry.lua",

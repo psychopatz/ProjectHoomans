@@ -29,6 +29,7 @@ local addCandidate = Internal.addCandidate
 local DEFINITIONS = Internal.DEFINITIONS
 local offersFromPlan = Internal.offersFromPlan
 local offersFromMessages = Internal.offersFromMessages
+local offersFromLifecycle = Internal.offersFromLifecycle
 
 function Internal.CollectSuggestionBuildSources(state)
     local result = state.result
@@ -100,6 +101,19 @@ function Internal.CollectSuggestionBuildSources(state)
     local response = type(decision.response) == "table"
         and decision.response or {}
     state.response = response
+    -- An NPC event beat is the durable authority for its follow-up window.
+    -- Project it before the transient response payload so identical offer
+    -- IDs cannot be claimed by a rendered/transient plan origin.
+    appendBranchOffers(
+        candidates,
+        seen,
+        offersFromLifecycle(context),
+        "npc_event_response_plan",
+        revision,
+        context,
+        ir,
+        predicateTrace
+    )
     appendBranchOffers(
         candidates,
         seen,

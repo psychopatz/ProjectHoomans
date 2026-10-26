@@ -50,6 +50,15 @@ function ReceiveContext.Build(args)
             dialogueContext:SetTopic(topic, false)
         end
     end
+    if type(args.semanticEventFacts) == "table" then
+        contextRoot.semanticEventFacts = args.semanticEventFacts
+        if state.context then
+            state.context.semanticEventFacts = args.semanticEventFacts
+        end
+        if state.session then
+            state.session.semanticEventFacts = args.semanticEventFacts
+        end
+    end
     if args.success ~= true then return state end
 
     state.block = Registry.GetBlock(args.blockID)

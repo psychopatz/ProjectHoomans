@@ -243,5 +243,45 @@ Catalog.Register(
     }
 )
 
+-- Event follow-up answers are selected by semantic question kind.  The
+-- bounded fact value is supplied only after this meaning is selected; it is
+-- never recovered from rendered NPC speech.
+local EVENT_FOLLOW_UPS = {
+    what_happened = "I don't have a confirmed account of what happened.",
+    location = "I don't have a confirmed location.",
+    quantity = "I don't have a confirmed count.",
+    attacker = "I don't have a confirmed account of who did it.",
+    need = "I don't have a confirmed need to report.",
+    deceased = "I don't have a confirmed name for who died.",
+    next = "I don't have a confirmed next step.",
+    health = "I don't have a confirmed health update.",
+    pursuer = "I don't have a confirmed account of who was after them.",
+    what = "I don't have a confirmed description of it.",
+}
+
+for questionKind, fallback in pairs(EVENT_FOLLOW_UPS) do
+    local poolID = "semantic.question.event_follow_up." .. questionKind
+    Catalog.Register(poolID, {
+        variants = {
+            {
+                id = poolID .. ".answer",
+                templateID = poolID .. ".answer",
+                fallback = "%1",
+                plan = {
+                    dialogueAct = "FACT_ANSWER",
+                    sourcePoolID = poolID,
+                    topic = "EVENT_FOLLOW_UP",
+                    turns = { { segments = {
+                        { kind = "literal", text = "%1" },
+                    } } },
+                },
+            },
+        },
+    })
+    -- Keep the unknown wording in the semantic pool's fallback contract for
+    -- runtimes that do not provide a fact argument.
+    if fallback == "" then return false end
+end
+
 
 return true

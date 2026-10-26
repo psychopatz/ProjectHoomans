@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 and P1 accepted; P2 is the active implementation slice.
+**Status:** IN PROGRESS — P0, P1 and P2 accepted; P3 is the active implementation slice.
 
 ## Audited baseline
 
@@ -41,8 +41,8 @@
 | --- | --- |
 | P0 — authority inventory/baseline | **ACCEPTED** |
 | P1 — standardized semantic event realization boundary | **ACCEPTED** |
-| P2 — NPC-initiated event follow-up bridge | **IN PROGRESS** |
-| P3 — lower-risk native SocialFlavor migration | NOT STARTED |
+| P2 — NPC-initiated event follow-up bridge | **ACCEPTED** |
+| P3 — lower-risk native SocialFlavor migration | **IN PROGRESS** |
 | P4 — complex medical/incapacitated migration | NOT STARTED |
 | P5 — ToolReplies + legacy registry migration | NOT STARTED |
 | P6 — compatibility semantic adapters | NOT STARTED |
@@ -81,20 +81,41 @@
 - Generic compatibility packets remain eligible for the generic Core Flavor
   fallback contract.
 
-## Immediate Next Chunk — P2
+## Accepted P2 — NPC-initiated event follow-up bridge
 
-Bridge grounded NPC-initiated event speech into the existing lifecycle and
-Suggestions path:
+- Event reactions now select one production `SocialReactions` realization and
+  carry its exact `ResponsePlan` offer IDs, `eventRef`, `factRefs`, pool and
+  realization provenance through `RecordNPCSpeech` and the existing lifecycle
+  response window.
+- Existing Suggestions projects only the active, disclosed event offers. It
+  does not reselect a catalog variant, scan other NPCs/events, or persist
+  rendered text.
+- Event context-reference frames now carry `QUESTION` meaning, so clicked and
+  typed follow-ups converge through the existing parser/router and local
+  response path. Answers use authoritative event facts or an explicit unknown
+  response.
+- Real production-worker coverage now proves horde selection, lifecycle
+  provenance, bounded offers, click/typed parity, no-fact suppression and
+  lazy expiry. The existing Lua smoke test covers the same boundary and
+  stale/private/no-facts cases.
+- P2 focused evidence: Python worker `2/2`, Lua selection `5/5`; no native
+  Project Zomboid or source save was used.
 
-1. Add bounded event follow-up offers to the existing semantic response plans.
-2. Carry plan offers/provenance through `RecordNPCSpeech` and the existing
-   response window without storing rendered text.
-3. Project only eligible offers for the active Player↔NPC target and accept
-   typed equivalents through the existing context/NLU route.
-4. Add click/typed parity, expiry, privacy, stale-fact, and no-facts negative
-   coverage.
+## Immediate Next Chunk — P3
 
-After P1 gate passes, continue automatically through P2–P9.
+Migrate the lower-risk native SocialFlavor families to semantic-first
+production event flows while preserving the existing queue and presentation
+infrastructure:
+
+1. Finish semantic-first migration evidence for farewell, safety, player-spoke,
+   witnessed kill, follower abandonment, horde/retreat and leader loss.
+2. Move accepted wording into the existing Dialogue Content/translation owner
+   where a family is migrated; keep legacy definitions only as characterized
+   source material until parity is proven.
+3. Add one-family-at-a-time negative proof that missing semantic realization
+   cannot select first-party SocialFlavor prose.
+
+After the P3 family gates pass, continue automatically through P4–P9.
 
 ## Stop conditions
 

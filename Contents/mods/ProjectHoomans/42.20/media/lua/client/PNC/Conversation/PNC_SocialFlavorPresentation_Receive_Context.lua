@@ -53,11 +53,91 @@ local function presentationInteraction(ambientFlavor, context, npcID,
         responsePlanID = ambientFlavor.responsePlanID,
         flowID = ambientFlavor.flowID
             or "social:" .. tostring(eventType),
-        poolID = ambientFlavor.poolID or ambientFlavor.flavorID,
+        poolID = ambientFlavor.poolID
+            or ambientFlavor.responsePlanID
+            or ambientFlavor.flavorID,
+        realizationFamily = ambientFlavor.realizationFamily,
+        realizationID = ambientFlavor.realizationID,
+        offerIDs = ambientFlavor.offerIDs
+            or context and context.offerIDs,
         eventType = eventType,
         eventRef = ambientFlavor.eventRef or eventID,
         factRefs = ambientFlavor.factRefs or context and context.factRefs,
     })
+end
+
+local function boundedList(value, limit)
+    local output = {}
+    if type(value) ~= "table" then return output end
+    for index = 1, math.min(#value, limit or 8) do
+        if value[index] ~= nil then
+            output[#output + 1] = tostring(value[index])
+        end
+    end
+    return output
+end
+
+-- A delivered server event may arrive while the existing conversation view is
+-- already open. Project the same bounded lifecycle capsule into that view so
+-- Suggestions can expose the server-authorized offers immediately. The
+-- server persistence projection remains authoritative on the next request;
+-- this is only the existing client session projection, never a second store.
+local function projectEventIntoConversation(receive)
+    local view = receive.view
+    local ambientFlavor = receive.ambientFlavor
+    local context = receive.context
+    local eventRef = tostring(
+        ambientFlavor.eventRef or receive.eventID or ""
+    )
+    if not view or not view.spec or not view.spec.context
+        or eventRef == ""
+        or not ambientFlavor.responsePlanID
+        or not ambientFlavor.realizationID
+    then
+        return
+    end
+    local root = view.spec.context
+    local session = view.session
+    local lifecycle = session and session.semanticInteractionLifecycle
+        or root.interactionLifecycle
+    if type(lifecycle) ~= "table" then
+        lifecycle = {
+            schema = "semantic.interaction.lifecycle.v1",
+            status = "ACTIVE",
+            topic = ambientFlavor.topic or receive.eventType,
+        }
+    end
+    lifecycle.status = lifecycle.status or "ACTIVE"
+    lifecycle.topic = ambientFlavor.topic or receive.eventType
+    lifecycle.activeBeat = {
+        id = ambientFlavor.beatID
+            or "beat:" .. tostring(receive.eventType) .. ":" .. eventRef,
+        topic = lifecycle.topic,
+        act = ambientFlavor.act or "REACT",
+        eventRef = eventRef,
+        eventType = receive.eventType,
+        responsePlanID = ambientFlavor.responsePlanID,
+        flowID = ambientFlavor.flowID,
+        poolID = ambientFlavor.poolID
+            or ambientFlavor.responsePlanID,
+        realizationID = ambientFlavor.realizationID,
+        factRefs = boundedList(
+            ambientFlavor.factRefs or context.factRefs,
+            8
+        ),
+        offerIDs = boundedList(
+            ambientFlavor.offerIDs or context.offerIDs,
+            8
+        ),
+    }
+    root.interactionLifecycle = lifecycle
+    root.semanticEventFacts = context.semanticEventFacts
+    if type(root.conversationBlockContext) == "table" then
+        root.conversationBlockContext.interactionLifecycle = lifecycle
+        root.conversationBlockContext.semanticEventFacts =
+            context.semanticEventFacts
+    end
+    if session then session.semanticInteractionLifecycle = lifecycle end
 end
 
 function H.BuildReceiveContext(ambientFlavor, summary, networkArgs)
@@ -181,6 +261,13 @@ function H.EnrichReceiveContext(receive)
     context.realizationID = context.realizationID
         or ambientFlavor.realizationID
     context.factRefs = context.factRefs or ambientFlavor.factRefs
+    context.offerIDs = context.offerIDs or ambientFlavor.offerIDs
+    context.eventRef = context.eventRef
+        or ambientFlavor.eventRef or receive.eventID
+    context.offerIDs = context.offerIDs or ambientFlavor.offerIDs
+    context.semanticEventFacts = context.semanticEventFacts
+        or ambientFlavor.semanticEventFacts
+    projectEventIntoConversation(receive)
     ambientFlavor.interaction = ambientFlavor.interaction
         or context.interaction
     -- Downed distress lines may address the attacker by name. The server

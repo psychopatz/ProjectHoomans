@@ -62,6 +62,37 @@ return function(Catalog, Core)
         return Catalog.POOLS[tostring(id or "")]
     end
 
+    -- Read the already selected variant without selecting again.  Lifecycle
+    -- follow-up offers are part of the selected response plan, so resolving
+    -- them must never rotate the catalog or create a second semantic choice.
+    function Catalog.GetVariant(id, realizationID)
+        local pool = Catalog.Get(id)
+        local requested = tostring(realizationID or "")
+        if not pool or requested == "" then return nil end
+        for _, variant in ipairs(pool.variants or {}) do
+            if tostring(variant.id or "") == requested then
+                return variant
+            end
+        end
+        return nil
+    end
+
+    function Catalog.OffersForSelection(id, realizationID)
+        local variant = Catalog.GetVariant(id, realizationID)
+        local plan = variant and variant.plan or nil
+        local output = {}
+        if type(plan) ~= "table" or type(plan.turns) ~= "table" then
+            return output
+        end
+        for _, turn in ipairs(plan.turns) do
+            for _, offer in ipairs(turn.offers or {}) do
+                if #output >= 8 then return output end
+                output[#output + 1] = offer
+            end
+        end
+        return output
+    end
+
     function Catalog.Extend(id, definition)
         id = tostring(id or "")
         local pool = Catalog.Get(id)

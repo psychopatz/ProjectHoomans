@@ -25,6 +25,7 @@ function H.BuildReceivePayload(receive)
             or nil
     return {
         eventID = receive.eventID,
+        eventRef = ambientFlavor.eventRef or receive.eventID,
         flavorID = ambientFlavor.flavorID
             or "social.witnessed_player_kill",
         family = receive.family,
@@ -43,6 +44,7 @@ function H.BuildReceivePayload(receive)
         realizationFamily = ambientFlavor.realizationFamily,
         realizationID = ambientFlavor.realizationID,
         factRefs = ambientFlavor.factRefs,
+        offerIDs = ambientFlavor.offerIDs or context.offerIDs,
         speakerID = receive.npcID,
         speakerName = speaker.fullName,
         playerUUID = H.PlayerUUID(),

@@ -322,6 +322,11 @@ function Envelope.NPCSpeech(spec)
         factRefs = spec.factRefs,
         eventType = spec.eventType,
         eventRef = spec.eventRef,
+        responsePlanID = spec.responsePlanID,
+        flowID = spec.flowID,
+        poolID = spec.poolID,
+        realizationFamily = spec.realizationFamily,
+        realizationID = spec.realizationID,
         worldHour = spec.worldHour,
         provenance = spec.provenance,
     })

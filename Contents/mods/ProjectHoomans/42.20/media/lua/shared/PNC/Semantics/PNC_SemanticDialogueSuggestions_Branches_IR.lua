@@ -16,6 +16,24 @@ local resolvedText = Internal.resolvedText
 local predicateContextFor = Internal.predicateContextFor
 local offersFromPlan = Internal.offersFromPlan
 local offersFromMessages = Internal.offersFromMessages
+local offersFromLifecycle = Internal.offersFromLifecycle
+
+local function responseCatalog()
+    local catalog = PNC.Semantics.ResponseCatalog
+    if type(catalog) == "table"
+        and type(catalog.OffersForSelection) == "function"
+    then
+        return catalog
+    end
+    local ok, loaded = pcall(require,
+        "PNC/Semantics/PNC_SemanticDialogueResponseCatalog")
+    if ok and type(loaded) == "table"
+        and type(loaded.OffersForSelection) == "function"
+    then
+        return loaded
+    end
+    return nil
+end
 
 function Suggestions.ResolveFrameText(frame)
     frame = type(frame) == "table" and frame or {}
@@ -30,7 +48,10 @@ local function sameBranchOrigin(frame, origin)
     if requested.kind ~= nil and requested.kind ~= origin.kind then
         return false
     end
-    for _, key in ipairs({ "flowID", "nodeID", "turnID", "sourcePoolID" }) do
+    for _, key in ipairs({
+        "flowID", "nodeID", "turnID", "sourcePoolID",
+        "realizationID", "eventRef",
+    }) do
         if requested[key] ~= nil
             and tostring(requested[key]) ~= tostring(origin[key] or "")
         then
@@ -78,6 +99,22 @@ local function branchOfferForFrame(frame, view)
             return item.offer, item.origin
         end
     end
+
+    local lifecycle = view and view.session
+        and view.session.semanticInteractionLifecycle or nil
+    if type(lifecycle) ~= "table" then
+        local context = view and view.spec and view.spec.context or nil
+        lifecycle = context and context.interactionLifecycle or nil
+    end
+    for _, item in ipairs(offersFromLifecycle({
+        interactionLifecycle = lifecycle,
+    })) do
+        if item.offer and item.offer.id == frame.candidateID
+            and sameBranchOrigin(frame, item.origin)
+        then
+            return item.offer, item.origin
+        end
+    end
     return nil, nil
 end
 
@@ -99,6 +136,12 @@ local function branchOfferIR(offer, origin, frame, view)
     if source.identityClaim ~= nil then
         socialContext.identityClaim = source.identityClaim
     end
+    local extensions = {}
+    if source.reference ~= nil then
+        extensions.dialogueFollowUp = "CONTEXT_REFERENCE"
+        extensions.topic = "conversation"
+        extensions.contextQuestion = source.reference
+    end
     local target = source.target and {
         kind = "conversation_actor",
         ref = source.target,
@@ -109,14 +152,22 @@ local function branchOfferIR(offer, origin, frame, view)
             offer.utteranceKey, offer.utteranceFallback
         ),
         normalizedText = normalizedText(offer.utteranceFallback),
-        intent = source.intent,
-        speechAct = source.speechAct,
+        -- Event follow-up offers are executable semantic questions. Preserve
+        -- the authored frame's explicit intent when present; the existing
+        -- context-reference contract supplies QUESTION when the offer only
+        -- carries its reference kind.
+        intent = source.intent
+            or source.reference and "QUESTION" or nil,
+        speechAct = source.speechAct
+            or source.reference and "QUESTION" or nil,
         action = source.action,
         subject = source.subject,
         target = target,
-            destination = copyValue(source.destination),
+        destination = copyValue(source.destination),
         slots = slots,
         socialContext = socialContext,
+        references = source.reference and { reference = source.reference } or nil,
+        extensions = extensions,
         confidence = 1,
         provenance = {
             provider = "suggestion",

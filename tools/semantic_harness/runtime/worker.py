@@ -336,6 +336,11 @@ class LuaSemanticWorker:
 
         return self._request("INTERACTION_NPC_SPEECH", payload)
 
+    def interaction_npc_event(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Resolve one production NPC event and project its response window."""
+
+        return self._request("INTERACTION_NPC_EVENT", payload)
+
     def interaction_close(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
         return self._request("INTERACTION_CLOSE", payload or {})
 

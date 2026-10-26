@@ -21,6 +21,32 @@ local resolveHealthStateQuestion = Internal.ResolveHealthStateQuestion
 local resolveKnowledgeQuestion = Internal.ResolveKnowledgeQuestion
 local resolveBackstoryQuestion = Internal.ResolveBackstoryQuestion
 
+local EVENT_POOL_BY_QUESTION = {
+    EVENT_WHAT_HAPPENED = "what_happened",
+    EVENT_LOCATION = "location",
+    EVENT_QUANTITY = "quantity",
+    EVENT_ATTACKER = "attacker",
+    EVENT_NEED = "need",
+    EVENT_DECEASED = "deceased",
+    EVENT_NEXT = "next",
+    EVENT_HEALTH = "health",
+    EVENT_PURSUER = "pursuer",
+    EVENT_WHAT = "what",
+}
+
+local EVENT_FIELD_BY_QUESTION = {
+    EVENT_WHAT_HAPPENED = { "summary", "happened", "description" },
+    EVENT_LOCATION = { "location", "locationLabel" },
+    EVENT_QUANTITY = { "countBand", "count", "quantity" },
+    EVENT_ATTACKER = { "attackerName", "attacker" },
+    EVENT_NEED = { "need", "needType" },
+    EVENT_DECEASED = { "deceasedName", "deceased" },
+    EVENT_NEXT = { "nextAction", "next" },
+    EVENT_HEALTH = { "health", "healthState" },
+    EVENT_PURSUER = { "pursuerName", "pursuer" },
+    EVENT_WHAT = { "description", "summary", "what" },
+}
+
 local function contextReferenceResponse(
     templateID,
     fallback,
@@ -80,6 +106,119 @@ local function recentBackstoryAnswer(context, responseTurn)
     return nil
 end
 
+local function activeEventBeat(context)
+    local lifecycle = type(context) == "table"
+        and context.interactionLifecycle or nil
+    local beat = type(lifecycle) == "table" and lifecycle.activeBeat or nil
+    if type(beat) ~= "table"
+        or tostring(beat.eventRef or "") == ""
+        or type(beat.factRefs) ~= "table" or #beat.factRefs == 0
+    then
+        return nil
+    end
+    return beat
+end
+
+local function authoritativeEventFact(context, eventRef)
+    local facts = type(context) == "table"
+        and context.semanticEventFacts or nil
+    if type(facts) ~= "table" then return nil end
+    local fact = facts[eventRef]
+    if type(fact) ~= "table" and facts.eventRef == eventRef then
+        fact = facts
+    end
+    if type(fact) ~= "table" then return nil end
+    if fact.eventRef ~= nil and tostring(fact.eventRef) ~= tostring(eventRef) then
+        return nil
+    end
+    if fact.authoritative ~= true and fact.authority ~= "server"
+        and fact.source ~= "authoritative"
+    then
+        return nil
+    end
+    if fact.disclosure == false or fact.disclosure == "private" then
+        return nil
+    end
+    return fact
+end
+
+local function scalarFactValue(value)
+    if type(value) == "string" or type(value) == "number"
+        or type(value) == "boolean"
+    then
+        local text = tostring(value)
+        return text ~= "" and text or nil
+    end
+    if type(value) ~= "table" then return nil end
+    if value.x ~= nil and value.y ~= nil then
+        local x = tonumber(value.x)
+        local y = tonumber(value.y)
+        local z = tonumber(value.z) or 0
+        if x and y then
+            return string.format(
+                "at (%.0f, %.0f, %.0f)", x, y, z
+            )
+        end
+    end
+    for _, key in ipairs({ "label", "name", "text", "summary", "value" }) do
+        local result = scalarFactValue(value[key])
+        if result then return result end
+    end
+    return nil
+end
+
+local function eventFollowUpResponse(ir, state, context, questionKind)
+    local suffix = EVENT_POOL_BY_QUESTION[questionKind]
+    local fields = EVENT_FIELD_BY_QUESTION[questionKind]
+    local beat = activeEventBeat(context)
+    if not suffix or not fields or not beat then return nil end
+
+    local eventRef = tostring(beat.eventRef)
+    local fact = authoritativeEventFact(context, eventRef)
+    local value
+    if fact then
+        for _, field in ipairs(fields) do
+            value = scalarFactValue(fact[field])
+            if value then break end
+        end
+    end
+    local unknown = {
+        what_happened = "I don't have a confirmed account of what happened.",
+        location = "I don't have a confirmed location.",
+        quantity = "I don't have a confirmed count.",
+        attacker = "I don't have a confirmed account of who did it.",
+        need = "I don't have a confirmed need to report.",
+        deceased = "I don't have a confirmed name for who died.",
+        next = "I don't have a confirmed next step.",
+        health = "I don't have a confirmed health update.",
+        pursuer = "I don't have a confirmed account of who was after them.",
+        what = "I don't have a confirmed description of it.",
+    }
+    local response = catalogResponse(
+        "semantic.question.event_follow_up." .. suffix,
+        ir,
+        state,
+        context,
+        { content = value or unknown[suffix] }
+    )
+    if not response then return nil end
+    response.selectionSource = "event_follow_up"
+    response.referenceResolution = value
+        and "authoritative_event_fact" or "event_fact_unavailable"
+    response.referenceSubject = "EVENT"
+    response.eventRef = eventRef
+    response.uncertainty = value and "known" or "unknown"
+    response.groundedFactRefs = copyArgs(beat.factRefs)
+    if fact and fact.factRef then
+        response.groundedFactRefs[#response.groundedFactRefs + 1] =
+            tostring(fact.factRef)
+    end
+    while #response.groundedFactRefs > 8 do
+        table.remove(response.groundedFactRefs)
+    end
+    return response
+end
+
 local function derivedQuestion(ir, subject, state, context)
     if not IR or type(IR.Clone) ~= "function" then return nil end
     if not Facts or type(Facts.Annotate) ~= "function" then return nil end
@@ -128,6 +267,13 @@ local function resolveContextReferenceQuestion(ir, state, context)
     local backstoryFollowUp = subject == "NPC_BACKSTORY"
         and (questionKind == "BACKSTORY_LOCATION"
             or questionKind == "BACKSTORY_MISS")
+
+    if EVENT_POOL_BY_QUESTION[questionKind] then
+        local response = eventFollowUpResponse(
+            ir, state, context, questionKind
+        )
+        if response then return response end
+    end
 
     if questionKind == "CAUSE" then
         local causeTopic = answer and answer.topic

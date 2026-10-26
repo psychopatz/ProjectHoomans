@@ -26,8 +26,8 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
     if not receive then return false, reason end
     H.EnrichReceiveContext(receive)
     local payload = H.BuildReceivePayload(receive)
-    if payload.semanticOwned and type(payload.text) ~= "string"
-        or payload.semanticOwned and payload.text == ""
+    if payload.semanticOwned
+        and (type(payload.text) ~= "string" or payload.text == "")
     then
         H.Log("rejected", "event=" .. tostring(receive.eventID)
             .. " reason=semantic_realization_text_required")

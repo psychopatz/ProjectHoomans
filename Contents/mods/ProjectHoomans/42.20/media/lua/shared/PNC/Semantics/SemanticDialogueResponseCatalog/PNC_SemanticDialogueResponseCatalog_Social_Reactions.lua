@@ -6,6 +6,54 @@ if type(Catalog) ~= "table" or type(Catalog.Register) ~= "function" then
     return false
 end
 
+local function followUp(id, fallback, reference)
+    return {
+        id = "semantic.followup.event." .. id,
+        labelKey = "UI_PNC_SemanticFollowUp_" .. id,
+        labelFallback = fallback,
+        utteranceKey = "UI_PNC_SemanticFollowUp_" .. id,
+        utteranceFallback = fallback,
+        frame = {
+            subject = "CONTEXT_REFERENCE",
+            reference = reference,
+        },
+    }
+end
+
+local FOLLOW_UP_OFFERS = {
+    horde = {
+        followUp("location", "Where are they?", "EVENT_LOCATION"),
+        followUp("quantity", "How many?", "EVENT_QUANTITY"),
+        followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
+    },
+    combat = {
+        followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
+    },
+    medical = {
+        followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
+        followUp("attacker", "Who hurt you?", "EVENT_ATTACKER"),
+        followUp("need", "What do you need?", "EVENT_NEED"),
+    },
+    leader = {
+        followUp("deceased", "Who died?", "EVENT_DECEASED"),
+        followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
+        followUp("next", "What do we do now?", "EVENT_NEXT"),
+    },
+    abandonment = {
+        followUp("health", "Are you hurt?", "EVENT_HEALTH"),
+        followUp("pursuer", "Who was after you?", "EVENT_PURSUER"),
+    },
+    safety = {
+        followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
+        followUp("location", "Where are they?", "EVENT_LOCATION"),
+        followUp("what", "What is it?", "EVENT_WHAT"),
+    },
+    corpse = {
+        followUp("deceased", "Who died?", "EVENT_DECEASED"),
+        followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
+    },
+}
+
 Catalog.Register("semantic.flow.farewell", {
     variants = {
         {
@@ -53,7 +101,7 @@ Catalog.Register("semantic.medical.distress", {
                 topic = "medical_distress",
                 turns = { { segments = {
                     { kind = "literal", text = "Please. I need help with this wound." },
-                } } },
+                }, offers = FOLLOW_UP_OFFERS.medical } },
             },
         },
         {
@@ -68,7 +116,7 @@ Catalog.Register("semantic.medical.distress", {
                 topic = "medical_distress",
                 turns = { { segments = {
                     { kind = "literal", text = "I am hurt. I need help now." },
-                } } },
+                }, offers = FOLLOW_UP_OFFERS.medical } },
             },
         },
         {
@@ -81,7 +129,7 @@ Catalog.Register("semantic.medical.distress", {
                 topic = "medical_distress",
                 turns = { { segments = {
                     { kind = "literal", text = "I need help with this wound." },
-                } } },
+                }, offers = FOLLOW_UP_OFFERS.medical } },
             },
         },
     },
@@ -101,7 +149,7 @@ Catalog.Register("semantic.leader_loss.reaction", {
                 topic = "leader_loss",
                 turns = { { segments = {
                     { kind = "literal", text = "We lost someone important. We need to stay together." },
-                } } },
+                }, offers = FOLLOW_UP_OFFERS.leader } },
             },
         },
         {
@@ -116,7 +164,7 @@ Catalog.Register("semantic.leader_loss.reaction", {
                 topic = "leader_loss",
                 turns = { { segments = {
                     { kind = "literal", text = "The old order is gone. What happens next is up to us." },
-                } } },
+                }, offers = FOLLOW_UP_OFFERS.leader } },
             },
         },
         {
@@ -129,7 +177,7 @@ Catalog.Register("semantic.leader_loss.reaction", {
                 topic = "leader_loss",
                 turns = { { segments = {
                     { kind = "literal", text = "We lost our leader. We need to decide what comes next." },
-                } } },
+                }, offers = FOLLOW_UP_OFFERS.leader } },
             },
         },
     },
@@ -149,7 +197,7 @@ Catalog.Register("semantic.combat.reaction", {
                 topic = "combat",
                 turns = { { segments = {
                     { kind = "literal", text = "That threat is down. Stay alert." },
-                } } },
+                }, offers = FOLLOW_UP_OFFERS.horde } },
             },
         },
         {
@@ -162,7 +210,7 @@ Catalog.Register("semantic.combat.reaction", {
                 topic = "combat",
                 turns = { { segments = {
                     { kind = "literal", text = "Good work. Keep watching the area." },
-                } } },
+                }, offers = FOLLOW_UP_OFFERS.combat } },
             },
         },
     },
@@ -201,7 +249,7 @@ Catalog.Register("semantic.companion.reaction", {
                 topic = "companion_relationship",
                 turns = { { segments = {
                     { kind = "literal", text = "Stay with me next time. We watch each other's backs." },
-                } } },
+                }, offers = FOLLOW_UP_OFFERS.abandonment } },
             },
         },
         {
@@ -252,7 +300,7 @@ Catalog.Register("semantic.conversation.safety", {
                 topic = "safety",
                 turns = { { segments = {
                     { kind = "literal", text = "Watch out. We need to move now." },
-                } } },
+                }, offers = FOLLOW_UP_OFFERS.safety } },
             },
         },
         {
@@ -300,7 +348,7 @@ Catalog.Register("semantic.corpse.reaction", {
                 topic = "corpse_reaction",
                 turns = { { segments = {
                     { kind = "literal", text = "Someone died here. We should remember that." },
-                } } },
+                }, offers = FOLLOW_UP_OFFERS.corpse } },
             },
         },
     },

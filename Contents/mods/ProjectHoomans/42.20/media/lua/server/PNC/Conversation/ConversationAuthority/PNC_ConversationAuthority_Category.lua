@@ -130,6 +130,7 @@ function Authority.HandleCategory(player, args)
         registryFingerprint = Registry.GetFingerprint(),
         selection = selection,
         interactionLifecycle = context.interactionLifecycle,
+        semanticEventFacts = context.semanticEventFacts,
     })
     return true, block.id
 end

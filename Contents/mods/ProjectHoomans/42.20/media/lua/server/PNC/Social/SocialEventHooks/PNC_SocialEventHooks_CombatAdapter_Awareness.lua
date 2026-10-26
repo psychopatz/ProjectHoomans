@@ -269,6 +269,71 @@ local function countBand(count)
     return "few"
 end
 
+local function locationFact(record)
+    local x = tonumber(record and record.x)
+    local y = tonumber(record and record.y)
+    local z = tonumber(record and record.z)
+    if x and y and z then
+        return { x = x, y = y, z = z }
+    end
+    return tostring(
+        record and (record.locationLabel or record.location)
+            or "nearby"
+    )
+end
+
+local function awarenessFacts(record, eventID, eventType, band, count, reason)
+    local fact = {
+        eventRef = eventID,
+        authoritative = true,
+        disclosure = "player",
+        location = locationFact(record),
+        countBand = band,
+        summary = eventType == ZOMBIE_HORDE_MEMORY
+            and "a zombie horde was detected"
+            or "the group retreated to recover stamina",
+        retreatReason = reason,
+    }
+    if count ~= nil then fact.countBand = countBand(count) end
+    return { [tostring(eventID)] = fact }
+end
+
+local function currentHordeCount(record)
+    local runtime = record and record.runtime or nil
+    local assessment = runtime and runtime.combatThreatAssessment or nil
+    return tonumber(assessment and assessment.hordeCount)
+        or tonumber(runtime and runtime.hordeCount)
+end
+
+-- Re-observe volatile event facts from the owning NPC/combat authority when a
+-- player opens a conversation after the event packet was delivered. No event
+-- transcript or second event registry is created; the stable lifecycle only
+-- supplies the event reference and the current record is authoritative.
+local function observeEventFacts(eventRef, npcID, record)
+    eventRef = tostring(eventRef or "")
+    if eventRef == "" then return nil end
+    local eventType
+    if string.find(eventRef, "social:zombie_horde_encounter:", 1, true) then
+        eventType = ZOMBIE_HORDE_MEMORY
+    elseif string.find(eventRef, "social:zombie_stamina_retreat:", 1, true) then
+        eventType = ZOMBIE_STAMINA_MEMORY
+    else
+        return nil
+    end
+    record = record or Registry and Registry.Get
+        and Registry.Get(npcID) or nil
+    if not record then return nil end
+    local count = currentHordeCount(record)
+    return awarenessFacts(
+        record,
+        eventRef,
+        eventType,
+        countBand(count),
+        count,
+        record.runtime and record.runtime.retreatReason
+    )
+end
+
 local function playerCanHearNPC(player, record, radiusSq)
     local px = coordinate(player, "getX")
     local py = coordinate(player, "getY")
@@ -364,12 +429,21 @@ local function emitZombieAwareness(
             memoryType = eventType,
             source = source,
             zombieCountBand = band,
+            factRefs = { eventID },
+            semanticEventFacts = awarenessFacts(
+                record, eventID, eventType, band, count, reason
+            ),
             retreatReason = reason,
             npcType = role,
             socialRole = speakerRole,
             relationshipState = state,
             relationshipTier = tier,
         }
+        if memoryID then context.factRefs[#context.factRefs + 1] = memoryID end
+        context.factRefs[#context.factRefs + 1] =
+            tostring(eventID) .. ":location"
+        context.factRefs[#context.factRefs + 1] =
+            tostring(eventID) .. ":quantity"
         local realization = SocialReactions
             and type(SocialReactions.Resolve) == "function"
             and SocialReactions.Resolve({
@@ -529,5 +603,6 @@ H.CombatCountBand = countBand
 H.CombatPlayerCanHearNPC = playerCanHearNPC
 H.CombatNewZombieAwarenessEventID = newZombieAwarenessEventID
 H.CombatEmitZombieAwareness = emitZombieAwareness
+H.ObserveSemanticEventFacts = observeEventFacts
 
 return Hooks

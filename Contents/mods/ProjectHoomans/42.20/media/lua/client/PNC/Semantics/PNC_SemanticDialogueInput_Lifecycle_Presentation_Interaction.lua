@@ -80,6 +80,9 @@ local function interactionContext(view, context)
         responsePlanID = beat.responsePlanID,
         flowID = beat.flowID,
         poolID = beat.poolID,
+        realizationID = beat.realizationID,
+        eventRef = beat.eventRef,
+        offerIDs = beat.offerIDs,
         factRefs = beat.factRefs,
     } or npcEnvelope and npcEnvelope.provenance or nil
     local campSiteCandidates = context.campSiteCandidates
@@ -99,6 +102,9 @@ local function interactionContext(view, context)
             or context.authoredTopic
             or context.conversationTopic,
         worldHour = context.worldHour or context.occurredAt,
+        eventRef = beat and beat.eventRef
+            or npcEnvelope and npcEnvelope.eventRef
+            or context.eventRef,
         provenance = provenance,
     }
 end

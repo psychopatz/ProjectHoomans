@@ -21,6 +21,23 @@ local relationshipCategory = Internal.RelationshipCategory
 local audienceMap = Internal.AudienceMap
 local worldAgeHours = Internal.WorldAgeHours
 
+local function eventFactsForLifecycle(record, lifecycle)
+    local beat = type(lifecycle) == "table"
+        and lifecycle.activeBeat or nil
+    local eventRef = beat and beat.eventRef or nil
+    if not eventRef then return nil end
+    local hooks = PNC.SocialEventHooksInternal
+    if not hooks or type(hooks.ObserveSemanticEventFacts) ~= "function" then
+        pcall(require,
+            "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness")
+        hooks = PNC.SocialEventHooksInternal
+    end
+    if hooks and type(hooks.ObserveSemanticEventFacts) == "function" then
+        return hooks.ObserveSemanticEventFacts(eventRef, record.id, record)
+    end
+    return nil
+end
+
 local function activeColony(factionID)
     if not PNC.Communities or not PNC.Communities.GetForFaction then
         return nil
@@ -112,6 +129,10 @@ function Authority.BuildContext(player, record, token)
         )
         context.interactionLifecycle = lifecycle
             and lifecycle.thread or nil
+        context.semanticEventFacts = eventFactsForLifecycle(
+            record,
+            context.interactionLifecycle
+        )
     end
     context.historyLookup = function(subjectID, scope)
         return History.Get(subjectID, { scope = scope }, context)

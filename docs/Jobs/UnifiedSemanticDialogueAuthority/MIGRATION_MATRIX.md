@@ -52,3 +52,20 @@ it does not mean the family has been migrated.
 
 P0 records these facts and adds characterization coverage. It does not delete
 or disable a selector.
+
+## P2 follow-up ownership update
+
+The reopened follow-up bridge is now accepted. The horde row's semantic
+selection remains owned by `SocialReactions` and
+`semantic.combat.reaction`; the selected plan's bounded offer IDs are recorded
+by `SemanticInteractionLifecycle.RecordNPCSpeech`, projected by
+`DialogueSuggestions`, and answered by the existing context-reference local
+response path. The same lifecycle contract is available to the medical,
+abandonment, leader-loss, safety and corpse families once their event adapters
+provide authoritative fact refs.
+
+P2 production-worker evidence is
+`tools/semantic_harness/tests/test_unified_authority_p2_event_followup.py` plus
+`tests/pnc_unified_authority_p2_event_followup_smoke.lua`. No family is marked
+fully retired by this bridge: legacy first-party selectors remain migration
+source material until the family-specific P3/P4/P6 parity gates pass.

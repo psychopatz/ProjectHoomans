@@ -134,10 +134,17 @@ function Lifecycle.Apply(store, rawEnvelope, options)
             id = beatID,
             topic = thread.topic,
             act = envelope.act,
+            eventRef = envelope.eventRef,
+            eventType = envelope.eventType,
             responsePlanID = envelope.provenance.responsePlanID,
             flowID = envelope.provenance.flowID,
             poolID = envelope.provenance.poolID,
+            realizationID = clean(
+                options.realizationID or envelope.provenance.realizationID,
+                128
+            ),
             factRefs = boundedList(envelope.factRefs, store.limits.factRefs),
+            offerIDs = boundedList(options.offerIDs, 8),
             expectedReplies = boundedList(options.expectedReplies, 6),
         }
     end
@@ -187,6 +194,7 @@ function Lifecycle.RecordNPCSpeech(store, spec)
     options.meaningful = spec.meaningful ~= false
     options.expectedReplies = spec.expectedReplies
     options.realizationID = spec.realizationID
+    options.offerIDs = spec.offerIDs
     options.worldHour = spec.worldHour
     options.preview = spec.preview
     return Lifecycle.Apply(store, envelope, options)

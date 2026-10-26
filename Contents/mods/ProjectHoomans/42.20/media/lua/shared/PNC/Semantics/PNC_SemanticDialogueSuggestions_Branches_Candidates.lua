@@ -13,6 +13,23 @@ local resolvedText = Internal.resolvedText
 local normalizeCandidate = Internal.normalizeCandidate
 local sourceRecord = Internal.sourceRecord
 
+local function responseCatalog()
+    local catalog = PNC.Semantics.ResponseCatalog
+    if type(catalog) == "table"
+        and type(catalog.OffersForSelection) == "function"
+    then
+        return catalog
+    end
+    local ok, loaded = pcall(require,
+        "PNC/Semantics/PNC_SemanticDialogueResponseCatalog")
+    if ok and type(loaded) == "table"
+        and type(loaded.OffersForSelection) == "function"
+    then
+        return loaded
+    end
+    return nil
+end
+
 local function addCandidate(output, seen, definition, kind, revision, reason)
     if not definition then return end
     local candidate = seen[definition.id]
@@ -136,6 +153,15 @@ local function branchOfferFrame(offer, revision, origin)
     frame.labelKey = offer.labelKey
     frame.requestRevision = revision
     frame.origin = copyValue(origin) or {}
+    if origin and origin.eventRef then
+        frame.eventRef = origin.eventRef
+    end
+    if frame.reference ~= nil then
+        frame.extensions = frame.extensions or {}
+        frame.extensions.dialogueFollowUp = "CONTEXT_REFERENCE"
+        frame.extensions.topic = frame.extensions.topic or "conversation"
+        frame.extensions.contextQuestion = frame.reference
+    end
     return frame
 end
 
@@ -231,16 +257,25 @@ local function offersFromPlan(plan)
     for turnIndex = 1, #plan.turns do
         local turn = plan.turns[turnIndex]
         for offerIndex = 1, #(turn.offers or {}) do
-            output[#output + 1] = {
-                offer = turn.offers[offerIndex],
-                origin = {
-                    kind = "response_plan",
-                    sourcePoolID = plan.sourcePoolID,
-                    turnID = turn.id,
-                    turnIndex = turnIndex,
-                    offerIndex = offerIndex,
-                },
-            }
+            local offer = turn.offers[offerIndex]
+            -- Event follow-ups are lifecycle-window projections. Keeping
+            -- them out of the transient response/message lanes prevents a
+            -- response payload from exposing them without event facts,
+            -- expiry, or disclosure checks.
+            if string.sub(tostring(offer and offer.id or ""), 1, 24)
+                ~= "semantic.followup.event."
+            then
+                output[#output + 1] = {
+                    offer = offer,
+                    origin = {
+                        kind = "response_plan",
+                        sourcePoolID = plan.sourcePoolID,
+                        turnID = turn.id,
+                        turnIndex = turnIndex,
+                        offerIndex = offerIndex,
+                    },
+                }
+            end
         end
     end
     return output
@@ -261,6 +296,49 @@ local function offersFromMessages(messages)
     return output
 end
 
+local function offersFromLifecycle(context)
+    local lifecycle = type(context) == "table"
+        and context.interactionLifecycle or nil
+    local beat = type(lifecycle) == "table" and lifecycle.activeBeat or nil
+    local eventRef = beat and tostring(beat.eventRef or "") or ""
+    local planID = beat and tostring(beat.responsePlanID or "") or ""
+    local realizationID = beat and tostring(beat.realizationID or "") or ""
+    local offerIDs = beat and beat.offerIDs or nil
+    if eventRef == "" or planID == "" or realizationID == ""
+        or type(offerIDs) ~= "table" or #offerIDs == 0
+        or type(beat.factRefs) ~= "table" or #beat.factRefs == 0
+    then
+        return {}
+    end
+
+    local wanted = {}
+    for index = 1, math.min(#offerIDs, 8) do
+        wanted[tostring(offerIDs[index] or "")] = true
+    end
+    local catalog = responseCatalog()
+    if not catalog then return {} end
+    local output = {}
+    for index, offer in ipairs(
+        catalog.OffersForSelection(planID, realizationID) or {}
+    ) do
+        if wanted[tostring(offer.id or "")] then
+            output[#output + 1] = {
+                offer = offer,
+                origin = {
+                    kind = "npc_event_response_plan",
+                    sourcePoolID = planID,
+                    realizationID = realizationID,
+                    eventRef = eventRef,
+                    turnID = beat.id,
+                    turnIndex = 1,
+                    offerIndex = index,
+                },
+            }
+        end
+    end
+    return output
+end
+
 Internal.addCandidate = addCandidate
 Internal.addProviderCandidate = addProviderCandidate
 Internal.addBranchOfferCandidate = addBranchOfferCandidate
@@ -268,6 +346,7 @@ Internal.branchOfferFrame = branchOfferFrame
 Internal.predicateContextFor = predicateContextFor
 Internal.offersFromPlan = offersFromPlan
 Internal.offersFromMessages = offersFromMessages
+Internal.offersFromLifecycle = offersFromLifecycle
 
 return Suggestions
 

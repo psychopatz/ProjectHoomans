@@ -64,7 +64,7 @@ function Reactions.Resolve(spec)
         topic = spec.topic or spec.eventType or "social_reaction",
         context = context,
         salt = spec.salt or spec.eventID or spec.npcID,
-        groundedFactRefs = spec.groundedFactRefs,
+        groundedFactRefs = spec.groundedFactRefs or context.factRefs,
     })
 end
 

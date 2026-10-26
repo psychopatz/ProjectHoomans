@@ -7,16 +7,81 @@ local Presentation = PNC.RelationshipPresentation
 local InteractionLifecycle = PNC.Semantics
     and PNC.Semantics.InteractionLifecycle or nil
 
+local function appendUniqueRef(output, seen, value)
+    if value == nil then return end
+    value = tostring(value)
+    if value == "" or seen[value] then return end
+    if #output >= 8 then return end
+    seen[value] = true
+    output[#output + 1] = value
+end
+
 local function interactionFactRefs(context, ambient)
     local refs = {}
+    local seen = {}
     local ambientContext = ambient and ambient.context or nil
-    local memoryID = context.memoryID or ambientContext
-        and ambientContext.memoryID
-    if memoryID then refs[#refs + 1] = memoryID end
-    local memoryType = context.memoryType or ambientContext
-        and ambientContext.memoryType
-    if memoryType then refs[#refs + 1] = memoryType end
+    local function append(value)
+        if type(value) == "table" then
+            for index = 1, math.min(#value, 8) do
+                appendUniqueRef(refs, seen, value[index])
+            end
+        else
+            appendUniqueRef(refs, seen, value)
+        end
+    end
+    append(context.factRefs)
+    append(ambient and ambient.factRefs)
+    append(ambientContext and ambientContext.factRefs)
+    append(context.memoryID or ambientContext and ambientContext.memoryID)
+    append(context.memoryType or ambientContext and ambientContext.memoryType)
     return refs
+end
+
+local function responseCatalog()
+    local catalog = PNC.Semantics and PNC.Semantics.ResponseCatalog
+    if type(catalog) == "table"
+        and type(catalog.OffersForSelection) == "function"
+    then
+        return catalog
+    end
+    local ok, loaded = pcall(
+        require, "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    )
+    if ok and type(loaded) == "table"
+        and type(loaded.OffersForSelection) == "function"
+    then
+        return loaded
+    end
+    return nil
+end
+
+local function semanticOfferIDs(context, ambient)
+    local output = {}
+    local seen = {}
+    local explicit = context.offerIDs
+        or ambient and ambient.offerIDs
+    if type(explicit) == "table" then
+        for index = 1, math.min(#explicit, 8) do
+            appendUniqueRef(output, seen, explicit[index])
+        end
+        return output
+    end
+    local responsePlanID = context.responsePlanID
+        or ambient and ambient.responsePlanID
+    local realizationID = context.realizationID
+        or ambient and ambient.realizationID
+    if not responsePlanID or not realizationID then return output end
+    local poolID = context.poolID
+        or ambient and ambient.poolID
+        or responsePlanID
+    local catalog = responseCatalog()
+    if not catalog then return output end
+    for _, offer in ipairs(
+        catalog.OffersForSelection(poolID, realizationID) or {}
+    ) do
+        appendUniqueRef(output, seen, offer and offer.id)
+    end
+    return output
 end
 
 local function ensureNPCSpeechInteraction(
@@ -64,6 +129,19 @@ local function ensureNPCSpeechInteraction(
     local eventType = context.eventType or reason or "social_reaction"
     local beatID = "beat:" .. tostring(eventType) .. ":"
         .. tostring(eventID)
+    local responsePlanID = context.responsePlanID
+        or ambient and ambient.responsePlanID
+        or "social.reaction." .. tostring(eventType)
+    local realizationID = context.realizationID
+        or ambient and ambient.realizationID
+    local poolID = context.poolID
+        or ambient and ambient.poolID
+        or realizationID and responsePlanID
+        or ambient and ambient.flavorID
+    local realizationFamily = context.realizationFamily
+        or ambient and ambient.realizationFamily
+    local factRefs = interactionFactRefs(context, ambient)
+    local offerIDs = semanticOfferIDs(context, ambient)
     local envelope = envelopeBuilder.NPCSpeech({
         npcID = npcID,
         targetID = playerKey,
@@ -71,13 +149,15 @@ local function ensureNPCSpeechInteraction(
         act = context.act or "REACT",
         topic = context.topic or eventType,
         beatID = context.beatID or beatID,
-        responsePlanID = context.responsePlanID
-            or "social.reaction." .. tostring(eventType),
+        responsePlanID = responsePlanID,
         eventType = eventType,
         eventRef = eventID,
         flowID = context.flowID or "social:" .. tostring(eventType),
-        poolID = ambient and ambient.flavorID,
-        factRefs = interactionFactRefs(context, ambient),
+        poolID = poolID,
+        realizationFamily = realizationFamily,
+        realizationID = realizationID,
+        offerIDs = offerIDs,
+        factRefs = factRefs,
         worldHour = context.worldAgeHours,
     })
     if not envelope then return nil end
@@ -88,20 +168,28 @@ local function ensureNPCSpeechInteraction(
         act = context.act or "REACT",
         topic = context.topic or eventType,
         beatID = context.beatID or beatID,
-        responsePlanID = context.responsePlanID
-            or "social.reaction." .. tostring(eventType),
+        responsePlanID = responsePlanID,
         eventType = eventType,
         eventRef = eventID,
         flowID = context.flowID or "social:" .. tostring(eventType),
-        poolID = ambient and ambient.flavorID,
-        factRefs = interactionFactRefs(context, ambient),
+        poolID = poolID,
+        realizationFamily = realizationFamily,
+        realizationID = realizationID,
+        offerIDs = offerIDs,
+        factRefs = factRefs,
         expectedReplies = context.expectedReplies,
         worldHour = context.worldAgeHours,
         meaningful = true,
     })
     if not recorded then return nil end
     context.interaction = envelope
-    if type(ambient) == "table" then ambient.interaction = envelope end
+    context.offerIDs = offerIDs
+    context.factRefs = factRefs
+    if type(ambient) == "table" then
+        ambient.interaction = envelope
+        ambient.offerIDs = offerIDs
+        ambient.factRefs = factRefs
+    end
     return envelope
 end
 
