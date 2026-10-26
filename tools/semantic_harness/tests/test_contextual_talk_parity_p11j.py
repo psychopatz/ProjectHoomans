@@ -12,6 +12,7 @@ import unittest
 
 from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.runtime.npc_profiles import apply_npc_profile
+from tools.semantic_harness.runtime.config import discover_newest_runtime
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
@@ -187,25 +188,38 @@ class ContextualTalkParityP11JTests(unittest.TestCase):
 
     def test_native_and_harness_enter_the_shared_talk_start_projection(self) -> None:
         project = Path(__file__).resolve().parents[3]
-        lifecycle = (
+        runtime = discover_newest_runtime(project / "Contents/mods/ProjectHoomans")
+        conversation_root = (
             project
-            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Lifecycle.lua"
+            / "Contents/mods/ProjectHoomans"
+            / runtime
+            / "media/lua/client/PNC/Conversation"
+        )
+        lifecycle = (
+            conversation_root
+            / "Definition/PNC_ConversationDefinition_Lifecycle.lua"
         ).read_text()
         builder = (
-            project
-            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Builder.lua"
+            conversation_root
+            / "Definition/PNC_ConversationDefinition_Builder.lua"
         ).read_text()
         parity = (
-            project
-            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkParity.lua"
+            conversation_root / "PNC_ConversationTalkParity.lua"
         ).read_text()
         targets = (
-            project
-            / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkParity_Targets.lua"
+            conversation_root / "PNC_ConversationTalkParity_Targets.lua"
+        ).read_text()
+        lifecycle_open = (
+            conversation_root
+            / "Definition/PNC_ConversationDefinition_Lifecycle_Open.lua"
         ).read_text()
 
-        self.assertIn("TalkStart.Project(entry, player", lifecycle)
-        self.assertIn("TalkStart.Project(entry, player", builder)
+        self.assertIn(
+            "PNC/Conversation/Definition/PNC_ConversationDefinition_Lifecycle_Open",
+            lifecycle,
+        )
+        self.assertIn("TalkStart.Project(entry, player", lifecycle_open)
+        self.assertIn("TalkStart.Project(entry,", builder)
         self.assertIn("TalkStart.Project(", parity + targets)
         self.assertNotIn("palette.ResolveType", parity)
         self.assertNotIn("audience.Resolve", parity)

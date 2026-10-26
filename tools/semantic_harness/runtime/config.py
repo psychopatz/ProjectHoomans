@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -13,6 +14,28 @@ from .protocol import DEFAULT_MAX_MESSAGE_BYTES
 
 class ConfigurationError(RuntimeError):
     """Raised when a required harness runtime cannot be discovered."""
+
+
+_RUNTIME_DIRECTORY = re.compile(r"^\d+\.\d+$")
+
+
+def discover_newest_runtime(mod_root: str | Path) -> str:
+    """Return the newest numeric Build runtime directory under ``mod_root``."""
+
+    root = Path(mod_root).expanduser().resolve()
+    if not root.is_dir():
+        raise ConfigurationError(f"runtime root does not exist: {root}")
+
+    versions = [
+        (tuple(int(part) for part in child.name.split(".")), child.name)
+        for child in root.iterdir()
+        if child.is_dir() and _RUNTIME_DIRECTORY.fullmatch(child.name)
+    ]
+    if not versions:
+        raise ConfigurationError(
+            f"no numeric runtime directory under {root}"
+        )
+    return max(versions)[1]
 
 
 def _looks_like_repository(path: Path) -> bool:
@@ -105,8 +128,8 @@ class HarnessConfig:
     core_repository: Path
     lua_bin: Path
     worker_script: Path
-    hoomans_runtime: str = "42.20"
-    core_runtime: str = "42.20"
+    hoomans_runtime: str | None = None
+    core_runtime: str | None = None
     startup_timeout: float = 8.0
     request_timeout: float = 5.0
     shutdown_timeout: float = 1.0
@@ -137,13 +160,19 @@ class HarnessConfig:
             raise ConfigurationError(f"Lua worker script does not exist: {worker}")
         if startup_timeout <= 0 or request_timeout <= 0 or shutdown_timeout <= 0:
             raise ConfigurationError("timeouts must be positive")
+        hoomans_runtime = os.environ.get("PZ_TEST_HOOMANS_RUNTIME") or (
+            discover_newest_runtime(repo / "Contents/mods/ProjectHoomans")
+        )
+        core_runtime = os.environ.get("PZ_TEST_CORE_RUNTIME") or (
+            discover_newest_runtime(core / "Contents/mods/PsychopatzCore")
+        )
         return cls(
             repository=repo,
             core_repository=core,
             lua_bin=lua,
             worker_script=worker,
-            hoomans_runtime=os.environ.get("PZ_TEST_HOOMANS_RUNTIME", "42.20"),
-            core_runtime=os.environ.get("PZ_TEST_CORE_RUNTIME", "42.20"),
+            hoomans_runtime=hoomans_runtime,
+            core_runtime=core_runtime,
             startup_timeout=float(startup_timeout),
             request_timeout=float(request_timeout),
             shutdown_timeout=float(shutdown_timeout),

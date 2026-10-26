@@ -6,14 +6,17 @@ import re
 import unittest
 from pathlib import Path
 
+from tools.semantic_harness.runtime.config import discover_newest_runtime
+
 
 REPOSITORY = Path(__file__).resolve().parents[3]
+RUNTIME = discover_newest_runtime(REPOSITORY / "Contents/mods/ProjectHoomans")
 SEMANTIC_INPUT_ROOT = (
     REPOSITORY
     / "Contents"
     / "mods"
     / "ProjectHoomans"
-    / "42.20"
+    / RUNTIME
     / "media"
     / "lua"
     / "client"
@@ -25,7 +28,7 @@ SERVER_HANDLER_ROOT = (
     / "Contents"
     / "mods"
     / "ProjectHoomans"
-    / "42.20"
+    / RUNTIME
     / "media"
     / "lua"
     / "server"

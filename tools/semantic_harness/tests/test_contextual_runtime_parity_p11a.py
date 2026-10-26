@@ -246,7 +246,10 @@ class RuntimeParityP11ATests(unittest.TestCase):
                     root2.update()
                     time.sleep(0.05)
                 self.assertEqual(app2.simulation_panes.sashpos(0), 700)
-                self.assertEqual(app2.workflow_pane_split.sashpos(0), 280)
+                # The responsive restore guard keeps the context dock usable
+                # on the 1080px acceptance-test floor; a saved 280px sash is
+                # restored at the effective 420px minimum.
+                self.assertEqual(app2.workflow_pane_split.sashpos(0), 420)
             finally:
                 app2.close()
                 del app2

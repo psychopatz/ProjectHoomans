@@ -6,8 +6,14 @@ local repository = arg[1] or os.getenv("PNC_HARNESS_REPOSITORY") or "."
 local coreRepository = arg[2]
     or os.getenv("PNC_HARNESS_CORE_REPOSITORY")
     or repository .. "/../psychopatzCore"
-local hoomansRuntime = os.getenv("PZ_TEST_HOOMANS_RUNTIME") or "42.20"
-local coreRuntime = os.getenv("PZ_TEST_CORE_RUNTIME") or "42.20"
+local hoomansRuntime = os.getenv("PZ_TEST_HOOMANS_RUNTIME")
+local coreRuntime = os.getenv("PZ_TEST_CORE_RUNTIME")
+if not hoomansRuntime or not coreRuntime then
+    error(
+        "semantic worker requires PZ_TEST_HOOMANS_RUNTIME and "
+            .. "PZ_TEST_CORE_RUNTIME from the host runtime resolver"
+    )
+end
 local dynamicTradingRepository = os.getenv(
     "PNC_HARNESS_DYNAMIC_TRADING_REPOSITORY"
 ) or repository .. "/../DynamicTrading"

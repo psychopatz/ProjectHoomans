@@ -12,12 +12,16 @@ from pathlib import Path
 import re
 import unittest
 
+from tools.semantic_harness.runtime.config import discover_newest_runtime
+
 
 REPOSITORY = Path(__file__).resolve().parents[3]
 WORKER = REPOSITORY / "tools/semantic_harness/lua/worker"
 LIVE_SEMANTICS = (
     REPOSITORY
-    / "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics"
+    / "Contents/mods/ProjectHoomans"
+    / discover_newest_runtime(REPOSITORY / "Contents/mods/ProjectHoomans")
+    / "media/lua/client/PNC/Semantics"
 )
 
 

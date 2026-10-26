@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import os
-import re
 import subprocess
 import sys
 import time
@@ -16,9 +15,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / "tests"
-VERSION = re.compile(r"^\d+\.\d+$")
 sys.path.insert(0, str(ROOT))
 
+from tools.semantic_harness.runtime.config import discover_newest_runtime
 from tools.semantic_harness.testing.suite import (
     BoundedLuaTestRunner,
     install_suite_shutdown_handler,
@@ -32,17 +31,6 @@ class Result:
     returncode: int
     output: str
     elapsed: float
-
-
-def newest_runtime(mod_root: Path) -> str:
-    versions = [
-        (tuple(int(part) for part in child.name.split(".")), child.name)
-        for child in mod_root.iterdir()
-        if child.is_dir() and VERSION.fullmatch(child.name)
-    ]
-    if not versions:
-        raise RuntimeError(f"no numeric runtime directory under {mod_root}")
-    return max(versions)[1]
 
 
 def core_repository() -> Path:
@@ -61,9 +49,9 @@ def test_environment(verbose: bool) -> dict[str, str]:
     environment = os.environ.copy()
     environment.update({
         "PZ_TEST_REPOSITORY": str(ROOT),
-        "PZ_TEST_HOOMANS_RUNTIME": newest_runtime(
+        "PZ_TEST_HOOMANS_RUNTIME": discover_newest_runtime(
             ROOT / "Contents/mods/ProjectHoomans"),
-        "PZ_TEST_CORE_RUNTIME": newest_runtime(
+        "PZ_TEST_CORE_RUNTIME": discover_newest_runtime(
             core / "Contents/mods/PsychopatzCore"),
         "PZ_TEST_CORE_REPOSITORY": str(core),
         "PZ_TEST_VERBOSE": "1" if verbose else "0",

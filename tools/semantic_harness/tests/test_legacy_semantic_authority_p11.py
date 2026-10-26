@@ -7,9 +7,16 @@ import json
 import subprocess
 import unittest
 
+from tools.semantic_harness.runtime.config import discover_newest_runtime
+
 
 PROJECT = Path(__file__).resolve().parents[3]
-LUA = PROJECT / "Contents/mods/ProjectHoomans/42.20/media/lua"
+LUA = (
+    PROJECT
+    / "Contents/mods/ProjectHoomans"
+    / discover_newest_runtime(PROJECT / "Contents/mods/ProjectHoomans")
+    / "media/lua"
+)
 
 
 class LegacySemanticAuthorityP11Tests(unittest.TestCase):

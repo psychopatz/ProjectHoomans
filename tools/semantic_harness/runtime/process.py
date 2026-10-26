@@ -91,10 +91,12 @@ class LuaProcess:
                 "PNC_HARNESS_CORE_REPOSITORY": str(self.config.core_repository),
                 "PZ_TEST_REPOSITORY": str(self.config.repository),
                 "PZ_TEST_CORE_REPOSITORY": str(self.config.core_repository),
-                "PZ_TEST_HOOMANS_RUNTIME": self.config.hoomans_runtime,
-                "PZ_TEST_CORE_RUNTIME": self.config.core_runtime,
             }
         )
+        if self.config.hoomans_runtime is not None:
+            environment["PZ_TEST_HOOMANS_RUNTIME"] = self.config.hoomans_runtime
+        if self.config.core_runtime is not None:
+            environment["PZ_TEST_CORE_RUNTIME"] = self.config.core_runtime
         try:
             self.process = subprocess.Popen(
                 [
