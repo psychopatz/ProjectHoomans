@@ -114,6 +114,10 @@ class SemanticObservatoryPane:
                 ttk.Button(controls, text="Run lifecycle + Goodbye probes",
                            command=self.coverage_lifecycle).pack(
                                side="left", padx=6)
+                ttk.Button(
+                    controls, text="Run EN/TL server-declared rejections",
+                    command=self.coverage_command_rejections,
+                ).pack(side="left", padx=6)
                 ttk.Button(controls, text="Explain greeting coverage",
                            command=self.coverage_selection).pack(
                                side="left", padx=6)
@@ -384,6 +388,23 @@ class SemanticObservatoryPane:
             return
         path = (self._repository / "tools/semantic_harness/fixtures"
                 / "observatory_lifecycle_en_tl.json")
+        cases = json.loads(path.read_text(encoding="utf-8"))["cases"]
+        self._submit(
+            lambda worker: run_quality_matrix(
+                cases,
+                worker_factory=lambda scenario: LuaSemanticWorker(
+                    scenario, config=worker.config,
+                ),
+            ),
+            self._on_coverage,
+        )
+
+    def coverage_command_rejections(self) -> None:
+        if self._repository is None:
+            self.status_var.set("Repository unavailable for rejection fixtures")
+            return
+        path = (self._repository / "tools/semantic_harness/fixtures"
+                / "observatory_permission_rejections_en_tl.json")
         cases = json.loads(path.read_text(encoding="utf-8"))["cases"]
         self._submit(
             lambda worker: run_quality_matrix(

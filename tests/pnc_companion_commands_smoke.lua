@@ -511,6 +511,12 @@ T.equal(records.owned.orderSpec.x, roomHint.x, "camp room anchor x")
 T.equal(records.owned.orderSpec.y, roomHint.y, "camp room anchor y")
 T.equal(records.owned.orderSpec.radius, 3, "camp order radius")
 
+-- Server-owned negative permission controls: rejected requests must not
+-- replace orders or broadcast a dirty authoritative state.
+local neutralOrderBeforeDenied = records.neutral.orderSpec
+local otherOwnerOrderBeforeDenied = records.other_owner.orderSpec
+local markedBeforeDenied = #marked
+local broadcastsBeforeDenied = #broadcasts
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "neutral",
     commandID = "follow",
@@ -524,6 +530,26 @@ affected, reason = PNC.CompanionCommands.Execute(player, {
 })
 T.equal(affected, 0, "other player's companion rejected")
 T.equal(reason, "not_owner", "ownership rejection reason")
+
+for _, rejected in ipairs({
+    { id = "neutral", reason = "not_companion" },
+    { id = "other_owner", reason = "not_owner" },
+}) do
+    affected, reason = PNC.CompanionCommands.Execute(player, {
+        id = rejected.id,
+        commandID = "stay",
+    })
+    T.equal(affected, 0, "unauthorized stay rejected by production server")
+    T.equal(reason, rejected.reason, "unauthorized stay reason is preserved")
+end
+T.equal(records.neutral.orderSpec, neutralOrderBeforeDenied,
+    "server rejection does not replace neutral NPC order")
+T.equal(records.other_owner.orderSpec, otherOwnerOrderBeforeDenied,
+    "server rejection does not replace other owner's order")
+T.equal(#marked, markedBeforeDenied,
+    "server rejection produces no authoritative dirty writes")
+T.equal(#broadcasts, broadcastsBeforeDenied,
+    "server rejection produces no record broadcasts")
 
 affected, reason = PNC.CompanionCommands.Execute(player, {
     commandID = "attack_ranged",

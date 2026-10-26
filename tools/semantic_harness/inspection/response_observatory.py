@@ -59,8 +59,45 @@ def run_quality_matrix(
         expected = case.get("expected") or {}
         if not isinstance(expected, dict):
             raise ValueError("matrix expected must be an object")
+        allowed_expectations = {
+            "lastKey", "firstKey", "lastKeyPrefix", "minActions",
+            "maxActions", "accepted", "conversationClosed",
+            "maxFallbackLookups", "minFallbackLookups",
+            "textContains", "textNotContains",
+            "minTransportCount", "maxTransportCount",
+            "commandAccepted", "executionStatus", "rejectionReason",
+        }
+        if set(expected) - allowed_expectations:
+            raise ValueError("unsupported matrix expectation: "
+                             + ", ".join(sorted(set(expected) - allowed_expectations)))
+        for limit_name in (
+            "minActions", "maxActions", "minTransportCount",
+            "maxTransportCount", "minFallbackLookups", "maxFallbackLookups",
+        ):
+            if limit_name in expected and (
+                type(expected[limit_name]) is not int
+                or expected[limit_name] < 0 or expected[limit_name] > 64
+            ):
+                raise ValueError("invalid bounded matrix count: " + limit_name)
+        for flag_name in ("accepted", "conversationClosed", "commandAccepted"):
+            if flag_name in expected and type(expected[flag_name]) is not bool:
+                raise ValueError("invalid boolean matrix expectation: " + flag_name)
+        for text_name in (
+            "lastKey", "firstKey", "lastKeyPrefix", "textContains",
+            "textNotContains", "executionStatus", "rejectionReason",
+        ):
+            if text_name in expected and (
+                not isinstance(expected[text_name], str)
+                or not 1 <= len(expected[text_name]) <= 200
+            ):
+                raise ValueError("invalid string matrix expectation: " + text_name)
+
         scenario = merge(DEFAULT_SCENARIO, overrides)
         scenario.setdefault("runtime", {})["language"] = language
+        configured_reply = bool(
+            ((overrides.get("runtime") or {}).get("commandResponses") or {})
+            if isinstance(overrides.get("runtime"), dict) else False
+        )
         with worker_factory(scenario) as worker:
             last = {}
             if interaction:
@@ -91,6 +128,11 @@ def run_quality_matrix(
         texts = [str(message.get("text") or "") for message in messages]
         effects = inspector.get("effects", {}).get("sideEffects", {})
         actions = effects.get("actionCount", 0)
+        transport_count = effects.get("transportCount", 0)
+        execution = inspector.get("execution") or {}
+        command_accepted = execution.get("accepted")
+        command_status = execution.get("status")
+        rejection_reason = execution.get("rejectionReason")
         lookups = (last.get("translation") or {}).get("lookups") or []
         fallback_lookups = sum(
             1 for item in lookups if isinstance(item, dict)
@@ -108,6 +150,17 @@ def run_quality_matrix(
             checks["minActions"] = actions >= int(expected["minActions"])
         if "accepted" in expected:
             checks["accepted"] = last.get("accepted") is expected["accepted"]
+        if "minTransportCount" in expected:
+            checks["minTransportCount"] = transport_count >= expected["minTransportCount"]
+        if "maxTransportCount" in expected:
+            checks["maxTransportCount"] = transport_count <= expected["maxTransportCount"]
+        if "commandAccepted" in expected:
+            checks["commandAccepted"] = command_accepted is expected["commandAccepted"]
+        if "executionStatus" in expected:
+            checks["executionStatus"] = command_status == expected["executionStatus"]
+        if "rejectionReason" in expected:
+            checks["rejectionReason"] = rejection_reason == expected["rejectionReason"]
+
         if "conversationClosed" in expected:
             checks["conversationClosed"] = (
                 lifecycle.get("closed") is expected["conversationClosed"]
@@ -143,8 +196,20 @@ def run_quality_matrix(
             "interaction": interaction,
             "conversationClosed": lifecycle.get("closed"),
             "responseKeys": keys[-4:], "responseTexts": texts[-4:],
+            # actionCount is *attempted request dispatch*, not verified game
+            # execution. A server-declared rejection can still have one request
+            # and one legitimate client->server transport in this fixture.
             "actions": actions,
-            "transportCount": effects.get("transportCount", 0),
+            "actionCountKind": "attempted_dispatch",
+            "transportCount": transport_count,
+            "commandAccepted": command_accepted,
+            "executionStatus": command_status,
+            "rejectionReason": rejection_reason,
+            "commandDecisionKind": (
+                "CONFIGURED_FIXTURE_NETWORK_REPLY" if configured_reply
+                else "UNVERIFIED_GAME_SERVER"
+            ),
+            "nativeServerAuthorityVerified": False,
             "translationFallbackLookups": fallback_lookups,
             "accepted": last.get("accepted"),
             "checks": checks,

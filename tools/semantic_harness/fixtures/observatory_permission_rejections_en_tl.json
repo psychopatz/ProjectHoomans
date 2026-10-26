@@ -1,0 +1,56 @@
+{
+  "cases": [
+    {
+      "label": "Follow server-declared rejection EN",
+      "language": "EN",
+      "utterance": "follow me",
+      "scenario": {"runtime": {"commandResponses": {"follow": {"accepted": false, "reason": "permission_denied"}}}},
+      "expected": {
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedFollowRejected",
+        "commandAccepted": false, "executionStatus": "rejected",
+        "rejectionReason": "permission_denied", "minActions": 1,
+        "minTransportCount": 1, "maxTransportCount": 1
+      }
+    },
+    {
+      "label": "Follow server-declared rejection TL",
+      "language": "TL",
+      "utterance": "follow me",
+      "scenario": {"runtime": {"commandResponses": {"follow": {"accepted": false, "reason": "permission_denied"}}}},
+      "expected": {
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedFollowRejected",
+        "textContains": "Hindi kita masusundan ngayon.",
+        "commandAccepted": false, "executionStatus": "rejected",
+        "rejectionReason": "permission_denied", "minActions": 1,
+        "minTransportCount": 1, "maxTransportCount": 1,
+        "maxFallbackLookups": 0
+      }
+    },
+    {
+      "label": "Stay server-declared rejection EN",
+      "language": "EN",
+      "utterance": "wait here",
+      "scenario": {"runtime": {"commandResponses": {"stay": {"accepted": false, "reason": "permission_denied"}}}},
+      "expected": {
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayRejected",
+        "commandAccepted": false, "executionStatus": "rejected",
+        "rejectionReason": "permission_denied", "minActions": 1,
+        "minTransportCount": 1, "maxTransportCount": 1
+      }
+    },
+    {
+      "label": "Stay server-declared rejection TL",
+      "language": "TL",
+      "utterance": "wait here",
+      "scenario": {"runtime": {"commandResponses": {"stay": {"accepted": false, "reason": "permission_denied"}}}},
+      "expected": {
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayRejected",
+        "textContains": "Hindi ako makapananatili rito ngayon.",
+        "commandAccepted": false, "executionStatus": "rejected",
+        "rejectionReason": "permission_denied", "minActions": 1,
+        "minTransportCount": 1, "maxTransportCount": 1,
+        "maxFallbackLookups": 0
+      }
+    }
+  ]
+}

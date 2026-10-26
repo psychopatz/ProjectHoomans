@@ -3,6 +3,7 @@ local T = require "tests/support/test"
 T.addPackagePaths({
     { "ProjectHoomans", "client" },
     { "ProjectHoomans", "shared" },
+    { "ProjectHoomans", "common_lua" },
     { "PsychopatzCore", "common" },
     { "PsychopatzCore", "common_client" },
 })
@@ -49,6 +50,9 @@ local EventBus = require "PsychopatzCore/Events/PC_EventBus"
 local Message = require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
 local Client = require "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient"
 local NameplateSpeech = require "PNC/UI/Nameplates/PNC_NameplateSpeech"
+-- Native shared composition loads the production response registry before
+-- client presentation; the standalone fixture must honor that contract.
+require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
 local Presentation = require "PNC/Conversation/PNC_SocialFlavorPresentation"
 local Flavor = require "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
 

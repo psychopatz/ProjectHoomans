@@ -77,6 +77,41 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertEqual(result["failed"], 1)
 
+    def test_command_rejections_are_server_declared_not_accepted_effects(self):
+        root = Path(__file__).resolve().parents[3]
+        path = (root / "tools/semantic_harness/fixtures"
+                / "observatory_permission_rejections_en_tl.json")
+        matrix = run_quality_matrix(json.loads(path.read_text())["cases"])
+        self.assertTrue(matrix["ok"], matrix)
+        self.assertEqual(matrix["passed"], 4)
+        self.assertEqual(matrix["failed"], 0)
+        for case in matrix["cases"]:
+            self.assertEqual(case["executionStatus"], "rejected")
+            self.assertIs(case["commandAccepted"], False)
+            self.assertEqual(case["rejectionReason"], "permission_denied")
+            self.assertEqual(case["actions"], 1)
+            self.assertEqual(case["actionCountKind"], "attempted_dispatch")
+            self.assertEqual(case["transportCount"], 1)
+            self.assertEqual(case["commandDecisionKind"],
+                             "CONFIGURED_FIXTURE_NETWORK_REPLY")
+            self.assertFalse(case["nativeServerAuthorityVerified"])
+            self.assertTrue(all(case["checks"].values()), case)
+
+    def test_matrix_rejects_unknown_unsupported_or_unbounded_assertions(self):
+        with self.assertRaisesRegex(ValueError, "unsupported matrix expectation"):
+            run_quality_matrix([
+                {"utterance": "hello", "expected": {
+                    "maxActions": 0, "unexpectedAlwaysTrue": True}}
+            ])
+        with self.assertRaisesRegex(ValueError, "invalid bounded matrix count"):
+            run_quality_matrix([
+                {"utterance": "hello", "expected": {"maxActions": -2}}
+            ])
+        with self.assertRaisesRegex(ValueError, "invalid boolean matrix expectation"):
+            run_quality_matrix([
+                {"utterance": "hello", "expected": {"commandAccepted": "false"}}
+            ])
+
     def test_safe_proposal_preflight_never_changes_loaded_pool(self):
         from tools.semantic_harness.runtime.worker import LuaSemanticWorker
         from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
@@ -390,6 +425,11 @@ class ObservatoryTkTests(unittest.TestCase):
                     self.assertIn("6 fixture cases", coverage)
                     self.assertIn("Goodbye root choice TL", coverage)
                     self.assertIn("FAIL=0", coverage)
+                    pane.coverage_command_rejections()
+                    negative = pane.views["Coverage"].get("1.0", "end")
+                    self.assertIn("4 fixture cases", negative)
+                    self.assertIn("server-declared rejection TL", negative)
+                    self.assertIn("FAIL=0", negative)
                     pane.coverage_selection()
                     selection_view = pane.views["Coverage"].get("1.0", "end")
                     self.assertIn("Production Lua selector coverage", selection_view)

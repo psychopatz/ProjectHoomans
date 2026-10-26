@@ -247,3 +247,28 @@ It returns `sourceSHA256`, `translationSourceSHA256` for EN/TL and a
 exploration but must **not** be interpreted as approval for production edits.
 The workflow still reports `approved=false`, produces zero production writes,
 and requires explicit wording approval and fresh post-approval verification.
+
+## EN/TL command rejection outcome checks
+
+Run the existing --response-quality-matrix CLI with
+tools/semantic_harness/fixtures/observatory_permission_rejections_en_tl.json.
+
+This 4-case real-Lua fixture explicitly configures mock network replies for
+rejected Follow and Stay requests. It asserts final EN/TL rejection keys, TL
+text, commandAccepted=false, executionStatus=rejected, the rejection reason,
+and exactly one attempted dispatch/transport. The report labels such replies
+CONFIGURED_FIXTURE_NETWORK_REPLY and nativeServerAuthorityVerified=false.
+actions counts attempted requests, not successful gameplay effects. This is
+not a native or server-side authority/security proof. Unknown expectation
+keys now fail instead of silently passing unchecked assertions.
+
+## Packaged Project Zomboid Kahlua syntax verification
+
+Run:
+  tools/semantic_harness/.venv/bin/python tools/semantic_harness/kahlua_verifier/verify.py --game-root /path/to/installed/ProjectZomboid/projectzomboid
+
+This invokes the installed game's Kahlua LuaCompiler, not a duplicate compiler.
+Temporary Java reflection and generated classes stay outside watched media.
+The verifier does not launch PZ, execute Lua, or touch saves. It reports
+compiler success/failure as machine-readable JSON. The opt-in integration
+test uses the PZ_KAHLUA_GAME_ROOT environment variable.
