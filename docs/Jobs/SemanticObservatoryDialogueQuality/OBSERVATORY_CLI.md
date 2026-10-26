@@ -236,3 +236,14 @@ tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jso
 ```
 
 This reuses CodeBuilder's dataset catalog, validated compiler and read-only preview; it compares ID, template, fallback, conditions and priority to the loaded Lua variant. Dialogue sources also require unchanged generated-artifact diffs. Ownership is per variant; mixed pools must not inherit a guessed single owner. Semantic-definition preview does not expose artifact diffs, so that detail is reported as not available. Unmatched or ambiguous variants remain UNKNOWN. Studio's Catalog tab exposes the same lineage review.
+
+## Optional source SHA pin for isolated candidate previews
+
+A proposal submitted to `--preview-response-proposal` may supply
+`expectedSourceSHA256` alongside the existing pool fingerprint. The preview
+rejects malformed hashes and stale exact authored-source bytes before staging.
+It returns `sourceSHA256`, `translationSourceSHA256` for EN/TL and a
+`sourceSHA256GuardMatched` result. An omitted source SHA is allowed for
+exploration but must **not** be interpreted as approval for production edits.
+The workflow still reports `approved=false`, produces zero production writes,
+and requires explicit wording approval and fresh post-approval verification.

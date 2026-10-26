@@ -180,13 +180,20 @@ def preview_authored_variant(
             raise ValueError("unsupported authored module overlay")
 
         original_bytes = source.read_bytes()
+        original_hash = _sha256(original_bytes)
+        expected_source_hash = proposal.get("expectedSourceSHA256")
+        if expected_source_hash is not None:
+            if (not isinstance(expected_source_hash, str)
+                    or not re.fullmatch(r"[a-f0-9]{64}", expected_source_hash)):
+                raise ValueError("invalid_expected_source_sha256")
+            if expected_source_hash != original_hash:
+                raise ValueError("stale_source_sha256")
         original = original_bytes.decode("utf-8")
         updated, source_diff = _authored_variant_patch(
             original, variant_id, variant["fallback"], entries[0]["EN"],
         )
         evidence = source_evidence(worker)
 
-    original_hash = _sha256(original_bytes)
     original_translation_hashes: dict[str, tuple[Path, str]] = {}
     cases: list[tuple[str, dict[str, Any], dict[str, Any], str]] = []
     for language in ("EN", "TL"):
@@ -309,7 +316,14 @@ def preview_authored_variant(
         "baselineFingerprint": details["contentFingerprint"],
         "candidateFingerprint": selected_fingerprint,
         "sourcePath": origin, "canonicalOwnerVerified": True,
-        "sourceSHA256": original_hash, "sourceDiff": source_diff,
+        "sourceSHA256": original_hash,
+        "sourceSHA256GuardMatched": expected_source_hash == original_hash
+            if expected_source_hash is not None else None,
+        "translationSourceSHA256": {
+            language: path_and_hash[1]
+            for language, path_and_hash in original_translation_hashes.items()
+        },
+        "sourceDiff": source_diff,
         "translationDiff": translation_diff,
         "languageCases": result_cases, "checks": {
             "sameSelectedKey": True, "unchangedGameplayEffects": True,

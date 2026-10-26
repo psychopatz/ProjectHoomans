@@ -140,6 +140,18 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                             for case in report["languageCases"]))
         self.assertEqual(report["sourcePath"], original["sourcePath"])
         self.assertTrue(report["checks"]["unchangedGameplayEffects"])
+        self.assertEqual(set(report["translationSourceSHA256"]), {"EN", "TL"})
+        self.assertTrue(all(len(value) == 64 for value
+                            in report["translationSourceSHA256"].values()))
+        self.assertIsNone(report["sourceSHA256GuardMatched"])
+        proposal["expectedSourceSHA256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "stale_source_sha256"):
+            preview_authored_variant(proposal, repository=repository)
+        proposal["expectedSourceSHA256"] = report["sourceSHA256"]
+        pinned = preview_authored_variant(proposal, repository=repository)
+        self.assertTrue(pinned["sourceSHA256GuardMatched"])
+        self.assertEqual(pinned["writesToProduction"], 0)
+        proposal.pop("expectedSourceSHA256")
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             after = worker.response_pool_detail(original["poolID"], limit=16)
         self.assertEqual(original["contentFingerprint"],
