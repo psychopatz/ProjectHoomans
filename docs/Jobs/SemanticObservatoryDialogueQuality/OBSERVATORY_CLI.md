@@ -228,3 +228,11 @@ condition fields with real registry fingerprint/revision. An unselected
 variant is **not** declared globally unreachable; all verdicts refer only to
 the supplied contexts. Queries do not execute actions or consume selection
 history. The same four greeting contexts are runnable from Studio Coverage.
+
+## Verified canonical CodeBuilder lineage (per loaded variant)
+
+```bash
+tools/semantic_harness/.venv/bin/python -m tools.semantic_harness --no-gui --jsonl --response-codebuilder-lineage semantic.accept
+```
+
+This reuses CodeBuilder's dataset catalog, validated compiler and read-only preview; it compares ID, template, fallback, conditions and priority to the loaded Lua variant. Dialogue sources also require unchanged generated-artifact diffs. Ownership is per variant; mixed pools must not inherit a guessed single owner. Semantic-definition preview does not expose artifact diffs, so that detail is reported as not available. Unmatched or ambiguous variants remain UNKNOWN. Studio's Catalog tab exposes the same lineage review.

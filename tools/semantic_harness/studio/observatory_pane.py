@@ -8,6 +8,7 @@ import json
 from ..inspection.response_candidate import preview_authored_variant
 from ..inspection.response_turn_trace import inspect_response_turn
 from ..inspection.response_selection_coverage import selection_coverage
+from ..inspection.response_source_lineage import inspect_codebuilder_lineage
 
 from ..inspection.response_observatory import run_quality_matrix
 from ..runtime.worker import LuaSemanticWorker
@@ -91,6 +92,8 @@ class SemanticObservatoryPane:
                 ttk.Label(controls, text="Actual registered variant data").pack(side="left")
                 ttk.Button(controls, text="Explain selection",
                            command=self.explain).pack(side="right")
+                ttk.Button(controls, text="Verify CodeBuilder owner",
+                           command=self.verify_source_lineage).pack(side="right", padx=4)
                 self.context_box = ttk.Combobox(
                     controls, textvariable=self.context_var, state="readonly",
                     values=(
@@ -391,6 +394,38 @@ class SemanticObservatoryPane:
             ),
             self._on_coverage,
         )
+
+    def verify_source_lineage(self) -> None:
+        if not self.selected_pool:
+            self.status_var.set("Select a registered pool first")
+            return
+        selected = self.selected_pool
+        self._submit(
+            lambda worker: inspect_codebuilder_lineage(worker, selected),
+            self._on_codebuilder_lineage,
+        )
+
+    def _on_codebuilder_lineage(self, report: dict[str, Any]) -> None:
+        lines = [
+            f"Verified CodeBuilder variant sources: {report['poolID']}",
+            f"Canonical matches: {report.get('verifiedVariantCount', 0)}/"
+            f"{report.get('variantCount', '?')}",
+            "Only per-variant compiler+loaded-Lua matches are authoritative.",
+            "Not verified does not prove missing or broken sources.",
+            "No source files are written; explicit approval still required.",
+            "",
+        ]
+        for owner in report.get("sourceOwners", []):
+            source = owner.get("canonicalSource") or {}
+            lines.extend((
+                f"{owner['variantID']}: {owner['reason']}",
+                f"  Source: {source.get('sourcePath', 'UNKNOWN')}",
+                f"  Generator parity: "
+                f"{source.get('generatedArtifactParity', 'UNKNOWN')}",
+                "",
+            ))
+        self._display("Review", "\n".join(lines))
+        self.tabs.select(3)
 
     def coverage_selection(self) -> None:
         if self._repository is None:
