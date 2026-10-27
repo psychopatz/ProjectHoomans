@@ -26,12 +26,12 @@ REPOSITORY = Path(__file__).resolve().parents[3]
 class ConversationCompilerP11B0Tests(unittest.TestCase):
     def test_manifest_merge_and_fingerprints_are_bounded(self) -> None:
         model = compile_conversation_sources(REPOSITORY)
-        self.assertEqual(len(model["content"]["phraseFamilies"]), 216)
+        self.assertEqual(len(model["content"]["phraseFamilies"]), 226)
         self.assertEqual(len(model["dialogue"]["patterns"]), 54)
         self.assertEqual(len(model["dialogue"]["responsePools"]), 26)
         self.assertEqual(len(model["semantic"]["flows"]), 2)
         self.assertEqual(len(model["ui"]), 10)
-        self.assertEqual(len(model["shards"]), 12)
+        self.assertEqual(len(model["shards"]), 13)
         self.assertEqual(len(model["wholeModelFingerprint"]), 64)
         modules, reports = render_conversation_runtime_plan(model)
         self.assertEqual(len(modules), len(reports))

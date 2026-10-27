@@ -22,7 +22,8 @@
       "EN/Conversation/Patterns.json",
       "EN/Conversation/Social.json",
       "EN/Conversation/Task.json",
-      "EN/Conversation/UI.json"
+      "EN/Conversation/UI.json",
+      "EN/Conversation/Wellbeing.json"
     ],
     "TL": [
       "TL/Conversation/Semantic/Addressing.json",
@@ -45,7 +46,8 @@
       "TL/Conversation/Patterns.json",
       "TL/Conversation/Social.json",
       "TL/Conversation/Task.json",
-      "TL/Conversation/UI.json"
+      "TL/Conversation/UI.json",
+      "TL/Conversation/Wellbeing.json"
     ]
   }
 }

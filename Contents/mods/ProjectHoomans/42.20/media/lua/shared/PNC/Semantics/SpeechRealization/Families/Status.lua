@@ -3,6 +3,14 @@
 local Builders = require
     "PNC/Semantics/PNC_SpeechRealization_FamilyBuilders"
 local phraseFamily = Builders.phraseFamily
+local canonicalContentStyleFamily = {
+    -- Wording is owned by generated Conversation Content. Keep only the
+    -- registry membership shell used by the existing style resolver.
+    neutral = {},
+    warm = {},
+    terse = {},
+    guarded = {},
+}
 
 return {
     ["semantic.flow.greeting.opening.default"] = {
@@ -77,15 +85,8 @@ return {
             fallback = "How are things?",
         },
     },
-    ["semantic.question.wellbeing.default"] = phraseFamily(
-        "Wellbeing", "I'm okay. How about you?", "I'm doing okay. Thanks for asking.",
-        "I'm okay.", "I'm managing. Don't press me."
-    ),
-    ["semantic.question.wellbeing.injured"] = phraseFamily(
-        "WellbeingInjured", "A little banged up, but I'll manage.",
-        "I took a hit, but I'm steady enough to keep going.",
-        "I'm hurt. I can manage.", "I'm hurt. That's all I can say."
-    ),
+    ["semantic.question.wellbeing.default"] = canonicalContentStyleFamily,
+    ["semantic.question.wellbeing.injured"] = canonicalContentStyleFamily,
     ["semantic.question.wellbeing.dataset.getting_by"] = phraseFamily(
         "WellbeingGettingBy", "I'm getting by, one day at a time. How about you?",
         "I'm getting by. Thanks for asking.", "Getting by.",

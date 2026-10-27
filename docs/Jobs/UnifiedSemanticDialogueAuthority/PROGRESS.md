@@ -578,14 +578,43 @@ Acceptance evidence:
   suite, and no native Project Zomboid session, source save, Workshop
   publication or remote branch was touched.
 
-## Immediate Next Chunk — P11B wording migration by domain shard
+## Accepted P11B — Wellbeing wording domain slice
 
-P11B0 acceptance is complete. Resume the parked wording work only by cohesive
-Conversation domain shard (for example Wellbeing, Needs, Health, Social
-Apology, or Task Fetch), never one translation key at a time. Use the
-manifest/compiler, generated domain bundles, aggregate snapshot and
-ID-addressed authoring service established above; preserve semantic identity,
-runtime parity, EN/TL parity, bounded output, and stale-fingerprint guards.
+The first post-P11B0 wording slice is accepted. The manifest-backed
+`content/wellbeing.json` shard now owns ten fixed, no-argument
+`semantic.question.wellbeing.*` families: default, injured, panic, stress,
+thirst, thirst alternate, hunger, hunger alternate, fatigue, and fatigue
+alternate. Default and injured preserve all four EN/TL style phrases; the
+other eight preserve their neutral-only route behavior. Existing wellbeing
+selection, health/need precedence, grounded/follow-up ownership, effects,
+transport, and tool-call behavior remain outside the wording change.
+
+The old static map entries, `Responses.json` records, and default/injured
+`Realizations.json`/`Status.lua` wording are retired for the migrated IDs.
+`Status.lua` retains only the empty registry-membership shell for the two
+style-capable families. The canonical shard emits the bounded Wellbeing Lua
+and EN/TL translation artifacts with generated Content keys. The
+`semantic.question.wellbeing.unknown` route remains on its legacy map because
+the same ID is already a response-pool owner; the compiler's global uniqueness
+guard rejects a duplicate until that response-pool boundary is migrated as a
+coherent slice.
+
+Evidence: focused Wellbeing/compiler/authoring/translation/regression set
+`77/77 PASS`; native Lua `897/897 PASS`; two consecutive CodeBuilder runs
+matched across `120` source/generated/translation artifacts; Project Hoomans
+Kahlua scan `3,388` files with `0` errors/warnings; installed Project Zomboid
+Kahlua compiler `123` files passed with `0` source writes and no game launch;
+`git diff --check` passes.
+
+## Immediate Next Chunk — P11B Needs wording domain shard
+
+Characterize and migrate the cohesive Needs wording domain next, preserving
+the distinction between `semantic.question.needs.*` response wording and
+dynamic need eligibility/effects. Use the manifest/compiler, generated domain
+bundles, aggregate snapshot and ID-addressed authoring service; do not edit
+generated artifacts as sources, introduce aliases, or migrate one key at a
+time. Keep the Wellbeing unknown response-pool collision and grounded/follow-up
+routes deferred until their owning boundaries are characterized.
 
 Do not begin P11C, P11D or P11E taxonomy cleanup until the selected P11B domain
 slice has its own characterization and acceptance evidence. Do not create P12

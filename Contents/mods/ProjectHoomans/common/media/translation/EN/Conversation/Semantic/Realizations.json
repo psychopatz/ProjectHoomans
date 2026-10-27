@@ -1,12 +1,4 @@
 {
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingNeutral": "I'm okay. How about you?",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingWarm": "I'm doing okay. Thanks for asking.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingTerse": "I'm okay.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingGuarded": "I'm managing. Don't press me.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingInjuredNeutral": "A little banged up, but I'll manage.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingInjuredWarm": "I took a hit, but I'm steady enough to keep going.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingInjuredTerse": "I'm hurt. I can manage.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingInjuredGuarded": "I'm hurt. That's all I can say.",
   "UI_PNC_Conversation_Semantic_RealizationWellbeingGettingByNeutral": "I'm getting by, one day at a time. How about you?",
   "UI_PNC_Conversation_Semantic_RealizationWellbeingGettingByWarm": "I'm getting by. Thanks for asking.",
   "UI_PNC_Conversation_Semantic_RealizationWellbeingGettingByTerse": "Getting by.",

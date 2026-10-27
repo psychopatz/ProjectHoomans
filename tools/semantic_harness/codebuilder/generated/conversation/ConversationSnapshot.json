@@ -1,6 +1,6 @@
 {
   "content": {
-    "contentFingerprint": "3dfca8565f760afca572093264267faae16b9e616b73ad896ded33c1f1f033ad",
+    "contentFingerprint": "dcd1969a3704a02c5a7172f5ddcc75bac9d72db27525057aaed59d73d33e2639",
     "phraseFamilies": [
       {
         "canonicalConcept": "SEMANTIC_COMBAT_REACTION_DEFAULT",
@@ -3140,6 +3140,228 @@
         }
       },
       {
+        "canonicalConcept": "SEMANTIC_QUESTION_WELLBEING_DEFAULT",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "wellbeing",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.wellbeing.default",
+        "semanticTemplateID": "semantic.question.wellbeing.default",
+        "sourceShard": "content/wellbeing.json",
+        "styles": {
+          "guarded": [
+            {
+              "fallback": "I'm managing. Don't press me.",
+              "id": "phrase.semantic.question.wellbeing.default.guarded.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultGuarded01"
+            }
+          ],
+          "neutral": [
+            {
+              "fallback": "I'm okay. How about you?",
+              "id": "phrase.semantic.question.wellbeing.default.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultNeutral01"
+            }
+          ],
+          "terse": [
+            {
+              "fallback": "I'm okay.",
+              "id": "phrase.semantic.question.wellbeing.default.terse.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultTerse01"
+            }
+          ],
+          "warm": [
+            {
+              "fallback": "I'm doing okay. Thanks for asking.",
+              "id": "phrase.semantic.question.wellbeing.default.warm.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultWarm01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_WELLBEING_FATIGUE",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "wellbeing",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.wellbeing.fatigue",
+        "semanticTemplateID": "semantic.question.wellbeing.fatigue",
+        "sourceShard": "content/wellbeing.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I'm worn out, but I can still manage.",
+              "id": "phrase.semantic.question.wellbeing.fatigue.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_WELLBEING_FATIGUE_ALT",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "wellbeing",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.wellbeing.fatigue_alt",
+        "semanticTemplateID": "semantic.question.wellbeing.fatigue_alt",
+        "sourceShard": "content/wellbeing.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I'm tired. A little rest would help.",
+              "id": "phrase.semantic.question.wellbeing.fatigue_alt.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueAltNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_WELLBEING_HUNGER",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "wellbeing",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.wellbeing.hunger",
+        "semanticTemplateID": "semantic.question.wellbeing.hunger",
+        "sourceShard": "content/wellbeing.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I'm pretty hungry, if I'm honest. Do you have anything to eat?",
+              "id": "phrase.semantic.question.wellbeing.hunger.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_WELLBEING_HUNGER_ALT",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "wellbeing",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.wellbeing.hunger_alt",
+        "semanticTemplateID": "semantic.question.wellbeing.hunger_alt",
+        "sourceShard": "content/wellbeing.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I'm getting hungry. Could you spare something to eat?",
+              "id": "phrase.semantic.question.wellbeing.hunger_alt.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerAltNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_WELLBEING_INJURED",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "wellbeing",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.wellbeing.injured",
+        "semanticTemplateID": "semantic.question.wellbeing.injured",
+        "sourceShard": "content/wellbeing.json",
+        "styles": {
+          "guarded": [
+            {
+              "fallback": "I'm hurt. That's all I can say.",
+              "id": "phrase.semantic.question.wellbeing.injured.guarded.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredGuarded01"
+            }
+          ],
+          "neutral": [
+            {
+              "fallback": "A little banged up, but I'll manage.",
+              "id": "phrase.semantic.question.wellbeing.injured.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredNeutral01"
+            }
+          ],
+          "terse": [
+            {
+              "fallback": "I'm hurt. I can manage.",
+              "id": "phrase.semantic.question.wellbeing.injured.terse.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredTerse01"
+            }
+          ],
+          "warm": [
+            {
+              "fallback": "I took a hit, but I'm steady enough to keep going.",
+              "id": "phrase.semantic.question.wellbeing.injured.warm.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredWarm01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_WELLBEING_PANIC",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "wellbeing",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.wellbeing.panic",
+        "semanticTemplateID": "semantic.question.wellbeing.panic",
+        "sourceShard": "content/wellbeing.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I'm pretty shaken up right now.",
+              "id": "phrase.semantic.question.wellbeing.panic.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingPanicNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_WELLBEING_STRESS",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "wellbeing",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.wellbeing.stress",
+        "semanticTemplateID": "semantic.question.wellbeing.stress",
+        "sourceShard": "content/wellbeing.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I'm tense, but I can keep going.",
+              "id": "phrase.semantic.question.wellbeing.stress.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingStressNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_WELLBEING_THIRST",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "wellbeing",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.wellbeing.thirst",
+        "semanticTemplateID": "semantic.question.wellbeing.thirst",
+        "sourceShard": "content/wellbeing.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I'm pretty thirsty. Could you spare some water?",
+              "id": "phrase.semantic.question.wellbeing.thirst.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_WELLBEING_THIRST_ALT",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "wellbeing",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.wellbeing.thirst_alt",
+        "semanticTemplateID": "semantic.question.wellbeing.thirst_alt",
+        "sourceShard": "content/wellbeing.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I could really use a drink. Do you have any water?",
+              "id": "phrase.semantic.question.wellbeing.thirst_alt.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstAltNeutral01"
+            }
+          ]
+        }
+      },
+      {
         "canonicalConcept": "SEMANTIC_SOCIAL_REACTION_DEFAULT",
         "contentOwner": "projecthoomans.dialogue_content.events",
         "conversationDomain": "event",
@@ -5140,6 +5362,22 @@
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral01": "I am still here. Please come back for me.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral01": "I still need food before I can get up.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral01": "I am hurt. I need help now.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultGuarded01": "I'm managing. Don't press me.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultNeutral01": "I'm okay. How about you?",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultTerse01": "I'm okay.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultWarm01": "I'm doing okay. Thanks for asking.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueAltNeutral01": "I'm tired. A little rest would help.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueNeutral01": "I'm worn out, but I can still manage.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerAltNeutral01": "I'm getting hungry. Could you spare something to eat?",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerNeutral01": "I'm pretty hungry, if I'm honest. Do you have anything to eat?",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredGuarded01": "I'm hurt. That's all I can say.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredNeutral01": "A little banged up, but I'll manage.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredTerse01": "I'm hurt. I can manage.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredWarm01": "I took a hit, but I'm steady enough to keep going.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingPanicNeutral01": "I'm pretty shaken up right now.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingStressNeutral01": "I'm tense, but I can keep going.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstAltNeutral01": "I could really use a drink. Do you have any water?",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstNeutral01": "I'm pretty thirsty. Could you spare some water?",
         "UI_PNC_Conversation_Content_SemanticSocialReactionDefaultNeutral01": "I hear you.",
         "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral01": "I hear you.",
         "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral01": "I will keep that in mind.",
@@ -5539,6 +5777,22 @@
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral01": "I am still here. Please come back for me.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral01": "I still need food before I can get up.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral01": "I am hurt. I need help now.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultGuarded01": "Kinakaya ko. Huwag mo nang ipilit.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultNeutral01": "Okay naman ako. Ikaw, kumusta?",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultTerse01": "Ayos lang ako.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultWarm01": "Ayos lang ako. Salamat sa pagtatanong.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueAltNeutral01": "Pagod ako. Makakatulong ang kaunting pahinga.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueNeutral01": "Pagod na pagod ako, pero kaya ko pa.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerAltNeutral01": "Nagugutom na ako. Maaari ba akong makahingi ng makakain?",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerNeutral01": "Medyo gutom ako, kung tutuusin. May makakain ka ba?",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredGuarded01": "Nasaktan ako. Iyon lang ang masasabi ko.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredNeutral01": "Medyo may tama ako, pero kakayanin ko.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredTerse01": "Nasaktan ako. Kaya ko.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredWarm01": "Nasaktan ako, pero kaya ko pang magpatuloy.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingPanicNeutral01": "Nanginginig pa rin ako ngayon.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingStressNeutral01": "Tensiyonado ako, pero kaya ko pa.",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstAltNeutral01": "Kailangan ko talaga ng maiinom. May tubig ka ba?",
+        "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstNeutral01": "Uhaw na uhaw ako. Maaari ba akong makahingi ng tubig?",
         "UI_PNC_Conversation_Content_SemanticSocialReactionDefaultNeutral01": "I hear you.",
         "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral01": "I hear you.",
         "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral01": "I will keep that in mind.",
@@ -9186,6 +9440,66 @@
       "kind": "content",
       "sourceShard": "content/event.json"
     },
+    "phrase.semantic.question.wellbeing.default": {
+      "domain": "wellbeing",
+      "id": "phrase.semantic.question.wellbeing.default",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "phrase.semantic.question.wellbeing.fatigue": {
+      "domain": "wellbeing",
+      "id": "phrase.semantic.question.wellbeing.fatigue",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "phrase.semantic.question.wellbeing.fatigue_alt": {
+      "domain": "wellbeing",
+      "id": "phrase.semantic.question.wellbeing.fatigue_alt",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "phrase.semantic.question.wellbeing.hunger": {
+      "domain": "wellbeing",
+      "id": "phrase.semantic.question.wellbeing.hunger",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "phrase.semantic.question.wellbeing.hunger_alt": {
+      "domain": "wellbeing",
+      "id": "phrase.semantic.question.wellbeing.hunger_alt",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "phrase.semantic.question.wellbeing.injured": {
+      "domain": "wellbeing",
+      "id": "phrase.semantic.question.wellbeing.injured",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "phrase.semantic.question.wellbeing.panic": {
+      "domain": "wellbeing",
+      "id": "phrase.semantic.question.wellbeing.panic",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "phrase.semantic.question.wellbeing.stress": {
+      "domain": "wellbeing",
+      "id": "phrase.semantic.question.wellbeing.stress",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "phrase.semantic.question.wellbeing.thirst": {
+      "domain": "wellbeing",
+      "id": "phrase.semantic.question.wellbeing.thirst",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "phrase.semantic.question.wellbeing.thirst_alt": {
+      "domain": "wellbeing",
+      "id": "phrase.semantic.question.wellbeing.thirst_alt",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
     "phrase.semantic.social.reaction.default": {
       "domain": "event",
       "id": "phrase.semantic.social.reaction.default",
@@ -11058,6 +11372,66 @@
       "kind": "responsePool",
       "sourceShard": "flows/common_responses.json"
     },
+    "semantic.question.wellbeing.default": {
+      "domain": "wellbeing",
+      "id": "semantic.question.wellbeing.default",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "semantic.question.wellbeing.fatigue": {
+      "domain": "wellbeing",
+      "id": "semantic.question.wellbeing.fatigue",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "semantic.question.wellbeing.fatigue_alt": {
+      "domain": "wellbeing",
+      "id": "semantic.question.wellbeing.fatigue_alt",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "semantic.question.wellbeing.hunger": {
+      "domain": "wellbeing",
+      "id": "semantic.question.wellbeing.hunger",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "semantic.question.wellbeing.hunger_alt": {
+      "domain": "wellbeing",
+      "id": "semantic.question.wellbeing.hunger_alt",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "semantic.question.wellbeing.injured": {
+      "domain": "wellbeing",
+      "id": "semantic.question.wellbeing.injured",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "semantic.question.wellbeing.panic": {
+      "domain": "wellbeing",
+      "id": "semantic.question.wellbeing.panic",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "semantic.question.wellbeing.stress": {
+      "domain": "wellbeing",
+      "id": "semantic.question.wellbeing.stress",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "semantic.question.wellbeing.thirst": {
+      "domain": "wellbeing",
+      "id": "semantic.question.wellbeing.thirst",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
+    "semantic.question.wellbeing.thirst_alt": {
+      "domain": "wellbeing",
+      "id": "semantic.question.wellbeing.thirst_alt",
+      "kind": "content",
+      "sourceShard": "content/wellbeing.json"
+    },
     "semantic.question.wellbeing.unknown": {
       "domain": "common",
       "id": "semantic.question.wellbeing.unknown",
@@ -11665,6 +12039,12 @@
         "path": "content/social.json"
       },
       {
+        "domain": "wellbeing",
+        "kind": "content",
+        "order": 135,
+        "path": "content/wellbeing.json"
+      },
+      {
         "domain": "command",
         "kind": "content",
         "order": 140,
@@ -12002,6 +12382,25 @@
         "semantic.tool_reply.sexual.1",
         "semantic.tool_reply.sexual.2",
         "semantic.tool_reply.sexual.3"
+      ]
+    },
+    {
+      "domain": "wellbeing",
+      "fingerprint": "d45bb0555a3b98734a41314c8a4bea53d172900bb3ac72e1f734f443b8480769",
+      "kind": "content",
+      "order": 135,
+      "path": "content/wellbeing.json",
+      "recordIDs": [
+        "semantic.question.wellbeing.default",
+        "semantic.question.wellbeing.fatigue",
+        "semantic.question.wellbeing.fatigue_alt",
+        "semantic.question.wellbeing.hunger",
+        "semantic.question.wellbeing.hunger_alt",
+        "semantic.question.wellbeing.injured",
+        "semantic.question.wellbeing.panic",
+        "semantic.question.wellbeing.stress",
+        "semantic.question.wellbeing.thirst",
+        "semantic.question.wellbeing.thirst_alt"
       ]
     },
     {
@@ -12656,5 +13055,5 @@
       "UI_PNC_Conversation_Suggestion_Wellbeing_Utterance": "Kumusta ang pakiramdam mo?"
     }
   },
-  "wholeModelFingerprint": "9c13c823757e9eae7a2e362a8019b3f9b4772e8fd94a7be534f6d907d4e4b291"
+  "wholeModelFingerprint": "3ce2009909ea53631a62f430fcb8067bec5c420231f0745d0d39604032d5f43c"
 }

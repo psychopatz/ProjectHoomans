@@ -59,6 +59,13 @@ return {
             ["recordCount"] = 46,
         },
         {
+            ["bytes"] = 9320,
+            ["domain"] = "wellbeing",
+            ["kind"] = "Content",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Content/Wellbeing",
+            ["recordCount"] = 10,
+        },
+        {
             ["bytes"] = 541,
             ["domain"] = "greeting",
             ["kind"] = "ContentChoices",
@@ -269,5 +276,5 @@ return {
             ["recordCount"] = 2,
         },
     },
-    ["wholeModelFingerprint"] = "9c13c823757e9eae7a2e362a8019b3f9b4772e8fd94a7be534f6d907d4e4b291",
+    ["wholeModelFingerprint"] = "3ce2009909ea53631a62f430fcb8067bec5c420231f0745d0d39604032d5f43c",
 }

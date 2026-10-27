@@ -1,12 +1,4 @@
 {
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingNeutral": "Ayos lang ako. Ikaw?",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingWarm": "Ayos lang ako. Salamat sa pagtatanong.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingTerse": "Ayos lang ako.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingGuarded": "Kinakaya ko. Huwag mo nang ipilit.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingInjuredNeutral": "Medyo sugatan, pero kakayanin ko.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingInjuredWarm": "Nasaktan ako, pero kaya ko pang magpatuloy.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingInjuredTerse": "Nasaktan ako. Kaya ko.",
-  "UI_PNC_Conversation_Semantic_RealizationWellbeingInjuredGuarded": "Nasaktan ako. Iyon lang ang masasabi ko.",
   "UI_PNC_Conversation_Semantic_RealizationWellbeingGettingByNeutral": "Kinakaya ko, isang araw bawat pagkakataon. Ikaw?",
   "UI_PNC_Conversation_Semantic_RealizationWellbeingGettingByWarm": "Kinakaya ko. Salamat sa pagtatanong.",
   "UI_PNC_Conversation_Semantic_RealizationWellbeingGettingByTerse": "Kinakaya.",
