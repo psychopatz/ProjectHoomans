@@ -38,6 +38,13 @@ return {
             ["recordCount"] = 7,
         },
         {
+            ["bytes"] = 5258,
+            ["domain"] = "health",
+            ["kind"] = "Content",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Content/Health",
+            ["recordCount"] = 3,
+        },
+        {
             ["bytes"] = 8768,
             ["domain"] = "needs",
             ["kind"] = "Content",
@@ -283,5 +290,5 @@ return {
             ["recordCount"] = 2,
         },
     },
-    ["wholeModelFingerprint"] = "08a79a870e27e02b2da4045ca11c46da6aed329f851c5ab5f712de9cba3c054a",
+    ["wholeModelFingerprint"] = "041fa369e1ee0dde1d97b4eb707c076e60a386c727ad8cda83490d9d882f31ee",
 }

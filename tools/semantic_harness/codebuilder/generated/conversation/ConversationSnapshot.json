@@ -1,6 +1,6 @@
 {
   "content": {
-    "contentFingerprint": "b40118baf99fa1be2e3d17e51d0a11ba31f179cbc5b9a6dd0f26fdc3f9d9e7d5",
+    "contentFingerprint": "f64753b4f6f7e657aee1e4761f73ab28fecf0e3e525847114791cbcba5e14be7",
     "phraseFamilies": [
       {
         "canonicalConcept": "SEMANTIC_COMBAT_REACTION_DEFAULT",
@@ -3140,6 +3140,123 @@
         }
       },
       {
+        "canonicalConcept": "SEMANTIC_QUESTION_HEALTH_STATE_HEALTHY",
+        "contentOwner": "projecthoomans.dialogue_content.facts",
+        "conversationDomain": "health",
+        "group": "facts",
+        "id": "phrase.semantic.question.health_state.healthy",
+        "semanticTemplateID": "semantic.question.health_state.healthy",
+        "sourceShard": "content/health.json",
+        "styles": {
+          "guarded": [
+            {
+              "fallback": "I'm fine. Don't make a thing of it.",
+              "id": "phrase.semantic.question.health_state.healthy.guarded.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded01"
+            }
+          ],
+          "neutral": [
+            {
+              "fallback": "I'm doing okay.",
+              "id": "phrase.semantic.question.health_state.healthy.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral01"
+            }
+          ],
+          "terse": [
+            {
+              "fallback": "I'm okay.",
+              "id": "phrase.semantic.question.health_state.healthy.terse.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse01"
+            }
+          ],
+          "warm": [
+            {
+              "fallback": "I'm doing okay. Thanks for checking in.",
+              "id": "phrase.semantic.question.health_state.healthy.warm.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_HEALTH_STATE_INJURED",
+        "contentOwner": "projecthoomans.dialogue_content.facts",
+        "conversationDomain": "health",
+        "group": "facts",
+        "id": "phrase.semantic.question.health_state.injured",
+        "semanticTemplateID": "semantic.question.health_state.injured",
+        "sourceShard": "content/health.json",
+        "styles": {
+          "guarded": [
+            {
+              "fallback": "I'm hurt. Give me space.",
+              "id": "phrase.semantic.question.health_state.injured.guarded.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded01"
+            }
+          ],
+          "neutral": [
+            {
+              "fallback": "I'm hurt, but I'm managing.",
+              "id": "phrase.semantic.question.health_state.injured.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral01"
+            }
+          ],
+          "terse": [
+            {
+              "fallback": "I'm hurt.",
+              "id": "phrase.semantic.question.health_state.injured.terse.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse01"
+            }
+          ],
+          "warm": [
+            {
+              "fallback": "I'm hurt, but I'm managing. Thanks for asking.",
+              "id": "phrase.semantic.question.health_state.injured.warm.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_HEALTH_STATE_UNKNOWN",
+        "contentOwner": "projecthoomans.dialogue_content.facts",
+        "conversationDomain": "health",
+        "group": "facts",
+        "id": "phrase.semantic.question.health_state.unknown",
+        "semanticTemplateID": "semantic.question.health_state.unknown",
+        "sourceShard": "content/health.json",
+        "styles": {
+          "guarded": [
+            {
+              "fallback": "I can't confirm that.",
+              "id": "phrase.semantic.question.health_state.unknown.guarded.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01"
+            }
+          ],
+          "neutral": [
+            {
+              "fallback": "I can't confirm my health status right now.",
+              "id": "phrase.semantic.question.health_state.unknown.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01"
+            }
+          ],
+          "terse": [
+            {
+              "fallback": "Can't confirm.",
+              "id": "phrase.semantic.question.health_state.unknown.terse.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01"
+            }
+          ],
+          "warm": [
+            {
+              "fallback": "I can't confirm it right now, but thanks for asking.",
+              "id": "phrase.semantic.question.health_state.unknown.warm.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01"
+            }
+          ]
+        }
+      },
+      {
         "canonicalConcept": "SEMANTIC_QUESTION_NEEDS_OFFER_FATIGUE",
         "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
         "conversationDomain": "needs",
@@ -5563,6 +5680,18 @@
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral01": "I am still here. Please come back for me.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral01": "I still need food before I can get up.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral01": "I am hurt. I need help now.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded01": "I'm fine. Don't make a thing of it.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral01": "I'm doing okay.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse01": "I'm okay.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm01": "I'm doing okay. Thanks for checking in.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded01": "I'm hurt. Give me space.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral01": "I'm hurt, but I'm managing.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse01": "I'm hurt.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm01": "I'm hurt, but I'm managing. Thanks for asking.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01": "I can't confirm that.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01": "I can't confirm my health status right now.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01": "Can't confirm.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01": "I can't confirm it right now, but thanks for asking.",
         "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferFatigueNeutral01": "A little rest would help, but this isn't something I can count.",
         "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerGuarded01": "I need food. Keep your distance.",
         "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerNeutral01": "Food would help, but I don't have an exact amount yet.",
@@ -5991,6 +6120,18 @@
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral01": "I am still here. Please come back for me.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral01": "I still need food before I can get up.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral01": "I am hurt. I need help now.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded01": "Mabuti ako. Huwag mo nang palakihin.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral01": "Ayos lang ako.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse01": "Ayos lang.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm01": "Ayos lang ako. Salamat sa pagsuri.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded01": "Nasaktan ako. Bigyan mo ako ng espasyo.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral01": "Nasaktan ako, pero kinakaya ko.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse01": "Nasaktan ako.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm01": "Nasaktan ako, pero kinakaya ko. Salamat sa pagtatanong.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01": "Hindi ko makumpirma iyon.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01": "Hindi ko makumpirma ang kalagayan ko ngayon.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01": "Hindi makumpirma.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01": "Hindi ko makumpirma ngayon, pero salamat sa pagtatanong.",
         "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferFatigueNeutral01": "Makakatulong ang kaunting pahinga, pero hindi ito mabibilang.",
         "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerGuarded01": "Kailangan ko ng pagkain. Lumayo ka.",
         "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerNeutral01": "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon.",
@@ -9667,6 +9808,24 @@
       "kind": "content",
       "sourceShard": "content/event.json"
     },
+    "phrase.semantic.question.health_state.healthy": {
+      "domain": "health",
+      "id": "phrase.semantic.question.health_state.healthy",
+      "kind": "content",
+      "sourceShard": "content/health.json"
+    },
+    "phrase.semantic.question.health_state.injured": {
+      "domain": "health",
+      "id": "phrase.semantic.question.health_state.injured",
+      "kind": "content",
+      "sourceShard": "content/health.json"
+    },
+    "phrase.semantic.question.health_state.unknown": {
+      "domain": "health",
+      "id": "phrase.semantic.question.health_state.unknown",
+      "kind": "content",
+      "sourceShard": "content/health.json"
+    },
     "phrase.semantic.question.needs.offer.fatigue": {
       "domain": "needs",
       "id": "phrase.semantic.question.needs.offer.fatigue",
@@ -11635,6 +11794,24 @@
       "kind": "responsePool",
       "sourceShard": "flows/grounded_personal_responses.json"
     },
+    "semantic.question.health_state.healthy": {
+      "domain": "health",
+      "id": "semantic.question.health_state.healthy",
+      "kind": "content",
+      "sourceShard": "content/health.json"
+    },
+    "semantic.question.health_state.injured": {
+      "domain": "health",
+      "id": "semantic.question.health_state.injured",
+      "kind": "content",
+      "sourceShard": "content/health.json"
+    },
+    "semantic.question.health_state.unknown": {
+      "domain": "health",
+      "id": "semantic.question.health_state.unknown",
+      "kind": "content",
+      "sourceShard": "content/health.json"
+    },
     "semantic.question.identity": {
       "domain": "common",
       "id": "semantic.question.identity",
@@ -12386,6 +12563,12 @@
         "path": "content/social.json"
       },
       {
+        "domain": "health",
+        "kind": "content",
+        "order": 133,
+        "path": "content/health.json"
+      },
+      {
         "domain": "wellbeing",
         "kind": "content",
         "order": 135,
@@ -12735,6 +12918,18 @@
         "semantic.tool_reply.sexual.1",
         "semantic.tool_reply.sexual.2",
         "semantic.tool_reply.sexual.3"
+      ]
+    },
+    {
+      "domain": "health",
+      "fingerprint": "4157650e751cc8096f042774c645217a96fe2075ce96aaefe36c55d8e6c5089a",
+      "kind": "content",
+      "order": 133,
+      "path": "content/health.json",
+      "recordIDs": [
+        "semantic.question.health_state.healthy",
+        "semantic.question.health_state.injured",
+        "semantic.question.health_state.unknown"
       ]
     },
     {
@@ -13427,5 +13622,5 @@
       "UI_PNC_Conversation_Suggestion_Wellbeing_Utterance": "Kumusta ang pakiramdam mo?"
     }
   },
-  "wholeModelFingerprint": "08a79a870e27e02b2da4045ca11c46da6aed329f851c5ab5f712de9cba3c054a"
+  "wholeModelFingerprint": "041fa369e1ee0dde1d97b4eb707c076e60a386c727ad8cda83490d9d882f31ee"
 }

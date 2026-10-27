@@ -1,0 +1,133 @@
+{
+  "domain": "health",
+  "groups": {
+    "facts": {
+      "contentOwner": "projecthoomans.dialogue_content.facts"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "facts",
+      "semanticTemplateID": "semantic.question.health_state.injured",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm hurt, but I'm managing.",
+              "TL": "Nasaktan ako, pero kinakaya ko."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm hurt, but I'm managing. Thanks for asking.",
+              "TL": "Nasaktan ako, pero kinakaya ko. Salamat sa pagtatanong."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I'm hurt.",
+              "TL": "Nasaktan ako."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I'm hurt. Give me space.",
+              "TL": "Nasaktan ako. Bigyan mo ako ng espasyo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "facts",
+      "semanticTemplateID": "semantic.question.health_state.healthy",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm doing okay.",
+              "TL": "Ayos lang ako."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm doing okay. Thanks for checking in.",
+              "TL": "Ayos lang ako. Salamat sa pagsuri."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I'm okay.",
+              "TL": "Ayos lang."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I'm fine. Don't make a thing of it.",
+              "TL": "Mabuti ako. Huwag mo nang palakihin."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "facts",
+      "semanticTemplateID": "semantic.question.health_state.unknown",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't confirm my health status right now.",
+              "TL": "Hindi ko makumpirma ang kalagayan ko ngayon."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I can't confirm it right now, but thanks for asking.",
+              "TL": "Hindi ko makumpirma ngayon, pero salamat sa pagtatanong."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Can't confirm.",
+              "TL": "Hindi makumpirma."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I can't confirm that.",
+              "TL": "Hindi ko makumpirma iyon."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

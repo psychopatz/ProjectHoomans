@@ -14,6 +14,9 @@
     "events": {
       "contentOwner": "projecthoomans.dialogue_content.events"
     },
+    "facts": {
+      "contentOwner": "projecthoomans.dialogue_content.facts"
+    },
     "tool_replies": {
       "contentOwner": "projecthoomans.dialogue_content.tool_replies"
     }
@@ -2838,6 +2841,120 @@
             "translations": {
               "EN": "I am hurt. I need help now.",
               "TL": "I am hurt. I need help now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "facts",
+      "semanticTemplateID": "semantic.question.health_state.healthy",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I'm fine. Don't make a thing of it.",
+              "TL": "Mabuti ako. Huwag mo nang palakihin."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm doing okay.",
+              "TL": "Ayos lang ako."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I'm okay.",
+              "TL": "Ayos lang."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm doing okay. Thanks for checking in.",
+              "TL": "Ayos lang ako. Salamat sa pagsuri."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "facts",
+      "semanticTemplateID": "semantic.question.health_state.injured",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I'm hurt. Give me space.",
+              "TL": "Nasaktan ako. Bigyan mo ako ng espasyo."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm hurt, but I'm managing.",
+              "TL": "Nasaktan ako, pero kinakaya ko."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I'm hurt.",
+              "TL": "Nasaktan ako."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm hurt, but I'm managing. Thanks for asking.",
+              "TL": "Nasaktan ako, pero kinakaya ko. Salamat sa pagtatanong."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "facts",
+      "semanticTemplateID": "semantic.question.health_state.unknown",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I can't confirm that.",
+              "TL": "Hindi ko makumpirma iyon."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't confirm my health status right now.",
+              "TL": "Hindi ko makumpirma ang kalagayan ko ngayon."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Can't confirm.",
+              "TL": "Hindi makumpirma."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I can't confirm it right now, but thanks for asking.",
+              "TL": "Hindi ko makumpirma ngayon, pero salamat sa pagtatanong."
             }
           }
         ]

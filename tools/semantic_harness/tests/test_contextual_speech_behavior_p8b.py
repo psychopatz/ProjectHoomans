@@ -172,9 +172,12 @@ class ContextualSpeechBehaviorP8BTests(unittest.TestCase):
             catalog = worker.persona_catalog()
         coverage = catalog["speechRealization"]["coverage"]
         families = set(catalog["speechRealization"]["families"])
+        phrase_content = catalog["speechRealization"]["phraseContent"]
         names = {row["family"] for row in coverage}
         self.assertTrue({"greeting", "wellbeing", "medical", "companion_action"} <= names)
-        self.assertIn("semantic.question.health_state.healthy", families)
+        self.assertNotIn("semantic.question.health_state.healthy", families)
+        self.assertTrue(phrase_content["families"])
+        self.assertEqual(len(phrase_content["fingerprint"]), 64)
         self.assertIn("UI_PNC_Conversation_Semantic_GeneratedFollowQueued", families)
 
 

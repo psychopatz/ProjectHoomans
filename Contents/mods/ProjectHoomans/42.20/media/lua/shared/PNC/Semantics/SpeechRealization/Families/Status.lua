@@ -107,19 +107,4 @@ return {
         "I can't confirm it, but thanks for checking.", "Can't confirm.",
         "I can't confirm that. Don't press me."
     ),
-    ["semantic.question.health_state.injured"] = phraseFamily(
-        "HealthStateInjured", "I'm hurt, but I'm managing.",
-        "I'm hurt, but I'm managing. Thanks for asking.", "I'm hurt.",
-        "I'm hurt. Give me space."
-    ),
-    ["semantic.question.health_state.healthy"] = phraseFamily(
-        "HealthStateHealthy", "I'm doing okay.",
-        "I'm doing okay. Thanks for checking in.", "I'm okay.",
-        "I'm fine. Don't make a thing of it."
-    ),
-    ["semantic.question.health_state.unknown"] = phraseFamily(
-        "HealthStateUnknown", "I can't confirm my health status right now.",
-        "I can't confirm it right now, but thanks for asking.", "Can't confirm.",
-        "I can't confirm that."
-    ),
 }

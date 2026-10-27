@@ -630,15 +630,40 @@ Project Hoomans `pz_verify --kahlua` scan passed over `3,389` files with no
 errors or warnings; installed Project Zomboid Kahlua compiler passed `123`
 files with `0` source writes and no game launch; `git diff --check` passes.
 
-## Immediate Next Chunk — P11B Health wording domain shard
+## Accepted P11B — Health wording domain slice
 
-Characterize and migrate the cohesive fixed Health wording domain next,
-preserving medical fact selection, dynamic health eligibility/effects, and
-grounded/follow-up ownership. Use the manifest/compiler, generated domain
-bundles, aggregate snapshot and ID-addressed authoring service; defer
-parameterized medical response-pool boundaries until characterized. Do not
-edit generated artifacts as sources, introduce aliases, or migrate one key at
-a time.
+The third post-P11B0 wording slice is accepted. Manifest-backed
+`content/health.json` now owns three fixed, no-argument
+`semantic.question.health_state.*` families: injured, healthy, and unknown,
+with four preserved EN/TL style variants each. Health fact selection, dynamic
+eligibility/effects, grounded references, and follow-up ownership remain in
+their existing runtime owners.
+
+The old three fixed `Responses.json` keys, twelve health-state
+`Realizations.json` keys, static health translation-key map entries, and three
+legacy `Status.lua` families are retired. The unknown route remains
+intentionally ungrounded; known health states retain `npc.healthState` fact
+provenance. Parameterized medical response-pool wording remains deferred until
+it can move as a separate coherent boundary.
+
+Acceptance evidence: focused Health/compiler/contextual tests `9/9 PASS`; full
+isolated Python acceptance runner `163` modules passed, `0` failed, `0` skipped;
+native Lua `897/897 PASS`; two consecutive generations matched byte-for-byte
+across `121` source/generated/translation artifacts (SHA-256
+`4a9818837f995fca9c19b55c20e7d7e73b4d16c9d6f9626ebd36580ee8d0a8d7`); full
+Project Hoomans `pz_verify --kahlua` scan passed over `3,390` files with no
+errors or warnings; installed Project Zomboid Kahlua compiler passed `123`
+files with `0` source writes and no game launch; `git diff --check` passes.
+
+## Immediate Next Chunk — P11B Social Apology wording domain shard
+
+Characterize and migrate the cohesive fixed Social Apology wording domain
+next, preserving relationship/bond state, apology follow-up, dynamic
+eligibility/effects, and grounded/response-plan ownership. Use the
+manifest/compiler, generated domain bundles, aggregate snapshot and
+ID-addressed authoring service; defer parameterized social response-pool
+boundaries until characterized. Do not edit generated artifacts as sources,
+introduce aliases, or migrate one key at a time.
 
 Do not begin P11C, P11D or P11E taxonomy cleanup until the selected P11B domain
 slice has its own characterization and acceptance evidence. Do not create P12

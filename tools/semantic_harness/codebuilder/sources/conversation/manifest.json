@@ -27,6 +27,12 @@
       "order": 130,
       "path": "content/social.json"
     },
+    {
+      "domain": "health",
+      "kind": "content",
+      "order": 133,
+      "path": "content/health.json"
+    },
  {
  "domain": "wellbeing",
  "kind": "content",
