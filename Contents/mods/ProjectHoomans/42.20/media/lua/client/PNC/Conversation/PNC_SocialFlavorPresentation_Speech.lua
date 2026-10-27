@@ -129,7 +129,8 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
                 local ok = Client.Enqueue({
                 eventID = eventID,
                 flavorID = "social.player_spoke",
-                resolvedText = semantic.fallback,
+                text = semantic.fallback,
+                semanticOwned = true,
                 responsePlanID = semantic.responsePlanID,
                 realizationFamily = semantic.realizationFamily,
                 realizationID = semantic.realizationID,
@@ -160,7 +161,7 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
                     tts = true,
                 },
                 source = {
-                    kind = "social_flavor",
+                    kind = "semantic_speech",
                     channel = "player_speech",
                     eventType = "player_spoke",
                     contextEligible = false,
@@ -253,7 +254,8 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
     accepted, enqueueReason = Client.Enqueue({
         eventID = eventID,
         flavorID = "social.conversation_safety_danger",
-        resolvedText = semantic.fallback,
+        text = semantic.fallback,
+        semanticOwned = true,
         responsePlanID = semantic.responsePlanID,
         realizationFamily = semantic.realizationFamily,
         realizationID = semantic.realizationID,
@@ -289,7 +291,7 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
             tts = true,
         },
         source = {
-            kind = "social_flavor",
+            kind = "semantic_speech",
             channel = "conversation_safety",
             eventType = "conversation_safety",
             reason = "danger",

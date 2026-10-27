@@ -11,8 +11,103 @@ PNC.Semantics.SocialReactions = Reactions
 
 local Authority = PNC.Semantics.RealizationAuthority
     or require "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+local EVENT_OFFER_FIELDS = {
+    EVENT_WHAT_HAPPENED = { "summary", "happened", "description" },
+    EVENT_LOCATION = { "location", "locationLabel" },
+    EVENT_QUANTITY = { "countBand", "count", "quantity" },
+    EVENT_ATTACKER = { "attackerName", "attacker" },
+    EVENT_NEED = { "need", "needType" },
+    EVENT_DECEASED = { "deceasedName", "deceased" },
+    EVENT_NEXT = { "nextAction", "next" },
+    EVENT_HEALTH = { "health", "healthState" },
+    EVENT_PURSUER = { "pursuerName", "pursuer", "attackerName" },
+    EVENT_WHAT = { "description", "summary", "what" },
+}
 
 Reactions.VERSION = 1
+
+local function hasScalarValue(value)
+    if type(value) == "string" or type(value) == "number"
+        or type(value) == "boolean"
+    then
+        return tostring(value) ~= ""
+    end
+    if type(value) ~= "table" then return false end
+    if value.x ~= nil and value.y ~= nil then return true end
+    for _, key in ipairs({ "label", "name", "text", "summary", "value" }) do
+        if hasScalarValue(value[key]) then return true end
+    end
+    return false
+end
+
+local function eventFact(context)
+    local facts = type(context) == "table"
+        and context.semanticEventFacts or nil
+    if type(facts) ~= "table" then return nil end
+    local eventRef = tostring(
+        context.eventRef or context.eventID or ""
+    )
+    if eventRef ~= "" and type(facts[eventRef]) == "table" then
+        local fact = facts[eventRef]
+        if fact.authoritative == true
+            and fact.disclosure ~= false
+            and fact.disclosure ~= "private"
+        then
+            return fact
+        end
+    end
+    if facts.eventRef ~= nil and tostring(facts.eventRef) == eventRef
+        and facts.authoritative == true
+        and facts.disclosure ~= false
+        and facts.disclosure ~= "private"
+    then
+        return facts
+    end
+    return nil
+end
+
+local function offerSupported(offer, context)
+    local frame = type(offer) == "table" and offer.frame or nil
+    local reference = frame and frame.reference or nil
+    local fields = EVENT_OFFER_FIELDS[tostring(reference or "")]
+    local fact
+    if not fields then return true end
+    fact = eventFact(context)
+    if not fact then return false end
+    for _, field in ipairs(fields) do
+        if hasScalarValue(fact[field]) then return true end
+    end
+    return false
+end
+
+local function filteredPlan(plan, context)
+    local output
+    if type(plan) ~= "table" or type(plan.turns) ~= "table" then
+        return plan, {}
+    end
+    output = {}
+    for key, value in pairs(plan) do output[key] = value end
+    output.turns = {}
+    local offerIDs = {}
+    local seen = {}
+    for index, turn in ipairs(plan.turns) do
+        local copiedTurn = {}
+        for key, value in pairs(turn) do copiedTurn[key] = value end
+        copiedTurn.offers = {}
+        for _, offer in ipairs(turn.offers or {}) do
+            if offerSupported(offer, context) then
+                copiedTurn.offers[#copiedTurn.offers + 1] = offer
+                local id = offer.id and tostring(offer.id) or ""
+                if id ~= "" and not seen[id] and #offerIDs < 8 then
+                    seen[id] = true
+                    offerIDs[#offerIDs + 1] = id
+                end
+            end
+        end
+        output.turns[index] = copiedTurn
+    end
+    return output, offerIDs
+end
 
 local function poolFor(spec)
     if spec.poolID then return tostring(spec.poolID) end
@@ -56,7 +151,7 @@ function Reactions.Resolve(spec)
     spec = type(spec) == "table" and spec or {}
     local context = type(spec.context) == "table" and spec.context or {}
     local poolID = poolFor(spec)
-    return Authority.Resolve({
+    local realization = Authority.Resolve({
         poolID = poolID,
         responsePlanID = spec.responsePlanID or poolID,
         realizationFamily = spec.realizationFamily or poolID,
@@ -66,6 +161,12 @@ function Reactions.Resolve(spec)
         salt = spec.salt or spec.eventID or spec.npcID,
         groundedFactRefs = spec.groundedFactRefs or context.factRefs,
     })
+    if not realization then return nil end
+    realization.responsePlan, realization.offerIDs = filteredPlan(
+        realization.responsePlan,
+        context
+    )
+    return realization
 end
 
 return Reactions

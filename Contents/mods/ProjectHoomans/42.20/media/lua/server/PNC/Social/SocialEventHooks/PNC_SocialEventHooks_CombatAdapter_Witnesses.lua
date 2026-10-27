@@ -165,6 +165,7 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
                     witnessNPCID = tostring(npcID),
                     killerSource = context and context.killerSource
                         or context and context.source or "unknown",
+                    semanticPresentation = "semantic_event_speech",
                 },
             }
         )
@@ -177,22 +178,61 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
             local after = detail and detail.relationshipAfter or nil
             local role = socialRole(record)
             local state = relationshipState(before)
+            local eventRef = processed.eventID or eventID
+            local factRefs = { eventRef }
+            local semanticEventFacts = {
+                [tostring(eventRef)] = {
+                    eventRef = eventRef,
+                    authoritative = true,
+                    disclosure = "player",
+                    summary = "the player killed a zombie",
+                    happened = "the player killed a zombie",
+                    location = {
+                        x = zombieX,
+                        y = zombieY,
+                        z = zombieZ,
+                    },
+                    threatID = threatID,
+                },
+            }
+            local semanticContext = {
+                eventType = "witnessed_player_kill",
+                eventRef = eventRef,
+                eventID = eventRef,
+                npcID = tostring(npcID),
+                relationshipState = state,
+                factRefs = factRefs,
+                semanticEventFacts = semanticEventFacts,
+                socialStyle = state == "friend"
+                    and "friendly" or nil,
+            }
             local realization = SocialReactions
                 and type(SocialReactions.Resolve) == "function"
                 and SocialReactions.Resolve({
                     eventType = "witnessed_player_kill",
                     act = "REACT",
                     topic = "combat",
-                    context = {
-                        eventType = "witnessed_player_kill",
-                        npcID = tostring(npcID),
-                        relationshipState = state,
-                        socialStyle = state == "friend"
-                            and "friendly" or nil,
-                    },
-                    eventID = processed.eventID or eventID,
+                    context = semanticContext,
+                    eventID = eventRef,
                     npcID = tostring(npcID),
                 }) or nil
+            if not realization
+                or type(realization.fallback) ~= "string"
+                or realization.fallback == ""
+            then
+                audit({
+                    "luaSide=server",
+                    "event=PlayerKillWitnessPresentation",
+                    "phase=selection",
+                    "result=false",
+                    "reason=semantic_realization_unavailable",
+                    "playerKey=" .. tostring(playerKey),
+                    "witnessNPCID=" .. tostring(npcID),
+                    "threatID=" .. threatID,
+                })
+                return
+            end
+            semanticContext.offerIDs = realization.offerIDs or {}
             if Network
                 and type(Network.SendConversationRelationshipForNPC)
                     == "function"
@@ -204,7 +244,9 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
                         "witnessed_player_kill",
                         {
                             source = "witnessed_player_kill",
-                            eventID = processed.eventID or eventID,
+                            eventID = eventRef,
+                            eventRef = eventRef,
+                            semanticEventFacts = semanticEventFacts,
                             relationshipBefore = detail
                                 and detail.relationshipBefore or nil,
                             relationshipAfter = detail
@@ -215,23 +257,21 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
                             ),
                             ambientFlavor = {
                                 flavorID = "social.witnessed_player_kill",
-                                text = realization
-                                    and realization.fallback or nil,
+                                text = realization.fallback,
+                                semanticOwned = true,
+                                eventRef = eventRef,
                                 eventType = "witnessed_player_kill",
                                 act = realization
                                     and realization.semanticAct or "REACT",
                                 topic = realization
                                     and realization.topic or "combat",
-                                responsePlanID = realization
-                                    and realization.responsePlanID or nil,
-                                poolID = realization
-                                    and realization.realizationFamily or nil,
-                                realizationFamily = realization
-                                    and realization.realizationFamily or nil,
-                                realizationID = realization
-                                    and realization.realizationID or nil,
-                                factRefs = realization
-                                    and realization.groundedFactRefs or nil,
+                                responsePlanID = realization.responsePlanID,
+                                poolID = realization.realizationFamily,
+                                realizationFamily = realization.realizationFamily,
+                                realizationID = realization.realizationID,
+                                factRefs = realization.groundedFactRefs,
+                                offerIDs = realization.offerIDs,
+                                semanticEventFacts = semanticEventFacts,
                                 family = "combat_commentary",
                                 priority = 35,
                                 llmEligible = true,
@@ -256,6 +296,10 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
                                     relationshipTier = relationshipTier(before),
                                     killerSource = context and context.killerSource
                                         or context and context.source or "unknown",
+                                    eventRef = eventRef,
+                                    factRefs = factRefs,
+                                    semanticEventFacts = semanticEventFacts,
+                                    offerIDs = realization.offerIDs,
                                 },
                             },
                             npcID = tostring(npcID),

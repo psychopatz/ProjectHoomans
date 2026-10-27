@@ -454,26 +454,43 @@ local function emitZombieAwareness(
                 eventID = eventID,
                 npcID = npcID,
             }) or nil
+        if not realization
+            or type(realization.fallback) ~= "string"
+            or realization.fallback == ""
+        then
+            audit({
+                "luaSide=server",
+                "event=SemanticAwarenessPresentation",
+                "phase=selection",
+                "result=false",
+                "reason=semantic_realization_unavailable",
+                "eventID=" .. tostring(eventID),
+                "npcID=" .. tostring(npcID),
+            })
+            return
+        end
+        context.eventRef = eventID
+        context.offerIDs = realization.offerIDs or {}
         result = {
             source = eventType,
             eventID = eventID,
             npcID = npcID,
             ambientFlavor = {
                 eventID = eventID,
+                eventRef = eventID,
                 flavorID = flavorID,
-                text = realization and realization.fallback or nil,
+                text = realization.fallback,
+                semanticOwned = true,
                 eventType = eventType,
                 act = realization and realization.semanticAct or "REACT",
                 topic = realization and realization.topic or "combat",
-                responsePlanID = realization
-                    and realization.responsePlanID or nil,
-                poolID = realization and realization.realizationFamily or nil,
-                realizationFamily = realization
-                    and realization.realizationFamily or nil,
-                realizationID = realization and realization.realizationID
-                    or nil,
-                factRefs = realization and realization.groundedFactRefs
-                    or nil,
+                responsePlanID = realization.responsePlanID,
+                poolID = realization.realizationFamily,
+                realizationFamily = realization.realizationFamily,
+                realizationID = realization.realizationID,
+                factRefs = realization.groundedFactRefs,
+                offerIDs = realization.offerIDs,
+                semanticEventFacts = context.semanticEventFacts,
                 family = "zombie_awareness",
                 priority = 12,
                 weight = 0.25,
@@ -495,7 +512,7 @@ local function emitZombieAwareness(
                 holdMs = 1800,
                 context = context,
                 source = {
-                    kind = "social_flavor",
+                    kind = "semantic_speech",
                     channel = "combat",
                     eventType = eventType,
                 },

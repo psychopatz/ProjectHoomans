@@ -62,6 +62,8 @@ local function recordLifecycleEvent(event, output)
     end
     local actor = EntityRef and EntityRef.Parse
         and EntityRef.Parse(event.actorKey) or nil
+    local directSemanticSpeech = type(event.context) == "table"
+        and event.context.semanticPresentation == "semantic_event_speech"
     if not actor or actor.kind ~= "player" then return end
     for _, detail in ipairs(output.details or {}) do
         local envelope = InteractionLifecycle.Envelope.WorldEvent({
@@ -84,7 +86,8 @@ local function recordLifecycleEvent(event, output)
             worldHour = event.occurredAt,
         })
         local speechEnvelope
-        if applied and type(InteractionPersistence.RecordNPCSpeech)
+        if applied and not directSemanticSpeech
+            and type(InteractionPersistence.RecordNPCSpeech)
             == "function"
         then
             local beatID = "beat:" .. tostring(event.type) .. ":"
@@ -130,7 +133,13 @@ local function recordLifecycleEvent(event, output)
         -- Keep the exact grounded provenance beside the observer result so
         -- the existing presentation bridge can carry meaning without ever
         -- reparsing the rendered flavor line.
-        detail.interaction = speechEnvelope or envelope
+        -- Direct semantic event producers select and record their exact
+        -- realization at the delivery edge.  Do not pre-create a generic
+        -- speech beat here: that would make the later producer reuse a
+        -- hard-coded plan and would either duplicate selection or hide the
+        -- selected ResponsePlan offers.
+        detail.interaction = directSemanticSpeech
+            and nil or speechEnvelope or envelope
         if not applied and PNC.Core
             and type(PNC.Core.LogWarn) == "function"
         then

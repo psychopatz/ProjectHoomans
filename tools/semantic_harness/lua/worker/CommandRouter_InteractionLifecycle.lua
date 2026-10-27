@@ -179,6 +179,10 @@ local function npcEvent(context, payload, module, store)
     reactionContext.eventID = eventRef
     reactionContext.npcID = payload.npcID or defaultsValue.targetID
     reactionContext.factRefs = factRefs
+    reactionContext.semanticEventFacts = contextCopy(
+        payload.semanticEventFacts
+            or payload.context and payload.context.semanticEventFacts
+    )
     local reactions = PNC.Semantics and PNC.Semantics.SocialReactions
     if type(reactions) ~= "table"
         or type(reactions.Resolve) ~= "function"

@@ -29,6 +29,9 @@ local FOLLOW_UP_OFFERS = {
     combat = {
         followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
     },
+    retreat = {
+        followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
+    },
     medical = {
         followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
         followUp("attacker", "Who hurt you?", "EVENT_ATTACKER"),
@@ -185,6 +188,29 @@ Catalog.Register("semantic.leader_loss.reaction", {
 
 Catalog.Register("semantic.combat.reaction", {
     variants = {
+        {
+            id = "semantic.combat.reaction.retreat",
+            templateID = "semantic.combat.reaction.retreat",
+            fallback = "I need a moment before I can swing again.",
+            when = { eventType = "zombie_stamina_retreat" },
+            priority = 4,
+            plan = {
+                dialogueAct = "REACT",
+                sourcePoolID = "semantic.combat.reaction",
+                topic = "combat",
+                turns = {
+                    {
+                        segments = {
+                            {
+                                kind = "literal",
+                                text = "I need a moment before I can swing again.",
+                            },
+                        },
+                        offers = FOLLOW_UP_OFFERS.retreat,
+                    },
+                },
+            },
+        },
         {
             id = "semantic.combat.reaction.threat",
             templateID = "semantic.combat.reaction.threat",

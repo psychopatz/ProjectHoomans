@@ -166,6 +166,16 @@ T.equal(sent[1].packet.family, Const.LEADER_DEATH_FAMILY,
     "the line uses the leader-loss family")
 T.equal(sent[1].packet.flavorID, Const.FLAVOR_LEADER_DEATH,
     "the line uses the leader-death flavor id")
+T.truthy(sent[1].packet.semanticOwned,
+    "leader-loss speech is explicitly semantic-owned")
+T.equal(sent[1].packet.eventType, "witnessed_leader_death",
+    "leader-loss semantic event type is not the legacy Flavor selector")
+T.truthy(sent[1].packet.text,
+    "leader-loss packet carries selected semantic text")
+T.truthy(sent[1].packet.responsePlanID,
+    "leader-loss packet carries response-plan provenance")
+T.truthy(sent[1].packet.semanticEventFacts,
+    "leader-loss packet carries bounded authoritative event facts")
 
 -- The several mourners share one flavor family, so the family cooldown must
 -- be open or the client queue would admit only the first voice.

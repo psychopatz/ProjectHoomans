@@ -139,6 +139,14 @@ T.equal(
     "social.follower_abandoned_zombie",
     "zombie departure selects zombie return flavor"
 )
+T.truthy(sent[1].context.ambientFlavor.semanticOwned,
+    "zombie departure is explicitly semantic-owned")
+T.truthy(sent[1].context.ambientFlavor.text,
+    "zombie departure carries selected semantic text")
+T.truthy(sent[1].context.ambientFlavor.responsePlanID,
+    "zombie departure carries response-plan provenance")
+T.truthy(sent[1].context.ambientFlavor.factRefs,
+    "zombie departure carries event fact references")
 T.equal(record.followerAbandonment, nil,
     "delivered marker is cleared and cannot repeat")
 T.equal(Service.HasPending(record), false,
@@ -164,6 +172,10 @@ T.equal(
     "social.follower_abandoned_hostile_npc",
     "hostile NPC departure selects hostile NPC return flavor"
 )
+T.truthy(sent[2].context.ambientFlavor.semanticOwned,
+    "hostile NPC departure is explicitly semantic-owned")
+T.truthy(sent[2].context.ambientFlavor.text,
+    "hostile NPC departure carries selected semantic text")
 
 record.runtime.target = { kind = "player", id = "other-player" }
 record.runtime.followState.mode = "combat"

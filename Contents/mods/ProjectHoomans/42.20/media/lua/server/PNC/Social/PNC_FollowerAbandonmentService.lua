@@ -197,6 +197,7 @@ local function applyRelationship(record, marker, at)
             hostileKind = marker.hostileKind,
             hostileID = marker.hostileID,
             npcID = tostring(record.id),
+            semanticPresentation = "semantic_event_speech",
         },
     })
     if result == true
@@ -296,6 +297,10 @@ function Service.TryDeliver(player, record, body, occurredAt, meeting)
     local role
     local tier
     local flavorID
+    local semanticEventType
+    local eventRef
+    local factRefs
+    local semanticEventFacts
     local context
     local sent
     local sendReason
@@ -355,8 +360,36 @@ function Service.TryDeliver(player, record, body, occurredAt, meeting)
     tier = relationshipTier(relationship)
     flavorID = marker.hostileKind == "zombie"
         and Service.FLAVOR_ZOMBIE or Service.FLAVOR_HOSTILE_NPC
+    semanticEventType = marker.hostileKind == "zombie"
+        and "follower_abandoned_zombie"
+        or "follower_abandoned_hostile_npc"
+    eventRef = tostring(marker.eventID)
+    factRefs = { eventRef }
+    if marker.hostileID then
+        factRefs[#factRefs + 1] = eventRef .. ":pursuer"
+    end
+    semanticEventFacts = {
+        [eventRef] = {
+            eventRef = eventRef,
+            authoritative = true,
+            disclosure = "player",
+            summary = "the follower was left behind during combat",
+            happened = "the follower was left behind during combat",
+            pursuer = marker.hostileKind == "zombie"
+                and "the dead"
+                or marker.hostileID
+                    and "hostile NPC " .. tostring(marker.hostileID)
+                    or nil,
+            pursuerName = marker.hostileKind == "zombie"
+                and "the dead" or marker.hostileID,
+            hostileKind = marker.hostileKind,
+            hostileID = marker.hostileID,
+        },
+    }
     context = {
         eventType = "abandoned_in_combat",
+        eventRef = eventRef,
+        eventID = eventRef,
         phase = "follow",
         detection = "follow_range_exit",
         hostileKind = marker.hostileKind,
@@ -365,19 +398,26 @@ function Service.TryDeliver(player, record, body, occurredAt, meeting)
         socialRole = role,
         relationshipState = relationshipState(relationship),
         relationshipTier = tier,
+        factRefs = factRefs,
+        semanticEventFacts = semanticEventFacts,
     }
     local realization = SocialReactions
         and type(SocialReactions.Resolve) == "function"
         and SocialReactions.Resolve({
-            eventType = marker.hostileKind == "zombie"
-                and "follower_abandoned_zombie"
-                or "follower_abandoned_hostile_npc",
+            eventType = semanticEventType,
             act = "REACT",
             topic = "companion_relationship",
             context = context,
             eventID = marker.eventID,
             npcID = tostring(record.id),
         }) or nil
+    if not realization
+        or type(realization.fallback) ~= "string"
+        or realization.fallback == ""
+    then
+        return false, "semantic_realization_unavailable"
+    end
+    context.offerIDs = realization.offerIDs or {}
     if not Network or not Network.SendConversationRelationshipForNPC then
         return false, "relationship_transport_unavailable"
     end
@@ -387,24 +427,28 @@ function Service.TryDeliver(player, record, body, occurredAt, meeting)
         "follow_abandonment_return",
         {
             source = "follow_abandonment",
-            eventID = marker.eventID,
+            eventID = eventRef,
+            eventRef = eventRef,
+            eventType = semanticEventType,
+            semanticEventFacts = semanticEventFacts,
+            factRefs = factRefs,
+            offerIDs = realization.offerIDs,
             npcID = tostring(record.id),
             ambientFlavor = {
                 flavorID = flavorID,
-                text = realization and realization.fallback or nil,
+                text = realization.fallback,
+                semanticOwned = true,
+                eventRef = eventRef,
                 eventType = "abandoned_in_combat",
-                act = realization and realization.semanticAct or "REACT",
-                topic = realization and realization.topic
-                    or "companion_relationship",
-                responsePlanID = realization
-                    and realization.responsePlanID or nil,
-                poolID = realization and realization.realizationFamily or nil,
-                realizationFamily = realization
-                    and realization.realizationFamily or nil,
-                realizationID = realization and realization.realizationID
-                    or nil,
-                factRefs = realization and realization.groundedFactRefs
-                    or nil,
+                semanticEventFacts = semanticEventFacts,
+                act = realization.semanticAct or "REACT",
+                topic = realization.topic or "companion_relationship",
+                responsePlanID = realization.responsePlanID,
+                poolID = realization.realizationFamily,
+                realizationFamily = realization.realizationFamily,
+                realizationID = realization.realizationID,
+                factRefs = realization.groundedFactRefs,
+                offerIDs = realization.offerIDs,
                 family = "relationship_commentary",
                 priority = 75,
                 llmEligible = false,

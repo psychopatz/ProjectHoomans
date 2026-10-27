@@ -112,7 +112,8 @@ local function deliver(item, current)
     local accepted, enqueueReason = client.Enqueue({
         eventID = item.eventID,
         flavorID = item.realizationID or "social.conversation_farewell",
-        text = item.resolvedText,
+        text = item.text,
+        semanticOwned = true,
         family = "conversation_farewell",
         priority = 100,
         weight = 1,
@@ -135,7 +136,7 @@ local function deliver(item, current)
             tts = true,
         },
         source = {
-            kind = "conversation_farewell",
+            kind = "semantic_speech",
             eventType = "conversation_farewell",
             socialRole = item.role,
             semanticAct = item.semanticAct,
@@ -242,7 +243,7 @@ function Farewell.Schedule(spec, state, reason)
         role = role,
         context = farewellContext,
         interaction = interaction,
-        resolvedText = realization.fallback,
+        text = realization.fallback,
         semanticAct = realization.semanticAct,
         topic = realization.topic,
         responsePlanID = realization.responsePlanID,

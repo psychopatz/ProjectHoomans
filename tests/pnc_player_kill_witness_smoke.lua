@@ -181,6 +181,16 @@ T.equal(relationshipBroadcasts[1].context.relationshipDelta.respect, 4,
 T.equal(relationshipBroadcasts[1].context.ambientFlavor.flavorID,
     "social.witnessed_player_kill",
     "SP feedback carries the reusable flavor ID")
+T.truthy(relationshipBroadcasts[1].context.ambientFlavor.semanticOwned,
+    "SP feedback is explicitly semantic-owned")
+T.truthy(relationshipBroadcasts[1].context.ambientFlavor.text,
+    "SP feedback carries selected semantic text")
+T.truthy(relationshipBroadcasts[1].context.ambientFlavor.responsePlanID,
+    "SP feedback carries selected response-plan provenance")
+T.truthy(relationshipBroadcasts[1].context.ambientFlavor.factRefs,
+    "SP feedback carries event fact references")
+T.truthy(relationshipBroadcasts[1].context.ambientFlavor.semanticEventFacts,
+    "SP feedback carries bounded authoritative event facts")
 T.equal(relationshipBroadcasts[1].context.ambientFlavor.socialRole,
     "neutral",
     "SP feedback classifies the witness for flavor")

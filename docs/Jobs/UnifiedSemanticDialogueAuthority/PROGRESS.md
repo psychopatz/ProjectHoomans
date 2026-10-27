@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0, P1 and P2 accepted; P3 is the active implementation slice.
+**Status:** IN PROGRESS — P0, P1, P2 and P3 accepted; P4 is the active implementation slice.
 
 ## Audited baseline
 
@@ -42,8 +42,8 @@
 | P0 — authority inventory/baseline | **ACCEPTED** |
 | P1 — standardized semantic event realization boundary | **ACCEPTED** |
 | P2 — NPC-initiated event follow-up bridge | **ACCEPTED** |
-| P3 — lower-risk native SocialFlavor migration | **IN PROGRESS** |
-| P4 — complex medical/incapacitated migration | NOT STARTED |
+| P3 — lower-risk native SocialFlavor migration | **ACCEPTED** |
+| P4 — complex medical/incapacitated migration | **IN PROGRESS** |
 | P5 — ToolReplies + legacy registry migration | NOT STARTED |
 | P6 — compatibility semantic adapters | NOT STARTED |
 | P7 — canonical content coverage / Studio observability | NOT STARTED |
@@ -101,21 +101,45 @@
 - P2 focused evidence: Python worker `2/2`, Lua selection `5/5`; no native
   Project Zomboid or source save was used.
 
-## Immediate Next Chunk — P3
+## Accepted P3 — lower-risk native SocialFlavor migration
 
-Migrate the lower-risk native SocialFlavor families to semantic-first
-production event flows while preserving the existing queue and presentation
-infrastructure:
+- Farewell, conversation safety, player-spoke acknowledgement, witnessed
+  player kill, follower abandonment, horde detection/stamina retreat and
+  leader loss now select semantic response plans before presentation. Their
+  packets carry selected text, semantic ownership, response-plan/realization
+  provenance, bounded event refs and disclosed fact capsules where the event
+  supports them.
+- Direct social-event producers no longer inherit a generic lifecycle speech
+  beat before their semantic delivery edge. This avoids duplicate selection
+  and preserves the selected plan's exact follow-up offers.
+- Event follow-up offers are filtered by authoritative disclosed facts before
+  they enter the existing lifecycle window. Unsupported abandonment/safety
+  questions remain hidden rather than producing speculative answers.
+- Existing `PNC_SocialFlavorDefinitions_*` files remain migration source
+  material for later canonical content/retirement work; no first-party
+  migrated caller uses them as the meaning selector.
+- P3 negative characterization coverage runs without loading those definition
+  shards and proves semantic selection/text for all listed families. The
+  existing witness, abandonment and leader pipeline tests now assert explicit
+  semantic ownership and provenance.
+- P3 focused evidence: Lua `6/6`, production worker P2 follow-up `2/2`, and
+  the existing family regressions remain green. No native Project Zomboid or
+  source save was used.
 
-1. Finish semantic-first migration evidence for farewell, safety, player-spoke,
-   witnessed kill, follower abandonment, horde/retreat and leader loss.
-2. Move accepted wording into the existing Dialogue Content/translation owner
-   where a family is migrated; keep legacy definitions only as characterized
-   source material until parity is proven.
-3. Add one-family-at-a-time negative proof that missing semantic realization
-   cannot select first-party SocialFlavor prose.
+## Immediate Next Chunk — P4
 
-After the P3 family gates pass, continue automatically through P4–P9.
+Migrate the complex medical/incapacitated/retreat families to the same
+semantic-first production event flows while preserving the existing queue and
+presentation infrastructure:
+
+1. Migrate witnessed teammate hurt, zombie stamina/retreat integration,
+   incapacitated call/update/repeat and medical/rescue wording.
+2. Preserve health/medical authority and expose only bounded disclosed facts to
+   the existing lifecycle follow-up path.
+3. Add family-level negative proof that missing semantic realization cannot
+   select first-party SocialFlavor prose.
+
+After the P4 family gates pass, continue automatically through P5–P9.
 
 ## Stop conditions
 

@@ -313,21 +313,51 @@ function Hooks.OnLeaderLost(faction, deadPlayerKey, succession, successorNPCID)
         })
         context.leaderName = leaderName or "our leader"
         context.successorName = successorName
-        context.eventType = flavorID()
+        context.eventType = "witnessed_leader_death"
         context.factionID = factionID
         context.deadLeaderKey = deadPlayerKey
         local eventID = "leader_loss:" .. factionID .. ":"
             .. tostring(math.floor(at)) .. ":" .. npcID
+        local factRefs = { eventID, eventID .. ":deceased" }
+        local semanticEventFacts = {
+            [eventID] = {
+                eventRef = eventID,
+                authoritative = true,
+                disclosure = "player",
+                summary = "the faction leader died",
+                happened = "the faction leader died",
+                deceasedName = leaderName or "our leader",
+                nextAction = successorName
+                    and "follow " .. successorName
+                    or "decide what comes next",
+                factionID = factionID,
+                deadLeaderKey = deadPlayerKey,
+            },
+        }
+        if successorName then
+            factRefs[#factRefs + 1] = eventID .. ":next"
+        end
+        context.eventRef = eventID
+        context.eventID = eventID
+        context.factRefs = factRefs
+        context.semanticEventFacts = semanticEventFacts
         local realization = SocialReactions
             and type(SocialReactions.Resolve) == "function"
             and SocialReactions.Resolve({
-                eventType = flavorID(),
+                eventType = "witnessed_leader_death",
                 act = "REACT",
                 topic = "leader_loss",
                 context = context,
                 eventID = eventID,
                 npcID = npcID,
             }) or nil
+        if not realization
+            or type(realization.fallback) ~= "string"
+            or realization.fallback == ""
+        then
+            return false, "semantic_realization_unavailable"
+        end
+        context.offerIDs = realization.offerIDs or {}
         Core.ForEachPlayer(function(player)
             if not player or not playerCanHear(player, record, radiusSq) then
                 return
@@ -336,22 +366,23 @@ function Hooks.OnLeaderLost(faction, deadPlayerKey, succession, successorNPCID)
                 source = flavorID(),
                 eventID = eventID,
                 npcID = npcID,
+                eventType = "witnessed_leader_death",
                 ambientFlavor = {
                     eventID = eventID,
+                    eventRef = eventID,
                     flavorID = flavorID(),
-                text = realization and realization.fallback or nil,
-                    eventType = flavorID(),
-                act = realization and realization.semanticAct or "REACT",
-                topic = realization and realization.topic or "leader_loss",
-                responsePlanID = realization
-                    and realization.responsePlanID or nil,
-                poolID = realization and realization.realizationFamily or nil,
-                realizationFamily = realization
-                    and realization.realizationFamily or nil,
-                realizationID = realization and realization.realizationID
-                    or nil,
-                factRefs = realization and realization.groundedFactRefs
-                    or nil,
+                    semanticOwned = true,
+                    text = realization.fallback,
+                    eventType = "witnessed_leader_death",
+                    semanticEventFacts = semanticEventFacts,
+                    act = realization.semanticAct or "REACT",
+                    topic = realization.topic or "leader_loss",
+                    responsePlanID = realization.responsePlanID,
+                    poolID = realization.realizationFamily,
+                    realizationFamily = realization.realizationFamily,
+                    realizationID = realization.realizationID,
+                    factRefs = realization.groundedFactRefs,
+                    offerIDs = realization.offerIDs,
                     family = familyID(),
                     priority = priorityValue(),
                     weight = weightValue(),
