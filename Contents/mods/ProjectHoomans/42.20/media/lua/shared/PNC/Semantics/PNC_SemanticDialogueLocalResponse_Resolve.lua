@@ -119,27 +119,23 @@ function Response.Resolve(ir, state, context, branch)
     if branch == "GIFT_SELECTION_REQUIRED" then
         return {
             templateID = "semantic.gift.selection_required",
-            fallback = "Oh? What did you bring me?",
             args = copyArgs({ object = ir.object }),
         }
     end
     if branch == "GIFT_OFFER_DISPATCHED" then
         return {
             templateID = "semantic.gift.pending",
-            fallback = "",
             args = copyArgs({ object = ir.object }),
         }
     end
     if branch == "GIFT_CONSENT_DECLINED" then
         return {
             templateID = "semantic.gift.consent.declined",
-            fallback = "No problem. I'll leave it with you.",
         }
     end
     if branch == "GIFT_CONSENT_AMBIGUOUS" then
         return {
             templateID = "semantic.gift.consent.ambiguous",
-            fallback = "More than one of us wants it. Please offer it to one person directly.",
         }
     end
     if branch == "QUESTION_RECEIVED" and type(resolveQuestion) == "function" then
@@ -153,7 +149,6 @@ function Response.Resolve(ir, state, context, branch)
             -- The authoritative identity-claim result decides whether the
             -- NPC may disclose their own name. Do not leak it before the
             -- server validates the player's claim.
-            fallback = "Nice to meet you. What's your name?",
             args = copyArgs({
                 playerName = claim.name,
                 npcName = context and (context.npcFullName or context.npcName),
@@ -186,28 +181,12 @@ function Response.Resolve(ir, state, context, branch)
             end
             if #gossipLines > 0 then
                 response.templateID = "semantic.gossip.memory"
-                response.fallback = table.concat(gossipLines, " ")
-                response.args = nil
+                response.args = copyArgs({
+                    content = table.concat(gossipLines, " "),
+                })
                 return response
             end
-            if type(information) == "table"
-                and information.event == "NEWS"
-            then
-                local target = type(ir.target) == "table"
-                    and ir.target.unresolved ~= true
-                    and ir.target or nil
-                local name = target and targetText(target) or ""
-                if name ~= "" and name ~= "them" then
-                    response.fallback = "I haven't heard anything new about "
-                        .. name .. " lately."
-                else
-                    response.fallback = "I haven't heard any news lately."
-                end
-            else
-                local name = targetText(ir.target)
-                response.fallback = "I haven't heard anything about "
-                    .. name .. " yet."
-            end
+            response.args = copyArgs({ target = targetText(ir.target) })
             return response
         end
     end

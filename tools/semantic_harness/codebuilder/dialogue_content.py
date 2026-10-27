@@ -35,9 +35,10 @@ LANGUAGES = ("EN", "TL")
 STYLES = ("neutral", "warm", "terse", "guarded")
 ID_PATTERN = re.compile(r"^[a-z][a-z0-9_.:-]{0,127}$")
 TRANSLATION_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,127}$")
-MAX_FAMILIES = 256
+MAX_FAMILIES = 512
 MAX_PHRASES_PER_STYLE = 6
 MAX_PLAYER_CONTENT = 32
+MAX_RUNTIME_ALIASES = 512
 MAX_TEXT = 256
 
 
@@ -238,6 +239,36 @@ def _player_content(
     }, translations
 
 
+def _runtime_alias(value: Any, semantic_ids: set[str], alias_keys: set[str]) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise CompileError("runtimeAliases entries must be objects")
+    semantic_id = _id(value.get("semanticTemplateID"), "runtimeAlias.semanticTemplateID")
+    if semantic_id not in semantic_ids:
+        raise CompileError(
+            f"runtime alias references an unknown semanticTemplateID: {semantic_id}"
+        )
+    runtime_key = _translation_key(value.get("runtimeKey"), "runtimeAlias.runtimeKey")
+    if runtime_key in alias_keys:
+        raise CompileError(f"duplicate runtime alias key: {runtime_key}")
+    alias_keys.add(runtime_key)
+    style = value.get("style", "neutral")
+    if style not in STYLES:
+        raise CompileError(f"runtime alias {runtime_key} has an invalid style: {style!r}")
+    phrase_index = value.get("phraseIndex", 1)
+    if not isinstance(phrase_index, int) or isinstance(phrase_index, bool):
+        raise CompileError(f"runtime alias {runtime_key} phraseIndex must be an integer")
+    if phrase_index < 1 or phrase_index > MAX_PHRASES_PER_STYLE:
+        raise CompileError(
+            f"runtime alias {runtime_key} phraseIndex is outside the bounded phrase range"
+        )
+    return {
+        "runtimeKey": runtime_key,
+        "semanticTemplateID": semantic_id,
+        "style": style,
+        "phraseIndex": phrase_index,
+    }
+
+
 def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
     """Validate and compile content without producing any files."""
     if not isinstance(document, dict):
@@ -256,6 +287,11 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
     raw_player = document.get("playerChoices", [])
     if not isinstance(raw_player, list) or len(raw_player) > MAX_PLAYER_CONTENT:
         raise CompileError(f"playerChoices must contain at most {MAX_PLAYER_CONTENT} records")
+    raw_aliases = document.get("runtimeAliases", [])
+    if not isinstance(raw_aliases, list) or len(raw_aliases) > MAX_RUNTIME_ALIASES:
+        raise CompileError(
+            f"runtimeAliases must contain at most {MAX_RUNTIME_ALIASES} records"
+        )
 
     family_ids: set[str] = set()
     semantic_ids: set[str] = set()
@@ -290,6 +326,29 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
             key, language = compound_key.rsplit(":", 1)
             translations_by_language[language][key] = text
 
+    aliases: list[dict[str, Any]] = []
+    alias_keys: set[str] = set()
+    family_by_semantic = {
+        family["semanticTemplateID"]: family for family in compiled_families
+    }
+    for raw_alias in raw_aliases:
+        alias = _runtime_alias(raw_alias, semantic_ids, alias_keys)
+        family = family_by_semantic[alias["semanticTemplateID"]]
+        phrases = family["styles"].get(alias["style"])
+        if not phrases:
+            phrases = family["styles"].get("neutral")
+            alias["style"] = "neutral"
+        phrase_index = min(alias["phraseIndex"], len(phrases))
+        alias["phraseIndex"] = phrase_index
+        phrase = phrases[phrase_index - 1]
+        alias["canonicalKey"] = phrase["key"]
+        for language in LANGUAGES:
+            canonical_key = phrase["key"]
+            translations_by_language[language][alias["runtimeKey"]] = (
+                translations_by_language[language][canonical_key]
+            )
+        aliases.append(alias)
+
     # Translation output is deliberately a flat string map.  Arrays here
     # would turn equivalent wording into a different runtime contract.
     for language, values in translations_by_language.items():
@@ -302,6 +361,7 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
         "source": source,
         "phraseFamilies": compiled_families,
         "playerChoices": compiled_player,
+        "runtimeAliases": aliases,
         "translations": translations_by_language,
     }
     compiled["contentFingerprint"] = content_fingerprint(document)
@@ -354,6 +414,15 @@ def render_dialogue_content_registry(compiled: dict[str, Any]) -> str:
         for family in compiled["phraseFamilies"]
     }
     choices = {choice["id"]: choice for choice in compiled["playerChoices"]}
+    aliases = {
+        alias["runtimeKey"]: {
+            "semanticTemplateID": alias["semanticTemplateID"],
+            "style": alias["style"],
+            "phraseIndex": alias["phraseIndex"],
+            "canonicalKey": alias["canonicalKey"],
+        }
+        for alias in compiled.get("runtimeAliases", [])
+    }
     lines = [
         "-- Generated by tools/semantic_harness/codebuilder/build.py; do not edit by hand.",
         "-- Dialogue Content Registry: bounded post-style phrases and player content.",
@@ -366,16 +435,35 @@ def render_dialogue_content_registry(compiled: dict[str, Any]) -> str:
         f"Registry.CONTENT_FINGERPRINT = {_lua_string(compiled['contentFingerprint'])}",
         f"Registry.PHRASE_FAMILIES = {_lua_value(families, 0)}",
         f"Registry.PLAYER_CHOICES = {_lua_value(choices, 0)}",
+        f"Registry.RUNTIME_ALIASES = {_lua_value(aliases, 0)}",
+        "function Registry.ResolveTemplate(templateID, style)",
+        "    local alias = Registry.RUNTIME_ALIASES[tostring(templateID or \"\")]",
+        "    if type(alias) == \"table\" then",
+        "        return alias.semanticTemplateID, alias.style or style or \"neutral\"",
+        "    end",
+        "    return tostring(templateID or \"\"), style or \"neutral\"",
+        "end",
         "function Registry.FamilyFor(templateID, style)",
-        "    local family = Registry.PHRASE_FAMILIES[tostring(templateID or \"\")]",
+        "    local alias = Registry.RUNTIME_ALIASES[tostring(templateID or \"\")]",
+        "    local resolvedID, resolvedStyle = Registry.ResolveTemplate(templateID, style)",
+        "    local family = Registry.PHRASE_FAMILIES[resolvedID]",
         "    if type(family) ~= \"table\" then return nil end",
-        "    local selectedStyle = tostring(style or \"neutral\")",
+        "    local selectedStyle = tostring(resolvedStyle or \"neutral\")",
         "    local phrases = family.styles and family.styles[selectedStyle]",
         "    if type(phrases) ~= \"table\" then",
         "        selectedStyle = \"neutral\"",
         "        phrases = family.styles and family.styles[selectedStyle]",
         "    end",
+        "    if type(alias) == \"table\" and type(phrases) == \"table\" then",
+        "        local selected = phrases[tonumber(alias.phraseIndex) or 1]",
+        "        phrases = selected and { selected } or phrases",
+        "    end",
         "    return family, type(phrases) == \"table\" and phrases or nil, selectedStyle",
+        "end",
+        "function Registry.KeyFor(templateID, style)",
+        "    local family, phrases = Registry.FamilyFor(templateID, style)",
+        "    local first = phrases and phrases[1] or nil",
+        "    return first and first.key or nil",
         "end",
         "function Registry.PlayerChoice(contentID)",
         "    return Registry.PLAYER_CHOICES[tostring(contentID or \"\")]",

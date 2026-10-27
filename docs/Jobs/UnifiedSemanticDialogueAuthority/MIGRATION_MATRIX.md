@@ -248,7 +248,16 @@ absence tests without changing semantic/runtime authority.
 | Compatibility speech bridge names | Bandits incoming damage/adapter; Necroa client composition; Companion Dogs interaction/presentation | first-party filenames/API locals now describe speech/caption transport; external behavior and transport contracts preserved | Bandits, Necroa, compatibility-shape, Companion Dogs smokes; PZ verifier |
 | Historical P8/P10 absence tests | deleted first-party legacy registry/namespace surfaces | consolidated into durable architecture-contract absence plus positive parity assertions; domain/runtime tests retained | `tests/pnc_conversation_architecture_contract_smoke.lua` |
 
-P11B is the active wording-ownership slice. Its audit matrix must cover
-`Responses.json`, `Realizations.json`, LocalResponse prose/fallbacks, static
-semantic-ID translation-key maps, and hard-coded SpeechRealization families
-before any superseded store is deleted.
+## P11B current closure
+
+| Surface | Verified current owner/callers | P11B disposition | Evidence |
+| --- | --- | --- | --- |
+| First-party semantic response wording | ResponseCatalog selection plus Dialogue Content registry | direct catalog/LocalResponse prose removed; semantic template IDs and bounded args/facts are selected before realization | focused local-response, route, response-catalog, event-follow-up and P7 content smokes |
+| Static semantic translation-key maps | client response translation resolver | deleted; resolver derives canonical Dialogue Content keys and resolves bounded runtime aliases | local-route/identity presentation smokes; Kahlua scan |
+| SpeechRealization family packs/builders | generated Dialogue Content Registry | deleted; SpeechRealization only applies canonical phrase families and exposes compatibility read-only coverage | realization authority, command/emote and P7 content smokes |
+| `Responses.json`, `Realizations.json`, identity response catalogs | Dialogue Content EN/TL artifacts | deleted from production tree and translation manifest after EN/TL key/provenance parity checks | `test_legacy_semantic_authority_p11` negative absence plus positive artifact assertions |
+| Grounded event follow-up wording | event semantic pools plus Dialogue Content | known answers use canonical `%s` templates with authoritative fact args; unknown answers use explicit canonical unknown templates | P2 event-follow-up smoke; typed/clicked selection parity retained |
+| Command/emote/greeting wording | command/emote/greeting ResponseCatalog pools plus Dialogue Content | canonical phrase variants retain deterministic anti-repeat and target argument formatting | companion command, emote, greeting and P7 content smokes |
+
+P11C is now the active authoring-layout slice. Its audit must preserve stable
+semantic IDs and move only physical canonical source ownership.

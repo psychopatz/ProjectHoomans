@@ -9,12 +9,10 @@ local copyArgs = Internal.CopyArgs
 local catalogResponse = Internal.CatalogResponse
 local targetText = Internal.TargetText
 local factFor = Internal.FactFor
-local locationText = Internal.LocationText
 
-local function continuationResponse(templateID, fallback, topic)
+local function continuationResponse(templateID, topic)
     return {
         templateID = templateID,
-        fallback = fallback,
         dialogueAct = "CONVERSATION_CONTINUATION",
         topic = topic,
         uncertainty = "unknown",
@@ -48,9 +46,6 @@ local function resolveConversationContinuation(ir, state, context)
             hasMemory
                 and "semantic.conversation.continuation.gossip_memory"
                 or "semantic.conversation.continuation.gossip_unknown",
-            hasMemory
-                and "That's all I know about it for now."
-                or "I don't have anything else to add right now.",
             "gossip"
         )
     end
@@ -59,7 +54,6 @@ local function resolveConversationContinuation(ir, state, context)
     then
         return continuationResponse(
             "semantic.conversation.continuation.residence",
-            "That's all I can confirm about where I live right now.",
             "RESIDENCE"
         )
     end
@@ -76,22 +70,17 @@ local function resolveConversationContinuation(ir, state, context)
             healthKnown
                 and "semantic.conversation.continuation.medical_known"
                 or "semantic.conversation.continuation.medical_unknown",
-            healthKnown
-                and "I don't have anything more to add about my health right now."
-                or "I can't confirm anything more about my health right now.",
             "MEDICAL"
         )
     end
     if subject == "NPC_KNOWLEDGE" or topic == "knowledge" then
         return continuationResponse(
             "semantic.conversation.continuation.knowledge",
-            "I don't have anything else reliable to add about that.",
             "KNOWLEDGE"
         )
     end
     return continuationResponse(
         "semantic.conversation.continuation.default",
-        "I don't have anything else to add about that right now.",
         topic or "conversation"
     )
 end
@@ -164,10 +153,7 @@ local function resolveRelationshipStatus(ir, state, context)
             ir,
             state,
             context
-        ) or {
-            templateID = "semantic.question.relationship_status.committed",
-            fallback = "I thought we were already together.",
-        }
+        )
     end
 
     if followsCompliment then
@@ -188,22 +174,30 @@ local function resolveRelationshipStatus(ir, state, context)
         ir,
         state,
         context
-    ) or {
-        templateID = "semantic.question.relationship_status.uncertain",
-        fallback = "I haven't really thought about dating. Right now, I'm focused on surviving.",
-    }
+    )
 end
 
 local function resolveLocationOrSeen(ir)
     local fact = factFor(ir)
     if fact and fact.status == "known" then
         if ir.subject == "LOCATION" then
+            local location = fact.location or {}
+            local band = location.distanceBand
+            local templateID = "semantic.question.location.unknown"
+            if location.label then
+                templateID = "semantic.question.location.named"
+            elseif band == "nearby" then
+                templateID = "semantic.question.location.nearby"
+            elseif band == "not_far" then
+                templateID = "semantic.question.location.not_far"
+            elseif band == "far" then
+                templateID = "semantic.question.location.far"
+            end
             return {
-                templateID = "semantic.question.location",
-                fallback = locationText(ir, fact),
+                templateID = templateID,
                 args = copyArgs({
                     target = targetText(ir.target, fact),
-                    location = fact.location,
+                    location = location.label,
                     freshness = fact.freshness,
                 }),
             }
@@ -211,35 +205,28 @@ local function resolveLocationOrSeen(ir)
         if fact.value == true then
             return {
                 templateID = "semantic.question.seen_yes",
-                fallback = "Yes, I saw " .. targetText(ir.target, fact) .. ".",
                 args = copyArgs({ target = targetText(ir.target, fact) }),
             }
         end
         if fact.value == false then
             return {
                 templateID = "semantic.question.seen_no",
-                fallback = "No, I haven't seen " .. targetText(ir.target, fact) .. ".",
                 args = copyArgs({ target = targetText(ir.target, fact) }),
             }
         end
     elseif fact and fact.status == "ambiguous" then
         return {
             templateID = "semantic.question.fact_clarification",
-            fallback = "I'm not sure which person you mean.",
             args = copyArgs({ target = targetText(ir.target, fact) }),
         }
     elseif ir.subject == "LOCATION" then
         return {
             templateID = "semantic.question.location_unknown",
-            fallback = "I don't know where " .. targetText(ir.target, fact)
-                .. " is.",
             args = copyArgs({ target = targetText(ir.target, fact) }),
         }
     else
         return {
             templateID = "semantic.question.seen_unknown",
-            fallback = "I don't know if I've seen "
-                .. targetText(ir.target, fact) .. ".",
             args = copyArgs({ target = targetText(ir.target, fact) }),
         }
     end

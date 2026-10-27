@@ -55,16 +55,6 @@ if type(InteractionLifecycle) ~= "table" then
     InteractionLifecycle = type(loaded) == "table" and loaded or nil
 end
 
-if Policy and type(Policy.RegisterTextFallbacks) == "function" then
-    Policy.RegisterTextFallbacks()
-end
-if ResponseCatalog and type(ResponseCatalog.RegisterTextFallbacks) == "function" then
-    -- History may contain semantic keys written before keyed fallbacks were
-    -- persisted. Register the current catalog before a full-screen session
-    -- loads that history so those old rows remain readable as well.
-    ResponseCatalog.RegisterTextFallbacks()
-end
-
 if SemanticCapabilityHandshake
     and type(SemanticCapabilityHandshake.Report) == "function"
 then

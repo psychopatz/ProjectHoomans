@@ -509,7 +509,7 @@ focused Python coverage is `15/15 PASS`, and the Project Hoomans Kahlua scan
 reported `0` errors / `0` warnings across `3,164` files. No source save,
 native Project Zomboid session, or Workshop operation was touched.
 
-## Immediate Next Chunk — P11B
+## Accepted P11B — one first-party wording path
 
 Audit every first-party wording path (`Responses.json`, `Realizations.json`,
 LocalResponse prose/fallbacks, static semantic-ID translation maps, and
@@ -517,6 +517,28 @@ hard-coded SpeechRealization families). Move wording into Dialogue Content
 with semantic template IDs plus bounded factual arguments, prove EN/TL and
 runtime parity, then remove superseded first-party wording stores and
 fallback seams.
+
+P11B is accepted after the first-party wording audit. ResponseCatalog and
+LocalResponse now select semantic template IDs plus bounded fact arguments;
+Dialogue Content is the only Project Hoomans first-party wording source used
+by SpeechRealization and payload rendering. Static client translation-key
+maps, SpeechRealization family builders/families, first-party semantic
+`Responses.json`/`Realizations.json`, and identity response catalogs were
+deleted after parity coverage. Canonical runtime aliases preserve stable
+legacy translation keys without retaining the old wording registries.
+
+Focused production-Lua coverage: `20/20 PASS` in `0.50s`; focused P11B
+Python coverage: `15/15 PASS`; Project Hoomans Kahlua scan: `0` errors / `0`
+warnings across `3,140` scanned files; CodeBuilder was run twice with
+identical generated SHA-256 outputs; `git diff --check`: PASS. The source is
+still migration-heavy and exceeds the P10 compact size target, so P11C/P11D
+must shard and compact it before final acceptance.
+
+## Immediate Next Chunk — P11C
+
+Split canonical Conversation authoring into cohesive domain shards, separate
+NLU/pattern authoring from response/content wording, and compile one
+deterministic globally unique manifest without changing stable semantic IDs.
 
 ## Historical P11A starting instructions (completed)
 

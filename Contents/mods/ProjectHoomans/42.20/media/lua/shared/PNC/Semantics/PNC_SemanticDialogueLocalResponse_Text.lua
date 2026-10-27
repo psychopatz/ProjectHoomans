@@ -8,7 +8,7 @@ Response.Internal = Internal
 local copyArgs = Internal.CopyArgs
 local catalogResponse = Internal.CatalogResponse
 
-local function clockText(world)
+local function clockFacts(world)
     local time = world and (world.time or world)
     if type(time) == "table" and time.available == false then return nil end
     local hour = tonumber(time and (time.hour or time.hour24))
@@ -18,15 +18,14 @@ local function clockText(world)
     local suffix = hour >= 12 and "PM" or "AM"
     local displayHour = hour % 12
     if displayHour == 0 then displayHour = 12 end
-    return string.format("It's %d:%02d %s.", displayHour, minute, suffix)
+    return {
+        display = string.format("%d:%02d %s", displayHour, minute, suffix),
+        hour = hour,
+        minute = minute,
+    }
 end
 
-local MONTH_NAMES = {
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
-}
-
-local function dayText(world)
+local function dayFacts(world)
     world = type(world) == "table" and world or {}
     local calendar = type(world.calendar) == "table" and world.calendar or {}
     local year = tonumber(calendar.year)
@@ -36,37 +35,37 @@ local function dayText(world)
         and year > 0 and month >= 1 and month <= 12
         and day >= 1 and day <= 31
     then
-        return "It's " .. tostring(MONTH_NAMES[math.floor(month)]) .. " "
-            .. tostring(math.floor(day)) .. ", " .. tostring(math.floor(year))
-            .. "."
+        return {
+            year = math.floor(year),
+            month = math.floor(month),
+            day = math.floor(day),
+        }
     end
     local gameDay = tonumber(world.gameDay)
-    if gameDay ~= nil then return "It's day " .. tostring(math.floor(gameDay)) .. "." end
+    if gameDay ~= nil then return { gameDay = math.floor(gameDay) } end
     return nil
 end
 
-local function weatherText(world)
+local function weatherFacts(world)
     local weather = world and world.weather or nil
     if type(weather) ~= "table" then return nil end
     local raining = weather.raining == true
     local foggy = weather.foggy == true
     local snowing = weather.snowing == true
-    if snowing and foggy then return "It's snowing and foggy out." end
-    if snowing then return "It's snowing right now." end
-    if raining and foggy then return "It's raining and foggy out." end
-    if raining then return "It's raining right now." end
-    if foggy then return "It's foggy out." end
+    if snowing then return { kind = "snowing", foggy = foggy } end
+    if raining then return { kind = "raining", foggy = foggy } end
+    if foggy then return { kind = "foggy" } end
     if weather.raining == false or weather.foggy == false then
-        return "The weather looks clear right now."
+        return { kind = "clear" }
     end
     local temperature = tonumber(weather.temperatureC)
     if temperature then
-        return string.format("It's about %.1f degrees out.", temperature)
+        return { kind = "temperature", temperature = temperature }
     end
     return nil
 end
 
-local function identityText(context)
+local function identityFacts(context)
     local name = type(context) == "table" and (
         context.npcFullName or context.npcName
     ) or nil
@@ -76,9 +75,9 @@ local function identityText(context)
         and name ~= ""
         and string.lower(name) ~= "unknown survivor"
     then
-        return "I'm " .. name .. "."
+        return { name = name, known = true }
     end
-    return "I'm a survivor."
+    return { name = nil, known = false }
 end
 
 local function targetText(target, fact)
@@ -98,18 +97,16 @@ local function factFor(ir)
     return type(fact) == "table" and fact or nil
 end
 
-local function locationText(ir, fact)
+local function locationFacts(ir, fact)
     local location = fact and fact.location or nil
     local name = targetText(ir and ir.target, fact)
     local band = location and location.distanceBand or nil
     local label = location and location.label or nil
-    if label then return name .. " is at " .. tostring(label) .. "." end
-    if band == "nearby" then return name .. " is nearby." end
-    if band == "not_far" then
-        return "I last saw " .. name .. " not far from here."
-    end
-    if band == "far" then return "I last saw " .. name .. " farther out." end
-    return "I know where " .. name .. " is, but not exactly."
+    return {
+        target = name,
+        location = label,
+        distanceBand = band,
+    }
 end
 
 -- The question resolver is a pure domain spoke. These helpers are read-only
@@ -119,12 +116,12 @@ Response.Internal = Response.Internal or {}
 local Internal = Response.Internal
 Internal.CopyArgs = copyArgs
 Internal.CatalogResponse = catalogResponse
-Internal.ClockText = clockText
-Internal.DayText = dayText
-Internal.WeatherText = weatherText
-Internal.IdentityText = identityText
+Internal.ClockFacts = clockFacts
+Internal.DayFacts = dayFacts
+Internal.WeatherFacts = weatherFacts
+Internal.IdentityFacts = identityFacts
 Internal.TargetText = targetText
 Internal.FactFor = factFor
-Internal.LocationText = locationText
+Internal.LocationFacts = locationFacts
 
 return Response

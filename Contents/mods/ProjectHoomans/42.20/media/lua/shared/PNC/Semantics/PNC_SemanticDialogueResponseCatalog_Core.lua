@@ -55,15 +55,6 @@ function Core.boundedText(value)
     return value
 end
 
-function Core.registerTextFallback(templateID, fallback)
-    local text = PsychopatzCore
-        and PsychopatzCore.Conversation
-        and PsychopatzCore.Conversation.Text
-    if text and type(text.RegisterFallback) == "function" then
-        text.RegisterFallback(templateID, fallback)
-    end
-end
-
 local function contentFallback(templateID)
     local registry = PNC.Semantics
         and PNC.Semantics.DialogueContentRegistry or nil
@@ -325,7 +316,6 @@ function Core.normalizedVariant(poolID, index, value)
         when = Core.copy(value.when),
         priority = tonumber(value.priority) or 0,
     }
-    Core.registerTextFallback(normalized.templateID, normalized.fallback)
     return normalized
 end
 

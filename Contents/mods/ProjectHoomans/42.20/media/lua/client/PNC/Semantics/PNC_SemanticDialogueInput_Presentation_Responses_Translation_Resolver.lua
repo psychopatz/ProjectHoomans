@@ -1,4 +1,8 @@
 -- Semantic response template-key resolver.
+--
+-- Dialogue Content derives the only first-party semantic-template → wording
+-- join. Runtime aliases are generated from that source for already-emitted
+-- packet keys; this module contains no authored key catalog.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 local Input = PNC.Semantics.DialogueInput or {}
@@ -6,50 +10,38 @@ PNC.Semantics.DialogueInput = Input
 local Internal = Input.Internal or {}
 Input.Internal = Internal
 
-local BACKSTORY_KINDS = {
-    former_job = "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob",
-    hometown = "UI_PNC_Conversation_Semantic_QuestionBackstoryHometown",
-    education = "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation",
-    hobby = "UI_PNC_Conversation_Semantic_QuestionBackstoryHobby",
-    family_background = "UI_PNC_Conversation_Semantic_QuestionBackstoryFamily",
-    fear = "UI_PNC_Conversation_Semantic_QuestionBackstoryFear",
-    tragedy = "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy",
-}
-local keys = Internal.SemanticTranslationKeys
+local Registry = PNC.Semantics.DialogueContentRegistry
+    or require "PNC/Semantics/Generated/DialogueContent/Registry"
 
 local function semanticTranslationKey(response)
     local templateID = tostring(response and response.templateID or "")
-    if string.sub(templateID, 1, 7) == "UI_PNC_" then
+    if type(Registry) ~= "table" then return nil end
+    if string.sub(templateID, 1, 7) == "UI_PNC_"
+        and type(Registry.RUNTIME_ALIASES) == "table"
+        and Registry.RUNTIME_ALIASES[templateID] ~= nil
+    then
         return templateID
     end
-    if templateID == "semantic.question.identity" then
-        local fallback = tostring(response and response.fallback or "")
-        if string.find(string.lower(fallback), "liars", 1, true) then
-            return "UI_PNC_Conversation_Semantic_QuestionIdentityWary"
-        end
-        if string.sub(fallback, 1, 4) == "I'm " then
-            return "UI_PNC_Conversation_Semantic_QuestionIdentityKnown"
-        end
-        return "UI_PNC_Conversation_Semantic_QuestionIdentity"
+    if string.sub(templateID, 1, 28)
+        == "UI_PNC_Conversation_Content_"
+    then
+        return templateID
     end
-    if templateID == "semantic.question.identity.known" then
-        return "UI_PNC_Conversation_Semantic_QuestionIdentityKnown"
+    local args = response and response.args or nil
+    local resolvedID = templateID
+    if templateID == "semantic.question.backstory.known"
+        and type(args) == "table" and type(args.kind) == "string"
+        and args.kind ~= ""
+    then
+        resolvedID = templateID .. "." .. args.kind
     end
-    if templateID == "semantic.question.backstory.known" then
-        local args = response and response.args
-        return BACKSTORY_KINDS[args and args.kind]
-            or "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown"
+    if type(Registry.KeyFor) == "function" then
+        return Registry.KeyFor(
+            resolvedID,
+            response and response.realizationVariant or nil
+        )
     end
-    if templateID == "semantic.question.backstory.suspected" then
-        return "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected"
-    end
-    if templateID == "semantic.question.backstory.ambiguous" then
-        return "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous"
-    end
-    if templateID == "semantic.question.backstory.refusal" then
-        return "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal"
-    end
-    return keys[templateID]
+    return nil
 end
 
 Internal.SemanticTranslationKey = semanticTranslationKey

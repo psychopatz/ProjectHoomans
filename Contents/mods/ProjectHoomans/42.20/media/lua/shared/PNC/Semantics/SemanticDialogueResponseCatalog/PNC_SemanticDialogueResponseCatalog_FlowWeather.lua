@@ -12,7 +12,7 @@ Catalog.Register("semantic.flow.weather.raining", {
         {
             id = "semantic.flow.weather.raining.default",
             templateID = "semantic.flow.weather.raining.default",
-            fallback = "It is raining right now. I would wait for a break.",
+
         },
     },
 })
@@ -22,7 +22,7 @@ Catalog.Register("semantic.flow.weather.clear", {
         {
             id = "semantic.flow.weather.clear.default",
             templateID = "semantic.flow.weather.clear.default",
-            fallback = "The weather looks clear right now.",
+
         },
     },
 })
@@ -32,7 +32,7 @@ Catalog.Register("semantic.flow.weather.unknown", {
         {
             id = "semantic.flow.weather.unknown.default",
             templateID = "semantic.flow.weather.unknown.default",
-            fallback = "I cannot confirm the weather from here.",
+
         },
     },
 })

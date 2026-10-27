@@ -14,28 +14,28 @@ Catalog.Extend("semantic.conversation.acknowledged", {
         {
             id = "semantic.navigation.orders",
             templateID = "semantic.navigation.orders",
-            fallback = "All right. What do you need?",
+
             when = { subject = "COMPANION_ORDERS" },
             priority = 5,
         },
         {
             id = "semantic.navigation.camp",
             templateID = "semantic.navigation.camp",
-            fallback = "Where should we set up?",
+
             when = { subject = "COMPANION_CAMP" },
             priority = 5,
         },
         {
             id = "semantic.navigation.camp_empty",
             templateID = "semantic.navigation.camp_empty",
-            fallback = "I don't see a good place to set up here.",
+
             when = { subject = "COMPANION_CAMP_EMPTY" },
             priority = 5,
         },
         {
             id = "semantic.navigation.subject_change",
             templateID = "semantic.navigation.subject_change",
-            fallback = "All right. What did you want to talk about?",
+
             when = { subject = "CONVERSATION_TOPIC" },
             priority = 5,
         },

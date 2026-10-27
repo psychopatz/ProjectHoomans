@@ -137,14 +137,4 @@ return function(Catalog, Core)
         return true, pool
     end
 
-    function Catalog.RegisterTextFallbacks()
-        local count = 0
-        for _, pool in pairs(Catalog.POOLS) do
-            for _, variant in ipairs(pool.variants or {}) do
-                Core.registerTextFallback(variant.templateID, variant.fallback)
-                count = count + 1
-            end
-        end
-        return count
-    end
 end

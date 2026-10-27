@@ -9,7 +9,6 @@ local LocalResponse = Internal.LocalResponse
 local copyValue = Internal.CopyValue
 local llmEnabled = Internal.LLMEnabled
 local classifyGiftOffer = Internal.ClassifyGiftOffer
-local registerTextFallback = Internal.RegisterTextFallback
 local COMMAND_ACTIONS = Internal.CommandActions
 local isInventoryQuery = Internal.IsInventoryQuery
 local isIdentityClaim = Internal.IsIdentityClaim
@@ -76,7 +75,6 @@ local function responseFor(branch, ir)
     return {
         kind = "semantic_template",
         templateID = definition.templateID,
-        fallback = definition.fallback,
         args = {
             intent = ir and ir.intent,
             action = ir and ir.action,
@@ -98,9 +96,7 @@ function Policy.RegisterResponse(branch, definition)
     end
     Policy.ResponseTemplates[branch] = {
         templateID = definition.templateID,
-        fallback = tostring(definition.fallback or ""),
     }
-    registerTextFallback(Policy.ResponseTemplates[branch])
     return true, Policy.ResponseTemplates[branch]
 end
 

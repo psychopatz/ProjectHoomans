@@ -1,7 +1,7 @@
 -- Shared SpeechRealization registry, resolver, and fallback boundary.
 --
--- Built-in phrase content lives in cohesive domain packs. This file owns the
--- one registry and the one application path used by semantic responses.
+-- Dialogue Content is the one first-party wording registry. This file owns the
+-- one application path used by semantic responses; it never selects prose.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
@@ -19,22 +19,6 @@ do
         "PNC/Semantics/Generated/DialogueContent/Registry")
     if ok and type(value) == "table" then phraseRegistry = value end
 end
-local FAMILIES = {}
-
-local function mergePack(pack)
-    if type(pack) ~= "table" then return end
-    for templateID, family in pairs(pack) do
-        FAMILIES[templateID] = family
-    end
-end
-
-mergePack(require "PNC/Semantics/SpeechRealization/Families/Status")
-mergePack(require "PNC/Semantics/SpeechRealization/Families/Social")
-mergePack(require "PNC/Semantics/SpeechRealization/Families/Knowledge")
-mergePack(require "PNC/Semantics/SpeechRealization/Families/Actions")
-mergePack(require "PNC/Semantics/SpeechRealization/Families/Navigation")
-mergePack(require "PNC/Semantics/SpeechRealization/Families/Conversation")
-
 local COVERAGE = {
     { family = "greeting", supported = { "neutral", "warm", "terse", "guarded" } },
     { family = "wellbeing", supported = { "neutral", "warm", "terse", "guarded" } },
@@ -141,7 +125,9 @@ local function selectPhrase(templateID, styleVariant, context, salt, localSelect
     phraseHistory[key] = selected.id
     local result = {
         familyID = familyID,
-        semanticTemplateID = tostring(templateID),
+        semanticTemplateID = tostring(
+            family.semanticTemplateID or templateID
+        ),
         style = style,
         phraseID = tostring(selected.id or ""),
         translationKey = tostring(selected.key or ""),
@@ -160,6 +146,7 @@ function Realization.PhraseCoverage()
         fingerprint = phraseRegistry.CONTENT_FINGERPRINT,
         families = phraseRegistry.PHRASE_FAMILIES,
         playerChoices = phraseRegistry.PLAYER_CHOICES,
+        runtimeAliases = phraseRegistry.RUNTIME_ALIASES,
     })
 end
 
@@ -169,16 +156,11 @@ function Realization.ResetPhraseHistory()
 end
 
 function Realization.Register(templateID, family)
-    templateID = tostring(templateID or "")
-    if templateID == "" or type(family) ~= "table" then
-        return false, "realization_family_invalid"
-    end
-    FAMILIES[templateID] = copy(family)
-    return true, templateID
+    return false, "dialogue_content_is_canonical"
 end
 
 function Realization.Families()
-    return copy(FAMILIES)
+    return copy(phraseRegistry and phraseRegistry.PHRASE_FAMILIES or {})
 end
 
 function Realization.Coverage()
@@ -202,42 +184,33 @@ local function relationshipArgument(style, argument)
 end
 
 function Realization.Resolve(templateID, style, semanticFallback)
-    local family = FAMILIES[tostring(templateID or "")]
-    if not family then return nil, "realization_family_unavailable" end
     style = type(style) == "table" and style or {}
-    local selectedFamily = family
-    local bond = type(style.bond) == "table" and style.bond or nil
-    local bondFamily = bond and family.bond and family.bond.any or nil
-    if type(bondFamily) == "table" and tostring(bond.class or "") ~= "" then
-        selectedFamily = bondFamily
-    end
     local selected = tostring(style.variant or "neutral")
-    local value = selectedFamily[selected]
-    local reason
-    if type(value) ~= "table" then
-        value = selectedFamily.neutral or family.neutral
-        reason = "neutral_fallback"
+    if type(phraseRegistry) ~= "table"
+        or type(phraseRegistry.FamilyFor) ~= "function"
+    then
+        return nil, "realization_content_unavailable"
     end
-    if type(value) ~= "table" then
-        return nil, "realization_neutral_unavailable"
+    local family, phrases, selectedStyle = phraseRegistry.FamilyFor(
+        templateID, selected
+    )
+    if type(family) ~= "table" or type(phrases) ~= "table"
+        or #phrases == 0
+    then
+        return nil, "realization_family_unavailable"
     end
-    if selected == "neutral" and not value.forceKey then
-        return {
-            templateID = tostring(templateID),
-            fallback = tostring(semanticFallback or value.fallback or ""),
-            family = tostring(templateID),
-            variant = "neutral",
-            fallbackReason = nil,
-        }
-    end
+    local value = phrases[1]
+    local canonicalID = tostring(family.semanticTemplateID or templateID)
+    local fallback = tostring(value.fallback or semanticFallback or "")
     return {
-        templateID = tostring(value.key or templateID),
-        fallback = tostring(value.fallback or ""),
-        family = tostring(templateID),
-        variant = type(selectedFamily[selected]) == "table"
-            and selected or "neutral",
-        fallbackReason = reason,
-        argument = value.argument,
+        templateID = canonicalID,
+        semanticTemplateID = canonicalID,
+        fallback = fallback,
+        family = canonicalID,
+        variant = tostring(selectedStyle or selected or "neutral"),
+        fallbackReason = nil,
+        argument = string.find(fallback, "%%s", 1, true)
+            and "familyAddress" or nil,
     }
 end
 
@@ -283,7 +256,8 @@ local function applySegment(segment, style, blocked, context, salt, localSelecti
     end
     local output = copy(segment)
     output.args = copy(segment.args or {})
-    output.semanticTemplateID = segment.templateID
+    output.semanticTemplateID = resolved.semanticTemplateID
+        or segment.templateID
     output.templateID = resolved.templateID
     output.fallback = resolved.fallback
     output.realizationFamily = resolved.family
@@ -353,7 +327,7 @@ function Realization.Apply(response, context)
         output.args = segment.args
         output.semanticTemplateID = output.templateID
         output.renderTemplateID = resolved.templateID
-        output.fallback = resolved.fallback
+        output.fallback = segment.fallback or resolved.fallback
         output.realizationFamily = resolved.family
         output.realizationVariant = resolved.variant
         output.realizationFallbackReason = resolved.fallbackReason
