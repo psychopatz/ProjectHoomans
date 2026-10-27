@@ -65,7 +65,7 @@
       "language": "EN",
       "utterance": "follow me",
       "expected": {
-        "lastKey": "semantic.command.follow.queued",
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
         "minActions": 1,
         "accepted": true
       }
@@ -75,7 +75,7 @@
       "language": "TL",
       "utterance": "follow me",
       "expected": {
-        "lastKey": "semantic.command.follow.queued",
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
         "minActions": 1,
         "maxFallbackLookups": 0,
         "textContains": "Sige, susundan kita."

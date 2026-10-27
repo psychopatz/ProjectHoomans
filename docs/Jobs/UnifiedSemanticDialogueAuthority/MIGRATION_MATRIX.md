@@ -248,71 +248,7 @@ absence tests without changing semantic/runtime authority.
 | Compatibility speech bridge names | Bandits incoming damage/adapter; Necroa client composition; Companion Dogs interaction/presentation | first-party filenames/API locals now describe speech/caption transport; external behavior and transport contracts preserved | Bandits, Necroa, compatibility-shape, Companion Dogs smokes; PZ verifier |
 | Historical P8/P10 absence tests | deleted first-party legacy registry/namespace surfaces | consolidated into durable architecture-contract absence plus positive parity assertions; domain/runtime tests retained | `tests/pnc_conversation_architecture_contract_smoke.lua` |
 
-## P11B current closure
-
-| Surface | Verified current owner/callers | P11B disposition | Evidence |
-| --- | --- | --- | --- |
-| First-party semantic response wording | ResponseCatalog selection plus Dialogue Content registry | direct catalog/LocalResponse prose removed; semantic template IDs and bounded args/facts are selected before realization | focused local-response, route, response-catalog, event-follow-up and P7 content smokes |
-| Static semantic translation-key maps | client response translation resolver | deleted; resolver derives canonical Dialogue Content keys and resolves bounded runtime aliases | local-route/identity presentation smokes; Kahlua scan |
-| SpeechRealization family packs/builders | generated Dialogue Content Registry | deleted; SpeechRealization only applies canonical phrase families and exposes compatibility read-only coverage | realization authority, command/emote and P7 content smokes |
-| `Responses.json`, `Realizations.json`, identity response catalogs | Dialogue Content EN/TL artifacts | deleted from production tree and translation manifest after EN/TL key/provenance parity checks | `test_legacy_semantic_authority_p11` negative absence plus positive artifact assertions |
-| Grounded event follow-up wording | event semantic pools plus Dialogue Content | known answers use canonical `%s` templates with authoritative fact args; unknown answers use explicit canonical unknown templates | P2 event-follow-up smoke; typed/clicked selection parity retained |
-| Command/emote/greeting wording | command/emote/greeting ResponseCatalog pools plus Dialogue Content | canonical phrase variants retain deterministic anti-repeat and target argument formatting | companion command, emote, greeting and P7 content smokes |
-
-## P11C current closure
-
-| Surface | Verified current owner/callers | P11C disposition | Evidence |
-| --- | --- | --- | --- |
-| Canonical Conversation source entrypoint | Dialogue Content CodeBuilder and shared authoring service | `conversation/manifest.json` is the sole content entrypoint; domain shards are declared there and the deleted monolith is not loaded | `test_p11_conversation_shards`, CodeBuilder output |
-| Domain content ownership | Dialogue Content shard loader | wording is grouped into cohesive Conversation-domain shards; shard order is deterministic and does not change stable semantic IDs | shard compiler test, generated Registry/content smokes |
-| NLU/pattern authoring boundary | `semantic_definitions.json` and semantic compiler inputs | patterns remain outside response/content shards; response pools and phrase wording are no longer embedded in generic pattern data | shard schema/absence assertions |
-| Global identity and generated join | Dialogue Content compiler | merged shards validate globally unique phrase, semantic-template, and player-choice IDs and retain the canonical semantic/content join | `test_p11_conversation_shards`, CodeBuilder twice |
-| Authoring writes and stale guards | `SemanticLabAuthoringService` | aggregate fingerprints, owning-shard writes, effect-free previews, and explicit writes are exposed through the service; callers do not patch shard files | service shard write test |
-
-## P11D current closure
-
-| Surface | Verified current owner/callers | P11D disposition | Evidence |
-| --- | --- | --- | --- |
-| Conversation UI source | manifest-declared conversation UI registry and CodeBuilder | one bounded conversation/ui_registry.json owns landing, hub, child, order, content references, semantic destinations, and provider references | test_p11_conversation_ui_registry, generated ConversationUI Registry |
-| What's Up structure | landing projection and static-question provider | generated registry supplies the root shortcut and nine static hub children; candidate IDs and ordering remain production-parity stable | contextual What's Up/hub/talk parity, production Lua smokes |
-| Wording references | Dialogue Content player-choice records | UI nodes carry content IDs and generated label/utterance keys; EN/TL wording is not duplicated in the UI registry or semantic provider | Dialogue Content registry parity |
-| Provider and semantic authority | static provider, relationship/gossip/gameplay authorities | provider references and semantic destinations are locked references; eligibility, facts, permissions, response meaning, and effects remain outside UI source | UI schema negative assertions, contextual provider tests |
-| Agent/human UI edits | SemanticLabAuthoringService | bounded inspect/validate/preview/write plus add/remove/move/reorder operations use one source fingerprint and reject stale/locked edits | test_p11_conversation_ui_registry |
-
-## P11E current closure
-
-| Migrated surface | Actual production callers | Semantic/content owner | Follow-up / provenance disposition | Proof |
-| --- | --- | --- | --- | --- |
-| Automatic command outcomes | command adapters, companion action flow, existing action-result response route | `semantic.command.<action>.<outcome>` → ResponseCatalog/ResponsePlan → automatic-flow and command shards | action/capability facts and bounded generator provenance remain metadata; no `semantic.generated.*` taxonomy | P11 semantic taxonomy, automatic-flow and follow-action tests |
-| Automatic task outcomes | task adapter and queued task lifecycle | `semantic.task.<action>.<outcome>` → ResponseCatalog/ResponsePlan → Dialogue Content | task authority/effects remain task systems; `workflowKind=parameterized_task` is diagnostic provenance only | automatic-flow generation and production Lua task smokes |
-| Automatic gift outcomes | gift input/selection and inventory outcome routes | `semantic.gift.<outcome>` → ResponseCatalog/ResponsePlan → Dialogue Content | inventory facts/effects remain authoritative; no generated-family wording path | taxonomy, gift, EN/TL content and response observatory tests |
-| Automatic-flow first-party wording | former generated translation artifacts and adapter-local EN/TL/key maps | canonical Conversation shards and generated Dialogue Content Registry/EN/TL artifacts | deleted generated translation files and manifest loads; no adapter wording fallback | shard/content compiler, matrix, idempotence and absence scans |
-| Bounded realization catalog | worker persona catalog and Studio diagnostics | SpeechRealization canonical family projection | deterministic capped list with representative domain coverage; no semantic selection change | P11G runtime speech test and worker catalog checks |
-| Response-quality semantic assertions | Observatory matrix fixtures and inspector | explicit semantic metadata plus authored translation keys | direct semantic action packets and localized authored packets are checked without conflating identifiers | Response Observatory and bundled real-Lua matrix tests |
-
-## P11F current closure
-
-| Surface | Actual production callers | Current owner | Disposition | Proof |
-| --- | --- | --- | --- | --- |
-| Normal Studio Conversation browser | `studio_surface_builder`, `ConversationExplorerPane`, existing `SemanticObservatoryPane` worker adapter | derived `studio.semantic_tree` over bounded ResponseCatalog and Dialogue Content rows | one Explore → Conversation projection; no second registry or response/content identity store | `test_surface_consolidation`, real-worker bounded projection |
-| Source traceability | Conversation explorer and existing `CanonicalSourceExplorerPane` | Dialogue Content/service source paths and fingerprints plus production pool source metadata | full canonical IDs and source ownership remain inspectable; no generated-file editing | surface tests, source explorer, content service tests |
-| Route/policy diagnostics | existing `InteractionExplorerPane` | production FlowEditor catalog and existing route metadata | removed from normal Explore; retained as narrow Developer Tools diagnostics; no duplicate response rows | surface ownership test and production catalog smoke |
-| Selected detail | Conversation explorer | ResponseCatalog/ResponsePlan, Dialogue Content, lifecycle/provider authority | bounded Overview/Wording/Route/Conditions/Follow-ups/Sources projection; no eligibility/effects ownership | Conversation projection test and response observatory detail checks |
-
-## P11G current closure
-
-| Surface | Actual production callers | Current owner | Disposition | Proof |
-| --- | --- | --- | --- | --- |
-| Phrase-family authoring | contextual Developer Tools and agent CLI | `SemanticLabAuthoringService` → owning Conversation shard → Dialogue Content compiler | structured EN/TL add/duplicate/delete/reorder/style operations; placeholder parity and structural locks enforced | shard/API tests, effect-free preview and stale-guard checks |
-| Player-facing choice wording | contextual Conversation UI editor | Dialogue Content `playerChoices` records | EN/TL labels and player utterances are editable through the same service; semantic destination/provider remain locked | Xvfb node-wording lifecycle test and content compiler parity |
-| Conversation UI structure | contextual Developer Tools and agent CLI | canonical `conversation/ui_registry.json` plus UI compiler | add/remove/move/reorder membership and presentation edits use bounded previews, explicit writes, and source fingerprints | Conversation UI registry/API tests |
-| Human/agent authoring boundary | Studio pane and `--conversation-*` CLI operations | one shared `SemanticLabAuthoringService` | inspect, variants, validate, preview/Review, write, and compile are machine-readable and effect-free until explicit write | authoring API tests, `--conversation-validate` checks |
-
-## P11H current closure
-
-| Contract | Shared implementation | Evidence |
-| --- | --- | --- |
-| Bounded inspection | `SemanticLabAuthoringService.inspect_dialogue_variants`, `inspect_conversation_ui`, and bounded CLI projections | content/UI API tests; canonical IDs and source fingerprints returned |
-| Effect-free validation and Review | `validate_dialogue_content`, `validate_conversation_ui`, content/UI preview operations | `10/10 PASS` focused authoring/compiler/UI tests; writes remain empty |
-| Explicit writes and compilation | service shard/UI writers and `--conversation-*-write` / `--conversation-compile` | stale-source rejection and temporary-shard write tests |
-| Human/agent parity | `ConversationAuthoringPane` and `tools.semantic_harness.cli` call the same service methods | CLI/service parity test and Xvfb contextual editor lifecycle |
+P11B is the active wording-ownership slice. Its audit matrix must cover
+`Responses.json`, `Realizations.json`, LocalResponse prose/fallbacks, static
+semantic-ID translation-key maps, and hard-coded SpeechRealization families
+before any superseded store is deleted.

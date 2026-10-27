@@ -16,31 +16,11 @@ local SpeechRealization = require
 local ResponseAdapter = Internal.ResponseAdapter or {}
 Internal.ResponseAdapter = ResponseAdapter
 
-local function argumentValues(args)
-    args = type(args) == "table" and args or {}
-    local values = {}
-    local order = {
-        "playerName", "npcName", "familyAddress", "familyTerm",
-        "target", "location", "content", "topic", "activity",
-        "time", "month", "day", "year", "temperature", "gameDay",
-        "object", "value",
-    }
-    for _, key in ipairs(order) do
-        local value = args[key]
-        if value ~= nil and type(value) ~= "table" then
-            values[#values + 1] = value
-            if #values >= 4 then break end
-        end
-    end
-    return values
-end
-
-local function localizedSegment(templateID, fallback, args, realizationVariant)
+local function localizedSegment(templateID, fallback, args)
     local response = {
         templateID = templateID,
         fallback = fallback,
         args = args,
-        realizationVariant = realizationVariant,
     }
     fallback = tostring(fallback or "")
     local key = Internal.SemanticTranslationKey(response)
@@ -51,30 +31,19 @@ local function localizedSegment(templateID, fallback, args, realizationVariant)
         return fallback, key
     end
     args = type(args) == "table" and args or {}
-    local values = argumentValues(args)
-    local ok, value = pcall(
-        translation.TrFormat,
-        key,
-        fallback,
-        values[1], values[2], values[3], values[4]
-    )
+    local firstArg = args.familyAddress or args.familyTerm or args.npcName
+        or args.target or args.object or args.location or args.topic
+        or args.content or args.value
+    if type(firstArg) == "table" then firstArg = nil end
+    local ok, value = pcall(translation.TrFormat, key, fallback, firstArg)
     if ok and value ~= nil and tostring(value) ~= "" then
         return tostring(value), key
     end
     return fallback, key
 end
 
-local function fallbackSegment(templateID, fallback, args)
-    local values = argumentValues(args)
-    local text = tostring(fallback or "")
-    text = string.gsub(text, "%%([1-9][0-9]*)", function(number)
-        local value = values[tonumber(number)]
-        return value ~= nil and tostring(value) or "%%" .. number
-    end)
-    local ok, formatted = pcall(
-        string.format, text, values[1], values[2], values[3], values[4]
-    )
-    return ok and formatted or text, nil
+local function fallbackSegment(templateID, fallback)
+    return fallback, nil
 end
 
 local function payloadForPlanTurn(response, rendered, fallbackRendered)
@@ -136,8 +105,6 @@ end
 
 local function payloadsForResponse(response)
     response = type(response) == "table" and response or {}
-    local realizationVariant = response.realizationVariant
-        or response.speechStyleVariant
     local renderPlan = response.renderPlan or response.plan
     if type(renderPlan) == "table"
         and ResponsePlan
@@ -151,14 +118,7 @@ local function payloadsForResponse(response)
             for index = 1, #renderPlan.turns do
                 local rendered = ResponsePlan.RenderDetailed(
                     renderPlan,
-                    function(templateID, fallback, args)
-                        return localizedSegment(
-                            templateID,
-                            fallback,
-                            args,
-                            realizationVariant
-                        )
-                    end,
+                    localizedSegment,
                     index
                 )
                 local fallbackRendered = ResponsePlan.RenderDetailed(
@@ -182,16 +142,10 @@ local function payloadsForResponse(response)
 
     local fallback = tostring(response.fallback or "")
     local renderTemplateID = response.renderTemplateID or response.templateID
-    local fallbackText = fallbackSegment(
-        renderTemplateID,
-        fallback,
-        response.args
-    )
     local text, translationKey = localizedSegment(
         renderTemplateID,
         fallback,
-        response.args,
-        realizationVariant
+        response.args
     )
     return {
         {
@@ -200,7 +154,7 @@ local function payloadsForResponse(response)
                 or response.templateID,
             domain = "pnc.system.shared.categories",
             text = text ~= "" and text or nil,
-        fallback = fallbackText,
+            fallback = fallback,
             args = response.args,
             translationKey = translationKey,
             plan = response.plan,

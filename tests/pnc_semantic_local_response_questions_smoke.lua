@@ -62,10 +62,8 @@ T.equal(time.branch, "QUESTION_RECEIVED",
     "time question stays on the deterministic response branch")
 T.equal(time.response.templateID, "semantic.question.time",
     "time response keeps its catalog key")
-T.equal(time.response.fallback, nil,
-    "time response leaves wording to Dialogue Content")
-T.equal(time.response.args.time, "9:05 PM",
-    "time response returns a bounded clock fact")
+T.equal(time.response.fallback, "It's 9:05 PM.",
+    "time response formats the read-only world snapshot")
 T.equal(time.response.args.hour, 21,
     "time response preserves the source hour for localization")
 
@@ -74,30 +72,20 @@ local date = decide("DATE", {
 })
 T.equal(date.response.templateID, "semantic.question.date",
     "date response keeps its catalog key")
-T.equal(date.response.fallback, nil,
-    "date response leaves wording to Dialogue Content")
-T.equal(date.response.args.month, 10,
-    "date response preserves the calendar month fact")
-T.equal(date.response.args.day, 19,
-    "date response preserves the calendar day fact")
-T.equal(date.response.args.year, 1993,
-    "date response preserves the calendar year fact")
+T.equal(date.response.fallback, "It's October 19, 1993.",
+    "date response formats the calendar snapshot")
 
 local dayCount = decide("DATE", { gameDay = 41 })
-T.equal(dayCount.response.templateID, "semantic.question.day",
-    "date response selects the bounded game-day template")
-T.equal(dayCount.response.fallback, nil,
-    "game-day response leaves wording to Dialogue Content")
-T.equal(dayCount.response.args.gameDay, 41,
-    "game-day response preserves the authoritative day fact")
+T.equal(dayCount.response.fallback, "It's day 41.",
+    "date response falls back to the game day when calendar fields are absent")
 
 local weather = decide("WEATHER", {
     weather = { raining = true, foggy = true },
 })
-T.equal(weather.response.templateID, "semantic.question.weather.raining",
-    "weather response selects a domain-specific catalog key")
-T.equal(weather.response.fallback, nil,
-    "weather response leaves wording to Dialogue Content")
+T.equal(weather.response.templateID, "semantic.question.weather",
+    "weather response keeps its catalog key")
+T.equal(weather.response.fallback, "It's raining and foggy out.",
+    "weather response combines available observations")
 T.equal(weather.response.args.weather.foggy, true,
     "weather response preserves the source snapshot for localization")
 
@@ -122,11 +110,9 @@ T.equal(unavailableTime.response.templateID, "semantic.question.received",
     "an unavailable clock keeps the standard question fallback")
 
 local malformedWeather = decide("WEATHER", { weather = "unknown" })
-T.equal(malformedWeather.response.templateID,
-    "semantic.question.weather.unknown",
-    "malformed weather data selects the explicit safe template")
-T.equal(malformedWeather.response.fallback, nil,
-    "malformed weather wording remains owned by Dialogue Content")
+T.equal(malformedWeather.response.fallback,
+    "I can't tell what the weather's doing right now.",
+    "malformed weather data receives the explicit safe fallback")
 
 local areYouOkay = Semantic.Parser.Parse("Are you okay?")
 T.equal(areYouOkay.intent, "QUESTION",

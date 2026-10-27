@@ -6,7 +6,7 @@
       "utterance": "follow me",
       "scenario": {"runtime": {"commandResponses": {"follow": {"accepted": false, "reason": "permission_denied"}}}},
       "expected": {
-        "lastKey": "semantic.command.follow.rejected",
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedFollowRejected",
         "commandAccepted": false, "executionStatus": "rejected",
         "rejectionReason": "permission_denied", "minActions": 1,
         "minTransportCount": 1, "maxTransportCount": 1
@@ -18,7 +18,7 @@
       "utterance": "follow me",
       "scenario": {"runtime": {"commandResponses": {"follow": {"accepted": false, "reason": "permission_denied"}}}},
       "expected": {
-        "lastKey": "semantic.command.follow.rejected",
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedFollowRejected",
         "textContains": "Hindi kita masusundan ngayon.",
         "commandAccepted": false, "executionStatus": "rejected",
         "rejectionReason": "permission_denied", "minActions": 1,
@@ -32,7 +32,7 @@
       "utterance": "wait here",
       "scenario": {"runtime": {"commandResponses": {"stay": {"accepted": false, "reason": "permission_denied"}}}},
       "expected": {
-        "lastKey": "semantic.command.stay.rejected",
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayRejected",
         "commandAccepted": false, "executionStatus": "rejected",
         "rejectionReason": "permission_denied", "minActions": 1,
         "minTransportCount": 1, "maxTransportCount": 1
@@ -44,7 +44,7 @@
       "utterance": "wait here",
       "scenario": {"runtime": {"commandResponses": {"stay": {"accepted": false, "reason": "permission_denied"}}}},
       "expected": {
-        "lastKey": "semantic.command.stay.rejected",
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayRejected",
         "textContains": "Hindi ako makapananatili rito ngayon.",
         "commandAccepted": false, "executionStatus": "rejected",
         "rejectionReason": "permission_denied", "minActions": 1,

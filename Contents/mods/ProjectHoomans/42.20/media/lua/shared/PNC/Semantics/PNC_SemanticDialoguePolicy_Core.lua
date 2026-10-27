@@ -80,82 +80,129 @@ local ITEM_REQUEST_ACTIONS = {
 local RESPONSE_TEMPLATES = {
     COMMAND_ACCEPTED = {
         templateID = "semantic.command.accepted",
+        fallback = "Okay.",
     },
     REQUEST_ACKNOWLEDGED = {
         templateID = "semantic.request.acknowledged",
+        fallback = "I'll see what I can do.",
     },
     QUESTION_RECEIVED = {
         templateID = "semantic.question.received",
+        fallback = "Let me think about that.",
     },
     INVENTORY_QUERY_RECEIVED = {
         templateID = "semantic.inventory.query.pending",
+        fallback = "Let me check what I have.",
     },
     SOCIAL_ACKNOWLEDGED = {
         templateID = "semantic.social.acknowledged",
+        fallback = "Understood.",
     },
     GREET_ACKNOWLEDGED = {
         templateID = "semantic.greet.acknowledged",
+        fallback = "Hey there.",
     },
     OFFER_RECEIVED = {
         templateID = "semantic.offer.received",
+        fallback = "I'd really like one. Could I have it?",
     },
     GIFT_SELECTION_REQUIRED = {
         templateID = "semantic.gift.selection_required",
+        fallback = "Oh? What did you bring me?",
     },
     GIFT_OFFER_DISPATCHED = {
         templateID = "semantic.gift.pending",
+        fallback = "",
     },
     GIFT_CONSENT_DECLINED = {
         templateID = "semantic.gift.consent.declined",
+        fallback = "No problem. I'll leave it with you.",
     },
     GIFT_CONSENT_AMBIGUOUS = {
         templateID = "semantic.gift.consent.ambiguous",
+        fallback = "More than one of us wants it. Please offer it to one person directly.",
     },
     CONVERSATION_RECRUITMENT_REQUESTED = {
         templateID = "semantic.conversation.recruitment.requested",
+        fallback = "",
     },
     GOSSIP_RECEIVED = {
         templateID = "semantic.gossip.unknown",
+        fallback = "I haven't heard anything about that yet.",
     },
     HOSTILE_REMARK_RECEIVED = {
         templateID = "semantic.social.hostile_remark",
+        fallback = "Don't talk to me like that.",
     },
     SELF_REFLECTION_RECEIVED = {
         templateID = "semantic.social.self_reflection",
+        fallback = "Don't talk about yourself like that.",
     },
     IDENTITY_CLAIM_RECEIVED = {
         templateID = "semantic.identity.exchange",
+        fallback = "Nice to meet you.",
     },
     IDENTITY_NAME_EVASION = {
         templateID = "semantic.identity.evasion",
+        fallback = "I asked you your name. Don't just change the subject.",
     },
     THREAT_RECEIVED = {
         templateID = "semantic.social.threat",
+        fallback = "Back off.",
     },
     ASK_CLARIFICATION = {
         templateID = "semantic.ask_clarification",
+        fallback = "I'm not sure what you mean.",
     },
     ACTION_UNAVAILABLE = {
         templateID = "semantic.action.unavailable",
+        fallback = "I can't do that yet.",
     },
     CAMP_REQUESTED = {
         templateID = "semantic.camp.requested",
+        fallback = "I'll find us a safe place to camp.",
     },
     UNKNOWN = {
         templateID = "semantic.unknown",
+        fallback = "I don't understand.",
     },
 }
 Policy.ResponseTemplates = Policy.ResponseTemplates or {}
+local function registerTextFallback(definition)
+    local text = PsychopatzCore
+        and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.Text
+    if text and type(text.RegisterFallback) == "function"
+        and type(definition) == "table"
+    then
+        text.RegisterFallback(definition.templateID, definition.fallback)
+    end
+end
+
 for branch, definition in pairs(RESPONSE_TEMPLATES) do
     local stored = Policy.ResponseTemplates[branch]
     if not stored then
-        stored = {}
+        stored = definition
+    elseif stored.templateID == definition.templateID
+        and (stored.fallback == nil
+            or stored.fallback == ""
+            or stored.fallback == stored.templateID)
+    then
+        -- Repair response tables left in memory by an older hot-reloaded
+        -- build that accidentally used the template ID as its fallback.
+        stored.fallback = definition.fallback
     end
-    stored.templateID = definition.templateID
-    -- A hot-reloaded process may still hold the pre-P11 fallback field. Clear
-    -- it so wording cannot survive outside Dialogue Content.
-    stored.fallback = nil
     Policy.ResponseTemplates[branch] = stored
+    registerTextFallback(stored)
+end
+
+function Policy.RegisterTextFallbacks()
+    local count = 0
+    for _, definition in pairs(Policy.ResponseTemplates) do
+        registerTextFallback(definition)
+        count = count + 1
+    end
+    return count
 end
 
 
@@ -167,6 +214,7 @@ Internal.LocalResponse = LocalResponse
 Internal.CommandActions = COMMAND_ACTIONS
 Internal.FuzzySafeActions = FUZZY_SAFE_ACTIONS
 Internal.ItemRequestActions = ITEM_REQUEST_ACTIONS
+Internal.RegisterTextFallback = registerTextFallback
 Internal.CandidateEligibility = CandidateEligibility
 Internal.FlowKernel = FlowKernel
 

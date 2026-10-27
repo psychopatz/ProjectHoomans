@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority
 
-**Status:** IN PROGRESS — P0–P10 and P11A–P11D are accepted foundation; P11E–P11I remain active/mandatory, followed by mandatory P12 Pragmatic Conversational Intelligence & Dialogue Director before live-test handoff.
+**Status:** IN PROGRESS — P0–P10 accepted foundation; P11 Modular Conversation Architecture & Contextual Authoring is mandatory before live-test handoff.
 **Project Hoomans audit baseline:** `181b58bcc30dc65dc61d19a49d6238abca50ece9`.
 **PsychopatzCore audit baseline:** `cf28189c57f7810f31d25c46c11eb88080f47baa`.
 **Checkout:** existing `main` only.
@@ -8,7 +8,7 @@
 
 ## Parent goal
 
-Finish the semantic migration so **Project Hoomans has exactly one conversational intelligence authority**, then make that same authority context-sensitive enough to resolve pragmatic intent, conversational obligations, topic/reference continuity, explainable NPC reactions and bounded initiative without requiring exact phrasing.
+Finish the semantic migration so **Project Hoomans has exactly one conversational intelligence authority**.
 
 All Project Hoomans-owned NPC speech — direct Conversation, greetings/farewells, social reactions, combat/medical/leader-loss/companion/world-event speech, ToolReplies, emote replies, compatibility event speech, and contextual follow-ups — must resolve meaning through the existing semantic architecture before wording or presentation.
 
@@ -23,8 +23,7 @@ The finished system must:
 - remain deterministic/offline by default, with PBrainZ/LLM optional and downstream of semantic truth;
 - remain sparse and performant for many NPCs/players: no per-NPC/per-tick dialogue scans, no transcript persistence, no duplicated world/relationship/inventory truth, and no repeated semantic evaluation at render time;
 - expose canonical content and provenance through the existing Semantic Lab / Observatory rather than creating another editor or simulator;
-- preserve accepted P10 zero-legacy semantics while completing P11: one first-party wording path, modular Conversation authoring sources, one canonical Conversation UI registry, domain-meaning IDs instead of `semantic.generated.*`, one Conversation explorer, and one contextual Developer Tools editor shared by humans and agents;
-- after P11, extend the same semantic authority with P12 pragmatic resolution, bounded topic/obligation/reference state, an explainable Dialogue Director, lightweight conversational beats, safe underspecified-language inference, compositional response planning and a cognition trace in the existing Semantic Lab.
+- preserve accepted P10 zero-legacy semantics while completing P11: one first-party wording path, modular Conversation authoring sources, one canonical Conversation UI registry, domain-meaning IDs instead of `semantic.generated.*`, one Conversation explorer, and one contextual Developer Tools editor shared by humans and agents.
 
 ## Central invariant — no split system
 
@@ -110,7 +109,7 @@ Reuse:
 
 ## Execution authority
 
-This directory is the **sole active roadmap for the Unified Semantic Dialogue Authority parent goal, including the current P11 modular Conversation authoring phase and the approved follow-on P12 pragmatic conversational-intelligence phase**.
+This directory is the **sole active roadmap for the Unified Semantic Dialogue Authority parent goal, including the current P11 modular Conversation authoring phase**.
 
 Older `SemanticInteractionLifecycle` P11 documents remain valuable historical/architectural evidence, but their earlier “complete” claim is superseded for the residual prose/content owners identified in this audit. Do not run two concurrent migration roadmaps.
 
@@ -127,6 +126,5 @@ Older `SemanticInteractionLifecycle` P11 documents remain valuable historical/ar
 9. `HARNESS_ACCEPTANCE.md`;
 10. `P10_CANONICAL_SEMANTIC_CLEANUP.md`;
 11. `P11_MODULAR_CONVERSATION_ARCHITECTURE.md`;
-12. `P12_PRAGMATIC_CONVERSATIONAL_INTELLIGENCE.md`;
-13. `ROADMAP.md`;
-14. `PROGRESS.md` **last** for current phase and exact Next Chunk.
+12. `ROADMAP.md`;
+13. `PROGRESS.md` **last** for current phase and exact Next Chunk.

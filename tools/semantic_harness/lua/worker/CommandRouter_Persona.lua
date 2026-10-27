@@ -95,32 +95,9 @@ local function speechRealizationCatalog(context)
     end
     local families = {}
     if type(realization.Families) == "function" then
-        local allFamilies = {}
         for templateID in pairs(realization.Families() or {}) do
-            allFamilies[#allFamilies + 1] = tostring(templateID)
-        end
-        table.sort(allFamilies)
-        local requiredPrefixes = {
-            "semantic.command.",
-            "semantic.question.",
-            "semantic.social.",
-        }
-        local selectedByID = {}
-        local function addFamily(templateID)
-            if #families >= 64 or selectedByID[templateID] then return end
-            selectedByID[templateID] = true
-            families[#families + 1] = templateID
-        end
-        for _, prefix in ipairs(requiredPrefixes) do
-            for _, templateID in ipairs(allFamilies) do
-                if string.sub(templateID, 1, #prefix) == prefix then
-                    addFamily(templateID)
-                    break
-                end
-            end
-        end
-        for _, templateID in ipairs(allFamilies) do
-            addFamily(templateID)
+            families[#families + 1] = tostring(templateID)
+            if #families >= 64 then break end
         end
         table.sort(families)
     end

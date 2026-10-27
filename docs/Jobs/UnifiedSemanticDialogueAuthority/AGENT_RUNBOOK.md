@@ -2,13 +2,13 @@
 
 ## Operating rule
 
-The parent objective is complete only when Project Hoomans-owned conversational meaning has one semantic authority, Dialogue Content is the one first-party wording authority, migration-era/legacy dialogue registries/aliases/names have been purged from production source, **and the same semantic authority provides the approved P12 pragmatic/contextual/director behavior without requiring a second chatbot or exact phrasing for ordinary supported meanings**.
+The parent objective is complete only when Project Hoomans-owned conversational meaning has one semantic authority, Dialogue Content is the one first-party wording authority, and migration-era/legacy dialogue registries, aliases and names have been purged from the production source.
 
 A phase/chunk passing does not finish the parent goal. After each accepted chunk, update `PROGRESS.md` and continue automatically to the next mandatory roadmap phase unless a genuine blocker or explicitly user-owned native gate is reached.
 
 ## Mandatory read order
 
-Read root `AGENTS.md`, then this job's `README.md`, `AUDIT.md`, `ARCHITECTURE.md`, `EVENT_FOLLOWUP_CONTRACT.md`, `MIGRATION_MATRIX.md`, `PERFORMANCE_AND_SCALING.md`, `HARNESS_ACCEPTANCE.md`, `P10_CANONICAL_SEMANTIC_CLEANUP.md`, `P11_MODULAR_CONVERSATION_ARCHITECTURE.md`, `P12_PRAGMATIC_CONVERSATIONAL_INTELLIGENCE.md`, `ROADMAP.md`, and **`PROGRESS.md` last**.
+Read root `AGENTS.md`, then this job's `README.md`, `AUDIT.md`, `ARCHITECTURE.md`, `EVENT_FOLLOWUP_CONTRACT.md`, `MIGRATION_MATRIX.md`, `PERFORMANCE_AND_SCALING.md`, `HARNESS_ACCEPTANCE.md`, `P10_CANONICAL_SEMANTIC_CLEANUP.md`, `P11_MODULAR_CONVERSATION_ARCHITECTURE.md`, `ROADMAP.md`, and **`PROGRESS.md` last**.
 
 Re-read the relevant current source before editing; historical job prose is not runtime truth.
 
@@ -123,12 +123,6 @@ For each P11 migration:
 
 Do not build a generic visual programming IDE. Developer Tools is a contextual
 editor for selected Conversation wording/presentation/navigation.
-
-After P11I passes, continue automatically through P12A–P12I. P12 must extend
-the existing parser, context/lifecycle, response-planning and Semantic Lab
-surfaces rather than introducing a second conversational intelligence stack.
-Pragmatic inference may choose conversational behavior, but ambiguous language
-must never bypass authoritative gameplay/domain effect checks.
 
 Do not expose raw gameplay predicates as editable JSON implementations. The UI
 may select/reference registered predicate/provider IDs and display why a

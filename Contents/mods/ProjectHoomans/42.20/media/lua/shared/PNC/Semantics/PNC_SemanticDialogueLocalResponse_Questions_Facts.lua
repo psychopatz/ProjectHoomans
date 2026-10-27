@@ -38,9 +38,10 @@ local function factTopic(ir, fact)
     return value ~= "" and value or "that"
 end
 
-local function factResponse(templateID, poolID, fact, topic, refs)
+local function factResponse(templateID, fallback, poolID, fact, topic, refs)
     return {
         templateID = templateID,
+        fallback = fallback,
         sourcePoolID = poolID,
         dialogueAct = "FACT_ANSWER",
         topic = topic,
@@ -60,6 +61,7 @@ local function resolveResidenceQuestion(ir, state, context)
     if fact and fact.status == "known" and label then
         return {
             templateID = "semantic.question.residence.known",
+            fallback = "I live at " .. tostring(label) .. ".",
             args = copyArgs({ location = label }),
             sourcePoolID = "semantic.question.residence",
             dialogueAct = "FACT_ANSWER",
@@ -72,6 +74,7 @@ local function resolveResidenceQuestion(ir, state, context)
     end
     return factResponse(
         "semantic.question.residence.unknown",
+        "I don't have a confirmed home to tell you about.",
         "semantic.question.residence",
         fact,
         "RESIDENCE"
@@ -81,16 +84,20 @@ end
 local function resolveHealthStateQuestion(ir, state, context)
     local fact = factFor(ir)
     local value = tostring(fact and fact.value or "")
+    local fallback
     local templateID
     if fact and fact.status == "known" then
         if value == "injured" or value == "wounded" or value == "critical" then
             templateID = "semantic.question.health_state.injured"
+            fallback = "I'm hurt, but I'm managing."
         elseif value == "healthy" or value == "normal" then
             templateID = "semantic.question.health_state.healthy"
+            fallback = "I'm doing okay."
         end
         if templateID then
             return factResponse(
                 templateID,
+                fallback,
                 "semantic.question.health_state",
                 fact,
                 "MEDICAL",
@@ -100,6 +107,7 @@ local function resolveHealthStateQuestion(ir, state, context)
     end
     return factResponse(
         "semantic.question.health_state.unknown",
+        "I can't confirm my health status right now.",
         "semantic.question.health_state",
         fact,
         "MEDICAL"
@@ -111,8 +119,11 @@ local function resolveKnowledgeQuestion(ir, state, context)
     local topic = factTopic(ir, fact)
     if fact and fact.status == "known" and fact.value == true then
         local answer = tostring(fact.answer or "")
+        local fallback = "I know about " .. topic .. "."
+        if answer ~= "" then fallback = fallback .. " " .. answer end
         local response = factResponse(
             "semantic.question.knowledge.known",
+            fallback,
             "semantic.question.knowledge",
             fact,
             "KNOWLEDGE",
@@ -128,6 +139,7 @@ local function resolveKnowledgeQuestion(ir, state, context)
     end
     local response = factResponse(
         "semantic.question.knowledge.unknown",
+        "I don't have reliable information about " .. topic .. ".",
         "semantic.question.knowledge",
         fact,
         "KNOWLEDGE"
@@ -143,6 +155,26 @@ local function resolveBackstoryQuestion(ir, state, context)
         or ir and ir.slots and ir.slots.backstoryKind or "backstory"
     local refs = fact and fact.factID and { fact.factID } or {}
     local response
+    local knownFallback = "Before all this, I was "
+        .. tostring(content or "someone else") .. "."
+    if kind == "hometown" then
+        knownFallback = "I grew up in " .. tostring(content or "there") .. "."
+    elseif kind == "former_job" then
+        knownFallback = "I worked as a "
+            .. tostring(content or "something else") .. " before all this."
+    elseif kind == "education" then
+        knownFallback = "I studied " .. tostring(content or "that") .. "."
+    elseif kind == "hobby" then
+        knownFallback = "I used to enjoy " .. tostring(content or "that") .. "."
+    elseif kind == "family_background" then
+        knownFallback = "My family was " .. tostring(content or "like that") .. "."
+    elseif kind == "fear" then
+        knownFallback = "I have always been afraid of "
+            .. tostring(content or "that") .. "."
+    elseif kind == "tragedy" then
+        knownFallback = "Something happened: "
+            .. tostring(content or "I lost people") .. "."
+    end
     if fact and fact.status == "known"
         and type(content) == "string" and content ~= ""
     then
@@ -183,6 +215,7 @@ local function resolveBackstoryQuestion(ir, state, context)
         end
         response = factResponse(
             "semantic.question.backstory.known",
+            knownFallback,
             "semantic.question.backstory",
             fact,
             "NPC_BACKSTORY",
@@ -211,6 +244,7 @@ local function resolveBackstoryQuestion(ir, state, context)
         end
         response = factResponse(
             "semantic.question.backstory.suspected",
+            "I think it was " .. content .. ", but I could be mistaken.",
             "semantic.question.backstory",
             fact,
             "NPC_BACKSTORY",
@@ -234,6 +268,7 @@ local function resolveBackstoryQuestion(ir, state, context)
         end
         return factResponse(
             "semantic.question.backstory.ambiguous",
+            "Which part of my past do you mean?",
             "semantic.question.backstory",
             fact,
             "NPC_BACKSTORY"
@@ -252,6 +287,7 @@ local function resolveBackstoryQuestion(ir, state, context)
     end
     return factResponse(
         "semantic.question.backstory.refusal",
+        "I'm not ready to talk about that yet.",
         "semantic.question.backstory",
         fact,
         "NPC_BACKSTORY"

@@ -1,6 +1,6 @@
 # P11 — Modular Conversation Architecture & Contextual Authoring
 
-**Status:** ACTIVE — P11A–P11D accepted; P11E–P11I remain mandatory before automatic transition to P12.
+**Status:** MANDATORY / NEXT.
 
 P0–P10 remain accepted semantic-runtime foundation. P11 does not replace the
 semantic engine. It removes the remaining authoring/content fragmentation and
@@ -481,11 +481,8 @@ Final developer acceptance must prove:
 
 ## Completion boundary
 
-After P11A–P11I pass, this phase is accepted but the parent goal remains
-**IN PROGRESS**. Continue automatically into
-`P12_PRAGMATIC_CONVERSATIONAL_INTELLIGENCE.md`; P11 completion is not a
-live-test handoff boundary.
+Only after P11A–P11I pass may the parent goal return to
+`READY FOR USER LIVE TEST`.
 
-The P11 phase handoff must describe the system in steady-state Conversation
-terms, not as a collection of Responses/Interactions/Generated/migration-era
-tools.
+The final handoff must describe the system in steady-state Conversation terms,
+not as a collection of Responses/Interactions/Generated/migration-era tools.

@@ -30,8 +30,8 @@ from tools.semantic_harness.codebuilder.dialogue_content import (
     CONTENT_TRANSLATION_STEM,
     compile_dialogue_content,
     dialogue_content_artifact_paths,
-    dialogue_content_source_fingerprint,
     load_dialogue_content_source,
+    source_fingerprint,
     write_dialogue_content_output,
 )
 from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
@@ -753,7 +753,7 @@ def preview_dialogue_content_source(
         **base,
         "ok": True,
         "diagnostics": [],
-        "sourceFingerprint": dialogue_content_source_fingerprint(source_path),
+        "sourceFingerprint": source_fingerprint(source_path),
         "contentFingerprint": compiled["contentFingerprint"],
         "phraseFamilyCount": len(compiled["phraseFamilies"]),
         "phraseCount": phrase_count,

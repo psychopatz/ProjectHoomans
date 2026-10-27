@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0–P11H are accepted foundation. P11I remains mandatory and active, followed automatically by mandatory P12A–P12I Pragmatic Conversational Intelligence & Dialogue Director before developer handoff.
+**Status:** IN PROGRESS — P0 through P10 are accepted foundation; P11A steady-state Conversation source hygiene is accepted and P11B–P11I remain mandatory for Modular Conversation Architecture & Contextual Authoring.
 
 ## Audited baseline
 
@@ -509,7 +509,7 @@ focused Python coverage is `15/15 PASS`, and the Project Hoomans Kahlua scan
 reported `0` errors / `0` warnings across `3,164` files. No source save,
 native Project Zomboid session, or Workshop operation was touched.
 
-## Accepted P11B — one first-party wording path
+## Immediate Next Chunk — P11B
 
 Audit every first-party wording path (`Responses.json`, `Realizations.json`,
 LocalResponse prose/fallbacks, static semantic-ID translation maps, and
@@ -517,150 +517,6 @@ hard-coded SpeechRealization families). Move wording into Dialogue Content
 with semantic template IDs plus bounded factual arguments, prove EN/TL and
 runtime parity, then remove superseded first-party wording stores and
 fallback seams.
-
-P11B is accepted after the first-party wording audit. ResponseCatalog and
-LocalResponse now select semantic template IDs plus bounded fact arguments;
-Dialogue Content is the only Project Hoomans first-party wording source used
-by SpeechRealization and payload rendering. Static client translation-key
-maps, SpeechRealization family builders/families, first-party semantic
-`Responses.json`/`Realizations.json`, and identity response catalogs were
-deleted after parity coverage. Canonical runtime aliases preserve stable
-legacy translation keys without retaining the old wording registries.
-
-Focused production-Lua coverage: `20/20 PASS` in `0.50s`; focused P11B
-Python coverage: `15/15 PASS`; Project Hoomans Kahlua scan: `0` errors / `0`
-warnings across `3,140` scanned files; CodeBuilder was run twice with
-identical generated SHA-256 outputs; `git diff --check`: PASS. The source is
-still migration-heavy and exceeds the P10 compact size target, so P11C/P11D
-must shard and compact it before final acceptance.
-
-## Accepted P11C — domain-sharded Conversation authoring
-
-P11C accepted. Canonical Dialogue Content now enters through
-`tools/semantic_harness/codebuilder/sources/conversation/manifest.json` and
-deterministically merges cohesive domain shards under `conversation/shards/`.
-The shards separate response/content wording from the NLU and semantic
-pattern source, which remains in `semantic_definitions.json`. The compiler
-validates global phrase, semantic-template, and player-choice identity while
-preserving the stable runtime semantic IDs and generated Registry contract.
-
-The shared authoring service now reads the aggregate manifest fingerprint,
-uses the owning shard for content edits, and reports stale/effect-free
-preview and explicit-write results without requiring callers to know shard
-paths. The former monolithic `semantic_dialogue_content.json` source is
-deleted; generated runtime output remains deterministic and byte-stable.
-
-P11C focused validation: `7/7 PASS` shard/registry tests, `7/7 PASS`
-production-Lua architecture/authority/content smokes, CodeBuilder run twice
-with identical generated hashes, and `git diff --check`: PASS. No source
-save, native Project Zomboid session, or Workshop operation was touched.
-
-## Accepted P11D — canonical Conversation UI registry
-
-P11D accepted. The content manifest now declares one canonical
-conversation/ui_registry.json; CodeBuilder validates and emits the bounded
-PZ-safe Generated/ConversationUI/Registry.lua. Landing, What's Up hub,
-static child membership, ordering, player-facing content references, semantic
-destinations, and provider references are represented there. The static
-semantic provider now supplies semantic contracts and production context
-eligibility only; its former presentation-definition file is retired.
-
-The existing landing projection and static-question provider consume the
-generated registry while preserving candidate IDs, order, frames, fallback
-behavior, and EN/TL wording. Provider references are visibly locked and the
-registry contains no eligibility or gameplay effects. The shared authoring
-service exposes bounded inspect, validate, effect-free preview, explicit write,
-add/remove/move/reorder, and stale-fingerprint operations.
-
-P11D focused validation: Conversation UI registry 3/3 PASS, shard/content
-registry and legacy parity tests pass, contextual What's Up/hub/talk parity
-46/46 PASS, production-Lua authority/identity/suggestion smokes 5/5 PASS,
-CodeBuilder compile PASS, and git diff --check: PASS. No source save, native
-Project Zomboid session, or Workshop operation was touched.
-
-## Accepted P11E — domain semantic taxonomy and automatic-flow provenance
-
-P11E accepted. Automatic command, task, and gift flows now use domain-meaning
-IDs (`semantic.command.*`, `semantic.task.*`, and `semantic.gift.*`) rather
-than the production taxonomy `semantic.generated.*`. Bounded generator
-metadata (`origin`, `workflowKind`, `templateVersion`, `templateFingerprint`,
-and action/capability identity) remains available for diagnostics and Studio
-detail without becoming semantic meaning.
-
-Automatic-flow adapters now provide response facts, conditions, and stable
-variant identity only. First-party EN/TL wording is compiled from the
-`conversation/shards/automatic_flows.json` and other canonical Conversation
-shards. Obsolete generated translation files and manifest loads were removed;
-the canonical Dialogue Content build is now 550 phrase families / 863 phrases
-and remains deterministic.
-
-The bounded Speech Realization catalog is deterministic and retains
-representative command/question/social coverage under its 64-family limit.
-The response-quality inspector distinguishes authored translation keys from
-direct semantic action packet keys without changing runtime authority.
-
-P11E focused validation: automatic taxonomy/flow/authoring/follow-up and
-shard/UI tests `29/29 PASS`; contextual speech behavior `8/8 PASS`; bounded
-runtime speech catalog `4/4 PASS`; Response Observatory `10/10 PASS`; bundled
-real-Lua response matrices `18/18 PASS`; isolated Xvfb Observatory Tk
-acceptance `2/2 PASS`; CodeBuilder compile PASS; and `git diff --check` PASS.
-No source save, native Project Zomboid session, or Workshop operation was
-touched.
-
-## Accepted P11F — derived Conversation Studio projection
-
-P11F accepted. Normal Studio navigation now presents Explore with one
-Conversation tree and Sources, plus the shared Review home. The Conversation
-tree derives its hierarchy from canonical semantic/content identity and merges
-bounded production ResponseCatalog rows with bounded Dialogue Content rows.
-Full canonical IDs, source fingerprints, and ownership remain visible.
-
-Selecting a leaf exposes bounded Overview, Wording, Route, Conditions,
-Follow-ups, and Sources details. Interaction execution-route information is
-retained under Developer Tools as narrow diagnostics rather than a second
-everyday browser. The existing serialized worker request path and lazy pool
-detail behavior remain unchanged; catalog failure stays local to Studio.
-
-P11F focused validation: surface ownership and Conversation projection
-`5/5 PASS` under Xvfb; derived semantic tree `3/3 PASS`; Conversation UI
-registry `3/3 PASS`; and `git diff --check` PASS. No source save, native
-Project Zomboid session, or Workshop operation was touched.
-
-## Accepted P11G — contextual Conversation authoring
-
-P11G accepted. Developer Tools now exposes a contextual Conversation authoring
-pane for the selected content family or UI node. Structured EN/TL variant
-add/duplicate/delete/reorder/style operations, player-choice label/utterance
-editing, and Conversation UI membership/order operations all use the shared
-`SemanticLabAuthoringService`; production semantic destinations and provider
-references remain locked. Preview and Review are effect-free, stale source
-fingerprints are rejected, and canonical writes plus CodeBuilder compilation
-remain explicit. Normal wording/navigation editing does not require raw JSON.
-
-P11G focused validation: shard/UI/compiler/API tests `10/10 PASS`; focused
-Studio surface/editor lifecycle `7/7 PASS` under Xvfb; placeholder parity,
-deterministic generated output, and `git diff --check` PASS. No source save,
-native Project Zomboid session, or Workshop operation was touched.
-
-## Accepted P11H — shared agent-friendly authoring API
-
-P11H accepted. The GUI and agent CLI now share one bounded,
-machine-readable authoring service for Conversation content and UI nodes:
-inspect, variant operations, add/remove/move/reorder membership, validation,
-effect-free preview/Review, source-fingerprint stale guards, explicit writes,
-and explicit content/UI compilation. Generated Lua and translation files are
-never direct authoring inputs, and no operation writes implicitly.
-
-P11H focused validation: shard/UI/compiler/API tests `10/10 PASS`; CLI
-validation and effect-free preview checks PASS; focused Studio surface/editor
-lifecycle `7/7 PASS` under Xvfb; `git diff --check` PASS.
-
-## Immediate Next Chunk — P11I
-
-Run the final zero-legacy, one-explorer, runtime parity, deterministic build,
-resource-aware Python, focused Xvfb, native Lua, Kahlua, source/save safety,
-and performance acceptance gates. Return the parent goal to
-`READY FOR USER LIVE TEST` only after all developer-side P11 gates pass.
 
 ## Historical P11A starting instructions (completed)
 
@@ -688,7 +544,7 @@ canonical services.
 
 ## Stop conditions
 
-Stop before full P11+P12 developer acceptance only for:
+Stop before P11 developer acceptance only for:
 
 - genuine unsafe repository divergence/concurrent ownership conflict;
 - a proven externally consumed Project Hoomans public API whose removal/rename
@@ -696,7 +552,5 @@ Stop before full P11+P12 developer acceptance only for:
 - missing required dependency/toolchain with no accepted fallback;
 - a proven architecture conflict requiring user decision.
 
-A P11 or P12 subphase passing is not a stop condition. Continue automatically
-through P11I, then P12A–P12I. Only after all developer-side P12 gates pass may
-the parent return to `READY FOR USER LIVE TEST` for the explicitly user-owned
-native Project Zomboid SP/MP validation.
+A P11 subphase passing is not a stop condition. Continue automatically through
+P11I.

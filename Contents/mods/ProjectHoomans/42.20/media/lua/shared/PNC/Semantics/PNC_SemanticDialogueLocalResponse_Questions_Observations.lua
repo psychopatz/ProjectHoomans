@@ -7,9 +7,10 @@ local Internal = Response and Response.Internal or {}
 Response.Internal = Internal
 local copyArgs = Internal.CopyArgs
 local catalogResponse = Internal.CatalogResponse
-local clockFacts = Internal.ClockFacts
-local dayFacts = Internal.DayFacts
-local weatherFacts = Internal.WeatherFacts
+local clockText = Internal.ClockText
+local dayText = Internal.DayText
+local weatherText = Internal.WeatherText
+local identityText = Internal.IdentityText
 
 local function resolveNeeds(ir, state, context)
     if ir and ir.subject == "QUANTITY" then
@@ -23,60 +24,57 @@ local function resolveNeeds(ir, state, context)
 end
 
 local function resolveTime(world)
-    local facts = clockFacts(world)
-    if not facts then return nil end
+    local text = clockText(world)
+    if not text then return nil end
     return {
         templateID = "semantic.question.time",
+        fallback = text,
         args = copyArgs({
-            time = facts.display,
-            hour = facts.hour,
-            minute = facts.minute,
+            hour = world.time and world.time.hour,
+            minute = world.time and world.time.minute,
             gameDay = world.gameDay,
         }),
     }
 end
 
 local function resolveDate(world)
-    local facts = dayFacts(world)
-    if not facts then return nil end
-    if facts.gameDay ~= nil then
-        return {
-            templateID = "semantic.question.day",
-            args = copyArgs({ gameDay = facts.gameDay }),
-        }
-    end
+    local text = dayText(world)
+    if not text then return nil end
+    local calendar = world.calendar or {}
     return {
         templateID = "semantic.question.date",
+        fallback = text,
         args = copyArgs({
-            year = facts.year,
-            month = facts.month,
-            day = facts.day,
+            gameDay = world.gameDay,
+            year = calendar.year,
+            month = calendar.month,
+            day = calendar.day,
         }),
     }
 end
 
 local function resolveWeather(world)
-    local facts = weatherFacts(world)
-    local kind = facts and facts.kind or "unknown"
+    local text = weatherText(world)
     return {
-        templateID = "semantic.question.weather." .. kind,
-        args = copyArgs({
-            weather = world and world.weather,
-            temperature = facts and facts.temperature,
-        }),
+        templateID = "semantic.question.weather",
+        fallback = text or "I can't tell what the weather's doing right now.",
+        args = copyArgs({ weather = world and world.weather }),
     }
 end
 
 local function resolveIdentityQuestion(ir, state, context)
+    local text
     if context and context.identityTrust == "untrustworthy" then
         local response = catalogResponse(
             "semantic.question.identity", ir, state, context
         )
         if response then return response end
+        text = "I don't share my name with liars. What's yours, truthfully?"
     elseif Internal.IdentityKnown(context)
     then
         return {
             templateID = "semantic.question.identity.known",
+            fallback = identityText(context) .. " We already know each other.",
             args = copyArgs({
                 npcName = context.npcFullName or context.npcName,
             }),
@@ -86,9 +84,12 @@ local function resolveIdentityQuestion(ir, state, context)
             "semantic.question.identity", ir, state, context
         )
         if response then return response end
+        text = "I'll tell you my name once we've established some trust."
+            .. " What's your name?"
     end
     return {
         templateID = "semantic.question.identity",
+        fallback = text,
         args = copyArgs({
             npcName = context and (context.npcFullName or context.npcName),
         }),

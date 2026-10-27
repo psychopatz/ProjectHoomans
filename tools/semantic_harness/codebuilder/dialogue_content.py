@@ -12,7 +12,6 @@ import hashlib
 import json
 import math
 import re
-from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -20,11 +19,9 @@ from .lexicon_compiler import CompileError, _lua_string
 
 
 CONTENT_SCHEMA = "pnc.semantic_dialogue_content.v2"
-CONTENT_MANIFEST_SCHEMA = "pnc.conversation_content_manifest.v1"
-CONTENT_SHARD_SCHEMA = "pnc.conversation_content_shard.v1"
-CONTENT_SOURCE_NAME = "conversation/manifest.json"
+CONTENT_SOURCE_NAME = "semantic_dialogue_content.json"
 CONTENT_SOURCE_RELATIVE = Path(
-    "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
+    "tools/semantic_harness/codebuilder/sources/semantic_dialogue_content.json"
 )
 CONTENT_RUNTIME_RELATIVE = Path(
     "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
@@ -38,13 +35,9 @@ LANGUAGES = ("EN", "TL")
 STYLES = ("neutral", "warm", "terse", "guarded")
 ID_PATTERN = re.compile(r"^[a-z][a-z0-9_.:-]{0,127}$")
 TRANSLATION_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,127}$")
-# Domain-sharded automatic task/command/gift responses are still canonical
-# Conversation wording, not a second registry. Keep the aggregate bound
-# explicit while leaving room for those bounded workflow variants.
-MAX_FAMILIES = 768
+MAX_FAMILIES = 256
 MAX_PHRASES_PER_STYLE = 6
 MAX_PLAYER_CONTENT = 32
-MAX_RUNTIME_ALIASES = 512
 MAX_TEXT = 256
 
 
@@ -65,162 +58,14 @@ def source_fingerprint(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _read_json(path: Path, label: str) -> dict[str, Any]:
+def load_dialogue_content_source(path: Path) -> dict[str, Any]:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
-        raise CompileError(f"cannot read {label} {path}: {error}") from error
+        raise CompileError(f"cannot read dialogue content source {path}: {error}") from error
     if not isinstance(value, dict):
-        raise CompileError(f"{label} root must be an object: {path}")
+        raise CompileError("dialogue content source root must be an object")
     return value
-
-
-def _shard_path(manifest_path: Path, value: Any) -> Path:
-    if not isinstance(value, str) or not value.strip():
-        raise CompileError("conversation content shard path must be a string")
-    relative = Path(value)
-    if relative.is_absolute() or ".." in relative.parts:
-        raise CompileError(f"conversation content shard path escapes the manifest: {value}")
-    return (manifest_path.parent / relative).resolve()
-
-
-def load_dialogue_content_manifest(path: Path) -> dict[str, Any]:
-    """Load the bounded authoring manifest without merging its shards."""
-    manifest = _read_json(path, "dialogue content manifest")
-    if manifest.get("schema") != CONTENT_MANIFEST_SCHEMA:
-        raise CompileError("conversation content manifest schema is invalid")
-    if manifest.get("schemaVersion") != 1:
-        raise CompileError("conversation content manifest schemaVersion must be 1")
-    source = manifest.get("source")
-    groups = manifest.get("groups")
-    shards = manifest.get("shards")
-    if not isinstance(source, dict) or not isinstance(groups, dict):
-        raise CompileError("conversation content manifest requires source and groups")
-    ui_registry = manifest.get("conversationUI")
-    if not isinstance(ui_registry, dict):
-        raise CompileError("conversation content manifest requires conversationUI")
-    if not isinstance(ui_registry.get("schema"), str) or not isinstance(
-        ui_registry.get("path"), str
-    ):
-        raise CompileError(
-            "conversation content manifest conversationUI requires schema and path"
-        )
-    if not isinstance(shards, list) or not shards:
-        raise CompileError("conversation content manifest requires shards")
-    seen_ids: set[str] = set()
-    for index, shard in enumerate(shards, 1):
-        if not isinstance(shard, dict):
-            raise CompileError(f"conversation content manifest shard {index} must be an object")
-        shard_id = shard.get("id")
-        if not isinstance(shard_id, str) or not shard_id.strip():
-            raise CompileError(f"conversation content manifest shard {index} requires an id")
-        if shard_id in seen_ids:
-            raise CompileError(f"duplicate conversation content shard id: {shard_id}")
-        seen_ids.add(shard_id)
-        _shard_path(path, shard.get("path"))
-    return manifest
-
-
-def _merge_dialogue_content_shards(path: Path, manifest: dict[str, Any]) -> dict[str, Any]:
-    merged: dict[str, Any] = {
-        "schemaVersion": 2,
-        "source": manifest["source"],
-        "groups": manifest["groups"],
-        "phraseFamilies": [],
-        "playerChoices": [],
-        "runtimeAliases": [],
-    }
-    for index, descriptor in enumerate(manifest["shards"], 1):
-        shard_path = _shard_path(path, descriptor.get("path"))
-        shard = _read_json(shard_path, "dialogue content shard")
-        if shard.get("schema") != CONTENT_SHARD_SCHEMA:
-            raise CompileError(f"conversation content shard {shard_path} schema is invalid")
-        if shard.get("schemaVersion") != 1:
-            raise CompileError(f"conversation content shard {shard_path} schemaVersion must be 1")
-        if shard.get("id") != descriptor.get("id"):
-            raise CompileError(f"conversation content shard identity mismatch: {shard_path}")
-        for key in ("phraseFamilies", "playerChoices", "runtimeAliases"):
-            values = shard.get(key, [])
-            if not isinstance(values, list):
-                raise CompileError(f"{shard_path}: {key} must be a list")
-            merged[key].extend(values)
-    return merged
-
-
-def load_dialogue_content_source(path: Path) -> dict[str, Any]:
-    value = _read_json(path, "dialogue content source")
-    if value.get("schema") == CONTENT_MANIFEST_SCHEMA:
-        return _merge_dialogue_content_shards(
-            path, load_dialogue_content_manifest(path)
-        )
-    return value
-
-
-def dialogue_content_source_fingerprint(path: Path) -> str:
-    """Fingerprint the manifest and every declared shard for stale guards."""
-    manifest = load_dialogue_content_manifest(path)
-    digest = hashlib.sha256()
-    digest.update(path.read_bytes())
-    for descriptor in manifest["shards"]:
-        shard_path = _shard_path(path, descriptor.get("path"))
-        digest.update(str(descriptor["id"]).encode("utf-8"))
-        digest.update(shard_path.read_bytes())
-    return digest.hexdigest()
-
-
-def write_dialogue_content_source(path: Path, document: dict[str, Any]) -> list[Path]:
-    """Write only shard records changed through the authoring service."""
-    manifest = load_dialogue_content_manifest(path)
-    family_by_id = {
-        str(item.get("id") or "phrase." + str(item.get("semanticTemplateID") or "")): item
-        for item in document.get("phraseFamilies", [])
-        if isinstance(item, dict)
-    }
-    choice_by_id = {
-        str(item.get("id")): item
-        for item in document.get("playerChoices", [])
-        if isinstance(item, dict) and item.get("id") is not None
-    }
-    alias_by_key = {
-        str(item.get("runtimeKey")): item
-        for item in document.get("runtimeAliases", [])
-        if isinstance(item, dict) and item.get("runtimeKey") is not None
-    }
-    written: list[Path] = []
-    for descriptor in manifest["shards"]:
-        shard_path = _shard_path(path, descriptor.get("path"))
-        shard = _read_json(shard_path, "dialogue content shard")
-        for family in shard.get("phraseFamilies", []):
-            if isinstance(family, dict):
-                family_id = str(
-                    family.get("id")
-                    or "phrase." + str(family.get("semanticTemplateID") or "")
-                )
-                if family_id not in family_by_id:
-                    raise CompileError(f"updated content lost family {family_id}")
-                family.clear()
-                family.update(family_by_id[family_id])
-        for choice in shard.get("playerChoices", []):
-            if isinstance(choice, dict):
-                choice_id = str(choice.get("id"))
-                if choice_id not in choice_by_id:
-                    raise CompileError(f"updated content lost player choice {choice_id}")
-                choice.clear()
-                choice.update(choice_by_id[choice_id])
-        for alias in shard.get("runtimeAliases", []):
-            if isinstance(alias, dict):
-                runtime_key = str(alias.get("runtimeKey"))
-                if runtime_key not in alias_by_key:
-                    raise CompileError(f"updated content lost runtime alias {runtime_key}")
-                alias.clear()
-                alias.update(alias_by_key[runtime_key])
-        shard_path.write_text(
-            json.dumps(shard, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-            newline="\n",
-        )
-        written.append(shard_path)
-    return written
 
 
 def _text(value: Any, label: str) -> str:
@@ -254,18 +99,6 @@ def _translations(value: Any, label: str) -> dict[str, str]:
     output: dict[str, str] = {}
     for language in LANGUAGES:
         output[language] = _text(value.get(language), f"{label}.{language}")
-    placeholders = {
-        language: Counter(
-            re.findall(r"\{[A-Za-z0-9_.:-]+\}|%[sd]", output[language])
-        )
-        for language in LANGUAGES
-    }
-    if placeholders["EN"] != placeholders["TL"]:
-        raise CompileError(
-            f"{label} EN/TL placeholders must match: "
-            f"EN={sorted(placeholders['EN'].elements())!r}, "
-            f"TL={sorted(placeholders['TL'].elements())!r}"
-        )
     unsupported = set(value) - set(LANGUAGES)
     if unsupported:
         raise CompileError(
@@ -399,42 +232,10 @@ def _player_content(
         "kind": kind,
         "labelKey": label_key,
         "choiceKey": choice_key,
-        "labelFallback": label_values["EN"],
-        "choiceFallback": choice_values["EN"],
         "route": _text(value.get("route"), f"{content_id}.route"),
         "hubID": _text(value.get("hubID"), f"{content_id}.hubID"),
         "canonicalConcept": derived_canonical_concept(content_id),
     }, translations
-
-
-def _runtime_alias(value: Any, semantic_ids: set[str], alias_keys: set[str]) -> dict[str, Any]:
-    if not isinstance(value, dict):
-        raise CompileError("runtimeAliases entries must be objects")
-    semantic_id = _id(value.get("semanticTemplateID"), "runtimeAlias.semanticTemplateID")
-    if semantic_id not in semantic_ids:
-        raise CompileError(
-            f"runtime alias references an unknown semanticTemplateID: {semantic_id}"
-        )
-    runtime_key = _translation_key(value.get("runtimeKey"), "runtimeAlias.runtimeKey")
-    if runtime_key in alias_keys:
-        raise CompileError(f"duplicate runtime alias key: {runtime_key}")
-    alias_keys.add(runtime_key)
-    style = value.get("style", "neutral")
-    if style not in STYLES:
-        raise CompileError(f"runtime alias {runtime_key} has an invalid style: {style!r}")
-    phrase_index = value.get("phraseIndex", 1)
-    if not isinstance(phrase_index, int) or isinstance(phrase_index, bool):
-        raise CompileError(f"runtime alias {runtime_key} phraseIndex must be an integer")
-    if phrase_index < 1 or phrase_index > MAX_PHRASES_PER_STYLE:
-        raise CompileError(
-            f"runtime alias {runtime_key} phraseIndex is outside the bounded phrase range"
-        )
-    return {
-        "runtimeKey": runtime_key,
-        "semanticTemplateID": semantic_id,
-        "style": style,
-        "phraseIndex": phrase_index,
-    }
 
 
 def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
@@ -455,11 +256,6 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
     raw_player = document.get("playerChoices", [])
     if not isinstance(raw_player, list) or len(raw_player) > MAX_PLAYER_CONTENT:
         raise CompileError(f"playerChoices must contain at most {MAX_PLAYER_CONTENT} records")
-    raw_aliases = document.get("runtimeAliases", [])
-    if not isinstance(raw_aliases, list) or len(raw_aliases) > MAX_RUNTIME_ALIASES:
-        raise CompileError(
-            f"runtimeAliases must contain at most {MAX_RUNTIME_ALIASES} records"
-        )
 
     family_ids: set[str] = set()
     semantic_ids: set[str] = set()
@@ -494,29 +290,6 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
             key, language = compound_key.rsplit(":", 1)
             translations_by_language[language][key] = text
 
-    aliases: list[dict[str, Any]] = []
-    alias_keys: set[str] = set()
-    family_by_semantic = {
-        family["semanticTemplateID"]: family for family in compiled_families
-    }
-    for raw_alias in raw_aliases:
-        alias = _runtime_alias(raw_alias, semantic_ids, alias_keys)
-        family = family_by_semantic[alias["semanticTemplateID"]]
-        phrases = family["styles"].get(alias["style"])
-        if not phrases:
-            phrases = family["styles"].get("neutral")
-            alias["style"] = "neutral"
-        phrase_index = min(alias["phraseIndex"], len(phrases))
-        alias["phraseIndex"] = phrase_index
-        phrase = phrases[phrase_index - 1]
-        alias["canonicalKey"] = phrase["key"]
-        for language in LANGUAGES:
-            canonical_key = phrase["key"]
-            translations_by_language[language][alias["runtimeKey"]] = (
-                translations_by_language[language][canonical_key]
-            )
-        aliases.append(alias)
-
     # Translation output is deliberately a flat string map.  Arrays here
     # would turn equivalent wording into a different runtime contract.
     for language, values in translations_by_language.items():
@@ -529,7 +302,6 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
         "source": source,
         "phraseFamilies": compiled_families,
         "playerChoices": compiled_player,
-        "runtimeAliases": aliases,
         "translations": translations_by_language,
     }
     compiled["contentFingerprint"] = content_fingerprint(document)
@@ -582,15 +354,6 @@ def render_dialogue_content_registry(compiled: dict[str, Any]) -> str:
         for family in compiled["phraseFamilies"]
     }
     choices = {choice["id"]: choice for choice in compiled["playerChoices"]}
-    aliases = {
-        alias["runtimeKey"]: {
-            "semanticTemplateID": alias["semanticTemplateID"],
-            "style": alias["style"],
-            "phraseIndex": alias["phraseIndex"],
-            "canonicalKey": alias["canonicalKey"],
-        }
-        for alias in compiled.get("runtimeAliases", [])
-    }
     lines = [
         "-- Generated by tools/semantic_harness/codebuilder/build.py; do not edit by hand.",
         "-- Dialogue Content Registry: bounded post-style phrases and player content.",
@@ -603,35 +366,16 @@ def render_dialogue_content_registry(compiled: dict[str, Any]) -> str:
         f"Registry.CONTENT_FINGERPRINT = {_lua_string(compiled['contentFingerprint'])}",
         f"Registry.PHRASE_FAMILIES = {_lua_value(families, 0)}",
         f"Registry.PLAYER_CHOICES = {_lua_value(choices, 0)}",
-        f"Registry.RUNTIME_ALIASES = {_lua_value(aliases, 0)}",
-        "function Registry.ResolveTemplate(templateID, style)",
-        "    local alias = Registry.RUNTIME_ALIASES[tostring(templateID or \"\")]",
-        "    if type(alias) == \"table\" then",
-        "        return alias.semanticTemplateID, alias.style or style or \"neutral\"",
-        "    end",
-        "    return tostring(templateID or \"\"), style or \"neutral\"",
-        "end",
         "function Registry.FamilyFor(templateID, style)",
-        "    local alias = Registry.RUNTIME_ALIASES[tostring(templateID or \"\")]",
-        "    local resolvedID, resolvedStyle = Registry.ResolveTemplate(templateID, style)",
-        "    local family = Registry.PHRASE_FAMILIES[resolvedID]",
+        "    local family = Registry.PHRASE_FAMILIES[tostring(templateID or \"\")]",
         "    if type(family) ~= \"table\" then return nil end",
-        "    local selectedStyle = tostring(resolvedStyle or \"neutral\")",
+        "    local selectedStyle = tostring(style or \"neutral\")",
         "    local phrases = family.styles and family.styles[selectedStyle]",
         "    if type(phrases) ~= \"table\" then",
         "        selectedStyle = \"neutral\"",
         "        phrases = family.styles and family.styles[selectedStyle]",
         "    end",
-        "    if type(alias) == \"table\" and type(phrases) == \"table\" then",
-        "        local selected = phrases[tonumber(alias.phraseIndex) or 1]",
-        "        phrases = selected and { selected } or phrases",
-        "    end",
         "    return family, type(phrases) == \"table\" and phrases or nil, selectedStyle",
-        "end",
-        "function Registry.KeyFor(templateID, style)",
-        "    local family, phrases = Registry.FamilyFor(templateID, style)",
-        "    local first = phrases and phrases[1] or nil",
-        "    return first and first.key or nil",
         "end",
         "function Registry.PlayerChoice(contentID)",
         "    return Registry.PLAYER_CHOICES[tostring(contentID or \"\")]",

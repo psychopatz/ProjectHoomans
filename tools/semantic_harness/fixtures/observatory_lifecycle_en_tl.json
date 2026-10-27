@@ -56,7 +56,7 @@
         "wait here"
       ],
       "expected": {
-        "lastKey": "semantic.command.stay.queued",
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayQueued",
         "minActions": 1
       }
     },
@@ -68,7 +68,7 @@
         "wait here"
       ],
       "expected": {
-        "lastKey": "semantic.command.stay.queued",
+        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayQueued",
         "minActions": 1,
         "maxFallbackLookups": 0
       }

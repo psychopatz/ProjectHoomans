@@ -149,15 +149,7 @@ def run_quality_matrix(
         ) or {}
         checks: dict[str, bool] = {}
         if "lastKey" in expected:
-            expected_key = str(expected["lastKey"])
-            observed = (
-                semantic_keys
-                if expected_key.startswith("semantic.")
-                and semantic_keys
-                and semantic_keys[-1].startswith("semantic.")
-                else keys
-            )
-            checks["lastKey"] = bool(observed) and observed[-1] == expected_key
+            checks["lastKey"] = bool(keys) and keys[-1] == expected["lastKey"]
         if "maxActions" in expected:
             checks["maxActions"] = actions <= int(expected["maxActions"])
         if "minActions" in expected:
@@ -192,16 +184,8 @@ def run_quality_matrix(
                 and semantic_keys[-1] == expected["lastSemanticKey"]
             )
         if "lastKeyPrefix" in expected:
-            prefix = str(expected["lastKeyPrefix"])
-            observed = (
-                semantic_keys
-                if prefix.startswith("semantic.")
-                and semantic_keys
-                and semantic_keys[-1].startswith("semantic.")
-                else keys
-            )
-            checks["lastKeyPrefix"] = bool(observed) and observed[-1].startswith(
-                prefix
+            checks["lastKeyPrefix"] = bool(keys) and keys[-1].startswith(
+                str(expected["lastKeyPrefix"])
             )
         if "maxFallbackLookups" in expected:
             checks["maxFallbackLookups"] = (

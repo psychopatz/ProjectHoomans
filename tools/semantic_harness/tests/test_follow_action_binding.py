@@ -152,7 +152,7 @@ class FollowActionBindingTests(unittest.TestCase):
         )
         self.assertEqual(
             denied["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral01",
+            "UI_PNC_Conversation_Semantic_GeneratedFollowRejected",
         )
 
 

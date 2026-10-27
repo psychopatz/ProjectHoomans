@@ -276,10 +276,11 @@ T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",
 T.equal(llmCalls, 0,
     "recognized greeting stays local even when the provider is ready")
 
-T.equal(registeredFallbacks["semantic.command.accepted"], nil,
-    "semantic policy does not register first-party wording")
-T.equal(registeredFallbacks["semantic.ask_clarification"], nil,
-    "clarification wording remains outside the policy registry")
+T.equal(registeredFallbacks["semantic.command.accepted"], "Okay.",
+    "semantic policy registers a readable history fallback")
+T.equal(registeredFallbacks["semantic.ask_clarification"],
+    "I'm not sure what you mean.",
+    "clarification history fallback is registered")
 T.equal(view.session.semanticDialogueState.currentTopic, "greeting",
     "greeting updates the compact conversation topic")
 T.equal(traceEntries[1].event, "semantic_input_local",

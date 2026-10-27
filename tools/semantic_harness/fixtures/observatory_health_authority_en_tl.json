@@ -22,11 +22,11 @@
     },
     {
       "label": "Companion Wait EN", "language": "EN", "utterance": "wait here",
-      "expected": {"lastKey": "semantic.command.stay.queued", "minActions": 1}
+      "expected": {"lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayQueued", "minActions": 1}
     },
     {
       "label": "Companion Wait TL", "language": "TL", "utterance": "wait here",
-      "expected": {"lastKey": "semantic.command.stay.queued", "minActions": 1, "maxFallbackLookups": 0, "textContains": "Sige, mananatili ako rito."}
+      "expected": {"lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayQueued", "minActions": 1, "maxFallbackLookups": 0, "textContains": "Sige, mananatili ako rito."}
     },
     {
       "label": "Hostile boundary EN", "language": "EN", "utterance": "fuck you",

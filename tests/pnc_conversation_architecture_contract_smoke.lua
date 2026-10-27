@@ -91,7 +91,7 @@ T.truthy(composition:find("PNC_Necroa_ZombieCaptionAdapter", 1, true),
 
 local sourcePath = T.repository
     .. "/tools/semantic_harness/codebuilder/sources/"
-    .. "conversation/manifest.json"
+    .. "semantic_dialogue_content.json"
 local sourceHandle = assert(io.open(sourcePath, "rb"))
 local contentSource = sourceHandle:read("*a")
 sourceHandle:close()

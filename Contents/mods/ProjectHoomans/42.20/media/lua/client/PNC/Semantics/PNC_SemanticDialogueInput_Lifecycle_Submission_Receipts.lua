@@ -35,7 +35,7 @@ local function applyGeneratedFlowResult(view, result, actionResult)
         { maxFlowStack = 4 }
     )
     if type(updated) ~= "table" then
-        audit("semantic.automatic_flow.result_unapplied", {
+        audit("semantic.generated_flow.result_unapplied", {
             flowID = flow.flowId,
             reason = reason,
             status = actionResult.status,

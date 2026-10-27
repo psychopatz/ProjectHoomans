@@ -291,7 +291,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         repository = Path(__file__).resolve().parents[3]
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             original = worker.response_pool_detail(
-                "semantic.command.follow.queued", limit=16)
+                "semantic.generated.simple_command.follow.queued", limit=16)
         proposal = {
             "poolID": original["poolID"],
             "expectedContentFingerprint": original["contentFingerprint"],
@@ -315,7 +315,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                         occurrence.setdefault(key, []).append(rel)
                 for suffix in ("FollowQueued", "StayQueued", "FollowRejected",
                                "StayRejected", "FollowFailed", "StayFailed"):
-                    key = "UI_PNC_Conversation_Content_SemanticCommand" + suffix + "Neutral01"
+                    key = "UI_PNC_Conversation_Semantic_Generated" + suffix
                     self.assertEqual(len(occurrence.get(key, [])), 1,
                                      (language, key, occurrence.get(key)))
 

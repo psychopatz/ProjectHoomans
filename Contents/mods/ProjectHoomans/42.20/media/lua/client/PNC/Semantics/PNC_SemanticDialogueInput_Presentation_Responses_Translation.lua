@@ -10,6 +10,7 @@ PNC.Semantics.DialogueInput = Input
 local Internal = Input.Internal or {}
 Input.Internal = Internal
 
+require "PNC/Semantics/PNC_SemanticDialogueInput_Presentation_Responses_Translation_Keys"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Presentation_Responses_Translation_Resolver"
 
 return Internal.SemanticTranslationKey

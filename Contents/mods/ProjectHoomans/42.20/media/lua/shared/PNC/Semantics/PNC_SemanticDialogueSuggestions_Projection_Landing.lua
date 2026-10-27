@@ -9,19 +9,8 @@ local normalizeCandidate = Internal.normalizeCandidate
 local sourceRecord = Internal.sourceRecord
 local Content = PNC.Semantics.DialogueContentRegistry
     or require "PNC/Semantics/Generated/DialogueContent/Registry"
-local UIRegistry = PNC.Semantics.ConversationUIRegistry
-    or require "PNC/Semantics/Generated/ConversationUI/Registry"
-
-local function landingChoiceNode()
-    local children = UIRegistry.Children("conversation.landing")
-    for index = 1, #children do
-        local node = UIRegistry.Node(children[index].nodeID)
-        if type(node) == "table" and node.kind == "landing_choice" then
-            return node, Content.PlayerChoice(node.contentID)
-        end
-    end
-    return nil, nil
-end
+local WhatsUpContent = Content.PlayerChoice
+    and Content.PlayerChoice("conversation.landing:whats_up") or {}
 
 local function hasConversationHistory(context)
     context = type(context) == "table" and context or {}
@@ -43,29 +32,24 @@ end
 local function appendLandingShortcuts(
     output, seen, revision, predicateTrace
 )
-    local node, content = landingChoiceNode()
-    local destination = node and node.semanticDestination or {}
-    local candidateID = destination.candidateID
-    if not candidateID then return end
+    local candidateID = "conversation.landing:whats_up"
     if seen[candidateID] or #output >= Suggestions.MAX_CANDIDATES then
         return
     end
-    local labelKey = content and content.choiceKey or ""
-    local label = resolvedText(
-        labelKey, content and content.choiceFallback or labelKey
-    )
-    local utterance = content and content.choiceFallback or labelKey
+    local labelKey = WhatsUpContent.choiceKey
+        or "UI_PNC_Conversation_Suggestion_WhatsUp_Label"
+    local label = resolvedText(labelKey, "What's up?")
+    local utterance = "What's up?"
     local frame = Suggestions.BuildShortcutFrame({
         candidateID = candidateID,
-        topic = destination.topic,
+        topic = "whats_up",
         labelKey = labelKey,
         labelFallback = label,
         utterance = utterance,
         extensions = {
-            route = destination.route,
-            hubID = destination.hubID,
-            canonicalConcept = destination.canonicalConcept
-                or content and content.canonicalConcept or "WHATS_UP",
+            route = "semantic_hub",
+            hubID = "whats_up",
+            canonicalConcept = "WHATS_UP",
             origin = "conversation_landing",
         },
     }, revision)
@@ -75,7 +59,7 @@ local function appendLandingShortcuts(
     )
     local candidate = {
         id = candidateID,
-        topic = destination.topic,
+        topic = "whats_up",
         groupID = Suggestions.ROOT_GROUP_ID,
         rank = #output + 1,
         source = source,
@@ -100,7 +84,7 @@ local function appendLandingShortcuts(
         predicateTrace[#predicateTrace + 1] = {
             candidateID = candidateID,
             source = "conversation_root",
-            path = "conversationLanding." .. tostring(destination.topic or "choice"),
+            path = "conversationLanding.whatsUp",
             status = "allowed",
             reason = "conversation_landing_shortcut",
         }

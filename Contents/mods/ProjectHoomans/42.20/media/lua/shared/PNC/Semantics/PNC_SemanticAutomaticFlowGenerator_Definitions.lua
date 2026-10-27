@@ -96,13 +96,18 @@ local function missingMetadata(row, template)
             local outcome = template.outcomes[index]
             local response = row.responsePools[outcome]
             if type(response) ~= "table"
+                or tostring(response.key or "") == ""
+                or tostring(response.en or "") == ""
+                or tostring(response.tl or "") == ""
             then
                 missing[#missing + 1] = "responsePools." .. outcome
             elseif type(response.variants) == "table" then
                 for variantIndex = 1, #response.variants do
                     local variant = response.variants[variantIndex]
                     if type(variant) ~= "table"
-                        or tostring(variant.id or "") == ""
+                        or tostring(variant.key or "") == ""
+                        or tostring(variant.en or "") == ""
+                        or tostring(variant.tl or "") == ""
                     then
                         missing[#missing + 1] = "responsePools."
                             .. outcome .. ".variants." .. tostring(variantIndex)
@@ -115,27 +120,8 @@ local function missingMetadata(row, template)
 end
 
 local function responsePoolID(action, outcome, workflowKind)
-    local domain
-    if workflowKind == "simple_command" then
-        domain = "semantic.command"
-    elseif workflowKind == "parameterized_task" then
-        domain = "semantic.task"
-    elseif workflowKind == "multi_stage_gift" then
-        domain = "semantic.gift"
-    else
-        -- The current templates are exhaustive, but keep a deterministic
-        -- domain for a future automatic workflow rather than reintroducing
-        -- implementation provenance into the semantic namespace.
-        domain = "semantic.automatic." .. lowerID(workflowKind)
-    end
-    local actionID = lowerID(action)
-    -- GIFT is the workflow's semantic domain, not an additional meaning
-    -- segment. This keeps the canonical IDs aligned with the existing gift
-    -- response pools (semantic.gift.pending, semantic.gift.completed, ...).
-    if workflowKind == "multi_stage_gift" and actionID == "gift" then
-        return domain .. "." .. tostring(outcome)
-    end
-    return domain .. "." .. actionID .. "." .. tostring(outcome)
+    return "semantic.generated." .. tostring(workflowKind) .. "."
+        .. lowerID(action) .. "." .. tostring(outcome)
 end
 
 local function flowID(capabilityID, workflowKind)

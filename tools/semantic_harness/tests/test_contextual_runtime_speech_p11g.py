@@ -15,10 +15,11 @@ class ContextualRuntimeSpeechP11GTests(unittest.TestCase):
             catalog = worker.persona_catalog()["speechRealization"]
 
         families = set(catalog["families"])
-        self.assertLessEqual(len(families), 64)
-        self.assertTrue(any(item.startswith("semantic.command.") for item in families))
-        self.assertTrue(any(item.startswith("semantic.question.") for item in families))
-        self.assertTrue(any(item.startswith("semantic.social.") for item in families))
+        self.assertIn("semantic.flow.greeting.opening.default", families)
+        self.assertIn("semantic.question.wellbeing.default", families)
+        self.assertIn("semantic.social.apology.friendly", families)
+        self.assertIn("semantic.question.knowledge.known", families)
+        self.assertIn("UI_PNC_Conversation_Semantic_GeneratedFollowQueued", families)
         self.assertEqual(len(catalog["coverage"]), 15)
 
     def test_domain_pack_resolution_preserves_style_and_translation_contract(self) -> None:

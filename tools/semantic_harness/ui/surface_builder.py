@@ -41,6 +41,7 @@ def build_ui(app: Any) -> None:
         panel.rowconfigure(0, weight=1)
         panel.columnconfigure(0, weight=1)
     studio_notebook.add(explore_tab, text="Explore")
+    studio_notebook.add(dialogue_content_tab, text="Dialogue Content")
     studio_notebook.add(review_tab, text="Review")
     developer_tools_host = ttk.Frame(studio_tab, padding=(0, 6, 0, 0))
     developer_tools_host.grid(row=2, column=0, sticky="nsew")

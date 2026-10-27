@@ -173,7 +173,7 @@ class SemanticAuthoringCompilerWorkerTests(unittest.TestCase):
             "Okay, I'll stay with you.",
         )
         self.assertEqual(
-            accepted["messages"][0]["payload"]["key"],
+            accepted["messages"][0]["payload"]["translationKey"],
             "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted",
         )
         self.assertEqual(
@@ -183,15 +183,11 @@ class SemanticAuthoringCompilerWorkerTests(unittest.TestCase):
         self.assertEqual(accepted["transport"][0]["payload"]["commandID"], "stay")
         self.assertEqual(
             denied["messages"][0]["payload"]["text"],
-            "I can't stay right now.",
-        )
-        self.assertEqual(
-            denied["messages"][0]["payload"]["key"],
-            "semantic.action.stay.unavailable",
+            "I can't stay here right now.",
         )
         self.assertEqual(
             denied["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Content_SemanticActionStayUnavailableNeutral01",
+            "UI_PNC_Conversation_Semantic_GeneratedStayRejected",
         )
         self.assertFalse(denied["result"]["actionResult"]["accepted"])
 

@@ -93,7 +93,6 @@ local function responsePoolCatalog(Values, responseCatalog)
                     and #pool.variants or 0,
                 contentOwners = ownerList,
                 followUpOfferCount = offerCount,
-                provenance = Values.copy(pool.provenance or {}),
             }
         end
     end
@@ -331,7 +330,6 @@ end
 -- provides trustworthy provenance; scanning Lua text is not provenance.
 function FlowEditor.responsePoolList(context, request)
     request = type(request) == "table" and request or {}
-    local Values = context.Values
     local offset = tonumber(request.offset) or 0
     local limit = tonumber(request.limit) or 32
     if offset < 0 or offset % 1 ~= 0 or limit < 1
@@ -367,7 +365,6 @@ function FlowEditor.responsePoolList(context, request)
                 id = id, variantCount = #pool.variants,
                 contentOwners = ownerList,
                 followUpOfferCount = offerCount,
-                provenance = Values.copy(pool.provenance or {}),
             }
         end
     end
@@ -550,7 +547,6 @@ function FlowEditor.responsePoolDetail(context, request)
         poolID = pool.id, variantCount = #pool.variants,
         registryRevision = ResponseCatalog.REVISION or 0,
         contentFingerprint = poolFingerprint(pool),
-        provenance = context.Values.copy(pool.provenance or {}),
         generatedActionLineage = generatedActionLineage(context, pool.id),
         offset = offset, limit = limit, hasMore = offset + #variants < #pool.variants,
         variants = variants,

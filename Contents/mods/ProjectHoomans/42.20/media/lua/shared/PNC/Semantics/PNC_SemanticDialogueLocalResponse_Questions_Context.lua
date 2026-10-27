@@ -49,12 +49,14 @@ local EVENT_FIELD_BY_QUESTION = {
 
 local function contextReferenceResponse(
     templateID,
+    fallback,
     topic,
     uncertainty,
     factRefs
 )
     return {
         templateID = templateID,
+        fallback = fallback,
         dialogueAct = "FACT_ANSWER",
         topic = topic or "CONVERSATION",
         groundedFactRefs = factRefs or {},
@@ -180,14 +182,24 @@ local function eventFollowUpResponse(ir, state, context, questionKind)
             if value then break end
         end
     end
-    local poolID = "semantic.question.event_follow_up." .. suffix
-    if not value then poolID = poolID .. ".unknown" end
+    local unknown = {
+        what_happened = "I don't have a confirmed account of what happened.",
+        location = "I don't have a confirmed location.",
+        quantity = "I don't have a confirmed count.",
+        attacker = "I don't have a confirmed account of who did it.",
+        need = "I don't have a confirmed need to report.",
+        deceased = "I don't have a confirmed name for who died.",
+        next = "I don't have a confirmed next step.",
+        health = "I don't have a confirmed health update.",
+        pursuer = "I don't have a confirmed account of who was after them.",
+        what = "I don't have a confirmed description of it.",
+    }
     local response = catalogResponse(
-        poolID,
+        "semantic.question.event_follow_up." .. suffix,
         ir,
         state,
         context,
-        value and { content = value } or nil
+        { content = value or unknown[suffix] }
     )
     if not response then return nil end
     response.selectionSource = "event_follow_up"
@@ -269,6 +281,9 @@ local function resolveContextReferenceQuestion(ir, state, context)
             or "CONVERSATION"
         local response = contextReferenceResponse(
             "semantic.conversation.context_reference.cause_unknown",
+            answer
+                and "I can confirm what happened, but I don't know why it is that way."
+                or "I don't know why that is; I can't confirm the cause.",
             causeTopic,
             "unknown"
         )
@@ -283,6 +298,7 @@ local function resolveContextReferenceQuestion(ir, state, context)
     then
         return contextReferenceResponse(
             "semantic.conversation.context_reference.unknown",
+            "I'm not sure what you're referring to.",
             "CONVERSATION",
             "unknown"
         )
@@ -291,6 +307,7 @@ local function resolveContextReferenceQuestion(ir, state, context)
     if questionKind == "SAFETY" then
         local response = contextReferenceResponse(
             "semantic.conversation.context_reference.location_safety_unknown",
+            "I don't have reliable information about whether it's safe there.",
             "RESIDENCE",
             "unknown"
         )
@@ -303,6 +320,7 @@ local function resolveContextReferenceQuestion(ir, state, context)
     then
         local response = contextReferenceResponse(
             "semantic.conversation.context_reference.description_unknown",
+            "I don't know enough about that place to describe it.",
             answer and answer.topic or "CONVERSATION",
             "unknown"
         )
@@ -316,6 +334,7 @@ local function resolveContextReferenceQuestion(ir, state, context)
     then
         local response = contextReferenceResponse(
             "semantic.conversation.context_reference.medical_unknown",
+            "I can't confirm anything about that pain right now.",
             "MEDICAL",
             "unknown"
         )
@@ -346,6 +365,7 @@ local function resolveContextReferenceQuestion(ir, state, context)
         end
         local fallback = contextReferenceResponse(
             "semantic.conversation.context_reference.medical_unknown",
+            "I can't confirm anything about my health right now.",
             "MEDICAL",
             fact and fact.status == "known" and "known" or "unknown"
         )
@@ -366,6 +386,7 @@ local function resolveContextReferenceQuestion(ir, state, context)
         end
         local fallback = contextReferenceResponse(
             "semantic.conversation.context_reference.unknown",
+            "I don't have enough confirmed information about that place.",
             "RESIDENCE",
             fact and fact.status == "known" and "known" or "unknown"
         )
@@ -386,6 +407,7 @@ local function resolveContextReferenceQuestion(ir, state, context)
         end
         local fallback = contextReferenceResponse(
             "semantic.conversation.context_reference.unknown",
+            "I don't have enough reliable information about that.",
             "KNOWLEDGE",
             fact and fact.status == "known" and "known" or "unknown"
         )
@@ -436,6 +458,7 @@ local function resolveContextReferenceQuestion(ir, state, context)
         end
         return contextReferenceResponse(
             "semantic.conversation.context_reference.backstory_unknown",
+            "I'm not sure which part of my past you mean.",
             "NPC_BACKSTORY",
             "unknown"
         )
@@ -443,6 +466,7 @@ local function resolveContextReferenceQuestion(ir, state, context)
 
     return contextReferenceResponse(
         "semantic.conversation.context_reference.unknown",
+        "I'm not sure what you're referring to.",
         answer and answer.topic or "CONVERSATION",
         "unknown"
     )

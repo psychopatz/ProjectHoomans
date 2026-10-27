@@ -1,14 +1,6 @@
 -- Hub-avenue candidate projection for static suggestions.
 
-return function(Provider, definition, contextReason, uiNode)
-    local Content = PNC.Semantics.DialogueContentRegistry
-        or require "PNC/Semantics/Generated/DialogueContent/Registry"
-    local content = uiNode and Content.PlayerChoice
-        and Content.PlayerChoice(uiNode.contentID) or {}
-    local labelKey = content.labelKey or ""
-    local utteranceKey = content.choiceKey or ""
-    local labelFallback = content.labelFallback or labelKey
-    local utteranceFallback = content.choiceFallback or utteranceKey
+return function(Provider, definition, contextReason)
     local extensions = {}
     for key, value in pairs(type(definition.extensions) == "table"
         and definition.extensions or {}) do
@@ -16,14 +8,13 @@ return function(Provider, definition, contextReason, uiNode)
     end
     extensions.route = "semantic_provider"
     extensions.providerID = Provider.id
-    extensions.hubID = uiNode and uiNode.semanticDestination
-        and uiNode.semanticDestination.hubID or "whats_up"
+    extensions.hubID = "whats_up"
     extensions.hubAvenue = true
     return {
         id = definition.id,
         topic = definition.topic,
         groupID = "semantic_hub.whats_up",
-        rank = uiNode and uiNode.order or definition.order,
+        rank = definition.order,
         providerID = Provider.id,
         semanticOwner = definition.semanticOwner
             or "projecthoomans.semantic." .. tostring(definition.topic),
@@ -52,15 +43,15 @@ return function(Provider, definition, contextReason, uiNode)
             modifiers = definition.modifiers,
             socialContext = definition.socialContext,
             extensions = extensions,
-            textKey = utteranceKey,
-            textFallback = utteranceFallback,
-            labelKey = labelKey,
+            textKey = definition.utteranceKey,
+            textFallback = definition.utteranceFallback,
+            labelKey = definition.labelKey,
         },
         display = {
-            labelKey = labelKey,
-            labelFallback = labelFallback,
-            utteranceKey = utteranceKey,
-            utteranceFallback = utteranceFallback,
+            labelKey = definition.labelKey,
+            labelFallback = definition.labelFallback,
+            utteranceKey = definition.utteranceKey,
+            utteranceFallback = definition.utteranceFallback,
         },
         visibility = "player",
     }

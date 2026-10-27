@@ -167,49 +167,26 @@ class LegacySemanticAuthorityP11Tests(unittest.TestCase):
 
     def test_canonical_en_tl_dialogue_content_is_the_only_pnc_wording_catalog(self) -> None:
         root = PROJECT / "Contents/mods/ProjectHoomans/common/media/translation"
-        registry = (
-            PROJECT
-            / "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/"
-            "Generated/DialogueContent/Registry.lua"
-        )
-        registry_source = registry.read_text()
-        self.assertIn("RUNTIME_ALIASES", registry_source)
-        self.assertIn("ResolveTemplate", registry_source)
         for language in ("EN", "TL"):
             content = root / language / "Conversation/Semantic/DialogueContent.json"
-            self.assertTrue(content.exists(), str(content))
-            content_values = json.loads(content.read_text())
-            self.assertTrue(content_values, str(content))
+            semantic = root / language / "Conversation/Semantic/Responses.json"
+            for path in (content, semantic):
+                self.assertTrue(path.exists(), str(path))
+                self.assertTrue(json.loads(path.read_text()), str(path))
             self.assertIn(
                 "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
-                content_values,
+                json.loads(content.read_text()),
             )
             self.assertIn(
                 "UI_PNC_Conversation_Content_SemanticEmotePlayerThumbsdownNeutral01",
-                content_values,
+                json.loads(content.read_text()),
             )
-            for legacy in (
-                root / language / "Conversation/Identity/Responses.json",
-                root / language / "Conversation/Semantic/Responses.json",
-                root / language / "Conversation/Semantic/Realizations.json",
-            ):
-                self.assertFalse(legacy.exists(), str(legacy))
-            self.assertFalse(
-                list((root / language / "Conversation/Flavor").glob("*.json"))
+            self.assertIn(
+                "UI_PNC_Conversation_Semantic_FlowGreetingOpening",
+                json.loads(semantic.read_text()),
             )
-            self.assertFalse(
-                list((root / language / "Conversation/ToolReplies").glob("*.json"))
-            )
-
-        lua_root = PROJECT / "Contents/mods/ProjectHoomans/42.20/media/lua"
-        self.assertFalse(
-            list((lua_root / "shared/PNC/Semantics/SpeechRealization/Families").glob("*.lua"))
-        )
-        self.assertFalse(
-            list((lua_root / "client/PNC/Semantics").glob(
-                "PNC_SemanticDialogueInput_Presentation_Responses_Translation_Keys*.lua"
-            ))
-        )
+            self.assertFalse(list((root / language / "Conversation/Flavor").glob("*.json")))
+            self.assertFalse(list((root / language / "Conversation/ToolReplies").glob("*.json")))
 
     def test_repository_policy_is_durable_and_no_executable_goal_prompt(self) -> None:
         root_policy = (PROJECT / "AGENTS.md").read_text()

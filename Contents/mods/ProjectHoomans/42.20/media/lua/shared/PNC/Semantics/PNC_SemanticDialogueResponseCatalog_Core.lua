@@ -55,6 +55,15 @@ function Core.boundedText(value)
     return value
 end
 
+function Core.registerTextFallback(templateID, fallback)
+    local text = PsychopatzCore
+        and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.Text
+    if text and type(text.RegisterFallback) == "function" then
+        text.RegisterFallback(templateID, fallback)
+    end
+end
+
 local function contentFallback(templateID)
     local registry = PNC.Semantics
         and PNC.Semantics.DialogueContentRegistry or nil
@@ -87,8 +96,6 @@ local function contentOwnerForPool(poolID)
     if string.find(poolID, "semantic.command.", 1, true) == 1
         or string.find(poolID, "semantic.emote.", 1, true) == 1
         or string.find(poolID, "semantic.flow.greeting.", 1, true) == 1
-        or string.find(poolID, "semantic.task.", 1, true) == 1
-        or string.find(poolID, "semantic.gift.", 1, true) == 1
     then
         return "projecthoomans.dialogue_content.commands_emotes"
     end
@@ -318,6 +325,7 @@ function Core.normalizedVariant(poolID, index, value)
         when = Core.copy(value.when),
         priority = tonumber(value.priority) or 0,
     }
+    Core.registerTextFallback(normalized.templateID, normalized.fallback)
     return normalized
 end
 

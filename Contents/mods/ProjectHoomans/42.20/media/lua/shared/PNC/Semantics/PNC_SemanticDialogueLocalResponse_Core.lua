@@ -102,14 +102,10 @@ local function renderFallback(fallback, args, translationArgs)
             end
         end
     end
-    fallback = string.gsub(fallback, "%%([1-9][0-9]*)", function(number)
+    return string.gsub(fallback, "%%([1-9][0-9]*)", function(number)
         local position = tonumber(number)
         return values[position] or "%" .. tostring(number)
     end)
-    if values[1] ~= nil then
-        fallback = string.gsub(fallback, "%%s", values[1], 1)
-    end
-    return fallback
 end
 
 local function socialCounts(state)
@@ -230,15 +226,6 @@ local function catalogResponse(poolID, ir, state, context, args)
     then
         local valid, normalized = ResponsePlan.Build(selected.plan)
         if valid then plan = normalized end
-    end
-    if plan and type(args) == "table" then
-        for _, turn in ipairs(plan.turns or {}) do
-            for _, segment in ipairs(turn.segments or {}) do
-                if segment.kind == "translation" then
-                    segment.args = copyArgs(args)
-                end
-            end
-        end
     end
     return {
         templateID = selected.templateID or selected.id,
