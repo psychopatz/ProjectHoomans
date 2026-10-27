@@ -24,6 +24,36 @@ def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _without_content_realization(value):
+    """Copy plan metadata without authored wording fields.
+
+    A candidate preview is allowed to change the Dialogue Content fallback
+    attached to a response-plan segment. The plan itself remains part of the
+    semantic contract, so compare its IDs, offers, gates, and effects while
+    excluding only the wording fields that the candidate is meant to edit.
+    """
+    if isinstance(value, dict):
+        return {
+            key: _without_content_realization(item)
+            for key, item in value.items()
+            if key not in {"fallback", "text"}
+        }
+    if isinstance(value, list):
+        return [_without_content_realization(item) for item in value]
+    return value
+
+
+def _semantic_variant_metadata(variant):
+    metadata = dict(variant)
+    for ignored in ("fallback", "sourceKind", "sourcePath"):
+        metadata.pop(ignored, None)
+    if "responsePlan" in metadata:
+        metadata["responsePlan"] = _without_content_realization(
+            metadata["responsePlan"]
+        )
+    return metadata
+
+
 def _authored_variant_patch(
     source: str, variant_id: str, old: str, new: str,
 ) -> tuple[str, list[str]]:
@@ -278,11 +308,8 @@ def preview_authored_variant(
                 v for v in candidate_detail["variants"]
                 if v["id"] == variant_id
             )
-            base_variant = dict(variant)
-            new_variant = dict(candidate_variant)
-            for ignored in ("fallback", "sourceKind", "sourcePath"):
-                base_variant.pop(ignored, None)
-                new_variant.pop(ignored, None)
+            base_variant = _semantic_variant_metadata(variant)
+            new_variant = _semantic_variant_metadata(candidate_variant)
             if base_variant != new_variant:
                 raise ValueError("candidate unexpectedly changed variant metadata")
             if candidate_variant["fallback"] != entries[0]["EN"]:

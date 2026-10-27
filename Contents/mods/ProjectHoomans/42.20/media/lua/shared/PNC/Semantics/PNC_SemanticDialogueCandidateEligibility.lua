@@ -87,6 +87,46 @@ local function requiredCapturesMatch(metadata, candidate)
     return true, nil
 end
 
+local function eventFollowUpMatches(metadata, context)
+    if type(metadata) ~= "table"
+        or metadata.requiresEventFollowUp ~= true
+    then
+        return true, nil
+    end
+
+    local lifecycle = type(context) == "table"
+        and context.interactionLifecycle or nil
+    local beat = type(lifecycle) == "table" and lifecycle.activeBeat or nil
+    if type(beat) ~= "table"
+        or tostring(beat.eventRef or "") == ""
+    then
+        return false, "event_follow_up_window_unavailable"
+    end
+
+    -- An event beat with no disclosed facts must still classify a typed
+    -- question so the response layer can answer explicitly that it does not
+    -- know. Suggestions remain suppressed by their existing fact/offer
+    -- checks; this branch only preserves the typed-input unknown path.
+    if type(beat.factRefs) ~= "table"
+        or #beat.factRefs == 0
+        or type(beat.offerIDs) ~= "table"
+        or #beat.offerIDs == 0
+    then
+        return true, nil
+    end
+
+    local expected = tostring(metadata.eventOfferID or "")
+    if expected == "" then
+        return false, "event_follow_up_offer_undefined"
+    end
+    for index = 1, math.min(#beat.offerIDs, 8) do
+        if tostring(beat.offerIDs[index] or "") == expected then
+            return true, nil
+        end
+    end
+    return false, "event_follow_up_offer_missing"
+end
+
 local function contextResolutionReason(ir)
     local diagnostics = ir and ir.diagnostics or {}
     local unresolved = diagnostics.contextUnresolvedReferences
@@ -120,6 +160,8 @@ function Eligibility.Evaluate(candidate, state, context, options,
     local metadata = type(candidate.metadata) == "table"
         and candidate.metadata or {}
     local matches, reason = requiredContextMatches(metadata, context)
+    if not matches then return false, reason, {} end
+    matches, reason = eventFollowUpMatches(metadata, context)
     if not matches then return false, reason, {} end
     matches, reason = requiredCapturesMatch(metadata, candidate)
     if not matches then return false, reason, {} end

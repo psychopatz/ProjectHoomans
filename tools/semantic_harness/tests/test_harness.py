@@ -399,12 +399,20 @@ class SemanticHarnessTests(unittest.TestCase):
         self.assertIn("Mara Vale", name_reply["text"])
         self.assertEqual(name_reply["toolCalls"][0]["label"], "ask_name")
         self.assertTrue(any(
-            lookup["key"].startswith("UI_PNC_Conversation_ToolReply_AskNameNamed_")
+            lookup["key"].startswith(
+                "UI_PNC_Conversation_Content_Migrated_ToolReplyAskNameNamed"
+            )
             for lookup in name_reply["translationLookups"]
         ))
         self.assertEqual(language["language"], "EN")
         self.assertEqual(camp_reply["language"], "EN")
-        self.assertIn("camp", camp_reply["text"].lower())
+        self.assertTrue(camp_reply["text"])
+        self.assertTrue(any(
+            lookup["key"].startswith(
+                "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderCamp"
+            )
+            for lookup in camp_reply["translationLookups"]
+        ))
 
     def test_tagalog_identity_exchange_uses_canonical_npc_translation(self) -> None:
         scenario = merge(DEFAULT_SCENARIO, {"runtime": {"language": "TL"}})

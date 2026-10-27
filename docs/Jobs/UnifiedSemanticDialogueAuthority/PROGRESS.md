@@ -49,7 +49,7 @@
 | P6 — compatibility semantic adapters | **ACCEPTED** |
 | P7 — canonical content coverage / Studio observability | **ACCEPTED** |
 | P8 — retire first-party legacy prose authority | **ACCEPTED** |
-| P9 — scale/MP/final acceptance | NOT STARTED |
+| P9 — scale/MP/final acceptance | **IN PROGRESS** |
 
 ## Accepted P0 — authority inventory and characterization
 
@@ -228,6 +228,15 @@ P8 evidence: Lua retirement/semantic negative smoke `6/6`, composition and
 command/diary regression set `8/8`, Python category/legacy/content set `20/20`,
 and `pz-verify` Kahlua scans for the eight changed Lua files `0` errors / `0`
 warnings.
+
+P9 routing/content repair slice is accepted: event context-reference patterns
+now require the matching disclosed lifecycle offer when an event window is
+active, preserving ordinary quantity/weather/health question routing; ToolReply
+responses reuse the existing SpeechRealization seam so generated Dialogue
+Content owns EN/TL wording; and candidate review compares semantic plan
+metadata separately from editable wording. The real-worker routing regression
+set is `42/42` in `150.76s`; targeted ToolReply/translation/observatory checks
+are green. The complete P9 acceptance gate remains active.
 
 ## Immediate Next Chunk — P9
 

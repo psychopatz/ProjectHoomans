@@ -19,6 +19,12 @@ local Authority = PNC.Semantics.RealizationAuthority
 if type(Authority) ~= "table" or type(Authority.Resolve) ~= "function" then
     Authority = require "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
 end
+local SpeechRealization = PNC.Semantics.SpeechRealization
+if type(SpeechRealization) ~= "table"
+    or type(SpeechRealization.Apply) ~= "function"
+then
+    SpeechRealization = require "PNC/Semantics/PNC_SpeechRealization"
+end
 local unpackValues = table.unpack or unpack
 
 Replies.VERSION = 3
@@ -220,7 +226,32 @@ local function buildDetailed(result, context)
         salt = resultSalt(result, context),
     })
     if not semantic then return nil, "semantic_tool_reply_unavailable" end
-    local text = formatText(semantic, args)
+    local rendered = SpeechRealization.Apply({
+        selectionID = semantic.realizationID,
+        templateID = semantic.templateID,
+        fallback = semantic.fallback,
+        args = args,
+        plan = semantic.responsePlan,
+    }, semanticContext(result, context))
+    if type(rendered) == "table" then
+        local renderedTurn = type(rendered.renderPlan) == "table"
+            and rendered.renderPlan.turns
+            and rendered.renderPlan.turns[1] or nil
+        local renderedSegment = type(renderedTurn) == "table"
+            and renderedTurn.segments and renderedTurn.segments[1] or nil
+        semantic.templateID = type(renderedSegment) == "table"
+            and (renderedSegment.templateID or rendered.renderTemplateID)
+            or rendered.renderTemplateID or rendered.templateID
+            or semantic.templateID
+        semantic.fallback = type(renderedSegment) == "table"
+            and (renderedSegment.fallback or rendered.fallback)
+            or rendered.fallback or semantic.fallback
+        semantic.responsePlan = rendered.plan or semantic.responsePlan
+        semantic.args = rendered.args or args
+        semantic.realizationFamily = rendered.realizationFamily
+            or semantic.realizationFamily
+    end
+    local text = formatText(semantic, semantic.args or args)
     if not text or text == "" then
         return nil, "semantic_tool_reply_text_unavailable"
     end

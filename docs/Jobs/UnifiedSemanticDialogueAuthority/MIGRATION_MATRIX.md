@@ -92,3 +92,16 @@ Generic PsychopatzCore SocialFlavor remains available to other adopters and to
 presentation/transport infrastructure. Project Hoomans semantic-owned packets
 must carry selected text and cannot silently invoke that generic prose
 selector.
+
+## P9 routing/content repair audit
+
+ToolReply meaning remains selected once by `ResponseCatalog` and
+`RealizationAuthority`; `PNC_ConversationToolReplies.lua` now passes that
+selected response through the existing `SpeechRealization` seam so generated
+Dialogue Content owns EN/TL wording at runtime. The old
+`PNC_ConversationToolReplyCatalog.lua` and legacy ToolReply translation keys
+remain migration/source material only. Event context-reference patterns now
+declare their lifecycle offer metadata, so ordinary questions cannot be
+claimed by an event follow-up parser outside an active disclosed response
+window. Evidence: ToolReply EN/TL coverage, translation integration,
+response-candidate isolation, and the 42-test event/context regression set.

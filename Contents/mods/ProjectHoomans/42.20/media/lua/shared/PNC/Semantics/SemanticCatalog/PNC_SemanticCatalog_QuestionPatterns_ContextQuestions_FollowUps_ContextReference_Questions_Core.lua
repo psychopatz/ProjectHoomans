@@ -42,14 +42,16 @@ function Internal.RegisterContextReferenceQuestion(
     confidence,
     priority,
     questionKind,
-    hasReference
+    hasReference,
+    metadata
 )
     registerPattern(
         patternID,
         match,
         contextReferenceQuestion(questionKind, hasReference),
         confidence,
-        priority
+        priority,
+        { metadata = metadata }
     )
 end
 
