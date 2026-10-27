@@ -181,17 +181,20 @@ local function poolFor(spec)
     then
         return "semantic.medical.distress"
     end
+    -- Follower abandonment is a companion event even when its authoritative
+    -- cause is a zombie.  Keep this family check ahead of the generic combat
+    -- cause check so the event cannot fall through to combat wording.
+    if string.find(eventType, "follower", 1, true)
+        or string.find(eventType, "companion", 1, true)
+    then
+        return "semantic.companion.reaction"
+    end
     if string.find(eventType, "combat", 1, true)
         or string.find(eventType, "kill", 1, true)
         or string.find(eventType, "horde", 1, true)
         or string.find(eventType, "zombie", 1, true)
     then
         return "semantic.combat.reaction"
-    end
-    if string.find(eventType, "follower", 1, true)
-        or string.find(eventType, "companion", 1, true)
-    then
-        return "semantic.companion.reaction"
     end
     return "semantic.social.reaction"
 end

@@ -1331,6 +1331,96 @@
       }
     },
     {
+      "id": "phrase.migrated.leader_loss_close",
+      "semanticTemplateID": "semantic.leader_loss.close",
+      "canonicalConcept": "MIGRATED_LEADER_LOSS_CLOSE",
+      "translationKeyPrefix": "UI_PNC_Conversation_Content_Migrated_LeaderLossClose",
+      "locked": {
+        "contentOwner": "projecthoomans.dialogue_content.migrated_events",
+        "semanticAuthority": "PNC.Semantics.ResponseCatalog",
+        "responsePoolID": "semantic.leader_loss.reaction",
+        "semanticVariantID": "semantic.leader_loss.close",
+        "conditions": "ResponseCatalog-owned conditions",
+        "priority": "ResponseCatalog-owned",
+        "contentVariation": "Dialogue Content phrase only; semantic variant remains ResponseCatalog-owned",
+        "followUpEligibility": "ResponsePlan offers filtered by authoritative facts",
+        "legacySource": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Social_Reactions.lua",
+        "authority": "SpeechRealization presentation copy only"
+      },
+      "styles": {
+        "neutral": [
+          {
+            "id": "phrase.migrated.leader_loss_close.neutral.01",
+            "translations": {
+              "EN": "We lost someone close to us. We need to stay together.",
+              "TL": "We lost someone close to us. We need to stay together."
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "id": "phrase.migrated.leader_loss_colonist",
+      "semanticTemplateID": "semantic.leader_loss.colonist",
+      "canonicalConcept": "MIGRATED_LEADER_LOSS_COLONIST",
+      "translationKeyPrefix": "UI_PNC_Conversation_Content_Migrated_LeaderLossColonist",
+      "locked": {
+        "contentOwner": "projecthoomans.dialogue_content.migrated_events",
+        "semanticAuthority": "PNC.Semantics.ResponseCatalog",
+        "responsePoolID": "semantic.leader_loss.reaction",
+        "semanticVariantID": "semantic.leader_loss.colonist",
+        "conditions": "ResponseCatalog-owned conditions",
+        "priority": "ResponseCatalog-owned",
+        "contentVariation": "Dialogue Content phrase only; semantic variant remains ResponseCatalog-owned",
+        "followUpEligibility": "ResponsePlan offers filtered by authoritative facts",
+        "legacySource": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Social_Reactions.lua",
+        "authority": "SpeechRealization presentation copy only"
+      },
+      "styles": {
+        "neutral": [
+          {
+            "id": "phrase.migrated.leader_loss_colonist.neutral.01",
+            "translations": {
+              "EN": "Our leader is gone. We keep the group together.",
+              "TL": "Our leader is gone. We keep the group together."
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "id": "phrase.migrated.leader_loss_distant",
+      "semanticTemplateID": "semantic.leader_loss.distant",
+      "canonicalConcept": "MIGRATED_LEADER_LOSS_DISTANT",
+      "translationKeyPrefix": "UI_PNC_Conversation_Content_Migrated_LeaderLossDistant",
+      "locked": {
+        "contentOwner": "projecthoomans.dialogue_content.migrated_events",
+        "semanticAuthority": "PNC.Semantics.ResponseCatalog",
+        "responsePoolID": "semantic.leader_loss.reaction",
+        "semanticVariantID": "semantic.leader_loss.distant",
+        "conditions": "ResponseCatalog-owned conditions",
+        "priority": "ResponseCatalog-owned",
+        "contentVariation": "Dialogue Content phrase only; semantic variant remains ResponseCatalog-owned",
+        "followUpEligibility": "ResponsePlan offers filtered by authoritative facts",
+        "legacySource": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Social_Reactions.lua",
+        "authority": "SpeechRealization presentation copy only"
+      },
+      "styles": {
+        "neutral": [
+          {
+            "id": "phrase.migrated.leader_loss_distant.neutral.01",
+            "translations": {
+              "EN": "The leader is gone. Someone needs to decide what comes next.",
+              "TL": "The leader is gone. Someone needs to decide what comes next."
+            }
+          }
+        ]
+      }
+    },
+
+    {
       "id": "phrase.migrated.medical_distress_call_bandage",
       "semanticTemplateID": "semantic.medical.distress.call.bandage",
       "canonicalConcept": "MIGRATED_MEDICAL_DISTRESS_CALL_BANDAGE",

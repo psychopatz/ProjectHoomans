@@ -6,7 +6,7 @@ local Registry = PNC.Semantics.DialogueContentRegistry or {}
 PNC.Semantics.DialogueContentRegistry = Registry
 Registry.SCHEMA = "pnc.semantic_dialogue_content.v1"
 Registry.VERSION = 1
-Registry.CONTENT_FINGERPRINT = "0a7af030923fd4c96d74e5347a0396dd639714b7fb1aac6759d370fb69d2b848"
+Registry.CONTENT_FINGERPRINT = "27aefd29c9743fb25537c7125468dfe683177f57dae2a8674997c5cb636d5284"
 Registry.PHRASE_FAMILIES = {
     ["semantic.combat.reaction.default"] = {
         ["canonicalConcept"] = "MIGRATED_COMBAT_REACTION_DEFAULT",
@@ -669,6 +669,36 @@ Registry.PHRASE_FAMILIES = {
             },
         },
     },
+    ["semantic.leader_loss.close"] = {
+        ["canonicalConcept"] = "MIGRATED_LEADER_LOSS_CLOSE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["id"] = "phrase.migrated.leader_loss_close",
+        ["semanticTemplateID"] = "semantic.leader_loss.close",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "We lost someone close to us. We need to stay together.",
+                    ["id"] = "phrase.migrated.leader_loss_close.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_Migrated_LeaderLossCloseNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.leader_loss.colonist"] = {
+        ["canonicalConcept"] = "MIGRATED_LEADER_LOSS_COLONIST",
+        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["id"] = "phrase.migrated.leader_loss_colonist",
+        ["semanticTemplateID"] = "semantic.leader_loss.colonist",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Our leader is gone. We keep the group together.",
+                    ["id"] = "phrase.migrated.leader_loss_colonist.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_Migrated_LeaderLossColonistNeutral01",
+                },
+            },
+        },
+    },
     ["semantic.leader_loss.default"] = {
         ["canonicalConcept"] = "MIGRATED_LEADER_LOSS_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
@@ -710,6 +740,21 @@ Registry.PHRASE_FAMILIES = {
                     ["fallback"] = "The old order is gone. What happens next is up to us.",
                     ["id"] = "phrase.migrated.leader_loss_dissent.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_Migrated_LeaderLossDissentNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.leader_loss.distant"] = {
+        ["canonicalConcept"] = "MIGRATED_LEADER_LOSS_DISTANT",
+        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["id"] = "phrase.migrated.leader_loss_distant",
+        ["semanticTemplateID"] = "semantic.leader_loss.distant",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "The leader is gone. Someone needs to decide what comes next.",
+                    ["id"] = "phrase.migrated.leader_loss_distant.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_Migrated_LeaderLossDistantNeutral01",
                 },
             },
         },

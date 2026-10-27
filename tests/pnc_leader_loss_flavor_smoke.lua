@@ -14,9 +14,18 @@ T.addPackagePaths({
 PsychopatzCore = PsychopatzCore or {}
 PsychopatzCore.RuntimeRole = { AllowsServerCode = function() return true end }
 PsychopatzCore.Conversation = PsychopatzCore.Conversation or {}
-PsychopatzCore.SocialFlavor = require "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
-
-local Flavor = PsychopatzCore.SocialFlavor
+PNC = { Semantics = {} }
+require "PsychopatzCore/Semantics/PsychopatzSemantic"
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+)
+local Reactions = T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Semantics/PNC_SemanticSocialReaction.lua"
+)
 local Resolver = require "PNC/Core/Social/PNC_FlavorTextResolver"
 local Const = PNC.FlavorTextConst
 
@@ -78,14 +87,22 @@ PNC.SocialMeeting = {
     end,
 }
 
--- Load the authored definitions and the module under test.
-local DIR = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/"
-dofile(DIR .. "PNC_SocialFlavorDefinitions_LeaderDeath_Close.lua")
-dofile(DIR .. "PNC_SocialFlavorDefinitions_LeaderDeath_Wider.lua")
-dofile(DIR .. "PNC_SocialFlavorDefinitions_LeaderDeath.lua")
-
 local Hooks = dofile("Contents/mods/ProjectHoomans/42.20/media/lua/server/"
     .. "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_LeaderLoss.lua")
+
+local function semanticResult(eventID, context)
+    context = context or {}
+    context.eventType = "witnessed_leader_death"
+    context.eventRef = eventID
+    context.eventID = eventID
+    return Reactions.Resolve({
+        eventType = "witnessed_leader_death",
+        eventID = eventID,
+        npcID = "npc-leader-test",
+        act = "REACT",
+        context = context,
+    })
+end
 
 local function reset()
     clearSent()
@@ -164,8 +181,8 @@ T.equal(sent[1].context.successorName, "npc-mate",
     "the successor's name is resolved for the line")
 T.equal(sent[1].packet.family, Const.LEADER_DEATH_FAMILY,
     "the line uses the leader-loss family")
-T.equal(sent[1].packet.flavorID, Const.FLAVOR_LEADER_DEATH,
-    "the line uses the leader-death flavor id")
+T.equal(sent[1].packet.realizationFamily, "semantic.leader_loss.reaction",
+    "the line carries the selected semantic leader-loss pool")
 T.truthy(sent[1].packet.semanticOwned,
     "leader-loss speech is explicitly semantic-owned")
 T.equal(sent[1].packet.eventType, "witnessed_leader_death",
@@ -186,8 +203,7 @@ T.equal(sent[1].packet.cooldowns.ambientMs, 0,
 T.truthy((sent[1].packet.cooldowns.speakerMs or 0) > 0,
     "a per-speaker cooldown still stops one NPC repeating")
 
-local text = Flavor.Resolve(
-    Const.FLAVOR_LEADER_DEATH, "npc", "s1", sent[1].context)
+local text = semanticResult("leader-loss:s1", sent[1].context).fallback
 T.truthy(text and text ~= "", "the devoted lane resolves to authored text")
 T.falsy(string.find(text, "{leaderName}", 1, true),
     "the leader name token is substituted")
@@ -242,8 +258,7 @@ Hooks.OnLeaderLost(
 T.equal(#sent, 1, "the rival still speaks")
 T.equal(sent[1].context.leaderGrief, Const.Grief.DISSENT,
     "an enemy is classed as dissent, not mourning")
-local rivalText = Flavor.Resolve(
-    Const.FLAVOR_LEADER_DEATH, "npc", "s2", sent[1].context)
+local rivalText = semanticResult("leader-loss:s2", sent[1].context).fallback
 T.truthy(rivalText ~= nil, "the dissent lane resolves to text")
 
 reset()
@@ -318,13 +333,14 @@ for g = 1, #griefs do
         context.leaderGrief = griefs[g]
         context.leaderName = "Mara"
         context.successorName = "Rook"
-        local result = Flavor.ResolveDetailed(
-            Const.FLAVOR_LEADER_DEATH, "npc", "matrix", context)
+        local result = semanticResult(
+            "leader-loss:matrix:" .. tostring(g) .. ":" .. tostring(s),
+            context)
         checked = checked + 1
-        if not result or not result.text or result.text == "" then
+        if not result or not result.fallback or result.fallback == "" then
             gaps[#gaps + 1] = griefs[g] .. "/" .. successions[s]
         else
-            T.falsy(string.find(result.text, "{leader", 1, true),
+            T.falsy(string.find(result.fallback, "{leader", 1, true),
                 "no unresolved leader token in " .. griefs[g] .. "/"
                     .. successions[s])
         end

@@ -119,6 +119,34 @@ source-save safety, and deterministic CodeBuilder evidence is recorded in
 `PROGRESS.md`.
 
 
+## P10A source purge audit
+
+P10A closed the dead first-party prose registries after an exact caller/loader
+audit and semantic/content parity proof. The executable production surfaces
+deleted in this slice are:
+
+- all 20 `PNC_SocialFlavorDefinitions*` files, including the incapacitated
+  and LeaderDeath shards;
+- `PNC_Bandits_HoomansFlavorDefinitions.lua`,
+  `PNC_Necroa_HoomansFlavorDefinitions.lua`, and
+  `PNC_ProjectALife_FlavorDefinitions.lua`;
+- `PNC_ConversationToolReplyCatalog.lua` and its worker `tool_catalog` load.
+
+The current owners are the semantic event adapters and the existing
+ResponseCatalog/ResponsePlan/Dialogue Content path. The production tree and
+worker/runtime composition contain no load or require reference to those
+deleted paths. The zombie abandonment cause is explicitly routed to
+`semantic.companion.reaction` before the generic combat-cause matcher.
+Leader-loss close, colonist, and distant variants were added to the existing
+semantic pool and generated content source so the queue parity test retains
+distinct semantic realizations.
+
+Evidence: `pnc_unified_authority_p10a_legacy_absence_smoke` plus the P3/P4/P5/
+P6/P8/presentation/medical/leader-loss native set passes `10/10`; the focused
+Python content/Observatory/compiler set passes `27/27`; targeted Kahlua scans
+cover 25 Lua files with zero errors/warnings. The next live wording owner is
+`PNC_CompanionCommandFlavor*`, tracked as P10B below.
+
 ## P10 cleanup closure matrix
 
 The P0–P9 rows above remain behavioral migration evidence. P10 tracks removal

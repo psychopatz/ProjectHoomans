@@ -1,10 +1,8 @@
 --[[
     PNC Flavor Text Resolver - bounded vocabularies.
 
-    These tables are the contract between the resolver and the flavor
-    definitions.  Adding a value here means adding at least one matching
-    `when` variant in `PNC_SocialFlavorDefinitions.lua`; unknown values must
-    always have a generic fallback lane.
+    These tables are the bounded vocabulary contract for semantic context
+    providers.  Unknown values must always have a generic fallback lane.
 ]]
 
 PNC = PNC or {}

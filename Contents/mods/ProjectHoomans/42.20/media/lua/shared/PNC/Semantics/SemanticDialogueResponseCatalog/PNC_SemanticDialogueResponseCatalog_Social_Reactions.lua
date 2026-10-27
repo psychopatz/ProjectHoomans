@@ -170,6 +170,63 @@ Catalog.Register("semantic.leader_loss.reaction", {
                 }, offers = FOLLOW_UP_OFFERS.leader } },
             },
         },
+    {
+      id = "semantic.leader_loss.close",
+      templateID = "semantic.leader_loss.close",
+      fallback = "We lost someone close to us. We need to stay together.",
+      when = { leaderGrief = "close" },
+      priority = 2,
+      plan = {
+        dialogueAct = "REACT",
+        sourcePoolID = "semantic.leader_loss.reaction",
+        topic = "leader_loss",
+        turns = { {
+          segments = { {
+            kind = "literal",
+            text = "We lost someone close to us. We need to stay together.",
+          }, },
+          offers = FOLLOW_UP_OFFERS.leader,
+        }, },
+      },
+    },
+    {
+      id = "semantic.leader_loss.colonist",
+      templateID = "semantic.leader_loss.colonist",
+      fallback = "Our leader is gone. We keep the group together.",
+      when = { leaderGrief = "colonist" },
+      priority = 2,
+      plan = {
+        dialogueAct = "REACT",
+        sourcePoolID = "semantic.leader_loss.reaction",
+        topic = "leader_loss",
+        turns = { {
+          segments = { {
+            kind = "literal",
+            text = "Our leader is gone. We keep the group together.",
+          }, },
+          offers = FOLLOW_UP_OFFERS.leader,
+        }, },
+      },
+    },
+    {
+      id = "semantic.leader_loss.distant",
+      templateID = "semantic.leader_loss.distant",
+      fallback = "The leader is gone. Someone needs to decide what comes next.",
+      when = { leaderGrief = "distant" },
+      priority = 2,
+      plan = {
+        dialogueAct = "REACT",
+        sourcePoolID = "semantic.leader_loss.reaction",
+        topic = "leader_loss",
+        turns = { {
+          segments = { {
+            kind = "literal",
+            text = "The leader is gone. Someone needs to decide what comes next.",
+          }, },
+          offers = FOLLOW_UP_OFFERS.leader,
+        }, },
+      },
+    },
         {
             id = "semantic.leader_loss.default",
             templateID = "semantic.leader_loss.default",

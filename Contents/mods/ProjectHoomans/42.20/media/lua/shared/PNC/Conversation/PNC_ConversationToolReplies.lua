@@ -3,7 +3,7 @@
 -- Tool handlers own execution facts. Semantic ResponseCatalog owns the
 -- meaning/variant choice. This module keeps the historical Build API for
 -- PBrainZ and older callers, but it no longer reads or selects from the
--- former PNC_ConversationToolReplyCatalog wording table.
+-- former first-party ToolReply wording table.
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}

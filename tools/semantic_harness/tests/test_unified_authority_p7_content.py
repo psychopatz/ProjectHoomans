@@ -99,7 +99,7 @@ class UnifiedAuthorityP7ContentTests(unittest.TestCase):
             detail = worker.response_pool_detail("semantic.leader_loss.reaction", limit=16)
 
         self.assertTrue(detail["ok"])
-        self.assertEqual(detail["variantCount"], 3)
+        self.assertEqual(detail["variantCount"], 6)
         for variant in detail["variants"]:
             with self.subTest(variant=variant["id"]):
                 self.assertEqual(

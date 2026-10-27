@@ -30,7 +30,6 @@ Events = {
 PsychopatzCore = { Conversation = {} }
 local EventBus = require "PsychopatzCore/Events/PC_EventBus"
 local Message = require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
-local Flavor = require "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
 local Client = require "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient"
 
 local messages = {}
@@ -38,28 +37,66 @@ EventBus.subscribe(Message.EVENT_TYPE, function(message)
     messages[#messages + 1] = message
 end, "leader-loss-message-test")
 
--- The shared resolver owns the leader-loss vocabulary this test asserts on.
-local Resolver = require "PNC/Core/Social/PNC_FlavorTextResolver"
+PNC = { Semantics = {} }
+require "PsychopatzCore/Semantics/PsychopatzSemantic"
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+)
+local Reactions = T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Semantics/PNC_SemanticSocialReaction.lua"
+)
+require "PNC/Core/Social/PNC_FlavorTextResolver"
 local Const = PNC.FlavorTextConst
-
--- Register the authored leader-loss lanes into the real registry.
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/"
-    .. "PNC_SocialFlavorDefinitions_LeaderDeath_Close.lua")
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/"
-    .. "PNC_SocialFlavorDefinitions_LeaderDeath_Wider.lua")
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/"
-    .. "PNC_SocialFlavorDefinitions_LeaderDeath.lua")
 
 -- ---------------------------------------------------------------------------
 -- Enqueue three mourners exactly as the server emitter's packets arrive.
 -- ---------------------------------------------------------------------------
 
 local function mournerPacket(npcID, grief, succession)
+    local eventID = "leader_loss:F1:1000:" .. npcID
+    local semantic = Reactions.Resolve({
+        eventType = "witnessed_leader_death",
+        eventID = eventID,
+        npcID = npcID,
+        act = "REACT",
+        context = {
+            eventType = "witnessed_leader_death",
+            eventRef = eventID,
+            leaderGrief = grief,
+            leaderSuccession = succession,
+            leaderDied = true,
+            leaderName = "Mara",
+            successorName = "Rook",
+            factRefs = { eventID },
+            semanticEventFacts = {
+                [eventID] = {
+                    eventRef = eventID,
+                    authoritative = true,
+                    disclosure = "player",
+                    summary = "the settlement leader died",
+                    deceasedName = "Mara",
+                    successorName = "Rook",
+                },
+            },
+        },
+    })
+    T.truthy(semantic and semantic.fallback,
+        "leader-loss packet has selected Dialogue Content text")
     return {
-        eventID = "leader_loss:F1:1000:" .. npcID,
-        flavorID = Const.FLAVOR_LEADER_DEATH,
-        eventType = Const.FLAVOR_LEADER_DEATH,
-        family = Const.LEADER_DEATH_FAMILY,
+        eventID = eventID,
+        eventType = "witnessed_leader_death",
+        family = "semantic.leader_loss.reaction",
+        text = semantic.fallback,
+        semanticOwned = true,
+        poolID = semantic.realizationFamily,
+        responsePlanID = semantic.responsePlanID,
+        realizationFamily = semantic.realizationFamily,
+        realizationID = semantic.realizationID,
+        offerIDs = semantic.offerIDs,
         priority = Const.LEADER_DEATH_PRIORITY,
         weight = Const.LEADER_DEATH_WEIGHT,
         llmEligible = false,
@@ -69,7 +106,7 @@ local function mournerPacket(npcID, grief, succession)
         socialRole = grief,
         relationshipState = grief,
         relationshipTier = "reserved",
-        mergeKey = npcID .. ":" .. Const.LEADER_DEATH_FAMILY,
+        mergeKey = npcID .. ":semantic.leader_loss.reaction",
         cooldowns = {
             familyMs = 0,
             speakerMs = Const.LEADER_DEATH_COOLDOWN_MS,
@@ -79,6 +116,9 @@ local function mournerPacket(npcID, grief, succession)
         ttlMs = Const.LEADER_DEATH_TTL_MS,
         holdMs = Const.LEADER_DEATH_HOLD_MS,
         context = {
+            eventType = "witnessed_leader_death",
+            eventRef = eventID,
+            eventID = eventID,
             leaderGrief = grief,
             leaderSuccession = succession,
             leaderDied = true,
@@ -86,9 +126,9 @@ local function mournerPacket(npcID, grief, succession)
             successorName = "Rook",
         },
         source = {
-            kind = "social_flavor",
+            kind = "semantic_speech",
             channel = "succession",
-            eventType = Const.FLAVOR_LEADER_DEATH,
+            eventType = "witnessed_leader_death",
             contextEligible = true,
         },
     }
@@ -148,17 +188,45 @@ T.equal(distinct, #speakerIDs,
 
 messages = {}
 local before = #messages
+local repeatEventID = "leader_loss:F1:1000:npc-mate:repeat"
+local repeatSemantic = Reactions.Resolve({
+    eventType = "witnessed_leader_death",
+    eventID = repeatEventID,
+    npcID = "npc-mate",
+    act = "REACT",
+    context = {
+        eventType = "witnessed_leader_death",
+        eventRef = repeatEventID,
+        leaderGrief = "devoted",
+        leaderDied = true,
+        factRefs = { repeatEventID },
+        semanticEventFacts = {
+            [repeatEventID] = {
+                eventRef = repeatEventID,
+                authoritative = true,
+                disclosure = "player",
+                summary = "the settlement leader died",
+            },
+        },
+    },
+})
 local readmitted = Client.Enqueue({
-    eventID = "leader_loss:F1:1000:npc-mate",
-    flavorID = Const.FLAVOR_LEADER_DEATH,
-    family = Const.LEADER_DEATH_FAMILY,
+    eventID = repeatEventID,
+    family = "semantic.leader_loss.reaction",
+    text = repeatSemantic.fallback,
+    semanticOwned = true,
     priority = Const.LEADER_DEATH_PRIORITY,
     npcID = "npc-mate",
     speakerID = "npc-mate",
-    mergeKey = "npc-mate:" .. Const.LEADER_DEATH_FAMILY,
+    mergeKey = "npc-mate:semantic.leader_loss.reaction",
     cooldowns = { familyMs = 0, speakerMs = 60000, ambientMs = 0 },
-    context = { leaderGrief = "devoted", leaderDied = true },
-    source = { kind = "social_flavor" },
+    context = {
+        eventType = "witnessed_leader_death",
+        eventRef = repeatEventID,
+        leaderGrief = "devoted",
+        leaderDied = true,
+    },
+    source = { kind = "semantic_speech", eventType = "witnessed_leader_death" },
 })
 T.falsy(readmitted,
     "the same mourner cannot replay its line inside the speaker cooldown")

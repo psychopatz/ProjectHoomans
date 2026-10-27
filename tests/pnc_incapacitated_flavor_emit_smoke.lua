@@ -16,9 +16,18 @@ T.addPackagePaths({
 PsychopatzCore = PsychopatzCore or {}
 PsychopatzCore.RuntimeRole = { AllowsServerCode = function() return true end }
 PsychopatzCore.Conversation = PsychopatzCore.Conversation or {}
-PsychopatzCore.SocialFlavor = require "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
-
-local Flavor = PsychopatzCore.SocialFlavor
+PNC = { Semantics = {} }
+require "PsychopatzCore/Semantics/PsychopatzSemantic"
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+)
+local Reactions = T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Semantics/PNC_SemanticSocialReaction.lua"
+)
 local Resolver = require "PNC/Core/Social/PNC_FlavorTextResolver"
 local Const = PNC.FlavorTextConst
 
@@ -127,19 +136,24 @@ PNC.NPCWounds = {
     end,
 }
 
--- Load the authored definitions and the module under test.
--- Load the split definitions through their real load-order barrel so the
--- require chain is exercised exactly as the game would resolve it.
-local FUNCTION_DIR = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/"
-local function loadDefinitions()
-    dofile(FUNCTION_DIR .. "PNC_SocialFlavorDefinitions_Incapacitated_Shared.lua")
-    dofile(FUNCTION_DIR .. "PNC_SocialFlavorDefinitions_Incapacitated_Call.lua")
-    dofile(FUNCTION_DIR .. "PNC_SocialFlavorDefinitions_Incapacitated_Update.lua")
-    dofile(FUNCTION_DIR .. "PNC_SocialFlavorDefinitions_Incapacitated_Repeat.lua")
-end
-loadDefinitions()
 local Hooks = dofile("Contents/mods/ProjectHoomans/42.20/media/lua/server/"
     .. "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_DownedDistress.lua")
+
+local function semanticText(eventType, eventID, context)
+    context = context or {}
+    context.eventType = eventType
+    context.eventRef = eventID
+    context.eventID = eventID
+    local result = Reactions.Resolve({
+        eventType = eventType,
+        eventID = eventID,
+        npcID = "npc-medical-test",
+        act = "REQUEST",
+        topic = "medical_distress",
+        context = context,
+    })
+    return result and result.fallback, result
+end
 
 local function reset()
     clearSent()
@@ -224,11 +238,13 @@ T.truthy(sent[1].packet.semanticEventFacts
 T.truthy(sent[1].packet.offerIDs and #sent[1].packet.offerIDs > 0,
     "the initial line carries bounded semantic follow-up offers")
 
-local allyText = Flavor.Resolve(
-    Const.FLAVOR_CALL, "npc", sent[1].packet.eventID, sent[1].context
+local allyText, allySemantic = semanticText(
+    sent[1].packet.eventType, sent[1].packet.eventID, sent[1].context
 )
+T.truthy(allySemantic and allySemantic.responsePlan,
+    "the emitted ally context keeps its selected semantic plan")
 T.truthy(allyText and allyText ~= "",
-    "the emitted ally context resolves to authored text")
+    "the emitted ally context resolves to Dialogue Content text")
 -- Name tokens ({playerFirstName}, {attackerName}) are substituted by the
 -- client presentation layer from identity data; only resolver-owned keys
 -- must never survive into the text.
@@ -265,8 +281,8 @@ Hooks.OnIncapacitated(dehydrated, "dehydration")
 T.equal(#sent, 1, "the dehydrated follower emits a distress line")
 T.equal(sent[1].context.downedNeed, Const.Need.DEHYDRATION,
     "the incapacitation context preserves the dehydration cause")
-local dehydrationText = Flavor.Resolve(
-    Const.FLAVOR_CALL, "npc", sent[1].packet.eventID, sent[1].context
+local dehydrationText = semanticText(
+    sent[1].packet.eventType, sent[1].packet.eventID, sent[1].context
 )
 T.truthy(string.find(string.lower(dehydrationText or ""), "water", 1, true),
     "the dehydrated follower asks for water instead of healing")
@@ -298,24 +314,24 @@ T.equal(sent[1].context.downedNeed, Const.Need.MERCY,
 T.equal(sent[1].context.downedThreat, Const.Threat.NPC,
     "an NPC attacker is attributed as an NPC")
 
-local mercyText = Flavor.Resolve(
-    Const.FLAVOR_CALL, "npc", sent[1].packet.eventID, sent[1].context
+local mercyText = semanticText(
+    sent[1].packet.eventType, sent[1].packet.eventID, sent[1].context
 )
 T.truthy(mercyText ~= nil, "the mercy context resolves to text")
 T.falsy(string.find(mercyText, "{downed", 1, true),
     "the mercy line has no unresolved resolver key")
 
 -- The named attacker must be substituted when the line references it.
-local named = Flavor.ResolveDetailed(
-    Const.FLAVOR_CALL, "npc", "attacker-seed", {
+local namedText, namedSemantic = semanticText(
+    "incapacitated_call", "downed:named", {
         downedAudience = Const.Audience.HOSTILE,
         downedNeed = Const.Need.MERCY,
         downedThreat = Const.Threat.NPC,
         attackerName = "Rook",
     }
 )
-T.truthy(named and named.text ~= "", "the named-attacker lane resolves")
-T.falsy(string.find(named.text, "{attackerName}", 1, true),
+T.truthy(namedSemantic and namedText ~= "", "the named-attacker lane resolves")
+T.falsy(string.find(namedText or "", "{attackerName}", 1, true),
     "the attacker name token is substituted, not left raw")
 
 -- ---------------------------------------------------------------------------
@@ -336,8 +352,8 @@ T.equal(sent[1].context.downedAudience, Const.Audience.STRANGER,
 T.falsy(sent[1].context.downedNeed == Const.Need.MERCY,
     "a stranger does not plead for mercy to a non-attacker")
 
-local strangerText = Flavor.Resolve(
-    Const.FLAVOR_CALL, "npc", sent[1].packet.eventID, sent[1].context
+local strangerText = semanticText(
+    sent[1].packet.eventType, sent[1].packet.eventID, sent[1].context
 )
 T.truthy(strangerText ~= nil, "the stranger lane resolves to text")
 T.falsy(string.find(strangerText, "{downed", 1, true),
@@ -509,6 +525,7 @@ T.equal(sent[2].packet.eventType, "incapacitated_repeat",
     "the repeat carries the typed semantic medical event")
 -- Capture before the next reset clears the send log.
 local repeatContext = sent[2].context
+local repeatEventID = sent[2].packet.eventID
 
 -- The repeat merges into the same visible line rather than stacking.
 T.equal(sent[2].packet.mergeKey, sent[1].packet.mergeKey,
@@ -543,12 +560,14 @@ T.falsy(Hooks.TickIncapacitatedDistress(standing),
 T.falsy(Hooks.TickIncapacitatedDistress(nil),
     "a nil record is safe on tick")
 
--- Repeat lines must be authored for the same lanes as the call.
-local repeatDef = PsychopatzCore.SocialFlavor.Get("social.incapacitated_repeat")
-T.truthy(repeatDef, "the repeat flavor is registered")
-local repeatText = PsychopatzCore.SocialFlavor.Resolve(
-    "social.incapacitated_repeat", "npc", "seed-r", repeatContext)
+-- Repeat lines must use the same semantic pool and canonical content owner as
+-- the call/update lanes; no first-party prose registry is consulted.
+local repeatText, repeatSemantic = semanticText(
+    "incapacitated_repeat", repeatEventID, repeatContext
+)
+T.truthy(repeatSemantic and repeatSemantic.responsePlan,
+    "the repeat keeps a selected semantic response plan")
 T.truthy(repeatText and repeatText ~= "",
-    "the repeat context resolves to authored text")
+    "the repeat context resolves to canonical content text")
 
 return true

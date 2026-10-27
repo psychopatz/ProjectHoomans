@@ -202,10 +202,10 @@ production Lua P4–P7 semantic/content smoke `4/4`, the new P7 Kahlua smoke
 `168` families / `179` phrases on both runs.
 
 The generated Dialogue Content source and registry remain compile-time,
-source-controlled artifacts; runtime inspection is bounded and lazy. Existing
-legacy definition files remain migration source material but are no longer
-loaded by production composition; P8 proves that no first-party caller still
-uses them as a selector.
+source-controlled artifacts; runtime inspection is bounded and lazy. The
+historical first-party definition files were removed in P10A after the
+semantic/content parity proof; the remaining migration work is now limited to
+the live CompanionCommandFlavor wording owner and naming/schema cleanup.
 
 ## Accepted P8 — first-party selector retirement
 
@@ -296,29 +296,38 @@ not yet clean enough for user live acceptance:
 These findings supersede the previous `READY FOR USER LIVE TEST` handoff but do
 not invalidate P0–P9 behavior/test evidence.
 
-## Immediate Next Chunk — P10A
+## Accepted P10A — dead first-party registry purge
 
-Read `P10_CANONICAL_SEMANTIC_CLEANUP.md` before editing.
+P10A is accepted. The executable first-party prose registries are gone from
+the production tree: all `PNC_SocialFlavorDefinitions*` shards, the Bandits,
+Necroa and Project ALife Hoomans Flavor-definition files, and
+`PNC_ConversationToolReplyCatalog.lua` were deleted. The production worker no
+longer loads the ToolReply catalog, and no production/runtime load or require
+reference to the deleted surfaces remains.
 
-Start with the hard source-truth purge:
+The semantic/content parity proof covers safety, player-spoke, witnessed kill,
+follower abandonment (including the zombie cause), horde, retreat, all
+incapacitated call/update/repeat phases, all leader-loss grief lanes, Bandits,
+Necroa, Project ALife and Companion Dogs. Leader-loss close, colonist and
+distant variants were restored in the existing ResponseCatalog and canonical
+Dialogue Content source before deletion; CodeBuilder regenerated the existing
+runtime registry and EN/TL artifacts deterministically.
 
-1. enumerate exact current callers/loaders/tests for all
-   `PNC_SocialFlavorDefinitions*`, first-party compatibility Flavor-definition
-   files and `PNC_ConversationToolReplyCatalog.lua`;
-2. prove required wording/variant parity exists in current ResponseCatalog +
-   Dialogue Content;
-3. delete only the definitions/catalogs whose first-party behavior is already
-   canonical;
-4. remove worker/composition/bootstrap loads;
-5. replace tests that validate the old registry with negative absence plus
-   semantic/content parity tests;
-6. run focused Lua/Python/Kahlua/idempotence checks;
-7. update this progress ledger and `MIGRATION_MATRIX.md`, then continue
-   automatically to P10B–P10F.
+P10A evidence: focused native semantic/retirement/lifecycle set `10/10 PASS`
+in `0.13s` wall time; focused Python content/Observatory/compiler set
+`27/27 PASS` in `22.04s`; targeted PZ Verify Kahlua scans covered `25` Lua
+files with `0` errors / `0` warnings; deleted-surface and worker-load scans
+are clean; `git diff --check` passes. The canonical source remains
+migration-heavy until P10D (`246,392` bytes, `171` families, `182` phrases,
+`170` migration IDs/concepts/source records).
 
-Do not begin by renaming every Flavor symbol globally. P10A first removes dead
-registries; P10B migrates the still-live CompanionCommandFlavor wording owner;
-P10C then renames/merges useful semantic helpers with caller proof.
+## Immediate Next Chunk — P10B
+
+Migrate the still-live `PNC_CompanionCommandFlavor*` wording registry and all
+Project Hoomans command/emote/greeting callers into the existing semantic
+ResponseCatalog → ResponsePlan/RealizationAuthority → SpeechRealization →
+Dialogue Content path. Delete that registry only after the direct semantic
+parity and negative-fallback proof passes.
 
 ## Stop conditions
 
