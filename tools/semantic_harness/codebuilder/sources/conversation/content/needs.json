@@ -1,0 +1,183 @@
+{
+  "domain": "needs",
+  "groups": {
+    "commands_emotes": {
+      "contentOwner": "projecthoomans.dialogue_content.commands_emotes"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.needs.offer.hunger",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Food would help, but I don't have an exact amount yet.",
+              "TL": "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Food would help, if you can spare it.",
+              "TL": "Makakatulong ang pagkain, kung may maibibigay ka."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I need food.",
+              "TL": "Kailangan ko ng pagkain."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I need food. Keep your distance.",
+              "TL": "Kailangan ko ng pagkain. Lumayo ka."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.needs.offer.thirst",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Water would help, but I don't have an exact amount yet.",
+              "TL": "Makakatulong ang tubig, pero wala akong eksaktong dami ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.needs.offer.fatigue",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "A little rest would help, but this isn't something I can count.",
+              "TL": "Makakatulong ang kaunting pahinga, pero hindi ito mabibilang."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.needs.offer.unknown",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't know what I need right now.",
+              "TL": "Hindi ko alam kung ano ang kailangan ko ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.needs.quantity.hunger",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I know food is what I need, but I can't give you an exact amount yet.",
+              "TL": "Alam kong pagkain ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.needs.quantity.thirst",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I know water is what I need, but I can't give you an exact amount yet.",
+              "TL": "Alam kong tubig ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.needs.quantity.unknown",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't confirm an exact amount yet. Which item do you mean?",
+              "TL": "Hindi ko makumpirma ang eksaktong dami. Anong gamit ang tinutukoy mo?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.needs.proposal.hunger",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+              "TL": "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.needs.proposal.thirst",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+              "TL": "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.needs.proposal.unknown",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+              "TL": "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

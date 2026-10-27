@@ -1,6 +1,6 @@
 {
   "content": {
-    "contentFingerprint": "dcd1969a3704a02c5a7172f5ddcc75bac9d72db27525057aaed59d73d33e2639",
+    "contentFingerprint": "b40118baf99fa1be2e3d17e51d0a11ba31f179cbc5b9a6dd0f26fdc3f9d9e7d5",
     "phraseFamilies": [
       {
         "canonicalConcept": "SEMANTIC_COMBAT_REACTION_DEFAULT",
@@ -3140,6 +3140,207 @@
         }
       },
       {
+        "canonicalConcept": "SEMANTIC_QUESTION_NEEDS_OFFER_FATIGUE",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "needs",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.needs.offer.fatigue",
+        "semanticTemplateID": "semantic.question.needs.offer.fatigue",
+        "sourceShard": "content/needs.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "A little rest would help, but this isn't something I can count.",
+              "id": "phrase.semantic.question.needs.offer.fatigue.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferFatigueNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_NEEDS_OFFER_HUNGER",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "needs",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.needs.offer.hunger",
+        "semanticTemplateID": "semantic.question.needs.offer.hunger",
+        "sourceShard": "content/needs.json",
+        "styles": {
+          "guarded": [
+            {
+              "fallback": "I need food. Keep your distance.",
+              "id": "phrase.semantic.question.needs.offer.hunger.guarded.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerGuarded01"
+            }
+          ],
+          "neutral": [
+            {
+              "fallback": "Food would help, but I don't have an exact amount yet.",
+              "id": "phrase.semantic.question.needs.offer.hunger.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerNeutral01"
+            }
+          ],
+          "terse": [
+            {
+              "fallback": "I need food.",
+              "id": "phrase.semantic.question.needs.offer.hunger.terse.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerTerse01"
+            }
+          ],
+          "warm": [
+            {
+              "fallback": "Food would help, if you can spare it.",
+              "id": "phrase.semantic.question.needs.offer.hunger.warm.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerWarm01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_NEEDS_OFFER_THIRST",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "needs",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.needs.offer.thirst",
+        "semanticTemplateID": "semantic.question.needs.offer.thirst",
+        "sourceShard": "content/needs.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "Water would help, but I don't have an exact amount yet.",
+              "id": "phrase.semantic.question.needs.offer.thirst.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferThirstNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_NEEDS_OFFER_UNKNOWN",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "needs",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.needs.offer.unknown",
+        "semanticTemplateID": "semantic.question.needs.offer.unknown",
+        "sourceShard": "content/needs.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I don't know what I need right now.",
+              "id": "phrase.semantic.question.needs.offer.unknown.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferUnknownNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_NEEDS_PROPOSAL_HUNGER",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "needs",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.needs.proposal.hunger",
+        "semanticTemplateID": "semantic.question.needs.proposal.hunger",
+        "sourceShard": "content/needs.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+              "id": "phrase.semantic.question.needs.proposal.hunger.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalHungerNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_NEEDS_PROPOSAL_THIRST",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "needs",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.needs.proposal.thirst",
+        "semanticTemplateID": "semantic.question.needs.proposal.thirst",
+        "sourceShard": "content/needs.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+              "id": "phrase.semantic.question.needs.proposal.thirst.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalThirstNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_NEEDS_PROPOSAL_UNKNOWN",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "needs",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.needs.proposal.unknown",
+        "semanticTemplateID": "semantic.question.needs.proposal.unknown",
+        "sourceShard": "content/needs.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+              "id": "phrase.semantic.question.needs.proposal.unknown.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalUnknownNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_NEEDS_QUANTITY_HUNGER",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "needs",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.needs.quantity.hunger",
+        "semanticTemplateID": "semantic.question.needs.quantity.hunger",
+        "sourceShard": "content/needs.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I know food is what I need, but I can't give you an exact amount yet.",
+              "id": "phrase.semantic.question.needs.quantity.hunger.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityHungerNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_NEEDS_QUANTITY_THIRST",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "needs",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.needs.quantity.thirst",
+        "semanticTemplateID": "semantic.question.needs.quantity.thirst",
+        "sourceShard": "content/needs.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I know water is what I need, but I can't give you an exact amount yet.",
+              "id": "phrase.semantic.question.needs.quantity.thirst.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityThirstNeutral01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_QUESTION_NEEDS_QUANTITY_UNKNOWN",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "conversationDomain": "needs",
+        "group": "commands_emotes",
+        "id": "phrase.semantic.question.needs.quantity.unknown",
+        "semanticTemplateID": "semantic.question.needs.quantity.unknown",
+        "sourceShard": "content/needs.json",
+        "styles": {
+          "neutral": [
+            {
+              "fallback": "I can't confirm an exact amount yet. Which item do you mean?",
+              "id": "phrase.semantic.question.needs.quantity.unknown.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityUnknownNeutral01"
+            }
+          ]
+        }
+      },
+      {
         "canonicalConcept": "SEMANTIC_QUESTION_WELLBEING_DEFAULT",
         "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
         "conversationDomain": "wellbeing",
@@ -5362,6 +5563,19 @@
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral01": "I am still here. Please come back for me.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral01": "I still need food before I can get up.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral01": "I am hurt. I need help now.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferFatigueNeutral01": "A little rest would help, but this isn't something I can count.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerGuarded01": "I need food. Keep your distance.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerNeutral01": "Food would help, but I don't have an exact amount yet.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerTerse01": "I need food.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerWarm01": "Food would help, if you can spare it.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferThirstNeutral01": "Water would help, but I don't have an exact amount yet.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferUnknownNeutral01": "I don't know what I need right now.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalHungerNeutral01": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalThirstNeutral01": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalUnknownNeutral01": "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityHungerNeutral01": "I know food is what I need, but I can't give you an exact amount yet.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityThirstNeutral01": "I know water is what I need, but I can't give you an exact amount yet.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityUnknownNeutral01": "I can't confirm an exact amount yet. Which item do you mean?",
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultGuarded01": "I'm managing. Don't press me.",
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultNeutral01": "I'm okay. How about you?",
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultTerse01": "I'm okay.",
@@ -5777,6 +5991,19 @@
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral01": "I am still here. Please come back for me.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral01": "I still need food before I can get up.",
         "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral01": "I am hurt. I need help now.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferFatigueNeutral01": "Makakatulong ang kaunting pahinga, pero hindi ito mabibilang.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerGuarded01": "Kailangan ko ng pagkain. Lumayo ka.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerNeutral01": "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerTerse01": "Kailangan ko ng pagkain.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerWarm01": "Makakatulong ang pagkain, kung may maibibigay ka.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferThirstNeutral01": "Makakatulong ang tubig, pero wala akong eksaktong dami ngayon.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferUnknownNeutral01": "Hindi ko alam kung ano ang kailangan ko ngayon.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalHungerNeutral01": "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalThirstNeutral01": "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalUnknownNeutral01": "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityHungerNeutral01": "Alam kong pagkain ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityThirstNeutral01": "Alam kong tubig ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
+        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityUnknownNeutral01": "Hindi ko makumpirma ang eksaktong dami. Anong gamit ang tinutukoy mo?",
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultGuarded01": "Kinakaya ko. Huwag mo nang ipilit.",
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultNeutral01": "Okay naman ako. Ikaw, kumusta?",
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultTerse01": "Ayos lang ako.",
@@ -9440,6 +9667,66 @@
       "kind": "content",
       "sourceShard": "content/event.json"
     },
+    "phrase.semantic.question.needs.offer.fatigue": {
+      "domain": "needs",
+      "id": "phrase.semantic.question.needs.offer.fatigue",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "phrase.semantic.question.needs.offer.hunger": {
+      "domain": "needs",
+      "id": "phrase.semantic.question.needs.offer.hunger",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "phrase.semantic.question.needs.offer.thirst": {
+      "domain": "needs",
+      "id": "phrase.semantic.question.needs.offer.thirst",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "phrase.semantic.question.needs.offer.unknown": {
+      "domain": "needs",
+      "id": "phrase.semantic.question.needs.offer.unknown",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "phrase.semantic.question.needs.proposal.hunger": {
+      "domain": "needs",
+      "id": "phrase.semantic.question.needs.proposal.hunger",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "phrase.semantic.question.needs.proposal.thirst": {
+      "domain": "needs",
+      "id": "phrase.semantic.question.needs.proposal.thirst",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "phrase.semantic.question.needs.proposal.unknown": {
+      "domain": "needs",
+      "id": "phrase.semantic.question.needs.proposal.unknown",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "phrase.semantic.question.needs.quantity.hunger": {
+      "domain": "needs",
+      "id": "phrase.semantic.question.needs.quantity.hunger",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "phrase.semantic.question.needs.quantity.thirst": {
+      "domain": "needs",
+      "id": "phrase.semantic.question.needs.quantity.thirst",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "phrase.semantic.question.needs.quantity.unknown": {
+      "domain": "needs",
+      "id": "phrase.semantic.question.needs.quantity.unknown",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
     "phrase.semantic.question.wellbeing.default": {
       "domain": "wellbeing",
       "id": "phrase.semantic.question.wellbeing.default",
@@ -11354,17 +11641,77 @@
       "kind": "responsePool",
       "sourceShard": "flows/common_responses.json"
     },
+    "semantic.question.needs.offer.fatigue": {
+      "domain": "needs",
+      "id": "semantic.question.needs.offer.fatigue",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "semantic.question.needs.offer.hunger": {
+      "domain": "needs",
+      "id": "semantic.question.needs.offer.hunger",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "semantic.question.needs.offer.thirst": {
+      "domain": "needs",
+      "id": "semantic.question.needs.offer.thirst",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "semantic.question.needs.offer.unknown": {
+      "domain": "needs",
+      "id": "semantic.question.needs.offer.unknown",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
     "semantic.question.needs.proposal": {
       "domain": "common",
       "id": "semantic.question.needs.proposal",
       "kind": "responsePool",
       "sourceShard": "flows/common_responses.json"
     },
+    "semantic.question.needs.proposal.hunger": {
+      "domain": "needs",
+      "id": "semantic.question.needs.proposal.hunger",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "semantic.question.needs.proposal.thirst": {
+      "domain": "needs",
+      "id": "semantic.question.needs.proposal.thirst",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "semantic.question.needs.proposal.unknown": {
+      "domain": "needs",
+      "id": "semantic.question.needs.proposal.unknown",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
     "semantic.question.needs.quantity": {
       "domain": "common",
       "id": "semantic.question.needs.quantity",
       "kind": "responsePool",
       "sourceShard": "flows/common_responses.json"
+    },
+    "semantic.question.needs.quantity.hunger": {
+      "domain": "needs",
+      "id": "semantic.question.needs.quantity.hunger",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "semantic.question.needs.quantity.thirst": {
+      "domain": "needs",
+      "id": "semantic.question.needs.quantity.thirst",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
+    },
+    "semantic.question.needs.quantity.unknown": {
+      "domain": "needs",
+      "id": "semantic.question.needs.quantity.unknown",
+      "kind": "content",
+      "sourceShard": "content/needs.json"
     },
     "semantic.question.wellbeing": {
       "domain": "common",
@@ -12045,6 +12392,12 @@
         "path": "content/wellbeing.json"
       },
       {
+        "domain": "needs",
+        "kind": "content",
+        "order": 137,
+        "path": "content/needs.json"
+      },
+      {
         "domain": "command",
         "kind": "content",
         "order": 140,
@@ -12401,6 +12754,25 @@
         "semantic.question.wellbeing.stress",
         "semantic.question.wellbeing.thirst",
         "semantic.question.wellbeing.thirst_alt"
+      ]
+    },
+    {
+      "domain": "needs",
+      "fingerprint": "e9f7c0fe6f59725b146398c81e7b9210c584117e8c19fee6b3282cf6ccfbcd8f",
+      "kind": "content",
+      "order": 137,
+      "path": "content/needs.json",
+      "recordIDs": [
+        "semantic.question.needs.offer.fatigue",
+        "semantic.question.needs.offer.hunger",
+        "semantic.question.needs.offer.thirst",
+        "semantic.question.needs.offer.unknown",
+        "semantic.question.needs.proposal.hunger",
+        "semantic.question.needs.proposal.thirst",
+        "semantic.question.needs.proposal.unknown",
+        "semantic.question.needs.quantity.hunger",
+        "semantic.question.needs.quantity.thirst",
+        "semantic.question.needs.quantity.unknown"
       ]
     },
     {
@@ -13055,5 +13427,5 @@
       "UI_PNC_Conversation_Suggestion_Wellbeing_Utterance": "Kumusta ang pakiramdam mo?"
     }
   },
-  "wholeModelFingerprint": "3ce2009909ea53631a62f430fcb8067bec5c420231f0745d0d39604032d5f43c"
+  "wholeModelFingerprint": "08a79a870e27e02b2da4045ca11c46da6aed329f851c5ab5f712de9cba3c054a"
 }

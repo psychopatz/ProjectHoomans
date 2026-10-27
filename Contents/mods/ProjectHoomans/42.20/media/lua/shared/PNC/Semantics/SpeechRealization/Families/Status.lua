@@ -92,11 +92,6 @@ return {
         "I'm getting by. Thanks for asking.", "Getting by.",
         "I'm getting by. Leave it there."
     ),
-    ["semantic.question.needs.offer.hunger"] = phraseFamily(
-        "NeedsHunger", "Food would help, but I don't know the exact amount.",
-        "Food would help, if you can spare it.", "I need food.",
-        "I need food. Keep your distance."
-    ),
     ["semantic.question.medical_bite.positive"] = phraseFamily(
         "MedicalBitePositive", "Yes, I've been bitten.",
         "Yes. I've been bitten, and I appreciate you checking.",

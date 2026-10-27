@@ -38,6 +38,13 @@ return {
             ["recordCount"] = 7,
         },
         {
+            ["bytes"] = 8768,
+            ["domain"] = "needs",
+            ["kind"] = "Content",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Content/Needs",
+            ["recordCount"] = 10,
+        },
+        {
             ["bytes"] = 56114,
             ["domain"] = "social",
             ["kind"] = "Content",
@@ -276,5 +283,5 @@ return {
             ["recordCount"] = 2,
         },
     },
-    ["wholeModelFingerprint"] = "3ce2009909ea53631a62f430fcb8067bec5c420231f0745d0d39604032d5f43c",
+    ["wholeModelFingerprint"] = "08a79a870e27e02b2da4045ca11c46da6aed329f851c5ab5f712de9cba3c054a",
 }
