@@ -4,12 +4,10 @@
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
-require "PNC/Core/Identity/PNC_FlavorAddress"
 
 local Diary = PNC.Conversation.Diary or {}
 PNC.Conversation.Diary = Diary
 Diary.MAX_ENTRIES = 80
-local FlavorAddress = PNC.FlavorAddress
 
 local function state()
     PNC.Network = PNC.Network or {}
@@ -22,62 +20,6 @@ local function copy(value)
     local output = {}
     for key, child in pairs(value) do output[key] = copy(child) end
     return output
-end
-
-local function npcName(npcID, entry)
-    local stateValue = state()
-    local snapshot = stateValue.snapshots
-        and stateValue.snapshots[tostring(npcID or "")] or nil
-    local identity = PNC.NPCIdentityPresentation
-    if identity and identity.GetName then
-        return identity.GetName(snapshot or { id = npcID })
-    end
-    return tostring(entry and entry.npcName
-        or snapshot and snapshot.displayName
-        or "Companion")
-end
-
-local function flavorContext(npcID, entry)
-    local name = npcName(npcID, entry)
-    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
-    local clientState = state()
-    local playerContext = clientState.playerContext or {}
-    local address = FlavorAddress.ResolveForNPC({
-        npcID = npcID,
-        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
-        player = player,
-        playerContext = playerContext,
-        playerUUID = playerContext.characterUUID
-            or playerContext.playerUUID
-            or player and player.getUsername and player:getUsername(),
-        state = clientState,
-    })
-    return {
-        name = name,
-        names = name,
-        count = 1,
-        player = address.addressName,
-        playerName = address.addressName,
-        playerAddressName = address.addressName,
-        playerFullName = address.fullName,
-        playerFirstName = address.firstName,
-        playerSurname = address.surname,
-        playerLastName = address.lastName,
-        playerNameKnown = address.known,
-        playerIsFemale = address.isFemale,
-        playerNicknameID = address.nicknameID,
-    }
-end
-
-local function resolveFlavor(npcID, entry, flavorID, speaker)
-    local flavor = PNC.CompanionCommandFlavor
-    if not flavor or not flavor.Resolve or not flavorID then return nil end
-    return flavor.Resolve(
-        flavorID,
-        speaker,
-        entry.eventID,
-        flavorContext(npcID, entry)
-    )
 end
 
 local function resolveConversationText(entry, key)
@@ -103,14 +45,10 @@ end
 local function enrich(npcID, value)
     local entry = copy(value)
     if not entry.playerText then
-        entry.playerText = resolveFlavor(
-            npcID, entry, entry.playerFlavorID, "player"
-        ) or resolveConversationText(entry, entry.playerTextKey)
+        entry.playerText = resolveConversationText(entry, entry.playerTextKey)
     end
     if not entry.npcText then
-        entry.npcText = resolveFlavor(
-            npcID, entry, entry.npcFlavorID, "npc"
-        ) or resolveConversationText(entry, entry.npcTextKey
+        entry.npcText = resolveConversationText(entry, entry.npcTextKey
             or entry.responseKey)
     end
     entry.npcID = tostring(npcID or entry.npcID or "")

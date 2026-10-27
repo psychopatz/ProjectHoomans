@@ -1,4 +1,4 @@
-"""Semantic Lab coverage for the first legacy-category ownership slice."""
+"""Semantic Lab coverage for semantic category ownership."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ class LegacyCategoryOwnershipTests(unittest.TestCase):
             snapshot["loadedModules"],
         )
 
-    def test_root_projection_exposes_compatibility_metadata_for_first_slice(self) -> None:
+    def test_root_projection_exposes_semantic_metadata_for_first_slice(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opened = worker.open_conversation()
             landing = next(
@@ -49,13 +49,13 @@ class LegacyCategoryOwnershipTests(unittest.TestCase):
                     extensions["semanticOwner"],
                     f"projecthoomans.semantic.{topic}",
                 )
-                self.assertTrue(extensions["legacyRegistry"])
+                self.assertFalse(extensions["legacyRegistry"])
                 self.assertEqual(
                     extensions["migrationPhase"],
-                    "legacy_registry_projection",
+                    "semantic_category_authority",
                 )
                 self.assertEqual(
-                    extensions["authority"], "conversation_registry"
+                    extensions["authority"], "semantic_response_flow"
                 )
 
 

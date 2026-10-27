@@ -4,8 +4,6 @@
 -- no farewell event, random roll, or text is sent back to the server.
 
 pcall(require, "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient")
-require "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
-require "PNC/Conversation/PNC_SocialFlavorDefinitions"
 require "PNC/Audio/PNC_PlayerSpeech"
 require "PNC/Conversation/PNC_ConversationFarewellContext"
 pcall(require, "PNC/Semantics/PNC_SemanticInteractionLifecycle")

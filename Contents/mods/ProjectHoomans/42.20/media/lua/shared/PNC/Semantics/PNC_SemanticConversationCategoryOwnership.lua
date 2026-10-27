@@ -1,9 +1,9 @@
--- Explicit ownership boundary for categories that are still authored by the
--- legacy conversation registry but are already consumed by semantic flows.
+-- Explicit ownership boundary for categories whose meaning is selected by
+-- semantic flows while ConversationBlocks retain authored data and effects.
 --
--- This is intentionally a read-only compatibility manifest. It lets the
--- composer, semantic projections, and the Semantic Lab agree on ownership
--- before any legacy registration is removed.
+-- This is intentionally a read-only ownership manifest. It lets the
+-- composer, semantic projections, and the Semantic Lab agree that the
+-- registry is only a bounded data/projection source.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
@@ -20,10 +20,10 @@ if type(TopicCatalog) ~= "table" then
     end
 end
 
-Ownership.VERSION = 1
+Ownership.VERSION = 2
 Ownership.MIGRATION_PHASE = "semantic_category_authority"
 Ownership.AUTHORITY = "semantic_response_flow"
-Ownership.REGISTRY_ROLE = "eligibility_gates_effects"
+Ownership.REGISTRY_ROLE = "eligibility_gates_effects_projection"
 Ownership.CATEGORY_IDS = {
     "projecthoomans:wellbeing",
     "projecthoomans:small_talk",
@@ -56,10 +56,10 @@ local function copyMetadata(categoryID, blockID)
         semanticOwner = "projecthoomans.semantic." .. topic,
         authority = Ownership.AUTHORITY,
         registryRole = Ownership.REGISTRY_ROLE,
-        registryOwner = "conversation_registry",
+        registryOwner = "conversation_registry_data",
         meaningAuthority = "semantic_response_flow",
         migrationPhase = Ownership.MIGRATION_PHASE,
-        legacyRegistry = true,
+        legacyRegistry = false,
     }
 end
 

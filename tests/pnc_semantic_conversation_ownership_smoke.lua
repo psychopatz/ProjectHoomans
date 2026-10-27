@@ -36,13 +36,13 @@ for categoryID, topic in pairs(expected) do
     )
     T.equal(
         metadata.registryRole,
-        "eligibility_gates_effects",
-        categoryID .. " retains registry gates/effects ownership"
+        "eligibility_gates_effects_projection",
+        categoryID .. " retains registry data/projection ownership"
     )
     T.equal(
         metadata.registryOwner,
-        "conversation_registry",
-        categoryID .. " records the legacy registry data owner"
+        "conversation_registry_data",
+        categoryID .. " records the registry data owner"
     )
     T.equal(
         metadata.migrationPhase,
@@ -62,7 +62,7 @@ T.equal(
 )
 T.truthy(
     Ownership.IsSemanticOwned("projecthoomans:ask_about"),
-    "Ask About is in the first semantic ownership slice"
+    "Ask About is semantic-owned"
 )
 T.falsy(
     Ownership.IsSemanticOwned("projecthoomans:trade"),

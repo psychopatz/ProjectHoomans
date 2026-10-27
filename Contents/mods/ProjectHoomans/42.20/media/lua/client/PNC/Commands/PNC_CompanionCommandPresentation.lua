@@ -495,13 +495,11 @@ end
 
 -- Ambient NPC speech publishes a canonical NPC message so nameplates and
 -- other speech consumers share one presentation path. A server-selected
--- localized gossip packet may supply resolvedText; ordinary greetings use
--- the standard flavor resolver below.
+-- localized gossip packet may supply resolvedText; ordinary greetings carry
+-- their selected semantic realization from the server.
 function Presentation.ShowAmbientNPCFlavor(actor, flavorID, context)
     local player = type(context) == "table" and context.playerActor
         or getSpecificPlayer and getSpecificPlayer(0) or nil
-    local flavorContext
-    local seed
     local text
     local published
     local semantic
@@ -539,15 +537,9 @@ function Presentation.ShowAmbientNPCFlavor(actor, flavorID, context)
             context.factRefs = semantic.groundedFactRefs
             text = semantic.fallback
         else
-            -- Compatibility/content-only adapter. This branch must not create
-            -- semantic lifecycle provenance; migrated event producers always
-            -- provide the semantic result above.
-            flavorContext = Presentation.BuildFlavorContext(player, context)
-            seed = type(context) == "table" and context.seed or nil
-            seed = tostring(seed or "")
-            text = Flavor and Flavor.Resolve
-                and Flavor.Resolve(flavorID, "npc", seed, flavorContext)
-                or nil
+            -- A Project Hoomans NPC event cannot fall through to a first-party
+            -- flavor selector after semantic migration.
+            return false, "semantic_realization_required"
         end
     end
     if not text or text == "" then return false end
@@ -651,20 +643,10 @@ function Presentation.SyncAcknowledgement(zombie, snapshot, modData)
     if semantic then
         text = semantic.fallback
     else
-        -- Compatibility/content-only fallback for partial compositions that
-        -- do not load the semantic reaction catalog.
-        local flavorContext = Presentation.BuildFlavorContext(
-            player,
-            acknowledgementContext
-        )
-        text = Flavor and Flavor.Resolve
-            and Flavor.Resolve(
-                feedback.id,
-                "npc",
-                tostring(snapshot.id or "") .. ":" .. tostring(revision),
-                flavorContext
-            )
-            or nil
+        -- Command acknowledgement is a semantic-owned packet. A missing
+        -- catalog result is an explicit delivery failure, never a legacy
+        -- prose lookup.
+        return false
     end
     return speak(zombie, text)
 end

@@ -11,8 +11,6 @@ require "PNC/UI/Context/PNC_ContextHub"
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 require "PNC/Semantics/PNC_SemanticGiftLifecycle"
 require "PNC/Semantics/PNC_SemanticGiftContext"
-require "PNC/Compatibility/Mods/Bandits/PNC_Bandits_HoomansFlavorDefinitions"
-require "PNC/Compatibility/Mods/Necroa/PNC_Necroa_HoomansFlavorDefinitions"
 require "PNC/Conversation/Composition/PNC_ConversationClientComposition"
 require "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime"
 

@@ -329,8 +329,6 @@ local expectedConversationComposition = {
     "PNC/Knowledge/PNC_NPCIdentityPresentation",
     "PNC/Semantics/PNC_SemanticGiftLifecycle",
     "PNC/Semantics/PNC_SemanticGiftContext",
-    "PNC/Compatibility/Mods/Bandits/PNC_Bandits_HoomansFlavorDefinitions",
-    "PNC/Compatibility/Mods/Necroa/PNC_Necroa_HoomansFlavorDefinitions",
     "PNC/Conversation/Composition/PNC_ConversationClientComposition",
     "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime",
     "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation",

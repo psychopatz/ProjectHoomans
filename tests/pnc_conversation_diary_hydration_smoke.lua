@@ -24,8 +24,6 @@ PNC = {
 }
 getSpecificPlayer = function() return player end
 
-T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavor.lua")
-T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavorDefinitions.lua")
 T.load(CLIENT .. "PNC/Conversation/PNC_ConversationDiary.lua")
 
 local Diary = PNC.Conversation.Diary
@@ -35,8 +33,8 @@ T.truthy(Diary.Hydrate("npc-one", {
     {
         eventID = "conversation:vanilla_emote:one",
         kind = "player_emote",
-        playerFlavorID = "vanilla_emote_wavehi",
-        npcFlavorID = "vanilla_emote_wavehi_npc_warm",
+        playerText = "Hello there.",
+        npcText = "Good to see you.",
         interactionType = "player_emote_wavehi",
         delta = { approval = 2, respect = 0, familiarity = 1 },
     },
@@ -44,9 +42,9 @@ T.truthy(Diary.Hydrate("npc-one", {
 T.equal(#Diary.Get("npc-one"), 1,
     "hydration restores the persisted interaction row")
 T.truthy(Diary.Get("npc-one")[1].playerText,
-    "hydration resolves persisted player flavor")
+    "hydration preserves persisted selected player wording")
 T.truthy(Diary.Get("npc-one")[1].npcText,
-    "hydration resolves persisted NPC flavor")
+    "hydration preserves persisted selected NPC wording")
 T.equal(state.conversationDiaryRevisions["npc-one"], 4,
     "hydration records the authoritative interaction revision")
 

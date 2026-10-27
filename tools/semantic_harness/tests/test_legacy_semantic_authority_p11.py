@@ -161,7 +161,7 @@ class LegacySemanticAuthorityP11Tests(unittest.TestCase):
         self.assertNotIn("Flavor.Resolve", authority)
         self.assertIn("Authority.Resolve", reactions)
         self.assertIn("context.responsePlanID and context.realizationID", presentation)
-        self.assertIn("Compatibility/content-only adapter", presentation)
+        self.assertIn("semantic_realization_required", presentation)
 
     def test_authored_en_tl_content_catalogs_remain_available(self) -> None:
         root = PROJECT / "Contents/mods/ProjectHoomans/common/media/translation"

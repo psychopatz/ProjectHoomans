@@ -50,6 +50,29 @@ listed in `PROGRESS.md`. The remaining legacy definition files and old
 translation keys are source material only; P8 is responsible for proving and
 retiring any residual first-party selector caller.
 
+## P8 retirement audit
+
+The first-party social definition shards are now source-only migration
+material: `PNC_SocialFlavorPresentation_Core.lua`, farewell, and the runtime
+conversation composition no longer load them. Bandits/Necroa compatibility
+definition shards are likewise not loaded by production composition; their
+adapters select `semantic.compat.*` first and explicit semantic failure
+suppresses delivery. Project ALife definitions remain unrequired source
+material. The diary hydrator preserves already-selected text and resolves only
+canonical Conversation Content keys; it never reselects a persisted flavor ID.
+
+The command interaction queue no longer lets `CompanionCommandFlavor` replace
+a selected `ResponseCatalog` realization. Its remaining `Flavor.Resolve`
+calls are explicit compatibility-only UI helpers for callers with no semantic
+result; semantic NPC event/greeting/acknowledgement paths fail explicitly when
+their realization is missing. This is the remaining compatibility boundary,
+not a semantic owner.
+
+P8 retirement evidence is
+`pnc_unified_authority_p8_retirement_smoke`, the updated composition and diary
+regressions, the semantic category ownership tests, and the production
+P3/P4/P6 semantic negative suites.
+
 ## P5 ownership boundary
 
 `PNC_ConversationToolReplyCatalog.lua` is retained as migration/source

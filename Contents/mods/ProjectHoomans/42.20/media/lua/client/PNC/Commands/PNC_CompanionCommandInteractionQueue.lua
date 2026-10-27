@@ -113,7 +113,6 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
     local presentationState
     options = type(options) == "table" and options or {}
     local realization = options.semanticRealization
-    local compatibilityFlavorID
     speaker = tostring(speaker or "npc")
     if speakerID == nil or tostring(speakerID) == "" then
         return false, "speaker_identity_unavailable"
@@ -124,18 +123,10 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
             or context.requestID or context.eventID)
         or tostring(currentTime())
     text = options.resolvedText
-    compatibilityFlavorID = realization
-        and (realization.compatibilityFlavorID or flavorID) or nil
-    if realization and compatibilityFlavorID
-        and Flavor and type(Flavor.Resolve) == "function"
-    then
-        local authoredText = Flavor.Resolve(
-            compatibilityFlavorID, speaker, seed, flavorContext
-        )
-        if authoredText and authoredText ~= "" then
-            text = authoredText
-        end
-    end
+    -- A semantic realization already owns meaning and its selected wording.
+    -- The old command flavor table remains an explicit compatibility content
+    -- path only for callers that have no semantic result; it must never
+    -- overwrite a selected ResponseCatalog realization.
     if not text and not realization then
         text = Flavor and Flavor.Resolve
             and Flavor.Resolve(flavorID, speaker, seed, flavorContext)

@@ -48,7 +48,7 @@
 | P5 — ToolReplies + legacy registry migration | **ACCEPTED** |
 | P6 — compatibility semantic adapters | **ACCEPTED** |
 | P7 — canonical content coverage / Studio observability | **ACCEPTED** |
-| P8 — retire first-party legacy prose authority | NOT STARTED |
+| P8 — retire first-party legacy prose authority | **IN PROGRESS** |
 | P9 — scale/MP/final acceptance | NOT STARTED |
 
 ## Accepted P0 — authority inventory and characterization
@@ -155,7 +155,8 @@
 - Production ToolReplies no longer require or read
   `PNC_ConversationToolReplyCatalog.lua`; the old table remains source material
   only. Existing EN/TL wording keys continue to resolve through the same
-  translation facade until the canonical Dialogue Content slice in P7.
+  translation facade remains migration/source material below the canonical
+  Dialogue Content owner established in P7.
 - The three legacy conversation categories now report
   `semantic_response_flow` as meaning authority and explicitly retain
   `conversation_registry` only for eligibility/gates/effects data. Branch,
@@ -201,8 +202,9 @@ production Lua P4–P7 semantic/content smoke `4/4`, the new P7 Kahlua smoke
 
 The generated Dialogue Content source and registry remain compile-time,
 source-controlled artifacts; runtime inspection is bounded and lazy. Existing
-legacy definition files remain migration source material until the P8
-retirement audit proves every first-party caller is semantic-first.
+legacy definition files remain migration source material but are no longer
+loaded by production composition; P8 proves that no first-party caller still
+uses them as a selector.
 
 ## Immediate Next Chunk — P8
 

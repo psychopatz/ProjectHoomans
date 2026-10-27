@@ -12,9 +12,6 @@ require "PsychopatzCore/Events/PC_EventBus"
 require "PNC/Core/Identity/PNC_FlavorAddress"
 require "PNC/Core/Social/PNC_FlavorTextResolver"
 require "PNC/Conversation/PNC_ConversationDiary"
-require "PNC/Conversation/PNC_SocialFlavorDefinitions"
-require "PNC/Conversation/PNC_SocialFlavorDefinitions_Incapacitated"
-require "PNC/Conversation/PNC_SocialFlavorDefinitions_LeaderDeath"
 
 PNC = PNC or {}
 PNC.SocialFlavorPresentation = PNC.SocialFlavorPresentation or {}
