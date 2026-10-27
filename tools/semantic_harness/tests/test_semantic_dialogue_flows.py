@@ -118,7 +118,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         self.assertTrue(opening_observation["response"]["translated"])
         self.assertEqual(
             opening_observation["response"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly",
+            "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral01",
         )
         self.assertEqual(len(opening["messages"]), 2)
         self.assertEqual(
@@ -127,7 +127,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         )
         self.assertEqual(
             opening["messages"][1]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestionFriendly",
+            "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral01",
         )
         self.assertTrue(opening_observation["response"]["composed"])
         self.assertEqual(opening_observation["response"]["queueCount"], 2)
@@ -180,7 +180,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
                 )
                 self.assertEqual(
                     payloads[1]["translationKey"],
-                    "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestion",
+                    "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral01",
                 )
                 self.assertEqual(
                     payloads[0]["plan"]["sourcePoolID"],

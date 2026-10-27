@@ -1,13 +1,13 @@
--- Context normalization and identity enrichment for ambient social flavor.
+-- Context normalization and identity enrichment for ambient semantic speech.
 
 PNC = PNC or {}
-PNC.SocialFlavorPresentation = PNC.SocialFlavorPresentation or {}
-PNC.SocialFlavorPresentationInternal =
-    PNC.SocialFlavorPresentationInternal or {}
+PNC.SemanticSpeechPresentation = PNC.SemanticSpeechPresentation or {}
+PNC.SemanticSpeechPresentationInternal =
+    PNC.SemanticSpeechPresentationInternal or {}
 
-local Presentation = PNC.SocialFlavorPresentation
-local H = PNC.SocialFlavorPresentationInternal
-local FlavorAddress = PNC.FlavorAddress
+local Presentation = PNC.SemanticSpeechPresentation
+local H = PNC.SemanticSpeechPresentationInternal
+local Addressing = PNC.Semantics.AddressResolver
 local clean = H.Clean
 local firstBoolean = H.FirstBoolean
 local currentPlayer = H.CurrentPlayer
@@ -37,8 +37,9 @@ local function presentationInteraction(ambientFlavor, context, npcID,
         or not ambientFlavor.responsePlanID
         or not ambientFlavor.realizationID
     then
-        -- Flavor-only compatibility packets remain presentation/transport
-        -- data. Never manufacture semantic provenance after their selection.
+        -- Compatibility packets without semantic provenance remain
+        -- presentation/transport data. Never manufacture semantic provenance
+        -- after their selection.
         return nil
     end
     return Envelope.NPCSpeech({
@@ -55,6 +56,8 @@ local function presentationInteraction(ambientFlavor, context, npcID,
             or "social:" .. tostring(eventType),
         poolID = ambientFlavor.poolID
             or ambientFlavor.responsePlanID
+            or ambientFlavor.speechEventID
+            -- Only external Core compatibility packets still use flavorID.
             or ambientFlavor.flavorID,
         realizationFamily = ambientFlavor.realizationFamily,
         realizationID = ambientFlavor.realizationID,
@@ -319,7 +322,7 @@ function H.EnrichReceiveContext(receive)
     context.playerIsFemale = player.isFemale
     context.playerNicknameID = player.nicknameID
     context.npcIdentitySeed = context.npcIdentitySeed
-        or FlavorAddress.ResolveNPCSeed(
+        or Addressing.ResolveNPCSeed(
             PNC.Network and PNC.Network.ClientState
                 and PNC.Network.ClientState.snapshots
                 and PNC.Network.ClientState.snapshots[npcID],

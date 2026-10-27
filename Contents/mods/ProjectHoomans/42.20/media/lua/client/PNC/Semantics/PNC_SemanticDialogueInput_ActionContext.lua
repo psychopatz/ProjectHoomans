@@ -38,10 +38,10 @@ function ActionContext.Build(view, result, value)
     local selectionOrigin = spec.context and spec.context.player
         or getSpecificPlayer and getSpecificPlayer(0) or nil
     local registry = PNC.Registry
-    local socialFlavor = PNC.SocialFlavorPresentation
-    local activeMedicalSupplyRequest = socialFlavor
-        and type(socialFlavor.GetActiveMedicalSupplyRequest) == "function"
-        and socialFlavor.GetActiveMedicalSupplyRequest(recipientID) or nil
+    local speechPresentation = PNC.SemanticSpeechPresentation
+    local activeMedicalSupplyRequest = speechPresentation
+        and type(speechPresentation.GetActiveMedicalSupplyRequest) == "function"
+        and speechPresentation.GetActiveMedicalSupplyRequest(recipientID) or nil
     if registry and type(registry.GetLiveZombie) == "function"
         and recipientID
     then

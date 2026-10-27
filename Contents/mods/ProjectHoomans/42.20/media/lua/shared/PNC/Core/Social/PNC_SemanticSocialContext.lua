@@ -1,7 +1,7 @@
 --[[
     Semantic social context providers
     Pure, deterministic mapping from "downed NPC context" to a bounded set of
-    flavor variant keys.  It owns no state, performs no world scans, and never
+    semantic variant keys. It owns no state, performs no world scans, and never
     touches the presentation queue, so it is safe to share between client and
     server and cheap enough to call on every state transition.
 
@@ -21,17 +21,14 @@
     exact combination or fall back to the audience-only key.
 ]]
 
-require "PNC/Core/Social/PNC_FlavorTextResolver_Constants"
+require "PNC/Core/Social/PNC_SemanticSocialContext_Constants"
 
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
-PNC.Semantics.ContextProviders = PNC.Semantics.ContextProviders or {}
--- Compatibility alias for old event adapters. Semantic callers use the
--- neutral provider table directly; it never selects prose or a renderer.
-PNC.FlavorText = PNC.Semantics.ContextProviders
+PNC.Semantics.SocialContext = PNC.Semantics.SocialContext or {}
 
-local FlavorText = PNC.Semantics.ContextProviders
-local Const = PNC.FlavorTextConst
+local SocialContext = PNC.Semantics.SocialContext
+local Const = PNC.Semantics.SocialContextConstants
 
 local function clean(value, fallback)
     if value == nil then return fallback end
@@ -57,7 +54,7 @@ end
 -- Normalizes every attacker representation the mod produces into one of
 -- Const.Threat.*.  Accepts a Perception recentThreat table, a damage event, or
 -- a pre-normalized string, so callers never have to agree on a shape.
-function FlavorText.ClassifyThreat(source)
+function SocialContext.ClassifyThreat(source)
     local kind
     local provider
     if source == nil then return Const.Threat.UNKNOWN end
@@ -97,7 +94,7 @@ end
 
 -- True when the threat was actually a survivor rather than the dead.  Hostile
 -- NPC/player attackers are the only case that can plausibly accept a plea.
-function FlavorText.IsHumanThreat(threat)
+function SocialContext.IsHumanThreat(threat)
     return threat == Const.Threat.NPC
         or threat == Const.Threat.PLAYER
         or threat == Const.Threat.FOREIGN_NPC
@@ -129,7 +126,7 @@ end
 --   7. everything else -> neutral
 -- War outranks friendship-tier and stranger standing; a personal enemy always
 -- outranks the faction view.
-function FlavorText.ClassifyAudience(input)
+function SocialContext.ClassifyAudience(input)
     local factionID
     local otherFactionID
     local band
@@ -177,7 +174,7 @@ end
 -- than a dependency keeps this module pure and testable.
 local function resolveAudience(input)
     if type(input) ~= "table" then return Const.Audience.NEUTRAL end
-    return FlavorText.ClassifyAudience({
+    return SocialContext.ClassifyAudience({
         factionID = input.factionID,
         otherFactionID = input.otherFactionID,
         factionBand = input.factionBand,
@@ -193,7 +190,7 @@ end
 
 -- Wound families are resolved by the caller (they own the wound model); this
 -- function only turns a compact description into a need bucket.
-function FlavorText.ClassifyNeed(input)
+function SocialContext.ClassifyNeed(input)
     if type(input) ~= "table" then return Const.Need.HELP end
     if input.bleeding == true or (tonumber(input.bleedingRate) or 0) > 0 then
         return Const.Need.BLEEDOUT
@@ -233,7 +230,7 @@ end
 -- the matrix changes bucket, because the same wound still needs the same care.
 local function applyThreatOverride(need, threat, audience)
     if audience == Const.Audience.HOSTILE
-        and FlavorText.IsHumanThreat(threat)
+        and SocialContext.IsHumanThreat(threat)
     then
         return Const.Need.MERCY
     end
@@ -250,7 +247,7 @@ end
 -- ---------------------------------------------------------------------------
 
 -- Returns a bounded, ordered list of variant keys to try, most specific first.
-function FlavorText.ResolveKeys(input)
+function SocialContext.ResolveKeys(input)
     local keys = {}
     local i
     local audience
@@ -259,9 +256,9 @@ function FlavorText.ResolveKeys(input)
     if type(input) ~= "table" then
         return { Const.Need.HELP }
     end
-    threat = FlavorText.ClassifyThreat(input.threat or input.attacker)
+    threat = SocialContext.ClassifyThreat(input.threat or input.attacker)
     audience = resolveAudience(input)
-    need = FlavorText.ClassifyNeed(input)
+    need = SocialContext.ClassifyNeed(input)
     need = applyThreatOverride(need, threat, audience)
     -- Zombie contact is the single most common case; keep the phrasing inside
     -- the generic audience lanes instead of multiplying variants per role.
@@ -280,17 +277,17 @@ function FlavorText.ResolveKeys(input)
     return keys
 end
 
--- Packages the resolver output as a normal social-flavor context table.  The
--- `when` matchers in the flavor definitions read these keys directly.
-function FlavorText.BuildContext(input)
+-- Packages the resolver output as a normal semantic social-context table.
+-- Response-pool matchers read these keys directly.
+function SocialContext.BuildContext(input)
     local audience
     local need
     local threat
     if type(input) ~= "table" then input = {} end
-    threat = FlavorText.ClassifyThreat(input.threat or input.attacker)
+    threat = SocialContext.ClassifyThreat(input.threat or input.attacker)
     audience = resolveAudience(input)
     need = applyThreatOverride(
-        FlavorText.ClassifyNeed(input),
+        SocialContext.ClassifyNeed(input),
         threat,
         audience
     )
@@ -302,11 +299,11 @@ function FlavorText.BuildContext(input)
 end
 
 -- Convenience: join build + resolve for callers that only need the keys.
-function FlavorText.Resolve(input)
-    return FlavorText.ResolveKeys(input), FlavorText.BuildContext(input)
+function SocialContext.Resolve(input)
+    return SocialContext.ResolveKeys(input), SocialContext.BuildContext(input)
 end
 
-FlavorText.VERSION = 1
+SocialContext.VERSION = 1
 
 -- ---------------------------------------------------------------------------
 -- Leadership-loss (grief) classification
@@ -316,7 +313,7 @@ FlavorText.VERSION = 1
 -- selector only: the addressed listener, the successor and the structural
 -- outcome are separate inputs, so a colonist can mourn warmly while a rival
 -- does not mourn at all.
-function FlavorText.ClassifyGrief(input)
+function SocialContext.ClassifyGrief(input)
     local state
     local tier
     if type(input) ~= "table" then return Const.Grief.DISTANT end
@@ -341,11 +338,11 @@ function FlavorText.ClassifyGrief(input)
     return Const.Grief.DISTANT
 end
 
--- Packages the leadership-loss context for the flavor `when` matchers.
-function FlavorText.BuildLeaderDeathContext(input)
+-- Packages the leadership-loss context for response-pool matchers.
+function SocialContext.BuildLeaderDeathContext(input)
     if type(input) ~= "table" then input = {} end
     return {
-        leaderGrief = FlavorText.ClassifyGrief(input),
+        leaderGrief = SocialContext.ClassifyGrief(input),
         leaderSuccession = tostring(input.succession or Const.Succession.NONE),
         leaderDied = true,
         leaderRelationshipKind = clean(input.relationshipKind, nil),
@@ -357,8 +354,8 @@ end
 
 -- Neutral identity/relationship context providers. These values are derived
 -- from authoritative records and may be used to ground a semantic plan or a
--- compatibility/content alias. They never select Flavor/SocialFlavor lines.
-function FlavorText.ResolveNPCType(record)
+-- compatibility/content alias. They never select legacy prose lines.
+function SocialContext.ResolveNPCType(record)
     local generation = record and record.generation or {}
     local relationshipKind = lower(
         generation.relationshipKind
@@ -393,7 +390,7 @@ function FlavorText.ResolveNPCType(record)
     return "neutral"
 end
 
-function FlavorText.ResolveRelationshipTier(relationship)
+function SocialContext.ResolveRelationshipTier(relationship)
     local approval = tonumber(relationship and relationship.approval) or 0
     local familiarity = tonumber(relationship and relationship.familiarity) or 0
     local state = lower(relationship and relationship.state)
@@ -403,4 +400,4 @@ function FlavorText.ResolveRelationshipTier(relationship)
     return "reserved"
 end
 
-return FlavorText
+return SocialContext

@@ -3,14 +3,14 @@
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
-require "PNC/Core/Identity/PNC_FlavorAddress"
+require "PNC/Semantics/PNC_SemanticAddressResolver"
 local AddressResolver = PNC.Semantics
     and PNC.Semantics.AddressResolver
     or require "PNC/Semantics/PNC_SemanticAddressResolver"
 
 local Context = PNC.Conversation.FarewellContext or {}
 PNC.Conversation.FarewellContext = Context
-local FlavorAddress = PNC.FlavorAddress
+local Addressing = PNC.Semantics.AddressResolver
 
 local function clean(value, fallback)
     value = tostring(value or "")
@@ -156,9 +156,9 @@ function Context.Build(spec, role, npcID)
             or call(player, "getUsername") or call(player, "getOnlineID"),
         "local-player"
     )
-    local playerAddress = FlavorAddress.ResolveForNPC({
+    local playerAddress = Addressing.ResolveForNPC({
         npcID = npcID,
-        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
+        npcIdentitySeed = Addressing.ResolveNPCSeed(entry, npcID),
         player = player,
         playerContext = playerContext,
         playerUUID = playerID,
@@ -182,7 +182,7 @@ function Context.Build(spec, role, npcID)
         playerNameKnown = playerAddress.known,
         playerIsFemale = playerAddress.isFemale,
         playerNicknameID = playerAddress.nicknameID,
-        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
+        npcIdentitySeed = Addressing.ResolveNPCSeed(entry, npcID),
         npcName = npcFull,
         npcFullName = npcFull,
         npcFirstName = npcFirst,

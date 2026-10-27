@@ -4,7 +4,7 @@
 require "PsychopatzCore/UI/Conversation/PsychopatzConversationLayout"
 require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
 require "PsychopatzCore/Conversation/PsychopatzNameParts"
-require "PNC/Core/Identity/PNC_FlavorAddress"
+require "PNC/Semantics/PNC_SemanticAddressResolver"
 require "PNC/Conversation/PNC_ConversationLLMTools"
 require "PNC/Conversation/PNC_ConversationToolReplies"
 require "PNC/Integrations/PNC_VoiceGateway"

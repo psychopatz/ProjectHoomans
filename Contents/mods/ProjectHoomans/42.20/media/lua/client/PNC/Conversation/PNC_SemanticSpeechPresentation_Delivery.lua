@@ -1,12 +1,12 @@
 -- Client-side delivery and presentation lifecycle provider.
 
 PNC = PNC or {}
-PNC.SocialFlavorPresentation = PNC.SocialFlavorPresentation or {}
-PNC.SocialFlavorPresentationInternal =
-    PNC.SocialFlavorPresentationInternal or {}
+PNC.SemanticSpeechPresentation = PNC.SemanticSpeechPresentation or {}
+PNC.SemanticSpeechPresentationInternal =
+    PNC.SemanticSpeechPresentationInternal or {}
 
-local Presentation = PNC.SocialFlavorPresentation
-local H = PNC.SocialFlavorPresentationInternal
+local Presentation = PNC.SemanticSpeechPresentation
+local H = PNC.SemanticSpeechPresentationInternal
 local Client = PsychopatzCore.SocialFlavorClient
 local EventBus = PsychopatzCore.Events
 local Diary = PNC.Conversation.Diary

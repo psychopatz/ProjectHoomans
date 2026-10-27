@@ -60,7 +60,7 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
             local snapshot = state.snapshots and state.snapshots[npcID]
                 or Registry and Registry.Get and Registry.Get(npcID)
                 or { id = npcID }
-            local flavorContext = Presentation.BuildFlavorContext(
+            local speechContext = Presentation.BuildSpeechContext(
                 player,
                 { target = snapshot }
             )
@@ -121,13 +121,13 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
                             greetingState = target.greetingState,
                             requestID = requestID,
                             eventID = target.eventID or key,
-                            renderTokens = flavorContext,
+                            renderTokens = speechContext,
                         }
                     ) or nil
                 if not npcRealization then
                     return false
                 end
-                _, _, replyText = Presentation.EnqueueFlavor(
+                _, _, replyText = Presentation.EnqueueSpeech(
                     npcRealization.realizationID,
                     "npc",
                     body,
@@ -163,7 +163,7 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
                                     and player:getUsername() or "local"),
                             requestID = requestID,
                             eventID = target.eventID or key,
-                            renderTokens = flavorContext,
+                            renderTokens = speechContext,
                         }
                     )
                 playerText = playerRealization
@@ -282,8 +282,8 @@ function Presentation.PlayCommand(player, commandID, target, context, outcome)
             outcome,
             context
         )
-    elseif Presentation.EnqueueFlavor then
-        Presentation.EnqueueFlavor(
+            elseif Presentation.EnqueueSpeech then
+                Presentation.EnqueueSpeech(
             commandID,
             "player",
             player,
@@ -291,7 +291,7 @@ function Presentation.PlayCommand(player, commandID, target, context, outcome)
             { family = "emote_interaction" }
         )
     else
-        Presentation.ShowPlayerFlavor(player, commandID, context)
+        Presentation.ShowPlayerSpeech(player, commandID, context)
     end
     return true
 end
@@ -330,7 +330,7 @@ function Presentation.SyncAcknowledgement(zombie, snapshot, modData)
         return false
     end
     if not isLocalOwner(snapshot, player) then return false end
-    local flavorContext = Presentation.BuildFlavorContext(player, {
+    local speechContext = Presentation.BuildSpeechContext(player, {
         npcID = snapshot and snapshot.id,
         target = snapshot,
     })
@@ -345,7 +345,7 @@ function Presentation.SyncAcknowledgement(zombie, snapshot, modData)
                     and "invalid" or "valid",
                 requestID = tostring(snapshot.id or "") .. ":"
                     .. tostring(revision),
-                renderTokens = flavorContext,
+            renderTokens = speechContext,
             }
         )
         text = realization and realization.fallback or nil

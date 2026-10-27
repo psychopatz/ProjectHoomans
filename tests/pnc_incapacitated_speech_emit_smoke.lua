@@ -1,3 +1,4 @@
+-- Semantic medical speech emission regression.
 local T = require "tests/support/test"
 
 T.addPackagePaths({
@@ -28,8 +29,8 @@ local Reactions = T.load(
     "shared",
     "PNC/Semantics/PNC_SemanticSocialReaction.lua"
 )
-local Resolver = require "PNC/Core/Social/PNC_FlavorTextResolver"
-local Const = PNC.FlavorTextConst
+local Resolver = require "PNC/Core/Social/PNC_SemanticSocialContext"
+local Const = PNC.Semantics.SocialContextConstants
 
 local now = 5000
 
@@ -159,7 +160,7 @@ local function reset()
     clearSent()
     setPlayers({})
     now = 5000
-    PNC.SocialEventHooksInternal.IncapacitatedFlavorDebugReset()
+    PNC.SocialEventHooksInternal.IncapacitatedSpeechDebugReset()
 end
 
 local function player(key, faction, x, y)
@@ -222,7 +223,7 @@ T.equal(sent[1].context.downedThreat, Const.Threat.ZOMBIE,
     "a zombie attacker is recorded")
 T.equal(sent[1].packet.family, Const.FAMILY,
     "the line uses the shared distress family")
-T.equal(sent[1].reason, Const.FLAVOR_CALL,
+ T.equal(sent[1].reason, Const.SPEECH_EVENT_CALL,
     "the initial line uses the call flavor id")
 T.equal(sent[1].packet.eventType, "incapacitated_call",
     "the initial line carries the typed semantic medical event")
@@ -409,7 +410,7 @@ now = now + 30000
 woundState[bleeding] = { bleeding = true, bleedingRate = 4, treatable = 1 }
 Hooks.OnIncapacitatedStatusChanged(bleeding, "wound_change")
 T.equal(#sent, 2, "the status change emits an update line")
-T.equal(sent[2].reason, Const.FLAVOR_UPDATE,
+ T.equal(sent[2].reason, Const.SPEECH_EVENT_UPDATE,
     "the follow-up uses the update flavor id")
 T.equal(sent[2].packet.eventType, "incapacitated_update",
     "the status update carries the typed semantic medical event")
@@ -461,7 +462,7 @@ PNC.Network.SendConversationRelationshipForNPC = function()
     error("simulated transport failure")
 end
 reset()
-PNC.SocialEventHooksInternal.IncapacitatedFlavorDebugReset()
+PNC.SocialEventHooksInternal.IncapacitatedSpeechDebugReset()
 local failing = npc("npc-10", "F1", 0, 0)
 setPlayers({ player("p3", "F1", 0, 0) })
 local survived = pcall(Hooks.OnIncapacitated, failing, "damage")
@@ -473,7 +474,7 @@ PNC.Network.SendConversationRelationshipForNPC = savedNetwork
 -- ---------------------------------------------------------------------------
 
 reset()
-PNC.SocialEventHooksInternal.IncapacitatedFlavorDebugReset()
+PNC.SocialEventHooksInternal.IncapacitatedSpeechDebugReset()
 local many = {}
 local i
 for i = 1, 12 do
@@ -491,7 +492,7 @@ T.truthy(#sent >= 1, "at least the nearest listener hears the line")
 -- ---------------------------------------------------------------------------
 
 reset()
-PNC.SocialEventHooksInternal.IncapacitatedFlavorDebugReset()
+PNC.SocialEventHooksInternal.IncapacitatedSpeechDebugReset()
 local persistent = npc("npc-repeat", "F1", 0, 0)
 setPlayers({ player("ally-repeat", "F1", 1, 1) })
 woundState[persistent] = { treatable = 1 }
@@ -501,7 +502,7 @@ persistent.runtime.recentThreat = {
 
 Hooks.OnIncapacitated(persistent, "damage")
 T.equal(#sent, 1, "the initial call is emitted")
-T.equal(sent[1].reason, Const.FLAVOR_CALL, "the first line is the call")
+ T.equal(sent[1].reason, Const.SPEECH_EVENT_CALL, "the first line is the call")
 
 -- Immediately after: still inside the repeat interval, so silence.
 T.falsy(Hooks.TickIncapacitatedDistress(persistent),
@@ -519,7 +520,7 @@ now = now + (Const.REPEAT_INTERVAL_MS or 45000) + 1000
 T.truthy(Hooks.TickIncapacitatedDistress(persistent),
     "the repeat beat fires once the interval elapses")
 T.equal(#sent, 2, "the repeat produced exactly one more line")
-T.equal(sent[2].reason, Const.FLAVOR_REPEAT,
+ T.equal(sent[2].reason, Const.SPEECH_EVENT_REPEAT,
     "the repeat uses its own flavor id, not the call id")
 T.equal(sent[2].packet.eventType, "incapacitated_repeat",
     "the repeat carries the typed semantic medical event")
@@ -540,7 +541,7 @@ T.equal(#sent, 2, "the repeat cannot fire twice in one interval")
 -- A downed NPC with no prior call (loaded save) adopts on first tick rather
 -- than waiting a full interval in silence.
 reset()
-PNC.SocialEventHooksInternal.IncapacitatedFlavorDebugReset()
+PNC.SocialEventHooksInternal.IncapacitatedSpeechDebugReset()
 local adopted = npc("npc-adopt", "F1", 0, 0)
 setPlayers({ player("ally-adopt", "F1", 1, 1) })
 woundState[adopted] = {}
@@ -549,7 +550,7 @@ adopted.runtime.recentThreat = {
 }
 T.truthy(Hooks.TickIncapacitatedDistress(adopted),
     "a downed NPC with no recorded call speaks on its first tick")
-T.equal(sent[1].reason, Const.FLAVOR_CALL,
+ T.equal(sent[1].reason, Const.SPEECH_EVENT_CALL,
     "the adopted line is the call, not the repeat")
 
 -- A standing NPC must never tick distress.

@@ -240,7 +240,7 @@ local function speak(
     local gossipPacket
     local npcID = tostring(observer.id or "")
     local memoryID = deathMemoryID(token)
-    local flavorID = "corpse_seen_" .. category
+    local speechEventID = "corpse_seen_" .. category
     local semantic
     local revengeMeaning = revenge and knownKillerName(attribution) ~= nil
     local arguments = {
@@ -269,14 +269,14 @@ local function speak(
         }) or nil
     if not semantic then return false end
     if revengeMeaning then
-        flavorID = "corpse_seen_revenge_" .. category
+        speechEventID = "corpse_seen_revenge_" .. category
         arguments.killer = safeDisplayText(attribution.killerName, "")
         if arguments.faction == "an unknown faction" then
             arguments.faction = "our group"
         end
     end
     template = memory.SelectGossipTemplate(
-        flavorID,
+        speechEventID,
         observer.identitySeed or 1,
         token
     )
@@ -290,7 +290,7 @@ local function speak(
             384
         ),
         npcID = npcID,
-        flavorID = flavorID,
+        speechEventID = speechEventID,
         poolID = semantic.responsePlanID,
         responsePlanID = semantic.responsePlanID,
         responsePlan = semantic.responsePlan,

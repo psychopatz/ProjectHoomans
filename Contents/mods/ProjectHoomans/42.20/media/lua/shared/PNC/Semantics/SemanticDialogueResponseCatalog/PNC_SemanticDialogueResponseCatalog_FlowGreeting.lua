@@ -46,7 +46,6 @@ Catalog.Register("semantic.flow.greeting.opening", {
         {
             id = "semantic.flow.greeting.opening.rain",
             templateID = "semantic.flow.greeting.opening.rain",
-            fallback = "Hey there. Wet one today.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { raining = true },
             priority = 3,
@@ -62,7 +61,6 @@ Catalog.Register("semantic.flow.greeting.opening", {
                             {
                                 kind = "translation",
                                 templateID = "semantic.flow.greeting.opening.rain",
-                                fallback = "Hey there. Wet one today.",
                             },
                         },
                     },
@@ -74,7 +72,6 @@ Catalog.Register("semantic.flow.greeting.opening", {
                             {
                                 kind = "translation",
                                 templateID = "semantic.flow.greeting.opening.question.default",
-                                fallback = "How have you been?",
                             },
                         },
                     },
@@ -84,7 +81,6 @@ Catalog.Register("semantic.flow.greeting.opening", {
         {
             id = "semantic.flow.greeting.opening.friendly",
             templateID = "semantic.flow.greeting.opening.friendly",
-            fallback = "Hey! Good to see you.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { socialStyle = "friendly" },
             priority = 2,
@@ -101,7 +97,6 @@ Catalog.Register("semantic.flow.greeting.opening", {
                                 kind = "translation",
                                 templateID =
                                     "semantic.flow.greeting.opening.friendly",
-                                fallback = "Hey! Good to see you.",
                             },
                         },
                     },
@@ -114,7 +109,6 @@ Catalog.Register("semantic.flow.greeting.opening", {
                                 kind = "translation",
                                 templateID =
                                     "semantic.flow.greeting.opening.question.friendly",
-                                fallback = "How have you been holding up?",
                             },
                         },
                     },
@@ -124,7 +118,6 @@ Catalog.Register("semantic.flow.greeting.opening", {
         {
             id = "semantic.flow.greeting.opening.default",
             templateID = "semantic.flow.greeting.opening.default",
-            fallback = "Hey there. Good to see you.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             plan = {
                 dialogueAct = "GREETING_OPENING",
@@ -139,7 +132,6 @@ Catalog.Register("semantic.flow.greeting.opening", {
                                 kind = "translation",
                                 templateID =
                                     "semantic.flow.greeting.opening.default",
-                                fallback = "Hey there. Good to see you.",
                             },
                         },
                     },
@@ -152,7 +144,6 @@ Catalog.Register("semantic.flow.greeting.opening", {
                                 kind = "translation",
                                 templateID =
                                     "semantic.flow.greeting.opening.question.default",
-                                fallback = "How have you been?",
                             },
                         },
                     },
@@ -167,14 +158,12 @@ Catalog.Register("semantic.flow.greeting.followup", {
         {
             id = "semantic.flow.greeting.followup.friendly",
             templateID = "semantic.flow.greeting.followup.friendly",
-            fallback = "You're welcome. It's good to see you too.",
             when = { socialStyle = "friendly" },
             priority = 2,
         },
         {
             id = "semantic.flow.greeting.followup.default",
             templateID = "semantic.flow.greeting.followup.default",
-            fallback = "You're welcome. Take care.",
         },
     },
 })

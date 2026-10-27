@@ -102,10 +102,19 @@ class WorkerSession(Generic[WorkerT]):
 
         with self._lock:
             if self._closed:
-                return
-            self._closed = True
-            worker = self._worker
-            if worker is not None:
-                self._executor.submit(worker.close)
-            # Cleanup remains behind any already queued operation.
-        self._executor.shutdown(wait=wait, cancel_futures=False)
+                # A UI close normally starts a non-blocking shutdown.  A
+                # hermetic test (or another owner that needs deterministic
+                # teardown) may subsequently request a blocking wait.  Do
+                # not turn that second, explicit wait into a no-op.
+                executor = self._executor
+            else:
+                self._closed = True
+                worker = self._worker
+                if worker is not None:
+                    self._executor.submit(worker.close)
+                # Cleanup remains behind any already queued operation.
+                executor = self._executor
+        if wait:
+            executor.shutdown(wait=True, cancel_futures=False)
+            return
+        executor.shutdown(wait=False, cancel_futures=False)

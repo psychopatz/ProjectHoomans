@@ -1,12 +1,12 @@
--- Client-side ambient social flavor receiver coordinator.
+-- Client-side ambient semantic speech receiver coordinator.
 
 PNC = PNC or {}
-PNC.SocialFlavorPresentation = PNC.SocialFlavorPresentation or {}
-PNC.SocialFlavorPresentationInternal =
-    PNC.SocialFlavorPresentationInternal or {}
+PNC.SemanticSpeechPresentation = PNC.SemanticSpeechPresentation or {}
+PNC.SemanticSpeechPresentationInternal =
+    PNC.SemanticSpeechPresentationInternal or {}
 
-local Presentation = PNC.SocialFlavorPresentation
-local H = PNC.SocialFlavorPresentationInternal
+local Presentation = PNC.SemanticSpeechPresentation
+local H = PNC.SemanticSpeechPresentationInternal
 local InteractionPresentationRegistry = require
     "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
 if not H.Clean then return Presentation end
@@ -14,8 +14,8 @@ if not H.Clean then return Presentation end
 local Client = PsychopatzCore.SocialFlavorClient
 local currentTime = H.CurrentTime
 
-require "PNC/Conversation/PNC_SocialFlavorPresentation_Receive_Context"
-require "PNC/Conversation/PNC_SocialFlavorPresentation_Receive_Payload"
+require "PNC/Conversation/PNC_SemanticSpeechPresentation_Receive_Context"
+require "PNC/Conversation/PNC_SemanticSpeechPresentation_Receive_Payload"
 
 function Presentation.Receive(ambientFlavor, summary, networkArgs)
     local receive, reason = H.BuildReceiveContext(

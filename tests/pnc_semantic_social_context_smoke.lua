@@ -4,8 +4,8 @@ T.addPackagePaths({
     { "ProjectHoomans", "shared" },
 })
 
-local Resolver = require "PNC/Core/Social/PNC_FlavorTextResolver"
-local Const = PNC.FlavorTextConst
+local Resolver = require "PNC/Core/Social/PNC_SemanticSocialContext"
+local Const = PNC.Semantics.SocialContextConstants
 
 local function context(input)
     return Resolver.BuildContext(input)

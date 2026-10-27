@@ -1,12 +1,12 @@
--- Queue payload projection for ambient social flavor delivery.
+-- Queue payload projection for selected semantic speech delivery.
 
 PNC = PNC or {}
-PNC.SocialFlavorPresentation = PNC.SocialFlavorPresentation or {}
-PNC.SocialFlavorPresentationInternal =
-    PNC.SocialFlavorPresentationInternal or {}
+PNC.SemanticSpeechPresentation = PNC.SemanticSpeechPresentation or {}
+PNC.SemanticSpeechPresentationInternal =
+    PNC.SemanticSpeechPresentationInternal or {}
 
-local Presentation = PNC.SocialFlavorPresentation
-local H = PNC.SocialFlavorPresentationInternal
+local Presentation = PNC.SemanticSpeechPresentation
+local H = PNC.SemanticSpeechPresentationInternal
 
 function H.BuildReceivePayload(receive)
     local ambientFlavor = receive.ambientFlavor
@@ -26,8 +26,11 @@ function H.BuildReceivePayload(receive)
     return {
         eventID = receive.eventID,
         eventRef = ambientFlavor.eventRef or receive.eventID,
-        flavorID = ambientFlavor.flavorID
-            or "social.witnessed_player_kill",
+        -- PsychopatzCore's queue retains this transport field for external
+        -- adopters; its value is already-selected semantic speech identity.
+        flavorID = ambientFlavor.speechEventID
+            or ambientFlavor.flavorID
+            or "semantic.speech.selected",
         family = receive.family,
         priority = tonumber(ambientFlavor.priority) or 35,
         llmPriority = tonumber(ambientFlavor.llmPriority) or 90,

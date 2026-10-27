@@ -330,7 +330,7 @@ function TalkParity.Emote(context, payload)
             realizationFamily = realization.realizationFamily,
             realizationID = realization.realizationID,
             factRefs = realization.groundedFactRefs,
-            compatibilityFlavorID = realization.compatibilityFlavorID,
+            speechEventID = realization.realizationID,
             interaction = envelope,
         })
         speech.accepted = delivered == true

@@ -51,15 +51,17 @@ class LegacySemanticAuthorityP11Tests(unittest.TestCase):
         ).read_text()
         self.assertNotIn("GreetingReplyFlavorID(", greeting)
         self.assertNotIn("ReplyFlavorID(", emote)
-        self.assertIn('poolID = "semantic.flow.greeting.opening"', greeting)
+        self.assertIn("CompanionSpeech", greeting)
+        self.assertIn("ResolveGreeting", greeting)
         self.assertIn('poolID = "semantic.emote.reply"', emote)
 
-    def test_legacy_flavor_resolver_is_a_semantic_context_provider_alias(self) -> None:
+    def test_social_context_is_the_only_project_hoomans_context_namespace(self) -> None:
         source = (
-            LUA / "shared/PNC/Core/Social/PNC_FlavorTextResolver.lua"
+            LUA / "shared/PNC/Core/Social/PNC_SemanticSocialContext.lua"
         ).read_text()
-        self.assertIn("PNC.Semantics.ContextProviders", source)
-        self.assertIn("PNC.FlavorText = PNC.Semantics.ContextProviders", source)
+        self.assertIn("PNC.Semantics.SocialContext", source)
+        self.assertNotIn("PNC.FlavorText", source)
+        self.assertNotIn("PNC.FlavorTextConst", source)
 
     def test_lifecycle_provenance_carries_realization_identity(self) -> None:
         source = (
@@ -89,7 +91,7 @@ class LegacySemanticAuthorityP11Tests(unittest.TestCase):
             "PNC_MedicalCareExecutor_Supply.lua",
             LUA / "shared/PNC/Core/Presence/PNC_BodyLifecycle/"
             "PNC_BodyLifecycle_CorpseAwareness_Reactions.lua",
-            LUA / "client/PNC/Conversation/PNC_SocialFlavorPresentation_Speech.lua",
+            LUA / "client/PNC/Conversation/PNC_SemanticSpeechPresentation_Speech.lua",
             LUA / "client/PNC/Commands/PNC_CompanionCommandPresentation.lua",
         )
         for path in paths:
@@ -100,17 +102,17 @@ class LegacySemanticAuthorityP11Tests(unittest.TestCase):
 
     def test_context_classifiers_are_neutral_providers(self) -> None:
         source = (
-            LUA / "shared/PNC/Core/Social/PNC_FlavorTextResolver.lua"
+            LUA / "shared/PNC/Core/Social/PNC_SemanticSocialContext.lua"
         ).read_text()
-        self.assertIn("function FlavorText.ResolveNPCType", source)
-        self.assertIn("function FlavorText.ResolveRelationshipTier", source)
-        self.assertIn("PNC.Semantics.ContextProviders", source)
+        self.assertIn("function SocialContext.ResolveNPCType", source)
+        self.assertIn("function SocialContext.ResolveRelationshipTier", source)
+        self.assertIn("PNC.Semantics.SocialContext", source)
 
     def test_representative_reactions_cross_the_same_boundary(self) -> None:
         cases = {
             "greeting": (
                 LUA / "server/PNC/Social/PNC_SocialGreetingService_TryGreet.lua",
-                ("RealizationAuthority", "semantic.flow.greeting.opening"),
+                ("CompanionSpeech", "ResolveGreeting", "responsePlanID", "realizationID"),
             ),
             "farewell": (
                 LUA / "client/PNC/Conversation/PNC_ConversationFarewell.lua",
@@ -163,27 +165,28 @@ class LegacySemanticAuthorityP11Tests(unittest.TestCase):
         self.assertIn("context.responsePlanID and context.realizationID", presentation)
         self.assertIn("semantic_realization_required", presentation)
 
-    def test_authored_en_tl_content_catalogs_remain_available(self) -> None:
+    def test_canonical_en_tl_dialogue_content_is_the_only_pnc_wording_catalog(self) -> None:
         root = PROJECT / "Contents/mods/ProjectHoomans/common/media/translation"
         for language in ("EN", "TL"):
-            social = root / language / "Conversation/Flavor/Social.json"
-            emotes = root / language / "Conversation/Flavor/VanillaEmote.json"
+            content = root / language / "Conversation/Semantic/DialogueContent.json"
             semantic = root / language / "Conversation/Semantic/Responses.json"
-            for path in (social, emotes, semantic):
+            for path in (content, semantic):
                 self.assertTrue(path.exists(), str(path))
                 self.assertTrue(json.loads(path.read_text()), str(path))
             self.assertIn(
-                "UI_PNC_Flavor_SocialGreeting_Neutral_Warm_First_1",
-                json.loads(social.read_text()),
+                "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
+                json.loads(content.read_text()),
             )
             self.assertIn(
-                "UI_PNC_Flavor_VanillaEmote_ThumbsDown_NPC_Neutral_1",
-                json.loads(emotes.read_text()),
+                "UI_PNC_Conversation_Content_SemanticEmotePlayerThumbsdownNeutral01",
+                json.loads(content.read_text()),
             )
             self.assertIn(
                 "UI_PNC_Conversation_Semantic_FlowGreetingOpening",
                 json.loads(semantic.read_text()),
             )
+            self.assertFalse(list((root / language / "Conversation/Flavor").glob("*.json")))
+            self.assertFalse(list((root / language / "Conversation/ToolReplies").glob("*.json")))
 
     def test_repository_policy_is_durable_and_no_executable_goal_prompt(self) -> None:
         root_policy = (PROJECT / "AGENTS.md").read_text()

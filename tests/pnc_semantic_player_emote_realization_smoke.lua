@@ -62,10 +62,10 @@ T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandPresentation.lua")
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandEmotes.lua")
 
 local presentation = PNC.CompanionCommandPresentation
-presentation.EnqueueFlavor = function(flavorID, speaker, actor, context,
+presentation.EnqueueSpeech = function(speechEventID, speaker, actor, context,
     options)
     queued[#queued + 1] = {
-        flavorID = flavorID,
+        speechEventID = speechEventID,
         speaker = speaker,
         actor = actor,
         context = context,
@@ -82,7 +82,7 @@ T.truthy(executed, "player emote gameplay request remains dispatched")
 T.truthy(executed.context.responsePlanID,
     "player emote context records semantic provenance")
 T.equal(#queued, 1, "player emote speech is queued once")
-T.equal(queued[1].flavorID, "semantic.emote.player.wavehi",
+T.equal(queued[1].speechEventID, "semantic.emote.player.wavehi",
     "player emote is queued by its semantic realization identity")
 T.equal(queued[1].options.semanticRealization.responsePlanID,
     "semantic.emote.player",

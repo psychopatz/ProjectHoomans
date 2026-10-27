@@ -55,7 +55,7 @@ local function deliverTeammateDamageFlavor(
     local semanticCompatibility = banditAttack
     local eventType = banditAttack
         and "bandit_attack" or "witnessed_teammate_hurt"
-    local flavorID = presentation and presentation.flavorID
+    local speechEventID = presentation and presentation.speechEventID
         or banditAttack
         and "compat.bandits.hooman_hurt"
         or "social.witnessed_teammate_hurt"
@@ -128,7 +128,7 @@ local function deliverTeammateDamageFlavor(
         if not witnessCanSeeDamage(record, body, targetBody, attacker) then
             return
         end
-        if flavorID == "social.witnessed_teammate_hurt" then
+        if speechEventID == "social.witnessed_teammate_hurt" then
             local treatment = PNC.Treatment
             if treatment and type(treatment.GetNPCBandagePlan) == "function" then
                 medicalBandageAvailable =
@@ -250,7 +250,8 @@ local function deliverTeammateDamageFlavor(
                         factRefs = context.factRefs,
                         offerIDs = realization and realization.offerIDs or {},
                         ambientFlavor = {
-                            flavorID = flavorID,
+                            speechEventID = realization
+                                and realization.realizationID or speechEventID,
                             text = realization and realization.fallback or nil,
                             semanticOwned = semanticMedical
                                 or semanticCompatibility,

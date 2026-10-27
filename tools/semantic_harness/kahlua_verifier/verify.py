@@ -29,7 +29,7 @@ def semantic_sources(repository: Path) -> list[Path]:
         shared / "PNC_SemanticSocialReaction.lua",
         shared / "PNC_SemanticDialogueRealizationAuthority.lua",
     ))
-    files.extend(client.glob("PNC_SocialFlavorPresentation*.lua"))
+    files.extend(client.glob("PNC_SemanticSpeechPresentation*.lua"))
     return sorted(set(files))
 
 

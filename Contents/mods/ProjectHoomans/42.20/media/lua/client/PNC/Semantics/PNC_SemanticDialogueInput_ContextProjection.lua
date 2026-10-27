@@ -91,12 +91,12 @@ function Projection.Build(view, getProviderStatus)
         output.identityState = "known"
         output.identityKnown = true
     end
-    local socialFlavor = PNC.SocialFlavorPresentation
-    if socialFlavor
-        and type(socialFlavor.GetActiveMedicalSupplyRequest) == "function"
+    local speechPresentation = PNC.SemanticSpeechPresentation
+    if speechPresentation
+        and type(speechPresentation.GetActiveMedicalSupplyRequest) == "function"
     then
         output.activeMedicalSupplyRequest =
-            socialFlavor.GetActiveMedicalSupplyRequest(output.npcID)
+            speechPresentation.GetActiveMedicalSupplyRequest(output.npcID)
     end
     local relationship = PNC.Network and PNC.Network.ClientState
         and PNC.Network.ClientState.conversationRelationships

@@ -181,3 +181,56 @@ PsychopatzCore SocialFlavor remains an external compatibility boundary.
 
 P10 is accepted only when every row is closed with source-level and runtime
 evidence.
+
+## P10 current closure (authoritative over historical migration notes above)
+
+The P7/P8 paragraphs above preserve the migration audit trail. Their wording
+about “source material”, `migrated_events`, legacy source metadata, or residual
+`Flavor.Resolve` compatibility is historical and is superseded by this
+current closure section.
+
+| Cleanup surface | Current owner/callers | Current source of truth | Current evidence | Disposition |
+| --- | --- | --- | --- | --- |
+| Social context classification | `PNC_Semantics.SocialContext`; social event hooks and medical context providers | bounded threat/audience/need/grief semantic context | `pnc_semantic_social_context_smoke`, P10C namespace smoke, incapacitated lifecycle smoke | `P10C_ACCEPTED`; no `PNC.FlavorText*` namespace or resolver file |
+| Conversational addressing | `PNC.Semantics.AddressResolver`; identity and relationship presentation callers | identity/knowledge authority plus semantic relationship-term projection | `pnc_semantic_address_projection_smoke`, identity/presentation regressions | `P10C_ACCEPTED`; no `PNC.FlavorAddress*` namespace or files |
+| Speech presentation | `PNC.SemanticSpeechPresentation`; semantic delivery and receive modules | already-selected realization/content text; generic Core queue only at transport boundary | speech presentation/transport/delivery smokes, P10C namespace smoke | `P10C_ACCEPTED`; no PNC `SocialFlavorPresentation` files |
+| Event/medical semantic packets | event adapters, `DownedDistress`, leader-loss and compatibility presenters | `ResponseCatalog` → `ResponsePlan`/realization → Dialogue Content; `speechEventID` packet identity | event, medical, compatibility, leader-loss, and P10F negative smokes | `P10C/P10D_ACCEPTED`; no first-party legacy prose selector |
+| Dialogue Content canonical source | CodeBuilder v2 source and generated Registry/EN/TL artifacts | semantic template/realization identity plus grouped content metadata | compact-content, parity, idempotence and P10F marker scans | `P10D_ACCEPTED`; `105007` source bytes, `216` families, `395` phrases, `1` player choice; zero migration markers |
+| Responses and Dialogue Content Studio organization | `studio/semantic_tree.py` projected by both panes | derived hierarchy from canonical `semantic.*` IDs | `test_semantic_tree_projection_p10e`, focused Xvfb Studio lane | `P10E_ACCEPTED`; bounded paging, search expansion, lazy details |
+| First-party legacy registries | no production callers or loaders | Git history only | `pnc_unified_authority_p10f_zero_legacy_smoke`, file/load scans | `P10F_PENDING_FINAL_GATE`; deleted from production tree, final full acceptance outstanding |
+| Generic PsychopatzCore SocialFlavor | external Core queue/arbitration/TTS/nameplate API and non-Hoomans adopters | adopter-owned compatibility contract | Core compatibility smoke and PNC transport boundary tests | `COMPATIBILITY_ONLY`; not a Project Hoomans wording authority |
+| External compatibility adapters | Bandits bridge and Necroa native zombie caption adapter | external provider facts/events; Hoomans semantic compatibility pools where applicable | Bandits/Necroa/Project ALife/Companion Dogs compatibility tests | `COMPATIBILITY_ONLY`; retain only where external transport/provider behavior requires it |
+
+P10F zero-legacy criteria are accepted by source audit: no first-party
+`PNC_SocialFlavorDefinitions*`, `PNC_ConversationToolReplyCatalog.lua`, or
+`PNC_CompanionCommandFlavor*`; no `PNC_FlavorText*`, `PNC_FlavorAddress*`, or
+PNC `SocialFlavorPresentation` files; no worker/composition loads of deleted
+files; no canonical `.migrated.`, `MIGRATED_*`, `legacySource`,
+`semanticAuthority`, duplicated response-pool/variant IDs, or migration-era
+locked metadata. The retained `SocialFlavorClient`, `flavorID`, ambient-flavor,
+PBrainZ, Necroa, and Companion Dogs names are bounded external
+compatibility/provider transport surfaces, not Project Hoomans wording
+registries.
+
+## P10F final acceptance closure
+
+The final semantic/content/presentation ownership is:
+
+| Layer | Authoritative responsibility | Final implementation evidence |
+| --- | --- | --- |
+| Semantic meaning | pool/variant selection, facts, gates, response plans and follow-up offers | `PNC.Semantics.ResponseCatalog`, `ResponsePlan`, lifecycle/context providers, event/follow-up native smokes |
+| Wording | EN/TL phrase realization and style | Dialogue Content schema v2, CodeBuilder, generated Registry and translation artifacts; `216` families / `395` phrases |
+| Continuation | beats, event references, fact references, disclosure windows and typed follow-up routing | existing `SemanticInteractionLifecycle` / `DialogueContextState` path |
+| Delivery | already-selected text plus semantic provenance to the existing queue/presentation | `PNC.SemanticSpeechPresentation` and `SemanticSpeechDelivery`; generic Core queue retained only as transport |
+| Studio organization | derived bounded hierarchy, not a new store | `studio.semantic_tree` projected by Responses and Dialogue Content |
+
+The canonical source is schema v2 at `105,007` bytes with `216` phrase
+families, `395` phrases, and `1` player-choice artifact. Generated Registry,
+EN, and TL artifacts are `205,402`, `39,671`, and `39,924` bytes. CodeBuilder
+was run twice with identical outputs. Final developer acceptance is recorded
+in `PROGRESS.md`: resource-aware Python `159/159` module PASS in `393.81s`
+with four isolated processes; focused Xvfb `49/49` PASS in `47.89s`; native
+Lua `901/901` PASS in `6.85s`; installed-PZ Kahlua `0` errors / `0` warnings;
+real-save source hash unchanged; and `git diff --check` PASS. P10A–P10F are
+closed and the matrix is ready for the user-owned native SP/MP validation
+boundary.

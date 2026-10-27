@@ -135,7 +135,7 @@ T.equal(delivered, true, "return meeting delivers the pending commentary")
 T.equal(deliveryReason, "delivered", "delivery reports its terminal result")
 T.equal(#sent, 1, "return meeting sends one relationship presentation")
 T.equal(
-    sent[1].context.ambientFlavor.flavorID,
+    sent[1].context.ambientFlavor.speechEventID,
     "social.follower_abandoned_zombie",
     "zombie departure selects zombie return flavor"
 )
@@ -168,7 +168,7 @@ local deliveredNPC = Service.TryDeliver(
 )
 T.equal(deliveredNPC, true, "hostile NPC return commentary is delivered")
 T.equal(
-    sent[2].context.ambientFlavor.flavorID,
+    sent[2].context.ambientFlavor.speechEventID,
     "social.follower_abandoned_hostile_npc",
     "hostile NPC departure selects hostile NPC return flavor"
 )

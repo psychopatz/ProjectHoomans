@@ -158,8 +158,8 @@ T.equal(playerEmote.realizationFamily, "emote_player",
     "player emote speech has a semantic realization family")
 T.equal(playerEmote.realizationID, "semantic.emote.player.wavehi",
     "player emote selects the gesture-specific realization")
-T.equal(playerEmote.compatibilityFlavorID, "vanilla_emote_wavehi",
-    "player emote keeps Flavor only as an authored content alias")
+T.equal(playerEmote.compatibilityFlavorID, nil,
+    "player emote no longer exposes the retired Flavor compatibility field")
 T.equal(playerEmote.responsePlan.dialogueAct, "GREET",
     "player emote response plan preserves the semantic act")
 
@@ -186,8 +186,8 @@ local campRejection = Authority.Resolve({
 T.equal(campRejection.realizationID,
     "semantic.companion.reaction.camp_rejected",
     "companion gameplay rejection selects semantic camp meaning first")
-T.equal(campRejection.compatibilityFlavorID, "camp_rejected",
-    "selected companion meaning retains the authored content alias")
+T.equal(campRejection.compatibilityFlavorID, nil,
+    "selected companion meaning has no retired content alias field")
 
 representative("combat reaction", "semantic.combat.reaction", function()
     return Reactions.Resolve({

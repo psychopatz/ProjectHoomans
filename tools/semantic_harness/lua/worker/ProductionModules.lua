@@ -17,27 +17,31 @@ function ProductionModules.load(context)
         local moduleName = os.getenv(
             "PNC_HARNESS_CANDIDATE_OVERLAY_MODULE"
         ) or ""
-        if not string.match(moduleName,
+        if moduleName ~= "" and not string.match(moduleName,
             "^PNC/Semantics/SemanticDialogueResponseCatalog/"
                 .. "PNC_SemanticDialogueResponseCatalog_[%w_]+$")
         then
             error("invalid candidate overlay provider module")
         end
-        local candidateFile = overlayRoot .. "/" .. moduleName .. ".lua"
-        local handle = io.open(candidateFile, "rb")
-        if not handle then error("candidate overlay missing authored response provider") end
-        handle:close()
-        local searchers = package.searchers or package.loaders
-        if type(searchers) ~= "table" then
-            error("worker Lua runtime does not support overlay searchers")
+        if moduleName ~= "" then
+            local candidateFile = overlayRoot .. "/" .. moduleName .. ".lua"
+            local handle = io.open(candidateFile, "rb")
+            if not handle then
+                error("candidate overlay missing authored response provider")
+            end
+            handle:close()
+            local searchers = package.searchers or package.loaders
+            if type(searchers) ~= "table" then
+                error("worker Lua runtime does not support overlay searchers")
+            end
+            table.insert(searchers, 1, function(requestedModule)
+                if requestedModule ~= moduleName then return nil end
+                local loader, reason = loadfile(candidateFile)
+                if not loader then error("invalid isolated candidate Lua: "
+                    .. tostring(reason)) end
+                return loader
+            end)
         end
-        table.insert(searchers, 1, function(requestedModule)
-            if requestedModule ~= moduleName then return nil end
-            local loader, reason = loadfile(candidateFile)
-            if not loader then error("invalid isolated candidate Lua: "
-                .. tostring(reason)) end
-            return loader
-        end)
     end
 
     local originalRequire = require

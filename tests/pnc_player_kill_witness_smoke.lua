@@ -178,7 +178,7 @@ T.equal(relationshipBroadcasts[1].context.relationshipDelta.approval, 2,
     "SP feedback carries the approval delta")
 T.equal(relationshipBroadcasts[1].context.relationshipDelta.respect, 4,
     "SP feedback carries the respect delta")
-T.equal(relationshipBroadcasts[1].context.ambientFlavor.flavorID,
+T.equal(relationshipBroadcasts[1].context.ambientFlavor.speechEventID,
     "social.witnessed_player_kill",
     "SP feedback carries the reusable flavor ID")
 T.truthy(relationshipBroadcasts[1].context.ambientFlavor.semanticOwned,

@@ -252,9 +252,9 @@ T.equal(#presentations, 3,
 T.equal(presentations[3].reason, "witnessed_teammate_hurt",
     "teammate hurt flavor reason is preserved")
 T.equal(
-    presentations[3].context.ambientFlavor.flavorID,
-    "social.witnessed_teammate_hurt",
-    "teammate hurt flavor ID is reusable")
+    presentations[3].context.ambientFlavor.speechEventID,
+    "semantic.medical.distress.teammate.default",
+    "teammate hurt semantic realization ID is reusable")
 T.equal(
     presentations[3].context.ambientFlavor.context.victimNPCID,
     damagedRecord.id,

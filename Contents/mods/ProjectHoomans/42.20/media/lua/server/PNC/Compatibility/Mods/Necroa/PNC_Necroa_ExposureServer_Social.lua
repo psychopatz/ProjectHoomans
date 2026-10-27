@@ -22,11 +22,11 @@ if type(SocialReactions) ~= "table" then
     SocialReactions = ok and loaded or nil
 end
 local ContextProviders = PNC.Semantics
-    and PNC.Semantics.ContextProviders or nil
+    and PNC.Semantics.SocialContext or nil
 if type(ContextProviders) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Core/Social/PNC_FlavorTextResolver"
+        "PNC/Core/Social/PNC_SemanticSocialContext"
     )
     ContextProviders = ok and loaded or nil
 end
@@ -155,6 +155,7 @@ function Social.Emit(observerRecord, actorKey, eventType, eventID,
     semanticAmbient.semanticOwned = true
     semanticAmbient.eventRef = processed.eventID
     semanticAmbient.eventType = eventType
+    semanticAmbient.speechEventID = semantic.realizationID
     semanticAmbient.responsePlanID = semantic.responsePlanID
     semanticAmbient.poolID = semantic.realizationFamily
     semanticAmbient.realizationFamily = semantic.realizationFamily

@@ -70,9 +70,10 @@ class LuaSemanticWorker:
                 raise ValueError("candidate overlay must be a directory")
             self.config = replace(
                 self.config, candidate_overlay_root=root,
-                candidate_overlay_module=candidate_overlay_module
-                    or ("PNC/Semantics/SemanticDialogueResponseCatalog/"
-                        "PNC_SemanticDialogueResponseCatalog_FlowGreeting"),
+                candidate_overlay_module=(candidate_overlay_module
+                    if candidate_overlay_module is not None else
+                    ("PNC/Semantics/SemanticDialogueResponseCatalog/"
+                     "PNC_SemanticDialogueResponseCatalog_FlowGreeting")),
             )
         self.activity_log = activity_log or ActivityLog(
             path=default_activity_path(self.config.repository),

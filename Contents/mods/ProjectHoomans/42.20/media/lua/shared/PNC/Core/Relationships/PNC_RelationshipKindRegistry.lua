@@ -156,9 +156,9 @@ for index = 1, #BUILTINS do
         class = definition.class,
         productionSupported = definition.productionSupported,
         termKeys = {
-            reference = "UI_PNC_Flavor_RelationshipTerm_"
+            reference = "UI_PNC_SemanticAddressing_RelationshipTerm_"
                 .. definition.kind:gsub("^%l", string.upper) .. "_Reference",
-            address = "UI_PNC_Flavor_RelationshipTerm_"
+            address = "UI_PNC_SemanticAddressing_RelationshipTerm_"
                 .. definition.kind:gsub("^%l", string.upper) .. "_Address",
         },
     })

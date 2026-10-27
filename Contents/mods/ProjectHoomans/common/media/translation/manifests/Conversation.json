@@ -2,12 +2,7 @@
   "version": 1,
   "languages": {
     "EN": [
-      "EN/Conversation/Flavor/Address.json",
-      "EN/Conversation/Flavor/Combat.json",
-      "EN/Conversation/Flavor/Incapacitated.json",
-      "EN/Conversation/Flavor/Social.json",
-      "EN/Conversation/Flavor/VanillaEmote.json",
-      "EN/Conversation/Flavor/WorldActions.json",
+      "EN/Conversation/Semantic/Addressing.json",
       "EN/Conversation/Identity/Responses.json",
       "EN/Conversation/Journal/Events.json",
       "EN/Conversation/PBrainZ/Interface.json",
@@ -18,7 +13,6 @@
       "EN/Conversation/Semantic/Responses.json",
       "EN/Conversation/Semantic/Realizations.json",
       "EN/Conversation/Telemetry/Diagnostics.json",
-      "EN/Conversation/ToolReplies/Commands.json",
       "EN/Conversation/WorldEvents/Events.json",
       "EN/Conversation/Semantic/GroundedPersonalDialogue.json",
       "EN/Conversation/Semantic/Suggestions.json",
@@ -27,12 +21,7 @@
       "EN/Conversation/Semantic/DialogueContent.json"
     ],
     "TL": [
-      "TL/Conversation/Flavor/Address.json",
-      "TL/Conversation/Flavor/Combat.json",
-      "TL/Conversation/Flavor/Incapacitated.json",
-      "TL/Conversation/Flavor/Social.json",
-      "TL/Conversation/Flavor/VanillaEmote.json",
-      "TL/Conversation/Flavor/WorldActions.json",
+      "TL/Conversation/Semantic/Addressing.json",
       "TL/Conversation/Identity/Responses.json",
       "TL/Conversation/Journal/Events.json",
       "TL/Conversation/PBrainZ/Interface.json",
@@ -43,7 +32,6 @@
       "TL/Conversation/Semantic/Responses.json",
       "TL/Conversation/Semantic/Realizations.json",
       "TL/Conversation/Telemetry/Diagnostics.json",
-      "TL/Conversation/ToolReplies/Commands.json",
       "TL/Conversation/WorldEvents/Events.json",
       "TL/Conversation/Semantic/GroundedPersonalDialogue.json",
       "TL/Conversation/Semantic/Suggestions.json",

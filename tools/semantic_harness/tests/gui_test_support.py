@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import gc
 import tempfile
 import time
 import tkinter as tk
@@ -58,6 +59,19 @@ class SemanticLabGuiTestCase(unittest.TestCase):
 
     @staticmethod
     def close_gui_app(app: SemanticHarnessApp, root: tk.Misc) -> None:
+        if not getattr(app, "__dict__", None):
+            try:
+                root.destroy()
+            except tk.TclError:
+                pass
+            return
+        # SemanticHarnessApp deliberately uses a nonblocking production close
+        # so an interactive window never freezes while a serialized worker
+        # request drains.  Tests own the process boundary, so finish any
+        # queued work before destroying the last Tk references.
+        session = getattr(app, "session", None)
+        if session is not None:
+            session.close(wait=True)
         try:
             app.close()
         except tk.TclError:
@@ -66,6 +80,12 @@ class SemanticLabGuiTestCase(unittest.TestCase):
             root.destroy()
         except tk.TclError:
             pass
+        # Release Tk variables/widgets while this fixture is still executing
+        # on the main thread.  Otherwise cyclic app state can be collected by
+        # a later worker-thread teardown and tkinter reports a wrong-thread
+        # async-handler deletion when the next test creates its root.
+        app.__dict__.clear()
+        gc.collect()
 
     def wait_for(
         self,

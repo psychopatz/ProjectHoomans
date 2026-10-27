@@ -65,7 +65,7 @@ local Client = require "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient
 -- client presentation; the standalone fixture must honor that contract.
 require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
 local Reactions = require "PNC/Semantics/PNC_SemanticSocialReaction"
-local Presentation = require "PNC/Conversation/PNC_SocialFlavorPresentation"
+local Presentation = require "PNC/Conversation/PNC_SemanticSpeechPresentation"
 local Diary = PNC.Conversation.Diary
 local received
 EventBus.subscribe(Message.EVENT_TYPE, function(message)
@@ -214,4 +214,4 @@ T.equal(received.speakerID, "npc-one",
 Client.SetLLMProvider(nil)
 
 EventBus.clearOwner("presentation-message-test")
-T.finish("pnc_social_flavor_presentation_smoke")
+T.finish("pnc_semantic_speech_presentation_smoke")

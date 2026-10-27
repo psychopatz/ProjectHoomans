@@ -9,7 +9,7 @@ T.addPackagePaths({
 -- normalizing the already-selected `resolvedText` field; keep the assertion
 -- here as a regression against the original authority defect.
 PNC = {
-    SocialFlavorPresentationInternal = {
+    SemanticSpeechPresentationInternal = {
         Clean = function(value, fallback)
             value = tostring(value or "")
             return value ~= "" and value or fallback
@@ -25,10 +25,10 @@ PNC = {
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Conversation/PNC_SocialFlavorPresentation_Receive_Payload.lua"
+    "PNC/Conversation/PNC_SemanticSpeechPresentation_Receive_Payload.lua"
 )
 
-local payload = PNC.SocialFlavorPresentationInternal.BuildReceivePayload({
+local payload = PNC.SemanticSpeechPresentationInternal.BuildReceivePayload({
     ambientFlavor = {
         flavorID = "social.witnessed_player_kill",
         resolvedText = "The semantic selection was made here.",

@@ -38,6 +38,18 @@ def close_app(app: Any) -> None:
                 app.root.after_cancel(after_id)
             except app._tk.TclError:
                 pass
+    # A few Tk widgets and startup callbacks schedule short-lived timers that
+    # are not owned by a single controller.  On normal close they must not
+    # survive the interpreter teardown and later touch destroyed StringVars.
+    try:
+        pending_after = app.root.tk.call("after", "info")
+    except app._tk.TclError:
+        pending_after = ()
+    for after_id in pending_after:
+        try:
+            app.root.after_cancel(after_id)
+        except app._tk.TclError:
+            pass
     # Tk shutdown must not wait on the serialized worker executor.  The
     # worker/process close operation is bounded and is submitted for cleanup;
     # waiting here can make the window appear frozen when the worker is still

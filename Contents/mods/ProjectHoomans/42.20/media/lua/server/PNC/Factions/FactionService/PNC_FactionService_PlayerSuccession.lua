@@ -172,7 +172,7 @@ end
 -- so this is pcall-guarded and reports nothing back.
 -- `succession` is passed as a plain literal ("player" | "promoted") so this
 -- faction module keeps no dependency on the flavor layer; the social module
--- maps those onto PNC.FlavorTextConst.Succession.
+-- maps those onto PNC.Semantics.SocialContextConstants.Succession.
 function Internal.AnnounceLeaderLost(
     faction,
     deadPlayerKey,

@@ -8,6 +8,10 @@
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
+if not PNC.Identity or not PNC.Identity.NormalizeSeed then
+    require "PNC/Core/Identity/PNC_Identity"
+end
+
 local Resolver = PNC.Semantics.AddressResolver or {}
 PNC.Semantics.AddressResolver = Resolver
 
@@ -223,6 +227,214 @@ function Resolver.Apply(context, spec)
     context.addressKind = resolved.kind
     context.identityKnown = resolved.known
     return context, resolved
+end
+
+-- The identity projection below is the same bounded addressing authority used
+-- by conversation, speech, PBrainZ, and radio context. It preserves the
+-- existing name-knowledge gate while keeping identity facts separate from the
+-- semantic term resolver above.
+local NAME_NICKNAMES = {
+    female = {
+        { id = "babe", key = "UI_PNC_SemanticAddressing_Female_Babe", fallback = "Babe" },
+        { id = "darling", key = "UI_PNC_SemanticAddressing_Female_Darling", fallback = "Darling" },
+        { id = "sweetheart", key = "UI_PNC_SemanticAddressing_Female_Sweetheart", fallback = "Sweetheart" },
+        { id = "stranger", key = "UI_PNC_SemanticAddressing_Female_Stranger", fallback = "Stranger" },
+    },
+    default = {
+        { id = "buddy", key = "UI_PNC_SemanticAddressing_Default_Buddy", fallback = "Buddy" },
+        { id = "friend", key = "UI_PNC_SemanticAddressing_Default_Friend", fallback = "Friend" },
+        { id = "stranger", key = "UI_PNC_SemanticAddressing_Default_Stranger", fallback = "Stranger" },
+        { id = "pal", key = "UI_PNC_SemanticAddressing_Default_Pal", fallback = "Pal" },
+    },
+}
+
+local function call(object, method)
+    local objectType = type(object)
+    if (objectType ~= "table" and objectType ~= "userdata")
+        or type(object[method]) ~= "function"
+    then
+        return nil
+    end
+    local ok, value = pcall(object[method], object)
+    return ok and value or nil
+end
+
+local function firstNonEmpty(...)
+    for index = 1, select("#", ...) do
+        local value = clean(select(index, ...), 96)
+        if value then return value end
+    end
+    return nil
+end
+
+local function knownFromMap(map, npcID, playerUUID)
+    if type(map) ~= "table" then return nil end
+    npcID = clean(npcID, 96)
+    playerUUID = clean(playerUUID, 96)
+    if not npcID then return nil end
+    local direct = map[npcID]
+    if type(direct) == "boolean" then return direct end
+    if type(direct) == "table" and playerUUID
+        and type(direct[playerUUID]) == "boolean"
+    then
+        return direct[playerUUID]
+    end
+    if playerUUID and type(map[playerUUID]) == "table"
+        and type(map[playerUUID][npcID]) == "boolean"
+    then
+        return map[playerUUID][npcID]
+    end
+    return nil
+end
+
+function Resolver.ResolveNPCSeed(source, fallback)
+    source = type(source) == "table" and source or {}
+    local candidates = {
+        source,
+        type(source.snapshot) == "table" and source.snapshot or nil,
+        type(source.record) == "table" and source.record or nil,
+    }
+    for index = 1, #candidates do
+        local value = candidates[index]
+        local identity = value and value.identity or nil
+        local seed = value and (value.identitySeed or value.npcIdentitySeed) or nil
+        seed = seed or identity and (identity.identitySeed or identity.seed) or nil
+        if seed ~= nil then
+            return PNC.Identity.NormalizeSeed(seed, fallback or "npc")
+        end
+    end
+    return PNC.Identity.NormalizeSeed(nil, fallback or "npc")
+end
+
+function Resolver.ResolvePlayerIsFemale(player, explicit)
+    if type(explicit) == "boolean" then return explicit end
+    local value = player and call(player, "isFemale") or nil
+    if type(value) == "boolean" then return value end
+    local descriptor = player and call(player, "getDescriptor") or nil
+    value = descriptor and call(descriptor, "isFemale") or nil
+    if type(value) == "boolean" then return value end
+    return false
+end
+
+function Resolver.IsPlayerNameKnown(npcID, playerUUID, state)
+    state = type(state) == "table" and state
+        or PNC.Network and PNC.Network.ClientState or {}
+    local maps = {
+        state.playerNameKnowledge,
+        state.npcPlayerKnowledge,
+        state.playerIdentityKnowledge,
+    }
+    for index = 1, #maps do
+        local value = knownFromMap(maps[index], npcID, playerUUID)
+        if value ~= nil then return value end
+    end
+    return false
+end
+
+local function readKnownName(options)
+    options = type(options) == "table" and options or {}
+    local player = options.player
+    local context = type(options.playerContext) == "table"
+        and options.playerContext or {}
+    local authoritative = type(options.authoritative) == "table"
+        and options.authoritative or {}
+    local descriptor = player and call(player, "getDescriptor") or nil
+    local firstName = firstNonEmpty(
+        authoritative.firstName, authoritative.forename,
+        options.playerFirstName, options.playerForename,
+        context.firstName, context.forename,
+        descriptor and call(descriptor, "getForename"),
+        player and call(player, "getForename")
+    )
+    local lastName = firstNonEmpty(
+        authoritative.lastName, authoritative.surname,
+        options.playerLastName, options.playerSurname,
+        context.lastName, context.surname,
+        descriptor and call(descriptor, "getSurname"),
+        player and call(player, "getSurname")
+    )
+    local fullName = firstNonEmpty(
+        authoritative.fullName, authoritative.displayName,
+        options.playerFullName,
+        context.fullName, context.displayName,
+        player and call(player, "getDisplayName"),
+        player and call(player, "getFullName"),
+        player and call(player, "getUsername")
+    )
+    if not fullName and (firstName or lastName) then
+        fullName = clean((firstName or "") .. " " .. (lastName or ""), 96)
+    end
+    if not firstName and fullName then firstName = string.match(fullName, "^(%S+)") end
+    if not lastName and fullName then lastName = string.match(fullName, "^%S+%s+(.+)$") end
+    return fullName, firstName, lastName
+end
+
+function Resolver.ResolveForNPC(options)
+    options = type(options) == "table" and options or {}
+    local playerUUID = clean(options.playerUUID, 96)
+    local npcID = clean(options.npcID, 96) or "unknown-npc"
+    local isFemale = Resolver.ResolvePlayerIsFemale(options.player, options.isFemale)
+    local seed = PNC.Identity.NormalizeSeed(options.npcIdentitySeed, npcID)
+    local nicknameSeed = playerUUID and PNC.Identity.HashText(playerUUID, seed) or seed
+    local pool = isFemale and NAME_NICKNAMES.female or NAME_NICKNAMES.default
+    local nickname = pool[PNC.Identity.Index(
+        nicknameSeed, "semantic-addressing:v" .. tostring(Resolver.VERSION), #pool
+    )] or pool[1]
+    local nicknameText = nickname and translated(nickname, options.language) or "Stranger"
+    local known = options.playerNameKnown
+    if type(known) ~= "boolean" then
+        known = Resolver.IsPlayerNameKnown(npcID, playerUUID, options.state)
+    end
+    if known then
+        local fullName, firstName, lastName = readKnownName(options)
+        known = fullName ~= nil or firstName ~= nil
+        if known then
+            return {
+                known = true,
+                isFemale = isFemale,
+                addressName = firstName or fullName or nicknameText,
+                firstName = firstName or fullName or nicknameText,
+                fullName = fullName or firstName or nicknameText,
+                surname = lastName or "",
+                lastName = lastName or "",
+                nicknameID = nil,
+            }
+        end
+    end
+    return {
+        known = false,
+        isFemale = isFemale,
+        addressName = nicknameText,
+        firstName = nicknameText,
+        fullName = nicknameText,
+        surname = "",
+        lastName = "",
+        nicknameID = nickname and nickname.id or "stranger",
+    }
+end
+
+function Resolver.ResolvePlayer(options)
+    options = type(options) == "table" and options or {}
+    local resolved = {}
+    for key, value in pairs(options) do resolved[key] = value end
+    resolved.playerNameKnown = options.playerNameKnown == true
+    return Resolver.ResolveForNPC(resolved)
+end
+
+function Resolver.ApplyPlayer(context, options)
+    context = type(context) == "table" and context or {}
+    local address = Resolver.ResolveForNPC(options)
+    context.player = address.addressName
+    context.playerName = address.addressName
+    context.playerAddressName = address.addressName
+    context.playerFullName = address.fullName
+    context.playerFirstName = address.firstName
+    context.playerSurname = address.surname
+    context.playerLastName = address.lastName
+    context.playerNameKnown = address.known
+    context.playerIsFemale = address.isFemale
+    context.playerNicknameID = address.nicknameID
+    return context, address
 end
 
 return Resolver

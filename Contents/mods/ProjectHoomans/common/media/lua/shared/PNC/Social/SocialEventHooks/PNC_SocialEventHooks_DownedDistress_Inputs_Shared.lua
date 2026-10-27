@@ -9,7 +9,7 @@ local Hooks = PNC.SocialEventHooks
 local H = PNC.SocialEventHooksInternal
 local now = H.Now
 local clean = H.Clean
-local flavorConst = H.FlavorConst
+local socialContextConstants = H.SocialContextConstants
 
 -- ---------------------------------------------------------------------------
 -- Server-side inputs for the resolver
@@ -157,9 +157,9 @@ local function buildInput(record, player, needInputs)
         otherFactionID = otherFactionID,
     }
     if band == "war" then
-        input.factionBand = (flavorConst().Audience or {}).HOSTILE
+        input.factionBand = (socialContextConstants().Audience or {}).HOSTILE
     elseif band == "allied" or band == "same" then
-        input.factionBand = (flavorConst().Audience or {}).ALLY
+        input.factionBand = (socialContextConstants().Audience or {}).ALLY
     end
     -- Wound inputs are resolved once per call site, not per listener.
     if type(needInputs) == "table" then

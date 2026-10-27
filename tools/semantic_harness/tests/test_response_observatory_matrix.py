@@ -20,11 +20,11 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         result = run_quality_matrix([
             {"label": "EN greeting", "language": "EN",
              "utterance": "hello",
-             "expected": {"lastKey": "semantic.flow.greeting.opening.question.default",
+             "expected": {"lastSemanticKey": "semantic.flow.greeting.opening.question.default",
                           "maxActions": 0}},
             {"label": "TL greeting", "language": "TL",
              "utterance": "hello",
-             "expected": {"lastKey": "semantic.flow.greeting.opening.question.default",
+             "expected": {"lastSemanticKey": "semantic.flow.greeting.opening.question.default",
                           "maxActions": 0}},
             {"label": "follow request", "language": "EN",
              "utterance": "follow me",
@@ -502,8 +502,20 @@ class ObservatoryTkTests(unittest.TestCase):
                 )
                 pane.filter_var.set("greeting")
                 pane.refresh()
-                self.assertEqual(len(pane.pools.get_children()), 3)
-                pane.pools.selection_set("semantic.flow.greeting.opening")
+                self.assertGreaterEqual(len(pane.pools.get_children()), 1)
+
+                def find_pool(parent: str = "") -> str | None:
+                    for item_id in pane.pools.get_children(parent):
+                        if item_id == "pool:semantic.flow.greeting.opening":
+                            return item_id
+                        found = find_pool(item_id)
+                        if found is not None:
+                            return found
+                    return None
+
+                opening = find_pool()
+                self.assertIsNotNone(opening)
+                pane.pools.selection_set(opening)
                 pane._selected()
                 self.assertIn("semantic.flow.greeting.opening.rain",
                     pane.views["Catalog"].get("1.0", "end"))

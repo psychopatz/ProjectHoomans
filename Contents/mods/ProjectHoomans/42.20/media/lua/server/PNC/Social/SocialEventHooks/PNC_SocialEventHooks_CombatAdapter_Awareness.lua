@@ -25,11 +25,11 @@ if not SocialReactions then
     SocialReactions = ok and loaded or nil
 end
 local ContextProviders = PNC.Semantics
-    and PNC.Semantics.ContextProviders or nil
+    and PNC.Semantics.SocialContext or nil
 if type(ContextProviders) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Core/Social/PNC_FlavorTextResolver"
+        "PNC/Core/Social/PNC_SemanticSocialContext"
     )
     ContextProviders = ok and loaded or nil
 end
@@ -367,7 +367,7 @@ end
 local function emitZombieAwareness(
     record,
     eventType,
-    flavorID,
+    speechEventID,
     eventID,
     source,
     now,
@@ -478,7 +478,7 @@ local function emitZombieAwareness(
             ambientFlavor = {
                 eventID = eventID,
                 eventRef = eventID,
-                flavorID = flavorID,
+                speechEventID = realization.realizationID,
                 text = realization.fallback,
                 semanticOwned = true,
                 eventType = eventType,

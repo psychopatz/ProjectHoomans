@@ -256,7 +256,7 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
                                 after
                             ),
                             ambientFlavor = {
-                                flavorID = "social.witnessed_player_kill",
+                                speechEventID = "social.witnessed_player_kill",
                                 text = realization.fallback,
                                 semanticOwned = true,
                                 eventRef = eventRef,

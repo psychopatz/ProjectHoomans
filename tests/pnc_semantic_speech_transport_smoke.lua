@@ -21,7 +21,7 @@ T.load("ProjectHoomans", "shared",
     "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_DebugPayloads.lua")
 local Network = PNC.Network
 local flavor = {
-    flavorID = "social.witnessed_player_kill",
+    speechEventID = "semantic.combat.reaction.threat",
     eventType = "witnessed_player_kill",
     priority = 35,
 }
@@ -36,10 +36,10 @@ Network.SendConversationRelationship(
     }
 )
 T.truthy(received, "SP transport emits a local relationship packet")
-T.equal(received.ambientFlavor.flavorID,
-    "social.witnessed_player_kill",
+T.equal(received.ambientFlavor.speechEventID,
+    "semantic.combat.reaction.threat",
     "relationship transport preserves the flavor hint")
 T.equal(received.relationshipDelta.approval, 2,
     "relationship transport preserves authoritative delta")
 
-T.finish("pnc_social_flavor_transport_smoke")
+T.finish("pnc_semantic_speech_transport_smoke")

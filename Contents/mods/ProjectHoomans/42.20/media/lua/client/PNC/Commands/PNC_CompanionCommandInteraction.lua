@@ -115,7 +115,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
                 commandID, outcome, playerContext)
             or nil
         if not playerSpeech then return false end
-        queued = Presentation.EnqueueFlavor(
+        queued = Presentation.EnqueueSpeech(
             playerSpeech.realizationID,
             "player",
             player,
@@ -131,7 +131,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
     end
     if outcome == "none" then
         if commandID ~= "camp" then return false end
-        queued = Presentation.EnqueueFlavor(
+        queued = Presentation.EnqueueSpeech(
             "semantic.command.player.camp_none", "player", player,
             playerContext, {
                 eventID = type(context) == "table" and context.requestID
@@ -161,7 +161,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
     if options.playerAlreadySpoke == true then
         playerShown = true
     else
-        playerShown = Presentation.EnqueueFlavor(
+        playerShown = Presentation.EnqueueSpeech(
             playerSpeech.realizationID,
             "player",
             player,
@@ -199,7 +199,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
                 socialStyle = context and context.socialStyle or nil,
                 requestID = context and context.requestID or nil,
                 eventID = context and context.eventID or nil,
-                renderTokens = Presentation.BuildFlavorContext(
+        renderTokens = Presentation.BuildSpeechContext(
                     player, { target = respondent }
                 ),
             }
@@ -238,7 +238,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
             and npcRealization.realizationID or nil
         npcContext.factRefs = npcRealization
             and npcRealization.groundedFactRefs or nil
-        queued = Presentation.EnqueueFlavor(
+        queued = Presentation.EnqueueSpeech(
             responseID,
             "npc",
             actor,

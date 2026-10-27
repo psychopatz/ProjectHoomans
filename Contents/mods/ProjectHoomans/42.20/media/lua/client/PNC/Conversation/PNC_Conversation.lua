@@ -12,7 +12,7 @@ require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer"
 require "PNC/Conversation/PNC_ConversationRelationshipPanel"
 require "PNC/Conversation/PNC_ConversationLifecycle"
 require "PNC/Conversation/PNC_ConversationGroup"
-require "PNC/Conversation/PNC_SocialFlavorPresentation"
+require "PNC/Conversation/PNC_SemanticSpeechPresentation"
 require "PNC/Conversation/PNC_ConversationLiveAnimation"
 
 require "PNC/Conversation/PortraitBackgrounds/PNC_BackgroundDawn"

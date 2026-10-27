@@ -1,9 +1,7 @@
 -- Semantic response pools for Project Hoomans compatibility adapters.
 --
--- The provider/addon remains authoritative for the event and its facts.  This
--- file only chooses the Hoomans meaning/response family.  The old compatibility
--- Flavor registrations are retained as migration source material, but they
--- are not needed to select any pool below.
+-- Provider/addon modules remain authoritative for event facts. This module
+-- selects the bounded semantic response and joins it to Dialogue Content.
 
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
@@ -45,7 +43,7 @@ local function eventOffers(includeAttacker)
     return { WHAT_HAPPENED }
 end
 
-local function plan(poolID, act, topic, text, offers)
+local function plan(poolID, act, topic, templateID, offers)
     return {
         dialogueAct = act,
         sourcePoolID = poolID,
@@ -53,7 +51,7 @@ local function plan(poolID, act, topic, text, offers)
         turns = {
             {
                 segments = {
-                    { kind = "literal", text = text },
+                    { kind = "translation", templateID = templateID },
                 },
                 offers = offers or {},
             },
@@ -61,38 +59,33 @@ local function plan(poolID, act, topic, text, offers)
     }
 end
 
-local function variant(poolID, id, text, when, priority, templateID,
-    compatibilityFlavorID, offers, act, topic)
+local function variant(poolID, id, when, priority, templateID,
+    offers, act, topic)
+    local resolvedTemplateID = templateID or poolID .. "." .. id
     return {
         id = poolID .. "." .. id,
-        templateID = templateID or poolID .. "." .. id,
-        fallback = text,
+        templateID = resolvedTemplateID,
         when = when,
         priority = priority or 0,
-        compatibilityFlavorID = compatibilityFlavorID,
         contentOwner = CONTENT_OWNER,
         plan = plan(
             poolID,
             act or "REACT",
             topic or "compatibility_event",
-            text,
+            resolvedTemplateID,
             offers
         ),
     }
 end
 
--- Bandits' damage/actor event is external truth.  These variants replace the
--- old Hoomans compatibility prose selector for the same grounded event.
 Catalog.Register("semantic.compat.bandits.hooman_hurt", {
     variants = {
         variant(
             "semantic.compat.bandits.hooman_hurt",
             "colonist",
-            "Bandit fire! Pull back and cover the wounded colonist.",
             { socialRole = "colonist" },
             4,
             "semantic.compat.bandits.hooman_hurt.colonist",
-            "compat.bandits.hooman_hurt",
             eventOffers(true),
             "REACT",
             "bandits_hurt"
@@ -100,11 +93,9 @@ Catalog.Register("semantic.compat.bandits.hooman_hurt", {
         variant(
             "semantic.compat.bandits.hooman_hurt",
             "lover",
-            "Bandit fire. Stay close; I have got you.",
             { socialRole = "lover" },
             4,
             "semantic.compat.bandits.hooman_hurt.lover",
-            "compat.bandits.hooman_hurt",
             eventOffers(true),
             "REACT",
             "bandits_hurt"
@@ -112,11 +103,9 @@ Catalog.Register("semantic.compat.bandits.hooman_hurt", {
         variant(
             "semantic.compat.bandits.hooman_hurt",
             "family",
-            "Bandit fire! Stay together and cover the wounded family member.",
             { socialRole = "family" },
             4,
             "semantic.compat.bandits.hooman_hurt.family",
-            "compat.bandits.hooman_hurt",
             eventOffers(true),
             "REACT",
             "bandits_hurt"
@@ -124,11 +113,9 @@ Catalog.Register("semantic.compat.bandits.hooman_hurt", {
         variant(
             "semantic.compat.bandits.hooman_hurt",
             "default",
-            "Bandit fire! Stay with the wounded survivor and watch the flank.",
             nil,
             0,
             "semantic.compat.bandits.hooman_hurt.default",
-            "compat.bandits.hooman_hurt",
             eventOffers(true),
             "REACT",
             "bandits_hurt"
@@ -136,16 +123,13 @@ Catalog.Register("semantic.compat.bandits.hooman_hurt", {
     },
 })
 
-local function necroaVariant(poolID, id, text, when, priority, templateID,
-    compatibilityFlavorID)
+local function necroaVariant(poolID, id, when, priority, templateID)
     return variant(
         poolID,
         id,
-        text,
         when,
         priority,
         templateID,
-        compatibilityFlavorID,
         eventOffers(false),
         "WARN",
         "necroa_mask_safety"
@@ -157,29 +141,23 @@ Catalog.Register("semantic.compat.necroa.mask_warning", {
         necroaVariant(
             "semantic.compat.necroa.mask_warning",
             "family",
-            "Put your mask on, family. I am not losing you to the air.",
             { socialRole = "family" },
             4,
-            "semantic.compat.necroa.mask_warning.family",
-            "compat.necroa.mask_warning"
+            "semantic.compat.necroa.mask_warning.family"
         ),
         necroaVariant(
             "semantic.compat.necroa.mask_warning",
             "colonist",
-            "Mask up. We keep the camp safe together.",
             { socialRole = "colonist" },
             4,
-            "semantic.compat.necroa.mask_warning.colonist",
-            "compat.necroa.mask_warning"
+            "semantic.compat.necroa.mask_warning.colonist"
         ),
         necroaVariant(
             "semantic.compat.necroa.mask_warning",
             "default",
-            "Put your mask back on. Knox is airborne.",
             nil,
             0,
-            "semantic.compat.necroa.mask_warning.default",
-            "compat.necroa.mask_warning"
+            "semantic.compat.necroa.mask_warning.default"
         ),
     },
 })
@@ -189,42 +167,34 @@ Catalog.Register("semantic.compat.necroa.player_mask_removed", {
         necroaVariant(
             "semantic.compat.necroa.player_mask_removed",
             "hostile",
-            "Put your mask back on before you become a problem.",
             { socialRole = "hostile" },
             4,
-            "semantic.compat.necroa.player_mask_removed.hostile",
-            "compat.necroa.player_mask_removed"
+            "semantic.compat.necroa.player_mask_removed.hostile"
         ),
         necroaVariant(
             "semantic.compat.necroa.player_mask_removed",
             "lover",
-            "Please put your mask back on, love. This air is not safe.",
             { socialRole = "lover" },
             4,
-            "semantic.compat.necroa.player_mask_removed.lover",
-            "compat.necroa.player_mask_removed"
+            "semantic.compat.necroa.player_mask_removed.lover"
         ),
         necroaVariant(
             "semantic.compat.necroa.player_mask_removed",
             "default",
-            "Put your mask back on. The air is not safe.",
             nil,
             0,
-            "semantic.compat.necroa.player_mask_removed.default",
-            "compat.necroa.player_mask_removed"
+            "semantic.compat.necroa.player_mask_removed.default"
         ),
     },
 })
 
-local function projectMeta(id, text, kind, templateID, flavorID)
+local function projectMeta(id, kind, templateID)
     return variant(
         "semantic.compat.projectalife.meta",
         id,
-        text,
         { projectALifeKind = kind },
         4,
         templateID,
-        flavorID,
         eventOffers(false),
         "WARN",
         "projectalife_meta"
@@ -235,52 +205,39 @@ Catalog.Register("semantic.compat.projectalife.meta", {
     variants = {
         projectMeta(
             "gunfire",
-            "Someone is shooting nearby. Keep your head down.",
             "gunfire",
-            "semantic.compat.projectalife.meta.gunfire",
-            "projectalife.meta_gunfire"
+            "semantic.compat.projectalife.meta.gunfire"
         ),
         projectMeta(
             "aircraft",
-            "Something is flying over us. Keep listening.",
             "heli",
-            "semantic.compat.projectalife.meta.aircraft.heli",
-            "projectalife.meta_aircraft"
+            "semantic.compat.projectalife.meta.aircraft.heli"
         ),
         projectMeta(
             "military",
-            "That aircraft sounds close. Stay sharp.",
             "military",
-            "semantic.compat.projectalife.meta.aircraft.military",
-            "projectalife.meta_aircraft"
+            "semantic.compat.projectalife.meta.aircraft.military"
         ),
         projectMeta(
             "crash",
-            "That crash sounded close. Keep your eyes open.",
             "crash",
-            "semantic.compat.projectalife.meta.crash",
-            "projectalife.meta_crash"
+            "semantic.compat.projectalife.meta.crash"
         ),
         projectMeta(
             "ambience",
-            "I do not like that sound. Stay close.",
             "ambience",
-            "semantic.compat.projectalife.meta.ambience",
-            "projectalife.meta_ambience"
+            "semantic.compat.projectalife.meta.ambience"
         ),
     },
 })
 
-local function projectEncounter(id, text, stance, templateID, flavorID,
-    priority)
+local function projectEncounter(id, stance, templateID, priority)
     return variant(
         "semantic.compat.projectalife.encounter",
         id,
-        text,
         { projectALifeStance = stance },
         priority or 4,
         templateID,
-        flavorID,
         eventOffers(false),
         "WARN",
         "projectalife_encounter"
@@ -291,42 +248,34 @@ Catalog.Register("semantic.compat.projectalife.encounter", {
     variants = {
         projectEncounter(
             "friendly",
-            "Those survivors seem friendly. Keep your hands visible.",
             "friendly",
-            "semantic.compat.projectalife.encounter.friendly",
-            "projectalife.encounter_friendly"
+            "semantic.compat.projectalife.encounter.friendly"
         ),
         projectEncounter(
             "hostile",
-            "That group looks hostile. Keep cover between us and them.",
             { "hostile", "careful" },
-            "semantic.compat.projectalife.encounter.hostile",
-            "projectalife.encounter_hostile"
+            "semantic.compat.projectalife.encounter.hostile"
         ),
         projectEncounter(
             "unknown",
-            "Someone is out there. Let us watch before we approach.",
             { "unknown", "neutral" },
             "semantic.compat.projectalife.encounter.unknown",
-            "projectalife.encounter_unknown",
             1
         ),
     },
 })
 
-local function projectFaction(id, text, eventType, stance, direction,
-    templateID, flavorID, priority)
+local function projectFaction(id, eventType, stance, direction,
+    templateID, priority)
     local when = { eventType = eventType }
     if stance then when.projectALifeStance = stance end
     if direction then when.projectALifeConflictDirection = direction end
     return variant(
         "semantic.compat.projectalife.faction",
         id,
-        text,
         when,
         priority or 4,
         templateID,
-        flavorID,
         eventOffers(false),
         "WARN",
         "projectalife_faction"
@@ -337,43 +286,35 @@ Catalog.Register("semantic.compat.projectalife.faction", {
     variants = {
         projectFaction(
             "hostile",
-            "That faction may be hostile toward us now. Stay alert.",
             "projectalife_faction_stance",
             { "hostile", "careful" },
             nil,
-            "semantic.compat.projectalife.faction.hostile",
-            "projectalife.faction_hostile"
+            "semantic.compat.projectalife.faction.hostile"
         ),
         projectFaction(
             "incoming",
-            "They just opened fire on us. Stay close.",
             "projectalife_faction_conflict",
             nil,
             "incoming",
-            "semantic.compat.projectalife.faction.incoming",
-            "projectalife.faction_conflict_incoming"
+            "semantic.compat.projectalife.faction.incoming"
         ),
         projectFaction(
             "outgoing",
-            "We hit them. They may retaliate soon.",
             "projectalife_faction_conflict",
             nil,
             "outgoing",
-            "semantic.compat.projectalife.faction.outgoing",
-            "projectalife.faction_conflict_outgoing"
+            "semantic.compat.projectalife.faction.outgoing"
         ),
     },
 })
 
-local function dogVariant(poolID, id, text, sex, templateID, flavorID)
+local function dogVariant(poolID, id, sex, templateID)
     return variant(
         poolID,
         id,
-        text,
         { companionDogSex = sex },
         3,
         templateID,
-        flavorID,
         nil,
         "ACK",
         "companion_dog"
@@ -385,26 +326,20 @@ Catalog.Register("semantic.compat.companion_dogs.greeting", {
         dogVariant(
             "semantic.compat.companion_dogs.greeting",
             "male",
-            "Who is a good boy?",
             "male",
-            "semantic.compat.companion_dogs.greeting.male",
-            "companion_dogs_good_boy"
+            "semantic.compat.companion_dogs.greeting.male"
         ),
         dogVariant(
             "semantic.compat.companion_dogs.greeting",
             "female",
-            "Who is a good girl?",
             "female",
-            "semantic.compat.companion_dogs.greeting.female",
-            "companion_dogs_good_girl"
+            "semantic.compat.companion_dogs.greeting.female"
         ),
         dogVariant(
             "semantic.compat.companion_dogs.greeting",
             "unknown",
-            "Who is a good dog?",
             "unknown",
-            "semantic.compat.companion_dogs.greeting.unknown",
-            "companion_dogs_good_dog"
+            "semantic.compat.companion_dogs.greeting.unknown"
         ),
     },
 })
@@ -414,26 +349,20 @@ Catalog.Register("semantic.compat.companion_dogs.feed", {
         dogVariant(
             "semantic.compat.companion_dogs.feed",
             "male",
-            "Here you go, good boy.",
             "male",
-            "semantic.compat.companion_dogs.feed.male",
-            "companion_dogs_feed_boy"
+            "semantic.compat.companion_dogs.feed.male"
         ),
         dogVariant(
             "semantic.compat.companion_dogs.feed",
             "female",
-            "Here you go, good girl.",
             "female",
-            "semantic.compat.companion_dogs.feed.female",
-            "companion_dogs_feed_girl"
+            "semantic.compat.companion_dogs.feed.female"
         ),
         dogVariant(
             "semantic.compat.companion_dogs.feed",
             "unknown",
-            "Here you go, good dog.",
             "unknown",
-            "semantic.compat.companion_dogs.feed.unknown",
-            "companion_dogs_feed_dog"
+            "semantic.compat.companion_dogs.feed.unknown"
         ),
     },
 })

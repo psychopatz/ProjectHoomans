@@ -92,7 +92,7 @@ end
 local function maskWarning(observerRecord, victimID)
     local role = Social.Role(observerRecord)
     return {
-        flavorID = "compat.necroa.mask_warning",
+        speechEventID = "compat.necroa.mask_warning",
         eventType = "necroa_mask_removed",
         family = "necroa_mask_safety",
         priority = 65,
@@ -118,7 +118,7 @@ end
 local function playerWarning(observerRecord)
     local role = Social.Role(observerRecord)
     return {
-        flavorID = "compat.necroa.player_mask_removed",
+        speechEventID = "compat.necroa.player_mask_removed",
         eventType = "necroa_player_mask_removed",
         family = "necroa_mask_safety",
         priority = 75,

@@ -37,13 +37,13 @@ class UnifiedAuthorityP7ContentTests(unittest.TestCase):
         }
         expected_owners = {
             "semantic.flow.farewell.default":
-            "projecthoomans.dialogue_content.migrated_events",
+            "projecthoomans.dialogue_content.events",
             "semantic.combat.reaction.threat":
-            "projecthoomans.dialogue_content.migrated_events",
+            "projecthoomans.dialogue_content.events",
             "semantic.medical.distress.call.default":
-            "projecthoomans.dialogue_content.migrated_events",
+            "projecthoomans.dialogue_content.events",
             "semantic.leader_loss.default":
-            "projecthoomans.dialogue_content.migrated_events",
+            "projecthoomans.dialogue_content.events",
             "semantic.tool_reply.admire.1":
             "projecthoomans.dialogue_content.tool_replies",
             "semantic.tool_reply.ask_name.named.1":
@@ -83,7 +83,7 @@ class UnifiedAuthorityP7ContentTests(unittest.TestCase):
         )
         self.assertEqual(
             rows["semantic.leader_loss.default"]["contentOwner"],
-            "projecthoomans.dialogue_content.migrated_events",
+            "projecthoomans.dialogue_content.events",
         )
         self.assertIn("sourceFingerprint", rows["semantic.flow.farewell.default"])
 
@@ -93,7 +93,7 @@ class UnifiedAuthorityP7ContentTests(unittest.TestCase):
             self.assertTrue(listing["ok"])
             self.assertTrue(listing["pools"])
             self.assertIn(
-                "projecthoomans.dialogue_content.migrated_events",
+            "projecthoomans.dialogue_content.events",
                 listing["pools"][0]["contentOwners"],
             )
             detail = worker.response_pool_detail("semantic.leader_loss.reaction", limit=16)
@@ -104,7 +104,7 @@ class UnifiedAuthorityP7ContentTests(unittest.TestCase):
             with self.subTest(variant=variant["id"]):
                 self.assertEqual(
                     variant["contentOwner"],
-                    "projecthoomans.dialogue_content.migrated_events",
+            "projecthoomans.dialogue_content.events",
                 )
                 self.assertEqual(
                     variant["provenance"]["selectionSource"],

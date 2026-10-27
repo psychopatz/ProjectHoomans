@@ -148,7 +148,7 @@
     },
     {
       "semanticTemplateID": "semantic.combat.reaction.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -162,7 +162,7 @@
     },
     {
       "semanticTemplateID": "semantic.combat.reaction.retreat",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -176,7 +176,7 @@
     },
     {
       "semanticTemplateID": "semantic.combat.reaction.threat",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -190,7 +190,7 @@
     },
     {
       "semanticTemplateID": "semantic.companion.reaction.abandonment",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -204,7 +204,7 @@
     },
     {
       "semanticTemplateID": "semantic.companion.reaction.camp_rejected",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -218,7 +218,7 @@
     },
     {
       "semanticTemplateID": "semantic.companion.reaction.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -610,7 +610,7 @@
     },
     {
       "semanticTemplateID": "semantic.conversation.safety.danger",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -624,7 +624,7 @@
     },
     {
       "semanticTemplateID": "semantic.conversation.safety.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -638,7 +638,7 @@
     },
     {
       "semanticTemplateID": "semantic.corpse.reaction.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -652,7 +652,7 @@
     },
     {
       "semanticTemplateID": "semantic.corpse.reaction.revenge",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -666,7 +666,7 @@
     },
     {
       "semanticTemplateID": "semantic.flow.farewell.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -680,7 +680,7 @@
     },
     {
       "semanticTemplateID": "semantic.flow.farewell.friendly",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -694,7 +694,7 @@
     },
     {
       "semanticTemplateID": "semantic.leader_loss.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -708,7 +708,7 @@
     },
     {
       "semanticTemplateID": "semantic.leader_loss.devoted",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -722,7 +722,7 @@
     },
     {
       "semanticTemplateID": "semantic.leader_loss.dissent",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -736,7 +736,7 @@
     },
     {
       "semanticTemplateID": "semantic.leader_loss.close",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -750,7 +750,7 @@
     },
     {
       "semanticTemplateID": "semantic.leader_loss.colonist",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -764,7 +764,7 @@
     },
     {
       "semanticTemplateID": "semantic.leader_loss.distant",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -778,7 +778,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.call.bandage",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -792,7 +792,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.call.bleedout",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -806,7 +806,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.call.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -820,7 +820,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.call.dehydration",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -834,7 +834,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.call.exhaustion",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -848,7 +848,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.call.mercy",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -862,7 +862,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.call.rescue",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -876,7 +876,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.call.starvation",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -890,7 +890,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -904,7 +904,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.mercy",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -918,7 +918,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.repeat.bandage",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -932,7 +932,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.repeat.bleedout",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -946,7 +946,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.repeat.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -960,7 +960,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.repeat.dehydration",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -974,7 +974,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.repeat.exhaustion",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -988,7 +988,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.repeat.mercy",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1002,7 +1002,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.repeat.rescue",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1016,7 +1016,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.repeat.starvation",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1030,7 +1030,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.teammate.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1044,7 +1044,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.teammate.found",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1058,7 +1058,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.teammate.missing",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1072,7 +1072,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.treatment.bandage",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1086,7 +1086,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.treatment.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1100,7 +1100,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.update.bandage",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1114,7 +1114,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.update.bleedout",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1128,7 +1128,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.update.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1142,7 +1142,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.update.dehydration",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1156,7 +1156,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.update.exhaustion",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1170,7 +1170,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.update.mercy",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1184,7 +1184,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.update.rescue",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1198,7 +1198,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.update.starvation",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1212,7 +1212,7 @@
     },
     {
       "semanticTemplateID": "semantic.medical.distress.urgent",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -1226,7 +1226,7 @@
     },
     {
       "semanticTemplateID": "semantic.social.reaction.default",
-      "group": "migrated_events",
+      "group": "events",
       "styles": {
         "neutral": [
           {
@@ -3864,7 +3864,7 @@
           {
             "translations": {
               "EN": "Good to see you.",
-              "TL": "Good to see you."
+              "TL": "Mabuti at nakita kita."
             }
           },
           {
@@ -4022,7 +4022,7 @@
           {
             "translations": {
               "EN": "Hey there. Wet one today.",
-              "TL": "Hey there. Wet one today."
+              "TL": "Uy, maulan ngayon."
             }
           },
           {
@@ -4048,7 +4048,7 @@
           {
             "translations": {
               "EN": "How have you been?",
-              "TL": "How have you been?"
+              "TL": "Kumusta ka?"
             }
           },
           {
@@ -4074,7 +4074,7 @@
           {
             "translations": {
               "EN": "How have you been holding up?",
-              "TL": "How have you been holding up?"
+              "TL": "Kumusta ka naman?"
             }
           },
           {
@@ -4100,7 +4100,7 @@
           {
             "translations": {
               "EN": "You're welcome. It's good to see you too.",
-              "TL": "You're welcome. It's good to see you too."
+              "TL": "Walang anuman. Mabuti at nakita rin kita."
             }
           },
           {
@@ -4150,8 +4150,8 @@
     }
   ],
   "groups": {
-    "migrated_events": {
-      "contentOwner": "projecthoomans.dialogue_content.migrated_events"
+    "events": {
+      "contentOwner": "projecthoomans.dialogue_content.events"
     },
     "tool_replies": {
       "contentOwner": "projecthoomans.dialogue_content.tool_replies"

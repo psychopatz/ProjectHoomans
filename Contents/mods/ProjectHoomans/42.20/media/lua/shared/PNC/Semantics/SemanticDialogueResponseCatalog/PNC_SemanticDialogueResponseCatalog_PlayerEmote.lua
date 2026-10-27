@@ -10,49 +10,41 @@ local DEFINITIONS = {
         action = "insult",
         act = "INSULT",
         topic = "hostility",
-        fallback = "Back off.",
     },
     {
         action = "thumbsdown",
         act = "DISAPPROVE",
         topic = "disapproval",
-        fallback = "No.",
     },
     {
         action = "wavehi",
         act = "GREET",
         topic = "greeting",
-        fallback = "Hey, {names}.",
     },
     {
         action = "wavebye",
         act = "FAREWELL",
         topic = "farewell",
-        fallback = "Take care.",
     },
     {
         action = "thankyou",
         act = "THANK",
         topic = "thanks",
-        fallback = "Thanks.",
     },
     {
         action = "thumbsup",
         act = "ACK",
         topic = "acknowledgement",
-        fallback = "Good.",
     },
     {
         action = "clap",
         act = "PRAISE",
         topic = "praise",
-        fallback = "Well done.",
     },
     {
         action = "salute",
         act = "ACK",
         topic = "acknowledgement",
-        fallback = "Respect.",
     },
 }
 
@@ -67,7 +59,6 @@ for index = 1, #DEFINITIONS do
     variants[#variants + 1] = {
         id = realizationID,
         templateID = realizationID,
-        fallback = definition.fallback,
         contentOwner = "projecthoomans.dialogue_content.commands_emotes",
         dialogueAct = definition.act,
         topic = definition.topic,
@@ -80,7 +71,7 @@ for index = 1, #DEFINITIONS do
             turns = {
                 {
                     segments = {
-                        { kind = "literal", text = definition.fallback },
+                        { kind = "translation", templateID = realizationID },
                     },
                 },
             },

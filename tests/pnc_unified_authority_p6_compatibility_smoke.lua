@@ -182,7 +182,7 @@ local received
 PNC.Compatibility = {
     ProjectALifeEvents = {},
 }
-PNC.SocialFlavorPresentation = {
+PNC.SemanticSpeechPresentation = {
     Receive = function(payload)
         received = payload
         return true

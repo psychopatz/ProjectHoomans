@@ -5,7 +5,7 @@
 -- event IDs. It deliberately does not accept free-form LLM memory text.
 
 require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
-require "PNC/Core/Identity/PNC_FlavorAddress"
+require "PNC/Semantics/PNC_SemanticAddressResolver"
 require "PNC/Integrations/PBrainZ/PNC_PBrainZ_Runtime"
 require "PNC/Integrations/PBrainZ/PNC_PBrainZ_Identity"
 require "PNC/Integrations/PBrainZ/PNC_PBrainZ_Outbox"
@@ -16,7 +16,7 @@ PNC.PBrainZ.Memory = PNC.PBrainZ.Memory or {}
 
 local Memory = PNC.PBrainZ.Memory
 local Message = PsychopatzCore.Conversation.Message
-local FlavorAddress = PNC.FlavorAddress
+local Addressing = PNC.Semantics.AddressResolver
 local Identity = PNC.PBrainZ.Identity
 local Runtime = PNC.PBrainZ.Internal.Runtime
 local Outbox = PNC.PBrainZ.Internal.Outbox
@@ -83,7 +83,7 @@ local function playerAddressName(npcID)
     end
     local state = clientState()
     local context = state.playerContext or {}
-    local address = FlavorAddress.ResolveForNPC({
+    local address = Addressing.ResolveForNPC({
         npcID = npcID,
         player = player(),
         playerContext = context,

@@ -193,8 +193,8 @@ class ContextualBondsP8ATests(unittest.TestCase):
                     "kind": "grandmother",
                     "class": "family",
                     "termKeys": {
-                        "reference": "UI_PNC_Flavor_RelationshipTerm_Grandmother_Reference",
-                        "address": "UI_PNC_Flavor_RelationshipTerm_Grandmother_Address",
+                        "reference": "UI_PNC_SemanticAddressing_RelationshipTerm_Grandmother_Reference",
+                        "address": "UI_PNC_SemanticAddressing_RelationshipTerm_Grandmother_Address",
                     },
                 }
             )

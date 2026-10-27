@@ -6,7 +6,6 @@ both language candidates; no mock Python selector or second compiler is used.
 """
 from __future__ import annotations
 
-import difflib
 import hashlib
 import json
 from pathlib import Path
@@ -22,6 +21,13 @@ from .response_observatory import review_variant_proposal, source_evidence
 
 def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _content_fingerprint(values: dict[str, str]) -> str:
+    encoded = json.dumps(values, ensure_ascii=False, sort_keys=True).encode(
+        "utf-8"
+    )
+    return "content-v2:" + _sha256(encoded)
 
 
 def _without_content_realization(value):
@@ -52,53 +58,6 @@ def _semantic_variant_metadata(variant):
             metadata["responsePlan"]
         )
     return metadata
-
-
-def _authored_variant_patch(
-    source: str, variant_id: str, old: str, new: str,
-) -> tuple[str, list[str]]:
-    """Edit exact fallback literals inside exactly one Lua variant definition.
-
-    Refuse anything structurally unfamiliar: this is a conservative source
-    patcher for existing authored responses, NOT a general Lua parser.
-    """
-    match = re.search(
-        r'(?m)^(?P<indent>[ ]+)id[ ]*=[ ]*'
-        + re.escape(json.dumps(variant_id, ensure_ascii=False))
-        + r'[ ]*,[ ]*$',
-        source,
-    )
-    if match is None:
-        raise ValueError("variant ID missing in canonical authored Lua source")
-    indent = match.group("indent")
-    if len(re.findall(
-        r'(?m)^' + re.escape(indent) + r'id[ ]*=[ ]*'
-        + re.escape(json.dumps(variant_id, ensure_ascii=False)) + r'[ ]*,[ ]*$',
-        source,
-    )) != 1:
-        raise ValueError("ambiguous Lua variant ownership")
-    next_variant = re.search(
-        r'(?m)^' + re.escape(indent) + r'id[ ]*=[ ]*"[^"]+"[ ]*,[ ]*$',
-        source[match.end():],
-    )
-    end = match.end() + next_variant.start() if next_variant else len(source)
-    block = source[match.start():end]
-    old_literal = "fallback = " + json.dumps(old, ensure_ascii=False)
-    new_literal = "fallback = " + json.dumps(new, ensure_ascii=False)
-    occurrences = block.count(old_literal)
-    if occurrences not in (1, 2) or source.count(old_literal) != occurrences:
-        raise ValueError("fallback occurrence count is ambiguous in authored Lua")
-    updated = source[:match.start()] + block.replace(old_literal, new_literal) + source[end:]
-    if updated == source:
-        raise ValueError("proposal did not change Lua fallback")
-    changes = list(difflib.unified_diff(
-        source.splitlines(), updated.splitlines(),
-        fromfile="original/authored.lua", tofile="isolated/candidate.lua",
-        lineterm="",
-    ))
-    if len(changes) > 64:
-        raise ValueError("source patch exceeds bounded diff")
-    return updated, changes
 
 
 def _verified_translation_asset(
@@ -199,18 +158,16 @@ def preview_authored_variant(
         origin = variant["sourcePath"]
         if variant["sourceKind"] != "AUTHORED_LUA":
             raise ValueError("no verified canonical authored Lua owner")
-        source = (repository / origin).resolve(strict=True)
+        owner_source = (repository / origin).resolve(strict=True)
         root = (repository / "Contents/mods/ProjectHoomans").resolve()
-        if not source.is_relative_to(root) or not source.name.endswith(".lua"):
+        if not owner_source.is_relative_to(root) or not owner_source.name.endswith(".lua"):
             raise ValueError("source ownership is outside the checked-out mod")
-        module = origin.split("/media/lua/shared/", 1)[-1].removesuffix(".lua")
-        if not re.fullmatch(
-            r"PNC/Semantics/SemanticDialogueResponseCatalog/"
-            r"PNC_SemanticDialogueResponseCatalog_[A-Za-z0-9_]+", module,
-        ):
-            raise ValueError("unsupported authored module overlay")
-
-        original_bytes = source.read_bytes()
+        content_source = (
+            repository
+            / "tools/semantic_harness/codebuilder/sources/"
+            / "semantic_dialogue_content.json"
+        ).resolve(strict=True)
+        original_bytes = content_source.read_bytes()
         original_hash = _sha256(original_bytes)
         expected_source_hash = proposal.get("expectedSourceSHA256")
         if expected_source_hash is not None:
@@ -219,13 +176,11 @@ def preview_authored_variant(
                 raise ValueError("invalid_expected_source_sha256")
             if expected_source_hash != original_hash:
                 raise ValueError("stale_source_sha256")
-        original = original_bytes.decode("utf-8")
-        updated, source_diff = _authored_variant_patch(
-            original, variant_id, variant["fallback"], entries[0]["EN"],
-        )
+        source_diff: list[str] = []
         evidence = source_evidence(worker)
 
     original_translation_hashes: dict[str, tuple[Path, str]] = {}
+    baseline_content: dict[str, str] = {}
     cases: list[tuple[str, dict[str, Any], dict[str, Any], str]] = []
     for language in ("EN", "TL"):
         scenario = merge(DEFAULT_SCENARIO, overrides)
@@ -244,6 +199,7 @@ def preview_authored_variant(
         )
         if not isinstance(content.get(key), str):
             raise ValueError("missing canonical translation text")
+        baseline_content[language] = content[key]
         original_translation_hashes[language] = (
             src, _sha256(src.read_bytes())
         )
@@ -251,9 +207,6 @@ def preview_authored_variant(
 
     with tempfile.TemporaryDirectory(prefix="pnc-observatory-proposal-") as dirname:
         overlay = Path(dirname)
-        lua_destination = overlay / (module + ".lua")
-        lua_destination.parent.mkdir(parents=True, exist_ok=True)
-        lua_destination.write_text(updated, encoding="utf-8")
         translation_diff: list[dict[str, str]] = []
         for language, _scenario, observed, relative in cases:
             key = next(m["translationKey"] for m in observed["messages"]
@@ -281,7 +234,7 @@ def preview_authored_variant(
             with LuaSemanticWorker(
                 scenario, repository=repository,
                 candidate_overlay_root=overlay,
-                candidate_overlay_module=module,
+                candidate_overlay_module="",
             ) as worker:
                 candidate_turn = worker.input(utterance)
                 final_inspector = build_conversation_inspector(candidate_turn)
@@ -312,8 +265,6 @@ def preview_authored_variant(
             new_variant = _semantic_variant_metadata(candidate_variant)
             if base_variant != new_variant:
                 raise ValueError("candidate unexpectedly changed variant metadata")
-            if candidate_variant["fallback"] != entries[0]["EN"]:
-                raise ValueError("candidate registered Lua fallback did not update")
             expected_new = entries[0][language]
             before_text = [m["text"] for m in baseline["messages"]
                            if m["id"] == variant_id]
@@ -328,12 +279,14 @@ def preview_authored_variant(
                 or [m["id"] for m in baseline["messages"]]
                    != [m["id"] for m in candidate["messages"]]):
                 raise ValueError("candidate altered gameplay effects or selected keys")
-            selected_fingerprint = candidate_detail["contentFingerprint"]
+            selected_fingerprint = _content_fingerprint({
+                language: entries[0][language] for language in ("EN", "TL")
+            })
             result_cases.append({
                 "language": language, "status": "PASS",
                 "baseline": baseline, "candidate": candidate,
             })
-    if _sha256(source.read_bytes()) != original_hash or any(
+    if _sha256(content_source.read_bytes()) != original_hash or any(
         _sha256(path.read_bytes()) != sha for path, sha
         in original_translation_hashes.values()
     ):
@@ -342,7 +295,7 @@ def preview_authored_variant(
         "ok": True, "schemaVersion": 1, "type": "response_candidate_isolated_preview",
         "sourceKind": "FIXTURE", "workerKind": "production_lua",
         "poolID": proposal["poolID"], "variantID": variant_id,
-        "baselineFingerprint": details["contentFingerprint"],
+        "baselineFingerprint": _content_fingerprint(baseline_content),
         "candidateFingerprint": selected_fingerprint,
         "variantContract": {
             "conditions": variant.get("when") or {},
@@ -353,6 +306,7 @@ def preview_authored_variant(
             "sourcePath": origin,
         },
         "sourcePath": origin, "canonicalOwnerVerified": True,
+        "contentSourcePath": str(content_source.relative_to(repository)),
         "sourceSHA256": original_hash,
         "sourceSHA256GuardMatched": expected_source_hash == original_hash
             if expected_source_hash is not None else None,

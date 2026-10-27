@@ -54,7 +54,7 @@ local NameplateSpeech = require "PNC/UI/Nameplates/PNC_NameplateSpeech"
 -- client presentation; the standalone fixture must honor that contract.
 require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
 local Reactions = require "PNC/Semantics/PNC_SemanticSocialReaction"
-local Presentation = require "PNC/Conversation/PNC_SocialFlavorPresentation"
+local Presentation = require "PNC/Conversation/PNC_SemanticSpeechPresentation"
 
 local view = {
     spec = { npcID = "npc-one" },

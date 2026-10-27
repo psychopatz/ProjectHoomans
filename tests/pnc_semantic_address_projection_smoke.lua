@@ -8,9 +8,9 @@ PNC = {}
 getText = function(key) return key end
 
 T.load("ProjectHoomans", "shared",
-    "PNC/Core/Identity/PNC_FlavorAddress.lua")
+    "PNC/Semantics/PNC_SemanticAddressResolver.lua")
 
-local Address = PNC.FlavorAddress
+local Address = PNC.Semantics.AddressResolver
 local femalePlayer = {
     isFemale = function() return true end,
     getDisplayName = function() return "Alexandra Mercer" end,
@@ -111,4 +111,4 @@ T.equal(applied.playerNameKnown, false,
 T.equal(appliedAddress.known, false,
     "ApplyPlayer returns the resolved address")
 
-T.finish("pnc_flavor_address_smoke")
+T.finish("pnc_semantic_address_projection_smoke")

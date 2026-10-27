@@ -1,4 +1,4 @@
--- Project Hoomans adapter for the reusable PsychopatzCore social-flavor hub.
+-- Project Hoomans adapter for the reusable PsychopatzCore speech hub.
 --
 -- This module owns Hoomans relationship vocabulary and the two Hoomans
 -- presentation sinks (conversation history and diary).  Arbitration remains
@@ -9,19 +9,19 @@ require "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient"
 require "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
 require "PsychopatzCore/Conversation/PsychopatzNameParts"
 require "PsychopatzCore/Events/PC_EventBus"
-require "PNC/Core/Identity/PNC_FlavorAddress"
-require "PNC/Core/Social/PNC_FlavorTextResolver"
+require "PNC/Semantics/PNC_SemanticAddressResolver"
+require "PNC/Core/Social/PNC_SemanticSocialContext"
 require "PNC/Conversation/PNC_ConversationDiary"
 
 PNC = PNC or {}
-PNC.SocialFlavorPresentation = PNC.SocialFlavorPresentation or {}
+PNC.SemanticSpeechPresentation = PNC.SemanticSpeechPresentation or {}
 
-local Presentation = PNC.SocialFlavorPresentation
+local Presentation = PNC.SemanticSpeechPresentation
 local Client = PsychopatzCore.SocialFlavorClient
 local EventBus = PsychopatzCore.Events
 local Diary = PNC.Conversation.Diary
 local NameParts = PsychopatzCore.Conversation.NameParts
-local FlavorAddress = PNC.FlavorAddress
+local Addressing = PNC.Semantics.AddressResolver
 local Targets = PNC.CompanionTargetResolver
 local OWNER_TOKEN = Presentation
 local MAX_PLAYER_SPEECH_RECIPIENTS = 8
@@ -43,7 +43,7 @@ end
 
 local function log(event, details)
     if print then
-        print("[PNC][SocialFlavor] " .. tostring(event) .. " "
+        print("[PNC][SemanticSpeech] " .. tostring(event) .. " "
             .. tostring(details or ""))
     end
 end
@@ -113,9 +113,9 @@ local function playerAddress(npcID, player, options)
     options = type(options) == "table" and options or {}
     local snapshot = state.snapshots
         and state.snapshots[tostring(npcID)] or nil
-    return FlavorAddress.ResolveForNPC({
+    return Addressing.ResolveForNPC({
         npcID = npcID,
-        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(snapshot, npcID),
+        npcIdentitySeed = Addressing.ResolveNPCSeed(snapshot, npcID),
         player = player,
         playerContext = playerContext,
         playerUUID = playerUUID(),
@@ -175,9 +175,9 @@ local function activeConversationFor(npcID)
 end
 
 
-PNC.SocialFlavorPresentationInternal =
-    PNC.SocialFlavorPresentationInternal or {}
-local H = PNC.SocialFlavorPresentationInternal
+PNC.SemanticSpeechPresentationInternal =
+    PNC.SemanticSpeechPresentationInternal or {}
+local H = PNC.SemanticSpeechPresentationInternal
 H.Clean = clean
 H.FirstBoolean = firstBoolean
 H.Log = log

@@ -23,13 +23,9 @@
       "label": "Rain greeting EN",
       "language": "EN",
       "utterance": "hello",
-      "scenario": {
-        "world": {
-          "weather": "rain"
-        }
-      },
+      "scenario": {"world": {"weather": "rain"}},
       "expected": {
-        "firstKey": "semantic.flow.greeting.opening.rain",
+        "firstSemanticKey": "semantic.flow.greeting.opening.rain",
         "maxActions": 0
       }
     },
@@ -37,13 +33,9 @@
       "label": "Rain greeting TL",
       "language": "TL",
       "utterance": "hello",
-      "scenario": {
-        "world": {
-          "weather": "rain"
-        }
-      },
+      "scenario": {"world": {"weather": "rain"}},
       "expected": {
-        "firstKey": "semantic.flow.greeting.opening.rain",
+        "firstSemanticKey": "semantic.flow.greeting.opening.rain",
         "maxActions": 0,
         "maxFallbackLookups": 0
       }
@@ -52,11 +44,7 @@
       "label": "Unknown identity EN",
       "language": "EN",
       "utterance": "what is your name",
-      "scenario": {
-        "npc": {
-          "name": ""
-        }
-      },
+      "scenario": {"npc": {"name": ""}},
       "expected": {
         "lastKeyPrefix": "semantic.question.identity.",
         "maxActions": 0
@@ -66,11 +54,7 @@
       "label": "Unknown identity TL",
       "language": "TL",
       "utterance": "what is your name",
-      "scenario": {
-        "npc": {
-          "name": ""
-        }
-      },
+      "scenario": {"npc": {"name": ""}},
       "expected": {
         "lastKeyPrefix": "semantic.question.identity.",
         "maxActions": 0

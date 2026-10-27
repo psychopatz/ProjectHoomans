@@ -131,7 +131,7 @@ local function deliverWorld(options, text)
     local accepted, reason = presentation.Receive({
         eventID = eventID,
         npcID = npcID,
-        flavorID = options.compatibilityFlavorID
+        speechEventID = options.speechEventID
             or "semantic.speech.selected",
         family = options.family or "semantic_speech",
         priority = tonumber(options.priority) or 100,

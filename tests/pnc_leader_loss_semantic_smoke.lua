@@ -1,3 +1,4 @@
+-- Semantic leader-loss speech and load-order regression.
 local T = require "tests/support/test"
 
 T.addPackagePaths({
@@ -26,8 +27,8 @@ local Reactions = T.load(
     "shared",
     "PNC/Semantics/PNC_SemanticSocialReaction.lua"
 )
-local Resolver = require "PNC/Core/Social/PNC_FlavorTextResolver"
-local Const = PNC.FlavorTextConst
+local Resolver = require "PNC/Core/Social/PNC_SemanticSocialContext"
+local Const = PNC.Semantics.SocialContextConstants
 
 local now = 9000
 
@@ -372,15 +373,15 @@ T.equal(Resolver.ClassifyGrief({}),
 -- 8. Load-order independence.
 --
 -- Both server modules must be loadable before the shared composition has
--- populated PNC.FlavorText / PNC.FlavorTextConst.  Reading those at module
+-- populated PNC.Semantics.SocialContext / SocialContextConstants. Reading those at module
 -- load time was a real bug: it broke any consumer that required the social
 -- hooks barrel earlier than the flavor resolver.
 -- ---------------------------------------------------------------------------
 
-local savedResolver = PNC.FlavorText
-local savedConstants = PNC.FlavorTextConst
-PNC.FlavorText = nil
-PNC.FlavorTextConst = nil
+local savedResolver = PNC.Semantics.SocialContext
+local savedConstants = PNC.Semantics.SocialContextConstants
+PNC.Semantics.SocialContext = nil
+PNC.Semantics.SocialContextConstants = nil
 
 local loadedEarly = pcall(dofile,
     "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/"
@@ -411,10 +412,10 @@ local earlyDowned = Hooks.OnIncapacitated(
 T.falsy(earlyDowned, "the downed hook degrades without the flavor layer")
 
 -- Restore so nothing else in the process sees a mutilated PNC.
-PNC.FlavorText = savedResolver
-PNC.FlavorTextConst = savedConstants
+PNC.Semantics.SocialContext = savedResolver
+PNC.Semantics.SocialContextConstants = savedConstants
 PNC.SocialEventHooksInternal.LeaderLossDebugReset()
-PNC.SocialEventHooksInternal.IncapacitatedFlavorDebugReset()
+PNC.SocialEventHooksInternal.IncapacitatedSpeechDebugReset()
 
 -- And the hooks work again once the layer is present.
 records["player-owner"] = { id = "player-owner", displayName = "Mara" }

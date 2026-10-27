@@ -340,13 +340,123 @@ for `33` files; `git diff --check` passes. P10D canonical-source groundwork
 is included: schema v2 derives family IDs, concepts, translation keys, and
 ownership from semantic IDs and removes migration metadata from the source.
 
-## Immediate Next Chunk — P10C and P10D
+## Accepted P10C — semantic naming and speech presentation cleanup
 
-Rename the remaining Project Hoomans FlavorText/FlavorAddress and misleading
-SocialFlavor presentation terminology without changing generic PsychopatzCore
-compatibility APIs. Finish the v2 Dialogue Content audit by removing any
-wording duplicated in semantic providers, then add the shared derived semantic
-tree projection for Responses and Dialogue Content.
+P10C is accepted. Project Hoomans now exposes social-context classification as
+`PNC.Semantics.SocialContext` with `SocialContextConstants`, semantic
+addressing as `PNC.Semantics.AddressResolver`, and PNC-owned delivery as
+`PNC.SemanticSpeechPresentation`. The old `PNC.FlavorText*`,
+`PNC.FlavorAddress*`, and `PNC_SocialFlavorPresentation*` production surfaces
+are absent. Downed distress packets and the migrated event adapters use
+`speechEventID`; the remaining `flavorID` fields are explicit transport
+boundaries for generic PsychopatzCore or legacy Conversation Memory/Gossip
+infrastructure. Threat, audience, need, grief, identity disclosure,
+relationship-address terms, and repetition avoidance remain unchanged.
+
+P10C evidence: the namespace/address/speech presentation native set is green,
+the incapacitated speech lifecycle remains green after the naming cleanup, and
+the P10F negative-absence smoke confirms the deleted production paths.
+
+## Accepted P10D — compact Dialogue Content schema
+
+P10D is accepted. CodeBuilder now consumes schema v2 canonical content with
+semantic template identity as the join. Mechanical family IDs, concepts,
+translation prefixes, style suffixes, fingerprints, and ownership are derived
+deterministically. The current source is `105007` bytes with `216` phrase
+families, `395` phrases, and `1` player-choice artifact; generated Registry,
+EN, and TL artifacts contain no `.migrated.`, `MIGRATED_*`, `legacySource`,
+`semanticAuthority`, duplicated response-pool/variant IDs, or migration-era
+locked metadata. ResponseCatalog plans remain the meaning/follow-up authority;
+Dialogue Content remains the wording authority.
+
+P10D evidence: compact-content, generated-content, EN/TL parity, ToolReply,
+and idempotence tests are green. Catalog wording fallbacks were removed for
+the migrated command, greeting, compatibility, medical, social-reaction, and
+ToolReply families; unavailable semantic realization is explicit.
+
+## Accepted P10E — shared hierarchical Semantic Lab projection
+
+P10E is accepted. Responses and Dialogue Content now project the same bounded
+semantic tree directly from canonical `semantic.*` IDs. Branch labels are
+humanized, descendant counts and full canonical IDs are visible, searches
+retain matching ancestors and auto-expand matches, and leaf details remain
+lazy. Existing paging, filters, source/provenance detail, and ownership
+boundaries remain intact; no hierarchy database was introduced.
+
+P10E evidence: the shared tree projection tests pass, including branch-match
+auto-expansion, and the Studio panes retain bounded page and lazy-detail
+behavior. Focused Xvfb Studio acceptance remains part of the final P10F gate.
+
+## Accepted P10F — final zero-legacy acceptance
+
+P10F is accepted. The repository now has literal canonical ownership: the
+ResponseCatalog selects semantic meaning, Dialogue Content supplies the one
+first-party wording realization, lifecycle/context owns continuation and
+follow-up state, and `PNC.SemanticSpeechPresentation` only delivers selected
+speech. The production tree contains zero `PNC_SocialFlavorDefinitions*`,
+`PNC_ConversationToolReplyCatalog.lua`, `PNC_CompanionCommandFlavor*`,
+`PNC.FlavorText*`, `PNC.FlavorAddress*`, or PNC
+`PNC_SocialFlavorPresentation*` files, and zero worker/composition loads for
+them. The negative absence smoke and source scans also prove no first-party
+`Flavor.Resolve`/`Flavor.Register` wording path, no compatibility
+`compatibilityFlavorID`, and no canonical-content migration markers remain.
+
+The remaining Flavor terminology is compatibility transport only: generic
+PsychopatzCore `SocialFlavorClient` queue/arbitration/TTS/nameplate APIs,
+PBrainZ ambient submission, the Necroa-owned zombie-caption adapter, and
+Companion Dogs' external presentation bridge. Their providers/transport carry
+facts or event identity; Project Hoomans semantic pools choose Hoomans
+meaning and Dialogue Content chooses Hoomans wording. `flavorID` remains only
+at those explicit external Core transport boundaries.
+
+The compact canonical source is schema v2: `105,007` bytes, `216` phrase
+families, `395` phrases, and `1` player-choice artifact. Generated artifacts
+are `205,402` bytes for the runtime Registry, `39,671` bytes for EN, and
+`39,924` bytes for TL. The pre-P10 audit baseline was approximately `242 KB`,
+`168` families / `179` phrases, `167` `.migrated.` IDs, `167` `MIGRATED_*`
+concepts, `167` `legacySource` records, and about `1,674` repeated locked
+fields. Two consecutive CodeBuilder runs produced identical SHA-256 outputs:
+Registry `1fa7e66c367a9b200f7ae0881bb853057210ddcb3f1934ac802885e7133111b0`,
+EN `9fe0479e03896e26754a2ea71e36d5883b171cf5b67592fd12e4189c94154558`, and
+TL `66cbb1ba5aaa862ef7d5a459e1cd01bc312632b1091ce0a73b029665908d953c`.
+
+Responses and Dialogue Content now share the derived semantic tree projection:
+humanized branches, descendant counts, search ancestor retention and
+auto-expansion, canonical IDs in details, exact provenance, bounded paging,
+and lazy variant/detail retrieval. No hierarchy database was added. Existing
+event follow-up, command/emote/greeting, medical, social, compatibility,
+PBrainZ, and EN/TL parity coverage remains green.
+
+Final developer-side evidence:
+
+- Resource-aware headless Python: `159 PASS / 0 FAIL / 0 SKIP` modules, `56`
+  expected display-dependent individual skips, maximum `4` active child
+  processes, `393.81s` wall time. Slowest modules were Response Observatory
+  `91.75s`, harness `59.65s`, contextual talk parity `45.39s`, contextual
+  social reactions `41.77s`, and automatic flow generation `41.41s`.
+- Focused Xvfb GUI/lifecycle lane: `14 PASS / 0 FAIL / 0 SKIP` invocations,
+  `49/49` tests, four active subprocesses, `47.89s` wall time. The focused
+  P3B module passed all four lifecycle tests in `25.32s`.
+- Startup samples: fixture worker-ready `1.697–1.740s`, fixture through
+  bounded Explore `1.721–1.765s`; remembered SAVE worker-ready
+  `1.802–1.831s`, remembered restoration `2.692–2.697s`. The product remains
+  read-only and uses the immutable imported source snapshot after worker
+  restart.
+- Native Lua: `901/901 PASS`, four workers, `6.85s` shell wall time.
+- Installed-PZ Kahlua: project verifier `123` files, pass; full `pz-verify`
+  scan `3,346` files, `0` errors / `0` warnings, no game launch.
+- Source/save safety: `18/18 PASS` selected real-save/import/re-hydration
+  tests in `55.90s`; the real save SHA-256 stayed
+  `b5e53dd9e1c92cb4a8cc7cbe963953ca25c9c5617b6764a3da32deba96df6518`.
+- Runner characterization, including bounded jobs, failure propagation,
+  exclusive serialization, child cleanup, timing reports, and slowest-module
+  reporting, remains `5/5 PASS`. The previous serial full-suite run remains
+  diagnostic evidence only (interrupted `608.35s`; earlier complete diagnostic
+  approximately `1001.81s`).
+- `git diff --check`: PASS.
+
+P10A–P10F are complete. Current phase: **READY FOR USER LIVE TEST**. Only
+explicitly user-owned native Project Zomboid SP/MP validation remains.
 
 ## Stop conditions
 

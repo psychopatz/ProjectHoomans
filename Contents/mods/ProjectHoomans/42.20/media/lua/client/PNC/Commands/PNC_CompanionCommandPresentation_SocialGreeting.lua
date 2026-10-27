@@ -16,7 +16,7 @@ function Presentation.HandleSocialGreeting(greeting)
     local memory
     local resolvedText
     local context
-    local socialFlavor
+    local speechPresentation
     local queueAccepted
     local queueReason
     local queuedReaction = false
@@ -83,16 +83,16 @@ function Presentation.HandleSocialGreeting(greeting)
         context.memoryID = greeting.memoryID
         context.memoryType = greeting.memoryType
         context.eventType = "corpse_reaction"
-        socialFlavor = PNC.SocialFlavorPresentation
-        if not socialFlavor or type(socialFlavor.Receive) ~= "function" then
+        speechPresentation = PNC.SemanticSpeechPresentation
+        if not speechPresentation or type(speechPresentation.Receive) ~= "function" then
             local ok = pcall(
                 require,
-                "PNC/Conversation/PNC_SocialFlavorPresentation"
+                "PNC/Conversation/PNC_SemanticSpeechPresentation"
             )
-            socialFlavor = ok and PNC.SocialFlavorPresentation or nil
+            speechPresentation = ok and PNC.SemanticSpeechPresentation or nil
         end
-        if socialFlavor and type(socialFlavor.Receive) == "function" then
-            queueAccepted, queueReason = socialFlavor.Receive({
+        if speechPresentation and type(speechPresentation.Receive) == "function" then
+            queueAccepted, queueReason = speechPresentation.Receive({
                 eventID = eventID,
                 npcID = npcID,
                 poolID = greeting.poolID,
@@ -153,7 +153,7 @@ function Presentation.HandleSocialGreeting(greeting)
         end
     end
     if not queuedReaction then
-        _, text = Presentation.ShowAmbientNPCFlavor(
+        _, text = Presentation.ShowAmbientNPCSpeech(
             body,
             greeting.poolID or greeting.eventType
                 or "npc_proximity_greeting",

@@ -56,7 +56,7 @@ local Lifecycle = Conversation.Lifecycle
 local Composer = Conversation.Composer
 local Backgrounds = Conversation.Backgrounds
 local Palette = PNC.NPCTypePalette
-local FlavorAddress = PNC.FlavorAddress
+local Addressing = PNC.Semantics.AddressResolver
 local TalkStart = Conversation.TalkStart
     or require "PNC/Conversation/PNC_ConversationTalkStart"
 local Context = require "PNC/Conversation/Definition/PNC_ConversationDefinition_Context"
@@ -64,11 +64,11 @@ local ExtensionParts = require "PNC/Conversation/Definition/PNC_ConversationDefi
 local IdentityChoice = require "PNC/Conversation/Blocks/PNC_ConversationIdentityChoice"
 local semanticInputWarningEmitted = false
 
-if type(FlavorAddress) ~= "table"
-    or type(FlavorAddress.ResolveNPCSeed) ~= "function"
+if type(Addressing) ~= "table"
+    or type(Addressing.ResolveNPCSeed) ~= "function"
 then
-    pcall(require, "PNC/Core/Identity/PNC_FlavorAddress")
-    FlavorAddress = PNC.FlavorAddress
+    pcall(require, "PNC/Semantics/PNC_SemanticAddressResolver")
+    Addressing = PNC.Semantics.AddressResolver
 end
 
 local function conversationTime()
@@ -216,7 +216,7 @@ local function buildConversationContext(
         actorAuthority = blockContext.actorAuthority,
         npcState = blockContext.npcState,
         conversationBlockContext = blockContext,
-        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
+        npcIdentitySeed = Addressing.ResolveNPCSeed(entry, npcID),
     }
     for key, value in pairs(identityArguments) do
         presentationContext[key] = value

@@ -1,14 +1,14 @@
 -- Client-side player-speech and safety presentation provider.
 
 PNC = PNC or {}
-PNC.SocialFlavorPresentation = PNC.SocialFlavorPresentation or {}
-PNC.SocialFlavorPresentationInternal =
-    PNC.SocialFlavorPresentationInternal or {}
+PNC.SemanticSpeechPresentation = PNC.SemanticSpeechPresentation or {}
+PNC.SemanticSpeechPresentationInternal =
+    PNC.SemanticSpeechPresentationInternal or {}
 
-local Presentation = PNC.SocialFlavorPresentation
-local H = PNC.SocialFlavorPresentationInternal
+local Presentation = PNC.SemanticSpeechPresentation
+local H = PNC.SemanticSpeechPresentationInternal
 local Client = PsychopatzCore.SocialFlavorClient
-local FlavorAddress = PNC.FlavorAddress
+local Addressing = PNC.Semantics.AddressResolver
 local Targets = PNC.CompanionTargetResolver
 local clean = H.Clean
 local currentPlayer = H.CurrentPlayer
@@ -21,7 +21,7 @@ local InteractionPresentationRegistry = require
     "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
 local MAX_PLAYER_SPEECH_RECIPIENTS = 8
 
-require "PNC/Conversation/PNC_SocialFlavorPresentation_Receive"
+require "PNC/Conversation/PNC_SemanticSpeechPresentation_Receive"
 local SocialReactions = PNC.Semantics
     and PNC.Semantics.SocialReactions or nil
 if type(SocialReactions) ~= "table" then
@@ -97,7 +97,7 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
                 speakerFullName = speaker.fullName,
                 speakerFirstName = speaker.firstName,
                 speakerSurname = speaker.surname,
-                npcIdentitySeed = FlavorAddress.ResolveNPCSeed(
+                npcIdentitySeed = Addressing.ResolveNPCSeed(
                     target.source or target, npcID
                 ),
                 player = playerIdentityValue.addressName,
@@ -231,7 +231,7 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
         playerNameKnown = identity.known,
         playerIsFemale = identity.isFemale,
         playerNicknameID = identity.nicknameID,
-        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
+        npcIdentitySeed = Addressing.ResolveNPCSeed(entry, npcID),
         speakerFullName = speaker.fullName,
         speakerFirstName = speaker.firstName,
         speakerSurname = speaker.surname,

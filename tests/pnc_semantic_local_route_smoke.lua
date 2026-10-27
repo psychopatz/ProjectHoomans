@@ -333,8 +333,17 @@ providerReady = false
 local offlineGreetingAccepted = Input.Submit(view, "hello there")
 T.equal(offlineGreetingAccepted, true,
     "greeting remains local when the provider is disabled")
-T.equal(queued[8].payload.fallback, "Hey there. Wet one today.",
-    "provider-disabled greeting still uses the local response catalog")
+local weatherFallbacks = {
+    ["Hey there. Wet one today."] = true,
+    ["Rain's not letting up."] = true,
+    ["Keep dry if you can."] = true,
+}
+T.truthy(weatherFallbacks[queued[8].payload.fallback],
+    "provider-disabled greeting still uses the bounded local response pool")
+T.truthy(string.find(queued[8].payload.translationKey or "",
+    "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRain",
+    1, true),
+    "provider-disabled greeting retains canonical content provenance")
 T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",
     "provider-disabled greeting remains on the deterministic route")
 T.equal(llmCalls, 0,

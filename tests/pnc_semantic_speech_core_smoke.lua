@@ -207,4 +207,4 @@ T.equal(#messages, 5, "cooldown prevents a second ambient line")
 
 EventBus.clearOwner("social-flavor-message-test")
 EventBus.clearOwner("social-flavor-delivery-test")
-T.finish("pnc_social_flavor_core_smoke")
+T.finish("pnc_semantic_speech_core_smoke")

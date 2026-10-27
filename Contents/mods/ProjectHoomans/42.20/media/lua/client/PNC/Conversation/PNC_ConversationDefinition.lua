@@ -2,7 +2,7 @@
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
-require "PNC/Core/Identity/PNC_FlavorAddress"
+require "PNC/Semantics/PNC_SemanticAddressResolver"
 if not PNC.Conversation.Audience then
     require "PNC/Conversation/PNC_ConversationAudience"
 end

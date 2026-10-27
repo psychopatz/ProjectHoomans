@@ -1,13 +1,13 @@
 -- Shared actor identity normalization for ambient and interactive contexts.
 require "PsychopatzCore/Conversation/PsychopatzNameParts"
-require "PNC/Core/Identity/PNC_FlavorAddress"
+require "PNC/Semantics/PNC_SemanticAddressResolver"
 PNC = PNC or {}
 PNC.PBrainZ = PNC.PBrainZ or {}
 PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
 
 local Integration = PNC.PBrainZ
 local NameParts = PsychopatzCore.Conversation.NameParts
-local FlavorAddress = PNC.FlavorAddress
+local Addressing = PNC.Semantics.AddressResolver
 local Identity = Integration.Internal.ActorIdentity or {}
 Integration.Internal.ActorIdentity = Identity
 
@@ -16,7 +16,7 @@ function Identity.Split(fullName, firstName, surname)
 end
 
 function Identity.ResolvePlayer(options)
-    return FlavorAddress.ResolveForNPC(options)
+    return Addressing.ResolveForNPC(options)
 end
 
 function Identity.Resolve(item, source, npcID, playerID)
@@ -29,7 +29,7 @@ function Identity.Resolve(item, source, npcID, playerID)
     )
     local playerAddress = Identity.ResolvePlayer({
         npcID = npcID,
-        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(source, npcID),
+        npcIdentitySeed = Addressing.ResolveNPCSeed(source, npcID),
         playerUUID = playerID,
         isFemale = source.playerIsFemale,
         playerNameKnown = source.playerNameKnown,

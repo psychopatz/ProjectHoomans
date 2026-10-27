@@ -96,7 +96,6 @@ return function(Catalog, Core)
             id = variant.id,
             templateID = variant.templateID,
             fallback = variant.fallback,
-            compatibilityFlavorID = variant.compatibilityFlavorID,
             plan = variant.plan,
             dialogueAct = variant.dialogueAct,
             topic = variant.topic,

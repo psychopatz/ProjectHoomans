@@ -11,6 +11,7 @@ import json
 from typing import Any, Callable
 
 from ..codebuilder.service import SemanticLabAuthoringService
+from .semantic_tree import build_semantic_tree, filter_semantic_tree
 
 
 class DialogueContentPane:
@@ -41,8 +42,10 @@ class DialogueContentPane:
         self.frame.columnconfigure(1, weight=3)
         self._status_var = tk.StringVar(value="Loading verified dialogue content…")
         self._items: list[dict[str, Any]] = []
+        self._tree_rows: dict[str, dict[str, Any]] = {}
         self._selected: dict[str, Any] | None = None
         self._source_fingerprint: str | None = None
+        self._filter_var = tk.StringVar(value="")
 
         toolbar = ttk.Frame(self.frame)
         toolbar.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 6))
@@ -54,20 +57,40 @@ class DialogueContentPane:
         ttk.Button(toolbar, text="Refresh", command=self.refresh).grid(
             row=0, column=1, padx=(8, 0)
         )
-        ttk.Label(toolbar, textvariable=self._status_var).grid(
-            row=0, column=2, padx=(12, 0), sticky="e"
+        ttk.Label(toolbar, text="Filter").grid(row=0, column=2, padx=(12, 4))
+        ttk.Entry(toolbar, textvariable=self._filter_var, width=24).grid(
+            row=0, column=3, sticky="ew"
         )
+        ttk.Button(toolbar, text="Search", command=self._render_tree).grid(
+            row=0, column=4, padx=(4, 0)
+        )
+        ttk.Label(toolbar, textvariable=self._status_var).grid(
+            row=0, column=5, padx=(12, 0), sticky="e"
+        )
+        toolbar.columnconfigure(3, weight=1)
 
         left = ttk.LabelFrame(self.frame, text="Verified content families")
         left.grid(row=1, column=0, sticky="nsew", padx=(0, 8))
         left.rowconfigure(0, weight=1)
         left.columnconfigure(0, weight=1)
-        self._listbox = tk.Listbox(left, width=42, exportselection=False)
-        self._listbox.grid(row=0, column=0, sticky="nsew")
-        self._listbox.bind("<<ListboxSelect>>", lambda _event: self.load_selected())
-        scrollbar = ttk.Scrollbar(left, orient="vertical", command=self._listbox.yview)
+        self._tree = ttk.Treeview(
+            left,
+            columns=("count", "canonical"),
+            show="tree headings",
+            selectmode="browse",
+        )
+        self._tree.heading("#0", text="Semantic branch / family")
+        self._tree.heading("count", text="Count")
+        self._tree.heading("canonical", text="Canonical ID")
+        self._tree.column("#0", width=270)
+        self._tree.column("count", width=60, stretch=False)
+        self._tree.column("canonical", width=280)
+        self._tree.grid(row=0, column=0, sticky="nsew")
+        self._tree.bind("<<TreeviewSelect>>", lambda _event: self.load_selected())
+        scrollbar = ttk.Scrollbar(left, orient="vertical", command=self._tree.yview)
         scrollbar.grid(row=0, column=1, sticky="ns")
-        self._listbox.configure(yscrollcommand=scrollbar.set)
+        scrollbar.configure(command=self._tree.yview)
+        self._tree.configure(yscrollcommand=scrollbar.set)
 
         right = ttk.Frame(self.frame)
         right.grid(row=1, column=1, sticky="nsew")
@@ -113,15 +136,67 @@ class DialogueContentPane:
             self._items = self.service.list_dialogue_content()
         except (OSError, ValueError, KeyError) as error:
             self._items = []
+            self._tree_rows = {}
             self._status_var.set(f"Content load failed: {error}")
             return
-        self._listbox.delete(0, "end")
-        for item in self._items:
-            self._listbox.insert("end", self._display_label(item))
+        self._render_tree()
         if self._items:
-            self._listbox.selection_set(0)
-            self.load_selected()
+            leaves = list(self._tree_rows)
+            if leaves:
+                self._tree.selection_set(leaves[0])
+                self.load_selected()
         self._status_var.set(f"{len(self._items)} verified content records")
+
+    def _render_tree(self) -> None:
+        tree = filter_semantic_tree(
+            build_semantic_tree(
+                self._items,
+                id_getter=lambda item: str(
+                    item.get("semanticTemplateID") or item.get("id") or ""
+                ),
+            ),
+            self._filter_var.get(),
+        )
+        self._tree_rows = {}
+        self._tree.delete(*self._tree.get_children())
+
+        def insert(node: dict[str, Any], parent: str = "") -> None:
+            for key in sorted(node.get("children", {}), key=str.casefold):
+                child = node["children"][key]
+                iid = "branch:" + str(child["key"])
+                self._tree.insert(
+                    parent,
+                    "end",
+                    iid=iid,
+                    text=f"{child['label']} ({child['count']})",
+                    values=(child["count"], ""),
+                    open=(
+                        not self._filter_var.get().strip()
+                        or child["key"] in tree.get("expanded", set())
+                    ),
+                )
+                for index, item in enumerate(
+                    sorted(
+                        child.get("items", []),
+                        key=lambda value: str(
+                            value.get("semanticTemplateID")
+                            or value.get("id") or ""
+                        ).casefold(),
+                    )
+                ):
+                    content_id = str(item.get("id") or f"item-{index}")
+                    iid = "content:" + content_id
+                    self._tree_rows[iid] = item
+                    self._tree.insert(
+                        "branch:" + str(child["key"]),
+                        "end",
+                        iid=iid,
+                        text=self._display_label(item),
+                        values=(1, str(item.get("semanticTemplateID") or content_id)),
+                    )
+                insert(child, "branch:" + str(child["key"]))
+
+        insert(tree)
 
     def _set_text(self, widget: Any, value: str, *, disabled: bool = False) -> None:
         widget.configure(state="normal")
@@ -131,10 +206,11 @@ class DialogueContentPane:
             widget.configure(state="disabled")
 
     def _selected_id(self) -> str | None:
-        selection = self._listbox.curselection()
+        selection = self._tree.selection()
         if not selection:
             return None
-        return str(self._items[selection[0]].get("id"))
+        item = self._tree_rows.get(selection[0])
+        return str(item.get("id")) if item else None
 
     def load_selected(self) -> None:
         content_id = self._selected_id()

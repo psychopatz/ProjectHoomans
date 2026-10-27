@@ -4,7 +4,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 local Discovery = PNC.WorldDiscovery
 local Internal = Discovery.RadioBroadcastsInternal
 local Types = PNC.WorldDiscoveryTypes
-local FlavorAddress = PNC.FlavorAddress
+local Addressing = PNC.Semantics.AddressResolver
 local playerContextFor = Internal.PlayerContextFor
 local pickSpeakers = Internal.PickSpeakers
 local pickConflictParticipant = Internal.PickConflictParticipant
@@ -28,7 +28,7 @@ function Discovery.BuildRadioTemplateContext(player, entity, phase)
         player, entity, speaker) or nil
     local conflictVariant = conflict ~= nil and conflictRoll() or false
     if not conflictVariant then conflict = nil end
-    local playerAddress = FlavorAddress.ResolveForNPC({
+    local playerAddress = Addressing.ResolveForNPC({
         npcID = speaker and speaker.npcID or "radio:unknown",
         npcIdentitySeed = speaker and speaker.identitySeed,
         player = player,

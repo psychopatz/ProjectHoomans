@@ -27,11 +27,13 @@ PNC = {
             EnsureSource = function() return true end,
         },
     },
-    FlavorAddress = {
+    Semantics = {
+        AddressResolver = {
         ResolveForNPC = function()
             return { addressName = "you", known = false }
         end,
         ResolveNPCSeed = function() return 1 end,
+        },
     },
     Network = {
         ClientState = {

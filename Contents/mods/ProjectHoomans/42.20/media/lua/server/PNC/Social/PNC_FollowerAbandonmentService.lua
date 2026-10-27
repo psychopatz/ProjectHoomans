@@ -32,17 +32,17 @@ if not SocialReactions then
     SocialReactions = ok and loaded or nil
 end
 local ContextProviders = PNC.Semantics
-    and PNC.Semantics.ContextProviders or nil
+    and PNC.Semantics.SocialContext or nil
 if type(ContextProviders) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Core/Social/PNC_FlavorTextResolver"
+        "PNC/Core/Social/PNC_SemanticSocialContext"
     )
     ContextProviders = ok and loaded or nil
 end
 
-Service.FLAVOR_ZOMBIE = "social.follower_abandoned_zombie"
-Service.FLAVOR_HOSTILE_NPC = "social.follower_abandoned_hostile_npc"
+Service.SPEECH_EVENT_ZOMBIE = "social.follower_abandoned_zombie"
+Service.SPEECH_EVENT_HOSTILE_NPC = "social.follower_abandoned_hostile_npc"
 
 local function worldAgeHours(value)
     value = tonumber(value)
@@ -296,7 +296,7 @@ function Service.TryDeliver(player, record, body, occurredAt, meeting)
     local relationship
     local role
     local tier
-    local flavorID
+    local speechEventID
     local semanticEventType
     local eventRef
     local factRefs
@@ -358,8 +358,8 @@ function Service.TryDeliver(player, record, body, occurredAt, meeting)
         and Relationships.Get(record.id, marker.ownerKey) or nil
     role = roleFor(record)
     tier = relationshipTier(relationship)
-    flavorID = marker.hostileKind == "zombie"
-        and Service.FLAVOR_ZOMBIE or Service.FLAVOR_HOSTILE_NPC
+    speechEventID = marker.hostileKind == "zombie"
+        and Service.SPEECH_EVENT_ZOMBIE or Service.SPEECH_EVENT_HOSTILE_NPC
     semanticEventType = marker.hostileKind == "zombie"
         and "follower_abandoned_zombie"
         or "follower_abandoned_hostile_npc"
@@ -435,7 +435,7 @@ function Service.TryDeliver(player, record, body, occurredAt, meeting)
             offerIDs = realization.offerIDs,
             npcID = tostring(record.id),
             ambientFlavor = {
-                flavorID = flavorID,
+                speechEventID = speechEventID,
                 text = realization.fallback,
                 semanticOwned = true,
                 eventRef = eventRef,
@@ -479,7 +479,7 @@ function Service.TryDeliver(player, record, body, occurredAt, meeting)
         "owner=" .. tostring(marker.ownerKey),
         "hostileKind=" .. tostring(marker.hostileKind),
         "hostileID=" .. tostring(marker.hostileID or "nil"),
-        "flavorID=" .. tostring(flavorID),
+        "speechEventID=" .. tostring(speechEventID),
     })
     return true, "delivered"
 end

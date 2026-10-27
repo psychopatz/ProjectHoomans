@@ -128,9 +128,9 @@ function Presentation.BuildResponse(
                 { playerFirst }
         end
         return localized(
-            "UI_PNC_Conversation_ToolReply_AskNameUnnamed_1",
-            "Nice to meet you."
-        ), "UI_PNC_Conversation_ToolReply_AskNameUnnamed_1", nil
+        "UI_PNC_Conversation_Content_SemanticToolReplyAskNameUnnamed1Neutral01",
+        "You want to know my name? Give me a second."
+    ), "UI_PNC_Conversation_Content_SemanticToolReplyAskNameUnnamed1Neutral01", nil
     end
     local key = "UI_PNC_Conversation_Identity_FalseName"
     return localized(key, "That isn't your exact name. Don't lie to me."),

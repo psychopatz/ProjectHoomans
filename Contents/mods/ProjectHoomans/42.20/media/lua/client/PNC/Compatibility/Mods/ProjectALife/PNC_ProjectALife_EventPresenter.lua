@@ -123,13 +123,13 @@ local function pruneSeen(now)
 end
 
 local function receive(event)
-    local presentation = PNC.SocialFlavorPresentation
+    local presentation = PNC.SemanticSpeechPresentation
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local point = player and playerPosition(player) or nil
     local radius = eventRadius(event)
-    local flavorID = flavorFor(event)
+    local speechEventID = flavorFor(event)
     if not presentation or type(presentation.Receive) ~= "function"
-        or not point or not flavorID
+        or not point or not speechEventID
         or not distanceWithin(point,
             { x = event.x, y = event.y, z = event.z }, radius)
     then
@@ -206,7 +206,7 @@ local function receive(event)
         npcID = speakerID,
         eventID = "projectalife:" .. event.eventID .. ":" .. speakerID,
         eventRef = event.eventID,
-        flavorID = flavorID,
+        speechEventID = semantic.realizationID,
         family = "projectalife_world_event",
         eventType = eventType,
         text = semantic.fallback,

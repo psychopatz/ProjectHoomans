@@ -35,7 +35,7 @@ PNC = {
             end,
         },
     },
-    SocialFlavorPresentation = {
+    SemanticSpeechPresentation = {
         Receive = function(packet)
             speech[#speech + 1] = packet
             return true, "queued"
@@ -69,7 +69,7 @@ PNC.CompanionCommandPresentation.Internal.CompanionSpeech = {
         }
     end,
 }
-PNC.CompanionCommandPresentation.BuildFlavorContext = function()
+PNC.CompanionCommandPresentation.BuildSpeechContext = function()
     return { name = target.name, names = target.name, count = 1 }
 end
 
@@ -77,7 +77,7 @@ getSpecificPlayer = function() return player end
 
 local SpeechProvider = T.load(
     CLIENT .. "PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua")
-SpeechProvider.Bind(PNC.SocialFlavorPresentation)
+SpeechProvider.Bind(PNC.SemanticSpeechPresentation)
 
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandPresentation_PlayerEmoteResult.lua")
 

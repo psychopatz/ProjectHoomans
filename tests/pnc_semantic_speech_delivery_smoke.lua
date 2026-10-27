@@ -32,7 +32,7 @@ PNC = {
             end,
         },
     },
-    SocialFlavorPresentation = {
+    SemanticSpeechPresentation = {
         Receive = function(packet)
             speech[#speech + 1] = packet
             return true, "queued"
@@ -45,7 +45,7 @@ getSpecificPlayer = function() return player end
 local SpeechProvider = T.load(
     CLIENT .. "PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua")
 T.truthy(SpeechProvider, "semantic speech provider is composed")
-T.truthy(SpeechProvider.Bind(PNC.SocialFlavorPresentation),
+T.truthy(SpeechProvider.Bind(PNC.SemanticSpeechPresentation),
     "semantic speech test binds its presentation sink")
 T.load(CLIENT .. "PNC/Semantics/PNC_SemanticSpeechDelivery.lua")
 local Delivery = PNC.Semantics.SemanticSpeechDelivery

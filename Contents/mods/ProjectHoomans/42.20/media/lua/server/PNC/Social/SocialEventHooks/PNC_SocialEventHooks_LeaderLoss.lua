@@ -51,34 +51,33 @@ local DEFAULT_FACTION_COOLDOWN_MS = 60000
 -- The flavor vocabulary and resolver are owned by the shared composition,
 -- which may not have run when this module is required.  Resolve them at call
 -- time (never at load time) so load order can never break the server tree.
-local function flavorConstants()
-    return PNC.FlavorTextConst
+local function socialContextConstants()
+    return PNC.Semantics and PNC.Semantics.SocialContextConstants
 end
 
-local function flavorText()
-    if not PNC.FlavorText then return nil end
-    return PNC.Semantics and PNC.Semantics.ContextProviders
+local function socialContext()
+    return PNC.Semantics and PNC.Semantics.SocialContext
 end
 
 local function factionCooldownMs()
-    local constants = flavorConstants()
+    local constants = socialContextConstants()
     return tonumber(constants and constants.LEADER_DEATH_COOLDOWN_MS)
         or DEFAULT_FACTION_COOLDOWN_MS
 end
 
-local function flavorID()
-    local constants = flavorConstants()
-    return (constants and constants.FLAVOR_LEADER_DEATH)
+local function speechEventID()
+    local constants = socialContextConstants()
+    return (constants and constants.SPEECH_EVENT_LEADER_DEATH)
         or "social.witnessed_leader_death"
 end
 
 local function familyID()
-    local constants = flavorConstants()
+    local constants = socialContextConstants()
     return (constants and constants.LEADER_DEATH_FAMILY) or "leader_loss"
 end
 
 local function successionName()
-    local constants = flavorConstants()
+    local constants = socialContextConstants()
     return (constants and constants.Succession
         and constants.Succession.NONE) or "none"
 end
@@ -86,22 +85,22 @@ end
 -- Presentation tuning.  The fallbacks mirror the constants' own defaults so a
 -- missing constants table degrades to sane numbers rather than nil.
 local function priorityValue()
-    local constants = flavorConstants()
+    local constants = socialContextConstants()
     return tonumber(constants and constants.LEADER_DEATH_PRIORITY) or 88
 end
 
 local function weightValue()
-    local constants = flavorConstants()
+    local constants = socialContextConstants()
     return tonumber(constants and constants.LEADER_DEATH_WEIGHT) or 6
 end
 
 local function ttlValue()
-    local constants = flavorConstants()
+    local constants = socialContextConstants()
     return tonumber(constants and constants.LEADER_DEATH_TTL_MS) or 18000
 end
 
 local function holdValue()
-    local constants = flavorConstants()
+    local constants = socialContextConstants()
     return tonumber(constants and constants.LEADER_DEATH_HOLD_MS) or 4500
 end
 
@@ -211,7 +210,7 @@ local function selectMourners(faction, deadPlayerKey)
             and registry.Get(npcID) or nil
         if record and record.alive ~= false then
             local relationship = relationshipFor(record, deadPlayerKey)
-            local classify = flavorText()
+            local classify = socialContext()
             local grief = classify.ClassifyGrief({
                 relationshipState = relationshipState(relationship),
                 relationshipTier = relationshipTier(relationship),
@@ -271,7 +270,7 @@ function Hooks.OnLeaderLost(faction, deadPlayerKey, succession, successorNPCID)
     local at = now()
     if not faction or not faction.id then return false, "invalid_faction" end
     if not deadPlayerKey then return false, "invalid_leader" end
-    local resolver = flavorText()
+    local resolver = socialContext()
     if not resolver or type(resolver.BuildLeaderDeathContext) ~= "function"
     then
         return false, "resolver_unavailable"
@@ -363,14 +362,14 @@ function Hooks.OnLeaderLost(faction, deadPlayerKey, succession, successorNPCID)
                 return
             end
             local result = {
-                source = flavorID(),
+                source = speechEventID(),
                 eventID = eventID,
                 npcID = npcID,
                 eventType = "witnessed_leader_death",
                 ambientFlavor = {
                     eventID = eventID,
                     eventRef = eventID,
-                    flavorID = flavorID(),
+                    speechEventID = realization.realizationID,
                     semanticOwned = true,
                     text = realization.fallback,
                     eventType = "witnessed_leader_death",
@@ -415,7 +414,7 @@ function Hooks.OnLeaderLost(faction, deadPlayerKey, succession, successorNPCID)
                     source = {
                         kind = "social_flavor",
                         channel = "succession",
-                        eventType = flavorID(),
+                        eventType = speechEventID(),
                         contextEligible = true,
                     },
                 },
@@ -424,7 +423,7 @@ function Hooks.OnLeaderLost(faction, deadPlayerKey, succession, successorNPCID)
                 Network.SendConversationRelationshipForNPC,
                 player,
                 npcID,
-                flavorID(),
+                speechEventID(),
                 result
             )
             if ok and sent == true then

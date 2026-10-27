@@ -89,7 +89,7 @@ function Actors.ResolveConversation(view, entry, source, definition, presentatio
     local playerID = Actors.PlayerUUID(view)
     local playerAddress = Identity.ResolvePlayer({
         npcID = npcID,
-        npcIdentitySeed = PNC.FlavorAddress.ResolveNPCSeed(source, npcID),
+        npcIdentitySeed = PNC.Semantics.AddressResolver.ResolveNPCSeed(source, npcID),
         player = presentation.player,
         playerContext = clientState.playerContext,
         playerUUID = playerID,

@@ -93,7 +93,7 @@ local unknownTarget = {
 local knownTarget = { id = "npc-one", name = "Mara" }
 state.semanticAddressHistory = nil
 local unknownAddressContext =
-    PNC.CompanionCommandPresentation.BuildFlavorContext(
+    PNC.CompanionCommandPresentation.BuildSpeechContext(
         player,
         { targets = { unknownTarget, knownTarget } }
     )
@@ -121,7 +121,7 @@ T.truthy(state.semanticAddressHistory
 T.equal(state.semanticAddressHistory["npc-unknown"][1], "stranger",
     "first unknown target address is recorded")
 local nextUnknownAddress =
-    PNC.CompanionCommandPresentation.BuildFlavorContext(
+    PNC.CompanionCommandPresentation.BuildSpeechContext(
         player,
         { targets = { unknownTarget } }
     )

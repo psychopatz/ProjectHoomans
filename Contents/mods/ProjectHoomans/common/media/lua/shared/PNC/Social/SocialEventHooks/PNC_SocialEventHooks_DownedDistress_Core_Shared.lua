@@ -40,30 +40,30 @@ local Network = PNC.Network
 -- The flavor vocabulary is owned by the shared composition, which may not
 -- have run when this module is required.  Resolve it at call time so load
 -- order can never break the server tree.
-local function flavorText()
-    if not PNC.FlavorText then return nil end
-    return PNC.Semantics and PNC.Semantics.ContextProviders
+local function socialContext()
+    return PNC.Semantics and PNC.Semantics.SocialContext
 end
 
 -- Never return nil: callers read fields straight off the result, and a nil
 -- table would turn a graceful degradation into an index error.
 local EMPTY_CONSTANTS = {}
-local function flavorConst()
-    return PNC.FlavorTextConst or EMPTY_CONSTANTS
+local function socialContextConstants()
+    return PNC.Semantics and PNC.Semantics.SocialContextConstants
+        or EMPTY_CONSTANTS
 end
 
--- Flavor ids carry their own literals so the module is usable (and testable)
+-- Speech-event ids carry their own literals so the module is usable (and testable)
 -- even if the constants table is absent.
-local function callFlavorID()
-    return flavorConst().FLAVOR_CALL or "social.incapacitated_call"
+local function callSpeechEventID()
+    return socialContextConstants().SPEECH_EVENT_CALL or "social.incapacitated_call"
 end
 
-local function updateFlavorID()
-    return flavorConst().FLAVOR_UPDATE or "social.incapacitated_update"
+local function updateSpeechEventID()
+    return socialContextConstants().SPEECH_EVENT_UPDATE or "social.incapacitated_update"
 end
 
-local function repeatFlavorID()
-    return flavorConst().FLAVOR_REPEAT or "social.incapacitated_repeat"
+local function repeatSpeechEventID()
+    return socialContextConstants().SPEECH_EVENT_REPEAT or "social.incapacitated_repeat"
 end
 
 local HEAR_RADIUS = tonumber(Const and Const.ZOMBIE_TARGET_RADIUS) or 12
@@ -144,11 +144,11 @@ local function playerCanHear(player, record, radiusSq)
     return true
 end
 
-H.FlavorText = flavorText
-H.FlavorConst = flavorConst
-H.CallFlavorID = callFlavorID
-H.UpdateFlavorID = updateFlavorID
-H.RepeatFlavorID = repeatFlavorID
+H.SocialContext = socialContext
+H.SocialContextConstants = socialContextConstants
+H.CallSpeechEventID = callSpeechEventID
+H.UpdateSpeechEventID = updateSpeechEventID
+H.RepeatSpeechEventID = repeatSpeechEventID
 H.Now = now
 H.Clean = clean
 H.MarkCalled = markCalled
@@ -161,7 +161,7 @@ H.HEAR_RADIUS = HEAR_RADIUS
 H.CALL_COOLDOWN_MS = CALL_COOLDOWN_MS
 H.UPDATE_COOLDOWN_MS = UPDATE_COOLDOWN_MS
 H.REPEAT_INTERVAL_MS = REPEAT_INTERVAL_MS
-H.ResetIncapacitatedFlavorState = function()
+H.ResetIncapacitatedSpeechState = function()
     for key in pairs(lastCallByNPC) do lastCallByNPC[key] = nil end
     while #lastCallOrder > 0 do table.remove(lastCallOrder) end
     return true

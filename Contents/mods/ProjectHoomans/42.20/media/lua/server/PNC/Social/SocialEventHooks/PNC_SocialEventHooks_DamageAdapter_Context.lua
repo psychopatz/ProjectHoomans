@@ -15,11 +15,11 @@ local Registry = PNC.Registry
 local Network = PNC.Network
 local Factions = PNC.Factions
 local ContextProviders = PNC.Semantics
-    and PNC.Semantics.ContextProviders or nil
+    and PNC.Semantics.SocialContext or nil
 if type(ContextProviders) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Core/Social/PNC_FlavorTextResolver"
+        "PNC/Core/Social/PNC_SemanticSocialContext"
     )
     ContextProviders = ok and loaded or nil
 end

@@ -77,7 +77,7 @@ local function firstTarget(context)
 end
 
 local function publishLocalSocialReaction(player, text, context)
-    local presentation = PNC.SocialFlavorPresentation
+    local presentation = PNC.SemanticSpeechPresentation
     if not presentation
         or type(presentation.ReceivePlayerSpeech) ~= "function"
     then

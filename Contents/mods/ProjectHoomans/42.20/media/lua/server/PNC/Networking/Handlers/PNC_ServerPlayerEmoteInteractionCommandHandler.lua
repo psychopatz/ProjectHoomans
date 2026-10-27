@@ -42,11 +42,11 @@ if type(CompanionSpeech) ~= "table" then
     CompanionSpeech = ok and loaded or nil
 end
 local ContextProviders = PNC.Semantics
-    and PNC.Semantics.ContextProviders or nil
+    and PNC.Semantics.SocialContext or nil
 if type(ContextProviders) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Core/Social/PNC_FlavorTextResolver"
+        "PNC/Core/Social/PNC_SemanticSocialContext"
     )
     ContextProviders = ok and loaded or nil
 end

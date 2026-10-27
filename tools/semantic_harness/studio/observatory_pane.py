@@ -8,6 +8,7 @@ import json
 from ..inspection.response_candidate import preview_authored_variant
 from ..inspection.response_source_lineage import inspect_codebuilder_lineage
 from ..inspection.response_translation_coverage import translation_coverage
+from .semantic_tree import filter_semantic_tree, build_semantic_tree
 
 
 class SemanticObservatoryPane:
@@ -36,6 +37,7 @@ class SemanticObservatoryPane:
         self._has_more = False
         self.loading = False
         self.catalog_ready = False
+        self._pool_rows: dict[str, dict[str, Any]] = {}
         toolbar = ttk.Frame(self.frame)
         toolbar.grid(row=0, column=0, sticky="ew")
         ttk.Label(toolbar, text="Response pools").pack(side="left")
@@ -58,11 +60,14 @@ class SemanticObservatoryPane:
         left.rowconfigure(0, weight=1)
         left.columnconfigure(0, weight=1)
         self.pools = ttk.Treeview(
-            left, columns=("variants",), show="tree headings", selectmode="browse")
-        self.pools.heading("#0", text="Registered pool")
-        self.pools.heading("variants", text="Variants")
+            left, columns=("variants", "canonical"),
+            show="tree headings", selectmode="browse")
+        self.pools.heading("#0", text="Semantic branch / pool")
+        self.pools.heading("variants", text="Count")
+        self.pools.heading("canonical", text="Canonical ID")
         self.pools.column("#0", width=360)
         self.pools.column("variants", width=80, stretch=False)
+        self.pools.column("canonical", width=300)
         self.pools.grid(row=0, column=0, sticky="nsew")
         scroll = ttk.Scrollbar(left, orient="vertical", command=self.pools.yview)
         scroll.grid(row=0, column=1, sticky="ns")
@@ -194,19 +199,27 @@ class SemanticObservatoryPane:
             before_styles = before.get("styles") or {}
             after_styles = after.get("styles") or {}
             for style in sorted(before_styles):
-                before_by_id = {
-                    item.get("id"): item
-                    for item in before_styles.get(style, [])
+                before_phrases = [
+                    item for item in before_styles.get(style, [])
                     if isinstance(item, dict)
-                }
-                after_by_id = {
-                    item.get("id"): item
-                    for item in after_styles.get(style, [])
+                ]
+                after_phrases = [
+                    item for item in after_styles.get(style, [])
                     if isinstance(item, dict)
-                }
-                for phrase_id in sorted(before_by_id):
-                    old = before_by_id[phrase_id].get("translations") or {}
-                    new = (after_by_id.get(phrase_id) or {}).get("translations") or {}
+                ]
+                for index, item in enumerate(before_phrases, 1):
+                    old = item.get("translations") or {}
+                    replacement = (
+                        after_phrases[index - 1]
+                        if index <= len(after_phrases)
+                        else {}
+                    )
+                    new = replacement.get("translations") or {}
+                    phrase_id = (
+                        item.get("id")
+                        or replacement.get("id")
+                        or f"{before.get('id', 'phrase')}.{style}.{index:02d}"
+                    )
                     lines.extend([
                         f"{style} · {phrase_id}",
                         f"  EN: {old.get('EN', '(missing)')} -> {new.get('EN', '(missing)')}",
@@ -324,25 +337,82 @@ class SemanticObservatoryPane:
         self._previous.configure(
             state="normal" if self._page_offset > 0 else "disabled")
         self._next.configure(state="normal" if self._has_more else "disabled")
-        self.pools.delete(*self.pools.get_children())
-        for pool in result.get("pools", []):
-            self.pools.insert("", "end", iid=pool["id"],
-                              text=pool["id"], values=(pool["variantCount"],))
+        rows = [pool for pool in result.get("pools", []) if isinstance(pool, dict)]
+        self._pool_rows = {str(pool.get("id")): pool for pool in rows}
+        self._render_pool_tree(rows)
         self.status_var.set(
             f"{len(result.get('pools', []))}/{result.get('total', 0)} pools "
             f"(revision {result.get('registryRevision', '?')})"
             + (" · filtered/page-limited" if result.get("hasMore") else "")
         )
 
+    def _render_pool_tree(self, rows: list[dict[str, Any]]) -> None:
+        """Render the current bounded page through the shared ID projection."""
+
+        query = self.filter_var.get().strip()
+        tree = filter_semantic_tree(
+            build_semantic_tree(rows, id_getter=lambda row: str(row.get("id", ""))),
+            query,
+        )
+        self.pools.delete(*self.pools.get_children())
+
+        def insert(node: dict[str, Any], parent: str = "") -> None:
+            for key in sorted(node.get("children", {}), key=str.casefold):
+                child = node["children"][key]
+                iid = "branch:" + str(child["key"])
+                self.pools.insert(
+                    parent,
+                    "end",
+                    iid=iid,
+                    text=f"{child['label']} ({child['count']})",
+                    values=(child["count"], ""),
+                    open=(not query or child["key"] in tree.get("expanded", set())),
+                )
+                for item in sorted(
+                    child.get("items", []),
+                    key=lambda value: str(value.get("id", "")).casefold(),
+                ):
+                    pool_id = str(item.get("id", ""))
+                    self.pools.insert(
+                        iid,
+                        "end",
+                        iid="pool:" + pool_id,
+                        text=str(pool_id.rsplit(".", 1)[-1]),
+                        values=(item.get("variantCount", 0), pool_id),
+                    )
+                insert(child, iid)
+
+        insert(tree)
+
     def _selected(self, _event: Any = None) -> None:
         selection = self.pools.selection()
         if not selection:
             return
-        self.selected_pool = selection[0]
+        iid = selection[0]
+        if not iid.startswith("pool:"):
+            self._show_branch(iid[len("branch:"):])
+            return
+        self.selected_pool = iid[len("pool:"):]
         self._submit(
             lambda worker: worker.response_pool_detail(
                 self.selected_pool, limit=16),
             self._on_detail,
+        )
+
+    def _show_branch(self, key: str) -> None:
+        """Keep branch selection useful without issuing a detail request."""
+
+        label = key.rsplit(".", 1)[-1].replace("_", " ").title()
+        descendants = [
+            row for row_id, row in self._pool_rows.items()
+            if row_id == key or row_id.startswith(key + ".")
+        ]
+        self._display(
+            "Explore",
+            f"Semantic branch: {label}\n"
+            f"Canonical branch ID: {key}\n"
+            f"Descendant pools on this bounded page: {len(descendants)}\n\n"
+            "Select a leaf pool to load its bounded production detail.",
         )
 
     def _on_detail(self, result: dict[str, Any]) -> None:

@@ -64,7 +64,28 @@ function Core.registerTextFallback(templateID, fallback)
     end
 end
 
-local function migratedContentOwner(poolID)
+local function contentFallback(templateID)
+    local registry = PNC.Semantics
+        and PNC.Semantics.DialogueContentRegistry or nil
+    if type(registry) ~= "table" then
+        local ok, loaded = pcall(
+            require,
+            "PNC/Semantics/Generated/DialogueContent/Registry"
+        )
+        registry = ok and loaded or nil
+    end
+    if type(registry) ~= "table"
+        or type(registry.FamilyFor) ~= "function"
+    then
+        return nil
+    end
+    local _, phrases = registry.FamilyFor(templateID, "neutral")
+    local phrase = type(phrases) == "table" and phrases[1] or nil
+    local fallback = phrase and phrase.fallback or nil
+    return Core.boundedText(fallback)
+end
+
+local function contentOwnerForPool(poolID)
     poolID = tostring(poolID or "")
     if string.find(poolID, "semantic.compat.", 1, true) == 1 then
         return "projecthoomans.dialogue_content.compatibility"
@@ -87,7 +108,7 @@ local function migratedContentOwner(poolID)
         or string.find(poolID, "semantic.flow.farewell", 1, true) == 1
         or string.find(poolID, "semantic.social.reaction", 1, true) == 1
     then
-        return "projecthoomans.dialogue_content.migrated_events"
+        return "projecthoomans.dialogue_content.events"
     end
     return nil
 end
@@ -271,7 +292,9 @@ function Core.normalizedVariant(poolID, index, value)
         value = { fallback = value }
     end
     if type(value) ~= "table" then return nil end
+    local templateID = tostring(value.templateID or value.id or "")
     local fallback = Core.boundedText(value.fallback or value.text)
+    if fallback == "" then fallback = contentFallback(templateID) end
     if fallback == "" then return nil end
     local id = tostring(value.id or (poolID .. "." .. tostring(index)))
     if not Core.validID(id) then return nil end
@@ -283,12 +306,11 @@ function Core.normalizedVariant(poolID, index, value)
             value.templateID or id
         ))
     end
-    local contentOwner = value.contentOwner or migratedContentOwner(poolID)
+    local contentOwner = value.contentOwner or contentOwnerForPool(poolID)
     local normalized = {
         id = id,
-        templateID = tostring(value.templateID or id),
+        templateID = templateID ~= "" and templateID or id,
         fallback = fallback,
-        compatibilityFlavorID = value.compatibilityFlavorID,
         plan = plan,
         dialogueAct = value.dialogueAct,
         topic = value.topic,

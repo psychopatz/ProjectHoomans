@@ -8,7 +8,7 @@ end
 
 local presentationCore = source(
     "client",
-    "PNC/Conversation/PNC_SocialFlavorPresentation_Core.lua"
+    "PNC/Conversation/PNC_SemanticSpeechPresentation_Core.lua"
 )
 local farewell = source(
     "client",

@@ -1,7 +1,7 @@
 -- Canonical semantic-to-realization boundary.
 --
 -- A caller resolves meaning through ResponseCatalog before it reaches any
--- Flavor/SocialFlavor renderer.  Renderers may translate, format, queue, or
+-- presentation renderer. Renderers may translate, format, queue, or
 -- speak the returned plan, but they must not choose a response family.
 
 PNC = PNC or {}
@@ -92,10 +92,6 @@ function Authority.Resolve(spec)
         realizationID = clean(selected.id, 128),
         templateID = clean(selected.templateID, 128),
         fallback = clean(selected.fallback, 256),
-        compatibilityFlavorID = clean(
-            selected.compatibilityFlavorID,
-            128
-        ),
         groundedFactRefs = copyList(
             spec.groundedFactRefs or selected.groundedFactRefs
         ),

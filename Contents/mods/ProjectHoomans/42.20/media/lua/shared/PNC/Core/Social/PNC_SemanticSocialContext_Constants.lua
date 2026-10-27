@@ -1,14 +1,15 @@
 --[[
-    PNC Flavor Text Resolver - bounded vocabularies.
+    Semantic social-context provider - bounded vocabularies.
 
     These tables are the bounded vocabulary contract for semantic context
     providers.  Unknown values must always have a generic fallback lane.
 ]]
 
 PNC = PNC or {}
-PNC.FlavorTextConst = PNC.FlavorTextConst or {}
+PNC.Semantics = PNC.Semantics or {}
+PNC.Semantics.SocialContextConstants = PNC.Semantics.SocialContextConstants or {}
 
-local Const = PNC.FlavorTextConst
+local Const = PNC.Semantics.SocialContextConstants
 
 -- Who caused the incapacitation.
 Const.Threat = {
@@ -88,16 +89,16 @@ Const.FAMILY = "incapacitated_distress"
 -- The initial plea, a wound-status change, and the slow repeat beat all share
 -- one episode merge key so a changing need replaces rather than stacks, but
 -- each has its own authored voice so a long wait does not read as one line.
-Const.FLAVOR_CALL = "social.incapacitated_call"
-Const.FLAVOR_UPDATE = "social.incapacitated_update"
-Const.FLAVOR_REPEAT = "social.incapacitated_repeat"
+Const.SPEECH_EVENT_CALL = "social.incapacitated_call"
+Const.SPEECH_EVENT_UPDATE = "social.incapacitated_update"
+Const.SPEECH_EVENT_REPEAT = "social.incapacitated_repeat"
 
 -- Cadence of the repeat beat while an NPC stays down.  Deliberately slower
 -- than the update cooldown: the NPC sounds insistent, not hysterical.
 Const.REPEAT_INTERVAL_MS = 45000
 
 -- ---------------------------------------------------------------------------
--- Leadership-loss flavor (a player leader died in front of their followers)
+-- Leadership-loss context (a player leader died in front of their followers)
 -- ---------------------------------------------------------------------------
 
 -- Mood of the grieving line, derived from the follower's relationship to the
@@ -128,7 +129,7 @@ Const.Succession = {
     NONE = "none",           -- no structural change observed
 }
 
-Const.FLAVOR_LEADER_DEATH = "social.witnessed_leader_death"
+Const.SPEECH_EVENT_LEADER_DEATH = "social.witnessed_leader_death"
 
 Const.LEADER_DEATH_PRIORITY = 88
 Const.LEADER_DEATH_WEIGHT = 6

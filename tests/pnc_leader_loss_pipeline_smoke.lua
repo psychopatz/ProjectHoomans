@@ -49,8 +49,8 @@ local Reactions = T.load(
     "shared",
     "PNC/Semantics/PNC_SemanticSocialReaction.lua"
 )
-require "PNC/Core/Social/PNC_FlavorTextResolver"
-local Const = PNC.FlavorTextConst
+require "PNC/Core/Social/PNC_SemanticSocialContext"
+local Const = PNC.Semantics.SocialContextConstants
 
 -- ---------------------------------------------------------------------------
 -- Enqueue three mourners exactly as the server emitter's packets arrive.

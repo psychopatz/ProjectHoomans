@@ -255,7 +255,7 @@ T.truthy(categories.corpse_seen_comrade, "faction comrade reply category")
 T.truthy(categories.corpse_seen_neutral, "neutral reply category")
 local comradeGreeting
 for _, event in ipairs(sentGreetings) do
-    if event.payload.flavorID == "corpse_seen_comrade" then
+    if event.payload.speechEventID == "corpse_seen_comrade" then
         comradeGreeting = event.payload
         break
     end

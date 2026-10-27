@@ -329,9 +329,9 @@ function ISEmoteRadialMenu:emote(emote)
                     socialContext.semanticAct = playerRealization.semanticAct
                     socialContext.topic = playerRealization.topic
                 end
-                if PNC.CompanionCommandPresentation.EnqueueFlavor then
+                if PNC.CompanionCommandPresentation.EnqueueSpeech then
                     if playerRealization then
-                        PNC.CompanionCommandPresentation.EnqueueFlavor(
+                        PNC.CompanionCommandPresentation.EnqueueSpeech(
                             playerRealization.realizationID,
                             "player",
                             player,
@@ -425,9 +425,9 @@ function ISEmoteRadialMenu:emote(emote)
             commandContext
         )
     elseif sent and PNC.CompanionCommandPresentation
-        and PNC.CompanionCommandPresentation.ShowPlayerFlavor
+        and PNC.CompanionCommandPresentation.ShowPlayerSpeech
     then
-        PNC.CompanionCommandPresentation.ShowPlayerFlavor(
+        PNC.CompanionCommandPresentation.ShowPlayerSpeech(
             player,
             commandID,
             commandContext

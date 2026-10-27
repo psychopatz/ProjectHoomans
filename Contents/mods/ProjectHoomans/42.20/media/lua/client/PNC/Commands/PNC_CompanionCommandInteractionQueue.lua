@@ -65,14 +65,14 @@ local function playerID(player)
     return nil
 end
 
-local function interactionEventID(flavorID, speaker, speakerID, context,
+local function interactionEventID(speechEventID, speaker, speakerID, context,
     options)
     local base = options.eventID
         or type(context) == "table" and (context.eventID
             or context.requestID)
         or nil
     if not base or tostring(base) == "" then
-        base = tostring(flavorID or "flavor") .. ":"
+        base = tostring(speechEventID or "speech") .. ":"
             .. tostring(currentTime())
     end
     return tostring(base) .. ":" .. tostring(speaker or "npc") .. ":"
@@ -88,7 +88,7 @@ local function deliverPlayerSpeech(text)
     return speak(player, text)
 end
 
-local function onFlavorDelivered(payload)
+local function onSpeechDelivered(payload)
     local item = payload and payload.item or nil
     local text = payload and payload.text or nil
     if not text or text == "" then return end
@@ -101,7 +101,7 @@ end
 
 -- Queue one line through Core.  Interaction priority is deliberately the top
 -- priority class; weight remains the tie-breaker among equally urgent lines.
-function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
+function Presentation.EnqueueSpeech(speechEventID, speaker, actor, context, options)
     local player = type(context) == "table" and context.playerActor
         or speaker == "player" and actor
         or getSpecificPlayer and getSpecificPlayer(0) or nil
@@ -110,7 +110,7 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
             or context.target and (context.target.id or context.target.npcID))
         or actor and actor.getModData and actor:getModData().PNC_UUID
         or nil
-    local flavorContext
+    local speechContext
     local seed
     local text
     local eventID
@@ -126,7 +126,7 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
     if speakerID == nil or tostring(speakerID) == "" then
         return false, "speaker_identity_unavailable"
     end
-    flavorContext = Presentation.BuildFlavorContext(player, context)
+    speechContext = Presentation.BuildSpeechContext(player, context)
     seed = options.seed
         or type(context) == "table" and (context.seed
             or context.requestID or context.eventID)
@@ -166,7 +166,7 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
     if not text or text == "" then
         return false, "semantic_realization_required"
     end
-    eventID = interactionEventID(flavorID, speaker, speakerID, context,
+    eventID = interactionEventID(speechEventID, speaker, speakerID, context,
         options)
     SocialFlavorClient = SocialFlavorClient
         or PsychopatzCore and PsychopatzCore.SocialFlavorClient or nil
@@ -179,10 +179,10 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
         return speak(actor, text), "presented", text, eventID
     end
     queueContext = {
-        name = flavorContext.name,
-        names = flavorContext.names,
-        count = flavorContext.count,
-        player = flavorContext.player,
+        name = speechContext.name,
+        names = speechContext.names,
+        count = speechContext.count,
+        player = speechContext.player,
         interaction = type(context) == "table"
             and context.interaction or nil,
     }
@@ -221,7 +221,8 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
     )
     accepted, reason = SocialFlavorClient.Enqueue({
         eventID = eventID,
-        flavorID = realization and realization.realizationID or flavorID,
+        speechEventID = realization and realization.realizationID
+            or speechEventID,
         seed = seed,
         text = text,
         family = options.family or "emote_interaction",
@@ -234,7 +235,7 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
         speakerName = speaker == "player"
             and tostring(player and player.getUsername
                 and player:getUsername() or speakerID)
-            or flavorContext.name
+            or speechContext.name
             or targetName(type(context) == "table" and context.target or {}),
         playerUUID = playerID(player),
         context = queueContext,
@@ -261,7 +262,7 @@ then
     EventBus.clearOwner(Presentation)
     EventBus.subscribe(
         SocialFlavorClient.EVENT_DELIVERED,
-        onFlavorDelivered,
+        onSpeechDelivered,
         Presentation
     )
 end

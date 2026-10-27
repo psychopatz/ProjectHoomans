@@ -4,7 +4,7 @@ PNC = PNC or {}
 PNC.CompanionCommandPresentation = PNC.CompanionCommandPresentation or {}
 
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
-require "PNC/Core/Identity/PNC_FlavorAddress"
+require "PNC/Semantics/PNC_SemanticAddressResolver"
 require "PNC/Audio/PNC_PlayerSpeech"
 local InteractionPresentationRegistry = require
     "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
@@ -39,7 +39,7 @@ end
 local Presentation = PNC.CompanionCommandPresentation
 local Commands = PNC.CompanionCommands
 local Identity = PNC.NPCIdentityPresentation
-local FlavorAddress = PNC.FlavorAddress
+local Addressing = PNC.Semantics.AddressResolver
 local Registry = PNC.Registry
 local PlayerSpeech = PNC.PlayerSpeech
 local AddressResolver = PNC.Semantics
@@ -57,7 +57,7 @@ end
 local Message = PsychopatzCore and PsychopatzCore.Conversation
     and PsychopatzCore.Conversation.Message or nil
 
-Presentation.FlavorRevision = Presentation.FlavorRevision or 0
+Presentation.SpeechRevision = Presentation.SpeechRevision or 0
 
 local function speak(actor, text)
     if not actor or not text or text == "" then return false end
@@ -210,7 +210,7 @@ local function ensureAmbientInteraction(context, npcID, player)
         or not npcID or not eventID or not playerUUID
         or not context.responsePlanID or not context.realizationID
     then
-        -- A legacy/compatibility presentation may still carry a Flavor ID,
+        -- A legacy/compatibility transport may still carry an event ID,
         -- but it is not allowed to synthesize semantic provenance after the
         -- renderer has selected its wording.
         return nil
@@ -227,7 +227,7 @@ local function ensureAmbientInteraction(context, npcID, player)
             or "social.reaction." .. tostring(eventType),
         flowID = context.flowID
             or "social:" .. tostring(eventType),
-        poolID = context.poolID or context.flavorID,
+        poolID = context.poolID or context.speechEventID or context.flavorID,
         eventType = eventType,
         eventRef = eventID,
         factRefs = context.factRefs,
@@ -235,7 +235,7 @@ local function ensureAmbientInteraction(context, npcID, player)
     return context.interaction
 end
 
-function Presentation.BuildFlavorContext(player, context)
+function Presentation.BuildSpeechContext(player, context)
     local targets = normalizeTargets(context)
     local state = PNC.Network and PNC.Network.ClientState or {}
     local names = formatTargetNames(
@@ -246,10 +246,10 @@ function Presentation.BuildFlavorContext(player, context)
     local playerContext = state.playerContext or {}
     local npcID = type(context) == "table" and context.npcID
         or targets[1] and (targets[1].id or targets[1].npcID)
-        or "command-flavor"
-    local playerAddress = FlavorAddress.ResolveForNPC({
+        or "command-speech"
+ local playerAddress = Addressing.ResolveForNPC({
         npcID = npcID,
-        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(
+        npcIdentitySeed = Addressing.ResolveNPCSeed(
             targets[1], npcID
         ),
         player = player,
@@ -276,7 +276,7 @@ function Presentation.BuildFlavorContext(player, context)
         playerNameKnown = playerAddress.known,
         playerIsFemale = playerAddress.isFemale,
         playerNicknameID = playerAddress.nicknameID,
-        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(targets[1], npcID),
+        npcIdentitySeed = Addressing.ResolveNPCSeed(targets[1], npcID),
     }
 end
 
@@ -292,7 +292,7 @@ function Presentation.ResolvePlayerEmoteRealization(emoteID, context)
     if action == "" then return nil, "player_emote_action_required" end
     context.npcID = context.npcID or "player:" .. actorID
     context.renderTokens = context.renderTokens
-        or Presentation.BuildFlavorContext(player, context)
+        or Presentation.BuildSpeechContext(player, context)
     if not CompanionSpeech
         or type(CompanionSpeech.ResolvePlayerEmote) ~= "function"
     then
@@ -309,21 +309,21 @@ function Presentation.ResolvePlayerEmoteRealization(emoteID, context)
     return realization
 end
 
-function Presentation.ShowPlayerFlavor(player, commandID, context)
+function Presentation.ShowPlayerSpeech(player, commandID, context)
     local outcome
     local realization
     local text
-    local flavorContext
+    local speechContext
     if not player
         or player.isDead and player:isDead()
     then
         return false
     end
-    Presentation.FlavorRevision = Presentation.FlavorRevision + 1
+    Presentation.SpeechRevision = Presentation.SpeechRevision + 1
     context = type(context) == "table" and context or {}
     context.playerActor = player
-    flavorContext = Presentation.BuildFlavorContext(player, context)
-    context.renderTokens = context.renderTokens or flavorContext
+    speechContext = Presentation.BuildSpeechContext(player, context)
+    context.renderTokens = context.renderTokens or speechContext
     outcome = context.commandOutcome or context.outcome
     if string.sub(tostring(commandID or ""), 1, 14)
         == "vanilla_emote_"
@@ -356,22 +356,22 @@ function Presentation.ShowPlayerFlavor(player, commandID, context)
     return speak(player, text)
 end
 
-function Presentation.ShowNPCFlavor(actor, flavorID, context)
+function Presentation.ShowNPCSpeech(actor, speechEventID, context)
     local player = type(context) == "table" and context.playerActor
         or getSpecificPlayer and getSpecificPlayer(0) or nil
-    local flavorContext
+    local speechContext
     local realization
     local text
-    if not actor or not flavorID
+    if not actor or not speechEventID
         or actor.isDead and actor:isDead()
     then
         return false
     end
-    Presentation.FlavorRevision = Presentation.FlavorRevision + 1
+    Presentation.SpeechRevision = Presentation.SpeechRevision + 1
     context = type(context) == "table" and context or {}
     context.playerActor = context.playerActor or player
-    flavorContext = Presentation.BuildFlavorContext(player, context)
-    context.renderTokens = context.renderTokens or flavorContext
+    speechContext = Presentation.BuildSpeechContext(player, context)
+    context.renderTokens = context.renderTokens or speechContext
     text = context.resolvedText
     realization = context.semanticRealization
     if not text and not realization and CompanionSpeech then
@@ -415,13 +415,13 @@ function Presentation.ShowCommandRejection(player, actor, commandID, reason,
             context
         )
     end
-    local playerShown = Presentation.ShowPlayerFlavor(
+    local playerShown = Presentation.ShowPlayerSpeech(
         player,
         "camp_rejected",
         context
     )
     local shown = actor
-        and Presentation.ShowNPCFlavor(actor, "camp_rejected", context)
+        and Presentation.ShowNPCSpeech(actor, "camp_rejected", context)
         or false
     return playerShown == true or shown == true
 end
@@ -462,7 +462,8 @@ local function publishNPCMessage(actor, text, context)
         namespace = "ProjectHoomans",
         payload = {
             text = text,
-            flavorID = type(context) == "table" and context.flavorID or nil,
+            speechEventID = type(context) == "table"
+                and (context.speechEventID or context.flavorID) or nil,
             semanticOwned = type(context) == "table"
                 and context.semanticOwned == true or false,
             contentOwner = type(context) == "table"
@@ -522,7 +523,7 @@ end
 -- other speech consumers share one presentation path. A server-selected
 -- localized gossip packet may supply resolvedText; ordinary greetings carry
 -- their selected semantic realization from the server.
-function Presentation.ShowAmbientNPCFlavor(actor, flavorID, context)
+function Presentation.ShowAmbientNPCSpeech(actor, speechEventID, context)
     local player = type(context) == "table" and context.playerActor
         or getSpecificPlayer and getSpecificPlayer(0) or nil
     local text
@@ -530,8 +531,8 @@ function Presentation.ShowAmbientNPCFlavor(actor, flavorID, context)
     local semantic
     local resolvedText = type(context) == "table"
         and context.resolvedText or nil
-    if not flavorID then return false end
-    Presentation.FlavorRevision = Presentation.FlavorRevision + 1
+    if not speechEventID then return false end
+    Presentation.SpeechRevision = Presentation.SpeechRevision + 1
     if type(resolvedText) == "string" and resolvedText ~= "" then
         text = resolvedText
     else
@@ -548,8 +549,8 @@ function Presentation.ShowAmbientNPCFlavor(actor, flavorID, context)
             and type(SocialReactions.Resolve) == "function"
         then
             semantic = SocialReactions.Resolve({
-                eventType = context.eventType or flavorID,
-                eventID = context.eventID or context.eventRef or flavorID,
+                eventType = context.eventType or speechEventID,
+                eventID = context.eventID or context.eventRef or speechEventID,
                 npcID = context.npcID,
                 context = context,
                 groundedFactRefs = context.factRefs,
@@ -570,7 +571,7 @@ function Presentation.ShowAmbientNPCFlavor(actor, flavorID, context)
     if not text or text == "" then return false end
     if type(context) ~= "table" then context = {} end
     context.playerActor = player
-    context.flavorID = flavorID
+    context.speechEventID = speechEventID
     ensureAmbientInteraction(context, context.npcID
         or context.target and (context.target.id or context.target.npcID), player)
     published = publishNPCMessage(actor, text, context)
@@ -603,8 +604,8 @@ function Presentation.PlayCommand(player, commandID, target, context, outcome)
             outcome,
             context
         )
-    elseif Presentation.EnqueueFlavor then
-        Presentation.EnqueueFlavor(
+    elseif Presentation.EnqueueSpeech then
+        Presentation.EnqueueSpeech(
             commandID,
             "player",
             player,
@@ -612,7 +613,7 @@ function Presentation.PlayCommand(player, commandID, target, context, outcome)
             { family = "emote_interaction" }
         )
     else
-        Presentation.ShowPlayerFlavor(player, commandID, context)
+        Presentation.ShowPlayerSpeech(player, commandID, context)
     end
     return true
 end

@@ -41,15 +41,15 @@ Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RELATIONSHIP,
                 }
             )
         end
-        local flavorPresentation = PNC.SocialFlavorPresentation
-        if args.ambientFlavor and not flavorPresentation then
-            pcall(require, "PNC/Conversation/PNC_SocialFlavorPresentation")
-            flavorPresentation = PNC.SocialFlavorPresentation
+        local speechPresentation = PNC.SemanticSpeechPresentation
+        if args.ambientFlavor and not speechPresentation then
+            pcall(require, "PNC/Conversation/PNC_SemanticSpeechPresentation")
+            speechPresentation = PNC.SemanticSpeechPresentation
         end
-        if args.ambientFlavor and flavorPresentation
-            and flavorPresentation.Receive
+        if args.ambientFlavor and speechPresentation
+            and speechPresentation.Receive
         then
-            flavorPresentation.Receive(args.ambientFlavor, summary, args)
+            speechPresentation.Receive(args.ambientFlavor, summary, args)
         end
         if hasChangeMetadata then
             ClientState.lastConversationDelta = {

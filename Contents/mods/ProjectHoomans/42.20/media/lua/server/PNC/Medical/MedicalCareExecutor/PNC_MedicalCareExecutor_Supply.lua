@@ -213,7 +213,7 @@ local function sendSupplyState(task, state)
             }) or nil
         if not semantic then return end
         ambientFlavor = {
-            flavorID = "social.witnessed_teammate_hurt",
+            speechEventID = semantic.realizationID,
             resolvedText = semantic.fallback,
             responsePlanID = semantic.responsePlanID,
             realizationFamily = semantic.realizationFamily,

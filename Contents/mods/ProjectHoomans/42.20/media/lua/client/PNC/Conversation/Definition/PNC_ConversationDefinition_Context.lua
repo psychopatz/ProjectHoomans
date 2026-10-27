@@ -4,18 +4,18 @@ PNC.Conversation = PNC.Conversation or {}
 
 local Conversation = PNC.Conversation
 local Context = {}
-local FlavorAddress = PNC.FlavorAddress
+local Addressing = PNC.Semantics.AddressResolver
 local IdentityPresentation = PNC.NPCIdentityPresentation
 local AddressResolver = PNC.Semantics
     and PNC.Semantics.AddressResolver
     or require "PNC/Semantics/PNC_SemanticAddressResolver"
 local Loader = Conversation.TextLoader
 
-if type(FlavorAddress) ~= "table"
-    or type(FlavorAddress.ResolveForNPC) ~= "function"
+if type(Addressing) ~= "table"
+    or type(Addressing.ResolveForNPC) ~= "function"
 then
-    pcall(require, "PNC/Core/Identity/PNC_FlavorAddress")
-    FlavorAddress = PNC.FlavorAddress
+    pcall(require, "PNC/Semantics/PNC_SemanticAddressResolver")
+    Addressing = PNC.Semantics.AddressResolver
 end
 if type(IdentityPresentation) ~= "table"
     or type(IdentityPresentation.GetFact) ~= "function"
@@ -89,9 +89,9 @@ local function visibleIdentityArguments(
 )
     local stranger = systemText("identity.stranger")
     local playerContext = clientState and clientState.playerContext or {}
-    local playerAddress = FlavorAddress.ResolveForNPC({
+    local playerAddress = Addressing.ResolveForNPC({
         npcID = npcID,
-        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
+        npcIdentitySeed = Addressing.ResolveNPCSeed(entry, npcID),
         player = player,
         playerContext = playerContext,
         playerUUID = playerContext.characterUUID or playerContext.playerUUID,

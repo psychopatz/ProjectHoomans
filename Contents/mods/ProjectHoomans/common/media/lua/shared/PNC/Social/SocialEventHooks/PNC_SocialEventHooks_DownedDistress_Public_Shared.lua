@@ -9,11 +9,11 @@ local Hooks = PNC.SocialEventHooks
 local H = PNC.SocialEventHooksInternal
 local Core = PNC.Core
 local Network = PNC.Network
-local flavorText = H.FlavorText
-local flavorConst = H.FlavorConst
-local callFlavorID = H.CallFlavorID
-local updateFlavorID = H.UpdateFlavorID
-local repeatFlavorID = H.RepeatFlavorID
+local socialContext = H.SocialContext
+local socialContextConstants = H.SocialContextConstants
+local callSpeechEventID = H.CallSpeechEventID
+local updateSpeechEventID = H.UpdateSpeechEventID
+local repeatSpeechEventID = H.RepeatSpeechEventID
 local SocialReactions = PNC.Semantics
     and PNC.Semantics.SocialReactions or nil
 if not SocialReactions then
@@ -35,10 +35,10 @@ local CALL_COOLDOWN_MS = H.CALL_COOLDOWN_MS
 local UPDATE_COOLDOWN_MS = H.UPDATE_COOLDOWN_MS
 local REPEAT_INTERVAL_MS = H.REPEAT_INTERVAL_MS
 
-local function semanticEventTypeFor(flavorID)
-    if flavorID == callFlavorID() then return "incapacitated_call" end
-    if flavorID == updateFlavorID() then return "incapacitated_update" end
-    if flavorID == repeatFlavorID() then return "incapacitated_repeat" end
+local function semanticEventTypeFor(speechEventID)
+    if speechEventID == callSpeechEventID() then return "incapacitated_call" end
+    if speechEventID == updateSpeechEventID() then return "incapacitated_update" end
+    if speechEventID == repeatSpeechEventID() then return "incapacitated_repeat" end
     return "incapacitated_call"
 end
 
@@ -82,7 +82,7 @@ end
 -- Delivery
 -- ---------------------------------------------------------------------------
 
-local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
+local function emitDistress(record, speechEventID, needInputs, reason, cooldownMs)
     local npcID = clean(record and record.id, nil)
     local at = now()
     if not npcID then return 0, "invalid_subject" end
@@ -91,7 +91,7 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
     if previous and at - previous < cooldownMs then
         return 0, "debounced"
     end
-    local resolver = flavorText()
+    local resolver = socialContext()
     if not resolver or type(resolver.BuildContext) ~= "function" then
         return 0, "resolver_unavailable"
     end
@@ -107,7 +107,7 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
     local emitted = 0
     local semanticUnavailable = false
     local eventID = "downed:" .. npcID .. ":" .. tostring(math.floor(at))
-    local semanticEventType = semanticEventTypeFor(flavorID)
+    local semanticEventType = semanticEventTypeFor(speechEventID)
     markCalled(npcID, at)
     Core.ForEachPlayer(function(player)
         if not player or not playerCanHear(player, record, radiusSq) then
@@ -166,7 +166,7 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
             ambientFlavor = {
                 eventID = eventID,
                 eventRef = eventID,
-                flavorID = flavorID,
+                speechEventID = speechEventID,
                 text = realization.fallback,
                 semanticOwned = true,
                 eventType = semanticEventType,
@@ -179,9 +179,9 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
                 realizationFamily = realization.realizationFamily,
                 realizationID = realization.realizationID,
                 factRefs = realization.groundedFactRefs,
-                family = (flavorConst().FAMILY or "incapacitated_distress"),
-                priority = (flavorConst().PRIORITY or 70),
-                weight = (flavorConst().WEIGHT or 3),
+                family = (socialContextConstants().FAMILY or "incapacitated_distress"),
+                priority = (socialContextConstants().PRIORITY or 70),
+                weight = (socialContextConstants().WEIGHT or 3),
                 llmEligible = false,
                 memoryEligible = false,
                 npcID = npcID,
@@ -191,15 +191,15 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
                 relationshipTier = input.relationshipTier,
                 -- One merge key per downed episode keeps "call" and "update"
                 -- as a single visible line that updates in place.
-                mergeKey = npcID .. ":" .. (flavorConst().FAMILY or "incapacitated_distress"),
+                mergeKey = npcID .. ":" .. (socialContextConstants().FAMILY or "incapacitated_distress"),
                 cooldowns = {
-                    familyMs = (flavorConst().FAMILY_COOLDOWN_MS or 15000),
-                    speakerMs = (flavorConst().SPEAKER_COOLDOWN_MS or 12000),
-                    ambientMs = (flavorConst().AMBIENT_CADENCE_MS or 4500),
-                    mergeWindowMs = (flavorConst().MERGE_WINDOW_MS or 8000),
+                    familyMs = (socialContextConstants().FAMILY_COOLDOWN_MS or 15000),
+                    speakerMs = (socialContextConstants().SPEAKER_COOLDOWN_MS or 12000),
+                    ambientMs = (socialContextConstants().AMBIENT_CADENCE_MS or 4500),
+                    mergeWindowMs = (socialContextConstants().MERGE_WINDOW_MS or 8000),
                 },
-                ttlMs = (flavorConst().TTL_MS or 12000),
-                holdMs = (flavorConst().HOLD_MS or 3200),
+                ttlMs = (socialContextConstants().TTL_MS or 12000),
+                holdMs = (socialContextConstants().HOLD_MS or 3200),
                 context = context,
                 source = {
                     kind = "semantic_speech",
@@ -213,7 +213,7 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
             Network.SendConversationRelationshipForNPC,
             player,
             npcID,
-            flavorID,
+            speechEventID,
             result
         )
         if ok and sent == true then
@@ -321,7 +321,7 @@ function Hooks.OnIncapacitated(record, reason)
     end
     local emitted, status = emitDistress(
         record,
-        callFlavorID(),
+        callSpeechEventID(),
         woundInputs(record),
         reason,
         CALL_COOLDOWN_MS
@@ -341,7 +341,7 @@ function Hooks.OnIncapacitatedStatusChanged(record, reason)
     end
     local emitted, status = emitDistress(
         record,
-        updateFlavorID(),
+        updateSpeechEventID(),
         woundInputs(record),
         reason,
         UPDATE_COOLDOWN_MS
@@ -372,7 +372,7 @@ function Hooks.TickIncapacitatedDistress(record)
     if at - previous < REPEAT_INTERVAL_MS then return false end
     local emitted, status = emitDistress(
         record,
-        repeatFlavorID(),
+        repeatSpeechEventID(),
         woundInputs(record),
         "repeat",
         REPEAT_INTERVAL_MS
@@ -381,8 +381,8 @@ function Hooks.TickIncapacitatedDistress(record)
 end
 
 -- Test/debug support.
-function H.IncapacitatedFlavorDebugReset()
-    return H.ResetIncapacitatedFlavorState()
+function H.IncapacitatedSpeechDebugReset()
+    return H.ResetIncapacitatedSpeechState()
 end
 
 return Hooks

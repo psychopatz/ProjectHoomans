@@ -137,7 +137,7 @@ local function ensureNPCSpeechInteraction(
     local poolID = context.poolID
         or ambient and ambient.poolID
         or realizationID and responsePlanID
-        or ambient and ambient.flavorID
+        or ambient and ambient.speechEventID
     local realizationFamily = context.realizationFamily
         or ambient and ambient.realizationFamily
     local factRefs = interactionFactRefs(context, ambient)

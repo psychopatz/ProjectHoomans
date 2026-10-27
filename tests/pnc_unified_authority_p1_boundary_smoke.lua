@@ -48,7 +48,7 @@ local Flavor = require
 local Client = require
     "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient"
 require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
-local Presentation = require "PNC/Conversation/PNC_SocialFlavorPresentation"
+local Presentation = require "PNC/Conversation/PNC_SemanticSpeechPresentation"
 
 local fallbackCalls = 0
 local resolveDetailed = Flavor.ResolveDetailed

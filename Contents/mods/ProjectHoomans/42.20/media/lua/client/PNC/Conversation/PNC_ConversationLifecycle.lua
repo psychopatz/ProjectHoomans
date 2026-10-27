@@ -231,13 +231,13 @@ local function presentSafetyFeedback(spec, state, reason)
     if tostring(reason or "") ~= "danger" then return false end
     if state and state.guardThreats == false then return false end
     if not Safety.GuardsThreats(spec) then return false end
-    local presentation = PNC.SocialFlavorPresentation
+    local presentation = PNC.SemanticSpeechPresentation
     if not presentation then
         local ok, loaded = pcall(
             require,
-            "PNC/Conversation/PNC_SocialFlavorPresentation"
+            "PNC/Conversation/PNC_SemanticSpeechPresentation"
         )
-        presentation = ok and loaded or PNC.SocialFlavorPresentation
+        presentation = ok and loaded or PNC.SemanticSpeechPresentation
     end
     return presentation
         and type(presentation.EnqueueConversationSafety) == "function"

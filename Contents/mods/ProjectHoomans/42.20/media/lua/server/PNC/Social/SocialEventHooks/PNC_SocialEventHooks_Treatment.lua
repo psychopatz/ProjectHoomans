@@ -167,7 +167,7 @@ function Hooks.OnTreatmentCompleted(
                     firstDetail and firstDetail.relationshipAfter or nil
                 ),
                 ambientFlavor = {
-                    flavorID = "social.witnessed_teammate_hurt",
+                    speechEventID = realization.realizationID,
                     text = realization.fallback,
                     semanticOwned = true,
                     eventRef = eventRef,

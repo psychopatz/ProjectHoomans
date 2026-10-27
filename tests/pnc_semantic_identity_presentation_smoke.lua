@@ -65,7 +65,7 @@ registeredHandler({
     accepted = true,
     truthful = true,
     responseText = "Nice to meet you. I'm Mara.",
-    responseKey = "UI_PNC_Conversation_ToolReply_AskNameNamed_1",
+    responseKey = "UI_PNC_Conversation_Content_SemanticToolReplyAskNameNamed1Neutral01",
     responseArgs = { "Mara" },
 })
 
@@ -77,10 +77,10 @@ T.equal(queued[1].payload.fallback,
     "Nice to meet you. I'm Mara.",
     "authoritative identity text reaches the active semantic view")
 T.equal(queued[1].payload.key,
-    "UI_PNC_Conversation_ToolReply_AskNameNamed_1",
+    "UI_PNC_Conversation_Content_SemanticToolReplyAskNameNamed1Neutral01",
     "authoritative identity preserves the real translation key")
 T.equal(queued[1].payload.text,
-    "TL:UI_PNC_Conversation_ToolReply_AskNameNamed_1:Mara",
+    "TL:UI_PNC_Conversation_Content_SemanticToolReplyAskNameNamed1Neutral01:Mara",
     "identity presentation resolves the key through the active language")
 T.equal(queued[1].metadata.source.channel,
     "authoritative_response",

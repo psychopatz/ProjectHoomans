@@ -113,7 +113,6 @@ Catalog.Register("semantic.emote.reply", {
         {
             id = "semantic.emote.reply.thumbsup.active",
             templateID = "semantic.emote.reply.thumbsup.active",
-            fallback = "Good. Let's keep moving on this.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thumbsup", previousTopic = "water" },
             priority = 4,
@@ -122,14 +121,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "water",
                 turns = { { segments = {
-                    { kind = "literal", text = "Good. Let's keep moving on this." },
+                    { kind = "translation", templateID = "semantic.emote.reply.thumbsup.active" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.thumbsup",
             templateID = "semantic.emote.reply.thumbsup",
-            fallback = "Good.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thumbsup" },
             priority = 2,
@@ -138,14 +136,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "acknowledgement",
                 turns = { { segments = {
-                    { kind = "literal", text = "Good." },
+                    { kind = "translation", templateID = "semantic.emote.reply.thumbsup" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.thumbsdown",
             templateID = "semantic.emote.reply.thumbsdown",
-            fallback = "I got the message. Tell me what is wrong.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thumbsdown" },
             priority = 2,
@@ -154,14 +151,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "disapproval",
                 turns = { { segments = {
-                    { kind = "literal", text = "I got the message. Tell me what is wrong." },
+                    { kind = "translation", templateID = "semantic.emote.reply.thumbsdown" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.insult",
             templateID = "semantic.emote.reply.insult",
-            fallback = "Keep it respectful.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "insult" },
             priority = 2,
@@ -170,14 +166,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "hostility",
                 turns = { { segments = {
-                    { kind = "literal", text = "Keep it respectful." },
+                    { kind = "translation", templateID = "semantic.emote.reply.insult" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.wavehi",
             templateID = "semantic.emote.reply.wavehi",
-            fallback = "Hey.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "wavehi" },
             priority = 2,
@@ -186,14 +181,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "greeting",
                 turns = { { segments = {
-                    { kind = "literal", text = "Hey." },
+                    { kind = "translation", templateID = "semantic.emote.reply.wavehi" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.wavebye",
             templateID = "semantic.emote.reply.wavebye",
-            fallback = "Take care.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "wavebye" },
             priority = 2,
@@ -202,14 +196,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "farewell",
                 turns = { { segments = {
-                    { kind = "literal", text = "Take care." },
+                    { kind = "translation", templateID = "semantic.emote.reply.wavebye" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.thankyou",
             templateID = "semantic.emote.reply.thankyou",
-            fallback = "You're welcome.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thankyou" },
             priority = 2,
@@ -218,14 +211,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "thanks",
                 turns = { { segments = {
-                    { kind = "literal", text = "You're welcome." },
+                    { kind = "translation", templateID = "semantic.emote.reply.thankyou" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.clap",
             templateID = "semantic.emote.reply.clap",
-            fallback = "Thanks. It was a small win.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "clap" },
             priority = 2,
@@ -234,14 +226,13 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "praise",
                 turns = { { segments = {
-                    { kind = "literal", text = "Thanks. It was a small win." },
+                    { kind = "translation", templateID = "semantic.emote.reply.clap" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.salute",
             templateID = "semantic.emote.reply.salute",
-            fallback = "Stay sharp.",
             contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "salute" },
             priority = 2,
@@ -250,20 +241,19 @@ Catalog.Register("semantic.emote.reply", {
                 sourcePoolID = "semantic.emote.reply",
                 topic = "acknowledgement",
                 turns = { { segments = {
-                    { kind = "literal", text = "Stay sharp." },
+                    { kind = "translation", templateID = "semantic.emote.reply.salute" },
                 } } },
             },
         },
         {
             id = "semantic.emote.reply.default",
             templateID = "semantic.emote.reply.default",
-            fallback = "I hear you.",
             plan = {
                 dialogueAct = "REACT",
                 sourcePoolID = "semantic.emote.reply",
                 topic = "social_reaction",
                 turns = { { segments = {
-                    { kind = "literal", text = "I hear you." },
+                    { kind = "translation", templateID = "semantic.emote.reply.default" },
                 } } },
             },
         },

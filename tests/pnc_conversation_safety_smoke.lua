@@ -337,7 +337,7 @@ T.truthy(record.runtime.conversationLease,
 T.truthy(record.runtime.llmRequestLease == compactRequest,
     "compact pending request remains active while danger is nearby")
 local compactSafetyFeedback = 0
-PNC.SocialFlavorPresentation = {
+PNC.SemanticSpeechPresentation = {
     EnqueueConversationSafety = function()
         compactSafetyFeedback = compactSafetyFeedback + 1
         return true
@@ -352,7 +352,7 @@ lifecycle.finish(
 T.equal(compactSafetyFeedback, 0,
     "compact danger never enqueues full-conversation safety speech")
 Scene.ClearLLMRequest(record, "test_cleanup")
-PNC.SocialFlavorPresentation = nil
+PNC.SemanticSpeechPresentation = nil
 
 candidates = {}
 enemyTarget = nil

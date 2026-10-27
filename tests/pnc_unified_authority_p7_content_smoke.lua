@@ -22,7 +22,7 @@ T.truthy(Registry.PHRASE_FAMILIES["semantic.leader_loss.default"],
     "migrated leader-loss variant has a stable phrase family")
 T.equal(
     Registry.PHRASE_FAMILIES["semantic.leader_loss.default"].contentOwner,
-    "projecthoomans.dialogue_content.migrated_events",
+        "projecthoomans.dialogue_content.events",
     "event wording exposes the canonical content owner"
 )
 
@@ -39,7 +39,7 @@ local function realize(poolID, context)
             and "projecthoomans.dialogue_content.compatibility"
             or poolID:find("semantic.tool_reply.", 1, true) == 1
                 and "projecthoomans.dialogue_content.tool_replies"
-                or "projecthoomans.dialogue_content.migrated_events",
+            or "projecthoomans.dialogue_content.events",
         poolID .. " keeps wording below semantic authority")
     if selected.plan then
         T.truthy(selected.plan.turns,
@@ -71,7 +71,7 @@ local leader, leaderRendered = realize("semantic.leader_loss.reaction", {
 T.equal(leader.id, "semantic.leader_loss.devoted",
     "leader-loss semantic variant remains the selected meaning")
 T.equal(leaderRendered.phraseID,
-    "phrase.migrated.leader_loss_devoted.neutral.01",
+    "phrase.semantic.leader_loss.devoted.neutral.01",
     "leader-loss wording comes from a stable Dialogue Content phrase")
 
 local medical = realize("semantic.medical.distress.call", {

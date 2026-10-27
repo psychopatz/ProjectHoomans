@@ -750,7 +750,7 @@ package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
 T.load(CLIENT_ROOT .. "Commands/PNC_CompanionCommandPresentation.lua")
 for i = 1, 8 do
-    PNC.CompanionCommandPresentation.ShowPlayerFlavor(
+    PNC.CompanionCommandPresentation.ShowPlayerSpeech(
         player,
         "follow",
         {
@@ -1049,7 +1049,7 @@ PNC.Client.SendCompanionCommand = function(commandID, npcId, scope)
     }
     return true
 end
-PNC.CompanionCommandPresentation.ShowPlayerFlavor =
+PNC.CompanionCommandPresentation.ShowPlayerSpeech =
     function(_, commandID, contextData)
         radialFlavor = {
             commandID = commandID,

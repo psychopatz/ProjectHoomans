@@ -77,7 +77,7 @@ local player = {
 }
 getSpecificPlayer = function() return player end
 
-PNC.SocialFlavorPresentation = {
+PNC.SemanticSpeechPresentation = {
     ReceivePlayerSpeech = function()
         reactionCount = reactionCount + 1
         return true
@@ -92,14 +92,14 @@ T.load("ProjectHoomans", "client", "PNC/Commands/PNC_CompanionCommandPresentatio
 
 local Presentation = PNC.CompanionCommandPresentation
 
-Presentation.ShowPlayerFlavor(player, "wave", {})
+Presentation.ShowPlayerSpeech(player, "wave", {})
 T.equal(sayCount, 1, "disabled player voice falls back to standard Say")
 T.equal(#packets, 0, "disabled player voice publishes no packet")
 T.equal(reactionCount, 1,
     "disabled player voice still reaches local social flavor")
 
 playerSpeechEnabled = true
-Presentation.ShowPlayerFlavor(player, "wave", { eventID = "event-one" })
+Presentation.ShowPlayerSpeech(player, "wave", { eventID = "event-one" })
 T.equal(sayCount, 2, "enabled player voice keeps the visible speech bubble")
 T.equal(#packets, 1, "enabled player voice uses the canonical endpoint")
 T.equal(packets[1].packet.speaker_kind, "player", "player packet kind")
@@ -109,7 +109,7 @@ T.equal(reactionCount, 2,
     "enabled player speech reaches local social flavor once")
 
 bridgeActive = false
-Presentation.ShowPlayerFlavor(player, "wave", {})
+Presentation.ShowPlayerSpeech(player, "wave", {})
 T.equal(sayCount, 3, "inactive brain falls back to standard Say")
 T.equal(#packets, 1, "inactive brain publishes no player packet")
 T.equal(reactionCount, 3,

@@ -9,8 +9,9 @@ Discovery.RadioBroadcastsInternal = Discovery.RadioBroadcastsInternal or {}
 local Internal = Discovery.RadioBroadcastsInternal
 local Types = PNC.WorldDiscoveryTypes
 
-require "PNC/Core/Identity/PNC_FlavorAddress"
-PNC.FlavorAddress = PNC.FlavorAddress or PNC.FlavorAddress
+require "PNC/Semantics/PNC_SemanticAddressResolver"
+PNC.Semantics = PNC.Semantics or {}
+PNC.Semantics.AddressResolver = PNC.Semantics.AddressResolver or {}
 
 Discovery.RADIO_IDENTITY_REVEAL_CHANCE = 35
 Discovery.RADIO_ARGUMENT_CHANCE = 25

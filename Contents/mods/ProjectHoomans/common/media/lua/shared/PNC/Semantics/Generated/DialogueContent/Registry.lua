@@ -6,11 +6,11 @@ local Registry = PNC.Semantics.DialogueContentRegistry or {}
 PNC.Semantics.DialogueContentRegistry = Registry
 Registry.SCHEMA = "pnc.semantic_dialogue_content.v2"
 Registry.VERSION = 2
-Registry.CONTENT_FINGERPRINT = "2cd98cb3cc98c0c6daec7e380f4454c24ed35929f6cb0f669330c2fea58bb057"
+Registry.CONTENT_FINGERPRINT = "48009793214aebd0917c427c6582fa62414e8baa35b1df004d0c3320a6d9ba73"
 Registry.PHRASE_FAMILIES = {
     ["semantic.combat.reaction.default"] = {
         ["canonicalConcept"] = "SEMANTIC_COMBAT_REACTION_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.combat.reaction.default",
         ["semanticTemplateID"] = "semantic.combat.reaction.default",
         ["styles"] = {
@@ -25,7 +25,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.combat.reaction.retreat"] = {
         ["canonicalConcept"] = "SEMANTIC_COMBAT_REACTION_RETREAT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.combat.reaction.retreat",
         ["semanticTemplateID"] = "semantic.combat.reaction.retreat",
         ["styles"] = {
@@ -40,7 +40,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.combat.reaction.threat"] = {
         ["canonicalConcept"] = "SEMANTIC_COMBAT_REACTION_THREAT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.combat.reaction.threat",
         ["semanticTemplateID"] = "semantic.combat.reaction.threat",
         ["styles"] = {
@@ -580,7 +580,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.companion.reaction.abandonment"] = {
         ["canonicalConcept"] = "SEMANTIC_COMPANION_REACTION_ABANDONMENT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.companion.reaction.abandonment",
         ["semanticTemplateID"] = "semantic.companion.reaction.abandonment",
         ["styles"] = {
@@ -595,7 +595,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.companion.reaction.camp_rejected"] = {
         ["canonicalConcept"] = "SEMANTIC_COMPANION_REACTION_CAMP_REJECTED",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.companion.reaction.camp_rejected",
         ["semanticTemplateID"] = "semantic.companion.reaction.camp_rejected",
         ["styles"] = {
@@ -610,7 +610,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.companion.reaction.default"] = {
         ["canonicalConcept"] = "SEMANTIC_COMPANION_REACTION_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.companion.reaction.default",
         ["semanticTemplateID"] = "semantic.companion.reaction.default",
         ["styles"] = {
@@ -1030,7 +1030,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.conversation.safety.danger"] = {
         ["canonicalConcept"] = "SEMANTIC_CONVERSATION_SAFETY_DANGER",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.conversation.safety.danger",
         ["semanticTemplateID"] = "semantic.conversation.safety.danger",
         ["styles"] = {
@@ -1045,7 +1045,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.conversation.safety.default"] = {
         ["canonicalConcept"] = "SEMANTIC_CONVERSATION_SAFETY_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.conversation.safety.default",
         ["semanticTemplateID"] = "semantic.conversation.safety.default",
         ["styles"] = {
@@ -1060,7 +1060,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.corpse.reaction.default"] = {
         ["canonicalConcept"] = "SEMANTIC_CORPSE_REACTION_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.corpse.reaction.default",
         ["semanticTemplateID"] = "semantic.corpse.reaction.default",
         ["styles"] = {
@@ -1075,7 +1075,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.corpse.reaction.revenge"] = {
         ["canonicalConcept"] = "SEMANTIC_CORPSE_REACTION_REVENGE",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.corpse.reaction.revenge",
         ["semanticTemplateID"] = "semantic.corpse.reaction.revenge",
         ["styles"] = {
@@ -1806,7 +1806,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.flow.farewell.default"] = {
         ["canonicalConcept"] = "SEMANTIC_FLOW_FAREWELL_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.flow.farewell.default",
         ["semanticTemplateID"] = "semantic.flow.farewell.default",
         ["styles"] = {
@@ -1821,7 +1821,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.flow.farewell.friendly"] = {
         ["canonicalConcept"] = "SEMANTIC_FLOW_FAREWELL_FRIENDLY",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.flow.farewell.friendly",
         ["semanticTemplateID"] = "semantic.flow.farewell.friendly",
         ["styles"] = {
@@ -2208,7 +2208,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.leader_loss.close"] = {
         ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_CLOSE",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.leader_loss.close",
         ["semanticTemplateID"] = "semantic.leader_loss.close",
         ["styles"] = {
@@ -2223,7 +2223,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.leader_loss.colonist"] = {
         ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_COLONIST",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.leader_loss.colonist",
         ["semanticTemplateID"] = "semantic.leader_loss.colonist",
         ["styles"] = {
@@ -2238,7 +2238,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.leader_loss.default"] = {
         ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.leader_loss.default",
         ["semanticTemplateID"] = "semantic.leader_loss.default",
         ["styles"] = {
@@ -2253,7 +2253,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.leader_loss.devoted"] = {
         ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_DEVOTED",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.leader_loss.devoted",
         ["semanticTemplateID"] = "semantic.leader_loss.devoted",
         ["styles"] = {
@@ -2268,7 +2268,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.leader_loss.dissent"] = {
         ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_DISSENT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.leader_loss.dissent",
         ["semanticTemplateID"] = "semantic.leader_loss.dissent",
         ["styles"] = {
@@ -2283,7 +2283,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.leader_loss.distant"] = {
         ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_DISTANT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.leader_loss.distant",
         ["semanticTemplateID"] = "semantic.leader_loss.distant",
         ["styles"] = {
@@ -2298,7 +2298,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.call.bandage"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_BANDAGE",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.call.bandage",
         ["semanticTemplateID"] = "semantic.medical.distress.call.bandage",
         ["styles"] = {
@@ -2313,7 +2313,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.call.bleedout"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_BLEEDOUT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.call.bleedout",
         ["semanticTemplateID"] = "semantic.medical.distress.call.bleedout",
         ["styles"] = {
@@ -2328,7 +2328,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.call.default"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.call.default",
         ["semanticTemplateID"] = "semantic.medical.distress.call.default",
         ["styles"] = {
@@ -2343,7 +2343,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.call.dehydration"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_DEHYDRATION",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.call.dehydration",
         ["semanticTemplateID"] = "semantic.medical.distress.call.dehydration",
         ["styles"] = {
@@ -2358,7 +2358,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.call.exhaustion"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_EXHAUSTION",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.call.exhaustion",
         ["semanticTemplateID"] = "semantic.medical.distress.call.exhaustion",
         ["styles"] = {
@@ -2373,7 +2373,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.call.mercy"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_MERCY",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.call.mercy",
         ["semanticTemplateID"] = "semantic.medical.distress.call.mercy",
         ["styles"] = {
@@ -2388,7 +2388,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.call.rescue"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_RESCUE",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.call.rescue",
         ["semanticTemplateID"] = "semantic.medical.distress.call.rescue",
         ["styles"] = {
@@ -2403,7 +2403,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.call.starvation"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_STARVATION",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.call.starvation",
         ["semanticTemplateID"] = "semantic.medical.distress.call.starvation",
         ["styles"] = {
@@ -2418,7 +2418,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.default"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.default",
         ["semanticTemplateID"] = "semantic.medical.distress.default",
         ["styles"] = {
@@ -2433,7 +2433,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.mercy"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_MERCY",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.mercy",
         ["semanticTemplateID"] = "semantic.medical.distress.mercy",
         ["styles"] = {
@@ -2448,7 +2448,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.repeat.bandage"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_BANDAGE",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.repeat.bandage",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.bandage",
         ["styles"] = {
@@ -2463,7 +2463,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.repeat.bleedout"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_BLEEDOUT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.repeat.bleedout",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.bleedout",
         ["styles"] = {
@@ -2478,7 +2478,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.repeat.default"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.repeat.default",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.default",
         ["styles"] = {
@@ -2493,7 +2493,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.repeat.dehydration"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_DEHYDRATION",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.repeat.dehydration",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.dehydration",
         ["styles"] = {
@@ -2508,7 +2508,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.repeat.exhaustion"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_EXHAUSTION",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.exhaustion",
         ["styles"] = {
@@ -2523,7 +2523,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.repeat.mercy"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_MERCY",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.repeat.mercy",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.mercy",
         ["styles"] = {
@@ -2538,7 +2538,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.repeat.rescue"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_RESCUE",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.repeat.rescue",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.rescue",
         ["styles"] = {
@@ -2553,7 +2553,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.repeat.starvation"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_STARVATION",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.repeat.starvation",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.starvation",
         ["styles"] = {
@@ -2568,7 +2568,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.teammate.default"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_TEAMMATE_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.teammate.default",
         ["semanticTemplateID"] = "semantic.medical.distress.teammate.default",
         ["styles"] = {
@@ -2583,7 +2583,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.teammate.found"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_TEAMMATE_FOUND",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.teammate.found",
         ["semanticTemplateID"] = "semantic.medical.distress.teammate.found",
         ["styles"] = {
@@ -2598,7 +2598,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.teammate.missing"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_TEAMMATE_MISSING",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.teammate.missing",
         ["semanticTemplateID"] = "semantic.medical.distress.teammate.missing",
         ["styles"] = {
@@ -2613,7 +2613,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.treatment.bandage"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_TREATMENT_BANDAGE",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.treatment.bandage",
         ["semanticTemplateID"] = "semantic.medical.distress.treatment.bandage",
         ["styles"] = {
@@ -2628,7 +2628,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.treatment.default"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_TREATMENT_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.treatment.default",
         ["semanticTemplateID"] = "semantic.medical.distress.treatment.default",
         ["styles"] = {
@@ -2643,7 +2643,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.update.bandage"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_BANDAGE",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.update.bandage",
         ["semanticTemplateID"] = "semantic.medical.distress.update.bandage",
         ["styles"] = {
@@ -2658,7 +2658,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.update.bleedout"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_BLEEDOUT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.update.bleedout",
         ["semanticTemplateID"] = "semantic.medical.distress.update.bleedout",
         ["styles"] = {
@@ -2673,7 +2673,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.update.default"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.update.default",
         ["semanticTemplateID"] = "semantic.medical.distress.update.default",
         ["styles"] = {
@@ -2688,7 +2688,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.update.dehydration"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_DEHYDRATION",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.update.dehydration",
         ["semanticTemplateID"] = "semantic.medical.distress.update.dehydration",
         ["styles"] = {
@@ -2703,7 +2703,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.update.exhaustion"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_EXHAUSTION",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.update.exhaustion",
         ["semanticTemplateID"] = "semantic.medical.distress.update.exhaustion",
         ["styles"] = {
@@ -2718,7 +2718,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.update.mercy"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_MERCY",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.update.mercy",
         ["semanticTemplateID"] = "semantic.medical.distress.update.mercy",
         ["styles"] = {
@@ -2733,7 +2733,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.update.rescue"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_RESCUE",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.update.rescue",
         ["semanticTemplateID"] = "semantic.medical.distress.update.rescue",
         ["styles"] = {
@@ -2748,7 +2748,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.update.starvation"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_STARVATION",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.update.starvation",
         ["semanticTemplateID"] = "semantic.medical.distress.update.starvation",
         ["styles"] = {
@@ -2763,7 +2763,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.medical.distress.urgent"] = {
         ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_URGENT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.medical.distress.urgent",
         ["semanticTemplateID"] = "semantic.medical.distress.urgent",
         ["styles"] = {
@@ -2778,7 +2778,7 @@ Registry.PHRASE_FAMILIES = {
     },
     ["semantic.social.reaction.default"] = {
         ["canonicalConcept"] = "SEMANTIC_SOCIAL_REACTION_DEFAULT",
-        ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
         ["id"] = "phrase.semantic.social.reaction.default",
         ["semanticTemplateID"] = "semantic.social.reaction.default",
         ["styles"] = {
