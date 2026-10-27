@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority
 
-**Status:** IN PROGRESS — new parent goal opened from a clean developer-accepted Semantic Observatory baseline.
+**Status:** IN PROGRESS — P0–P9 accepted foundation; P10 canonical cleanup / legacy purge is mandatory before live-test handoff.
 **Project Hoomans audit baseline:** `181b58bcc30dc65dc61d19a49d6238abca50ece9`.
 **PsychopatzCore audit baseline:** `cf28189c57f7810f31d25c46c11eb88080f47baa`.
 **Checkout:** existing `main` only.
@@ -16,13 +16,14 @@ The finished system must:
 
 - make `ResponseCatalog` / semantic flows / response plans the only Project Hoomans authority that chooses conversational meaning and response family;
 - use the existing Dialogue Content / speech-realization path for meaning-equivalent wording variation;
-- preserve the existing SocialFlavor/social presentation queue only as a bounded delivery/localization/TTS/nameplate/compatibility backend, never as a second prose-selection brain;
+- use one Project Hoomans semantic speech presentation path for queue/localization/TTS/nameplate delivery; generic PsychopatzCore compatibility infrastructure may remain externally, but Project Hoomans must not retain first-party legacy prose registries or legacy Flavor aliases;
 - migrate remaining `PNC_SocialFlavorDefinitions_*`, `PNC_ConversationToolReplyCatalog`, legacy conversation-registry authority, and first-party compatibility prose selection into the semantic/content architecture;
 - let NPC-initiated semantic event speech open a bounded, grounded conversational response window so the player can naturally ask appropriate follow-up questions;
 - route those follow-ups through the existing semantic Suggestions, `DialogueContextState`, context resolver, response plans and authoritative fact refs rather than a separate event-chat subsystem;
 - remain deterministic/offline by default, with PBrainZ/LLM optional and downstream of semantic truth;
 - remain sparse and performant for many NPCs/players: no per-NPC/per-tick dialogue scans, no transcript persistence, no duplicated world/relationship/inventory truth, and no repeated semantic evaluation at render time;
-- expose the migrated content and provenance through the existing Semantic Lab / Observatory rather than creating another editor or simulator.
+- expose canonical content and provenance through the existing Semantic Lab / Observatory rather than creating another editor or simulator;
+- finish P10 by deleting migration-era executable/source-only dialogue registries, removing legacy Project Hoomans `Flavor*` namespaces, compacting Dialogue Content identity/schema, and grouping Studio content by semantic family.
 
 ## Central invariant — no split system
 
@@ -45,7 +46,7 @@ localization / formatting
 queue / cooldown / priority / nameplate / Conversation / TTS
 ```
 
-A legacy Flavor ID may survive temporarily as a compatibility alias, but it may not decide relationship stance, audience, need, grief, reply family, response plan or realization.
+During P10, temporary migration aliases may exist only while a caller is actively being converted. The accepted steady state contains **no Project Hoomans first-party legacy Flavor prose/content registry or legacy Flavor compatibility namespace**. Git history, not production source, preserves migration archaeology.
 
 ## Follow-up invariant
 
@@ -89,7 +90,7 @@ Reuse:
 - ActorConversationContext / SpeechStyleContext;
 - existing Knowledge/Relationship/Faction/Health/Inventory/Task/Quest/gameplay authorities;
 - existing Dialogue Content Registry / CodeBuilder generation;
-- existing Semantic Speech delivery and SocialFlavor queue;
+- existing semantic speech delivery/presentation behavior, renamed or consolidated where legacy `Flavor` terminology would imply obsolete authority;
 - existing production Lua worker, Semantic Lab, Observatory and headless CLI.
 
 ## Explicit non-goals
@@ -123,5 +124,6 @@ Older `SemanticInteractionLifecycle` P11 documents remain valuable historical/ar
 7. `MIGRATION_MATRIX.md`;
 8. `PERFORMANCE_AND_SCALING.md`;
 9. `HARNESS_ACCEPTANCE.md`;
-10. `ROADMAP.md`;
-11. `PROGRESS.md` **last** for current phase and exact Next Chunk.
+10. `P10_CANONICAL_SEMANTIC_CLEANUP.md`;
+11. `ROADMAP.md`;
+12. `PROGRESS.md` **last** for current phase and exact Next Chunk.

@@ -151,3 +151,98 @@ This goal closes that gap using existing lifecycle/context machinery.
 Older Semantic Interaction Lifecycle P11 evidence remains valid for the semantic-first paths it tested, but the statement that all first-party legacy prose authority was fully retired is superseded by this audit.
 
 The old job remains foundation/history; this job is the active migration authority.
+
+
+## Post-P9 cleanup audit — `fa1d9f9f`
+
+P0–P9 correctly established semantic-first runtime behavior, but a subsequent
+source/UI audit found that the repository still carries migration-era
+architecture that conflicts with the desired steady state.
+
+### Executable first-party legacy definitions remain
+
+The production mod tree still contains `PNC_SocialFlavorDefinitions.lua` and
+its shards, with 13 first-party `Flavor.Register(...)` registrations covering
+farewell, combat/medical reactions, abandonment, horde/retreat, incapacitated
+speech and leader loss.
+
+Bandits/Necroa/Project ALife first-party compatibility Flavor-definition files
+also remain physically present.
+
+These files are no longer needed as semantic authority and must not remain in
+production merely as migration history. P10 must prove content parity and
+delete them.
+
+### ToolReply literal catalog is still loaded by the worker
+
+`PNC_ConversationToolReplies.lua` correctly selects through ResponseCatalog and
+states that it no longer reads the former literal table. However,
+`ProductionModules_ConversationSemantic.lua` still explicitly loads
+`PNC_ConversationToolReplyCatalog.lua` as `tool_catalog`.
+
+That is an unnecessary split-source residue and makes the old catalog appear
+live. P10 deletes the table and the load after parity proof.
+
+### CompanionCommandFlavor is still a live wording registry
+
+`PNC_SharedComposition_Final.lua` still loads `PNC_CompanionCommandFlavor` and
+its definition shards. Some player command/emote and NPC presentation helpers
+still call `Flavor.Resolve(...)`.
+
+The semantic emote catalog currently treats those groups as a compatibility
+content source, which means semantic meaning may be selected first but Dialogue
+Content is not yet the sole first-party wording registry.
+
+P10 migrates this content to ResponseCatalog + SpeechRealization + Dialogue
+Content and removes the parallel registry.
+
+### Legacy semantic names remain
+
+`PNC_FlavorTextResolver*` now provides semantic threat/audience/need/grief
+context but retains `PNC.FlavorText` / `PNC.FlavorTextConst`.
+
+`PNC_FlavorAddress*` remains a useful addressing/identity projection beside the
+newer semantic address resolver, but its name and namespace preserve the
+obsolete Flavor architecture.
+
+P10 keeps the behavior and removes/merges the legacy naming/namespace.
+
+### Dialogue Content source is migration-heavy
+
+Measured source state:
+
+- about 242 KB;
+- 168 phrase families / 179 phrase records;
+- 167 family IDs contain `.migrated.`;
+- 167 families contain `MIGRATED_*` concepts;
+- 167 families contain `legacySource`;
+- roughly 1,674 repeated locked metadata fields;
+- roughly 126 KB attributable to repeated `canonicalConcept + locked` metadata.
+
+Most repeated semantic ownership/conditions/priority/follow-up metadata does not
+belong to the wording owner. It duplicates ResponseCatalog truth for Studio
+display.
+
+P10 introduces a compact canonical schema and makes Studio join semantic and
+content authorities dynamically.
+
+### Studio has reached flat-list scaling limits
+
+The current production catalog contains 191 response pools and 168 content
+families. Both Studio surfaces render flat lists.
+
+The IDs already encode natural hierarchy (`semantic.compat.*`,
+`semantic.medical.distress.*`, `semantic.tool_reply.*`,
+`semantic.generated.*`, etc.). P10 must derive a tree from those canonical IDs
+rather than inventing another grouping database.
+
+### Revised conclusion
+
+P0–P9 remain accepted semantic-runtime foundation, but the previous
+`READY FOR USER LIVE TEST` boundary is superseded.
+
+The parent goal is reopened for P10 because the desired steady state is not
+"legacy code is no longer authoritative"; it is:
+
+> **legacy first-party dialogue code/content is absent, canonical semantic/content
+> ownership is compact, and Studio exposes that ownership hierarchically.**

@@ -179,3 +179,83 @@ If semantic selection fails:
 - do **not** fall through to a hidden first-party legacy prose selector.
 
 Presentation failure may suppress/delay delivery according to existing queue policy but must not choose a different meaning.
+
+
+## P10 steady-state repository architecture
+
+The authority model must also be visible in file/schema structure.
+
+### One first-party content registry
+
+Project Hoomans steady state has exactly one first-party dialogue wording
+registry: Dialogue Content.
+
+There is no separate:
+
+- SocialFlavor definition registry;
+- ToolReply literal catalog;
+- CompanionCommandFlavor wording registry;
+- compatibility-mod PNC wording registry.
+
+Player/NPC command/emote/greeting text is content like every other semantic
+realization and must pass through the same content seam.
+
+### No legacy namespace as architecture
+
+Useful semantic code must use semantic names.
+
+`FlavorText` cannot remain the public namespace for a semantic context provider.
+`FlavorAddress` cannot remain a parallel addressing namespace when the function
+is semantic conversational addressing.
+
+Do not preserve internal Project Hoomans aliases after their callers have been
+migrated.
+
+### Compact content identity
+
+The semantic template/realization identity is the canonical join between
+ResponseCatalog and Dialogue Content.
+
+Do not create three or four permanent identities for the same concept merely to
+preserve migration history.
+
+Mechanical phrase IDs and translation keys may be generated deterministically
+where no external stability contract requires explicit authoring.
+
+### Canonical source versus generated observability
+
+Canonical Dialogue Content owns only wording/authoring structure and the
+minimum stable identity required to join semantics.
+
+Generated/read-only tooling may enrich that with:
+
+- response pool;
+- variant;
+- plan;
+- follow-up offers;
+- fact refs;
+- semantic authority;
+- source provenance;
+- fingerprints.
+
+That enriched view is **derived** and must not be copied back into every
+canonical phrase record.
+
+### Semantic Lab hierarchy
+
+Studio hierarchy is a projection, not data authority.
+
+Both Responses and Dialogue Content derive their branch tree from canonical
+semantic IDs and content joins. Humanized labels are UI-only; exact canonical
+IDs remain available in details/search.
+
+This keeps organization scalable without introducing a second taxonomy store.
+
+### External compatibility boundary
+
+Generic PsychopatzCore APIs may remain available to external adopters when
+outside this repository's ownership, but Project Hoomans must not route its
+first-party wording through a legacy generic selector.
+
+Compatibility adapters provide facts/events. Project Hoomans semantics chooses
+meaning and Dialogue Content chooses PNC wording.

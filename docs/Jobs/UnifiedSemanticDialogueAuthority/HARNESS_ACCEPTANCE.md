@@ -113,4 +113,40 @@ Before `READY FOR USER LIVE TEST`:
 - CodeBuilder/Dialogue Content idempotence green;
 - save/data-safety checks green;
 - `git diff --check` green;
-- migration matrix shows no Project Hoomans first-party legacy prose selector with semantic authority.
+- migration matrix shows no Project Hoomans first-party legacy prose selector with semantic authority;
+- P10 no-legacy/source/schema/Studio gates in `P10_CANONICAL_SEMANTIC_CLEANUP.md` pass.
+
+
+## P10 no-legacy acceptance extension
+
+The earlier P8/P9 gate proved that legacy prose was no longer semantic
+authority. P10 raises the steady-state requirement from "non-authoritative" to
+"absent from Project Hoomans production architecture."
+
+Required negative checks:
+
+- no `PNC_SocialFlavorDefinitions*` source;
+- no `PNC_ConversationToolReplyCatalog.lua`;
+- no Project Hoomans CompanionCommandFlavor wording registry;
+- no `PNC.FlavorText` / `PNC.FlavorTextConst`;
+- no first-party semantic packet depending on `Flavor.Resolve`;
+- no `.migrated.` family ID in canonical Dialogue Content;
+- no `MIGRATED_*` content concept;
+- no `legacySource` in canonical Dialogue Content;
+- no worker/composition load of a deleted legacy file.
+
+Required positive checks:
+
+- former command/emote/greeting content resolves through ResponseCatalog →
+  SpeechRealization → Dialogue Content;
+- social/medical/compatibility content remains EN/TL-equivalent;
+- semantic context/address behavior remains equivalent after rename/merge;
+- Studio Responses and Dialogue Content are hierarchical, searchable and
+  traceable to exact canonical IDs;
+- generated outputs are deterministic across two consecutive builds;
+- PBrainZ and compatibility adapters still consume canonical semantic
+  realization/context;
+- full P9 regression topology remains green.
+
+Final broad acceptance must use the resource-aware Python runner introduced in
+P9, not plain serial full `unittest discover`.

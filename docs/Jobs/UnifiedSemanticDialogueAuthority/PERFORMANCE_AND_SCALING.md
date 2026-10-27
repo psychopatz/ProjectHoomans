@@ -131,3 +131,21 @@ Migration is not accepted if it introduces:
 - repeated ResponseCatalog selection for one delivered line;
 - persistent text growth;
 - materially slower normal regression/startup without measured justification.
+
+
+## P10 source/tooling efficiency
+
+Canonical content size and Studio query shape are now acceptance concerns.
+
+- Do not retain duplicated semantic metadata in every phrase family merely for
+  Studio display.
+- Derive mechanical identifiers during CodeBuilder generation when safe.
+- Do not add a second hierarchy index persisted beside ResponseCatalog.
+- Studio grouping/search must operate on bounded catalog/content projections and
+  must not trigger semantic re-selection.
+- Use lazy loading/details for leaf content where practical.
+- Keep the P9 resource-aware Python runner as the broad acceptance path.
+
+Record P10 before/after source/runtime artifact bytes and acceptance wall-clock
+times. A smaller source is desirable, but correctness and stable external IDs
+take precedence over an arbitrary byte target.

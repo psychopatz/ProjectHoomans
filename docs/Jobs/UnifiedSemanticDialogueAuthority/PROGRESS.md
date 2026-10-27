@@ -1,7 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** READY FOR USER LIVE TEST — P0 through P9 accepted; developer-side
-acceptance is complete.
+**Status:** IN PROGRESS — P0 through P9 remain accepted foundation; post-P9 audit reopened the parent goal for mandatory P10 Canonical Semantic Cleanup & Legacy Purge.
 
 ## Audited baseline
 
@@ -51,6 +50,7 @@ acceptance is complete.
 | P7 — canonical content coverage / Studio observability | **ACCEPTED** |
 | P8 — retire first-party legacy prose authority | **ACCEPTED** |
 | P9 — scale/MP/final acceptance | **ACCEPTED** |
+| P10 — canonical semantic cleanup / legacy purge | **NEXT / IN PROGRESS** |
 
 ## Accepted P0 — authority inventory and characterization
 
@@ -272,21 +272,64 @@ remains diagnostic evidence only: its interrupted run reached `608.35s`, and
 the earlier complete serial diagnostic was approximately `1001.81s` with
 `635` tests, `25` failures, `4` errors, and `56` display skips.
 
-## Immediate Next Chunk
+## Post-P9 audit that reopened the goal
 
-User-owned live SP/MP validation remains. Keep generic PsychopatzCore
-SocialFlavor infrastructure and external provider compatibility authority
-intact while validating the accepted semantic-first behavior in the native
-game when convenient.
+Audit baseline: `fa1d9f9f1332e5d2a870a02e6abcfd885d7a7f0f`.
+
+The semantic runtime migration is accepted, but the source/UI steady state is
+not yet clean enough for user live acceptance:
+
+- `PNC_SocialFlavorDefinitions*` remains executable production-tree source with
+  13 first-party Flavor registrations;
+- first-party compatibility Flavor definitions remain;
+- `PNC_ConversationToolReplyCatalog.lua` remains and the production worker still
+  loads it as `tool_catalog`;
+- `PNC_CompanionCommandFlavor*` remains loaded and still resolves wording for
+  some command/emote/greeting paths;
+- semantic context/address helpers still expose obsolete Flavor namespaces;
+- Dialogue Content remains migration-heavy: ~242 KB, 168 families / 179
+  phrases, 167 `.migrated.` IDs, 167 `MIGRATED_*` concepts, 167 `legacySource`
+  entries and ~1,674 repeated locked fields;
+- Responses is a flat 191-pool list and Dialogue Content is a flat 168-family
+  list.
+
+These findings supersede the previous `READY FOR USER LIVE TEST` handoff but do
+not invalidate P0–P9 behavior/test evidence.
+
+## Immediate Next Chunk — P10A
+
+Read `P10_CANONICAL_SEMANTIC_CLEANUP.md` before editing.
+
+Start with the hard source-truth purge:
+
+1. enumerate exact current callers/loaders/tests for all
+   `PNC_SocialFlavorDefinitions*`, first-party compatibility Flavor-definition
+   files and `PNC_ConversationToolReplyCatalog.lua`;
+2. prove required wording/variant parity exists in current ResponseCatalog +
+   Dialogue Content;
+3. delete only the definitions/catalogs whose first-party behavior is already
+   canonical;
+4. remove worker/composition/bootstrap loads;
+5. replace tests that validate the old registry with negative absence plus
+   semantic/content parity tests;
+6. run focused Lua/Python/Kahlua/idempotence checks;
+7. update this progress ledger and `MIGRATION_MATRIX.md`, then continue
+   automatically to P10B–P10F.
+
+Do not begin by renaming every Flavor symbol globally. P10A first removes dead
+registries; P10B migrates the still-live CompanionCommandFlavor wording owner;
+P10C then renames/merges useful semantic helpers with caller proof.
 
 ## Stop conditions
 
-Stop before developer-side completion only for:
+Stop before P10 developer acceptance only for:
 
 - genuine unsafe repository divergence/concurrent ownership conflict;
+- a required legacy surface that proves to be an externally consumed public
+  Project Hoomans API and cannot be removed without an explicit compatibility
+  decision;
 - missing required dependency/toolchain with no accepted fallback;
-- a proven architecture conflict requiring user decision;
-- an explicit user-owned native acceptance gate after all developer work is
-  complete.
+- a proven architecture conflict requiring user decision.
 
-A phase/test passing is not a stop condition.
+A P10 subphase passing is not a stop condition. Continue automatically through
+P10F.

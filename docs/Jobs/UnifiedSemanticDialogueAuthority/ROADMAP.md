@@ -1,6 +1,6 @@
 # Roadmap — Unified Semantic Dialogue Authority
 
-**Parent status:** IN PROGRESS.
+**Parent status:** IN PROGRESS — P0–P9 accepted foundation; P10 cleanup is mandatory before live-test handoff.
 **Completion rule:** phases organize work; completing a phase does not complete the parent goal. Continue automatically until all developer-side gates pass or a genuine blocker is reached.
 
 ## P0 — Reconcile authority inventory and freeze baseline
@@ -166,3 +166,56 @@ Required:
 - final migration matrix complete.
 
 **Gate:** one semantic conversation architecture owns direct and event-driven NPC speech plus grounded follow-up. Only user-owned native SP/MP acceptance remains.
+
+
+## P10 — Canonical semantic cleanup and legacy purge
+
+P0–P9 proved semantic-first behavior. P10 makes that architecture the literal
+steady-state source/schema/UI structure.
+
+Detailed contract: `P10_CANONICAL_SEMANTIC_CLEANUP.md`.
+
+### P10A — hard legacy-file purge
+
+Delete first-party SocialFlavor definition shards, ToolReply literal catalog,
+and first-party compatibility Flavor-definition source after semantic/content
+parity proof. Remove worker/composition loads and replace legacy-definition
+tests with absence + semantic-parity tests.
+
+### P10B — retire CompanionCommandFlavor wording registry
+
+Migrate command/emote/greeting/rejection/dog wording into the canonical
+ResponseCatalog → SpeechRealization → Dialogue Content path, then remove the
+parallel registry/definitions and obsolete flavor IDs.
+
+### P10C — normalize semantic helper names
+
+Rename/merge FlavorText semantic context and FlavorAddress semantic addressing;
+remove internal legacy aliases and update callers/tests. Rename Project Hoomans
+presentation APIs/variables where Flavor terminology now falsely implies a
+content authority.
+
+### P10D — Dialogue Content schema v2
+
+Remove migration-era IDs/metadata, use semantic identity as the canonical join,
+derive mechanical IDs/keys where safe, group shared ownership once, and do not
+keep a permanent v1 compatibility reader.
+
+### P10E — hierarchical Studio
+
+Derive a shared semantic tree projection for Responses and Dialogue Content.
+Humanize branch labels, show counts, support search/auto-expand, and keep full
+canonical IDs in detail views. No second hierarchy database.
+
+### P10F — final no-legacy acceptance
+
+Run source-absence, semantic/content parity, PBrainZ/compatibility, Studio,
+CodeBuilder/idempotence, Lua/Kahlua, save-safety and resource-aware Python
+acceptance. Record before/after source/runtime bytes and wall-clock timings.
+
+**P10 gate:** Project Hoomans has one semantic response authority, one Dialogue
+Content wording authority, one semantic lifecycle/context authority and a
+presentation-only speech layer; no first-party legacy dialogue registry,
+migration-era content schema, or misleading Flavor namespace remains.
+
+Only after P10 passes may the parent return to `READY FOR USER LIVE TEST`.

@@ -2,13 +2,13 @@
 
 ## Operating rule
 
-The parent objective is complete only when Project Hoomans-owned conversational meaning has one semantic authority and the remaining legacy prose selectors are retired from production authority.
+The parent objective is complete only when Project Hoomans-owned conversational meaning has one semantic authority, Dialogue Content is the one first-party wording authority, and migration-era/legacy dialogue registries, aliases and names have been purged from the production source.
 
 A phase/chunk passing does not finish the parent goal. After each accepted chunk, update `PROGRESS.md` and continue automatically to the next mandatory roadmap phase unless a genuine blocker or explicitly user-owned native gate is reached.
 
 ## Mandatory read order
 
-Read root `AGENTS.md`, then this job's `README.md`, `AUDIT.md`, `ARCHITECTURE.md`, `EVENT_FOLLOWUP_CONTRACT.md`, `MIGRATION_MATRIX.md`, `PERFORMANCE_AND_SCALING.md`, `HARNESS_ACCEPTANCE.md`, `ROADMAP.md`, and **`PROGRESS.md` last**.
+Read root `AGENTS.md`, then this job's `README.md`, `AUDIT.md`, `ARCHITECTURE.md`, `EVENT_FOLLOWUP_CONTRACT.md`, `MIGRATION_MATRIX.md`, `PERFORMANCE_AND_SCALING.md`, `HARNESS_ACCEPTANCE.md`, `P10_CANONICAL_SEMANTIC_CLEANUP.md`, `ROADMAP.md`, and **`PROGRESS.md` last**.
 
 Re-read the relevant current source before editing; historical job prose is not runtime truth.
 
@@ -26,6 +26,9 @@ Re-read the relevant current source before editing; historical job prose is not 
 - No ordinary rendered text or transcript in NPC ModData.
 - No per-NPC/per-tick semantic work.
 - Preserve PBrainZ as optional downstream realization/context consumer; it does not become semantic truth authority.
+- P10 steady state contains no first-party `PNC_SocialFlavorDefinitions*`, `PNC_ConversationToolReplyCatalog`, `PNC_CompanionCommandFlavor*` wording registry, `PNC.FlavorText*`, `.migrated.` content IDs, `MIGRATED_*` content concepts, or `legacySource` fields.
+- Git history is the archive. Do not keep executable legacy files in `media/lua` merely as migration/source material.
+- Studio grouping is a derived view over canonical semantic IDs; do not create another hierarchy authority.
 
 ## Migration discipline
 
@@ -42,6 +45,14 @@ For each legacy family:
 9. retire the old decision API only after caller analysis proves no semantic-owned production dependency remains.
 
 Do not count “legacy chose a Flavor ID, then semantic provenance was attached afterward” as migrated.
+
+## P10 cleanup discipline
+
+For deletion/rename work, prove current callers before editing, migrate useful behavior to its canonical owner, then delete the old source and update tests in the same coherent slice. Do not leave compatibility shims inside Project Hoomans after all internal callers are migrated merely to preserve old names.
+
+When compacting Dialogue Content, treat ResponseCatalog as semantic topology authority and the content source as wording authority. Studio must join those sources at read time instead of copying semantic conditions, priorities, pool ownership and migration provenance into every phrase record.
+
+Use the P9 resource-aware Python runner for broad acceptance. Do not reintroduce the old serial full-suite gate.
 
 ## Follow-up discipline
 

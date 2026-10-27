@@ -117,3 +117,25 @@ the acceptance path itself cannot validate a migrated family by accidentally
 consulting first-party legacy prose. The complete Python/Lua/Kahlua,
 source-save safety, and deterministic CodeBuilder evidence is recorded in
 `PROGRESS.md`.
+
+
+## P10 cleanup closure matrix
+
+The P0–P9 rows above remain behavioral migration evidence. P10 tracks removal
+of the migration scaffolding itself.
+
+| Residual surface | P10 target | Required disposition |
+| --- | --- | --- |
+| `PNC_SocialFlavorDefinitions*` | canonical semantic/content only | delete files and loads; replace old definition tests |
+| Bandits/Necroa/Project ALife PNC Flavor definitions | compatibility facts → semantic pools → Dialogue Content | delete first-party wording definitions after parity |
+| `PNC_ConversationToolReplyCatalog.lua` | semantic ToolReply pools + Dialogue Content | delete file and worker `tool_catalog` load |
+| `PNC_CompanionCommandFlavor*` | semantic command/emote/greeting pools + Dialogue Content | migrate remaining callers, then delete registry/definitions |
+| `PNC.FlavorText*` / `PNC_FlavorTextResolver*` | semantic social-context provider | rename/merge; remove legacy namespace/aliases |
+| `PNC.FlavorAddress*` | canonical semantic addressing | reconcile/rename; remove legacy namespace |
+| `PNC_SocialFlavorPresentation*` and `flavorID` terminology | semantic/speech presentation | rename/consolidate where no external compatibility contract requires the legacy name |
+| `.migrated.` / `MIGRATED_*` / `legacySource` content metadata | compact steady-state Dialogue Content | remove from canonical source; retain history only in Git/job docs |
+| flat Studio Responses/Dialogue Content lists | derived semantic tree | shared branch projection, counts, search, full IDs in detail pane |
+| generic PsychopatzCore SocialFlavor API | external compatibility only | Project Hoomans has zero wording-selection dependency; do not fork another PNC compatibility layer |
+
+P10 is accepted only when every row is closed with source-level and runtime
+evidence.
