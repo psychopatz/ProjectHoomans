@@ -38,6 +38,12 @@ if __package__ in {None, ""}:
         load_dialogue_content_source,
         write_dialogue_content_output,
     )
+    from tools.semantic_harness.codebuilder.conversation_ui import (
+        compile_conversation_ui,
+        conversation_ui_source_path_from_manifest,
+        load_conversation_ui_source,
+        write_conversation_ui_output,
+    )
     from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
         compile_semantic_definitions,
         load_semantic_source,
@@ -65,6 +71,12 @@ else:
         compile_dialogue_content,
         load_dialogue_content_source,
         write_dialogue_content_output,
+    )
+    from .conversation_ui import (
+        compile_conversation_ui,
+        conversation_ui_source_path_from_manifest,
+        load_conversation_ui_source,
+        write_conversation_ui_output,
     )
     from .semantic_definition_compiler import (
         compile_semantic_definitions,
@@ -377,6 +389,7 @@ def main(arguments: list[str] | None = None) -> int:
     compiled_dialogue = None
     compiled_semantic = None
     compiled_content = None
+    compiled_conversation_ui = None
 
     try:
         if options.wordnet_home is not None:
@@ -399,6 +412,13 @@ def main(arguments: list[str] | None = None) -> int:
             compiled_content = compile_dialogue_content(
                 load_dialogue_content_source(options.content_source)
             )
+            if options.content_source.name == "manifest.json":
+                ui_source = conversation_ui_source_path_from_manifest(
+                    options.content_source
+                )
+                compiled_conversation_ui = compile_conversation_ui(
+                    load_conversation_ui_source(ui_source)
+                )
     except CompileError as error:
         print(f"semantic compiler error: {error}", file=sys.stderr)
         return 2
@@ -439,6 +459,11 @@ def main(arguments: list[str] | None = None) -> int:
     if compiled_content is not None:
         output_root = options.content_output_root.expanduser().resolve()
         paths = write_dialogue_content_output(output_root, compiled_content)
+        ui_path = None
+        if compiled_conversation_ui is not None:
+            ui_path = write_conversation_ui_output(
+                output_root, compiled_conversation_ui
+            )
         phrase_count = sum(
             len(phrases)
             for family in compiled_content["phraseFamilies"]
@@ -449,6 +474,8 @@ def main(arguments: list[str] | None = None) -> int:
             f"({len(compiled_content['phraseFamilies'])} phrase families, "
             f"{phrase_count} phrases, {len(compiled_content['playerChoices'])} player choices)"
         )
+        if ui_path is not None:
+            print(f"wrote Conversation UI registry {ui_path}")
     return 0
 
 

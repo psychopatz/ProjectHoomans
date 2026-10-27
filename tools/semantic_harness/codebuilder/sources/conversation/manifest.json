@@ -6,6 +6,11 @@
     "version": "3",
     "contentLicense": "Project Hoomans authored content"
   },
+  "conversationUI": {
+    "schema": "pnc.conversation_ui_registry.v1",
+    "id": "conversation_ui",
+    "path": "ui_registry.json"
+  },
   "groups": {
     "events": {
       "contentOwner": "projecthoomans.dialogue_content.events"
@@ -150,6 +155,11 @@
       "id": "compatibility_runtime_aliases",
       "domain": "compatibility.runtime.aliases",
       "path": "shards/compatibility_runtime_aliases.json"
+    },
+    {
+      "id": "conversation_ui_choices",
+      "domain": "conversation.ui.choices",
+      "path": "shards/conversation_ui_choices.json"
     }
   ]
 }

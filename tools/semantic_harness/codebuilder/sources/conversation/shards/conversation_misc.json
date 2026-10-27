@@ -553,20 +553,5 @@
       }
     }
   ],
-  "playerChoices": [
-    {
-      "id": "conversation.landing:whats_up",
-      "kind": "player_landing_choice",
-      "route": "semantic_hub",
-      "hubID": "whats_up",
-      "labelTranslations": {
-        "EN": "What's up",
-        "TL": "Ano ang balita"
-      },
-      "choiceTranslations": {
-        "EN": "What's up?",
-        "TL": "Ano ang balita?"
-      }
-    }
-  ]
+  "playerChoices": []
 }

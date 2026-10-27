@@ -68,7 +68,7 @@ class P11ConversationShardTests(unittest.TestCase):
         self.assertEqual(len(semantic_ids), len(set(semantic_ids)))
         self.assertEqual(len(phrase_ids), len(set(phrase_ids)))
         self.assertEqual(len(compiled["phraseFamilies"]), 463)
-        self.assertEqual(len(compiled["playerChoices"]), 1)
+        self.assertEqual(len(compiled["playerChoices"]), 12)
         self.assertEqual(len(compiled["runtimeAliases"]), 292)
 
     def test_authoring_service_reads_and_writes_the_owning_shard(self) -> None:

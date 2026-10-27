@@ -92,6 +92,15 @@ def load_dialogue_content_manifest(path: Path) -> dict[str, Any]:
     shards = manifest.get("shards")
     if not isinstance(source, dict) or not isinstance(groups, dict):
         raise CompileError("conversation content manifest requires source and groups")
+    ui_registry = manifest.get("conversationUI")
+    if not isinstance(ui_registry, dict):
+        raise CompileError("conversation content manifest requires conversationUI")
+    if not isinstance(ui_registry.get("schema"), str) or not isinstance(
+        ui_registry.get("path"), str
+    ):
+        raise CompileError(
+            "conversation content manifest conversationUI requires schema and path"
+        )
     if not isinstance(shards, list) or not shards:
         raise CompileError("conversation content manifest requires shards")
     seen_ids: set[str] = set()
@@ -374,6 +383,8 @@ def _player_content(
         "kind": kind,
         "labelKey": label_key,
         "choiceKey": choice_key,
+        "labelFallback": label_values["EN"],
+        "choiceFallback": choice_values["EN"],
         "route": _text(value.get("route"), f"{content_id}.route"),
         "hubID": _text(value.get("hubID"), f"{content_id}.hubID"),
         "canonicalConcept": derived_canonical_concept(content_id),

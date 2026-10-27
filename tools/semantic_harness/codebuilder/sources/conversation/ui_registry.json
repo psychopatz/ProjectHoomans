@@ -1,0 +1,276 @@
+{
+  "schema": "pnc.conversation_ui_registry.v1",
+  "schemaVersion": 1,
+  "source": {
+    "name": "Project Hoomans Conversation UI Registry",
+    "version": "1",
+    "owner": "projecthoomans.conversation_ui"
+  },
+  "nodes": [
+    {
+      "id": "conversation.landing",
+      "kind": "landing",
+      "parentID": null,
+      "order": 0,
+      "contentID": "conversation.landing:root",
+      "children": [
+        {
+          "nodeID": "conversation.landing:whats_up",
+          "order": 10
+        }
+      ]
+    },
+    {
+      "id": "conversation.landing:whats_up",
+      "kind": "landing_choice",
+      "parentID": "conversation.landing",
+      "order": 10,
+      "contentID": "conversation.landing:whats_up",
+      "providerRef": {
+        "id": "conversation_root",
+        "ownership": "production",
+        "source": "PNC_SemanticDialogueSuggestions_Projection_Landing",
+        "locked": true
+      },
+      "semanticDestination": {
+        "candidateID": "conversation.landing:whats_up",
+        "providerID": "conversation_root",
+        "route": "semantic_hub",
+        "topic": "whats_up",
+        "hubID": "whats_up",
+        "canonicalConcept": "WHATS_UP"
+      },
+      "children": [
+        {
+          "nodeID": "conversation.hub:whats_up",
+          "order": 10
+        }
+      ]
+    },
+    {
+      "id": "conversation.hub:whats_up",
+      "kind": "hub",
+      "parentID": "conversation.landing:whats_up",
+      "order": 10,
+      "contentID": "conversation.landing:whats_up",
+      "children": [
+        {
+          "nodeID": "conversation.choice:question.wellbeing",
+          "order": 10
+        },
+        {
+          "nodeID": "conversation.choice:question.needs",
+          "order": 30
+        },
+        {
+          "nodeID": "conversation.choice:question.health",
+          "order": 40
+        },
+        {
+          "nodeID": "conversation.choice:question.identity",
+          "order": 50
+        },
+        {
+          "nodeID": "conversation.choice:question.activity",
+          "order": 60
+        },
+        {
+          "nodeID": "conversation.choice:question.time",
+          "order": 60
+        },
+        {
+          "nodeID": "conversation.choice:question.date",
+          "order": 70
+        },
+        {
+          "nodeID": "conversation.choice:question.gossip",
+          "order": 70
+        },
+        {
+          "nodeID": "conversation.choice:question.weather",
+          "order": 80
+        }
+      ]
+    },
+    {
+      "id": "conversation.choice:question.wellbeing",
+      "kind": "choice",
+      "parentID": "conversation.hub:whats_up",
+      "order": 10,
+      "contentID": "conversation.choice:question.wellbeing",
+      "providerRef": {
+        "id": "projecthoomans.static_questions",
+        "ownership": "production",
+        "source": "PNC_SemanticDialogueSuggestions_StaticProvider",
+        "locked": true
+      },
+      "semanticDestination": {
+        "candidateID": "question.wellbeing",
+        "providerID": "projecthoomans.static_questions",
+        "route": "semantic_provider",
+        "topic": "wellbeing",
+        "hubID": "whats_up"
+      }
+    },
+    {
+      "id": "conversation.choice:question.needs",
+      "kind": "choice",
+      "parentID": "conversation.hub:whats_up",
+      "order": 30,
+      "contentID": "conversation.choice:question.needs",
+      "providerRef": {
+        "id": "projecthoomans.static_questions",
+        "ownership": "production",
+        "source": "PNC_SemanticDialogueSuggestions_StaticProvider",
+        "locked": true
+      },
+      "semanticDestination": {
+        "candidateID": "question.needs",
+        "providerID": "projecthoomans.static_questions",
+        "route": "semantic_provider",
+        "topic": "needs",
+        "hubID": "whats_up"
+      }
+    },
+    {
+      "id": "conversation.choice:question.health",
+      "kind": "choice",
+      "parentID": "conversation.hub:whats_up",
+      "order": 40,
+      "contentID": "conversation.choice:question.health",
+      "providerRef": {
+        "id": "projecthoomans.static_questions",
+        "ownership": "production",
+        "source": "PNC_SemanticDialogueSuggestions_StaticProvider",
+        "locked": true
+      },
+      "semanticDestination": {
+        "candidateID": "question.health",
+        "providerID": "projecthoomans.static_questions",
+        "route": "semantic_provider",
+        "topic": "medical",
+        "hubID": "whats_up"
+      }
+    },
+    {
+      "id": "conversation.choice:question.identity",
+      "kind": "choice",
+      "parentID": "conversation.hub:whats_up",
+      "order": 50,
+      "contentID": "conversation.choice:question.identity",
+      "providerRef": {
+        "id": "projecthoomans.static_questions",
+        "ownership": "production",
+        "source": "PNC_SemanticDialogueSuggestions_StaticProvider",
+        "locked": true
+      },
+      "semanticDestination": {
+        "candidateID": "question.identity",
+        "providerID": "projecthoomans.static_questions",
+        "route": "semantic_provider",
+        "topic": "identity",
+        "hubID": "whats_up"
+      }
+    },
+    {
+      "id": "conversation.choice:question.activity",
+      "kind": "choice",
+      "parentID": "conversation.hub:whats_up",
+      "order": 60,
+      "contentID": "conversation.choice:question.activity",
+      "providerRef": {
+        "id": "projecthoomans.static_questions",
+        "ownership": "production",
+        "source": "PNC_SemanticDialogueSuggestions_StaticProvider",
+        "locked": true
+      },
+      "semanticDestination": {
+        "candidateID": "question.activity",
+        "providerID": "projecthoomans.static_questions",
+        "route": "semantic_provider",
+        "topic": "activity",
+        "hubID": "whats_up"
+      }
+    },
+    {
+      "id": "conversation.choice:question.time",
+      "kind": "choice",
+      "parentID": "conversation.hub:whats_up",
+      "order": 60,
+      "contentID": "conversation.choice:question.time",
+      "providerRef": {
+        "id": "projecthoomans.static_questions",
+        "ownership": "production",
+        "source": "PNC_SemanticDialogueSuggestions_StaticProvider",
+        "locked": true
+      },
+      "semanticDestination": {
+        "candidateID": "question.time",
+        "providerID": "projecthoomans.static_questions",
+        "route": "semantic_provider",
+        "topic": "time",
+        "hubID": "whats_up"
+      }
+    },
+    {
+      "id": "conversation.choice:question.date",
+      "kind": "choice",
+      "parentID": "conversation.hub:whats_up",
+      "order": 70,
+      "contentID": "conversation.choice:question.date",
+      "providerRef": {
+        "id": "projecthoomans.static_questions",
+        "ownership": "production",
+        "source": "PNC_SemanticDialogueSuggestions_StaticProvider",
+        "locked": true
+      },
+      "semanticDestination": {
+        "candidateID": "question.date",
+        "providerID": "projecthoomans.static_questions",
+        "route": "semantic_provider",
+        "topic": "date",
+        "hubID": "whats_up"
+      }
+    },
+    {
+      "id": "conversation.choice:question.gossip",
+      "kind": "choice",
+      "parentID": "conversation.hub:whats_up",
+      "order": 70,
+      "contentID": "conversation.choice:question.gossip",
+      "providerRef": {
+        "id": "projecthoomans.static_questions",
+        "ownership": "production",
+        "source": "PNC_SemanticDialogueSuggestions_StaticProvider",
+        "locked": true
+      },
+      "semanticDestination": {
+        "candidateID": "question.gossip",
+        "providerID": "projecthoomans.static_questions",
+        "route": "semantic_provider",
+        "topic": "gossip",
+        "hubID": "whats_up"
+      }
+    },
+    {
+      "id": "conversation.choice:question.weather",
+      "kind": "choice",
+      "parentID": "conversation.hub:whats_up",
+      "order": 80,
+      "contentID": "conversation.choice:question.weather",
+      "providerRef": {
+        "id": "projecthoomans.static_questions",
+        "ownership": "production",
+        "source": "PNC_SemanticDialogueSuggestions_StaticProvider",
+        "locked": true
+      },
+      "semanticDestination": {
+        "candidateID": "question.weather",
+        "providerID": "projecthoomans.static_questions",
+        "route": "semantic_provider",
+        "topic": "weather",
+        "hubID": "whats_up"
+      }
+    }
+  ]
+}

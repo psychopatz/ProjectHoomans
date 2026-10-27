@@ -143,11 +143,11 @@ class ContextualSemanticHubP10BTests(unittest.TestCase):
 
         self.assertEqual(
             rows["EN"]["labelKey"],
-            "UI_PNC_Conversation_Suggestion_Activity_Label",
+                "UI_PNC_Conversation_Content_ConversationChoiceQuestionActivity_Label",
         )
         self.assertEqual(
             rows["TL"]["labelKey"],
-            "UI_PNC_Conversation_Suggestion_Activity_Label",
+                "UI_PNC_Conversation_Content_ConversationChoiceQuestionActivity_Label",
         )
         self.assertNotEqual(rows["EN"]["label"], rows["TL"]["label"])
         self.assertNotEqual(

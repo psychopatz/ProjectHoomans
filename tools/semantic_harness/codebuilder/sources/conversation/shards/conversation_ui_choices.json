@@ -1,0 +1,177 @@
+{
+  "schema": "pnc.conversation_content_shard.v1",
+  "schemaVersion": 1,
+  "id": "conversation_ui_choices",
+  "phraseFamilies": [],
+  "runtimeAliases": [],
+  "playerChoices": [
+    {
+      "id": "conversation.landing:root",
+      "kind": "player_landing_root",
+      "route": "conversation_landing",
+      "hubID": "conversation_landing",
+      "labelTranslations": {
+        "EN": "Talk",
+        "TL": "Usap"
+      },
+      "choiceTranslations": {
+        "EN": "Talk",
+        "TL": "Usap"
+      }
+    },
+    {
+      "id": "conversation.landing:whats_up",
+      "kind": "player_landing_choice",
+      "route": "semantic_hub",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "What's up",
+        "TL": "Ano ang balita"
+      },
+      "choiceTranslations": {
+        "EN": "What's up?",
+        "TL": "Ano ang balita?"
+      }
+    },
+    {
+      "id": "conversation.choice:question.wellbeing",
+      "kind": "player_semantic_choice",
+      "route": "semantic_provider",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "Ask about wellbeing",
+        "TL": "Itanong ang kalagayan"
+      },
+      "choiceTranslations": {
+        "EN": "How are you feeling?",
+        "TL": "Kumusta ang pakiramdam mo?"
+      }
+    },
+    {
+      "id": "conversation.choice:question.wellbeing_detail",
+      "kind": "player_follow_up_choice",
+      "route": "semantic_provider",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "Can you tell me more?",
+        "TL": "Itanong kung ano ang problema"
+      },
+      "choiceTranslations": {
+        "EN": "What's wrong?",
+        "TL": "Ano ang problema?"
+      }
+    },
+    {
+      "id": "conversation.choice:question.needs",
+      "kind": "player_semantic_choice",
+      "route": "semantic_provider",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "Do you need anything?",
+        "TL": "Itanong ang pangangailangan"
+      },
+      "choiceTranslations": {
+        "EN": "Do you need anything?",
+        "TL": "May kailangan ka ba?"
+      }
+    },
+    {
+      "id": "conversation.choice:question.health",
+      "kind": "player_semantic_choice",
+      "route": "semantic_provider",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "Ask about injuries",
+        "TL": "Itanong ang mga sugat"
+      },
+      "choiceTranslations": {
+        "EN": "Are you hurt?",
+        "TL": "Nasaktan ka ba?"
+      }
+    },
+    {
+      "id": "conversation.choice:question.activity",
+      "kind": "player_semantic_choice",
+      "route": "semantic_provider",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "Ask what they've been doing",
+        "TL": "Itanong ang pinagkakaabalahan"
+      },
+      "choiceTranslations": {
+        "EN": "What have you been doing?",
+        "TL": "Ano ang mga pinagkakaabalahan mo?"
+      }
+    },
+    {
+      "id": "conversation.choice:question.gossip",
+      "kind": "player_semantic_choice",
+      "route": "semantic_provider",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "Ask about gossip",
+        "TL": "Magtanong tungkol sa tsismis"
+      },
+      "choiceTranslations": {
+        "EN": "Any gossip?",
+        "TL": "May narinig ka bang tsismis?"
+      }
+    },
+    {
+      "id": "conversation.choice:question.identity",
+      "kind": "player_semantic_choice",
+      "route": "semantic_provider",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "Ask who they are",
+        "TL": "Itanong kung sino siya"
+      },
+      "choiceTranslations": {
+        "EN": "Who are you?",
+        "TL": "Sino ka?"
+      }
+    },
+    {
+      "id": "conversation.choice:question.time",
+      "kind": "player_semantic_choice",
+      "route": "semantic_provider",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "Ask about time",
+        "TL": "Itanong ang oras"
+      },
+      "choiceTranslations": {
+        "EN": "What time is it?",
+        "TL": "Anong oras na?"
+      }
+    },
+    {
+      "id": "conversation.choice:question.date",
+      "kind": "player_semantic_choice",
+      "route": "semantic_provider",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "Ask about date",
+        "TL": "Itanong ang petsa"
+      },
+      "choiceTranslations": {
+        "EN": "What's today's date?",
+        "TL": "Ano ang petsa ngayon?"
+      }
+    },
+    {
+      "id": "conversation.choice:question.weather",
+      "kind": "player_semantic_choice",
+      "route": "semantic_provider",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "Ask about weather",
+        "TL": "Itanong ang panahon"
+      },
+      "choiceTranslations": {
+        "EN": "How is the weather?",
+        "TL": "Kumusta ang panahon?"
+      }
+    }
+  ]
+}

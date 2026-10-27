@@ -269,6 +269,15 @@ absence tests without changing semantic/runtime authority.
 | Global identity and generated join | Dialogue Content compiler | merged shards validate globally unique phrase, semantic-template, and player-choice IDs and retain the canonical semantic/content join | `test_p11_conversation_shards`, CodeBuilder twice |
 | Authoring writes and stale guards | `SemanticLabAuthoringService` | aggregate fingerprints, owning-shard writes, effect-free previews, and explicit writes are exposed through the service; callers do not patch shard files | service shard write test |
 
-P11D is now the active UI-authoring slice. Its audit must retain the same
-manifest/compiler boundary and keep dynamic eligibility and gameplay effects
-outside declarative Conversation UI structure.
+## P11D current closure
+
+| Surface | Verified current owner/callers | P11D disposition | Evidence |
+| --- | --- | --- | --- |
+| Conversation UI source | manifest-declared conversation UI registry and CodeBuilder | one bounded conversation/ui_registry.json owns landing, hub, child, order, content references, semantic destinations, and provider references | test_p11_conversation_ui_registry, generated ConversationUI Registry |
+| What's Up structure | landing projection and static-question provider | generated registry supplies the root shortcut and nine static hub children; candidate IDs and ordering remain production-parity stable | contextual What's Up/hub/talk parity, production Lua smokes |
+| Wording references | Dialogue Content player-choice records | UI nodes carry content IDs and generated label/utterance keys; EN/TL wording is not duplicated in the UI registry or semantic provider | Dialogue Content registry parity |
+| Provider and semantic authority | static provider, relationship/gossip/gameplay authorities | provider references and semantic destinations are locked references; eligibility, facts, permissions, response meaning, and effects remain outside UI source | UI schema negative assertions, contextual provider tests |
+| Agent/human UI edits | SemanticLabAuthoringService | bounded inspect/validate/preview/write plus add/remove/move/reorder operations use one source fingerprint and reject stale/locked edits | test_p11_conversation_ui_registry |
+
+P11E is now the active semantic-taxonomy slice. Its audit must preserve domain
+meaning and move generator provenance into metadata rather than canonical IDs.

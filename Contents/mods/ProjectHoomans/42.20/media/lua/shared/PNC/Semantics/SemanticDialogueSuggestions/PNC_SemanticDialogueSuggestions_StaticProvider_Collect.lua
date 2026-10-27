@@ -1,6 +1,8 @@
 -- Static provider collection and context routing.
 
 return function(Provider, Identity, Context, hubCandidate, IdentityAlias)
+    local UIRegistry = PNC.Semantics.ConversationUIRegistry
+        or require "PNC/Semantics/Generated/ConversationUI/Registry"
     function Provider.collect(context)
         context = type(context) == "table" and context or {}
         if Identity.pendingIdentity(context) then
@@ -26,8 +28,10 @@ return function(Provider, Identity, Context, hubCandidate, IdentityAlias)
         local owned = Context.ownedCompanion(actor)
         local safeGossip = Context.hasSafeGossip(context)
         local output = {}
-        for _, definition in ipairs(Provider.Definitions) do
-            if definition.hubID == "whats_up"
+        for _, choice in ipairs(UIRegistry.StaticChoices("whats_up")) do
+            local destination = choice.semanticDestination or {}
+            local definition = Provider.Find(destination.candidateID)
+            if definition
                 and (definition.id ~= "question.identity"
                     or not Identity.identityKnown(context))
             then
@@ -48,7 +52,7 @@ return function(Provider, Identity, Context, hubCandidate, IdentityAlias)
                 end
                 if allowed then
                     output[#output + 1] = hubCandidate(
-                        Provider, definition, contextReason
+                        Provider, definition, contextReason, choice
                     )
                 end
             end

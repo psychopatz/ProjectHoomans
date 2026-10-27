@@ -555,14 +555,35 @@ production-Lua architecture/authority/content smokes, CodeBuilder run twice
 with identical generated hashes, and `git diff --check`: PASS. No source
 save, native Project Zomboid session, or Workshop operation was touched.
 
-## Immediate Next Chunk — P11D
+## Accepted P11D — canonical Conversation UI registry
 
-Create the canonical declarative Conversation UI Registry and move the
-`conversation.landing:whats_up` child structure into it. Preserve production
-ownership of eligibility, facts, permissions, and effects while making
-membership, ordering, labels, utterance references, provider references, and
-effect-free preview/edit operations available through the shared authoring
-service.
+P11D accepted. The content manifest now declares one canonical
+conversation/ui_registry.json; CodeBuilder validates and emits the bounded
+PZ-safe Generated/ConversationUI/Registry.lua. Landing, What's Up hub,
+static child membership, ordering, player-facing content references, semantic
+destinations, and provider references are represented there. The static
+semantic provider now supplies semantic contracts and production context
+eligibility only; its former presentation-definition file is retired.
+
+The existing landing projection and static-question provider consume the
+generated registry while preserving candidate IDs, order, frames, fallback
+behavior, and EN/TL wording. Provider references are visibly locked and the
+registry contains no eligibility or gameplay effects. The shared authoring
+service exposes bounded inspect, validate, effect-free preview, explicit write,
+add/remove/move/reorder, and stale-fingerprint operations.
+
+P11D focused validation: Conversation UI registry 3/3 PASS, shard/content
+registry and legacy parity tests pass, contextual What's Up/hub/talk parity
+46/46 PASS, production-Lua authority/identity/suggestion smokes 5/5 PASS,
+CodeBuilder compile PASS, and git diff --check: PASS. No source save, native
+Project Zomboid session, or Workshop operation was touched.
+
+## Immediate Next Chunk — P11E
+
+Remove semantic.generated.* from the canonical semantic taxonomy. Migrate
+automatic task, command, gift, and related runtime callers to domain-meaning
+IDs while retaining generator provenance as metadata and preserving runtime
+behavior.
 
 ## Historical P11A starting instructions (completed)
 
