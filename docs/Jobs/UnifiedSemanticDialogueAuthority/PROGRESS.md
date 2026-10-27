@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 through P10 are accepted foundation; P11A steady-state Conversation source hygiene is accepted and P11B–P11I remain mandatory for Modular Conversation Architecture & Contextual Authoring.
+**Status:** IN PROGRESS — P0–P10 and P11A–P11D are accepted foundation. P11E–P11I remain mandatory and active, followed automatically by mandatory P12A–P12I Pragmatic Conversational Intelligence & Dialogue Director before developer handoff.
 
 ## Audited baseline
 
@@ -580,10 +580,17 @@ Project Zomboid session, or Workshop operation was touched.
 
 ## Immediate Next Chunk — P11E
 
-Remove semantic.generated.* from the canonical semantic taxonomy. Migrate
+**Do not start P12 yet. Preserve the current uncommitted P11E work.**
+
+Remove `semantic.generated.*` from the canonical semantic taxonomy. Migrate
 automatic task, command, gift, and related runtime callers to domain-meaning
 IDs while retaining generator provenance as metadata and preserving runtime
 behavior.
+
+After P11E acceptance, continue automatically through P11F–P11I. After P11I
+passes, continue automatically into `P12_PRAGMATIC_CONVERSATIONAL_INTELLIGENCE.md`
+starting with P12A recognized-to-response parity; P11 completion is no longer a
+parent-goal stop/handoff condition.
 
 ## Historical P11A starting instructions (completed)
 
@@ -611,7 +618,7 @@ canonical services.
 
 ## Stop conditions
 
-Stop before P11 developer acceptance only for:
+Stop before full P11+P12 developer acceptance only for:
 
 - genuine unsafe repository divergence/concurrent ownership conflict;
 - a proven externally consumed Project Hoomans public API whose removal/rename
@@ -619,5 +626,7 @@ Stop before P11 developer acceptance only for:
 - missing required dependency/toolchain with no accepted fallback;
 - a proven architecture conflict requiring user decision.
 
-A P11 subphase passing is not a stop condition. Continue automatically through
-P11I.
+A P11 or P12 subphase passing is not a stop condition. Continue automatically
+through P11I, then P12A–P12I. Only after all developer-side P12 gates pass may
+the parent return to `READY FOR USER LIVE TEST` for the explicitly user-owned
+native Project Zomboid SP/MP validation.

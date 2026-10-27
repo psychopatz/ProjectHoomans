@@ -214,3 +214,94 @@ P11 is accepted only when the following additional gates pass.
 P11 is not complete merely because the new editor renders. It must prove that
 the old parallel wording/navigation authoring paths are removed or reduced to
 explicit external provider boundaries.
+
+## P12 pragmatic conversational-intelligence acceptance extension
+
+P12 is accepted only when real Core+Hoomans Lua worker evidence proves all of
+the following.
+
+### Recognized-to-response parity
+
+- a high-confidence recognized semantic act with a valid deterministic branch
+  cannot silently display the generic clarification response;
+- the user-observed hostile-turn class is reproduced/explained through the same
+  Simulation path and protected by regression coverage;
+- trace links selected IR → branch → pool/plan → realization → rendered text.
+
+### Pragmatic interpretation
+
+- pending-question answer, challenge, accept/refuse, dismissal and interruption
+  are distinguishable through context;
+- quoted, negated, third-person and ambiguous cases are safe;
+- context may disambiguate but cannot fabricate facts.
+
+### Conversation state
+
+- topic salience, obligations, referents, commitments and suspended topics are
+  bounded and scoped to the correct player/NPC conversation;
+- "How?", "Why?", "How many?", "And him?" resolve when context is sufficient
+  and clarify when it is not;
+- second-player and second-NPC isolation passes;
+- no full transcript persistence.
+
+### Dialogue Director
+
+- reaction candidates and rejection reasons are observable;
+- contrasting personality/relationship contexts can select different
+  conversational behaviors for the same semantic act without changing truth;
+- no Director decision bypasses gameplay/domain authorization.
+
+### Beats and initiative
+
+- at least argument escalation→apology/reconciliation and one first-contact or
+  grounded follow-up beat work without fixed sentence trees;
+- cooldown/expiry prevents repetitive prompting;
+- explicit dismissal/exit ends initiative;
+- no per-tick dialogue planner exists.
+
+### Safe underspecified language
+
+- ordinary paraphrases converge on shared semantic desired states where
+  supported;
+- ambiguous dismissive/social language does not perform destructive task/group
+  effects without sufficient intent;
+- negative/quoted/third-person protected cases dispatch zero gameplay actions.
+
+### Response planning and languages
+
+- Director behavior is represented by ResponsePlan/dialogue acts plus grounded
+  facts and uncertainty;
+- EN/TL output remains semantically equivalent;
+- deterministic offline mode is fully functional;
+- optional PBrainZ realizes the same selected semantic plan and cannot add
+  effects or facts.
+
+### Cognition inspector
+
+For a selected Simulation turn the existing Semantic Lab exposes, in a
+human/agent-readable view:
+
+1. semantic candidates and provenance;
+2. selected pragmatic interpretation;
+3. relevant topic/obligation/reference evidence;
+4. eligible Director reactions and rejection reasons;
+5. selected reaction and why;
+6. ResponsePlan / fact refs / optional action request;
+7. final displayed text;
+8. actual authoritative effects/transport route.
+
+Raw JSON remains available diagnostically; no new standalone simulator/editor is
+introduced.
+
+### Final P12 regression
+
+The held-out suite covers typos/noise, multi-turn interruption/resumption,
+ellipsis/pronouns, hostility/apology, wellbeing/medical, safe command
+inference, event follow-up, typed/clicked parity, two players/two NPCs, EN/TL
+and PBrainZ off/on.
+
+Protected negative set: **zero false gameplay dispatch**.
+
+Final developer acceptance also requires resource-aware Python, focused Xvfb,
+native Lua, installed-PZ Kahlua, CodeBuilder/idempotence, save-safety,
+bounded-memory/performance and `git diff --check` gates.

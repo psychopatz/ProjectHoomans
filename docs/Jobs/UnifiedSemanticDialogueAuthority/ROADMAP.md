@@ -1,6 +1,6 @@
 # Roadmap — Unified Semantic Dialogue Authority
 
-**Parent status:** IN PROGRESS — P0–P10 accepted foundation; P11 modular Conversation architecture/contextual authoring is mandatory before live-test handoff.
+**Parent status:** IN PROGRESS — P0–P10 and P11A–P11D are accepted foundation; P11E–P11I remain active/mandatory, followed by mandatory P12 pragmatic conversational intelligence before live-test handoff.
 **Completion rule:** phases organize work; completing a phase does not complete the parent goal. Continue automatically until all developer-side gates pass or a genuine blocker is reached.
 
 ## P0 — Reconcile authority inventory and freeze baseline
@@ -283,4 +283,83 @@ CodeBuilder idempotence/performance gates.
 wording authority, one Conversation UI/navigation registry, one Conversation
 browser and one contextual authoring service used by both humans and agents.
 
-Only after P11 passes may the parent return to `READY FOR USER LIVE TEST`.
+P11 completion is now an intermediate architecture/tooling gate. After P11 passes, continue automatically into P12; do **not** return the parent to `READY FOR USER LIVE TEST` yet.
+
+## P12 — Pragmatic Conversational Intelligence & Dialogue Director
+
+P11 leaves Project Hoomans with one clean semantic/content/navigation authoring
+architecture. P12 makes the same runtime authority conversationally smarter and
+less dependent on exact phrasing.
+
+Detailed contract: `P12_PRAGMATIC_CONVERSATIONAL_INTELLIGENCE.md`.
+
+### P12A — recognized-to-response parity and cognition baseline
+
+Reproduce and repair the user-observed class where the parser recognizes a
+high-confidence social meaning such as `HOSTILE_REMARK` but the displayed NPC
+reply degrades to generic clarification. Trace the actual Core+Hoomans Lua
+worker through selected IR, policy branch, response pool/plan, realization and
+final text. Add a durable no-degrade regression.
+
+### P12B — pragmatic interpretation
+
+Use bounded candidate interpretations plus conversation context to distinguish
+answer, challenge, accept/refuse, dismissal, interruption, ambiguity and other
+conversational functions. Preserve quoted/negated/third-person safety.
+
+### P12C — bounded conversation state
+
+Extend the existing DialogueContextState/lifecycle with bounded topic salience,
+pending questions/offers/requests, recent dialogue acts, referents,
+commitments and suspended topics. Prove ellipsis/pronoun follow-ups and strict
+player/NPC isolation.
+
+### P12D — Dialogue Director
+
+Choose among reusable conversational behaviors such as answer, clarify,
+challenge, warn, retaliate verbally, defuse, refuse, ask follow-up, return to
+topic and end conversation. Selection must be explainable and may use existing
+personality/relationship/context projections without duplicating domain truth.
+
+### P12E — beats and bounded initiative
+
+Add lightweight conversational beat pressure over the existing lifecycle.
+Prove argument escalation/reconciliation, first-contact interruption, one
+grounded NPC follow-up, cooldown, dismissal and clean exit without scripted
+sentence trees.
+
+### P12F — safe underspecified-language inference
+
+Normalize ordinary paraphrases into shared semantic desired states. Context may
+help resolve language, but ambiguous social speech must never become an
+irreversible gameplay mutation without sufficient authoritative intent.
+
+### P12G — compositional response planning
+
+Use existing ResponsePlan + Dialogue Content to express the selected behavior
+with grounded facts, tone/style and optional return-to-topic. Preserve EN/TL,
+offline determinism and PBrainZ parity against the same semantic plan.
+
+### P12H — cognition observability
+
+Extend the existing Semantic Lab/Observatory so a selected turn explains:
+candidate meanings → pragmatic/context resolution → Director candidates and
+rejection reasons → selected behavior → ResponsePlan/facts → final text →
+effects/authority route. Raw JSON stays diagnostic, not the primary view.
+
+### P12I — held-out conversational acceptance
+
+Run noisy/typo, interruption/resumption, ellipsis/pronoun, ambiguity,
+hostility/apology, wellbeing/medical, safe command inference, world-event
+follow-up, typed/clicked, multi-NPC/player, EN/TL and PBrainZ parity scenarios.
+Protected negatives must produce zero false gameplay dispatch. Run full
+resource-aware Python, focused Xvfb, native Lua, Kahlua,
+CodeBuilder/idempotence, save-safety, bounded-memory and performance gates.
+
+**P12 gate:** Project Hoomans conversation is context-sensitive, explainable,
+multi-turn and naturally tolerant of ordinary supported paraphrases while
+retaining one semantic authority, one wording authority and conservative
+gameplay-effect boundaries.
+
+Only after P12 passes may the parent return to `READY FOR USER LIVE TEST`;
+native Project Zomboid SP/MP remains the user-owned final acceptance surface.
