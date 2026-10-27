@@ -6,6 +6,15 @@ local Bridge = PNC.Compatibility.CompanionDogs or {}
 local Internal = Bridge.Internal or {}
 Bridge.Internal = Internal
 PNC.Compatibility.CompanionDogs = Bridge
+local SocialReactions = PNC.Semantics
+    and PNC.Semantics.SocialReactions or nil
+if type(SocialReactions) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticSocialReaction"
+    )
+    SocialReactions = ok and loaded or nil
+end
 
 local FLAVORS = {
     {
@@ -112,18 +121,74 @@ function Internal.SendFlavorToNearbyPlayers(body, dog, npcID, dogKey,
     local network = PNC.Network
     local sent = 0
     local payload
+    local eventType = fed and "companion_dog_feed"
+        or "companion_dog_greeting"
+    local semanticContext = {
+        eventType = eventType,
+        eventRef = eventID,
+        eventID = eventID,
+        npcID = tostring(npcID),
+        companionDogSex = dogSex or "unknown",
+        companionDogFed = fed == true,
+        factRefs = { eventID },
+        semanticEventFacts = {
+            [tostring(eventID)] = {
+                eventRef = eventID,
+                authoritative = true,
+                disclosure = "player",
+                summary = fed and "the companion dog was fed"
+                    or "the companion dog greeted the survivor",
+                happened = fed and "the companion dog was fed"
+                    or "the companion dog greeted the survivor",
+                dogSex = dogSex or "unknown",
+                fed = fed == true,
+            },
+        },
+    }
+    local semantic = SocialReactions
+        and type(SocialReactions.Resolve) == "function"
+        and SocialReactions.Resolve({
+            eventType = eventType,
+            eventID = eventID,
+            npcID = tostring(npcID),
+            act = "ACK",
+            topic = "companion_dog",
+            context = semanticContext,
+        }) or nil
     if not network or type(network.SendSocialGreeting) ~= "function" then
         Bridge._lastPresentationReason = "social_transport_unavailable"
         return 0
     end
-    Bridge.RegisterFlavors()
+    if not semantic or type(semantic.fallback) ~= "string"
+        or semantic.fallback == ""
+    then
+        Bridge._lastPresentationReason = "semantic_realization_unavailable"
+        return 0
+    end
     payload = {
         eventID = eventID,
         npcID = tostring(npcID),
         flavorID = flavorID,
-        eventType = "companion_dog",
-        interactionType = fed and "companion_dog_feed"
-            or "companion_dog_greeting",
+        eventType = eventType,
+        interactionType = eventType,
+        text = semantic.fallback,
+        resolvedText = semantic.fallback,
+        semanticOwned = true,
+        responsePlanID = semantic.responsePlanID,
+        poolID = semantic.realizationFamily,
+        realizationFamily = semantic.realizationFamily,
+        realizationID = semantic.realizationID,
+        contentOwner = semantic.contentOwner,
+        factRefs = semantic.groundedFactRefs,
+        offerIDs = semantic.offerIDs,
+        context = semanticContext,
+        source = {
+            kind = "semantic_speech",
+            channel = "companion_dogs",
+            eventType = eventType,
+            semanticOwned = true,
+            contextEligible = false,
+        },
         dogKey = dogKey,
         dogSex = dogSex,
         dogX = dog:getX(),

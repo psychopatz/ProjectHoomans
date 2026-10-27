@@ -43,12 +43,21 @@ function Presentation.HandleSocialGreeting(greeting)
         speakerName = targetName(snapshot),
         seed = eventID,
         eventID = eventID,
+        semanticOwned = greeting.semanticOwned == true,
+        contentOwner = greeting.contentOwner,
+        poolID = greeting.poolID,
+        semanticAct = greeting.semanticAct,
+        topic = greeting.topic,
         interaction = greeting.interaction,
         resolvedText = greeting.resolvedText or greeting.text,
         realizationFamily = greeting.realizationFamily,
         realizationID = greeting.realizationID,
         responsePlanID = greeting.responsePlanID,
         factRefs = greeting.factRefs,
+        offerIDs = greeting.offerIDs,
+        semanticEventFacts = greeting.context
+            and greeting.context.semanticEventFacts or nil,
+        source = greeting.source,
     }
     if greeting.eventType == "corpse_reaction"
         and type(greeting.gossipPacket) == "table"

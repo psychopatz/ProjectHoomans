@@ -52,6 +52,7 @@ local function deliverTeammateDamageFlavor(
         or attackerKind == "foreign_npc"
             and hit and hit.attackerProvider == "Bandits"
     local semanticMedical = not banditAttack
+    local semanticCompatibility = banditAttack
     local eventType = banditAttack
         and "bandit_attack" or "witnessed_teammate_hurt"
     local flavorID = presentation and presentation.flavorID
@@ -176,6 +177,7 @@ local function deliverTeammateDamageFlavor(
                 relationshipScope = "teammate",
                 socialRole = role,
                 npcType = role,
+                compatibilitySource = banditAttack and "bandits" or nil,
             }
             if observer.medicalBandageAvailable == false then
                 context.medicalBandageRequired = true
@@ -207,12 +209,13 @@ local function deliverTeammateDamageFlavor(
                 and SocialReactions.Resolve({
                     eventType = eventType,
                     act = "REACT",
-                    topic = "medical_distress",
+                    topic = banditAttack
+                        and "bandits_hurt" or "medical_distress",
                     context = context,
                     eventID = eventID,
                     npcID = observer.id,
                 }) or nil
-            if semanticMedical and (not realization
+            if (semanticMedical or semanticCompatibility) and (not realization
                 or type(realization.fallback) ~= "string"
                 or realization.fallback == "")
             then
@@ -248,9 +251,9 @@ local function deliverTeammateDamageFlavor(
                         offerIDs = realization and realization.offerIDs or {},
                         ambientFlavor = {
                             flavorID = flavorID,
-                            text = realization
-                                and realization.fallback or nil,
-                            semanticOwned = semanticMedical,
+                            text = realization and realization.fallback or nil,
+                            semanticOwned = semanticMedical
+                                or semanticCompatibility,
                             eventRef = eventID,
                             eventType = eventType,
                             semanticEventFacts = context.semanticEventFacts,
@@ -261,6 +264,8 @@ local function deliverTeammateDamageFlavor(
                                 and realization.topic or "medical_distress",
                             responsePlanID = realization
                                 and realization.responsePlanID or nil,
+                            contentOwner = realization
+                                and realization.contentOwner or nil,
                             poolID = realization
                                 and realization.realizationFamily or nil,
                             realizationFamily = realization
@@ -270,9 +275,12 @@ local function deliverTeammateDamageFlavor(
                             factRefs = realization
                                 and realization.groundedFactRefs or nil,
                             source = {
-                                kind = semanticMedical
+                                kind = (semanticMedical
+                                    or semanticCompatibility)
                                     and "semantic_speech" or "social_flavor",
                                 eventType = eventType,
+                                semanticOwned = semanticMedical
+                                    or semanticCompatibility,
                             },
                             family = "combat_commentary",
                             priority = 55,

@@ -278,7 +278,44 @@ T.truthy(
     presentations[3].context.ambientFlavor.semanticEventFacts,
     "teammate hurt presentation carries authoritative event facts")
 
-clock = 3000
+clock = 6000
+local banditCount, banditCandidates, banditReason =
+    H.DeliverTeammateDamageFlavor(
+        damagedRecord,
+        teammateBody,
+        attackerBody,
+        {
+            amount = 9,
+            healthLoss = 9,
+            attackerID = "bandit:test",
+            attackerProvider = "Bandits",
+            woundType = "laceration",
+        },
+        "bandit",
+        nil
+    )
+T.equal(banditCount, 1,
+    "Bandits hurt commentary reaches the existing presentation transport")
+T.equal(banditCandidates, 1,
+    "Bandits hurt commentary uses the bounded teammate witness set")
+T.equal(banditReason, "teammates_notified",
+    "Bandits hurt commentary dispatch succeeds")
+T.truthy(presentations[4].context.ambientFlavor.semanticOwned,
+    "Bandits hurt commentary is semantic-owned")
+T.equal(
+    presentations[4].context.ambientFlavor.eventType,
+    "bandit_attack",
+    "Bandits hurt commentary carries its typed compatibility event")
+T.equal(
+    presentations[4].context.ambientFlavor.source.kind,
+    "semantic_speech",
+    "Bandits hurt commentary cannot fall through legacy prose")
+T.equal(
+    presentations[4].context.ambientFlavor.realizationFamily,
+    "semantic.compat.bandits.hooman_hurt",
+    "Bandits hurt commentary carries its semantic pool")
+
+clock = 9000
 local npcAttackerCount, npcAttackerCandidates, npcAttackerReason =
     H.RecordNPCDamagedByNPC(
         damagedRecord,
@@ -296,16 +333,16 @@ T.equal(npcAttackerCandidates, 1,
     "NPC battle hurt scan finds one visible teammate")
 T.equal(npcAttackerReason, "teammates_notified",
     "NPC battle teammate flavor dispatch succeeds")
-T.equal(#presentations, 4,
+T.equal(#presentations, 5,
     "NPC battle teammate flavor uses the presentation transport")
-T.equal(presentations[4].context.ambientFlavor.context.attackerKind, "npc",
+T.equal(presentations[5].context.ambientFlavor.context.attackerKind, "npc",
     "NPC battle teammate flavor preserves attacker kind")
 
 T.equal(#tickHandlers, 1, "vanilla damage poll registers once")
 tickHandlers[1]()
 bodyPart.health = 92
 bodyPart.scratchTime = 8
-clock = 5100
+clock = 10500
 tickHandlers[1]()
 T.equal(events[3].type, "witnessed_player_hurt",
     "vanilla zombie wound is converted to a hurt event")

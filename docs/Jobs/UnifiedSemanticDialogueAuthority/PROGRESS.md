@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 through P5 accepted; P6 is the active implementation slice.
+**Status:** IN PROGRESS — P0 through P6 accepted; P7 is the active implementation slice.
 
 ## Audited baseline
 
@@ -46,8 +46,8 @@
 | P3 — lower-risk native SocialFlavor migration | **ACCEPTED** |
 | P4 — complex medical/incapacitated migration | **ACCEPTED** |
 | P5 — ToolReplies + legacy registry migration | **ACCEPTED** |
-| P6 — compatibility semantic adapters | **IN PROGRESS** |
-| P7 — canonical content coverage / Studio observability | NOT STARTED |
+| P6 — compatibility semantic adapters | **ACCEPTED** |
+| P7 — canonical content coverage / Studio observability | **IN PROGRESS** |
 | P8 — retire first-party legacy prose authority | NOT STARTED |
 | P9 — scale/MP/final acceptance | NOT STARTED |
 
@@ -164,14 +164,27 @@
   semantic result is unchanged. Focused P5 plus PBrainZ, translation,
   Conversation registry/flow, and P1–P4 regressions pass `16/16`.
 
-## Immediate Next Chunk — P6
+## Accepted P6 — compatibility semantic adapters
 
-Migrate first-party compatibility speech for Bandits, Necroa, Project ALife,
-and any additional adapters confirmed by the P0 inventory. Expose provider
-facts/event references to existing semantic pools without taking gameplay
-authority from the external provider or changing compatibility boundaries.
+P6 is accepted. Bandits, Necroa mask warnings, Project ALife meta/encounter/
+faction events, and the additional Companion Dogs greeting/feed adapter now
+select bounded semantic compatibility pools before presentation. Provider
+facts and native Necroa zombie captions remain external compatibility
+authority; Hoomans-owned missing realizations suppress delivery rather than
+falling through to first-party legacy prose.
 
-After the P6 family gates pass, continue automatically through P7–P9.
+Focused P6 compatibility, producer, and P1–P5 regression evidence passes
+`16/16`; the producer coverage includes Bandits damage commentary, Necroa
+mask warning, Project A-Life meta presentation, and Companion Dogs feed.
+
+## Immediate Next Chunk — P7
+
+Expand canonical Dialogue Content / translation ownership for the migrated
+families and expose compatibility/event provenance, response plans, content
+owners and follow-up offers through the existing Semantic Lab/Observatory.
+Keep phrase variation content-only and generated/runtime artifacts bounded;
+do not create a second editor or registry. Continue automatically through
+P8–P9 after the P7 gate passes.
 
 ## Stop conditions
 

@@ -438,6 +438,12 @@ local function publishNPCMessage(actor, text, context)
         payload = {
             text = text,
             flavorID = type(context) == "table" and context.flavorID or nil,
+            semanticOwned = type(context) == "table"
+                and context.semanticOwned == true or false,
+            contentOwner = type(context) == "table"
+                and context.contentOwner or nil,
+            poolID = type(context) == "table"
+                and context.poolID or nil,
             responsePlanID = type(context) == "table"
                 and context.responsePlanID or nil,
             realizationFamily = type(context) == "table"
@@ -449,9 +455,16 @@ local function publishNPCMessage(actor, text, context)
         },
         text = text,
         source = {
-            kind = "social_greeting",
+            kind = type(context) == "table" and context.semanticOwned == true
+                and "semantic_speech" or "social_greeting",
             channel = "ambient_social",
             contextEligible = false,
+            semanticOwned = type(context) == "table"
+                and context.semanticOwned == true or false,
+            contentOwner = type(context) == "table"
+                and context.contentOwner or nil,
+            poolID = type(context) == "table"
+                and context.poolID or nil,
             eventID = eventID,
             interaction = type(context) == "table"
                 and context.interaction or nil,

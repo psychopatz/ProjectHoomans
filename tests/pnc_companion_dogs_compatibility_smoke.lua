@@ -265,6 +265,14 @@ T.equal(
     "companion_dogs_feed_boy",
     "feed event uses male flavor"
 )
+T.truthy(lastPayload.semanticOwned,
+    "Companion Dogs speech is selected before compatibility presentation")
+T.equal(lastPayload.eventType, "companion_dog_feed",
+    "Companion Dogs preserves the typed semantic event")
+T.equal(lastPayload.poolID, "semantic.compat.companion_dogs.feed",
+    "Companion Dogs carries its semantic response pool")
+T.truthy(lastPayload.text and lastPayload.text ~= "",
+    "Companion Dogs carries selected semantic wording")
 T.equal(interactionBridge.Pump(true), 0, "pair cooldown prevents flooding")
 T.equal(barked, 1, "pair cooldown prevents repeated bark")
 

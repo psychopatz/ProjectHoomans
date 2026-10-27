@@ -112,6 +112,34 @@ end
 local function poolFor(spec)
     if spec.poolID then return tostring(spec.poolID) end
     local eventType = string.lower(tostring(spec.eventType or ""))
+    if eventType == "bandit_attack" then
+        return "semantic.compat.bandits.hooman_hurt"
+    end
+    if eventType == "necroa_mask_removed" then
+        return "semantic.compat.necroa.mask_warning"
+    end
+    if eventType == "necroa_player_mask_removed" then
+        return "semantic.compat.necroa.player_mask_removed"
+    end
+    if eventType == "projectalife_meta"
+        or eventType == "projectalife_meta_event"
+    then
+        return "semantic.compat.projectalife.meta"
+    end
+    if eventType == "projectalife_encounter" then
+        return "semantic.compat.projectalife.encounter"
+    end
+    if eventType == "projectalife_faction_stance"
+        or eventType == "projectalife_faction_conflict"
+    then
+        return "semantic.compat.projectalife.faction"
+    end
+    if eventType == "companion_dog_greeting" then
+        return "semantic.compat.companion_dogs.greeting"
+    end
+    if eventType == "companion_dog_feed" then
+        return "semantic.compat.companion_dogs.feed"
+    end
     if eventType == "incapacitated_call"
         or eventType == "social.incapacitated_call"
     then

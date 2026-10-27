@@ -1,6 +1,7 @@
 -- Nearby Hoomans speakers for normalized Project A-Life world events.
-
-require "PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_FlavorDefinitions"
+--
+-- Project A-Life owns the event facts.  Hoomans semantic compatibility pools
+-- choose the response before this module enters the presentation queue.
 
 local Client = PNC.Compatibility.ProjectALifeEvents.Client
 local SocialReactions = PNC.Semantics
@@ -151,17 +152,48 @@ local function receive(event)
     local eventType = "projectalife_" .. event.category
     local semanticContext = {
         eventType = eventType,
+        eventRef = event.eventID,
+        eventID = event.eventID,
         projectALifeKind = event.metaKind or event.category,
         projectALifeStance = event.stance,
         projectALifeConflictDirection = event.direction,
         projectALifeConflictDamage = event.damage,
         factionName = event.factionName or "that faction",
+        socialRole = target.source and (
+            target.source.socialRole or target.source.npcType) or "colonist",
+    }
+    semanticContext.factRefs = { event.eventID }
+    semanticContext.semanticEventFacts = {
+        [tostring(event.eventID)] = {
+            eventRef = event.eventID,
+            authoritative = true,
+            disclosure = "player",
+            summary = event.category == "meta"
+                and "a Project A-Life world event occurred nearby"
+                or event.category == "encounter"
+                and "a Project A-Life encounter was observed nearby"
+                or "a Project A-Life faction event occurred nearby",
+            happened = event.category == "meta"
+                and "a Project A-Life world event occurred nearby"
+                or event.category == "encounter"
+                and "a Project A-Life encounter was observed nearby"
+                or "a Project A-Life faction event occurred nearby",
+            location = "nearby",
+            category = event.category,
+            metaKind = event.metaKind,
+            stance = event.stance,
+            direction = event.direction,
+            factionName = event.factionName,
+            damage = event.damage,
+        },
     }
     local semantic = SocialReactions and SocialReactions.Resolve and
         SocialReactions.Resolve({
             eventType = eventType,
             eventID = event.eventID,
             npcID = speakerID,
+            act = "WARN",
+            topic = eventType,
             context = semanticContext,
         }) or nil
     if not semantic then return false end
@@ -177,11 +209,16 @@ local function receive(event)
         flavorID = flavorID,
         family = "projectalife_world_event",
         eventType = eventType,
+        text = semantic.fallback,
         resolvedText = semantic.fallback,
+        semanticOwned = true,
         responsePlanID = semantic.responsePlanID,
+        poolID = semantic.realizationFamily,
         realizationFamily = semantic.realizationFamily,
         realizationID = semantic.realizationID,
         factRefs = semantic.groundedFactRefs,
+        offerIDs = semantic.offerIDs,
+        contentOwner = semantic.contentOwner,
         socialRole = target.source and (
             target.source.socialRole or target.source.npcType) or "colonist",
         priority = 38,
@@ -189,10 +226,11 @@ local function receive(event)
         memoryEligible = false,
         context = semanticContext,
         source = {
-            kind = "social_flavor",
+            kind = "semantic_speech",
             channel = "projectalife",
-            eventType = "projectalife_" .. event.category,
-            contextEligible = false,
+            eventType = eventType,
+            semanticOwned = true,
+            contextEligible = true,
         },
         cooldowns = {
             ambientMs = 12000,

@@ -107,28 +107,69 @@ function Social.Emit(observerRecord, actorKey, eventType, eventID,
     semanticContext = type(ambient) == "table"
         and type(ambient.context) == "table" and ambient.context or {}
     semanticContext.eventType = eventType
+    semanticContext.eventRef = processed.eventID
+    semanticContext.eventID = processed.eventID
     semanticContext.source = "necroa_airborne_exposure"
+    semanticContext.socialRole = ambient and (
+        ambient.socialRole or ambient.npcType) or nil
+    semanticContext.factRefs = { processed.eventID }
+    semanticContext.semanticEventFacts = {
+        [tostring(processed.eventID)] = {
+            eventRef = processed.eventID,
+            authoritative = true,
+            disclosure = "player",
+            summary = eventType == "necroa_mask_removed"
+                and "a survivor removed their mask"
+                or "the player removed their mask",
+            happened = eventType == "necroa_mask_removed"
+                and "a survivor removed their mask"
+                or "the player removed their mask",
+            source = "necroa_airborne_exposure",
+            victimNPCID = ambient and ambient.victimNPCID or nil,
+            actorKey = actorKey,
+        },
+    }
     semantic = SocialReactions and SocialReactions.Resolve and
         SocialReactions.Resolve({
             eventType = eventType,
             eventID = processed.eventID,
             npcID = observerRecord.id,
+            act = "WARN",
+            topic = "necroa_mask_safety",
             context = semanticContext,
         }) or nil
-    if semantic then
-        semanticAmbient = {}
-        for key, value in pairs(ambient or {}) do
-            semanticAmbient[key] = value
-        end
-        semanticAmbient.resolvedText = semantic.fallback
-        semanticAmbient.responsePlanID = semantic.responsePlanID
-        semanticAmbient.realizationFamily = semantic.realizationFamily
-        semanticAmbient.realizationID = semantic.realizationID
-        semanticAmbient.factRefs = semantic.groundedFactRefs
-        semanticAmbient.context = semanticContext
-    else
-        semanticAmbient = ambient
+    if not semantic or type(semantic.fallback) ~= "string"
+        or semantic.fallback == ""
+    then
+        -- These are Hoomans-owned compatibility events.  A missing semantic
+        -- realization suppresses delivery instead of reopening the old
+        -- first-party SocialFlavor selector.
+        return false
     end
+    semanticAmbient = {}
+    for key, value in pairs(ambient or {}) do
+        semanticAmbient[key] = value
+    end
+    semanticAmbient.text = semantic.fallback
+    semanticAmbient.resolvedText = semantic.fallback
+    semanticAmbient.semanticOwned = true
+    semanticAmbient.eventRef = processed.eventID
+    semanticAmbient.eventType = eventType
+    semanticAmbient.responsePlanID = semantic.responsePlanID
+    semanticAmbient.poolID = semantic.realizationFamily
+    semanticAmbient.realizationFamily = semantic.realizationFamily
+    semanticAmbient.realizationID = semantic.realizationID
+    semanticAmbient.contentOwner = semantic.contentOwner
+    semanticAmbient.factRefs = semantic.groundedFactRefs
+    semanticAmbient.offerIDs = semantic.offerIDs
+    semanticAmbient.context = semanticContext
+    semanticAmbient.source = {
+        kind = "semantic_speech",
+        channel = "necroa",
+        eventType = eventType,
+        semanticOwned = true,
+        contextEligible = true,
+    }
     if player and Network and Network.SendConversationRelationshipForNPC then
         detail = processed.details and processed.details[1] or nil
         Network.SendConversationRelationshipForNPC(

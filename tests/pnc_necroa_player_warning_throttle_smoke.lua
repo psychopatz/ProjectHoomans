@@ -10,6 +10,7 @@ local worldHour = 12
 local hasMask = false
 local emitted = {}
 local presented = 0
+local presentedContext
 local observerRecord = { id = "npc-warning", alive = true }
 local observerBody = {
     getX = function() return 10 end,
@@ -42,8 +43,9 @@ PNC = {
         ForNPC = function(id) return "npc:" .. tostring(id) end,
     },
     Network = {
-        SendConversationRelationshipForNPC = function()
+        SendConversationRelationshipForNPC = function(_, _, _, context)
             presented = presented + 1
+            presentedContext = context
         end,
     },
     Registry = {
@@ -84,6 +86,17 @@ local Exposure = {
 Observers.Player(Exposure, player)
 T.equal(#emitted, 1, "unmasked player received an initial warning")
 T.equal(presented, 1, "initial warning was presented once")
+T.truthy(presentedContext and presentedContext.ambientFlavor
+    and presentedContext.ambientFlavor.semanticOwned,
+    "Necroa warning is semantic-owned before presentation")
+T.equal(
+    presentedContext.ambientFlavor.source.kind,
+    "semantic_speech",
+    "Necroa warning does not use the legacy prose source"
+)
+T.truthy(presentedContext.ambientFlavor.text
+    and presentedContext.ambientFlavor.text ~= "",
+    "Necroa warning carries selected semantic wording")
 
 Observers.Player(Exposure, player)
 worldHour = 12.5

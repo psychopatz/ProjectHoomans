@@ -21,6 +21,9 @@ Core.CONDITION_FIELDS = {
     "medicalSupplyRequestStatus",
     "downedAudience", "downedNeed", "downedThreat",
     "leaderGrief", "leaderSuccession", "corpseRevenge",
+    "projectALifeKind", "projectALifeStance",
+    "projectALifeConflictDirection", "projectALifeConflictDamage",
+    "companionDogSex", "companionDogFed",
 }
 
 function Core.copy(value, depth)
@@ -160,6 +163,13 @@ function Core.conditionContext(context)
         leaderGrief = context.leaderGrief,
         leaderSuccession = context.leaderSuccession,
         corpseRevenge = context.corpseRevenge,
+        projectALifeKind = context.projectALifeKind,
+        projectALifeStance = context.projectALifeStance,
+        projectALifeConflictDirection =
+            context.projectALifeConflictDirection,
+        projectALifeConflictDamage = context.projectALifeConflictDamage,
+        companionDogSex = context.companionDogSex,
+        companionDogFed = context.companionDogFed,
     }
 end
 
