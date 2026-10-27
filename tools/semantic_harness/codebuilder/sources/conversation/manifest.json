@@ -32,6 +32,11 @@
       "path": "shards/commands.json"
     },
     {
+      "id": "automatic_flows",
+      "domain": "commands.automatic_flows",
+      "path": "shards/automatic_flows.json"
+    },
+    {
       "id": "compatibility_bandits",
       "domain": "compatibility.bandits",
       "path": "shards/compatibility_bandits.json"

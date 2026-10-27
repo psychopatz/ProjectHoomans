@@ -32,20 +32,21 @@ local function buildFlow(row)
         local variants = {
             {
                 id = "default",
-                templateID = response.key,
-                fallback = response.en,
+                -- Automatic-flow wording is resolved from the canonical
+                -- Conversation shard. The capability adapter supplies facts
+                -- and workflow metadata, never a second wording authority.
+                templateID = poolID,
             },
         }
         for variantIndex, variant in ipairs(response.variants or {}) do
             if type(variant) == "table"
-                and tostring(variant.key or "") ~= ""
-                and tostring(variant.en or "") ~= ""
-                and tostring(variant.tl or "") ~= ""
+                and tostring(variant.id or "") ~= ""
             then
                 variants[#variants + 1] = {
                     id = variant.id or ("context." .. tostring(variantIndex)),
-                    templateID = variant.key,
-                    fallback = variant.en,
+                    templateID = poolID .. "." .. tostring(
+                        variant.id or ("context." .. tostring(variantIndex))
+                    ),
                     priority = tonumber(variant.priority) or 0,
                     when = copyValue(variant.when),
                 }
@@ -53,6 +54,15 @@ local function buildFlow(row)
         end
         responsePools[#responsePools + 1] = {
             id = poolID,
+            provenance = {
+                origin = "automatic_flow",
+                workflowKind = workflowKind,
+                templateVersion = tonumber(row.templateVersion)
+                    or template.version,
+                templateFingerprint = template.fingerprint,
+                actionID = action,
+                capabilityID = capabilityID,
+            },
             variants = variants,
         }
     end

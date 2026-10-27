@@ -6,7 +6,7 @@ local Registry = PNC.Semantics.DialogueContentRegistry or {}
 PNC.Semantics.DialogueContentRegistry = Registry
 Registry.SCHEMA = "pnc.semantic_dialogue_content.v2"
 Registry.VERSION = 2
-Registry.CONTENT_FINGERPRINT = "51f7da7c330b8e205226241baa7e93d8e7431b2f6d58abd561d3fde52d679b91"
+Registry.CONTENT_FINGERPRINT = "7a8056965796017a106b549ad95636e2badc8a8e1ab1000fc667d2c070369ec7"
 Registry.PHRASE_FAMILIES = {
     ["semantic.action.follow.unavailable"] = {
         ["canonicalConcept"] = "SEMANTIC_ACTION_FOLLOW_UNAVAILABLE",
@@ -154,6 +154,366 @@ Registry.PHRASE_FAMILIES = {
                     ["fallback"] = "Okay.",
                     ["id"] = "phrase.semantic.command.accepted.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandAcceptedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.camp.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_CAMP_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.camp.failed",
+        ["semanticTemplateID"] = "semantic.command.camp.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't set up camp there.",
+                    ["id"] = "phrase.semantic.command.camp.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.camp.queued"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_CAMP_QUEUED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.camp.queued",
+        ["semanticTemplateID"] = "semantic.command.camp.queued",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Okay, I'll set up camp there.",
+                    ["id"] = "phrase.semantic.command.camp.queued.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.camp.queued.friendly"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_CAMP_QUEUED_FRIENDLY",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.camp.queued.friendly",
+        ["semanticTemplateID"] = "semantic.command.camp.queued.friendly",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Sure, I'll set up camp there.",
+                    ["id"] = "phrase.semantic.command.camp.queued.friendly.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.camp.queued.repeated"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_CAMP_QUEUED_REPEATED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.camp.queued.repeated",
+        ["semanticTemplateID"] = "semantic.command.camp.queued.repeated",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm still setting up camp there.",
+                    ["id"] = "phrase.semantic.command.camp.queued.repeated.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedRepeatedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.camp.queued.trusted"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_CAMP_QUEUED_TRUSTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.camp.queued.trusted",
+        ["semanticTemplateID"] = "semantic.command.camp.queued.trusted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "All right, I'll make camp there.",
+                    ["id"] = "phrase.semantic.command.camp.queued.trusted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedTrustedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.camp.queued.withdrawn"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_CAMP_QUEUED_WITHDRAWN",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.camp.queued.withdrawn",
+        ["semanticTemplateID"] = "semantic.command.camp.queued.withdrawn",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll set up camp there.",
+                    ["id"] = "phrase.semantic.command.camp.queued.withdrawn.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedWithdrawnNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.camp.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_CAMP_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.camp.rejected",
+        ["semanticTemplateID"] = "semantic.command.camp.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't set up camp there right now.",
+                    ["id"] = "phrase.semantic.command.camp.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.follow.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_FOLLOW_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.follow.failed",
+        ["semanticTemplateID"] = "semantic.command.follow.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't start following you.",
+                    ["id"] = "phrase.semantic.command.follow.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.follow.queued"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_FOLLOW_QUEUED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.follow.queued",
+        ["semanticTemplateID"] = "semantic.command.follow.queued",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Okay, I'll follow you.",
+                    ["id"] = "phrase.semantic.command.follow.queued.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.follow.queued.friendly"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_FOLLOW_QUEUED_FRIENDLY",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.follow.queued.friendly",
+        ["semanticTemplateID"] = "semantic.command.follow.queued.friendly",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Of course, I'll follow you.",
+                    ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.follow.queued.repeated"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_FOLLOW_QUEUED_REPEATED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.follow.queued.repeated",
+        ["semanticTemplateID"] = "semantic.command.follow.queued.repeated",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm still following you.",
+                    ["id"] = "phrase.semantic.command.follow.queued.repeated.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.follow.queued.trusted"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_FOLLOW_QUEUED_TRUSTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.follow.queued.trusted",
+        ["semanticTemplateID"] = "semantic.command.follow.queued.trusted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I know you. I'll follow.",
+                    ["id"] = "phrase.semantic.command.follow.queued.trusted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedTrustedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.follow.queued.withdrawn"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_FOLLOW_QUEUED_WITHDRAWN",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.follow.queued.withdrawn",
+        ["semanticTemplateID"] = "semantic.command.follow.queued.withdrawn",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll follow.",
+                    ["id"] = "phrase.semantic.command.follow.queued.withdrawn.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedWithdrawnNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.follow.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_FOLLOW_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.follow.rejected",
+        ["semanticTemplateID"] = "semantic.command.follow.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't follow you right now.",
+                    ["id"] = "phrase.semantic.command.follow.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.go.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_GO_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.go.failed",
+        ["semanticTemplateID"] = "semantic.command.go.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't head home.",
+                    ["id"] = "phrase.semantic.command.go.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandGoFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.go.queued"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_GO_QUEUED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.go.queued",
+        ["semanticTemplateID"] = "semantic.command.go.queued",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Okay, I'll head home.",
+                    ["id"] = "phrase.semantic.command.go.queued.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandGoQueuedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.go.queued.friendly"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_GO_QUEUED_FRIENDLY",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.go.queued.friendly",
+        ["semanticTemplateID"] = "semantic.command.go.queued.friendly",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Sure, I'll head home.",
+                    ["id"] = "phrase.semantic.command.go.queued.friendly.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandGoQueuedFriendlyNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.go.queued.repeated"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_GO_QUEUED_REPEATED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.go.queued.repeated",
+        ["semanticTemplateID"] = "semantic.command.go.queued.repeated",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm still heading home.",
+                    ["id"] = "phrase.semantic.command.go.queued.repeated.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandGoQueuedRepeatedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.go.queued.trusted"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_GO_QUEUED_TRUSTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.go.queued.trusted",
+        ["semanticTemplateID"] = "semantic.command.go.queued.trusted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "All right, I'm heading home.",
+                    ["id"] = "phrase.semantic.command.go.queued.trusted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandGoQueuedTrustedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.go.queued.withdrawn"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_GO_QUEUED_WITHDRAWN",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.go.queued.withdrawn",
+        ["semanticTemplateID"] = "semantic.command.go.queued.withdrawn",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll head home.",
+                    ["id"] = "phrase.semantic.command.go.queued.withdrawn.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandGoQueuedWithdrawnNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.go.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_GO_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.go.rejected",
+        ["semanticTemplateID"] = "semantic.command.go.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't head home right now.",
+                    ["id"] = "phrase.semantic.command.go.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandGoRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.help.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_HELP_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.help.failed",
+        ["semanticTemplateID"] = "semantic.command.help.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't check that clinic-supplies request.",
+                    ["id"] = "phrase.semantic.command.help.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandHelpFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.help.queued"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_HELP_QUEUED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.help.queued",
+        ["semanticTemplateID"] = "semantic.command.help.queued",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can help with the clinic supplies.",
+                    ["id"] = "phrase.semantic.command.help.queued.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandHelpQueuedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.help.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_HELP_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.help.rejected",
+        ["semanticTemplateID"] = "semantic.command.help.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't take that clinic-supplies request right now.",
+                    ["id"] = "phrase.semantic.command.help.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandHelpRejectedNeutral01",
                 },
             },
         },
@@ -423,6 +783,141 @@ Registry.PHRASE_FAMILIES = {
             },
         },
     },
+    ["semantic.command.quest.accept.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_QUEST_ACCEPT_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.quest.accept.failed",
+        ["semanticTemplateID"] = "semantic.command.quest.accept.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't accept that request.",
+                    ["id"] = "phrase.semantic.command.quest.accept.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandQuestAcceptFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.quest.accept.queued"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_QUEST_ACCEPT_QUEUED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.quest.accept.queued",
+        ["semanticTemplateID"] = "semantic.command.quest.accept.queued",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll bring the clinic supplies.",
+                    ["id"] = "phrase.semantic.command.quest.accept.queued.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandQuestAcceptQueuedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.quest.accept.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_QUEST_ACCEPT_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.quest.accept.rejected",
+        ["semanticTemplateID"] = "semantic.command.quest.accept.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't accept that request right now.",
+                    ["id"] = "phrase.semantic.command.quest.accept.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandQuestAcceptRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.quest.status.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_QUEST_STATUS_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.quest.status.failed",
+        ["semanticTemplateID"] = "semantic.command.quest.status.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't check that request.",
+                    ["id"] = "phrase.semantic.command.quest.status.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandQuestStatusFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.quest.status.queued"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_QUEST_STATUS_QUEUED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.quest.status.queued",
+        ["semanticTemplateID"] = "semantic.command.quest.status.queued",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll check the clinic-supplies request.",
+                    ["id"] = "phrase.semantic.command.quest.status.queued.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandQuestStatusQueuedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.quest.status.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_QUEST_STATUS_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.quest.status.rejected",
+        ["semanticTemplateID"] = "semantic.command.quest.status.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't check that request right now.",
+                    ["id"] = "phrase.semantic.command.quest.status.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandQuestStatusRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.quest.turn.in.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_QUEST_TURN_IN_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.quest.turn.in.failed",
+        ["semanticTemplateID"] = "semantic.command.quest.turn.in.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't turn in the clinic supplies.",
+                    ["id"] = "phrase.semantic.command.quest.turn.in.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandQuestTurnInFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.quest.turn.in.queued"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_QUEST_TURN_IN_QUEUED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.quest.turn.in.queued",
+        ["semanticTemplateID"] = "semantic.command.quest.turn.in.queued",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll turn in the clinic supplies.",
+                    ["id"] = "phrase.semantic.command.quest.turn.in.queued.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandQuestTurnInQueuedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.quest.turn.in.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_QUEST_TURN_IN_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.quest.turn.in.rejected",
+        ["semanticTemplateID"] = "semantic.command.quest.turn.in.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't turn that in yet.",
+                    ["id"] = "phrase.semantic.command.quest.turn.in.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandQuestTurnInRejectedNeutral01",
+                },
+            },
+        },
+    },
     ["semantic.command.reply.attack_auto"] = {
         ["canonicalConcept"] = "SEMANTIC_COMMAND_REPLY_ATTACK_AUTO",
         ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -679,6 +1174,216 @@ Registry.PHRASE_FAMILIES = {
                     ["fallback"] = "I'll keep watch.",
                     ["id"] = "phrase.semantic.command.reply.stay.neutral.03",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyStayNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.stay.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STAY_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stay.failed",
+        ["semanticTemplateID"] = "semantic.command.stay.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't start the stay order.",
+                    ["id"] = "phrase.semantic.command.stay.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stay.queued"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STAY_QUEUED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stay.queued",
+        ["semanticTemplateID"] = "semantic.command.stay.queued",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Okay, I'll stay here.",
+                    ["id"] = "phrase.semantic.command.stay.queued.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stay.queued.friendly"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STAY_QUEUED_FRIENDLY",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stay.queued.friendly",
+        ["semanticTemplateID"] = "semantic.command.stay.queued.friendly",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Sure, I'll stay here.",
+                    ["id"] = "phrase.semantic.command.stay.queued.friendly.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedFriendlyNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stay.queued.repeated"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STAY_QUEUED_REPEATED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stay.queued.repeated",
+        ["semanticTemplateID"] = "semantic.command.stay.queued.repeated",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm already staying here.",
+                    ["id"] = "phrase.semantic.command.stay.queued.repeated.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedRepeatedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stay.queued.trusted"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STAY_QUEUED_TRUSTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stay.queued.trusted",
+        ["semanticTemplateID"] = "semantic.command.stay.queued.trusted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "All right, I'll stay.",
+                    ["id"] = "phrase.semantic.command.stay.queued.trusted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedTrustedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stay.queued.withdrawn"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STAY_QUEUED_WITHDRAWN",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stay.queued.withdrawn",
+        ["semanticTemplateID"] = "semantic.command.stay.queued.withdrawn",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Okay, I'll stay.",
+                    ["id"] = "phrase.semantic.command.stay.queued.withdrawn.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedWithdrawnNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stay.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STAY_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stay.rejected",
+        ["semanticTemplateID"] = "semantic.command.stay.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't stay here right now.",
+                    ["id"] = "phrase.semantic.command.stay.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stop.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STOP_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stop.failed",
+        ["semanticTemplateID"] = "semantic.command.stop.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't stop following.",
+                    ["id"] = "phrase.semantic.command.stop.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStopFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stop.queued"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STOP_QUEUED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stop.queued",
+        ["semanticTemplateID"] = "semantic.command.stop.queued",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Okay, I'll stop following.",
+                    ["id"] = "phrase.semantic.command.stop.queued.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStopQueuedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stop.queued.friendly"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STOP_QUEUED_FRIENDLY",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stop.queued.friendly",
+        ["semanticTemplateID"] = "semantic.command.stop.queued.friendly",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Got it, I'll stop following.",
+                    ["id"] = "phrase.semantic.command.stop.queued.friendly.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStopQueuedFriendlyNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stop.queued.repeated"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STOP_QUEUED_REPEATED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stop.queued.repeated",
+        ["semanticTemplateID"] = "semantic.command.stop.queued.repeated",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I've already stopped following.",
+                    ["id"] = "phrase.semantic.command.stop.queued.repeated.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStopQueuedRepeatedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stop.queued.trusted"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STOP_QUEUED_TRUSTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stop.queued.trusted",
+        ["semanticTemplateID"] = "semantic.command.stop.queued.trusted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Understood, I'll stop.",
+                    ["id"] = "phrase.semantic.command.stop.queued.trusted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStopQueuedTrustedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stop.queued.withdrawn"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STOP_QUEUED_WITHDRAWN",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stop.queued.withdrawn",
+        ["semanticTemplateID"] = "semantic.command.stop.queued.withdrawn",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Okay, I'll stop.",
+                    ["id"] = "phrase.semantic.command.stop.queued.withdrawn.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStopQueuedWithdrawnNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.stop.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_STOP_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.stop.rejected",
+        ["semanticTemplateID"] = "semantic.command.stop.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't stop following right now.",
+                    ["id"] = "phrase.semantic.command.stop.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStopRejectedNeutral01",
                 },
             },
         },
@@ -2637,6 +3342,21 @@ Registry.PHRASE_FAMILIES = {
             },
         },
     },
+    ["semantic.gift.completed"] = {
+        ["canonicalConcept"] = "SEMANTIC_GIFT_COMPLETED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.gift.completed",
+        ["semanticTemplateID"] = "semantic.gift.completed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Thank you for the gift.",
+                    ["id"] = "phrase.semantic.gift.completed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGiftCompletedNeutral01",
+                },
+            },
+        },
+    },
     ["semantic.gift.consent.ambiguous"] = {
         ["canonicalConcept"] = "SEMANTIC_GIFT_CONSENT_AMBIGUOUS",
         ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -2667,6 +3387,51 @@ Registry.PHRASE_FAMILIES = {
             },
         },
     },
+    ["semantic.gift.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_GIFT_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.gift.failed",
+        ["semanticTemplateID"] = "semantic.gift.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't accept that gift.",
+                    ["id"] = "phrase.semantic.gift.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGiftFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.gift.pending"] = {
+        ["canonicalConcept"] = "SEMANTIC_GIFT_PENDING",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.gift.pending",
+        ["semanticTemplateID"] = "semantic.gift.pending",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll take a look at that gift.",
+                    ["id"] = "phrase.semantic.gift.pending.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGiftPendingNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.gift.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_GIFT_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.gift.rejected",
+        ["semanticTemplateID"] = "semantic.gift.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't accept that gift right now.",
+                    ["id"] = "phrase.semantic.gift.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGiftRejectedNeutral01",
+                },
+            },
+        },
+    },
     ["semantic.gift.selection_required"] = {
         ["canonicalConcept"] = "SEMANTIC_GIFT_SELECTION_REQUIRED",
         ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -2675,7 +3440,7 @@ Registry.PHRASE_FAMILIES = {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "Oh? What did you bring me?",
+                    ["fallback"] = "I need to see what you brought me first.",
                     ["id"] = "phrase.semantic.gift.selection_required.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticGiftSelectionRequiredNeutral01",
                 },
@@ -2690,7 +3455,7 @@ Registry.PHRASE_FAMILIES = {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I have something I remember about that.",
+                    ["fallback"] = "%s",
                     ["id"] = "phrase.semantic.gossip.memory.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticGossipMemoryNeutral01",
                 },
@@ -7103,6 +7868,21 @@ Registry.PHRASE_FAMILIES = {
             },
         },
     },
+    ["semantic.social.refuse_default"] = {
+        ["canonicalConcept"] = "SEMANTIC_SOCIAL_REFUSE_DEFAULT",
+        ["contentOwner"] = "projecthoomans.dialogue_content.events",
+        ["id"] = "phrase.semantic.social.refuse_default",
+        ["semanticTemplateID"] = "semantic.social.refuse_default",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "No.",
+                    ["id"] = "phrase.semantic.social.refuse_default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialRefuseDefaultNeutral01",
+                },
+            },
+        },
+    },
     ["semantic.social.refuse_request"] = {
         ["canonicalConcept"] = "SEMANTIC_SOCIAL_REFUSE_REQUEST",
         ["contentOwner"] = "projecthoomans.dialogue_content.events",
@@ -7345,6 +8125,531 @@ Registry.PHRASE_FAMILIES = {
                     ["fallback"] = "Keep your distance. I'm not discussing this.",
                     ["id"] = "phrase.semantic.social.threat_withdrawn.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatWithdrawnNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.consume.active"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_CONSUME_ACTIVE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.consume.active",
+        ["semanticTemplateID"] = "semantic.task.consume.active",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm using that now.",
+                    ["id"] = "phrase.semantic.task.consume.active.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskConsumeActiveNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.consume.admitted"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_CONSUME_ADMITTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.consume.admitted",
+        ["semanticTemplateID"] = "semantic.task.consume.admitted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll use that.",
+                    ["id"] = "phrase.semantic.task.consume.admitted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskConsumeAdmittedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.consume.completed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_CONSUME_COMPLETED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.consume.completed",
+        ["semanticTemplateID"] = "semantic.task.consume.completed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "That's done.",
+                    ["id"] = "phrase.semantic.task.consume.completed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskConsumeCompletedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.consume.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_CONSUME_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.consume.failed",
+        ["semanticTemplateID"] = "semantic.task.consume.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't use that.",
+                    ["id"] = "phrase.semantic.task.consume.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskConsumeFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.consume.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_CONSUME_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.consume.rejected",
+        ["semanticTemplateID"] = "semantic.task.consume.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't use that right now.",
+                    ["id"] = "phrase.semantic.task.consume.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskConsumeRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.drink.active"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_DRINK_ACTIVE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.drink.active",
+        ["semanticTemplateID"] = "semantic.task.drink.active",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm drinking that now.",
+                    ["id"] = "phrase.semantic.task.drink.active.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkActiveNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.drink.admitted"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_DRINK_ADMITTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.drink.admitted",
+        ["semanticTemplateID"] = "semantic.task.drink.admitted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll drink that.",
+                    ["id"] = "phrase.semantic.task.drink.admitted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkAdmittedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.drink.completed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_DRINK_COMPLETED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.drink.completed",
+        ["semanticTemplateID"] = "semantic.task.drink.completed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I feel better.",
+                    ["id"] = "phrase.semantic.task.drink.completed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkCompletedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.drink.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_DRINK_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.drink.failed",
+        ["semanticTemplateID"] = "semantic.task.drink.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't drink that.",
+                    ["id"] = "phrase.semantic.task.drink.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.drink.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_DRINK_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.drink.rejected",
+        ["semanticTemplateID"] = "semantic.task.drink.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't drink that right now.",
+                    ["id"] = "phrase.semantic.task.drink.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.eat.active"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_EAT_ACTIVE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.eat.active",
+        ["semanticTemplateID"] = "semantic.task.eat.active",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm eating that now.",
+                    ["id"] = "phrase.semantic.task.eat.active.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatActiveNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.eat.admitted"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_EAT_ADMITTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.eat.admitted",
+        ["semanticTemplateID"] = "semantic.task.eat.admitted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll eat that.",
+                    ["id"] = "phrase.semantic.task.eat.admitted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatAdmittedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.eat.completed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_EAT_COMPLETED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.eat.completed",
+        ["semanticTemplateID"] = "semantic.task.eat.completed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "That hit the spot.",
+                    ["id"] = "phrase.semantic.task.eat.completed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatCompletedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.eat.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_EAT_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.eat.failed",
+        ["semanticTemplateID"] = "semantic.task.eat.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't eat that.",
+                    ["id"] = "phrase.semantic.task.eat.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.eat.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_EAT_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.eat.rejected",
+        ["semanticTemplateID"] = "semantic.task.eat.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't eat that right now.",
+                    ["id"] = "phrase.semantic.task.eat.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.fetch.active"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_FETCH_ACTIVE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.fetch.active",
+        ["semanticTemplateID"] = "semantic.task.fetch.active",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm working on that now.",
+                    ["id"] = "phrase.semantic.task.fetch.active.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskFetchActiveNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.fetch.admitted"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_FETCH_ADMITTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.fetch.admitted",
+        ["semanticTemplateID"] = "semantic.task.fetch.admitted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll fetch that.",
+                    ["id"] = "phrase.semantic.task.fetch.admitted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskFetchAdmittedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.fetch.completed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_FETCH_COMPLETED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.fetch.completed",
+        ["semanticTemplateID"] = "semantic.task.fetch.completed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Here you go.",
+                    ["id"] = "phrase.semantic.task.fetch.completed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskFetchCompletedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.fetch.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_FETCH_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.fetch.failed",
+        ["semanticTemplateID"] = "semantic.task.fetch.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't fetch that.",
+                    ["id"] = "phrase.semantic.task.fetch.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskFetchFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.fetch.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_FETCH_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.fetch.rejected",
+        ["semanticTemplateID"] = "semantic.task.fetch.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't fetch that right now.",
+                    ["id"] = "phrase.semantic.task.fetch.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskFetchRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.give.active"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_GIVE_ACTIVE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.give.active",
+        ["semanticTemplateID"] = "semantic.task.give.active",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm handing that over now.",
+                    ["id"] = "phrase.semantic.task.give.active.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveActiveNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.give.admitted"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_GIVE_ADMITTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.give.admitted",
+        ["semanticTemplateID"] = "semantic.task.give.admitted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Okay, I'll give that to you.",
+                    ["id"] = "phrase.semantic.task.give.admitted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.give.completed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_GIVE_COMPLETED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.give.completed",
+        ["semanticTemplateID"] = "semantic.task.give.completed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Here you go.",
+                    ["id"] = "phrase.semantic.task.give.completed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveCompletedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.give.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_GIVE_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.give.failed",
+        ["semanticTemplateID"] = "semantic.task.give.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't give that.",
+                    ["id"] = "phrase.semantic.task.give.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.give.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_GIVE_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.give.rejected",
+        ["semanticTemplateID"] = "semantic.task.give.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't give that right now.",
+                    ["id"] = "phrase.semantic.task.give.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.refill.active"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_REFILL_ACTIVE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.refill.active",
+        ["semanticTemplateID"] = "semantic.task.refill.active",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm refilling that now.",
+                    ["id"] = "phrase.semantic.task.refill.active.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskRefillActiveNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.refill.admitted"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_REFILL_ADMITTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.refill.admitted",
+        ["semanticTemplateID"] = "semantic.task.refill.admitted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll refill that.",
+                    ["id"] = "phrase.semantic.task.refill.admitted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskRefillAdmittedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.refill.completed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_REFILL_COMPLETED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.refill.completed",
+        ["semanticTemplateID"] = "semantic.task.refill.completed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "It's full now.",
+                    ["id"] = "phrase.semantic.task.refill.completed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskRefillCompletedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.refill.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_REFILL_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.refill.failed",
+        ["semanticTemplateID"] = "semantic.task.refill.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't refill that.",
+                    ["id"] = "phrase.semantic.task.refill.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskRefillFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.refill.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_REFILL_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.refill.rejected",
+        ["semanticTemplateID"] = "semantic.task.refill.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't refill that right now.",
+                    ["id"] = "phrase.semantic.task.refill.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskRefillRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.wait.at.active"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_WAIT_AT_ACTIVE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.wait.at.active",
+        ["semanticTemplateID"] = "semantic.task.wait.at.active",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm waiting there now.",
+                    ["id"] = "phrase.semantic.task.wait.at.active.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtActiveNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.wait.at.admitted"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_WAIT_AT_ADMITTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.wait.at.admitted",
+        ["semanticTemplateID"] = "semantic.task.wait.at.admitted",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Okay, I'll wait there.",
+                    ["id"] = "phrase.semantic.task.wait.at.admitted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.wait.at.completed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_WAIT_AT_COMPLETED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.wait.at.completed",
+        ["semanticTemplateID"] = "semantic.task.wait.at.completed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'm here.",
+                    ["id"] = "phrase.semantic.task.wait.at.completed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtCompletedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.wait.at.failed"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_WAIT_AT_FAILED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.wait.at.failed",
+        ["semanticTemplateID"] = "semantic.task.wait.at.failed",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I couldn't wait there.",
+                    ["id"] = "phrase.semantic.task.wait.at.failed.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtFailedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.task.wait.at.rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_TASK_WAIT_AT_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.task.wait.at.rejected",
+        ["semanticTemplateID"] = "semantic.task.wait.at.rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't wait there right now.",
+                    ["id"] = "phrase.semantic.task.wait.at.rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtRejectedNeutral01",
                 },
             },
         },

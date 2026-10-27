@@ -209,7 +209,7 @@ function Realization.Resolve(templateID, style, semanticFallback)
         family = canonicalID,
         variant = tostring(selectedStyle or selected or "neutral"),
         fallbackReason = nil,
-        argument = string.find(fallback, "%%s", 1, true)
+        argument = string.find(fallback, "%s", 1, true)
             and "familyAddress" or nil,
     }
 end

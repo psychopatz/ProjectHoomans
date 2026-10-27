@@ -87,6 +87,8 @@ local function contentOwnerForPool(poolID)
     if string.find(poolID, "semantic.command.", 1, true) == 1
         or string.find(poolID, "semantic.emote.", 1, true) == 1
         or string.find(poolID, "semantic.flow.greeting.", 1, true) == 1
+        or string.find(poolID, "semantic.task.", 1, true) == 1
+        or string.find(poolID, "semantic.gift.", 1, true) == 1
     then
         return "projecthoomans.dialogue_content.commands_emotes"
     end

@@ -45,19 +45,10 @@ Adapter.RegisterAction("FOLLOW", {
     },
     responsePools = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
-            en = "Okay, I'll follow you.",
-            tl = "Sige, susundan kita.",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedFollowRejected",
-            en = "I can't follow you right now.",
-            tl = "Hindi kita masusundan ngayon.",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedFollowFailed",
-            en = "I couldn't start following you.",
-            tl = "Hindi ko masimulan ang pagsunod sa iyo.",
         },
     },
     translationOwner = "ProjectHoomans",
@@ -113,19 +104,10 @@ Adapter.RegisterAction("STAY", {
     },
     responsePools = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStayQueued",
-            en = "Okay, I'll stay here.",
-            tl = "Sige, mananatili ako rito.",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStayRejected",
-            en = "I can't stay here right now.",
-            tl = "Hindi ako makapananatili rito ngayon.",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStayFailed",
-            en = "I couldn't start the stay order.",
-            tl = "Hindi ko masimulan ang utos na manatili.",
         },
     },
     translationOwner = "ProjectHoomans",
@@ -184,19 +166,10 @@ Adapter.RegisterAction("STOP", {
     },
     responsePools = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStopQueued",
-            en = "Okay, I'll stop following.",
-            tl = "Sige, titigil ako sa pagsunod.",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStopRejected",
-            en = "I can't stop following right now.",
-            tl = "Hindi ako makapaghinto sa pagsunod ngayon.",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStopFailed",
-            en = "I couldn't stop following.",
-            tl = "Hindi ako nakahinto sa pagsunod.",
         },
     },
     translationOwner = "ProjectHoomans",
@@ -255,19 +228,10 @@ Adapter.RegisterAction("GO", {
     },
     responsePools = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGoQueued",
-            en = "Okay, I'll head home.",
-            tl = "Sige, uuwi ako.",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGoRejected",
-            en = "I can't head home right now.",
-            tl = "Hindi ako makauuwi ngayon.",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGoFailed",
-            en = "I couldn't head home.",
-            tl = "Hindi ako nakauwi.",
         },
     },
     translationOwner = "ProjectHoomans",
@@ -329,19 +293,10 @@ Adapter.RegisterAction("CAMP", {
     },
     responsePools = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedCampQueued",
-            en = "Okay, I'll set up camp there.",
-            tl = "Sige, magse-set up ako ng kampo roon.",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedCampRejected",
-            en = "I can't set up camp there right now.",
-            tl = "Hindi ako makapag-set up ng kampo roon ngayon.",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedCampFailed",
-            en = "I couldn't set up camp there.",
-            tl = "Hindi ako nakapag-set up ng kampo roon.",
         },
     },
     translationOwner = "ProjectHoomans",

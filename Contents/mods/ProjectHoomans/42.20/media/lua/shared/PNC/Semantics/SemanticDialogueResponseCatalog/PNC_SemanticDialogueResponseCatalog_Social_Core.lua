@@ -188,7 +188,7 @@ Catalog.Register("semantic.refuse", {
         },
         {
             id = "semantic.refuse.default",
-            templateID = "semantic.social.acknowledged",
+            templateID = "semantic.social.refuse_default",
 
         },
     },

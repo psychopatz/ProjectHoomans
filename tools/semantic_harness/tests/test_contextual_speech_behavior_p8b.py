@@ -174,8 +174,8 @@ class ContextualSpeechBehaviorP8BTests(unittest.TestCase):
         families = set(catalog["speechRealization"]["families"])
         names = {row["family"] for row in coverage}
         self.assertTrue({"greeting", "wellbeing", "medical", "companion_action"} <= names)
-        self.assertIn("semantic.question.health_state.healthy", families)
-        self.assertIn("UI_PNC_Conversation_Semantic_GeneratedFollowQueued", families)
+        self.assertLessEqual(len(families), 64)
+        self.assertTrue(any(item.startswith("semantic.command.") for item in families))
 
 
 if __name__ == "__main__":

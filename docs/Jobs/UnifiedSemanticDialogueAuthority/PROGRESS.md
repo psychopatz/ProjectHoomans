@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0–P10 and P11A–P11D are accepted foundation. P11E–P11I remain mandatory and active, followed automatically by mandatory P12A–P12I Pragmatic Conversational Intelligence & Dialogue Director before developer handoff.
+**Status:** IN PROGRESS — P0–P11E are accepted foundation. P11F–P11I remain mandatory and active, followed automatically by mandatory P12A–P12I Pragmatic Conversational Intelligence & Dialogue Director before developer handoff.
 
 ## Audited baseline
 
@@ -578,19 +578,41 @@ registry and legacy parity tests pass, contextual What's Up/hub/talk parity
 CodeBuilder compile PASS, and git diff --check: PASS. No source save, native
 Project Zomboid session, or Workshop operation was touched.
 
-## Immediate Next Chunk — P11E
+## Accepted P11E — domain semantic taxonomy and automatic-flow provenance
 
-**Do not start P12 yet. Preserve the current uncommitted P11E work.**
+P11E accepted. Automatic command, task, and gift flows now use domain-meaning
+IDs (`semantic.command.*`, `semantic.task.*`, and `semantic.gift.*`) rather
+than the production taxonomy `semantic.generated.*`. Bounded generator
+metadata (`origin`, `workflowKind`, `templateVersion`, `templateFingerprint`,
+and action/capability identity) remains available for diagnostics and Studio
+detail without becoming semantic meaning.
 
-Remove `semantic.generated.*` from the canonical semantic taxonomy. Migrate
-automatic task, command, gift, and related runtime callers to domain-meaning
-IDs while retaining generator provenance as metadata and preserving runtime
-behavior.
+Automatic-flow adapters now provide response facts, conditions, and stable
+variant identity only. First-party EN/TL wording is compiled from the
+`conversation/shards/automatic_flows.json` and other canonical Conversation
+shards. Obsolete generated translation files and manifest loads were removed;
+the canonical Dialogue Content build is now 550 phrase families / 863 phrases
+and remains deterministic.
 
-After P11E acceptance, continue automatically through P11F–P11I. After P11I
-passes, continue automatically into `P12_PRAGMATIC_CONVERSATIONAL_INTELLIGENCE.md`
-starting with P12A recognized-to-response parity; P11 completion is no longer a
-parent-goal stop/handoff condition.
+The bounded Speech Realization catalog is deterministic and retains
+representative command/question/social coverage under its 64-family limit.
+The response-quality inspector distinguishes authored translation keys from
+direct semantic action packet keys without changing runtime authority.
+
+P11E focused validation: automatic taxonomy/flow/authoring/follow-up and
+shard/UI tests `29/29 PASS`; contextual speech behavior `8/8 PASS`; bounded
+runtime speech catalog `4/4 PASS`; Response Observatory `10/10 PASS`; bundled
+real-Lua response matrices `18/18 PASS`; isolated Xvfb Observatory Tk
+acceptance `2/2 PASS`; CodeBuilder compile PASS; and `git diff --check` PASS.
+No source save, native Project Zomboid session, or Workshop operation was
+touched.
+
+## Immediate Next Chunk — P11F
+
+Consolidate Studio into one derived Conversation explorer with Sources and
+bounded detail (wording, route, conditions, follow-ups, and provenance), while
+retaining lazy loading and removing Interactions as a redundant everyday
+browser. Continue automatically through P11G–P11I, then P12.
 
 ## Historical P11A starting instructions (completed)
 

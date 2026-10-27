@@ -50,29 +50,14 @@ local TASK_METADATA = {
         },
         responsePools = {
             admitted = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedFetchAdmitted",
-                en = "I'll fetch that.",
-                tl = "Kukunin ko iyon.",
             },
             active = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedFetchActive",
-                en = "I'm working on that now.",
-                tl = "Inaayos ko na iyon ngayon.",
             },
             completed = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedFetchCompleted",
-                en = "Here you go.",
-                tl = "Heto na.",
             },
             rejected = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedFetchRejected",
-                en = "I can't fetch that right now.",
-                tl = "Hindi ko makuha iyon ngayon.",
             },
             failed = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedFetchFailed",
-                en = "I couldn't fetch that.",
-                tl = "Hindi ko nakuha iyon.",
             },
         },
         translationOwner = "ProjectHoomans",
@@ -124,29 +109,14 @@ local TASK_METADATA = {
         },
         responsePools = {
             admitted = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedWaitAtAdmitted",
-                en = "Okay, I'll wait there.",
-                tl = "Sige, maghihintay ako roon.",
             },
             active = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedWaitAtActive",
-                en = "I'm waiting there now.",
-                tl = "Naghihintay na ako roon.",
             },
             completed = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedWaitAtCompleted",
-                en = "I'm here.",
-                tl = "Narito na ako.",
             },
             rejected = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedWaitAtRejected",
-                en = "I can't wait there right now.",
-                tl = "Hindi ako makapaghihintay roon ngayon.",
             },
             failed = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedWaitAtFailed",
-                en = "I couldn't wait there.",
-                tl = "Hindi ako nakapaghintay roon.",
             },
         },
         translationOwner = "ProjectHoomans",

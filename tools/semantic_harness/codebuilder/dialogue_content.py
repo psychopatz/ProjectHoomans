@@ -37,7 +37,10 @@ LANGUAGES = ("EN", "TL")
 STYLES = ("neutral", "warm", "terse", "guarded")
 ID_PATTERN = re.compile(r"^[a-z][a-z0-9_.:-]{0,127}$")
 TRANSLATION_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,127}$")
-MAX_FAMILIES = 512
+# Domain-sharded automatic task/command/gift responses are still canonical
+# Conversation wording, not a second registry. Keep the aggregate bound
+# explicit while leaving room for those bounded workflow variants.
+MAX_FAMILIES = 768
 MAX_PHRASES_PER_STYLE = 6
 MAX_PLAYER_CONTENT = 32
 MAX_RUNTIME_ALIASES = 512

@@ -87,29 +87,14 @@ local GiftCapability = {
     },
     responsePools = {
         selection_required = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGiftSelectionRequired",
-            en = "I need to see what you brought me first.",
-            tl = "Kailangan ko munang makita ang dala mo.",
         },
         pending = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGiftPending",
-            en = "I'll take a look at that gift.",
-            tl = "Titingnan ko ang regalong iyan.",
         },
         completed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGiftCompleted",
-            en = "Thank you for the gift.",
-            tl = "Salamat sa regalo.",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGiftRejected",
-            en = "I can't accept that gift right now.",
-            tl = "Hindi ko matanggap ang regalong iyan ngayon.",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGiftFailed",
-            en = "I couldn't accept that gift.",
-            tl = "Hindi ko matanggap ang regalong iyan.",
         },
     },
     translationOwner = "ProjectHoomans",

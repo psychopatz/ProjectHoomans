@@ -44,7 +44,7 @@ class ResponseObservatoryTests(unittest.TestCase):
             self.assertTrue(all(v["sourcePath"] == authored["sourcePath"]
                                 for v in authored["variants"]))
             generated = worker.response_pool_detail(
-                "semantic.generated.simple_command.follow.queued", limit=16)
+                "semantic.command.follow.queued", limit=16)
             self.assertEqual(generated["sourceKind"],
                              "GENERATED_REGISTRATION_SITE")
             self.assertIn("AutomaticFlowGenerator_Registration.lua",
@@ -225,7 +225,7 @@ class ResponseObservatoryTests(unittest.TestCase):
             before = worker.inspect_actor_state()
             for _ in range(4):
                 worker.explain_response_selection(
-                    "semantic.generated.simple_command.follow.queued",
+                    "semantic.command.follow.queued",
                     {"npcID": "isolation", "socialStyle": "friendly"}, "same",
                 )
             after = worker.inspect_actor_state()

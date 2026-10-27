@@ -19,6 +19,33 @@ return function(Catalog, Core)
         return nil
     end
 
+    local function normalizedProvenance(value)
+        if type(value) ~= "table" then return nil end
+        local output = {}
+        local fields = {
+            "origin", "workflowKind", "templateVersion",
+            "templateFingerprint", "actionID", "capabilityID",
+        }
+        for index = 1, #fields do
+            local field = fields[index]
+            local item = value[field]
+            if type(item) == "string" then
+                output[field] = Core.boundedText(item)
+            elseif type(item) == "number" then
+                output[field] = item
+            end
+        end
+        if next(output) == nil then return nil end
+        return output
+    end
+
+    local function applyProvenance(pool, definition)
+        local provenance = normalizedProvenance(
+            type(definition) == "table" and definition.provenance or nil
+        )
+        if provenance then pool.provenance = provenance end
+    end
+
     function Catalog.Register(id, definition)
         local pool
         local variants
@@ -36,6 +63,7 @@ return function(Catalog, Core)
             id = id,
             variants = {},
         }
+        applyProvenance(pool, definition)
         for index = 1, math.min(#variants, Catalog.MAX_VARIANTS) do
             variant = Core.normalizedVariant(id, index, variants[index])
             if variant then pool.variants[#pool.variants + 1] = variant end
@@ -126,6 +154,7 @@ return function(Catalog, Core)
             seenIDs[normalized.id] = true
             additions[#additions + 1] = normalized
         end
+        applyProvenance(pool, definition)
         local origin = registrationSource()
         local origins = Catalog.REGISTRATION_ORIGINS[id] or {}
         for index = 1, #additions do

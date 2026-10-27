@@ -35,11 +35,12 @@ local function argumentValues(args)
     return values
 end
 
-local function localizedSegment(templateID, fallback, args)
+local function localizedSegment(templateID, fallback, args, realizationVariant)
     local response = {
         templateID = templateID,
         fallback = fallback,
         args = args,
+        realizationVariant = realizationVariant,
     }
     fallback = tostring(fallback or "")
     local key = Internal.SemanticTranslationKey(response)
@@ -135,6 +136,8 @@ end
 
 local function payloadsForResponse(response)
     response = type(response) == "table" and response or {}
+    local realizationVariant = response.realizationVariant
+        or response.speechStyleVariant
     local renderPlan = response.renderPlan or response.plan
     if type(renderPlan) == "table"
         and ResponsePlan
@@ -148,7 +151,14 @@ local function payloadsForResponse(response)
             for index = 1, #renderPlan.turns do
                 local rendered = ResponsePlan.RenderDetailed(
                     renderPlan,
-                    localizedSegment,
+                    function(templateID, fallback, args)
+                        return localizedSegment(
+                            templateID,
+                            fallback,
+                            args,
+                            realizationVariant
+                        )
+                    end,
                     index
                 )
                 local fallbackRendered = ResponsePlan.RenderDetailed(
@@ -180,7 +190,8 @@ local function payloadsForResponse(response)
     local text, translationKey = localizedSegment(
         renderTemplateID,
         fallback,
-        response.args
+        response.args,
+        realizationVariant
     )
     return {
         {

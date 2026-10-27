@@ -279,5 +279,13 @@ absence tests without changing semantic/runtime authority.
 | Provider and semantic authority | static provider, relationship/gossip/gameplay authorities | provider references and semantic destinations are locked references; eligibility, facts, permissions, response meaning, and effects remain outside UI source | UI schema negative assertions, contextual provider tests |
 | Agent/human UI edits | SemanticLabAuthoringService | bounded inspect/validate/preview/write plus add/remove/move/reorder operations use one source fingerprint and reject stale/locked edits | test_p11_conversation_ui_registry |
 
-P11E is now the active semantic-taxonomy slice. Its audit must preserve domain
-meaning and move generator provenance into metadata rather than canonical IDs.
+## P11E current closure
+
+| Migrated surface | Actual production callers | Semantic/content owner | Follow-up / provenance disposition | Proof |
+| --- | --- | --- | --- | --- |
+| Automatic command outcomes | command adapters, companion action flow, existing action-result response route | `semantic.command.<action>.<outcome>` → ResponseCatalog/ResponsePlan → automatic-flow and command shards | action/capability facts and bounded generator provenance remain metadata; no `semantic.generated.*` taxonomy | P11 semantic taxonomy, automatic-flow and follow-action tests |
+| Automatic task outcomes | task adapter and queued task lifecycle | `semantic.task.<action>.<outcome>` → ResponseCatalog/ResponsePlan → Dialogue Content | task authority/effects remain task systems; `workflowKind=parameterized_task` is diagnostic provenance only | automatic-flow generation and production Lua task smokes |
+| Automatic gift outcomes | gift input/selection and inventory outcome routes | `semantic.gift.<outcome>` → ResponseCatalog/ResponsePlan → Dialogue Content | inventory facts/effects remain authoritative; no generated-family wording path | taxonomy, gift, EN/TL content and response observatory tests |
+| Automatic-flow first-party wording | former generated translation artifacts and adapter-local EN/TL/key maps | canonical Conversation shards and generated Dialogue Content Registry/EN/TL artifacts | deleted generated translation files and manifest loads; no adapter wording fallback | shard/content compiler, matrix, idempotence and absence scans |
+| Bounded realization catalog | worker persona catalog and Studio diagnostics | SpeechRealization canonical family projection | deterministic capped list with representative domain coverage; no semantic selection change | P11G runtime speech test and worker catalog checks |
+| Response-quality semantic assertions | Observatory matrix fixtures and inspector | explicit semantic metadata plus authored translation keys | direct semantic action packets and localized authored packets are checked without conflating identifiers | Response Observatory and bundled real-Lua matrix tests |

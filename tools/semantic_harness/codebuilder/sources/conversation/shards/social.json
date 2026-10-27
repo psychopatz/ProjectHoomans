@@ -67,8 +67,8 @@
         "neutral": [
           {
             "translations": {
-              "EN": "I have something I remember about that.",
-              "TL": "I have something I remember about that."
+              "EN": "%s",
+              "TL": "%s"
             }
           }
         ]
@@ -1283,6 +1283,20 @@
             "translations": {
               "EN": "No problem. I'll leave it.",
               "TL": "Walang problema. Iiwan ko na iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.social.refuse_default",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "No.",
+              "TL": "Hindi."
             }
           }
         ]

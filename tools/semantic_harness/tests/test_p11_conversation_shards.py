@@ -67,7 +67,7 @@ class P11ConversationShardTests(unittest.TestCase):
         ]
         self.assertEqual(len(semantic_ids), len(set(semantic_ids)))
         self.assertEqual(len(phrase_ids), len(set(phrase_ids)))
-        self.assertEqual(len(compiled["phraseFamilies"]), 463)
+        self.assertEqual(len(compiled["phraseFamilies"]), 550)
         self.assertEqual(len(compiled["playerChoices"]), 12)
         self.assertEqual(len(compiled["runtimeAliases"]), 292)
 

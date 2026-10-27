@@ -64,7 +64,7 @@ class ObservatoryP7ScaleTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[3]
         watched = [
             root / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Selection.lua",
-            root / "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/GeneratedTaskCommands.json",
+            root / "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/DialogueContent.json",
         ]
         hashes = lambda: [sha256(path.read_bytes()).hexdigest() for path in watched]
         before_files = hashes()

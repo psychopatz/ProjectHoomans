@@ -211,9 +211,19 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             follow = worker.input("Follow me")
             stay = worker.input("Stay here")
 
-        for result, action, response_key in (
-            (follow, "follow", "UI_PNC_Conversation_Semantic_GeneratedFollowQueued"),
-            (stay, "stay", "UI_PNC_Conversation_Semantic_GeneratedStayQueued"),
+        for result, action, template_id, translation_key in (
+            (
+                follow,
+                "follow",
+                "semantic.command.follow.queued",
+                "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral01",
+            ),
+            (
+                stay,
+                "stay",
+                "semantic.command.stay.queued",
+                "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral01",
+            ),
         ):
             flow = result["result"]["flow"]
             self.assertTrue(flow["generated"])
@@ -223,7 +233,11 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             self.assertEqual(result["result"]["actionResult"]["status"], "accepted")
             self.assertEqual(result["result"]["actionResult"]["commandID"], action)
             self.assertEqual(len(result["transport"]), 1)
-            self.assertEqual(result["messages"][0]["payload"]["translationKey"], response_key)
+            self.assertEqual(result["messages"][0]["payload"]["key"], template_id)
+            self.assertEqual(
+                result["messages"][0]["payload"]["translationKey"],
+                translation_key,
+            )
 
     def test_generated_simple_command_uses_relationship_and_personality_context(self) -> None:
         friendly_scenario = merge(
@@ -260,18 +274,33 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             tagalog = worker.input("Follow me")
 
         self.assertEqual(
+            friendly["messages"][0]["payload"]["key"],
+            "semantic.command.follow.queued.friendly",
+        )
+        self.assertEqual(
+            trusted["messages"][0]["payload"]["key"],
+            "semantic.command.follow.queued",
+        )
+        self.assertEqual(
+            tagalog["messages"][0]["payload"]["key"],
+            "semantic.command.follow.queued.friendly",
+        )
+        self.assertEqual(
             friendly["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm",
+            "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral01",
         )
         self.assertEqual(
             trusted["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm",
+            "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral01",
         )
         self.assertEqual(
             tagalog["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm",
+            "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral01",
         )
-        self.assertEqual(tagalog["messages"][0]["payload"]["text"], "Siyempre, susunod ako sa iyo.")
+        self.assertEqual(
+            tagalog["messages"][0]["payload"]["text"],
+            "Siyempre, susundan kita.",
+        )
         for result in (friendly, trusted, tagalog):
             self.assertTrue(result["result"]["flow"]["generated"])
             self.assertEqual(result["result"]["flow"]["resultOutcome"], "queued")
@@ -284,12 +313,20 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             repeated = worker.input("Follow me")
 
         self.assertEqual(
+            first["messages"][0]["payload"]["key"],
+            "semantic.command.follow.queued",
+        )
+        self.assertEqual(
+            repeated["messages"][0]["payload"]["key"],
+            "semantic.command.follow.queued.repeated",
+        )
+        self.assertEqual(
             first["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
+            "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral01",
         )
         self.assertEqual(
             repeated["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedRepeated",
+            "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral01",
         )
         self.assertEqual(repeated["result"]["flow"]["resultOutcome"], "queued")
         self.assertEqual(repeated["result"]["flow"]["dispatchCount"], 1)
@@ -386,6 +423,10 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
 
                 response = result["result"]["decision"]["response"]
                 self.assertEqual(response["templateID"], "semantic.gossip.memory")
+                self.assertEqual(
+                    result["result"]["decision"]["response"]["args"]["content"],
+                    expected,
+                )
                 self.assertEqual(result["messages"][0]["payload"]["text"], expected)
                 self.assertEqual(
                     [
@@ -450,11 +491,11 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             second = worker.input("any news about Morgan?")
 
         self.assertEqual(
-            first["result"]["decision"]["response"]["fallback"],
+            first["result"]["decision"]["response"]["args"]["content"],
             "Sarah has been looking out for people.",
         )
         self.assertEqual(
-            second["result"]["decision"]["response"]["fallback"],
+            second["result"]["decision"]["response"]["args"]["content"],
             "Morgan has been looking out for people.",
         )
         second_request = next(
