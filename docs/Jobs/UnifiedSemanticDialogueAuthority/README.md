@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority
 
-**Status:** IN PROGRESS — P0–P10 and P11A are accepted foundation. The rejected P11B–P11H attempt was safely recovered; P11B restarts from the verified P11A tree and P11B–P11I remain mandatory before live-test handoff.
+**Status:** IN PROGRESS — P0–P10 and P11A are accepted foundation. P11B0 Modular Conversation Source & Generation Foundation is now mandatory before any further P11B wording migration; P11B–P11I remain mandatory afterward.
 **Recovery commit:** `18eacad50745e445c92639d1ce77d487d1da07fd` (tree-equivalent to verified P11A anchor `08081ac8`).
 **Project Hoomans audit baseline:** `181b58bcc30dc65dc61d19a49d6238abca50ece9`.
 **PsychopatzCore audit baseline:** `cf28189c57f7810f31d25c46c11eb88080f47baa`.
@@ -127,5 +127,6 @@ Older `SemanticInteractionLifecycle` P11 documents remain valuable historical/ar
 9. `HARNESS_ACCEPTANCE.md`;
 10. `P10_CANONICAL_SEMANTIC_CLEANUP.md`;
 11. `P11_MODULAR_CONVERSATION_ARCHITECTURE.md`;
-12. `ROADMAP.md`;
-13. `PROGRESS.md` **last** for current phase and exact Next Chunk.
+12. `P11B0_MODULAR_CONVERSATION_COMPILER.md`;
+13. `ROADMAP.md`;
+14. `PROGRESS.md` **last** for current phase and exact Next Chunk.

@@ -217,3 +217,24 @@ P11 is accepted only when the following additional gates pass.
 P11 is not complete merely because the new editor renders. It must prove that
 the old parallel wording/navigation authoring paths are removed or reduced to
 explicit external provider boundaries.
+
+## P11B0 modular compiler acceptance
+
+Before P11B wording migration resumes:
+
+- canonical Conversation authoring is manifest-backed and domain-sharded;
+- each shard validates independently;
+- the merged model rejects duplicate IDs and invalid cross-references globally;
+- two consecutive generation runs are byte-identical;
+- generated runtime output is domain-sharded and no single registry exceeds the
+  configured verifier/toolchain bound;
+- the runtime registry/manifest is a small hub, not a full data dump;
+- generated translations are domain-oriented outputs;
+- one generated whole-model snapshot exists for audit/tests only;
+- an item can be located/edited by canonical ID without a caller knowing its
+  physical shard path;
+- moving a record between shards with unchanged canonical ID preserves runtime
+  semantic identity;
+- full native Lua remains green and previously-green Python/Kahlua contracts
+  remain green;
+- no source save, native PZ session or Workshop state is touched.

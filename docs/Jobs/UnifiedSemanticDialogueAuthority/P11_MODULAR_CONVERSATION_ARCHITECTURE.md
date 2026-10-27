@@ -113,12 +113,30 @@ Required:
 **P11A gate:** production and durable tests describe the current architecture,
 not the migration history used to reach it.
 
+## P11B0 — modular Conversation source & generation foundation
+
+P11B0 is a mandatory prerequisite before further wording migration.
+
+The current source/runtime shape is too monolithic for the scale of future
+Conversation variation. Follow
+`P11B0_MODULAR_CONVERSATION_COMPILER.md` to establish:
+
+- small canonical Conversation domain shards;
+- explicit deterministic manifest;
+- merged whole-model validation;
+- bounded generated runtime shards and small hub/manifest files;
+- generated domain translation artifacts;
+- generated aggregate audit snapshot;
+- stable ID → owning-shard authoring APIs.
+
+Do not resume the parked P11B wording branch until P11B0 passes.
+
 ## P11B — one first-party wording path
 
-Make Dialogue Content the literal first-party wording authority, but do it
-incrementally. The rejected 2026-10-27 attempt proved that a repository-wide
-wording rewrite can make focused new tests pass while breaking established
-Conversation behavior.
+After P11B0 acceptance, make Dialogue Content the literal first-party wording
+authority incrementally **by coherent domain shard**. The rejected 2026-10-27
+attempt proved that a repository-wide wording rewrite can make focused new tests
+pass while breaking established Conversation behavior.
 
 ### P11B-R0 — characterize before migration
 
@@ -189,59 +207,27 @@ is traceable to Dialogue Content or a clearly external provider-owned surface;
 no broad compatibility alias registry masks unmigrated internal callers; and
 the full pre-existing native Lua regression suite remains green.
 
-## P11C — modular Conversation authoring sources
+## P11C — modular Conversation source refinement
 
-Replace giant/mixed authoring documents with domain shards and a deterministic
-manifest/compiler.
+P11B0 establishes the manifest-driven modular source/compiler foundation.
+P11C refines that model after real wording migration exposes the remaining
+domain boundaries.
 
-Target conceptual domains include:
-
-```text
-Conversation/
-  greeting
-  social/
-    compliment
-    apology
-    relationship
-  questions/
-    identity
-    wellbeing
-    needs
-    health
-    activity
-    weather
-    time_date
-    knowledge
-    backstory
-  commands/
-  tasks/
-  gifts/
-  events/
-    combat
-    medical
-    leader_loss
-    companion
-  compatibility/
-    bandits
-    necroa
-    companion_dogs
-    project_alife
-```
+Target conceptual domains still include greeting, social, questions, commands,
+tasks, gifts, events and compatibility, but P11C must **refine** rather than
+recreate the P11B0 loader/compiler.
 
 Requirements:
 
-- split NLU/pattern authoring from response/content wording;
-- do not keep response pools embedded in generic pattern datasets merely for
-  convenience;
-- load shards through one manifest or deterministic discovery contract that is
-  Project Zomboid-safe at generation time;
-- enforce global unique semantic IDs and content IDs;
-- preserve stable canonical identities across physical file moves;
-- generated/runtime artifacts remain deterministic/idempotent;
-- agents and GUI use service APIs, not knowledge of physical shard paths.
+- remove any remaining mixed NLU/pattern + response wording seams;
+- split domains that become too large while preserving canonical IDs;
+- keep one manifest/compiler and one authoring-service ownership model;
+- preserve deterministic/idempotent generated outputs;
+- keep agents and GUI independent of physical shard paths;
+- never collapse modular shards back into a canonical aggregate authoring file.
 
-**P11C gate:** adding variants to one conversation family does not require
-editing a 100+ KB monolith or a mixed NLU/response document.
+**P11C gate:** real migrated content remains easy to edit by bounded domain and
+no new scaling hotspot or second source-discovery mechanism appears.
 
 ## P11D — canonical Conversation UI Registry
 

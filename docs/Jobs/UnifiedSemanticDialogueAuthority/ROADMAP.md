@@ -233,14 +233,42 @@ Remove remaining migration-only fallback/vocabulary/test archaeology, reconcile
 stale P10 status, and rename legitimate compatibility speech bridges whose
 names still imply obsolete Flavor authority.
 
+### P11B0 — modular Conversation source & generation foundation
+
+Before any further wording migration, establish the manifest-driven modular
+compiler in `P11B0_MODULAR_CONVERSATION_COMPILER.md`.
+
+Required:
+
+- small domain canonical shards under one Conversation source root;
+- explicit deterministic manifest;
+- merged whole-model validation and global ID uniqueness;
+- bounded generated runtime shards with small registry/manifest hubs;
+- generated domain translation artifacts;
+- generated whole-model audit snapshot;
+- stable ID → owning-shard authoring APIs;
+- full regression and byte-for-byte idempotence.
+
+Do not resume the parked one-string-at-a-time P11B branch until this foundation
+passes.
+
 ### P11B — one first-party wording path
 
-Restart from the verified P11A tree and migrate wording **incrementally by coherent domain/caller family**, not as a repository-wide big-bang rewrite. First characterize exact callers/placeholders and lock existing behavior tests. Then move one bounded family at a time from `Responses.json`, `Realizations.json`, LocalResponse English fallbacks and static mapping modules into Dialogue Content. Runtime handlers return semantic template IDs plus bounded arguments. Every accepted slice must preserve the full native Lua regression gate; broad runtime-key alias tables are not an accepted steady-state shortcut.
+After P11B0 acceptance, migrate wording **incrementally by coherent Conversation
+domain shard**, not one sentence at a time and not as a repository-wide big-bang
+rewrite. First characterize exact callers/placeholders and lock existing
+behavior tests. Then move bounded domains from `Responses.json`,
+`Realizations.json`, LocalResponse English fallbacks and static mapping modules
+into Dialogue Content. Runtime handlers return semantic template IDs plus
+bounded arguments. Every accepted slice must preserve the full native Lua
+regression gate; broad runtime-key alias tables are not an accepted steady-state
+shortcut.
 
-### P11C — modular Conversation sources
+### P11C — modular Conversation source refinement
 
-Split monolithic/mixed authoring files into domain shards with one deterministic
-manifest/compiler. Separate NLU/pattern authoring from response/content wording.
+P11B0 establishes the modular source/compiler foundation. P11C refines domain
+boundaries, removes remaining mixed NLU/response authoring seams, and expands
+the shard model as needed without reintroducing monolithic canonical sources.
 
 ### P11D — canonical Conversation UI Registry
 

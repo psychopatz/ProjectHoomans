@@ -330,3 +330,35 @@ directly.
 Interactions is not a separate everyday authority/browser. Its useful route,
 trigger, flow, conditions and follow-up evidence is projected into the selected
 Conversation detail.
+
+## P11B0 modular source/generation architecture
+
+Conversation authoring is a compiled source tree, not a collection of giant
+hand-maintained catalogs.
+
+```text
+conversation/manifest.json
+ + small content/pattern/flow/ui shards
+        ↓
+ canonical merge + validation
+        ↓
+ deterministic fingerprints / snapshot
+        ↓
+ bounded generated runtime modules
+        ↓
+ small generated registries/manifests
+```
+
+The canonical source tree owns intentional authored data. Generated artifacts
+own mechanical expansion.
+
+Required consequences:
+
+- source file boundaries are organizational only; canonical IDs carry identity;
+- moving a record between source shards does not change runtime identity;
+- build provenance and generated module location are metadata;
+- one compiler validates global uniqueness/cross-references;
+- runtime lookup APIs do not require callers to know shard paths;
+- no canonical or generated file grows without an enforced bounded policy;
+- the existing modular Dialogue/SemanticAuthoring/Lexicon generator patterns
+  are preferred over introducing another bespoke loading model.

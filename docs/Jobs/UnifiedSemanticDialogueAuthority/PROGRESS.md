@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** RECOVERED / IN PROGRESS — P0 through P10 and P11A are accepted foundation. The prior P11B–P11H implementation was rejected after regression audit and reverted. P11B restarts from recovery commit `18eacad50745e445c92639d1ce77d487d1da07fd` (tree-equivalent to verified P11A anchor `08081ac8`); P11B–P11I remain mandatory.
+**Status:** IN PROGRESS — P0 through P10 and P11A are accepted foundation. P11B0 Modular Conversation Source & Generation Foundation is now the mandatory next phase; parked P11B wording work must remain parked until P11B0 passes. P11B–P11I remain mandatory afterward.
 
 ## Audited baseline
 
@@ -52,7 +52,8 @@
 | P9 — scale/MP/final acceptance | **ACCEPTED** |
 | P10 — canonical semantic cleanup / legacy purge | **ACCEPTED** |
 | P11A — steady-state Conversation source hygiene | **ACCEPTED** |
-| P11B–P11I — canonical wording, modular authoring, UI registry, Studio and final acceptance | **NEXT / IN PROGRESS** |
+| P11B0 — modular Conversation source & generation foundation | **NEXT / IN PROGRESS** |
+| P11B–P11I — canonical wording, modular authoring refinement, UI registry, Studio and final acceptance | **MANDATORY AFTER P11B0** |
 
 ## Accepted P0 — authority inventory and characterization
 
@@ -529,36 +530,46 @@ Recovery validation:
 
 Rejected P11B–P11H acceptance claims are void. P11A remains accepted.
 
-## Immediate Next Chunk — P11B-R0 / P11B-R1
+## Immediate Next Chunk — P11B0A / P11B0B
 
-Read the recovery section in `AUDIT.md` and the revised P11B contract in
-`P11_MODULAR_CONVERSATION_ARCHITECTURE.md` before editing.
+Read `P11B0_MODULAR_CONVERSATION_COMPILER.md` before editing.
 
-Start with **P11B-R0 characterization only**:
+Do **not** resume the parked P11B wording migration.
 
-1. enumerate every live first-party wording caller and its current key/template;
-2. record EN/TL placeholders/arguments and whether the response is fixed,
-   parameterized, fact-derived, external compatibility or dead;
-3. preserve the existing behavior tests as contract evidence;
-4. record the current full native Lua `897/897` baseline;
-5. select one low-risk wording family with fully enumerable callers for the
-   first migration slice.
+Start with the modular source foundation:
 
-Then perform **only that one P11B-R1 family**:
+1. inventory the canonical source records currently owned by
+   `semantic_dialogue_content.json`, `common_interactions.json`,
+   `grounded_personal_dialogue.json`, `semantic_definitions.json`, and the
+   current Conversation UI/static suggestion definitions;
+2. design the minimal `sources/conversation/manifest.json` contract and stable
+   domain shard boundaries;
+3. add characterization proving the current merged model/IDs before moving any
+   record;
+4. implement manifest loading, per-shard validation, canonical merge,
+   deterministic ordering, global ID uniqueness and cross-reference checks;
+5. migrate one small source domain into shards without changing runtime output;
+6. prove two consecutive generation runs are byte-identical;
+7. run focused tests plus the full native Lua `897/897` regression gate.
 
-- add/reuse its Dialogue Content semantic template;
-- migrate its real production caller(s) directly;
-- regenerate through CodeBuilder;
-- run focused tests plus the full native Lua suite;
-- accept the slice only if the pre-existing full suite stays green;
-- remove that family's old key only after caller search reaches zero.
+Then continue through P11B0C–P11B0H:
 
-Do not touch identity exchange, gossip, backstory, PBrainZ or multiple
-parameterized domains in the first slice.
+- move remaining canonical authoring into modular shards;
+- generate a whole-model audit snapshot;
+- replace giant Dialogue Content `Registry.lua` with bounded generated runtime
+  shards + a small hub/manifest;
+- generate translation artifacts by Conversation domain;
+- make authoring services resolve stable IDs to owning shards;
+- enforce shard size/count bounds.
 
-Do not create a broad runtime-key alias registry.
+P11B0 is not accepted while a canonical source or generated runtime registry
+remains a scaling monolith merely for compatibility.
 
-Do not redesign Studio until P11B is completely regression-clean.
+Do not perform the P11E taxonomy rename yet unless the compiler needs a narrow
+internal change. Build provenance/physical shard path must stay metadata, not
+canonical identity.
+
+Do not redesign Studio yet.
 
 Do not create P12 or any new mandatory parent phase.
 

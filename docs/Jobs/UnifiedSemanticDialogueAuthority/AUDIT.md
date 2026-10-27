@@ -363,3 +363,25 @@ Conversation explorer, and a shared GUI/agent authoring service may be
 reimplemented later, but only on top of a regression-clean incremental P11B.
 
 No new P12 or parent-goal expansion is authorized.
+
+## 2026-10-28 modular source/compiler audit
+
+The clean recovery baseline still uses monolithic canonical source contracts:
+
+- `semantic_dialogue_content.json` ~105 KB / 216 phrase families / 395 phrases;
+- `common_interactions.json` ~38 KB / 47 patterns + 13 response pools;
+- `grounded_personal_dialogue.json` ~10 KB / patterns + response pools;
+- `semantic_definitions.json` mixes definitions/flows/content;
+- Dialogue Content emits one `Generated/DialogueContent/Registry.lua`.
+
+The parked P11B attempt demonstrated the scaling failure directly: Dialogue
+Content generation grew beyond the verifier's 256 KiB single-file ceiling
+before wording consolidation was complete.
+
+CodeBuilder already has a successful modular pattern elsewhere:
+Dialogue datasets, SemanticAuthoring and Lexicon render bounded generated shards
+plus manifests/hubs.
+
+Decision: do not resume wording migration on top of the monolithic source/output
+shape. P11B0 generalizes the existing manifest + generated-shard pattern to
+Conversation authoring first.

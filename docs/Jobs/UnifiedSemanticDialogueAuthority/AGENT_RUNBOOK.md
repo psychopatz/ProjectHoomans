@@ -8,7 +8,7 @@ A phase/chunk passing does not finish the parent goal. After each accepted chunk
 
 ## Mandatory read order
 
-Read root `AGENTS.md`, then this job's `README.md`, `AUDIT.md`, `ARCHITECTURE.md`, `EVENT_FOLLOWUP_CONTRACT.md`, `MIGRATION_MATRIX.md`, `PERFORMANCE_AND_SCALING.md`, `HARNESS_ACCEPTANCE.md`, `P10_CANONICAL_SEMANTIC_CLEANUP.md`, `P11_MODULAR_CONVERSATION_ARCHITECTURE.md`, `ROADMAP.md`, and **`PROGRESS.md` last**.
+Read root `AGENTS.md`, then this job's `README.md`, `AUDIT.md`, `ARCHITECTURE.md`, `EVENT_FOLLOWUP_CONTRACT.md`, `MIGRATION_MATRIX.md`, `PERFORMANCE_AND_SCALING.md`, `HARNESS_ACCEPTANCE.md`, `P10_CANONICAL_SEMANTIC_CLEANUP.md`, `P11_MODULAR_CONVERSATION_ARCHITECTURE.md`, `P11B0_MODULAR_CONVERSATION_COMPILER.md`, `ROADMAP.md`, and **`PROGRESS.md` last**.
 
 Re-read the relevant current source before editing; historical job prose is not runtime truth.
 
@@ -140,3 +140,22 @@ dynamic choice is locked.
 Normal phrase editing must support structural variant operations through safe
 service methods; raw JSON remains an optional diagnostic, not the primary
 workflow.
+
+## P11B0 modular-generation discipline
+
+P11B0 is a source/compiler foundation, not a wording migration.
+
+- Prefer small canonical Conversation shards over large authoring documents.
+- Prefer generated runtime structure, indexes, translation keys, fingerprints
+  and manifests over hand-maintained mechanical metadata.
+- Generation must be deterministic from an explicit manifest/canonical order;
+  do not depend on incidental filesystem enumeration.
+- Generated aggregate snapshots are audit/test artifacts only and may never
+  become canonical write targets.
+- Generated runtime output must be bounded by semantic/domain shards; do not
+  replace one giant source with one giant generated registry.
+- Stable semantic/content IDs must not depend on physical shard paths.
+- Agents and GUI services operate by canonical ID and owning-shard resolution,
+  not by hard-coded monolithic filenames.
+- P11E owns broad taxonomy/name cleanup. P11B0 only establishes the metadata
+  and generation seams needed to make that cleanup safe.
