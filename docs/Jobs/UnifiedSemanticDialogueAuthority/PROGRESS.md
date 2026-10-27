@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 through P7 accepted; P8 is the active implementation slice.
+**Status:** IN PROGRESS — P0 through P8 accepted; P9 is the active implementation slice.
 
 ## Audited baseline
 
@@ -48,7 +48,7 @@
 | P5 — ToolReplies + legacy registry migration | **ACCEPTED** |
 | P6 — compatibility semantic adapters | **ACCEPTED** |
 | P7 — canonical content coverage / Studio observability | **ACCEPTED** |
-| P8 — retire first-party legacy prose authority | **IN PROGRESS** |
+| P8 — retire first-party legacy prose authority | **ACCEPTED** |
 | P9 — scale/MP/final acceptance | NOT STARTED |
 
 ## Accepted P0 — authority inventory and characterization
@@ -206,13 +206,36 @@ legacy definition files remain migration source material but are no longer
 loaded by production composition; P8 proves that no first-party caller still
 uses them as a selector.
 
-## Immediate Next Chunk — P8
+## Accepted P8 — first-party selector retirement
 
-Audit and retire/deprecate remaining first-party prose selectors and
-compatibility-only aliases after proving all migrated callers are semantic-first.
-Keep generic PsychopatzCore SocialFlavor infrastructure and external provider
-compatibility authority intact. Continue automatically through P9 after the P8
-gate passes.
+P8 is accepted. Production composition no longer loads the migrated
+`PNC_SocialFlavorDefinitions_*` shards or Bandits/Necroa Hoomans flavor
+definition shards. Project ALife definitions remain unrequired source material
+for the external adapter. Semantic event, medical, compatibility, greeting,
+and companion acknowledgement paths therefore enter presentation only after
+ResponseCatalog selection.
+
+The diary hydrator now preserves selected persisted wording and resolves only
+canonical Conversation Content keys; it cannot reselect from a `flavorID`.
+The command interaction queue cannot replace a selected semantic realization
+with a legacy line, and missing semantic NPC acknowledgement/ambient
+realization fails explicitly. The remaining CompanionCommandFlavor calls are
+bounded compatibility-only helpers for non-semantic command/emote callers.
+Conversation category metadata now reports semantic response-flow authority
+and registry data/effects projection rather than legacy registry authority.
+
+P8 evidence: Lua retirement/semantic negative smoke `6/6`, composition and
+command/diary regression set `8/8`, Python category/legacy/content set `20/20`,
+and `pz-verify` Kahlua scans for the eight changed Lua files `0` errors / `0`
+warnings.
+
+## Immediate Next Chunk — P9
+
+Run the complete developer-side acceptance once: full headless Python,
+focused Xvfb GUI/lifecycle modules, production Lua, installed-PZ Kahlua,
+CodeBuilder/content idempotence, source/save data-safety, performance timing,
+and `git diff --check`. Keep generic PsychopatzCore SocialFlavor infrastructure
+and external provider compatibility authority intact.
 
 ## Stop conditions
 
