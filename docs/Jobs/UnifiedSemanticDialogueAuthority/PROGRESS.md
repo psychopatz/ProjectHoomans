@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0, P1, P2 and P3 accepted; P4 is the active implementation slice.
+**Status:** IN PROGRESS — P0 through P4 accepted; P5 is the active implementation slice.
 
 ## Audited baseline
 
@@ -43,8 +43,8 @@
 | P1 — standardized semantic event realization boundary | **ACCEPTED** |
 | P2 — NPC-initiated event follow-up bridge | **ACCEPTED** |
 | P3 — lower-risk native SocialFlavor migration | **ACCEPTED** |
-| P4 — complex medical/incapacitated migration | **IN PROGRESS** |
-| P5 — ToolReplies + legacy registry migration | NOT STARTED |
+| P4 — complex medical/incapacitated migration | **ACCEPTED** |
+| P5 — ToolReplies + legacy registry migration | **IN PROGRESS** |
 | P6 — compatibility semantic adapters | NOT STARTED |
 | P7 — canonical content coverage / Studio observability | NOT STARTED |
 | P8 — retire first-party legacy prose authority | NOT STARTED |
@@ -126,20 +126,33 @@
   the existing family regressions remain green. No native Project Zomboid or
   source save was used.
 
-## Immediate Next Chunk — P4
+## Accepted P4 — complex medical/incapacitated migration
 
-Migrate the complex medical/incapacitated/retreat families to the same
-semantic-first production event flows while preserving the existing queue and
-presentation infrastructure:
+- Added phase-specific semantic medical pools for incapacitated call, update,
+  repeat, witnessed teammate hurt, and treatment acknowledgement. The selected
+  ResponsePlan and wording are produced before the existing presentation queue.
+- Downed distress now carries a typed event reference, an authoritative bounded
+  fact capsule, selected text, semantic ownership, and filtered follow-up offers.
+  Teammate hurt and treatment use the same lifecycle contract; missing attacker,
+  need, or health facts do not create speculative offers.
+- Existing health, wound, treatment, stamina, and inventory authorities remain
+  unchanged. Legacy incapacitated and teammate prose definitions remain only as
+  migration source material in this slice.
+- P4 negative proof deliberately omits first-party SocialFlavor definitions and
+  still verifies semantic call/update/repeat/medical selection. Focused Lua
+  evidence is `5/5`, including the new medical authority smoke and direct
+  producer regressions. `pz-verify` reports zero Kahlua errors on the changed
+  Lua surface.
 
-1. Migrate witnessed teammate hurt, zombie stamina/retreat integration,
-   incapacitated call/update/repeat and medical/rescue wording.
-2. Preserve health/medical authority and expose only bounded disclosed facts to
-   the existing lifecycle follow-up path.
-3. Add family-level negative proof that missing semantic realization cannot
-   select first-party SocialFlavor prose.
+## Immediate Next Chunk — P5
 
-After the P4 family gates pass, continue automatically through P5–P9.
+Migrate first-party ToolReply wording and finish semantic ownership of the
+legacy `projecthoomans:wellbeing`, `projecthoomans:small_talk`, and
+`projecthoomans:ask_about` categories without changing ConversationBlocks'
+branch, gate, effect, or repeat authority. Preserve existing semantic flows,
+Dialogue Content ownership, lifecycle follow-ups, and compatibility boundaries.
+
+After the P5 family gates pass, continue automatically through P6–P9.
 
 ## Stop conditions
 

@@ -210,6 +210,19 @@ T.equal(sent[1].packet.family, Const.FAMILY,
     "the line uses the shared distress family")
 T.equal(sent[1].reason, Const.FLAVOR_CALL,
     "the initial line uses the call flavor id")
+T.equal(sent[1].packet.eventType, "incapacitated_call",
+    "the initial line carries the typed semantic medical event")
+T.truthy(sent[1].packet.semanticOwned,
+    "the initial line is marked as semantic-owned")
+T.equal(sent[1].packet.source.kind, "semantic_speech",
+    "the initial line uses the semantic speech source")
+T.equal(sent[1].packet.eventRef, sent[1].packet.eventID,
+    "the initial line carries one stable event reference")
+T.truthy(sent[1].packet.semanticEventFacts
+    and sent[1].packet.semanticEventFacts[sent[1].packet.eventID],
+    "the initial line carries an authoritative fact capsule")
+T.truthy(sent[1].packet.offerIDs and #sent[1].packet.offerIDs > 0,
+    "the initial line carries bounded semantic follow-up offers")
 
 local allyText = Flavor.Resolve(
     Const.FLAVOR_CALL, "npc", sent[1].packet.eventID, sent[1].context
@@ -382,6 +395,10 @@ Hooks.OnIncapacitatedStatusChanged(bleeding, "wound_change")
 T.equal(#sent, 2, "the status change emits an update line")
 T.equal(sent[2].reason, Const.FLAVOR_UPDATE,
     "the follow-up uses the update flavor id")
+T.equal(sent[2].packet.eventType, "incapacitated_update",
+    "the status update carries the typed semantic medical event")
+T.truthy(sent[2].packet.semanticOwned,
+    "the status update is marked as semantic-owned")
 T.equal(sent[2].packet.mergeKey, callMergeKey,
     "call and update share one merge key so the line updates in place")
 T.equal(sent[2].context.downedNeed, Const.Need.BLEEDOUT,
@@ -488,6 +505,8 @@ T.truthy(Hooks.TickIncapacitatedDistress(persistent),
 T.equal(#sent, 2, "the repeat produced exactly one more line")
 T.equal(sent[2].reason, Const.FLAVOR_REPEAT,
     "the repeat uses its own flavor id, not the call id")
+T.equal(sent[2].packet.eventType, "incapacitated_repeat",
+    "the repeat carries the typed semantic medical event")
 -- Capture before the next reset clears the send log.
 local repeatContext = sent[2].context
 

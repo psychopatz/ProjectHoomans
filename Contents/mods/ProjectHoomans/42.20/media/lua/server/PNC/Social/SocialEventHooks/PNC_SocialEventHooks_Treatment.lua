@@ -97,6 +97,7 @@ function Hooks.OnTreatmentCompleted(
             bodyPart = tostring(partID or ""),
             woundType = context and context.woundType or nil,
             severity = tonumber(context and context.severity),
+            semanticPresentation = "semantic_event_speech",
         },
     }
     output = PNC.SocialEvents.Emit(event)
@@ -104,11 +105,33 @@ function Hooks.OnTreatmentCompleted(
         and Network and Network.SendConversationRelationshipForNPC
     then
         firstDetail = output.details and output.details[1] or nil
+        local eventRef = tostring(output.eventID or event.id)
+        local factRefs = { eventRef }
+        local semanticEventFacts = {
+            [eventRef] = {
+                eventRef = eventRef,
+                authoritative = true,
+                disclosure = "player",
+                summary = "the wound was treated",
+                happened = "the wound was treated",
+                need = "bandage",
+                needType = "bandage",
+                victimNPCID = tostring(targetRecord.id),
+                woundType = context and context.woundType or nil,
+                healthState = targetRecord.health
+                    and targetRecord.health.state or nil,
+            },
+        }
         local reactionContext = {
             eventType = "treated_wound",
+            eventRef = eventRef,
+            eventID = eventRef,
             downedNeed = "bandage",
+            need = "bandage",
             woundType = context and context.woundType or nil,
             npcID = targetRecord.id,
+            factRefs = factRefs,
+            semanticEventFacts = semanticEventFacts,
         }
         local realization = SocialReactions
             and type(SocialReactions.Resolve) == "function"
@@ -117,16 +140,26 @@ function Hooks.OnTreatmentCompleted(
                 act = "ACK",
                 topic = "medical",
                 context = reactionContext,
-                eventID = output.eventID,
+                eventID = eventRef,
                 npcID = targetRecord.id,
             }) or nil
+        if not realization
+            or type(realization.fallback) ~= "string"
+            or realization.fallback == ""
+        then
+            return output
+        end
         Network.SendConversationRelationshipForNPC(
             player,
             targetRecord.id,
             "treated_wound",
             {
                 source = "treated_wound",
-                eventID = output.eventID,
+                eventID = eventRef,
+                eventRef = eventRef,
+                semanticEventFacts = semanticEventFacts,
+                factRefs = factRefs,
+                offerIDs = realization.offerIDs,
                 relationshipBefore = firstDetail
                     and firstDetail.relationshipBefore or nil,
                 relationshipDelta = relationshipDelta(
@@ -135,21 +168,21 @@ function Hooks.OnTreatmentCompleted(
                 ),
                 ambientFlavor = {
                     flavorID = "social.witnessed_teammate_hurt",
-                    text = realization and realization.fallback or nil,
+                    text = realization.fallback,
+                    semanticOwned = true,
+                    eventRef = eventRef,
                     eventType = "treated_wound",
-                    act = realization and realization.semanticAct or "ACK",
-                    topic = realization and realization.topic or "medical",
-                    responsePlanID = realization
-                        and realization.responsePlanID or nil,
-                    poolID = realization
-                        and realization.realizationFamily or nil,
-                    realizationFamily = realization
-                        and realization.realizationFamily or nil,
-                    realizationID = realization
-                        and realization.realizationID or nil,
-                    factRefs = realization
-                        and realization.groundedFactRefs or nil,
+                    semanticEventFacts = semanticEventFacts,
+                    offerIDs = realization.offerIDs,
+                    act = realization.semanticAct or "ACK",
+                    topic = realization.topic or "medical",
+                    responsePlanID = realization.responsePlanID,
+                    poolID = realization.realizationFamily,
+                    realizationFamily = realization.realizationFamily,
+                    realizationID = realization.realizationID,
+                    factRefs = realization.groundedFactRefs,
                     npcID = targetRecord.id,
+                    source = { kind = "semantic_speech", eventType = "treated_wound" },
                     context = reactionContext,
                 },
             }

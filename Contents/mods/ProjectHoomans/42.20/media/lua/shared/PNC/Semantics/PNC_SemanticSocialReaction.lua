@@ -112,6 +112,27 @@ end
 local function poolFor(spec)
     if spec.poolID then return tostring(spec.poolID) end
     local eventType = string.lower(tostring(spec.eventType or ""))
+    if eventType == "incapacitated_call"
+        or eventType == "social.incapacitated_call"
+    then
+        return "semantic.medical.distress.call"
+    end
+    if eventType == "incapacitated_update"
+        or eventType == "social.incapacitated_update"
+    then
+        return "semantic.medical.distress.update"
+    end
+    if eventType == "incapacitated_repeat"
+        or eventType == "social.incapacitated_repeat"
+    then
+        return "semantic.medical.distress.repeat"
+    end
+    if eventType == "witnessed_teammate_hurt" then
+        return "semantic.medical.distress.teammate"
+    end
+    if eventType == "treated_wound" then
+        return "semantic.medical.distress.treatment"
+    end
     if string.find(eventType, "conversation_safety", 1, true) then
         return "semantic.conversation.safety"
     end

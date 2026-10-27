@@ -15,6 +15,8 @@ Core.CONDITION_FIELDS = {
     "socialStyle", "emotionType", "emotionUrgency", "hostilityCount",
     "insultCount", "lastSpeechAct",
     "eventType", "commandID", "commandReason",
+    "medicalBandageRequired", "medicalBandageStatus",
+    "medicalSupplyRequestStatus",
     "downedAudience", "downedNeed", "downedThreat",
     "leaderGrief", "leaderSuccession", "corpseRevenge",
 }
@@ -142,6 +144,9 @@ function Core.conditionContext(context)
             or state.socialContext and state.socialContext.insultCount,
         lastSpeechAct = context.lastSpeechAct
             or state.socialContext and state.socialContext.lastSpeechAct,
+        medicalBandageRequired = context.medicalBandageRequired,
+        medicalBandageStatus = context.medicalBandageStatus,
+        medicalSupplyRequestStatus = context.medicalSupplyRequestStatus,
         downedAudience = context.downedAudience,
         downedNeed = context.downedNeed,
         downedThreat = context.downedThreat,

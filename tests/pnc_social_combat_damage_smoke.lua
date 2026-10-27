@@ -263,6 +263,20 @@ T.equal(
     presentations[3].context.ambientFlavor.context.woundType,
     "scratch",
     "teammate hurt flavor carries wound type")
+T.truthy(
+    presentations[3].context.ambientFlavor.semanticOwned,
+    "teammate hurt presentation is semantic-owned")
+T.equal(
+    presentations[3].context.ambientFlavor.eventType,
+    "witnessed_teammate_hurt",
+    "teammate hurt presentation carries the typed medical event")
+T.equal(
+    presentations[3].context.ambientFlavor.source.kind,
+    "semantic_speech",
+    "teammate hurt presentation uses semantic speech")
+T.truthy(
+    presentations[3].context.ambientFlavor.semanticEventFacts,
+    "teammate hurt presentation carries authoritative event facts")
 
 clock = 3000
 local npcAttackerCount, npcAttackerCandidates, npcAttackerReason =

@@ -51,6 +51,7 @@ local function deliverTeammateDamageFlavor(
     local banditAttack = attackerKind == "bandit"
         or attackerKind == "foreign_npc"
             and hit and hit.attackerProvider == "Bandits"
+    local semanticMedical = not banditAttack
     local eventType = banditAttack
         and "bandit_attack" or "witnessed_teammate_hurt"
     local flavorID = presentation and presentation.flavorID
@@ -163,6 +164,8 @@ local function deliverTeammateDamageFlavor(
             )
             local context = {
                 eventType = eventType,
+                eventRef = eventID,
+                eventID = eventID,
                 damage = amount,
                 healthLoss = tonumber(hit and hit.healthLoss) or amount,
                 woundType = hit and hit.woundType or nil,
@@ -177,7 +180,28 @@ local function deliverTeammateDamageFlavor(
             if observer.medicalBandageAvailable == false then
                 context.medicalBandageRequired = true
                 context.medicalBandageStatus = "missing"
+            elseif observer.medicalBandageAvailable == true then
+                context.medicalBandageRequired = true
+                context.medicalBandageStatus = "found"
             end
+            context.factRefs = { eventID }
+            context.semanticEventFacts = {
+                [tostring(eventID)] = {
+                    eventRef = eventID,
+                    authoritative = true,
+                    disclosure = "player",
+                    summary = "a teammate was hurt",
+                    happened = "a teammate was hurt",
+                    victimNPCID = tostring(targetRecord.id),
+                    attacker = attackerKind and attackerKind ~= "unknown"
+                        and attackerKind or nil,
+                    attackerID = attackerID,
+                    attackerKind = attackerKind,
+                    need = context.medicalBandageStatus == "missing"
+                        and "bandage" or "medical attention",
+                    woundType = context.woundType,
+                },
+            }
             local realization = SocialReactions
                 and type(SocialReactions.Resolve) == "function"
                 and SocialReactions.Resolve({
@@ -188,6 +212,22 @@ local function deliverTeammateDamageFlavor(
                     eventID = eventID,
                     npcID = observer.id,
                 }) or nil
+            if semanticMedical and (not realization
+                or type(realization.fallback) ~= "string"
+                or realization.fallback == "")
+            then
+                audit({
+                    "luaSide=server",
+                    "event=SemanticTeammateHurtPresentation",
+                    "phase=selection",
+                    "result=false",
+                    "reason=semantic_realization_unavailable",
+                    "eventID=" .. tostring(eventID),
+                    "observerNPCID=" .. observer.id,
+                })
+                return
+            end
+            context.offerIDs = realization and realization.offerIDs or {}
             attempted = attempted + 1
             local sent, reason = false, nil
             if Network
@@ -201,12 +241,20 @@ local function deliverTeammateDamageFlavor(
                     {
                         source = eventType,
                         eventID = eventID,
+                        eventRef = eventID,
                         npcID = observer.id,
+                        semanticEventFacts = context.semanticEventFacts,
+                        factRefs = context.factRefs,
+                        offerIDs = realization and realization.offerIDs or {},
                         ambientFlavor = {
                             flavorID = flavorID,
                             text = realization
                                 and realization.fallback or nil,
+                            semanticOwned = semanticMedical,
+                            eventRef = eventID,
                             eventType = eventType,
+                            semanticEventFacts = context.semanticEventFacts,
+                            offerIDs = realization and realization.offerIDs or {},
                             act = realization
                                 and realization.semanticAct or "REACT",
                             topic = realization
@@ -221,6 +269,11 @@ local function deliverTeammateDamageFlavor(
                                 and realization.realizationID or nil,
                             factRefs = realization
                                 and realization.groundedFactRefs or nil,
+                            source = {
+                                kind = semanticMedical
+                                    and "semantic_speech" or "social_flavor",
+                                eventType = eventType,
+                            },
                             family = "combat_commentary",
                             priority = 55,
                             -- Keep the supply-shortage line grounded in the

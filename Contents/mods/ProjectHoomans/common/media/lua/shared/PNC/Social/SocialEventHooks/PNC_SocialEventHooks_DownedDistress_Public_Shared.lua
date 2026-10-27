@@ -35,6 +35,49 @@ local CALL_COOLDOWN_MS = H.CALL_COOLDOWN_MS
 local UPDATE_COOLDOWN_MS = H.UPDATE_COOLDOWN_MS
 local REPEAT_INTERVAL_MS = H.REPEAT_INTERVAL_MS
 
+local function semanticEventTypeFor(flavorID)
+    if flavorID == callFlavorID() then return "incapacitated_call" end
+    if flavorID == updateFlavorID() then return "incapacitated_update" end
+    if flavorID == repeatFlavorID() then return "incapacitated_repeat" end
+    return "incapacitated_call"
+end
+
+local function eventFacts(eventRef, context, reason)
+    local threat = context and context.downedThreat
+    local attacker = context and context.downedAttackerName or nil
+    local fact = {
+        eventRef = eventRef,
+        authoritative = true,
+        disclosure = "player",
+        summary = "the NPC was incapacitated",
+        happened = "the NPC was incapacitated",
+        healthState = "incapacitated",
+        need = context and context.downedNeed or nil,
+        needType = context and context.downedNeed or nil,
+        attackerName = attacker,
+        attacker = attacker,
+        attackerKind = threat ~= "unknown" and threat or nil,
+        reason = reason,
+    }
+    if not fact.attacker and fact.attackerKind then
+        fact.attacker = fact.attackerKind
+    end
+    return { [tostring(eventRef)] = fact }
+end
+
+local function eventFactRefs(eventRef, context)
+    local refs = { tostring(eventRef) }
+    if context and context.downedNeed then
+        refs[#refs + 1] = tostring(eventRef) .. ":need"
+    end
+    if context and (context.downedAttackerName or context.downedThreat)
+        and context.downedThreat ~= "unknown"
+    then
+        refs[#refs + 1] = tostring(eventRef) .. ":attacker"
+    end
+    return refs
+end
+
 -- ---------------------------------------------------------------------------
 -- Delivery
 -- ---------------------------------------------------------------------------
@@ -62,7 +105,9 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
     end
     local radiusSq = HEAR_RADIUS * HEAR_RADIUS
     local emitted = 0
+    local semanticUnavailable = false
     local eventID = "downed:" .. npcID .. ":" .. tostring(math.floor(at))
+    local semanticEventType = semanticEventTypeFor(flavorID)
     markCalled(npcID, at)
     Core.ForEachPlayer(function(player)
         if not player or not playerCanHear(player, record, radiusSq) then
@@ -79,18 +124,26 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
         for key, value in pairs(context or {}) do
             planningContext[key] = value
         end
-        context.eventType = flavorID
+        context.eventType = semanticEventType
+        context.eventRef = eventID
+        context.eventID = eventID
         context.downedAttackerName = recordAttackerName(threat)
         context.attackerKind = context.downedThreat
         context.downedReason = reason
         context.victimNPCID = npcID
-        planningContext.eventType = flavorID
+        context.factRefs = eventFactRefs(eventID, context)
+        context.semanticEventFacts = eventFacts(eventID, context, reason)
+        planningContext.eventType = semanticEventType
+        planningContext.eventRef = eventID
+        planningContext.eventID = eventID
         planningContext.npcID = npcID
         planningContext.downedAttackerName = context.downedAttackerName
         planningContext.downedReason = reason
+        planningContext.factRefs = context.factRefs
+        planningContext.semanticEventFacts = context.semanticEventFacts
         if SocialReactions and type(SocialReactions.Resolve) == "function" then
             realization = SocialReactions.Resolve({
-                eventType = flavorID,
+                eventType = semanticEventType,
                 act = "REQUEST",
                 topic = "medical_distress",
                 context = planningContext,
@@ -98,27 +151,34 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
                 npcID = npcID,
             })
         end
+        if not realization
+            or type(realization.fallback) ~= "string"
+            or realization.fallback == ""
+        then
+            semanticUnavailable = true
+            return
+        end
+        context.offerIDs = realization.offerIDs or {}
         local result = {
-            source = flavorID,
+            source = semanticEventType,
             eventID = eventID,
             npcID = npcID,
             ambientFlavor = {
                 eventID = eventID,
+                eventRef = eventID,
                 flavorID = flavorID,
-                text = realization and realization.fallback or nil,
-                eventType = flavorID,
-                act = realization and realization.semanticAct or "REQUEST",
-                topic = realization and realization.topic
-                    or "medical_distress",
-                responsePlanID = realization
-                    and realization.responsePlanID or nil,
-                poolID = realization and realization.realizationFamily or nil,
-                realizationFamily = realization
-                    and realization.realizationFamily or nil,
-                realizationID = realization and realization.realizationID
-                    or nil,
-                factRefs = realization and realization.groundedFactRefs
-                    or nil,
+                text = realization.fallback,
+                semanticOwned = true,
+                eventType = semanticEventType,
+                semanticEventFacts = context.semanticEventFacts,
+                offerIDs = realization.offerIDs,
+                act = realization.semanticAct or "REQUEST",
+                topic = realization.topic or "medical_distress",
+                responsePlanID = realization.responsePlanID,
+                poolID = realization.realizationFamily,
+                realizationFamily = realization.realizationFamily,
+                realizationID = realization.realizationID,
+                factRefs = realization.groundedFactRefs,
                 family = (flavorConst().FAMILY or "incapacitated_distress"),
                 priority = (flavorConst().PRIORITY or 70),
                 weight = (flavorConst().WEIGHT or 3),
@@ -142,9 +202,9 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
                 holdMs = (flavorConst().HOLD_MS or 3200),
                 context = context,
                 source = {
-                    kind = "social_flavor",
+                    kind = "semantic_speech",
                     channel = "health",
-                    eventType = flavorID,
+                    eventType = semanticEventType,
                     contextEligible = false,
                 },
             },
@@ -160,7 +220,11 @@ local function emitDistress(record, flavorID, needInputs, reason, cooldownMs)
             emitted = emitted + 1
         end
     end)
-    return emitted, emitted > 0 and "emitted" or "no_audience"
+    if emitted > 0 then return emitted, "emitted" end
+    if semanticUnavailable then
+        return 0, "semantic_realization_unavailable"
+    end
+    return 0, "no_audience"
 end
 
 -- ---------------------------------------------------------------------------
