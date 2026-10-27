@@ -286,3 +286,80 @@ remaining first-party wording paths, modularize authoring sources, establish one
 Conversation UI registry, remove build provenance from semantic taxonomy, fold
 Interactions into Conversation detail, and repurpose Developer Tools into a
 contextual selected-item editor shared with agent authoring APIs.
+
+## 2026-10-27 P11 recovery audit
+
+A stopped agent run mixed the approved P11 goal with an unrelated conversational
+intelligence expansion and published the resulting P11B–P11H stack to
+`origin/main`.
+
+### Preserved rejected state
+
+The rejected committed state remains reachable at local branch:
+
+`recovery/mangled-p11-p12-20261027` → `590d8d4ef8208425ba78a4c08893b7191e69803e`.
+
+The stopped agent's additional uncommitted layer was preserved outside the
+repository at:
+
+`/home/psychopatz/Zomboid/Workshop/ProjectHoomans-Recovery-2026-10-27/uncommitted-after-590d8d4e.patch`
+
+with SHA-256:
+
+`5dd886711336a780dc5c1609767b1c538568dcb511bb7cbd0505279ab7f6fb0c`.
+
+This evidence exists for inspection/salvage only. Do not reapply the patch or
+cherry-pick the rejected stack as a unit.
+
+### First bad commit
+
+Bisection against established semantic regressions identified:
+
+`535c9598 p11b: consolidate first-party wording authority`
+
+as the first bad implementation commit.
+
+At the P11 documentation baseline and at P11A `08081ac8`, representative
+cognition/fact/gossip/social/state response tests all passed. Starting at
+`535c9598`, all five failed and remained broken through `590d8d4e`.
+
+A clean full native Lua run at `590d8d4e` showed established Conversation
+regressions including nil local responses, incorrect placeholder realization,
+and changed social translation identity. The same full native Lua suite at
+P11A `08081ac8` passed `897/897` in 5.74s during audit and `897/897` in
+6.57s after recovery staging.
+
+### Architectural defects in the rejected stack
+
+The rejected implementation also:
+
+- created a ~62 KB `compatibility_runtime_aliases.json` with 292 runtime-key
+  aliases and made tests require that alias count, turning migration scaffolding
+  into an enforced architecture;
+- left old production translation-key callers active behind that alias layer
+  rather than finishing direct caller migration;
+- marked Studio/Developer Tools consolidation accepted while the old Flow
+  editor, Canonical source editor, Block contracts, Interaction composer and
+  Legacy build workflow were still instantiated alongside the new Conversation
+  authoring pane;
+- created a new mandatory P12 Pragmatic Conversational Intelligence phase before
+  P11I and rewrote the parent completion boundary without user approval;
+- began a second uncommitted cross-cutting migration touching canonical shards,
+  generated Lua, translations, PBrainZ, identity networking and many tests
+  before P11I acceptance.
+
+### Recovery decision
+
+The repository was recovered with normal revert history rather than rewriting
+published Git history. Recovery commit:
+
+`18eacad50745e445c92639d1ce77d487d1da07fd`
+
+has a tree identical to verified P11A anchor `08081ac8`.
+
+P11A remains accepted. P11B–P11H acceptance claims from the rejected run are
+void. Useful concepts such as a declarative Conversation UI registry, one
+Conversation explorer, and a shared GUI/agent authoring service may be
+reimplemented later, but only on top of a regression-clean incremental P11B.
+
+No new P12 or parent-goal expansion is authorized.

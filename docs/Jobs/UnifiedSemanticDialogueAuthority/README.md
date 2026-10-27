@@ -1,6 +1,7 @@
 # Unified Semantic Dialogue Authority
 
-**Status:** IN PROGRESS — P0–P10 accepted foundation; P11 Modular Conversation Architecture & Contextual Authoring is mandatory before live-test handoff.
+**Status:** IN PROGRESS — P0–P10 and P11A are accepted foundation. The rejected P11B–P11H attempt was safely recovered; P11B restarts from the verified P11A tree and P11B–P11I remain mandatory before live-test handoff.
+**Recovery commit:** `18eacad50745e445c92639d1ce77d487d1da07fd` (tree-equivalent to verified P11A anchor `08081ac8`).
 **Project Hoomans audit baseline:** `181b58bcc30dc65dc61d19a49d6238abca50ece9`.
 **PsychopatzCore audit baseline:** `cf28189c57f7810f31d25c46c11eb88080f47baa`.
 **Checkout:** existing `main` only.

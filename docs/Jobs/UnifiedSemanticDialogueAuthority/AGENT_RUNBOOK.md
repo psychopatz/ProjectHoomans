@@ -119,7 +119,16 @@ For each P11 migration:
 6. generate rather than hand-edit runtime Lua/translation artifacts;
 7. validate typed/clicked/runtime parity;
 8. remove the superseded source/path in the same slice;
-9. update `PROGRESS.md` and continue automatically.
+9. run the full native Lua suite after every coherent wording/runtime migration slice; any pre-existing behavior regression rejects the slice;
+10. update `PROGRESS.md` and continue automatically.
+
+Recovery-specific rules:
+
+- The verified restart point is recovery commit `18eacad50745e445c92639d1ce77d487d1da07fd`, whose tree matches P11A anchor `08081ac8` and passed native Lua `897/897`.
+- Do not recreate the rejected P11B big-bang wording migration. Migrate one small caller/domain family at a time and keep the old path until the new path proves parity.
+- Do not create a broad `runtimeAliases` / translation-key compatibility registry as a permanent or phase-wide substitute for migrating callers. If an externally consumed public key truly requires compatibility, stop and document that exact API boundary for user decision.
+- Do not rewrite existing regression expectations merely because a new translation key or fallback string differs. First prove the user-visible/semantic contract remains equivalent; otherwise the change is a regression.
+- Do not create P12, a new parent phase, or any mandatory scope beyond P11A–P11I without explicit user approval. New ideas belong in notes only until approved.
 
 Do not build a generic visual programming IDE. Developer Tools is a contextual
 editor for selected Conversation wording/presentation/navigation.

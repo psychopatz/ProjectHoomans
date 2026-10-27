@@ -203,6 +203,9 @@ P11 is accepted only when the following additional gates pass.
 
 ### Regression
 
+- every coherent P11B+ runtime/wording migration slice must pass the full native Lua suite before it is accepted or used as a base for the next slice;
+- tests that predate the slice remain contract evidence and must not be mechanically rewritten to accept changed keys/text/`nil` behavior without explicit parity proof;
+- no broad runtime-key alias registry may be used to declare one-wording-authority acceptance while old production callers remain unmigrated;
 - typed/clicked parity remains;
 - task/command/gift automatic flows retain behavior after ID migration;
 - event follow-up grounding/privacy remains;

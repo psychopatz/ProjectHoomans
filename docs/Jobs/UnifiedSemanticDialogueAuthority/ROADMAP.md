@@ -235,9 +235,7 @@ names still imply obsolete Flavor authority.
 
 ### P11B — one first-party wording path
 
-Migrate live first-party wording from `Responses.json`, `Realizations.json`,
-LocalResponse English fallbacks and static mapping modules into Dialogue
-Content. Runtime handlers return semantic template IDs plus bounded arguments.
+Restart from the verified P11A tree and migrate wording **incrementally by coherent domain/caller family**, not as a repository-wide big-bang rewrite. First characterize exact callers/placeholders and lock existing behavior tests. Then move one bounded family at a time from `Responses.json`, `Realizations.json`, LocalResponse English fallbacks and static mapping modules into Dialogue Content. Runtime handlers return semantic template IDs plus bounded arguments. Every accepted slice must preserve the full native Lua regression gate; broad runtime-key alias tables are not an accepted steady-state shortcut.
 
 ### P11C — modular Conversation sources
 

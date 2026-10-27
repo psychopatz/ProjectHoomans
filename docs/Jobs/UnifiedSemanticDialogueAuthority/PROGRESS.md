@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 through P10 are accepted foundation; P11A steady-state Conversation source hygiene is accepted and P11B–P11I remain mandatory for Modular Conversation Architecture & Contextual Authoring.
+**Status:** RECOVERED / IN PROGRESS — P0 through P10 and P11A are accepted foundation. The prior P11B–P11H implementation was rejected after regression audit and reverted. P11B restarts from recovery commit `18eacad50745e445c92639d1ce77d487d1da07fd` (tree-equivalent to verified P11A anchor `08081ac8`); P11B–P11I remain mandatory.
 
 ## Audited baseline
 
@@ -509,14 +509,58 @@ focused Python coverage is `15/15 PASS`, and the Project Hoomans Kahlua scan
 reported `0` errors / `0` warnings across `3,164` files. No source save,
 native Project Zomboid session, or Workshop operation was touched.
 
-## Immediate Next Chunk — P11B
+## Recovery audit — rejected P11B–P11H attempt
 
-Audit every first-party wording path (`Responses.json`, `Realizations.json`,
-LocalResponse prose/fallbacks, static semantic-ID translation maps, and
-hard-coded SpeechRealization families). Move wording into Dialogue Content
-with semantic template IDs plus bounded factual arguments, prove EN/TL and
-runtime parity, then remove superseded first-party wording stores and
-fallback seams.
+The repository was returned to verified P11A content through recovery commit
+`18eacad50745e445c92639d1ce77d487d1da07fd`. Its tree matches P11A anchor
+`08081ac8`.
+
+The first bad implementation commit was `535c9598` (the previous P11B wording
+consolidation). Established cognition/fact/gossip/social/state tests were green
+before it and failed from that commit onward. The rejected stack also introduced
+a 292-entry runtime-key alias architecture, retained the old Developer Tools
+beside the new editor, and added an unauthorized mandatory P12.
+
+Recovery validation:
+
+- full native Lua: `897/897 PASS` in 6.57s;
+- representative cognition/fact/gossip/social/state regressions: `5/5 PASS`;
+- `git diff --check`: PASS.
+
+Rejected P11B–P11H acceptance claims are void. P11A remains accepted.
+
+## Immediate Next Chunk — P11B-R0 / P11B-R1
+
+Read the recovery section in `AUDIT.md` and the revised P11B contract in
+`P11_MODULAR_CONVERSATION_ARCHITECTURE.md` before editing.
+
+Start with **P11B-R0 characterization only**:
+
+1. enumerate every live first-party wording caller and its current key/template;
+2. record EN/TL placeholders/arguments and whether the response is fixed,
+   parameterized, fact-derived, external compatibility or dead;
+3. preserve the existing behavior tests as contract evidence;
+4. record the current full native Lua `897/897` baseline;
+5. select one low-risk wording family with fully enumerable callers for the
+   first migration slice.
+
+Then perform **only that one P11B-R1 family**:
+
+- add/reuse its Dialogue Content semantic template;
+- migrate its real production caller(s) directly;
+- regenerate through CodeBuilder;
+- run focused tests plus the full native Lua suite;
+- accept the slice only if the pre-existing full suite stays green;
+- remove that family's old key only after caller search reaches zero.
+
+Do not touch identity exchange, gossip, backstory, PBrainZ or multiple
+parameterized domains in the first slice.
+
+Do not create a broad runtime-key alias registry.
+
+Do not redesign Studio until P11B is completely regression-clean.
+
+Do not create P12 or any new mandatory parent phase.
 
 ## Historical P11A starting instructions (completed)
 

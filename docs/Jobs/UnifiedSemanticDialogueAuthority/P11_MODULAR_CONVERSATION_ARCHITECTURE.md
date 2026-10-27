@@ -1,6 +1,6 @@
 # P11 — Modular Conversation Architecture & Contextual Authoring
 
-**Status:** MANDATORY / NEXT.
+**Status:** IN PROGRESS — P11A accepted; P11B recovery restart is active. The prior P11B–P11H attempt was rejected and reverted after regression audit.
 
 P0–P10 remain accepted semantic-runtime foundation. P11 does not replace the
 semantic engine. It removes the remaining authoring/content fragmentation and
@@ -115,25 +115,68 @@ not the migration history used to reach it.
 
 ## P11B — one first-party wording path
 
-Make Dialogue Content the literal first-party wording authority.
+Make Dialogue Content the literal first-party wording authority, but do it
+incrementally. The rejected 2026-10-27 attempt proved that a repository-wide
+wording rewrite can make focused new tests pass while breaking established
+Conversation behavior.
 
-Migrate live first-party wording from:
+### P11B-R0 — characterize before migration
 
-- `Responses.json`;
-- `Realizations.json`;
-- LocalResponse English fallback construction;
-- static translation-key mapping modules whose only purpose is mapping semantic
-  IDs to those alternate wording stores;
-- other first-party semantic wording seams discovered by caller audit.
+Before deleting or redirecting any wording source:
 
-Runtime semantic/question handlers must return stable semantic template IDs plus
-bounded arguments/facts rather than authored English prose.
+- enumerate every production caller of `Responses.json`, `Realizations.json`,
+  LocalResponse fallback prose, static translation-key maps, and hard-coded
+  SpeechRealization family keys;
+- record placeholder/argument conventions for each family;
+- classify each key as fixed wording, parameterized wording, dynamic fact
+  formatting, external/public compatibility, or dead;
+- preserve the existing behavior tests as contract evidence;
+- run the full native Lua suite and record the green baseline before the first
+  wording change.
+
+The verified recovery baseline is native Lua `897/897 PASS` at recovery commit
+`18eacad50745e445c92639d1ce77d487d1da07fd`, whose tree matches P11A anchor
+`08081ac8`.
+
+### P11B-R1+ — migrate one bounded family at a time
+
+For each coherent wording family:
+
+1. add or reuse the Dialogue Content semantic template and EN/TL variants;
+2. preserve exact parameter/placeholder semantics;
+3. migrate the actual production caller(s) to the semantic template directly;
+4. regenerate outputs through CodeBuilder rather than hand-editing generated
+   Lua/translation files;
+5. run focused caller/content tests;
+6. run the **full native Lua suite** before accepting the slice;
+7. run relevant Python/Kahlua/PBrainZ/compatibility checks;
+8. only after all callers are migrated, remove that family's old translation
+   key/table entry;
+9. prove there is no production caller for the retired key before continuing.
+
+Start with a low-risk family whose callers and formatting are fully enumerable.
+Do **not** begin with identity exchange, gossip, backstory, PBrainZ integration,
+or other parameterized cross-domain responses in the same slice.
+
+### No alias-table shortcut
+
+Do not introduce a broad `runtimeAliases`, translation-key alias shard, or
+equivalent phase-wide compatibility registry merely to keep old callers working
+while claiming one wording authority. That reproduces the split system under a
+different name.
+
+If a specific externally consumed public key truly must remain compatible,
+document that exact boundary and stop for an explicit compatibility decision.
+Internal Project Hoomans callers should be migrated directly.
+
+Runtime semantic/question handlers should ultimately return stable semantic
+template IDs plus bounded arguments/facts rather than authored English prose.
 
 Parameterized time/date/weather/identity/location/etc. answers may use
 localized templates and arguments; do not move volatile fact truth into
 Dialogue Content.
 
-After parity:
+After per-family parity is proven:
 
 - remove first-party `Responses.json` and `Realizations.json` as independent
   wording authorities;
@@ -142,7 +185,9 @@ After parity:
   canonical content compiler.
 
 **P11B gate:** every Project Hoomans first-party NPC/player conversational phrase
-is traceable to Dialogue Content or a clearly external provider-owned surface.
+is traceable to Dialogue Content or a clearly external provider-owned surface;
+no broad compatibility alias registry masks unmigrated internal callers; and
+the full pre-existing native Lua regression suite remains green.
 
 ## P11C — modular Conversation authoring sources
 
