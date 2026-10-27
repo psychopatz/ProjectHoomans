@@ -1,147 +1,81 @@
 {
-  "schemaVersion": 1,
-  "source": {
-    "name": "Project Hoomans Common Interaction Seed",
-    "version": "1",
-    "contentLicense": "Project Hoomans authored content",
-    "references": [
-      {
-        "name": "DailyDialog",
-        "url": "https://aclanthology.org/I17-1099/",
-        "use": "Everyday dialogue-act coverage guidance; no corpus turns are copied.",
-        "license": "ACL Anthology terms; metadata-only reference",
-        "reviewedOn": "2026-10-19"
-      },
-      {
-        "name": "EmpatheticDialogues",
-        "url": "https://github.com/facebookresearch/EmpatheticDialogues",
-        "use": "Emotion-aware interaction coverage guidance; no corpus turns are copied.",
-        "license": "CC BY 4.0; metadata-only reference",
-        "reviewedOn": "2026-10-19"
-      },
-      {
-        "name": "WordNet 3.0",
-        "url": "https://wordnet.princeton.edu/",
-        "use": "Reviewed FETCH lexical sense guidance for the pick-up paraphrase; no dictionary files ship at runtime.",
-        "license": "WordNet 3.0 license",
-        "reviewedOn": "2026-10-19"
-      },
-      {
-        "name": "MASSIVE",
-        "url": "https://github.com/alexa/massive",
-        "use": "Build-time reviewed English intent record imported and mapped to the existing WEATHER route; raw corpus stays outside runtime media.",
-        "license": "CC BY 4.0",
-        "reviewedOn": "2026-10-19",
-        "sourceVersion": "1.0",
-        "sourceSha256": "c70f75c6a543a26e249ec383df67733ad9b1066f6c0406c2e04a3f03356e407e",
-        "recordRefs": [
-          {"recordID": "98", "locale": "en-US", "partition": "train", "intent": "weather_query"}
-        ],
-        "importStatus": {"imported": 1, "mapped": 1, "approved": 1, "compiled": 1, "workerVerified": 1}
-      },
-      {
-        "name": "SGD",
-        "url": "https://github.com/google-research-datasets/dstc8-schema-guided-dialogue",
-        "use": "Build-time reviewed Weather_1 user turn imported and mapped to the existing WEATHER route; raw corpus stays outside runtime media.",
-        "license": "CC BY-SA 4.0",
-        "reviewedOn": "2026-10-19",
-        "sourceVersion": "DSTC8 train",
-        "sourceSha256": "78310f5e8e4c5a48cb600d36ba762448d13ebdd91f30ef09831251f5345fa836",
-        "recordRefs": [
-          {"dialogueID": "90_00031", "turn": 6, "service": "Weather_1", "intent": "GetWeather"}
-        ],
-        "importStatus": {"imported": 1, "mapped": 1, "approved": 1, "compiled": 1, "workerVerified": 1}
-      }
-    ]
+  "generatedCompatibility": {
+    "owner": "manifest-backed Conversation compiler",
+    "readOnly": true,
+    "sourceManifest": "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
   },
   "patterns": [
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "hubID": "whats_up",
+          "route": "semantic_hub",
+          "topic": "whats_up"
+        },
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC"
+      },
       "id": "pnc.dataset.question.whats_up.whats_up",
-      "utterance": "what's up",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "CONVERSATION_TOPIC",
-        "extensions": {
-          "topic": "whats_up",
-          "hubID": "whats_up",
-          "route": "semantic_hub"
-        }
-      },
-      "reviewed": true,
-      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
         "dialogueState": "WHATS_UP_HUB",
-        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+        "sourceRefs": [
+          "DailyDialog",
+          "EmpatheticDialogues"
+        ]
       },
-      "confidence": 0.99,
-      "priority": 155
+      "priority": 155,
+      "reviewed": true,
+      "sourceRefs": [
+        "DailyDialog",
+        "EmpatheticDialogues"
+      ],
+      "utterance": "what's up"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "hubID": "whats_up",
+          "route": "semantic_hub",
+          "topic": "whats_up"
+        },
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC"
+      },
       "id": "pnc.dataset.question.whats_up.whats_up_ascii",
-      "utterance": "whats up",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "CONVERSATION_TOPIC",
-        "extensions": {
-          "topic": "whats_up",
-          "hubID": "whats_up",
-          "route": "semantic_hub"
-        }
-      },
-      "reviewed": true,
-      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
         "dialogueState": "WHATS_UP_HUB",
-        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+        "sourceRefs": [
+          "DailyDialog",
+          "EmpatheticDialogues"
+        ]
       },
-      "confidence": 0.99,
-      "priority": 155
+      "priority": 155,
+      "reviewed": true,
+      "sourceRefs": [
+        "DailyDialog",
+        "EmpatheticDialogues"
+      ],
+      "utterance": "whats up"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "hubID": "whats_up",
+          "route": "semantic_hub",
+          "topic": "whats_up"
+        },
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC"
+      },
       "id": "pnc.dataset.question.whats_up.what_is_up",
-      "utterance": "what is up",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "CONVERSATION_TOPIC",
-        "extensions": {
-          "topic": "whats_up",
-          "hubID": "whats_up",
-          "route": "semantic_hub"
-        }
-      },
-      "reviewed": true,
-      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
-      "mapping": {
-        "canonicalConcept": "WHATS_UP",
-        "dialogueState": "WHATS_UP_HUB",
-        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
-      },
-      "confidence": 0.99,
-      "priority": 155
-    },
-    {
-      "id": "pnc.dataset.question.whats_up.whatsup_compact",
-      "utterance": "whatsup",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "CONVERSATION_TOPIC",
-        "extensions": {
-          "topic": "whats_up",
-          "hubID": "whats_up",
-          "route": "semantic_hub"
-        }
-      },
-      "reviewed": true,
-      "sourceRefs": [
-        "DailyDialog",
-        "EmpatheticDialogues"
-      ],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
         "dialogueState": "WHATS_UP_HUB",
@@ -150,27 +84,27 @@
           "EmpatheticDialogues"
         ]
       },
+      "priority": 155,
+      "reviewed": true,
+      "sourceRefs": [
+        "DailyDialog",
+        "EmpatheticDialogues"
+      ],
+      "utterance": "what is up"
+    },
+    {
       "confidence": 0.98,
-      "priority": 155
-    },
-    {
-      "id": "pnc.dataset.question.whats_up.what_up",
-      "utterance": "what up",
       "emit": {
+        "extensions": {
+          "hubID": "whats_up",
+          "route": "semantic_hub",
+          "topic": "whats_up"
+        },
         "intent": "QUESTION",
         "speechAct": "QUESTION",
-        "subject": "CONVERSATION_TOPIC",
-        "extensions": {
-          "topic": "whats_up",
-          "hubID": "whats_up",
-          "route": "semantic_hub"
-        }
+        "subject": "CONVERSATION_TOPIC"
       },
-      "reviewed": true,
-      "sourceRefs": [
-        "DailyDialog",
-        "EmpatheticDialogues"
-      ],
+      "id": "pnc.dataset.question.whats_up.whatsup_compact",
       "mapping": {
         "canonicalConcept": "WHATS_UP",
         "dialogueState": "WHATS_UP_HUB",
@@ -179,163 +113,225 @@
           "EmpatheticDialogues"
         ]
       },
+      "priority": 155,
+      "reviewed": true,
+      "sourceRefs": [
+        "DailyDialog",
+        "EmpatheticDialogues"
+      ],
+      "utterance": "whatsup"
+    },
+    {
       "confidence": 0.97,
-      "priority": 155
+      "emit": {
+        "extensions": {
+          "hubID": "whats_up",
+          "route": "semantic_hub",
+          "topic": "whats_up"
+        },
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC"
+      },
+      "id": "pnc.dataset.question.whats_up.what_up",
+      "mapping": {
+        "canonicalConcept": "WHATS_UP",
+        "dialogueState": "WHATS_UP_HUB",
+        "sourceRefs": [
+          "DailyDialog",
+          "EmpatheticDialogues"
+        ]
+      },
+      "priority": 155,
+      "reviewed": true,
+      "sourceRefs": [
+        "DailyDialog",
+        "EmpatheticDialogues"
+      ],
+      "utterance": "what up"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "hubID": "whats_up",
+          "route": "semantic_hub",
+          "topic": "whats_up"
+        },
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC"
+      },
       "id": "pnc.dataset.question.whats_up.whats_new",
-      "utterance": "what's new",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "CONVERSATION_TOPIC",
-        "extensions": {
-          "topic": "whats_up",
-          "hubID": "whats_up",
-          "route": "semantic_hub"
-        }
-      },
-      "reviewed": true,
-      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
         "dialogueState": "WHATS_UP_HUB",
-        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+        "sourceRefs": [
+          "DailyDialog",
+          "EmpatheticDialogues"
+        ]
       },
-      "confidence": 0.99,
-      "priority": 155
+      "priority": 155,
+      "reviewed": true,
+      "sourceRefs": [
+        "DailyDialog",
+        "EmpatheticDialogues"
+      ],
+      "utterance": "what's new"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "hubID": "whats_up",
+          "route": "semantic_hub",
+          "topic": "whats_up"
+        },
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC"
+      },
       "id": "pnc.dataset.question.whats_up.whats_new_ascii",
-      "utterance": "whats new",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "CONVERSATION_TOPIC",
-        "extensions": {
-          "topic": "whats_up",
-          "hubID": "whats_up",
-          "route": "semantic_hub"
-        }
-      },
-      "reviewed": true,
-      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
         "dialogueState": "WHATS_UP_HUB",
-        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+        "sourceRefs": [
+          "DailyDialog",
+          "EmpatheticDialogues"
+        ]
       },
-      "confidence": 0.99,
-      "priority": 155
+      "priority": 155,
+      "reviewed": true,
+      "sourceRefs": [
+        "DailyDialog",
+        "EmpatheticDialogues"
+      ],
+      "utterance": "whats new"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "hubID": "whats_up",
+          "route": "semantic_hub",
+          "topic": "whats_up"
+        },
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC"
+      },
       "id": "pnc.dataset.question.whats_up.anything_new",
-      "utterance": "anything new",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "CONVERSATION_TOPIC",
-        "extensions": {
-          "topic": "whats_up",
-          "hubID": "whats_up",
-          "route": "semantic_hub"
-        }
-      },
-      "reviewed": true,
-      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
         "dialogueState": "WHATS_UP_HUB",
-        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+        "sourceRefs": [
+          "DailyDialog",
+          "EmpatheticDialogues"
+        ]
       },
-      "confidence": 0.99,
-      "priority": 155
+      "priority": 155,
+      "reviewed": true,
+      "sourceRefs": [
+        "DailyDialog",
+        "EmpatheticDialogues"
+      ],
+      "utterance": "anything new"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "hubID": "whats_up",
+          "route": "semantic_hub",
+          "topic": "whats_up"
+        },
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC"
+      },
       "id": "pnc.dataset.question.whats_up.whats_happening",
-      "utterance": "what's happening",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "CONVERSATION_TOPIC",
-        "extensions": {
-          "topic": "whats_up",
-          "hubID": "whats_up",
-          "route": "semantic_hub"
-        }
-      },
-      "reviewed": true,
-      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
         "dialogueState": "WHATS_UP_HUB",
-        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+        "sourceRefs": [
+          "DailyDialog",
+          "EmpatheticDialogues"
+        ]
       },
-      "confidence": 0.99,
-      "priority": 155
+      "priority": 155,
+      "reviewed": true,
+      "sourceRefs": [
+        "DailyDialog",
+        "EmpatheticDialogues"
+      ],
+      "utterance": "what's happening"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "hubID": "whats_up",
+          "route": "semantic_hub",
+          "topic": "whats_up"
+        },
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC"
+      },
       "id": "pnc.dataset.question.whats_up.whats_happening_ascii",
-      "utterance": "whats happening",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "CONVERSATION_TOPIC",
-        "extensions": {
-          "topic": "whats_up",
-          "hubID": "whats_up",
-          "route": "semantic_hub"
-        }
-      },
-      "reviewed": true,
-      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
         "dialogueState": "WHATS_UP_HUB",
-        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+        "sourceRefs": [
+          "DailyDialog",
+          "EmpatheticDialogues"
+        ]
       },
-      "confidence": 0.99,
-      "priority": 155
+      "priority": 155,
+      "reviewed": true,
+      "sourceRefs": [
+        "DailyDialog",
+        "EmpatheticDialogues"
+      ],
+      "utterance": "whats happening"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "hubID": "whats_up",
+          "route": "semantic_hub",
+          "topic": "whats_up"
+        },
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONVERSATION_TOPIC"
+      },
       "id": "pnc.dataset.question.whats_up.anything_going_on",
-      "utterance": "anything going on",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "CONVERSATION_TOPIC",
-        "extensions": {
-          "topic": "whats_up",
-          "hubID": "whats_up",
-          "route": "semantic_hub"
-        }
-      },
-      "reviewed": true,
-      "sourceRefs": ["DailyDialog", "EmpatheticDialogues"],
       "mapping": {
         "canonicalConcept": "WHATS_UP",
         "dialogueState": "WHATS_UP_HUB",
-        "sourceRefs": ["DailyDialog", "EmpatheticDialogues"]
+        "sourceRefs": [
+          "DailyDialog",
+          "EmpatheticDialogues"
+        ]
       },
-      "confidence": 0.99,
-      "priority": 155
+      "priority": 155,
+      "reviewed": true,
+      "sourceRefs": [
+        "DailyDialog",
+        "EmpatheticDialogues"
+      ],
+      "utterance": "anything going on"
     },
     {
-      "id": "pnc.dataset.question.weather.can_we_talk_about_the_weather",
-      "utterance": "can we talk about the weather",
+      "confidence": 0.99,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "WEATHER"
       },
-      "negatives": [
-        "can we talk about weather"
-      ],
-      "reviewed": true,
-      "sourceRefs": [
-        "MASSIVE",
-        "SGD"
-      ],
+      "id": "pnc.dataset.question.weather.can_we_talk_about_the_weather",
       "mapping": {
         "canonicalConcept": "WEATHER",
         "dialogueState": "WEATHER_TOPIC",
@@ -344,25 +340,25 @@
           "SGD"
         ]
       },
-      "confidence": 0.99,
-      "priority": 165
-    },
-    {
-      "id": "pnc.dataset.question.wellbeing.what_is_going_on_with_you",
-      "utterance": "what is going on with you",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "WELLBEING"
-      },
       "negatives": [
-        "what is going on with me"
+        "can we talk about weather"
       ],
+      "priority": 165,
       "reviewed": true,
       "sourceRefs": [
         "MASSIVE",
         "SGD"
       ],
+      "utterance": "can we talk about the weather"
+    },
+    {
+      "confidence": 0.99,
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "WELLBEING"
+      },
+      "id": "pnc.dataset.question.wellbeing.what_is_going_on_with_you",
       "mapping": {
         "canonicalConcept": "WELLBEING",
         "dialogueState": "WELLBEING_FOLLOW_UP",
@@ -371,113 +367,164 @@
           "SGD"
         ]
       },
-      "confidence": 0.99,
-      "priority": 164
-    },
-    {
-      "id": "pnc.dataset.massive.weather.is_it_currently_snowing",
-      "utterance": "is it currently snowing",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "WEATHER"
-      },
-      "reviewed": true,
-      "sourceRefs": ["MASSIVE"],
-      "mapping": {
-        "canonicalConcept": "WEATHER",
-        "dialogueState": "WEATHER_TOPIC",
-        "sourceRefs": ["MASSIVE"]
-      },
-      "confidence": 0.99,
-      "priority": 166
-    },
-    {
-      "id": "pnc.dataset.sgd.weather.how_is_the_weather_on_9th_of_march",
-      "utterance": "How is the weather on 9th of March?",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "WEATHER"
-      },
-      "reviewed": true,
-      "sourceRefs": ["SGD"],
-      "mapping": {
-        "canonicalConcept": "WEATHER",
-        "dialogueState": "WEATHER_TOPIC",
-        "sourceRefs": ["SGD"]
-      },
-      "confidence": 0.99,
-      "priority": 166
-    },
-    {
-      "id": "pnc.dataset.massive.weather.what_is_the_weather_like",
-      "utterance": "what is the weather like",
-      "match": [
-        {"kind": "concept", "id": "WEATHER"},
-        {"kind": "literal", "value": "like"}
+      "negatives": [
+        "what is going on with me"
       ],
+      "priority": 164,
+      "reviewed": true,
+      "sourceRefs": [
+        "MASSIVE",
+        "SGD"
+      ],
+      "utterance": "what is going on with you"
+    },
+    {
+      "confidence": 0.99,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "WEATHER"
       },
+      "id": "pnc.dataset.massive.weather.is_it_currently_snowing",
+      "mapping": {
+        "canonicalConcept": "WEATHER",
+        "dialogueState": "WEATHER_TOPIC",
+        "sourceRefs": [
+          "MASSIVE"
+        ]
+      },
+      "priority": 166,
+      "reviewed": true,
+      "sourceRefs": [
+        "MASSIVE"
+      ],
+      "utterance": "is it currently snowing"
+    },
+    {
+      "confidence": 0.99,
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "WEATHER"
+      },
+      "id": "pnc.dataset.sgd.weather.how_is_the_weather_on_9th_of_march",
+      "mapping": {
+        "canonicalConcept": "WEATHER",
+        "dialogueState": "WEATHER_TOPIC",
+        "sourceRefs": [
+          "SGD"
+        ]
+      },
+      "priority": 166,
+      "reviewed": true,
+      "sourceRefs": [
+        "SGD"
+      ],
+      "utterance": "How is the weather on 9th of March?"
+    },
+    {
+      "confidence": 0.99,
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "WEATHER"
+      },
+      "id": "pnc.dataset.massive.weather.what_is_the_weather_like",
+      "mapping": {
+        "canonicalConcept": "WEATHER",
+        "dialogueState": "WEATHER_TOPIC",
+        "sourceRefs": [
+          "MASSIVE"
+        ]
+      },
+      "match": [
+        {
+          "id": "WEATHER",
+          "kind": "concept"
+        },
+        {
+          "kind": "literal",
+          "value": "like"
+        }
+      ],
       "negatives": [
         "what is my weather like"
       ],
+      "priority": 166,
       "reviewed": true,
-      "sourceRefs": ["MASSIVE"],
-      "mapping": {
-        "canonicalConcept": "WEATHER",
-        "dialogueState": "WEATHER_TOPIC",
-        "sourceRefs": ["MASSIVE"]
-      },
-      "confidence": 0.99,
-      "priority": 166
+      "sourceRefs": [
+        "MASSIVE"
+      ],
+      "utterance": "what is the weather like"
     },
-
     {
-      "id": "pnc.dataset.massive.weather.is_it_still_snowing",
-      "utterance": "is it still snowing",
+      "confidence": 0.99,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "WEATHER"
+      },
+      "id": "pnc.dataset.massive.weather.is_it_still_snowing",
+      "mapping": {
+        "canonicalConcept": "WEATHER",
+        "dialogueState": "WEATHER_TOPIC",
+        "sourceRefs": [
+          "MASSIVE"
+        ]
       },
       "negatives": [
         "is it still snowing inside"
       ],
+      "priority": 166,
       "reviewed": true,
-      "sourceRefs": ["MASSIVE"],
-      "mapping": {
-        "canonicalConcept": "WEATHER",
-        "dialogueState": "WEATHER_TOPIC",
-        "sourceRefs": ["MASSIVE"]
-      },
-      "confidence": 0.99,
-      "priority": 166
+      "sourceRefs": [
+        "MASSIVE"
+      ],
+      "utterance": "is it still snowing"
     },
-
     {
-      "id": "pnc.dataset.clarify.needs.which_item_do_you_mean",
-      "utterance": "which item do you mean",
+      "confidence": 0.99,
       "emit": {
+        "extensions": {
+          "dialogueFollowUp": "NEEDS_QUANTITY",
+          "topic": "NEEDS"
+        },
         "intent": "CLARIFY",
         "speechAct": "CLARIFY",
-        "subject": "NEEDS",
-        "extensions": {
-          "topic": "NEEDS",
-          "dialogueFollowUp": "NEEDS_QUANTITY"
-        }
+        "subject": "NEEDS"
+      },
+      "id": "pnc.dataset.clarify.needs.which_item_do_you_mean",
+      "mapping": {
+        "canonicalConcept": "ANY_ITEM",
+        "dialogueState": "NEEDS_QUANTITY",
+        "sourceRefs": [
+          "MASSIVE",
+          "SGD"
+        ]
       },
       "negatives": [
         "which items do you mean"
       ],
+      "priority": 167,
       "reviewed": true,
       "sourceRefs": [
         "MASSIVE",
         "SGD"
       ],
+      "utterance": "which item do you mean"
+    },
+    {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "dialogueFollowUp": "NEEDS_QUANTITY",
+          "topic": "NEEDS"
+        },
+        "intent": "CLARIFY",
+        "speechAct": "CLARIFY",
+        "subject": "NEEDS"
+      },
+      "id": "pnc.dataset.clarify.needs.what_item_do_you_mean",
       "mapping": {
         "canonicalConcept": "ANY_ITEM",
         "dialogueState": "NEEDS_QUANTITY",
@@ -485,63 +532,30 @@
           "MASSIVE",
           "SGD"
         ]
-      },
-      "confidence": 0.99,
-      "priority": 167
-    },
-    {
-      "id": "pnc.dataset.clarify.needs.what_item_do_you_mean",
-      "utterance": "what item do you mean",
-      "emit": {
-        "intent": "CLARIFY",
-        "speechAct": "CLARIFY",
-        "subject": "NEEDS",
-        "extensions": {
-          "topic": "NEEDS",
-          "dialogueFollowUp": "NEEDS_QUANTITY"
-        }
       },
       "negatives": [
         "what items do you mean"
       ],
+      "priority": 167,
       "reviewed": true,
       "sourceRefs": [
         "MASSIVE",
         "SGD"
       ],
-      "mapping": {
-        "canonicalConcept": "ANY_ITEM",
-        "dialogueState": "NEEDS_QUANTITY",
-        "sourceRefs": [
-          "MASSIVE",
-          "SGD"
-        ]
-      },
-      "confidence": 0.99,
-      "priority": 167
+      "utterance": "what item do you mean"
     },
-
     {
-      "id": "pnc.dataset.promise.needs.i_ll_pick_some_up",
-      "utterance": "i'll pick some up",
+      "confidence": 0.99,
       "emit": {
+        "extensions": {
+          "dialogueFollowUp": "NEEDS_PROPOSAL",
+          "topic": "NEEDS"
+        },
         "intent": "PROMISE",
         "speechAct": "PROMISE",
-        "subject": "NEEDS",
-        "extensions": {
-          "topic": "NEEDS",
-          "dialogueFollowUp": "NEEDS_PROPOSAL"
-        }
+        "subject": "NEEDS"
       },
-      "negatives": [
-        "i won't pick some up"
-      ],
-      "reviewed": true,
-      "sourceRefs": [
-        "WordNet 3.0",
-        "MASSIVE",
-        "SGD"
-      ],
+      "id": "pnc.dataset.promise.needs.i_ll_pick_some_up",
       "mapping": {
         "canonicalConcept": "FETCH",
         "dialogueState": "NEEDS_PROPOSAL",
@@ -551,301 +565,310 @@
           "SGD"
         ]
       },
-      "confidence": 0.99,
-      "priority": 166
+      "negatives": [
+        "i won't pick some up"
+      ],
+      "priority": 166,
+      "reviewed": true,
+      "sourceRefs": [
+        "WordNet 3.0",
+        "MASSIVE",
+        "SGD"
+      ],
+      "utterance": "i'll pick some up"
     },
     {
+      "confidence": 0.98,
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "WELLBEING"
+      },
       "id": "pnc.dataset.question.wellbeing.how_are_things_going",
-      "utterance": "how are things going",
+      "priority": 120,
+      "utterance": "how are things going"
+    },
+    {
+      "confidence": 0.98,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "WELLBEING"
       },
-      "confidence": 0.98,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.wellbeing.how_is_everything_going",
-      "utterance": "how is everything going",
+      "priority": 120,
+      "utterance": "how is everything going"
+    },
+    {
+      "confidence": 0.98,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "WELLBEING"
       },
-      "confidence": 0.98,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.wellbeing.hows_everything_going",
-      "utterance": "how's everything going",
+      "priority": 120,
+      "utterance": "how's everything going"
+    },
+    {
+      "confidence": 0.99,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "WELLBEING"
       },
-      "confidence": 0.98,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.wellbeing.how_are_you_holding_up",
-      "utterance": "how are you holding up",
+      "priority": 120,
+      "utterance": "how are you holding up"
+    },
+    {
+      "confidence": 0.99,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "WELLBEING"
       },
-      "confidence": 0.99,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.wellbeing.are_you_holding_up_okay",
-      "utterance": "are you holding up okay",
+      "priority": 120,
+      "utterance": "are you holding up okay"
+    },
+    {
+      "confidence": 0.97,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "WELLBEING"
       },
-      "confidence": 0.99,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.wellbeing.you_doing_all_right",
-      "utterance": "you doing all right",
+      "priority": 120,
+      "utterance": "you doing all right"
+    },
+    {
+      "confidence": 0.97,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "WELLBEING"
       },
-      "confidence": 0.97,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.wellbeing.how_are_you_managing",
-      "utterance": "how are you managing",
+      "priority": 120,
+      "utterance": "how are you managing"
+    },
+    {
+      "confidence": 0.97,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "WELLBEING"
       },
-      "confidence": 0.97,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.wellbeing.how_has_your_day_been",
-      "utterance": "how has your day been",
+      "priority": 120,
+      "utterance": "how has your day been"
+    },
+    {
+      "confidence": 0.98,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
-        "subject": "WELLBEING"
+        "subject": "ACTIVITY"
       },
-      "confidence": 0.97,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.activity.what_are_you_working_on",
-      "utterance": "what are you working on",
+      "priority": 120,
+      "utterance": "what are you working on"
+    },
+    {
+      "confidence": 0.98,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "ACTIVITY"
       },
-      "confidence": 0.98,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.activity.what_have_you_been_up_to_lately",
-      "utterance": "what have you been up to lately",
+      "priority": 120,
+      "utterance": "what have you been up to lately"
+    },
+    {
+      "confidence": 0.98,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "ACTIVITY"
       },
-      "confidence": 0.98,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.activity.what_have_you_been_doing_today",
-      "utterance": "what have you been doing today",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "ACTIVITY"
-      },
-      "confidence": 0.98,
-      "priority": 120
+      "priority": 120,
+      "utterance": "what have you been doing today"
     },
     {
-      "id": "pnc.dataset.question.activity.what_are_you_focused_on",
-      "utterance": "what are you focused on",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "ACTIVITY"
-      },
       "confidence": 0.97,
-      "priority": 120
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "ACTIVITY"
+      },
+      "id": "pnc.dataset.question.activity.what_are_you_focused_on",
+      "priority": 120,
+      "utterance": "what are you focused on"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "IDENTITY"
+      },
       "id": "pnc.dataset.question.identity.may_i_ask_your_name",
-      "utterance": "may i ask your name",
+      "priority": 120,
+      "utterance": "may i ask your name"
+    },
+    {
+      "confidence": 0.99,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "IDENTITY"
       },
-      "confidence": 0.99,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.identity.can_i_ask_your_name",
-      "utterance": "can i ask your name",
+      "priority": 120,
+      "utterance": "can i ask your name"
+    },
+    {
+      "confidence": 0.99,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "IDENTITY"
       },
-      "confidence": 0.99,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.identity.may_i_know_your_name",
-      "utterance": "may i know your name",
+      "priority": 120,
+      "utterance": "may i know your name"
+    },
+    {
+      "confidence": 0.99,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "IDENTITY"
       },
-      "confidence": 0.99,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.identity.can_you_tell_me_your_name",
-      "utterance": "can you tell me your name",
+      "priority": 120,
+      "utterance": "can you tell me your name"
+    },
+    {
+      "confidence": 0.98,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "IDENTITY"
       },
-      "confidence": 0.99,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.identity.what_should_i_call_you",
-      "utterance": "what should i call you",
+      "priority": 120,
+      "utterance": "what should i call you"
+    },
+    {
+      "confidence": 0.99,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "IDENTITY"
       },
-      "confidence": 0.98,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.identity.who_am_i_talking_to",
-      "utterance": "who am i talking to",
+      "priority": 120,
+      "utterance": "who am i talking to"
+    },
+    {
+      "confidence": 0.99,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "IDENTITY"
       },
-      "confidence": 0.99,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.identity.who_am_i_speaking_with",
-      "utterance": "who am i speaking with",
+      "priority": 120,
+      "utterance": "who am i speaking with"
+    },
+    {
+      "confidence": 0.98,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "IDENTITY"
       },
-      "confidence": 0.99,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.identity.what_do_people_call_you",
-      "utterance": "what do people call you",
+      "priority": 120,
+      "utterance": "what do people call you"
+    },
+    {
+      "confidence": 0.98,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "IDENTITY"
       },
-      "confidence": 0.98,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.identity.what_do_you_go_by",
-      "utterance": "what do you go by",
+      "priority": 120,
+      "utterance": "what do you go by"
+    },
+    {
+      "confidence": 0.98,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "IDENTITY"
       },
-      "confidence": 0.98,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.question.identity.mind_telling_me_your_name",
-      "utterance": "mind telling me your name",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "IDENTITY"
-      },
-      "confidence": 0.98,
-      "priority": 120
+      "priority": 120,
+      "utterance": "mind telling me your name"
     },
     {
-      "id": "pnc.dataset.question.wellbeing.how_are_you_doing",
-      "utterance": "how are you doing",
+      "confidence": 0.99,
       "emit": {
         "intent": "QUESTION",
         "speechAct": "QUESTION",
         "subject": "WELLBEING"
       },
-      "confidence": 0.99,
-      "priority": 120
+      "id": "pnc.dataset.question.wellbeing.how_are_you_doing",
+      "priority": 120,
+      "utterance": "how are you doing"
     },
     {
+      "confidence": 0.98,
+      "emit": {
+        "intent": "GREET",
+        "speechAct": "GREET"
+      },
       "id": "pnc.dataset.greeting.long_time_no_see",
-      "utterance": "long time no see",
+      "priority": 120,
+      "utterance": "long time no see"
+    },
+    {
+      "confidence": 0.98,
       "emit": {
         "intent": "GREET",
         "speechAct": "GREET"
       },
-      "confidence": 0.98,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.greeting.good_to_see_you_again",
-      "utterance": "good to see you again",
+      "priority": 120,
+      "utterance": "good to see you again"
+    },
+    {
+      "confidence": 0.98,
       "emit": {
         "intent": "GREET",
         "speechAct": "GREET"
       },
-      "confidence": 0.98,
-      "priority": 120
-    },
-    {
       "id": "pnc.dataset.greeting.nice_to_see_you_again",
-      "utterance": "nice to see you again",
-      "emit": {
-        "intent": "GREET",
-        "speechAct": "GREET"
-      },
-      "confidence": 0.98,
-      "priority": 120
+      "priority": 120,
+      "utterance": "nice to see you again"
     },
     {
-      "id": "pnc.dataset.greeting.glad_to_see_you_again",
-      "utterance": "glad to see you again",
+      "confidence": 0.97,
       "emit": {
         "intent": "GREET",
         "speechAct": "GREET"
       },
-      "confidence": 0.97,
-      "priority": 120
+      "id": "pnc.dataset.greeting.glad_to_see_you_again",
+      "priority": 120,
+      "utterance": "glad to see you again"
     }
   ],
   "responsePools": [
@@ -853,19 +876,19 @@
       "id": "semantic.greeting",
       "variants": [
         {
+          "fallback": "Hey. How are you holding up?",
           "id": "semantic.greeting.dataset.holding_up",
-          "templateID": "semantic.greeting.dataset.holding_up",
-          "fallback": "Hey. How are you holding up?"
+          "templateID": "semantic.greeting.dataset.holding_up"
         },
         {
+          "fallback": "Good to see you again.",
           "id": "semantic.greeting.dataset.good_to_see",
-          "templateID": "semantic.greeting.dataset.good_to_see",
-          "fallback": "Good to see you again."
+          "templateID": "semantic.greeting.dataset.good_to_see"
         },
         {
+          "fallback": "Hey. How are things going?",
           "id": "semantic.greeting.dataset.how_things",
-          "templateID": "semantic.greeting.dataset.how_things",
-          "fallback": "Hey. How are things going?"
+          "templateID": "semantic.greeting.dataset.how_things"
         }
       ]
     },
@@ -873,19 +896,19 @@
       "id": "semantic.question.activity",
       "variants": [
         {
+          "fallback": "Just doing what I can to keep things moving.",
           "id": "semantic.question.activity.dataset.keep_moving",
-          "templateID": "semantic.question.activity.dataset.keep_moving",
-          "fallback": "Just doing what I can to keep things moving."
+          "templateID": "semantic.question.activity.dataset.keep_moving"
         },
         {
+          "fallback": "A little bit of everything.",
           "id": "semantic.question.activity.dataset.bit_of_everything",
-          "templateID": "semantic.question.activity.dataset.bit_of_everything",
-          "fallback": "A little bit of everything."
+          "templateID": "semantic.question.activity.dataset.bit_of_everything"
         },
         {
+          "fallback": "Just taking care of what needs doing.",
           "id": "semantic.question.activity.dataset.taking_care",
-          "templateID": "semantic.question.activity.dataset.taking_care",
-          "fallback": "Just taking care of what needs doing."
+          "templateID": "semantic.question.activity.dataset.taking_care"
         }
       ]
     },
@@ -893,24 +916,25 @@
       "id": "semantic.question.wellbeing",
       "variants": [
         {
+          "fallback": "I'm hanging in there. Thanks for asking.",
           "id": "semantic.question.wellbeing.dataset.hanging_in",
-          "templateID": "semantic.question.wellbeing.dataset.hanging_in",
-          "fallback": "I'm hanging in there. Thanks for asking."
+          "templateID": "semantic.question.wellbeing.dataset.hanging_in"
         },
         {
+          "fallback": "Doing okay, all things considered.",
           "id": "semantic.question.wellbeing.dataset.all_things_considered",
-          "templateID": "semantic.question.wellbeing.dataset.all_things_considered",
-          "fallback": "Doing okay, all things considered."
+          "templateID": "semantic.question.wellbeing.dataset.all_things_considered"
         },
         {
+          "fallback": "I'm getting by, one day at a time. How about you?",
           "id": "semantic.question.wellbeing.dataset.getting_by",
-          "templateID": "semantic.question.wellbeing.dataset.getting_by",
-          "fallback": "I'm getting by, one day at a time. How about you?"
+          "templateID": "semantic.question.wellbeing.dataset.getting_by"
         },
         {
-          "id": "semantic.question.wellbeing.dataset.hungry",
-          "templateID": "semantic.question.wellbeing.dataset.hungry",
           "fallback": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
+          "id": "semantic.question.wellbeing.dataset.hungry",
+          "priority": 2,
+          "templateID": "semantic.question.wellbeing.dataset.hungry",
           "when": {
             "needType": "hunger",
             "needUrgency": [
@@ -919,13 +943,13 @@
               "emergency",
               "critical"
             ]
-          },
-          "priority": 2
+          }
         },
         {
-          "id": "semantic.question.wellbeing.dataset.thirsty",
-          "templateID": "semantic.question.wellbeing.dataset.thirsty",
           "fallback": "I'm pretty thirsty. If you have water, could you spare some?",
+          "id": "semantic.question.wellbeing.dataset.thirsty",
+          "priority": 3,
+          "templateID": "semantic.question.wellbeing.dataset.thirsty",
           "when": {
             "needType": "thirst",
             "needUrgency": [
@@ -934,13 +958,13 @@
               "emergency",
               "critical"
             ]
-          },
-          "priority": 3
+          }
         },
         {
-          "id": "semantic.question.wellbeing.dataset.tired",
-          "templateID": "semantic.question.wellbeing.dataset.tired",
           "fallback": "I'm tired, though I can manage for now.",
+          "id": "semantic.question.wellbeing.dataset.tired",
+          "priority": 2,
+          "templateID": "semantic.question.wellbeing.dataset.tired",
           "when": {
             "needType": "fatigue",
             "needUrgency": [
@@ -949,8 +973,7 @@
               "emergency",
               "critical"
             ]
-          },
-          "priority": 2
+          }
         }
       ]
     },
@@ -958,19 +981,19 @@
       "id": "semantic.thanks",
       "variants": [
         {
+          "fallback": "No problem at all.",
           "id": "semantic.thanks.dataset.no_problem",
-          "templateID": "semantic.thanks.dataset.no_problem",
-          "fallback": "No problem at all."
+          "templateID": "semantic.thanks.dataset.no_problem"
         },
         {
+          "fallback": "Anytime.",
           "id": "semantic.thanks.dataset.anytime",
-          "templateID": "semantic.thanks.dataset.anytime",
-          "fallback": "Anytime."
+          "templateID": "semantic.thanks.dataset.anytime"
         },
         {
+          "fallback": "Glad I could help.",
           "id": "semantic.thanks.dataset.glady",
-          "templateID": "semantic.thanks.dataset.glady",
-          "fallback": "Glad I could help."
+          "templateID": "semantic.thanks.dataset.glady"
         }
       ]
     },
@@ -978,22 +1001,22 @@
       "id": "semantic.accept",
       "variants": [
         {
-          "id": "semantic.accept.dataset.pending_started",
-          "templateID": "semantic.accept.dataset.pending_started",
           "fallback": "Okay, I'll get started.",
+          "id": "semantic.accept.dataset.pending_started",
+          "priority": 1,
+          "templateID": "semantic.accept.dataset.pending_started",
           "when": {
             "hasPendingRequest": true
-          },
-          "priority": 1
+          }
         },
         {
-          "id": "semantic.accept.dataset.pending_care",
-          "templateID": "semantic.accept.dataset.pending_care",
           "fallback": "All right. I can take care of that.",
+          "id": "semantic.accept.dataset.pending_care",
+          "priority": 1,
+          "templateID": "semantic.accept.dataset.pending_care",
           "when": {
             "hasPendingRequest": true
-          },
-          "priority": 1
+          }
         }
       ]
     },
@@ -1001,22 +1024,22 @@
       "id": "semantic.refuse",
       "variants": [
         {
-          "id": "semantic.refuse.dataset.pending_unavailable",
-          "templateID": "semantic.refuse.dataset.pending_unavailable",
           "fallback": "I can't take that on right now.",
+          "id": "semantic.refuse.dataset.pending_unavailable",
+          "priority": 1,
+          "templateID": "semantic.refuse.dataset.pending_unavailable",
           "when": {
             "hasPendingRequest": true
-          },
-          "priority": 1
+          }
         },
         {
-          "id": "semantic.refuse.dataset.pending_enough",
-          "templateID": "semantic.refuse.dataset.pending_enough",
           "fallback": "Not this time. I have enough to manage.",
+          "id": "semantic.refuse.dataset.pending_enough",
+          "priority": 1,
+          "templateID": "semantic.refuse.dataset.pending_enough",
           "when": {
             "hasPendingRequest": true
-          },
-          "priority": 1
+          }
         }
       ]
     },
@@ -1024,9 +1047,10 @@
       "id": "semantic.offer",
       "variants": [
         {
-          "id": "semantic.offer.dataset.hungry_share",
-          "templateID": "semantic.offer.dataset.hungry_share",
           "fallback": "That would help a lot. Could I have some?",
+          "id": "semantic.offer.dataset.hungry_share",
+          "priority": 2,
+          "templateID": "semantic.offer.dataset.hungry_share",
           "when": {
             "needType": "hunger",
             "needUrgency": [
@@ -1035,13 +1059,13 @@
               "emergency",
               "critical"
             ]
-          },
-          "priority": 2
+          }
         },
         {
-          "id": "semantic.offer.dataset.hungry_appreciate",
-          "templateID": "semantic.offer.dataset.hungry_appreciate",
           "fallback": "I'd appreciate a bite. Would you share?",
+          "id": "semantic.offer.dataset.hungry_appreciate",
+          "priority": 2,
+          "templateID": "semantic.offer.dataset.hungry_appreciate",
           "when": {
             "needType": "hunger",
             "needUrgency": [
@@ -1050,8 +1074,7 @@
               "emergency",
               "critical"
             ]
-          },
-          "priority": 2
+          }
         }
       ]
     },
@@ -1059,14 +1082,14 @@
       "id": "semantic.compliment",
       "variants": [
         {
+          "fallback": "That's kind of you. I appreciate it.",
           "id": "semantic.compliment.dataset.kind_of_you",
-          "templateID": "semantic.compliment.dataset.kind_of_you",
-          "fallback": "That's kind of you. I appreciate it."
+          "templateID": "semantic.compliment.dataset.kind_of_you"
         },
         {
+          "fallback": "Aw, thank you. That means a lot.",
           "id": "semantic.compliment.dataset.means_a_lot",
-          "templateID": "semantic.compliment.dataset.means_a_lot",
-          "fallback": "Aw, thank you. That means a lot."
+          "templateID": "semantic.compliment.dataset.means_a_lot"
         }
       ]
     },
@@ -1074,32 +1097,32 @@
       "id": "semantic.question.identity",
       "variants": [
         {
+          "fallback": "I keep my name to myself until I know someone better. What should I call you?",
           "id": "semantic.question.identity.dataset.stranger_alt_1",
-          "templateID": "semantic.question.identity.stranger_alt_1",
-          "fallback": "I keep my name to myself until I know someone better. What should I call you?"
+          "templateID": "semantic.question.identity.stranger_alt_1"
         },
         {
+          "fallback": "Let's get to know each other first. What do people call you?",
           "id": "semantic.question.identity.dataset.stranger_alt_2",
-          "templateID": "semantic.question.identity.stranger_alt_2",
-          "fallback": "Let's get to know each other first. What do people call you?"
+          "templateID": "semantic.question.identity.stranger_alt_2"
         },
         {
-          "id": "semantic.question.identity.dataset.wary_alt_1",
-          "templateID": "semantic.question.identity.wary_alt_1",
           "fallback": "I don't trust you enough to share my name. Who are you, really?",
+          "id": "semantic.question.identity.dataset.wary_alt_1",
+          "priority": 2,
+          "templateID": "semantic.question.identity.wary_alt_1",
           "when": {
             "identityTrust": "untrustworthy"
-          },
-          "priority": 2
+          }
         },
         {
-          "id": "semantic.question.identity.dataset.wary_alt_2",
-          "templateID": "semantic.question.identity.wary_alt_2",
           "fallback": "After that lie, I'm not telling you my name. Tell me the truth about yours.",
+          "id": "semantic.question.identity.dataset.wary_alt_2",
+          "priority": 2,
+          "templateID": "semantic.question.identity.wary_alt_2",
           "when": {
             "identityTrust": "untrustworthy"
-          },
-          "priority": 2
+          }
         }
       ]
     },
@@ -1107,10 +1130,39 @@
       "id": "semantic.question.needs.proposal",
       "variants": [
         {
-          "id": "semantic.question.needs.proposal.dataset.thirst",
-          "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
-          "fallback": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
           "en": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+          "fallback": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+          "id": "semantic.question.needs.proposal.dataset.thirst",
+          "plan": {
+            "dialogueAct": "PROMISE_ACKNOWLEDGEMENT",
+            "groundedFactRefs": [
+              "npc.needs.thirst"
+            ],
+            "sourcePoolID": "semantic.question.needs.proposal",
+            "tone": "direct",
+            "topic": "NEEDS",
+            "turns": [
+              {
+                "continuation": "continue",
+                "id": "dataset_proposal_acknowledged",
+                "segments": [
+                  {
+                    "fallback": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst"
+                  }
+                ]
+              }
+            ],
+            "uncertainty": "pending"
+          },
+          "priority": 4,
+          "reviewed": true,
+          "sourceRefs": [
+            "MASSIVE",
+            "SGD"
+          ],
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
           "tl": "Maaari ko iyong ituring na panukala, pero kailangan ko pa ang item at dami bago ako magtala ng pangako.",
           "when": {
             "needType": "thirst",
@@ -1120,35 +1172,6 @@
               "emergency",
               "critical"
             ]
-          },
-          "priority": 4,
-          "reviewed": true,
-          "sourceRefs": [
-            "MASSIVE",
-            "SGD"
-          ],
-          "plan": {
-            "dialogueAct": "PROMISE_ACKNOWLEDGEMENT",
-            "sourcePoolID": "semantic.question.needs.proposal",
-            "topic": "NEEDS",
-            "groundedFactRefs": [
-              "npc.needs.thirst"
-            ],
-            "uncertainty": "pending",
-            "tone": "direct",
-            "turns": [
-              {
-                "id": "dataset_proposal_acknowledged",
-                "continuation": "continue",
-                "segments": [
-                  {
-                    "kind": "translation",
-                    "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
-                    "fallback": "I can keep that as a proposal, but I still need the item and amount before I record a commitment."
-                  }
-                ]
-              }
-            ]
           }
         }
       ]
@@ -1157,14 +1180,31 @@
       "id": "semantic.question.needs.quantity",
       "variants": [
         {
-          "id": "semantic.question.needs.quantity.dataset.clarify_thirst",
-          "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
-          "fallback": "I can confirm water is a need, but which item do you mean?",
           "en": "I can confirm water is a need, but which item do you mean?",
-          "tl": "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
-          "when": {
-            "needType": "thirst",
-            "lastIntent": "CLARIFY"
+          "fallback": "I can confirm water is a need, but which item do you mean?",
+          "id": "semantic.question.needs.quantity.dataset.clarify_thirst",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "groundedFactRefs": [
+              "npc.needs.thirst"
+            ],
+            "sourcePoolID": "semantic.question.needs.quantity",
+            "tone": "clarifying",
+            "topic": "NEEDS",
+            "turns": [
+              {
+                "continuation": "continue",
+                "id": "dataset_needs_clarification",
+                "segments": [
+                  {
+                    "fallback": "I can confirm water is a need, but which item do you mean?",
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst"
+                  }
+                ]
+              }
+            ],
+            "uncertainty": "ambiguous"
           },
           "priority": 4,
           "reviewed": true,
@@ -1172,28 +1212,11 @@
             "MASSIVE",
             "SGD"
           ],
-          "plan": {
-            "dialogueAct": "ASK_CLARIFICATION",
-            "sourcePoolID": "semantic.question.needs.quantity",
-            "topic": "NEEDS",
-            "groundedFactRefs": [
-              "npc.needs.thirst"
-            ],
-            "uncertainty": "ambiguous",
-            "tone": "clarifying",
-            "turns": [
-              {
-                "id": "dataset_needs_clarification",
-                "continuation": "continue",
-                "segments": [
-                  {
-                    "kind": "translation",
-                    "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
-                    "fallback": "I can confirm water is a need, but which item do you mean?"
-                  }
-                ]
-              }
-            ]
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
+          "tl": "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
+          "when": {
+            "lastIntent": "CLARIFY",
+            "needType": "thirst"
           }
         }
       ]
@@ -1202,13 +1225,32 @@
       "id": "semantic.flow.weather.raining",
       "variants": [
         {
-          "id": "semantic.flow.weather.raining.dataset.contextual_switch",
-          "templateID": "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
-          "fallback": "It is raining right now. We can return to that proposal when you are ready.",
           "en": "It is raining right now. We can return to that proposal when you are ready.",
-          "tl": "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na.",
-          "when": {
-            "pattern": "pnc.dataset.question.weather.can_we_talk_about_the_weather"
+          "fallback": "It is raining right now. We can return to that proposal when you are ready.",
+          "id": "semantic.flow.weather.raining.dataset.contextual_switch",
+          "plan": {
+            "dialogueAct": "WEATHER_REPORT",
+            "groundedFactRefs": [
+              "world.weather.raining"
+            ],
+            "personalityStyle": "contextual",
+            "sourcePoolID": "semantic.flow.weather.raining",
+            "tone": "conversational",
+            "topic": "WEATHER",
+            "turns": [
+              {
+                "continuation": "continue",
+                "id": "dataset_contextual_weather_switch",
+                "segments": [
+                  {
+                    "fallback": "It is raining right now. We can return to that proposal when you are ready.",
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch"
+                  }
+                ]
+              }
+            ],
+            "uncertainty": "known"
           },
           "priority": 4,
           "reviewed": true,
@@ -1216,29 +1258,10 @@
             "MASSIVE",
             "SGD"
           ],
-          "plan": {
-            "dialogueAct": "WEATHER_REPORT",
-            "sourcePoolID": "semantic.flow.weather.raining",
-            "topic": "WEATHER",
-            "groundedFactRefs": [
-              "world.weather.raining"
-            ],
-            "uncertainty": "known",
-            "tone": "conversational",
-            "personalityStyle": "contextual",
-            "turns": [
-              {
-                "id": "dataset_contextual_weather_switch",
-                "continuation": "continue",
-                "segments": [
-                  {
-                    "kind": "translation",
-                    "templateID": "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
-                    "fallback": "It is raining right now. We can return to that proposal when you are ready."
-                  }
-                ]
-              }
-            ]
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
+          "tl": "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na.",
+          "when": {
+            "pattern": "pnc.dataset.question.weather.can_we_talk_about_the_weather"
           }
         }
       ]
@@ -1247,14 +1270,30 @@
       "id": "semantic.question.wellbeing.unknown",
       "variants": [
         {
-          "id": "semantic.question.wellbeing.unknown.dataset.causal_followup",
-          "templateID": "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown",
-          "fallback": "I can tell something is off, but I do not know what caused it yet.",
           "en": "I can tell something is off, but I do not know what caused it yet.",
-          "tl": "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito.",
-          "when": {
-            "pattern": "pnc.dataset.question.wellbeing.what_is_going_on_with_you",
-            "healthState": "unknown"
+          "fallback": "I can tell something is off, but I do not know what caused it yet.",
+          "id": "semantic.question.wellbeing.unknown.dataset.causal_followup",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "groundedFactRefs": [],
+            "personalityStyle": "truthful",
+            "sourcePoolID": "semantic.question.wellbeing.unknown",
+            "tone": "clarifying",
+            "topic": "WELLBEING",
+            "turns": [
+              {
+                "continuation": "continue",
+                "id": "dataset_causal_wellbeing_unknown",
+                "segments": [
+                  {
+                    "fallback": "I can tell something is off, but I do not know what caused it yet.",
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown"
+                  }
+                ]
+              }
+            ],
+            "uncertainty": "unknown"
           },
           "priority": 4,
           "reviewed": true,
@@ -1262,30 +1301,91 @@
             "MASSIVE",
             "SGD"
           ],
-          "plan": {
-            "dialogueAct": "ASK_CLARIFICATION",
-            "sourcePoolID": "semantic.question.wellbeing.unknown",
-            "topic": "WELLBEING",
-            "groundedFactRefs": [],
-            "uncertainty": "unknown",
-            "tone": "clarifying",
-            "personalityStyle": "truthful",
-            "turns": [
-              {
-                "id": "dataset_causal_wellbeing_unknown",
-                "continuation": "continue",
-                "segments": [
-                  {
-                    "kind": "translation",
-                    "templateID": "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown",
-                    "fallback": "I can tell something is off, but I do not know what caused it yet."
-                  }
-                ]
-              }
-            ]
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown",
+          "tl": "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito.",
+          "when": {
+            "healthState": "unknown",
+            "pattern": "pnc.dataset.question.wellbeing.what_is_going_on_with_you"
           }
         }
       ]
     }
-  ]
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Common Interaction Seed",
+    "references": [
+      {
+        "license": "ACL Anthology terms; metadata-only reference",
+        "name": "DailyDialog",
+        "reviewedOn": "2026-10-19",
+        "url": "https://aclanthology.org/I17-1099/",
+        "use": "Everyday dialogue-act coverage guidance; no corpus turns are copied."
+      },
+      {
+        "license": "CC BY 4.0; metadata-only reference",
+        "name": "EmpatheticDialogues",
+        "reviewedOn": "2026-10-19",
+        "url": "https://github.com/facebookresearch/EmpatheticDialogues",
+        "use": "Emotion-aware interaction coverage guidance; no corpus turns are copied."
+      },
+      {
+        "license": "WordNet 3.0 license",
+        "name": "WordNet 3.0",
+        "reviewedOn": "2026-10-19",
+        "url": "https://wordnet.princeton.edu/",
+        "use": "Reviewed FETCH lexical sense guidance for the pick-up paraphrase; no dictionary files ship at runtime."
+      },
+      {
+        "importStatus": {
+          "approved": 1,
+          "compiled": 1,
+          "imported": 1,
+          "mapped": 1,
+          "workerVerified": 1
+        },
+        "license": "CC BY 4.0",
+        "name": "MASSIVE",
+        "recordRefs": [
+          {
+            "intent": "weather_query",
+            "locale": "en-US",
+            "partition": "train",
+            "recordID": "98"
+          }
+        ],
+        "reviewedOn": "2026-10-19",
+        "sourceSha256": "c70f75c6a543a26e249ec383df67733ad9b1066f6c0406c2e04a3f03356e407e",
+        "sourceVersion": "1.0",
+        "url": "https://github.com/alexa/massive",
+        "use": "Build-time reviewed English intent record imported and mapped to the existing WEATHER route; raw corpus stays outside runtime media."
+      },
+      {
+        "importStatus": {
+          "approved": 1,
+          "compiled": 1,
+          "imported": 1,
+          "mapped": 1,
+          "workerVerified": 1
+        },
+        "license": "CC BY-SA 4.0",
+        "name": "SGD",
+        "recordRefs": [
+          {
+            "dialogueID": "90_00031",
+            "intent": "GetWeather",
+            "service": "Weather_1",
+            "turn": 6
+          }
+        ],
+        "reviewedOn": "2026-10-19",
+        "sourceSha256": "78310f5e8e4c5a48cb600d36ba762448d13ebdd91f30ef09831251f5345fa836",
+        "sourceVersion": "DSTC8 train",
+        "url": "https://github.com/google-research-datasets/dstc8-schema-guided-dialogue",
+        "use": "Build-time reviewed Weather_1 user turn imported and mapped to the existing WEATHER route; raw corpus stays outside runtime media."
+      }
+    ],
+    "version": "1"
+  }
 }

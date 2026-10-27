@@ -24,11 +24,15 @@ from .codeblocks import validate_codeblock_document
 from .dataset_adapters import preview_dataset_adapter, promote_reviewed_candidates
 from .interaction_explorer import build_interaction_rows, search_interactions
 from .dialogue_content import (
-    CONTENT_SOURCE_RELATIVE,
     compile_dialogue_content,
     derived_canonical_concept,
-    load_dialogue_content_source,
-    source_fingerprint,
+)
+from .conversation_compiler import (
+    CONVERSATION_MANIFEST_RELATIVE,
+    CONVERSATION_SOURCE_RELATIVE,
+    compile_conversation_sources,
+    conversation_record,
+    render_conversation_compatibility_source,
 )
 from .lexicon_compiler import CompileError
 
@@ -105,22 +109,108 @@ class SemanticLabAuthoringService:
 
     @property
     def dialogue_content_source_path(self) -> Path:
-        return self.repository / CONTENT_SOURCE_RELATIVE
+        """Return the manifest, never a generated compatibility snapshot."""
+        return self.repository / CONVERSATION_MANIFEST_RELATIVE
+
+    def _conversation_model(self) -> dict[str, Any]:
+        return compile_conversation_sources(
+            self.repository,
+            runtime_root=self.runtime_root,
+        )
+
+    @staticmethod
+    def _content_shard_report(model: dict[str, Any], source_shard: str) -> dict[str, Any]:
+        for report in model.get("shards", []):
+            if report.get("path") == source_shard:
+                return report
+        raise KeyError(f"unknown Conversation content shard: {source_shard}")
+
+    def _content_source_path(self, source_shard: str) -> Path:
+        return self.repository / CONVERSATION_SOURCE_RELATIVE / Path(source_shard)
+
+    def _conversation_content_document(self, model: dict[str, Any]) -> dict[str, Any]:
+        """Expose the merged authored shape to compatibility UI helpers."""
+        return render_conversation_compatibility_source(model, "content")
+
+    def _raw_content_item(
+        self,
+        model: dict[str, Any],
+        content_id: str,
+    ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]] | None:
+        location = conversation_record(model, content_id)
+        if not isinstance(location, dict) or location.get("kind") != "content":
+            return None
+        source_shard = str(location["sourceShard"])
+        source_document = model.get("_source_documents", {}).get(source_shard)
+        if not isinstance(source_document, dict):
+            return None
+        item = self._content_item(source_document, content_id)
+        if item is None:
+            return None
+        return item, source_document, location
 
     def preview_dialogue_content_source(self) -> dict[str, Any]:
-        return authoring.preview_dialogue_content_source(
-            self.dialogue_content_source_path,
-            repository=self.repository,
-        )
+        try:
+            model = self._conversation_model()
+        except (OSError, ValueError, TypeError, CompileError) as error:
+            return {
+                "ok": False,
+                "type": "conversation_compile_preview",
+                "previewOnly": True,
+                "effectFree": True,
+                "sourcePath": str(self.dialogue_content_source_path),
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "writes": [],
+            }
+        return {
+            "ok": True,
+            "type": "conversation_compile_preview",
+            "schema": model["schema"],
+            "repository": str(self.repository),
+            "sourcePath": str(self.dialogue_content_source_path),
+            "previewOnly": True,
+            "effectFree": True,
+            "wholeModelFingerprint": model["wholeModelFingerprint"],
+            "phraseFamilyCount": len(model["content"]["phraseFamilies"]),
+            "phraseCount": sum(
+                len(phrases)
+                for family in model["content"]["phraseFamilies"]
+                for phrases in family["styles"].values()
+            ),
+            "playerChoiceCount": len(model["content"]["playerChoices"]),
+            "patternCount": len(model["dialogue"]["patterns"]),
+            "flowCount": len(model["semantic"]["flows"]),
+            "uiSuggestionCount": len(model["ui"]),
+            "shards": model["shards"],
+            "writes": [],
+        }
 
     def generate_dialogue_content_source(self) -> dict[str, Any]:
-        return authoring.generate_dialogue_content_source(
-            self.dialogue_content_source_path,
-            repository=self.repository,
-        )
+        preview = self.preview_dialogue_content_source()
+        if preview.get("ok") is not True:
+            return preview
+        try:
+            from .build import write_conversation_output
+
+            model = self._conversation_model()
+            written = write_conversation_output(self.repository, model)
+        except (OSError, ValueError, TypeError, CompileError) as error:
+            return {
+                **preview,
+                "ok": False,
+                "generationApproved": True,
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "writes": [],
+            }
+        return {
+            **self.preview_dialogue_content_source(),
+            "generationApproved": True,
+            "writes": [str(path) for path in written],
+            "reloadedBy": "caller_restart_required",
+        }
 
     def _dialogue_content_document(self) -> dict[str, Any]:
-        return load_dialogue_content_source(self.dialogue_content_source_path)
+        return self._conversation_content_document(self._conversation_model())
 
     @staticmethod
     def _family_id(family: dict[str, Any]) -> str:
@@ -161,7 +251,13 @@ class SemanticLabAuthoringService:
         value = json.loads(json.dumps(item, ensure_ascii=False))
         kind = value.get("kind")
         value.pop("kind", None)
-        for metadata_key in ("sourcePath", "sourceFingerprint", "verifiedOwner"):
+        for metadata_key in (
+            "sourcePath",
+            "sourceShard",
+            "sourceFingerprint",
+            "generatedModule",
+            "verifiedOwner",
+        ):
             value.pop(metadata_key, None)
         if kind == "phraseFamily":
             for phrases in value.get("styles", {}).values():
@@ -174,13 +270,18 @@ class SemanticLabAuthoringService:
         return value
 
     def list_dialogue_content(self) -> list[dict[str, Any]]:
-        document = self._dialogue_content_document()
-        fingerprint = source_fingerprint(self.dialogue_content_source_path)
+        model = self._conversation_model()
+        document = self._conversation_content_document(model)
         groups = document.get("groups") or {}
         rows: list[dict[str, Any]] = []
         for family in document.get("phraseFamilies", []):
             if not isinstance(family, dict):
                 continue
+            location = conversation_record(
+                model, str(family.get("semanticTemplateID") or "")
+            ) or {}
+            source_shard = str(location.get("sourceShard") or "")
+            report = self._content_shard_report(model, source_shard)
             rows.append({
                 "id": self._family_id(family),
                 "kind": "phraseFamily",
@@ -195,13 +296,18 @@ class SemanticLabAuthoringService:
                     else None
                 ),
                 "styles": sorted(family.get("styles", {})),
-                "sourcePath": str(self.dialogue_content_source_path),
-                "sourceFingerprint": fingerprint,
-                "verifiedOwner": "CodeBuilder → Dialogue Content Registry",
+                "sourcePath": str(self._content_source_path(source_shard)),
+                "sourceShard": source_shard,
+                "sourceFingerprint": report["fingerprint"],
+                "generatedModule": "PNC/Semantics/Generated/Conversation/Content",
+                "verifiedOwner": "CodeBuilder → Conversation Registry",
             })
         for choice in document.get("playerChoices", []):
             if not isinstance(choice, dict):
                 continue
+            location = conversation_record(model, str(choice.get("id") or "")) or {}
+            source_shard = str(location.get("sourceShard") or "")
+            report = self._content_shard_report(model, source_shard)
             rows.append({
                 "id": choice.get("id"),
                 "kind": "playerChoice",
@@ -209,20 +315,28 @@ class SemanticLabAuthoringService:
                 or derived_canonical_concept(str(choice.get("id") or "unknown")),
                 "route": choice.get("route"),
                 "hubID": choice.get("hubID"),
-                "sourcePath": str(self.dialogue_content_source_path),
-                "sourceFingerprint": fingerprint,
-                "verifiedOwner": "CodeBuilder → Dialogue Content Registry",
+                "sourcePath": str(self._content_source_path(source_shard)),
+                "sourceShard": source_shard,
+                "sourceFingerprint": report["fingerprint"],
+                "generatedModule": "PNC/Semantics/Generated/Conversation/Content/PlayerChoices",
+                "verifiedOwner": "CodeBuilder → Conversation Registry",
             })
-        return rows
+        return sorted(rows, key=lambda item: str(item.get("id") or ""))
 
     def load_dialogue_content(self, content_id: str) -> dict[str, Any]:
-        document = self._dialogue_content_document()
-        item = self._content_item(document, str(content_id))
-        if item is None:
+        model = self._conversation_model()
+        result = self._raw_content_item(model, str(content_id))
+        if result is None:
             raise KeyError(f"unknown dialogue content id: {content_id}")
+        item, _source_document, location = result
+        source_shard = str(location["sourceShard"])
+        report = self._content_shard_report(model, source_shard)
         item["sourcePath"] = str(self.dialogue_content_source_path)
-        item["sourceFingerprint"] = source_fingerprint(self.dialogue_content_source_path)
-        item["verifiedOwner"] = "CodeBuilder → Dialogue Content Registry"
+        item["sourceShard"] = source_shard
+        item["sourcePath"] = str(self._content_source_path(source_shard))
+        item["sourceFingerprint"] = report["fingerprint"]
+        item["generatedModule"] = "PNC/Semantics/Generated/Conversation/Content"
+        item["verifiedOwner"] = "CodeBuilder → Conversation Registry"
         return item
 
     def _apply_dialogue_content_edit(
@@ -232,8 +346,20 @@ class SemanticLabAuthoringService:
         *,
         expected_source_fingerprint: str | None = None,
     ) -> tuple[dict[str, Any] | None, dict[str, Any]]:
-        path = self.dialogue_content_source_path
-        actual_fingerprint = source_fingerprint(path)
+        model = self._conversation_model()
+        result = self._raw_content_item(model, str(content_id))
+        if result is None:
+            return None, {
+                "ok": False,
+                "type": "dialogue_content_edit_preview",
+                "contentID": content_id,
+                "diagnostics": [{"severity": "error", "message": "unknown dialogue content id"}],
+                "writes": [],
+            }
+        current, source_document, location = result
+        source_shard = str(location["sourceShard"])
+        shard_report = self._content_shard_report(model, source_shard)
+        actual_fingerprint = str(shard_report["fingerprint"])
         if expected_source_fingerprint and expected_source_fingerprint != actual_fingerprint:
             return None, {
                 "ok": False,
@@ -243,6 +369,7 @@ class SemanticLabAuthoringService:
                 "reason": "source_fingerprint_mismatch",
                 "expectedSourceFingerprint": expected_source_fingerprint,
                 "sourceFingerprint": actual_fingerprint,
+                "sourceShard": source_shard,
                 "writes": [],
             }
         if not isinstance(edited_item, dict):
@@ -251,16 +378,6 @@ class SemanticLabAuthoringService:
                 "type": "dialogue_content_edit_preview",
                 "contentID": content_id,
                 "diagnostics": [{"severity": "error", "message": "content edit must be an object"}],
-                "writes": [],
-            }
-        document = self._dialogue_content_document()
-        current = self._content_item(document, content_id)
-        if current is None:
-            return None, {
-                "ok": False,
-                "type": "dialogue_content_edit_preview",
-                "contentID": content_id,
-                "diagnostics": [{"severity": "error", "message": "unknown dialogue content id"}],
                 "writes": [],
             }
         if self._content_structure(current) != self._content_structure(edited_item):
@@ -275,10 +392,10 @@ class SemanticLabAuthoringService:
                 }],
                 "writes": [],
             }
-        updated = json.loads(json.dumps(document, ensure_ascii=False))
+        updated_shard = json.loads(json.dumps(source_document, ensure_ascii=False))
         if current.get("kind") == "phraseFamily":
             target = next(
-                item for item in updated["phraseFamilies"]
+                item for item in updated_shard["phraseFamilies"]
                 if self._family_id(item) == content_id
             )
             edited_styles = edited_item.get("styles", {})
@@ -290,20 +407,39 @@ class SemanticLabAuthoringService:
                         if isinstance(edited_phrase, dict):
                             phrase["translations"] = edited_phrase.get("translations")
         else:
-            target = next(item for item in updated["playerChoices"] if item["id"] == content_id)
+            target = next(item for item in updated_shard["playerChoices"] if item["id"] == content_id)
             target["labelTranslations"] = edited_item.get("labelTranslations")
             target["choiceTranslations"] = edited_item.get("choiceTranslations")
-        return updated, {
+        aggregate = self._conversation_content_document(model)
+        if current.get("kind") == "phraseFamily":
+            aggregate_target = next(
+                item for item in aggregate["phraseFamilies"]
+                if self._family_id(item) == content_id
+            )
+            aggregate_target.clear()
+            aggregate_target.update(json.loads(json.dumps(target, ensure_ascii=False)))
+        else:
+            aggregate_target = next(
+                item for item in aggregate["playerChoices"]
+                if item["id"] == content_id
+            )
+            aggregate_target.clear()
+            aggregate_target.update(json.loads(json.dumps(target, ensure_ascii=False)))
+        aggregate.pop("generatedCompatibility", None)
+        compiled_aggregate = compile_dialogue_content(aggregate)
+        return aggregate, {
             "ok": True,
             "type": "dialogue_content_edit_preview",
             "contentID": content_id,
             "kind": current.get("kind"),
             "stale": False,
             "structuralLocked": True,
+            "sourceShard": source_shard,
             "sourceFingerprint": actual_fingerprint,
-            "newContentFingerprint": compile_dialogue_content(updated)["contentFingerprint"],
+            "newContentFingerprint": compiled_aggregate["contentFingerprint"],
             "contentBefore": json.loads(json.dumps(current, ensure_ascii=False)),
             "contentAfter": json.loads(json.dumps(edited_item, ensure_ascii=False)),
+            "_updatedShard": updated_shard,
             "writes": [],
         }
 
@@ -332,16 +468,20 @@ class SemanticLabAuthoringService:
                 "writes": [],
             }
         return {
-            **report,
+            **{
+                key: value for key, value in report.items()
+                if not key.startswith("_")
+            },
             "diagnostics": [],
             "contentFingerprint": compiled["contentFingerprint"],
             "generatedPaths": [
                 str(self.repository / path)
                 for path in (
                     "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-                    "Semantics/Generated/DialogueContent/Registry.lua",
-                    "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/DialogueContent.json",
-                    "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/DialogueContent.json",
+                    "Semantics/Generated/Conversation/Registry.lua",
+                    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
+                    "Semantics/Generated/Conversation/Manifest.lua",
+                    "tools/semantic_harness/codebuilder/generated/conversation/ConversationSnapshot.json",
                 )
             ],
         }
@@ -362,11 +502,20 @@ class SemanticLabAuthoringService:
             return report
         try:
             compile_dialogue_content(updated)
-            self.dialogue_content_source_path.write_text(
-                json.dumps(updated, ensure_ascii=False, indent=2) + "\n",
+            updated_shard = report.get("_updatedShard")
+            source_shard = str(report.get("sourceShard") or "")
+            if not isinstance(updated_shard, dict) or not source_shard:
+                raise CompileError("Conversation edit did not resolve an owning source shard")
+            source_path = self._content_source_path(source_shard)
+            source_path.write_text(
+                json.dumps(updated_shard, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
                 encoding="utf-8",
                 newline="\n",
             )
+            from .build import write_conversation_output
+
+            model = self._conversation_model()
+            generated = write_conversation_output(self.repository, model)
         except (OSError, ValueError, TypeError, CompileError) as error:
             return {
                 **report,
@@ -378,7 +527,7 @@ class SemanticLabAuthoringService:
             **report,
             "previewOnly": False,
             "effectFree": False,
-            "writes": [str(self.dialogue_content_source_path)],
+            "writes": [str(source_path), *(str(path) for path in generated)],
             "reloadedBy": "caller_restart_required",
         }
     def list_semantic_blocks(

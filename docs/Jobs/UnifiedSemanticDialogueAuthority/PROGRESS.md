@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 through P10 and P11A are accepted foundation. P11B0 Modular Conversation Source & Generation Foundation is now the mandatory next phase; parked P11B wording work must remain parked until P11B0 passes. P11B–P11I remain mandatory afterward.
+**Status:** IN PROGRESS — P0 through P10, P11A and P11B0 are accepted foundation. P11B wording work is next and may resume only by cohesive Conversation domain shard; P11B–P11I remain mandatory afterward.
 
 ## Audited baseline
 
@@ -52,8 +52,8 @@
 | P9 — scale/MP/final acceptance | **ACCEPTED** |
 | P10 — canonical semantic cleanup / legacy purge | **ACCEPTED** |
 | P11A — steady-state Conversation source hygiene | **ACCEPTED** |
-| P11B0 — modular Conversation source & generation foundation | **NEXT / IN PROGRESS** |
-| P11B–P11I — canonical wording, modular authoring refinement, UI registry, Studio and final acceptance | **MANDATORY AFTER P11B0** |
+| P11B0 — modular Conversation source & generation foundation | **ACCEPTED** |
+| P11B–P11I — canonical wording, modular authoring refinement, UI registry, Studio and final acceptance | **NEXT / MANDATORY** |
 
 ## Accepted P0 — authority inventory and characterization
 
@@ -530,48 +530,66 @@ Recovery validation:
 
 Rejected P11B–P11H acceptance claims are void. P11A remains accepted.
 
-## Immediate Next Chunk — P11B0A / P11B0B
+## Accepted P11B0 — modular Conversation source & generation foundation
 
-Read `P11B0_MODULAR_CONVERSATION_COMPILER.md` before editing.
+P11B0 is accepted. The Conversation authoring model is now explicit and
+manifest-backed rather than dependent on filesystem discovery or one giant
+canonical/runtime file. The pre-migration inventory is preserved in the
+compiler characterization: Dialogue Content had `216` phrase families,
+`395` phrases and `1` player choice; Common Interactions had `47` patterns
+and `13` response pools; Grounded Personal Dialogue had `7` patterns and
+`13` response pools; Semantic Definitions had `2` flows/definitions; and the
+static Conversation UI provider had `10` suggestions.
 
-Do **not** resume the parked P11B wording migration.
+The accepted foundation includes:
 
-Start with the modular source foundation:
+- twelve cohesive canonical shards under
+  `tools/semantic_harness/codebuilder/sources/conversation/` and one explicit
+  ordered manifest with duplicate-path, duplicate-ID, missing/unregistered
+  shard, per-shard schema, global uniqueness and cross-reference validation;
+- one existing-CodeBuilder Conversation compiler that validates independently,
+  merges in memory, canonical-sorts, and emits per-shard plus whole-model
+  fingerprints and canonical-ID provenance/location records;
+- generated compatibility snapshots for the four retired monolithic source
+  files, with the modular shards remaining the only authoring source;
+- bounded generated Conversation runtime shards: `41` Lua files, a `6,481`
+  byte registry hub, a maximum generated shard of `56,114` bytes, and explicit
+  `64 KiB`/`48`-record compiler bounds;
+- generated domain translation bundles, a generated-only read-only aggregate
+  snapshot, and the stable-ID service path that reports an owning shard,
+  validates stale fingerprints, and writes only that shard before regenerating;
+- response-observatory translation overlays updated to recognize the modular
+  Conversation translation tree without changing gameplay or publication
+  behavior.
 
-1. inventory the canonical source records currently owned by
-   `semantic_dialogue_content.json`, `common_interactions.json`,
-   `grounded_personal_dialogue.json`, `semantic_definitions.json`, and the
-   current Conversation UI/static suggestion definitions;
-2. design the minimal `sources/conversation/manifest.json` contract and stable
-   domain shard boundaries;
-3. add characterization proving the current merged model/IDs before moving any
-   record;
-4. implement manifest loading, per-shard validation, canonical merge,
-   deterministic ordering, global ID uniqueness and cross-reference checks;
-5. migrate one small source domain into shards without changing runtime output;
-6. prove two consecutive generation runs are byte-identical;
-7. run focused tests plus the full native Lua `897/897` regression gate.
+Acceptance evidence:
 
-Then continue through P11B0C–P11B0H:
+- P11B0 compiler/authoring tests: `4/4 PASS`; focused affected authoring,
+  translation, dataset and runtime tests: `50/50 PASS`; response-observatory
+  matrix: `20` tests, `18 PASS`, `2` expected skips;
+- full Python discovery: `649` tests, `OK`, `56` expected skips;
+- native Lua regression: `897/897 PASS`;
+- two consecutive CodeBuilder generations matched byte-for-byte across `110`
+  Conversation source/generated/translation artifacts;
+- full Project Hoomans Kahlua scan: `3,387` files, `0` errors and `0` warnings;
+  installed Project Zomboid Kahlua compiler: `123` files passed, `0` source
+  writes, no game launch;
+- `git diff --check`: PASS. Source-save guards remained green in the full
+  suite, and no native Project Zomboid session, source save, Workshop
+  publication or remote branch was touched.
 
-- move remaining canonical authoring into modular shards;
-- generate a whole-model audit snapshot;
-- replace giant Dialogue Content `Registry.lua` with bounded generated runtime
-  shards + a small hub/manifest;
-- generate translation artifacts by Conversation domain;
-- make authoring services resolve stable IDs to owning shards;
-- enforce shard size/count bounds.
+## Immediate Next Chunk — P11B wording migration by domain shard
 
-P11B0 is not accepted while a canonical source or generated runtime registry
-remains a scaling monolith merely for compatibility.
+P11B0 acceptance is complete. Resume the parked wording work only by cohesive
+Conversation domain shard (for example Wellbeing, Needs, Health, Social
+Apology, or Task Fetch), never one translation key at a time. Use the
+manifest/compiler, generated domain bundles, aggregate snapshot and
+ID-addressed authoring service established above; preserve semantic identity,
+runtime parity, EN/TL parity, bounded output, and stale-fingerprint guards.
 
-Do not perform the P11E taxonomy rename yet unless the compiler needs a narrow
-internal change. Build provenance/physical shard path must stay metadata, not
-canonical identity.
-
-Do not redesign Studio yet.
-
-Do not create P12 or any new mandatory parent phase.
+Do not begin P11C, P11D or P11E taxonomy cleanup until the selected P11B domain
+slice has its own characterization and acceptance evidence. Do not create P12
+or another mandatory parent phase.
 
 ## Historical P11A starting instructions (completed)
 

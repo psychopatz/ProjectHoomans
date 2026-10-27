@@ -1,0 +1,205 @@
+{
+  "domain": "grounded_personal",
+  "kind": "responses",
+  "responsePools": [
+    {
+      "id": "semantic.question.backstory.known.former_job",
+      "variants": [
+        {
+          "en": "I worked as %1 before all this.",
+          "fallback": "I worked as %1 before all this.",
+          "id": "semantic.question.backstory.known.former_job.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob",
+          "tl": "Nagtrabaho ako bilang %1 bago ang lahat ng ito.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.hometown",
+      "variants": [
+        {
+          "en": "I grew up in %1.",
+          "fallback": "I grew up in %1.",
+          "id": "semantic.question.backstory.known.hometown.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryHometown",
+          "tl": "Lumaki ako sa %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.education",
+      "variants": [
+        {
+          "en": "I studied %1.",
+          "fallback": "I studied %1.",
+          "id": "semantic.question.backstory.known.education.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation",
+          "tl": "Nag-aral ako ng %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.hobby",
+      "variants": [
+        {
+          "en": "I used to enjoy %1.",
+          "fallback": "I used to enjoy %1.",
+          "id": "semantic.question.backstory.known.hobby.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryHobby",
+          "tl": "Mahilig ako noon sa %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.family_background",
+      "variants": [
+        {
+          "en": "My family was %1.",
+          "fallback": "My family was %1.",
+          "id": "semantic.question.backstory.known.family_background.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFamily",
+          "tl": "Ang pamilya ko ay %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.fear",
+      "variants": [
+        {
+          "en": "I have always been afraid of %1.",
+          "fallback": "I have always been afraid of %1.",
+          "id": "semantic.question.backstory.known.fear.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFear",
+          "tl": "Palagi akong natatakot sa %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.tragedy",
+      "variants": [
+        {
+          "en": "Something happened: %1.",
+          "fallback": "Something happened: %1.",
+          "id": "semantic.question.backstory.known.tragedy.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy",
+          "tl": "May nangyari: %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known",
+      "variants": [
+        {
+          "en": "Before all this, I was %1.",
+          "fallback": "Before all this, I was %1.",
+          "id": "semantic.question.backstory.known.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown",
+          "tl": "Bago ang lahat ng ito, ako ay %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.suspected",
+      "variants": [
+        {
+          "en": "I think it was %1, but I could be mistaken.",
+          "fallback": "I think it was %1, but I could be mistaken.",
+          "id": "semantic.question.backstory.suspected.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected",
+          "tl": "Sa tingin ko ay %1 iyon, pero maaaring mali ako.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.ambiguous",
+      "variants": [
+        {
+          "en": "Which part of my past do you mean?",
+          "fallback": "Which part of my past do you mean?",
+          "id": "semantic.question.backstory.ambiguous.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous",
+          "tl": "Aling bahagi ng nakaraan ko ang ibig mong sabihin?"
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.refusal",
+      "variants": [
+        {
+          "en": "I'm not ready to talk about that yet.",
+          "fallback": "I'm not ready to talk about that yet.",
+          "id": "semantic.question.backstory.refusal.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal",
+          "tl": "Hindi pa ako handang pag-usapan iyan."
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.follow_up.location",
+      "variants": [
+        {
+          "en": "I remember that part of my life, but I don't have more detail about where it was.",
+          "fallback": "I remember that part of my life, but I don't have more detail about where it was.",
+          "id": "semantic.question.backstory.follow_up.location.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation",
+          "tl": "Naaalala ko ang bahaging iyon ng buhay ko, pero wala akong higit na detalye kung saan iyon."
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.follow_up.miss",
+      "variants": [
+        {
+          "en": "Sometimes. I still think about that part of my life.",
+          "fallback": "Sometimes. I still think about that part of my life.",
+          "id": "semantic.question.backstory.follow_up.miss.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss",
+          "tl": "Minsan. Naiisip ko pa rin ang bahaging iyon ng buhay ko."
+        }
+      ]
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Grounded Personal Dialogue",
+    "references": [
+      {
+        "license": "Project Hoomans authored content",
+        "name": "Project Hoomans Authoring Review",
+        "reviewedOn": "2026-10-20",
+        "url": "https://github.com/psychopatz/ProjectHoomans",
+        "use": "Reviewed semantic shapes for identity-seeded personal backstory questions and bounded follow-up references."
+      }
+    ],
+    "version": "1"
+  },
+  "version": 1
+}

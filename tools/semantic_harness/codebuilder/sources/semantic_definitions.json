@@ -1,121 +1,126 @@
 {
-  "schema": "pnc.semantic_authoring.v1",
-  "source": {
-    "owner": "ProjectHoomans",
-    "version": "1"
-  },
   "definitions": [
     {
-      "id": "pnc.dialogue.follow",
-      "owner": "ProjectHoomans",
       "capability": "pnc:companion.follow",
-      "utterances": {
-        "positives": [
-          "keep close behind me",
-          "please keep close behind me"
-        ],
-        "negatives": [
-          "don't keep close behind me",
-          "are you keeping close behind me",
-          "i kept close behind you"
-        ]
-      },
-      "emit": {
-        "intent": "REQUEST",
-        "speechAct": "REQUEST",
-        "action": "FOLLOW",
-        "reference": "AUTHORED_FOLLOW"
-      },
       "confidence": 0.99,
-      "priority": 165,
+      "emit": {
+        "action": "FOLLOW",
+        "intent": "REQUEST",
+        "reference": "AUTHORED_FOLLOW",
+        "speechAct": "REQUEST"
+      },
       "flow": {
         "id": "pnc.dialogue.follow.flow",
-        "version": 1,
-        "owner": "ProjectHoomans",
-        "triggers": [
-          {
-            "intent": "REQUEST",
-            "speechAct": "REQUEST",
-            "action": "FOLLOW",
-            "pattern": "pnc.dialogue.follow.keep_close_behind_me"
-          },
-          {
-            "intent": "REQUEST",
-            "speechAct": "REQUEST",
-            "action": "FOLLOW",
-            "pattern": "pnc.dialogue.follow.please_keep_close_behind_me"
-          }
-        ],
         "initial": "accepted",
         "nodes": {
           "accepted": {
-            "terminal": true,
-            "responsePool": "semantic.authored.follow"
+            "responsePool": "semantic.authored.follow",
+            "terminal": true
           }
-        }
+        },
+        "owner": "ProjectHoomans",
+        "triggers": [
+          {
+            "action": "FOLLOW",
+            "intent": "REQUEST",
+            "pattern": "pnc.dialogue.follow.keep_close_behind_me",
+            "speechAct": "REQUEST"
+          },
+          {
+            "action": "FOLLOW",
+            "intent": "REQUEST",
+            "pattern": "pnc.dialogue.follow.please_keep_close_behind_me",
+            "speechAct": "REQUEST"
+          }
+        ],
+        "version": 1
       },
+      "id": "pnc.dialogue.follow",
+      "owner": "ProjectHoomans",
+      "priority": 165,
       "responses": {
         "poolID": "semantic.authored.follow",
         "variants": [
           {
+            "en": "Okay, I'll come with you.",
             "id": "accepted",
             "key": "UI_PNC_Conversation_Semantic_AuthoredFollowAccepted",
-            "en": "Okay, I'll come with you.",
             "tl": "Sige, sasama ako sa iyo."
           }
+        ]
+      },
+      "utterances": {
+        "negatives": [
+          "don't keep close behind me",
+          "are you keeping close behind me",
+          "i kept close behind you"
+        ],
+        "positives": [
+          "keep close behind me",
+          "please keep close behind me"
         ]
       }
     },
     {
-      "id": "pnc.lab.stay_with_you",
-      "owner": "SemanticLab",
       "capability": "pnc:companion.stay",
-      "utterances": {
-        "positives": [
-          "stay with you"
-        ],
-        "negatives": [
-          "don't stay with you"
-        ]
-      },
-      "emit": {
-        "intent": "REQUEST",
-        "speechAct": "REQUEST",
-        "action": "STAY"
-      },
       "confidence": 0.99,
-      "priority": 170,
+      "emit": {
+        "action": "STAY",
+        "intent": "REQUEST",
+        "speechAct": "REQUEST"
+      },
       "flow": {
         "id": "pnc.lab.stay_with_you.flow",
-        "version": 1,
-        "owner": "SemanticLab",
-        "triggers": [
-          {
-            "intent": "REQUEST",
-            "speechAct": "REQUEST",
-            "action": "STAY",
-            "pattern": "pnc.lab.stay_with_you.stay_with_you"
-          }
-        ],
         "initial": "accepted",
         "nodes": {
           "accepted": {
-            "terminal": true,
-            "responsePool": "semantic.lab.stay.with.you"
+            "responsePool": "semantic.lab.stay.with.you",
+            "terminal": true
           }
-        }
+        },
+        "owner": "SemanticLab",
+        "triggers": [
+          {
+            "action": "STAY",
+            "intent": "REQUEST",
+            "pattern": "pnc.lab.stay_with_you.stay_with_you",
+            "speechAct": "REQUEST"
+          }
+        ],
+        "version": 1
       },
+      "id": "pnc.lab.stay_with_you",
+      "owner": "SemanticLab",
+      "priority": 170,
       "responses": {
         "poolID": "semantic.lab.stay.with.you",
         "variants": [
           {
+            "en": "Okay, I'll stay with you.",
             "id": "accepted",
             "key": "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted",
-            "en": "Okay, I'll stay with you.",
             "tl": "Sige, mananatili ako sa iyo."
           }
         ]
+      },
+      "utterances": {
+        "negatives": [
+          "don't stay with you"
+        ],
+        "positives": [
+          "stay with you"
+        ]
       }
     }
-  ]
+  ],
+  "generatedCompatibility": {
+    "owner": "manifest-backed Conversation compiler",
+    "readOnly": true,
+    "sourceManifest": "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
+  },
+  "schema": "pnc.semantic_authoring.v1",
+  "source": {
+    "owner": "ProjectHoomans",
+    "version": "1"
+  }
 }

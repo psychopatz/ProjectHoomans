@@ -1,154 +1,27 @@
 {
-  "schemaVersion": 2,
-  "source": {
-    "name": "Project Hoomans Dialogue Content Registry",
-    "version": "3",
-    "contentLicense": "Project Hoomans authored content"
+  "generatedCompatibility": {
+    "owner": "manifest-backed Conversation compiler",
+    "readOnly": true,
+    "sourceManifest": "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
+  },
+  "groups": {
+    "commands_emotes": {
+      "contentOwner": "projecthoomans.dialogue_content.commands_emotes"
+    },
+    "compatibility": {
+      "contentOwner": "projecthoomans.dialogue_content.compatibility"
+    },
+    "events": {
+      "contentOwner": "projecthoomans.dialogue_content.events"
+    },
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
   },
   "phraseFamilies": [
     {
-      "semanticTemplateID": "semantic.flow.greeting.opening.default",
-      "group": "commands_emotes",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Hey there. Good to see you.",
-              "TL": "Uy, mabuti at nakita kita."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Hello there. Good to see you.",
-              "TL": "Kumusta. Mabuti at nakita kita."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Good to see you.",
-              "TL": "Mabuti at nakita kita."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Morning.",
-              "TL": "Morning."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Hey again.",
-              "TL": "Hey again."
-            }
-          },
-          {
-            "translations": {
-              "EN": "There you are again.",
-              "TL": "There you are again."
-            }
-          }
-        ],
-        "warm": [
-          {
-            "translations": {
-              "EN": "Hey! It is good to see you.",
-              "TL": "Uy! Mabuti at nakita kita."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Hey, good to see you.",
-              "TL": "Uy, mabuti kang makita."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Glad to see you.",
-              "TL": "Masaya akong nakita kita."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Hey. Stay safe out there.",
-              "TL": "Hey. Stay safe out there."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Back already?",
-              "TL": "Back already?"
-            }
-          },
-          {
-            "translations": {
-              "EN": "Hey, love.",
-              "TL": "Hey, love."
-            }
-          }
-        ],
-        "terse": [
-          {
-            "translations": {
-              "EN": "Hello.",
-              "TL": "Kumusta."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Hi.",
-              "TL": "Hi."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Hey.",
-              "TL": "Uy."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Morning, sweetheart.",
-              "TL": "Morning, sweetheart."
-            }
-          },
-          {
-            "translations": {
-              "EN": "There you are.",
-              "TL": "There you are."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Take care of yourself.",
-              "TL": "Take care of yourself."
-            }
-          }
-        ],
-        "guarded": [
-          {
-            "translations": {
-              "EN": "State your business. Keep your distance.",
-              "TL": "Sabihin mo ang pakay mo. Lumayo ka."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Keep your distance.",
-              "TL": "Lumayo ka."
-            }
-          },
-          {
-            "translations": {
-              "EN": "State your business.",
-              "TL": "Sabihin mo ang pakay mo."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.combat.reaction.default",
       "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.default",
       "styles": {
         "neutral": [
           {
@@ -161,8 +34,8 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.combat.reaction.retreat",
       "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.retreat",
       "styles": {
         "neutral": [
           {
@@ -175,8 +48,8 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.combat.reaction.threat",
       "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.threat",
       "styles": {
         "neutral": [
           {
@@ -189,2398 +62,112 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.companion.reaction.abandonment",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Stay with me next time. We watch each other's backs.",
-              "TL": "Stay with me next time. We watch each other's backs."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.companion.reaction.camp_rejected",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I can't find a safe room or campfire nearby.",
-              "TL": "I can't find a safe room or campfire nearby."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.companion.reaction.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I heard you. We will handle it together.",
-              "TL": "I heard you. We will handle it together."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.colonist",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Bandit fire! Pull back and cover the wounded colonist.",
-              "TL": "Bandit fire! Pull back and cover the wounded colonist."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.default",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Bandit fire! Stay with the wounded survivor and watch the flank.",
-              "TL": "Bandit fire! Stay with the wounded survivor and watch the flank."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.family",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Bandit fire! Stay together and cover the wounded family member.",
-              "TL": "Bandit fire! Stay together and cover the wounded family member."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.lover",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Bandit fire. Stay close; I have got you.",
-              "TL": "Bandit fire. Stay close; I have got you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.companion_dogs.feed.female",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Here you go, good girl.",
-              "TL": "Here you go, good girl."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.companion_dogs.feed.male",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Here you go, good boy.",
-              "TL": "Here you go, good boy."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.companion_dogs.feed.unknown",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Here you go, good dog.",
-              "TL": "Here you go, good dog."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.companion_dogs.greeting.female",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Who is a good girl?",
-              "TL": "Who is a good girl?"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.companion_dogs.greeting.male",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Who is a good boy?",
-              "TL": "Who is a good boy?"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.companion_dogs.greeting.unknown",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Who is a good dog?",
-              "TL": "Who is a good dog?"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.necroa.mask_warning.colonist",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Mask up. We keep the camp safe together.",
-              "TL": "Mask up. We keep the camp safe together."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.necroa.mask_warning.default",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Put your mask back on. Knox is airborne.",
-              "TL": "Put your mask back on. Knox is airborne."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.necroa.mask_warning.family",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Put your mask on, family. I am not losing you to the air.",
-              "TL": "Put your mask on, family. I am not losing you to the air."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.necroa.player_mask_removed.default",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Put your mask back on. The air is not safe.",
-              "TL": "Put your mask back on. The air is not safe."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.necroa.player_mask_removed.hostile",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Put your mask back on before you become a problem.",
-              "TL": "Put your mask back on before you become a problem."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.necroa.player_mask_removed.lover",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Please put your mask back on, love. This air is not safe.",
-              "TL": "Please put your mask back on, love. This air is not safe."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.projectalife.encounter.friendly",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Those survivors seem friendly. Keep your hands visible.",
-              "TL": "Those survivors seem friendly. Keep your hands visible."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.projectalife.encounter.hostile",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That group looks hostile. Keep cover between us and them.",
-              "TL": "That group looks hostile. Keep cover between us and them."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.projectalife.encounter.unknown",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Someone is out there. Let us watch before we approach.",
-              "TL": "Someone is out there. Let us watch before we approach."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.projectalife.faction.hostile",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That faction may be hostile toward us now. Stay alert.",
-              "TL": "That faction may be hostile toward us now. Stay alert."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.projectalife.faction.incoming",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "They just opened fire on us. Stay close.",
-              "TL": "They just opened fire on us. Stay close."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.projectalife.faction.outgoing",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "We hit them. They may retaliate soon.",
-              "TL": "We hit them. They may retaliate soon."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.projectalife.meta.aircraft.heli",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Something is flying over us. Keep listening.",
-              "TL": "Something is flying over us. Keep listening."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.projectalife.meta.aircraft.military",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That aircraft sounds close. Stay sharp.",
-              "TL": "That aircraft sounds close. Stay sharp."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.projectalife.meta.ambience",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I do not like that sound. Stay close.",
-              "TL": "I do not like that sound. Stay close."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.projectalife.meta.crash",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That crash sounded close. Keep your eyes open.",
-              "TL": "That crash sounded close. Keep your eyes open."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.compat.projectalife.meta.gunfire",
-      "group": "compatibility",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Someone is shooting nearby. Keep your head down.",
-              "TL": "Someone is shooting nearby. Keep your head down."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.conversation.safety.danger",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Watch out. We need to move now.",
-              "TL": "Watch out. We need to move now."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.conversation.safety.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Stay alert.",
-              "TL": "Stay alert."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.corpse.reaction.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Someone died here. We should remember that.",
-              "TL": "Someone died here. We should remember that."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.corpse.reaction.revenge",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Someone is going to answer for this.",
-              "TL": "Someone is going to answer for this."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.flow.farewell.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Take care.",
-              "TL": "Take care."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.flow.farewell.friendly",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Take care. I will see you soon.",
-              "TL": "Take care. I will see you soon."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.leader_loss.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "We lost our leader. We need to decide what comes next.",
-              "TL": "We lost our leader. We need to decide what comes next."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.leader_loss.devoted",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "We lost someone important. We need to stay together.",
-              "TL": "We lost someone important. We need to stay together."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.leader_loss.dissent",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "The old order is gone. What happens next is up to us.",
-              "TL": "The old order is gone. What happens next is up to us."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.leader_loss.close",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "We lost someone close to us. We need to stay together.",
-              "TL": "We lost someone close to us. We need to stay together."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.leader_loss.colonist",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Our leader is gone. We keep the group together.",
-              "TL": "Our leader is gone. We keep the group together."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.leader_loss.distant",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "The leader is gone. Someone needs to decide what comes next.",
-              "TL": "The leader is gone. Someone needs to decide what comes next."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.call.bandage",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am hurt and down. Please patch me up.",
-              "TL": "I am hurt and down. Please patch me up."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.call.bleedout",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am bleeding out. I need a bandage now.",
-              "TL": "I am bleeding out. I need a bandage now."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.call.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am down. I need help.",
-              "TL": "I am down. I need help."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.call.dehydration",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am too weak to move. I need water.",
-              "TL": "I am too weak to move. I need water."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.call.exhaustion",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I pushed too far. I need a moment to recover.",
-              "TL": "I pushed too far. I need a moment to recover."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.call.mercy",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am down. Please let me live.",
-              "TL": "I am down. Please let me live."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.call.rescue",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I cannot move. I need help over here.",
-              "TL": "I cannot move. I need help over here."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.call.starvation",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am too weak to move. I need food.",
-              "TL": "I am too weak to move. I need food."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I need help with this wound.",
-              "TL": "I need help with this wound."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.mercy",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Please. I need help with this wound.",
-              "TL": "Please. I need help with this wound."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.repeat.bandage",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I still need these wounds patched.",
-              "TL": "I still need these wounds patched."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.repeat.bleedout",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am still losing blood. Please help.",
-              "TL": "I am still losing blood. Please help."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.repeat.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am not up yet. Please help me.",
-              "TL": "I am not up yet. Please help me."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.repeat.dehydration",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I still need water to recover.",
-              "TL": "I still need water to recover."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.repeat.exhaustion",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I still need a little more time to recover.",
-              "TL": "I still need a little more time to recover."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.repeat.mercy",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am still asking you to spare me.",
-              "TL": "I am still asking you to spare me."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.repeat.rescue",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am still down here. Do not leave me.",
-              "TL": "I am still down here. Do not leave me."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.repeat.starvation",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I still need something to eat.",
-              "TL": "I still need something to eat."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.teammate.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "They are hurt. Stay with them while I cover you.",
-              "TL": "They are hurt. Stay with them while I cover you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.teammate.found",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I found a bandage for them. Hold still while I patch them up.",
-              "TL": "I found a bandage for them. Hold still while I patch them up."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.teammate.missing",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am out of bandages. Can someone spare one for them?",
-              "TL": "I am out of bandages. Can someone spare one for them?"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.treatment.bandage",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "The wound is treated. I can move when you are ready.",
-              "TL": "The wound is treated. I can move when you are ready."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.treatment.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Thank you. That treatment helped.",
-              "TL": "Thank you. That treatment helped."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.update.bandage",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am still down and waiting for a patch.",
-              "TL": "I am still down and waiting for a patch."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.update.bleedout",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "The bleeding has not stopped. I still need a bandage.",
-              "TL": "The bleeding has not stopped. I still need a bandage."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.update.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am still down. I still need help.",
-              "TL": "I am still down. I still need help."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.update.dehydration",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I still need water before I can move.",
-              "TL": "I still need water before I can move."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.update.exhaustion",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I still need time to recover my strength.",
-              "TL": "I still need time to recover my strength."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.update.mercy",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am still down. Please do not finish me.",
-              "TL": "I am still down. Please do not finish me."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.update.rescue",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am still here. Please come back for me.",
-              "TL": "I am still here. Please come back for me."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.update.starvation",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I still need food before I can get up.",
-              "TL": "I still need food before I can get up."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.medical.distress.urgent",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am hurt. I need help now.",
-              "TL": "I am hurt. I need help now."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.social.reaction.default",
-      "group": "events",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I hear you.",
-              "TL": "I hear you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.accepted_generic.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I hear you.",
-              "TL": "I hear you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.accepted_generic.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I will keep that in mind.",
-              "TL": "I will keep that in mind."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.admire.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I appreciate that more than you know.",
-              "TL": "Mas pinahahalagahan ko iyan kaysa sa iniisip mo."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.admire.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That is kind of you to say.",
-              "TL": "That is kind of you to say."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.admire.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You see more in me than most people do.",
-              "TL": "You see more in me than most people do."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.apology.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "All right. Let us move on.",
-              "TL": "All right. Let us move on."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.apology.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I accept the apology.",
-              "TL": "I accept the apology."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.apology.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Fine. We can put it behind us.",
-              "TL": "Fine. We can put it behind us."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.ask_name.named.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am %s.",
-              "TL": "I am %s."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.ask_name.named.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "The name is %s.",
-              "TL": "The name is %s."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.ask_name.named.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You can call me %s.",
-              "TL": "Maaari mo akong tawaging %s."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.ask_name.prompt",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I'll tell you my name once we've established some trust. What's your name?",
-              "TL": "I'll tell you my name once we've established some trust. What's your name?"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.ask_name.rejected.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am not ready to share that yet.",
-              "TL": "I am not ready to share that yet."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.ask_name.rejected.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Ask me again when we know each other better.",
-              "TL": "Ask me again when we know each other better."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.ask_name.unnamed.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You want to know my name? Give me a second.",
-              "TL": "You want to know my name? Give me a second."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.ask_name.unnamed.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "My name is a longer story than you might expect.",
-              "TL": "My name is a longer story than you might expect."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.comfort.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Thanks. I needed that.",
-              "TL": "Thanks. I needed that."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.comfort.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I appreciate you being here.",
-              "TL": "I appreciate you being here."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.comfort.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That helps more than I expected.",
-              "TL": "That helps more than I expected."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.compliment.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That is kind of you to say.",
-              "TL": "That is kind of you to say."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.compliment.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I appreciate the compliment.",
-              "TL": "I appreciate the compliment."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.compliment.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You noticed. Thank you.",
-              "TL": "You noticed. Thank you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.cooldown.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You have had your turn with the compliments today.",
-              "TL": "You have had your turn with the compliments today."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.cooldown.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Save the sweet talk for tomorrow.",
-              "TL": "Save the sweet talk for tomorrow."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.flirt.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Careful. You are making me smile.",
-              "TL": "Careful. You are making me smile."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.flirt.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You always know how to get my attention.",
-              "TL": "You always know how to get my attention."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.flirt.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That is a dangerous thing to say to me.",
-              "TL": "That is a dangerous thing to say to me."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.hostile.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Watch your mouth.",
-              "TL": "Watch your mouth."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.hostile.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Try that again and see what happens.",
-              "TL": "Try that again and see what happens."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.hostile.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I have heard worse, but do not make a habit of it.",
-              "TL": "I have heard worse, but do not make a habit of it."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.insult.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Watch your mouth.",
-              "TL": "Watch your mouth."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.insult.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Try that again and see what happens.",
-              "TL": "Try that again and see what happens."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.insult.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I have heard worse, but do not make a habit of it.",
-              "TL": "I have heard worse, but do not make a habit of it."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_camp.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "All right. We will make camp here.",
-              "TL": "All right. We will make camp here."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_camp.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I will settle in here for now.",
-              "TL": "I will settle in here for now."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_camp.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Understood. I will stay here and take care of my needs.",
-              "TL": "Understood. I will stay here and take care of my needs."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_follow.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "All right. I am with you.",
-              "TL": "Sige. Sasama ako sa iyo."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_follow.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Lead the way.",
-              "TL": "Lead the way."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_follow.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I will stay close.",
-              "TL": "I will stay close."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_generic.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "All right.",
-              "TL": "All right."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_generic.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Understood.",
-              "TL": "Understood."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_generic.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I will handle it.",
-              "TL": "I will handle it."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_rejected.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I cannot do that right now.",
-              "TL": "I cannot do that right now."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_rejected.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That order is not going to work.",
-              "TL": "That order is not going to work."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_stay.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "All right. I will hold here.",
-              "TL": "All right. I will hold here."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.order_stay.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I will stay put.",
-              "TL": "I will stay put."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.orientation.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That is not the kind of interest I have in you.",
-              "TL": "That is not the kind of interest I have in you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.orientation.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Do not mistake my kindness for an invitation.",
-              "TL": "Do not mistake my kindness for an invitation."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.personality.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That kind of attention is not welcome from me.",
-              "TL": "That kind of attention is not welcome from me."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.personality.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You are reading me wrong.",
-              "TL": "You are reading me wrong."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.praise.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I appreciate that.",
-              "TL": "I appreciate that."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.praise.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Good. I was hoping you noticed.",
-              "TL": "Good. I was hoping you noticed."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.praise.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That is nice to hear from you.",
-              "TL": "That is nice to hear from you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_admire.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I hear you.",
-              "TL": "I hear you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_admire.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That got through.",
-              "TL": "That got through."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_apology.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I hear you.",
-              "TL": "I hear you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_apology.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "We will talk about it.",
-              "TL": "We will talk about it."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_comfort.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I hear you.",
-              "TL": "I hear you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_comfort.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Thanks for saying that.",
-              "TL": "Thanks for saying that."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_compliment.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I heard the compliment.",
-              "TL": "I heard the compliment."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_compliment.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That is kind of you to say.",
-              "TL": "That is kind of you to say."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_flirt.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I heard you.",
-              "TL": "I heard you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_flirt.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You are bold, I will give you that.",
-              "TL": "You are bold, I will give you that."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_generic.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I hear you.",
-              "TL": "I hear you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_generic.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Give me a moment.",
-              "TL": "Give me a moment."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_hostile.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I heard you. Watch yourself.",
-              "TL": "I heard you. Watch yourself."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_hostile.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Noted. Choose your next words carefully.",
-              "TL": "Noted. Choose your next words carefully."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_insult.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I heard you.",
-              "TL": "I heard you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_insult.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Noted.",
-              "TL": "Noted."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_praise.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I hear you.",
-              "TL": "I hear you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_praise.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I will remember that.",
-              "TL": "I will remember that."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_romantic.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I heard you. You are bold, I will give you that.",
-              "TL": "I heard you. You are bold, I will give you that."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_romantic.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You certainly know how to get my attention.",
-              "TL": "You certainly know how to get my attention."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_sexual.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I heard you. Give me a second.",
-              "TL": "I heard you. Give me a second."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.queued_sexual.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That is a bold thing to say.",
-              "TL": "That is a bold thing to say."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.rejected_game.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Not now.",
-              "TL": "Not now."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.rejected_game.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That did not land well.",
-              "TL": "That did not land well."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.rejected_generic.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That did not land well.",
-              "TL": "That did not land well."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.rejected_generic.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I am not taking that from you right now.",
-              "TL": "I am not taking that from you right now."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.rejected_hostile.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Back off.",
-              "TL": "Back off."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.rejected_hostile.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You do not get to speak to me that way.",
-              "TL": "You do not get to speak to me that way."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.rejected_sexual.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That is not happening.",
-              "TL": "That is not happening."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.rejected_sexual.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Do not talk to me like that.",
-              "TL": "Do not talk to me like that."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.rejected_sexual.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You are moving far too fast.",
-              "TL": "You are moving far too fast."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.relationship.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "We are not there yet.",
-              "TL": "We are not there yet."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.relationship.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That is a little too familiar for us.",
-              "TL": "That is a little too familiar for us."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.romantic.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Careful. You are making me smile.",
-              "TL": "Careful. You are making me smile."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.romantic.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You always know how to get my attention.",
-              "TL": "You always know how to get my attention."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.romantic.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That is a dangerous thing to say to me.",
-              "TL": "That is a dangerous thing to say to me."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.sexual.1",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You are bold. I cannot say I dislike that.",
-              "TL": "You are bold. I cannot say I dislike that."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.sexual.2",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "That is a very direct proposition.",
-              "TL": "That is a very direct proposition."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.tool_reply.sexual.3",
-      "group": "tool_replies",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "You are moving fast, but I heard you.",
-              "TL": "You are moving fast, but I heard you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.command.player.follow",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.player.attack_auto",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "{names}, on me.",
-              "TL": "{names}, sumunod kayo sa akin."
+              "EN": "{name}, use your best judgment.",
+              "TL": "{name}, gamitin ang iyong pasya."
             }
           },
           {
             "translations": {
-              "EN": "Stay close, {names}.",
-              "TL": "Manatili kayong malapit, {names}."
+              "EN": "{name}, handle threats as you see fit.",
+              "TL": "{name}, harapin ang banta ayon sa iyong pasya."
             }
           },
           {
             "translations": {
-              "EN": "{names}, let's move.",
-              "TL": "{names}, umalis na tayo."
+              "EN": "Watch our backs, {name}.",
+              "TL": "Bantayan mo kami, {name}."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.command.player.stay",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.player.attack_melee",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "{names}, wait here.",
-              "TL": "{names}, maghintay kayo rito."
+              "EN": "{name}, keep it close.",
+              "TL": "{name}, lumaban nang malapitan."
             }
           },
           {
             "translations": {
-              "EN": "Hold this position, {names}.",
-              "TL": "Panatilihin ang posisyon, {names}."
+              "EN": "Take the front line, {name}.",
+              "TL": "Ikaw sa unahan, {name}."
             }
           },
           {
             "translations": {
-              "EN": "{names}, stay put for now.",
-              "TL": "{names}, manatili muna rito."
+              "EN": "{name}, save your ammunition.",
+              "TL": "{name}, itabi ang bala."
             }
           }
         ]
       }
     },
     {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.player.attack_none",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "{name}, stay out of the fight.",
+              "TL": "{name}, huwag sumali sa laban."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Avoid trouble, {name}.",
+              "TL": "Iwasan ang gulo, {name}."
+            }
+          },
+          {
+            "translations": {
+              "EN": "{name}, don't engage unless I change the order.",
+              "TL": "{name}, huwag lumaban hangga't hindi ko binabago ang utos."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.player.attack_ranged",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "{name}, keep your distance.",
+              "TL": "{name}, panatilihin ang distansya."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Give us ranged cover, {name}.",
+              "TL": "Takpan kami mula sa malayo, {name}."
+            }
+          },
+          {
+            "translations": {
+              "EN": "{name}, engage from a safe distance.",
+              "TL": "{name}, lumaban mula sa ligtas na layo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
       "semanticTemplateID": "semantic.command.player.camp",
-      "group": "commands_emotes",
       "styles": {
         "neutral": [
           {
@@ -2617,8 +204,8 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.command.player.camp_none",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.player.camp_none",
       "styles": {
         "neutral": [
           {
@@ -2631,8 +218,8 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.command.player.camp_rejected",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.player.camp_rejected",
       "styles": {
         "neutral": [
           {
@@ -2657,8 +244,48 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.command.player.return_home",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.player.follow",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "{names}, on me.",
+              "TL": "{names}, sumunod kayo sa akin."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Stay close, {names}.",
+              "TL": "Manatili kayong malapit, {names}."
+            }
+          },
+          {
+            "translations": {
+              "EN": "{names}, let's move.",
+              "TL": "{names}, umalis na tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.player.generic",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Understood, {names}.",
+              "TL": "Naiintindihan ko, {names}."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.player.return_home",
       "styles": {
         "neutral": [
           {
@@ -2683,178 +310,138 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.command.player.attack_auto",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.player.stay",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "{name}, use your best judgment.",
-              "TL": "{name}, gamitin ang iyong pasya."
+              "EN": "{names}, wait here.",
+              "TL": "{names}, maghintay kayo rito."
             }
           },
           {
             "translations": {
-              "EN": "{name}, handle threats as you see fit.",
-              "TL": "{name}, harapin ang banta ayon sa iyong pasya."
+              "EN": "Hold this position, {names}.",
+              "TL": "Panatilihin ang posisyon, {names}."
             }
           },
           {
             "translations": {
-              "EN": "Watch our backs, {name}.",
-              "TL": "Bantayan mo kami, {name}."
+              "EN": "{names}, stay put for now.",
+              "TL": "{names}, manatili muna rito."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.command.player.attack_melee",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.attack_auto",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "{name}, keep it close.",
-              "TL": "{name}, lumaban nang malapitan."
+              "EN": "I'll handle it.",
+              "TL": "Ako na ang bahala."
             }
           },
           {
             "translations": {
-              "EN": "Take the front line, {name}.",
-              "TL": "Ikaw sa unahan, {name}."
+              "EN": "I'll stay alert.",
+              "TL": "Mananatili akong alerto."
             }
           },
           {
             "translations": {
-              "EN": "{name}, save your ammunition.",
-              "TL": "{name}, itabi ang bala."
+              "EN": "Leave it to me.",
+              "TL": "Ipaubaya mo sa akin."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.command.player.attack_ranged",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.attack_melee",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "{name}, keep your distance.",
-              "TL": "{name}, panatilihin ang distansya."
+              "EN": "Going in close.",
+              "TL": "Lalapit ako."
             }
           },
           {
             "translations": {
-              "EN": "Give us ranged cover, {name}.",
-              "TL": "Takpan kami mula sa malayo, {name}."
+              "EN": "I'll take the front.",
+              "TL": "Ako sa unahan."
             }
           },
           {
             "translations": {
-              "EN": "{name}, engage from a safe distance.",
-              "TL": "{name}, lumaban mula sa ligtas na layo."
+              "EN": "Keeping it quiet.",
+              "TL": "Tahimik lang ako."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.command.player.attack_none",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.attack_none",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "{name}, stay out of the fight.",
-              "TL": "{name}, huwag sumali sa laban."
+              "EN": "I'll avoid trouble.",
+              "TL": "Iiwas ako sa gulo."
             }
           },
           {
             "translations": {
-              "EN": "Avoid trouble, {name}.",
-              "TL": "Iwasan ang gulo, {name}."
+              "EN": "I won't engage.",
+              "TL": "Hindi ako sasali."
             }
           },
           {
             "translations": {
-              "EN": "{name}, don't engage unless I change the order.",
-              "TL": "{name}, huwag lumaban hangga't hindi ko binabago ang utos."
+              "EN": "Staying out of it.",
+              "TL": "Hindi ako makikialam."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.command.player.generic",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.attack_ranged",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "Understood, {names}.",
-              "TL": "Naiintindihan ko, {names}."
+              "EN": "I'll cover you.",
+              "TL": "Bibigyan kita ng takip."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Keeping my distance.",
+              "TL": "Mananatili akong malayo."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I've got a clear shot.",
+              "TL": "May malinaw akong tira."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.command.reply.follow",
       "group": "commands_emotes",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Right behind you.",
-              "TL": "Susunod ako sa iyo."
-            }
-          },
-          {
-            "translations": {
-              "EN": "I'm with you.",
-              "TL": "Kasama mo ako."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Lead the way.",
-              "TL": "Ikaw ang manguna."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.command.reply.stay",
-      "group": "commands_emotes",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I'll stay here.",
-              "TL": "Mananatili ako rito."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Holding position.",
-              "TL": "Hawak ko ang posisyon."
-            }
-          },
-          {
-            "translations": {
-              "EN": "I'll keep watch.",
-              "TL": "Magbabantay ako."
-            }
-          }
-        ]
-      }
-    },
-    {
       "semanticTemplateID": "semantic.command.reply.camp",
-      "group": "commands_emotes",
       "styles": {
         "neutral": [
           {
@@ -2891,138 +478,8 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.command.reply.return_home",
       "group": "commands_emotes",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Heading home.",
-              "TL": "Uuwi na ako."
-            }
-          },
-          {
-            "translations": {
-              "EN": "I'll return to the base.",
-              "TL": "Babalik ako sa base."
-            }
-          },
-          {
-            "translations": {
-              "EN": "On my way home.",
-              "TL": "Papauwi na ako."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.command.reply.attack_auto",
-      "group": "commands_emotes",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I'll handle it.",
-              "TL": "Ako na ang bahala."
-            }
-          },
-          {
-            "translations": {
-              "EN": "I'll stay alert.",
-              "TL": "Mananatili akong alerto."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Leave it to me.",
-              "TL": "Ipaubaya mo sa akin."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.command.reply.attack_melee",
-      "group": "commands_emotes",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Going in close.",
-              "TL": "Lalapit ako."
-            }
-          },
-          {
-            "translations": {
-              "EN": "I'll take the front.",
-              "TL": "Ako sa unahan."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Keeping it quiet.",
-              "TL": "Tahimik lang ako."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.command.reply.attack_ranged",
-      "group": "commands_emotes",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I'll cover you.",
-              "TL": "Bibigyan kita ng takip."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Keeping my distance.",
-              "TL": "Mananatili akong malayo."
-            }
-          },
-          {
-            "translations": {
-              "EN": "I've got a clear shot.",
-              "TL": "May malinaw akong tira."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.command.reply.attack_none",
-      "group": "commands_emotes",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I'll avoid trouble.",
-              "TL": "Iiwas ako sa gulo."
-            }
-          },
-          {
-            "translations": {
-              "EN": "I won't engage.",
-              "TL": "Hindi ako sasali."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Staying out of it.",
-              "TL": "Hindi ako makikialam."
-            }
-          }
-        ]
-      }
-    },
-    {
       "semanticTemplateID": "semantic.command.reply.camp_rejected",
-      "group": "commands_emotes",
       "styles": {
         "neutral": [
           {
@@ -3059,8 +516,34 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.command.reply.generic_rejected",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.follow",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Right behind you.",
+              "TL": "Susunod ako sa iyo."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I'm with you.",
+              "TL": "Kasama mo ako."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Lead the way.",
+              "TL": "Ikaw ang manguna."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.generic_rejected",
       "styles": {
         "neutral": [
           {
@@ -3073,164 +556,536 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.player.insult",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.return_home",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "Back off, {names}.",
-              "TL": "Lumayo ka, {names}."
+              "EN": "Heading home.",
+              "TL": "Uuwi na ako."
             }
           },
           {
             "translations": {
-              "EN": "You're asking for trouble, {names}.",
-              "TL": "Naghahanap ka ng gulo, {names}."
+              "EN": "I'll return to the base.",
+              "TL": "Babalik ako sa base."
             }
           },
           {
             "translations": {
-              "EN": "Keep your distance, {names}.",
-              "TL": "Panatilihin ang distansya, {names}."
+              "EN": "On my way home.",
+              "TL": "Papauwi na ako."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.player.thumbsdown",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.stay",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "No. That's not good enough, {names}.",
-              "TL": "Hindi. Hindi sapat iyan, {names}."
+              "EN": "I'll stay here.",
+              "TL": "Mananatili ako rito."
             }
           },
           {
             "translations": {
-              "EN": "I don't like that, {names}.",
-              "TL": "Hindi ko gusto iyan, {names}."
+              "EN": "Holding position.",
+              "TL": "Hawak ko ang posisyon."
             }
           },
           {
             "translations": {
-              "EN": "Try again, {names}.",
-              "TL": "Subukan muli, {names}."
+              "EN": "I'll keep watch.",
+              "TL": "Magbabantay ako."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.player.wavehi",
-      "group": "commands_emotes",
+      "group": "events",
+      "semanticTemplateID": "semantic.companion.reaction.abandonment",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "Hey, {names}.",
-              "TL": "Uy, {names}."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Good to see you, {names}.",
-              "TL": "Mabuti at nakita kita, {names}."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Morning, {names}.",
-              "TL": "Magandang umaga, {names}."
+              "EN": "Stay with me next time. We watch each other's backs.",
+              "TL": "Stay with me next time. We watch each other's backs."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.player.wavebye",
-      "group": "commands_emotes",
+      "group": "events",
+      "semanticTemplateID": "semantic.companion.reaction.camp_rejected",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "Take care, {names}.",
-              "TL": "Mag-ingat, {names}."
-            }
-          },
-          {
-            "translations": {
-              "EN": "See you around, {names}.",
-              "TL": "Kita tayo, {names}."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Stay safe, {names}.",
-              "TL": "Manatiling ligtas, {names}."
+              "EN": "I can't find a safe room or campfire nearby.",
+              "TL": "I can't find a safe room or campfire nearby."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.player.thankyou",
-      "group": "commands_emotes",
+      "group": "events",
+      "semanticTemplateID": "semantic.companion.reaction.default",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "Thanks, {names}.",
-              "TL": "Salamat, {names}."
-            }
-          },
-          {
-            "translations": {
-              "EN": "I appreciate that, {names}.",
-              "TL": "Pinahahalagahan ko iyan, {names}."
-            }
-          },
-          {
-            "translations": {
-              "EN": "You have my thanks, {names}.",
-              "TL": "Salamat sa iyo, {names}."
+              "EN": "I heard you. We will handle it together.",
+              "TL": "I heard you. We will handle it together."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.player.thumbsup",
-      "group": "commands_emotes",
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.colonist",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "Good work, {names}.",
-              "TL": "Mahusay, {names}."
-            }
-          },
-          {
-            "translations": {
-              "EN": "That's what I like to see, {names}.",
-              "TL": "Iyan ang gusto kong makita, {names}."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Keep it up, {names}.",
-              "TL": "Ipagpatuloy mo, {names}."
+              "EN": "Bandit fire! Pull back and cover the wounded colonist.",
+              "TL": "Bandit fire! Pull back and cover the wounded colonist."
             }
           }
         ]
       }
     },
     {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Bandit fire! Stay with the wounded survivor and watch the flank.",
+              "TL": "Bandit fire! Stay with the wounded survivor and watch the flank."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.family",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Bandit fire! Stay together and cover the wounded family member.",
+              "TL": "Bandit fire! Stay together and cover the wounded family member."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.lover",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Bandit fire. Stay close; I have got you.",
+              "TL": "Bandit fire. Stay close; I have got you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.companion_dogs.feed.female",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Here you go, good girl.",
+              "TL": "Here you go, good girl."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.companion_dogs.feed.male",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Here you go, good boy.",
+              "TL": "Here you go, good boy."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.companion_dogs.feed.unknown",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Here you go, good dog.",
+              "TL": "Here you go, good dog."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.companion_dogs.greeting.female",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Who is a good girl?",
+              "TL": "Who is a good girl?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.companion_dogs.greeting.male",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Who is a good boy?",
+              "TL": "Who is a good boy?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.companion_dogs.greeting.unknown",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Who is a good dog?",
+              "TL": "Who is a good dog?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.necroa.mask_warning.colonist",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Mask up. We keep the camp safe together.",
+              "TL": "Mask up. We keep the camp safe together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.necroa.mask_warning.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Put your mask back on. Knox is airborne.",
+              "TL": "Put your mask back on. Knox is airborne."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.necroa.mask_warning.family",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Put your mask on, family. I am not losing you to the air.",
+              "TL": "Put your mask on, family. I am not losing you to the air."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.necroa.player_mask_removed.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Put your mask back on. The air is not safe.",
+              "TL": "Put your mask back on. The air is not safe."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.necroa.player_mask_removed.hostile",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Put your mask back on before you become a problem.",
+              "TL": "Put your mask back on before you become a problem."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.necroa.player_mask_removed.lover",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Please put your mask back on, love. This air is not safe.",
+              "TL": "Please put your mask back on, love. This air is not safe."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.projectalife.encounter.friendly",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Those survivors seem friendly. Keep your hands visible.",
+              "TL": "Those survivors seem friendly. Keep your hands visible."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.projectalife.encounter.hostile",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That group looks hostile. Keep cover between us and them.",
+              "TL": "That group looks hostile. Keep cover between us and them."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.projectalife.encounter.unknown",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Someone is out there. Let us watch before we approach.",
+              "TL": "Someone is out there. Let us watch before we approach."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.projectalife.faction.hostile",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That faction may be hostile toward us now. Stay alert.",
+              "TL": "That faction may be hostile toward us now. Stay alert."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.projectalife.faction.incoming",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "They just opened fire on us. Stay close.",
+              "TL": "They just opened fire on us. Stay close."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.projectalife.faction.outgoing",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We hit them. They may retaliate soon.",
+              "TL": "We hit them. They may retaliate soon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.projectalife.meta.aircraft.heli",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Something is flying over us. Keep listening.",
+              "TL": "Something is flying over us. Keep listening."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.projectalife.meta.aircraft.military",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That aircraft sounds close. Stay sharp.",
+              "TL": "That aircraft sounds close. Stay sharp."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.projectalife.meta.ambience",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I do not like that sound. Stay close.",
+              "TL": "I do not like that sound. Stay close."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.projectalife.meta.crash",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That crash sounded close. Keep your eyes open.",
+              "TL": "That crash sounded close. Keep your eyes open."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "compatibility",
+      "semanticTemplateID": "semantic.compat.projectalife.meta.gunfire",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Someone is shooting nearby. Keep your head down.",
+              "TL": "Someone is shooting nearby. Keep your head down."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.conversation.safety.danger",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Watch out. We need to move now.",
+              "TL": "Watch out. We need to move now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.conversation.safety.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Stay alert.",
+              "TL": "Stay alert."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.corpse.reaction.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Someone died here. We should remember that.",
+              "TL": "Someone died here. We should remember that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.corpse.reaction.revenge",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Someone is going to answer for this.",
+              "TL": "Someone is going to answer for this."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
       "semanticTemplateID": "semantic.emote.player.clap",
-      "group": "commands_emotes",
       "styles": {
         "neutral": [
           {
@@ -3255,8 +1110,34 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.player.salute",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.player.insult",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Back off, {names}.",
+              "TL": "Lumayo ka, {names}."
+            }
+          },
+          {
+            "translations": {
+              "EN": "You're asking for trouble, {names}.",
+              "TL": "Naghahanap ka ng gulo, {names}."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Keep your distance, {names}.",
+              "TL": "Panatilihin ang distansya, {names}."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.player.salute",
       "styles": {
         "neutral": [
           {
@@ -3281,136 +1162,210 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.reply.thumbsup.active",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.player.thankyou",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "Good. Let's keep moving on this.",
-              "TL": "Good. Let's keep moving on this."
+              "EN": "Thanks, {names}.",
+              "TL": "Salamat, {names}."
             }
           },
           {
             "translations": {
-              "EN": "Good work.",
-              "TL": "Good work."
+              "EN": "I appreciate that, {names}.",
+              "TL": "Pinahahalagahan ko iyan, {names}."
             }
           },
           {
             "translations": {
-              "EN": "Let's keep moving.",
-              "TL": "Let's keep moving."
+              "EN": "You have my thanks, {names}.",
+              "TL": "Salamat sa iyo, {names}."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.reply.thumbsup",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.player.thumbsdown",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "Good.",
-              "TL": "Good."
+              "EN": "No. That's not good enough, {names}.",
+              "TL": "Hindi. Hindi sapat iyan, {names}."
             }
           },
           {
             "translations": {
-              "EN": "Let's hope it holds.",
-              "TL": "Let's hope it holds."
+              "EN": "I don't like that, {names}.",
+              "TL": "Hindi ko gusto iyan, {names}."
             }
           },
           {
             "translations": {
-              "EN": "Good work.",
-              "TL": "Good work."
+              "EN": "Try again, {names}.",
+              "TL": "Subukan muli, {names}."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.player.thumbsup",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good work, {names}.",
+              "TL": "Mahusay, {names}."
             }
           },
           {
             "translations": {
-              "EN": "That's how we get through this.",
-              "TL": "That's how we get through this."
+              "EN": "That's what I like to see, {names}.",
+              "TL": "Iyan ang gusto kong makita, {names}."
             }
           },
           {
             "translations": {
-              "EN": "That's my survivor.",
-              "TL": "That's my survivor."
+              "EN": "Keep it up, {names}.",
+              "TL": "Ipagpatuloy mo, {names}."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.player.wavebye",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Take care, {names}.",
+              "TL": "Mag-ingat, {names}."
             }
           },
           {
             "translations": {
-              "EN": "I knew you could do it.",
-              "TL": "I knew you could do it."
+              "EN": "See you around, {names}.",
+              "TL": "Kita tayo, {names}."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Stay safe, {names}.",
+              "TL": "Manatiling ligtas, {names}."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.player.wavehi",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Hey, {names}.",
+              "TL": "Uy, {names}."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good to see you, {names}.",
+              "TL": "Mabuti at nakita kita, {names}."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Morning, {names}.",
+              "TL": "Magandang umaga, {names}."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.clap",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Thanks.",
+              "TL": "Thanks."
+            }
+          },
+          {
+            "translations": {
+              "EN": "It was a small win.",
+              "TL": "It was a small win."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Glad you were there.",
+              "TL": "Glad you were there."
+            }
+          },
+          {
+            "translations": {
+              "EN": "We did it together.",
+              "TL": "We did it together."
+            }
+          },
+          {
+            "translations": {
+              "EN": "You make a good audience.",
+              "TL": "You make a good audience."
+            }
+          },
+          {
+            "translations": {
+              "EN": "That means a lot, love.",
+              "TL": "That means a lot, love."
             }
           }
         ],
         "warm": [
           {
             "translations": {
-              "EN": "That's the spirit.",
-              "TL": "That's the spirit."
+              "EN": "You're too kind.",
+              "TL": "You're too kind."
             }
           },
           {
             "translations": {
-              "EN": "Proud of you.",
-              "TL": "Proud of you."
+              "EN": "Nice to hear that from you.",
+              "TL": "Nice to hear that from you."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.reply.thumbsdown",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.default",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "I got the message. Tell me what's wrong.",
-              "TL": "I got the message. Tell me what's wrong."
-            }
-          },
-          {
-            "translations": {
-              "EN": "You could just say what's wrong.",
-              "TL": "You could just say what's wrong."
-            }
-          },
-          {
-            "translations": {
-              "EN": "If you have a problem, tell me.",
-              "TL": "If you have a problem, tell me."
-            }
-          },
-          {
-            "translations": {
-              "EN": "We need to work together.",
-              "TL": "We need to work together."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Tell me what bothered you, love.",
-              "TL": "Tell me what bothered you, love."
-            }
-          },
-          {
-            "translations": {
-              "EN": "I see the disapproval.",
-              "TL": "I see the disapproval."
+              "EN": "I hear you.",
+              "TL": "I hear you."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.reply.insult",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.insult",
       "styles": {
         "neutral": [
           {
@@ -3467,104 +1422,276 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.reply.wavehi",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.salute",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "Hey.",
-              "TL": "Hey."
+              "EN": "Stay sharp.",
+              "TL": "Stay sharp."
             }
           },
           {
             "translations": {
-              "EN": "I see you.",
-              "TL": "I see you."
+              "EN": "Acknowledged.",
+              "TL": "Acknowledged."
             }
           },
           {
             "translations": {
-              "EN": "Keep your distance.",
-              "TL": "Keep your distance."
+              "EN": "Stay sharp, survivor.",
+              "TL": "Stay sharp, survivor."
             }
           },
           {
             "translations": {
-              "EN": "I see you. Don't come closer.",
-              "TL": "I see you. Don't come closer."
+              "EN": "Right back at you.",
+              "TL": "Right back at you."
             }
           },
           {
             "translations": {
-              "EN": "Hello.",
-              "TL": "Hello."
+              "EN": "Don't salute me.",
+              "TL": "Don't salute me."
             }
           },
           {
             "translations": {
-              "EN": "Morning.",
-              "TL": "Morning."
+              "EN": "Stay sharp and stay away.",
+              "TL": "Stay sharp and stay away."
             }
           }
         ],
         "warm": [
           {
             "translations": {
-              "EN": "Hey again.",
-              "TL": "Hey again."
+              "EN": "Always, love.",
+              "TL": "Always, love."
             }
           },
           {
             "translations": {
-              "EN": "There you are again.",
-              "TL": "There you are again."
+              "EN": "Stay safe for me.",
+              "TL": "Stay safe for me."
             }
           },
           {
             "translations": {
-              "EN": "Morning, good to see you.",
-              "TL": "Morning, good to see you."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Hey, we're all here.",
-              "TL": "Hey, we're all here."
-            }
-          },
-          {
-            "translations": {
-              "EN": "There you are, love.",
-              "TL": "There you are, love."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Good morning, sweetheart.",
-              "TL": "Good morning, sweetheart."
-            }
-          }
-        ],
-        "terse": [
-          {
-            "translations": {
-              "EN": "There you are.",
-              "TL": "There you are."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Good to see you.",
-              "TL": "Good to see you."
+              "EN": "Take care.",
+              "TL": "Take care."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.reply.wavebye",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.thankyou",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You're welcome.",
+              "TL": "You're welcome."
+            }
+          },
+          {
+            "translations": {
+              "EN": "No trouble.",
+              "TL": "No trouble."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Anytime.",
+              "TL": "Anytime."
+            }
+          },
+          {
+            "translations": {
+              "EN": "You don't have to thank me.",
+              "TL": "You don't have to thank me."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Don't mistake this for friendship.",
+              "TL": "Don't mistake this for friendship."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Fine. It was nothing.",
+              "TL": "Fine. It was nothing."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Anytime. We look after our own.",
+              "TL": "Anytime. We look after our own."
+            }
+          },
+          {
+            "translations": {
+              "EN": "That's what we're here for.",
+              "TL": "That's what we're here for."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Always, love.",
+              "TL": "Always, love."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Anything for you.",
+              "TL": "Anything for you."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Of course.",
+              "TL": "Of course."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.thumbsdown",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I got the message. Tell me what's wrong.",
+              "TL": "I got the message. Tell me what's wrong."
+            }
+          },
+          {
+            "translations": {
+              "EN": "You could just say what's wrong.",
+              "TL": "You could just say what's wrong."
+            }
+          },
+          {
+            "translations": {
+              "EN": "If you have a problem, tell me.",
+              "TL": "If you have a problem, tell me."
+            }
+          },
+          {
+            "translations": {
+              "EN": "We need to work together.",
+              "TL": "We need to work together."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Tell me what bothered you, love.",
+              "TL": "Tell me what bothered you, love."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I see the disapproval.",
+              "TL": "I see the disapproval."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.thumbsup",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good.",
+              "TL": "Good."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Let's hope it holds.",
+              "TL": "Let's hope it holds."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good work.",
+              "TL": "Good work."
+            }
+          },
+          {
+            "translations": {
+              "EN": "That's how we get through this.",
+              "TL": "That's how we get through this."
+            }
+          },
+          {
+            "translations": {
+              "EN": "That's my survivor.",
+              "TL": "That's my survivor."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I knew you could do it.",
+              "TL": "I knew you could do it."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "That's the spirit.",
+              "TL": "That's the spirit."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Proud of you.",
+              "TL": "Proud of you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.thumbsup.active",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good. Let's keep moving on this.",
+              "TL": "Good. Let's keep moving on this."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good work.",
+              "TL": "Good work."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Let's keep moving.",
+              "TL": "Let's keep moving."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.wavebye",
       "styles": {
         "neutral": [
           {
@@ -3645,194 +1772,106 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.reply.thankyou",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.wavehi",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "You're welcome.",
-              "TL": "You're welcome."
+              "EN": "Hey.",
+              "TL": "Hey."
             }
           },
           {
             "translations": {
-              "EN": "No trouble.",
-              "TL": "No trouble."
+              "EN": "I see you.",
+              "TL": "I see you."
             }
           },
           {
             "translations": {
-              "EN": "Anytime.",
-              "TL": "Anytime."
+              "EN": "Keep your distance.",
+              "TL": "Keep your distance."
             }
           },
           {
             "translations": {
-              "EN": "You don't have to thank me.",
-              "TL": "You don't have to thank me."
+              "EN": "I see you. Don't come closer.",
+              "TL": "I see you. Don't come closer."
             }
           },
           {
             "translations": {
-              "EN": "Don't mistake this for friendship.",
-              "TL": "Don't mistake this for friendship."
+              "EN": "Hello.",
+              "TL": "Hello."
             }
           },
           {
             "translations": {
-              "EN": "Fine. It was nothing.",
-              "TL": "Fine. It was nothing."
+              "EN": "Morning.",
+              "TL": "Morning."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "There you are.",
+              "TL": "There you are."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good to see you.",
+              "TL": "Good to see you."
             }
           }
         ],
         "warm": [
           {
             "translations": {
-              "EN": "Anytime. We look after our own.",
-              "TL": "Anytime. We look after our own."
+              "EN": "Hey again.",
+              "TL": "Hey again."
             }
           },
           {
             "translations": {
-              "EN": "That's what we're here for.",
-              "TL": "That's what we're here for."
+              "EN": "There you are again.",
+              "TL": "There you are again."
             }
           },
           {
             "translations": {
-              "EN": "Always, love.",
-              "TL": "Always, love."
+              "EN": "Morning, good to see you.",
+              "TL": "Morning, good to see you."
             }
           },
           {
             "translations": {
-              "EN": "Anything for you.",
-              "TL": "Anything for you."
+              "EN": "Hey, we're all here.",
+              "TL": "Hey, we're all here."
             }
           },
           {
             "translations": {
-              "EN": "Of course.",
-              "TL": "Of course."
+              "EN": "There you are, love.",
+              "TL": "There you are, love."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good morning, sweetheart.",
+              "TL": "Good morning, sweetheart."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.reply.clap",
-      "group": "commands_emotes",
+      "group": "events",
+      "semanticTemplateID": "semantic.flow.farewell.default",
       "styles": {
         "neutral": [
-          {
-            "translations": {
-              "EN": "Thanks.",
-              "TL": "Thanks."
-            }
-          },
-          {
-            "translations": {
-              "EN": "It was a small win.",
-              "TL": "It was a small win."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Glad you were there.",
-              "TL": "Glad you were there."
-            }
-          },
-          {
-            "translations": {
-              "EN": "We did it together.",
-              "TL": "We did it together."
-            }
-          },
-          {
-            "translations": {
-              "EN": "You make a good audience.",
-              "TL": "You make a good audience."
-            }
-          },
-          {
-            "translations": {
-              "EN": "That means a lot, love.",
-              "TL": "That means a lot, love."
-            }
-          }
-        ],
-        "warm": [
-          {
-            "translations": {
-              "EN": "You're too kind.",
-              "TL": "You're too kind."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Nice to hear that from you.",
-              "TL": "Nice to hear that from you."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "semanticTemplateID": "semantic.emote.reply.salute",
-      "group": "commands_emotes",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Stay sharp.",
-              "TL": "Stay sharp."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Acknowledged.",
-              "TL": "Acknowledged."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Stay sharp, survivor.",
-              "TL": "Stay sharp, survivor."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Right back at you.",
-              "TL": "Right back at you."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Don't salute me.",
-              "TL": "Don't salute me."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Stay sharp and stay away.",
-              "TL": "Stay sharp and stay away."
-            }
-          }
-        ],
-        "warm": [
-          {
-            "translations": {
-              "EN": "Always, love.",
-              "TL": "Always, love."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Stay safe for me.",
-              "TL": "Stay safe for me."
-            }
-          },
           {
             "translations": {
               "EN": "Take care.",
@@ -3843,23 +1882,241 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.emote.reply.default",
-      "group": "commands_emotes",
+      "group": "events",
+      "semanticTemplateID": "semantic.flow.farewell.friendly",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "I hear you.",
-              "TL": "I hear you."
+              "EN": "Take care. I will see you soon.",
+              "TL": "Take care. I will see you soon."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.flow.greeting.opening.friendly",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.flow.greeting.followup.default",
       "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You're welcome. Take care.",
+              "TL": "You're welcome. Take care."
+            }
+          },
+          {
+            "translations": {
+              "EN": "No trouble. Stay safe.",
+              "TL": "No trouble. Stay safe."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.flow.greeting.followup.friendly",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You're welcome. It's good to see you too.",
+              "TL": "Walang anuman. Mabuti at nakita rin kita."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Anytime. Glad you're here.",
+              "TL": "Anytime. Glad you're here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.flow.greeting.opening.default",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "State your business. Keep your distance.",
+              "TL": "Sabihin mo ang pakay mo. Lumayo ka."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Keep your distance.",
+              "TL": "Lumayo ka."
+            }
+          },
+          {
+            "translations": {
+              "EN": "State your business.",
+              "TL": "Sabihin mo ang pakay mo."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Hey there. Good to see you.",
+              "TL": "Uy, mabuti at nakita kita."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hello there. Good to see you.",
+              "TL": "Kumusta. Mabuti at nakita kita."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good to see you.",
+              "TL": "Mabuti at nakita kita."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Morning.",
+              "TL": "Morning."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hey again.",
+              "TL": "Hey again."
+            }
+          },
+          {
+            "translations": {
+              "EN": "There you are again.",
+              "TL": "There you are again."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Hello.",
+              "TL": "Kumusta."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hi.",
+              "TL": "Hi."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hey.",
+              "TL": "Uy."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Morning, sweetheart.",
+              "TL": "Morning, sweetheart."
+            }
+          },
+          {
+            "translations": {
+              "EN": "There you are.",
+              "TL": "There you are."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Take care of yourself.",
+              "TL": "Take care of yourself."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Hey! It is good to see you.",
+              "TL": "Uy! Mabuti at nakita kita."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hey, good to see you.",
+              "TL": "Uy, mabuti kang makita."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Glad to see you.",
+              "TL": "Masaya akong nakita kita."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hey. Stay safe out there.",
+              "TL": "Hey. Stay safe out there."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Back already?",
+              "TL": "Back already?"
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hey, love.",
+              "TL": "Hey, love."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.flow.greeting.opening.friendly",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Hey. Everything holding together?",
+              "TL": "Hey. Everything holding together?"
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good timing. We could use you.",
+              "TL": "Good timing. We could use you."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hey again. Everything under control?",
+              "TL": "Hey again. Everything under control?"
+            }
+          },
+          {
+            "translations": {
+              "EN": "Back again? Stay safe.",
+              "TL": "Back again? Stay safe."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hey, love. How are you holding up?",
+              "TL": "Hey, love. How are you holding up?"
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good to see you, sweetheart.",
+              "TL": "Good to see you, sweetheart."
+            }
+          }
+        ],
         "neutral": [
           {
             "translations": {
@@ -3895,44 +2152,6 @@
             "translations": {
               "EN": "Good to see you again. Need anything?",
               "TL": "Good to see you again. Need anything?"
-            }
-          }
-        ],
-        "warm": [
-          {
-            "translations": {
-              "EN": "There you are, love.",
-              "TL": "There you are, love."
-            }
-          },
-          {
-            "translations": {
-              "EN": "I was hoping I'd see you today.",
-              "TL": "I was hoping I'd see you today."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Back so soon, love?",
-              "TL": "Back so soon, love?"
-            }
-          },
-          {
-            "translations": {
-              "EN": "I was hoping you'd come back.",
-              "TL": "I was hoping you'd come back."
-            }
-          },
-          {
-            "translations": {
-              "EN": "There you are. You doing alright?",
-              "TL": "There you are. You doing alright?"
-            }
-          },
-          {
-            "translations": {
-              "EN": "Good to see you. Come here.",
-              "TL": "Good to see you. Come here."
             }
           }
         ],
@@ -3974,75 +2193,49 @@
             }
           }
         ],
-        "guarded": [
+        "warm": [
           {
             "translations": {
-              "EN": "Hey. Everything holding together?",
-              "TL": "Hey. Everything holding together?"
+              "EN": "There you are, love.",
+              "TL": "There you are, love."
             }
           },
           {
             "translations": {
-              "EN": "Good timing. We could use you.",
-              "TL": "Good timing. We could use you."
+              "EN": "I was hoping I'd see you today.",
+              "TL": "I was hoping I'd see you today."
             }
           },
           {
             "translations": {
-              "EN": "Hey again. Everything under control?",
-              "TL": "Hey again. Everything under control?"
+              "EN": "Back so soon, love?",
+              "TL": "Back so soon, love?"
             }
           },
           {
             "translations": {
-              "EN": "Back again? Stay safe.",
-              "TL": "Back again? Stay safe."
+              "EN": "I was hoping you'd come back.",
+              "TL": "I was hoping you'd come back."
             }
           },
           {
             "translations": {
-              "EN": "Hey, love. How are you holding up?",
-              "TL": "Hey, love. How are you holding up?"
+              "EN": "There you are. You doing alright?",
+              "TL": "There you are. You doing alright?"
             }
           },
           {
             "translations": {
-              "EN": "Good to see you, sweetheart.",
-              "TL": "Good to see you, sweetheart."
+              "EN": "Good to see you. Come here.",
+              "TL": "Good to see you. Come here."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.flow.greeting.opening.rain",
       "group": "commands_emotes",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "Hey there. Wet one today.",
-              "TL": "Uy, maulan ngayon."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Rain's not letting up.",
-              "TL": "Rain's not letting up."
-            }
-          },
-          {
-            "translations": {
-              "EN": "Keep dry if you can.",
-              "TL": "Keep dry if you can."
-            }
-          }
-        ]
-      }
-    },
-    {
       "semanticTemplateID": "semantic.flow.greeting.opening.question.default",
-      "group": "commands_emotes",
       "styles": {
         "neutral": [
           {
@@ -4067,8 +2260,8 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.flow.greeting.opening.question.friendly",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.flow.greeting.opening.question.friendly",
       "styles": {
         "neutral": [
           {
@@ -4093,40 +2286,1860 @@
       }
     },
     {
-      "semanticTemplateID": "semantic.flow.greeting.followup.friendly",
       "group": "commands_emotes",
+      "semanticTemplateID": "semantic.flow.greeting.opening.rain",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "You're welcome. It's good to see you too.",
-              "TL": "Walang anuman. Mabuti at nakita rin kita."
+              "EN": "Hey there. Wet one today.",
+              "TL": "Uy, maulan ngayon."
             }
           },
           {
             "translations": {
-              "EN": "Anytime. Glad you're here.",
-              "TL": "Anytime. Glad you're here."
+              "EN": "Rain's not letting up.",
+              "TL": "Rain's not letting up."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Keep dry if you can.",
+              "TL": "Keep dry if you can."
             }
           }
         ]
       }
     },
     {
-      "semanticTemplateID": "semantic.flow.greeting.followup.default",
-      "group": "commands_emotes",
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.close",
       "styles": {
         "neutral": [
           {
             "translations": {
-              "EN": "You're welcome. Take care.",
-              "TL": "You're welcome. Take care."
+              "EN": "We lost someone close to us. We need to stay together.",
+              "TL": "We lost someone close to us. We need to stay together."
             }
-          },
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.colonist",
+      "styles": {
+        "neutral": [
           {
             "translations": {
-              "EN": "No trouble. Stay safe.",
-              "TL": "No trouble. Stay safe."
+              "EN": "Our leader is gone. We keep the group together.",
+              "TL": "Our leader is gone. We keep the group together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We lost our leader. We need to decide what comes next.",
+              "TL": "We lost our leader. We need to decide what comes next."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.devoted",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We lost someone important. We need to stay together.",
+              "TL": "We lost someone important. We need to stay together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.dissent",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The old order is gone. What happens next is up to us.",
+              "TL": "The old order is gone. What happens next is up to us."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.distant",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The leader is gone. Someone needs to decide what comes next.",
+              "TL": "The leader is gone. Someone needs to decide what comes next."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.bandage",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am hurt and down. Please patch me up.",
+              "TL": "I am hurt and down. Please patch me up."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.bleedout",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am bleeding out. I need a bandage now.",
+              "TL": "I am bleeding out. I need a bandage now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am down. I need help.",
+              "TL": "I am down. I need help."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.dehydration",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am too weak to move. I need water.",
+              "TL": "I am too weak to move. I need water."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.exhaustion",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I pushed too far. I need a moment to recover.",
+              "TL": "I pushed too far. I need a moment to recover."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.mercy",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am down. Please let me live.",
+              "TL": "I am down. Please let me live."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.rescue",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I cannot move. I need help over here.",
+              "TL": "I cannot move. I need help over here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.starvation",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am too weak to move. I need food.",
+              "TL": "I am too weak to move. I need food."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I need help with this wound.",
+              "TL": "I need help with this wound."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.mercy",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Please. I need help with this wound.",
+              "TL": "Please. I need help with this wound."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.bandage",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need these wounds patched.",
+              "TL": "I still need these wounds patched."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.bleedout",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still losing blood. Please help.",
+              "TL": "I am still losing blood. Please help."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am not up yet. Please help me.",
+              "TL": "I am not up yet. Please help me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.dehydration",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need water to recover.",
+              "TL": "I still need water to recover."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.exhaustion",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need a little more time to recover.",
+              "TL": "I still need a little more time to recover."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.mercy",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still asking you to spare me.",
+              "TL": "I am still asking you to spare me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.rescue",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still down here. Do not leave me.",
+              "TL": "I am still down here. Do not leave me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.starvation",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need something to eat.",
+              "TL": "I still need something to eat."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.teammate.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "They are hurt. Stay with them while I cover you.",
+              "TL": "They are hurt. Stay with them while I cover you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.teammate.found",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I found a bandage for them. Hold still while I patch them up.",
+              "TL": "I found a bandage for them. Hold still while I patch them up."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.teammate.missing",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am out of bandages. Can someone spare one for them?",
+              "TL": "I am out of bandages. Can someone spare one for them?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.treatment.bandage",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The wound is treated. I can move when you are ready.",
+              "TL": "The wound is treated. I can move when you are ready."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.treatment.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Thank you. That treatment helped.",
+              "TL": "Thank you. That treatment helped."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.bandage",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still down and waiting for a patch.",
+              "TL": "I am still down and waiting for a patch."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.bleedout",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The bleeding has not stopped. I still need a bandage.",
+              "TL": "The bleeding has not stopped. I still need a bandage."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still down. I still need help.",
+              "TL": "I am still down. I still need help."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.dehydration",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need water before I can move.",
+              "TL": "I still need water before I can move."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.exhaustion",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need time to recover my strength.",
+              "TL": "I still need time to recover my strength."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.mercy",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still down. Please do not finish me.",
+              "TL": "I am still down. Please do not finish me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.rescue",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still here. Please come back for me.",
+              "TL": "I am still here. Please come back for me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.starvation",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need food before I can get up.",
+              "TL": "I still need food before I can get up."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.urgent",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am hurt. I need help now.",
+              "TL": "I am hurt. I need help now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.social.reaction.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.accepted_generic.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.accepted_generic.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will keep that in mind.",
+              "TL": "I will keep that in mind."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.admire.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I appreciate that more than you know.",
+              "TL": "Mas pinahahalagahan ko iyan kaysa sa iniisip mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.admire.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is kind of you to say.",
+              "TL": "That is kind of you to say."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.admire.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You see more in me than most people do.",
+              "TL": "You see more in me than most people do."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.apology.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. Let us move on.",
+              "TL": "All right. Let us move on."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.apology.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I accept the apology.",
+              "TL": "I accept the apology."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.apology.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Fine. We can put it behind us.",
+              "TL": "Fine. We can put it behind us."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.named.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am %s.",
+              "TL": "I am %s."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.named.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The name is %s.",
+              "TL": "The name is %s."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.named.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You can call me %s.",
+              "TL": "Maaari mo akong tawaging %s."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.prompt",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll tell you my name once we've established some trust. What's your name?",
+              "TL": "I'll tell you my name once we've established some trust. What's your name?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.rejected.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am not ready to share that yet.",
+              "TL": "I am not ready to share that yet."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.rejected.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Ask me again when we know each other better.",
+              "TL": "Ask me again when we know each other better."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.unnamed.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You want to know my name? Give me a second.",
+              "TL": "You want to know my name? Give me a second."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.unnamed.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "My name is a longer story than you might expect.",
+              "TL": "My name is a longer story than you might expect."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.comfort.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Thanks. I needed that.",
+              "TL": "Thanks. I needed that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.comfort.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I appreciate you being here.",
+              "TL": "I appreciate you being here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.comfort.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That helps more than I expected.",
+              "TL": "That helps more than I expected."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.compliment.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is kind of you to say.",
+              "TL": "That is kind of you to say."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.compliment.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I appreciate the compliment.",
+              "TL": "I appreciate the compliment."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.compliment.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You noticed. Thank you.",
+              "TL": "You noticed. Thank you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.cooldown.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You have had your turn with the compliments today.",
+              "TL": "You have had your turn with the compliments today."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.cooldown.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Save the sweet talk for tomorrow.",
+              "TL": "Save the sweet talk for tomorrow."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.flirt.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Careful. You are making me smile.",
+              "TL": "Careful. You are making me smile."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.flirt.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You always know how to get my attention.",
+              "TL": "You always know how to get my attention."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.flirt.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is a dangerous thing to say to me.",
+              "TL": "That is a dangerous thing to say to me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.hostile.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Watch your mouth.",
+              "TL": "Watch your mouth."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.hostile.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Try that again and see what happens.",
+              "TL": "Try that again and see what happens."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.hostile.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I have heard worse, but do not make a habit of it.",
+              "TL": "I have heard worse, but do not make a habit of it."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.insult.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Watch your mouth.",
+              "TL": "Watch your mouth."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.insult.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Try that again and see what happens.",
+              "TL": "Try that again and see what happens."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.insult.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I have heard worse, but do not make a habit of it.",
+              "TL": "I have heard worse, but do not make a habit of it."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_camp.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. We will make camp here.",
+              "TL": "All right. We will make camp here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_camp.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will settle in here for now.",
+              "TL": "I will settle in here for now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_camp.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Understood. I will stay here and take care of my needs.",
+              "TL": "Understood. I will stay here and take care of my needs."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_follow.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. I am with you.",
+              "TL": "Sige. Sasama ako sa iyo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_follow.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Lead the way.",
+              "TL": "Lead the way."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_follow.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will stay close.",
+              "TL": "I will stay close."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_generic.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right.",
+              "TL": "All right."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_generic.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Understood.",
+              "TL": "Understood."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_generic.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will handle it.",
+              "TL": "I will handle it."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_rejected.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I cannot do that right now.",
+              "TL": "I cannot do that right now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_rejected.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That order is not going to work.",
+              "TL": "That order is not going to work."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_stay.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. I will hold here.",
+              "TL": "All right. I will hold here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_stay.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will stay put.",
+              "TL": "I will stay put."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.orientation.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is not the kind of interest I have in you.",
+              "TL": "That is not the kind of interest I have in you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.orientation.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Do not mistake my kindness for an invitation.",
+              "TL": "Do not mistake my kindness for an invitation."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.personality.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That kind of attention is not welcome from me.",
+              "TL": "That kind of attention is not welcome from me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.personality.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You are reading me wrong.",
+              "TL": "You are reading me wrong."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.praise.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I appreciate that.",
+              "TL": "I appreciate that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.praise.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good. I was hoping you noticed.",
+              "TL": "Good. I was hoping you noticed."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.praise.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is nice to hear from you.",
+              "TL": "That is nice to hear from you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_admire.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_admire.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That got through.",
+              "TL": "That got through."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_apology.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_apology.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We will talk about it.",
+              "TL": "We will talk about it."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_comfort.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_comfort.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Thanks for saying that.",
+              "TL": "Thanks for saying that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_compliment.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard the compliment.",
+              "TL": "I heard the compliment."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_compliment.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is kind of you to say.",
+              "TL": "That is kind of you to say."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_flirt.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you.",
+              "TL": "I heard you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_flirt.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You are bold, I will give you that.",
+              "TL": "You are bold, I will give you that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_generic.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_generic.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Give me a moment.",
+              "TL": "Give me a moment."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_hostile.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you. Watch yourself.",
+              "TL": "I heard you. Watch yourself."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_hostile.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Noted. Choose your next words carefully.",
+              "TL": "Noted. Choose your next words carefully."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_insult.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you.",
+              "TL": "I heard you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_insult.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Noted.",
+              "TL": "Noted."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_praise.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_praise.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will remember that.",
+              "TL": "I will remember that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_romantic.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you. You are bold, I will give you that.",
+              "TL": "I heard you. You are bold, I will give you that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_romantic.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You certainly know how to get my attention.",
+              "TL": "You certainly know how to get my attention."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_sexual.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you. Give me a second.",
+              "TL": "I heard you. Give me a second."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.queued_sexual.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is a bold thing to say.",
+              "TL": "That is a bold thing to say."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.rejected_game.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Not now.",
+              "TL": "Not now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.rejected_game.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That did not land well.",
+              "TL": "That did not land well."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.rejected_generic.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That did not land well.",
+              "TL": "That did not land well."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.rejected_generic.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am not taking that from you right now.",
+              "TL": "I am not taking that from you right now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.rejected_hostile.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Back off.",
+              "TL": "Back off."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.rejected_hostile.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You do not get to speak to me that way.",
+              "TL": "You do not get to speak to me that way."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.rejected_sexual.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is not happening.",
+              "TL": "That is not happening."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.rejected_sexual.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Do not talk to me like that.",
+              "TL": "Do not talk to me like that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.rejected_sexual.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You are moving far too fast.",
+              "TL": "You are moving far too fast."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.relationship.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We are not there yet.",
+              "TL": "We are not there yet."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.relationship.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is a little too familiar for us.",
+              "TL": "That is a little too familiar for us."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.romantic.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Careful. You are making me smile.",
+              "TL": "Careful. You are making me smile."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.romantic.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You always know how to get my attention.",
+              "TL": "You always know how to get my attention."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.romantic.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is a dangerous thing to say to me.",
+              "TL": "That is a dangerous thing to say to me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.sexual.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You are bold. I cannot say I dislike that.",
+              "TL": "You are bold. I cannot say I dislike that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.sexual.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is a very direct proposition.",
+              "TL": "That is a very direct proposition."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.sexual.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You are moving fast, but I heard you.",
+              "TL": "You are moving fast, but I heard you."
             }
           }
         ]
@@ -4135,32 +4148,24 @@
   ],
   "playerChoices": [
     {
+      "choiceTranslations": {
+        "EN": "What's up?",
+        "TL": "Ano ang balita?"
+      },
+      "hubID": "whats_up",
       "id": "conversation.landing:whats_up",
       "kind": "player_landing_choice",
-      "route": "semantic_hub",
-      "hubID": "whats_up",
       "labelTranslations": {
         "EN": "What's up",
         "TL": "Ano ang balita"
       },
-      "choiceTranslations": {
-        "EN": "What's up?",
-        "TL": "Ano ang balita?"
-      }
+      "route": "semantic_hub"
     }
   ],
-  "groups": {
-    "events": {
-      "contentOwner": "projecthoomans.dialogue_content.events"
-    },
-    "tool_replies": {
-      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
-    },
-    "compatibility": {
-      "contentOwner": "projecthoomans.dialogue_content.compatibility"
-    },
-    "commands_emotes": {
-      "contentOwner": "projecthoomans.dialogue_content.commands_emotes"
-    }
+  "schemaVersion": 2,
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
   }
 }

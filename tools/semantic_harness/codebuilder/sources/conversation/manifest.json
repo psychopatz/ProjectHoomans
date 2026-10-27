@@ -1,0 +1,97 @@
+{
+  "externalReferences": {
+    "patternIDs": [
+      "pnc.question.activity",
+      "pnc.question.date",
+      "pnc.question.health.are_you_hurt",
+      "pnc.question.identity",
+      "pnc.question.needs_offer_plain",
+      "pnc.question.time",
+      "pnc.question.weather",
+      "pnc.question.wellbeing_feeling",
+      "pnc.question.wellbeing_follow_up_what_is_wrong",
+      "pnc.social.gossip_event"
+    ]
+  },
+  "schema": "pnc.conversation.manifest.v1",
+  "shards": [
+    {
+      "domain": "greeting",
+      "kind": "content",
+      "order": 120,
+      "path": "content/greeting.json"
+    },
+    {
+      "domain": "social",
+      "kind": "content",
+      "order": 130,
+      "path": "content/social.json"
+    },
+    {
+      "domain": "command",
+      "kind": "content",
+      "order": 140,
+      "path": "content/command.json"
+    },
+    {
+      "domain": "event",
+      "kind": "content",
+      "order": 150,
+      "path": "content/event.json"
+    },
+    {
+      "domain": "compatibility",
+      "kind": "content",
+      "order": 160,
+      "path": "content/compatibility.json"
+    },
+    {
+      "domain": "task",
+      "kind": "content",
+      "order": 170,
+      "path": "content/task.json"
+    },
+    {
+      "domain": "common",
+      "kind": "patterns",
+      "order": 180,
+      "path": "patterns/common.json"
+    },
+    {
+      "domain": "common",
+      "kind": "responses",
+      "order": 190,
+      "path": "flows/common_responses.json"
+    },
+    {
+      "domain": "grounded_personal",
+      "kind": "patterns",
+      "order": 200,
+      "path": "patterns/grounded_personal.json"
+    },
+    {
+      "domain": "grounded_personal",
+      "kind": "responses",
+      "order": 210,
+      "path": "flows/grounded_personal_responses.json"
+    },
+    {
+      "domain": "semantic",
+      "kind": "flows",
+      "order": 220,
+      "path": "flows/semantic_definitions.json"
+    },
+    {
+      "domain": "static_suggestions",
+      "kind": "ui",
+      "order": 230,
+      "path": "ui/static_suggestions.json"
+    }
+  ],
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Conversation Authoring",
+    "version": "1"
+  },
+  "version": 1
+}

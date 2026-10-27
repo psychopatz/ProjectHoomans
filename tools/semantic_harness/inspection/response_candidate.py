@@ -73,7 +73,7 @@ def _verified_translation_asset(
     files = manifest["languages"][language]
     found: list[tuple[Path, str, dict[str, str]]] = []
     for relative in files:
-        if not relative.startswith(f"{language}/Conversation/Semantic/"):
+        if not relative.startswith(f"{language}/Conversation/"):
             continue
         if not relative.endswith(".json") or ".." in relative:
             raise ValueError("invalid manifest translation asset path")

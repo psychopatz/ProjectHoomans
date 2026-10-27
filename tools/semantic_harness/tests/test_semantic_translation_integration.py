@@ -134,15 +134,13 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
         )
         for language in ("EN", "TL"):
             with self.subTest(language=language):
-                relative = (
-                    f"{language}/Conversation/Semantic/GroundedPersonalDialogue.json"
-                )
+                relative = f"{language}/Conversation/Patterns.json"
                 self.assertIn(relative, manifest["languages"][language])
                 catalog = json.loads(
                     (repository / "Contents/mods/ProjectHoomans/common/media/translation"
                      / relative).read_text(encoding="utf-8")
                 )
-                self.assertEqual(set(catalog), self.BACKSTORY_KEYS)
+                self.assertTrue(self.BACKSTORY_KEYS.issubset(catalog))
                 self.assertTrue(all(catalog.values()))
                 if language == "TL":
                     self.assertNotEqual(

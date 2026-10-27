@@ -485,6 +485,10 @@ class SemanticInteractionAuthoring:
             )
             output.parent.mkdir(parents=True, exist_ok=True)
             writes.extend(write_dialogue_output(output, preview["compiled"]))
+            authoring._merge_modular_conversation_translations(
+                self.repository,
+                preview["compiled"],
+            )
         post_write = self.preview_interaction_spec(
             spec,
             source_id=source_id,

@@ -501,10 +501,18 @@ def _dialogue_preview_paths(
             if manifest_path.is_file() else {"version": 1, "languages": {}}
     except (OSError, UnicodeError, json.JSONDecodeError):
         manifest = {"version": 1, "languages": {}}
+    compatibility_snapshot = False
+    try:
+        source_document = json.loads(source_path.read_text(encoding="utf-8"))
+        compatibility_snapshot = isinstance(source_document, dict) and bool(
+            source_document.get("generatedCompatibility")
+        )
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        compatibility_snapshot = False
     for language in ("EN", "TL"):
         relative_path = f"{language}/Conversation/Semantic/{asset_stem}.json"
         entries = manifest.setdefault("languages", {}).setdefault(language, [])
-        if relative_path not in entries:
+        if relative_path not in entries and not compatibility_snapshot:
             entries.append(relative_path)
     expected_sources[manifest_relative_path] = (
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
@@ -678,6 +686,13 @@ def generate_dialogue_source(
             output,
             compiled,
         )
+        # Legacy workflow callers may still emit a compatibility dataset
+        # artifact while the checkout already uses the modular Conversation
+        # translation bundle. Merge only the generated translation keys into
+        # that domain bundle so the old path need not be re-registered (which
+        # would duplicate keys at runtime). Canonical edits are handled by the
+        # shard-aware Conversation service.
+        _merge_modular_conversation_translations(repository, compiled)
     except (CompileError, OSError, ValueError) as error:
         return {
             **preview,
@@ -693,6 +708,33 @@ def generate_dialogue_source(
         "writes": [str(path) for path in written],
         "reloadedBy": "caller_restart_required",
     }
+
+
+def _merge_modular_conversation_translations(
+    repository: Path,
+    compiled: dict[str, Any],
+) -> None:
+    """Keep legacy dataset generation visible in an existing modular bundle."""
+    translation_root = repository / TRANSLATION_RELATIVE_ROOT
+    for language in ("EN", "TL"):
+        path = translation_root / language / "Conversation/Patterns.json"
+        if not path.is_file():
+            continue
+        try:
+            current = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            current = {}
+        if not isinstance(current, dict):
+            current = {}
+        values = compiled.get("translations", {}).get(language, {})
+        if not isinstance(values, dict):
+            continue
+        current.update({key: value for key, value in values.items() if isinstance(value, str)})
+        path.write_text(
+            json.dumps(current, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
 
 
 def _dialogue_content_artifacts(repository: Path) -> list[dict[str, Any]]:

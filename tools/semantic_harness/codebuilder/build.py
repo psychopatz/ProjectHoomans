@@ -45,6 +45,23 @@ if __package__ in {None, ""}:
         render_semantic_lua_plan,
         render_semantic_manifest,
     )
+    from tools.semantic_harness.codebuilder.conversation_compiler import (
+        CONVERSATION_COMPATIBILITY_RUNTIME_RELATIVE,
+        CONVERSATION_MANIFEST_RELATIVE,
+        CONVERSATION_RUNTIME_RELATIVE,
+        CONVERSATION_SNAPSHOT_RELATIVE,
+        CONVERSATION_UI_COMPATIBILITY_RELATIVE,
+        CONVERSATION_UI_RUNTIME_RELATIVE,
+        compile_conversation_sources,
+        conversation_translation_bundles,
+        render_conversation_compatibility_source,
+        render_conversation_registry,
+        render_conversation_manifest_lua,
+        render_conversation_runtime_plan,
+        render_conversation_snapshot,
+        render_conversation_ui_compatibility_module,
+        render_conversation_ui_compatibility_shim,
+    )
 else:
     from .lexicon_compiler import (  # noqa: E402
         CompileError,
@@ -73,6 +90,23 @@ else:
         render_semantic_lua_plan,
         render_semantic_manifest,
     )
+    from .conversation_compiler import (
+        CONVERSATION_COMPATIBILITY_RUNTIME_RELATIVE,
+        CONVERSATION_MANIFEST_RELATIVE,
+        CONVERSATION_RUNTIME_RELATIVE,
+        CONVERSATION_SNAPSHOT_RELATIVE,
+        CONVERSATION_UI_COMPATIBILITY_RELATIVE,
+        CONVERSATION_UI_RUNTIME_RELATIVE,
+        compile_conversation_sources,
+        conversation_translation_bundles,
+        render_conversation_compatibility_source,
+        render_conversation_registry,
+        render_conversation_manifest_lua,
+        render_conversation_runtime_plan,
+        render_conversation_snapshot,
+        render_conversation_ui_compatibility_module,
+        render_conversation_ui_compatibility_shim,
+    )
 
 
 DEFAULT_OUTPUT = (
@@ -90,6 +124,7 @@ CANONICAL_SOURCE_ROOT = (
 )
 DEFAULT_SEMANTIC_SOURCE = CANONICAL_SOURCE_ROOT / "semantic_definitions.json"
 DEFAULT_CONTENT_SOURCE = CANONICAL_SOURCE_ROOT / "semantic_dialogue_content.json"
+DEFAULT_CONVERSATION_MANIFEST = CANONICAL_SOURCE_ROOT / "conversation/manifest.json"
 DEFAULT_SEMANTIC_OUTPUT_ROOT = ROOT
 
 
@@ -165,7 +200,12 @@ def write_semantic_output(output_root: Path, compiled: dict) -> list[Path]:
         for language, relative_paths in translation_paths.items():
             entries = translation_manifest.setdefault("languages", {}).setdefault(language, [])
             for relative_path in relative_paths:
-                if relative_path not in entries:
+                # The modular Conversation compiler owns this translation
+                # domain once its generated bundle is registered. Keep the
+                # legacy file as a compatibility artifact without loading it
+                # a second time at runtime.
+                modular_path = f"{language}/Conversation/Flows.json"
+                if relative_path not in entries and modular_path not in entries:
                     entries.append(relative_path)
         manifest_path.write_text(
             json.dumps(translation_manifest, ensure_ascii=False, indent=2)
@@ -291,7 +331,8 @@ def write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
             )
             paths.append(translation_path)
             entries = manifest.setdefault("languages", {}).setdefault(language, [])
-            if relative_path not in entries:
+            modular_path = f"{language}/Conversation/Patterns.json"
+            if relative_path not in entries and modular_path not in entries:
                 entries.append(relative_path)
         manifest_path.parent.mkdir(parents=True, exist_ok=True)
         manifest_path.write_text(
@@ -300,6 +341,170 @@ def write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
             newline="\n",
         )
         paths.append(manifest_path)
+    return paths
+
+
+def write_conversation_output(
+    repository: Path,
+    model: dict | None = None,
+) -> list[Path]:
+    """Write the manifest-backed Conversation runtime and audit artifacts."""
+    repository = repository.expanduser().resolve()
+    model = model or compile_conversation_sources(repository)
+    shared_root = repository / "Contents/mods/ProjectHoomans/common/media/lua/shared"
+    runtime_dir = repository / CONVERSATION_RUNTIME_RELATIVE
+    runtime_dir.mkdir(parents=True, exist_ok=True)
+    _clean_generated_tree(runtime_dir)
+
+    rendered, reports = render_conversation_runtime_plan(model)
+    paths = _write_modules(shared_root, rendered)
+    registry_path = runtime_dir / "Registry.lua"
+    registry_path.write_text(
+        render_conversation_registry(model, reports),
+        encoding="utf-8",
+        newline="\n",
+    )
+    paths.append(registry_path)
+    manifest_path = runtime_dir / "Manifest.lua"
+    manifest_path.write_text(
+        render_conversation_manifest_lua(model, reports),
+        encoding="utf-8",
+        newline="\n",
+    )
+    paths.append(manifest_path)
+
+    ui_runtime_path = repository / CONVERSATION_UI_RUNTIME_RELATIVE
+    ui_runtime_path.parent.mkdir(parents=True, exist_ok=True)
+    ui_runtime_path.write_text(
+        render_conversation_ui_compatibility_module(model),
+        encoding="utf-8",
+        newline="\n",
+    )
+    paths.append(ui_runtime_path)
+
+    compatibility_registry = repository / CONVERSATION_COMPATIBILITY_RUNTIME_RELATIVE
+    compatibility_registry.parent.mkdir(parents=True, exist_ok=True)
+    compatibility_registry.write_text(
+        '-- Generated compatibility shim; edit manifest-backed Conversation shards.\n'
+        'return require "PNC/Semantics/Generated/Conversation/Registry"\n',
+        encoding="utf-8",
+        newline="\n",
+    )
+    paths.append(compatibility_registry)
+    compatibility_ui = repository / CONVERSATION_UI_COMPATIBILITY_RELATIVE
+    compatibility_ui.parent.mkdir(parents=True, exist_ok=True)
+    compatibility_ui.write_text(
+        render_conversation_ui_compatibility_shim(),
+        encoding="utf-8",
+        newline="\n",
+    )
+    paths.append(compatibility_ui)
+
+    translation_root = repository / "Contents/mods/ProjectHoomans/common/media/translation"
+    translation_manifest_path = translation_root / "manifests/Conversation.json"
+    translation_manifest = (
+        json.loads(translation_manifest_path.read_text(encoding="utf-8"))
+        if translation_manifest_path.is_file()
+        else {"version": 1, "languages": {}}
+    )
+    bundles = conversation_translation_bundles(model)
+    retired_translation_paths = {
+        f"{language}/Conversation/Semantic/{name}"
+        for language in ("EN", "TL")
+        for name in (
+            "Generated.json",
+            "CommonInteractions.json",
+            "GroundedPersonalDialogue.json",
+            "DialogueContent.json",
+            "Suggestions.json",
+        )
+    }
+    for language in ("EN", "TL"):
+        # The existing Suggestions bundle also serves contextual UI outside
+        # the ten static definitions. Carry those compatibility keys into the
+        # generated UI-domain bundle before retiring its history-based path.
+        suggestions_path = translation_root / language / "Conversation/Semantic/Suggestions.json"
+        if suggestions_path.is_file():
+            try:
+                suggestions = json.loads(suggestions_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                suggestions = {}
+            if isinstance(suggestions, dict):
+                bundles[language].setdefault("UI", {}).update(
+                    {key: value for key, value in suggestions.items() if isinstance(value, str)}
+                )
+        for domain, values in bundles[language].items():
+            relative = f"{language}/Conversation/{domain}.json"
+            path = translation_root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(
+                json.dumps(values, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n",
+                encoding="utf-8",
+                newline="\n",
+            )
+            paths.append(path)
+            entries = translation_manifest.setdefault("languages", {}).setdefault(language, [])
+            if relative not in entries:
+                entries.append(relative)
+        compatibility_relative = f"{language}/Conversation/Semantic/DialogueContent.json"
+        compatibility_path = translation_root / compatibility_relative
+        compatibility_path.parent.mkdir(parents=True, exist_ok=True)
+        compatibility_path.write_text(
+            json.dumps(
+                model["content"]["translations"][language],
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        paths.append(compatibility_path)
+        entries = translation_manifest.setdefault("languages", {}).setdefault(language, [])
+        if compatibility_relative not in entries:
+            entries.append(compatibility_relative)
+    translation_manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    for language in ("EN", "TL"):
+        entries = translation_manifest.setdefault("languages", {}).setdefault(language, [])
+        translation_manifest["languages"][language] = [
+            entry for entry in entries if entry not in retired_translation_paths
+        ]
+    translation_manifest_path.write_text(
+        json.dumps(translation_manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    paths.append(translation_manifest_path)
+
+    snapshot_path = repository / CONVERSATION_SNAPSHOT_RELATIVE
+    snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+    snapshot_path.write_text(
+        render_conversation_snapshot(model),
+        encoding="utf-8",
+        newline="\n",
+    )
+    paths.append(snapshot_path)
+
+    compatibility_sources = {
+        "semantic_dialogue_content.json": "content",
+        "common_interactions.json": "common_interactions",
+        "grounded_personal_dialogue.json": "grounded_personal_dialogue",
+        "semantic_definitions.json": "semantic_definitions",
+    }
+    source_root = repository / CANONICAL_SOURCE_ROOT.relative_to(ROOT)
+    for filename, kind in compatibility_sources.items():
+        path = source_root / filename
+        path.write_text(
+            json.dumps(
+                render_conversation_compatibility_source(model, kind),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            ) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        paths.append(path)
     return paths
 
 
@@ -360,6 +565,18 @@ def main(arguments: list[str] | None = None) -> int:
         default=ROOT,
         help="repository root receiving generated dialogue content artifacts",
     )
+    parser.add_argument(
+        "--conversation-manifest",
+        type=Path,
+        default=None,
+        help="manifest-backed Conversation source tree to compile and generate",
+    )
+    parser.add_argument(
+        "--conversation-output-root",
+        type=Path,
+        default=ROOT,
+        help="repository root receiving generated Conversation artifacts",
+    )
     options = parser.parse_args(arguments)
 
     if (
@@ -367,6 +584,7 @@ def main(arguments: list[str] | None = None) -> int:
         and options.dialogue_source is None
         and options.semantic_source is None
         and options.content_source is None
+        and options.conversation_manifest is None
     ):
         parser.error(
             "provide --wordnet-home, --dialogue-source, --semantic-source, "
@@ -377,6 +595,7 @@ def main(arguments: list[str] | None = None) -> int:
     compiled_dialogue = None
     compiled_semantic = None
     compiled_content = None
+    compiled_conversation = None
 
     try:
         if options.wordnet_home is not None:
@@ -398,6 +617,14 @@ def main(arguments: list[str] | None = None) -> int:
         if options.content_source is not None:
             compiled_content = compile_dialogue_content(
                 load_dialogue_content_source(options.content_source)
+            )
+        if options.conversation_manifest is not None:
+            output_root = options.conversation_output_root.expanduser().resolve()
+            manifest_path = options.conversation_manifest.expanduser().resolve()
+            compiled_conversation = compile_conversation_sources(
+                output_root,
+                manifest_path=manifest_path,
+                runtime_root=options.semantic_runtime_root.expanduser().resolve(),
             )
     except CompileError as error:
         print(f"semantic compiler error: {error}", file=sys.stderr)
@@ -448,6 +675,15 @@ def main(arguments: list[str] | None = None) -> int:
             f"wrote dialogue content registry and {len(paths) - 1} translation artifacts "
             f"({len(compiled_content['phraseFamilies'])} phrase families, "
             f"{phrase_count} phrases, {len(compiled_content['playerChoices'])} player choices)"
+        )
+    if compiled_conversation is not None:
+        output_root = options.conversation_output_root.expanduser().resolve()
+        paths = write_conversation_output(output_root, compiled_conversation)
+        print(
+            f"wrote manifest-backed Conversation output and {len(paths) - 1} generated files "
+            f"({len(compiled_conversation['content']['phraseFamilies'])} phrase families, "
+            f"{len(compiled_conversation['dialogue']['patterns'])} patterns, "
+            f"{len(compiled_conversation['ui'])} UI definitions)"
         )
     return 0
 

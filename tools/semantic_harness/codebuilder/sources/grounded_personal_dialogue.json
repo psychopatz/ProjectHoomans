@@ -1,118 +1,441 @@
 {
-  "schemaVersion": 1,
-  "source": {
-    "name": "Project Hoomans Grounded Personal Dialogue",
-    "version": "1",
-    "contentLicense": "Project Hoomans authored content",
-    "references": [
-      {
-        "name": "Project Hoomans Authoring Review",
-        "url": "https://github.com/psychopatz/ProjectHoomans",
-        "use": "Reviewed semantic shapes for identity-seeded personal backstory questions and bounded follow-up references.",
-        "license": "Project Hoomans authored content",
-        "reviewedOn": "2026-10-20"
-      }
-    ]
+  "generatedCompatibility": {
+    "owner": "manifest-backed Conversation compiler",
+    "readOnly": true,
+    "sourceManifest": "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
   },
   "patterns": [
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "disclosure": "server_authorized",
+          "factProvider": "npc_backstory",
+          "topicID": "backstory.former_job"
+        },
+        "intent": "QUESTION",
+        "slots": {
+          "backstoryKind": "former_job"
+        },
+        "speechAct": "QUESTION",
+        "subject": "NPC_BACKSTORY"
+      },
       "id": "pnc.backstory.question.former_job.old_job",
-      "utterance": "what was your old job",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "NPC_BACKSTORY",
-        "slots": {"backstoryKind": "former_job"},
-        "extensions": {"factProvider": "npc_backstory", "topicID": "backstory.former_job", "disclosure": "server_authorized"}
+      "mapping": {
+        "canonicalConcept": "NPC_BACKSTORY",
+        "dialogueState": "BACKSTORY_QUESTION",
+        "sourceRefs": [
+          "Project Hoomans Authoring Review"
+        ]
       },
+      "priority": 151,
       "reviewed": true,
-      "sourceRefs": ["Project Hoomans Authoring Review"],
-      "mapping": {"canonicalConcept": "NPC_BACKSTORY", "dialogueState": "BACKSTORY_QUESTION", "sourceRefs": ["Project Hoomans Authoring Review"]},
-      "confidence": 0.99,
-      "priority": 151
+      "sourceRefs": [
+        "Project Hoomans Authoring Review"
+      ],
+      "utterance": "what was your old job"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "disclosure": "server_authorized",
+          "factProvider": "npc_backstory",
+          "topicID": "backstory.former_job"
+        },
+        "intent": "QUESTION",
+        "slots": {
+          "backstoryKind": "former_job"
+        },
+        "speechAct": "QUESTION",
+        "subject": "NPC_BACKSTORY"
+      },
       "id": "pnc.backstory.question.former_job.before_all_this",
-      "utterance": "what did you do before",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "NPC_BACKSTORY",
-        "slots": {"backstoryKind": "former_job"},
-        "extensions": {"factProvider": "npc_backstory", "topicID": "backstory.former_job", "disclosure": "server_authorized"}
+      "mapping": {
+        "canonicalConcept": "NPC_BACKSTORY",
+        "dialogueState": "BACKSTORY_QUESTION",
+        "sourceRefs": [
+          "Project Hoomans Authoring Review"
+        ]
       },
+      "priority": 150,
       "reviewed": true,
-      "sourceRefs": ["Project Hoomans Authoring Review"],
-      "mapping": {"canonicalConcept": "NPC_BACKSTORY", "dialogueState": "BACKSTORY_QUESTION", "sourceRefs": ["Project Hoomans Authoring Review"]},
-      "confidence": 0.99,
-      "priority": 150
+      "sourceRefs": [
+        "Project Hoomans Authoring Review"
+      ],
+      "utterance": "what did you do before"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "disclosure": "server_authorized",
+          "factProvider": "npc_backstory",
+          "topicID": "backstory.hometown"
+        },
+        "intent": "QUESTION",
+        "slots": {
+          "backstoryKind": "hometown"
+        },
+        "speechAct": "QUESTION",
+        "subject": "NPC_BACKSTORY"
+      },
       "id": "pnc.backstory.question.hometown.grew_up",
-      "utterance": "where did you grow up",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "NPC_BACKSTORY",
-        "slots": {"backstoryKind": "hometown"},
-        "extensions": {"factProvider": "npc_backstory", "topicID": "backstory.hometown", "disclosure": "server_authorized"}
+      "mapping": {
+        "canonicalConcept": "NPC_BACKSTORY",
+        "dialogueState": "BACKSTORY_QUESTION",
+        "sourceRefs": [
+          "Project Hoomans Authoring Review"
+        ]
       },
+      "priority": 150,
       "reviewed": true,
-      "sourceRefs": ["Project Hoomans Authoring Review"],
-      "mapping": {"canonicalConcept": "NPC_BACKSTORY", "dialogueState": "BACKSTORY_QUESTION", "sourceRefs": ["Project Hoomans Authoring Review"]},
-      "confidence": 0.99,
-      "priority": 150
+      "sourceRefs": [
+        "Project Hoomans Authoring Review"
+      ],
+      "utterance": "where did you grow up"
     },
     {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "disclosure": "server_authorized",
+          "factProvider": "npc_backstory",
+          "topicID": "backstory.hobby"
+        },
+        "intent": "QUESTION",
+        "slots": {
+          "backstoryKind": "hobby"
+        },
+        "speechAct": "QUESTION",
+        "subject": "NPC_BACKSTORY"
+      },
       "id": "pnc.backstory.question.hobby.interest",
-      "utterance": "what is your hobby",
-      "emit": {
-        "intent": "QUESTION",
-        "speechAct": "QUESTION",
-        "subject": "NPC_BACKSTORY",
-        "slots": {"backstoryKind": "hobby"},
-        "extensions": {"factProvider": "npc_backstory", "topicID": "backstory.hobby", "disclosure": "server_authorized"}
+      "mapping": {
+        "canonicalConcept": "NPC_BACKSTORY",
+        "dialogueState": "BACKSTORY_QUESTION",
+        "sourceRefs": [
+          "Project Hoomans Authoring Review"
+        ]
       },
+      "priority": 150,
       "reviewed": true,
-      "sourceRefs": ["Project Hoomans Authoring Review"],
-      "mapping": {"canonicalConcept": "NPC_BACKSTORY", "dialogueState": "BACKSTORY_QUESTION", "sourceRefs": ["Project Hoomans Authoring Review"]},
-      "confidence": 0.99,
-      "priority": 150
+      "sourceRefs": [
+        "Project Hoomans Authoring Review"
+      ],
+      "utterance": "what is your hobby"
     },
     {
-      "id": "pnc.backstory.question.fear.private",
-      "utterance": "what are you afraid of",
+      "confidence": 0.99,
       "emit": {
+        "extensions": {
+          "disclosure": "server_authorized",
+          "factProvider": "npc_backstory",
+          "topicID": "backstory.fear"
+        },
+        "intent": "QUESTION",
+        "slots": {
+          "backstoryKind": "fear"
+        },
+        "speechAct": "QUESTION",
+        "subject": "NPC_BACKSTORY"
+      },
+      "id": "pnc.backstory.question.fear.private",
+      "mapping": {
+        "canonicalConcept": "NPC_BACKSTORY",
+        "dialogueState": "BACKSTORY_QUESTION",
+        "sourceRefs": [
+          "Project Hoomans Authoring Review"
+        ]
+      },
+      "priority": 150,
+      "reviewed": true,
+      "sourceRefs": [
+        "Project Hoomans Authoring Review"
+      ],
+      "utterance": "what are you afraid of"
+    },
+    {
+      "confidence": 0.99,
+      "emit": {
+        "extensions": {
+          "contextQuestion": "BACKSTORY_LOCATION",
+          "dialogueFollowUp": "CONTEXT_REFERENCE",
+          "topic": "conversation"
+        },
         "intent": "QUESTION",
         "speechAct": "QUESTION",
-        "subject": "NPC_BACKSTORY",
-        "slots": {"backstoryKind": "fear"},
-        "extensions": {"factProvider": "npc_backstory", "topicID": "backstory.fear", "disclosure": "server_authorized"}
+        "subject": "CONTEXT_REFERENCE",
+        "target": "$capture.reference"
       },
+      "id": "pnc.backstory.follow_up.where",
+      "mapping": {
+        "canonicalConcept": "CONTEXT_REFERENCE",
+        "dialogueState": "BACKSTORY_FOLLOW_UP",
+        "sourceRefs": [
+          "Project Hoomans Authoring Review"
+        ]
+      },
+      "match": [
+        {
+          "capture": "reference",
+          "kind": "literal",
+          "value": "where"
+        }
+      ],
+      "priority": 129,
       "reviewed": true,
-      "sourceRefs": ["Project Hoomans Authoring Review"],
-      "mapping": {"canonicalConcept": "NPC_BACKSTORY", "dialogueState": "BACKSTORY_QUESTION", "sourceRefs": ["Project Hoomans Authoring Review"]},
+      "sourceRefs": [
+        "Project Hoomans Authoring Review"
+      ],
+      "utterance": "where"
+    },
+    {
       "confidence": 0.99,
-      "priority": 150
- },
- {"id":"pnc.backstory.follow_up.where","utterance":"where","match":[{"kind":"literal","value":"where","capture":"reference"}],"emit":{"intent":"QUESTION","speechAct":"QUESTION","subject":"CONTEXT_REFERENCE","target":"$capture.reference","extensions":{"dialogueFollowUp":"CONTEXT_REFERENCE","topic":"conversation","contextQuestion":"BACKSTORY_LOCATION"}},"reviewed":true,"sourceRefs":["Project Hoomans Authoring Review"],"mapping":{"canonicalConcept":"CONTEXT_REFERENCE","dialogueState":"BACKSTORY_FOLLOW_UP","sourceRefs":["Project Hoomans Authoring Review"]},"confidence":0.99,"priority":129},
- {"id":"pnc.backstory.follow_up.do_you_miss_it","utterance":"do you miss it","match":[{"kind":"literal","value":"do"},{"kind":"literal","value":"you"},{"kind":"literal","value":"miss"},{"kind":"literal","value":"it","capture":"reference"}],"emit":{"intent":"QUESTION","speechAct":"QUESTION","subject":"CONTEXT_REFERENCE","target":"$capture.reference","extensions":{"dialogueFollowUp":"CONTEXT_REFERENCE","topic":"conversation","contextQuestion":"BACKSTORY_MISS"}},"reviewed":true,"sourceRefs":["Project Hoomans Authoring Review"],"mapping":{"canonicalConcept":"CONTEXT_REFERENCE","dialogueState":"BACKSTORY_FOLLOW_UP","sourceRefs":["Project Hoomans Authoring Review"]},"confidence":0.99,"priority":129}
-],
- "responsePools": [
-    {"id": "semantic.question.backstory.known.former_job", "variants": [{"id": "semantic.question.backstory.known.former_job.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob", "fallback": "I worked as %1 before all this.", "en": "I worked as %1 before all this.", "tl": "Nagtrabaho ako bilang %1 bago ang lahat ng ito.", "translationArgs": {"content": "fact_content"}}]},
-    {"id": "semantic.question.backstory.known.hometown", "variants": [{"id": "semantic.question.backstory.known.hometown.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryHometown", "fallback": "I grew up in %1.", "en": "I grew up in %1.", "tl": "Lumaki ako sa %1.", "translationArgs": {"content": "fact_content"}}]},
-    {"id": "semantic.question.backstory.known.education", "variants": [{"id": "semantic.question.backstory.known.education.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation", "fallback": "I studied %1.", "en": "I studied %1.", "tl": "Nag-aral ako ng %1.", "translationArgs": {"content": "fact_content"}}]},
-    {"id": "semantic.question.backstory.known.hobby", "variants": [{"id": "semantic.question.backstory.known.hobby.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryHobby", "fallback": "I used to enjoy %1.", "en": "I used to enjoy %1.", "tl": "Mahilig ako noon sa %1.", "translationArgs": {"content": "fact_content"}}]},
-    {"id": "semantic.question.backstory.known.family_background", "variants": [{"id": "semantic.question.backstory.known.family_background.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFamily", "fallback": "My family was %1.", "en": "My family was %1.", "tl": "Ang pamilya ko ay %1.", "translationArgs": {"content": "fact_content"}}]},
-    {"id": "semantic.question.backstory.known.fear", "variants": [{"id": "semantic.question.backstory.known.fear.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFear", "fallback": "I have always been afraid of %1.", "en": "I have always been afraid of %1.", "tl": "Palagi akong natatakot sa %1.", "translationArgs": {"content": "fact_content"}}]},
-    {"id": "semantic.question.backstory.known.tragedy", "variants": [{"id": "semantic.question.backstory.known.tragedy.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy", "fallback": "Something happened: %1.", "en": "Something happened: %1.", "tl": "May nangyari: %1.", "translationArgs": {"content": "fact_content"}}]},
-    {"id": "semantic.question.backstory.known", "variants": [{"id": "semantic.question.backstory.known.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown", "fallback": "Before all this, I was %1.", "en": "Before all this, I was %1.", "tl": "Bago ang lahat ng ito, ako ay %1.", "translationArgs": {"content": "fact_content"}}]},
-    {"id": "semantic.question.backstory.suspected", "variants": [{"id": "semantic.question.backstory.suspected.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected", "fallback": "I think it was %1, but I could be mistaken.", "en": "I think it was %1, but I could be mistaken.", "tl": "Sa tingin ko ay %1 iyon, pero maaaring mali ako.", "translationArgs": {"content": "fact_content"}}]},
-    {"id": "semantic.question.backstory.ambiguous", "variants": [{"id": "semantic.question.backstory.ambiguous.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous", "fallback": "Which part of my past do you mean?", "en": "Which part of my past do you mean?", "tl": "Aling bahagi ng nakaraan ko ang ibig mong sabihin?"}]},
-    {"id": "semantic.question.backstory.refusal", "variants": [{"id": "semantic.question.backstory.refusal.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal", "fallback": "I'm not ready to talk about that yet.", "en": "I'm not ready to talk about that yet.", "tl": "Hindi pa ako handang pag-usapan iyan."}]},
-
-    {"id": "semantic.question.backstory.follow_up.location", "variants": [{"id": "semantic.question.backstory.follow_up.location.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation", "fallback": "I remember that part of my life, but I don't have more detail about where it was.", "en": "I remember that part of my life, but I don't have more detail about where it was.", "tl": "Naaalala ko ang bahaging iyon ng buhay ko, pero wala akong higit na detalye kung saan iyon."}]},
-
-    {"id": "semantic.question.backstory.follow_up.miss", "variants": [{"id": "semantic.question.backstory.follow_up.miss.generated", "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss", "fallback": "Sometimes. I still think about that part of my life.", "en": "Sometimes. I still think about that part of my life.", "tl": "Minsan. Naiisip ko pa rin ang bahaging iyon ng buhay ko."}]}
-  ]
+      "emit": {
+        "extensions": {
+          "contextQuestion": "BACKSTORY_MISS",
+          "dialogueFollowUp": "CONTEXT_REFERENCE",
+          "topic": "conversation"
+        },
+        "intent": "QUESTION",
+        "speechAct": "QUESTION",
+        "subject": "CONTEXT_REFERENCE",
+        "target": "$capture.reference"
+      },
+      "id": "pnc.backstory.follow_up.do_you_miss_it",
+      "mapping": {
+        "canonicalConcept": "CONTEXT_REFERENCE",
+        "dialogueState": "BACKSTORY_FOLLOW_UP",
+        "sourceRefs": [
+          "Project Hoomans Authoring Review"
+        ]
+      },
+      "match": [
+        {
+          "kind": "literal",
+          "value": "do"
+        },
+        {
+          "kind": "literal",
+          "value": "you"
+        },
+        {
+          "kind": "literal",
+          "value": "miss"
+        },
+        {
+          "capture": "reference",
+          "kind": "literal",
+          "value": "it"
+        }
+      ],
+      "priority": 129,
+      "reviewed": true,
+      "sourceRefs": [
+        "Project Hoomans Authoring Review"
+      ],
+      "utterance": "do you miss it"
+    }
+  ],
+  "responsePools": [
+    {
+      "id": "semantic.question.backstory.known.former_job",
+      "variants": [
+        {
+          "en": "I worked as %1 before all this.",
+          "fallback": "I worked as %1 before all this.",
+          "id": "semantic.question.backstory.known.former_job.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob",
+          "tl": "Nagtrabaho ako bilang %1 bago ang lahat ng ito.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.hometown",
+      "variants": [
+        {
+          "en": "I grew up in %1.",
+          "fallback": "I grew up in %1.",
+          "id": "semantic.question.backstory.known.hometown.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryHometown",
+          "tl": "Lumaki ako sa %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.education",
+      "variants": [
+        {
+          "en": "I studied %1.",
+          "fallback": "I studied %1.",
+          "id": "semantic.question.backstory.known.education.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation",
+          "tl": "Nag-aral ako ng %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.hobby",
+      "variants": [
+        {
+          "en": "I used to enjoy %1.",
+          "fallback": "I used to enjoy %1.",
+          "id": "semantic.question.backstory.known.hobby.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryHobby",
+          "tl": "Mahilig ako noon sa %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.family_background",
+      "variants": [
+        {
+          "en": "My family was %1.",
+          "fallback": "My family was %1.",
+          "id": "semantic.question.backstory.known.family_background.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFamily",
+          "tl": "Ang pamilya ko ay %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.fear",
+      "variants": [
+        {
+          "en": "I have always been afraid of %1.",
+          "fallback": "I have always been afraid of %1.",
+          "id": "semantic.question.backstory.known.fear.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFear",
+          "tl": "Palagi akong natatakot sa %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known.tragedy",
+      "variants": [
+        {
+          "en": "Something happened: %1.",
+          "fallback": "Something happened: %1.",
+          "id": "semantic.question.backstory.known.tragedy.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy",
+          "tl": "May nangyari: %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.known",
+      "variants": [
+        {
+          "en": "Before all this, I was %1.",
+          "fallback": "Before all this, I was %1.",
+          "id": "semantic.question.backstory.known.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown",
+          "tl": "Bago ang lahat ng ito, ako ay %1.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.suspected",
+      "variants": [
+        {
+          "en": "I think it was %1, but I could be mistaken.",
+          "fallback": "I think it was %1, but I could be mistaken.",
+          "id": "semantic.question.backstory.suspected.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected",
+          "tl": "Sa tingin ko ay %1 iyon, pero maaaring mali ako.",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.ambiguous",
+      "variants": [
+        {
+          "en": "Which part of my past do you mean?",
+          "fallback": "Which part of my past do you mean?",
+          "id": "semantic.question.backstory.ambiguous.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous",
+          "tl": "Aling bahagi ng nakaraan ko ang ibig mong sabihin?"
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.refusal",
+      "variants": [
+        {
+          "en": "I'm not ready to talk about that yet.",
+          "fallback": "I'm not ready to talk about that yet.",
+          "id": "semantic.question.backstory.refusal.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal",
+          "tl": "Hindi pa ako handang pag-usapan iyan."
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.follow_up.location",
+      "variants": [
+        {
+          "en": "I remember that part of my life, but I don't have more detail about where it was.",
+          "fallback": "I remember that part of my life, but I don't have more detail about where it was.",
+          "id": "semantic.question.backstory.follow_up.location.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation",
+          "tl": "Naaalala ko ang bahaging iyon ng buhay ko, pero wala akong higit na detalye kung saan iyon."
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.backstory.follow_up.miss",
+      "variants": [
+        {
+          "en": "Sometimes. I still think about that part of my life.",
+          "fallback": "Sometimes. I still think about that part of my life.",
+          "id": "semantic.question.backstory.follow_up.miss.generated",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss",
+          "tl": "Minsan. Naiisip ko pa rin ang bahaging iyon ng buhay ko."
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Grounded Personal Dialogue",
+    "references": [
+      {
+        "license": "Project Hoomans authored content",
+        "name": "Project Hoomans Authoring Review",
+        "reviewedOn": "2026-10-20",
+        "url": "https://github.com/psychopatz/ProjectHoomans",
+        "use": "Reviewed semantic shapes for identity-seeded personal backstory questions and bounded follow-up references."
+      }
+    ],
+    "version": "1"
+  }
 }

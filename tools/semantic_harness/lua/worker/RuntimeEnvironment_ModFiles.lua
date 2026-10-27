@@ -34,7 +34,7 @@ local function packagedReader(context, modID, relativePath)
     local overlay = os.getenv("PNC_HARNESS_CANDIDATE_OVERLAY_ROOT")
     if overlay and overlay ~= "" and modID == "ProjectHoomans"
         and string.match(relativePath,
-            "^media/translation/[A-Z][A-Z]/Conversation/Semantic/[%w_]+%.json$")
+            "^media/translation/[A-Z][A-Z]/Conversation/.+%.json$")
     then
         local candidate = io.open(overlay .. "/" .. relativePath, "rb")
         if candidate then

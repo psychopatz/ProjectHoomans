@@ -1,0 +1,733 @@
+{
+  "domain": "event",
+  "groups": {
+    "events": {
+      "contentOwner": "projecthoomans.dialogue_content.events"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good work. Keep watching the area.",
+              "TL": "Good work. Keep watching the area."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.retreat",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I need a moment before I can swing again.",
+              "TL": "I need a moment before I can swing again."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.threat",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That threat is down. Stay alert.",
+              "TL": "That threat is down. Stay alert."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.companion.reaction.abandonment",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Stay with me next time. We watch each other's backs.",
+              "TL": "Stay with me next time. We watch each other's backs."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.companion.reaction.camp_rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't find a safe room or campfire nearby.",
+              "TL": "I can't find a safe room or campfire nearby."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.companion.reaction.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you. We will handle it together.",
+              "TL": "I heard you. We will handle it together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.conversation.safety.danger",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Watch out. We need to move now.",
+              "TL": "Watch out. We need to move now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.conversation.safety.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Stay alert.",
+              "TL": "Stay alert."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.corpse.reaction.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Someone died here. We should remember that.",
+              "TL": "Someone died here. We should remember that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.corpse.reaction.revenge",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Someone is going to answer for this.",
+              "TL": "Someone is going to answer for this."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.flow.farewell.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Take care.",
+              "TL": "Take care."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.flow.farewell.friendly",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Take care. I will see you soon.",
+              "TL": "Take care. I will see you soon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.close",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We lost someone close to us. We need to stay together.",
+              "TL": "We lost someone close to us. We need to stay together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.colonist",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Our leader is gone. We keep the group together.",
+              "TL": "Our leader is gone. We keep the group together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We lost our leader. We need to decide what comes next.",
+              "TL": "We lost our leader. We need to decide what comes next."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.devoted",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We lost someone important. We need to stay together.",
+              "TL": "We lost someone important. We need to stay together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.dissent",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The old order is gone. What happens next is up to us.",
+              "TL": "The old order is gone. What happens next is up to us."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.distant",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The leader is gone. Someone needs to decide what comes next.",
+              "TL": "The leader is gone. Someone needs to decide what comes next."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.bandage",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am hurt and down. Please patch me up.",
+              "TL": "I am hurt and down. Please patch me up."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.bleedout",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am bleeding out. I need a bandage now.",
+              "TL": "I am bleeding out. I need a bandage now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am down. I need help.",
+              "TL": "I am down. I need help."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.dehydration",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am too weak to move. I need water.",
+              "TL": "I am too weak to move. I need water."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.exhaustion",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I pushed too far. I need a moment to recover.",
+              "TL": "I pushed too far. I need a moment to recover."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.mercy",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am down. Please let me live.",
+              "TL": "I am down. Please let me live."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.rescue",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I cannot move. I need help over here.",
+              "TL": "I cannot move. I need help over here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.call.starvation",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am too weak to move. I need food.",
+              "TL": "I am too weak to move. I need food."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I need help with this wound.",
+              "TL": "I need help with this wound."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.mercy",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Please. I need help with this wound.",
+              "TL": "Please. I need help with this wound."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.bandage",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need these wounds patched.",
+              "TL": "I still need these wounds patched."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.bleedout",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still losing blood. Please help.",
+              "TL": "I am still losing blood. Please help."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am not up yet. Please help me.",
+              "TL": "I am not up yet. Please help me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.dehydration",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need water to recover.",
+              "TL": "I still need water to recover."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.exhaustion",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need a little more time to recover.",
+              "TL": "I still need a little more time to recover."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.mercy",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still asking you to spare me.",
+              "TL": "I am still asking you to spare me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.rescue",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still down here. Do not leave me.",
+              "TL": "I am still down here. Do not leave me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.repeat.starvation",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need something to eat.",
+              "TL": "I still need something to eat."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.teammate.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "They are hurt. Stay with them while I cover you.",
+              "TL": "They are hurt. Stay with them while I cover you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.teammate.found",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I found a bandage for them. Hold still while I patch them up.",
+              "TL": "I found a bandage for them. Hold still while I patch them up."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.teammate.missing",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am out of bandages. Can someone spare one for them?",
+              "TL": "I am out of bandages. Can someone spare one for them?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.treatment.bandage",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The wound is treated. I can move when you are ready.",
+              "TL": "The wound is treated. I can move when you are ready."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.treatment.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Thank you. That treatment helped.",
+              "TL": "Thank you. That treatment helped."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.bandage",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still down and waiting for a patch.",
+              "TL": "I am still down and waiting for a patch."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.bleedout",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The bleeding has not stopped. I still need a bandage.",
+              "TL": "The bleeding has not stopped. I still need a bandage."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still down. I still need help.",
+              "TL": "I am still down. I still need help."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.dehydration",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need water before I can move.",
+              "TL": "I still need water before I can move."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.exhaustion",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need time to recover my strength.",
+              "TL": "I still need time to recover my strength."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.mercy",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still down. Please do not finish me.",
+              "TL": "I am still down. Please do not finish me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.rescue",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am still here. Please come back for me.",
+              "TL": "I am still here. Please come back for me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.update.starvation",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I still need food before I can get up.",
+              "TL": "I still need food before I can get up."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.medical.distress.urgent",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am hurt. I need help now.",
+              "TL": "I am hurt. I need help now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.social.reaction.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

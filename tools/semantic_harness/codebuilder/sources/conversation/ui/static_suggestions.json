@@ -1,0 +1,283 @@
+{
+  "domain": "static_suggestions",
+  "kind": "ui",
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Conversation Authoring",
+    "version": "1"
+  },
+  "suggestions": [
+    {
+      "hubID": "whats_up",
+      "id": "question.wellbeing",
+      "intent": "QUESTION",
+      "labelFallback": "How are you feeling?",
+      "labelKey": "UI_PNC_Conversation_Suggestion_Wellbeing_Label",
+      "order": 10,
+      "patternID": "pnc.question.wellbeing_feeling",
+      "speechAct": "QUESTION",
+      "subject": "WELLBEING",
+      "topic": "wellbeing",
+      "translations": {
+        "EN": {
+          "label": "Ask about wellbeing",
+          "utterance": "How are you feeling?"
+        },
+        "TL": {
+          "label": "Itanong ang kalagayan",
+          "utterance": "Kumusta ang pakiramdam mo?"
+        }
+      },
+      "utteranceFallback": "How are you feeling?",
+      "utteranceKey": "UI_PNC_Conversation_Suggestion_Wellbeing_Utterance"
+    },
+    {
+      "extensions": {
+        "dialogueFollowUp": "WELLBEING"
+      },
+      "id": "question.wellbeing_detail",
+      "intent": "QUESTION",
+      "labelFallback": "Can you tell me more?",
+      "labelKey": "UI_PNC_Conversation_Suggestion_WellbeingDetail_Label",
+      "order": 20,
+      "patternID": "pnc.question.wellbeing_follow_up_what_is_wrong",
+      "slots": {
+        "followUp": true
+      },
+      "speechAct": "QUESTION",
+      "subject": "WELLBEING",
+      "topic": "wellbeing",
+      "translations": {
+        "EN": {
+          "label": "Ask what is wrong",
+          "utterance": "What's wrong?"
+        },
+        "TL": {
+          "label": "Itanong kung ano ang problema",
+          "utterance": "Ano ang problema?"
+        }
+      },
+      "utteranceFallback": "What's wrong?",
+      "utteranceKey": "UI_PNC_Conversation_Suggestion_WellbeingDetail_Utterance"
+    },
+    {
+      "dialogueFollowUp": "NEEDS_QUANTITY",
+      "hubAudience": "owned_companion",
+      "hubID": "whats_up",
+      "id": "question.needs",
+      "intent": "QUESTION",
+      "labelFallback": "Do you need anything?",
+      "labelKey": "UI_PNC_Conversation_Suggestion_Needs_Label",
+      "order": 30,
+      "patternID": "pnc.question.needs_offer_plain",
+      "speechAct": "QUESTION",
+      "subject": "NEEDS",
+      "topic": "needs",
+      "translations": {
+        "EN": {
+          "label": "Ask about needs",
+          "utterance": "Do you need anything?"
+        },
+        "TL": {
+          "label": "Itanong ang pangangailangan",
+          "utterance": "May kailangan ka ba?"
+        }
+      },
+      "utteranceFallback": "Do you need anything?",
+      "utteranceKey": "UI_PNC_Conversation_Suggestion_Needs_Utterance"
+    },
+    {
+      "extensions": {
+        "topic": "medical"
+      },
+      "hubAudience": "owned_companion",
+      "hubID": "whats_up",
+      "id": "question.health",
+      "intent": "QUESTION",
+      "labelFallback": "Are you hurt?",
+      "labelKey": "UI_PNC_Conversation_Suggestion_Health_Label",
+      "order": 40,
+      "patternID": "pnc.question.health.are_you_hurt",
+      "slots": {
+        "attribute": "health_state"
+      },
+      "speechAct": "QUESTION",
+      "subject": "NPC_HEALTH_STATE",
+      "target": "SELF",
+      "topic": "medical",
+      "translations": {
+        "EN": {
+          "label": "Ask about injuries",
+          "utterance": "Are you hurt?"
+        },
+        "TL": {
+          "label": "Itanong ang mga sugat",
+          "utterance": "Nasaktan ka ba?"
+        }
+      },
+      "utteranceFallback": "Are you hurt?",
+      "utteranceKey": "UI_PNC_Conversation_Suggestion_Health_Utterance"
+    },
+    {
+      "id": "question.identity",
+      "intent": "QUESTION",
+      "labelFallback": "Who are you?",
+      "labelKey": "UI_PNC_Conversation_Suggestion_Identity_Label",
+      "order": 50,
+      "patternID": "pnc.question.identity",
+      "speechAct": "QUESTION",
+      "subject": "IDENTITY",
+      "topic": "identity",
+      "translations": {
+        "EN": {
+          "label": "Ask who they are",
+          "utterance": "Who are you?"
+        },
+        "TL": {
+          "label": "Itanong kung sino siya",
+          "utterance": "Sino ka?"
+        }
+      },
+      "utteranceFallback": "Who are you?",
+      "utteranceKey": "UI_PNC_Conversation_Suggestion_Identity_Utterance"
+    },
+    {
+      "extensions": {
+        "topic": "activity"
+      },
+      "hubID": "whats_up",
+      "hubOnly": true,
+      "id": "question.activity",
+      "intent": "QUESTION",
+      "labelFallback": "Ask what they've been doing",
+      "labelKey": "UI_PNC_Conversation_Suggestion_Activity_Label",
+      "order": 60,
+      "patternID": "pnc.question.activity",
+      "speechAct": "QUESTION",
+      "subject": "ACTIVITY",
+      "topic": "activity",
+      "translations": {
+        "EN": {
+          "label": "Ask what they've been doing",
+          "utterance": "What have you been doing?"
+        },
+        "TL": {
+          "label": "Itanong ang pinagkakaabalahan",
+          "utterance": "Ano ang mga pinagkakaabalahan mo?"
+        }
+      },
+      "utteranceFallback": "What have you been doing?",
+      "utteranceKey": "UI_PNC_Conversation_Suggestion_Activity_Utterance"
+    },
+    {
+      "extensions": {
+        "topic": "time"
+      },
+      "id": "question.time",
+      "intent": "QUESTION",
+      "labelFallback": "Ask about the time",
+      "labelKey": "UI_PNC_Conversation_Suggestion_Time_Label",
+      "order": 60,
+      "patternID": "pnc.question.time",
+      "speechAct": "QUESTION",
+      "subject": "TIME",
+      "topic": "time",
+      "translations": {
+        "EN": {
+          "label": "Ask about the time",
+          "utterance": "What time is it?"
+        },
+        "TL": {
+          "label": "Itanong ang oras",
+          "utterance": "Anong oras na?"
+        }
+      },
+      "utteranceFallback": "What time is it?",
+      "utteranceKey": "UI_PNC_Conversation_Suggestion_Time_Utterance"
+    },
+    {
+      "extensions": {
+        "topic": "date"
+      },
+      "id": "question.date",
+      "intent": "QUESTION",
+      "labelFallback": "Ask about the date",
+      "labelKey": "UI_PNC_Conversation_Suggestion_Date_Label",
+      "order": 70,
+      "patternID": "pnc.question.date",
+      "speechAct": "QUESTION",
+      "subject": "DATE",
+      "topic": "date",
+      "translations": {
+        "EN": {
+          "label": "Ask about the date",
+          "utterance": "What's today's date?"
+        },
+        "TL": {
+          "label": "Itanong ang petsa",
+          "utterance": "Ano ang petsa ngayon?"
+        }
+      },
+      "utteranceFallback": "What's today's date?",
+      "utteranceKey": "UI_PNC_Conversation_Suggestion_Date_Utterance"
+    },
+    {
+      "extensions": {
+        "topic": "gossip"
+      },
+      "hubID": "whats_up",
+      "hubOnly": true,
+      "hubRequiresSafeGossip": true,
+      "id": "question.gossip",
+      "intent": "GOSSIP",
+      "labelFallback": "Heard any gossip?",
+      "labelKey": "UI_PNC_Conversation_Suggestion_Gossip_Label",
+      "order": 70,
+      "patternID": "pnc.social.gossip_event",
+      "speechAct": "GOSSIP",
+      "subject": "GOSSIP",
+      "topic": "gossip",
+      "translations": {
+        "EN": {
+          "label": "Ask about gossip",
+          "utterance": "Any gossip?"
+        },
+        "TL": {
+          "label": "Magtanong tungkol sa tsismis",
+          "utterance": "May narinig ka bang tsismis?"
+        }
+      },
+      "utteranceFallback": "Any gossip?",
+      "utteranceKey": "UI_PNC_Conversation_Suggestion_Gossip_Utterance"
+    },
+    {
+      "extensions": {
+        "topic": "weather"
+      },
+      "hubID": "whats_up",
+      "id": "question.weather",
+      "intent": "QUESTION",
+      "labelFallback": "Ask about the weather",
+      "labelKey": "UI_PNC_Conversation_Suggestion_Weather_Label",
+      "order": 80,
+      "patternID": "pnc.question.weather",
+      "speechAct": "QUESTION",
+      "subject": "WEATHER",
+      "topic": "weather",
+      "translations": {
+        "EN": {
+          "label": "Ask about the weather",
+          "utterance": "How is the weather?"
+        },
+        "TL": {
+          "label": "Itanong ang panahon",
+          "utterance": "Kumusta ang panahon?"
+        }
+      },
+      "utteranceFallback": "How is the weather?",
+      "utteranceKey": "UI_PNC_Conversation_Suggestion_Weather_Utterance"
+    }
+  ],
+  "version": 1
+}
