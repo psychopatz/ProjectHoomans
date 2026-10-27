@@ -22,8 +22,15 @@ class ConversationExplorerPane(SemanticObservatoryPane):
     _CONTENT_PAGE_SIZE = 64
     _DETAIL_TABS = ("Overview", "Wording", "Route", "Conditions", "Follow-ups", "Sources")
 
-    def __init__(self, *args: Any, authoring_service: Any, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        *args: Any,
+        authoring_service: Any,
+        on_select_item: Any | None = None,
+        **kwargs: Any,
+    ) -> None:
         self._authoring_service = authoring_service
+        self._on_select_item = on_select_item
         self._scrolled_text = args[3]
         self._content_rows: dict[str, dict[str, Any]] = {}
         self._content_error = ""
@@ -225,6 +232,8 @@ class ConversationExplorerPane(SemanticObservatoryPane):
             f"Source fingerprint: {detail.get('sourceFingerprint', 'UNKNOWN')}\n"
             f"Owner: {detail.get('verifiedOwner', 'UNKNOWN')}",
         )
+        if self._on_select_item:
+            self._on_select_item(semantic_id)
 
     def _on_detail(self, result: dict[str, Any]) -> None:
         super()._on_detail(result)

@@ -330,7 +330,7 @@
           {
             "translations": {
               "EN": "{names}, get back home safely.",
-              "TL": "{names}, ligtas na umuwi, {names}."
+              "TL": "Ligtas na umuwi, {names}."
             }
           }
         ]

@@ -48,6 +48,13 @@ AUTHORING_OPERATIONS = (
     "workflow_preview",
     "workflow_generate",
     "adapt_dataset",
+    "conversation_inspect",
+    "conversation_variants",
+    "conversation_operation",
+    "conversation_ui_inspect",
+    "conversation_ui_operation",
+    "conversation_validate",
+    "conversation_compile",
 )
 CLI_OPERATIONS = (
     "discover_saves",
@@ -305,6 +312,89 @@ def _run_authoring_operation(
     arguments: argparse.Namespace,
     service: SemanticLabAuthoringService,
 ) -> dict | None:
+    if arguments.conversation_inspect is not None:
+        content_id = arguments.conversation_inspect
+        if content_id:
+            return {
+                "ok": True,
+                "type": "conversation_inspect",
+                "item": service.load_dialogue_content(content_id),
+            }
+        rows = service.list_dialogue_content()[:64]
+        return {
+            "ok": True,
+            "type": "conversation_inspect",
+            "bounded": True,
+            "items": rows,
+            "count": len(rows),
+        }
+    if arguments.conversation_variants:
+        return service.inspect_dialogue_variants(arguments.conversation_variants)
+    if arguments.conversation_operation:
+        content_id = arguments.conversation_content_id
+        if not content_id:
+            raise ValueError("--conversation-operation requires --conversation-content-id")
+        operation_arguments: dict[str, object] = {}
+        if arguments.conversation_style:
+            operation_arguments["style"] = arguments.conversation_style
+        if arguments.conversation_index is not None:
+            operation_arguments["index"] = arguments.conversation_index
+        if arguments.conversation_target_index is not None:
+            operation_arguments["targetIndex"] = arguments.conversation_target_index
+        if arguments.conversation_en is not None or arguments.conversation_tl is not None:
+            if arguments.conversation_en is None or arguments.conversation_tl is None:
+                raise ValueError("variant wording requires both --conversation-en and --conversation-tl")
+            operation_arguments["translations"] = {
+                "EN": arguments.conversation_en,
+                "TL": arguments.conversation_tl,
+            }
+        expected = arguments.conversation_source_fingerprint
+        if arguments.conversation_write:
+            return service.write_dialogue_content_operation(
+                content_id, arguments.conversation_operation,
+                expected_source_fingerprint=expected,
+                **operation_arguments,
+            )
+        return service.preview_dialogue_content_operation(
+            content_id, arguments.conversation_operation,
+            expected_source_fingerprint=expected,
+            **operation_arguments,
+        )
+    if arguments.conversation_ui_inspect is not None:
+        return service.inspect_conversation_ui(arguments.conversation_ui_inspect or None)
+    if arguments.conversation_ui_operation:
+        operation_arguments = {}
+        for name, key in (
+            ("conversation_ui_node", "nodeID"),
+            ("conversation_ui_parent", "parentID"),
+            ("conversation_ui_child", "childID"),
+            ("conversation_ui_new_parent", "newParentID"),
+        ):
+            value = getattr(arguments, name)
+            if value:
+                operation_arguments[key] = value
+        if arguments.conversation_ui_order is not None:
+            operation_arguments["order"] = arguments.conversation_ui_order
+        expected = arguments.conversation_ui_source_fingerprint
+        if arguments.conversation_ui_write:
+            return service.write_conversation_ui_operation(
+                arguments.conversation_ui_operation,
+                expected_source_fingerprint=expected,
+                **operation_arguments,
+            )
+        return service.preview_conversation_ui_operation(
+            arguments.conversation_ui_operation,
+            expected_source_fingerprint=expected,
+            **operation_arguments,
+        )
+    if arguments.conversation_validate:
+        if arguments.conversation_validate == "content":
+            return service.validate_dialogue_content()
+        return service.validate_conversation_ui()
+    if arguments.conversation_compile:
+        if arguments.conversation_compile == "content":
+            return service.generate_dialogue_content_source()
+        return service.compile_conversation_ui()
     if arguments.list_datasets:
         return {
             "ok": True,
@@ -965,6 +1055,50 @@ def _parser() -> argparse.ArgumentParser:
         choices=("massive", "sgd"),
         metavar="ADAPTER",
         help="review one bounded external MASSIVE/SGD-style source through a build-time adapter",
+    )
+    authoring.add_argument(
+        "--conversation-inspect", nargs="?", const="", metavar="CONTENT_ID",
+        help="inspect up to 64 canonical Conversation content records, or one content ID",
+    )
+    authoring.add_argument(
+        "--conversation-variants", metavar="CONTENT_ID",
+        help="inspect bounded EN/TL variants for one canonical phrase family",
+    )
+    authoring.add_argument(
+        "--conversation-operation",
+        choices=("add_variant", "duplicate_variant", "delete_variant", "move_variant", "add_style", "remove_style"),
+        help="preview a bounded canonical Conversation content operation",
+    )
+    parser.add_argument("--conversation-content-id", metavar="CONTENT_ID")
+    parser.add_argument("--conversation-style", choices=("neutral", "warm", "terse", "guarded"))
+    parser.add_argument("--conversation-index", type=int)
+    parser.add_argument("--conversation-target-index", type=int)
+    parser.add_argument("--conversation-en")
+    parser.add_argument("--conversation-tl")
+    parser.add_argument("--conversation-source-fingerprint")
+    parser.add_argument("--conversation-write", action="store_true")
+    authoring.add_argument(
+        "--conversation-ui-inspect", nargs="?", const="", metavar="NODE_ID",
+        help="inspect the canonical Conversation UI registry or one node",
+    )
+    authoring.add_argument(
+        "--conversation-ui-operation",
+        choices=("add_child", "remove_child", "move_child", "reorder_child", "update_node"),
+    )
+    parser.add_argument("--conversation-ui-node")
+    parser.add_argument("--conversation-ui-parent")
+    parser.add_argument("--conversation-ui-child")
+    parser.add_argument("--conversation-ui-new-parent")
+    parser.add_argument("--conversation-ui-order", type=int)
+    parser.add_argument("--conversation-ui-source-fingerprint")
+    parser.add_argument("--conversation-ui-write", action="store_true")
+    authoring.add_argument(
+        "--conversation-validate", choices=("content", "ui"),
+        help="validate canonical Conversation content or UI without writing",
+    )
+    authoring.add_argument(
+        "--conversation-compile", choices=("content", "ui"),
+        help="explicitly compile canonical Conversation content or UI registry",
     )
     parser.add_argument(
         "--dataset-source",

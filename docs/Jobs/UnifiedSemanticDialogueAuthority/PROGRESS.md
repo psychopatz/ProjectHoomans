@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0–P11E are accepted foundation. P11F–P11I remain mandatory and active, followed automatically by mandatory P12A–P12I Pragmatic Conversational Intelligence & Dialogue Director before developer handoff.
+**Status:** IN PROGRESS — P0–P11G are accepted foundation. P11H–P11I remain mandatory and active, followed automatically by mandatory P12A–P12I Pragmatic Conversational Intelligence & Dialogue Director before developer handoff.
 
 ## Audited baseline
 
@@ -626,12 +626,29 @@ P11F focused validation: surface ownership and Conversation projection
 registry `3/3 PASS`; and `git diff --check` PASS. No source save, native
 Project Zomboid session, or Workshop operation was touched.
 
-## Immediate Next Chunk — P11G
+## Accepted P11G — contextual Conversation authoring
 
-Repurpose Developer Tools around the selected Conversation item. Add
-structured EN/TL phrase-family variant and Conversation UI editing through the
-existing authoring service, with explicit preview/Review/write/compile and
-locked production-owned semantic destinations and eligibility.
+P11G accepted. Developer Tools now exposes a contextual Conversation authoring
+pane for the selected content family or UI node. Structured EN/TL variant
+add/duplicate/delete/reorder/style operations, player-choice label/utterance
+editing, and Conversation UI membership/order operations all use the shared
+`SemanticLabAuthoringService`; production semantic destinations and provider
+references remain locked. Preview and Review are effect-free, stale source
+fingerprints are rejected, and canonical writes plus CodeBuilder compilation
+remain explicit. Normal wording/navigation editing does not require raw JSON.
+
+P11G focused validation: shard/UI/compiler/API tests `10/10 PASS`; focused
+Studio surface/editor lifecycle `7/7 PASS` under Xvfb; placeholder parity,
+deterministic generated output, and `git diff --check` PASS. No source save,
+native Project Zomboid session, or Workshop operation was touched.
+
+## Immediate Next Chunk — P11H
+
+Finish and verify the bounded machine-readable Conversation authoring API used
+by the GUI and agents: inspect, variants, structural operations, UI operations,
+validation, preview/Review, explicit write, compile, stale guards, and
+deterministic diagnostics. Then run the P11I zero-legacy and full acceptance
+gates.
 
 ## Historical P11A starting instructions (completed)
 

@@ -298,3 +298,12 @@ absence tests without changing semantic/runtime authority.
 | Source traceability | Conversation explorer and existing `CanonicalSourceExplorerPane` | Dialogue Content/service source paths and fingerprints plus production pool source metadata | full canonical IDs and source ownership remain inspectable; no generated-file editing | surface tests, source explorer, content service tests |
 | Route/policy diagnostics | existing `InteractionExplorerPane` | production FlowEditor catalog and existing route metadata | removed from normal Explore; retained as narrow Developer Tools diagnostics; no duplicate response rows | surface ownership test and production catalog smoke |
 | Selected detail | Conversation explorer | ResponseCatalog/ResponsePlan, Dialogue Content, lifecycle/provider authority | bounded Overview/Wording/Route/Conditions/Follow-ups/Sources projection; no eligibility/effects ownership | Conversation projection test and response observatory detail checks |
+
+## P11G current closure
+
+| Surface | Actual production callers | Current owner | Disposition | Proof |
+| --- | --- | --- | --- | --- |
+| Phrase-family authoring | contextual Developer Tools and agent CLI | `SemanticLabAuthoringService` → owning Conversation shard → Dialogue Content compiler | structured EN/TL add/duplicate/delete/reorder/style operations; placeholder parity and structural locks enforced | shard/API tests, effect-free preview and stale-guard checks |
+| Player-facing choice wording | contextual Conversation UI editor | Dialogue Content `playerChoices` records | EN/TL labels and player utterances are editable through the same service; semantic destination/provider remain locked | Xvfb node-wording lifecycle test and content compiler parity |
+| Conversation UI structure | contextual Developer Tools and agent CLI | canonical `conversation/ui_registry.json` plus UI compiler | add/remove/move/reorder membership and presentation edits use bounded previews, explicit writes, and source fingerprints | Conversation UI registry/API tests |
+| Human/agent authoring boundary | Studio pane and `--conversation-*` CLI operations | one shared `SemanticLabAuthoringService` | inspect, variants, validate, preview/Review, write, and compile are machine-readable and effect-free until explicit write | authoring API tests, `--conversation-validate` checks |

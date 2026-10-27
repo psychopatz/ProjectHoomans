@@ -44,9 +44,15 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
             "Interaction composer",
             "Legacy build workflow",
             "Route diagnostics",
+            "Conversation authoring",
         ])
         self.assertTrue(hasattr(app, "developer_tools_button"))
         self.assertTrue(hasattr(app, "dialogue_content"))
+        self.assertTrue(hasattr(app, "conversation_authoring"))
+        self.assertEqual(
+            _labels(app.conversation_authoring._tabs),
+            ["Wording variants", "Conversation UI"],
+        )
         self.assertEqual(_labels(app.observatory.tabs), [
             "Overview", "Wording", "Route", "Conditions", "Follow-ups", "Sources",
         ])
@@ -68,6 +74,23 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
         self.assertEqual(_labels(app.studio_explore_notebook), ["Conversation", "Sources"])
         self.assertNotIn("Interactions", _labels(app.studio_explore_notebook))
 
+    def test_developer_tools_open_current_conversation_selection(self) -> None:
+        root = tk.Tk()
+        app = self.make_gui_app(root)
+        root.update()
+        app.open_conversation_editor("phrase.semantic.command.player.follow")
+        root.update()
+        root.update_idletasks()
+        self.assertTrue(app.developer_tools_host.winfo_ismapped())
+        self.assertEqual(
+            app.advanced_notebook.tab(app.advanced_notebook.select(), "text"),
+            "Conversation authoring",
+        )
+        self.assertIn(
+            "semantic.command.player.follow",
+            app.conversation_authoring._content_label.get(),
+        )
+
         self.assertEqual(_labels(app.trace_tabs), [
             "Inspect", "Graph", "Compare / Regression", "World", "Debug",
         ])
@@ -86,6 +109,31 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
         self.assertTrue(hasattr(app, "selection_explain_button"))
         self.assertTrue(hasattr(app, "regression_output"))
         self.assertTrue(hasattr(app, "source_explorer"))
+
+    def test_conversation_ui_editor_loads_player_wording_effect_free(self) -> None:
+        root = tk.Tk()
+        app = self.make_gui_app(root)
+        root.update()
+        target_id = "conversation.choice:question.weather"
+        index = next(
+            index
+            for index, node in enumerate(app.conversation_authoring._ui_nodes)
+            if node.get("id") == target_id
+        )
+        app.conversation_authoring._node_list.selection_clear(0, "end")
+        app.conversation_authoring._node_list.selection_set(index)
+        app.conversation_authoring._show_node()
+        self.assertIsNotNone(app.conversation_authoring._node_content_item)
+        self.assertTrue(app.conversation_authoring._node_label_en.get())
+        self.assertTrue(app.conversation_authoring._node_choice_en.get())
+        report = app.conversation_authoring.preview_node_wording()
+        self.assertTrue(report["ok"])
+        self.assertTrue(report["effectFree"])
+        self.assertEqual(report["writes"], [])
+        self.assertEqual(
+            report["contentAfter"]["labelTranslations"]["EN"],
+            app.conversation_authoring._node_label_en.get(),
+        )
 
     def test_structural_studio_tools_are_hidden_behind_developer_launcher(self) -> None:
         root = tk.Tk()

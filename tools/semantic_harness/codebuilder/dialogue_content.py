@@ -12,6 +12,7 @@ import hashlib
 import json
 import math
 import re
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -253,6 +254,18 @@ def _translations(value: Any, label: str) -> dict[str, str]:
     output: dict[str, str] = {}
     for language in LANGUAGES:
         output[language] = _text(value.get(language), f"{label}.{language}")
+    placeholders = {
+        language: Counter(
+            re.findall(r"\{[A-Za-z0-9_.:-]+\}|%[sd]", output[language])
+        )
+        for language in LANGUAGES
+    }
+    if placeholders["EN"] != placeholders["TL"]:
+        raise CompileError(
+            f"{label} EN/TL placeholders must match: "
+            f"EN={sorted(placeholders['EN'].elements())!r}, "
+            f"TL={sorted(placeholders['TL'].elements())!r}"
+        )
     unsupported = set(value) - set(LANGUAGES)
     if unsupported:
         raise CompileError(

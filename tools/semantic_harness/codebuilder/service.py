@@ -25,6 +25,8 @@ from .dataset_adapters import preview_dataset_adapter, promote_reviewed_candidat
 from .interaction_explorer import build_interaction_rows, search_interactions
 from .dialogue_content import (
     CONTENT_SOURCE_RELATIVE,
+    MAX_PHRASES_PER_STYLE,
+    STYLES,
     compile_dialogue_content,
     dialogue_content_source_fingerprint,
     derived_canonical_concept,
@@ -37,6 +39,7 @@ from .conversation_ui import (
     conversation_ui_source_fingerprint,
     conversation_ui_source_path_from_manifest,
     load_conversation_ui_source,
+    write_conversation_ui_output,
     write_conversation_ui_source,
 )
 from .lexicon_compiler import CompileError
@@ -409,6 +412,31 @@ class SemanticLabAuthoringService:
             "effectFree": True,
         }
 
+    def compile_conversation_ui(self) -> dict[str, Any]:
+        """Explicitly compile the canonical UI source and generated runtime registry."""
+        path = self.conversation_ui_source_path
+        try:
+            compiled = compile_conversation_ui(load_conversation_ui_source(path))
+            output = write_conversation_ui_output(self.repository, compiled)
+        except (OSError, ValueError, TypeError, CompileError) as error:
+            return {
+                "ok": False,
+                "type": "conversation_ui_compile",
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "writes": [],
+                "effectFree": False,
+            }
+        return {
+            "ok": True,
+            "type": "conversation_ui_compile",
+            "sourcePath": str(path),
+            "runtimePath": str(output),
+            "nodeCount": len(compiled["nodes"]),
+            "sourceFingerprint": conversation_ui_source_fingerprint(path),
+            "writes": [str(output)],
+            "effectFree": False,
+        }
+
     def preview_dialogue_content_source(self) -> dict[str, Any]:
         return authoring.preview_dialogue_content_source(
             self.dialogue_content_source_path,
@@ -518,6 +546,297 @@ class SemanticLabAuthoringService:
                 "verifiedOwner": "CodeBuilder → Dialogue Content Registry",
             })
         return rows
+
+    def inspect_dialogue_variants(
+        self,
+        content_id: str,
+        *,
+        limit: int = MAX_PHRASES_PER_STYLE,
+    ) -> dict[str, Any]:
+        """Return one bounded phrase-family variant page for GUI/agent callers."""
+        if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= MAX_PHRASES_PER_STYLE:
+            return {
+                "ok": False,
+                "type": "dialogue_variants_inspect",
+                "contentID": str(content_id),
+                "diagnostics": [{"severity": "error", "message": "variant limit is outside the bounded range"}],
+                "writes": [],
+                "effectFree": True,
+            }
+        try:
+            item = self.load_dialogue_content(str(content_id))
+        except (OSError, ValueError, KeyError) as error:
+            return {
+                "ok": False,
+                "type": "dialogue_variants_inspect",
+                "contentID": str(content_id),
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "writes": [],
+                "effectFree": True,
+            }
+        if item.get("kind") != "phraseFamily":
+            return {
+                "ok": False,
+                "type": "dialogue_variants_inspect",
+                "contentID": str(content_id),
+                "diagnostics": [{"severity": "error", "message": "player choices do not have phrase variants"}],
+                "writes": [],
+                "effectFree": True,
+            }
+        variants: list[dict[str, Any]] = []
+        for style in STYLES:
+            phrases = item.get("styles", {}).get(style, [])
+            for index, phrase in enumerate(phrases[:limit]):
+                variants.append({
+                    "style": style,
+                    "index": index,
+                    "translations": json.loads(json.dumps(phrase.get("translations", {}), ensure_ascii=False)),
+                })
+        return {
+            "ok": True,
+            "type": "dialogue_variants_inspect",
+            "contentID": str(content_id),
+            "semanticTemplateID": item.get("semanticTemplateID"),
+            "sourcePath": item.get("sourcePath"),
+            "sourceFingerprint": item.get("sourceFingerprint"),
+            "variants": variants,
+            "variantCount": len(variants),
+            "diagnostics": [],
+            "writes": [],
+            "effectFree": True,
+        }
+
+    @staticmethod
+    def _dialogue_content_operation(
+        document: dict[str, Any],
+        content_id: str,
+        operation: str,
+        arguments: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Apply one bounded structural phrase operation to a copied document."""
+        updated = json.loads(json.dumps(document, ensure_ascii=False))
+        families = updated.get("phraseFamilies", [])
+        family = next(
+            (
+                value for value in families
+                if isinstance(value, dict)
+                and SemanticLabAuthoringService._family_id(value) == str(content_id)
+            ),
+            None,
+        )
+        if not isinstance(family, dict):
+            raise CompileError(f"unknown dialogue content id: {content_id}")
+        if not family.get("styles"):
+            raise CompileError(f"{content_id} is not a phrase family")
+
+        style = str(arguments.get("style", "neutral"))
+        if style not in STYLES:
+            raise CompileError(f"unsupported phrase style: {style}")
+        styles = family.setdefault("styles", {})
+        phrases = styles.get(style)
+        if phrases is not None and not isinstance(phrases, list):
+            raise CompileError(f"{content_id}.{style} must be a phrase list")
+
+        def integer(name: str, default: int | None = None) -> int:
+            value = arguments.get(name, default)
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise CompileError(f"{name} must be an integer")
+            return value
+
+        def translations() -> dict[str, str]:
+            value = arguments.get("translations")
+            if not isinstance(value, dict):
+                raise CompileError("translations must contain EN and TL")
+            return json.loads(json.dumps(value, ensure_ascii=False))
+
+        if operation == "add_variant":
+            if phrases is None:
+                raise CompileError(f"style does not exist: {style}")
+            value = {"translations": translations()}
+            index = arguments.get("index")
+            if index is None:
+                phrases.append(value)
+            else:
+                index = integer("index")
+                if index < 0 or index > len(phrases):
+                    raise CompileError("variant index is outside the bounded phrase list")
+                phrases.insert(index, value)
+        elif operation == "duplicate_variant":
+            if phrases is None:
+                raise CompileError(f"style does not exist: {style}")
+            index = integer("index")
+            if index < 0 or index >= len(phrases):
+                raise CompileError("variant index is outside the bounded phrase list")
+            value = json.loads(json.dumps(phrases[index], ensure_ascii=False))
+            target = arguments.get("targetIndex", index + 1)
+            if isinstance(target, bool) or not isinstance(target, int) or target < 0 or target > len(phrases):
+                raise CompileError("targetIndex is outside the bounded phrase list")
+            phrases.insert(target, value)
+        elif operation == "delete_variant":
+            if phrases is None:
+                raise CompileError(f"style does not exist: {style}")
+            index = integer("index")
+            if index < 0 or index >= len(phrases):
+                raise CompileError("variant index is outside the bounded phrase list")
+            phrases.pop(index)
+        elif operation == "move_variant":
+            if phrases is None:
+                raise CompileError(f"style does not exist: {style}")
+            index = integer("index")
+            target = integer("targetIndex")
+            if index < 0 or index >= len(phrases) or target < 0 or target >= len(phrases):
+                raise CompileError("variant move index is outside the bounded phrase list")
+            value = phrases.pop(index)
+            phrases.insert(target, value)
+        elif operation == "add_style":
+            if style in styles:
+                raise CompileError(f"style already exists: {style}")
+            styles[style] = [{"translations": translations()}]
+        elif operation == "remove_style":
+            if style not in styles:
+                raise CompileError(f"style does not exist: {style}")
+            styles.pop(style)
+        else:
+            raise CompileError(f"unsupported dialogue content operation: {operation}")
+        return updated
+
+    def _prepare_dialogue_content_operation(
+        self,
+        content_id: str,
+        operation: str,
+        *,
+        expected_source_fingerprint: str | None = None,
+        **arguments: Any,
+    ) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+        path = self.dialogue_content_source_path
+        actual_fingerprint = dialogue_content_source_fingerprint(path)
+        base = {
+            "ok": False,
+            "type": "dialogue_content_operation",
+            "contentID": str(content_id),
+            "operation": str(operation),
+            "sourcePath": str(path),
+            "sourceFingerprint": actual_fingerprint,
+            "writes": [],
+            "previewOnly": True,
+            "effectFree": True,
+        }
+        if expected_source_fingerprint and expected_source_fingerprint != actual_fingerprint:
+            return None, {
+                **base,
+                "stale": True,
+                "reason": "source_fingerprint_mismatch",
+                "expectedSourceFingerprint": expected_source_fingerprint,
+                "diagnostics": [{"severity": "error", "message": "Dialogue Content source changed since inspection"}],
+            }
+        try:
+            document = load_dialogue_content_source(path)
+            updated = self._dialogue_content_operation(document, str(content_id), str(operation), arguments)
+            compiled = compile_dialogue_content(updated)
+        except (OSError, ValueError, TypeError, CompileError) as error:
+            return None, {
+                **base,
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+            }
+        return updated, {
+            **base,
+            "ok": True,
+            "stale": False,
+            "diagnostics": [],
+            "contentFingerprint": compiled["contentFingerprint"],
+            "generatedPaths": [
+                str(self.repository / path)
+                for path in (
+                    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/DialogueContent/Registry.lua",
+                    "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/DialogueContent.json",
+                    "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/DialogueContent.json",
+                )
+            ],
+        }
+
+    def preview_dialogue_content_operation(
+        self,
+        content_id: str,
+        operation: str,
+        *,
+        expected_source_fingerprint: str | None = None,
+        **arguments: Any,
+    ) -> dict[str, Any]:
+        """Validate a structural content operation without writing any file."""
+        _updated, report = self._prepare_dialogue_content_operation(
+            content_id,
+            operation,
+            expected_source_fingerprint=expected_source_fingerprint,
+            **arguments,
+        )
+        return report
+
+    def write_dialogue_content_operation(
+        self,
+        content_id: str,
+        operation: str,
+        *,
+        expected_source_fingerprint: str | None = None,
+        **arguments: Any,
+    ) -> dict[str, Any]:
+        """Write a previously validated structural operation to its shard(s)."""
+        updated, report = self._prepare_dialogue_content_operation(
+            content_id,
+            operation,
+            expected_source_fingerprint=expected_source_fingerprint,
+            **arguments,
+        )
+        if updated is None or report.get("ok") is not True:
+            return report
+        try:
+            written = write_dialogue_content_source(self.dialogue_content_source_path, updated)
+        except (OSError, ValueError, TypeError, CompileError) as error:
+            return {
+                **report,
+                "ok": False,
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "writes": [],
+            }
+        return {
+            **report,
+            "previewOnly": False,
+            "effectFree": False,
+            "writes": [str(path) for path in written],
+            "reloadedBy": "caller_compile_required",
+        }
+
+    def validate_dialogue_content(
+        self,
+        document: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Return machine-readable canonical content validation diagnostics."""
+        try:
+            source = document if document is not None else load_dialogue_content_source(
+                self.dialogue_content_source_path
+            )
+            compiled = compile_dialogue_content(source)
+        except (OSError, ValueError, TypeError, CompileError) as error:
+            return {
+                "ok": False,
+                "type": "dialogue_content_validation",
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "writes": [],
+                "effectFree": True,
+            }
+        return {
+            "ok": True,
+            "type": "dialogue_content_validation",
+            "phraseFamilyCount": len(compiled["phraseFamilies"]),
+            "phraseCount": sum(
+                len(phrases)
+                for family in compiled["phraseFamilies"]
+                for phrases in family["styles"].values()
+            ),
+            "contentFingerprint": compiled["contentFingerprint"],
+            "diagnostics": [],
+            "writes": [],
+            "effectFree": True,
+        }
 
     def load_dialogue_content(self, content_id: str) -> dict[str, Any]:
         document = self._dialogue_content_document()
