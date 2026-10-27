@@ -64,6 +64,7 @@ local Client = require "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient
 -- Native shared composition loads the production response registry before
 -- client presentation; the standalone fixture must honor that contract.
 require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+local Reactions = require "PNC/Semantics/PNC_SemanticSocialReaction"
 local Presentation = require "PNC/Conversation/PNC_SocialFlavorPresentation"
 local Diary = PNC.Conversation.Diary
 local received
@@ -71,15 +72,47 @@ EventBus.subscribe(Message.EVENT_TYPE, function(message)
     received = message
 end, "presentation-message-test")
 
+local function semanticFlavor(eventID, eventType, context)
+    context = context or {}
+    context.eventType = eventType
+    context.npcID = context.npcID or "npc-one"
+    context.socialRole = context.socialRole or "neutral"
+    local semantic = Reactions.Resolve({
+        eventID = eventID,
+        eventType = eventType,
+        npcID = context.npcID,
+        context = context,
+    })
+    T.truthy(semantic, "semantic event realization is available: " .. eventType)
+    T.truthy(semantic.fallback, "semantic event has selected wording: " .. eventType)
+    return {
+        eventID = eventID,
+        eventType = eventType,
+        family = "semantic_event",
+        npcID = context.npcID,
+        socialRole = context.socialRole,
+        llmEligible = false,
+        semanticOwned = true,
+        resolvedText = semantic.fallback,
+        responsePlanID = semantic.responsePlanID,
+        realizationFamily = semantic.realizationFamily,
+        realizationID = semantic.realizationID,
+        factRefs = semantic.groundedFactRefs,
+        offerIDs = semantic.offerIDs,
+        context = context,
+        source = {
+            kind = "semantic_speech",
+            channel = "social_event",
+            eventType = eventType,
+        },
+    }
+end
+
 Client.Reset()
-local accepted = Presentation.Receive({
-    eventID = "social:event:one",
-    flavorID = "social.witnessed_player_kill",
-    family = "combat_commentary",
-    npcID = "npc-one",
-    socialRole = "neutral",
-    llmEligible = false,
-}, {
+local accepted = Presentation.Receive(semanticFlavor(
+    "social:event:one",
+    "witnessed_player_kill"
+), {
     npcID = "npc-one",
     state = "neutral",
 }, {
@@ -91,10 +124,10 @@ T.truthy(received, "adapter reaches the Core message bus")
 T.equal(received.speakerID, "npc-one", "adapter preserves NPC identity")
 T.equal(received.speakerName, "Mara", "adapter resolves NPC display name")
 T.truthy(received.text ~= "", "adapter resolves relationship-aware text")
-T.truthy(string.find(received.text, "Alexandra", 1, true),
-    "dialogue addresses the player by first name")
-T.falsy(string.find(received.text, "Maximilian", 1, true),
-    "dialogue does not repeat the player's surname")
+T.equal(received.source.kind, "semantic_speech",
+    "event delivery preserves semantic speech ownership")
+T.equal(received.source.eventType, "witnessed_player_kill",
+    "event delivery preserves the typed semantic event")
 local entries = Diary.Get("npc-one")
 T.equal(#entries, 1, "adapter records the delivered flavor in the diary")
 T.equal(entries[1].kind, "social_flavor", "diary identifies reusable flavor")
@@ -118,15 +151,11 @@ T.equal(#Diary.Get("npc-one"), diaryCountBeforeInteraction,
 
 Client.Reset()
 received = nil
-local teammateAccepted = Presentation.Receive({
-    eventID = "social:event:teammate",
-    flavorID = "social.witnessed_teammate_hurt",
-    family = "combat_commentary",
-    npcID = "npc-one",
-    socialRole = "neutral",
-    llmEligible = false,
-    context = { victimNPCID = "npc-two" },
-}, {
+local teammateAccepted = Presentation.Receive(semanticFlavor(
+    "social:event:teammate",
+    "witnessed_teammate_hurt",
+    { victimNPCID = "npc-two" }
+), {
     npcID = "npc-one",
     state = "neutral",
 }, {
@@ -135,10 +164,10 @@ local teammateAccepted = Presentation.Receive({
 T.truthy(teammateAccepted, "teammate flavor is accepted")
 Client.Pump(now)
 T.truthy(received, "teammate flavor reaches the Core message bus")
-T.truthy(string.find(received.text, "Jordan", 1, true),
-    "teammate flavor addresses the injured NPC by first name")
-T.falsy(string.find(received.text, "Longsurname", 1, true),
-    "teammate flavor does not repeat the injured NPC surname")
+T.equal(received.source.kind, "semantic_speech",
+    "teammate delivery preserves semantic speech ownership")
+T.equal(received.source.eventType, "witnessed_teammate_hurt",
+    "teammate delivery preserves its typed semantic event")
 
 local capturedBinding
 local capturedSpeechMessage
@@ -151,14 +180,12 @@ Client.SetLLMProvider(function(item, complete)
     return true
 end)
 Client.Reset()
-local llmAccepted = Presentation.Receive({
-    eventID = "social:event:voice-binding",
-    flavorID = "social.witnessed_player_kill",
-    family = "voice_binding",
-    npcID = "npc-one",
-    socialRole = "neutral",
-    llmEligible = true,
-}, {
+local voiceFlavor = semanticFlavor(
+    "social:event:voice-binding",
+    "witnessed_player_kill"
+)
+voiceFlavor.llmEligible = true
+local llmAccepted = Presentation.Receive(voiceFlavor, {
     npcID = "npc-one",
     state = "neutral",
 }, {

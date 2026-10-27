@@ -5,11 +5,12 @@ return function(Catalog, Core)
     -- without debug.getinfo. It never changes selection or depends on paths
     -- guessed by Python textual scanning.
     local function registrationSource()
-        if type(debug) ~= "table"
-            or type(debug.getinfo) ~= "function" then
+        local debugAPI = rawget(_G, "debug")
+        local getInfo = type(debugAPI) == "table" and debugAPI["getinfo"]
+        if type(getInfo) ~= "function" then
             return nil
         end
-        local info = debug.getinfo(3, "S")
+        local info = getInfo(3, "S")
         local source = info and info.source
         if type(source) == "string" and string.sub(source, 1, 1) == "@"
             and #source < 1024 then

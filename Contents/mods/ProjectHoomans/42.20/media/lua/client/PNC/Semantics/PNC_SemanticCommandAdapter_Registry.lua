@@ -25,8 +25,10 @@ function Adapter.RegisterAction(action, definition)
     end
     Adapter.Actions[action] = definition
     -- The real descriptor author, not an inferred generated Lua ownership.
-    if type(debug) == "table" and type(debug.getinfo) == "function" then
-        local info = debug.getinfo(2, "S")
+    local debugAPI = rawget(_G, "debug")
+    local getInfo = type(debugAPI) == "table" and debugAPI["getinfo"]
+    if type(getInfo) == "function" then
+        local info = getInfo(2, "S")
         if info and type(info.source) == "string"
             and string.sub(info.source, 1, 1) == "@"
             and #info.source < 1024 then

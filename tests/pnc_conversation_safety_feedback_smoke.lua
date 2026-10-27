@@ -53,8 +53,8 @@ local NameplateSpeech = require "PNC/UI/Nameplates/PNC_NameplateSpeech"
 -- Native shared composition loads the production response registry before
 -- client presentation; the standalone fixture must honor that contract.
 require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+local Reactions = require "PNC/Semantics/PNC_SemanticSocialReaction"
 local Presentation = require "PNC/Conversation/PNC_SocialFlavorPresentation"
-local Flavor = require "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
 
 local view = {
     spec = { npcID = "npc-one" },
@@ -173,14 +173,21 @@ T.equal(#view.historyPart.messages, 1,
     "active danger close emits the safety warning")
 T.equal(sceneEnded, true, "active danger close ends the scene lease")
 
-local definition = Flavor.Get("social.conversation_safety_danger")
-T.truthy(definition, "danger warning is registered in the flavor registry")
-T.truthy(#definition.npc >= 9, "danger warning has broad base line variety")
-T.equal(#definition.variants, 5, "danger warning has relationship variety")
-for _, variant in ipairs(definition.variants) do
-    T.truthy(#variant.npc >= 9,
-        "danger warning role variant has line variety: " .. variant.id)
-end
+local semantic = Reactions.Resolve({
+    eventID = "conversation-safety:semantic-check",
+    eventType = "conversation_safety",
+    npcID = "npc-one",
+    context = {
+        eventType = "conversation_safety",
+        npcID = "npc-one",
+        socialRole = "neutral",
+    },
+})
+T.truthy(semantic, "danger warning is selected by the semantic catalog")
+T.equal(semantic.realizationFamily, "semantic.conversation.safety",
+    "danger warning reports semantic pool ownership")
+T.truthy(semantic.responsePlan,
+    "danger warning carries a semantic response plan")
 
 EventBus.clearOwner("conversation-safety-feedback-test")
 T.finish("pnc_conversation_safety_feedback_smoke")
