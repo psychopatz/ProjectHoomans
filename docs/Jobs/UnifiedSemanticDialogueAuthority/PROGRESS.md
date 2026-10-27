@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 through P6 accepted; P7 is the active implementation slice.
+**Status:** IN PROGRESS — P0 through P7 accepted; P8 is the active implementation slice.
 
 ## Audited baseline
 
@@ -47,7 +47,7 @@
 | P4 — complex medical/incapacitated migration | **ACCEPTED** |
 | P5 — ToolReplies + legacy registry migration | **ACCEPTED** |
 | P6 — compatibility semantic adapters | **ACCEPTED** |
-| P7 — canonical content coverage / Studio observability | **IN PROGRESS** |
+| P7 — canonical content coverage / Studio observability | **ACCEPTED** |
 | P8 — retire first-party legacy prose authority | NOT STARTED |
 | P9 — scale/MP/final acceptance | NOT STARTED |
 
@@ -177,14 +177,40 @@ Focused P6 compatibility, producer, and P1–P5 regression evidence passes
 `16/16`; the producer coverage includes Bandits damage commentary, Necroa
 mask warning, Project A-Life meta presentation, and Companion Dogs feed.
 
-## Immediate Next Chunk — P7
+## Accepted P7 — canonical Dialogue Content and Observatory ownership
 
-Expand canonical Dialogue Content / translation ownership for the migrated
-families and expose compatibility/event provenance, response plans, content
-owners and follow-up offers through the existing Semantic Lab/Observatory.
-Keep phrase variation content-only and generated/runtime artifacts bounded;
-do not create a second editor or registry. Continue automatically through
-P8–P9 after the P7 gate passes.
+P7 is accepted. The migrated semantic families now resolve through the existing
+generated Dialogue Content Registry rather than legacy first-party prose keys:
+168 bounded phrase families and 179 phrase records have stable semantic
+template/content identities, explicit content owners, EN/TL key parity, and
+content-only phrase variation. ToolReply semantic templates no longer derive
+their realization identity from hashed legacy fallback text; the old keys remain
+translation/source material for migration review.
+
+ResponsePlan literal segments are promoted at the semantic normalization seam
+to Dialogue Content translation segments. ResponsePlan still selects meaning
+and bounded follow-up offers exactly once; SpeechRealization applies the
+selected content phrase without introducing another selector. Semantic Lab
+response-pool list/detail now exposes production authority, content owners,
+plans, bounded follow-up offers, fact references, and selection provenance.
+
+P7 evidence: focused Python content/Observatory/compiler regression `34/34`,
+production Lua P4–P7 semantic/content smoke `4/4`, the new P7 Kahlua smoke
+`0` errors, and CodeBuilder generation repeated deterministically with
+`168` families / `179` phrases on both runs.
+
+The generated Dialogue Content source and registry remain compile-time,
+source-controlled artifacts; runtime inspection is bounded and lazy. Existing
+legacy definition files remain migration source material until the P8
+retirement audit proves every first-party caller is semantic-first.
+
+## Immediate Next Chunk — P8
+
+Audit and retire/deprecate remaining first-party prose selectors and
+compatibility-only aliases after proving all migrated callers are semantic-first.
+Keep generic PsychopatzCore SocialFlavor infrastructure and external provider
+compatibility authority intact. Continue automatically through P9 after the P8
+gate passes.
 
 ## Stop conditions
 

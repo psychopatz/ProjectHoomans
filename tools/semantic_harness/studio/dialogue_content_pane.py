@@ -153,6 +153,8 @@ class DialogueContentPane:
             if key in {
                 "id", "kind", "semanticTemplateID", "canonicalConcept", "locked",
                 "translationKeyPrefix", "labelKey", "choiceKey", "verifiedOwner",
+                "contentOwner", "semanticAuthority", "responsePoolID",
+                "semanticVariantID", "followUpEligibility", "legacySource",
             }
         }
         self._set_text(

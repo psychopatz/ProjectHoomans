@@ -125,7 +125,15 @@ class SemanticLabAuthoringService:
     def _content_item(document: dict[str, Any], content_id: str) -> dict[str, Any] | None:
         for family in document.get("phraseFamilies", []):
             if isinstance(family, dict) and family.get("id") == content_id:
-                return {"kind": "phraseFamily", **family}
+                item = {"kind": "phraseFamily", **family}
+                locked = item.get("locked") or {}
+                item["contentOwner"] = locked.get("contentOwner")
+                item["semanticAuthority"] = locked.get("semanticAuthority")
+                item["responsePoolID"] = locked.get("responsePoolID")
+                item["semanticVariantID"] = locked.get("semanticVariantID")
+                item["followUpEligibility"] = locked.get("followUpEligibility")
+                item["legacySource"] = locked.get("legacySource")
+                return item
         for choice in document.get("playerChoices", []):
             if isinstance(choice, dict) and choice.get("id") == content_id:
                 return {"kind": "playerChoice", **choice}
@@ -161,6 +169,14 @@ class SemanticLabAuthoringService:
                 "kind": "phraseFamily",
                 "semanticTemplateID": family.get("semanticTemplateID"),
                 "canonicalConcept": family.get("canonicalConcept"),
+                "contentOwner": family.get("contentOwner")
+                or (family.get("locked") or {}).get("contentOwner"),
+                "semanticAuthority": (family.get("locked") or {}).get(
+                    "semanticAuthority"
+                ),
+                "legacySource": (family.get("locked") or {}).get(
+                    "legacySource"
+                ),
                 "styles": sorted(family.get("styles", {})),
                 "sourcePath": str(self.dialogue_content_source_path),
                 "sourceFingerprint": fingerprint,

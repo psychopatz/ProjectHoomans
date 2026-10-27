@@ -63,6 +63,53 @@ function Core.registerTextFallback(templateID, fallback)
     end
 end
 
+local function migratedContentOwner(poolID)
+    poolID = tostring(poolID or "")
+    if string.find(poolID, "semantic.compat.", 1, true) == 1 then
+        return "projecthoomans.dialogue_content.compatibility"
+    end
+    if string.find(poolID, "semantic.tool_reply.", 1, true) == 1 then
+        return "projecthoomans.dialogue_content.tool_replies"
+    end
+    if string.find(poolID, "semantic.medical.", 1, true) == 1
+        or string.find(poolID, "semantic.combat.", 1, true) == 1
+        or string.find(poolID, "semantic.leader_loss.", 1, true) == 1
+        or string.find(poolID, "semantic.companion.", 1, true) == 1
+        or string.find(poolID, "semantic.conversation.safety", 1, true) == 1
+        or string.find(poolID, "semantic.corpse.", 1, true) == 1
+        or string.find(poolID, "semantic.flow.farewell", 1, true) == 1
+        or string.find(poolID, "semantic.social.reaction", 1, true) == 1
+    then
+        return "projecthoomans.dialogue_content.migrated_events"
+    end
+    return nil
+end
+
+local function normalizePlanContent(plan, templateID)
+    if type(plan) ~= "table" or type(plan.turns) ~= "table" then
+        return plan
+    end
+    for _, turn in ipairs(plan.turns) do
+        for _, segment in ipairs(turn.segments or {}) do
+            if type(segment) == "table" and segment.kind == "literal" then
+                local text = Core.boundedText(segment.text)
+                if text ~= "" then
+                    -- ResponsePlan remains the semantic plan owner. A literal
+                    -- event segment is promoted to the same translation seam
+                    -- as the selected response so Dialogue Content can own
+                    -- wording without creating another selector.
+                    segment.kind = "translation"
+                    segment.templateID = templateID
+                    segment.fallback = text
+                    segment.args = {}
+                    segment.text = nil
+                end
+            end
+        end
+    end
+    return plan
+end
+
 function Core.hash(value)
     local output = 0
     value = tostring(value or "")
@@ -221,8 +268,11 @@ function Core.normalizedVariant(poolID, index, value)
     if value.plan ~= nil then
         local valid, normalized = ResponsePlan.Build(value.plan)
         if not valid then return nil end
-        plan = normalized
+        plan = normalizePlanContent(normalized, tostring(
+            value.templateID or id
+        ))
     end
+    local contentOwner = value.contentOwner or migratedContentOwner(poolID)
     local normalized = {
         id = id,
         templateID = tostring(value.templateID or id),
@@ -237,7 +287,7 @@ function Core.normalizedVariant(poolID, index, value)
         uncertainty = value.uncertainty,
         tone = value.tone,
         personalityStyle = value.personalityStyle,
-        contentOwner = value.contentOwner,
+        contentOwner = contentOwner,
         translationArgs = Core.copy(value.translationArgs),
         when = Core.copy(value.when),
         priority = tonumber(value.priority) or 0,

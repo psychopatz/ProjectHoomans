@@ -100,12 +100,14 @@ local function selectPhrase(templateID, styleVariant, context, salt, localSelect
     then
         return nil
     end
-    local family, phrases = phraseRegistry.FamilyFor(templateID, styleVariant)
+    local family, phrases, selectedStyle = phraseRegistry.FamilyFor(
+        templateID, styleVariant
+    )
     if type(family) ~= "table" or type(phrases) ~= "table" or #phrases == 0 then
         return nil
     end
     local familyID = tostring(family.id or templateID)
-    local style = tostring(styleVariant or "neutral")
+    local style = tostring(selectedStyle or styleVariant or "neutral")
     local key = phraseActorID(context) .. ":" .. familyID .. ":" .. style
     local existing = localSelections and localSelections[key]
     if existing then return existing end
@@ -249,7 +251,36 @@ local function applySegment(segment, style, blocked, context, salt, localSelecti
     local resolved = Realization.Resolve(
         segment.templateID, style, segment.fallback
     )
-    if not resolved then return segment, nil end
+    local phrase
+    if resolved then
+        phrase = selectPhrase(
+            segment.templateID,
+            resolved.variant,
+            context,
+            salt,
+            localSelections
+        )
+    else
+        -- Migrated event/ToolReply templates may intentionally have no
+        -- speech-style family. Dialogue Content still owns their wording;
+        -- applying that phrase must not require a second semantic selector.
+        phrase = selectPhrase(
+            segment.templateID,
+            style.variant,
+            context,
+            salt,
+            localSelections
+        )
+        if not phrase then return segment, nil end
+        resolved = {
+            templateID = segment.templateID,
+            fallback = phrase.fallback,
+            family = segment.templateID,
+            variant = phrase.style,
+            fallbackReason = nil,
+            contentOnly = true,
+        }
+    end
     local output = copy(segment)
     output.args = copy(segment.args or {})
     output.semanticTemplateID = segment.templateID
@@ -258,13 +289,6 @@ local function applySegment(segment, style, blocked, context, salt, localSelecti
     output.realizationFamily = resolved.family
     output.realizationVariant = resolved.variant
     output.realizationFallbackReason = resolved.fallbackReason
-    local phrase = selectPhrase(
-        segment.templateID,
-        resolved.variant,
-        context,
-        salt,
-        localSelections
-    )
     if phrase then
         output.templateID = phrase.translationKey
         output.fallback = phrase.fallback

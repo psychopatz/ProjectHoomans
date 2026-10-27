@@ -35,7 +35,7 @@ LANGUAGES = ("EN", "TL")
 STYLES = ("neutral", "warm", "terse", "guarded")
 ID_PATTERN = re.compile(r"^[a-z][a-z0-9_.:-]{0,127}$")
 TRANSLATION_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,127}$")
-MAX_FAMILIES = 32
+MAX_FAMILIES = 192
 MAX_PHRASES_PER_STYLE = 6
 MAX_PLAYER_CONTENT = 32
 MAX_TEXT = 256
@@ -192,12 +192,16 @@ def _phrase_family(
 
     if not compiled_styles:
         raise CompileError(f"{family_id} has no compiled style phrases")
+    content_owner = locked.get("contentOwner")
+    if content_owner is not None:
+        content_owner = _text(content_owner, f"{family_id}.locked.contentOwner")
     return {
         "id": family_id,
         "semanticTemplateID": semantic_id,
         "canonicalConcept": concept,
         "styles": compiled_styles,
         "locked": locked,
+        "contentOwner": content_owner,
     }, translations
 
 
@@ -335,6 +339,7 @@ def render_dialogue_content_registry(compiled: dict[str, Any]) -> str:
             "id": family["id"],
             "semanticTemplateID": family["semanticTemplateID"],
             "canonicalConcept": family["canonicalConcept"],
+            "contentOwner": family.get("contentOwner"),
             "styles": family["styles"],
         }
         for family in compiled["phraseFamilies"]
@@ -355,8 +360,13 @@ def render_dialogue_content_registry(compiled: dict[str, Any]) -> str:
         "function Registry.FamilyFor(templateID, style)",
         "    local family = Registry.PHRASE_FAMILIES[tostring(templateID or \"\")]",
         "    if type(family) ~= \"table\" then return nil end",
-        "    local phrases = family.styles and family.styles[tostring(style or \"neutral\")]",
-        "    return family, type(phrases) == \"table\" and phrases or nil",
+        "    local selectedStyle = tostring(style or \"neutral\")",
+        "    local phrases = family.styles and family.styles[selectedStyle]",
+        "    if type(phrases) ~= \"table\" then",
+        "        selectedStyle = \"neutral\"",
+        "        phrases = family.styles and family.styles[selectedStyle]",
+        "    end",
+        "    return family, type(phrases) == \"table\" and phrases or nil, selectedStyle",
         "end",
         "function Registry.PlayerChoice(contentID)",
         "    return Registry.PLAYER_CHOICES[tostring(contentID or \"\")]",

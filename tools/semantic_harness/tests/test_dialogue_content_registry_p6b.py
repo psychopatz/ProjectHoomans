@@ -33,14 +33,20 @@ class DialogueContentRegistryP6BTests(unittest.TestCase):
         second = compile_dialogue_content(source)
 
         self.assertEqual(first, second)
-        self.assertEqual(len(first["phraseFamilies"]), 1)
-        family = first["phraseFamilies"][0]
+        self.assertGreaterEqual(len(first["phraseFamilies"]), 1)
+        family = next(
+            item for item in first["phraseFamilies"]
+            if item["id"] == "phrase.greeting.opening.default"
+        )
         self.assertEqual(family["semanticTemplateID"], "semantic.flow.greeting.opening.default")
         self.assertTrue(
             all(len(phrases) >= 3 for phrases in family["styles"].values())
         )
-        self.assertEqual(len(first["translations"]["EN"]), 14)
-        self.assertEqual(len(first["translations"]["TL"]), 14)
+        self.assertGreaterEqual(len(first["translations"]["EN"]), 14)
+        self.assertEqual(
+            set(first["translations"]["EN"]),
+            set(first["translations"]["TL"]),
+        )
         self.assertTrue(
             all(
                 isinstance(value, str)

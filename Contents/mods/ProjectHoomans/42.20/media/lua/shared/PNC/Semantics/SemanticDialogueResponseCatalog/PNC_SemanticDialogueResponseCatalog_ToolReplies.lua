@@ -14,28 +14,24 @@ end
 
 local CONTENT_OWNER = "projecthoomans.dialogue_content.tool_replies"
 
-local function hash(value)
-    local output = 0
-    value = tostring(value or "")
-    for index = 1, #value do
-        output = (output * 31 + string.byte(value, index)) % 2147483647
-    end
-    return output
-end
-
 local function line(fallback, id)
     return {
         id = id,
-        templateID = "UI_PNC_Conversation_ToolReply_Line_" .. hash(fallback),
+        -- The old hashed translation key remains migration source material in
+        -- Commands.json.  Semantic-owned wording now has a stable content
+        -- identity that Dialogue Content can author and inspect.
+        templateID = id,
         fallback = fallback,
         contentOwner = CONTENT_OWNER,
     }
 end
 
-local function namedLine(templateID, fallback, id)
+local function namedLine(legacyTemplateID, fallback, id)
     return {
         id = id,
-        templateID = templateID,
+        -- Keep the legacy key in the source call site for migration review,
+        -- but do not let it remain the semantic realization identity.
+        templateID = id,
         fallback = fallback,
         contentOwner = CONTENT_OWNER,
     }

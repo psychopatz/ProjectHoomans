@@ -235,10 +235,14 @@ def build_interaction_rows(production_catalog: dict[str, Any] | None) -> list[di
             kind="response_pool",
             identifier=f"response_pool:{pool_id}",
             label=pool_id,
-            source="generated or reviewed response pool",
+            source="production Lua PNC.Semantics.ResponseCatalog",
             value={
                 "responsePoolID": pool_id,
                 "variantCount": variant_count,
+                "contentOwners": _copy(pool.get("contentOwners", [])),
+                "followUpOfferCount": pool.get("followUpOfferCount", 0),
+                "semanticAuthority": "PNC.Semantics.ResponseCatalog",
+                "inspection": "response_pool_detail provides variants, plans, provenance and offers",
                 "languages": sorted({
                     language
                     for variant in _iter_dicts(variants)

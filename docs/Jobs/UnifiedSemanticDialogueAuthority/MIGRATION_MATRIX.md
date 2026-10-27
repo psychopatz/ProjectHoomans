@@ -32,6 +32,24 @@ owner, and the old first-party prose selector is no longer an authority.
 | Companion Dogs greeting/feed | `PNC_CompanionDogs_Interaction.lua` → `PNC_CompanionDogs_Presentation.lua`; old `CompanionCommandFlavor` groups remain compatibility aliases | External dog sex/hunger/feed result, NPC/dog/event identity | `semantic.compat.companion_dogs.greeting`; `.feed` | `projecthoomans.dialogue_content.compatibility`; old dog lines are source material | None; bounded ambient delivery | `pnc_companion_dogs_compatibility_smoke`, `pnc_unified_authority_p6_compatibility_smoke` | `SEMANTIC_FIRST_ACCEPTED`; selected text is sent before social-greeting presentation |
 | Generic PsychopatzCore SocialFlavor API | PsychopatzCore `PsychopatzSocialFlavor.lua`, `PsychopatzSocialFlavorClient.lua`; other adopters | Caller-owned generic flavor registrations and presentation policy | Not replaced | Adopter-owned content | n/a | Core SocialFlavor smoke suite and PNC compatibility boundary tests | `COMPATIBILITY_ONLY`; retain generic queue/arbitration/TTS/nameplate infrastructure |
 
+## P7 content-ownership closure
+
+The table's earlier “canonical Dialogue Content migration in P7” notes are
+resolved by the generated source and registry at
+`tools/semantic_harness/codebuilder/sources/semantic_dialogue_content.json`.
+All migrated event/medical/social families use
+`projecthoomans.dialogue_content.migrated_events`; ToolReply families use
+`projecthoomans.dialogue_content.tool_replies`; compatibility families use
+`projecthoomans.dialogue_content.compatibility`. Each family is keyed by the
+stable semantic template ID and carries its response-pool, semantic-variant,
+follow-up, legacy-source, and semantic-authority metadata for Studio review.
+
+P7 acceptance is covered by the generated-registry/content parity tests,
+production Lua content smoke, and live Observatory response-pool detail tests
+listed in `PROGRESS.md`. The remaining legacy definition files and old
+translation keys are source material only; P8 is responsible for proving and
+retiring any residual first-party selector caller.
+
 ## P5 ownership boundary
 
 `PNC_ConversationToolReplyCatalog.lua` is retained as migration/source

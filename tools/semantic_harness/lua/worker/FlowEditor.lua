@@ -74,16 +74,45 @@ local function responsePoolCatalog(Values, responseCatalog)
         and responseCatalog.POOLS or {}
     for poolID, pool in pairs(pools) do
         if type(pool) == "table" and type(pool.id) == "string" then
+            local owners = {}
+            local offerCount = 0
+            for _, variant in ipairs(pool.variants or {}) do
+                if variant.contentOwner then
+                    owners[tostring(variant.contentOwner)] = true
+                end
+                for _, turn in ipairs((variant.plan or {}).turns or {}) do
+                    offerCount = offerCount + #(turn.offers or {})
+                end
+            end
+            local ownerList = {}
+            for owner in pairs(owners) do ownerList[#ownerList + 1] = owner end
+            table.sort(ownerList)
             output[#output + 1] = {
                 id = pool.id or tostring(poolID),
                 variantCount = type(pool.variants) == "table"
                     and #pool.variants or 0,
+                contentOwners = ownerList,
+                followUpOfferCount = offerCount,
             }
         end
     end
     table.sort(output, function(left, right)
         return tostring(left.id) < tostring(right.id)
     end)
+    return output
+end
+
+local function boundedPlanOffers(plan, Values)
+    local output = {}
+    if type(plan) ~= "table" or type(plan.turns) ~= "table" then
+        return output
+    end
+    for _, turn in ipairs(plan.turns) do
+        for _, offer in ipairs(turn.offers or {}) do
+            if #output >= 8 then return output end
+            output[#output + 1] = Values.copy(offer)
+        end
+    end
     return output
 end
 
@@ -319,8 +348,23 @@ function FlowEditor.responsePoolList(context, request)
     for id, pool in pairs(ResponseCatalog.POOLS or {}) do
         if filter == "" or string.find(string.lower(id),
             string.lower(filter), 1, true) then
+            local owners = {}
+            local offerCount = 0
+            for _, variant in ipairs(pool.variants or {}) do
+                if variant.contentOwner then
+                    owners[tostring(variant.contentOwner)] = true
+                end
+                for _, turn in ipairs((variant.plan or {}).turns or {}) do
+                    offerCount = offerCount + #(turn.offers or {})
+                end
+            end
+            local ownerList = {}
+            for owner in pairs(owners) do ownerList[#ownerList + 1] = owner end
+            table.sort(ownerList)
             matches[#matches + 1] = {
                 id = id, variantCount = #pool.variants,
+                contentOwners = ownerList,
+                followUpOfferCount = offerCount,
             }
         end
     end
@@ -468,9 +512,22 @@ function FlowEditor.responsePoolDetail(context, request)
             id = v.id, templateID = v.templateID, fallback = v.fallback,
             when = context.Values.copy(v.when or {}), priority = v.priority,
             planSummary = boundedPlanSummary(v.plan),
+            responsePlanID = v.plan and v.plan.sourcePoolID or pool.id,
+            responsePlan = context.Values.copy(v.plan or {}),
+            followUpOffers = boundedPlanOffers(v.plan, context.Values),
             translationArgs = context.Values.copy(v.translationArgs or {}),
             dialogueAct = v.dialogueAct, topic = v.topic,
             groundedFactRefs = context.Values.copy(v.groundedFactRefs or {}),
+            semanticTemplateID = v.templateID,
+            contentOwner = v.contentOwner,
+            provenance = {
+                selectionSource = "production_lua_response_catalog",
+                poolID = pool.id,
+                responsePlanID = v.plan and v.plan.sourcePoolID or pool.id,
+                realizationID = v.id,
+                factRefs = context.Values.copy(v.groundedFactRefs or {}),
+                eventConditions = context.Values.copy(v.when or {}),
+            },
             sourceKind = sourceKind, sourcePath = sourcePath,
         }
     end
