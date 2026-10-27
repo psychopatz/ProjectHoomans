@@ -102,6 +102,7 @@ function Authority.Resolve(spec)
         uncertainty = selected.uncertainty,
         tone = selected.tone,
         personalityStyle = selected.personalityStyle,
+        contentOwner = clean(selected.contentOwner, 128),
         translationArgs = selected.translationArgs,
         selectionSource = Authority.SELECTION_SOURCE,
     }

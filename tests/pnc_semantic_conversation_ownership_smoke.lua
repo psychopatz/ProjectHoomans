@@ -31,13 +31,23 @@ for categoryID, topic in pairs(expected) do
     )
     T.equal(
         metadata.authority,
+        "semantic_response_flow",
+        categoryID .. " reports semantic meaning authority"
+    )
+    T.equal(
+        metadata.registryRole,
+        "eligibility_gates_effects",
+        categoryID .. " retains registry gates/effects ownership"
+    )
+    T.equal(
+        metadata.registryOwner,
         "conversation_registry",
-        categoryID .. " retains registry authority during migration"
+        categoryID .. " records the legacy registry data owner"
     )
     T.equal(
         metadata.migrationPhase,
-        "legacy_registry_projection",
-        categoryID .. " is explicitly marked as a compatibility projection"
+        "semantic_category_authority",
+        categoryID .. " is explicitly marked as semantic-owned"
     )
 end
 

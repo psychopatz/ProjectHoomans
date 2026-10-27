@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 through P4 accepted; P5 is the active implementation slice.
+**Status:** IN PROGRESS — P0 through P5 accepted; P6 is the active implementation slice.
 
 ## Audited baseline
 
@@ -22,10 +22,11 @@
 - PsychopatzCore SocialFlavor client can still choose registered prose when
   selected text is absent.
 - Project Hoomans still registers first-party SocialFlavor prose families.
-- `PNC_ConversationToolReplyCatalog.lua` remains a separate first-party wording
-  owner.
-- Wellbeing/small-talk/ask-about still advertise legacy conversation-registry
-  authority.
+- `PNC_ConversationToolReplyCatalog.lua` remains only migration/source material;
+  semantic ToolReply pools now own production selection.
+- Wellbeing/small-talk/ask-about report semantic response-flow authority while
+  ConversationBlocks retain registry data, gates, branches, effects, and repeat
+  behavior.
 - Generic compatibility Flavor registrations still exist.
 - `SemanticInteractionLifecycle` already records NPC speech, beats, event refs,
   and response windows.
@@ -44,8 +45,8 @@
 | P2 — NPC-initiated event follow-up bridge | **ACCEPTED** |
 | P3 — lower-risk native SocialFlavor migration | **ACCEPTED** |
 | P4 — complex medical/incapacitated migration | **ACCEPTED** |
-| P5 — ToolReplies + legacy registry migration | **IN PROGRESS** |
-| P6 — compatibility semantic adapters | NOT STARTED |
+| P5 — ToolReplies + legacy registry migration | **ACCEPTED** |
+| P6 — compatibility semantic adapters | **IN PROGRESS** |
 | P7 — canonical content coverage / Studio observability | NOT STARTED |
 | P8 — retire first-party legacy prose authority | NOT STARTED |
 | P9 — scale/MP/final acceptance | NOT STARTED |
@@ -144,15 +145,33 @@
   producer regressions. `pz-verify` reports zero Kahlua errors on the changed
   Lua surface.
 
-## Immediate Next Chunk — P5
+## Accepted P5 — ToolReplies and legacy category ownership
 
-Migrate first-party ToolReply wording and finish semantic ownership of the
-legacy `projecthoomans:wellbeing`, `projecthoomans:small_talk`, and
-`projecthoomans:ask_about` categories without changing ConversationBlocks'
-branch, gate, effect, or repeat authority. Preserve existing semantic flows,
-Dialogue Content ownership, lifecycle follow-ups, and compatibility boundaries.
+- Added bounded semantic ResponseCatalog pools for social ToolReply outcomes,
+  ask-name identity outcomes, and companion order acknowledgements/rejections.
+  The compatibility `Build` API remains stable for PBrainZ, while
+  `BuildDetailed` carries semantic ownership, content owner, response-plan,
+  realization, and pool provenance.
+- Production ToolReplies no longer require or read
+  `PNC_ConversationToolReplyCatalog.lua`; the old table remains source material
+  only. Existing EN/TL wording keys continue to resolve through the same
+  translation facade until the canonical Dialogue Content slice in P7.
+- The three legacy conversation categories now report
+  `semantic_response_flow` as meaning authority and explicitly retain
+  `conversation_registry` only for eligibility/gates/effects data. Branch,
+  effect, and repeat authority is unchanged.
+- P5 negative proof substitutes a legacy ToolReply table and verifies that the
+  semantic result is unchanged. Focused P5 plus PBrainZ, translation,
+  Conversation registry/flow, and P1–P4 regressions pass `16/16`.
 
-After the P5 family gates pass, continue automatically through P6–P9.
+## Immediate Next Chunk — P6
+
+Migrate first-party compatibility speech for Bandits, Necroa, Project ALife,
+and any additional adapters confirmed by the P0 inventory. Expose provider
+facts/event references to existing semantic pools without taking gameplay
+authority from the external provider or changing compatibility boundaries.
+
+After the P6 family gates pass, continue automatically through P7–P9.
 
 ## Stop conditions
 

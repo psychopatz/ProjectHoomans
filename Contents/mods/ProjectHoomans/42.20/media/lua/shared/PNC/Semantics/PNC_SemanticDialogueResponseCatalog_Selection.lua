@@ -104,6 +104,7 @@ return function(Catalog, Core)
             uncertainty = variant.uncertainty,
             tone = variant.tone,
             personalityStyle = variant.personalityStyle,
+            contentOwner = variant.contentOwner,
             translationArgs = Core.copy(variant.translationArgs),
         }, selectedIndex
     end
