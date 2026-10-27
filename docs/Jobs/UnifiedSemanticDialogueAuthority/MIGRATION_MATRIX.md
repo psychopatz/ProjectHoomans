@@ -234,3 +234,21 @@ Lua `901/901` PASS in `6.85s`; installed-PZ Kahlua `0` errors / `0` warnings;
 real-save source hash unchanged; and `git diff --check` PASS. P10A–P10F are
 closed and the matrix is ready for the user-owned native SP/MP validation
 boundary.
+
+## P11A current closure
+
+P11A removed migration-only runtime vocabulary and consolidated historical
+absence tests without changing semantic/runtime authority.
+
+| Surface | Verified current owner/callers | P11A disposition | Evidence |
+| --- | --- | --- | --- |
+| Category/composer/suggestion migration metadata | semantic category ownership, ConversationComposer semantic output, and Suggestions offer projection | `legacyRegistry` and `migrationPhase` removed from runtime packets; authority/meaning-owner fields retained | `pnc_semantic_conversation_ownership_smoke`, `pnc_conversation_architecture_contract_smoke` |
+| Trace naming | semantic input/world-target/inventory/action-plan callers | `legacyTrace` locals renamed to neutral `coreTrace`; Core DebugTrace behavior unchanged | focused production-Lua suite and source audit |
+| LocalResponse legacy fallback registration | `PNC_SemanticDialogueLocalResponse_Core` and input composition | `LEGACY_TEXT_FALLBACKS` table/registration removed; remaining authored LocalResponse wording is the P11B migration surface | `test_legacy_semantic_authority_p11`, architecture contract |
+| Compatibility speech bridge names | Bandits incoming damage/adapter; Necroa client composition; Companion Dogs interaction/presentation | first-party filenames/API locals now describe speech/caption transport; external behavior and transport contracts preserved | Bandits, Necroa, compatibility-shape, Companion Dogs smokes; PZ verifier |
+| Historical P8/P10 absence tests | deleted first-party legacy registry/namespace surfaces | consolidated into durable architecture-contract absence plus positive parity assertions; domain/runtime tests retained | `tests/pnc_conversation_architecture_contract_smoke.lua` |
+
+P11B is the active wording-ownership slice. Its audit matrix must cover
+`Responses.json`, `Realizations.json`, LocalResponse prose/fallbacks, static
+semantic-ID translation-key maps, and hard-coded SpeechRealization families
+before any superseded store is deleted.

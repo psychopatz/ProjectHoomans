@@ -1,4 +1,6 @@
--- Companion Dogs compatibility: one canonical flavor and bark presentation.
+-- Companion Dogs compatibility: one canonical speech transport and bark
+-- presentation. Project Hoomans semantics chooses the meaning before this
+-- external presentation bridge is called.
 
 PNC = PNC or {}
 PNC.Compatibility = PNC.Compatibility or {}
@@ -37,7 +39,7 @@ function Internal.HasNearbyPlayer(body, dog)
     return countNearbyPlayers(body, dog) > 0
 end
 
-function Internal.SendFlavorToNearbyPlayers(body, dog, npcID, dogKey,
+function Internal.SendSpeechToNearbyPlayers(body, dog, npcID, dogKey,
     eventID, dogSex, fed)
     local core = PNC.Core
     local network = PNC.Network

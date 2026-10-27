@@ -99,7 +99,7 @@ local function processRecord(record, body, npcID, dogs, current)
     Bridge._eventSerial = Bridge._eventSerial + 1
     eventID = "companion_dog:" .. tostring(npcID) .. ":"
         .. tostring(dogKey) .. ":" .. tostring(Bridge._eventSerial)
-    sent = Internal.SendFlavorToNearbyPlayers(body, dog, npcID, dogKey,
+    sent = Internal.SendSpeechToNearbyPlayers(body, dog, npcID, dogKey,
         eventID, Bridge.GetDogSex(dog), fed)
     if sent <= 0 then
         -- A missing client route must be retried, not hidden behind the normal

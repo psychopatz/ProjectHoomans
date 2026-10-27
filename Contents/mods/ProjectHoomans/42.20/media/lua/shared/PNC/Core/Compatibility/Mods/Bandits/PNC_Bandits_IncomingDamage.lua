@@ -88,13 +88,13 @@ function Bridge.ApplyAuthoritativeHit(shooter, item, victim, amount, metadata)
     if victim.setAttackedBy and shooter then
         pcall(victim.setAttackedBy, victim, shooter)
     end
-    if PNC.Compatibility.Bandits.Flavor
-        and type(PNC.Compatibility.Bandits.Flavor.Say) == "function"
+    if PNC.Compatibility.Bandits.SpeechBridge
+        and type(PNC.Compatibility.Bandits.SpeechBridge.Say) == "function"
     then
-        pcall(PNC.Compatibility.Bandits.Flavor.Say,
+        pcall(PNC.Compatibility.Bandits.SpeechBridge.Say,
             shooter, "HOOMANS_ATTACK")
         if victim.isDead and victim:isDead() then
-            pcall(PNC.Compatibility.Bandits.Flavor.Say,
+            pcall(PNC.Compatibility.Bandits.SpeechBridge.Say,
                 shooter, "HOOMANS_DOWN", true)
         end
     end

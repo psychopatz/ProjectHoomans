@@ -96,7 +96,7 @@ PNC = {
                     return true, "bandit_hostile"
                 end,
             },
-            Flavor = {
+            SpeechBridge = {
                 Say = function()
                     flavorCalls = flavorCalls + 1
                     return true

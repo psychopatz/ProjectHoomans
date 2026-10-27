@@ -32,8 +32,6 @@ local function semanticProjection(choice)
         and CategoryOwnership.Get(semantic.categoryID) or nil
     if ownership then
         output.semanticOwner = ownership.semanticOwner
-        output.legacyRegistry = ownership.legacyRegistry
-        output.migrationPhase = ownership.migrationPhase
         output.authority = ownership.authority
     end
     return output

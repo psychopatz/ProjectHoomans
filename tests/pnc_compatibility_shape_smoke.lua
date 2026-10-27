@@ -18,7 +18,7 @@ local PROVIDERS = {
         adapterID = "Bandits",
         version = "Bandits2-B42.20",
         spokes = {
-            "Access", "Targeting", "Relationships", "Combat", "Flavor",
+            "Access", "Targeting", "Relationships", "Combat", "SpeechBridge",
             "IncomingBridge", "IncomingContext", "IncomingDamage",
             "RuntimeHook",
         },

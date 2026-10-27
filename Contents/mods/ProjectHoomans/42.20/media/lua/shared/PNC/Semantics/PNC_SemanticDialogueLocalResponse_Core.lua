@@ -51,45 +51,6 @@ if type(ResponsePlan) ~= "table" then
     ResponsePlan = type(loaded) == "table" and loaded or nil
 end
 
-local LEGACY_TEXT_FALLBACKS = {
-    ["semantic.question.time"] = "I can't tell the exact time.",
-    ["semantic.question.date"] = "I don't know today's date.",
-    ["semantic.question.weather"] =
-        "I can't tell what the weather's doing right now.",
-    ["semantic.question.identity"] = "I'm a survivor.",
-    ["semantic.identity.exchange"] = "Nice to meet you. I'm a survivor.",
-    ["semantic.identity.evasion"] =
-        "I asked you your name. Don't just change the subject.",
-    ["semantic.social.self_reflection"] =
-        "Don't talk about yourself like that.",
-    ["semantic.question.location"] =
-        "I know where they are, but not exactly.",
-    ["semantic.question.location_unknown"] = "I don't know where they are.",
-    ["semantic.question.seen_yes"] = "Yes, I saw them.",
-    ["semantic.question.seen_no"] = "No, I haven't seen them.",
-    ["semantic.question.seen_unknown"] =
-        "I don't know if I've seen them.",
-    ["semantic.question.fact_clarification"] =
-        "I'm not sure which person you mean.",
-}
-
-function Response.RegisterTextFallbacks()
-    local text = PsychopatzCore
-        and PsychopatzCore.Conversation
-        and PsychopatzCore.Conversation.Text
-    if not text or type(text.RegisterFallback) ~= "function" then
-        return 0
-    end
-    local count = 0
-    for key, fallback in pairs(LEGACY_TEXT_FALLBACKS) do
-        text.RegisterFallback(key, fallback)
-        count = count + 1
-    end
-    return count
-end
-
-Response.RegisterTextFallbacks()
-
 local function copyArgs(values)
     local output = {}
     if type(values) ~= "table" then return output end

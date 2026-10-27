@@ -55,9 +55,6 @@ if type(InteractionLifecycle) ~= "table" then
     InteractionLifecycle = type(loaded) == "table" and loaded or nil
 end
 
-if LocalResponse and type(LocalResponse.RegisterTextFallbacks) == "function" then
-    LocalResponse.RegisterTextFallbacks()
-end
 if Policy and type(Policy.RegisterTextFallbacks) == "function" then
     Policy.RegisterTextFallbacks()
 end

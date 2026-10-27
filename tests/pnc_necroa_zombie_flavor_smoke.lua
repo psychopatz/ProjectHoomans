@@ -3,7 +3,7 @@ local T = require "tests/support/test"
 local ZOMBIE_FLAVOR_FILE = T.path(
     "ProjectHoomans",
     "client",
-    "PNC/Compatibility/Mods/Necroa/PNC_Necroa_ZombieFlavor.lua"
+    "PNC/Compatibility/Mods/Necroa/PNC_Necroa_ZombieCaptionAdapter.lua"
 )
 
 local now = 5000

@@ -9,7 +9,7 @@ from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
-class LegacyCategoryOwnershipTests(unittest.TestCase):
+class ConversationCategoryOwnershipTests(unittest.TestCase):
     def test_worker_loads_the_shared_ownership_manifest(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             worker.open_conversation()
@@ -49,11 +49,8 @@ class LegacyCategoryOwnershipTests(unittest.TestCase):
                     extensions["semanticOwner"],
                     f"projecthoomans.semantic.{topic}",
                 )
-                self.assertFalse(extensions["legacyRegistry"])
-                self.assertEqual(
-                    extensions["migrationPhase"],
-                    "semantic_category_authority",
-                )
+                self.assertNotIn("legacyRegistry", extensions)
+                self.assertNotIn("migrationPhase", extensions)
                 self.assertEqual(
                     extensions["authority"], "semantic_response_flow"
                 )

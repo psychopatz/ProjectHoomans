@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 through P10 are accepted foundation; post-P10 audit reopened the parent goal for mandatory P11 Modular Conversation Architecture & Contextual Authoring.
+**Status:** IN PROGRESS — P0 through P10 are accepted foundation; P11A steady-state Conversation source hygiene is accepted and P11B–P11I remain mandatory for Modular Conversation Architecture & Contextual Authoring.
 
 ## Audited baseline
 
@@ -51,7 +51,8 @@
 | P8 — retire first-party legacy prose authority | **ACCEPTED** |
 | P9 — scale/MP/final acceptance | **ACCEPTED** |
 | P10 — canonical semantic cleanup / legacy purge | **ACCEPTED** |
-| P11 — modular Conversation architecture / contextual authoring | **NEXT / IN PROGRESS** |
+| P11A — steady-state Conversation source hygiene | **ACCEPTED** |
+| P11B–P11I — canonical wording, modular authoring, UI registry, Studio and final acceptance | **NEXT / IN PROGRESS** |
 
 ## Accepted P0 — authority inventory and characterization
 
@@ -490,7 +491,34 @@ Verified gaps:
 These are post-P10 authoring/tooling/modularity defects. They do not invalidate
 the accepted semantic runtime authority work.
 
-## Immediate Next Chunk — P11A
+## Accepted P11A — steady-state Conversation source hygiene
+
+P11A is accepted. Migration-only runtime vocabulary was removed from the
+category/composer/suggestion contracts: `legacyRegistry` and `migrationPhase`
+are no longer emitted, and `legacyTrace` locals were renamed to neutral trace
+names without changing Core debug behavior. The LocalResponse registration
+seam for `LEGACY_TEXT_FALLBACKS` was removed. First-party compatibility bridge
+names now describe speech/caption transport (`Bandits.SpeechBridge` and
+`Necroa_ZombieCaptionAdapter`), and Companion Dogs uses a speech transport
+name while retaining its external behavior.
+
+The historical P8/P10 absence checks were consolidated into
+`pnc_conversation_architecture_contract_smoke.lua`; domain and compatibility
+behavior tests remain in place. Focused production-Lua coverage is `6/6 PASS`,
+focused Python coverage is `15/15 PASS`, and the Project Hoomans Kahlua scan
+reported `0` errors / `0` warnings across `3,164` files. No source save,
+native Project Zomboid session, or Workshop operation was touched.
+
+## Immediate Next Chunk — P11B
+
+Audit every first-party wording path (`Responses.json`, `Realizations.json`,
+LocalResponse prose/fallbacks, static semantic-ID translation maps, and
+hard-coded SpeechRealization families). Move wording into Dialogue Content
+with semantic template IDs plus bounded factual arguments, prove EN/TL and
+runtime parity, then remove superseded first-party wording stores and
+fallback seams.
+
+## Historical P11A starting instructions (completed)
 
 Read `P11_MODULAR_CONVERSATION_ARCHITECTURE.md` before editing.
 

@@ -7,7 +7,7 @@
 --   PNC.Compatibility.Bandits.Targeting    -- actor refs + discovery
 --   PNC.Compatibility.Bandits.Relationships-- attack permission
 --   PNC.Compatibility.Bandits.Combat       -- damage delivery
---   PNC.Compatibility.Bandits.Flavor       -- native presentation
+--   PNC.Compatibility.Bandits.SpeechBridge -- native presentation
 --   returns the PNC.Compatibility.Bandits namespace table
 --
 -- PNC_Bandits_AnimPathCompat is deliberately NOT required here: it must patch
@@ -27,7 +27,7 @@ require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Access"
 require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Targeting"
 require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Relationships"
 require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Combat"
-require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Flavor"
+require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_SpeechBridge"
 require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_IncomingBridge"
 require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_IncomingContext"
 require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_IncomingDamage"
@@ -37,7 +37,7 @@ local Access = Bridge.Internal
 local Targeting = Bridge.Targeting
 local Relationships = Bridge.Relationships
 local Combat = Bridge.Combat
-local Flavor = Bridge.Flavor
+local SpeechBridge = Bridge.SpeechBridge
 
 -- Inbound provider events. Single consumer: the registration spec below.
 local function onEvent(context)
@@ -47,12 +47,12 @@ local function onEvent(context)
     local body = target and target.worldObject
     if eventName ~= "foreign_damage_applied"
         or not body
-        or not Flavor
-        or type(Flavor.Say) ~= "function"
+        or not SpeechBridge
+        or type(SpeechBridge.Say) ~= "function"
     then
         return false
     end
-    return Flavor.Say(body, "HOOMANS_HIT") == true
+    return SpeechBridge.Say(body, "HOOMANS_HIT") == true
 end
 
 if not ActorOwnership

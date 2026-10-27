@@ -13,11 +13,11 @@ local function traceQuery(record, query, status, reason, result, options)
     local semanticAudit = Diagnostics
         and type(Diagnostics.IsEnabled) == "function"
         and Diagnostics.IsEnabled() == true
-    local legacyTrace = trace
+    local coreTrace = trace
         and type(trace.IsEnabled) == "function"
         and trace.IsEnabled() == true
         and type(trace.Record) == "function"
-    if not semanticAudit and not legacyTrace
+    if not semanticAudit and not coreTrace
     then
         return result, reason
     end

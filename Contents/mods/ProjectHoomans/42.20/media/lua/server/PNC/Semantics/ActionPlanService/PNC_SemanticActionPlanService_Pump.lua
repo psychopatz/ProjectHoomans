@@ -74,11 +74,11 @@ local function traceProgress(plan, event, cause)
     local semanticAudit = Diagnostics
         and type(Diagnostics.IsEnabled) == "function"
         and Diagnostics.IsEnabled() == true
-    local legacyTrace = Trace
+    local coreTrace = Trace
         and type(Trace.IsEnabled) == "function"
         and Trace.IsEnabled() == true
         and type(Trace.Record) == "function"
-    if not semanticAudit and not legacyTrace
+    if not semanticAudit and not coreTrace
     then
         return false
     end

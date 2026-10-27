@@ -127,10 +127,6 @@ local function appendConversationChoices(
                 }
                 if ownership then
                     frame.extensions.semanticOwner = ownership.semanticOwner
-                    frame.extensions.legacyRegistry =
-                        ownership.legacyRegistry
-                    frame.extensions.migrationPhase =
-                        ownership.migrationPhase
                     frame.extensions.authority = ownership.authority
                 end
                 candidate = normalizeCandidate(

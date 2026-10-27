@@ -1,16 +1,17 @@
--- Necroa-native zombie speech aimed at Hoomans.
--- This deliberately bypasses Hoomans SocialFlavor: zombie captions remain in
--- Necroa's native addLineChatElement lane and never become Hoomans dialogue.
+-- Necroa-owned zombie caption adapter.
+--
+-- These lines are external Necroa presentation, not Project Hoomans dialogue
+-- content. Hoomans only supplies the ownership/policy boundary.
 
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsClientCode()
-then return end
+then
+    return
+end
 
-PNC = PNC or {}
-PNC.Compatibility = PNC.Compatibility or {}
-local Policy = PNC.Compatibility.Necroa
+local Policy = PNC and PNC.Compatibility
+    and PNC.Compatibility.Necroa
     or require "PNC/Core/Compatibility/Mods/Necroa/PNC_Necroa_Policy"
-
 local COOLDOWN_MS = 3500
 local PROBE_INTERVAL_MS = 1000
 local PROBE_RADIUS = 10
@@ -19,24 +20,19 @@ local activeCache = false
 local activeCheckedAt = -PROBE_INTERVAL_MS
 local probeAtByCell = setmetatable({}, { __mode = "k" })
 local LINES = {
-    "Ho0omans r T@sty",
-    "Mmm... warm meat...",
-    "Nnnngh... e@t... e@t...",
-    "Hooman... mask... no mask...",
-    "Br@ins... soft br@ins...",
-    "Grrh... come closer...",
-    "M4sk off... dinner time...",
-    "Nnng... hrrr... t@sty...",
+    "Grrr...",
+    "Hrrr...",
+    "Urrgh...",
 }
 
 local function nowMillis()
-    return getTimeInMillis and getTimeInMillis() or 0
+    return type(getTimeInMillis) == "function" and getTimeInMillis() or 0
 end
 
-local function distanceSq(left, right)
-    local dx = (tonumber(left:getX()) or 0) - (tonumber(right:getX()) or 0)
-    local dy = (tonumber(left:getY()) or 0) - (tonumber(right:getY()) or 0)
-    local dz = (tonumber(left:getZ()) or 0) - (tonumber(right:getZ()) or 0)
+local function distanceSq(a, b)
+    local dx = (tonumber(a:getX()) or 0) - (tonumber(b:getX()) or 0)
+    local dy = (tonumber(a:getY()) or 0) - (tonumber(b:getY()) or 0)
+    local dz = (tonumber(a:getZ()) or 0) - (tonumber(b:getZ()) or 0)
     return dx * dx + dy * dy + dz * dz * 4
 end
 
@@ -69,8 +65,8 @@ local function isActive(now)
 end
 
 local function bucketKey(x, y)
-    return tostring(math.floor(x / PROBE_RADIUS))
-        .. ":" .. tostring(math.floor(y / PROBE_RADIUS))
+    return tostring(math.floor(x / PROBE_RADIUS)) .. ":"
+        .. tostring(math.floor(y / PROBE_RADIUS))
 end
 
 local function bucketHasHooman(buckets, zombie)
@@ -78,17 +74,15 @@ local function bucketHasHooman(buckets, zombie)
     local y = tonumber(zombie:getY()) or 0
     local bucketX = math.floor(x / PROBE_RADIUS)
     local bucketY = math.floor(y / PROBE_RADIUS)
-    local bucket
-    local candidate
     for offsetX = -1, 1 do
         for offsetY = -1, 1 do
-            bucket = buckets[bucketKey(
+            local bucket = buckets[bucketKey(
                 (bucketX + offsetX) * PROBE_RADIUS,
                 (bucketY + offsetY) * PROBE_RADIUS
             )]
             if bucket then
                 for index = 1, #bucket do
-                    candidate = bucket[index]
+                    local candidate = bucket[index]
                     if candidate ~= zombie
                         and distanceSq(zombie, candidate)
                             <= PROBE_RADIUS * PROBE_RADIUS
@@ -102,21 +96,21 @@ local function bucketHasHooman(buckets, zombie)
     return false
 end
 
--- OnZombieUpdate is emitted for every active zombie. Only the first callback
--- in each interval performs one cell scan; the old implementation made every
--- zombie scan the entire cell zombie list independently (O(zombies^2)).
 local function probeCell(cell)
-    local list = cell and cell.getZombieList and cell:getZombieList() or nil
-    local hoomansByBucket = {}
+    local list = cell.getZombieList and cell:getZombieList() or nil
+    if not list or type(list.size) ~= "function"
+        or type(list.get) ~= "function"
+    then
+        return
+    end
     local ordinaryZombies = {}
-    local candidate
-    if not list or not list.size or not list.get then return end
+    local hoomansByBucket = {}
     for index = 0, list:size() - 1 do
-        candidate = list:get(index)
+        local candidate = list:get(index)
         if candidate and candidate.isAlive and candidate:isAlive() then
+            local x = tonumber(candidate:getX()) or 0
+            local y = tonumber(candidate:getY()) or 0
             if Policy.IsHoomansOwned(candidate) then
-                local x = tonumber(candidate:getX()) or 0
-                local y = tonumber(candidate:getY()) or 0
                 local key = bucketKey(x, y)
                 hoomansByBucket[key] = hoomansByBucket[key] or {}
                 hoomansByBucket[key][#hoomansByBucket[key] + 1] = candidate
@@ -138,20 +132,17 @@ end
 
 local function onZombieUpdate(zombie)
     local now = nowMillis()
-    local cell
-    local lastProbe
     if not isActive(now) then return end
-    cell = zombie and zombie.getCell and zombie:getCell() or nil
+    local cell = zombie and zombie.getCell and zombie:getCell() or nil
     if not cell then return end
-    lastProbe = tonumber(probeAtByCell[cell]) or -PROBE_INTERVAL_MS
+    local lastProbe = tonumber(probeAtByCell[cell]) or -PROBE_INTERVAL_MS
     if now - lastProbe < PROBE_INTERVAL_MS then return end
     probeAtByCell[cell] = now
     probeCell(cell)
 end
 
 local function onWeaponHitCharacter(attacker, target)
-    if not Policy.IsActive()
-        or not attacker or not target
+    if not Policy.IsActive() or not attacker or not target
         or not instanceof or not instanceof(target, "IsoZombie")
         or not Policy.IsHoomansOwned(target)
         or Policy.IsHoomansOwned(attacker)

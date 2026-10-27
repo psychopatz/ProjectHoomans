@@ -44,11 +44,12 @@ for categoryID, topic in pairs(expected) do
         "conversation_registry_data",
         categoryID .. " records the registry data owner"
     )
-    T.equal(
-        metadata.migrationPhase,
-        "semantic_category_authority",
-        categoryID .. " is explicitly marked as semantic-owned"
-    )
+    T.equal(metadata.meaningAuthority, "semantic_response_flow",
+        categoryID .. " keeps semantic meaning authority")
+    T.equal(metadata.legacyRegistry, nil,
+        categoryID .. " has no migration registry marker")
+    T.equal(metadata.migrationPhase, nil,
+        categoryID .. " has no migration phase marker")
 end
 
 local blockMetadata = Ownership.ForBlock({

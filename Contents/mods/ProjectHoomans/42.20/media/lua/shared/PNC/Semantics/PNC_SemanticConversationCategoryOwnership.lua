@@ -21,7 +21,6 @@ if type(TopicCatalog) ~= "table" then
 end
 
 Ownership.VERSION = 2
-Ownership.MIGRATION_PHASE = "semantic_category_authority"
 Ownership.AUTHORITY = "semantic_response_flow"
 Ownership.REGISTRY_ROLE = "eligibility_gates_effects_projection"
 Ownership.CATEGORY_IDS = {
@@ -58,8 +57,6 @@ local function copyMetadata(categoryID, blockID)
         registryRole = Ownership.REGISTRY_ROLE,
         registryOwner = "conversation_registry_data",
         meaningAuthority = "semantic_response_flow",
-        migrationPhase = Ownership.MIGRATION_PHASE,
-        legacyRegistry = false,
     }
 end
 
