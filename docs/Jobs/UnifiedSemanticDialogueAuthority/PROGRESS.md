@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0–P11G are accepted foundation. P11H–P11I remain mandatory and active, followed automatically by mandatory P12A–P12I Pragmatic Conversational Intelligence & Dialogue Director before developer handoff.
+**Status:** IN PROGRESS — P0–P11H are accepted foundation. P11I remains mandatory and active, followed automatically by mandatory P12A–P12I Pragmatic Conversational Intelligence & Dialogue Director before developer handoff.
 
 ## Audited baseline
 
@@ -642,13 +642,25 @@ Studio surface/editor lifecycle `7/7 PASS` under Xvfb; placeholder parity,
 deterministic generated output, and `git diff --check` PASS. No source save,
 native Project Zomboid session, or Workshop operation was touched.
 
-## Immediate Next Chunk — P11H
+## Accepted P11H — shared agent-friendly authoring API
 
-Finish and verify the bounded machine-readable Conversation authoring API used
-by the GUI and agents: inspect, variants, structural operations, UI operations,
-validation, preview/Review, explicit write, compile, stale guards, and
-deterministic diagnostics. Then run the P11I zero-legacy and full acceptance
-gates.
+P11H accepted. The GUI and agent CLI now share one bounded,
+machine-readable authoring service for Conversation content and UI nodes:
+inspect, variant operations, add/remove/move/reorder membership, validation,
+effect-free preview/Review, source-fingerprint stale guards, explicit writes,
+and explicit content/UI compilation. Generated Lua and translation files are
+never direct authoring inputs, and no operation writes implicitly.
+
+P11H focused validation: shard/UI/compiler/API tests `10/10 PASS`; CLI
+validation and effect-free preview checks PASS; focused Studio surface/editor
+lifecycle `7/7 PASS` under Xvfb; `git diff --check` PASS.
+
+## Immediate Next Chunk — P11I
+
+Run the final zero-legacy, one-explorer, runtime parity, deterministic build,
+resource-aware Python, focused Xvfb, native Lua, Kahlua, source/save safety,
+and performance acceptance gates. Return the parent goal to
+`READY FOR USER LIVE TEST` only after all developer-side P11 gates pass.
 
 ## Historical P11A starting instructions (completed)
 

@@ -307,3 +307,12 @@ absence tests without changing semantic/runtime authority.
 | Player-facing choice wording | contextual Conversation UI editor | Dialogue Content `playerChoices` records | EN/TL labels and player utterances are editable through the same service; semantic destination/provider remain locked | Xvfb node-wording lifecycle test and content compiler parity |
 | Conversation UI structure | contextual Developer Tools and agent CLI | canonical `conversation/ui_registry.json` plus UI compiler | add/remove/move/reorder membership and presentation edits use bounded previews, explicit writes, and source fingerprints | Conversation UI registry/API tests |
 | Human/agent authoring boundary | Studio pane and `--conversation-*` CLI operations | one shared `SemanticLabAuthoringService` | inspect, variants, validate, preview/Review, write, and compile are machine-readable and effect-free until explicit write | authoring API tests, `--conversation-validate` checks |
+
+## P11H current closure
+
+| Contract | Shared implementation | Evidence |
+| --- | --- | --- |
+| Bounded inspection | `SemanticLabAuthoringService.inspect_dialogue_variants`, `inspect_conversation_ui`, and bounded CLI projections | content/UI API tests; canonical IDs and source fingerprints returned |
+| Effect-free validation and Review | `validate_dialogue_content`, `validate_conversation_ui`, content/UI preview operations | `10/10 PASS` focused authoring/compiler/UI tests; writes remain empty |
+| Explicit writes and compilation | service shard/UI writers and `--conversation-*-write` / `--conversation-compile` | stale-source rejection and temporary-shard write tests |
+| Human/agent parity | `ConversationAuthoringPane` and `tools.semantic_harness.cli` call the same service methods | CLI/service parity test and Xvfb contextual editor lifecycle |
