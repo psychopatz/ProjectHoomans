@@ -259,3 +259,74 @@ first-party wording through a legacy generic selector.
 
 Compatibility adapters provide facts/events. Project Hoomans semantics chooses
 meaning and Dialogue Content chooses PNC wording.
+
+## P11 steady-state Conversation authoring architecture
+
+P11 preserves the P10 runtime authority model while simplifying how content and
+Conversation UI structure are authored.
+
+### One wording authority
+
+Dialogue Content is the only Project Hoomans first-party conversational wording
+authority. Semantic/local-response handlers return semantic template identity
+plus bounded arguments/facts; they do not own alternate prose tables.
+
+Separate first-party `Responses.json`, `Realizations.json`, hard-coded English
+fallback prose, or static semantic-ID→translation-key maps are not steady-state
+wording authorities.
+
+### Conversation UI Registry
+
+Player-facing navigation/presentation has one declarative registry for:
+
+- landing choices;
+- hubs;
+- parent/child membership;
+- order;
+- labels and player utterance references;
+- presentation groups;
+- semantic destination references;
+- registered predicate/provider references.
+
+The registry is **not** gameplay authority. Relationship eligibility, gossip
+privacy, recruitment, task execution, inventory effects, dynamic camp-site
+discovery and other domain decisions remain in their production services.
+
+Dynamic providers contribute eligible choices; the registry may own their
+presentation slot/order/wording when Project Hoomans-owned.
+
+### Modular authoring sources
+
+Physical source layout follows Conversation domains rather than migration/build
+history. Canonical semantic/content identity must remain stable when content is
+moved between shards.
+
+NLU patterns, semantic topology, wording and Conversation UI navigation are
+separate responsibilities even when CodeBuilder compiles them together.
+
+### Generated provenance is metadata
+
+Automatic generation may register tasks/commands/gifts, but canonical IDs
+describe meaning rather than generator origin. `generated` belongs in
+provenance metadata, not the Conversation taxonomy.
+
+### One human/agent authoring service
+
+Semantic Lab and autonomous agents use the same bounded authoring service for
+inspect/edit/add/remove/reorder/validate/preview/write/compile operations.
+
+Normal editing must never require modifying generated Lua/translation artifacts
+directly.
+
+### Studio ownership
+
+- **Simulation** executes and explains production behavior.
+- **Explore → Conversation** browses the canonical semantic/content/navigation
+  projection.
+- **Developer Tools** edits the currently selected Conversation item.
+- **Review** shows validated before/after evidence.
+- **Sources** remains read-only provenance/discovery.
+
+Interactions is not a separate everyday authority/browser. Its useful route,
+trigger, flow, conditions and follow-up evidence is projected into the selected
+Conversation detail.

@@ -8,7 +8,7 @@ A phase/chunk passing does not finish the parent goal. After each accepted chunk
 
 ## Mandatory read order
 
-Read root `AGENTS.md`, then this job's `README.md`, `AUDIT.md`, `ARCHITECTURE.md`, `EVENT_FOLLOWUP_CONTRACT.md`, `MIGRATION_MATRIX.md`, `PERFORMANCE_AND_SCALING.md`, `HARNESS_ACCEPTANCE.md`, `P10_CANONICAL_SEMANTIC_CLEANUP.md`, `ROADMAP.md`, and **`PROGRESS.md` last**.
+Read root `AGENTS.md`, then this job's `README.md`, `AUDIT.md`, `ARCHITECTURE.md`, `EVENT_FOLLOWUP_CONTRACT.md`, `MIGRATION_MATRIX.md`, `PERFORMANCE_AND_SCALING.md`, `HARNESS_ACCEPTANCE.md`, `P10_CANONICAL_SEMANTIC_CLEANUP.md`, `P11_MODULAR_CONVERSATION_ARCHITECTURE.md`, `ROADMAP.md`, and **`PROGRESS.md` last**.
 
 Re-read the relevant current source before editing; historical job prose is not runtime truth.
 
@@ -29,6 +29,9 @@ Re-read the relevant current source before editing; historical job prose is not 
 - P10 steady state contains no first-party `PNC_SocialFlavorDefinitions*`, `PNC_ConversationToolReplyCatalog`, `PNC_CompanionCommandFlavor*` wording registry, `PNC.FlavorText*`, `.migrated.` content IDs, `MIGRATED_*` content concepts, or `legacySource` fields.
 - Git history is the archive. Do not keep executable legacy files in `media/lua` merely as migration/source material.
 - Studio grouping is a derived view over canonical semantic IDs; do not create another hierarchy authority.
+- P11 must not create a second wording editor, Conversation UI authority, or agent-only patch path. GUI and agents use the same bounded authoring service.
+- Conversation UI Registry may own presentation/navigation structure and references to registered predicates/providers, but never gameplay/domain eligibility or effects.
+- `generated` is provenance, not semantic meaning; canonical IDs must describe conversation/domain meaning.
 
 ## Migration discipline
 
@@ -100,3 +103,31 @@ Use the split fast headless + focused Xvfb topology established by `SemanticObse
 - Do not publish Steam Workshop content.
 - Do not add goal progress to root `AGENTS.md`.
 - Commit coherent slices only after validation.
+
+## P11 authoring discipline
+
+Treat P10 runtime behavior as accepted foundation. P11 should simplify source
+and tooling while preserving semantic/gameplay authority.
+
+For each P11 migration:
+
+1. identify the current canonical semantic/content/navigation owner;
+2. identify every caller and generated artifact;
+3. add service-level characterization before moving source;
+4. migrate one coherent domain/surface;
+5. keep stable canonical IDs where externally/runtime significant;
+6. generate rather than hand-edit runtime Lua/translation artifacts;
+7. validate typed/clicked/runtime parity;
+8. remove the superseded source/path in the same slice;
+9. update `PROGRESS.md` and continue automatically.
+
+Do not build a generic visual programming IDE. Developer Tools is a contextual
+editor for selected Conversation wording/presentation/navigation.
+
+Do not expose raw gameplay predicates as editable JSON implementations. The UI
+may select/reference registered predicate/provider IDs and display why a
+dynamic choice is locked.
+
+Normal phrase editing must support structural variant operations through safe
+service methods; raw JSON remains an optional diagnostic, not the primary
+workflow.

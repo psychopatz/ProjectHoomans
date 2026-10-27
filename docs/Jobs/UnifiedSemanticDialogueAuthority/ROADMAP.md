@@ -1,6 +1,6 @@
 # Roadmap — Unified Semantic Dialogue Authority
 
-**Parent status:** IN PROGRESS — P0–P9 accepted foundation; P10 cleanup is mandatory before live-test handoff.
+**Parent status:** IN PROGRESS — P0–P10 accepted foundation; P11 modular Conversation architecture/contextual authoring is mandatory before live-test handoff.
 **Completion rule:** phases organize work; completing a phase does not complete the parent goal. Continue automatically until all developer-side gates pass or a genuine blocker is reached.
 
 ## P0 — Reconcile authority inventory and freeze baseline
@@ -219,3 +219,68 @@ presentation-only speech layer; no first-party legacy dialogue registry,
 migration-era content schema, or misleading Flavor namespace remains.
 
 Only after P10 passes may the parent return to `READY FOR USER LIVE TEST`.
+
+## P11 — Modular Conversation Architecture & Contextual Authoring
+
+P10 proved the zero-legacy semantic runtime. P11 makes the authoring/content/tooling
+model scalable and user-facing.
+
+Detailed contract: `P11_MODULAR_CONVERSATION_ARCHITECTURE.md`.
+
+### P11A — steady-state hygiene
+
+Remove remaining migration-only fallback/vocabulary/test archaeology, reconcile
+stale P10 status, and rename legitimate compatibility speech bridges whose
+names still imply obsolete Flavor authority.
+
+### P11B — one first-party wording path
+
+Migrate live first-party wording from `Responses.json`, `Realizations.json`,
+LocalResponse English fallbacks and static mapping modules into Dialogue
+Content. Runtime handlers return semantic template IDs plus bounded arguments.
+
+### P11C — modular Conversation sources
+
+Split monolithic/mixed authoring files into domain shards with one deterministic
+manifest/compiler. Separate NLU/pattern authoring from response/content wording.
+
+### P11D — canonical Conversation UI Registry
+
+Move static landing/hub/child/order/label/navigation structure into one
+declarative registry. It may reference registered predicates/providers but may
+not own gameplay/domain authority.
+
+### P11E — semantic taxonomy cleanup
+
+Replace `semantic.generated.*` IDs with domain-meaning IDs for tasks, commands,
+gifts and other generated flows. Keep generator provenance as metadata only.
+
+### P11F — Studio consolidation
+
+Use one Conversation explorer. Fold route/conditions/follow-ups/sources into the
+selected item and retire Interactions as a redundant everyday browser.
+
+### P11G — contextual Developer Tools editor
+
+Repurpose Developer Tools to edit the currently selected Conversation item:
+EN/TL wording, phrase variants/styles, and Conversation UI hub/child
+presentation/navigation. Normal authoring must not require raw JSON or Lua.
+
+### P11H — agent-friendly authoring API
+
+Expose the same bounded inspect/edit/add/remove/reorder/validate/preview/write/
+compile services to agents and the GUI, with stale guards and deterministic
+outputs.
+
+### P11I — final modular acceptance
+
+Run architecture/source absence, EN/TL, UI registry, selected-item editor,
+agent-service parity, typed/clicked/event, generated-flow, PBrainZ/
+compatibility, save-safety, resource-aware Python, focused Xvfb, Lua/Kahlua and
+CodeBuilder idempotence/performance gates.
+
+**P11 gate:** Project Hoomans has one semantic meaning authority, one first-party
+wording authority, one Conversation UI/navigation registry, one Conversation
+browser and one contextual authoring service used by both humans and agents.
+
+Only after P11 passes may the parent return to `READY FOR USER LIVE TEST`.

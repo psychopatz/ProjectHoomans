@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 through P9 remain accepted foundation; post-P9 audit reopened the parent goal for mandatory P10 Canonical Semantic Cleanup & Legacy Purge.
+**Status:** IN PROGRESS — P0 through P10 are accepted foundation; post-P10 audit reopened the parent goal for mandatory P11 Modular Conversation Architecture & Contextual Authoring.
 
 ## Audited baseline
 
@@ -50,7 +50,8 @@
 | P7 — canonical content coverage / Studio observability | **ACCEPTED** |
 | P8 — retire first-party legacy prose authority | **ACCEPTED** |
 | P9 — scale/MP/final acceptance | **ACCEPTED** |
-| P10 — canonical semantic cleanup / legacy purge | **NEXT / IN PROGRESS** |
+| P10 — canonical semantic cleanup / legacy purge | **ACCEPTED** |
+| P11 — modular Conversation architecture / contextual authoring | **NEXT / IN PROGRESS** |
 
 ## Accepted P0 — authority inventory and characterization
 
@@ -455,19 +456,73 @@ Final developer-side evidence:
   approximately `1001.81s`).
 - `git diff --check`: PASS.
 
-P10A–P10F are complete. Current phase: **READY FOR USER LIVE TEST**. Only
-explicitly user-owned native Project Zomboid SP/MP validation remains.
+P10A–P10F are complete and remain accepted foundation. The prior
+**READY FOR USER LIVE TEST** handoff is superseded by the post-P10 P11 audit
+below; native SP/MP remains user-owned only after P11 developer acceptance.
+
+## Post-P10 audit that reopened the parent goal
+
+Audit baseline: `7c9e91d096f52909c1470b12a7e08e747ddc0ab4`.
+
+Verified gaps:
+
+- the canonical Dialogue Content source is still one ~105 KB / 216-family /
+  395-phrase authoring monolith;
+- `Responses.json` has 144 live production keys and `Realizations.json`
+  remains a second live realization-key family;
+- LocalResponse retains hard-coded English fallbacks and
+  `LEGACY_TEXT_FALLBACKS`;
+- current pattern/definition sources mix NLU, flows and response wording;
+- 67/193 response pools are named `semantic.generated.*`, exposing build
+  provenance as semantic taxonomy;
+- Studio still separates Responses, Interactions and Dialogue Content;
+- Interactions duplicates response pools while also containing genuinely useful
+  route/trigger/flow/capability evidence;
+- Developer Tools still exposes low-level Flow editor / Canonical source editor /
+  Block contracts / Interaction composer / Legacy build workflow;
+- Dialogue Content's safe editor can replace wording but cannot add/delete/
+  reorder phrase variants;
+- `conversation.landing:whats_up` is canonical, but its child membership/order
+  is still distributed through Lua providers and group projection;
+- dynamic relationship/gossip/camp/capability eligibility correctly remains
+  production-owned and must not be moved into editable UI data.
+
+These are post-P10 authoring/tooling/modularity defects. They do not invalidate
+the accepted semantic runtime authority work.
+
+## Immediate Next Chunk — P11A
+
+Read `P11_MODULAR_CONVERSATION_ARCHITECTURE.md` before editing.
+
+Start with steady-state hygiene:
+
+1. re-enumerate remaining migration-only production vocabulary/fallbacks and
+   exact callers;
+2. remove `LEGACY_TEXT_FALLBACKS` only after canonical-content parity proof;
+3. remove dead `legacyRegistry`, `migrationPhase`, `legacyTrace` and
+   equivalent migration-only fields with caller proof;
+4. rename legitimate compatibility speech bridges whose filenames still imply
+   obsolete Flavor authority without changing external behavior;
+5. consolidate historical P8/P10 absence tests into durable architecture
+   contracts while preserving domain behavior tests;
+6. run focused Lua/Python/Kahlua/idempotence checks;
+7. update this progress ledger, then continue automatically through
+   P11B–P11I.
+
+Do not start by redesigning Semantic Lab. First make the source contracts clean,
+then consolidate wording, modularize sources, introduce the Conversation UI
+registry, clean semantic IDs, and finally rebuild the Studio/editor over those
+canonical services.
 
 ## Stop conditions
 
-Stop before P10 developer acceptance only for:
+Stop before P11 developer acceptance only for:
 
 - genuine unsafe repository divergence/concurrent ownership conflict;
-- a required legacy surface that proves to be an externally consumed public
-  Project Hoomans API and cannot be removed without an explicit compatibility
-  decision;
+- a proven externally consumed Project Hoomans public API whose removal/rename
+  requires a compatibility decision not already covered by the job;
 - missing required dependency/toolchain with no accepted fallback;
 - a proven architecture conflict requiring user decision.
 
-A P10 subphase passing is not a stop condition. Continue automatically through
-P10F.
+A P11 subphase passing is not a stop condition. Continue automatically through
+P11I.

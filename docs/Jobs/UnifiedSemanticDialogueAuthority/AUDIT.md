@@ -246,3 +246,43 @@ The parent goal is reopened for P10 because the desired steady state is not
 
 > **legacy first-party dialogue code/content is absent, canonical semantic/content
 > ownership is compact, and Studio exposes that ownership hierarchically.**
+
+## Post-P10 modular Conversation / authoring audit — 7c9e91d0
+
+P10 is accepted as the zero-legacy semantic-runtime foundation, but the
+steady-state content/tooling model is still fragmented.
+
+Verified findings:
+
+- Dialogue Content canonical source is ~105 KB with 216 phrase families / 395
+  phrases in one file.
+- `Responses.json` has 144 live keys referenced by production Lua.
+- `Realizations.json` remains a second live realization-key family.
+- LocalResponse retains hard-coded English fallbacks and
+  `LEGACY_TEXT_FALLBACKS`.
+- `common_interactions.json`, `grounded_personal_dialogue.json` and
+  `semantic_definitions.json` mix responsibilities that should scale
+  independently.
+- 67/193 production response pools are named `semantic.generated.*`, encoding
+  generator provenance instead of conversation meaning.
+- Studio splits Responses, Interactions and Dialogue Content despite overlapping
+  identity/provenance.
+- Interactions contains unique route/trigger/flow/capability evidence but also
+  duplicates response-pool browsing.
+- Developer Tools exposes five low-level structural authoring tabs that are not
+  aligned with the human workflow now that agents implement semantic topology.
+- Dialogue Content already has reusable stale/fingerprint guards, validation,
+  preview, Review and explicit-write/compile safety.
+- current Dialogue Content editing cannot add/delete/reorder phrase variants.
+- `conversation.landing:whats_up` is canonical content, but hub children/order
+  are still hard-coded across Lua providers/group projection.
+- dynamic choices correctly depend on production relationship/gossip/camp/
+  capability authorities and must stay dynamically gated.
+
+Conclusion:
+
+P11 should not alter the semantic authority model. It should consolidate the
+remaining first-party wording paths, modularize authoring sources, establish one
+Conversation UI registry, remove build provenance from semantic taxonomy, fold
+Interactions into Conversation detail, and repurpose Developer Tools into a
+contextual selected-item editor shared with agent authoring APIs.

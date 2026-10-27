@@ -150,3 +150,67 @@ Required positive checks:
 
 Final broad acceptance must use the resource-aware Python runner introduced in
 P9, not plain serial full `unittest discover`.
+
+## P11 modular Conversation acceptance extension
+
+P11 is accepted only when the following additional gates pass.
+
+### Source/authority
+
+- no live `LEGACY_TEXT_FALLBACKS` or equivalent first-party wording fallback;
+- no dead migration-only `legacyRegistry`, `migrationPhase`, `legacyTrace`
+  fields in production contracts;
+- no first-party `Responses.json` / `Realizations.json` independent wording
+  authority;
+- Dialogue Content is the traceable first-party wording owner;
+- one canonical Conversation UI/navigation registry exists;
+- gameplay/domain services remain authoritative for eligibility/effects.
+
+### Taxonomy/modularity
+
+- no canonical `semantic.generated.*` response taxonomy;
+- generator origin remains inspectable metadata;
+- Conversation content is domain-sharded;
+- NLU/pattern sources do not embed response wording merely for convenience;
+- global ID uniqueness and deterministic compilation are enforced.
+
+### Human authoring
+
+- selecting a phrase family can edit EN/TL and add/duplicate/delete/reorder
+  variants through structured controls;
+- selecting a landing/hub/choice can edit labels/utterances and
+  add/remove/reorder existing registered semantic children;
+- What's Up child membership can be changed without editing production Lua;
+- dynamic provider eligibility is visibly locked and still production-owned;
+- stale edits are rejected;
+- preview/review is effect-free until explicit write;
+- normal editing does not require raw JSON.
+
+### Agent authoring
+
+- bounded machine-readable inspect/edit/add/remove/reorder APIs exist;
+- GUI and agents use the same service contract;
+- generated artifacts are never edited directly;
+- validation/diagnostics are deterministic and machine-readable.
+
+### Studio
+
+- one Conversation explorer replaces the everyday Responses/Interactions split;
+- route/conditions/follow-ups/sources remain inspectable for the selected item;
+- Sources stays read-only;
+- Review stays centralized;
+- branch counts are unambiguous.
+
+### Regression
+
+- typed/clicked parity remains;
+- task/command/gift automatic flows retain behavior after ID migration;
+- event follow-up grounding/privacy remains;
+- PBrainZ and compatibility adapters remain green;
+- source saves remain unchanged;
+- resource-aware Python, focused Xvfb, native Lua, installed-PZ Kahlua,
+  CodeBuilder idempotence and performance gates remain green.
+
+P11 is not complete merely because the new editor renders. It must prove that
+the old parallel wording/navigation authoring paths are removed or reduced to
+explicit external provider boundaries.

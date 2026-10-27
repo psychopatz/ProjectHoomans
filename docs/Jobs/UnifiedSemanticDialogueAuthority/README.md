@@ -1,6 +1,6 @@
 # Unified Semantic Dialogue Authority
 
-**Status:** IN PROGRESS — P0–P9 accepted foundation; P10 canonical cleanup / legacy purge is mandatory before live-test handoff.
+**Status:** IN PROGRESS — P0–P10 accepted foundation; P11 Modular Conversation Architecture & Contextual Authoring is mandatory before live-test handoff.
 **Project Hoomans audit baseline:** `181b58bcc30dc65dc61d19a49d6238abca50ece9`.
 **PsychopatzCore audit baseline:** `cf28189c57f7810f31d25c46c11eb88080f47baa`.
 **Checkout:** existing `main` only.
@@ -17,13 +17,13 @@ The finished system must:
 - make `ResponseCatalog` / semantic flows / response plans the only Project Hoomans authority that chooses conversational meaning and response family;
 - use the existing Dialogue Content / speech-realization path for meaning-equivalent wording variation;
 - use one Project Hoomans semantic speech presentation path for queue/localization/TTS/nameplate delivery; generic PsychopatzCore compatibility infrastructure may remain externally, but Project Hoomans must not retain first-party legacy prose registries or legacy Flavor aliases;
-- migrate remaining `PNC_SocialFlavorDefinitions_*`, `PNC_ConversationToolReplyCatalog`, legacy conversation-registry authority, and first-party compatibility prose selection into the semantic/content architecture;
+- preserve the accepted P10 zero-legacy semantic authority and remove the remaining post-P10 first-party wording fragmentation (`Responses.json`, `Realizations.json`, LocalResponse prose/fallback seams) into one Dialogue Content path;
 - let NPC-initiated semantic event speech open a bounded, grounded conversational response window so the player can naturally ask appropriate follow-up questions;
 - route those follow-ups through the existing semantic Suggestions, `DialogueContextState`, context resolver, response plans and authoritative fact refs rather than a separate event-chat subsystem;
 - remain deterministic/offline by default, with PBrainZ/LLM optional and downstream of semantic truth;
 - remain sparse and performant for many NPCs/players: no per-NPC/per-tick dialogue scans, no transcript persistence, no duplicated world/relationship/inventory truth, and no repeated semantic evaluation at render time;
 - expose canonical content and provenance through the existing Semantic Lab / Observatory rather than creating another editor or simulator;
-- finish P10 by deleting migration-era executable/source-only dialogue registries, removing legacy Project Hoomans `Flavor*` namespaces, compacting Dialogue Content identity/schema, and grouping Studio content by semantic family.
+- preserve accepted P10 zero-legacy semantics while completing P11: one first-party wording path, modular Conversation authoring sources, one canonical Conversation UI registry, domain-meaning IDs instead of `semantic.generated.*`, one Conversation explorer, and one contextual Developer Tools editor shared by humans and agents.
 
 ## Central invariant — no split system
 
@@ -109,7 +109,7 @@ Reuse:
 
 ## Execution authority
 
-This directory is the **sole active roadmap for the new semantic-authority retirement/follow-up migration**.
+This directory is the **sole active roadmap for the Unified Semantic Dialogue Authority parent goal, including the current P11 modular Conversation authoring phase**.
 
 Older `SemanticInteractionLifecycle` P11 documents remain valuable historical/architectural evidence, but their earlier “complete” claim is superseded for the residual prose/content owners identified in this audit. Do not run two concurrent migration roadmaps.
 
@@ -125,5 +125,6 @@ Older `SemanticInteractionLifecycle` P11 documents remain valuable historical/ar
 8. `PERFORMANCE_AND_SCALING.md`;
 9. `HARNESS_ACCEPTANCE.md`;
 10. `P10_CANONICAL_SEMANTIC_CLEANUP.md`;
-11. `ROADMAP.md`;
-12. `PROGRESS.md` **last** for current phase and exact Next Chunk.
+11. `P11_MODULAR_CONVERSATION_ARCHITECTURE.md`;
+12. `ROADMAP.md`;
+13. `PROGRESS.md` **last** for current phase and exact Next Chunk.
