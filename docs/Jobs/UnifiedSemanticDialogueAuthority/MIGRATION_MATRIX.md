@@ -105,3 +105,15 @@ declare their lifecycle offer metadata, so ordinary questions cannot be
 claimed by an event follow-up parser outside an active disclosed response
 window. Evidence: ToolReply EN/TL coverage, translation integration,
 response-candidate isolation, and the 42-test event/context regression set.
+
+## P9 developer acceptance closure
+
+P9 added no new conversational authority or persistence owner. The final
+production checks preserve the matrix boundaries: Project Hoomans semantic
+packets are selected before presentation, Dialogue Content owns wording, and
+generic PsychopatzCore SocialFlavor remains compatibility-only. Native
+semantic smoke tests now supply selected semantic realizations directly, so
+the acceptance path itself cannot validate a migrated family by accidentally
+consulting first-party legacy prose. The complete Python/Lua/Kahlua,
+source-save safety, and deterministic CodeBuilder evidence is recorded in
+`PROGRESS.md`.

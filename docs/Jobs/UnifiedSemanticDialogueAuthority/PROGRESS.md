@@ -1,6 +1,7 @@
 # Unified Semantic Dialogue Authority — Current Progress
 
-**Status:** IN PROGRESS — P0 through P8 accepted; P9 is the active implementation slice.
+**Status:** READY FOR USER LIVE TEST — P0 through P9 accepted; developer-side
+acceptance is complete.
 
 ## Audited baseline
 
@@ -49,7 +50,7 @@
 | P6 — compatibility semantic adapters | **ACCEPTED** |
 | P7 — canonical content coverage / Studio observability | **ACCEPTED** |
 | P8 — retire first-party legacy prose authority | **ACCEPTED** |
-| P9 — scale/MP/final acceptance | **IN PROGRESS** |
+| P9 — scale/MP/final acceptance | **ACCEPTED** |
 
 ## Accepted P0 — authority inventory and characterization
 
@@ -229,22 +230,54 @@ command/diary regression set `8/8`, Python category/legacy/content set `20/20`,
 and `pz-verify` Kahlua scans for the eight changed Lua files `0` errors / `0`
 warnings.
 
-P9 routing/content repair slice is accepted: event context-reference patterns
-now require the matching disclosed lifecycle offer when an event window is
-active, preserving ordinary quantity/weather/health question routing; ToolReply
-responses reuse the existing SpeechRealization seam so generated Dialogue
-Content owns EN/TL wording; and candidate review compares semantic plan
-metadata separately from editable wording. The real-worker routing regression
-set is `42/42` in `150.76s`; targeted ToolReply/translation/observatory checks
-are green. The complete P9 acceptance gate remains active.
+P9 is accepted. Event context-reference patterns require the matching disclosed
+lifecycle offer when an event window is active, preserving ordinary
+quantity/weather/health question routing. ToolReply responses reuse the
+existing SpeechRealization seam so generated Dialogue Content owns EN/TL
+wording, and candidate review compares semantic plan metadata separately from
+editable wording. The real-worker routing regression set is `42/42` in
+`150.76s`; the corrected ToolReply/translation/Observatory check ran `9`
+tests with `8` PASS, `0` FAIL, and `1` expected Tk-only SKIP.
 
-## Immediate Next Chunk — P9
+The new resource-aware Python acceptance runner executes each module in an
+isolated subprocess, caps the default lane at four jobs, preserves one-worker
+serialization inside each process, serializes canonical/generation mutators,
+and reports module status, return code, timeout, duration, and a slowest-module
+table. The latency-budget module is additionally isolated as a resource-
+sensitive serial case; its existing assertion was not weakened. Runner
+characterization coverage is `5/5`.
 
-Run the complete developer-side acceptance once: full headless Python,
-focused Xvfb GUI/lifecycle modules, production Lua, installed-PZ Kahlua,
-CodeBuilder/content idempotence, source/save data-safety, performance timing,
-and `git diff --check`. Keep generic PsychopatzCore SocialFlavor infrastructure
-and external provider compatibility authority intact.
+Final developer-side evidence:
+
+- full headless Python: `157 PASS / 0 FAIL / 0 SKIP` modules, `56` expected
+  display-dependent test skips, four active processes maximum, `368.15s`;
+- focused Xvfb GUI/lifecycle lane: `29 PASS / 0 FAIL / 0 SKIP`, four active
+  processes maximum, `101.72s`;
+- full native Lua suite: `898/898 PASS` with four workers, `6.35s` wall time;
+- installed-PZ Kahlua verification: `3195` files scanned, `0` flagged,
+  `0` errors, `0` warnings;
+- source/save safety subset: `8/8 PASS` in `29.41s`; real-save hash remained
+  unchanged through the SAVE lifecycle tests;
+- CodeBuilder ran twice after the final content update; all generated hashes
+  remained identical (`168` phrase families, `179` phrases, `1` player-choice
+  artifact);
+- `git diff --check`: PASS.
+
+Measured Semantic Lab startup samples were fixture worker-ready `1.73–1.94s`
+and fixture-through-Explore `1.75–1.96s`; remembered-SAVE restoration completed
+in `2.41–2.53s` after worker-ready at `1.60–1.73s`. The isolated real-worker
+performance benchmark retained bounded six-event/twelve-turn observations and
+strictly increasing worker sequences/timestamps. The old serial acceptance
+remains diagnostic evidence only: its interrupted run reached `608.35s`, and
+the earlier complete serial diagnostic was approximately `1001.81s` with
+`635` tests, `25` failures, `4` errors, and `56` display skips.
+
+## Immediate Next Chunk
+
+User-owned live SP/MP validation remains. Keep generic PsychopatzCore
+SocialFlavor infrastructure and external provider compatibility authority
+intact while validating the accepted semantic-first behavior in the native
+game when convenient.
 
 ## Stop conditions
 
