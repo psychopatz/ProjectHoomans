@@ -26,16 +26,8 @@ local keys = {
             "UI_PNC_Conversation_Semantic_ComplimentTrusted",
         ["semantic.social.compliment.withdrawn"] =
             "UI_PNC_Conversation_Semantic_ComplimentWithdrawn",
-        ["semantic.social.apology.friendly"] =
-            "UI_PNC_Conversation_Semantic_ApologyFriendly",
         ["semantic.social.apology.trusted"] =
             "UI_PNC_Conversation_Semantic_ApologyTrusted",
-        ["semantic.social.apology.stressed"] =
-            "UI_PNC_Conversation_Semantic_ApologyStressed",
-        ["semantic.social.apology.withdrawn"] =
-            "UI_PNC_Conversation_Semantic_ApologyWithdrawn",
-        ["semantic.social.apology.default"] =
-            "UI_PNC_Conversation_Semantic_ApologyDefault",
         ["semantic.social.threat_stressed"] =
             "UI_PNC_Conversation_Semantic_ThreatStressed",
         ["semantic.social.threat_withdrawn"] =

@@ -1,9 +1,5 @@
 {
-  "UI_PNC_Conversation_Semantic_ApologyDefault": "Noted. Let's move on.",
-  "UI_PNC_Conversation_Semantic_ApologyFriendly": "It's okay. We can put that behind us.",
-  "UI_PNC_Conversation_Semantic_ApologyStressed": "I know things are tense. Let's keep it calm.",
   "UI_PNC_Conversation_Semantic_ApologyTrusted": "I appreciate you saying that. We're all under pressure.",
-  "UI_PNC_Conversation_Semantic_ApologyWithdrawn": "All right. Let's leave it there.",
   "UI_PNC_Conversation_Semantic_ComplimentAlternate": "I appreciate you saying that.",
   "UI_PNC_Conversation_Semantic_ComplimentDefault": "Thanks. That's kind of you.",
   "UI_PNC_Conversation_Semantic_ComplimentFriendly": "Thanks. You seem pretty great yourself.",

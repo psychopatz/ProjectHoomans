@@ -3,6 +3,13 @@ return {
     ["schema"] = "pnc.conversation.runtime-manifest.v1",
     ["shards"] = {
         {
+            ["bytes"] = 6724,
+            ["domain"] = "apology",
+            ["kind"] = "Content",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Content/Apology",
+            ["recordCount"] = 4,
+        },
+        {
             ["bytes"] = 26635,
             ["domain"] = "command",
             ["kind"] = "Content",
@@ -290,5 +297,5 @@ return {
             ["recordCount"] = 2,
         },
     },
-    ["wholeModelFingerprint"] = "041fa369e1ee0dde1d97b4eb707c076e60a386c727ad8cda83490d9d882f31ee",
+    ["wholeModelFingerprint"] = "a4c61fbcc3b98aa2ea3f055bf92bb86608e19542e88861dfc3c138abe35a8108",
 }

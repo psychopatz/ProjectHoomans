@@ -1,0 +1,171 @@
+{
+  "domain": "apology",
+  "groups": {
+    "social": {
+      "contentOwner": "projecthoomans.dialogue_content.social"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "social",
+      "semanticTemplateID": "semantic.social.apology.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Noted. Let's move on.",
+              "TL": "Naitala ko. Magpatuloy tayo."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I appreciate the apology. Let's move on.",
+              "TL": "Pinahahalagahan ko ang paghingi mo ng tawad. Magpatuloy tayo."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Noted.",
+              "TL": "Naitala ko."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Apology heard. Leave it there.",
+              "TL": "Narinig ko ang paghingi ng tawad. Tama na."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "social",
+      "semanticTemplateID": "semantic.social.apology.friendly",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's okay. We can put that behind us.",
+              "TL": "Ayos lang. Kalimutan na natin iyon."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "It's okay. I appreciate you saying that.",
+              "TL": "Ayos lang. Pinahahalagahan ko ang sinabi mo."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "It's okay.",
+              "TL": "Ayos lang."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I heard you. Leave it there.",
+              "TL": "Narinig kita. Tama na."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "social",
+      "semanticTemplateID": "semantic.social.apology.stressed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I know things are tense. Let's keep it calm.",
+              "TL": "Alam kong tensiyonado tayo. Panatilihin nating mahinahon."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I know things are tense. Thanks for saying that.",
+              "TL": "Alam kong tensiyonado tayo. Salamat sa pagsabi niyan."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Keep it calm.",
+              "TL": "Maging mahinahon."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Things are tense. Leave it there.",
+              "TL": "Tensiyonado tayo. Tama na iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "social",
+      "semanticTemplateID": "semantic.social.apology.withdrawn",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. Let's leave it there.",
+              "TL": "Sige. Tama na iyon."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "All right. Let's leave it there for now.",
+              "TL": "Sige. Tama na muna iyon."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Leave it.",
+              "TL": "Tama na."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "All right. Leave it there.",
+              "TL": "Sige. Tama na iyon."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

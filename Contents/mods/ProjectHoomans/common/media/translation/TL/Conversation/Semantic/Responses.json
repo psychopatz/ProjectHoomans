@@ -1,9 +1,5 @@
 {
-  "UI_PNC_Conversation_Semantic_ApologyDefault": "Naiintindihan ko. Magpatuloy na tayo.",
-  "UI_PNC_Conversation_Semantic_ApologyFriendly": "Ayos lang. Iwan na natin iyon.",
-  "UI_PNC_Conversation_Semantic_ApologyStressed": "Alam kong tensiyonado ang lahat. Manatili tayong kalmado.",
   "UI_PNC_Conversation_Semantic_ApologyTrusted": "Pinahahalagahan ko ang paghingi mo ng tawad. Nahihirapan lang tayong lahat.",
-  "UI_PNC_Conversation_Semantic_ApologyWithdrawn": "Sige. Iwan na natin iyon.",
   "UI_PNC_Conversation_Semantic_ComplimentAlternate": "Pinahahalagahan ko ang sinabi mo.",
   "UI_PNC_Conversation_Semantic_ComplimentDefault": "Salamat. Mabait mong sabihin iyan.",
   "UI_PNC_Conversation_Semantic_ComplimentFriendly": "Salamat. Ang galing mo rin naman.",

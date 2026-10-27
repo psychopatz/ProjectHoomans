@@ -10,25 +10,6 @@ return {
         "Acknowledged", "All right.", "All right. I hear you.", "All right.",
         "Understood. We'll leave it there."
     ),
-    ["semantic.social.apology.default"] = phraseFamily(
-        "Apology", "Noted. Let's move on.", "I appreciate the apology. Let's move on.",
-        "Noted.", "Apology heard. Leave it there."
-    ),
-    ["semantic.social.apology.friendly"] = phraseFamily(
-        "ApologyFriendly", "It's okay. We can put that behind us.",
-        "It's okay. I appreciate you saying that.", "It's okay.",
-        "I heard you. Leave it there."
-    ),
-    ["semantic.social.apology.withdrawn"] = phraseFamily(
-        "ApologyWithdrawn", "All right. Let's leave it there.",
-        "All right. Let's leave it there for now.", "Leave it.",
-        "All right. Leave it there."
-    ),
-    ["semantic.social.apology.stressed"] = phraseFamily(
-        "ApologyStressed", "I know things are tense. Let's keep it calm.",
-        "I know things are tense. Thanks for saying that.", "Keep it calm.",
-        "Things are tense. Leave it there."
-    ),
     ["semantic.social.offer_friendly"] = bondPhraseFamily(
         "OfferHelp", "That's kind of you. I'll keep it in mind.",
         "Thank you. I'll keep it in mind.", "Thanks.",

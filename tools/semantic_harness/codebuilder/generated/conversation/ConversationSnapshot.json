@@ -1,6 +1,6 @@
 {
   "content": {
-    "contentFingerprint": "f64753b4f6f7e657aee1e4761f73ab28fecf0e3e525847114791cbcba5e14be7",
+    "contentFingerprint": "261a7f1aac927a2d48fef4e3ceb55b40c3ff23cdad08d5c99e6076bdc0d3fed0",
     "phraseFamilies": [
       {
         "canonicalConcept": "SEMANTIC_COMBAT_REACTION_DEFAULT",
@@ -3680,6 +3680,162 @@
         }
       },
       {
+        "canonicalConcept": "SEMANTIC_SOCIAL_APOLOGY_DEFAULT",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "conversationDomain": "apology",
+        "group": "social",
+        "id": "phrase.semantic.social.apology.default",
+        "semanticTemplateID": "semantic.social.apology.default",
+        "sourceShard": "content/social_apology.json",
+        "styles": {
+          "guarded": [
+            {
+              "fallback": "Apology heard. Leave it there.",
+              "id": "phrase.semantic.social.apology.default.guarded.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultGuarded01"
+            }
+          ],
+          "neutral": [
+            {
+              "fallback": "Noted. Let's move on.",
+              "id": "phrase.semantic.social.apology.default.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultNeutral01"
+            }
+          ],
+          "terse": [
+            {
+              "fallback": "Noted.",
+              "id": "phrase.semantic.social.apology.default.terse.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultTerse01"
+            }
+          ],
+          "warm": [
+            {
+              "fallback": "I appreciate the apology. Let's move on.",
+              "id": "phrase.semantic.social.apology.default.warm.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultWarm01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_SOCIAL_APOLOGY_FRIENDLY",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "conversationDomain": "apology",
+        "group": "social",
+        "id": "phrase.semantic.social.apology.friendly",
+        "semanticTemplateID": "semantic.social.apology.friendly",
+        "sourceShard": "content/social_apology.json",
+        "styles": {
+          "guarded": [
+            {
+              "fallback": "I heard you. Leave it there.",
+              "id": "phrase.semantic.social.apology.friendly.guarded.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyGuarded01"
+            }
+          ],
+          "neutral": [
+            {
+              "fallback": "It's okay. We can put that behind us.",
+              "id": "phrase.semantic.social.apology.friendly.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyNeutral01"
+            }
+          ],
+          "terse": [
+            {
+              "fallback": "It's okay.",
+              "id": "phrase.semantic.social.apology.friendly.terse.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyTerse01"
+            }
+          ],
+          "warm": [
+            {
+              "fallback": "It's okay. I appreciate you saying that.",
+              "id": "phrase.semantic.social.apology.friendly.warm.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyWarm01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_SOCIAL_APOLOGY_STRESSED",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "conversationDomain": "apology",
+        "group": "social",
+        "id": "phrase.semantic.social.apology.stressed",
+        "semanticTemplateID": "semantic.social.apology.stressed",
+        "sourceShard": "content/social_apology.json",
+        "styles": {
+          "guarded": [
+            {
+              "fallback": "Things are tense. Leave it there.",
+              "id": "phrase.semantic.social.apology.stressed.guarded.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyStressedGuarded01"
+            }
+          ],
+          "neutral": [
+            {
+              "fallback": "I know things are tense. Let's keep it calm.",
+              "id": "phrase.semantic.social.apology.stressed.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyStressedNeutral01"
+            }
+          ],
+          "terse": [
+            {
+              "fallback": "Keep it calm.",
+              "id": "phrase.semantic.social.apology.stressed.terse.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyStressedTerse01"
+            }
+          ],
+          "warm": [
+            {
+              "fallback": "I know things are tense. Thanks for saying that.",
+              "id": "phrase.semantic.social.apology.stressed.warm.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyStressedWarm01"
+            }
+          ]
+        }
+      },
+      {
+        "canonicalConcept": "SEMANTIC_SOCIAL_APOLOGY_WITHDRAWN",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "conversationDomain": "apology",
+        "group": "social",
+        "id": "phrase.semantic.social.apology.withdrawn",
+        "semanticTemplateID": "semantic.social.apology.withdrawn",
+        "sourceShard": "content/social_apology.json",
+        "styles": {
+          "guarded": [
+            {
+              "fallback": "All right. Leave it there.",
+              "id": "phrase.semantic.social.apology.withdrawn.guarded.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnGuarded01"
+            }
+          ],
+          "neutral": [
+            {
+              "fallback": "All right. Let's leave it there.",
+              "id": "phrase.semantic.social.apology.withdrawn.neutral.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnNeutral01"
+            }
+          ],
+          "terse": [
+            {
+              "fallback": "Leave it.",
+              "id": "phrase.semantic.social.apology.withdrawn.terse.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnTerse01"
+            }
+          ],
+          "warm": [
+            {
+              "fallback": "All right. Let's leave it there for now.",
+              "id": "phrase.semantic.social.apology.withdrawn.warm.01",
+              "key": "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnWarm01"
+            }
+          ]
+        }
+      },
+      {
         "canonicalConcept": "SEMANTIC_SOCIAL_REACTION_DEFAULT",
         "contentOwner": "projecthoomans.dialogue_content.events",
         "conversationDomain": "event",
@@ -5721,6 +5877,22 @@
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingStressNeutral01": "I'm tense, but I can keep going.",
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstAltNeutral01": "I could really use a drink. Do you have any water?",
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstNeutral01": "I'm pretty thirsty. Could you spare some water?",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultGuarded01": "Apology heard. Leave it there.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultNeutral01": "Noted. Let's move on.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultTerse01": "Noted.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultWarm01": "I appreciate the apology. Let's move on.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyGuarded01": "I heard you. Leave it there.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyNeutral01": "It's okay. We can put that behind us.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyTerse01": "It's okay.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyWarm01": "It's okay. I appreciate you saying that.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyStressedGuarded01": "Things are tense. Leave it there.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyStressedNeutral01": "I know things are tense. Let's keep it calm.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyStressedTerse01": "Keep it calm.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyStressedWarm01": "I know things are tense. Thanks for saying that.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnGuarded01": "All right. Leave it there.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnNeutral01": "All right. Let's leave it there.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnTerse01": "Leave it.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnWarm01": "All right. Let's leave it there for now.",
         "UI_PNC_Conversation_Content_SemanticSocialReactionDefaultNeutral01": "I hear you.",
         "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral01": "I hear you.",
         "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral01": "I will keep that in mind.",
@@ -6161,6 +6333,22 @@
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingStressNeutral01": "Tensiyonado ako, pero kaya ko pa.",
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstAltNeutral01": "Kailangan ko talaga ng maiinom. May tubig ka ba?",
         "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstNeutral01": "Uhaw na uhaw ako. Maaari ba akong makahingi ng tubig?",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultGuarded01": "Narinig ko ang paghingi ng tawad. Tama na.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultNeutral01": "Naitala ko. Magpatuloy tayo.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultTerse01": "Naitala ko.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultWarm01": "Pinahahalagahan ko ang paghingi mo ng tawad. Magpatuloy tayo.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyGuarded01": "Narinig kita. Tama na.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyNeutral01": "Ayos lang. Kalimutan na natin iyon.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyTerse01": "Ayos lang.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyWarm01": "Ayos lang. Pinahahalagahan ko ang sinabi mo.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyStressedGuarded01": "Tensiyonado tayo. Tama na iyon.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyStressedNeutral01": "Alam kong tensiyonado tayo. Panatilihin nating mahinahon.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyStressedTerse01": "Maging mahinahon.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyStressedWarm01": "Alam kong tensiyonado tayo. Salamat sa pagsabi niyan.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnGuarded01": "Sige. Tama na iyon.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnNeutral01": "Sige. Tama na iyon.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnTerse01": "Tama na.",
+        "UI_PNC_Conversation_Content_SemanticSocialApologyWithdrawnWarm01": "Sige. Tama na muna iyon.",
         "UI_PNC_Conversation_Content_SemanticSocialReactionDefaultNeutral01": "I hear you.",
         "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral01": "I hear you.",
         "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral01": "I will keep that in mind.",
@@ -9946,6 +10134,30 @@
       "kind": "content",
       "sourceShard": "content/wellbeing.json"
     },
+    "phrase.semantic.social.apology.default": {
+      "domain": "apology",
+      "id": "phrase.semantic.social.apology.default",
+      "kind": "content",
+      "sourceShard": "content/social_apology.json"
+    },
+    "phrase.semantic.social.apology.friendly": {
+      "domain": "apology",
+      "id": "phrase.semantic.social.apology.friendly",
+      "kind": "content",
+      "sourceShard": "content/social_apology.json"
+    },
+    "phrase.semantic.social.apology.stressed": {
+      "domain": "apology",
+      "id": "phrase.semantic.social.apology.stressed",
+      "kind": "content",
+      "sourceShard": "content/social_apology.json"
+    },
+    "phrase.semantic.social.apology.withdrawn": {
+      "domain": "apology",
+      "id": "phrase.semantic.social.apology.withdrawn",
+      "kind": "content",
+      "sourceShard": "content/social_apology.json"
+    },
     "phrase.semantic.social.reaction.default": {
       "domain": "event",
       "id": "phrase.semantic.social.reaction.default",
@@ -11968,6 +12180,30 @@
       "kind": "responsePool",
       "sourceShard": "flows/common_responses.json"
     },
+    "semantic.social.apology.default": {
+      "domain": "apology",
+      "id": "semantic.social.apology.default",
+      "kind": "content",
+      "sourceShard": "content/social_apology.json"
+    },
+    "semantic.social.apology.friendly": {
+      "domain": "apology",
+      "id": "semantic.social.apology.friendly",
+      "kind": "content",
+      "sourceShard": "content/social_apology.json"
+    },
+    "semantic.social.apology.stressed": {
+      "domain": "apology",
+      "id": "semantic.social.apology.stressed",
+      "kind": "content",
+      "sourceShard": "content/social_apology.json"
+    },
+    "semantic.social.apology.withdrawn": {
+      "domain": "apology",
+      "id": "semantic.social.apology.withdrawn",
+      "kind": "content",
+      "sourceShard": "content/social_apology.json"
+    },
     "semantic.social.reaction.default": {
       "domain": "event",
       "id": "semantic.social.reaction.default",
@@ -12563,6 +12799,12 @@
         "path": "content/social.json"
       },
       {
+        "domain": "apology",
+        "kind": "content",
+        "order": 132,
+        "path": "content/social_apology.json"
+      },
+      {
         "domain": "health",
         "kind": "content",
         "order": 133,
@@ -12918,6 +13160,19 @@
         "semantic.tool_reply.sexual.1",
         "semantic.tool_reply.sexual.2",
         "semantic.tool_reply.sexual.3"
+      ]
+    },
+    {
+      "domain": "apology",
+      "fingerprint": "eb2ec95432010cf0f82794e9152c4b4d060ff259fa5d7b8ea12eb5fdd37f8677",
+      "kind": "content",
+      "order": 132,
+      "path": "content/social_apology.json",
+      "recordIDs": [
+        "semantic.social.apology.default",
+        "semantic.social.apology.friendly",
+        "semantic.social.apology.stressed",
+        "semantic.social.apology.withdrawn"
       ]
     },
     {
@@ -13622,5 +13877,5 @@
       "UI_PNC_Conversation_Suggestion_Wellbeing_Utterance": "Kumusta ang pakiramdam mo?"
     }
   },
-  "wholeModelFingerprint": "041fa369e1ee0dde1d97b4eb707c076e60a386c727ad8cda83490d9d882f31ee"
+  "wholeModelFingerprint": "a4c61fbcc3b98aa2ea3f055bf92bb86608e19542e88861dfc3c138abe35a8108"
 }

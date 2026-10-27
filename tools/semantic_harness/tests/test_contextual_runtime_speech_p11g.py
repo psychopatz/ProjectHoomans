@@ -17,9 +17,11 @@ class ContextualRuntimeSpeechP11GTests(unittest.TestCase):
         families = set(catalog["families"])
         self.assertIn("semantic.flow.greeting.opening.default", families)
         self.assertIn("semantic.question.wellbeing.default", families)
-        self.assertIn("semantic.social.apology.friendly", families)
         self.assertIn("semantic.question.knowledge.known", families)
         self.assertIn("UI_PNC_Conversation_Semantic_GeneratedFollowQueued", families)
+        phrase_content = catalog["phraseContent"]
+        self.assertTrue(phrase_content["families"])
+        self.assertEqual(len(phrase_content["fingerprint"]), 64)
         self.assertEqual(len(catalog["coverage"]), 15)
 
     def test_domain_pack_resolution_preserves_style_and_translation_contract(self) -> None:

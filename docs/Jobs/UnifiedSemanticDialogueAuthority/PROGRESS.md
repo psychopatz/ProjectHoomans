@@ -655,15 +655,40 @@ Project Hoomans `pz_verify --kahlua` scan passed over `3,390` files with no
 errors or warnings; installed Project Zomboid Kahlua compiler passed `123`
 files with `0` source writes and no game launch; `git diff --check` passes.
 
-## Immediate Next Chunk — P11B Social Apology wording domain shard
+## Accepted P11B — Social Apology wording domain slice
 
-Characterize and migrate the cohesive fixed Social Apology wording domain
-next, preserving relationship/bond state, apology follow-up, dynamic
-eligibility/effects, and grounded/response-plan ownership. Use the
-manifest/compiler, generated domain bundles, aggregate snapshot and
-ID-addressed authoring service; defer parameterized social response-pool
-boundaries until characterized. Do not edit generated artifacts as sources,
-introduce aliases, or migrate one key at a time.
+The fourth post-P11B0 wording slice is accepted. Manifest-backed
+`content/social_apology.json` now owns the four fixed, no-argument
+`semantic.social.apology.*` realization families: default, friendly, stressed,
+and withdrawn, with four preserved EN/TL style variants each. Response-catalog
+selection, relationship/bond projection, apology follow-up, dynamic
+eligibility/effects, and grounded/response-plan ownership remain in their
+existing runtime owners.
+
+The old four fixed `Responses.json` keys, sixteen apology `Realizations.json`
+keys, static social translation-key map entries, and four handwritten Social
+realization families are retired. The externally eligible
+`semantic.apology.trusted` response variant remains a compatibility boundary;
+its fallback and static key were not invented or migrated without a legacy
+style family to characterize.
+
+Acceptance evidence: focused Social Apology/compiler/runtime/compatibility
+tests `6/6 PASS`; full isolated Python acceptance runner `164` modules passed,
+`0` failed, `0` skipped; native Lua `897/897 PASS`; two consecutive generations
+matched byte-for-byte across `125` source/generated/translation artifacts
+(SHA-256 `d5b864b8de13d3889d2d06dafed012840e90f9fbb256339aa3b19de2b1066de7`);
+full Project Hoomans `pz_verify --kahlua` scan passed over `3,391` files with
+no errors or warnings; installed Project Zomboid Kahlua compiler passed `123`
+files with `0` source writes and no game launch; `git diff --check` passes.
+
+## Immediate Next Chunk — P11B Task Fetch wording domain shard
+
+Characterize and migrate the cohesive fixed Task Fetch wording domain next,
+preserving task eligibility, queued-task effects, response-plan/tool ownership,
+and follow-up behavior. Use the manifest/compiler, generated domain bundles,
+aggregate snapshot and ID-addressed authoring service; defer parameterized task
+response-pool boundaries until characterized. Do not edit generated artifacts
+as sources, introduce aliases, or migrate one key at a time.
 
 Do not begin P11C, P11D or P11E taxonomy cleanup until the selected P11B domain
 slice has its own characterization and acceptance evidence. Do not create P12

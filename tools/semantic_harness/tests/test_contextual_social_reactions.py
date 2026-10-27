@@ -52,7 +52,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "personality": {"socialStyle": "neutral"},
                 },
                 "semantic.social.apology.default",
-                "UI_PNC_Conversation_Semantic_ApologyDefault",
+                "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultNeutral01",
                 "neutral",
             ),
             (
@@ -61,7 +61,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "traits": {"friendly": True},
                 },
                 "semantic.social.apology.friendly",
-                "UI_PNC_Conversation_Semantic_RealizationApologyFriendlyWarm",
+                "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyWarm01",
                 "friendly",
             ),
             (
@@ -72,7 +72,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "personality": {"socialStyle": "neutral"},
                 },
                 "semantic.social.apology.default",
-                "UI_PNC_Conversation_Semantic_ApologyDefault",
+                "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultNeutral01",
                 "neutral",
             ),
             (
@@ -83,7 +83,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "personality": {"socialStyle": "neutral"},
                 },
                 "semantic.social.apology.stressed",
-                "UI_PNC_Conversation_Semantic_ApologyStressed",
+                "UI_PNC_Conversation_Content_SemanticSocialApologyStressedNeutral01",
                 "neutral",
             ),
             (
@@ -94,7 +94,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "personality": {"socialStyle": "friendly"},
                 },
                 "semantic.social.apology.stressed",
-                "UI_PNC_Conversation_Semantic_RealizationApologyStressedWarm",
+                "UI_PNC_Conversation_Content_SemanticSocialApologyStressedWarm01",
                 "friendly",
             ),
         )

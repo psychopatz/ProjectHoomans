@@ -25,7 +25,8 @@
       "EN/Conversation/UI.json",
       "EN/Conversation/Wellbeing.json",
       "EN/Conversation/Needs.json",
-      "EN/Conversation/Health.json"
+      "EN/Conversation/Health.json",
+      "EN/Conversation/Apology.json"
     ],
     "TL": [
       "TL/Conversation/Semantic/Addressing.json",
@@ -51,7 +52,8 @@
       "TL/Conversation/UI.json",
       "TL/Conversation/Wellbeing.json",
       "TL/Conversation/Needs.json",
-      "TL/Conversation/Health.json"
+      "TL/Conversation/Health.json",
+      "TL/Conversation/Apology.json"
     ]
   }
 }

@@ -46,7 +46,14 @@ class UnifiedAuthorityP10DCompactContentTests(unittest.TestCase):
 
         self.assertEqual(
             set(source["groups"]),
-            {"events", "tool_replies", "compatibility", "commands_emotes", "facts"},
+            {
+                "events",
+                "tool_replies",
+                "compatibility",
+                "commands_emotes",
+                "facts",
+                "social",
+            },
         )
         for family in source["phraseFamilies"]:
             self.assertEqual(set(family), {"semanticTemplateID", "group", "styles"})

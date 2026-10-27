@@ -28,6 +28,12 @@
       "path": "content/social.json"
     },
     {
+      "domain": "apology",
+      "kind": "content",
+      "order": 132,
+      "path": "content/social_apology.json"
+    },
+    {
       "domain": "health",
       "kind": "content",
       "order": 133,

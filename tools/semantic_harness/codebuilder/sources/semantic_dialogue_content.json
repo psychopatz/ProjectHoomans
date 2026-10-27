@@ -17,6 +17,9 @@
     "facts": {
       "contentOwner": "projecthoomans.dialogue_content.facts"
     },
+    "social": {
+      "contentOwner": "projecthoomans.dialogue_content.social"
+    },
     "tool_replies": {
       "contentOwner": "projecthoomans.dialogue_content.tool_replies"
     }
@@ -3307,6 +3310,158 @@
             "translations": {
               "EN": "I could really use a drink. Do you have any water?",
               "TL": "Kailangan ko talaga ng maiinom. May tubig ka ba?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "social",
+      "semanticTemplateID": "semantic.social.apology.default",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Apology heard. Leave it there.",
+              "TL": "Narinig ko ang paghingi ng tawad. Tama na."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Noted. Let's move on.",
+              "TL": "Naitala ko. Magpatuloy tayo."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Noted.",
+              "TL": "Naitala ko."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I appreciate the apology. Let's move on.",
+              "TL": "Pinahahalagahan ko ang paghingi mo ng tawad. Magpatuloy tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "social",
+      "semanticTemplateID": "semantic.social.apology.friendly",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I heard you. Leave it there.",
+              "TL": "Narinig kita. Tama na."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's okay. We can put that behind us.",
+              "TL": "Ayos lang. Kalimutan na natin iyon."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "It's okay.",
+              "TL": "Ayos lang."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "It's okay. I appreciate you saying that.",
+              "TL": "Ayos lang. Pinahahalagahan ko ang sinabi mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "social",
+      "semanticTemplateID": "semantic.social.apology.stressed",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Things are tense. Leave it there.",
+              "TL": "Tensiyonado tayo. Tama na iyon."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I know things are tense. Let's keep it calm.",
+              "TL": "Alam kong tensiyonado tayo. Panatilihin nating mahinahon."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Keep it calm.",
+              "TL": "Maging mahinahon."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I know things are tense. Thanks for saying that.",
+              "TL": "Alam kong tensiyonado tayo. Salamat sa pagsabi niyan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "social",
+      "semanticTemplateID": "semantic.social.apology.withdrawn",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "All right. Leave it there.",
+              "TL": "Sige. Tama na iyon."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. Let's leave it there.",
+              "TL": "Sige. Tama na iyon."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Leave it.",
+              "TL": "Tama na."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "All right. Let's leave it there for now.",
+              "TL": "Sige. Tama na muna iyon."
             }
           }
         ]
