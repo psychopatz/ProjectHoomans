@@ -5,13 +5,13 @@ from __future__ import annotations
 from typing import Any
 
 from ..studio.block_registry import SemanticBlockRegistryPane
+from ..studio.conversation_explorer_pane import ConversationExplorerPane
 from ..studio.dataset_library import DatasetLibraryPane
 from ..studio.dialogue_content_pane import DialogueContentPane
 from ..studio.interaction_explorer_pane import InteractionExplorerPane
 from ..studio.interaction_spec_pane import InteractionSpecPane
 from ..studio.source_explorer_pane import CanonicalSourceExplorerPane
 from ..studio.workflow import SemanticLabWorkflowPane
-from ..studio.observatory_pane import SemanticObservatoryPane
 from .flow_editor.pane import FlowEditorPane
 
 
@@ -27,12 +27,11 @@ def build_studio_editors(
 ) -> None:
     """Create the three Studio homes without taking runtime ownership.
 
-    Explore is read-only and combines the response, interaction, and source
-    browsers. Dialogue Content owns bounded wording edits. Review owns
-    candidate-source evidence. Developer Tools contains the existing
-    structural authoring tools, including the temporary legacy workflow. All
-    worker callbacks remain the existing shell/services; this function only
-    changes their navigation home.
+    Explore is read-only and combines the bounded Conversation and source
+    projections. Dialogue Content owns bounded wording edits. Review owns
+    candidate-source evidence. Developer Tools contains structural authoring
+    and narrow route diagnostics. All worker callbacks remain the existing
+    shell/services; this function only changes their navigation home.
     """
 
     explore_notebook = ttk.Notebook(explore_tab)
@@ -42,21 +41,20 @@ def build_studio_editors(
     app.studio_explore_notebook = explore_notebook
 
     response_frame = ttk.Frame(explore_notebook, padding=6)
-    interaction_frame = ttk.Frame(explore_notebook, padding=6)
     source_frame = ttk.Frame(explore_notebook, padding=6)
-    for panel in (response_frame, interaction_frame, source_frame):
+    for panel in (response_frame, source_frame):
         panel.rowconfigure(0, weight=1)
         panel.columnconfigure(0, weight=1)
-    explore_notebook.add(response_frame, text="Responses")
-    explore_notebook.add(interaction_frame, text="Interactions")
+    explore_notebook.add(response_frame, text="Conversation")
     explore_notebook.add(source_frame, text="Sources")
 
-    app.observatory = SemanticObservatoryPane(
+    app.observatory = ConversationExplorerPane(
         response_frame, app._tk, ttk, scrolled_text,
         run_worker=app._start_background_operation,
         repository=app.authoring_service.repository,
         filedialog=app._filedialog,
         review_parent=review_tab,
+        authoring_service=app.authoring_service,
     )
     app.source_explorer = CanonicalSourceExplorerPane(
         source_frame,
@@ -77,21 +75,8 @@ def build_studio_editors(
         on_preview_simulation=lambda _report: app.main_tabs.select(0),
         on_send_review=lambda report: (
             app.observatory.show_dialogue_content_review(report),
-            app.studio_notebook.select(2),
+            app.studio_notebook.select(review_tab),
         ),
-    )
-
-    app.interaction_explorer = InteractionExplorerPane(
-        interaction_frame,
-        app._tk,
-        ttk,
-        scrolled_text,
-        app.authoring_service,
-        on_open_flow=lambda flow_id: (
-            app.advanced_notebook.select(app.flow_editor_frame)
-            if hasattr(app, "advanced_notebook")
-            else None
-        ) or app.flow_editor.select_flow(flow_id),
     )
 
     advanced_notebook = ttk.Notebook(developer_tools_parent)
@@ -107,7 +92,8 @@ def build_studio_editors(
     blocks_frame = ttk.Frame(advanced_notebook)
     composer_frame = ttk.Frame(advanced_notebook)
     workflow_frame = ttk.Frame(advanced_notebook)
-    for panel in (library_frame, blocks_frame, composer_frame, workflow_frame):
+    route_frame = ttk.Frame(advanced_notebook)
+    for panel in (library_frame, blocks_frame, composer_frame, workflow_frame, route_frame):
         panel.rowconfigure(0, weight=1)
         panel.columnconfigure(0, weight=1)
     advanced_notebook.add(flow_frame, text="Flow editor")
@@ -115,13 +101,24 @@ def build_studio_editors(
     advanced_notebook.add(blocks_frame, text="Block contracts")
     advanced_notebook.add(composer_frame, text="Interaction composer")
     advanced_notebook.add(workflow_frame, text="Legacy build workflow")
+    advanced_notebook.add(route_frame, text="Route diagnostics")
     app.flow_editor_frame = flow_frame
     app.library_tab = library_frame
     app.blocks_tab = blocks_frame
     app.composer_tab = composer_frame
     app.workflow_tab = workflow_frame
+    app.route_tab = route_frame
     # Compatibility for callers that used the former nested editor notebook.
     app.editor_notebook = advanced_notebook
+
+    app.interaction_explorer = InteractionExplorerPane(
+        route_frame,
+        app._tk,
+        ttk,
+        scrolled_text,
+        app.authoring_service,
+        on_open_flow=lambda flow_id: app.flow_editor.select_flow(flow_id),
+    )
 
     app.flow_editor = FlowEditorPane(
         flow_frame,

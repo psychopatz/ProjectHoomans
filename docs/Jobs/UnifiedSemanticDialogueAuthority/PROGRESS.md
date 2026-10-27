@@ -607,12 +607,31 @@ acceptance `2/2 PASS`; CodeBuilder compile PASS; and `git diff --check` PASS.
 No source save, native Project Zomboid session, or Workshop operation was
 touched.
 
-## Immediate Next Chunk — P11F
+## Accepted P11F — derived Conversation Studio projection
 
-Consolidate Studio into one derived Conversation explorer with Sources and
-bounded detail (wording, route, conditions, follow-ups, and provenance), while
-retaining lazy loading and removing Interactions as a redundant everyday
-browser. Continue automatically through P11G–P11I, then P12.
+P11F accepted. Normal Studio navigation now presents Explore with one
+Conversation tree and Sources, plus the shared Review home. The Conversation
+tree derives its hierarchy from canonical semantic/content identity and merges
+bounded production ResponseCatalog rows with bounded Dialogue Content rows.
+Full canonical IDs, source fingerprints, and ownership remain visible.
+
+Selecting a leaf exposes bounded Overview, Wording, Route, Conditions,
+Follow-ups, and Sources details. Interaction execution-route information is
+retained under Developer Tools as narrow diagnostics rather than a second
+everyday browser. The existing serialized worker request path and lazy pool
+detail behavior remain unchanged; catalog failure stays local to Studio.
+
+P11F focused validation: surface ownership and Conversation projection
+`5/5 PASS` under Xvfb; derived semantic tree `3/3 PASS`; Conversation UI
+registry `3/3 PASS`; and `git diff --check` PASS. No source save, native
+Project Zomboid session, or Workshop operation was touched.
+
+## Immediate Next Chunk — P11G
+
+Repurpose Developer Tools around the selected Conversation item. Add
+structured EN/TL phrase-family variant and Conversation UI editing through the
+existing authoring service, with explicit preview/Review/write/compile and
+locked production-owned semantic destinations and eligibility.
 
 ## Historical P11A starting instructions (completed)
 

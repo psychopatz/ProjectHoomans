@@ -32,10 +32,10 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
         root = tk.Tk()
         app = self.make_gui_app(root)
         self.assertEqual(_labels(app.studio_notebook), [
-            "Explore", "Dialogue Content", "Review",
+            "Explore", "Review",
         ])
         self.assertEqual(_labels(app.studio_explore_notebook), [
-            "Responses", "Interactions", "Sources",
+            "Conversation", "Sources",
         ])
         self.assertEqual(_labels(app.advanced_notebook), [
             "Flow editor",
@@ -43,14 +43,30 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
             "Block contracts",
             "Interaction composer",
             "Legacy build workflow",
+            "Route diagnostics",
         ])
         self.assertTrue(hasattr(app, "developer_tools_button"))
         self.assertTrue(hasattr(app, "dialogue_content"))
         self.assertEqual(_labels(app.observatory.tabs), [
-            "Registered responses",
+            "Overview", "Wording", "Route", "Conditions", "Follow-ups", "Sources",
         ])
         self.assertNotIn("Test Lab", _labels(app.observatory.tabs))
         self.assertNotIn("Coverage", _labels(app.observatory.tabs))
+
+    def test_conversation_projection_combines_bounded_pool_and_content_rows(self) -> None:
+        root = tk.Tk()
+        app = self.make_gui_app(root)
+        self.wait_for_worker_ready(root, app)
+        self.wait_for(
+            root,
+            lambda: app.observatory.catalog_ready and not app.observatory.loading,
+            "timed out waiting for bounded Conversation catalog",
+        )
+        rows = list(app.observatory._pool_rows.values())
+        self.assertTrue(any(row.get("kind") == "content" for row in rows))
+        self.assertTrue(any(row.get("kind") != "content" for row in rows))
+        self.assertEqual(_labels(app.studio_explore_notebook), ["Conversation", "Sources"])
+        self.assertNotIn("Interactions", _labels(app.studio_explore_notebook))
 
         self.assertEqual(_labels(app.trace_tabs), [
             "Inspect", "Graph", "Compare / Regression", "World", "Debug",
@@ -104,7 +120,7 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
         app.dialogue_content.on_send_review(report)
         root.update_idletasks()
         self.assertEqual(
-            app.studio_notebook.index(app.studio_notebook.select()), 2
+            app.studio_notebook.index(app.studio_notebook.select()), 1
         )
         review = app.observatory.views["Review"].get("1.0", "end")
         self.assertIn("Dialogue Content review", review)

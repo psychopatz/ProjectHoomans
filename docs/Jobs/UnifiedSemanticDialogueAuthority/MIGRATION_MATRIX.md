@@ -289,3 +289,12 @@ absence tests without changing semantic/runtime authority.
 | Automatic-flow first-party wording | former generated translation artifacts and adapter-local EN/TL/key maps | canonical Conversation shards and generated Dialogue Content Registry/EN/TL artifacts | deleted generated translation files and manifest loads; no adapter wording fallback | shard/content compiler, matrix, idempotence and absence scans |
 | Bounded realization catalog | worker persona catalog and Studio diagnostics | SpeechRealization canonical family projection | deterministic capped list with representative domain coverage; no semantic selection change | P11G runtime speech test and worker catalog checks |
 | Response-quality semantic assertions | Observatory matrix fixtures and inspector | explicit semantic metadata plus authored translation keys | direct semantic action packets and localized authored packets are checked without conflating identifiers | Response Observatory and bundled real-Lua matrix tests |
+
+## P11F current closure
+
+| Surface | Actual production callers | Current owner | Disposition | Proof |
+| --- | --- | --- | --- | --- |
+| Normal Studio Conversation browser | `studio_surface_builder`, `ConversationExplorerPane`, existing `SemanticObservatoryPane` worker adapter | derived `studio.semantic_tree` over bounded ResponseCatalog and Dialogue Content rows | one Explore → Conversation projection; no second registry or response/content identity store | `test_surface_consolidation`, real-worker bounded projection |
+| Source traceability | Conversation explorer and existing `CanonicalSourceExplorerPane` | Dialogue Content/service source paths and fingerprints plus production pool source metadata | full canonical IDs and source ownership remain inspectable; no generated-file editing | surface tests, source explorer, content service tests |
+| Route/policy diagnostics | existing `InteractionExplorerPane` | production FlowEditor catalog and existing route metadata | removed from normal Explore; retained as narrow Developer Tools diagnostics; no duplicate response rows | surface ownership test and production catalog smoke |
+| Selected detail | Conversation explorer | ResponseCatalog/ResponsePlan, Dialogue Content, lifecycle/provider authority | bounded Overview/Wording/Route/Conditions/Follow-ups/Sources projection; no eligibility/effects ownership | Conversation projection test and response observatory detail checks |
