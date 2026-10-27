@@ -4,2632 +4,4169 @@ PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 local Registry = PNC.Semantics.DialogueContentRegistry or {}
 PNC.Semantics.DialogueContentRegistry = Registry
-Registry.SCHEMA = "pnc.semantic_dialogue_content.v1"
-Registry.VERSION = 1
-Registry.CONTENT_FINGERPRINT = "27aefd29c9743fb25537c7125468dfe683177f57dae2a8674997c5cb636d5284"
+Registry.SCHEMA = "pnc.semantic_dialogue_content.v2"
+Registry.VERSION = 2
+Registry.CONTENT_FINGERPRINT = "2cd98cb3cc98c0c6daec7e380f4454c24ed35929f6cb0f669330c2fea58bb057"
 Registry.PHRASE_FAMILIES = {
     ["semantic.combat.reaction.default"] = {
-        ["canonicalConcept"] = "MIGRATED_COMBAT_REACTION_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_COMBAT_REACTION_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.combat_reaction_default",
+        ["id"] = "phrase.semantic.combat.reaction.default",
         ["semanticTemplateID"] = "semantic.combat.reaction.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Good work. Keep watching the area.",
-                    ["id"] = "phrase.migrated.combat_reaction_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CombatReactionDefaultNeutral01",
+                    ["id"] = "phrase.semantic.combat.reaction.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCombatReactionDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.combat.reaction.retreat"] = {
-        ["canonicalConcept"] = "MIGRATED_COMBAT_REACTION_RETREAT",
+        ["canonicalConcept"] = "SEMANTIC_COMBAT_REACTION_RETREAT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.combat_reaction_retreat",
+        ["id"] = "phrase.semantic.combat.reaction.retreat",
         ["semanticTemplateID"] = "semantic.combat.reaction.retreat",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I need a moment before I can swing again.",
-                    ["id"] = "phrase.migrated.combat_reaction_retreat.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CombatReactionRetreatNeutral01",
+                    ["id"] = "phrase.semantic.combat.reaction.retreat.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCombatReactionRetreatNeutral01",
                 },
             },
         },
     },
     ["semantic.combat.reaction.threat"] = {
-        ["canonicalConcept"] = "MIGRATED_COMBAT_REACTION_THREAT",
+        ["canonicalConcept"] = "SEMANTIC_COMBAT_REACTION_THREAT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.combat_reaction_threat",
+        ["id"] = "phrase.semantic.combat.reaction.threat",
         ["semanticTemplateID"] = "semantic.combat.reaction.threat",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That threat is down. Stay alert.",
-                    ["id"] = "phrase.migrated.combat_reaction_threat.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CombatReactionThreatNeutral01",
+                    ["id"] = "phrase.semantic.combat.reaction.threat.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCombatReactionThreatNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.player.attack_auto"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_PLAYER_ATTACK_AUTO",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.player.attack_auto",
+        ["semanticTemplateID"] = "semantic.command.player.attack_auto",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "{name}, use your best judgment.",
+                    ["id"] = "phrase.semantic.command.player.attack_auto.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackAutoNeutral01",
+                },
+                {
+                    ["fallback"] = "{name}, handle threats as you see fit.",
+                    ["id"] = "phrase.semantic.command.player.attack_auto.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackAutoNeutral02",
+                },
+                {
+                    ["fallback"] = "Watch our backs, {name}.",
+                    ["id"] = "phrase.semantic.command.player.attack_auto.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackAutoNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.player.attack_melee"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_PLAYER_ATTACK_MELEE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.player.attack_melee",
+        ["semanticTemplateID"] = "semantic.command.player.attack_melee",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "{name}, keep it close.",
+                    ["id"] = "phrase.semantic.command.player.attack_melee.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackMeleeNeutral01",
+                },
+                {
+                    ["fallback"] = "Take the front line, {name}.",
+                    ["id"] = "phrase.semantic.command.player.attack_melee.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackMeleeNeutral02",
+                },
+                {
+                    ["fallback"] = "{name}, save your ammunition.",
+                    ["id"] = "phrase.semantic.command.player.attack_melee.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackMeleeNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.player.attack_none"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_PLAYER_ATTACK_NONE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.player.attack_none",
+        ["semanticTemplateID"] = "semantic.command.player.attack_none",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "{name}, stay out of the fight.",
+                    ["id"] = "phrase.semantic.command.player.attack_none.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackNoneNeutral01",
+                },
+                {
+                    ["fallback"] = "Avoid trouble, {name}.",
+                    ["id"] = "phrase.semantic.command.player.attack_none.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackNoneNeutral02",
+                },
+                {
+                    ["fallback"] = "{name}, don't engage unless I change the order.",
+                    ["id"] = "phrase.semantic.command.player.attack_none.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackNoneNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.player.attack_ranged"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_PLAYER_ATTACK_RANGED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.player.attack_ranged",
+        ["semanticTemplateID"] = "semantic.command.player.attack_ranged",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "{name}, keep your distance.",
+                    ["id"] = "phrase.semantic.command.player.attack_ranged.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackRangedNeutral01",
+                },
+                {
+                    ["fallback"] = "Give us ranged cover, {name}.",
+                    ["id"] = "phrase.semantic.command.player.attack_ranged.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackRangedNeutral02",
+                },
+                {
+                    ["fallback"] = "{name}, engage from a safe distance.",
+                    ["id"] = "phrase.semantic.command.player.attack_ranged.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackRangedNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.player.camp"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_PLAYER_CAMP",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.player.camp",
+        ["semanticTemplateID"] = "semantic.command.player.camp",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Make camp here, {names}.",
+                    ["id"] = "phrase.semantic.command.player.camp.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerCampNeutral01",
+                },
+                {
+                    ["fallback"] = "Settle in here, {names}.",
+                    ["id"] = "phrase.semantic.command.player.camp.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerCampNeutral02",
+                },
+                {
+                    ["fallback"] = "We'll camp here for now, {names}.",
+                    ["id"] = "phrase.semantic.command.player.camp.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerCampNeutral03",
+                },
+                {
+                    ["fallback"] = "We could make camp here, {names}.",
+                    ["id"] = "phrase.semantic.command.player.camp.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerCampNeutral04",
+                },
+                {
+                    ["fallback"] = "Let's make this our camp, {names}.",
+                    ["id"] = "phrase.semantic.command.player.camp.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerCampNeutral05",
+                },
+            },
+        },
+    },
+    ["semantic.command.player.camp_none"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_PLAYER_CAMP_NONE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.player.camp_none",
+        ["semanticTemplateID"] = "semantic.command.player.camp_none",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "...",
+                    ["id"] = "phrase.semantic.command.player.camp_none.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerCampNoneNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.player.camp_rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_PLAYER_CAMP_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.player.camp_rejected",
+        ["semanticTemplateID"] = "semantic.command.player.camp_rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't find a safe room or campfire nearby.",
+                    ["id"] = "phrase.semantic.command.player.camp_rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerCampRejectedNeutral01",
+                },
+                {
+                    ["fallback"] = "We need a nearby room or campfire before we make camp.",
+                    ["id"] = "phrase.semantic.command.player.camp_rejected.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerCampRejectedNeutral02",
+                },
+                {
+                    ["fallback"] = "No usable camp site is visible from here.",
+                    ["id"] = "phrase.semantic.command.player.camp_rejected.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerCampRejectedNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.player.follow"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_PLAYER_FOLLOW",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.player.follow",
+        ["semanticTemplateID"] = "semantic.command.player.follow",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "{names}, on me.",
+                    ["id"] = "phrase.semantic.command.player.follow.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerFollowNeutral01",
+                },
+                {
+                    ["fallback"] = "Stay close, {names}.",
+                    ["id"] = "phrase.semantic.command.player.follow.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerFollowNeutral02",
+                },
+                {
+                    ["fallback"] = "{names}, let's move.",
+                    ["id"] = "phrase.semantic.command.player.follow.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerFollowNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.player.generic"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_PLAYER_GENERIC",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.player.generic",
+        ["semanticTemplateID"] = "semantic.command.player.generic",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Understood, {names}.",
+                    ["id"] = "phrase.semantic.command.player.generic.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerGenericNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.player.return_home"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_PLAYER_RETURN_HOME",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.player.return_home",
+        ["semanticTemplateID"] = "semantic.command.player.return_home",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "{names}, head home.",
+                    ["id"] = "phrase.semantic.command.player.return_home.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerReturnHomeNeutral01",
+                },
+                {
+                    ["fallback"] = "Return to the base, {names}.",
+                    ["id"] = "phrase.semantic.command.player.return_home.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerReturnHomeNeutral02",
+                },
+                {
+                    ["fallback"] = "{names}, get back home safely.",
+                    ["id"] = "phrase.semantic.command.player.return_home.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerReturnHomeNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.player.stay"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_PLAYER_STAY",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.player.stay",
+        ["semanticTemplateID"] = "semantic.command.player.stay",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "{names}, wait here.",
+                    ["id"] = "phrase.semantic.command.player.stay.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerStayNeutral01",
+                },
+                {
+                    ["fallback"] = "Hold this position, {names}.",
+                    ["id"] = "phrase.semantic.command.player.stay.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerStayNeutral02",
+                },
+                {
+                    ["fallback"] = "{names}, stay put for now.",
+                    ["id"] = "phrase.semantic.command.player.stay.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandPlayerStayNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.reply.attack_auto"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_REPLY_ATTACK_AUTO",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.reply.attack_auto",
+        ["semanticTemplateID"] = "semantic.command.reply.attack_auto",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll handle it.",
+                    ["id"] = "phrase.semantic.command.reply.attack_auto.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackAutoNeutral01",
+                },
+                {
+                    ["fallback"] = "I'll stay alert.",
+                    ["id"] = "phrase.semantic.command.reply.attack_auto.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackAutoNeutral02",
+                },
+                {
+                    ["fallback"] = "Leave it to me.",
+                    ["id"] = "phrase.semantic.command.reply.attack_auto.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackAutoNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.reply.attack_melee"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_REPLY_ATTACK_MELEE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.reply.attack_melee",
+        ["semanticTemplateID"] = "semantic.command.reply.attack_melee",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Going in close.",
+                    ["id"] = "phrase.semantic.command.reply.attack_melee.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackMeleeNeutral01",
+                },
+                {
+                    ["fallback"] = "I'll take the front.",
+                    ["id"] = "phrase.semantic.command.reply.attack_melee.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackMeleeNeutral02",
+                },
+                {
+                    ["fallback"] = "Keeping it quiet.",
+                    ["id"] = "phrase.semantic.command.reply.attack_melee.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackMeleeNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.reply.attack_none"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_REPLY_ATTACK_NONE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.reply.attack_none",
+        ["semanticTemplateID"] = "semantic.command.reply.attack_none",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll avoid trouble.",
+                    ["id"] = "phrase.semantic.command.reply.attack_none.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackNoneNeutral01",
+                },
+                {
+                    ["fallback"] = "I won't engage.",
+                    ["id"] = "phrase.semantic.command.reply.attack_none.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackNoneNeutral02",
+                },
+                {
+                    ["fallback"] = "Staying out of it.",
+                    ["id"] = "phrase.semantic.command.reply.attack_none.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackNoneNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.reply.attack_ranged"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_REPLY_ATTACK_RANGED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.reply.attack_ranged",
+        ["semanticTemplateID"] = "semantic.command.reply.attack_ranged",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll cover you.",
+                    ["id"] = "phrase.semantic.command.reply.attack_ranged.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackRangedNeutral01",
+                },
+                {
+                    ["fallback"] = "Keeping my distance.",
+                    ["id"] = "phrase.semantic.command.reply.attack_ranged.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackRangedNeutral02",
+                },
+                {
+                    ["fallback"] = "I've got a clear shot.",
+                    ["id"] = "phrase.semantic.command.reply.attack_ranged.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyAttackRangedNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.reply.camp"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_REPLY_CAMP",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.reply.camp",
+        ["semanticTemplateID"] = "semantic.command.reply.camp",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "We'll make camp here.",
+                    ["id"] = "phrase.semantic.command.reply.camp.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyCampNeutral01",
+                },
+                {
+                    ["fallback"] = "Settling in here.",
+                    ["id"] = "phrase.semantic.command.reply.camp.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyCampNeutral02",
+                },
+                {
+                    ["fallback"] = "I'll hold this camp.",
+                    ["id"] = "phrase.semantic.command.reply.camp.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyCampNeutral03",
+                },
+                {
+                    ["fallback"] = "A roof sounds good. Let's settle in.",
+                    ["id"] = "phrase.semantic.command.reply.camp.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyCampNeutral04",
+                },
+                {
+                    ["fallback"] = "This works for me. We can camp here.",
+                    ["id"] = "phrase.semantic.command.reply.camp.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyCampNeutral05",
+                },
+            },
+        },
+    },
+    ["semantic.command.reply.camp_rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_REPLY_CAMP_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.reply.camp_rejected",
+        ["semanticTemplateID"] = "semantic.command.reply.camp_rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't find a safe room or campfire nearby.",
+                    ["id"] = "phrase.semantic.command.reply.camp_rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyCampRejectedNeutral01",
+                },
+                {
+                    ["fallback"] = "Not here. We need a nearby room or campfire.",
+                    ["id"] = "phrase.semantic.command.reply.camp_rejected.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyCampRejectedNeutral02",
+                },
+                {
+                    ["fallback"] = "I can't see a usable camp site from here.",
+                    ["id"] = "phrase.semantic.command.reply.camp_rejected.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyCampRejectedNeutral03",
+                },
+                {
+                    ["fallback"] = "We're too exposed out here. Let's find a room or campfire.",
+                    ["id"] = "phrase.semantic.command.reply.camp_rejected.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyCampRejectedNeutral04",
+                },
+                {
+                    ["fallback"] = "No usable camp site is visible from here.",
+                    ["id"] = "phrase.semantic.command.reply.camp_rejected.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyCampRejectedNeutral05",
+                },
+            },
+        },
+    },
+    ["semantic.command.reply.follow"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_REPLY_FOLLOW",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.reply.follow",
+        ["semanticTemplateID"] = "semantic.command.reply.follow",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Right behind you.",
+                    ["id"] = "phrase.semantic.command.reply.follow.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyFollowNeutral01",
+                },
+                {
+                    ["fallback"] = "I'm with you.",
+                    ["id"] = "phrase.semantic.command.reply.follow.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyFollowNeutral02",
+                },
+                {
+                    ["fallback"] = "Lead the way.",
+                    ["id"] = "phrase.semantic.command.reply.follow.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyFollowNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.reply.generic_rejected"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_REPLY_GENERIC_REJECTED",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.reply.generic_rejected",
+        ["semanticTemplateID"] = "semantic.command.reply.generic_rejected",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't do that right now.",
+                    ["id"] = "phrase.semantic.command.reply.generic_rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyGenericRejectedNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.command.reply.return_home"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_REPLY_RETURN_HOME",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.reply.return_home",
+        ["semanticTemplateID"] = "semantic.command.reply.return_home",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Heading home.",
+                    ["id"] = "phrase.semantic.command.reply.return_home.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyReturnHomeNeutral01",
+                },
+                {
+                    ["fallback"] = "I'll return to the base.",
+                    ["id"] = "phrase.semantic.command.reply.return_home.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyReturnHomeNeutral02",
+                },
+                {
+                    ["fallback"] = "On my way home.",
+                    ["id"] = "phrase.semantic.command.reply.return_home.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyReturnHomeNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.command.reply.stay"] = {
+        ["canonicalConcept"] = "SEMANTIC_COMMAND_REPLY_STAY",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.command.reply.stay",
+        ["semanticTemplateID"] = "semantic.command.reply.stay",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I'll stay here.",
+                    ["id"] = "phrase.semantic.command.reply.stay.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyStayNeutral01",
+                },
+                {
+                    ["fallback"] = "Holding position.",
+                    ["id"] = "phrase.semantic.command.reply.stay.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyStayNeutral02",
+                },
+                {
+                    ["fallback"] = "I'll keep watch.",
+                    ["id"] = "phrase.semantic.command.reply.stay.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReplyStayNeutral03",
                 },
             },
         },
     },
     ["semantic.companion.reaction.abandonment"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPANION_REACTION_ABANDONMENT",
+        ["canonicalConcept"] = "SEMANTIC_COMPANION_REACTION_ABANDONMENT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.companion_reaction_abandonment",
+        ["id"] = "phrase.semantic.companion.reaction.abandonment",
         ["semanticTemplateID"] = "semantic.companion.reaction.abandonment",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Stay with me next time. We watch each other's backs.",
-                    ["id"] = "phrase.migrated.companion_reaction_abandonment.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompanionReactionAbandonmentNeutral01",
+                    ["id"] = "phrase.semantic.companion.reaction.abandonment.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompanionReactionAbandonmentNeutral01",
                 },
             },
         },
     },
     ["semantic.companion.reaction.camp_rejected"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPANION_REACTION_CAMP_REJECTED",
+        ["canonicalConcept"] = "SEMANTIC_COMPANION_REACTION_CAMP_REJECTED",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.companion_reaction_camp_rejected",
+        ["id"] = "phrase.semantic.companion.reaction.camp_rejected",
         ["semanticTemplateID"] = "semantic.companion.reaction.camp_rejected",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I can't find a safe room or campfire nearby.",
-                    ["id"] = "phrase.migrated.companion_reaction_camp_rejected.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompanionReactionCampRejectedNeutral01",
+                    ["id"] = "phrase.semantic.companion.reaction.camp_rejected.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompanionReactionCampRejectedNeutral01",
                 },
             },
         },
     },
     ["semantic.companion.reaction.default"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPANION_REACTION_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_COMPANION_REACTION_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.companion_reaction_default",
+        ["id"] = "phrase.semantic.companion.reaction.default",
         ["semanticTemplateID"] = "semantic.companion.reaction.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I heard you. We will handle it together.",
-                    ["id"] = "phrase.migrated.companion_reaction_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompanionReactionDefaultNeutral01",
+                    ["id"] = "phrase.semantic.companion.reaction.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompanionReactionDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.bandits.hooman_hurt.colonist"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_BANDITS_HOOMAN_HURT_COLONIST",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_BANDITS_HOOMAN_HURT_COLONIST",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_bandits_hooman_hurt_colonist",
+        ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.colonist",
         ["semanticTemplateID"] = "semantic.compat.bandits.hooman_hurt.colonist",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Bandit fire! Pull back and cover the wounded colonist.",
-                    ["id"] = "phrase.migrated.compat_bandits_hooman_hurt_colonist.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatBanditsHoomanHurtColonistNeutral01",
+                    ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.colonist.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatBanditsHoomanHurtColonistNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.bandits.hooman_hurt.default"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_BANDITS_HOOMAN_HURT_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_BANDITS_HOOMAN_HURT_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_bandits_hooman_hurt_default",
+        ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.default",
         ["semanticTemplateID"] = "semantic.compat.bandits.hooman_hurt.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Bandit fire! Stay with the wounded survivor and watch the flank.",
-                    ["id"] = "phrase.migrated.compat_bandits_hooman_hurt_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatBanditsHoomanHurtDefaultNeutral01",
+                    ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatBanditsHoomanHurtDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.bandits.hooman_hurt.family"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_BANDITS_HOOMAN_HURT_FAMILY",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_BANDITS_HOOMAN_HURT_FAMILY",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_bandits_hooman_hurt_family",
+        ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.family",
         ["semanticTemplateID"] = "semantic.compat.bandits.hooman_hurt.family",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Bandit fire! Stay together and cover the wounded family member.",
-                    ["id"] = "phrase.migrated.compat_bandits_hooman_hurt_family.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatBanditsHoomanHurtFamilyNeutral01",
+                    ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.family.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatBanditsHoomanHurtFamilyNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.bandits.hooman_hurt.lover"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_BANDITS_HOOMAN_HURT_LOVER",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_BANDITS_HOOMAN_HURT_LOVER",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_bandits_hooman_hurt_lover",
+        ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.lover",
         ["semanticTemplateID"] = "semantic.compat.bandits.hooman_hurt.lover",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Bandit fire. Stay close; I have got you.",
-                    ["id"] = "phrase.migrated.compat_bandits_hooman_hurt_lover.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatBanditsHoomanHurtLoverNeutral01",
+                    ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.lover.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatBanditsHoomanHurtLoverNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.companion_dogs.feed.female"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_COMPANION_DOGS_FEED_FEMALE",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_COMPANION_DOGS_FEED_FEMALE",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_companion_dogs_feed_female",
+        ["id"] = "phrase.semantic.compat.companion_dogs.feed.female",
         ["semanticTemplateID"] = "semantic.compat.companion_dogs.feed.female",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Here you go, good girl.",
-                    ["id"] = "phrase.migrated.compat_companion_dogs_feed_female.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatCompanionDogsFeedFemaleNeutral01",
+                    ["id"] = "phrase.semantic.compat.companion_dogs.feed.female.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsFeedFemaleNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.companion_dogs.feed.male"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_COMPANION_DOGS_FEED_MALE",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_COMPANION_DOGS_FEED_MALE",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_companion_dogs_feed_male",
+        ["id"] = "phrase.semantic.compat.companion_dogs.feed.male",
         ["semanticTemplateID"] = "semantic.compat.companion_dogs.feed.male",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Here you go, good boy.",
-                    ["id"] = "phrase.migrated.compat_companion_dogs_feed_male.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatCompanionDogsFeedMaleNeutral01",
+                    ["id"] = "phrase.semantic.compat.companion_dogs.feed.male.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsFeedMaleNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.companion_dogs.feed.unknown"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_COMPANION_DOGS_FEED_UNKNOWN",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_COMPANION_DOGS_FEED_UNKNOWN",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_companion_dogs_feed_unknown",
+        ["id"] = "phrase.semantic.compat.companion_dogs.feed.unknown",
         ["semanticTemplateID"] = "semantic.compat.companion_dogs.feed.unknown",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Here you go, good dog.",
-                    ["id"] = "phrase.migrated.compat_companion_dogs_feed_unknown.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatCompanionDogsFeedUnknownNeutral01",
+                    ["id"] = "phrase.semantic.compat.companion_dogs.feed.unknown.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsFeedUnknownNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.companion_dogs.greeting.female"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_COMPANION_DOGS_GREETING_FEMALE",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_COMPANION_DOGS_GREETING_FEMALE",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_companion_dogs_greeting_female",
+        ["id"] = "phrase.semantic.compat.companion_dogs.greeting.female",
         ["semanticTemplateID"] = "semantic.compat.companion_dogs.greeting.female",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Who is a good girl?",
-                    ["id"] = "phrase.migrated.compat_companion_dogs_greeting_female.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatCompanionDogsGreetingFemaleNeutral01",
+                    ["id"] = "phrase.semantic.compat.companion_dogs.greeting.female.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsGreetingFemaleNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.companion_dogs.greeting.male"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_COMPANION_DOGS_GREETING_MALE",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_COMPANION_DOGS_GREETING_MALE",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_companion_dogs_greeting_male",
+        ["id"] = "phrase.semantic.compat.companion_dogs.greeting.male",
         ["semanticTemplateID"] = "semantic.compat.companion_dogs.greeting.male",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Who is a good boy?",
-                    ["id"] = "phrase.migrated.compat_companion_dogs_greeting_male.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatCompanionDogsGreetingMaleNeutral01",
+                    ["id"] = "phrase.semantic.compat.companion_dogs.greeting.male.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsGreetingMaleNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.companion_dogs.greeting.unknown"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_COMPANION_DOGS_GREETING_UNKNOWN",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_COMPANION_DOGS_GREETING_UNKNOWN",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_companion_dogs_greeting_unknown",
+        ["id"] = "phrase.semantic.compat.companion_dogs.greeting.unknown",
         ["semanticTemplateID"] = "semantic.compat.companion_dogs.greeting.unknown",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Who is a good dog?",
-                    ["id"] = "phrase.migrated.compat_companion_dogs_greeting_unknown.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatCompanionDogsGreetingUnknownNeutral01",
+                    ["id"] = "phrase.semantic.compat.companion_dogs.greeting.unknown.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsGreetingUnknownNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.necroa.mask_warning.colonist"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_NECROA_MASK_WARNING_COLONIST",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_NECROA_MASK_WARNING_COLONIST",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_necroa_mask_warning_colonist",
+        ["id"] = "phrase.semantic.compat.necroa.mask_warning.colonist",
         ["semanticTemplateID"] = "semantic.compat.necroa.mask_warning.colonist",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Mask up. We keep the camp safe together.",
-                    ["id"] = "phrase.migrated.compat_necroa_mask_warning_colonist.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatNecroaMaskWarningColonistNeutral01",
+                    ["id"] = "phrase.semantic.compat.necroa.mask_warning.colonist.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaMaskWarningColonistNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.necroa.mask_warning.default"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_NECROA_MASK_WARNING_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_NECROA_MASK_WARNING_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_necroa_mask_warning_default",
+        ["id"] = "phrase.semantic.compat.necroa.mask_warning.default",
         ["semanticTemplateID"] = "semantic.compat.necroa.mask_warning.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Put your mask back on. Knox is airborne.",
-                    ["id"] = "phrase.migrated.compat_necroa_mask_warning_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatNecroaMaskWarningDefaultNeutral01",
+                    ["id"] = "phrase.semantic.compat.necroa.mask_warning.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaMaskWarningDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.necroa.mask_warning.family"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_NECROA_MASK_WARNING_FAMILY",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_NECROA_MASK_WARNING_FAMILY",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_necroa_mask_warning_family",
+        ["id"] = "phrase.semantic.compat.necroa.mask_warning.family",
         ["semanticTemplateID"] = "semantic.compat.necroa.mask_warning.family",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Put your mask on, family. I am not losing you to the air.",
-                    ["id"] = "phrase.migrated.compat_necroa_mask_warning_family.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatNecroaMaskWarningFamilyNeutral01",
+                    ["id"] = "phrase.semantic.compat.necroa.mask_warning.family.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaMaskWarningFamilyNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.necroa.player_mask_removed.default"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_NECROA_PLAYER_MASK_REMOVED_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_NECROA_PLAYER_MASK_REMOVED_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_necroa_player_mask_removed_default",
+        ["id"] = "phrase.semantic.compat.necroa.player_mask_removed.default",
         ["semanticTemplateID"] = "semantic.compat.necroa.player_mask_removed.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Put your mask back on. The air is not safe.",
-                    ["id"] = "phrase.migrated.compat_necroa_player_mask_removed_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatNecroaPlayerMaskRemovedDefaultNeutral01",
+                    ["id"] = "phrase.semantic.compat.necroa.player_mask_removed.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaPlayerMaskRemovedDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.necroa.player_mask_removed.hostile"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_NECROA_PLAYER_MASK_REMOVED_HOSTILE",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_NECROA_PLAYER_MASK_REMOVED_HOSTILE",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_necroa_player_mask_removed_hostile",
+        ["id"] = "phrase.semantic.compat.necroa.player_mask_removed.hostile",
         ["semanticTemplateID"] = "semantic.compat.necroa.player_mask_removed.hostile",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Put your mask back on before you become a problem.",
-                    ["id"] = "phrase.migrated.compat_necroa_player_mask_removed_hostile.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatNecroaPlayerMaskRemovedHostileNeutral01",
+                    ["id"] = "phrase.semantic.compat.necroa.player_mask_removed.hostile.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaPlayerMaskRemovedHostileNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.necroa.player_mask_removed.lover"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_NECROA_PLAYER_MASK_REMOVED_LOVER",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_NECROA_PLAYER_MASK_REMOVED_LOVER",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_necroa_player_mask_removed_lover",
+        ["id"] = "phrase.semantic.compat.necroa.player_mask_removed.lover",
         ["semanticTemplateID"] = "semantic.compat.necroa.player_mask_removed.lover",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Please put your mask back on, love. This air is not safe.",
-                    ["id"] = "phrase.migrated.compat_necroa_player_mask_removed_lover.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatNecroaPlayerMaskRemovedLoverNeutral01",
+                    ["id"] = "phrase.semantic.compat.necroa.player_mask_removed.lover.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaPlayerMaskRemovedLoverNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.projectalife.encounter.friendly"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_PROJECTALIFE_ENCOUNTER_FRIENDLY",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_PROJECTALIFE_ENCOUNTER_FRIENDLY",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_projectalife_encounter_friendly",
+        ["id"] = "phrase.semantic.compat.projectalife.encounter.friendly",
         ["semanticTemplateID"] = "semantic.compat.projectalife.encounter.friendly",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Those survivors seem friendly. Keep your hands visible.",
-                    ["id"] = "phrase.migrated.compat_projectalife_encounter_friendly.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatProjectalifeEncounterFriendlyNeutral01",
+                    ["id"] = "phrase.semantic.compat.projectalife.encounter.friendly.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeEncounterFriendlyNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.projectalife.encounter.hostile"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_PROJECTALIFE_ENCOUNTER_HOSTILE",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_PROJECTALIFE_ENCOUNTER_HOSTILE",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_projectalife_encounter_hostile",
+        ["id"] = "phrase.semantic.compat.projectalife.encounter.hostile",
         ["semanticTemplateID"] = "semantic.compat.projectalife.encounter.hostile",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That group looks hostile. Keep cover between us and them.",
-                    ["id"] = "phrase.migrated.compat_projectalife_encounter_hostile.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatProjectalifeEncounterHostileNeutral01",
+                    ["id"] = "phrase.semantic.compat.projectalife.encounter.hostile.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeEncounterHostileNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.projectalife.encounter.unknown"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_PROJECTALIFE_ENCOUNTER_UNKNOWN",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_PROJECTALIFE_ENCOUNTER_UNKNOWN",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_projectalife_encounter_unknown",
+        ["id"] = "phrase.semantic.compat.projectalife.encounter.unknown",
         ["semanticTemplateID"] = "semantic.compat.projectalife.encounter.unknown",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Someone is out there. Let us watch before we approach.",
-                    ["id"] = "phrase.migrated.compat_projectalife_encounter_unknown.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatProjectalifeEncounterUnknownNeutral01",
+                    ["id"] = "phrase.semantic.compat.projectalife.encounter.unknown.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeEncounterUnknownNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.projectalife.faction.hostile"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_PROJECTALIFE_FACTION_HOSTILE",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_PROJECTALIFE_FACTION_HOSTILE",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_projectalife_faction_hostile",
+        ["id"] = "phrase.semantic.compat.projectalife.faction.hostile",
         ["semanticTemplateID"] = "semantic.compat.projectalife.faction.hostile",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That faction may be hostile toward us now. Stay alert.",
-                    ["id"] = "phrase.migrated.compat_projectalife_faction_hostile.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatProjectalifeFactionHostileNeutral01",
+                    ["id"] = "phrase.semantic.compat.projectalife.faction.hostile.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeFactionHostileNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.projectalife.faction.incoming"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_PROJECTALIFE_FACTION_INCOMING",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_PROJECTALIFE_FACTION_INCOMING",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_projectalife_faction_incoming",
+        ["id"] = "phrase.semantic.compat.projectalife.faction.incoming",
         ["semanticTemplateID"] = "semantic.compat.projectalife.faction.incoming",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "They just opened fire on us. Stay close.",
-                    ["id"] = "phrase.migrated.compat_projectalife_faction_incoming.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatProjectalifeFactionIncomingNeutral01",
+                    ["id"] = "phrase.semantic.compat.projectalife.faction.incoming.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeFactionIncomingNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.projectalife.faction.outgoing"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_PROJECTALIFE_FACTION_OUTGOING",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_PROJECTALIFE_FACTION_OUTGOING",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_projectalife_faction_outgoing",
+        ["id"] = "phrase.semantic.compat.projectalife.faction.outgoing",
         ["semanticTemplateID"] = "semantic.compat.projectalife.faction.outgoing",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "We hit them. They may retaliate soon.",
-                    ["id"] = "phrase.migrated.compat_projectalife_faction_outgoing.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatProjectalifeFactionOutgoingNeutral01",
+                    ["id"] = "phrase.semantic.compat.projectalife.faction.outgoing.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeFactionOutgoingNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.projectalife.meta.aircraft.heli"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_PROJECTALIFE_META_AIRCRAFT_HELI",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_PROJECTALIFE_META_AIRCRAFT_HELI",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_projectalife_meta_aircraft_heli",
+        ["id"] = "phrase.semantic.compat.projectalife.meta.aircraft.heli",
         ["semanticTemplateID"] = "semantic.compat.projectalife.meta.aircraft.heli",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Something is flying over us. Keep listening.",
-                    ["id"] = "phrase.migrated.compat_projectalife_meta_aircraft_heli.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatProjectalifeMetaAircraftHeliNeutral01",
+                    ["id"] = "phrase.semantic.compat.projectalife.meta.aircraft.heli.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeMetaAircraftHeliNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.projectalife.meta.aircraft.military"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_PROJECTALIFE_META_AIRCRAFT_MILITARY",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_PROJECTALIFE_META_AIRCRAFT_MILITARY",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_projectalife_meta_aircraft_military",
+        ["id"] = "phrase.semantic.compat.projectalife.meta.aircraft.military",
         ["semanticTemplateID"] = "semantic.compat.projectalife.meta.aircraft.military",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That aircraft sounds close. Stay sharp.",
-                    ["id"] = "phrase.migrated.compat_projectalife_meta_aircraft_military.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatProjectalifeMetaAircraftMilitaryNeutral01",
+                    ["id"] = "phrase.semantic.compat.projectalife.meta.aircraft.military.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeMetaAircraftMilitaryNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.projectalife.meta.ambience"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_PROJECTALIFE_META_AMBIENCE",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_PROJECTALIFE_META_AMBIENCE",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_projectalife_meta_ambience",
+        ["id"] = "phrase.semantic.compat.projectalife.meta.ambience",
         ["semanticTemplateID"] = "semantic.compat.projectalife.meta.ambience",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I do not like that sound. Stay close.",
-                    ["id"] = "phrase.migrated.compat_projectalife_meta_ambience.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatProjectalifeMetaAmbienceNeutral01",
+                    ["id"] = "phrase.semantic.compat.projectalife.meta.ambience.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeMetaAmbienceNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.projectalife.meta.crash"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_PROJECTALIFE_META_CRASH",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_PROJECTALIFE_META_CRASH",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_projectalife_meta_crash",
+        ["id"] = "phrase.semantic.compat.projectalife.meta.crash",
         ["semanticTemplateID"] = "semantic.compat.projectalife.meta.crash",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That crash sounded close. Keep your eyes open.",
-                    ["id"] = "phrase.migrated.compat_projectalife_meta_crash.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatProjectalifeMetaCrashNeutral01",
+                    ["id"] = "phrase.semantic.compat.projectalife.meta.crash.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeMetaCrashNeutral01",
                 },
             },
         },
     },
     ["semantic.compat.projectalife.meta.gunfire"] = {
-        ["canonicalConcept"] = "MIGRATED_COMPAT_PROJECTALIFE_META_GUNFIRE",
+        ["canonicalConcept"] = "SEMANTIC_COMPAT_PROJECTALIFE_META_GUNFIRE",
         ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
-        ["id"] = "phrase.migrated.compat_projectalife_meta_gunfire",
+        ["id"] = "phrase.semantic.compat.projectalife.meta.gunfire",
         ["semanticTemplateID"] = "semantic.compat.projectalife.meta.gunfire",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Someone is shooting nearby. Keep your head down.",
-                    ["id"] = "phrase.migrated.compat_projectalife_meta_gunfire.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CompatProjectalifeMetaGunfireNeutral01",
+                    ["id"] = "phrase.semantic.compat.projectalife.meta.gunfire.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeMetaGunfireNeutral01",
                 },
             },
         },
     },
     ["semantic.conversation.safety.danger"] = {
-        ["canonicalConcept"] = "MIGRATED_CONVERSATION_SAFETY_DANGER",
+        ["canonicalConcept"] = "SEMANTIC_CONVERSATION_SAFETY_DANGER",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.conversation_safety_danger",
+        ["id"] = "phrase.semantic.conversation.safety.danger",
         ["semanticTemplateID"] = "semantic.conversation.safety.danger",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Watch out. We need to move now.",
-                    ["id"] = "phrase.migrated.conversation_safety_danger.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ConversationSafetyDangerNeutral01",
+                    ["id"] = "phrase.semantic.conversation.safety.danger.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationSafetyDangerNeutral01",
                 },
             },
         },
     },
     ["semantic.conversation.safety.default"] = {
-        ["canonicalConcept"] = "MIGRATED_CONVERSATION_SAFETY_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_CONVERSATION_SAFETY_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.conversation_safety_default",
+        ["id"] = "phrase.semantic.conversation.safety.default",
         ["semanticTemplateID"] = "semantic.conversation.safety.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Stay alert.",
-                    ["id"] = "phrase.migrated.conversation_safety_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ConversationSafetyDefaultNeutral01",
+                    ["id"] = "phrase.semantic.conversation.safety.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationSafetyDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.corpse.reaction.default"] = {
-        ["canonicalConcept"] = "MIGRATED_CORPSE_REACTION_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_CORPSE_REACTION_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.corpse_reaction_default",
+        ["id"] = "phrase.semantic.corpse.reaction.default",
         ["semanticTemplateID"] = "semantic.corpse.reaction.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Someone died here. We should remember that.",
-                    ["id"] = "phrase.migrated.corpse_reaction_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CorpseReactionDefaultNeutral01",
+                    ["id"] = "phrase.semantic.corpse.reaction.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCorpseReactionDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.corpse.reaction.revenge"] = {
-        ["canonicalConcept"] = "MIGRATED_CORPSE_REACTION_REVENGE",
+        ["canonicalConcept"] = "SEMANTIC_CORPSE_REACTION_REVENGE",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.corpse_reaction_revenge",
+        ["id"] = "phrase.semantic.corpse.reaction.revenge",
         ["semanticTemplateID"] = "semantic.corpse.reaction.revenge",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Someone is going to answer for this.",
-                    ["id"] = "phrase.migrated.corpse_reaction_revenge.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_CorpseReactionRevengeNeutral01",
+                    ["id"] = "phrase.semantic.corpse.reaction.revenge.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCorpseReactionRevengeNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.emote.player.clap"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_PLAYER_CLAP",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.player.clap",
+        ["semanticTemplateID"] = "semantic.emote.player.clap",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Well done, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.clap.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerClapNeutral01",
+                },
+                {
+                    ["fallback"] = "That's worth celebrating, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.clap.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerClapNeutral02",
+                },
+                {
+                    ["fallback"] = "Nice work, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.clap.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerClapNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.emote.player.insult"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_PLAYER_INSULT",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.player.insult",
+        ["semanticTemplateID"] = "semantic.emote.player.insult",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Back off, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.insult.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerInsultNeutral01",
+                },
+                {
+                    ["fallback"] = "You're asking for trouble, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.insult.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerInsultNeutral02",
+                },
+                {
+                    ["fallback"] = "Keep your distance, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.insult.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerInsultNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.emote.player.salute"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_PLAYER_SALUTE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.player.salute",
+        ["semanticTemplateID"] = "semantic.emote.player.salute",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Respect, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.salute.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerSaluteNeutral01",
+                },
+                {
+                    ["fallback"] = "I see you, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.salute.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerSaluteNeutral02",
+                },
+                {
+                    ["fallback"] = "Stay sharp, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.salute.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerSaluteNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.emote.player.thankyou"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_PLAYER_THANKYOU",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.player.thankyou",
+        ["semanticTemplateID"] = "semantic.emote.player.thankyou",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Thanks, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.thankyou.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerThankyouNeutral01",
+                },
+                {
+                    ["fallback"] = "I appreciate that, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.thankyou.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerThankyouNeutral02",
+                },
+                {
+                    ["fallback"] = "You have my thanks, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.thankyou.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerThankyouNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.emote.player.thumbsdown"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_PLAYER_THUMBSDOWN",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.player.thumbsdown",
+        ["semanticTemplateID"] = "semantic.emote.player.thumbsdown",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "No. That's not good enough, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.thumbsdown.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerThumbsdownNeutral01",
+                },
+                {
+                    ["fallback"] = "I don't like that, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.thumbsdown.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerThumbsdownNeutral02",
+                },
+                {
+                    ["fallback"] = "Try again, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.thumbsdown.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerThumbsdownNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.emote.player.thumbsup"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_PLAYER_THUMBSUP",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.player.thumbsup",
+        ["semanticTemplateID"] = "semantic.emote.player.thumbsup",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Good work, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.thumbsup.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerThumbsupNeutral01",
+                },
+                {
+                    ["fallback"] = "That's what I like to see, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.thumbsup.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerThumbsupNeutral02",
+                },
+                {
+                    ["fallback"] = "Keep it up, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.thumbsup.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerThumbsupNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.emote.player.wavebye"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_PLAYER_WAVEBYE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.player.wavebye",
+        ["semanticTemplateID"] = "semantic.emote.player.wavebye",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Take care, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.wavebye.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerWavebyeNeutral01",
+                },
+                {
+                    ["fallback"] = "See you around, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.wavebye.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerWavebyeNeutral02",
+                },
+                {
+                    ["fallback"] = "Stay safe, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.wavebye.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerWavebyeNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.emote.player.wavehi"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_PLAYER_WAVEHI",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.player.wavehi",
+        ["semanticTemplateID"] = "semantic.emote.player.wavehi",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Hey, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.wavehi.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerWavehiNeutral01",
+                },
+                {
+                    ["fallback"] = "Good to see you, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.wavehi.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerWavehiNeutral02",
+                },
+                {
+                    ["fallback"] = "Morning, {names}.",
+                    ["id"] = "phrase.semantic.emote.player.wavehi.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmotePlayerWavehiNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.emote.reply.clap"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_REPLY_CLAP",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.reply.clap",
+        ["semanticTemplateID"] = "semantic.emote.reply.clap",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Thanks.",
+                    ["id"] = "phrase.semantic.emote.reply.clap.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyClapNeutral01",
+                },
+                {
+                    ["fallback"] = "It was a small win.",
+                    ["id"] = "phrase.semantic.emote.reply.clap.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyClapNeutral02",
+                },
+                {
+                    ["fallback"] = "Glad you were there.",
+                    ["id"] = "phrase.semantic.emote.reply.clap.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyClapNeutral03",
+                },
+                {
+                    ["fallback"] = "We did it together.",
+                    ["id"] = "phrase.semantic.emote.reply.clap.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyClapNeutral04",
+                },
+                {
+                    ["fallback"] = "You make a good audience.",
+                    ["id"] = "phrase.semantic.emote.reply.clap.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyClapNeutral05",
+                },
+                {
+                    ["fallback"] = "That means a lot, love.",
+                    ["id"] = "phrase.semantic.emote.reply.clap.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyClapNeutral06",
+                },
+            },
+            ["warm"] = {
+                {
+                    ["fallback"] = "You're too kind.",
+                    ["id"] = "phrase.semantic.emote.reply.clap.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyClapWarm01",
+                },
+                {
+                    ["fallback"] = "Nice to hear that from you.",
+                    ["id"] = "phrase.semantic.emote.reply.clap.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyClapWarm02",
+                },
+            },
+        },
+    },
+    ["semantic.emote.reply.default"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_REPLY_DEFAULT",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.reply.default",
+        ["semanticTemplateID"] = "semantic.emote.reply.default",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I hear you.",
+                    ["id"] = "phrase.semantic.emote.reply.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyDefaultNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.emote.reply.insult"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_REPLY_INSULT",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.reply.insult",
+        ["semanticTemplateID"] = "semantic.emote.reply.insult",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Keep it respectful.",
+                    ["id"] = "phrase.semantic.emote.reply.insult.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyInsultNeutral01",
+                },
+                {
+                    ["fallback"] = "Say that again and you'll regret it.",
+                    ["id"] = "phrase.semantic.emote.reply.insult.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyInsultNeutral02",
+                },
+                {
+                    ["fallback"] = "Careful. I'm not in the mood.",
+                    ["id"] = "phrase.semantic.emote.reply.insult.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyInsultNeutral03",
+                },
+                {
+                    ["fallback"] = "That's unnecessary.",
+                    ["id"] = "phrase.semantic.emote.reply.insult.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyInsultNeutral04",
+                },
+                {
+                    ["fallback"] = "We're on the same side. Cut it out.",
+                    ["id"] = "phrase.semantic.emote.reply.insult.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyInsultNeutral05",
+                },
+                {
+                    ["fallback"] = "Don't talk to me like that.",
+                    ["id"] = "phrase.semantic.emote.reply.insult.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyInsultNeutral06",
+                },
+            },
+            ["warm"] = {
+                {
+                    ["fallback"] = "You're lucky I know you.",
+                    ["id"] = "phrase.semantic.emote.reply.insult.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyInsultWarm01",
+                },
+                {
+                    ["fallback"] = "Watch your mouth.",
+                    ["id"] = "phrase.semantic.emote.reply.insult.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyInsultWarm02",
+                },
+            },
+        },
+    },
+    ["semantic.emote.reply.salute"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_REPLY_SALUTE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.reply.salute",
+        ["semanticTemplateID"] = "semantic.emote.reply.salute",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Stay sharp.",
+                    ["id"] = "phrase.semantic.emote.reply.salute.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplySaluteNeutral01",
+                },
+                {
+                    ["fallback"] = "Acknowledged.",
+                    ["id"] = "phrase.semantic.emote.reply.salute.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplySaluteNeutral02",
+                },
+                {
+                    ["fallback"] = "Stay sharp, survivor.",
+                    ["id"] = "phrase.semantic.emote.reply.salute.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplySaluteNeutral03",
+                },
+                {
+                    ["fallback"] = "Right back at you.",
+                    ["id"] = "phrase.semantic.emote.reply.salute.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplySaluteNeutral04",
+                },
+                {
+                    ["fallback"] = "Don't salute me.",
+                    ["id"] = "phrase.semantic.emote.reply.salute.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplySaluteNeutral05",
+                },
+                {
+                    ["fallback"] = "Stay sharp and stay away.",
+                    ["id"] = "phrase.semantic.emote.reply.salute.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplySaluteNeutral06",
+                },
+            },
+            ["warm"] = {
+                {
+                    ["fallback"] = "Always, love.",
+                    ["id"] = "phrase.semantic.emote.reply.salute.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplySaluteWarm01",
+                },
+                {
+                    ["fallback"] = "Stay safe for me.",
+                    ["id"] = "phrase.semantic.emote.reply.salute.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplySaluteWarm02",
+                },
+                {
+                    ["fallback"] = "Take care.",
+                    ["id"] = "phrase.semantic.emote.reply.salute.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplySaluteWarm03",
+                },
+            },
+        },
+    },
+    ["semantic.emote.reply.thankyou"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_REPLY_THANKYOU",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.reply.thankyou",
+        ["semanticTemplateID"] = "semantic.emote.reply.thankyou",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "You're welcome.",
+                    ["id"] = "phrase.semantic.emote.reply.thankyou.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThankyouNeutral01",
+                },
+                {
+                    ["fallback"] = "No trouble.",
+                    ["id"] = "phrase.semantic.emote.reply.thankyou.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThankyouNeutral02",
+                },
+                {
+                    ["fallback"] = "Anytime.",
+                    ["id"] = "phrase.semantic.emote.reply.thankyou.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThankyouNeutral03",
+                },
+                {
+                    ["fallback"] = "You don't have to thank me.",
+                    ["id"] = "phrase.semantic.emote.reply.thankyou.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThankyouNeutral04",
+                },
+                {
+                    ["fallback"] = "Don't mistake this for friendship.",
+                    ["id"] = "phrase.semantic.emote.reply.thankyou.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThankyouNeutral05",
+                },
+                {
+                    ["fallback"] = "Fine. It was nothing.",
+                    ["id"] = "phrase.semantic.emote.reply.thankyou.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThankyouNeutral06",
+                },
+            },
+            ["warm"] = {
+                {
+                    ["fallback"] = "Anytime. We look after our own.",
+                    ["id"] = "phrase.semantic.emote.reply.thankyou.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThankyouWarm01",
+                },
+                {
+                    ["fallback"] = "That's what we're here for.",
+                    ["id"] = "phrase.semantic.emote.reply.thankyou.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThankyouWarm02",
+                },
+                {
+                    ["fallback"] = "Always, love.",
+                    ["id"] = "phrase.semantic.emote.reply.thankyou.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThankyouWarm03",
+                },
+                {
+                    ["fallback"] = "Anything for you.",
+                    ["id"] = "phrase.semantic.emote.reply.thankyou.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThankyouWarm04",
+                },
+                {
+                    ["fallback"] = "Of course.",
+                    ["id"] = "phrase.semantic.emote.reply.thankyou.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThankyouWarm05",
+                },
+            },
+        },
+    },
+    ["semantic.emote.reply.thumbsdown"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_REPLY_THUMBSDOWN",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.reply.thumbsdown",
+        ["semanticTemplateID"] = "semantic.emote.reply.thumbsdown",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I got the message. Tell me what's wrong.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsdown.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsdownNeutral01",
+                },
+                {
+                    ["fallback"] = "You could just say what's wrong.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsdown.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsdownNeutral02",
+                },
+                {
+                    ["fallback"] = "If you have a problem, tell me.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsdown.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsdownNeutral03",
+                },
+                {
+                    ["fallback"] = "We need to work together.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsdown.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsdownNeutral04",
+                },
+                {
+                    ["fallback"] = "Tell me what bothered you, love.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsdown.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsdownNeutral05",
+                },
+                {
+                    ["fallback"] = "I see the disapproval.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsdown.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsdownNeutral06",
+                },
+            },
+        },
+    },
+    ["semantic.emote.reply.thumbsup"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_REPLY_THUMBSUP",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.reply.thumbsup",
+        ["semanticTemplateID"] = "semantic.emote.reply.thumbsup",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Good.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsup.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsupNeutral01",
+                },
+                {
+                    ["fallback"] = "Let's hope it holds.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsup.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsupNeutral02",
+                },
+                {
+                    ["fallback"] = "Good work.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsup.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsupNeutral03",
+                },
+                {
+                    ["fallback"] = "That's how we get through this.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsup.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsupNeutral04",
+                },
+                {
+                    ["fallback"] = "That's my survivor.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsup.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsupNeutral05",
+                },
+                {
+                    ["fallback"] = "I knew you could do it.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsup.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsupNeutral06",
+                },
+            },
+            ["warm"] = {
+                {
+                    ["fallback"] = "That's the spirit.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsup.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsupWarm01",
+                },
+                {
+                    ["fallback"] = "Proud of you.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsup.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsupWarm02",
+                },
+            },
+        },
+    },
+    ["semantic.emote.reply.thumbsup.active"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_REPLY_THUMBSUP_ACTIVE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.reply.thumbsup.active",
+        ["semanticTemplateID"] = "semantic.emote.reply.thumbsup.active",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Good. Let's keep moving on this.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsup.active.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsupActiveNeutral01",
+                },
+                {
+                    ["fallback"] = "Good work.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsup.active.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsupActiveNeutral02",
+                },
+                {
+                    ["fallback"] = "Let's keep moving.",
+                    ["id"] = "phrase.semantic.emote.reply.thumbsup.active.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyThumbsupActiveNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.emote.reply.wavebye"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_REPLY_WAVEBYE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.reply.wavebye",
+        ["semanticTemplateID"] = "semantic.emote.reply.wavebye",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Take care.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeNeutral01",
+                },
+                {
+                    ["fallback"] = "Stay safe.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeNeutral02",
+                },
+                {
+                    ["fallback"] = "See you soon.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeNeutral03",
+                },
+                {
+                    ["fallback"] = "You too. Stay safe.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeNeutral04",
+                },
+                {
+                    ["fallback"] = "Keep walking.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeNeutral05",
+                },
+                {
+                    ["fallback"] = "Don't make this a conversation.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeNeutral06",
+                },
+            },
+            ["warm"] = {
+                {
+                    ["fallback"] = "Goodbye.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeWarm01",
+                },
+                {
+                    ["fallback"] = "Stay safe out there.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeWarm02",
+                },
+                {
+                    ["fallback"] = "See you at camp.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeWarm03",
+                },
+                {
+                    ["fallback"] = "Come back safe, love.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeWarm04",
+                },
+                {
+                    ["fallback"] = "I'll see you soon.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeWarm05",
+                },
+                {
+                    ["fallback"] = "Take care of yourself.",
+                    ["id"] = "phrase.semantic.emote.reply.wavebye.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavebyeWarm06",
+                },
+            },
+        },
+    },
+    ["semantic.emote.reply.wavehi"] = {
+        ["canonicalConcept"] = "SEMANTIC_EMOTE_REPLY_WAVEHI",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.emote.reply.wavehi",
+        ["semanticTemplateID"] = "semantic.emote.reply.wavehi",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Hey.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiNeutral01",
+                },
+                {
+                    ["fallback"] = "I see you.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiNeutral02",
+                },
+                {
+                    ["fallback"] = "Keep your distance.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiNeutral03",
+                },
+                {
+                    ["fallback"] = "I see you. Don't come closer.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiNeutral04",
+                },
+                {
+                    ["fallback"] = "Hello.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiNeutral05",
+                },
+                {
+                    ["fallback"] = "Morning.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiNeutral06",
+                },
+            },
+            ["terse"] = {
+                {
+                    ["fallback"] = "There you are.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.terse.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiTerse01",
+                },
+                {
+                    ["fallback"] = "Good to see you.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiTerse02",
+                },
+            },
+            ["warm"] = {
+                {
+                    ["fallback"] = "Hey again.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiWarm01",
+                },
+                {
+                    ["fallback"] = "There you are again.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiWarm02",
+                },
+                {
+                    ["fallback"] = "Morning, good to see you.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiWarm03",
+                },
+                {
+                    ["fallback"] = "Hey, we're all here.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiWarm04",
+                },
+                {
+                    ["fallback"] = "There you are, love.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiWarm05",
+                },
+                {
+                    ["fallback"] = "Good morning, sweetheart.",
+                    ["id"] = "phrase.semantic.emote.reply.wavehi.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticEmoteReplyWavehiWarm06",
                 },
             },
         },
     },
     ["semantic.flow.farewell.default"] = {
-        ["canonicalConcept"] = "MIGRATED_FLOW_FAREWELL_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_FLOW_FAREWELL_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.flow_farewell_default",
+        ["id"] = "phrase.semantic.flow.farewell.default",
         ["semanticTemplateID"] = "semantic.flow.farewell.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Take care.",
-                    ["id"] = "phrase.migrated.flow_farewell_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_FlowFarewellDefaultNeutral01",
+                    ["id"] = "phrase.semantic.flow.farewell.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowFarewellDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.flow.farewell.friendly"] = {
-        ["canonicalConcept"] = "MIGRATED_FLOW_FAREWELL_FRIENDLY",
+        ["canonicalConcept"] = "SEMANTIC_FLOW_FAREWELL_FRIENDLY",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.flow_farewell_friendly",
+        ["id"] = "phrase.semantic.flow.farewell.friendly",
         ["semanticTemplateID"] = "semantic.flow.farewell.friendly",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Take care. I will see you soon.",
-                    ["id"] = "phrase.migrated.flow_farewell_friendly.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_FlowFarewellFriendlyNeutral01",
+                    ["id"] = "phrase.semantic.flow.farewell.friendly.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowFarewellFriendlyNeutral01",
+                },
+            },
+        },
+    },
+    ["semantic.flow.greeting.followup.default"] = {
+        ["canonicalConcept"] = "SEMANTIC_FLOW_GREETING_FOLLOWUP_DEFAULT",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.flow.greeting.followup.default",
+        ["semanticTemplateID"] = "semantic.flow.greeting.followup.default",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "You're welcome. Take care.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupDefaultNeutral01",
+                },
+                {
+                    ["fallback"] = "No trouble. Stay safe.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.default.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupDefaultNeutral02",
+                },
+            },
+        },
+    },
+    ["semantic.flow.greeting.followup.friendly"] = {
+        ["canonicalConcept"] = "SEMANTIC_FLOW_GREETING_FOLLOWUP_FRIENDLY",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.flow.greeting.followup.friendly",
+        ["semanticTemplateID"] = "semantic.flow.greeting.followup.friendly",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "You're welcome. It's good to see you too.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.friendly.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupFriendlyNeutral01",
+                },
+                {
+                    ["fallback"] = "Anytime. Glad you're here.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.friendly.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupFriendlyNeutral02",
                 },
             },
         },
     },
     ["semantic.flow.greeting.opening.default"] = {
-        ["canonicalConcept"] = "GREETING_OPENING",
-        ["contentOwner"] = nil,
-        ["id"] = "phrase.greeting.opening.default",
+        ["canonicalConcept"] = "SEMANTIC_FLOW_GREETING_OPENING_DEFAULT",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.flow.greeting.opening.default",
         ["semanticTemplateID"] = "semantic.flow.greeting.opening.default",
         ["styles"] = {
             ["guarded"] = {
                 {
                     ["fallback"] = "State your business. Keep your distance.",
-                    ["id"] = "phrase.greeting.opening.default.guarded.01",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultGuarded01",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded01",
                 },
                 {
                     ["fallback"] = "Keep your distance.",
-                    ["id"] = "phrase.greeting.opening.default.guarded.02",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultGuarded02",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded02",
                 },
                 {
                     ["fallback"] = "State your business.",
-                    ["id"] = "phrase.greeting.opening.default.guarded.03",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultGuarded03",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded03",
                 },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "Hey there. Good to see you.",
-                    ["id"] = "phrase.greeting.opening.default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultNeutral01",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
                 },
                 {
                     ["fallback"] = "Hello there. Good to see you.",
-                    ["id"] = "phrase.greeting.opening.default.neutral.02",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultNeutral02",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral02",
                 },
                 {
                     ["fallback"] = "Good to see you.",
-                    ["id"] = "phrase.greeting.opening.default.neutral.03",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultNeutral03",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral03",
+                },
+                {
+                    ["fallback"] = "Morning.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral04",
+                },
+                {
+                    ["fallback"] = "Hey again.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral05",
+                },
+                {
+                    ["fallback"] = "There you are again.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral06",
                 },
             },
             ["terse"] = {
                 {
                     ["fallback"] = "Hello.",
-                    ["id"] = "phrase.greeting.opening.default.terse.01",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultTerse01",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse01",
                 },
                 {
                     ["fallback"] = "Hi.",
-                    ["id"] = "phrase.greeting.opening.default.terse.02",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultTerse02",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse02",
                 },
                 {
                     ["fallback"] = "Hey.",
-                    ["id"] = "phrase.greeting.opening.default.terse.03",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultTerse03",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse03",
+                },
+                {
+                    ["fallback"] = "Morning, sweetheart.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse04",
+                },
+                {
+                    ["fallback"] = "There you are.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse05",
+                },
+                {
+                    ["fallback"] = "Take care of yourself.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse06",
                 },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Hey! It is good to see you.",
-                    ["id"] = "phrase.greeting.opening.default.warm.01",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultWarm01",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm01",
                 },
                 {
                     ["fallback"] = "Hey, good to see you.",
-                    ["id"] = "phrase.greeting.opening.default.warm.02",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultWarm02",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm02",
                 },
                 {
                     ["fallback"] = "Glad to see you.",
-                    ["id"] = "phrase.greeting.opening.default.warm.03",
-                    ["key"] = "UI_PNC_Conversation_Content_GreetingOpeningDefaultWarm03",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm03",
+                },
+                {
+                    ["fallback"] = "Hey. Stay safe out there.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm04",
+                },
+                {
+                    ["fallback"] = "Back already?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm05",
+                },
+                {
+                    ["fallback"] = "Hey, love.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm06",
+                },
+            },
+        },
+    },
+    ["semantic.flow.greeting.opening.friendly"] = {
+        ["canonicalConcept"] = "SEMANTIC_FLOW_GREETING_OPENING_FRIENDLY",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.flow.greeting.opening.friendly",
+        ["semanticTemplateID"] = "semantic.flow.greeting.opening.friendly",
+        ["styles"] = {
+            ["guarded"] = {
+                {
+                    ["fallback"] = "Hey. Everything holding together?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded01",
+                },
+                {
+                    ["fallback"] = "Good timing. We could use you.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded02",
+                },
+                {
+                    ["fallback"] = "Hey again. Everything under control?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded03",
+                },
+                {
+                    ["fallback"] = "Back again? Stay safe.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded04",
+                },
+                {
+                    ["fallback"] = "Hey, love. How are you holding up?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded05",
+                },
+                {
+                    ["fallback"] = "Good to see you, sweetheart.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded06",
+                },
+            },
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Good to see you.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral01",
+                },
+                {
+                    ["fallback"] = "I was hoping we'd cross paths.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral02",
+                },
+                {
+                    ["fallback"] = "Good to see you. How's the camp holding?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral03",
+                },
+                {
+                    ["fallback"] = "There you are. Ready for another day?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral04",
+                },
+                {
+                    ["fallback"] = "Back again. How's the work going?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral05",
+                },
+                {
+                    ["fallback"] = "Good to see you again. Need anything?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral06",
+                },
+            },
+            ["terse"] = {
+                {
+                    ["fallback"] = "Back again? You holding up?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse01",
+                },
+                {
+                    ["fallback"] = "Good to see you again.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse02",
+                },
+                {
+                    ["fallback"] = "Hey. How have you been?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse03",
+                },
+                {
+                    ["fallback"] = "Didn't expect to see you.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse04",
+                },
+                {
+                    ["fallback"] = "Hey again. How's it going?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse05",
+                },
+                {
+                    ["fallback"] = "There you are again.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse06",
+                },
+            },
+            ["warm"] = {
+                {
+                    ["fallback"] = "There you are, love.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm01",
+                },
+                {
+                    ["fallback"] = "I was hoping I'd see you today.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm02",
+                },
+                {
+                    ["fallback"] = "Back so soon, love?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm03",
+                },
+                {
+                    ["fallback"] = "I was hoping you'd come back.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm04",
+                },
+                {
+                    ["fallback"] = "There you are. You doing alright?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm05",
+                },
+                {
+                    ["fallback"] = "Good to see you. Come here.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm06",
+                },
+            },
+        },
+    },
+    ["semantic.flow.greeting.opening.question.default"] = {
+        ["canonicalConcept"] = "SEMANTIC_FLOW_GREETING_OPENING_QUESTION_DEFAULT",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.flow.greeting.opening.question.default",
+        ["semanticTemplateID"] = "semantic.flow.greeting.opening.question.default",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "How have you been?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral01",
+                },
+                {
+                    ["fallback"] = "How are you holding up?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.default.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral02",
+                },
+                {
+                    ["fallback"] = "Everything all right?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.default.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.flow.greeting.opening.question.friendly"] = {
+        ["canonicalConcept"] = "SEMANTIC_FLOW_GREETING_OPENING_QUESTION_FRIENDLY",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly",
+        ["semanticTemplateID"] = "semantic.flow.greeting.opening.question.friendly",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "How have you been holding up?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral01",
+                },
+                {
+                    ["fallback"] = "How's the camp holding?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral02",
+                },
+                {
+                    ["fallback"] = "Need anything?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral03",
+                },
+            },
+        },
+    },
+    ["semantic.flow.greeting.opening.rain"] = {
+        ["canonicalConcept"] = "SEMANTIC_FLOW_GREETING_OPENING_RAIN",
+        ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+        ["id"] = "phrase.semantic.flow.greeting.opening.rain",
+        ["semanticTemplateID"] = "semantic.flow.greeting.opening.rain",
+        ["styles"] = {
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Hey there. Wet one today.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral01",
+                },
+                {
+                    ["fallback"] = "Rain's not letting up.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral02",
+                },
+                {
+                    ["fallback"] = "Keep dry if you can.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral03",
                 },
             },
         },
     },
     ["semantic.leader_loss.close"] = {
-        ["canonicalConcept"] = "MIGRATED_LEADER_LOSS_CLOSE",
+        ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_CLOSE",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.leader_loss_close",
+        ["id"] = "phrase.semantic.leader_loss.close",
         ["semanticTemplateID"] = "semantic.leader_loss.close",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "We lost someone close to us. We need to stay together.",
-                    ["id"] = "phrase.migrated.leader_loss_close.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_LeaderLossCloseNeutral01",
+                    ["id"] = "phrase.semantic.leader_loss.close.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticLeaderLossCloseNeutral01",
                 },
             },
         },
     },
     ["semantic.leader_loss.colonist"] = {
-        ["canonicalConcept"] = "MIGRATED_LEADER_LOSS_COLONIST",
+        ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_COLONIST",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.leader_loss_colonist",
+        ["id"] = "phrase.semantic.leader_loss.colonist",
         ["semanticTemplateID"] = "semantic.leader_loss.colonist",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Our leader is gone. We keep the group together.",
-                    ["id"] = "phrase.migrated.leader_loss_colonist.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_LeaderLossColonistNeutral01",
+                    ["id"] = "phrase.semantic.leader_loss.colonist.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticLeaderLossColonistNeutral01",
                 },
             },
         },
     },
     ["semantic.leader_loss.default"] = {
-        ["canonicalConcept"] = "MIGRATED_LEADER_LOSS_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.leader_loss_default",
+        ["id"] = "phrase.semantic.leader_loss.default",
         ["semanticTemplateID"] = "semantic.leader_loss.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "We lost our leader. We need to decide what comes next.",
-                    ["id"] = "phrase.migrated.leader_loss_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_LeaderLossDefaultNeutral01",
+                    ["id"] = "phrase.semantic.leader_loss.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticLeaderLossDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.leader_loss.devoted"] = {
-        ["canonicalConcept"] = "MIGRATED_LEADER_LOSS_DEVOTED",
+        ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_DEVOTED",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.leader_loss_devoted",
+        ["id"] = "phrase.semantic.leader_loss.devoted",
         ["semanticTemplateID"] = "semantic.leader_loss.devoted",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "We lost someone important. We need to stay together.",
-                    ["id"] = "phrase.migrated.leader_loss_devoted.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_LeaderLossDevotedNeutral01",
+                    ["id"] = "phrase.semantic.leader_loss.devoted.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticLeaderLossDevotedNeutral01",
                 },
             },
         },
     },
     ["semantic.leader_loss.dissent"] = {
-        ["canonicalConcept"] = "MIGRATED_LEADER_LOSS_DISSENT",
+        ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_DISSENT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.leader_loss_dissent",
+        ["id"] = "phrase.semantic.leader_loss.dissent",
         ["semanticTemplateID"] = "semantic.leader_loss.dissent",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "The old order is gone. What happens next is up to us.",
-                    ["id"] = "phrase.migrated.leader_loss_dissent.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_LeaderLossDissentNeutral01",
+                    ["id"] = "phrase.semantic.leader_loss.dissent.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticLeaderLossDissentNeutral01",
                 },
             },
         },
     },
     ["semantic.leader_loss.distant"] = {
-        ["canonicalConcept"] = "MIGRATED_LEADER_LOSS_DISTANT",
+        ["canonicalConcept"] = "SEMANTIC_LEADER_LOSS_DISTANT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.leader_loss_distant",
+        ["id"] = "phrase.semantic.leader_loss.distant",
         ["semanticTemplateID"] = "semantic.leader_loss.distant",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "The leader is gone. Someone needs to decide what comes next.",
-                    ["id"] = "phrase.migrated.leader_loss_distant.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_LeaderLossDistantNeutral01",
+                    ["id"] = "phrase.semantic.leader_loss.distant.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticLeaderLossDistantNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.call.bandage"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_CALL_BANDAGE",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_BANDAGE",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_call_bandage",
+        ["id"] = "phrase.semantic.medical.distress.call.bandage",
         ["semanticTemplateID"] = "semantic.medical.distress.call.bandage",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am hurt and down. Please patch me up.",
-                    ["id"] = "phrase.migrated.medical_distress_call_bandage.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressCallBandageNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.call.bandage.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBandageNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.call.bleedout"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_CALL_BLEEDOUT",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_BLEEDOUT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_call_bleedout",
+        ["id"] = "phrase.semantic.medical.distress.call.bleedout",
         ["semanticTemplateID"] = "semantic.medical.distress.call.bleedout",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am bleeding out. I need a bandage now.",
-                    ["id"] = "phrase.migrated.medical_distress_call_bleedout.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressCallBleedoutNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.call.bleedout.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBleedoutNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.call.default"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_CALL_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_call_default",
+        ["id"] = "phrase.semantic.medical.distress.call.default",
         ["semanticTemplateID"] = "semantic.medical.distress.call.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am down. I need help.",
-                    ["id"] = "phrase.migrated.medical_distress_call_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressCallDefaultNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.call.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.call.dehydration"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_CALL_DEHYDRATION",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_DEHYDRATION",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_call_dehydration",
+        ["id"] = "phrase.semantic.medical.distress.call.dehydration",
         ["semanticTemplateID"] = "semantic.medical.distress.call.dehydration",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am too weak to move. I need water.",
-                    ["id"] = "phrase.migrated.medical_distress_call_dehydration.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressCallDehydrationNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.call.dehydration.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDehydrationNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.call.exhaustion"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_CALL_EXHAUSTION",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_EXHAUSTION",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_call_exhaustion",
+        ["id"] = "phrase.semantic.medical.distress.call.exhaustion",
         ["semanticTemplateID"] = "semantic.medical.distress.call.exhaustion",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I pushed too far. I need a moment to recover.",
-                    ["id"] = "phrase.migrated.medical_distress_call_exhaustion.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressCallExhaustionNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.call.exhaustion.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallExhaustionNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.call.mercy"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_CALL_MERCY",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_MERCY",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_call_mercy",
+        ["id"] = "phrase.semantic.medical.distress.call.mercy",
         ["semanticTemplateID"] = "semantic.medical.distress.call.mercy",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am down. Please let me live.",
-                    ["id"] = "phrase.migrated.medical_distress_call_mercy.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressCallMercyNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.call.mercy.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallMercyNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.call.rescue"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_CALL_RESCUE",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_RESCUE",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_call_rescue",
+        ["id"] = "phrase.semantic.medical.distress.call.rescue",
         ["semanticTemplateID"] = "semantic.medical.distress.call.rescue",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I cannot move. I need help over here.",
-                    ["id"] = "phrase.migrated.medical_distress_call_rescue.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressCallRescueNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.call.rescue.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallRescueNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.call.starvation"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_CALL_STARVATION",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_CALL_STARVATION",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_call_starvation",
+        ["id"] = "phrase.semantic.medical.distress.call.starvation",
         ["semanticTemplateID"] = "semantic.medical.distress.call.starvation",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am too weak to move. I need food.",
-                    ["id"] = "phrase.migrated.medical_distress_call_starvation.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressCallStarvationNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.call.starvation.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallStarvationNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.default"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_default",
+        ["id"] = "phrase.semantic.medical.distress.default",
         ["semanticTemplateID"] = "semantic.medical.distress.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I need help with this wound.",
-                    ["id"] = "phrase.migrated.medical_distress_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressDefaultNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.mercy"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_MERCY",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_MERCY",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_mercy",
+        ["id"] = "phrase.semantic.medical.distress.mercy",
         ["semanticTemplateID"] = "semantic.medical.distress.mercy",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Please. I need help with this wound.",
-                    ["id"] = "phrase.migrated.medical_distress_mercy.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressMercyNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.mercy.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressMercyNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.repeat.bandage"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_REPEAT_BANDAGE",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_BANDAGE",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_repeat_bandage",
+        ["id"] = "phrase.semantic.medical.distress.repeat.bandage",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.bandage",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I still need these wounds patched.",
-                    ["id"] = "phrase.migrated.medical_distress_repeat_bandage.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressRepeatBandageNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bandage.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBandageNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.repeat.bleedout"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_REPEAT_BLEEDOUT",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_BLEEDOUT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_repeat_bleedout",
+        ["id"] = "phrase.semantic.medical.distress.repeat.bleedout",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.bleedout",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am still losing blood. Please help.",
-                    ["id"] = "phrase.migrated.medical_distress_repeat_bleedout.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressRepeatBleedoutNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bleedout.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBleedoutNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.repeat.default"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_REPEAT_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_repeat_default",
+        ["id"] = "phrase.semantic.medical.distress.repeat.default",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am not up yet. Please help me.",
-                    ["id"] = "phrase.migrated.medical_distress_repeat_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressRepeatDefaultNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.repeat.dehydration"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_REPEAT_DEHYDRATION",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_DEHYDRATION",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_repeat_dehydration",
+        ["id"] = "phrase.semantic.medical.distress.repeat.dehydration",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.dehydration",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I still need water to recover.",
-                    ["id"] = "phrase.migrated.medical_distress_repeat_dehydration.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressRepeatDehydrationNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.dehydration.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDehydrationNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.repeat.exhaustion"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_REPEAT_EXHAUSTION",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_EXHAUSTION",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_repeat_exhaustion",
+        ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.exhaustion",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I still need a little more time to recover.",
-                    ["id"] = "phrase.migrated.medical_distress_repeat_exhaustion.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressRepeatExhaustionNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatExhaustionNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.repeat.mercy"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_REPEAT_MERCY",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_MERCY",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_repeat_mercy",
+        ["id"] = "phrase.semantic.medical.distress.repeat.mercy",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.mercy",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am still asking you to spare me.",
-                    ["id"] = "phrase.migrated.medical_distress_repeat_mercy.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressRepeatMercyNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.mercy.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatMercyNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.repeat.rescue"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_REPEAT_RESCUE",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_RESCUE",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_repeat_rescue",
+        ["id"] = "phrase.semantic.medical.distress.repeat.rescue",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.rescue",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am still down here. Do not leave me.",
-                    ["id"] = "phrase.migrated.medical_distress_repeat_rescue.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressRepeatRescueNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.rescue.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatRescueNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.repeat.starvation"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_REPEAT_STARVATION",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_REPEAT_STARVATION",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_repeat_starvation",
+        ["id"] = "phrase.semantic.medical.distress.repeat.starvation",
         ["semanticTemplateID"] = "semantic.medical.distress.repeat.starvation",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I still need something to eat.",
-                    ["id"] = "phrase.migrated.medical_distress_repeat_starvation.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressRepeatStarvationNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.starvation.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatStarvationNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.teammate.default"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_TEAMMATE_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_TEAMMATE_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_teammate_default",
+        ["id"] = "phrase.semantic.medical.distress.teammate.default",
         ["semanticTemplateID"] = "semantic.medical.distress.teammate.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "They are hurt. Stay with them while I cover you.",
-                    ["id"] = "phrase.migrated.medical_distress_teammate_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressTeammateDefaultNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.teammate.found"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_TEAMMATE_FOUND",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_TEAMMATE_FOUND",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_teammate_found",
+        ["id"] = "phrase.semantic.medical.distress.teammate.found",
         ["semanticTemplateID"] = "semantic.medical.distress.teammate.found",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I found a bandage for them. Hold still while I patch them up.",
-                    ["id"] = "phrase.migrated.medical_distress_teammate_found.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressTeammateFoundNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.found.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateFoundNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.teammate.missing"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_TEAMMATE_MISSING",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_TEAMMATE_MISSING",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_teammate_missing",
+        ["id"] = "phrase.semantic.medical.distress.teammate.missing",
         ["semanticTemplateID"] = "semantic.medical.distress.teammate.missing",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am out of bandages. Can someone spare one for them?",
-                    ["id"] = "phrase.migrated.medical_distress_teammate_missing.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressTeammateMissingNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.missing.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateMissingNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.treatment.bandage"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_TREATMENT_BANDAGE",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_TREATMENT_BANDAGE",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_treatment_bandage",
+        ["id"] = "phrase.semantic.medical.distress.treatment.bandage",
         ["semanticTemplateID"] = "semantic.medical.distress.treatment.bandage",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "The wound is treated. I can move when you are ready.",
-                    ["id"] = "phrase.migrated.medical_distress_treatment_bandage.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressTreatmentBandageNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.bandage.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentBandageNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.treatment.default"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_TREATMENT_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_TREATMENT_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_treatment_default",
+        ["id"] = "phrase.semantic.medical.distress.treatment.default",
         ["semanticTemplateID"] = "semantic.medical.distress.treatment.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Thank you. That treatment helped.",
-                    ["id"] = "phrase.migrated.medical_distress_treatment_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressTreatmentDefaultNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.update.bandage"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_UPDATE_BANDAGE",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_BANDAGE",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_update_bandage",
+        ["id"] = "phrase.semantic.medical.distress.update.bandage",
         ["semanticTemplateID"] = "semantic.medical.distress.update.bandage",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am still down and waiting for a patch.",
-                    ["id"] = "phrase.migrated.medical_distress_update_bandage.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressUpdateBandageNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.update.bandage.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBandageNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.update.bleedout"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_UPDATE_BLEEDOUT",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_BLEEDOUT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_update_bleedout",
+        ["id"] = "phrase.semantic.medical.distress.update.bleedout",
         ["semanticTemplateID"] = "semantic.medical.distress.update.bleedout",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "The bleeding has not stopped. I still need a bandage.",
-                    ["id"] = "phrase.migrated.medical_distress_update_bleedout.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressUpdateBleedoutNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.update.bleedout.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBleedoutNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.update.default"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_UPDATE_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_update_default",
+        ["id"] = "phrase.semantic.medical.distress.update.default",
         ["semanticTemplateID"] = "semantic.medical.distress.update.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am still down. I still need help.",
-                    ["id"] = "phrase.migrated.medical_distress_update_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressUpdateDefaultNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.update.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.update.dehydration"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_UPDATE_DEHYDRATION",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_DEHYDRATION",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_update_dehydration",
+        ["id"] = "phrase.semantic.medical.distress.update.dehydration",
         ["semanticTemplateID"] = "semantic.medical.distress.update.dehydration",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I still need water before I can move.",
-                    ["id"] = "phrase.migrated.medical_distress_update_dehydration.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressUpdateDehydrationNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.update.dehydration.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDehydrationNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.update.exhaustion"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_UPDATE_EXHAUSTION",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_EXHAUSTION",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_update_exhaustion",
+        ["id"] = "phrase.semantic.medical.distress.update.exhaustion",
         ["semanticTemplateID"] = "semantic.medical.distress.update.exhaustion",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I still need time to recover my strength.",
-                    ["id"] = "phrase.migrated.medical_distress_update_exhaustion.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressUpdateExhaustionNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.update.exhaustion.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateExhaustionNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.update.mercy"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_UPDATE_MERCY",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_MERCY",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_update_mercy",
+        ["id"] = "phrase.semantic.medical.distress.update.mercy",
         ["semanticTemplateID"] = "semantic.medical.distress.update.mercy",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am still down. Please do not finish me.",
-                    ["id"] = "phrase.migrated.medical_distress_update_mercy.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressUpdateMercyNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.update.mercy.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateMercyNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.update.rescue"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_UPDATE_RESCUE",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_RESCUE",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_update_rescue",
+        ["id"] = "phrase.semantic.medical.distress.update.rescue",
         ["semanticTemplateID"] = "semantic.medical.distress.update.rescue",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am still here. Please come back for me.",
-                    ["id"] = "phrase.migrated.medical_distress_update_rescue.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressUpdateRescueNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.update.rescue.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.update.starvation"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_UPDATE_STARVATION",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_UPDATE_STARVATION",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_update_starvation",
+        ["id"] = "phrase.semantic.medical.distress.update.starvation",
         ["semanticTemplateID"] = "semantic.medical.distress.update.starvation",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I still need food before I can get up.",
-                    ["id"] = "phrase.migrated.medical_distress_update_starvation.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressUpdateStarvationNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.update.starvation.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral01",
                 },
             },
         },
     },
     ["semantic.medical.distress.urgent"] = {
-        ["canonicalConcept"] = "MIGRATED_MEDICAL_DISTRESS_URGENT",
+        ["canonicalConcept"] = "SEMANTIC_MEDICAL_DISTRESS_URGENT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.medical_distress_urgent",
+        ["id"] = "phrase.semantic.medical.distress.urgent",
         ["semanticTemplateID"] = "semantic.medical.distress.urgent",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am hurt. I need help now.",
-                    ["id"] = "phrase.migrated.medical_distress_urgent.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_MedicalDistressUrgentNeutral01",
+                    ["id"] = "phrase.semantic.medical.distress.urgent.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral01",
                 },
             },
         },
     },
     ["semantic.social.reaction.default"] = {
-        ["canonicalConcept"] = "MIGRATED_SOCIAL_REACTION_DEFAULT",
+        ["canonicalConcept"] = "SEMANTIC_SOCIAL_REACTION_DEFAULT",
         ["contentOwner"] = "projecthoomans.dialogue_content.migrated_events",
-        ["id"] = "phrase.migrated.social_reaction_default",
+        ["id"] = "phrase.semantic.social.reaction.default",
         ["semanticTemplateID"] = "semantic.social.reaction.default",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I hear you.",
-                    ["id"] = "phrase.migrated.social_reaction_default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_SocialReactionDefaultNeutral01",
+                    ["id"] = "phrase.semantic.social.reaction.default.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialReactionDefaultNeutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.accepted_generic.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ACCEPTED_GENERIC_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ACCEPTED_GENERIC_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_accepted_generic_1",
+        ["id"] = "phrase.semantic.tool_reply.accepted_generic.1",
         ["semanticTemplateID"] = "semantic.tool_reply.accepted_generic.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I hear you.",
-                    ["id"] = "phrase.migrated.tool_reply_accepted_generic_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAcceptedGeneric1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.accepted_generic.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ACCEPTED_GENERIC_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ACCEPTED_GENERIC_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_accepted_generic_2",
+        ["id"] = "phrase.semantic.tool_reply.accepted_generic.2",
         ["semanticTemplateID"] = "semantic.tool_reply.accepted_generic.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I will keep that in mind.",
-                    ["id"] = "phrase.migrated.tool_reply_accepted_generic_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAcceptedGeneric2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.admire.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ADMIRE_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ADMIRE_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_admire_1",
+        ["id"] = "phrase.semantic.tool_reply.admire.1",
         ["semanticTemplateID"] = "semantic.tool_reply.admire.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I appreciate that more than you know.",
-                    ["id"] = "phrase.migrated.tool_reply_admire_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAdmire1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.admire.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAdmire1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.admire.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ADMIRE_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ADMIRE_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_admire_2",
+        ["id"] = "phrase.semantic.tool_reply.admire.2",
         ["semanticTemplateID"] = "semantic.tool_reply.admire.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That is kind of you to say.",
-                    ["id"] = "phrase.migrated.tool_reply_admire_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAdmire2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.admire.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAdmire2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.admire.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ADMIRE_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ADMIRE_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_admire_3",
+        ["id"] = "phrase.semantic.tool_reply.admire.3",
         ["semanticTemplateID"] = "semantic.tool_reply.admire.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You see more in me than most people do.",
-                    ["id"] = "phrase.migrated.tool_reply_admire_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAdmire3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.admire.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAdmire3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.apology.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_APOLOGY_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_APOLOGY_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_apology_1",
+        ["id"] = "phrase.semantic.tool_reply.apology.1",
         ["semanticTemplateID"] = "semantic.tool_reply.apology.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "All right. Let us move on.",
-                    ["id"] = "phrase.migrated.tool_reply_apology_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyApology1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.apology.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyApology1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.apology.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_APOLOGY_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_APOLOGY_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_apology_2",
+        ["id"] = "phrase.semantic.tool_reply.apology.2",
         ["semanticTemplateID"] = "semantic.tool_reply.apology.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I accept the apology.",
-                    ["id"] = "phrase.migrated.tool_reply_apology_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyApology2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.apology.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyApology2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.apology.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_APOLOGY_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_APOLOGY_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_apology_3",
+        ["id"] = "phrase.semantic.tool_reply.apology.3",
         ["semanticTemplateID"] = "semantic.tool_reply.apology.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Fine. We can put it behind us.",
-                    ["id"] = "phrase.migrated.tool_reply_apology_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyApology3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.apology.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyApology3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.ask_name.named.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ASK_NAME_NAMED_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ASK_NAME_NAMED_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_ask_name_named_1",
+        ["id"] = "phrase.semantic.tool_reply.ask_name.named.1",
         ["semanticTemplateID"] = "semantic.tool_reply.ask_name.named.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am %s.",
-                    ["id"] = "phrase.migrated.tool_reply_ask_name_named_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAskNameNamed1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.ask_name.named.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAskNameNamed1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.ask_name.named.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ASK_NAME_NAMED_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ASK_NAME_NAMED_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_ask_name_named_2",
+        ["id"] = "phrase.semantic.tool_reply.ask_name.named.2",
         ["semanticTemplateID"] = "semantic.tool_reply.ask_name.named.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "The name is %s.",
-                    ["id"] = "phrase.migrated.tool_reply_ask_name_named_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAskNameNamed2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.ask_name.named.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAskNameNamed2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.ask_name.named.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ASK_NAME_NAMED_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ASK_NAME_NAMED_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_ask_name_named_3",
+        ["id"] = "phrase.semantic.tool_reply.ask_name.named.3",
         ["semanticTemplateID"] = "semantic.tool_reply.ask_name.named.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You can call me %s.",
-                    ["id"] = "phrase.migrated.tool_reply_ask_name_named_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAskNameNamed3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.ask_name.named.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAskNameNamed3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.ask_name.prompt"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ASK_NAME_PROMPT",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ASK_NAME_PROMPT",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_ask_name_prompt",
+        ["id"] = "phrase.semantic.tool_reply.ask_name.prompt",
         ["semanticTemplateID"] = "semantic.tool_reply.ask_name.prompt",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I'll tell you my name once we've established some trust. What's your name?",
-                    ["id"] = "phrase.migrated.tool_reply_ask_name_prompt.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAskNamePromptNeutral01",
+                    ["id"] = "phrase.semantic.tool_reply.ask_name.prompt.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAskNamePromptNeutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.ask_name.rejected.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ASK_NAME_REJECTED_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ASK_NAME_REJECTED_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_ask_name_rejected_1",
+        ["id"] = "phrase.semantic.tool_reply.ask_name.rejected.1",
         ["semanticTemplateID"] = "semantic.tool_reply.ask_name.rejected.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am not ready to share that yet.",
-                    ["id"] = "phrase.migrated.tool_reply_ask_name_rejected_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAskNameRejected1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.ask_name.rejected.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAskNameRejected1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.ask_name.rejected.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ASK_NAME_REJECTED_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ASK_NAME_REJECTED_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_ask_name_rejected_2",
+        ["id"] = "phrase.semantic.tool_reply.ask_name.rejected.2",
         ["semanticTemplateID"] = "semantic.tool_reply.ask_name.rejected.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Ask me again when we know each other better.",
-                    ["id"] = "phrase.migrated.tool_reply_ask_name_rejected_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAskNameRejected2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.ask_name.rejected.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAskNameRejected2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.ask_name.unnamed.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ASK_NAME_UNNAMED_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ASK_NAME_UNNAMED_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_ask_name_unnamed_1",
+        ["id"] = "phrase.semantic.tool_reply.ask_name.unnamed.1",
         ["semanticTemplateID"] = "semantic.tool_reply.ask_name.unnamed.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You want to know my name? Give me a second.",
-                    ["id"] = "phrase.migrated.tool_reply_ask_name_unnamed_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAskNameUnnamed1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.ask_name.unnamed.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAskNameUnnamed1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.ask_name.unnamed.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ASK_NAME_UNNAMED_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ASK_NAME_UNNAMED_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_ask_name_unnamed_2",
+        ["id"] = "phrase.semantic.tool_reply.ask_name.unnamed.2",
         ["semanticTemplateID"] = "semantic.tool_reply.ask_name.unnamed.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "My name is a longer story than you might expect.",
-                    ["id"] = "phrase.migrated.tool_reply_ask_name_unnamed_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyAskNameUnnamed2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.ask_name.unnamed.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAskNameUnnamed2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.comfort.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_COMFORT_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_COMFORT_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_comfort_1",
+        ["id"] = "phrase.semantic.tool_reply.comfort.1",
         ["semanticTemplateID"] = "semantic.tool_reply.comfort.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Thanks. I needed that.",
-                    ["id"] = "phrase.migrated.tool_reply_comfort_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyComfort1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.comfort.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyComfort1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.comfort.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_COMFORT_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_COMFORT_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_comfort_2",
+        ["id"] = "phrase.semantic.tool_reply.comfort.2",
         ["semanticTemplateID"] = "semantic.tool_reply.comfort.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I appreciate you being here.",
-                    ["id"] = "phrase.migrated.tool_reply_comfort_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyComfort2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.comfort.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyComfort2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.comfort.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_COMFORT_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_COMFORT_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_comfort_3",
+        ["id"] = "phrase.semantic.tool_reply.comfort.3",
         ["semanticTemplateID"] = "semantic.tool_reply.comfort.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That helps more than I expected.",
-                    ["id"] = "phrase.migrated.tool_reply_comfort_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyComfort3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.comfort.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyComfort3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.compliment.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_COMPLIMENT_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_COMPLIMENT_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_compliment_1",
+        ["id"] = "phrase.semantic.tool_reply.compliment.1",
         ["semanticTemplateID"] = "semantic.tool_reply.compliment.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That is kind of you to say.",
-                    ["id"] = "phrase.migrated.tool_reply_compliment_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyCompliment1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.compliment.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCompliment1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.compliment.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_COMPLIMENT_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_COMPLIMENT_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_compliment_2",
+        ["id"] = "phrase.semantic.tool_reply.compliment.2",
         ["semanticTemplateID"] = "semantic.tool_reply.compliment.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I appreciate the compliment.",
-                    ["id"] = "phrase.migrated.tool_reply_compliment_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyCompliment2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.compliment.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCompliment2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.compliment.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_COMPLIMENT_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_COMPLIMENT_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_compliment_3",
+        ["id"] = "phrase.semantic.tool_reply.compliment.3",
         ["semanticTemplateID"] = "semantic.tool_reply.compliment.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You noticed. Thank you.",
-                    ["id"] = "phrase.migrated.tool_reply_compliment_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyCompliment3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.compliment.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCompliment3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.cooldown.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_COOLDOWN_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_COOLDOWN_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_cooldown_1",
+        ["id"] = "phrase.semantic.tool_reply.cooldown.1",
         ["semanticTemplateID"] = "semantic.tool_reply.cooldown.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You have had your turn with the compliments today.",
-                    ["id"] = "phrase.migrated.tool_reply_cooldown_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyCooldown1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.cooldown.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_COOLDOWN_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_COOLDOWN_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_cooldown_2",
+        ["id"] = "phrase.semantic.tool_reply.cooldown.2",
         ["semanticTemplateID"] = "semantic.tool_reply.cooldown.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Save the sweet talk for tomorrow.",
-                    ["id"] = "phrase.migrated.tool_reply_cooldown_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyCooldown2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.flirt.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_FLIRT_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_FLIRT_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_flirt_1",
+        ["id"] = "phrase.semantic.tool_reply.flirt.1",
         ["semanticTemplateID"] = "semantic.tool_reply.flirt.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Careful. You are making me smile.",
-                    ["id"] = "phrase.migrated.tool_reply_flirt_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyFlirt1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.flirt.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyFlirt1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.flirt.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_FLIRT_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_FLIRT_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_flirt_2",
+        ["id"] = "phrase.semantic.tool_reply.flirt.2",
         ["semanticTemplateID"] = "semantic.tool_reply.flirt.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You always know how to get my attention.",
-                    ["id"] = "phrase.migrated.tool_reply_flirt_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyFlirt2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.flirt.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyFlirt2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.flirt.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_FLIRT_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_FLIRT_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_flirt_3",
+        ["id"] = "phrase.semantic.tool_reply.flirt.3",
         ["semanticTemplateID"] = "semantic.tool_reply.flirt.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That is a dangerous thing to say to me.",
-                    ["id"] = "phrase.migrated.tool_reply_flirt_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyFlirt3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.flirt.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyFlirt3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.hostile.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_HOSTILE_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_HOSTILE_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_hostile_1",
+        ["id"] = "phrase.semantic.tool_reply.hostile.1",
         ["semanticTemplateID"] = "semantic.tool_reply.hostile.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Watch your mouth.",
-                    ["id"] = "phrase.migrated.tool_reply_hostile_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyHostile1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.hostile.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_HOSTILE_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_HOSTILE_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_hostile_2",
+        ["id"] = "phrase.semantic.tool_reply.hostile.2",
         ["semanticTemplateID"] = "semantic.tool_reply.hostile.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Try that again and see what happens.",
-                    ["id"] = "phrase.migrated.tool_reply_hostile_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyHostile2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.hostile.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_HOSTILE_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_HOSTILE_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_hostile_3",
+        ["id"] = "phrase.semantic.tool_reply.hostile.3",
         ["semanticTemplateID"] = "semantic.tool_reply.hostile.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I have heard worse, but do not make a habit of it.",
-                    ["id"] = "phrase.migrated.tool_reply_hostile_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyHostile3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.insult.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_INSULT_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_INSULT_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_insult_1",
+        ["id"] = "phrase.semantic.tool_reply.insult.1",
         ["semanticTemplateID"] = "semantic.tool_reply.insult.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Watch your mouth.",
-                    ["id"] = "phrase.migrated.tool_reply_insult_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyInsult1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.insult.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyInsult1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.insult.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_INSULT_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_INSULT_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_insult_2",
+        ["id"] = "phrase.semantic.tool_reply.insult.2",
         ["semanticTemplateID"] = "semantic.tool_reply.insult.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Try that again and see what happens.",
-                    ["id"] = "phrase.migrated.tool_reply_insult_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyInsult2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.insult.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyInsult2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.insult.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_INSULT_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_INSULT_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_insult_3",
+        ["id"] = "phrase.semantic.tool_reply.insult.3",
         ["semanticTemplateID"] = "semantic.tool_reply.insult.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I have heard worse, but do not make a habit of it.",
-                    ["id"] = "phrase.migrated.tool_reply_insult_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyInsult3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.insult.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyInsult3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_camp.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_CAMP_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_CAMP_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_camp_1",
+        ["id"] = "phrase.semantic.tool_reply.order_camp.1",
         ["semanticTemplateID"] = "semantic.tool_reply.order_camp.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "All right. We will make camp here.",
-                    ["id"] = "phrase.migrated.tool_reply_order_camp_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderCamp1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_camp.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderCamp1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_camp.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_CAMP_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_CAMP_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_camp_2",
+        ["id"] = "phrase.semantic.tool_reply.order_camp.2",
         ["semanticTemplateID"] = "semantic.tool_reply.order_camp.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I will settle in here for now.",
-                    ["id"] = "phrase.migrated.tool_reply_order_camp_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderCamp2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_camp.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderCamp2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_camp.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_CAMP_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_CAMP_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_camp_3",
+        ["id"] = "phrase.semantic.tool_reply.order_camp.3",
         ["semanticTemplateID"] = "semantic.tool_reply.order_camp.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Understood. I will stay here and take care of my needs.",
-                    ["id"] = "phrase.migrated.tool_reply_order_camp_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderCamp3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_camp.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderCamp3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_follow.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_FOLLOW_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_FOLLOW_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_follow_1",
+        ["id"] = "phrase.semantic.tool_reply.order_follow.1",
         ["semanticTemplateID"] = "semantic.tool_reply.order_follow.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "All right. I am with you.",
-                    ["id"] = "phrase.migrated.tool_reply_order_follow_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderFollow1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_follow.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderFollow1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_follow.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_FOLLOW_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_FOLLOW_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_follow_2",
+        ["id"] = "phrase.semantic.tool_reply.order_follow.2",
         ["semanticTemplateID"] = "semantic.tool_reply.order_follow.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Lead the way.",
-                    ["id"] = "phrase.migrated.tool_reply_order_follow_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderFollow2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_follow.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderFollow2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_follow.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_FOLLOW_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_FOLLOW_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_follow_3",
+        ["id"] = "phrase.semantic.tool_reply.order_follow.3",
         ["semanticTemplateID"] = "semantic.tool_reply.order_follow.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I will stay close.",
-                    ["id"] = "phrase.migrated.tool_reply_order_follow_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderFollow3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_follow.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderFollow3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_generic.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_GENERIC_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_GENERIC_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_generic_1",
+        ["id"] = "phrase.semantic.tool_reply.order_generic.1",
         ["semanticTemplateID"] = "semantic.tool_reply.order_generic.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "All right.",
-                    ["id"] = "phrase.migrated.tool_reply_order_generic_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderGeneric1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_generic.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderGeneric1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_generic.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_GENERIC_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_GENERIC_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_generic_2",
+        ["id"] = "phrase.semantic.tool_reply.order_generic.2",
         ["semanticTemplateID"] = "semantic.tool_reply.order_generic.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Understood.",
-                    ["id"] = "phrase.migrated.tool_reply_order_generic_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderGeneric2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_generic.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderGeneric2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_generic.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_GENERIC_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_GENERIC_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_generic_3",
+        ["id"] = "phrase.semantic.tool_reply.order_generic.3",
         ["semanticTemplateID"] = "semantic.tool_reply.order_generic.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I will handle it.",
-                    ["id"] = "phrase.migrated.tool_reply_order_generic_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderGeneric3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_generic.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderGeneric3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_rejected.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_REJECTED_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_REJECTED_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_rejected_1",
+        ["id"] = "phrase.semantic.tool_reply.order_rejected.1",
         ["semanticTemplateID"] = "semantic.tool_reply.order_rejected.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I cannot do that right now.",
-                    ["id"] = "phrase.migrated.tool_reply_order_rejected_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderRejected1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_rejected.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_REJECTED_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_REJECTED_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_rejected_2",
+        ["id"] = "phrase.semantic.tool_reply.order_rejected.2",
         ["semanticTemplateID"] = "semantic.tool_reply.order_rejected.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That order is not going to work.",
-                    ["id"] = "phrase.migrated.tool_reply_order_rejected_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderRejected2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_stay.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_STAY_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_STAY_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_stay_1",
+        ["id"] = "phrase.semantic.tool_reply.order_stay.1",
         ["semanticTemplateID"] = "semantic.tool_reply.order_stay.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "All right. I will hold here.",
-                    ["id"] = "phrase.migrated.tool_reply_order_stay_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderStay1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.order_stay.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORDER_STAY_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORDER_STAY_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_order_stay_2",
+        ["id"] = "phrase.semantic.tool_reply.order_stay.2",
         ["semanticTemplateID"] = "semantic.tool_reply.order_stay.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I will stay put.",
-                    ["id"] = "phrase.migrated.tool_reply_order_stay_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrderStay2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.orientation.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORIENTATION_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORIENTATION_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_orientation_1",
+        ["id"] = "phrase.semantic.tool_reply.orientation.1",
         ["semanticTemplateID"] = "semantic.tool_reply.orientation.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That is not the kind of interest I have in you.",
-                    ["id"] = "phrase.migrated.tool_reply_orientation_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrientation1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.orientation.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ORIENTATION_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ORIENTATION_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_orientation_2",
+        ["id"] = "phrase.semantic.tool_reply.orientation.2",
         ["semanticTemplateID"] = "semantic.tool_reply.orientation.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Do not mistake my kindness for an invitation.",
-                    ["id"] = "phrase.migrated.tool_reply_orientation_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyOrientation2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.personality.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_PERSONALITY_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_PERSONALITY_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_personality_1",
+        ["id"] = "phrase.semantic.tool_reply.personality.1",
         ["semanticTemplateID"] = "semantic.tool_reply.personality.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That kind of attention is not welcome from me.",
-                    ["id"] = "phrase.migrated.tool_reply_personality_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyPersonality1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.personality.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.personality.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_PERSONALITY_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_PERSONALITY_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_personality_2",
+        ["id"] = "phrase.semantic.tool_reply.personality.2",
         ["semanticTemplateID"] = "semantic.tool_reply.personality.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You are reading me wrong.",
-                    ["id"] = "phrase.migrated.tool_reply_personality_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyPersonality2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.personality.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.praise.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_PRAISE_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_PRAISE_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_praise_1",
+        ["id"] = "phrase.semantic.tool_reply.praise.1",
         ["semanticTemplateID"] = "semantic.tool_reply.praise.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I appreciate that.",
-                    ["id"] = "phrase.migrated.tool_reply_praise_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyPraise1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.praise.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPraise1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.praise.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_PRAISE_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_PRAISE_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_praise_2",
+        ["id"] = "phrase.semantic.tool_reply.praise.2",
         ["semanticTemplateID"] = "semantic.tool_reply.praise.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Good. I was hoping you noticed.",
-                    ["id"] = "phrase.migrated.tool_reply_praise_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyPraise2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.praise.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPraise2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.praise.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_PRAISE_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_PRAISE_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_praise_3",
+        ["id"] = "phrase.semantic.tool_reply.praise.3",
         ["semanticTemplateID"] = "semantic.tool_reply.praise.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That is nice to hear from you.",
-                    ["id"] = "phrase.migrated.tool_reply_praise_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyPraise3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.praise.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPraise3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_admire.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_ADMIRE_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_ADMIRE_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_admire_1",
+        ["id"] = "phrase.semantic.tool_reply.queued_admire.1",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_admire.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I hear you.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_admire_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedAdmire1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_admire.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_ADMIRE_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_ADMIRE_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_admire_2",
+        ["id"] = "phrase.semantic.tool_reply.queued_admire.2",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_admire.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That got through.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_admire_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedAdmire2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_apology.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_APOLOGY_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_APOLOGY_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_apology_1",
+        ["id"] = "phrase.semantic.tool_reply.queued_apology.1",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_apology.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I hear you.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_apology_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedApology1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_apology.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_APOLOGY_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_APOLOGY_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_apology_2",
+        ["id"] = "phrase.semantic.tool_reply.queued_apology.2",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_apology.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "We will talk about it.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_apology_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedApology2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_comfort.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_COMFORT_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_COMFORT_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_comfort_1",
+        ["id"] = "phrase.semantic.tool_reply.queued_comfort.1",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_comfort.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I hear you.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_comfort_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedComfort1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_comfort.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_COMFORT_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_COMFORT_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_comfort_2",
+        ["id"] = "phrase.semantic.tool_reply.queued_comfort.2",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_comfort.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Thanks for saying that.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_comfort_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedComfort2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_compliment.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_COMPLIMENT_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_COMPLIMENT_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_compliment_1",
+        ["id"] = "phrase.semantic.tool_reply.queued_compliment.1",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_compliment.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I heard the compliment.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_compliment_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedCompliment1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_compliment.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedCompliment1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_compliment.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_COMPLIMENT_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_COMPLIMENT_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_compliment_2",
+        ["id"] = "phrase.semantic.tool_reply.queued_compliment.2",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_compliment.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That is kind of you to say.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_compliment_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedCompliment2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_compliment.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedCompliment2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_flirt.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_FLIRT_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_FLIRT_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_flirt_1",
+        ["id"] = "phrase.semantic.tool_reply.queued_flirt.1",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_flirt.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I heard you.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_flirt_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedFlirt1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_flirt.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_FLIRT_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_FLIRT_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_flirt_2",
+        ["id"] = "phrase.semantic.tool_reply.queued_flirt.2",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_flirt.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You are bold, I will give you that.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_flirt_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedFlirt2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_generic.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_GENERIC_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_GENERIC_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_generic_1",
+        ["id"] = "phrase.semantic.tool_reply.queued_generic.1",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_generic.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I hear you.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_generic_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedGeneric1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_generic.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_GENERIC_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_GENERIC_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_generic_2",
+        ["id"] = "phrase.semantic.tool_reply.queued_generic.2",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_generic.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Give me a moment.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_generic_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedGeneric2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_hostile.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_HOSTILE_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_HOSTILE_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_hostile_1",
+        ["id"] = "phrase.semantic.tool_reply.queued_hostile.1",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_hostile.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I heard you. Watch yourself.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_hostile_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedHostile1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_hostile.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_HOSTILE_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_HOSTILE_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_hostile_2",
+        ["id"] = "phrase.semantic.tool_reply.queued_hostile.2",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_hostile.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Noted. Choose your next words carefully.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_hostile_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedHostile2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_insult.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_INSULT_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_INSULT_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_insult_1",
+        ["id"] = "phrase.semantic.tool_reply.queued_insult.1",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_insult.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I heard you.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_insult_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedInsult1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_insult.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_INSULT_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_INSULT_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_insult_2",
+        ["id"] = "phrase.semantic.tool_reply.queued_insult.2",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_insult.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Noted.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_insult_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedInsult2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_praise.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_PRAISE_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_PRAISE_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_praise_1",
+        ["id"] = "phrase.semantic.tool_reply.queued_praise.1",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_praise.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I hear you.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_praise_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedPraise1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_praise.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_PRAISE_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_PRAISE_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_praise_2",
+        ["id"] = "phrase.semantic.tool_reply.queued_praise.2",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_praise.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I will remember that.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_praise_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedPraise2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_romantic.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_ROMANTIC_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_ROMANTIC_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_romantic_1",
+        ["id"] = "phrase.semantic.tool_reply.queued_romantic.1",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_romantic.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I heard you. You are bold, I will give you that.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_romantic_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedRomantic1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_romantic.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_ROMANTIC_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_ROMANTIC_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_romantic_2",
+        ["id"] = "phrase.semantic.tool_reply.queued_romantic.2",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_romantic.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You certainly know how to get my attention.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_romantic_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedRomantic2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_sexual.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_SEXUAL_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_SEXUAL_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_sexual_1",
+        ["id"] = "phrase.semantic.tool_reply.queued_sexual.1",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_sexual.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I heard you. Give me a second.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_sexual_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedSexual1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.queued_sexual.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_QUEUED_SEXUAL_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_QUEUED_SEXUAL_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_queued_sexual_2",
+        ["id"] = "phrase.semantic.tool_reply.queued_sexual.2",
         ["semanticTemplateID"] = "semantic.tool_reply.queued_sexual.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That is a bold thing to say.",
-                    ["id"] = "phrase.migrated.tool_reply_queued_sexual_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyQueuedSexual2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.rejected_game.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_REJECTED_GAME_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_REJECTED_GAME_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_rejected_game_1",
+        ["id"] = "phrase.semantic.tool_reply.rejected_game.1",
         ["semanticTemplateID"] = "semantic.tool_reply.rejected_game.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Not now.",
-                    ["id"] = "phrase.migrated.tool_reply_rejected_game_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRejectedGame1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_game.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGame1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.rejected_game.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_REJECTED_GAME_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_REJECTED_GAME_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_rejected_game_2",
+        ["id"] = "phrase.semantic.tool_reply.rejected_game.2",
         ["semanticTemplateID"] = "semantic.tool_reply.rejected_game.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That did not land well.",
-                    ["id"] = "phrase.migrated.tool_reply_rejected_game_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRejectedGame2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_game.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGame2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.rejected_generic.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_REJECTED_GENERIC_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_REJECTED_GENERIC_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_rejected_generic_1",
+        ["id"] = "phrase.semantic.tool_reply.rejected_generic.1",
         ["semanticTemplateID"] = "semantic.tool_reply.rejected_generic.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That did not land well.",
-                    ["id"] = "phrase.migrated.tool_reply_rejected_generic_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRejectedGeneric1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.rejected_generic.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_REJECTED_GENERIC_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_REJECTED_GENERIC_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_rejected_generic_2",
+        ["id"] = "phrase.semantic.tool_reply.rejected_generic.2",
         ["semanticTemplateID"] = "semantic.tool_reply.rejected_generic.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "I am not taking that from you right now.",
-                    ["id"] = "phrase.migrated.tool_reply_rejected_generic_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRejectedGeneric2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.rejected_hostile.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_REJECTED_HOSTILE_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_REJECTED_HOSTILE_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_rejected_hostile_1",
+        ["id"] = "phrase.semantic.tool_reply.rejected_hostile.1",
         ["semanticTemplateID"] = "semantic.tool_reply.rejected_hostile.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Back off.",
-                    ["id"] = "phrase.migrated.tool_reply_rejected_hostile_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRejectedHostile1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_hostile.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedHostile1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.rejected_hostile.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_REJECTED_HOSTILE_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_REJECTED_HOSTILE_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_rejected_hostile_2",
+        ["id"] = "phrase.semantic.tool_reply.rejected_hostile.2",
         ["semanticTemplateID"] = "semantic.tool_reply.rejected_hostile.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You do not get to speak to me that way.",
-                    ["id"] = "phrase.migrated.tool_reply_rejected_hostile_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRejectedHostile2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_hostile.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedHostile2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.rejected_sexual.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_REJECTED_SEXUAL_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_REJECTED_SEXUAL_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_rejected_sexual_1",
+        ["id"] = "phrase.semantic.tool_reply.rejected_sexual.1",
         ["semanticTemplateID"] = "semantic.tool_reply.rejected_sexual.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That is not happening.",
-                    ["id"] = "phrase.migrated.tool_reply_rejected_sexual_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRejectedSexual1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_sexual.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedSexual1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.rejected_sexual.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_REJECTED_SEXUAL_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_REJECTED_SEXUAL_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_rejected_sexual_2",
+        ["id"] = "phrase.semantic.tool_reply.rejected_sexual.2",
         ["semanticTemplateID"] = "semantic.tool_reply.rejected_sexual.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Do not talk to me like that.",
-                    ["id"] = "phrase.migrated.tool_reply_rejected_sexual_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRejectedSexual2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_sexual.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedSexual2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.rejected_sexual.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_REJECTED_SEXUAL_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_REJECTED_SEXUAL_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_rejected_sexual_3",
+        ["id"] = "phrase.semantic.tool_reply.rejected_sexual.3",
         ["semanticTemplateID"] = "semantic.tool_reply.rejected_sexual.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You are moving far too fast.",
-                    ["id"] = "phrase.migrated.tool_reply_rejected_sexual_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRejectedSexual3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_sexual.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedSexual3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.relationship.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_RELATIONSHIP_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_RELATIONSHIP_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_relationship_1",
+        ["id"] = "phrase.semantic.tool_reply.relationship.1",
         ["semanticTemplateID"] = "semantic.tool_reply.relationship.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "We are not there yet.",
-                    ["id"] = "phrase.migrated.tool_reply_relationship_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRelationship1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.relationship.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRelationship1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.relationship.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_RELATIONSHIP_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_RELATIONSHIP_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_relationship_2",
+        ["id"] = "phrase.semantic.tool_reply.relationship.2",
         ["semanticTemplateID"] = "semantic.tool_reply.relationship.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That is a little too familiar for us.",
-                    ["id"] = "phrase.migrated.tool_reply_relationship_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRelationship2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.relationship.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRelationship2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.romantic.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ROMANTIC_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ROMANTIC_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_romantic_1",
+        ["id"] = "phrase.semantic.tool_reply.romantic.1",
         ["semanticTemplateID"] = "semantic.tool_reply.romantic.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "Careful. You are making me smile.",
-                    ["id"] = "phrase.migrated.tool_reply_romantic_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRomantic1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.romantic.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRomantic1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.romantic.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ROMANTIC_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ROMANTIC_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_romantic_2",
+        ["id"] = "phrase.semantic.tool_reply.romantic.2",
         ["semanticTemplateID"] = "semantic.tool_reply.romantic.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You always know how to get my attention.",
-                    ["id"] = "phrase.migrated.tool_reply_romantic_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRomantic2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.romantic.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRomantic2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.romantic.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_ROMANTIC_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_ROMANTIC_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_romantic_3",
+        ["id"] = "phrase.semantic.tool_reply.romantic.3",
         ["semanticTemplateID"] = "semantic.tool_reply.romantic.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That is a dangerous thing to say to me.",
-                    ["id"] = "phrase.migrated.tool_reply_romantic_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplyRomantic3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.romantic.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRomantic3Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.sexual.1"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_SEXUAL_1",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_SEXUAL_1",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_sexual_1",
+        ["id"] = "phrase.semantic.tool_reply.sexual.1",
         ["semanticTemplateID"] = "semantic.tool_reply.sexual.1",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You are bold. I cannot say I dislike that.",
-                    ["id"] = "phrase.migrated.tool_reply_sexual_1.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplySexual1Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.sexual.1.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplySexual1Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.sexual.2"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_SEXUAL_2",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_SEXUAL_2",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_sexual_2",
+        ["id"] = "phrase.semantic.tool_reply.sexual.2",
         ["semanticTemplateID"] = "semantic.tool_reply.sexual.2",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "That is a very direct proposition.",
-                    ["id"] = "phrase.migrated.tool_reply_sexual_2.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplySexual2Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.sexual.2.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplySexual2Neutral01",
                 },
             },
         },
     },
     ["semantic.tool_reply.sexual.3"] = {
-        ["canonicalConcept"] = "MIGRATED_TOOL_REPLY_SEXUAL_3",
+        ["canonicalConcept"] = "SEMANTIC_TOOL_REPLY_SEXUAL_3",
         ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
-        ["id"] = "phrase.migrated.tool_reply_sexual_3",
+        ["id"] = "phrase.semantic.tool_reply.sexual.3",
         ["semanticTemplateID"] = "semantic.tool_reply.sexual.3",
         ["styles"] = {
             ["neutral"] = {
                 {
                     ["fallback"] = "You are moving fast, but I heard you.",
-                    ["id"] = "phrase.migrated.tool_reply_sexual_3.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_Migrated_ToolReplySexual3Neutral01",
+                    ["id"] = "phrase.semantic.tool_reply.sexual.3.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplySexual3Neutral01",
                 },
             },
         },
@@ -2637,17 +4174,13 @@ Registry.PHRASE_FAMILIES = {
 }
 Registry.PLAYER_CHOICES = {
     ["conversation.landing:whats_up"] = {
-        ["choiceKey"] = "UI_PNC_Conversation_Content_WhatsUp_Choice_Label",
+        ["canonicalConcept"] = "CONVERSATION_LANDING_WHATS_UP",
+        ["choiceKey"] = "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+        ["hubID"] = "whats_up",
         ["id"] = "conversation.landing:whats_up",
         ["kind"] = "player_landing_choice",
-        ["labelKey"] = "UI_PNC_Conversation_Content_WhatsUp_Landing_Label",
-        ["locked"] = {
-            ["authority"] = "DialogueSuggestions navigation",
-            ["canonicalConcept"] = "WHATS_UP",
-            ["eligibility"] = "root conversation landing",
-            ["hubID"] = "whats_up",
-            ["route"] = "semantic_hub",
-        },
+        ["labelKey"] = "UI_PNC_Conversation_Content_ConversationLandingWhatsUp_Label",
+        ["route"] = "semantic_hub",
     },
 }
 function Registry.FamilyFor(templateID, style)

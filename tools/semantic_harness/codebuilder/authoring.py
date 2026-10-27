@@ -24,6 +24,7 @@ from tools.semantic_harness.codebuilder.dialogue_rendering import (
     render_dialogue_translation,
 )
 from tools.semantic_harness.codebuilder.dialogue_content import (
+    CONTENT_SCHEMA,
     CONTENT_RUNTIME_RELATIVE,
     CONTENT_TRANSLATION_RELATIVE,
     CONTENT_TRANSLATION_STEM,
@@ -726,7 +727,7 @@ def preview_dialogue_content_source(
     base: dict[str, Any] = {
         "ok": False,
         "type": "dialogue_content_compile_preview",
-        "schema": "pnc.semantic_dialogue_content.v1",
+        "schema": CONTENT_SCHEMA,
         "repository": str(repository),
         "sourcePath": str(source_path),
         "previewOnly": True,

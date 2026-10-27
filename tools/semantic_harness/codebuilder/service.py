@@ -26,6 +26,7 @@ from .interaction_explorer import build_interaction_rows, search_interactions
 from .dialogue_content import (
     CONTENT_SOURCE_RELATIVE,
     compile_dialogue_content,
+    derived_canonical_concept,
     load_dialogue_content_source,
     source_fingerprint,
 )
@@ -122,21 +123,36 @@ class SemanticLabAuthoringService:
         return load_dialogue_content_source(self.dialogue_content_source_path)
 
     @staticmethod
-    def _content_item(document: dict[str, Any], content_id: str) -> dict[str, Any] | None:
+    def _family_id(family: dict[str, Any]) -> str:
+        return str(
+            family.get("id")
+            or "phrase." + str(family.get("semanticTemplateID") or "unknown")
+        )
+
+    @classmethod
+    def _content_item(
+        cls, document: dict[str, Any], content_id: str
+    ) -> dict[str, Any] | None:
         for family in document.get("phraseFamilies", []):
-            if isinstance(family, dict) and family.get("id") == content_id:
+            if isinstance(family, dict) and cls._family_id(family) == content_id:
                 item = {"kind": "phraseFamily", **family}
-                locked = item.get("locked") or {}
-                item["contentOwner"] = locked.get("contentOwner")
-                item["semanticAuthority"] = locked.get("semanticAuthority")
-                item["responsePoolID"] = locked.get("responsePoolID")
-                item["semanticVariantID"] = locked.get("semanticVariantID")
-                item["followUpEligibility"] = locked.get("followUpEligibility")
-                item["legacySource"] = locked.get("legacySource")
+                item["id"] = cls._family_id(family)
+                item["canonicalConcept"] = item.get("canonicalConcept") or derived_canonical_concept(
+                    str(item.get("semanticTemplateID") or item["id"])
+                )
+                if not item.get("contentOwner"):
+                    groups = document.get("groups") or {}
+                    group = groups.get(item.get("group"))
+                    if isinstance(group, dict):
+                        item["contentOwner"] = group.get("contentOwner")
                 return item
         for choice in document.get("playerChoices", []):
             if isinstance(choice, dict) and choice.get("id") == content_id:
-                return {"kind": "playerChoice", **choice}
+                item = {"kind": "playerChoice", **choice}
+                item["canonicalConcept"] = item.get("canonicalConcept") or derived_canonical_concept(
+                    str(item["id"])
+                )
+                return item
         return None
 
     @staticmethod
@@ -160,22 +176,23 @@ class SemanticLabAuthoringService:
     def list_dialogue_content(self) -> list[dict[str, Any]]:
         document = self._dialogue_content_document()
         fingerprint = source_fingerprint(self.dialogue_content_source_path)
+        groups = document.get("groups") or {}
         rows: list[dict[str, Any]] = []
         for family in document.get("phraseFamilies", []):
             if not isinstance(family, dict):
                 continue
             rows.append({
-                "id": family.get("id"),
+                "id": self._family_id(family),
                 "kind": "phraseFamily",
                 "semanticTemplateID": family.get("semanticTemplateID"),
-                "canonicalConcept": family.get("canonicalConcept"),
+                "canonicalConcept": family.get("canonicalConcept")
+                or derived_canonical_concept(str(family.get("semanticTemplateID") or "unknown")),
+                "group": family.get("group"),
                 "contentOwner": family.get("contentOwner")
-                or (family.get("locked") or {}).get("contentOwner"),
-                "semanticAuthority": (family.get("locked") or {}).get(
-                    "semanticAuthority"
-                ),
-                "legacySource": (family.get("locked") or {}).get(
-                    "legacySource"
+                or (
+                    groups.get(family.get("group"), {}).get("contentOwner")
+                    if isinstance(groups.get(family.get("group")), dict)
+                    else None
                 ),
                 "styles": sorted(family.get("styles", {})),
                 "sourcePath": str(self.dialogue_content_source_path),
@@ -188,9 +205,10 @@ class SemanticLabAuthoringService:
             rows.append({
                 "id": choice.get("id"),
                 "kind": "playerChoice",
-                "canonicalConcept": (choice.get("locked") or {}).get("canonicalConcept"),
-                "route": (choice.get("locked") or {}).get("route"),
-                "hubID": (choice.get("locked") or {}).get("hubID"),
+                "canonicalConcept": choice.get("canonicalConcept")
+                or derived_canonical_concept(str(choice.get("id") or "unknown")),
+                "route": choice.get("route"),
+                "hubID": choice.get("hubID"),
                 "sourcePath": str(self.dialogue_content_source_path),
                 "sourceFingerprint": fingerprint,
                 "verifiedOwner": "CodeBuilder → Dialogue Content Registry",
@@ -259,18 +277,18 @@ class SemanticLabAuthoringService:
             }
         updated = json.loads(json.dumps(document, ensure_ascii=False))
         if current.get("kind") == "phraseFamily":
-            target = next(item for item in updated["phraseFamilies"] if item["id"] == content_id)
+            target = next(
+                item for item in updated["phraseFamilies"]
+                if self._family_id(item) == content_id
+            )
             edited_styles = edited_item.get("styles", {})
             for style, phrases in target.get("styles", {}).items():
-                edited_by_id = {
-                    phrase.get("id"): phrase
-                    for phrase in edited_styles.get(style, [])
-                    if isinstance(phrase, dict)
-                }
-                for phrase in phrases:
-                    edited_phrase = edited_by_id.get(phrase.get("id"))
-                    if edited_phrase is not None:
-                        phrase["translations"] = edited_phrase.get("translations")
+                edited_phrases = edited_styles.get(style, [])
+                for index, phrase in enumerate(phrases):
+                    if index < len(edited_phrases):
+                        edited_phrase = edited_phrases[index]
+                        if isinstance(edited_phrase, dict):
+                            phrase["translations"] = edited_phrase.get("translations")
         else:
             target = next(item for item in updated["playerChoices"] if item["id"] == content_id)
             target["labelTranslations"] = edited_item.get("labelTranslations")

@@ -5,8 +5,8 @@ T.addPackagePaths()
 
 local speech = {}
 local diary = {}
-local playerFlavorCalls = 0
-local npcFlavorCalls = 0
+local playerResolutionCalls = 0
+local npcResolutionCalls = 0
 local player = {
     getUsername = function() return "alice" end,
 }
@@ -47,11 +47,26 @@ PNC = {
 }
 
 PNC.CompanionCommandPresentation.Internal.Registry = PNC.Registry
-PNC.CompanionCommandPresentation.Internal.Flavor = {
-    Resolve = function(_, speaker)
-        if speaker == "npc" then npcFlavorCalls = npcFlavorCalls + 1 end
-        if speaker == "player" then playerFlavorCalls = playerFlavorCalls + 1 end
-        return "compatibility text"
+PNC.CompanionCommandPresentation.Internal.CompanionSpeech = {
+    ResolvePlayerEmote = function(_, emoteID)
+        playerResolutionCalls = playerResolutionCalls + 1
+        return {
+            responsePlanID = "semantic.emote.player",
+            realizationFamily = "emote_player",
+            realizationID = "semantic.emote.player." .. tostring(emoteID),
+            fallback = "semantic player text",
+            semanticOwned = true,
+        }
+    end,
+    ResolveNPCEmote = function(_, emoteID)
+        npcResolutionCalls = npcResolutionCalls + 1
+        return {
+            responsePlanID = "semantic.emote.reply",
+            realizationFamily = "emote_reply",
+            realizationID = "semantic.emote.reply." .. tostring(emoteID),
+            fallback = "semantic NPC text",
+            semanticOwned = true,
+        }
     end,
 }
 PNC.CompanionCommandPresentation.BuildFlavorContext = function()
@@ -112,9 +127,9 @@ T.equal(speech[1].pumpImmediately, true,
     "semantic emote reply is not pumped immediately")
 T.equal(speech[1].source.deliveryOwner, "player_emote",
     "semantic emote reply diary ownership is not explicit")
-T.equal(npcFlavorCalls, 0,
-    "resolved semantic text was fed back through NPC Flavor selection")
-T.equal(playerFlavorCalls, 1, "player emote presentation was not resolved")
+T.equal(npcResolutionCalls, 0,
+    "resolved semantic text was fed back through NPC realization selection")
+T.equal(playerResolutionCalls, 1, "player emote presentation was not resolved")
 T.equal(#diary, 1, "semantic emote result was not recorded once")
 T.equal(diary[1].entry.npcText, "Good.",
     "diary did not retain the delivered semantic text")

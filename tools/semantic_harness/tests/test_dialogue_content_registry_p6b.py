@@ -36,7 +36,7 @@ class DialogueContentRegistryP6BTests(unittest.TestCase):
         self.assertGreaterEqual(len(first["phraseFamilies"]), 1)
         family = next(
             item for item in first["phraseFamilies"]
-            if item["id"] == "phrase.greeting.opening.default"
+            if item["id"] == "phrase.semantic.flow.greeting.opening.default"
         )
         self.assertEqual(family["semanticTemplateID"], "semantic.flow.greeting.opening.default")
         self.assertTrue(
@@ -67,7 +67,7 @@ class DialogueContentRegistryP6BTests(unittest.TestCase):
 
     def test_authoring_service_locks_structure_and_allows_content_only_edits(self) -> None:
         service = SemanticLabAuthoringService(repository=REPOSITORY, runtime_root=REPOSITORY)
-        family = service.load_dialogue_content("phrase.greeting.opening.default")
+        family = service.load_dialogue_content("phrase.semantic.flow.greeting.opening.default")
         source_fingerprint = family["sourceFingerprint"]
 
         unchanged = service.preview_dialogue_content_edit(
@@ -119,9 +119,9 @@ class DialogueContentRegistryP6BTests(unittest.TestCase):
         self.assertTrue(choice_report["ok"])
         self.assertTrue(choice_report["structuralLocked"])
         self.assertEqual(choice["labelTranslations"]["EN"], "What's up")
-        self.assertEqual(choice["locked"]["route"], "semantic_hub")
-        self.assertEqual(choice["locked"]["hubID"], "whats_up")
-        self.assertEqual(choice["locked"]["canonicalConcept"], "WHATS_UP")
+        self.assertEqual(choice["route"], "semantic_hub")
+        self.assertEqual(choice["hubID"], "whats_up")
+        self.assertEqual(choice["canonicalConcept"], "CONVERSATION_LANDING_WHATS_UP")
 
     def test_real_lua_phrase_layer_is_separate_and_effect_equivalent(self) -> None:
         all_rows: dict[str, list[dict]] = {}
@@ -152,7 +152,7 @@ class DialogueContentRegistryP6BTests(unittest.TestCase):
                 all(
                     response["phraseSelection"]["phraseID"] == response["phraseID"]
                     and response["phraseSelection"]["familyID"]
-                    == "phrase.greeting.opening.default"
+                    == "phrase.semantic.flow.greeting.opening.default"
                     and response["phraseSelection"]["style"] == "neutral"
                     for response in responses
                 )
@@ -202,7 +202,10 @@ class DialogueContentRegistryP6BTests(unittest.TestCase):
                     if item["id"] == "conversation.landing:whats_up"
                 )
             frame = candidate["frame"]
-            self.assertEqual(frame["labelKey"], "UI_PNC_Conversation_Content_WhatsUp_Choice_Label")
+            self.assertEqual(
+                frame["labelKey"],
+                "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+            )
             self.assertEqual(frame["labelFallback"], label_fallback)
             self.assertEqual(frame["textFallback"], "What's up?")
             self.assertEqual(frame["extensions"]["route"], "semantic_hub")

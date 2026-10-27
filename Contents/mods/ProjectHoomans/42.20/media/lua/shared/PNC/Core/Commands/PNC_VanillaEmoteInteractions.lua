@@ -6,24 +6,10 @@ PNC.VanillaEmoteInteractions = PNC.VanillaEmoteInteractions or {}
 
 local Interactions = PNC.VanillaEmoteInteractions
 
-local NPC_TYPES = {
-    "hostile",
-    "neutral",
-    "colonist",
-    "lover",
-    "family",
-}
-
 local GREETING_MEMORY_TYPES = {
     "player_greeted",
     "npc_greeted_player",
     "greeting_exchanged",
-}
-
-local GREETING_TIERS = {
-    warm = true,
-    familiar = true,
-    reserved = true,
 }
 
 local FAMILY_RELATIONSHIPS = {
@@ -38,34 +24,6 @@ local FAMILY_RELATIONSHIPS = {
     family = true,
 }
 
-local function typedReplies(id)
-    local output = {}
-    local index
-    local npcType
-    for index = 1, #NPC_TYPES do
-        npcType = NPC_TYPES[index]
-        output[npcType] = "vanilla_emote_" .. tostring(id)
-            .. "_npc_" .. npcType
-    end
-    return output
-end
-
-local function dailyTypedReplies(id)
-    local output = {}
-    local index
-    local npcType
-    for index = 1, #NPC_TYPES do
-        npcType = NPC_TYPES[index]
-        output[npcType] = {
-            first = "vanilla_emote_" .. tostring(id)
-                .. "_npc_" .. npcType .. "_first",
-            returning = "vanilla_emote_" .. tostring(id)
-                .. "_npc_" .. npcType .. "_returning",
-        }
-    end
-    return output
-end
-
 local function normalizeType(value)
     value = string.lower(tostring(value or ""))
     value = string.gsub(value, "[%s%-]", "_")
@@ -76,102 +34,53 @@ local DEFINITIONS = {
     insult = {
         id = "insult",
         eventType = "player_emote_insult",
-        flavorID = "vanilla_emote_insult",
         radius = 12,
         maxTargets = 6,
         hostile = true,
-        replyFlavor = {
-            familiar = "vanilla_emote_insult_npc_familiar",
-            guarded = "vanilla_emote_insult_npc_guarded",
-            hostile = "vanilla_emote_insult_npc_hostile",
-            byNPCType = typedReplies("insult"),
-        },
     },
     thumbsdown = {
         id = "thumbsdown",
         eventType = "player_emote_thumbsdown",
-        flavorID = "vanilla_emote_thumbsdown",
         radius = 12,
         maxTargets = 6,
         hostile = true,
-        replyFlavor = {
-            guarded = "vanilla_emote_thumbsdown_npc_guarded",
-            hostile = "vanilla_emote_thumbsdown_npc_hostile",
-            byNPCType = typedReplies("thumbsdown"),
-        },
     },
     wavehi = {
         id = "wavehi",
         eventType = "player_emote_wavehi",
-        flavorID = "vanilla_emote_wavehi",
         radius = 14,
         maxTargets = 8,
         dayGate = "greeting",
-        replyFlavor = {
-            warm = "vanilla_emote_wavehi_npc_warm",
-            reserved = "vanilla_emote_wavehi_npc_reserved",
-            byNPCType = dailyTypedReplies("wavehi"),
-        },
     },
     wavebye = {
         id = "wavebye",
         eventType = "player_emote_wavebye",
-        flavorID = "vanilla_emote_wavebye",
         radius = 14,
         maxTargets = 8,
-        replyFlavor = {
-            warm = "vanilla_emote_wavebye_npc_warm",
-            reserved = "vanilla_emote_wavebye_npc_reserved",
-            byNPCType = typedReplies("wavebye"),
-        },
     },
     thankyou = {
         id = "thankyou",
         eventType = "player_emote_thankyou",
-        flavorID = "vanilla_emote_thankyou",
         radius = 14,
         maxTargets = 8,
-        replyFlavor = {
-            warm = "vanilla_emote_thankyou_npc_warm",
-            reserved = "vanilla_emote_thankyou_npc_reserved",
-            byNPCType = typedReplies("thankyou"),
-        },
     },
     thumbsup = {
         id = "thumbsup",
         eventType = "player_emote_thumbsup",
-        flavorID = "vanilla_emote_thumbsup",
         radius = 14,
         maxTargets = 8,
-        replyFlavor = {
-            warm = "vanilla_emote_thumbsup_npc_warm",
-            reserved = "vanilla_emote_thumbsup_npc_reserved",
-            byNPCType = typedReplies("thumbsup"),
-        },
     },
     clap = {
         id = "clap",
         eventType = "player_emote_clap",
-        flavorID = "vanilla_emote_clap",
         radius = 14,
         maxTargets = 8,
-        replyFlavor = {
-            warm = "vanilla_emote_clap_npc_warm",
-            reserved = "vanilla_emote_clap_npc_reserved",
-            byNPCType = typedReplies("clap"),
-        },
     },
     salute = {
         id = "salute",
         eventType = "player_emote_salute",
-        flavorID = "vanilla_emote_salute",
         radius = 14,
         maxTargets = 8,
-        replyFlavor = {
-            warm = "vanilla_emote_salute_npc_warm",
-            reserved = "vanilla_emote_salute_npc_reserved",
-            byNPCType = typedReplies("salute"),
-        },
     },
 }
 
@@ -320,61 +229,6 @@ function Interactions.IsAutomaticGreetingEligible(relationship, npcType)
     if state == "friend" or approval >= 10 then return true end
     return (npcType == "lover" or npcType == "family")
         and familiarity >= 5
-end
-
-function Interactions.GreetingReplyFlavorID(npcType, relationshipTier, state)
-    npcType = normalizeType(npcType)
-    relationshipTier = normalizeType(relationshipTier)
-    state = normalizeType(state)
-    if not GREETING_TIERS[relationshipTier] then
-        relationshipTier = "reserved"
-    end
-    if state ~= "first" and state ~= "returning" then
-        state = "first"
-    end
-    return "social_greeting_npc_" .. npcType .. "_"
-        .. relationshipTier .. "_" .. state
-end
-
-function Interactions.ReplyFlavorID(definition, relationship, context)
-    local approval = tonumber(relationship and relationship.approval) or 0
-    local flavors = definition and definition.replyFlavor or nil
-    local npcType = normalizeType(context and context.npcType)
-    local greetingState = normalizeType(context and context.greetingState)
-    local typed = flavors and flavors.byNPCType
-        and flavors.byNPCType[npcType] or nil
-    if not flavors then return nil end
-    if definition.id == "wavehi" and context
-        and context.relationshipTier
-    then
-        return Interactions.GreetingReplyFlavorID(
-            npcType,
-            context.relationshipTier,
-            greetingState
-        )
-    end
-    if typed then
-        if type(typed) == "table" and typed[greetingState] then
-            return typed[greetingState]
-        end
-        if type(typed) == "string" then return typed end
-        if type(typed) == "table" and typed.default then
-            return typed.default
-        end
-    end
-    if definition.hostile == true then
-        if approval <= -25 then
-            return flavors.hostile or flavors.guarded
-        end
-        if approval >= 30 then
-            return flavors.familiar or flavors.guarded
-        end
-        return flavors.guarded or flavors.hostile
-    end
-    if approval >= 30 then
-        return flavors.warm or flavors.reserved
-    end
-    return flavors.reserved or flavors.warm
 end
 
 return Interactions

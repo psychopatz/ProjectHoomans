@@ -151,10 +151,9 @@ class DialogueContentPane:
             key: value
             for key, value in item.items()
             if key in {
-                "id", "kind", "semanticTemplateID", "canonicalConcept", "locked",
-                "translationKeyPrefix", "labelKey", "choiceKey", "verifiedOwner",
-                "contentOwner", "semanticAuthority", "responsePoolID",
-                "semanticVariantID", "followUpEligibility", "legacySource",
+                "id", "kind", "semanticTemplateID", "canonicalConcept", "group",
+                "contentOwner", "route", "hubID", "labelKey", "choiceKey",
+                "verifiedOwner",
             }
         }
         self._set_text(

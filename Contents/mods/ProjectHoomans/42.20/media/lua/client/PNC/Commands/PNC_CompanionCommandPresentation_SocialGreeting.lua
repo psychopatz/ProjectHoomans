@@ -95,7 +95,7 @@ function Presentation.HandleSocialGreeting(greeting)
             queueAccepted, queueReason = socialFlavor.Receive({
                 eventID = eventID,
                 npcID = npcID,
-                flavorID = greeting.flavorID,
+                poolID = greeting.poolID,
                 responsePlanID = greeting.responsePlanID,
                 realizationFamily = greeting.realizationFamily,
                 realizationID = greeting.realizationID,
@@ -155,7 +155,8 @@ function Presentation.HandleSocialGreeting(greeting)
     if not queuedReaction then
         _, text = Presentation.ShowAmbientNPCFlavor(
             body,
-            greeting.flavorID,
+            greeting.poolID or greeting.eventType
+                or "npc_proximity_greeting",
             context
         )
     end

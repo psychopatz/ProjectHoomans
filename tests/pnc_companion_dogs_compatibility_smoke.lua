@@ -113,7 +113,7 @@ T.truthy(
     "late-installed wrapper recognizes Hoomans body"
 )
 
--- The interaction remains adapter-owned: gender selects the flavor, hunger
+-- The interaction remains adapter-owned: gender is exposed as a fact, hunger
 -- gates feeding, and the bark is emitted once for the throttled event.
 Events = nil
 CharacterStat = { HUNGER = "hunger", THIRST = "thirst" }
@@ -217,23 +217,15 @@ loadAdapter()
 local interactionBridge = PNC.Compatibility.CompanionDogs
 
 T.equal(interactionBridge.GetDogSex(dog), "male", "reads male dog sex")
-T.equal(
-    interactionBridge.GetFlavorID(dog, false),
-    "companion_dogs_good_boy",
-    "selects boy flavor"
-)
 CompanionDogs.animalSex = function() return "female" end
 T.equal(
-    interactionBridge.GetFlavorID(dog, false),
-    "companion_dogs_good_girl",
-    "selects girl flavor"
+    interactionBridge.GetDogSex(dog),
+    "female",
+    "exposes female dog fact"
 )
 CompanionDogs.animalSex = function() return nil end
-T.equal(
-    interactionBridge.GetFlavorID(dog, false),
-    "companion_dogs_good_dog",
-    "selects neutral flavor"
-)
+T.falsy(interactionBridge.GetDogSex(dog),
+    "missing dog sex remains an unknown fact for semantic normalization")
 CompanionDogs.animalSex = function() return "male" end
 T.truthy(interactionBridge.IsDogHungry(dog), "detects hungry dog")
 T.truthy(interactionBridge.IsNPCNotHungry(record), "detects fed NPC")
@@ -258,12 +250,12 @@ T.truthy(interactionBridge.IsDogHungry(dog), "pump dog is hungry")
 T.truthy(interactionBridge.IsNPCNotHungry(record), "pump NPC is fed")
 T.equal(interactionBridge.GetDogKey(dog), "dog-one", "pump dog key")
 T.equal(interactionBridge.Pump(true), 1, "pumps one dog interaction")
-T.equal(sent, 1, "sends one flavor event")
+T.equal(sent, 1, "sends one semantic speech event")
 T.equal(barked, 1, "barks once for the interaction")
 T.equal(
-    lastPayload.flavorID,
-    "companion_dogs_feed_boy",
-    "feed event uses male flavor"
+    lastPayload.realizationID,
+    "semantic.compat.companion_dogs.feed.male",
+    "feed event uses the semantic male realization"
 )
 T.truthy(lastPayload.semanticOwned,
     "Companion Dogs speech is selected before compatibility presentation")

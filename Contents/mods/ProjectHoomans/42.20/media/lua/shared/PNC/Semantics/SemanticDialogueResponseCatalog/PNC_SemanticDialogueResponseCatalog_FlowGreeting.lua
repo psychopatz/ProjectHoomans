@@ -47,6 +47,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
             id = "semantic.flow.greeting.opening.rain",
             templateID = "semantic.flow.greeting.opening.rain",
             fallback = "Hey there. Wet one today.",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { raining = true },
             priority = 3,
             plan = {
@@ -84,6 +85,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
             id = "semantic.flow.greeting.opening.friendly",
             templateID = "semantic.flow.greeting.opening.friendly",
             fallback = "Hey! Good to see you.",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { socialStyle = "friendly" },
             priority = 2,
             plan = {
@@ -123,6 +125,7 @@ Catalog.Register("semantic.flow.greeting.opening", {
             id = "semantic.flow.greeting.opening.default",
             templateID = "semantic.flow.greeting.opening.default",
             fallback = "Hey there. Good to see you.",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             plan = {
                 dialogueAct = "GREETING_OPENING",
                 sourcePoolID = "semantic.flow.greeting.opening",

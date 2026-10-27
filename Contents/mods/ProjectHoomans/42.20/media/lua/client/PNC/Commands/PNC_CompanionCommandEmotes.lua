@@ -332,7 +332,7 @@ function ISEmoteRadialMenu:emote(emote)
                 if PNC.CompanionCommandPresentation.EnqueueFlavor then
                     if playerRealization then
                         PNC.CompanionCommandPresentation.EnqueueFlavor(
-                            vanillaDefinition.flavorID,
+                            playerRealization.realizationID,
                             "player",
                             player,
                             socialContext,

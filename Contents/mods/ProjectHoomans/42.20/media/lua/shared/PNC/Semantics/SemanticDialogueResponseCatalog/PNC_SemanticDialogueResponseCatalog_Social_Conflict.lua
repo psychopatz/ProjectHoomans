@@ -107,15 +107,14 @@ Catalog.Register("semantic.threat", {
 })
 
 -- Vanilla emotes enter the semantic lifecycle as acts.  These pools are the
--- response authority; the old role/tier Flavor IDs remain content aliases
--- only and are not consulted for the selected reaction.
+-- response authority; wording is supplied by Dialogue Content.
 Catalog.Register("semantic.emote.reply", {
     variants = {
         {
             id = "semantic.emote.reply.thumbsup.active",
             templateID = "semantic.emote.reply.thumbsup.active",
             fallback = "Good. Let's keep moving on this.",
-            compatibilityFlavorID = "vanilla_emote_thumbsup_npc_neutral",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thumbsup", previousTopic = "water" },
             priority = 4,
             plan = {
@@ -131,7 +130,7 @@ Catalog.Register("semantic.emote.reply", {
             id = "semantic.emote.reply.thumbsup",
             templateID = "semantic.emote.reply.thumbsup",
             fallback = "Good.",
-            compatibilityFlavorID = "vanilla_emote_thumbsup_npc_neutral",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thumbsup" },
             priority = 2,
             plan = {
@@ -147,7 +146,7 @@ Catalog.Register("semantic.emote.reply", {
             id = "semantic.emote.reply.thumbsdown",
             templateID = "semantic.emote.reply.thumbsdown",
             fallback = "I got the message. Tell me what is wrong.",
-            compatibilityFlavorID = "vanilla_emote_thumbsdown_npc_neutral",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thumbsdown" },
             priority = 2,
             plan = {
@@ -163,7 +162,7 @@ Catalog.Register("semantic.emote.reply", {
             id = "semantic.emote.reply.insult",
             templateID = "semantic.emote.reply.insult",
             fallback = "Keep it respectful.",
-            compatibilityFlavorID = "vanilla_emote_insult_npc_neutral",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "insult" },
             priority = 2,
             plan = {
@@ -179,7 +178,7 @@ Catalog.Register("semantic.emote.reply", {
             id = "semantic.emote.reply.wavehi",
             templateID = "semantic.emote.reply.wavehi",
             fallback = "Hey.",
-            compatibilityFlavorID = "vanilla_emote_wavehi_npc_neutral",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "wavehi" },
             priority = 2,
             plan = {
@@ -195,7 +194,7 @@ Catalog.Register("semantic.emote.reply", {
             id = "semantic.emote.reply.wavebye",
             templateID = "semantic.emote.reply.wavebye",
             fallback = "Take care.",
-            compatibilityFlavorID = "vanilla_emote_wavebye_npc_neutral",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "wavebye" },
             priority = 2,
             plan = {
@@ -211,7 +210,7 @@ Catalog.Register("semantic.emote.reply", {
             id = "semantic.emote.reply.thankyou",
             templateID = "semantic.emote.reply.thankyou",
             fallback = "You're welcome.",
-            compatibilityFlavorID = "vanilla_emote_thankyou_npc_neutral",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "thankyou" },
             priority = 2,
             plan = {
@@ -227,7 +226,7 @@ Catalog.Register("semantic.emote.reply", {
             id = "semantic.emote.reply.clap",
             templateID = "semantic.emote.reply.clap",
             fallback = "Thanks. It was a small win.",
-            compatibilityFlavorID = "vanilla_emote_clap_npc_neutral",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "clap" },
             priority = 2,
             plan = {
@@ -243,7 +242,7 @@ Catalog.Register("semantic.emote.reply", {
             id = "semantic.emote.reply.salute",
             templateID = "semantic.emote.reply.salute",
             fallback = "Stay sharp.",
-            compatibilityFlavorID = "vanilla_emote_salute_npc_neutral",
+            contentOwner = "projecthoomans.dialogue_content.commands_emotes",
             when = { action = "salute" },
             priority = 2,
             plan = {

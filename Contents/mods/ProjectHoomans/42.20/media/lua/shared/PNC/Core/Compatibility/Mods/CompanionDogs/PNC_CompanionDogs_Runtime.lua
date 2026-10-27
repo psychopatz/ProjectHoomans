@@ -40,7 +40,6 @@ local function runtimeTick()
         return
     end
     Bridge._nextRuntimeProbeAt = current + 1000
-    if not Bridge._flavorsRegistered then Bridge.RegisterFlavors() end
     if type(CompanionDogs) ~= "table" then return end
     Bridge.Pump()
 end

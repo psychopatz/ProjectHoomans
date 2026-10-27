@@ -125,18 +125,6 @@ function Bridge.GetDogKey(dog)
     return nil
 end
 
-function Bridge.GetFlavorID(dog, fed)
-    local sex = Bridge.GetDogSex(dog)
-    if fed then
-        if sex == "male" then return "companion_dogs_feed_boy" end
-        if sex == "female" then return "companion_dogs_feed_girl" end
-        return "companion_dogs_feed_dog"
-    end
-    if sex == "male" then return "companion_dogs_good_boy" end
-    if sex == "female" then return "companion_dogs_good_girl" end
-    return "companion_dogs_good_dog"
-end
-
 function Bridge.IsDogEligible(dog)
     local cd = Internal.CompanionDogs()
     local ok

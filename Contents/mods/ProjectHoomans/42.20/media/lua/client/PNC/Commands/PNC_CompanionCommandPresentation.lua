@@ -19,6 +19,15 @@ if type(InteractionLifecycle) ~= "table" then
     )
     InteractionLifecycle = ok and loaded or nil
 end
+local CompanionSpeech = PNC.Semantics
+    and PNC.Semantics.CompanionSpeech or nil
+if type(CompanionSpeech) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticCompanionSpeech"
+    )
+    CompanionSpeech = ok and loaded or nil
+end
 if type(RealizationAuthority) ~= "table" then
     local ok, loaded = pcall(
         require,
@@ -29,7 +38,6 @@ end
 
 local Presentation = PNC.CompanionCommandPresentation
 local Commands = PNC.CompanionCommands
-local Flavor = PNC.CompanionCommandFlavor
 local Identity = PNC.NPCIdentityPresentation
 local FlavorAddress = PNC.FlavorAddress
 local Registry = PNC.Registry
@@ -272,9 +280,8 @@ function Presentation.BuildFlavorContext(player, context)
     }
 end
 
--- Select the player's emote speech meaning before the authored content
--- renderer is reached. CompanionCommandFlavor remains the compatibility
--- content source for localized wording variants only.
+-- Select the player's emote meaning before the authored content renderer is
+-- reached. SpeechRealization then applies the canonical Dialogue Content.
 function Presentation.ResolvePlayerEmoteRealization(emoteID, context)
     context = type(context) == "table" and context or {}
     local state = PNC.Network and PNC.Network.ClientState or {}
@@ -282,29 +289,17 @@ function Presentation.ResolvePlayerEmoteRealization(emoteID, context)
         or getSpecificPlayer and getSpecificPlayer(0) or nil
     local action = tostring(emoteID or "")
     local actorID = semanticPlayerID(player, state)
-    local realization
-    local reason
     if action == "" then return nil, "player_emote_action_required" end
-    if not RealizationAuthority
-        or type(RealizationAuthority.Resolve) ~= "function"
+    context.npcID = context.npcID or "player:" .. actorID
+    context.renderTokens = context.renderTokens
+        or Presentation.BuildFlavorContext(player, context)
+    if not CompanionSpeech
+        or type(CompanionSpeech.ResolvePlayerEmote) ~= "function"
     then
         return nil, "semantic_realization_unavailable"
     end
-    realization, reason = RealizationAuthority.Resolve({
-        poolID = "semantic.emote.player",
-        responsePlanID = "semantic.emote.player",
-        realizationFamily = "emote_player",
-        act = PLAYER_EMOTE_ACTS[action] or "REACT",
-        context = {
-            action = action,
-            eventType = context.eventType or "player_emote_" .. action,
-            npcID = "player:" .. actorID,
-            currentTopic = context.currentTopic or context.topic,
-            previousTopic = context.previousTopic,
-            socialStyle = context.socialStyle,
-        },
-        salt = context.requestID or context.eventID or action,
-    })
+    local realization, reason = CompanionSpeech.ResolvePlayerEmote(
+        action, context)
     if not realization then
         return nil, reason or "player_emote_realization_unavailable"
     end
@@ -315,7 +310,8 @@ function Presentation.ResolvePlayerEmoteRealization(emoteID, context)
 end
 
 function Presentation.ShowPlayerFlavor(player, commandID, context)
-    local seed
+    local outcome
+    local realization
     local text
     local flavorContext
     if not player
@@ -324,13 +320,26 @@ function Presentation.ShowPlayerFlavor(player, commandID, context)
         return false
     end
     Presentation.FlavorRevision = Presentation.FlavorRevision + 1
-    seed = tostring(player.getUsername and player:getUsername() or "")
-        .. ":" .. tostring(PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0)
-        .. ":" .. tostring(Presentation.FlavorRevision)
+    context = type(context) == "table" and context or {}
+    context.playerActor = player
     flavorContext = Presentation.BuildFlavorContext(player, context)
-    text = Flavor and Flavor.Resolve
-        and Flavor.Resolve(commandID, "player", seed, flavorContext)
-        or nil
+    context.renderTokens = context.renderTokens or flavorContext
+    outcome = context.commandOutcome or context.outcome
+    if string.sub(tostring(commandID or ""), 1, 14)
+        == "vanilla_emote_"
+    then
+        realization = CompanionSpeech and CompanionSpeech.ResolvePlayerEmote
+            and CompanionSpeech.ResolvePlayerEmote(
+                string.sub(tostring(commandID), 15), context)
+            or nil
+    else
+        realization = CompanionSpeech
+            and CompanionSpeech.ResolvePlayerCommand
+            and CompanionSpeech.ResolvePlayerCommand(
+                commandID, outcome, context)
+            or nil
+    end
+    text = realization and realization.fallback or nil
     -- The player adapter keeps the standard visible presentation and
     -- best-effort routes the same canonical line through the optional voice
     -- endpoint. If the brain is unavailable it remains a normal game string.
@@ -351,7 +360,7 @@ function Presentation.ShowNPCFlavor(actor, flavorID, context)
     local player = type(context) == "table" and context.playerActor
         or getSpecificPlayer and getSpecificPlayer(0) or nil
     local flavorContext
-    local seed
+    local realization
     local text
     if not actor or not flavorID
         or actor.isDead and actor:isDead()
@@ -359,12 +368,28 @@ function Presentation.ShowNPCFlavor(actor, flavorID, context)
         return false
     end
     Presentation.FlavorRevision = Presentation.FlavorRevision + 1
+    context = type(context) == "table" and context or {}
+    context.playerActor = context.playerActor or player
     flavorContext = Presentation.BuildFlavorContext(player, context)
-    seed = type(context) == "table" and context.seed or nil
-    seed = tostring(seed or "") .. ":" .. tostring(Presentation.FlavorRevision)
-    text = Flavor and Flavor.Resolve
-        and Flavor.Resolve(flavorID, "npc", seed, flavorContext)
-        or nil
+    context.renderTokens = context.renderTokens or flavorContext
+    text = context.resolvedText
+    realization = context.semanticRealization
+    if not text and not realization and CompanionSpeech then
+        if context.commandID and CompanionSpeech.ResolveNPCCommand then
+            realization = CompanionSpeech.ResolveNPCCommand(
+                context.commandID,
+                context.commandOutcome or context.outcome,
+                context
+            )
+        elseif context.emoteID and CompanionSpeech.ResolveNPCEmote then
+            realization = CompanionSpeech.ResolveNPCEmote(
+                context.emoteID, context)
+        end
+    end
+    text = text or realization and realization.fallback or nil
+    if not text or text == "" then
+        return false, "semantic_realization_required"
+    end
     return speak(actor, text), text
 end
 
@@ -654,7 +679,7 @@ end
 Presentation.Internal = Presentation.Internal or {}
 local Internal = Presentation.Internal
 Internal.Registry = Registry
-Internal.Flavor = Flavor
+Internal.CompanionSpeech = CompanionSpeech
 Internal.TargetName = targetName
 Internal.speak = speak
 

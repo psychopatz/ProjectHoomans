@@ -53,8 +53,9 @@ T.load("PsychopatzCore", "common",
 T.load("PsychopatzCore", "common",
     "PsychopatzCore/Conversation/PsychopatzConversationMessage.lua")
 T.load(CLIENT .. "PNC/UI/Nameplates/PNC_NameplateSpeech.lua")
-T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavor.lua")
-T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavorDefinitions.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticCompanionSpeech.lua")
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandPresentation.lua")
 
 local Message = PsychopatzCore.Conversation.Message
@@ -65,7 +66,12 @@ T.equal(
     Presentation.HandleSocialGreeting({
         eventID = "conversation:proximity_greeting:one",
         npcID = "npc-one",
-        flavorID = "social_greeting_npc_neutral_warm_first",
+        poolID = "greeting",
+        responsePlanID = "semantic.flow.greeting.opening",
+        realizationFamily = "greeting",
+        realizationID = "semantic.flow.greeting.opening.friendly",
+        resolvedText = "Good to see you.",
+        semanticOwned = true,
         npcType = "neutral",
         relationshipTier = "warm",
         greetingState = "first",
@@ -92,7 +98,11 @@ T.equal(
     Presentation.HandleSocialGreeting({
         eventID = "conversation:proximity_greeting:one",
         npcID = "npc-one",
-        flavorID = "social_greeting_npc_neutral_warm_first",
+        poolID = "greeting",
+        responsePlanID = "semantic.flow.greeting.opening",
+        realizationFamily = "greeting",
+        realizationID = "semantic.flow.greeting.opening.friendly",
+        semanticOwned = true,
     }),
     false,
     "duplicate ambient event is ignored"

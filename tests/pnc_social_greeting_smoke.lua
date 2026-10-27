@@ -210,9 +210,19 @@ T.equal(presentationRequests[1].options.eventID,
 T.equal(presentationRequests[1].options.reason, "proximity_greeting",
     "proximity greeting animation reports its source")
 T.equal(
-    speechBroadcasts[1].flavorID,
-    "social_greeting_npc_neutral_warm_first",
-    "friendly neutral NPC receives warm first greeting flavor"
+    speechBroadcasts[1].poolID,
+    "greeting",
+    "friendly neutral NPC uses the semantic greeting realization family"
+)
+T.equal(
+    speechBroadcasts[1].responsePlanID,
+    "semantic.flow.greeting.opening",
+    "greeting carries its canonical semantic response plan"
+)
+T.contains(
+    speechBroadcasts[1].realizationID,
+    "semantic.flow.greeting.opening",
+    "greeting carries its canonical semantic realization"
 )
 T.equal(
     Interactions.GreetingState(
@@ -293,9 +303,16 @@ T.equal(
     "hostile NPCs do not receive friendly automatic greeting behavior"
 )
 T.equal(
-    Interactions.GreetingReplyFlavorID("family", "warm", "first"),
-    "social_greeting_npc_family_warm_first",
-    "family greeting flavor is relationship-aware"
+    PNC.Semantics.CompanionSpeech.ResolveGreeting({
+        npcID = "npc-family",
+        npcType = "family",
+        relationshipTier = "warm",
+        greetingState = "first",
+        socialStyle = "friendly",
+        eventID = "family-greeting-semantic",
+    }).responsePlanID,
+    "semantic.flow.greeting.opening",
+    "family greeting uses the canonical semantic response plan"
 )
 
 return T.finish("pnc_social_greeting_smoke")

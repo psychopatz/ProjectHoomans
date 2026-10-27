@@ -67,8 +67,9 @@ package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
 getSpecificPlayer = function() return player end
 
-T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavor.lua")
-T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavorDefinitions.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticCompanionSpeech.lua")
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandPresentation.lua")
 
 local playerEmoteRealization =
@@ -81,9 +82,8 @@ T.equal(playerEmoteRealization.responsePlanID, "semantic.emote.player",
 T.equal(playerEmoteRealization.realizationID,
     "semantic.emote.player.wavehi",
     "player emote presentation selects a gesture realization")
-T.equal(playerEmoteRealization.compatibilityFlavorID,
-    "vanilla_emote_wavehi",
-    "player emote presentation renders only through the selected content alias")
+T.equal(playerEmoteRealization.compatibilityFlavorID, nil,
+    "player emote no longer carries a wording-registry alias")
 
 local unknownTarget = {
     id = "npc-unknown",
@@ -105,12 +105,14 @@ T.equal(string.find(
     1,
     true
 ), nil, "player emote target addresses do not leak the placeholder")
-local unknownAddressLine = PNC.CompanionCommandFlavor.Resolve(
-    "vanilla_emote_wavehi",
-    "player",
-    "unknown-address",
-    unknownAddressContext
-)
+local unknownAddressLine = PNC.Semantics.CompanionSpeech.ResolvePlayerEmote(
+    "wavehi",
+    {
+        npcID = "player:one",
+        requestID = "unknown-address",
+        renderTokens = unknownAddressContext,
+    }
+).fallback
 T.truthy(string.find(unknownAddressLine, "stranger and Mara", 1, true),
     "rendered emote speech uses semantic target addresses")
 T.truthy(state.semanticAddressHistory
@@ -136,7 +138,7 @@ local result = PNC.CompanionCommandPresentation
                 npcID = "npc-one",
                 accepted = true,
                 eventID = "event-one",
-                replyFlavorID = "vanilla_emote_insult_npc_guarded",
+                realizationID = "semantic.emote.reply.insult",
                 relationshipBefore = { approval = 20, respect = 20 },
                 relationshipAfter = {
                     approval = 16,
@@ -174,25 +176,21 @@ T.truthy(diaryEntries[1].entry.npcText,
     "diary contains dynamic NPC reply text")
 T.truthy(#spoken > 0, "NPC reply flavor is spoken when the body is live")
 
-PNC.CompanionCommandFlavor.Register("companion_dogs_good_boy", {
-    npc = { { fallback = "Who's a good boy?" } },
-})
 local dogGreetingResult =
     PNC.CompanionCommandPresentation.HandleSocialGreeting({
         eventID = "dog-event-one",
         npcID = "npc-one",
-        flavorID = "companion_dogs_good_boy",
-        eventType = "companion_dog",
+        poolID = "semantic.compat.companion_dogs.greeting",
+        eventType = "companion_dog_greeting",
         interactionType = "companion_dog_greeting",
+        resolvedText = "Who's a good boy?",
+        responsePlanID = "semantic.compat.companion_dogs.greeting",
+        realizationFamily = "semantic.compat.companion_dogs.greeting",
+        realizationID = "semantic.compat.companion_dogs.greeting.male",
+        semanticOwned = true,
     })
 T.equal(dogGreetingResult, true,
     "Companion Dogs greeting reaches the canonical presenter")
-T.equal(
-    PNC.CompanionCommandFlavor.Resolve(
-        "companion_dogs_good_boy", "npc", "dog-event-one", {}
-    ),
-    "Who's a good boy?",
-    "Companion Dogs greeting resolves its registered flavor")
 
 PNC.RelationshipPresentation = {
     Summarize = function(relationship) return relationship end,

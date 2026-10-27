@@ -1,8 +1,7 @@
 -- Semantic realization plans for the player's visible vanilla-emote speech.
 --
--- The existing CompanionCommandFlavor groups remain authored localized
--- content.  They are compatibility aliases selected only after this pool
--- has chosen the semantic emote meaning and realization family.
+-- Dialogue Content is the only first-party wording owner.  The pool below
+-- chooses the semantic act; SpeechRealization applies the authored phrase.
 
 local Catalog = PNC.Semantics.ResponseCatalog
 
@@ -11,56 +10,48 @@ local DEFINITIONS = {
         action = "insult",
         act = "INSULT",
         topic = "hostility",
-        flavorID = "vanilla_emote_insult",
         fallback = "Back off.",
     },
     {
         action = "thumbsdown",
         act = "DISAPPROVE",
         topic = "disapproval",
-        flavorID = "vanilla_emote_thumbsdown",
         fallback = "No.",
     },
     {
         action = "wavehi",
         act = "GREET",
         topic = "greeting",
-        flavorID = "vanilla_emote_wavehi",
-        fallback = "Hey.",
+        fallback = "Hey, {names}.",
     },
     {
         action = "wavebye",
         act = "FAREWELL",
         topic = "farewell",
-        flavorID = "vanilla_emote_wavebye",
         fallback = "Take care.",
     },
     {
         action = "thankyou",
         act = "THANK",
         topic = "thanks",
-        flavorID = "vanilla_emote_thankyou",
         fallback = "Thanks.",
     },
     {
         action = "thumbsup",
         act = "ACK",
         topic = "acknowledgement",
-        flavorID = "vanilla_emote_thumbsup",
         fallback = "Good.",
     },
     {
         action = "clap",
         act = "PRAISE",
         topic = "praise",
-        flavorID = "vanilla_emote_clap",
         fallback = "Well done.",
     },
     {
         action = "salute",
         act = "ACK",
         topic = "acknowledgement",
-        flavorID = "vanilla_emote_salute",
         fallback = "Respect.",
     },
 }
@@ -77,7 +68,7 @@ for index = 1, #DEFINITIONS do
         id = realizationID,
         templateID = realizationID,
         fallback = definition.fallback,
-        compatibilityFlavorID = definition.flavorID,
+        contentOwner = "projecthoomans.dialogue_content.commands_emotes",
         dialogueAct = definition.act,
         topic = definition.topic,
         when = { action = definition.action },

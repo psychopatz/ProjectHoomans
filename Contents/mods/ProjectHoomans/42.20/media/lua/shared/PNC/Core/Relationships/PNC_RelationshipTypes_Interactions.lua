@@ -59,9 +59,8 @@ local function normalizeInteraction(value)
         npcTextKey = boundedString(source.npcTextKey, 256),
         playerText = boundedString(source.playerText, 512),
         npcText = boundedString(source.npcText, 512),
-        playerFlavorID = boundedString(source.playerFlavorID, 256),
-        npcFlavorID = boundedString(source.npcFlavorID
-            or source.replyFlavorID or source.flavorID, 256),
+        playerSpeechID = boundedString(source.playerSpeechID, 256),
+        npcSpeechID = boundedString(source.npcSpeechID, 256),
         emote = boundedString(source.emote, 64),
         reaction = boundedString(source.reaction, 64),
         intensity = boundedString(source.intensity, 32),

@@ -2,7 +2,7 @@
 local Presentation = PNC.CompanionCommandPresentation
 local Internal = Presentation.Internal
 local Registry = Internal.Registry
-local Flavor = Internal.Flavor
+local CompanionSpeech = Internal.CompanionSpeech
 local speak = Internal.speak
 local SpeechDelivery = PNC.Semantics
     and PNC.Semantics.SemanticSpeechDelivery
@@ -88,7 +88,7 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
                     realizationFamily = target.realizationFamily,
                     realizationID = target.realizationID,
                     factRefs = target.factRefs,
-                    compatibilityFlavorID = target.replyFlavorID,
+                    contentOwner = target.contentOwner,
                     family = "emote_interaction_reply",
                     priority = 100,
                     weight = 100,
@@ -105,9 +105,30 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
                     eventType = target.interactionType
                         or "player_emote_reply",
                 })
-            elseif target.replyFlavorID then
+            else
+                local npcRealization = CompanionSpeech
+                    and CompanionSpeech.ResolveNPCEmote
+                    and CompanionSpeech.ResolveNPCEmote(
+                        result.emote,
+                        {
+                            target = snapshot,
+                            targets = { snapshot },
+                            npcID = npcID,
+                            playerActor = player,
+                            relationshipState = target.relationshipAfter
+                                and target.relationshipAfter.state or nil,
+                            relationshipTier = target.relationshipTier,
+                            greetingState = target.greetingState,
+                            requestID = requestID,
+                            eventID = target.eventID or key,
+                            renderTokens = flavorContext,
+                        }
+                    ) or nil
+                if not npcRealization then
+                    return false
+                end
                 _, _, replyText = Presentation.EnqueueFlavor(
-                    target.replyFlavorID,
+                    npcRealization.realizationID,
                     "npc",
                     body,
                     {
@@ -119,21 +140,34 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
                         playerActor = player,
                         commandID = "vanilla_emote_"
                             .. tostring(result.emote),
+                        emoteID = tostring(result.emote or ""),
                         seed = target.eventID or key,
                     },
                     {
                         eventID = target.eventID or key,
                         family = "emote_interaction",
+                        semanticRealization = npcRealization,
                     }
                 )
             end
-            if Flavor and Flavor.Resolve then
-                playerText = Flavor.Resolve(
-                    "vanilla_emote_" .. tostring(result.emote or ""),
-                    "player",
-                    requestID,
-                    flavorContext
-                )
+            if CompanionSpeech
+                and type(CompanionSpeech.ResolvePlayerEmote) == "function"
+            then
+                local playerRealization =
+                    CompanionSpeech.ResolvePlayerEmote(
+                        tostring(result.emote or ""),
+                        {
+                            playerActor = player,
+                            npcID = "player:" .. tostring(
+                                player and player.getUsername
+                                    and player:getUsername() or "local"),
+                            requestID = requestID,
+                            eventID = target.eventID or key,
+                            renderTokens = flavorContext,
+                        }
+                    )
+                playerText = playerRealization
+                    and playerRealization.fallback or nil
             end
             if target.relationshipAfter
                 and PNC.Conversation
@@ -300,14 +334,22 @@ function Presentation.SyncAcknowledgement(zombie, snapshot, modData)
         npcID = snapshot and snapshot.id,
         target = snapshot,
     })
-    text = Flavor and Flavor.Resolve
-        and Flavor.Resolve(
+    if CompanionSpeech and CompanionSpeech.ResolveNPCCommand then
+        local realization = CompanionSpeech.ResolveNPCCommand(
             feedback.id,
-            "npc",
-            tostring(snapshot.id or "") .. ":" .. tostring(revision),
-            flavorContext
+            feedback.reason == "rejected" and "invalid" or "valid",
+            {
+                npcID = snapshot and snapshot.id,
+                commandID = feedback.id,
+                commandOutcome = feedback.reason == "rejected"
+                    and "invalid" or "valid",
+                requestID = tostring(snapshot.id or "") .. ":"
+                    .. tostring(revision),
+                renderTokens = flavorContext,
+            }
         )
-        or nil
+        text = realization and realization.fallback or nil
+    end
     return speak(zombie, text)
 end
 

@@ -14,7 +14,7 @@ Core.CONDITION_FIELDS = {
     "needType", "needUrgency", "relationshipAttitude", "healthState",
     "socialStyle", "emotionType", "emotionUrgency", "hostilityCount",
     "insultCount", "lastSpeechAct",
-    "eventType", "commandID", "commandReason",
+    "eventType", "commandID", "commandReason", "commandOutcome",
     "toolStatus", "toolReason", "toolReaction", "toolSubtype",
     "toolOutcome",
     "medicalBandageRequired", "medicalBandageStatus",
@@ -23,7 +23,8 @@ Core.CONDITION_FIELDS = {
     "leaderGrief", "leaderSuccession", "corpseRevenge",
     "projectALifeKind", "projectALifeStance",
     "projectALifeConflictDirection", "projectALifeConflictDamage",
-    "companionDogSex", "companionDogFed",
+    "companionDogSex", "companionDogFed", "npcType", "relationshipTier",
+    "greetingState",
 }
 
 function Core.copy(value, depth)
@@ -70,6 +71,12 @@ local function migratedContentOwner(poolID)
     end
     if string.find(poolID, "semantic.tool_reply.", 1, true) == 1 then
         return "projecthoomans.dialogue_content.tool_replies"
+    end
+    if string.find(poolID, "semantic.command.", 1, true) == 1
+        or string.find(poolID, "semantic.emote.", 1, true) == 1
+        or string.find(poolID, "semantic.flow.greeting.", 1, true) == 1
+    then
+        return "projecthoomans.dialogue_content.commands_emotes"
     end
     if string.find(poolID, "semantic.medical.", 1, true) == 1
         or string.find(poolID, "semantic.combat.", 1, true) == 1
@@ -168,6 +175,7 @@ function Core.conditionContext(context)
         eventType = context.eventType,
         commandID = context.commandID,
         commandReason = context.commandReason,
+        commandOutcome = context.commandOutcome,
         toolStatus = context.toolStatus,
         toolReason = context.toolReason,
         toolReaction = context.toolReaction,
@@ -217,6 +225,9 @@ function Core.conditionContext(context)
         projectALifeConflictDamage = context.projectALifeConflictDamage,
         companionDogSex = context.companionDogSex,
         companionDogFed = context.companionDogFed,
+        npcType = context.npcType,
+        relationshipTier = context.relationshipTier,
+        greetingState = context.greetingState,
     }
 end
 

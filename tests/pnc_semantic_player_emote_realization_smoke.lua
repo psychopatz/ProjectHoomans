@@ -54,8 +54,9 @@ package.preload["ISUI/ISEmoteRadialMenu"] = function()
     return ISEmoteRadialMenu
 end
 
-T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavor.lua")
-T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavorDefinitions.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticCompanionSpeech.lua")
 T.load(SHARED .. "PNC/Core/Commands/PNC_VanillaEmoteInteractions.lua")
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandPresentation.lua")
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandEmotes.lua")
@@ -81,8 +82,8 @@ T.truthy(executed, "player emote gameplay request remains dispatched")
 T.truthy(executed.context.responsePlanID,
     "player emote context records semantic provenance")
 T.equal(#queued, 1, "player emote speech is queued once")
-T.equal(queued[1].flavorID, "vanilla_emote_wavehi",
-    "player emote retains the authored content alias at the renderer")
+T.equal(queued[1].flavorID, "semantic.emote.player.wavehi",
+    "player emote is queued by its semantic realization identity")
 T.equal(queued[1].options.semanticRealization.responsePlanID,
     "semantic.emote.player",
     "queued player emote carries the semantic response plan")

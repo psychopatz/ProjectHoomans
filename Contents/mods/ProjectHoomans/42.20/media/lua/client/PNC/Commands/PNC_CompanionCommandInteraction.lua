@@ -1,7 +1,7 @@
 -- Command outcome policy for player/NPC interactive exchanges.
 --
 -- Delivery is delegated to the bounded Core queue adapter.  This module only
--- maps command outcomes to flavor IDs and suppresses duplicate legacy acks.
+-- maps command outcomes to semantic plans and suppresses duplicate acks.
 
 PNC = PNC or {}
 PNC.CompanionCommandPresentation = PNC.CompanionCommandPresentation or {}
@@ -10,14 +10,14 @@ require "PNC/Commands/PNC_CompanionCommandInteractionQueue"
 
 local Presentation = PNC.CompanionCommandPresentation
 local Registry = PNC.Registry
-local RealizationAuthority = PNC.Semantics
-    and PNC.Semantics.RealizationAuthority or nil
-if type(RealizationAuthority) ~= "table" then
+local CompanionSpeech = PNC.Semantics
+    and PNC.Semantics.CompanionSpeech or nil
+if type(CompanionSpeech) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+        "PNC/Semantics/PNC_SemanticCompanionSpeech"
     )
-    RealizationAuthority = ok and loaded or nil
+    CompanionSpeech = ok and loaded or nil
 end
 
 Presentation.CommandAckSuppressions =
@@ -84,7 +84,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
     local playerContext = copyContext(context)
     local npcContext
     local actor
-    local playerFlavorID
+    local playerSpeech
     local responseID
     local playerShown
     local npcShown
@@ -99,6 +99,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
     playerContext.target = target
     playerContext.targets = targets
     playerContext.commandID = commandID
+    playerContext.commandOutcome = outcome
     if target then targetList[#targetList + 1] = target end
     if type(targets) == "table" then
         for _, value in ipairs(targets) do
@@ -108,10 +109,14 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
     if #targetList == 0 and respondent then targetList[1] = respondent end
     if #targetList == 0 then
         if commandID ~= "camp" then return false end
-        playerFlavorID = outcome == "invalid"
-            and "camp_rejected" or "camp_no_npc"
+        playerSpeech = CompanionSpeech
+            and CompanionSpeech.ResolvePlayerCommand
+            and CompanionSpeech.ResolvePlayerCommand(
+                commandID, outcome, playerContext)
+            or nil
+        if not playerSpeech then return false end
         queued = Presentation.EnqueueFlavor(
-            playerFlavorID,
+            playerSpeech.realizationID,
             "player",
             player,
             playerContext,
@@ -119,6 +124,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
                 eventID = type(context) == "table" and context.requestID
                     or nil,
                 family = "emote_interaction",
+                semanticRealization = playerSpeech,
             }
         )
         return queued == true
@@ -126,10 +132,15 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
     if outcome == "none" then
         if commandID ~= "camp" then return false end
         queued = Presentation.EnqueueFlavor(
-            "camp_no_npc", "player", player, playerContext, {
+            "semantic.command.player.camp_none", "player", player,
+            playerContext, {
                 eventID = type(context) == "table" and context.requestID
                     or nil,
                 family = "emote_interaction",
+                semanticRealization = CompanionSpeech
+                    and CompanionSpeech.ResolvePlayerCommand
+                    and CompanionSpeech.ResolvePlayerCommand(
+                        "camp", "none", playerContext) or nil,
             }
         )
         return queued == true
@@ -139,12 +150,19 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
     then
         return false
     end
-    playerFlavorID = outcome == "invalid" and "camp_rejected" or commandID
+    playerSpeech = CompanionSpeech
+        and CompanionSpeech.ResolvePlayerCommand
+        and CompanionSpeech.ResolvePlayerCommand(
+            commandID, outcome, playerContext)
+        or nil
+    if not playerSpeech and options.playerAlreadySpoke ~= true then
+        return false
+    end
     if options.playerAlreadySpoke == true then
         playerShown = true
     else
         playerShown = Presentation.EnqueueFlavor(
-            playerFlavorID,
+            playerSpeech.realizationID,
             "player",
             player,
             playerContext,
@@ -152,6 +170,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
                 eventID = type(context) == "table" and context.requestID
                     or nil,
                 family = "emote_interaction",
+                semanticRealization = playerSpeech,
             }
         )
     end
@@ -159,33 +178,34 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
         suppressAcknowledgements(commandID, targetList)
         return playerShown == true
     end
-    responseID = outcome == "invalid" and "camp_rejected" or commandID
-    if RealizationAuthority
-        and type(RealizationAuthority.Resolve) == "function"
+    responseID = commandID
+    if CompanionSpeech
+        and type(CompanionSpeech.ResolveNPCCommand) == "function"
     then
-        npcRealization = RealizationAuthority.Resolve({
-            poolID = "semantic.companion.reaction",
-            responsePlanID = "semantic.companion.reaction",
-            realizationFamily = "companion_command_reply",
-            act = outcome == "invalid" and "REACT" or "ACK",
-            topic = "companion_command",
-            context = {
+        npcRealization = CompanionSpeech.ResolveNPCCommand(
+            commandID,
+            outcome,
+            {
                 eventType = outcome == "invalid"
                     and "companion_command_rejection"
                     or "companion_command_acknowledgement",
                 npcID = respondent and respondent.id,
                 commandID = commandID,
+                commandOutcome = outcome,
                 commandReason = context and context.commandReason or nil,
                 currentTopic = "companion_command",
                 relationshipState = context
                     and context.relationshipState or nil,
                 socialStyle = context and context.socialStyle or nil,
-                action = commandID,
-            },
-            salt = tostring(context and (context.requestID
-                or context.eventID) or commandID),
-        })
+                requestID = context and context.requestID or nil,
+                eventID = context and context.eventID or nil,
+                renderTokens = Presentation.BuildFlavorContext(
+                    player, { target = respondent }
+                ),
+            }
+        )
     end
+    if not npcRealization then return playerShown == true end
     for _, value in ipairs(targetList) do
         currentTarget = value
         actor = Registry and Registry.GetLiveZombie and currentTarget.id
@@ -195,6 +215,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
         npcContext = copyContext(context)
         npcContext.playerActor = player
         npcContext.commandID = commandID
+        npcContext.commandOutcome = outcome
         npcContext.eventType = outcome == "invalid"
             and "companion_command_rejection"
             or "companion_command_acknowledgement"

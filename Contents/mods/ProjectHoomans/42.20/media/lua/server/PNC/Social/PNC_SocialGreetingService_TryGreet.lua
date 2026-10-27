@@ -21,14 +21,14 @@ local InteractionLifecycle = PNC.Semantics
     and PNC.Semantics.InteractionLifecycle or nil
 local InteractionPersistence = PNC.Conversation
     and PNC.Conversation.InteractionLifecyclePersistence or nil
-local RealizationAuthority = PNC.Semantics
-    and PNC.Semantics.RealizationAuthority or nil
-if not RealizationAuthority then
+local CompanionSpeech = PNC.Semantics
+    and PNC.Semantics.CompanionSpeech or nil
+if not CompanionSpeech then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+        "PNC/Semantics/PNC_SemanticCompanionSpeech"
     )
-    RealizationAuthority = ok and loaded or nil
+    CompanionSpeech = ok and loaded or nil
 end
 local ContextProviders = PNC.Semantics
     and PNC.Semantics.ContextProviders or nil
@@ -65,8 +65,6 @@ function Service.TryGreet(player, target, at, actorKey)
     local delta
     local presentationEventID
     local greetingState
-    local flavorID
-    local compatibilityFlavorID
     local realization
     local semanticContext
     local beatID
@@ -125,33 +123,24 @@ function Service.TryGreet(player, target, at, actorKey)
         .. npcID .. ":day:" .. tostring(day)
     semanticContext = {
         npcID = npcID,
+        eventID = eventID,
+        npcType = npcType,
+        relationshipTier = tier,
+        greetingState = greetingState,
         relationshipState = relationship and relationship.state,
         relationshipAttitude = relationship and relationship.attitude,
         socialStyle = relationship and relationship.state == "friend"
             and "friendly" or nil,
     }
-    if not RealizationAuthority
-        or type(RealizationAuthority.Resolve) ~= "function"
+    if not CompanionSpeech
+        or type(CompanionSpeech.ResolveGreeting) ~= "function"
     then
         return false, "semantic_realization_unavailable"
     end
-    realization = RealizationAuthority.Resolve({
-        poolID = "semantic.flow.greeting.opening",
-        responsePlanID = "semantic.flow.greeting.opening",
-        realizationFamily = "greeting",
-        act = "GREET",
-        topic = "greeting",
-        context = semanticContext,
-        salt = eventID,
-    })
+    realization = CompanionSpeech.ResolveGreeting(semanticContext)
     if not realization then
         return false, "semantic_greeting_plan_unavailable"
     end
-    -- This legacy ID is a content/transport alias only. The semantic plan and
-    -- resolved text above are authoritative for conversational meaning.
-    compatibilityFlavorID = "social_greeting_npc_" .. tostring(npcType)
-        .. "_" .. tostring(tier) .. "_" .. tostring(greetingState)
-    flavorID = compatibilityFlavorID
     before = relationshipSummary(relationship, true, npcID)
     applied, reason, details = Relationships.ApplyConversationEffect(
         npcID,
@@ -169,7 +158,6 @@ function Service.TryGreet(player, target, at, actorKey)
                 kind = "npc_proximity_greeting",
                 source = "proximity_greeting",
                 interactionType = definition.id,
-                npcFlavorID = flavorID,
                 semanticAct = realization.semanticAct,
                 semanticTopic = realization.topic,
                 responsePlanID = realization.responsePlanID,
@@ -283,7 +271,7 @@ function Service.TryGreet(player, target, at, actorKey)
         Network.SendSocialGreeting(player, {
             eventID = presentationEventID,
             npcID = npcID,
-            flavorID = flavorID,
+            poolID = realization.realizationFamily,
             resolvedText = realization.fallback,
             semanticAct = realization.semanticAct,
             topic = realization.topic,
@@ -309,7 +297,7 @@ function Service.TryGreet(player, target, at, actorKey)
     return true, {
         npcID = npcID,
         eventID = details and details.eventID or eventID,
-        flavorID = flavorID,
+        poolID = realization.realizationFamily,
         resolvedText = realization.fallback,
         semanticAct = realization.semanticAct,
         topic = realization.topic,

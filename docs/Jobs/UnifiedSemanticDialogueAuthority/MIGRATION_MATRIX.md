@@ -165,5 +165,19 @@ of the migration scaffolding itself.
 | flat Studio Responses/Dialogue Content lists | derived semantic tree | shared branch projection, counts, search, full IDs in detail pane |
 | generic PsychopatzCore SocialFlavor API | external compatibility only | Project Hoomans has zero wording-selection dependency; do not fork another PNC compatibility layer |
 
+### P10B ownership closure
+
+| Migrated family | Actual production callers | Semantic/content owner | Follow-up / compatibility disposition | Proof |
+| --- | --- | --- | --- | --- |
+| Player commands and NPC acknowledgements/rejections | `PNC_CompanionCommandInteraction`, `PNC_CompanionCommandInteractionQueue`, server emote interaction handler | `semantic.command.player` / `semantic.command.reply` → `PNC_SemanticCompanionSpeech` → `commands_emotes` Dialogue Content | Command outcome remains an authority fact; no first-party Flavor fallback | `pnc_unified_authority_p10b_companion_command_absence_smoke`, command interaction/presentation smokes |
+| Player and NPC emotes | `PNC_CompanionCommandEmotes`, `PNC_CompanionCommandPresentation*`, vanilla emote handler | `semantic.emote.player.*` / `semantic.emote.reply.*` → `commands_emotes` Dialogue Content | Emote transport retains event identity only; selected realization is delivered unchanged | player-emote, vanilla-emote, delivery and presentation smokes |
+| Greetings | `PNC_SocialGreetingService_TryGreet`, client greeting presentation | `semantic.flow.greeting.*` → `commands_emotes` Dialogue Content | Greeting state/tier remains context; no registry wording owner | social-greeting and P7 content tests |
+| Companion Dogs | `PNC_CompanionDogs_Interaction` / `Presentation` | `semantic.compat.companion_dogs.*` → `compatibility` Dialogue Content | Dog provider supplies sex/hunger/feed facts; no Project Hoomans flavor registry | `pnc_companion_dogs_compatibility_smoke`, P10B absence smoke |
+
+P10B source facts: the six `PNC_CompanionCommandFlavor*` files, literal Companion
+Dogs flavor table, and composition loads are absent. `Flavor.Resolve` and
+`Flavor.Register` are absent from Project Hoomans production Lua; generic
+PsychopatzCore SocialFlavor remains an external compatibility boundary.
+
 P10 is accepted only when every row is closed with source-level and runtime
 evidence.

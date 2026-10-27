@@ -132,8 +132,9 @@ getGameTime = function()
     return { getWorldAgeHours = function() return 42 end }
 end
 
-T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavor.lua")
-T.load(SHARED .. "PNC/Core/Commands/PNC_CompanionCommandFlavorDefinitions.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua")
+T.load(SHARED .. "PNC/Semantics/PNC_SemanticCompanionSpeech.lua")
 T.load(SHARED .. "PNC/Core/Commands/PNC_VanillaEmoteInteractions.lua")
 T.load(SHARED .. "PNC/Core/Relationships/PNC_SocialEventDefinitions.lua")
 T.load(SHARED .. "PNC/Core/Conduct/PNC_ConductDefinitions.lua")
@@ -142,7 +143,8 @@ local Lifecycle = T.load(
     SHARED .. "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
 )
 local lifecycleStore = Lifecycle.New({ worldHour = 0 })
-PNC.Semantics = { InteractionLifecycle = Lifecycle }
+PNC.Semantics = PNC.Semantics or {}
+PNC.Semantics.InteractionLifecycle = Lifecycle
 PNC.Conversation = {
     InteractionLifecyclePersistence = {
         Apply = function(envelope, options)
@@ -158,46 +160,28 @@ PNC.Conversation = {
 }
 
 local Interactions = PNC.VanillaEmoteInteractions
-local Flavor = PNC.CompanionCommandFlavor
+local CompanionSpeech = PNC.Semantics.CompanionSpeech
 local all = Interactions.List()
 T.equal(#all, 8, "first vanilla emote slice has eight interactions")
 for _, id in ipairs(all) do
     local definition = Interactions.Get(id)
     T.truthy(definition.eventType, id .. " event type")
-    T.truthy(Flavor.Resolve(
-        definition.flavorID,
-        "player",
-        id,
-        { names = "Mara", name = "Mara", count = 1 }
-    ), id .. " player flavor")
-    T.truthy(Flavor.Resolve(
-        Interactions.ReplyFlavorID(definition, { approval = 0 }),
-        "npc",
-        id
-    ), id .. " NPC flavor")
+    T.truthy(CompanionSpeech.ResolvePlayerEmote(id, {
+        npcID = "player:one",
+        renderTokens = { names = "Mara", name = "Mara", count = 1 },
+    }), id .. " player semantic realization")
+    T.truthy(CompanionSpeech.ResolveNPCEmote(id, {
+        npcID = "npc-one",
+        renderTokens = { names = "Mara", name = "Mara", count = 1 },
+    }), id .. " NPC semantic realization")
 end
 T.contains(
-    Flavor.Resolve("vanilla_emote_wavehi", "player", "seed", {
-        names = "Mara and Ellis",
-    }),
+    CompanionSpeech.ResolvePlayerEmote("wavehi", {
+        npcID = "player:one",
+        renderTokens = { names = "Mara and Ellis" },
+    }).fallback,
     "Mara and Ellis",
     "player flavor includes dynamic target names"
-)
-T.contains(
-    Interactions.ReplyFlavorID(
-        Interactions.Get("insult"),
-        { approval = -40 }
-    ),
-    "hostile",
-    "hostile relationship selects hard insult reply"
-)
-T.contains(
-    Interactions.ReplyFlavorID(
-        Interactions.Get("insult"),
-        { approval = 35 }
-    ),
-    "familiar",
-    "friendly relationship selects familiar insult reply"
 )
 T.equal(
     PNC.SocialEventDefinitions.player_emote_insult.cooldownHours,
@@ -209,17 +193,13 @@ T.equal(
     nil,
     "negative thumbs-down emote has no cooldown"
 )
-T.truthy(
-    Interactions.ReplyFlavorID(
-        Interactions.Get("wavehi"),
-        { approval = 80 },
-        { npcType = "lover", greetingState = "first" }
-    ) ~= Interactions.ReplyFlavorID(
-        Interactions.Get("wavehi"),
-        { approval = 80 },
-        { npcType = "lover", greetingState = "returning" }
-    ),
-    "daily greeting uses distinct first and returning replies"
+T.equal(
+    CompanionSpeech.ResolveNPCEmote("wavehi", {
+        npcID = "npc-one", relationshipTier = "warm",
+        greetingState = "first",
+    }).responsePlanID,
+    "semantic.emote.reply",
+    "daily greeting reply uses the semantic emote response pool"
 )
 T.equal(
     Interactions.ResolveNPCType({ tacticalClass = "hostile" }),
@@ -302,9 +282,11 @@ T.equal(appliedEffects[1].context.eventID,
     "authority supplies an idempotent conversation event ID")
 T.equal(result.targets[1].npcType, "neutral",
     "authority resolves the NPC type from the authoritative record")
-T.equal(result.targets[1].replyFlavorID,
-    "vanilla_emote_insult_npc_neutral",
-    "authority selects a neutral-specific reply")
+T.equal(result.targets[1].realizationID,
+    "semantic.emote.reply.insult",
+    "authority selects an NPC semantic reply")
+T.equal(result.targets[1].replyFlavorID, nil,
+    "authority does not emit the retired wording-registry alias")
 T.equal(result.targets[1].interaction.source, "emote",
     "authority preserves the canonical player emote meaning")
 T.equal(result.targets[1].replyInteraction.source, "npc_speech",

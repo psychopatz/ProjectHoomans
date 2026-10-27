@@ -321,13 +321,32 @@ are clean; `git diff --check` passes. The canonical source remains
 migration-heavy until P10D (`246,392` bytes, `171` families, `182` phrases,
 `170` migration IDs/concepts/source records).
 
-## Immediate Next Chunk — P10B
+## Accepted P10B — canonical command, emote, greeting wording
 
-Migrate the still-live `PNC_CompanionCommandFlavor*` wording registry and all
-Project Hoomans command/emote/greeting callers into the existing semantic
-ResponseCatalog → ResponsePlan/RealizationAuthority → SpeechRealization →
-Dialogue Content path. Delete that registry only after the direct semantic
-parity and negative-fallback proof passes.
+P10B is accepted. Project Hoomans command acknowledgements/rejections, player
+and NPC emotes, greetings, and Companion Dogs wording now resolve through the
+existing semantic ResponseCatalog → ResponsePlan/RealizationAuthority →
+SpeechRealization → Dialogue Content path. The six `PNC_CompanionCommandFlavor*`
+registry/definition files are deleted, composition no longer loads them, and
+missing semantic realization is explicit rather than a first-party prose
+fallback. External compatibility adapters still provide facts and event
+identity only.
+
+P10B evidence: the semantic command/emote/greeting negative-absence and parity
+set passes `11/11`; focused Dialogue Content/Observatory/compiler tests pass
+`9/9`; CodeBuilder regenerated `216` families / `395` phrases / `1` player
+choice twice with identical artifact hashes; changed Lua syntax checks pass
+for `33` files; `git diff --check` passes. P10D canonical-source groundwork
+is included: schema v2 derives family IDs, concepts, translation keys, and
+ownership from semantic IDs and removes migration metadata from the source.
+
+## Immediate Next Chunk — P10C and P10D
+
+Rename the remaining Project Hoomans FlavorText/FlavorAddress and misleading
+SocialFlavor presentation terminology without changing generic PsychopatzCore
+compatibility APIs. Finish the v2 Dialogue Content audit by removing any
+wording duplicated in semantic providers, then add the shared derived semantic
+tree projection for Responses and Dialogue Content.
 
 ## Stop conditions
 

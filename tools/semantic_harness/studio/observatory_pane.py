@@ -183,7 +183,7 @@ class SemanticObservatoryPane:
             f"Dialogue Content review: {report.get('contentID', 'UNKNOWN')}",
             f"Content kind: {report.get('kind', before.get('kind', 'UNKNOWN'))}",
             f"Canonical semantic owner: {before.get('semanticTemplateID', 'player-facing')}",
-            f"Canonical concept: {before.get('canonicalConcept', (before.get('locked') or {}).get('canonicalConcept', 'UNKNOWN'))}",
+            f"Canonical concept: {before.get('canonicalConcept', 'UNKNOWN')}",
             f"Source fingerprint: {report.get('sourceFingerprint', 'UNKNOWN')}",
             f"Proposed content fingerprint: {report.get('contentFingerprint', report.get('newContentFingerprint', 'UNKNOWN'))}",
             "Structural metadata: PRESERVED / LOCKED",
@@ -223,8 +223,9 @@ class SemanticObservatoryPane:
                 ])
         lines.extend([
             "",
-            "Locked invariants:",
-            f"  {before.get('locked', {})}",
+            "Semantic/content invariants:",
+            f"  semanticTemplateID: {before.get('semanticTemplateID', '(player-facing)')}",
+            f"  contentOwner: {before.get('contentOwner', '(derived)')}",
             "",
             "Approve or reject this wording proposal, then use the explicit",
             "Dialogue Content source/compile actions when authorized.",

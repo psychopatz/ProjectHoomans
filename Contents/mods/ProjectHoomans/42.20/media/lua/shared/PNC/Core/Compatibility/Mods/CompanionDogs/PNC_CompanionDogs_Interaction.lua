@@ -74,7 +74,6 @@ local function processRecord(record, body, npcID, dogs, current)
     local key
     local last
     local fed = false
-    local flavorID
     local eventID
     local sent
     if not record or not body or (body.isDead and body:isDead()) then
@@ -97,12 +96,11 @@ local function processRecord(record, body, npcID, dogs, current)
     then
         fed = Bridge.FeedDog(record, body, dog) == true
     end
-    flavorID = Bridge.GetFlavorID(dog, fed)
     Bridge._eventSerial = Bridge._eventSerial + 1
     eventID = "companion_dog:" .. tostring(npcID) .. ":"
         .. tostring(dogKey) .. ":" .. tostring(Bridge._eventSerial)
     sent = Internal.SendFlavorToNearbyPlayers(body, dog, npcID, dogKey,
-        flavorID, eventID, Bridge.GetDogSex(dog), fed)
+        eventID, Bridge.GetDogSex(dog), fed)
     if sent <= 0 then
         -- A missing client route must be retried, not hidden behind the normal
         -- 120-second pair cooldown. This is the former flavor-text failure.
@@ -171,7 +169,6 @@ function Bridge.Pump(force)
         return 0
     end
     Bridge._nextInteractionAt = current + Bridge.INTERACTION_INTERVAL_MS
-    Bridge.RegisterFlavors()
     dogs = refreshDogCache(current, false)
     if not dogs then return 0 end
     interactions = pumpLiveTable(registry, dogs, current)

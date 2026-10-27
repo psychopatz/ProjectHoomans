@@ -16,84 +16,6 @@ if type(SocialReactions) ~= "table" then
     SocialReactions = ok and loaded or nil
 end
 
-local FLAVORS = {
-    {
-        id = "companion_dogs_good_boy",
-        lines = {
-            { key = "UI_PNC_CompanionDogs_GoodBoy_1",
-                fallback = "Who's a good boy?" },
-            { key = "UI_PNC_CompanionDogs_GoodBoy_2",
-                fallback = "Good boy. That's a good boy." },
-        },
-    },
-    {
-        id = "companion_dogs_good_girl",
-        lines = {
-            { key = "UI_PNC_CompanionDogs_GoodGirl_1",
-                fallback = "Who's a good girl?" },
-            { key = "UI_PNC_CompanionDogs_GoodGirl_2",
-                fallback = "Good girl. That's a good girl." },
-        },
-    },
-    {
-        id = "companion_dogs_good_dog",
-        lines = {
-            { key = "UI_PNC_CompanionDogs_GoodDog_1",
-                fallback = "Who's a good dog?" },
-            { key = "UI_PNC_CompanionDogs_GoodDog_2",
-                fallback = "Good dog. You look well cared for." },
-        },
-    },
-    {
-        id = "companion_dogs_feed_boy",
-        lines = {
-            { key = "UI_PNC_CompanionDogs_FeedBoy_1",
-                fallback = "Here you go, good boy." },
-            { key = "UI_PNC_CompanionDogs_FeedBoy_2",
-                fallback = "There you go, boy. Eat up." },
-        },
-    },
-    {
-        id = "companion_dogs_feed_girl",
-        lines = {
-            { key = "UI_PNC_CompanionDogs_FeedGirl_1",
-                fallback = "Here you go, good girl." },
-            { key = "UI_PNC_CompanionDogs_FeedGirl_2",
-                fallback = "There you go, girl. Eat up." },
-        },
-    },
-    {
-        id = "companion_dogs_feed_dog",
-        lines = {
-            { key = "UI_PNC_CompanionDogs_FeedDog_1",
-                fallback = "Here you go, good dog." },
-            { key = "UI_PNC_CompanionDogs_FeedDog_2",
-                fallback = "There you go. Eat up." },
-        },
-    },
-}
-
-function Bridge.RegisterFlavors()
-    local flavor = PNC.CompanionCommandFlavor
-    local index
-    local definition
-    if not flavor then
-        pcall(require, "PNC/Core/Commands/PNC_CompanionCommandFlavor")
-        flavor = PNC.CompanionCommandFlavor
-    end
-    if not flavor or type(flavor.Register) ~= "function" then
-        return false
-    end
-    for index = 1, #FLAVORS do
-        definition = FLAVORS[index]
-        if type(flavor.Get) ~= "function" or not flavor.Get(definition.id) then
-            flavor.Register(definition.id, { npc = definition.lines })
-        end
-    end
-    Bridge._flavorsRegistered = true
-    return true
-end
-
 local function countNearbyPlayers(body, dog)
     local core = PNC.Core
     local count = 0
@@ -116,7 +38,7 @@ function Internal.HasNearbyPlayer(body, dog)
 end
 
 function Internal.SendFlavorToNearbyPlayers(body, dog, npcID, dogKey,
-    flavorID, eventID, dogSex, fed)
+    eventID, dogSex, fed)
     local core = PNC.Core
     local network = PNC.Network
     local sent = 0
@@ -168,7 +90,6 @@ function Internal.SendFlavorToNearbyPlayers(body, dog, npcID, dogKey,
     payload = {
         eventID = eventID,
         npcID = tostring(npcID),
-        flavorID = flavorID,
         eventType = eventType,
         interactionType = eventType,
         text = semantic.fallback,

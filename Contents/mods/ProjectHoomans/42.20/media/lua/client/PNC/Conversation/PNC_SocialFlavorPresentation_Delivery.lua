@@ -56,7 +56,7 @@ local function onDelivered(payload)
         source = "social_flavor",
         eventType = context.eventType or source.eventType or item.family,
         eventID = item.eventID,
-        npcFlavorID = item.flavorID,
+        npcSpeechID = item.realizationID or item.flavorID,
         npcText = payload.text or message.text,
         npcType = context.socialRole or context.npcType,
         relationshipState = context.relationshipState,

@@ -23,7 +23,7 @@ SOURCE = (
 
 
 class UnifiedAuthorityP7ContentTests(unittest.TestCase):
-    def test_migrated_families_have_stable_content_ownership_and_en_tl_parity(self) -> None:
+    def test_compact_families_have_stable_content_ownership_and_en_tl_parity(self) -> None:
         compiled = compile_dialogue_content(load_dialogue_content_source(SOURCE))
         self.assertLessEqual(len(compiled["phraseFamilies"]), MAX_FAMILIES)
         self.assertEqual(
@@ -60,7 +60,7 @@ class UnifiedAuthorityP7ContentTests(unittest.TestCase):
         for template_id, owner in expected_owners.items():
             with self.subTest(template_id=template_id):
                 family = by_template[template_id]
-                self.assertEqual(family["locked"]["contentOwner"], owner)
+                self.assertEqual(family["contentOwner"], owner)
                 phrase = family["styles"]["neutral"][0]
                 self.assertTrue(phrase["id"].startswith("phrase."))
                 self.assertTrue(phrase["fallback"])
@@ -82,8 +82,8 @@ class UnifiedAuthorityP7ContentTests(unittest.TestCase):
             "projecthoomans.dialogue_content.compatibility",
         )
         self.assertEqual(
-            rows["semantic.leader_loss.default"]["semanticAuthority"],
-            "PNC.Semantics.ResponseCatalog",
+            rows["semantic.leader_loss.default"]["contentOwner"],
+            "projecthoomans.dialogue_content.migrated_events",
         )
         self.assertIn("sourceFingerprint", rows["semantic.flow.farewell.default"])
 

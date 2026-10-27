@@ -32,6 +32,15 @@ if not RealizationAuthority then
     )
     RealizationAuthority = ok and loaded or nil
 end
+local CompanionSpeech = PNC.Semantics
+    and PNC.Semantics.CompanionSpeech or nil
+if type(CompanionSpeech) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticCompanionSpeech"
+    )
+    CompanionSpeech = ok and loaded or nil
+end
 local ContextProviders = PNC.Semantics
     and PNC.Semantics.ContextProviders or nil
 if type(ContextProviders) ~= "table" then
@@ -337,10 +346,6 @@ local function targetResult(target, definition, eventID, state)
         greetingDay = state.greetingDay,
         interaction = state.interaction,
         replyInteraction = state.replyInteraction,
-        -- Compatibility alias only. It is not consulted to choose the
-        -- semantic response; the resolved text/plan above is authoritative.
-        replyFlavorID = accepted and (state.compatibilityFlavorID
-            or state.realizationID) or nil,
         resolvedText = accepted and state.resolvedText or nil,
         responsePlanID = accepted and state.responsePlanID or nil,
         realizationFamily = accepted and state.realizationFamily or nil,
@@ -413,6 +418,7 @@ local function processTarget(
     end
     semanticContext = {
         action = definition.id,
+        eventType = definition.eventType,
         currentTopic = activeBeat and activeBeat.topic
             or definition.eventType,
         previousTopic = activeBeat and activeBeat.topic or nil,
@@ -423,6 +429,15 @@ local function processTarget(
                 or (tonumber(beforeRelationship.approval) or 0) >= 30)
             and "friendly" or nil,
         npcID = tostring(target.id or ""),
+        npcType = npcType,
+        relationshipTier = relationshipTier,
+        greetingState = greetingState,
+        renderTokens = {
+            name = target.record and (target.record.name
+                or target.record.displayName) or target.id,
+            names = target.record and (target.record.name
+                or target.record.displayName) or target.id,
+        },
     }
     if not RealizationAuthority
         or type(RealizationAuthority.Resolve) ~= "function"
@@ -443,15 +458,22 @@ local function processTarget(
             interaction = interaction,
         }, before
     end
-    realization = RealizationAuthority.Resolve({
-        poolID = "semantic.emote.reply",
-        responsePlanID = "semantic.emote.reply",
-        realizationFamily = "emote_reply",
-        act = interaction and interaction.act or "REACT",
-        topic = activeBeat and activeBeat.topic or definition.eventType,
-        context = semanticContext,
-        salt = eventID,
-    })
+    if CompanionSpeech and type(CompanionSpeech.ResolveNPCEmote) == "function" then
+        realization = CompanionSpeech.ResolveNPCEmote(
+            definition.id,
+            semanticContext
+        )
+    else
+        realization = RealizationAuthority.Resolve({
+            poolID = "semantic.emote.reply",
+            responsePlanID = "semantic.emote.reply",
+            realizationFamily = "emote_reply",
+            act = interaction and interaction.act or "REACT",
+            topic = activeBeat and activeBeat.topic or definition.eventType,
+            context = semanticContext,
+            salt = eventID,
+        })
+    end
     if not realization then
         return {
             npcID = target.id,
@@ -500,8 +522,8 @@ local function processTarget(
                     source = "player_emote",
                     interactionType = definition.eventType,
                     emote = definition.id,
-                    playerFlavorID = definition.flavorID,
-                    npcFlavorID = realization.realizationID,
+                    playerSpeechID = realization.realizationID,
+                    npcSpeechID = realization.realizationID,
                     semanticAct = realization.semanticAct,
                     semanticTopic = realization.topic,
                     responsePlanID = realization.responsePlanID,
@@ -557,7 +579,6 @@ local function processTarget(
             and Interactions.DayIndex(at) or nil,
         interaction = interaction,
         resolvedText = realization.fallback,
-        compatibilityFlavorID = realization.compatibilityFlavorID,
         responsePlanID = realization.responsePlanID,
         realizationFamily = realization.realizationFamily,
         realizationID = realization.realizationID,

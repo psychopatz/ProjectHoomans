@@ -211,7 +211,12 @@ PNC = {
 
 T.load(SHARED_ROOT .. "PNC_CompanionCommandRegistry.lua")
 T.load(SHARED_ROOT .. "PNC_CompanionCommandDefinitions.lua")
-T.load(SHARED_ROOT .. "PNC_CompanionCommandFlavor.lua")
+T.load("ProjectHoomans", "shared",
+    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua")
+T.load("ProjectHoomans", "shared",
+    "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua")
+T.load("ProjectHoomans", "shared",
+    "PNC/Semantics/PNC_SemanticCompanionSpeech.lua")
 T.truthy(PNC.CompanionCommands.Get("manual_eat"),
     "manual eat command is registered")
 T.truthy(PNC.CompanionCommands.Get("manual_drink"),
@@ -238,55 +243,40 @@ T.truthy(string.find(
 ), "camp command site metadata is registered")
 T.equal(PNC.CompanionCommands.Get("manual_sleep").contextOnly, true,
     "manual sleep stays out of the radial command list")
-T.load(SHARED_ROOT .. "PNC_CompanionCommandFlavorDefinitions.lua")
-
-T.truthy(PNC.CompanionCommandFlavor.Resolve("follow", "player", "seed"),
-    "built-in player flavor missing")
-T.truthy(PNC.CompanionCommandFlavor.Resolve("follow", "npc", "seed"),
-    "built-in NPC flavor missing")
-T.truthy(PNC.CompanionCommandFlavor.Resolve("camp", "player", "seed"),
-    "built-in camp player flavor missing")
-T.equal(PNC.CompanionCommandFlavor.Resolve(
-    "camp_no_npc", "player", "seed"
-), "...", "camp without an NPC should use an ellipsis flavor")
-local campRejectedFlavor = PNC.CompanionCommandFlavor.Get("camp_rejected")
-T.truthy(campRejectedFlavor and campRejectedFlavor.npc
-    and #campRejectedFlavor.npc > 0,
-    "camp rejection NPC flavor missing")
-T.contains(campRejectedFlavor.npc[1].fallback, "safe",
-    "camp rejection flavor does not explain outdoor camping is unsafe")
-T.equal(PNC.CompanionCommandFlavor.Register("extension_command", {
-    player = {
-        { key = "UI_Extension_Command", fallback = "Extension fallback." },
-    },
-}), true, "extension flavor registration")
-T.equal(PNC.CompanionCommandFlavor.Resolve(
-    "extension_command",
-    "player",
-    "seed"
-), "Extension fallback.", "extension flavor fallback")
-local namedFlavor = PNC.CompanionCommandFlavor.Resolve(
+local playerCommand = PNC.Semantics.CompanionSpeech.ResolvePlayerCommand(
     "follow",
-    "player",
-    "named_seed",
-    { name = "Walker Sage", names = "Walker Sage", count = 1 }
+    "valid",
+    {
+        requestID = "command-semantic-1",
+        renderTokens = { name = "Walker Sage", names = "Walker Sage" },
+    }
 )
-T.truthy(string.find(namedFlavor, "Walker Sage", 1, true),
-    "player flavor omitted companion name")
-local flavorVariants = {}
-for i = 1, 20 do
-    flavorVariants[PNC.CompanionCommandFlavor.Resolve(
-        "follow",
-        "player",
-        tostring(i),
-        { name = "Walker Sage", names = "Walker Sage", count = 1 }
-    )] = true
-end
-local flavorVariantCount = 0
-for _ in pairs(flavorVariants) do
-    flavorVariantCount = flavorVariantCount + 1
-end
-T.truthy(flavorVariantCount >= 2, "player flavor did not vary by seed")
+T.truthy(playerCommand, "built-in player semantic realization missing")
+T.equal(playerCommand.realizationID, "semantic.command.player.follow",
+    "player command meaning is selected by the semantic pool")
+T.equal(playerCommand.responsePlanID, "semantic.command.player",
+    "player command carries its semantic response plan")
+T.equal(playerCommand.contentOwner,
+    "projecthoomans.dialogue_content.commands_emotes",
+    "player command wording has canonical Dialogue Content ownership")
+T.truthy(string.find(playerCommand.fallback, "Walker Sage", 1, true),
+    "player command realization omitted companion name")
+
+local campNone = PNC.Semantics.CompanionSpeech.ResolvePlayerCommand(
+    "camp", "none", { requestID = "command-semantic-2" }
+)
+T.equal(campNone.realizationID, "semantic.command.player.camp_none",
+    "camp without a site keeps the semantic none outcome")
+T.equal(campNone.fallback, "...",
+    "camp without an NPC retains the accepted ellipsis wording")
+
+local npcReply = PNC.Semantics.CompanionSpeech.ResolveNPCCommand(
+    "camp", "invalid", { requestID = "command-semantic-3" }
+)
+T.equal(npcReply.realizationID, "semantic.command.reply.camp_rejected",
+    "NPC command rejection uses the semantic rejection variant")
+T.contains(npcReply.fallback, "safe",
+    "camp rejection realization explains outdoor camping is unsafe")
 
 local player = {
     getUsername = function() return "alice" end,
@@ -763,7 +753,10 @@ for i = 1, 8 do
     PNC.CompanionCommandPresentation.ShowPlayerFlavor(
         player,
         "follow",
-        { target = { displayName = "Walker Sage" } }
+        {
+            eventID = "command-player-" .. tostring(i),
+            target = { displayName = "Walker Sage" },
+        }
     )
 end
 local spokenVariants = {}

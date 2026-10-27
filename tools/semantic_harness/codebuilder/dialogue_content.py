@@ -18,7 +18,7 @@ from typing import Any
 from .lexicon_compiler import CompileError, _lua_string
 
 
-CONTENT_SCHEMA = "pnc.semantic_dialogue_content.v1"
+CONTENT_SCHEMA = "pnc.semantic_dialogue_content.v2"
 CONTENT_SOURCE_NAME = "semantic_dialogue_content.json"
 CONTENT_SOURCE_RELATIVE = Path(
     "tools/semantic_harness/codebuilder/sources/semantic_dialogue_content.json"
@@ -35,7 +35,7 @@ LANGUAGES = ("EN", "TL")
 STYLES = ("neutral", "warm", "terse", "guarded")
 ID_PATTERN = re.compile(r"^[a-z][a-z0-9_.:-]{0,127}$")
 TRANSLATION_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,127}$")
-MAX_FAMILIES = 192
+MAX_FAMILIES = 256
 MAX_PHRASES_PER_STYLE = 6
 MAX_PLAYER_CONTENT = 32
 MAX_TEXT = 256
@@ -117,36 +117,34 @@ def _metadata(value: Any) -> dict[str, str]:
     }
 
 
-def _locked(value: Any, label: str) -> dict[str, Any]:
-    if not isinstance(value, dict) or not value:
-        raise CompileError(f"{label} requires locked structural metadata")
-    output: dict[str, Any] = {}
-    for key, item in value.items():
-        if not isinstance(key, str) or not key.strip():
-            raise CompileError(f"{label} contains an invalid field name")
-        if isinstance(item, (dict, list)):
-            # The metadata is diagnostic-only, but keeping it JSON-shaped
-            # makes the lock view useful without allowing arbitrary code.
-            output[key] = item
-        elif isinstance(item, (str, int, float, bool)) or item is None:
-            output[key] = item
-        else:
-            raise CompileError(f"{label}.{key} has an unsupported value")
-    return output
+def derived_canonical_concept(semantic_id: str) -> str:
+    pieces = [piece for piece in re.split(r"[^A-Za-z0-9]+", semantic_id) if piece]
+    return "_".join(piece.upper() for piece in pieces)
+
+
+def _derived_translation_prefix(semantic_id: str) -> str:
+    pieces = [piece for piece in re.split(r"[^A-Za-z0-9]+", semantic_id) if piece]
+    return "UI_PNC_Conversation_Content_" + "".join(
+        piece[:1].upper() + piece[1:] for piece in pieces
+    )
 
 
 def _phrase_family(
     value: Any,
+    groups: dict[str, Any],
     phrase_ids: set[str],
     translation_keys: set[str],
 ) -> tuple[dict[str, Any], dict[str, str]]:
     if not isinstance(value, dict):
         raise CompileError("phraseFamilies entries must be objects")
-    family_id = _id(value.get("id"), "phrase family id")
-    semantic_id = _id(value.get("semanticTemplateID"), f"{family_id}.semanticTemplateID")
-    concept = _text(value.get("canonicalConcept"), f"{family_id}.canonicalConcept")
-    prefix = _translation_key(value.get("translationKeyPrefix"), f"{family_id}.translationKeyPrefix")
-    locked = _locked(value.get("locked"), f"{family_id}.locked")
+    semantic_id = _id(value.get("semanticTemplateID"), "semanticTemplateID")
+    group = _id(value.get("group"), f"{semantic_id}.group")
+    group_metadata = groups.get(group)
+    if not isinstance(group_metadata, dict):
+        raise CompileError(f"{semantic_id}.group is not declared: {group}")
+    family_id = "phrase." + semantic_id
+    concept = derived_canonical_concept(semantic_id)
+    prefix = _derived_translation_prefix(semantic_id)
     styles = value.get("styles")
     if not isinstance(styles, dict) or not styles:
         raise CompileError(f"{family_id}.styles requires at least one style")
@@ -171,7 +169,7 @@ def _phrase_family(
         for index, raw_phrase in enumerate(raw_phrases, 1):
             if not isinstance(raw_phrase, dict):
                 raise CompileError(f"{family_id}.styles.{style}[{index}] must be an object")
-            phrase_id = _id(raw_phrase.get("id"), f"{family_id}.{style}[{index}].id")
+            phrase_id = f"{family_id}.{style}.{index:02d}"
             if phrase_id in phrase_ids:
                 raise CompileError(f"duplicate phrase id: {phrase_id}")
             phrase_ids.add(phrase_id)
@@ -179,7 +177,9 @@ def _phrase_family(
             if key in translation_keys:
                 raise CompileError(f"duplicate generated translation key: {key}")
             translation_keys.add(key)
-            values = _translations(raw_phrase.get("translations"), f"{phrase_id}.translations")
+            values = _translations(
+                raw_phrase.get("translations"), f"{phrase_id}.translations"
+            )
             compiled_phrases.append({
                 "id": phrase_id,
                 "key": key,
@@ -192,15 +192,15 @@ def _phrase_family(
 
     if not compiled_styles:
         raise CompileError(f"{family_id} has no compiled style phrases")
-    content_owner = locked.get("contentOwner")
-    if content_owner is not None:
-        content_owner = _text(content_owner, f"{family_id}.locked.contentOwner")
+    content_owner = _text(
+        group_metadata.get("contentOwner"), f"groups.{group}.contentOwner"
+    )
     return {
         "id": family_id,
         "semanticTemplateID": semantic_id,
         "canonicalConcept": concept,
+        "group": group,
         "styles": compiled_styles,
-        "locked": locked,
         "contentOwner": content_owner,
     }, translations
 
@@ -213,9 +213,11 @@ def _player_content(
         raise CompileError("playerChoices entries must be objects")
     content_id = _id(value.get("id"), "player choice id")
     kind = _text(value.get("kind"), f"{content_id}.kind")
-    label_key = _translation_key(value.get("labelKey"), f"{content_id}.labelKey")
-    choice_key = _translation_key(value.get("choiceKey"), f"{content_id}.choiceKey")
-    locked = _locked(value.get("locked"), f"{content_id}.locked")
+    label_key = "UI_PNC_Conversation_Content_" + "".join(
+        piece[:1].upper() + piece[1:]
+        for piece in re.split(r"[^A-Za-z0-9]+", content_id) if piece
+    ) + "_Label"
+    choice_key = label_key[:-6] + "Choice"
     if label_key == choice_key or label_key in translation_keys or choice_key in translation_keys:
         raise CompileError(f"duplicate player-content translation key: {content_id}")
     translation_keys.update((label_key, choice_key))
@@ -230,7 +232,9 @@ def _player_content(
         "kind": kind,
         "labelKey": label_key,
         "choiceKey": choice_key,
-        "locked": locked,
+        "route": _text(value.get("route"), f"{content_id}.route"),
+        "hubID": _text(value.get("hubID"), f"{content_id}.hubID"),
+        "canonicalConcept": derived_canonical_concept(content_id),
     }, translations
 
 
@@ -238,9 +242,12 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
     """Validate and compile content without producing any files."""
     if not isinstance(document, dict):
         raise CompileError("dialogue content source root must be an object")
-    if document.get("schemaVersion") != 1:
-        raise CompileError("dialogue content source schemaVersion must be 1")
+    if document.get("schemaVersion") != 2:
+        raise CompileError("dialogue content source schemaVersion must be 2")
     source = _metadata(document.get("source"))
+    groups = document.get("groups")
+    if not isinstance(groups, dict) or not groups:
+        raise CompileError("dialogue content source requires groups")
     raw_families = document.get("phraseFamilies")
     if not isinstance(raw_families, list) or not raw_families:
         raise CompileError("dialogue content source requires phraseFamilies")
@@ -258,7 +265,9 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
     compiled_families: list[dict[str, Any]] = []
     translations_by_language = {language: {} for language in LANGUAGES}
     for raw_family in raw_families:
-        family, values = _phrase_family(raw_family, phrase_ids, translation_keys)
+        family, values = _phrase_family(
+            raw_family, groups, phrase_ids, translation_keys
+        )
         if family["id"] in family_ids:
             raise CompileError(f"duplicate phrase family id: {family['id']}")
         if family["semanticTemplateID"] in semantic_ids:
@@ -289,7 +298,7 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
 
     compiled = {
         "schema": CONTENT_SCHEMA,
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "source": source,
         "phraseFamilies": compiled_families,
         "playerChoices": compiled_player,
@@ -353,7 +362,7 @@ def render_dialogue_content_registry(compiled: dict[str, Any]) -> str:
         "local Registry = PNC.Semantics.DialogueContentRegistry or {}",
         "PNC.Semantics.DialogueContentRegistry = Registry",
         f"Registry.SCHEMA = {_lua_string(CONTENT_SCHEMA)}",
-        "Registry.VERSION = 1",
+        "Registry.VERSION = 2",
         f"Registry.CONTENT_FINGERPRINT = {_lua_string(compiled['contentFingerprint'])}",
         f"Registry.PHRASE_FAMILIES = {_lua_value(families, 0)}",
         f"Registry.PLAYER_CHOICES = {_lua_value(choices, 0)}",

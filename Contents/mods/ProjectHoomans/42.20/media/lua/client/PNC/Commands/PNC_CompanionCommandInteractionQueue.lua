@@ -13,9 +13,17 @@ local InteractionPresentationRegistry = require
     "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
 
 local Presentation = PNC.CompanionCommandPresentation
-local Flavor = PNC.CompanionCommandFlavor
 local Identity = PNC.NPCIdentityPresentation
 local Registry = PNC.Registry
+local CompanionSpeech = PNC.Semantics
+    and PNC.Semantics.CompanionSpeech or nil
+if type(CompanionSpeech) ~= "table" then
+    local ok, loaded = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticCompanionSpeech"
+    )
+    CompanionSpeech = ok and loaded or nil
+end
 local SocialFlavorClient = PsychopatzCore
     and PsychopatzCore.SocialFlavorClient or nil
 local EventBus = PsychopatzCore and PsychopatzCore.Events or nil
@@ -111,6 +119,7 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
     local queueContext
     local source
     local presentationState
+    local resolved
     options = type(options) == "table" and options or {}
     local realization = options.semanticRealization
     speaker = tostring(speaker or "npc")
@@ -123,17 +132,40 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
             or context.requestID or context.eventID)
         or tostring(currentTime())
     text = options.resolvedText
-    -- A semantic realization already owns meaning and its selected wording.
-    -- The old command flavor table remains an explicit compatibility content
-    -- path only for callers that have no semantic result; it must never
-    -- overwrite a selected ResponseCatalog realization.
-    if not text and not realization then
-        text = Flavor and Flavor.Resolve
-            and Flavor.Resolve(flavorID, speaker, seed, flavorContext)
-            or nil
+    -- A semantic realization owns meaning and its selected wording.  Missing
+    -- semantic input is an explicit delivery failure; no first-party prose
+    -- registry may fill the gap.
+    if not text and not realization and CompanionSpeech then
+        if speaker == "player"
+            and type(CompanionSpeech.ResolvePlayerCommand) == "function"
+            and type(context) == "table" and context.commandID
+        then
+            resolved = CompanionSpeech.ResolvePlayerCommand(
+                context.commandID,
+                context.commandOutcome or context.outcome,
+                context
+            )
+        elseif speaker == "npc"
+            and type(CompanionSpeech.ResolveNPCCommand) == "function"
+            and type(context) == "table" and context.commandID
+        then
+            resolved = CompanionSpeech.ResolveNPCCommand(
+                context.commandID,
+                context.commandOutcome or context.outcome,
+                context
+            )
+        elseif type(context) == "table" and context.emoteID
+            and type(CompanionSpeech.ResolveNPCEmote) == "function"
+        then
+            resolved = CompanionSpeech.ResolveNPCEmote(
+                context.emoteID, context)
+        end
+        realization = resolved or realization
     end
     if not text and realization then text = realization.fallback end
-    if not text or text == "" then return false, "flavor_unavailable" end
+    if not text or text == "" then
+        return false, "semantic_realization_required"
+    end
     eventID = interactionEventID(flavorID, speaker, speakerID, context,
         options)
     SocialFlavorClient = SocialFlavorClient
@@ -169,6 +201,8 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
             or type(context) == "table" and context.realizationFamily or nil,
         realizationID = realization and realization.realizationID
             or type(context) == "table" and context.realizationID or nil,
+        contentOwner = realization and realization.contentOwner
+            or type(context) == "table" and context.contentOwner or nil,
         factRefs = realization and realization.groundedFactRefs
             or type(context) == "table" and context.factRefs or nil,
         contextEligible = false,
@@ -187,7 +221,7 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
     )
     accepted, reason = SocialFlavorClient.Enqueue({
         eventID = eventID,
-        flavorID = flavorID,
+        flavorID = realization and realization.realizationID or flavorID,
         seed = seed,
         text = text,
         family = options.family or "emote_interaction",

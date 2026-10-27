@@ -5,6 +5,28 @@ PsychopatzCore = { Conversation = {} }
 PNC = {
     Registry = {},
     Core = { Now = function() return 1000 end },
+    Semantics = {
+        CompanionSpeech = {
+            ResolvePlayerCommand = function()
+                return {
+                    fallback = "Hello from the player.",
+                    semanticOwned = true,
+                    responsePlanID = "semantic.command.player",
+                    realizationFamily = "companion_command_player",
+                    realizationID = "semantic.command.player.generic",
+                }
+            end,
+            ResolvePlayerEmote = function()
+                return {
+                    fallback = "Hello from the player.",
+                    semanticOwned = true,
+                    responsePlanID = "semantic.emote.player",
+                    realizationFamily = "emote_player",
+                    realizationID = "semantic.emote.player.wavehi",
+                }
+            end,
+        },
+    },
 }
 local packets = {}
 local bridgeActive = true
@@ -55,9 +77,6 @@ local player = {
 }
 getSpecificPlayer = function() return player end
 
-PNC.CompanionCommandFlavor = {
-    Resolve = function() return "Hello from the player." end,
-}
 PNC.SocialFlavorPresentation = {
     ReceivePlayerSpeech = function()
         reactionCount = reactionCount + 1
