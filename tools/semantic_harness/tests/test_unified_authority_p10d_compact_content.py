@@ -18,7 +18,7 @@ from tools.semantic_harness.codebuilder.dialogue_content import (
 REPOSITORY = Path(__file__).resolve().parents[3]
 SOURCE = (
     REPOSITORY
-    / "tools/semantic_harness/codebuilder/sources/semantic_dialogue_content.json"
+    / "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 )
 
 

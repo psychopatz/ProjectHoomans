@@ -534,11 +534,35 @@ identical generated SHA-256 outputs; `git diff --check`: PASS. The source is
 still migration-heavy and exceeds the P10 compact size target, so P11C/P11D
 must shard and compact it before final acceptance.
 
-## Immediate Next Chunk — P11C
+## Accepted P11C — domain-sharded Conversation authoring
 
-Split canonical Conversation authoring into cohesive domain shards, separate
-NLU/pattern authoring from response/content wording, and compile one
-deterministic globally unique manifest without changing stable semantic IDs.
+P11C accepted. Canonical Dialogue Content now enters through
+`tools/semantic_harness/codebuilder/sources/conversation/manifest.json` and
+deterministically merges cohesive domain shards under `conversation/shards/`.
+The shards separate response/content wording from the NLU and semantic
+pattern source, which remains in `semantic_definitions.json`. The compiler
+validates global phrase, semantic-template, and player-choice identity while
+preserving the stable runtime semantic IDs and generated Registry contract.
+
+The shared authoring service now reads the aggregate manifest fingerprint,
+uses the owning shard for content edits, and reports stale/effect-free
+preview and explicit-write results without requiring callers to know shard
+paths. The former monolithic `semantic_dialogue_content.json` source is
+deleted; generated runtime output remains deterministic and byte-stable.
+
+P11C focused validation: `7/7 PASS` shard/registry tests, `7/7 PASS`
+production-Lua architecture/authority/content smokes, CodeBuilder run twice
+with identical generated hashes, and `git diff --check`: PASS. No source
+save, native Project Zomboid session, or Workshop operation was touched.
+
+## Immediate Next Chunk — P11D
+
+Create the canonical declarative Conversation UI Registry and move the
+`conversation.landing:whats_up` child structure into it. Preserve production
+ownership of eligibility, facts, permissions, and effects while making
+membership, ordering, labels, utterance references, provider references, and
+effect-free preview/edit operations available through the shared authoring
+service.
 
 ## Historical P11A starting instructions (completed)
 

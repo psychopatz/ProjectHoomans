@@ -1,0 +1,92 @@
+{
+  "schema": "pnc.conversation_content_shard.v1",
+  "schemaVersion": 1,
+  "id": "compatibility_necroa",
+  "domain": "compatibility.necroa",
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.compat.necroa.mask_warning.colonist",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Mask up. We keep the camp safe together.",
+              "TL": "Mask up. We keep the camp safe together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.necroa.mask_warning.default",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Put your mask back on. Knox is airborne.",
+              "TL": "Put your mask back on. Knox is airborne."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.necroa.mask_warning.family",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Put your mask on, family. I am not losing you to the air.",
+              "TL": "Put your mask on, family. I am not losing you to the air."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.necroa.player_mask_removed.default",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Put your mask back on. The air is not safe.",
+              "TL": "Put your mask back on. The air is not safe."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.necroa.player_mask_removed.hostile",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Put your mask back on before you become a problem.",
+              "TL": "Put your mask back on before you become a problem."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.necroa.player_mask_removed.lover",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Please put your mask back on, love. This air is not safe.",
+              "TL": "Please put your mask back on, love. This air is not safe."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

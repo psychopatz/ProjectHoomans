@@ -1,0 +1,50 @@
+{
+  "schema": "pnc.conversation_content_shard.v1",
+  "schemaVersion": 1,
+  "id": "events_combat",
+  "domain": "events.combat",
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.combat.reaction.default",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good work. Keep watching the area.",
+              "TL": "Good work. Keep watching the area."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.combat.reaction.retreat",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I need a moment before I can swing again.",
+              "TL": "I need a moment before I can swing again."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.combat.reaction.threat",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That threat is down. Stay alert.",
+              "TL": "That threat is down. Stay alert."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

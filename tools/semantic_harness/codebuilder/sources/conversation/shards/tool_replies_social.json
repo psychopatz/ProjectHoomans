@@ -1,0 +1,1002 @@
+{
+  "schema": "pnc.conversation_content_shard.v1",
+  "schemaVersion": 1,
+  "id": "tool_replies_social",
+  "domain": "tool.replies.social",
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.tool_reply.accepted_generic.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.accepted_generic.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will keep that in mind.",
+              "TL": "I will keep that in mind."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.admire.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I appreciate that more than you know.",
+              "TL": "Mas pinahahalagahan ko iyan kaysa sa iniisip mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.admire.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is kind of you to say.",
+              "TL": "That is kind of you to say."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.admire.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You see more in me than most people do.",
+              "TL": "You see more in me than most people do."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.apology.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. Let us move on.",
+              "TL": "All right. Let us move on."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.apology.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I accept the apology.",
+              "TL": "I accept the apology."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.apology.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Fine. We can put it behind us.",
+              "TL": "Fine. We can put it behind us."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.comfort.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Thanks. I needed that.",
+              "TL": "Thanks. I needed that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.comfort.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I appreciate you being here.",
+              "TL": "I appreciate you being here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.comfort.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That helps more than I expected.",
+              "TL": "That helps more than I expected."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.compliment.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is kind of you to say.",
+              "TL": "That is kind of you to say."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.compliment.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I appreciate the compliment.",
+              "TL": "I appreciate the compliment."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.compliment.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You noticed. Thank you.",
+              "TL": "You noticed. Thank you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.cooldown.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You have had your turn with the compliments today.",
+              "TL": "You have had your turn with the compliments today."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.cooldown.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Save the sweet talk for tomorrow.",
+              "TL": "Save the sweet talk for tomorrow."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.flirt.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Careful. You are making me smile.",
+              "TL": "Careful. You are making me smile."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.flirt.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You always know how to get my attention.",
+              "TL": "You always know how to get my attention."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.flirt.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is a dangerous thing to say to me.",
+              "TL": "That is a dangerous thing to say to me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.hostile.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Watch your mouth.",
+              "TL": "Watch your mouth."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.hostile.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Try that again and see what happens.",
+              "TL": "Try that again and see what happens."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.hostile.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I have heard worse, but do not make a habit of it.",
+              "TL": "I have heard worse, but do not make a habit of it."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.insult.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Watch your mouth.",
+              "TL": "Watch your mouth."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.insult.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Try that again and see what happens.",
+              "TL": "Try that again and see what happens."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.insult.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I have heard worse, but do not make a habit of it.",
+              "TL": "I have heard worse, but do not make a habit of it."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.orientation.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is not the kind of interest I have in you.",
+              "TL": "That is not the kind of interest I have in you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.orientation.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Do not mistake my kindness for an invitation.",
+              "TL": "Do not mistake my kindness for an invitation."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.personality.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That kind of attention is not welcome from me.",
+              "TL": "That kind of attention is not welcome from me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.personality.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You are reading me wrong.",
+              "TL": "You are reading me wrong."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.praise.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I appreciate that.",
+              "TL": "I appreciate that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.praise.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good. I was hoping you noticed.",
+              "TL": "Good. I was hoping you noticed."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.praise.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is nice to hear from you.",
+              "TL": "That is nice to hear from you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_admire.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_admire.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That got through.",
+              "TL": "That got through."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_apology.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_apology.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We will talk about it.",
+              "TL": "We will talk about it."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_comfort.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_comfort.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Thanks for saying that.",
+              "TL": "Thanks for saying that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_compliment.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard the compliment.",
+              "TL": "I heard the compliment."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_compliment.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is kind of you to say.",
+              "TL": "That is kind of you to say."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_flirt.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you.",
+              "TL": "I heard you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_flirt.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You are bold, I will give you that.",
+              "TL": "You are bold, I will give you that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_generic.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_generic.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Give me a moment.",
+              "TL": "Give me a moment."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_hostile.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you. Watch yourself.",
+              "TL": "I heard you. Watch yourself."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_hostile.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Noted. Choose your next words carefully.",
+              "TL": "Noted. Choose your next words carefully."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_insult.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you.",
+              "TL": "I heard you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_insult.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Noted.",
+              "TL": "Noted."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_praise.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_praise.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will remember that.",
+              "TL": "I will remember that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_romantic.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you. You are bold, I will give you that.",
+              "TL": "I heard you. You are bold, I will give you that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_romantic.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You certainly know how to get my attention.",
+              "TL": "You certainly know how to get my attention."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_sexual.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you. Give me a second.",
+              "TL": "I heard you. Give me a second."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.queued_sexual.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is a bold thing to say.",
+              "TL": "That is a bold thing to say."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.rejected_game.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Not now.",
+              "TL": "Not now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.rejected_game.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That did not land well.",
+              "TL": "That did not land well."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.rejected_generic.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That did not land well.",
+              "TL": "That did not land well."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.rejected_generic.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am not taking that from you right now.",
+              "TL": "I am not taking that from you right now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.rejected_hostile.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Back off.",
+              "TL": "Back off."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.rejected_hostile.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You do not get to speak to me that way.",
+              "TL": "You do not get to speak to me that way."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.rejected_sexual.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is not happening.",
+              "TL": "That is not happening."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.rejected_sexual.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Do not talk to me like that.",
+              "TL": "Do not talk to me like that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.rejected_sexual.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You are moving far too fast.",
+              "TL": "You are moving far too fast."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.relationship.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We are not there yet.",
+              "TL": "We are not there yet."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.relationship.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is a little too familiar for us.",
+              "TL": "That is a little too familiar for us."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.romantic.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Careful. You are making me smile.",
+              "TL": "Careful. You are making me smile."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.romantic.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You always know how to get my attention.",
+              "TL": "You always know how to get my attention."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.romantic.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is a dangerous thing to say to me.",
+              "TL": "That is a dangerous thing to say to me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.sexual.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You are bold. I cannot say I dislike that.",
+              "TL": "You are bold. I cannot say I dislike that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.sexual.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is a very direct proposition.",
+              "TL": "That is a very direct proposition."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.sexual.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You are moving fast, but I heard you.",
+              "TL": "You are moving fast, but I heard you."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "pnc.conversation_content_shard.v1",
+  "schemaVersion": 1,
+  "id": "flows_farewell",
+  "domain": "flows.farewell",
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.flow.farewell.default",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Take care.",
+              "TL": "Take care."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.flow.farewell.friendly",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Take care. I will see you soon.",
+              "TL": "Take care. I will see you soon."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

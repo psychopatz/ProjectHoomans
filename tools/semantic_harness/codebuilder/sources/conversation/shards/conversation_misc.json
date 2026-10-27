@@ -1,0 +1,572 @@
+{
+  "schema": "pnc.conversation_content_shard.v1",
+  "schemaVersion": 1,
+  "id": "conversation_misc",
+  "domain": "conversation.misc",
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.conversation.acknowledged.default",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. Ask if you want to talk about it more.",
+              "TL": "Sige. Sabihin mo kung gusto mo pa itong pag-usapan."
+            }
+          },
+          {
+            "translations": {
+              "EN": "All right. Ask if you want to talk more.",
+              "TL": "Sige. Magtanong ka kung gusto mo pang mag-usap."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "All right. I'm here if you want to talk more.",
+              "TL": "Sige. Narito ako kung gusto mo pang mag-usap."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "All right.",
+              "TL": "Sige."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Understood. We'll leave it there.",
+              "TL": "Naiintindihan ko. Tama na iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.acknowledged.friendly",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. Ask if you want to talk about it more.",
+              "TL": "Sige. Sabihin mo kung gusto mo pa itong pag-usapan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.acknowledged.withdrawn",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. We can leave it there for now.",
+              "TL": "Sige. Maaari nating iwan muna iyan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.context_reference.backstory_unknown",
+      "group": "commands_emotes",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm not sure which part of my past you mean.",
+              "TL": "Hindi ako sigurado kung aling bahagi ng nakaraan ko ang ibig mong sabihin."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.context_reference.cause_unknown",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't know why that is; I only know what I can confirm.",
+              "TL": "Hindi ko alam kung bakit ganoon; ang masasabi ko lang ay ang mga bagay na kumpirmado ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.context_reference.description_unknown",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't know enough about that place to describe it.",
+              "TL": "Wala akong sapat na alam tungkol sa lugar na iyon para mailarawan ito."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.context_reference.location_safety_unknown",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't have reliable information about whether it's safe there.",
+              "TL": "Wala akong mapagkakatiwalaang impormasyon kung ligtas ba roon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.context_reference.medical_unknown",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't confirm anything about that pain right now.",
+              "TL": "Hindi ko makumpirma ang anumang sakit na iyon sa ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.context_reference.unknown",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm not sure what you're referring to.",
+              "TL": "Hindi ko tiyak kung ano ang tinutukoy mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.continuation.default",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't have anything else to add about that right now.",
+              "TL": "Wala na akong ibang maidaragdag tungkol doon sa ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.continuation.gossip_memory",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's all I know about it for now.",
+              "TL": "Iyan na ang lahat ng alam ko tungkol dito sa ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.continuation.gossip_unknown",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't have anything else to add right now.",
+              "TL": "Wala na akong ibang maidaragdag sa ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.continuation.knowledge",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't have anything else reliable to add about that.",
+              "TL": "Wala na akong ibang maaasahang maidaragdag tungkol doon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.continuation.medical",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't confirm anything more about my health right now.",
+              "TL": "Hindi ko makumpirma ang iba pa tungkol sa kalusugan ko ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.continuation.medical_known",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't have anything more to add about my health right now.",
+              "TL": "Wala na akong ibang maidaragdag tungkol sa kalusugan ko sa ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.continuation.medical_unknown",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't confirm anything more about my health right now.",
+              "TL": "Hindi ko makumpirma ang iba pa tungkol sa kalusugan ko ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.continuation.residence",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's all I can confirm about where I live right now.",
+              "TL": "Iyan lang ang makukumpirma ko tungkol sa tinitirhan ko sa ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.safety.danger",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Watch out. We need to move now.",
+              "TL": "Watch out. We need to move now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.conversation.safety.default",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Stay alert.",
+              "TL": "Stay alert."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.evasion",
+      "group": "commands_emotes",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I asked you your name. Don't just change the subject.",
+              "TL": "I asked you your name. Don't just change the subject."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.evasion.default",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You avoided my question. That makes you seem untrustworthy.",
+              "TL": "Iniwasan mo ang tanong ko. Nagmumukha kang hindi mapagkakatiwalaan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.evasion.friendly",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I asked you your name. Changing the subject makes me question your honesty.",
+              "TL": "Tinanong ko ang pangalan mo. Dahil binago mo ang paksa, nagdududa ako sa katapatan mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.evasion.rude.1",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's a rude way to answer.",
+              "TL": "Ang bastos naman ng sagot mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.evasion.rude.2",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "If you want my help, show some basic courtesy.",
+              "TL": "Kung gusto mo ng tulong ko, magpakita ka ng kaunting paggalang."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.evasion.rude.3",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Fine. Keep your name to yourself, then.",
+              "TL": "Sige. Sarili mo na lang ang pangalan mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.evasion.untrustworthy",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You avoided my question. I can't trust you with my name.",
+              "TL": "Iniwasan mo ang tanong ko. Hindi kita mapagkakatiwalaan sa pangalan ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.evasion.withdrawn",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Forget it. Keep your name to yourself; I don't trust evasive people.",
+              "TL": "Sige na. Itago mo ang pangalan mo; hindi ako nagtitiwala sa mga umiiwas."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.exchange",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Nice to meet you. What's your name?",
+              "TL": "Ikinagagalak kitang makilala. Ano ang pangalan mo?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.exchange.confirmed",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Okay %s, nice to meet you. I'm %s.",
+              "TL": "Sige, %s. Ikinagagalak kitang makilala. Ako si %s."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.exchange.confirmed.unnamed",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Okay %s, nice to meet you.",
+              "TL": "Sige, %s. Ikinagagalak kitang makilala."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.exchange.unavailable",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't verify your name just now. Could you tell me again?",
+              "TL": "Hindi ko makumpirma ang pangalan mo sa ngayon. Maaari mo bang sabihin itong muli?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.identity.false_name",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't believe you.",
+              "TL": "Hindi ako naniniwala sa iyo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.navigation.camp",
+      "group": "commands_emotes",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Where should we set up?",
+              "TL": "Where should we set up?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.navigation.camp_empty",
+      "group": "commands_emotes",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't see a good place to set up here.",
+              "TL": "I don't see a good place to set up here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.navigation.orders",
+      "group": "commands_emotes",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. What do you need?",
+              "TL": "All right. What do you need?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.navigation.subject_change",
+      "group": "commands_emotes",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. What did you want to talk about?",
+              "TL": "All right. What did you want to talk about?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.unknown",
+      "group": "commands_emotes",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't understand.",
+              "TL": "I don't understand."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [
+    {
+      "id": "conversation.landing:whats_up",
+      "kind": "player_landing_choice",
+      "route": "semantic_hub",
+      "hubID": "whats_up",
+      "labelTranslations": {
+        "EN": "What's up",
+        "TL": "Ano ang balita"
+      },
+      "choiceTranslations": {
+        "EN": "What's up?",
+        "TL": "Ano ang balita?"
+      }
+    }
+  ]
+}

@@ -19,9 +19,11 @@ from .lexicon_compiler import CompileError, _lua_string
 
 
 CONTENT_SCHEMA = "pnc.semantic_dialogue_content.v2"
-CONTENT_SOURCE_NAME = "semantic_dialogue_content.json"
+CONTENT_MANIFEST_SCHEMA = "pnc.conversation_content_manifest.v1"
+CONTENT_SHARD_SCHEMA = "pnc.conversation_content_shard.v1"
+CONTENT_SOURCE_NAME = "conversation/manifest.json"
 CONTENT_SOURCE_RELATIVE = Path(
-    "tools/semantic_harness/codebuilder/sources/semantic_dialogue_content.json"
+    "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 )
 CONTENT_RUNTIME_RELATIVE = Path(
     "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
@@ -59,14 +61,153 @@ def source_fingerprint(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def load_dialogue_content_source(path: Path) -> dict[str, Any]:
+def _read_json(path: Path, label: str) -> dict[str, Any]:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
-        raise CompileError(f"cannot read dialogue content source {path}: {error}") from error
+        raise CompileError(f"cannot read {label} {path}: {error}") from error
     if not isinstance(value, dict):
-        raise CompileError("dialogue content source root must be an object")
+        raise CompileError(f"{label} root must be an object: {path}")
     return value
+
+
+def _shard_path(manifest_path: Path, value: Any) -> Path:
+    if not isinstance(value, str) or not value.strip():
+        raise CompileError("conversation content shard path must be a string")
+    relative = Path(value)
+    if relative.is_absolute() or ".." in relative.parts:
+        raise CompileError(f"conversation content shard path escapes the manifest: {value}")
+    return (manifest_path.parent / relative).resolve()
+
+
+def load_dialogue_content_manifest(path: Path) -> dict[str, Any]:
+    """Load the bounded authoring manifest without merging its shards."""
+    manifest = _read_json(path, "dialogue content manifest")
+    if manifest.get("schema") != CONTENT_MANIFEST_SCHEMA:
+        raise CompileError("conversation content manifest schema is invalid")
+    if manifest.get("schemaVersion") != 1:
+        raise CompileError("conversation content manifest schemaVersion must be 1")
+    source = manifest.get("source")
+    groups = manifest.get("groups")
+    shards = manifest.get("shards")
+    if not isinstance(source, dict) or not isinstance(groups, dict):
+        raise CompileError("conversation content manifest requires source and groups")
+    if not isinstance(shards, list) or not shards:
+        raise CompileError("conversation content manifest requires shards")
+    seen_ids: set[str] = set()
+    for index, shard in enumerate(shards, 1):
+        if not isinstance(shard, dict):
+            raise CompileError(f"conversation content manifest shard {index} must be an object")
+        shard_id = shard.get("id")
+        if not isinstance(shard_id, str) or not shard_id.strip():
+            raise CompileError(f"conversation content manifest shard {index} requires an id")
+        if shard_id in seen_ids:
+            raise CompileError(f"duplicate conversation content shard id: {shard_id}")
+        seen_ids.add(shard_id)
+        _shard_path(path, shard.get("path"))
+    return manifest
+
+
+def _merge_dialogue_content_shards(path: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+    merged: dict[str, Any] = {
+        "schemaVersion": 2,
+        "source": manifest["source"],
+        "groups": manifest["groups"],
+        "phraseFamilies": [],
+        "playerChoices": [],
+        "runtimeAliases": [],
+    }
+    for index, descriptor in enumerate(manifest["shards"], 1):
+        shard_path = _shard_path(path, descriptor.get("path"))
+        shard = _read_json(shard_path, "dialogue content shard")
+        if shard.get("schema") != CONTENT_SHARD_SCHEMA:
+            raise CompileError(f"conversation content shard {shard_path} schema is invalid")
+        if shard.get("schemaVersion") != 1:
+            raise CompileError(f"conversation content shard {shard_path} schemaVersion must be 1")
+        if shard.get("id") != descriptor.get("id"):
+            raise CompileError(f"conversation content shard identity mismatch: {shard_path}")
+        for key in ("phraseFamilies", "playerChoices", "runtimeAliases"):
+            values = shard.get(key, [])
+            if not isinstance(values, list):
+                raise CompileError(f"{shard_path}: {key} must be a list")
+            merged[key].extend(values)
+    return merged
+
+
+def load_dialogue_content_source(path: Path) -> dict[str, Any]:
+    value = _read_json(path, "dialogue content source")
+    if value.get("schema") == CONTENT_MANIFEST_SCHEMA:
+        return _merge_dialogue_content_shards(
+            path, load_dialogue_content_manifest(path)
+        )
+    return value
+
+
+def dialogue_content_source_fingerprint(path: Path) -> str:
+    """Fingerprint the manifest and every declared shard for stale guards."""
+    manifest = load_dialogue_content_manifest(path)
+    digest = hashlib.sha256()
+    digest.update(path.read_bytes())
+    for descriptor in manifest["shards"]:
+        shard_path = _shard_path(path, descriptor.get("path"))
+        digest.update(str(descriptor["id"]).encode("utf-8"))
+        digest.update(shard_path.read_bytes())
+    return digest.hexdigest()
+
+
+def write_dialogue_content_source(path: Path, document: dict[str, Any]) -> list[Path]:
+    """Write only shard records changed through the authoring service."""
+    manifest = load_dialogue_content_manifest(path)
+    family_by_id = {
+        str(item.get("id") or "phrase." + str(item.get("semanticTemplateID") or "")): item
+        for item in document.get("phraseFamilies", [])
+        if isinstance(item, dict)
+    }
+    choice_by_id = {
+        str(item.get("id")): item
+        for item in document.get("playerChoices", [])
+        if isinstance(item, dict) and item.get("id") is not None
+    }
+    alias_by_key = {
+        str(item.get("runtimeKey")): item
+        for item in document.get("runtimeAliases", [])
+        if isinstance(item, dict) and item.get("runtimeKey") is not None
+    }
+    written: list[Path] = []
+    for descriptor in manifest["shards"]:
+        shard_path = _shard_path(path, descriptor.get("path"))
+        shard = _read_json(shard_path, "dialogue content shard")
+        for family in shard.get("phraseFamilies", []):
+            if isinstance(family, dict):
+                family_id = str(
+                    family.get("id")
+                    or "phrase." + str(family.get("semanticTemplateID") or "")
+                )
+                if family_id not in family_by_id:
+                    raise CompileError(f"updated content lost family {family_id}")
+                family.clear()
+                family.update(family_by_id[family_id])
+        for choice in shard.get("playerChoices", []):
+            if isinstance(choice, dict):
+                choice_id = str(choice.get("id"))
+                if choice_id not in choice_by_id:
+                    raise CompileError(f"updated content lost player choice {choice_id}")
+                choice.clear()
+                choice.update(choice_by_id[choice_id])
+        for alias in shard.get("runtimeAliases", []):
+            if isinstance(alias, dict):
+                runtime_key = str(alias.get("runtimeKey"))
+                if runtime_key not in alias_by_key:
+                    raise CompileError(f"updated content lost runtime alias {runtime_key}")
+                alias.clear()
+                alias.update(alias_by_key[runtime_key])
+        shard_path.write_text(
+            json.dumps(shard, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        written.append(shard_path)
+    return written
 
 
 def _text(value: Any, label: str) -> str:

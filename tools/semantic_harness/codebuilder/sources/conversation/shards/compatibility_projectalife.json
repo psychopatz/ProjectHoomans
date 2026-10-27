@@ -1,0 +1,162 @@
+{
+  "schema": "pnc.conversation_content_shard.v1",
+  "schemaVersion": 1,
+  "id": "compatibility_projectalife",
+  "domain": "compatibility.projectalife",
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.compat.projectalife.encounter.friendly",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Those survivors seem friendly. Keep your hands visible.",
+              "TL": "Those survivors seem friendly. Keep your hands visible."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.projectalife.encounter.hostile",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That group looks hostile. Keep cover between us and them.",
+              "TL": "That group looks hostile. Keep cover between us and them."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.projectalife.encounter.unknown",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Someone is out there. Let us watch before we approach.",
+              "TL": "Someone is out there. Let us watch before we approach."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.projectalife.faction.hostile",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That faction may be hostile toward us now. Stay alert.",
+              "TL": "That faction may be hostile toward us now. Stay alert."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.projectalife.faction.incoming",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "They just opened fire on us. Stay close.",
+              "TL": "They just opened fire on us. Stay close."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.projectalife.faction.outgoing",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We hit them. They may retaliate soon.",
+              "TL": "We hit them. They may retaliate soon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.projectalife.meta.aircraft.heli",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Something is flying over us. Keep listening.",
+              "TL": "Something is flying over us. Keep listening."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.projectalife.meta.aircraft.military",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That aircraft sounds close. Stay sharp.",
+              "TL": "That aircraft sounds close. Stay sharp."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.projectalife.meta.ambience",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I do not like that sound. Stay close.",
+              "TL": "I do not like that sound. Stay close."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.projectalife.meta.crash",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That crash sounded close. Keep your eyes open.",
+              "TL": "That crash sounded close. Keep your eyes open."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.projectalife.meta.gunfire",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Someone is shooting nearby. Keep your head down.",
+              "TL": "Someone is shooting nearby. Keep your head down."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

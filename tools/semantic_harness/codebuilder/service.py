@@ -26,9 +26,10 @@ from .interaction_explorer import build_interaction_rows, search_interactions
 from .dialogue_content import (
     CONTENT_SOURCE_RELATIVE,
     compile_dialogue_content,
+    dialogue_content_source_fingerprint,
     derived_canonical_concept,
     load_dialogue_content_source,
-    source_fingerprint,
+    write_dialogue_content_source,
 )
 from .lexicon_compiler import CompileError
 
@@ -175,7 +176,9 @@ class SemanticLabAuthoringService:
 
     def list_dialogue_content(self) -> list[dict[str, Any]]:
         document = self._dialogue_content_document()
-        fingerprint = source_fingerprint(self.dialogue_content_source_path)
+        fingerprint = dialogue_content_source_fingerprint(
+            self.dialogue_content_source_path
+        )
         groups = document.get("groups") or {}
         rows: list[dict[str, Any]] = []
         for family in document.get("phraseFamilies", []):
@@ -221,7 +224,9 @@ class SemanticLabAuthoringService:
         if item is None:
             raise KeyError(f"unknown dialogue content id: {content_id}")
         item["sourcePath"] = str(self.dialogue_content_source_path)
-        item["sourceFingerprint"] = source_fingerprint(self.dialogue_content_source_path)
+        item["sourceFingerprint"] = dialogue_content_source_fingerprint(
+            self.dialogue_content_source_path
+        )
         item["verifiedOwner"] = "CodeBuilder → Dialogue Content Registry"
         return item
 
@@ -233,7 +238,7 @@ class SemanticLabAuthoringService:
         expected_source_fingerprint: str | None = None,
     ) -> tuple[dict[str, Any] | None, dict[str, Any]]:
         path = self.dialogue_content_source_path
-        actual_fingerprint = source_fingerprint(path)
+        actual_fingerprint = dialogue_content_source_fingerprint(path)
         if expected_source_fingerprint and expected_source_fingerprint != actual_fingerprint:
             return None, {
                 "ok": False,
@@ -334,6 +339,8 @@ class SemanticLabAuthoringService:
         return {
             **report,
             "diagnostics": [],
+            "previewOnly": True,
+            "effectFree": True,
             "contentFingerprint": compiled["contentFingerprint"],
             "generatedPaths": [
                 str(self.repository / path)
@@ -362,10 +369,9 @@ class SemanticLabAuthoringService:
             return report
         try:
             compile_dialogue_content(updated)
-            self.dialogue_content_source_path.write_text(
-                json.dumps(updated, ensure_ascii=False, indent=2) + "\n",
-                encoding="utf-8",
-                newline="\n",
+            written = write_dialogue_content_source(
+                self.dialogue_content_source_path,
+                updated,
             )
         except (OSError, ValueError, TypeError, CompileError) as error:
             return {
@@ -378,7 +384,7 @@ class SemanticLabAuthoringService:
             **report,
             "previewOnly": False,
             "effectFree": False,
-            "writes": [str(self.dialogue_content_source_path)],
+            "writes": [str(path) for path in written],
             "reloadedBy": "caller_restart_required",
         }
     def list_semantic_blocks(

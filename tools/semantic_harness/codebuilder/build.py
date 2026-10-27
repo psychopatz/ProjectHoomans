@@ -89,7 +89,7 @@ CANONICAL_SOURCE_ROOT = (
     ROOT / "tools" / "semantic_harness" / "codebuilder" / "sources"
 )
 DEFAULT_SEMANTIC_SOURCE = CANONICAL_SOURCE_ROOT / "semantic_definitions.json"
-DEFAULT_CONTENT_SOURCE = CANONICAL_SOURCE_ROOT / "semantic_dialogue_content.json"
+DEFAULT_CONTENT_SOURCE = CANONICAL_SOURCE_ROOT / "conversation/manifest.json"
 DEFAULT_SEMANTIC_OUTPUT_ROOT = ROOT
 
 

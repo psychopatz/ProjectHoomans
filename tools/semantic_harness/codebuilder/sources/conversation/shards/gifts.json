@@ -1,0 +1,50 @@
+{
+  "schema": "pnc.conversation_content_shard.v1",
+  "schemaVersion": 1,
+  "id": "gifts",
+  "domain": "gifts",
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.gift.consent.ambiguous",
+      "group": "commands_emotes",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "More than one of us wants it. Please offer it to one person directly.",
+              "TL": "More than one of us wants it. Please offer it to one person directly."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.gift.consent.declined",
+      "group": "commands_emotes",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "No problem. I'll leave it with you.",
+              "TL": "No problem. I'll leave it with you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.gift.selection_required",
+      "group": "commands_emotes",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Oh? What did you bring me?",
+              "TL": "Oh? What did you bring me?"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

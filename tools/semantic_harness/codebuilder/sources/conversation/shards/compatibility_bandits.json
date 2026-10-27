@@ -1,0 +1,64 @@
+{
+  "schema": "pnc.conversation_content_shard.v1",
+  "schemaVersion": 1,
+  "id": "compatibility_bandits",
+  "domain": "compatibility.bandits",
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.colonist",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Bandit fire! Pull back and cover the wounded colonist.",
+              "TL": "Bandit fire! Pull back and cover the wounded colonist."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.default",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Bandit fire! Stay with the wounded survivor and watch the flank.",
+              "TL": "Bandit fire! Stay with the wounded survivor and watch the flank."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.family",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Bandit fire! Stay together and cover the wounded family member.",
+              "TL": "Bandit fire! Stay together and cover the wounded family member."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.compat.bandits.hooman_hurt.lover",
+      "group": "compatibility",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Bandit fire. Stay close; I have got you.",
+              "TL": "Bandit fire. Stay close; I have got you."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

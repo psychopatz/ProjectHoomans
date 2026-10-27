@@ -259,5 +259,16 @@ absence tests without changing semantic/runtime authority.
 | Grounded event follow-up wording | event semantic pools plus Dialogue Content | known answers use canonical `%s` templates with authoritative fact args; unknown answers use explicit canonical unknown templates | P2 event-follow-up smoke; typed/clicked selection parity retained |
 | Command/emote/greeting wording | command/emote/greeting ResponseCatalog pools plus Dialogue Content | canonical phrase variants retain deterministic anti-repeat and target argument formatting | companion command, emote, greeting and P7 content smokes |
 
-P11C is now the active authoring-layout slice. Its audit must preserve stable
-semantic IDs and move only physical canonical source ownership.
+## P11C current closure
+
+| Surface | Verified current owner/callers | P11C disposition | Evidence |
+| --- | --- | --- | --- |
+| Canonical Conversation source entrypoint | Dialogue Content CodeBuilder and shared authoring service | `conversation/manifest.json` is the sole content entrypoint; domain shards are declared there and the deleted monolith is not loaded | `test_p11_conversation_shards`, CodeBuilder output |
+| Domain content ownership | Dialogue Content shard loader | wording is grouped into cohesive Conversation-domain shards; shard order is deterministic and does not change stable semantic IDs | shard compiler test, generated Registry/content smokes |
+| NLU/pattern authoring boundary | `semantic_definitions.json` and semantic compiler inputs | patterns remain outside response/content shards; response pools and phrase wording are no longer embedded in generic pattern data | shard schema/absence assertions |
+| Global identity and generated join | Dialogue Content compiler | merged shards validate globally unique phrase, semantic-template, and player-choice IDs and retain the canonical semantic/content join | `test_p11_conversation_shards`, CodeBuilder twice |
+| Authoring writes and stale guards | `SemanticLabAuthoringService` | aggregate fingerprints, owning-shard writes, effect-free previews, and explicit writes are exposed through the service; callers do not patch shard files | service shard write test |
+
+P11D is now the active UI-authoring slice. Its audit must retain the same
+manifest/compiler boundary and keep dynamic eligibility and gameplay effects
+outside declarative Conversation UI structure.

@@ -1,0 +1,190 @@
+{
+  "schema": "pnc.conversation_content_shard.v1",
+  "schemaVersion": 1,
+  "id": "tool_replies_order",
+  "domain": "tool.replies.order",
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_camp.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. We will make camp here.",
+              "TL": "All right. We will make camp here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_camp.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will settle in here for now.",
+              "TL": "I will settle in here for now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_camp.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Understood. I will stay here and take care of my needs.",
+              "TL": "Understood. I will stay here and take care of my needs."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_follow.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. I am with you.",
+              "TL": "Sige. Sasama ako sa iyo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_follow.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Lead the way.",
+              "TL": "Lead the way."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_follow.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will stay close.",
+              "TL": "I will stay close."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_generic.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right.",
+              "TL": "All right."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_generic.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Understood.",
+              "TL": "Understood."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_generic.3",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will handle it.",
+              "TL": "I will handle it."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_rejected.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I cannot do that right now.",
+              "TL": "I cannot do that right now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_rejected.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That order is not going to work.",
+              "TL": "That order is not going to work."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_stay.1",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. I will hold here.",
+              "TL": "All right. I will hold here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.tool_reply.order_stay.2",
+      "group": "tool_replies",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will stay put.",
+              "TL": "I will stay put."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

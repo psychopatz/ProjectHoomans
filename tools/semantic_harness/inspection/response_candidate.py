@@ -165,7 +165,7 @@ def preview_authored_variant(
         content_source = (
             repository
             / "tools/semantic_harness/codebuilder/sources/"
-            / "semantic_dialogue_content.json"
+            / "conversation/manifest.json"
         ).resolve(strict=True)
         original_bytes = content_source.read_bytes()
         original_hash = _sha256(original_bytes)

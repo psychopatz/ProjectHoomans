@@ -1,0 +1,96 @@
+{
+  "schema": "pnc.conversation_content_shard.v1",
+  "schemaVersion": 1,
+  "id": "questions_knowledge",
+  "domain": "questions.knowledge",
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.question.knowledge.known",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I know about %s.",
+              "TL": "May alam ako tungkol sa %s."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I know about that.",
+              "TL": "May alam ako tungkol diyan."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I know about that. I can share what I remember.",
+              "TL": "May alam ako tungkol diyan. Maibabahagi ko ang naaalala ko."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I know it.",
+              "TL": "Alam ko iyan."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I know enough.",
+              "TL": "Sapat ang alam ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.question.knowledge.unknown",
+      "group": "events",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't have reliable information about %s.",
+              "TL": "Wala akong mapagkakatiwalaang impormasyon tungkol sa %s."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I don't have reliable information about that.",
+              "TL": "Wala akong maaasahang impormasyon tungkol diyan."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I don't know enough about that to help.",
+              "TL": "Hindi sapat ang alam ko para makatulong."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I don't know.",
+              "TL": "Hindi ko alam."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I don't know that. Don't guess.",
+              "TL": "Hindi ko alam iyan. Huwag manghula."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
