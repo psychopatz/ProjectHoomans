@@ -2,6 +2,22 @@
 local Handler = {}
 
 function Handler.handle(context, command, payload)
+    if command == "TEST_EVIDENCE_PROVIDERS" then
+        local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
+        for _, tier in ipairs({ "SESSION", "TODAY", "DURABLE" }) do
+            local sourceTier = tier
+            Providers.RegisterEvidenceAdapter({ id = "fixture." .. tier,
+                sourceTier = tier, Query = function()
+                    return {{ sourceRef = sourceTier .. ":fixture", actorID = "player:a",
+                        targetID = "npc:b", relations = { opens = { "test" } },
+                        retentionSalience = 220, confidence = 0.8,
+                        effectiveStrength = 0.5, ageHours = 1,
+                        rawText = "excluded" }}
+                end })
+        end
+        return { ok = true, evidence = Providers.QueryEvidence({}, {
+            relation = "test", targetID = "npc:b" }) }
+    end
     if command ~= "TEST_EVIDENCE_STORAGE" then return false end
     local Runtime = context.Runtime
     local record = Runtime.hydratedNpcRecord

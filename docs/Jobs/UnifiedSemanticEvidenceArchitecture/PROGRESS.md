@@ -1,10 +1,16 @@
 # Progress — Unified Semantic Evidence Architecture
 
-**Status:** IN PROGRESS — E0 baseline accepted; architecture implementation pending.
+**Status:** IN PROGRESS — E0/E1 accepted; tier adapters and relations pending.
 **Branch:** existing main.
 **Audit anchor:** ProjectHoomans 2bc4810f.
-**Current phase:** E1 — canonical evidence schema and provider seam.
-**Next exact chunk:** E1A — extend InteractionProviders/InteractionContext with bounded normalized evidence and adapter registration; test SESSION/TODAY/DURABLE normalization before implementing tier adapters.
+**Current phase:** E2 — canonical owning-domain metadata.
+**Next exact chunk:** E2A — describe all first-party social events in their authoritative definitions and derive compact registration, preserving stable numeric codes and compatibility aliases.
+
+## E1 accepted (2026-10-28)
+
+- InteractionProviders exposes NormalizeEvidence, RegisterEvidenceAdapter and QueryEvidence; InteractionContext carries the read-only result. The cohesive schema/query spoke owns no facts or persistence.
+- Limits: 16 adapters, 16 rows per adapter/result, 8 terms per class/relation/tag list, 128 characters per identifier. Fixed relation keys; only explicit fields copied. Adapter callback failure contributes no evidence; diagnostics are bounded. Target/class/relation selection and deterministic SESSION/TODAY/DURABLE ordering are tested.
+- Production-worker tier fixtures PASS; provider seam smoke PASS; existing provider smoke PASS; semantic Lua 100/100 PASS; Kahlua verifier and diff check PASS. New paths are untracked in the old graph generation and were read directly.
 
 ## E0A accepted (2026-10-28)
 

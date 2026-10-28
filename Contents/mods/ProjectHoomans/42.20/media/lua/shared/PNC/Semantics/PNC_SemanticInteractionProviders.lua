@@ -3,6 +3,7 @@ PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
 local ValueBounds = require "PNC/Semantics/PNC_SemanticValueBounds"
+local Evidence = require "PNC/Semantics/PNC_SemanticInteractionEvidence"
 local Providers = PNC.Semantics.InteractionProviders or {}
 PNC.Semantics.InteractionProviders = Providers
 
@@ -10,6 +11,9 @@ Providers.VERSION = 1
 Providers.MAX_ADAPTERS = 16
 Providers.MAX_TAGS = 16
 Providers.MAX_KNOWLEDGE_REFS = 16
+Providers.NormalizeEvidence = Evidence.Normalize
+Providers.RegisterEvidenceAdapter = Evidence.Register
+Providers.QueryEvidence = Evidence.Query
 
 local adapters = {}
 
@@ -267,6 +271,7 @@ function Providers.ProjectDialogue(context)
         relationship = relation,
         world = world,
         knowledge = knowledgeProjection,
+        evidence = Evidence.Query(context, context.evidenceQuery),
         provenance = {
             actor = actor.providerID,
             relationship = relation.providerID,
@@ -365,6 +370,7 @@ function Providers.ProjectExternalContext(actor, otherActor, context)
     return {
         schemaVersion = Providers.VERSION,
         actor = Providers.NormalizeActor(actorValue, adapter.id),
+        evidence = Evidence.Query(context, type(context) == "table" and context.evidenceQuery),
         relationship = Providers.NormalizeRelationship(
             relationshipValue, adapter.id
         ),
