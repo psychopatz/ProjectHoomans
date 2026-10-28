@@ -1,6 +1,6 @@
 # Audit — Current Conversation-Coherence Gap
 
-This file records only the evidence that justifies the active C0–C8 roadmap. Completed R0–R9 recovery history is available in Git and is not repeated here.
+This file records only the evidence that justifies the active C0–C10 roadmap. Completed R0–R9 recovery history is available in Git and is not repeated here.
 
 ## Current production findings
 
@@ -40,7 +40,17 @@ The accepted pragmatic resolver knows flows, topic and recent semantic state, bu
 
 The missing layer belongs between Core candidates and the existing pragmatic resolver.
 
-## Root cause 4 — social persistence can masquerade as semantic failure
+## Root cause 4 — suggestions and replies are still more authored than semantic
+
+The existing PNC_SemanticDialogueSuggestions pipeline already has the correct execution authority: it gathers authored/root/flow/response-plan/provider candidates, ranks and deduplicates them, and clicks typed semantic_click_frame values through the existing conversation path.
+
+However, most visible candidate wording is still supplied by authored labelKey / utteranceKey / fallback records. The system does not yet derive a balanced set of positive, negative and contextual semantic continuations directly from the current DiscourseFrame.
+
+Likewise, PNC_SpeechRealization.lua already owns style-aware phrase-family selection and anti-repeat, but it mainly selects complete authored phrases. It does not yet compose a bounded runtime utterance from a semantic strategy plus canonical lexical slots.
+
+Therefore the next architecture should extend these existing authorities, not create a second button generator or response engine.
+
+## Root cause 5 — social persistence can masquerade as semantic failure
 
 Conduct evidence is bounded at 64 entries. `PNC_ConductService_EvidenceInternals.lua` inserts new evidence and calls `PruneEvidence`; when the new item itself is removed, the operation returns `evidence_pruned_by_limit`.
 
@@ -58,4 +68,4 @@ Do not fix this by:
 - globally lowering confidence thresholds;
 - expanding conduct evidence without bounds.
 
-Proceed through the C0–C8 roadmap using existing Core NLU, ParseCandidates, discourse state, pragmatic resolver, Interaction Director and Semantic Lab.
+Proceed through the C0–C10 roadmap using existing Core NLU, ParseCandidates, discourse state, pragmatic resolver, Interaction Director and Semantic Lab.

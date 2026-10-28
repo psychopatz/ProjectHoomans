@@ -14,11 +14,14 @@ For human input expose a bounded chain:
 6. discourse-context evidence and adjustments;
 7. selected DiscourseFrame or explicit ambiguity;
 8. pragmatic frame;
-9. beat/behavior candidates and selected InteractionPlan;
-10. Dialogue Content / emote / gameplay projection;
-11. final presentation;
-12. authoritative relationship/gameplay result;
-13. durable conduct-memory result.
+9. dynamic player-affordance candidates with origin/stance/strategy;
+10. selected semantic-click frame and player UtterancePlan when applicable;
+11. beat/behavior candidates and selected InteractionPlan;
+12. NPC/player UtterancePlan and realization components when composition is used;
+13. Dialogue Content / emote / gameplay projection or authored fallback;
+14. final presentation;
+15. authoritative relationship/gameplay result;
+16. durable conduct-memory result.
 
 NPC semantic acts begin at the semantic-stimulus step and must show that no human NLU reparse occurred.
 
@@ -112,6 +115,43 @@ Prove both directions:
 
 The known `HOSTILE_REMARK` around 0.83 → generic clarification failure must be eliminated without globally lowering action safety.
 
+## Dynamic button acceptance
+
+After representative NPC turns, inspect the same production suggestion pipeline and prove:
+
+- authored/static choices remain available when intentionally authored;
+- eligible positive-leading continuations can be generated from semantic/discourse state;
+- eligible negative-leading continuations can be generated from semantic/discourse state;
+- contextual/neutral/trait-induced continuations appear only from grounded player/context providers;
+- trait-driven choices do not leak hidden NPC traits or private facts;
+- candidates expose origin, stance, strategy, source evidence and eligibility;
+- deterministic ranking/deduplication prevents near-duplicate button spam;
+- the UI need not force one choice from every lane when a lane has no valid candidate;
+- clicking a generated choice sends its typed semantic frame directly and does not pass its displayed utterance back through NLU;
+- a typed utterance with equivalent meaning and the generated button converge on the same DiscourseFrame / authoritative outcome.
+
+At least one multi-turn hostility case should naturally offer contrasting continuations such as de-escalate/apologize, challenge/retaliate and dismiss/change-topic when context permits them.
+
+## Compositional realization acceptance
+
+Prove runtime construction through the existing SpeechRealization authority.
+
+Required evidence:
+
+- the selected semantic behavior/strategy is stable before realization;
+- canonical lexical concepts come from semantic/discourse evidence rather than arbitrary raw-text echo;
+- locale-specific construction is compiler-owned and deterministic;
+- a bounded UtterancePlan is observable;
+- the same semantic strategy can realize more than one context/style-appropriate sentence without adding one full response definition per combination;
+- unsupported/ambiguous construction falls back to ordinary Dialogue Content;
+- optional PBrainZ realization, if present, consumes the same plan and cannot change facts/intent/authority.
+
+Required example class:
+
+`fuckyouuu!!!` (or equivalent recovered insult) → canonical directed-insult payload → NPC `RETALIATE_VERBALLY / MIRROR` → a runtime-composed retort such as `Fuck you too.`, with no dedicated full-sentence definition required and no raw-input injection.
+
+Also test non-mirroring strategies so dynamic realization is not merely an insult special case: agreement, disagreement, acknowledgement, apology/de-escalation, ask-back/follow-up and deflection.
+
 ## Social-memory saturation acceptance
 
 Construct a disposable saturated conduct record and prove:
@@ -148,13 +188,16 @@ Measure and bound:
 
 No full transcript persistence and no all-NPC/all-definition per-tick scanning.
 
-## Final C8 gate
+## Final C10 gate
 
 Developer acceptance requires:
 
 - focused and broad real-worker corpus green;
 - action-safety controls green;
 - contextual multi-turn cases green;
+- dynamic authored/positive/negative/contextual button cases green;
+- typed/button semantic parity green;
+- compositional player/NPC UtterancePlan realization green with authored fallback coverage;
 - social-memory saturation green;
 - accepted NPC-scene/interaction regressions green;
 - deterministic generation where relevant;

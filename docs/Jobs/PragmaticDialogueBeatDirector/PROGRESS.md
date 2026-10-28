@@ -54,15 +54,17 @@ Required initial groups:
 6. context-dependent short replies;
 7. benign false positives;
 8. mutating-action safety;
-9. conduct-saturation reaction vs persistence.
+9. conduct-saturation reaction vs persistence;
+10. current post-NPC-reply button sources, stance diversity and authored/static dependence;
+11. current NPC response realization for mirror/counter/agreement/disagreement cases, including whether a full authored phrase is required.
 
-Record expected semantic class, contextual outcome, allowed recovery type and whether authoritative mutation is permitted.
+Record expected semantic class, contextual outcome, allowed recovery type, semantic button continuations, realization strategy and whether authoritative mutation is permitted.
 
 Then use that corpus to drive C1 rather than adding one-off phrase aliases.
 
 ## Remaining mandatory work
 
-C1 surface recovery → C2 compositional social features → C3 Contextual Discourse Resolver → C4 risk-aware acceptance → C5 discourse continuity → C6 conduct-memory decoupling → C7 observability/fuzzing → C8 integrated acceptance.
+C1 surface recovery → C2 compositional social features → C3 Contextual Discourse Resolver → C4 risk-aware acceptance → C5 dynamic semantic affordances → C6 compositional utterance realization → C7 discourse continuity → C8 conduct-memory decoupling → C9 observability/fuzzing → C10 integrated acceptance.
 
 ## Safety
 

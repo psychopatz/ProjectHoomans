@@ -10,7 +10,7 @@ Read `AUDIT.md` only when you need the evidence behind the current failure taxon
 
 ## Operating goal
 
-Complete C0–C8 so human text, semantic candidates, discourse context, pragmatic interaction, behavior selection and social effects behave as one coherent conversation system.
+Complete C0–C10 so human text, semantic candidates, discourse context, dynamic choices, runtime utterance realization, pragmatic interaction, behavior selection and social effects behave as one coherent conversation system.
 
 The Next Chunk is a starting point, not a stop condition. After each accepted chunk, update `PROGRESS.md` concisely and continue automatically to the next mandatory phase.
 
@@ -61,6 +61,23 @@ A moderate-confidence social act may be accepted when contextual evidence is str
 Inventory/world/task/gameplay mutation remains conservative and requires the existing exact/high-confidence/confirmation protections.
 
 Do not globally lower thresholds to make conversation examples pass.
+
+## Dynamic choice and realization rules
+
+Dynamic buttons are semantic affordances, not generated strings with hidden behavior.
+
+Internally separate:
+
+- origin: authored vs generated;
+- stance: positive / negative / neutral;
+- strategy: apologize, challenge, dismiss, follow up, agree, disagree, repair, etc.;
+- contextual modifiers: traits, relationship, topic, beat, world state and capabilities.
+
+The user-facing surface may group generated choices into positive-leading, negative-leading and contextual/trait-driven lanes, but trait-driven choices may themselves be positive or negative. Do not encode trait as a mutually exclusive sentiment class.
+
+Generated button clicks carry their typed semantic frame through the existing suggestion/click pipeline. Do not render text and send it back through NLU.
+
+Dynamic NPC/player wording must use a bounded UtterancePlan / compositional realization path inside the existing SpeechRealization authority. Reuse canonical semantic lexemes and locale-specific construction rules; never echo arbitrary raw player text as generated dialogue. Always retain an ordinary Dialogue Content fallback when a composition is unavailable or unsafe.
 
 ## Social-memory rules
 
@@ -113,7 +130,7 @@ For each chunk:
 - `git diff --check`;
 - no source-save mutation.
 
-C8 performs broad final regression.
+C10 performs broad final regression.
 
 ## Documentation hygiene
 

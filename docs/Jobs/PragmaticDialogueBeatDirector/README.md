@@ -18,7 +18,9 @@ The system must connect:
 - grounded world/social knowledge;
 - flows and bounded interaction beats;
 - behavior arbitration;
-- Dialogue Content realization;
+- dynamic semantic player affordances/buttons;
+- compositional runtime player/NPC utterance realization;
+- Dialogue Content realization and authored fallbacks;
 - authoritative social/gameplay effects.
 
 The result should remain deterministic and explainable offline, with optional PBrainZ realization but no required runtime LLM.
@@ -43,7 +45,7 @@ Do not reopen these unless current code evidence proves a regression.
 
 ## Active architecture gap
 
-Human input is still too dependent on whitespace/exact phrase shape, candidate confidence is gated too globally, and discourse context does not yet participate strongly enough in choosing between plausible conversational meanings.
+Human input is still too dependent on whitespace/exact phrase shape, candidate confidence is gated too globally, and discourse context does not yet participate strongly enough in choosing between plausible conversational meanings. The existing semantic suggestion surface and SpeechRealization path are authoritative but still rely too heavily on pre-authored button/reply wording instead of deriving reusable semantic continuations and bounded runtime utterances from the same discourse state.
 
 The active path is:
 
@@ -57,12 +59,17 @@ PsychopatzCore ParseCandidates
 Project Hoomans Contextual Discourse Resolver
   ↓
 Pragmatic Resolver
+  ├─→ dynamic semantic player affordances
+  │      ↓
+  │   player UtterancePlan
   ↓
 Interaction Director
   ↓
 InteractionPlan
   ↓
-Dialogue Content / emote / existing gameplay authority
+NPC/player UtterancePlan
+  ↓
+SpeechRealization / Dialogue Content fallback / emote / existing gameplay authority
 ```
 
 No parallel parser, sentiment engine, response engine, or gameplay authority may be introduced.

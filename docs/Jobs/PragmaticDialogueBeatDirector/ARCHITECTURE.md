@@ -161,7 +161,132 @@ The DiscourseFrame feeds the existing pragmatic resolver, which resolves current
 
 The director does not parse text and does not own wording.
 
-## 7. Social effects and durable memory
+## 7. Dynamic player affordances
+
+The existing DialogueSuggestions pipeline remains the one player-choice authority.
+
+Generated choices are **semantic affordances**, not free-form strings. Keep two internal axes:
+
+- `origin = AUTHORED | GENERATED`;
+- `stance = POSITIVE | NEGATIVE | NEUTRAL`.
+
+A third field, `strategy`, carries the actual conversational move such as:
+
+- AGREE;
+- DISAGREE;
+- APOLOGIZE;
+- DEESCALATE;
+- CHALLENGE;
+- RETALIATE;
+- DISMISS;
+- ASK_WHY;
+- ASK_FOLLOWUP;
+- CHANGE_TOPIC;
+- OFFER_HELP;
+- CALL_BLUFF.
+
+Traits, relationship, active beat, topic, world state and capabilities are **modifiers/providers**, not a fourth mutually exclusive semantic class. A brave trait may surface a negative `CALL_BLUFF`; empathy may surface a positive `COMFORT`; suspicious state may surface a neutral `PRESS_FOR_DETAILS`.
+
+For presentation, the UI may expose four useful lanes:
+
+1. authored/static;
+2. positive-leading;
+3. negative-leading;
+4. contextual/neutral/trait-induced.
+
+Do not force one candidate from every lane. Rank all eligible semantic candidates, enforce diversity where useful, and backfill from the best remaining candidates.
+
+A generated candidate should carry roughly:
+
+```text
+candidateID
+origin
+stance
+strategy
+semantic frame
+topic / subject / replyTo
+target
+source evidence
+eligibility/provenance
+utterance plan
+```
+
+Clicking a generated button sends its typed semantic frame through the existing semantic-click path. The displayed sentence is presentation only and must never be reparsed by NLU.
+
+Typed input and button input should converge on the same DiscourseFrame / pragmatic semantics wherever they mean the same thing.
+
+## 8. Compositional runtime utterance realization
+
+Do not require a complete authored sentence for every semantic combination.
+
+Extend the existing SpeechRealization authority with a bounded `UtterancePlan` / microplanning mode.
+
+Conceptually:
+
+```text
+UtterancePlan
+- speaker
+- target
+- dialogueAct
+- strategy
+- stance
+- topic / subject
+- canonical lexical concepts
+- intensity
+- relationship/style hints
+- optional discourse marker
+- locale
+- fallbackContentTemplateID
+```
+
+The runtime realizer composes from compiler-owned locale constructions and canonical lexemes. It must not concatenate arbitrary raw player text.
+
+Example:
+
+```text
+PLAYER raw: "fuckyouuu!!!"
+Core recovery: INSULT
+canonical lexical payload: PROFANITY_FUCK + RECIPIENT
+DiscourseFrame: directed hostility, high intensity
+
+NPC behavior:
+  RETALIATE_VERBALLY
+
+UtterancePlan:
+  strategy = MIRROR
+  dialogueAct = RETORT
+  lexical payload = PROFANITY_FUCK + RECIPIENT
+  counter = TOO
+
+EN realization:
+  "Fuck you too."
+```
+
+The full sentence does not need its own response definition. Only the semantic strategy, canonical lexeme and locale construction are authored.
+
+Useful reusable construction strategies include:
+
+- MIRROR;
+- COUNTER;
+- AGREE;
+- DISAGREE;
+- ACKNOWLEDGE;
+- QUALIFY;
+- DENY;
+- APOLOGIZE;
+- ESCALATE;
+- DEESCALATE;
+- DEFLECT;
+- ASK_BACK;
+- FOLLOW_UP.
+
+Locale-specific construction rules are compiler-owned; do not build an English sentence and machine-translate it at runtime.
+
+If required lexemes/constructions are unavailable, ambiguous, unsafe or grammatically unsupported, fall back to ordinary Dialogue Content. Existing authored phrase families remain valuable for signature dialogue, high-risk wording and graceful fallback.
+
+Optional PBrainZ may realize the same UtterancePlan more freely when enabled, but it cannot change semantic intent, grounded facts or gameplay authority.
+
+## 9. Social effects and durable memory
 
 Understanding, immediate reaction, relationship effect and durable conduct persistence are separate outcomes.
 
@@ -180,7 +305,7 @@ Repeated low-value social evidence should be coalesced/compacted where possible 
 
 No full transcript persistence.
 
-## 8. Observability
+## 10. Observability
 
 Simulation → Interactions/Inspect must make the chain inspectable without giant dumps:
 
@@ -191,8 +316,11 @@ raw
 → contextual adjustments
 → selected DiscourseFrame
 → pragmatic frame
+→ generated/authored player affordances
+→ selected semantic click / player UtterancePlan
 → beat/behavior candidates
 → InteractionPlan
+→ NPC/player UtterancePlan or Dialogue Content fallback
 → response/content lineage
 → authoritative effects
 → durable-memory outcome

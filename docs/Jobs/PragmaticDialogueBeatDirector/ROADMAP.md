@@ -4,7 +4,7 @@
 
 The completed R0–R9 recovery is accepted foundation and is intentionally not repeated here. Git history contains that implementation record.
 
-The remaining developer objective is C0–C8.
+The remaining developer objective is C0–C10.
 
 ## C0 — failure corpus, ownership audit and baselines
 
@@ -95,7 +95,60 @@ Fix the known class where a recognized `HOSTILE_REMARK` around 0.83 becomes gene
 
 **Gate:** conversational understanding improves without increasing unsafe action execution.
 
-## C5 — coherent discourse continuity
+## C5 — dynamic semantic player affordances
+
+Extend the existing DialogueSuggestions candidate-provider/ranking pipeline; do not create a new button system.
+
+Internally classify candidates by:
+
+- origin: authored or generated;
+- stance: positive / negative / neutral;
+- conversational strategy;
+- contextual/trait/relationship/world provenance.
+
+The UI may present four practical lanes:
+
+1. authored/static;
+2. positive-leading;
+3. negative-leading;
+4. contextual/neutral/trait-induced.
+
+Generated candidates must come from the current DiscourseFrame, response plan, active flow/beat, capabilities and grounded context. Traits modify eligibility/rank or introduce strategies; they are not themselves a sentiment class.
+
+Generated button wording is presentation. Clicking carries the typed semantic frame directly through the existing semantic-click path; it is never reparsed through NLU.
+
+Add bounded diversity/ranking so the surface does not become four near-identical choices.
+
+**Gate:** after representative NPC replies, the production worker produces semantically distinct positive, negative and contextual continuations when eligible, preserves authored choices, and typed/button equivalents converge on the same semantic result.
+
+## C6 — compositional runtime utterance realization
+
+Extend the existing SpeechRealization authority with bounded UtterancePlan/microplanning support for both NPC replies and generated player-button utterances.
+
+Compose from:
+
+- dialogue act / strategy;
+- canonical semantic lexemes;
+- target/topic/subject;
+- intensity;
+- style/relationship context;
+- locale-specific construction rules.
+
+Do not echo arbitrary raw player text. Use canonical concepts captured by NLU/discourse interpretation.
+
+Compiler-owned construction/lexicon sources should generate runtime Lua tables, avoiding one full response definition for every possible combination.
+
+Example target:
+
+`fuckyouuu!!!` → recovered INSULT + canonical profanity payload → NPC selects RETALIATE_VERBALLY/MIRROR → EN realization `Fuck you too.` without a dedicated full-sentence response record.
+
+Keep ordinary Dialogue Content as the fallback for unsupported composition, signature authored lines and cases where free composition would be unsafe/awkward.
+
+Optional PBrainZ may realize the same UtterancePlan, but cannot change semantics or authority.
+
+**Gate:** multiple runtime sentences are produced from reusable semantic strategies/lexemes with deterministic locale-aware output, while the semantic plan remains stable and no raw-input injection/reparse path exists.
+
+## C7 — coherent discourse continuity
 
 Make accepted conversation systems participate in one bounded discourse state.
 
@@ -106,14 +159,16 @@ Prove:
 - apology after hostility;
 - greeting/first-contact continuity;
 - referent reuse;
+- generated affordances responding to the current NPC act/topic;
+- dynamic reply strategies responding to the preceding player act;
 - interruptions and resumption where valid;
 - actor/world events influencing the same conversation without replacing semantic authority.
 
 Do not persist transcripts.
 
-**Gate:** multi-turn harness scenarios feel coherent because later turns derive meaning from earlier semantic state rather than independent sentence classification.
+**Gate:** multi-turn harness scenarios feel coherent because later meanings, buttons and replies derive from prior semantic state rather than independent sentence classification.
 
-## C6 — social effect / conduct-memory decoupling
+## C8 — social effect / conduct-memory decoupling
 
 Fix the `evidence_pruned_by_limit` class of failure.
 
@@ -128,29 +183,35 @@ Implement bounded aggregation/coalescing where appropriate and expose distinct o
 
 **Gate:** a saturated conduct ledger still permits coherent social reaction while persistence remains bounded.
 
-## C7 — Semantic Lab observability and fuzz/regression tools
+## C9 — Semantic Lab observability and fuzz/regression tools
 
-Expose the complete understanding chain in bounded form:
+Expose the complete understanding/choice/realization chain in bounded form:
 
 - raw/normalized/recovered surface;
 - candidate list;
 - recovery provenance;
 - contextual score/reason changes;
 - DiscourseFrame;
+- generated affordance candidates with origin/stance/strategy;
+- selected button semantic frame and realized player utterance;
 - pragmatic/interaction decision;
+- UtterancePlan and realization components;
 - social-effect and conduct-memory outcome.
 
 Add deterministic mutation/fuzz coverage for spacing, repeated letters, punctuation, capitalization and safe typo classes.
 
-**Gate:** an agent can diagnose why a malformed or contextual utterance succeeded/failed without screenshots or monolithic JSON.
+**Gate:** an agent can diagnose why malformed/contextual input, a dynamic button, or a runtime-composed reply succeeded/failed without screenshots or monolithic JSON.
 
-## C8 — integrated acceptance and live-test handoff
+## C10 — integrated acceptance and live-test handoff
 
 Run focused + broad real-worker regression across:
 
 - EN and supported additional locales where semantics are locale-independent;
 - surface recovery;
 - contextual discourse;
+- dynamic semantic buttons;
+- compositional player/NPC realization;
+- multi-turn continuity;
 - interaction behavior;
 - action-safety controls;
 - social-effect saturation;
@@ -164,7 +225,7 @@ Only after all developer gates pass return to **READY FOR USER LIVE TEST**.
 
 ## Continue / stop rule
 
-Under an autonomous goal, implement C0 first, validate it, update `PROGRESS.md`, and continue through C8 automatically.
+Under an autonomous goal, implement C0 first, validate it, update `PROGRESS.md`, and continue through C10 automatically.
 
 Stop early only for a genuine repository-ownership/safety blocker, an external dependency that prevents implementation, or completion of all developer-side gates.
 
