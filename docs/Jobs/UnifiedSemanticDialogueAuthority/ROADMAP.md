@@ -1,312 +1,144 @@
 # Roadmap — Unified Semantic Dialogue Authority
 
-**Parent status:** IN PROGRESS — P0–P10 accepted foundation; P11 modular Conversation architecture/contextual authoring is mandatory before live-test handoff.
-**Completion rule:** phases organize work; completing a phase does not complete the parent goal. Continue automatically until all developer-side gates pass or a genuine blocker is reached.
+**Parent status:** IN PROGRESS / PAUSED.
+**Developer completion boundary:** P11I.
 
-## P0 — Reconcile authority inventory and freeze baseline
+## Accepted foundation
 
-Audit the current post-P12/post-Observatory source rather than trusting older P11 “complete” claims.
+P0–P10, P11A, and P11B0 are accepted.
 
-Required:
+Those phases established semantic-first dialogue authority, removed first-party
+legacy Flavor/ToolReply wording authority, created modular manifest-backed
+Conversation authoring, bounded generated runtime shards, deterministic
+generation, and generated domain translation bundles.
 
-- enumerate all `Flavor.Register`, `ResolveDetailed`, SocialFlavor conditional selection, ToolReply catalog reads, conversation-registry authority and compatibility prose paths;
-- classify each path as gameplay/domain authority, semantic decision authority, content-only, presentation-only, transport-only, compatibility-only or dead;
-- update `MIGRATION_MATRIX.md` with actual callers and tests;
-- capture baseline behavior/performance for representative event speech and Conversation follow-up;
-- add characterization tests where deletion/migration would otherwise be blind.
+Do not reread or recreate their phase-by-phase migration history during normal
+work.
 
-**Gate:** no first-party legacy dialogue owner is ambiguous.
+## P11B — one first-party wording authority
 
-## P1 — Standardize the semantic event realization boundary
+**Status:** IN PROGRESS.
 
-Make one reusable path for known NPC/world/social events:
+Completed domains:
+
+- Wellbeing;
+- Needs;
+- Health;
+- Social Apology.
+
+Next recommended domain: **Task Fetch**.
+
+Continue by coherent Conversation domain, not by individual translation key.
+Each domain must migrate real production callers directly into canonical
+Dialogue Content, preserve EN and optional-locale placeholder behavior, and
+remove superseded paths only after parity/caller-zero proof.
+
+P11B is complete when Project Hoomans first-party conversational wording is
+traceable to Dialogue Content or an explicit external provider boundary, with no
+broad alias registry hiding unmigrated internal callers.
+
+## P11C — modular source refinement
+
+Refine P11B0's source/compiler model only where real migrated content exposes a
+scaling problem.
+
+Required steady state:
+
+- one Conversation manifest/compiler;
+- cohesive content/pattern/flow/UI shards;
+- no giant canonical aggregate authoring file;
+- stable IDs independent of physical shard paths;
+- generated aggregate snapshots remain read-only audit artifacts.
+
+## P11D — Conversation UI Registry
+
+Move static landing/hub/child/order/presentation structure into one canonical
+registry under the modular Conversation source model.
+
+The registry may reference dynamic providers/predicates but must not own
+relationship, gossip, recruitment, task, inventory, faction, world or other
+gameplay authority.
+
+Primary acceptance case: edit/reorder the children of **What's up?** without
+editing production Lua.
+
+## P11E — taxonomy and naming cleanup
+
+Canonical IDs must describe meaning, not implementation provenance.
+
+Remove or migrate names such as:
+
+- `semantic.generated.*`;
+- `parameterized_task` as visible taxonomy;
+- unnecessarily repeated `semantic`/generator prefixes;
+- implementation-history translation filenames.
+
+Keep provenance such as generator/workflow/source-shard in metadata.
+
+Target examples:
 
 ```text
-authoritative facts
-→ semantic event/context
-→ explicit pool/flow
-→ ResponseCatalog/ResponsePlan
-→ realization/content
-→ delivery
+task.fetch.failed
+command.follow.queued
+gift.pending
+question.wellbeing.fatigue
+social.apology.friendly
 ```
 
-Required:
+Translation keys should be derived mechanically and kept short enough for
+inspection; humans/agents should normally author canonical Conversation IDs,
+not translation-key boilerplate.
 
-- reuse existing RealizationAuthority/ResponseCatalog/ResponsePlan;
-- standardize event/fact/plan/realization provenance;
-- ensure semantic selection occurs once before presentation;
-- add guard/diagnostic preventing Project Hoomans semantic-owned events from silently falling through generic SocialFlavor prose selection;
-- preserve generic Core compatibility for other adopters.
+## P11F — Studio consolidation
 
-**Gate:** representative event can be delivered with SocialFlavor definitions removed/substituted without changing semantic selection.
+Use one primary **Conversation** explorer.
 
-## P2 — NPC-initiated event follow-up bridge
+Fold useful route/trigger/flow/conditions/follow-up/source information into the
+selected Conversation item. Remove the redundant everyday
+Responses/Interactions/Dialogue Content maze.
 
-Reuse the existing lifecycle rather than adding a new subsystem.
+## P11G — contextual Developer Tools
 
-Required:
+Repurpose Developer Tools to edit the selected Conversation item.
 
-- carry selected response-plan offers through `RecordNPCSpeech` / beat / response window;
-- project eligible event follow-ups through existing Suggestions;
-- typed follow-ups resolve through existing NLU + pending/context-reference resolution;
-- clicked and typed equivalents converge;
-- preserve interruptions/expiry/freshness;
-- answer from event/fact refs or current authoritative re-observation;
-- no transcript persistence or new event-chat database.
+Required normal operations:
 
-**Gate:** horde event end-to-end: NPC speaks → player follows up typed/clicked → grounded answer, all through existing semantic lifecycle.
+- EN/other-locale wording;
+- add/duplicate/delete/reorder phrase variants;
+- style editing;
+- Conversation hub membership/order;
+- label/player utterance editing;
+- preview;
+- Review;
+- explicit validated write/compile.
 
-## P3 — Migrate lower-risk native SocialFlavor families
+Gameplay/dynamic authority remains locked and visibly sourced.
 
-Migrate first-party families whose context maps cleanly to existing semantic pools:
+## P11H — shared GUI/agent authoring service
 
-- farewell;
-- conversation safety;
-- player-spoke/social acknowledgement;
-- witnessed player kill;
-- follower abandonment;
-- horde detection;
-- leader loss.
+GUI and agents use the same bounded canonical-ID APIs for inspect/edit/add/
+remove/reorder/validate/preview/write/compile operations.
 
-Required per family:
+No direct generated-file authoring.
 
-- semantic condition/response mapping;
-- accepted EN/TL wording moved into canonical content ownership where appropriate;
-- optional grounded follow-up offers;
-- presentation queue receives already-selected text;
-- old first-party selector retired after parity.
+## P11I — final modular acceptance
 
-**Gate:** listed families have one semantic authority and no hidden prose fallback.
+Final developer acceptance must prove:
 
-## P4 — Migrate complex medical/incapacitated/retreat families
+- one semantic meaning authority;
+- one first-party wording authority;
+- one Conversation UI/navigation authority;
+- locale discovery is data-driven with EN fallback;
+- generated artifacts are deterministic and bounded;
+- canonical names describe domain meaning;
+- Studio/Developer Tools follow the consolidated workflow;
+- typed/clicked/event behavior remains;
+- PBrainZ and compatibility adapters remain;
+- no save mutation;
+- full native Lua and relevant Python/Kahlua/CodeBuilder gates remain green.
 
-Migrate:
+Only then return to **READY FOR USER LIVE TEST**.
 
-- witnessed teammate hurt;
-- zombie stamina/retreat;
-- incapacitated call;
-- incapacitated update;
-- incapacitated repeat;
-- related medical/mercy/rescue wording.
+## Scope boundary
 
-Preserve health/medical gameplay authority. Convert legacy audience/need/mercy/grief-style classifiers into neutral semantic context providers when still useful.
-
-**Gate:** medical event matrix is semantic-first, grounded, follow-up capable, bounded and parity-tested.
-
-## P5 — Migrate ToolReplies and legacy conversation-registry categories
-
-### ToolReplies
-
-Move social reactions, ask-name, order acknowledgements/rejections and other first-party ToolReply wording into semantic response/content ownership.
-
-### Legacy registry categories
-
-Finish semantic ownership for:
-
-- `projecthoomans:wellbeing`;
-- `projecthoomans:small_talk`;
-- `projecthoomans:ask_about`.
-
-Do not replace ConversationBlocks effect/branch authority.
-
-**Gate:** ToolReply catalog no longer owns migrated production prose and no target category reports `conversation_registry` as conversational authority.
-
-## P6 — Compatibility semantic adapters
-
-Audit/migrate first-party compatibility speech for:
-
-- Bandits;
-- Necroa;
-- Project ALife;
-- other current Project Hoomans compatibility adapters discovered in P0.
-
-Provider/addon systems keep gameplay truth. Adapters expose bounded facts/event refs to semantic response selection.
-
-**Gate:** compatibility speech uses semantic-first Project Hoomans realization without requiring first-party legacy prose fallback.
-
-## P7 — Canonical content coverage and Studio observability
-
-Expand Dialogue Content/translation ownership incrementally so migrated wording has one canonical content owner.
-
-Required:
-
-- stable phrase IDs;
-- EN/TL parity;
-- content-only phrase variation separated from semantic variants;
-- Studio/Observatory can discover migrated event families, content owner, provenance and follow-up offers;
-- no giant replacement database; generated/runtime artifacts remain bounded.
-
-**Gate:** migrated families are inspectable/editable through the established content workflow with no duplicate text authority.
-
-## P8 — Retire first-party legacy prose authority
-
-After all family gates pass:
-
-- remove/deprecate obsolete Project Hoomans `PNC_SocialFlavorDefinitions_*` decision content;
-- remove/deprecate ToolReply production prose selectors;
-- remove obsolete role/audience/need/grief response selectors;
-- make missing semantic realization fail explicitly instead of choosing hidden first-party Flavor prose;
-- retain presentation/transport/localization/TTS compatibility infrastructure that remains useful;
-- rename misleading modules only when it reduces ambiguity without compatibility breakage.
-
-**Gate:** source/caller audit finds no Project Hoomans first-party legacy prose selector above the semantic authority line.
-
-## P9 — Scale, multiplayer, no-split final acceptance
-
-Required:
-
-- sparse pair/thread state;
-- bounded event/follow-up stress;
-- private/player-specific context isolation;
-- no per-tick scans;
-- no source-save mutation;
-- no duplicate delivery/TTS;
-- no semantic/gameplay authority regressions;
-- full harness/Lua/Kahlua/content/idempotence/performance gates;
-- final migration matrix complete.
-
-**Gate:** one semantic conversation architecture owns direct and event-driven NPC speech plus grounded follow-up. Only user-owned native SP/MP acceptance remains.
-
-
-## P10 — Canonical semantic cleanup and legacy purge
-
-P0–P9 proved semantic-first behavior. P10 makes that architecture the literal
-steady-state source/schema/UI structure.
-
-Detailed contract: `P10_CANONICAL_SEMANTIC_CLEANUP.md`.
-
-### P10A — hard legacy-file purge
-
-Delete first-party SocialFlavor definition shards, ToolReply literal catalog,
-and first-party compatibility Flavor-definition source after semantic/content
-parity proof. Remove worker/composition loads and replace legacy-definition
-tests with absence + semantic-parity tests.
-
-### P10B — retire CompanionCommandFlavor wording registry
-
-Migrate command/emote/greeting/rejection/dog wording into the canonical
-ResponseCatalog → SpeechRealization → Dialogue Content path, then remove the
-parallel registry/definitions and obsolete flavor IDs.
-
-### P10C — normalize semantic helper names
-
-Rename/merge FlavorText semantic context and FlavorAddress semantic addressing;
-remove internal legacy aliases and update callers/tests. Rename Project Hoomans
-presentation APIs/variables where Flavor terminology now falsely implies a
-content authority.
-
-### P10D — Dialogue Content schema v2
-
-Remove migration-era IDs/metadata, use semantic identity as the canonical join,
-derive mechanical IDs/keys where safe, group shared ownership once, and do not
-keep a permanent v1 compatibility reader.
-
-### P10E — hierarchical Studio
-
-Derive a shared semantic tree projection for Responses and Dialogue Content.
-Humanize branch labels, show counts, support search/auto-expand, and keep full
-canonical IDs in detail views. No second hierarchy database.
-
-### P10F — final no-legacy acceptance
-
-Run source-absence, semantic/content parity, PBrainZ/compatibility, Studio,
-CodeBuilder/idempotence, Lua/Kahlua, save-safety and resource-aware Python
-acceptance. Record before/after source/runtime bytes and wall-clock timings.
-
-**P10 gate:** Project Hoomans has one semantic response authority, one Dialogue
-Content wording authority, one semantic lifecycle/context authority and a
-presentation-only speech layer; no first-party legacy dialogue registry,
-migration-era content schema, or misleading Flavor namespace remains.
-
-Only after P10 passes may the parent return to `READY FOR USER LIVE TEST`.
-
-## P11 — Modular Conversation Architecture & Contextual Authoring
-
-P10 proved the zero-legacy semantic runtime. P11 makes the authoring/content/tooling
-model scalable and user-facing.
-
-Detailed contract: `P11_MODULAR_CONVERSATION_ARCHITECTURE.md`.
-
-### P11A — steady-state hygiene
-
-Remove remaining migration-only fallback/vocabulary/test archaeology, reconcile
-stale P10 status, and rename legitimate compatibility speech bridges whose
-names still imply obsolete Flavor authority.
-
-### P11B0 — modular Conversation source & generation foundation
-
-Before any further wording migration, establish the manifest-driven modular
-compiler in `P11B0_MODULAR_CONVERSATION_COMPILER.md`.
-
-Required:
-
-- small domain canonical shards under one Conversation source root;
-- explicit deterministic manifest;
-- merged whole-model validation and global ID uniqueness;
-- bounded generated runtime shards with small registry/manifest hubs;
-- generated domain translation artifacts;
-- generated whole-model audit snapshot;
-- stable ID → owning-shard authoring APIs;
-- full regression and byte-for-byte idempotence.
-
-Do not resume the parked one-string-at-a-time P11B branch until this foundation
-passes.
-
-### P11B — one first-party wording path
-
-After P11B0 acceptance, migrate wording **incrementally by coherent Conversation
-domain shard**, not one sentence at a time and not as a repository-wide big-bang
-rewrite. First characterize exact callers/placeholders and lock existing
-behavior tests. Then move bounded domains from `Responses.json`,
-`Realizations.json`, LocalResponse English fallbacks and static mapping modules
-into Dialogue Content. Runtime handlers return semantic template IDs plus
-bounded arguments. Every accepted slice must preserve the full native Lua
-regression gate; broad runtime-key alias tables are not an accepted steady-state
-shortcut.
-
-### P11C — modular Conversation source refinement
-
-P11B0 establishes the modular source/compiler foundation. P11C refines domain
-boundaries, removes remaining mixed NLU/response authoring seams, and expands
-the shard model as needed without reintroducing monolithic canonical sources.
-
-### P11D — canonical Conversation UI Registry
-
-Move static landing/hub/child/order/label/navigation structure into one
-declarative registry. It may reference registered predicates/providers but may
-not own gameplay/domain authority.
-
-### P11E — semantic taxonomy cleanup
-
-Replace `semantic.generated.*` IDs with domain-meaning IDs for tasks, commands,
-gifts and other generated flows. Keep generator provenance as metadata only.
-
-### P11F — Studio consolidation
-
-Use one Conversation explorer. Fold route/conditions/follow-ups/sources into the
-selected item and retire Interactions as a redundant everyday browser.
-
-### P11G — contextual Developer Tools editor
-
-Repurpose Developer Tools to edit the currently selected Conversation item:
-EN/TL wording, phrase variants/styles, and Conversation UI hub/child
-presentation/navigation. Normal authoring must not require raw JSON or Lua.
-
-### P11H — agent-friendly authoring API
-
-Expose the same bounded inspect/edit/add/remove/reorder/validate/preview/write/
-compile services to agents and the GUI, with stale guards and deterministic
-outputs.
-
-### P11I — final modular acceptance
-
-Run architecture/source absence, EN/TL, UI registry, selected-item editor,
-agent-service parity, typed/clicked/event, generated-flow, PBrainZ/
-compatibility, save-safety, resource-aware Python, focused Xvfb, Lua/Kahlua and
-CodeBuilder idempotence/performance gates.
-
-**P11 gate:** Project Hoomans has one semantic meaning authority, one first-party
-wording authority, one Conversation UI/navigation registry, one Conversation
-browser and one contextual authoring service used by both humans and agents.
-
-Only after P11 passes may the parent return to `READY FOR USER LIVE TEST`.
+No P12 or new mandatory parent phase without explicit user approval.

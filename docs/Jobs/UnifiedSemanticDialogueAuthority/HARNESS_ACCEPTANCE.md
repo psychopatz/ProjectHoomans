@@ -1,240 +1,113 @@
-# Harness Acceptance — Unified Semantic Dialogue Authority
+# Harness Acceptance — Remaining P11
 
-All acceptance uses the existing production Lua worker/Semantic Lab. Python is orchestration/presentation, not dialogue authority.
+Use this contract for future P11B–P11I work.
 
-## Acceptance matrix
+## Authority
 
-| Gate | Required proof |
-| --- | --- |
-| A. Authority inventory | Every first-party Flavor/ToolReply/legacy-registry production path is classified and mapped to a semantic/content owner or explicitly retained generic compatibility boundary. |
-| B. Single semantic selection | Representative migrated events call semantic response selection once and carry response plan/realization/fact provenance into presentation. |
-| C. No hidden first-party prose fallback | Project Hoomans semantic-owned packets cannot silently call generic SocialFlavor prose resolution when selected text/realization is missing; tests fail loudly or use explicit semantic fallback. |
-| D. Content migration | Accepted authored EN/TL wording remains available through Dialogue Content/translation ownership or a documented equivalent content backend below semantic authority. |
-| E. NPC-initiated follow-up | Delivered event speech records the existing lifecycle beat/eventRef/facts/offers and exposes grounded follow-up choices/typed resolution through existing Suggestions/ContextResolver. |
-| F. Typed/click parity | Equivalent typed and clicked follow-ups converge on the same semantic answer/plan when appropriate. |
-| G. Grounding/privacy | Follow-ups use authoritative fact refs/Knowledge/disclosure; unknown/private/stale facts do not become invented answers. |
-| H. Legacy conversation categories | wellbeing/small-talk/ask-about no longer report `conversation_registry` as conversational authority. |
-| I. ToolReplies retirement | ToolReply literal tables no longer choose production conversational wording for migrated first-party outcomes. |
-| J. Presentation-only SocialFlavor | Queue/cooldown/TTL/TTS/nameplate/Conversation behavior remains, but swapping presentation does not change semantic plan/variant. |
-| K. Compatibility | Bandits/Necroa/Project ALife facts adapt into semantics without stealing provider gameplay authority; generic Core compatibility remains intact. |
-| L. Persistence/scale | No transcript text, no new Player×NPC preallocation, no per-tick scan, bounded thread/event/offer state, source saves unchanged. |
-| M. Observatory/Studio | Migrated families expose semantic owner, content owner, EN/TL, event/fact provenance and follow-up affordances through existing tooling without a second editor. |
-| N. Performance | Event selection/follow-up projection/startup/regression remain within measured practical budgets; no duplicate semantic evaluation. |
+Acceptance must preserve:
 
-## Required scenario set
+- one semantic meaning/ResponseCatalog authority;
+- one Project Hoomans first-party wording authority;
+- one semantic lifecycle/context authority;
+- one Conversation UI/navigation authority once P11D lands;
+- gameplay/domain systems as factual/effect authority;
+- presentation as delivery only.
 
-At minimum prove through real production Lua:
+Generated compatibility shims may bridge old require paths temporarily but must
+not become semantic or wording authorities.
 
-1. conversation farewell;
-2. conversation safety/danger;
-3. witnessed player kill or equivalent combat reaction;
-4. teammate hurt / medical distress;
-5. follower abandonment;
-6. horde detection;
-7. incapacitated call/update/repeat;
-8. leader death;
-9. one social ToolReply;
-10. ask-name ToolReply path;
-11. one companion order result;
-12. wellbeing;
-13. small-talk;
-14. ask-about/context question;
-15. Bandits or Necroa compatibility event;
-16. Project ALife event.
+## Canonical source / generation
 
-## Required follow-up scenarios
-
-### Horde
-
-- event produces canonical event/fact refs;
-- semantic combat/horde response is selected;
-- NPC speaks once;
-- existing lifecycle response window exposes eligible “where/how many/what happened” style semantic offers;
-- typed and clicked equivalent follow-up resolve against the same event context;
-- stale/current-state location is revalidated or answered with uncertainty.
-
-### Medical/incapacitated
-
-- health remains authoritative;
-- NPC semantic distress line is delivered;
-- follow-up offers only facts actually known;
-- “what do you need?” resolves without duplicating health state.
-
-### Leader loss
-
-- faction event remains canonical;
-- grief reaction is selected semantically;
-- follow-up uses same event ref;
-- “what now?” can query current succession/faction state without rewriting event history.
-
-## Negative tests
-
-- semantic-owned presentation packet with missing selected realization must not silently pick a first-party Flavor prose line;
-- deleting/substituting SocialFlavor definition tables for migrated families must not alter semantic selected pool/variant/plan;
-- follow-up is not offered to an unrelated player/NPC pair;
-- expired response window does not surface stale offer;
-- private/unknown fact is not disclosed;
-- repeated event does not create unbounded pair/thread state;
-- Conversation open does not scan all NPCs/events/catalog pools.
-
-## Content/translation checks
-
-- EN/TL placeholder parity;
-- normal translation values remain strings;
-- Dialogue Content generation is deterministic/idempotent;
-- phrase variants do not consume semantic variant slots merely for synonyms;
-- migrated content has one canonical owner.
-
-## Performance/data checks
-
-Capture and compare:
-
-- worker startup;
-- event response selection;
-- event speech delivery;
-- follow-up suggestion projection;
-- typed follow-up answer;
-- many-event bounded stress;
-- dormant many-NPC case;
-- lifecycle/pair serialized size where relevant;
-- full headless + focused GUI suite timings.
-
-Source-save hashes must remain unchanged.
-
-## Final developer gate
-
-Before `READY FOR USER LIVE TEST`:
-
-- focused migration tests green;
-- full headless semantic-harness Python suite green;
-- focused Xvfb GUI/Observatory acceptance green;
-- full native Lua suite green;
-- installed-PZ Kahlua verification green;
-- CodeBuilder/Dialogue Content idempotence green;
-- save/data-safety checks green;
-- `git diff --check` green;
-- migration matrix shows no Project Hoomans first-party legacy prose selector with semantic authority;
-- P10 no-legacy/source/schema/Studio gates in `P10_CANONICAL_SEMANTIC_CLEANUP.md` pass.
-
-
-## P10 no-legacy acceptance extension
-
-The earlier P8/P9 gate proved that legacy prose was no longer semantic
-authority. P10 raises the steady-state requirement from "non-authoritative" to
-"absent from Project Hoomans production architecture."
-
-Required negative checks:
-
-- no `PNC_SocialFlavorDefinitions*` source;
-- no `PNC_ConversationToolReplyCatalog.lua`;
-- no Project Hoomans CompanionCommandFlavor wording registry;
-- no `PNC.FlavorText` / `PNC.FlavorTextConst`;
-- no first-party semantic packet depending on `Flavor.Resolve`;
-- no `.migrated.` family ID in canonical Dialogue Content;
-- no `MIGRATED_*` content concept;
-- no `legacySource` in canonical Dialogue Content;
-- no worker/composition load of a deleted legacy file.
-
-Required positive checks:
-
-- former command/emote/greeting content resolves through ResponseCatalog →
-  SpeechRealization → Dialogue Content;
-- social/medical/compatibility content remains EN/TL-equivalent;
-- semantic context/address behavior remains equivalent after rename/merge;
-- Studio Responses and Dialogue Content are hierarchical, searchable and
-  traceable to exact canonical IDs;
-- generated outputs are deterministic across two consecutive builds;
-- PBrainZ and compatibility adapters still consume canonical semantic
-  realization/context;
-- full P9 regression topology remains green.
-
-Final broad acceptance must use the resource-aware Python runner introduced in
-P9, not plain serial full `unittest discover`.
-
-## P11 modular Conversation acceptance extension
-
-P11 is accepted only when the following additional gates pass.
-
-### Source/authority
-
-- no live `LEGACY_TEXT_FALLBACKS` or equivalent first-party wording fallback;
-- no dead migration-only `legacyRegistry`, `migrationPhase`, `legacyTrace`
-  fields in production contracts;
-- no first-party `Responses.json` / `Realizations.json` independent wording
-  authority;
-- Dialogue Content is the traceable first-party wording owner;
-- one canonical Conversation UI/navigation registry exists;
-- gameplay/domain services remain authoritative for eligibility/effects.
-
-### Taxonomy/modularity
-
-- no canonical `semantic.generated.*` response taxonomy;
-- generator origin remains inspectable metadata;
-- Conversation content is domain-sharded;
-- NLU/pattern sources do not embed response wording merely for convenience;
-- global ID uniqueness and deterministic compilation are enforced.
-
-### Human authoring
-
-- selecting a phrase family can edit EN/TL and add/duplicate/delete/reorder
-  variants through structured controls;
-- selecting a landing/hub/choice can edit labels/utterances and
-  add/remove/reorder existing registered semantic children;
-- What's Up child membership can be changed without editing production Lua;
-- dynamic provider eligibility is visibly locked and still production-owned;
-- stale edits are rejected;
-- preview/review is effect-free until explicit write;
-- normal editing does not require raw JSON.
-
-### Agent authoring
-
-- bounded machine-readable inspect/edit/add/remove/reorder APIs exist;
-- GUI and agents use the same service contract;
-- generated artifacts are never edited directly;
-- validation/diagnostics are deterministic and machine-readable.
-
-### Studio
-
-- one Conversation explorer replaces the everyday Responses/Interactions split;
-- route/conditions/follow-ups/sources remain inspectable for the selected item;
-- Sources stays read-only;
-- Review stays centralized;
-- branch counts are unambiguous.
-
-### Regression
-
-- every coherent P11B+ runtime/wording migration slice must pass the full native Lua suite before it is accepted or used as a base for the next slice;
-- tests that predate the slice remain contract evidence and must not be mechanically rewritten to accept changed keys/text/`nil` behavior without explicit parity proof;
-- no broad runtime-key alias registry may be used to declare one-wording-authority acceptance while old production callers remain unmigrated;
-- typed/clicked parity remains;
-- task/command/gift automatic flows retain behavior after ID migration;
-- event follow-up grounding/privacy remains;
-- PBrainZ and compatibility adapters remain green;
-- source saves remain unchanged;
-- resource-aware Python, focused Xvfb, native Lua, installed-PZ Kahlua,
-  CodeBuilder idempotence and performance gates remain green.
-
-P11 is not complete merely because the new editor renders. It must prove that
-the old parallel wording/navigation authoring paths are removed or reduced to
-explicit external provider boundaries.
-
-## P11B0 modular compiler acceptance
-
-Before P11B wording migration resumes:
-
-- canonical Conversation authoring is manifest-backed and domain-sharded;
-- each shard validates independently;
-- the merged model rejects duplicate IDs and invalid cross-references globally;
+- canonical Conversation authoring is manifest-backed and modular;
+- agents/editors write canonical shards, never generated output;
+- global IDs/cross-references validate across shards;
+- generated runtime modules are bounded;
+- generated indexes/manifests/translations are deterministic;
 - two consecutive generation runs are byte-identical;
-- generated runtime output is domain-sharded and no single registry exceeds the
-  configured verifier/toolchain bound;
-- the runtime registry/manifest is a small hub, not a full data dump;
-- generated translations are domain-oriented outputs;
-- one generated whole-model snapshot exists for audit/tests only;
-- an item can be located/edited by canonical ID without a caller knowing its
-  physical shard path;
-- moving a record between shards with unchanged canonical ID preserves runtime
-  semantic identity;
-- full native Lua remains green and previously-green Python/Kahlua contracts
-  remain green;
-- no source save, native PZ session or Workshop state is touched.
+- generated aggregate snapshots are read-only;
+- physical shard moves do not change canonical identity.
+
+## Translation
+
+- EN is the required fallback locale;
+- other locales are discovered from generic translation data/directories;
+- adding a locale does not require a compiler language whitelist;
+- placeholders/arguments remain equivalent across available locales;
+- generated `Conversation.json` reflects actual locale files;
+- automatic-flow/semantic manifests do not duplicate locale path ownership;
+- generated JSON is deterministic, readable and newline-terminated.
+
+## P11B wording-domain gate
+
+For each migrated domain:
+
+- characterize real production callers once;
+- preserve factual/parameter behavior;
+- migrate callers directly to canonical Dialogue Content;
+- focused domain tests pass;
+- full native Lua remains green;
+- relevant Python/worker tests pass;
+- old key/path is removed only after production caller search reaches zero;
+- no broad runtime alias table masks incomplete migration.
+
+## P11D Conversation UI gate
+
+When implemented:
+
+- static landing/hub/child/order data comes from one registry;
+- What's Up child membership can be changed without production Lua edits;
+- dynamic provider eligibility remains production-owned and visibly locked;
+- UI changes do not mutate gameplay policy.
+
+## P11F/G Studio/editor gate
+
+When implemented:
+
+- one Conversation explorer is the normal inspection surface;
+- route/conditions/follow-ups/sources remain inspectable;
+- Developer Tools edits the selected item;
+- phrase variants can be added/duplicated/deleted/reordered safely;
+- all available locales are editable through generic locale controls;
+- normal authoring does not require raw JSON;
+- preview/review is effect-free until explicit write;
+- stale/fingerprint guards reject outdated writes.
+
+## P11H agent-authoring gate
+
+- GUI and agent workflows call the same canonical-ID service;
+- bounded inspect/edit/add/remove/reorder APIs exist;
+- diagnostics are machine-readable;
+- no hidden writes;
+- generated artifacts are never direct edit targets.
+
+## Runtime regression
+
+For runtime-affecting slices:
+
+- typed/clicked/event semantic parity remains;
+- command/task/gift automatic flows retain behavior;
+- follow-up grounding/privacy remains;
+- PBrainZ integration remains;
+- compatibility adapters remain;
+- full native Lua remains green;
+- relevant resource-aware Python acceptance remains green;
+- installed-PZ Kahlua verification is run when the verifier is available;
+- `git diff --check` passes.
+
+Do not relabel a newly failing old test as a baseline failure without verifying
+that it was already red at the accepted pre-slice baseline.
+
+## Data/save safety
+
+- developer acceptance does not launch native Project Zomboid;
+- source saves are not mutated;
+- no Workshop publication occurs;
+- no player/NPC persisted state is added merely for rendered dialogue;
+- no per-NPC/per-tick semantic scans are introduced.
+
+## P11I completion
+
+Only after all remaining P11 gates pass may the parent return to
+`READY FOR USER LIVE TEST`.
+
+Native SP/MP acceptance remains user-owned.

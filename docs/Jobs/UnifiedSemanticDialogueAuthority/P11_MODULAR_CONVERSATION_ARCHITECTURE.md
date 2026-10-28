@@ -1,519 +1,160 @@
-# P11 — Modular Conversation Architecture & Contextual Authoring
+# P11 — Remaining Modular Conversation Architecture
 
-**Status:** IN PROGRESS — P11A accepted; P11B recovery restart is active. The prior P11B–P11H attempt was rejected and reverted after regression audit.
+P11A and P11B0 are complete and no longer have separate active phase docs.
+This document describes only the remaining P11 product work.
 
-P0–P10 remain accepted semantic-runtime foundation. P11 does not replace the
-semantic engine. It removes the remaining authoring/content fragmentation and
-turns Semantic Lab into a scalable Conversation browser + contextual editor.
+## P11B — one first-party wording authority
 
-## Parent result
+**Status:** IN PROGRESS.
 
-The steady-state developer model must be:
+Completed domains:
 
-```text
-WORLD / PLAYER INPUT
-        ↓
-semantic frame + authoritative facts
-        ↓
-ResponseCatalog / flow / response plan
-        ↓
-Dialogue Content
-        ↓
-Speech Presentation
-```
+- Wellbeing;
+- Needs;
+- Health;
+- Social Apology.
 
-For player-facing navigation:
+Continue by coherent domain shard, not individual string.
 
-```text
-Conversation UI Registry
-        ↓
-registered semantic choice / hub / capability reference
-        ↓
-existing semantic route + gameplay/domain authority
-```
+For each domain:
 
-And for authoring:
+1. characterize production callers and placeholders once;
+2. move first-party wording to canonical Dialogue Content;
+3. migrate callers directly;
+4. regenerate through CodeBuilder;
+5. preserve EN fallback and all available locale placeholders;
+6. run focused tests + full native Lua;
+7. retire old keys only after caller-zero proof.
 
-```text
-Explore = what exists?
-Simulation = what happens?
-Developer Tools = edit the selected Conversation item
-Review = what changed?
-```
+No broad compatibility-alias registry may hide unmigrated internal callers.
 
-The GUI and automated agents must use the same bounded authoring service. Do
-not create separate human and agent content pipelines.
+## P11C — source refinement
 
-## Post-P10 audit baseline
+The manifest-backed modular compiler already exists.
 
-Audit baseline: `7c9e91d096f52909c1470b12a7e08e747ddc0ab4`.
+P11C may refine shard boundaries only where real migrated content exposes a
+problem:
 
-Verified:
+- split oversized domains without changing canonical IDs;
+- remove remaining pattern/wording mixtures;
+- keep one source manifest/compiler;
+- keep aggregate snapshots generated/read-only;
+- keep GUI/agents independent of physical shard paths.
 
-- P10 removed the old first-party SocialFlavor/ToolReply/CompanionCommandFlavor
-  prose authorities and first-party Flavor resolve/register paths.
-- `semantic_dialogue_content.json` is still one ~105 KB source with 216 phrase
-  families and 395 phrases.
-- `Responses.json` contains 144 live keys referenced by production Lua.
-- `Realizations.json` contains a second live realization-key family.
-- LocalResponse still contains hard-coded English fallback wording and a
-  `LEGACY_TEXT_FALLBACKS` registration seam.
-- `common_interactions.json` mixes NLU patterns and response pools.
-- `grounded_personal_dialogue.json` also mixes patterns and response pools.
-- `semantic_definitions.json` mixes patterns, flows and wording.
-- the runtime catalog exposes 193 pools, including 67
-  `semantic.generated.*` pools whose IDs encode build provenance rather than
-  conversational meaning.
-- Studio currently exposes separate Responses, Interactions and Dialogue
-  Content views.
-- Interactions duplicates response pools while also containing useful route,
-  trigger, flow, capability, speech-act and policy information.
-- Developer Tools currently exposes Flow editor, Canonical source editor,
-  Block contracts, Interaction composer and Legacy build workflow.
-- Dialogue Content already provides useful fingerprint/stale guards, validation,
-  preview, Review handoff, explicit writes and deterministic compilation.
-- current Dialogue Content editing permits wording replacement but rejects
-  adding/removing phrase variants as structural changes.
-- `conversation.landing:whats_up` is canonical content, but its child buttons
-  are distributed across Lua providers and group-presentation code, so adding
-  a child requires Lua edits.
-- dynamic choices such as relationship proposal, gossip eligibility, camp
-  locations and gameplay capabilities depend on production authorities and
-  must remain dynamically gated.
+## P11D — Conversation UI Registry
 
-## Core invariant
-
-P11 must reduce surfaces, not create new authorities.
-
-> **Semantics owns meaning. Dialogue Content owns first-party wording.
-> Conversation UI Registry owns presentation/navigation structure.
-> Gameplay/domain services own permissions and effects.**
-
-Conversation UI data may reference an existing semantic choice, capability,
-provider or registered predicate. It must not copy the implementation of that
-authority.
-
-## P11A — steady-state hygiene
-
-Finish the post-P10 cleanup before modularization.
-
-Required:
-
-- reconcile stale P10 status at the top/phase table of `PROGRESS.md`;
-- remove `LEGACY_TEXT_FALLBACKS` by moving required wording to the canonical
-  content path;
-- remove dead `legacyRegistry`, `migrationPhase`, `legacyTrace` and similar
-  migration-only vocabulary when no production consumer requires it;
-- rename legitimate compatibility speech adapters whose `Flavor` filenames
-  now falsely imply dialogue authority, while preserving external behavior;
-- consolidate migration-era absence tests into durable architecture-contract
-  tests instead of preserving one test per historical phase;
-- keep domain behavior tests that still prove real runtime behavior.
-
-**P11A gate:** production and durable tests describe the current architecture,
-not the migration history used to reach it.
-
-## P11B0 — modular Conversation source & generation foundation
-
-P11B0 is a mandatory prerequisite before further wording migration.
-
-The current source/runtime shape is too monolithic for the scale of future
-Conversation variation. Follow
-`P11B0_MODULAR_CONVERSATION_COMPILER.md` to establish:
-
-- small canonical Conversation domain shards;
-- explicit deterministic manifest;
-- merged whole-model validation;
-- bounded generated runtime shards and small hub/manifest files;
-- generated domain translation artifacts;
-- generated aggregate audit snapshot;
-- stable ID → owning-shard authoring APIs.
-
-Do not resume the parked P11B wording branch until P11B0 passes.
-
-## P11B — one first-party wording path
-
-After P11B0 acceptance, make Dialogue Content the literal first-party wording
-authority incrementally **by coherent domain shard**. The rejected 2026-10-27
-attempt proved that a repository-wide wording rewrite can make focused new tests
-pass while breaking established Conversation behavior.
-
-### P11B-R0 — characterize before migration
-
-Before deleting or redirecting any wording source:
-
-- enumerate every production caller of `Responses.json`, `Realizations.json`,
-  LocalResponse fallback prose, static translation-key maps, and hard-coded
-  SpeechRealization family keys;
-- record placeholder/argument conventions for each family;
-- classify each key as fixed wording, parameterized wording, dynamic fact
-  formatting, external/public compatibility, or dead;
-- preserve the existing behavior tests as contract evidence;
-- run the full native Lua suite and record the green baseline before the first
-  wording change.
-
-The verified recovery baseline is native Lua `897/897 PASS` at recovery commit
-`18eacad50745e445c92639d1ce77d487d1da07fd`, whose tree matches P11A anchor
-`08081ac8`.
-
-### P11B-R1+ — migrate one bounded family at a time
-
-For each coherent wording family:
-
-1. add or reuse the Dialogue Content semantic template and EN/TL variants;
-2. preserve exact parameter/placeholder semantics;
-3. migrate the actual production caller(s) to the semantic template directly;
-4. regenerate outputs through CodeBuilder rather than hand-editing generated
-   Lua/translation files;
-5. run focused caller/content tests;
-6. run the **full native Lua suite** before accepting the slice;
-7. run relevant Python/Kahlua/PBrainZ/compatibility checks;
-8. only after all callers are migrated, remove that family's old translation
-   key/table entry;
-9. prove there is no production caller for the retired key before continuing.
-
-Start with a low-risk family whose callers and formatting are fully enumerable.
-Do **not** begin with identity exchange, gossip, backstory, PBrainZ integration,
-or other parameterized cross-domain responses in the same slice.
-
-### No alias-table shortcut
-
-Do not introduce a broad `runtimeAliases`, translation-key alias shard, or
-equivalent phase-wide compatibility registry merely to keep old callers working
-while claiming one wording authority. That reproduces the split system under a
-different name.
-
-If a specific externally consumed public key truly must remain compatible,
-document that exact boundary and stop for an explicit compatibility decision.
-Internal Project Hoomans callers should be migrated directly.
-
-Runtime semantic/question handlers should ultimately return stable semantic
-template IDs plus bounded arguments/facts rather than authored English prose.
-
-Parameterized time/date/weather/identity/location/etc. answers may use
-localized templates and arguments; do not move volatile fact truth into
-Dialogue Content.
-
-After per-family parity is proven:
-
-- remove first-party `Responses.json` and `Realizations.json` as independent
-  wording authorities;
-- remove obsolete text-fallback registration;
-- retain generated translation artifacts only when they are outputs of the one
-  canonical content compiler.
-
-**P11B gate:** every Project Hoomans first-party NPC/player conversational phrase
-is traceable to Dialogue Content or a clearly external provider-owned surface;
-no broad compatibility alias registry masks unmigrated internal callers; and
-the full pre-existing native Lua regression suite remains green.
-
-## P11C — modular Conversation source refinement
-
-P11B0 establishes the manifest-driven modular source/compiler foundation.
-P11C refines that model after real wording migration exposes the remaining
-domain boundaries.
-
-Target conceptual domains still include greeting, social, questions, commands,
-tasks, gifts, events and compatibility, but P11C must **refine** rather than
-recreate the P11B0 loader/compiler.
-
-Requirements:
-
-- remove any remaining mixed NLU/pattern + response wording seams;
-- split domains that become too large while preserving canonical IDs;
-- keep one manifest/compiler and one authoring-service ownership model;
-- preserve deterministic/idempotent generated outputs;
-- keep agents and GUI independent of physical shard paths;
-- never collapse modular shards back into a canonical aggregate authoring file.
-
-**P11C gate:** real migrated content remains easy to edit by bounded domain and
-no new scaling hotspot or second source-discovery mechanism appears.
-
-## P11D — canonical Conversation UI Registry
-
-Create one canonical, declarative registry for player-facing Conversation
-navigation/presentation.
+Create one declarative navigation/presentation registry under the modular
+Conversation source model.
 
 It owns:
 
 - landing choices;
-- hub definitions;
+- hubs;
 - parent/child membership;
-- ordering;
-- labels and player utterance wording references;
-- presentation grouping;
-- registered eligibility/predicate references;
-- semantic route references;
-- static child membership.
-
-It does **not** own:
-
-- relationship eligibility logic;
-- recruitment authority;
-- inventory/task/gameplay effects;
-- faction policy;
-- world mutation;
-- dynamic camp-site discovery;
-- gossip truth/privacy;
-- semantic response selection.
-
-Dynamic providers remain production authorities. The registry may provide their
-presentation slot/order/wording and reference their provider ID.
-
-Migrate hard-coded presentation/navigation for surfaces such as:
-
-- `conversation.landing:whats_up`;
-- What's Up child membership/order;
-- group labels;
-- static question entries;
-- companion-orders/camp navigation where declarative structure is safe;
-- other static Conversation UI structure discovered by caller audit.
-
-Example target:
-
-```text
-Conversation UI
-├─ Landing
-│  └─ What's up
-└─ Hub: What's up
-   ├─ Wellbeing
-   ├─ Needs
-   ├─ Health
-   ├─ Activity
-   ├─ Gossip          [dynamic eligibility]
-   ├─ Weather
-   └─ Relationship    [dynamic provider/eligibility]
-```
-
-**P11D gate:** adding/reordering an existing semantic choice beneath What's Up
-does not require editing production Lua.
-
-## P11E — remove generated taxonomy pollution
-
-`generated` describes provenance, not conversational meaning.
-
-Migrate `semantic.generated.*` IDs to domain identities, e.g.:
-
-```text
-semantic.task.consume.active
-semantic.task.consume.completed
-semantic.command.follow.queued
-semantic.command.camp.failed
-semantic.gift.pending
-semantic.gift.completed
-```
-
-Keep build origin separately:
-
-```text
-origin = automatic_flow
-workflowKind = parameterized_task
-templateVersion = ...
-```
-
-Do not create a visible Generated domain in Studio merely because CodeBuilder
-generated the registration.
-
-**P11E gate:** canonical semantic IDs describe conversation/domain meaning; build
-provenance remains inspectable metadata.
-
-## P11F — Studio consolidation
-
-Replace redundant browsing surfaces with one primary Conversation explorer.
-
-Target:
-
-```text
-Studio
-├─ Explore
-│  ├─ Conversation
-│  └─ Sources
-└─ Review
-
-[ Developer Tools… ]
-```
-
-The Conversation tree combines response/content/navigation identity without
-duplicating authority. Selecting a leaf exposes bounded detail tabs such as:
-
-```text
-Overview
-Wording
-Route
-Conditions
-Follow-ups
-Sources
-```
-
-Requirements:
-
-- fold useful Interactions execution-route information into selected
-  Conversation detail;
-- remove duplicated response-pool rows from a separate Interactions browser;
-- raw trigger/concept/speech-act/generation diagnostics may move under a narrow
-  diagnostic/developer inspection surface when still useful;
-- full canonical IDs and source provenance remain visible;
-- search and hierarchy remain bounded/lazy;
-- branch counts must be unambiguous, e.g. pools vs variants vs phrases.
-
-**P11F gate:** ordinary inspection has one obvious Conversation browser; no
-separate Responses/Interactions/Dialogue Content maze is required.
-
-## P11G — contextual Developer Tools editor
-
-Repurpose Developer Tools from structural semantic construction into a
-contextual editor for the selected Conversation item.
-
-Retire/demote the current user-facing:
-
-- Flow editor;
-- Canonical source editor;
-- Block contracts;
-- Interaction composer;
-- Legacy build workflow;
-
-unless a specific low-level diagnostic remains justified under an explicit
-advanced/diagnostic surface.
-
-### Dialogue/translation editing
-
-For a selected phrase family, support structured:
-
-- EN/TL editing;
-- style selection;
-- add phrase variant;
-- duplicate variant;
-- delete variant;
-- reorder variant;
-- add/remove style when allowed by the content schema;
-- generated phrase IDs/translation keys;
-- validation;
-- preview in Simulation;
-- Review;
-- explicit canonical write;
-- explicit compile.
-
-Do not require raw JSON for normal edits.
-
-### Conversation UI editing
-
-For a selected landing/hub/choice node, support:
-
-- EN/TL label;
-- EN/TL player utterance;
-- parent hub;
-- child membership;
 - order;
-- add existing registered semantic choice;
-- remove/reorder child;
-- select registered eligibility/predicate/provider reference;
-- preview the actual Conversation UI;
+- labels/player utterance references;
+- semantic/provider/predicate references.
+
+It does not own gameplay eligibility/effects.
+
+Primary acceptance: add/reorder/remove an existing semantic child under
+**What's up?** without editing production Lua.
+
+## P11E — taxonomy/naming cleanup
+
+Remove compiler history from canonical identity.
+
+Examples:
+
+```text
+semantic.generated.parameterized_task.fetch.failed
+→ task.fetch.failed
+
+semantic.question.wellbeing.fatigue
+→ question.wellbeing.fatigue
+
+semantic.social.apology.friendly
+→ social.apology.friendly
+```
+
+`generated`, workflow kind, source shard, and module path belong in provenance
+metadata.
+
+Translation keys/file names are generated and should be shorter/domain-based.
+Do not preserve obsolete internal names through a broad permanent alias table.
+
+## P11F — one Conversation explorer
+
+Replace the everyday Responses/Interactions/Dialogue Content split with one
+Conversation hierarchy.
+
+Selected-item details retain:
+
+- Overview;
+- Wording;
+- Route;
+- Conditions;
+- Follow-ups;
+- Sources.
+
+Raw catalogs may remain only as narrow diagnostics.
+
+## P11G — contextual Developer Tools
+
+Developer Tools becomes the editor for the selected Conversation item.
+
+Wording editor:
+
+- all available locales;
+- styles;
+- add/duplicate/delete/reorder variants;
+- preview;
 - Review;
-- explicit canonical write/compile.
+- explicit validated write/compile.
 
-Semantic destination, gameplay authority and dynamic predicate implementation
-remain locked and visibly sourced.
+Conversation UI editor:
 
-### Dynamic provider presentation
+- labels/player utterances;
+- parent/child membership/order;
+- provider/predicate references;
+- preview actual Conversation UI.
 
-Dynamic choices may be shown in the editor with fields such as:
+Dynamic gameplay authority stays locked.
 
-```text
-Source: Relationship Provider
-Eligibility: production-owned / locked
-Presentation/order: editable
-Wording: editable when Project Hoomans-owned
-```
+## P11H — shared GUI/agent API
 
-Do not convert dynamic gameplay authority into editable static JSON merely to
-make the GUI convenient.
+GUI and agents call the same canonical-ID service for:
 
-**P11G gate:** a human can select a dialogue family and add a new EN/TL variant,
-or select What's Up and add/reorder an existing semantic child, without editing
-Lua or giant JSON manually.
+- inspect;
+- edit;
+- add/remove/reorder;
+- validate;
+- preview;
+- write;
+- compile.
 
-## P11H — agent-friendly authoring API
+No generated-file direct editing.
 
-The GUI and agents must call the same authoring service.
+## P11I — final acceptance
 
-Provide bounded operations conceptually equivalent to:
-
-```text
-conversation inspect <id>
-conversation variants <id>
-conversation variant add|duplicate|delete|move ...
-conversation ui inspect <node>
-conversation ui add-child|remove-child|move-child ...
-conversation validate ...
-conversation preview ...
-conversation write ...
-conversation compile ...
-```
-
-Exact CLI naming is implementation-defined. Required properties:
-
-- stable IDs;
-- bounded reads;
-- stale/fingerprint guards;
-- schema validation;
-- no generated-file direct editing;
-- no hidden auto-write;
-- deterministic outputs;
-- machine-readable diagnostics;
-- human GUI uses the same service methods.
-
-**P11H gate:** an agent can add/edit response variants and Conversation UI
-membership without patching arbitrary Lua/JSON files directly.
-
-## P11I — final modular acceptance
-
-Final developer acceptance must prove:
-
-### Architecture
+Required final state:
 
 - one semantic meaning authority;
 - one first-party wording authority;
-- one Conversation UI/navigation registry;
-- gameplay/domain authority remains external to UI authoring;
-- no `semantic.generated.*` canonical taxonomy;
-- no live migration-era wording/fallback shim;
-- no separate human-vs-agent authoring path.
+- one Conversation UI/navigation authority;
+- dynamic locale discovery with EN fallback;
+- deterministic bounded generated artifacts;
+- domain-meaning canonical names;
+- consolidated Studio/editor workflow;
+- typed/clicked/event parity;
+- PBrainZ/compatibility parity;
+- save safety;
+- full regression/idempotence/Kahlua gates where tooling is available.
 
-### Authoring
+Only then return to `READY FOR USER LIVE TEST`.
 
-- content is domain-sharded and deterministically compiled;
-- add/duplicate/delete/reorder phrase variants works;
-- EN/TL parity and placeholders are validated;
-- What's Up children can be added/reordered/removed declaratively;
-- dynamic provider eligibility remains locked/authoritative;
-- stale source edits are rejected;
-- Review and preview remain effect-free until explicit write.
+## Non-goals
 
-### Studio
-
-- one Conversation explorer;
-- Interactions is removed as a redundant everyday browser;
-- Route/Conditions/Follow-ups/Sources remain inspectable;
-- Developer Tools edits the currently selected item;
-- normal editing does not require raw JSON.
-
-### Runtime/regression
-
-- typed/clicked semantic parity remains;
-- command/task/gift generated flows preserve behavior under renamed IDs;
-- event follow-up remains grounded;
-- PBrainZ compatibility remains;
-- Bandits/Necroa/Companion Dogs/Project ALife behavior remains;
-- no save mutation;
-- no native PZ launch / Workshop publication by the agent;
-- resource-aware Python, focused Xvfb, native Lua, Kahlua and CodeBuilder
-  idempotence remain green;
-- no material unexplained worker/runtime regression.
-
-## Completion boundary
-
-Only after P11A–P11I pass may the parent goal return to
-`READY FOR USER LIVE TEST`.
-
-The final handoff must describe the system in steady-state Conversation terms,
-not as a collection of Responses/Interactions/Generated/migration-era tools.
+Do not create P12 or another dialogue engine.
+Do not move gameplay authority into authoring JSON.
+Do not hand-maintain generated artifacts.

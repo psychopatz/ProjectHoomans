@@ -1,387 +1,86 @@
-# Audit — Unified Semantic Dialogue Authority
+# Current Audit — Unified Semantic Dialogue Authority
 
-**Audit baseline:** ProjectHoomans `181b58bcc30dc65dc61d19a49d6238abca50ece9`; PsychopatzCore `cf28189c57f7810f31d25c46c11eb88080f47baa`.
+**Audit point:** current local worktree on top of `c78a97fc`.
 
-This audit establishes why a new follow-on goal is required even though the older Semantic Interaction Lifecycle P11 declared the audited migration families complete.
+## Verified current architecture
 
-## What is already correct
+The modular Conversation foundation is real and active:
 
-### Semantic realization authority exists
+- canonical source lives under
+  `tools/semantic_harness/codebuilder/sources/conversation/`;
+- one manifest inventories content/pattern/flow/UI shards;
+- CodeBuilder merges and validates the whole model;
+- runtime Conversation output is generated into bounded shards;
+- the generated registry is a small hub rather than a content monolith;
+- old aggregate source files are generated/read-only compatibility views.
 
-`PNC_SemanticDialogueRealizationAuthority.lua` requires semantic selection before Flavor/SocialFlavor rendering for modern paths.
+P11B has already migrated the Wellbeing, Needs, Health, and Social Apology
+wording domains.
 
-Current semantic response pools already include representative event speech such as:
+## Translation/compiler audit
 
-- `semantic.flow.farewell`;
-- `semantic.medical.distress`;
-- `semantic.leader_loss.reaction`;
-- `semantic.combat.reaction`;
-- `semantic.companion.reaction`;
-- `semantic.social.reaction`;
-- `semantic.conversation.safety`;
-- `semantic.corpse.reaction`.
+The previous compiler still treated Tagalog as a hard-coded second language in
+multiple modules. That was inconsistent with the runtime translation catalog,
+which already loads languages from `media/translation/manifests/Conversation.json`.
 
-Modern social-event producers commonly call semantic social reaction/realization first and pass selected text plus response-plan/realization/fact provenance into presentation.
+The current worktree corrects that boundary:
 
-### Semantic lifecycle already has the follow-up foundation
+- EN is the required fallback locale;
+- other locale codes are discovered from generic `translations` maps and
+  actual translation directories;
+- historical `en`/`tl` fields are normalized only by one compatibility
+  adapter;
+- the Conversation translation manifest is generated from actual locale files;
+- automatic-flow semantic metadata no longer duplicates EN/TL path tables;
+- generated Conversation JSON is pretty, deterministic, newline-terminated;
+- a synthetic `XX` locale proves a third language works without changing a
+  whitelist.
 
-`PNC_SemanticInteractionLifecycle` already supports:
+## Output-format audit
 
-- `npc_speech` envelopes;
-- `eventRef`;
-- `beatID`;
-- bounded thread event refs/memories;
-- `RecordNPCSpeech`;
-- `ResponseWindow`;
-- sparse thread state and compaction.
+The one-line output visible in files such as
+`GroundedPersonalDialogue.json` was produced by compact JSON renderers.
 
-`PNC_SemanticDialogueContextState` already owns:
+CodeBuilder renderers now emit readable deterministic JSON. Regeneration fixed
+CodeBuilder-owned modular bundles and compatibility outputs including:
 
-- one bounded pending follow-up;
-- bounded agenda;
-- recent semantic turns/topics.
+- Conversation domain bundles;
+- `CommonInteractions.json`;
+- `GroundedPersonalDialogue.json`;
+- semantic `Generated.json`;
+- generated `Conversation.json` manifest.
 
-`PNC_SemanticContextResolver.ResolvePendingFollowUp` already resolves matched/interrupted follow-ups.
+`GeneratedTaskCommand*.json`, `Responses.json`, and `Realizations.json`
+remain owned by older runtime/migration surfaces. They should not be manually
+reformatted; their owning generator/authority should change when P11B/P11E
+reaches them.
 
-`ResponsePlan` already supports bounded turns, fact refs and per-turn offers.
+## Validation
 
-The Suggestions system already supports contextual/branch-continuation candidates and a bounded `MAX_CANDIDATES = 24`.
+Current cleanup evidence:
 
-**Conclusion:** do not add a second recent-event/follow-up subsystem. Extend the existing lifecycle response window/beat so NPC-initiated event speech exposes grounded follow-up offers through the existing semantic Suggestions route.
+- compiler/authoring focused Python: 7/7 PASS;
+- locale/automatic-flow focused Python: 3/3 PASS;
+- synthetic third-locale acceptance: PASS;
+- full native Lua: 897/897 PASS;
+- two consecutive generated-artifact trees: identical SHA-256;
+- CodeBuilder py_compile: PASS.
 
-### Presentation infrastructure is useful
+No current `pz-verify` executable was available on PATH, so no new Kahlua
+verifier claim is made.
 
-PsychopatzCore SocialFlavor / Project Hoomans SocialFlavor presentation still provides useful:
+## Remaining product gap
 
-- queueing/arbitration;
-- TTL/cooldown/priority;
-- merge/dedupe;
-- nameplate/world delivery;
-- Conversation delivery;
-- TTS;
-- compatibility transport.
+The system is not yet finished. Remaining mandatory work is P11B–P11I in
+`ROADMAP.md`, beginning with the next coherent wording domain (recommended:
+Task Fetch).
 
-That infrastructure should remain below the semantic authority line.
+The most visible later cleanup is P11E: remove implementation-history taxonomy
+such as `semantic.generated.parameterized_task.*`, shorten canonical IDs and
+translation keys, and keep generator provenance as metadata.
 
-## Residual split authority
+## Scope warning
 
-### Core SocialFlavor can still choose prose
-
-PsychopatzCore `PsychopatzSocialFlavorClient.lua` accepts already-selected text, but when text is absent it can still call `SocialFlavor.ResolveDetailed(flavorID, ...)` and choose prose from registered definitions.
-
-That fallback is appropriate for generic external compatibility, but **Project Hoomans semantic-owned events must no longer depend on it**.
-
-### Project Hoomans SocialFlavor definitions still own prose
-
-The current native Project Hoomans registry includes at least these first-party families:
-
-1. `social.conversation_farewell`
-2. `social.conversation_safety_danger`
-3. `social.player_spoke`
-4. `social.witnessed_player_kill`
-5. `social.witnessed_teammate_hurt`
-6. `social.follower_abandoned_zombie`
-7. `social.follower_abandoned_hostile_npc`
-8. `social.zombie_horde_detected`
-9. `social.zombie_stamina_retreat`
-10. `social.incapacitated_call`
-11. `social.incapacitated_update`
-12. `social.incapacitated_repeat`
-13. `social.witnessed_leader_death`
-
-These tables still contain relationship/role/medical/context-conditioned authored prose. For migrated first-party semantics they should become source material for canonical semantic/content variants, then lose production decision authority.
-
-### ToolReplies is another text authority
-
-`PNC_ConversationToolReplyCatalog.lua` still owns literal reply pools for areas including:
-
-- social react compliment/flirt/insult/apologize/comfort and relationship-gate rejection;
-- ask-name named/unnamed/rejected;
-- companion/order follow/stay/camp and rejection;
-- other command acknowledgements/rejections.
-
-Even when the action/gameplay owner is correct, this remains a parallel conversational content owner.
-
-### Legacy conversation-registry authority remains explicit
-
-`PNC_SemanticConversationCategoryOwnership.lua` still reports `MIGRATION_PHASE = "legacy_registry_projection"` / `AUTHORITY = "conversation_registry"` for at least:
-
-- `projecthoomans:wellbeing`;
-- `projecthoomans:small_talk`;
-- `projecthoomans:ask_about`.
-
-Those categories need final semantic ownership without duplicating ConversationBlocks/gameplay authority.
-
-### Compatibility flavor families remain
-
-First-party adapters still register flavor families for examples such as:
-
-- Bandits: `compat.bandits.hooman_hurt`;
-- Necroa: `compat.necroa.mask_warning`, `compat.necroa.player_mask_removed`;
-- Project ALife meta/encounter/faction events.
-
-Modern paths already carry semantic provenance in many cases, but the migration must prove Project Hoomans-owned compatibility speech no longer needs fallback prose selection.
-
-## Misleading legacy names that are no longer authorities
-
-`PNC_FlavorTextResolver.lua` is already a compatibility alias to semantic context providers rather than a prose resolver. Do not treat the filename alone as evidence of split authority.
-
-Likewise, `PNC_SocialFlavorPresentation_*` may remain after migration if it only delivers already-selected semantic speech.
-
-## Content coverage gap
-
-The accepted Dialogue Content Registry proves the architecture but currently covers only a small migrated subset. Existing Flavor/ToolReply/translation wording must be migrated incrementally into canonical semantic/content ownership; do not dump all strings into one new monolith.
-
-## Follow-up gap
-
-Event-driven NPC speech currently carries semantic provenance, but the product does not yet standardize:
-
-```text
-ambient semantic event response
-→ existing lifecycle beat/response window
-→ contextual follow-up offers
-→ player typed/click answer
-→ grounded resolution against the same event/fact refs
-```
-
-This goal closes that gap using existing lifecycle/context machinery.
-
-## Superseded historical claim
-
-Older Semantic Interaction Lifecycle P11 evidence remains valid for the semantic-first paths it tested, but the statement that all first-party legacy prose authority was fully retired is superseded by this audit.
-
-The old job remains foundation/history; this job is the active migration authority.
-
-
-## Post-P9 cleanup audit — `fa1d9f9f`
-
-P0–P9 correctly established semantic-first runtime behavior, but a subsequent
-source/UI audit found that the repository still carries migration-era
-architecture that conflicts with the desired steady state.
-
-### Executable first-party legacy definitions remain
-
-The production mod tree still contains `PNC_SocialFlavorDefinitions.lua` and
-its shards, with 13 first-party `Flavor.Register(...)` registrations covering
-farewell, combat/medical reactions, abandonment, horde/retreat, incapacitated
-speech and leader loss.
-
-Bandits/Necroa/Project ALife first-party compatibility Flavor-definition files
-also remain physically present.
-
-These files are no longer needed as semantic authority and must not remain in
-production merely as migration history. P10 must prove content parity and
-delete them.
-
-### ToolReply literal catalog is still loaded by the worker
-
-`PNC_ConversationToolReplies.lua` correctly selects through ResponseCatalog and
-states that it no longer reads the former literal table. However,
-`ProductionModules_ConversationSemantic.lua` still explicitly loads
-`PNC_ConversationToolReplyCatalog.lua` as `tool_catalog`.
-
-That is an unnecessary split-source residue and makes the old catalog appear
-live. P10 deletes the table and the load after parity proof.
-
-### CompanionCommandFlavor is still a live wording registry
-
-`PNC_SharedComposition_Final.lua` still loads `PNC_CompanionCommandFlavor` and
-its definition shards. Some player command/emote and NPC presentation helpers
-still call `Flavor.Resolve(...)`.
-
-The semantic emote catalog currently treats those groups as a compatibility
-content source, which means semantic meaning may be selected first but Dialogue
-Content is not yet the sole first-party wording registry.
-
-P10 migrates this content to ResponseCatalog + SpeechRealization + Dialogue
-Content and removes the parallel registry.
-
-### Legacy semantic names remain
-
-`PNC_FlavorTextResolver*` now provides semantic threat/audience/need/grief
-context but retains `PNC.FlavorText` / `PNC.FlavorTextConst`.
-
-`PNC_FlavorAddress*` remains a useful addressing/identity projection beside the
-newer semantic address resolver, but its name and namespace preserve the
-obsolete Flavor architecture.
-
-P10 keeps the behavior and removes/merges the legacy naming/namespace.
-
-### Dialogue Content source is migration-heavy
-
-Measured source state:
-
-- about 242 KB;
-- 168 phrase families / 179 phrase records;
-- 167 family IDs contain `.migrated.`;
-- 167 families contain `MIGRATED_*` concepts;
-- 167 families contain `legacySource`;
-- roughly 1,674 repeated locked metadata fields;
-- roughly 126 KB attributable to repeated `canonicalConcept + locked` metadata.
-
-Most repeated semantic ownership/conditions/priority/follow-up metadata does not
-belong to the wording owner. It duplicates ResponseCatalog truth for Studio
-display.
-
-P10 introduces a compact canonical schema and makes Studio join semantic and
-content authorities dynamically.
-
-### Studio has reached flat-list scaling limits
-
-The current production catalog contains 191 response pools and 168 content
-families. Both Studio surfaces render flat lists.
-
-The IDs already encode natural hierarchy (`semantic.compat.*`,
-`semantic.medical.distress.*`, `semantic.tool_reply.*`,
-`semantic.generated.*`, etc.). P10 must derive a tree from those canonical IDs
-rather than inventing another grouping database.
-
-### Revised conclusion
-
-P0–P9 remain accepted semantic-runtime foundation, but the previous
-`READY FOR USER LIVE TEST` boundary is superseded.
-
-The parent goal is reopened for P10 because the desired steady state is not
-"legacy code is no longer authoritative"; it is:
-
-> **legacy first-party dialogue code/content is absent, canonical semantic/content
-> ownership is compact, and Studio exposes that ownership hierarchically.**
-
-## Post-P10 modular Conversation / authoring audit — 7c9e91d0
-
-P10 is accepted as the zero-legacy semantic-runtime foundation, but the
-steady-state content/tooling model is still fragmented.
-
-Verified findings:
-
-- Dialogue Content canonical source is ~105 KB with 216 phrase families / 395
-  phrases in one file.
-- `Responses.json` has 144 live keys referenced by production Lua.
-- `Realizations.json` remains a second live realization-key family.
-- LocalResponse retains hard-coded English fallbacks and
-  `LEGACY_TEXT_FALLBACKS`.
-- `common_interactions.json`, `grounded_personal_dialogue.json` and
-  `semantic_definitions.json` mix responsibilities that should scale
-  independently.
-- 67/193 production response pools are named `semantic.generated.*`, encoding
-  generator provenance instead of conversation meaning.
-- Studio splits Responses, Interactions and Dialogue Content despite overlapping
-  identity/provenance.
-- Interactions contains unique route/trigger/flow/capability evidence but also
-  duplicates response-pool browsing.
-- Developer Tools exposes five low-level structural authoring tabs that are not
-  aligned with the human workflow now that agents implement semantic topology.
-- Dialogue Content already has reusable stale/fingerprint guards, validation,
-  preview, Review and explicit-write/compile safety.
-- current Dialogue Content editing cannot add/delete/reorder phrase variants.
-- `conversation.landing:whats_up` is canonical content, but hub children/order
-  are still hard-coded across Lua providers/group projection.
-- dynamic choices correctly depend on production relationship/gossip/camp/
-  capability authorities and must stay dynamically gated.
-
-Conclusion:
-
-P11 should not alter the semantic authority model. It should consolidate the
-remaining first-party wording paths, modularize authoring sources, establish one
-Conversation UI registry, remove build provenance from semantic taxonomy, fold
-Interactions into Conversation detail, and repurpose Developer Tools into a
-contextual selected-item editor shared with agent authoring APIs.
-
-## 2026-10-27 P11 recovery audit
-
-A stopped agent run mixed the approved P11 goal with an unrelated conversational
-intelligence expansion and published the resulting P11B–P11H stack to
-`origin/main`.
-
-### Preserved rejected state
-
-The rejected committed state remains reachable at local branch:
-
-`recovery/mangled-p11-p12-20261027` → `590d8d4ef8208425ba78a4c08893b7191e69803e`.
-
-The stopped agent's additional uncommitted layer was preserved outside the
-repository at:
-
-`/home/psychopatz/Zomboid/Workshop/ProjectHoomans-Recovery-2026-10-27/uncommitted-after-590d8d4e.patch`
-
-with SHA-256:
-
-`5dd886711336a780dc5c1609767b1c538568dcb511bb7cbd0505279ab7f6fb0c`.
-
-This evidence exists for inspection/salvage only. Do not reapply the patch or
-cherry-pick the rejected stack as a unit.
-
-### First bad commit
-
-Bisection against established semantic regressions identified:
-
-`535c9598 p11b: consolidate first-party wording authority`
-
-as the first bad implementation commit.
-
-At the P11 documentation baseline and at P11A `08081ac8`, representative
-cognition/fact/gossip/social/state response tests all passed. Starting at
-`535c9598`, all five failed and remained broken through `590d8d4e`.
-
-A clean full native Lua run at `590d8d4e` showed established Conversation
-regressions including nil local responses, incorrect placeholder realization,
-and changed social translation identity. The same full native Lua suite at
-P11A `08081ac8` passed `897/897` in 5.74s during audit and `897/897` in
-6.57s after recovery staging.
-
-### Architectural defects in the rejected stack
-
-The rejected implementation also:
-
-- created a ~62 KB `compatibility_runtime_aliases.json` with 292 runtime-key
-  aliases and made tests require that alias count, turning migration scaffolding
-  into an enforced architecture;
-- left old production translation-key callers active behind that alias layer
-  rather than finishing direct caller migration;
-- marked Studio/Developer Tools consolidation accepted while the old Flow
-  editor, Canonical source editor, Block contracts, Interaction composer and
-  Legacy build workflow were still instantiated alongside the new Conversation
-  authoring pane;
-- created a new mandatory P12 Pragmatic Conversational Intelligence phase before
-  P11I and rewrote the parent completion boundary without user approval;
-- began a second uncommitted cross-cutting migration touching canonical shards,
-  generated Lua, translations, PBrainZ, identity networking and many tests
-  before P11I acceptance.
-
-### Recovery decision
-
-The repository was recovered with normal revert history rather than rewriting
-published Git history. Recovery commit:
-
-`18eacad50745e445c92639d1ce77d487d1da07fd`
-
-has a tree identical to verified P11A anchor `08081ac8`.
-
-P11A remains accepted. P11B–P11H acceptance claims from the rejected run are
-void. Useful concepts such as a declarative Conversation UI registry, one
-Conversation explorer, and a shared GUI/agent authoring service may be
-reimplemented later, but only on top of a regression-clean incremental P11B.
-
-No new P12 or parent-goal expansion is authorized.
-
-## 2026-10-28 modular source/compiler audit
-
-The clean recovery baseline still uses monolithic canonical source contracts:
-
-- `semantic_dialogue_content.json` ~105 KB / 216 phrase families / 395 phrases;
-- `common_interactions.json` ~38 KB / 47 patterns + 13 response pools;
-- `grounded_personal_dialogue.json` ~10 KB / patterns + response pools;
-- `semantic_definitions.json` mixes definitions/flows/content;
-- Dialogue Content emits one `Generated/DialogueContent/Registry.lua`.
-
-The parked P11B attempt demonstrated the scaling failure directly: Dialogue
-Content generation grew beyond the verifier's 256 KiB single-file ceiling
-before wording consolidation was complete.
-
-CodeBuilder already has a successful modular pattern elsewhere:
-Dialogue datasets, SemanticAuthoring and Lexicon render bounded generated shards
-plus manifests/hubs.
-
-Decision: do not resume wording migration on top of the monolithic source/output
-shape. P11B0 generalizes the existing manifest + generated-shard pattern to
-Conversation authoring first.
+Do not reopen completed migration phases or recreate historical compatibility
+systems. Git history is the archive. New work must improve the current modular
+compiler/source architecture rather than clean generated files by hand.
