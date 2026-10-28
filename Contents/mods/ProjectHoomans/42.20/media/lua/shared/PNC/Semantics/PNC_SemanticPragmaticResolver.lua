@@ -5,6 +5,7 @@ PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
 local ValueBounds = require "PNC/Semantics/PNC_SemanticValueBounds"
+local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
 
 local Resolver = PNC.Semantics.PragmaticResolver or {}
 PNC.Semantics.PragmaticResolver = Resolver
@@ -159,6 +160,100 @@ local function factRefs(stimulus)
     return output
 end
 
+local function hasRelation(row, kind, relation)
+    local values = row.relations and row.relations[kind] or {}
+    for index = 1, math.min(#values, 8) do
+        if values[index] == relation then return true end
+    end
+    return false
+end
+
+local function compatibleActors(row, actor, target)
+    return row.actorID and row.targetID and (
+        row.actorID == actor and row.targetID == target
+        or row.actorID == target and row.targetID == actor)
+end
+
+-- Pure relation matching over the provider read model. No event-name lookup,
+-- parser branch, store mutation or gameplay permission is owned here.
+function Resolver.ResolveEvidence(stimulus, evidence)
+    local semantic = stimulus.semantic or {}
+    local metadata = Relations.GetAct(semantic.speechAct or semantic.intent)
+    local wanted = {}
+    for _, kind in ipairs({ "addresses", "resolves", "violates", "explains" }) do
+        for _, relation in ipairs(metadata and metadata.relations[kind] or {}) do
+            if #wanted < 8 then wanted[#wanted + 1] = relation end
+        end
+    end
+    local result = { status = "unrelated", admitted = false, candidates = {},
+        reason = "act_has_no_context_requirement", relations = wanted }
+    if #wanted == 0 then return result end
+    result.status, result.reason = "unresolved", "no_compatible_antecedent"
+    local actor = stimulus.source and stimulus.source.actorID
+    local target = stimulus.targets and stimulus.targets[1]
+    if not actor or not target then result.reason = "actor_target_unavailable"; return result end
+    local rows = evidence and evidence.rows or {}
+    local tierOrder = { SESSION = 1, TODAY = 2, DURABLE = 3 }
+    for _, relation in ipairs(wanted) do
+        local latestSession
+        for index = 1, math.min(#rows, 16) do
+            local row = rows[index]
+            if row.sourceTier == "SESSION" and compatibleActors(row, actor, target)
+                and (hasRelation(row, "opens", relation) or hasRelation(row, "addresses", relation)
+                    or hasRelation(row, "resolves", relation))
+                and (not latestSession or (row.sequence or 0) > (latestSession.sequence or 0)) then
+                latestSession = row
+            end
+        end
+        local sessionClosed = latestSession and not hasRelation(latestSession, "opens", relation)
+        for index = 1, math.min(#rows, 16) do
+            local row = rows[index]
+            if compatibleActors(row, actor, target) and hasRelation(row, "opens", relation)
+                and (row.effectiveStrength == nil or row.effectiveStrength > 0)
+                and (row.confidence == nil or row.confidence >= 0.25)
+                and not sessionClosed and #result.candidates < 8 then
+                local age = row.ageHours or 24
+                local recency = 1 / (1 + age / 24)
+                local topicMatch = semantic.topic and row.topic == semantic.topic or false
+                local relevance = 0.4 + 0.2 * recency + 0.15 * (row.confidence or 0.5)
+                    + 0.15 * (row.effectiveStrength or 0.5)
+                    + 0.1 * ((row.retentionSalience or 0) / 255)
+                    + (topicMatch and 0.05 or 0)
+                result.candidates[#result.candidates + 1] = {
+                    sourceRef = row.sourceRef, providerID = row.providerID,
+                    sourceTier = row.sourceTier, relation = relation,
+                    actorID = row.actorID, targetID = row.targetID,
+                    retentionSalience = row.retentionSalience, confidence = row.confidence,
+                    effectiveStrength = row.effectiveStrength, ageHours = row.ageHours,
+                    recency = recency, topicMatch = topicMatch,
+                    contextualRelevance = relevance, relationCompatible = true,
+                    priority = tierOrder[row.sourceTier],
+                    actorTargetCompatible = true, sequence = row.sequence,
+                }
+            end
+        end
+        if sessionClosed then result.reason = "relation_already_addressed" end
+    end
+    table.sort(result.candidates, function(a, b)
+        if a.sourceTier ~= b.sourceTier then return tierOrder[a.sourceTier] < tierOrder[b.sourceTier] end
+        if a.sequence ~= b.sequence then return (a.sequence or 0) > (b.sequence or 0) end
+        if a.contextualRelevance ~= b.contextualRelevance then return a.contextualRelevance > b.contextualRelevance end
+        return a.sourceRef < b.sourceRef
+    end)
+    local selected = result.candidates[1]
+    if selected then
+        local second = result.candidates[2]
+        if second and selected.relation ~= second.relation and selected.sourceTier == second.sourceTier
+            and math.abs(selected.contextualRelevance - second.contextualRelevance) < 0.02 then
+            result.status, result.reason = "ambiguous", "multiple_compatible_relations"
+        else
+            result.status, result.reason, result.admitted = "grounded", "compatible_relation", true
+            result.selected = copy(selected)
+        end
+    end
+    return result
+end
+
 function Resolver.Resolve(stimulus, state, context, root)
     stimulus = type(stimulus) == "table" and stimulus or {}
     root = type(root) == "table" and root or {}
@@ -237,6 +332,7 @@ function Resolver.Resolve(stimulus, state, context, root)
         groundedFactRefs = factRefs(stimulus),
         groundedEventRefs = eventRefs(stimulus),
         evidence = copy(root.evidence or { rows = {}, providers = {} }),
+        contextualAdmission = Resolver.ResolveEvidence(stimulus, root.evidence),
     }
 end
 

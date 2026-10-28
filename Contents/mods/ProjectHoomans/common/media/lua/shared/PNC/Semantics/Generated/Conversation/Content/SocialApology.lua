@@ -8,28 +8,28 @@ return {
         ["styles"] = {
             ["guarded"] = {
                 {
-                    ["fallback"] = "Apology heard. Leave it there.",
+                    ["fallback"] = "What are you apologizing for?",
                     ["id"] = "phrase.semantic.social.apology.default.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultGuarded01",
                 },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "Noted. Let's move on.",
+                    ["fallback"] = "What are you apologizing for?",
                     ["id"] = "phrase.semantic.social.apology.default.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultNeutral01",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Noted.",
+                    ["fallback"] = "What are you apologizing for?",
                     ["id"] = "phrase.semantic.social.apology.default.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultTerse01",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "I appreciate the apology. Let's move on.",
+                    ["fallback"] = "What are you apologizing for?",
                     ["id"] = "phrase.semantic.social.apology.default.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultWarm01",
                 },

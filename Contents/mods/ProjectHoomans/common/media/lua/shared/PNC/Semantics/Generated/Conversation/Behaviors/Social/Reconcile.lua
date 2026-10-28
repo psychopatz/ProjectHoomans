@@ -42,9 +42,17 @@ return {
         },
         ["version"] = 1,
         ["when"] = {
-            ["op"] = "eq",
-            ["path"] = "stimulus.semantic.intent",
-            ["value"] = "APOLOGIZE",
+            ["all"] = {
+                {
+                    ["op"] = "eq",
+                    ["path"] = "stimulus.semantic.intent",
+                    ["value"] = "APOLOGIZE",
+                },
+                {
+                    ["op"] = "truthy",
+                    ["path"] = "pragmatic.contextualAdmission.admitted",
+                },
+            },
         },
     },
 }

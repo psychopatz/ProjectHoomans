@@ -20,14 +20,18 @@
       "entry": {
         "all": [
           {
-            "op": "eq",
             "path": "stimulus.semantic.intent",
+            "op": "eq",
             "value": "APOLOGIZE"
           },
           {
-            "op": "gt",
-            "path": "history.hostilityCount",
-            "value": 0
+            "path": "pragmatic.contextualAdmission.admitted",
+            "op": "truthy"
+          },
+          {
+            "path": "pragmatic.contextualAdmission.selected.relation",
+            "op": "eq",
+            "value": "repair"
           }
         ]
       },

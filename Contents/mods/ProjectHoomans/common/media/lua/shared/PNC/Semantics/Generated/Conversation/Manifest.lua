@@ -430,6 +430,17 @@ return {
             ["sourceShard"] = "content/social/interaction/argument_retaliate.json",
         },
         {
+            ["bytes"] = 806,
+            ["domain"] = "social",
+            ["kind"] = "Content",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ContextClarify",
+            ["recordCount"] = 1,
+            ["recordIDs"] = {
+                "phrase.semantic.interaction.context.clarify",
+            },
+            ["sourceShard"] = "content/social/interaction/context_clarify.json",
+        },
+        {
             ["bytes"] = 1885,
             ["domain"] = "social",
             ["kind"] = "Content",
@@ -724,7 +735,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/sexual.json",
         },
         {
-            ["bytes"] = 6724,
+            ["bytes"] = 6743,
             ["domain"] = "apology",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/SocialApology",
@@ -1408,6 +1419,17 @@ return {
             ["sourceShard"] = "behaviors/social/challenge.json",
         },
         {
+            ["bytes"] = 1167,
+            ["domain"] = "social",
+            ["kind"] = "Behaviors",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/ClarifyContext",
+            ["recordCount"] = 1,
+            ["recordIDs"] = {
+                "behavior.clarify_context",
+            },
+            ["sourceShard"] = "behaviors/social/clarify_context.json",
+        },
+        {
             ["bytes"] = 1767,
             ["domain"] = "social",
             ["kind"] = "Behaviors",
@@ -1430,7 +1452,7 @@ return {
             ["sourceShard"] = "behaviors/social/end_conversation.json",
         },
         {
-            ["bytes"] = 1428,
+            ["bytes"] = 1677,
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/Reconcile",
@@ -1485,7 +1507,7 @@ return {
             ["sourceShard"] = "beats/social/argument_escalation.json",
         },
         {
-            ["bytes"] = 1830,
+            ["bytes"] = 2011,
             ["domain"] = "social",
             ["kind"] = "Beats",
             ["module"] = "PNC/Semantics/Generated/Conversation/Beats/Social/Reconciliation",
@@ -1627,18 +1649,19 @@ return {
             ["sourceShard"] = "@index/beat/social",
         },
         {
-            ["bytes"] = 4331,
+            ["bytes"] = 4665,
             ["domain"] = "social",
             ["indexKind"] = "behavior",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Behavior/Social",
-            ["recordCount"] = 11,
+            ["recordCount"] = 12,
             ["recordIDs"] = {
                 "behavior.acknowledge_memory",
                 "behavior.acknowledge_news",
                 "behavior.acknowledge_thanks",
                 "behavior.ask_memory_followup",
                 "behavior.challenge",
+                "behavior.clarify_context",
                 "behavior.deescalate",
                 "behavior.end_conversation",
                 "behavior.reconcile",
@@ -1961,12 +1984,12 @@ return {
             ["sourceShard"] = "@index/content/quest",
         },
         {
-            ["bytes"] = 31221,
+            ["bytes"] = 31612,
             ["domain"] = "social",
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Social",
-            ["recordCount"] = 85,
+            ["recordCount"] = 86,
             ["recordIDs"] = {
                 "phrase.semantic.conversation.acknowledged.default",
                 "phrase.semantic.emote.player.clap",
@@ -1989,6 +2012,7 @@ return {
                 "phrase.semantic.emote.reply.wavehi",
                 "phrase.semantic.interaction.argument.deescalate",
                 "phrase.semantic.interaction.argument.retaliate",
+                "phrase.semantic.interaction.context.clarify",
                 "phrase.semantic.interaction.first_contact.challenge",
                 "phrase.semantic.interaction.memory.acknowledge",
                 "phrase.semantic.interaction.memory.acknowledge_flavor",
@@ -2451,5 +2475,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "52978b77f9ba498c77bc0b6e259faa4bb0af4fcfefe9ede74b43d146398a0dd0",
+    ["wholeModelFingerprint"] = "730b48e5331f4215a61186271d0c240f150535c650843ec8589dc4e8c769d896",
 }

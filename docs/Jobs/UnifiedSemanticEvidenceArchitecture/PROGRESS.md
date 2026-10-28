@@ -4,7 +4,16 @@
 **Branch:** existing main.
 **Audit anchor:** ProjectHoomans 2bc4810f.
 **Current phase:** E4 — generic relation resolution.
-**Next exact chunk:** E4A — resolve declaratively registered semantic act relations against normalized tier evidence, exposing grounded/unresolved/unrelated/ambiguous admission and separate ranking signals; then gate pragmatic content/behavior through canonical sources.
+**Next exact chunk:** E4B — record bounded authoritative relation markers through the existing server InteractionLifecycle/Conversation Memory path and derive closure across conversations; finish E4 then continue E5 adopters. E4 is not yet accepted as a phase.
+
+## E4A accepted (2026-10-28)
+
+- PragmaticResolver matches registered act relations, actors/targets and bounded provider rows. Exposes grounded/unresolved/unrelated/ambiguous status and independent confidence, retention salience, strength, age/recency, topic fit, priority and ephemeral contextual relevance. No APOLOGIZE-to-INSULT branch.
+- Canonical content/behavior now clarifies ungrounded contextual acts and requires admitted repair for reconciliation. Added EN/TL generic clarification and made fallback apology wording ask for context. Source + generated outputs are kept together.
+- Production-worker tests prove reset clarification, session/today/durable repair, repeated in-session closure and newer grievance admission. Generic Lua test covers repair/gratitude/response, swapped reply roles, wrong actor, expired strength and ambiguity.
+- Lua 905/905 PASS. Focused worker/structural suites pass; two CodeBuilder generations are byte-identical across 223 generated/translation files. Kahlua/diff checks pass.
+- Broad pragmatic Python baseline has four pre-existing failures, reproduced on an isolated `git archive bbaf2cd4` with the same Core checkout: P5 promotion paths (2), R9 structural-diff generated path (1), R2 visible phraseSemanticTemplateID expectation (1). Logs `/tmp/unified-baseline-regressions.log`; none is treated as new acceptance. Stale catalog-count and no-context THANK expectations introduced by this slice were updated to the current contract.
+- Closure currently uses session evidence. Compact cross-session closure is intentionally pending E4B; do not mark E4 or the parent complete.
 
 ## E3B / E3 accepted (2026-10-28)
 

@@ -115,6 +115,7 @@
   "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral01": "You're really testing me right now.",
   "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateTerse01": "Keep talking.",
   "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateWarm01": "You're pushing this too far.",
+  "UI_PNC_Conversation_Content_SemanticInteractionContextClarifyNeutral01": "What are you referring to?",
   "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeGuarded01": "That's close enough. What do you want?",
   "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeNeutral01": "Hold it. Who are you?",
   "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeTerse01": "Who are you?",

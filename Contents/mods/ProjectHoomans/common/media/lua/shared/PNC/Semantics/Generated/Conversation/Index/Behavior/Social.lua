@@ -48,6 +48,15 @@ return {
         ["kind"] = "behavior",
         ["source"] = "behaviors/social/challenge.json",
     },
+    ["behavior.clarify_context"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/ClarifyContext",
+        },
+        ["id"] = "behavior.clarify_context",
+        ["kind"] = "behavior",
+        ["source"] = "behaviors/social/clarify_context.json",
+    },
     ["behavior.deescalate"] = {
         ["dependents"] = {
             "beat.argument_escalation",

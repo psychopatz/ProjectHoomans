@@ -1,0 +1,32 @@
+{
+  "schema": "pnc.conversation.shard.v1",
+  "version": 1,
+  "kind": "content",
+  "domain": "social",
+  "source": {
+    "name": "Project Hoomans contextual clarification",
+    "version": "1",
+    "contentLicense": "Project Hoomans authored content"
+  },
+  "groups": {
+    "interaction": {
+      "contentOwner": "projecthoomans.dialogue_content.social_interaction"
+    }
+  },
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.interaction.context.clarify",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "What are you referring to?",
+              "TL": "Ano ang tinutukoy mo?"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

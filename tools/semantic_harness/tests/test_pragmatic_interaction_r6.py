@@ -9,7 +9,7 @@ from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class PragmaticInteractionR6Tests(unittest.TestCase):
-    def test_thanks_uses_one_shot_behavior_without_entering_a_beat(self) -> None:
+    def test_ungrounded_thanks_clarifies_without_entering_a_beat(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             result = worker.input("thanks")
 
@@ -19,7 +19,7 @@ class PragmaticInteractionR6Tests(unittest.TestCase):
         self.assertEqual(director["behaviorSource"], "one_shot")
         self.assertEqual(
             director["selectedBehavior"]["id"],
-            "behavior.acknowledge_thanks",
+            "behavior.clarify_context",
         )
         self.assertEqual(
             decision["interactionPlan"]["behaviorMode"],
@@ -28,7 +28,7 @@ class PragmaticInteractionR6Tests(unittest.TestCase):
         self.assertIsNone(decision["interactionPlan"].get("beatID"))
         self.assertEqual(
             decision["interactionPlan"]["behaviorAct"],
-            "ACKNOWLEDGE_THANKS",
+            "ASK_CLARIFICATION",
         )
         self.assertEqual(
             decision["response"]["sourcePoolID"],
@@ -36,15 +36,15 @@ class PragmaticInteractionR6Tests(unittest.TestCase):
         )
         self.assertEqual(
             decision["response"]["plan"]["dialogueAct"],
-            "ACKNOWLEDGE",
+            "ASK_CLARIFICATION",
         )
         self.assertEqual(
             result["observation"]["response"]["semanticTemplateID"],
-            "semantic.social.acknowledged",
+            "semantic.interaction.context.clarify",
         )
         self.assertEqual(
-            result["observation"]["response"]["realizationFamily"],
-            "utterance_plan",
+            decision["response"]["plan"]["kind"],
+            "dialogue_act_plan",
         )
 
     def test_generic_npc_semantic_act_preview_bypasses_nlu(self) -> None:
@@ -79,7 +79,7 @@ class PragmaticInteractionR6Tests(unittest.TestCase):
         self.assertEqual(preview["behaviorSource"], "one_shot")
         self.assertEqual(
             preview["selectedBehavior"]["id"],
-            "behavior.acknowledge_thanks",
+            "behavior.clarify_context",
         )
         self.assertEqual(
             preview["interactionPlan"]["sourceStimulusType"],
@@ -129,9 +129,9 @@ class PragmaticInteractionR6Tests(unittest.TestCase):
             catalog = worker.beat_catalog()
         behavior = next(
             row for row in catalog["behaviors"]
-            if row["id"] == "behavior.acknowledge_thanks"
+            if row["id"] == "behavior.clarify_context"
         )
-        self.assertEqual(behavior["act"], "ACKNOWLEDGE_THANKS")
+        self.assertEqual(behavior["act"], "ASK_CLARIFICATION")
         self.assertEqual(behavior["mode"], "one_shot")
         self.assertEqual(
             behavior["stimuli"],

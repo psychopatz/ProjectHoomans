@@ -189,6 +189,15 @@ return {
         ["kind"] = "content",
         ["source"] = "content/social/interaction/argument_retaliate.json",
     },
+    ["phrase.semantic.interaction.context.clarify"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ContextClarify",
+        },
+        ["id"] = "phrase.semantic.interaction.context.clarify",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/context_clarify.json",
+    },
     ["phrase.semantic.interaction.first_contact.challenge"] = {
         ["domain"] = "social",
         ["generated"] = {

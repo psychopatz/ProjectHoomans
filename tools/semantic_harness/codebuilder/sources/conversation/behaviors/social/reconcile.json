@@ -41,9 +41,17 @@
       ],
       "version": 1,
       "when": {
-        "op": "eq",
-        "path": "stimulus.semantic.intent",
-        "value": "APOLOGIZE"
+        "all": [
+          {
+            "op": "eq",
+            "path": "stimulus.semantic.intent",
+            "value": "APOLOGIZE"
+          },
+          {
+            "path": "pragmatic.contextualAdmission.admitted",
+            "op": "truthy"
+          }
+        ]
       }
     }
   ],

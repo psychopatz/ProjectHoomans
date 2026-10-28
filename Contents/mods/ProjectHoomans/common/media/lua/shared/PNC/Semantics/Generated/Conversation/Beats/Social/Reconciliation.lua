@@ -26,9 +26,13 @@ return {
                     ["value"] = "APOLOGIZE",
                 },
                 {
-                    ["op"] = "gt",
-                    ["path"] = "history.hostilityCount",
-                    ["value"] = 0,
+                    ["op"] = "truthy",
+                    ["path"] = "pragmatic.contextualAdmission.admitted",
+                },
+                {
+                    ["op"] = "eq",
+                    ["path"] = "pragmatic.contextualAdmission.selected.relation",
+                    ["value"] = "repair",
                 },
             },
         },

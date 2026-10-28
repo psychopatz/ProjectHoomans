@@ -14,32 +14,32 @@
         "neutral": [
           {
             "translations": {
-              "EN": "Noted. Let's move on.",
-              "TL": "Naitala ko. Magpatuloy tayo."
+              "EN": "What are you apologizing for?",
+              "TL": "Ano ang hinihingi mo ng tawad?"
             }
           }
         ],
         "warm": [
           {
             "translations": {
-              "EN": "I appreciate the apology. Let's move on.",
-              "TL": "Pinahahalagahan ko ang paghingi mo ng tawad. Magpatuloy tayo."
+              "EN": "What are you apologizing for?",
+              "TL": "Ano ang hinihingi mo ng tawad?"
             }
           }
         ],
         "terse": [
           {
             "translations": {
-              "EN": "Noted.",
-              "TL": "Naitala ko."
+              "EN": "What are you apologizing for?",
+              "TL": "Ano ang hinihingi mo ng tawad?"
             }
           }
         ],
         "guarded": [
           {
             "translations": {
-              "EN": "Apology heard. Leave it there.",
-              "TL": "Narinig ko ang paghingi ng tawad. Tama na."
+              "EN": "What are you apologizing for?",
+              "TL": "Ano ang hinihingi mo ng tawad?"
             }
           }
         ]
