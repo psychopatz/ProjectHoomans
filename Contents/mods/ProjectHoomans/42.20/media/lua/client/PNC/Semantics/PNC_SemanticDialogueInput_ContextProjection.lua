@@ -27,6 +27,53 @@ local function localPlayer(view, source)
         or getSpecificPlayer and getSpecificPlayer(0)
 end
 
+local function boundedPlayerTraits(player)
+    local output = {}
+    local seen = {}
+    local function add(value)
+        value = tostring(value or "")
+        if value == "" or seen[value] or #output >= 32 then return end
+        seen[value] = true
+        output[#output + 1] = value
+    end
+
+    if type(player) == "table" then
+        local values = player.traits or player.socialTraits
+        if type(values) == "table" then
+            for key, value in pairs(values) do
+                if type(key) == "string" and value == true then
+                    add(key)
+                elseif type(value) == "string" then
+                    add(value)
+                elseif type(value) == "table" then
+                    add(value.id or value.type or value.name)
+                end
+            end
+        end
+    end
+
+    if player and type(player.getTraits) == "function" then
+        local ok, values = pcall(player.getTraits, player)
+        if ok and values then
+            if type(values.size) == "function"
+                and type(values.get) == "function"
+            then
+                local sizeOK, size = pcall(values.size, values)
+                size = sizeOK and math.min(tonumber(size) or 0, 32) or 0
+                for index = 0, size - 1 do
+                    local getOK, value = pcall(values.get, values, index)
+                    if getOK then add(value) end
+                end
+            elseif type(values) == "table" then
+                for _, value in pairs(values) do add(value) end
+            end
+        end
+    end
+
+    table.sort(output)
+    return output
+end
+
 function Projection.LLMEnabled()
     local integration = PNC.PBrainZ
     if integration
@@ -192,6 +239,7 @@ function Projection.Build(view, getProviderStatus)
         end
     end
     local enginePlayer = localPlayer(view, source)
+    output.playerTraits = boundedPlayerTraits(enginePlayer)
     if WorldContext and type(WorldContext.Get) == "function" then
         output.worldContext = WorldContext.Get({
             player = enginePlayer,

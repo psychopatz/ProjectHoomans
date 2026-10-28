@@ -210,6 +210,12 @@ function Internal.QueueDeterministicResponse(
     local decision = result.decision or {}
     local presentationContext = type(Internal.ShallowContext) == "function"
         and Internal.ShallowContext(view) or {}
+    -- Presentation may use the already-authoritative semantic decision for
+    -- wording/microplanning, but it never feeds generated text back into NLU
+    -- or gameplay authority.
+    presentationContext.dialogueIR = result.ir
+    presentationContext.dialogueDecision = decision
+    presentationContext.interactionPlan = decision.interactionPlan
     local responses
     if type(options.responses) == "table" and #options.responses > 0 then
         responses = options.responses

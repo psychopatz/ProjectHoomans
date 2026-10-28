@@ -225,6 +225,12 @@
       "kind": "beats",
       "order": 2260,
       "path": "beats/social"
+    },
+    {
+      "domain": "social",
+      "kind": "realization",
+      "order": 2270,
+      "path": "realization/social"
     }
   ],
   "version": 1

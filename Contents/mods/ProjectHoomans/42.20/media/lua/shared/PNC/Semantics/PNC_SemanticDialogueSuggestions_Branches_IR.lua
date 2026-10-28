@@ -253,6 +253,10 @@ function Suggestions.FrameToIR(frame, view)
                     and candidate.frame or nil
                 if not source then return nil, "suggestion_provider_frame_missing" end
                 local target = copyValue(source.target)
+                local sourceExtensions = copyValue(source.extensions) or {}
+                if sourceExtensions.topic == nil and source.topic ~= nil then
+                    sourceExtensions.topic = copyValue(source.topic)
+                end
                 return IR.New({
                     kind = "semantic_suggestion_frame",
                     rawText = Suggestions.ResolveFrameText(source),
@@ -268,7 +272,7 @@ function Suggestions.FrameToIR(frame, view)
                     slots = copyValue(source.slots) or {},
                     modifiers = copyValue(source.modifiers) or {},
                     socialContext = copyValue(source.socialContext) or {},
-                    extensions = copyValue(source.extensions) or {},
+                    extensions = sourceExtensions,
                     confidence = 1,
                     provenance = {
                         provider = tostring(providerID),

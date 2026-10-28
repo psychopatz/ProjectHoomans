@@ -55,7 +55,10 @@ CONVERSATION_PREFERRED_RECORDS_PER_SHARD = 16
 CONVERSATION_MAX_RECORDS_PER_SHARD = 32
 CONVERSATION_MAX_INDEX_BYTES = 48 * 1024
 _ID = re.compile(r"^[a-z][a-z0-9_.:-]{0,127}$")
-_SHARD_KINDS = frozenset(("content", "patterns", "responses", "flows", "beats", "behaviors", "ui"))
+_SHARD_KINDS = frozenset((
+    "content", "patterns", "responses", "flows", "beats", "behaviors",
+    "realization", "ui",
+))
 
 
 def _canonical_json(value: Any) -> str:
@@ -574,6 +577,99 @@ def _validate_beat_shard(document: dict[str, Any], path: str) -> dict[str, Any]:
     return {"records": records}
 
 
+def _validate_realization_shard(
+    document: dict[str, Any],
+    path: str,
+) -> dict[str, Any]:
+    values = document.get("realizations")
+    if not isinstance(values, list):
+        raise CompileError(f"Realization shard {path} requires a realizations list")
+    if len(values) > CONVERSATION_MAX_RECORDS_PER_SHARD:
+        raise CompileError(
+            f"Realization shard {path} exceeds the "
+            f"{CONVERSATION_MAX_RECORDS_PER_SHARD}-record hard budget"
+        )
+    records: list[dict[str, Any]] = []
+    for index, raw in enumerate(values):
+        label = f"{path}.realizations[{index}]"
+        if not isinstance(raw, dict):
+            raise CompileError(f"{label} must be an object")
+        record_id = _validate_id(raw.get("id"), f"{label}.id")
+        realization_type = str(raw.get("type") or "")
+        if realization_type not in {"lexeme", "construction"}:
+            raise CompileError(
+                f"{label}.type must be lexeme or construction"
+            )
+        record = _copy_json(raw)
+        record["id"] = record_id
+        record["type"] = realization_type
+        if realization_type == "lexeme":
+            concept = str(raw.get("concept") or "")
+            if not concept or len(concept) > 96:
+                raise CompileError(f"{label}.concept is required")
+            forms = raw.get("forms")
+            if not isinstance(forms, dict) or not forms:
+                raise CompileError(f"{label}.forms must be a non-empty object")
+            if len(forms) > 8:
+                raise CompileError(f"{label}.forms exceeds 8 locales")
+            for locale, value in forms.items():
+                if not isinstance(locale, str) or not locale or len(locale) > 12:
+                    raise CompileError(f"{label}.forms locale is invalid")
+                if not isinstance(value, str) or not value or len(value) > 96:
+                    raise CompileError(
+                        f"{label}.forms[{locale}] must be bounded text"
+                    )
+        else:
+            locale = str(raw.get("locale") or "")
+            strategy = str(raw.get("strategy") or "")
+            if not locale or len(locale) > 12:
+                raise CompileError(f"{label}.locale is required")
+            if not strategy or len(strategy) > 64:
+                raise CompileError(f"{label}.strategy is required")
+            tokens = raw.get("tokens")
+            if not isinstance(tokens, list) or not tokens or len(tokens) > 12:
+                raise CompileError(
+                    f"{label}.tokens must contain 1-12 token objects"
+                )
+            for token_index, token in enumerate(tokens):
+                token_label = f"{label}.tokens[{token_index}]"
+                if not isinstance(token, dict):
+                    raise CompileError(f"{token_label} must be an object")
+                token_kind = str(token.get("kind") or "")
+                if token_kind not in {"literal", "lexeme", "slot"}:
+                    raise CompileError(
+                        f"{token_label}.kind is not supported"
+                    )
+                if token_kind == "literal":
+                    value = token.get("value")
+                    if not isinstance(value, str) or len(value) > 128:
+                        raise CompileError(
+                            f"{token_label}.value must be bounded text"
+                        )
+                else:
+                    slot = token.get("slot")
+                    if not isinstance(slot, str) or not slot or len(slot) > 64:
+                        raise CompileError(
+                            f"{token_label}.slot is required"
+                        )
+        records.append(record)
+    return {"records": records}
+
+
+def _merge_realization_sources(
+    shards: list[tuple[dict[str, Any], dict[str, Any], str]],
+) -> dict[str, Any]:
+    records: list[dict[str, Any]] = []
+    for document, entry, _ in shards:
+        if entry["kind"] != "realization":
+            continue
+        compiled = _validate_realization_shard(document, entry["path"])
+        for record in compiled["records"]:
+            records.append({**record, "domain": entry["domain"]})
+    records.sort(key=lambda item: item["id"])
+    return {"records": records}
+
+
 def _merge_director_sources(
     shards: list[tuple[dict[str, Any], dict[str, Any], str]],
     kind: str,
@@ -636,6 +732,8 @@ def _compile_shard(
         compiled = _validate_behavior_shard(document, path)
     elif kind == "beats":
         compiled = _validate_beat_shard(document, path)
+    elif kind == "realization":
+        compiled = _validate_realization_shard(document, path)
     else:
         compiled = {"suggestions": _validate_ui_shard(document, path)}
     return compiled
@@ -827,6 +925,8 @@ def compile_conversation_sources(
             record_ids.extend(str(item["id"]) for item in document.get("behaviors", []))
         elif entry["kind"] == "beats":
             record_ids.extend(str(item["id"]) for item in document.get("beats", []))
+        elif entry["kind"] == "realization":
+            record_ids.extend(str(item["id"]) for item in document.get("realizations", []))
         else:
             record_ids.extend(str(item["id"]) for item in document.get("suggestions", []))
         record_ids.sort()
@@ -846,6 +946,7 @@ def compile_conversation_sources(
     semantic = _merge_semantic_sources(loaded, runtime_root)
     behaviors = _merge_director_sources(loaded, "behaviors")
     beats = _merge_director_sources(loaded, "beats")
+    realization = _merge_realization_sources(loaded)
     ui = sorted(
         [item for document, entry, _ in loaded if entry["kind"] == "ui" for item in document.get("suggestions", [])],
         key=lambda item: (item.get("order", 0), item.get("id", "")),
@@ -886,6 +987,15 @@ def compile_conversation_sources(
         elif entry["kind"] == "beats":
             for beat in document.get("beats", []):
                 _add_global_id(locations, beat.get("id"), kind="beat", shard=entry, path=path)
+        elif entry["kind"] == "realization":
+            for realization_record in document.get("realizations", []):
+                _add_global_id(
+                    locations,
+                    realization_record.get("id"),
+                    kind="realization",
+                    shard=entry,
+                    path=path,
+                )
         else:
             for suggestion in document.get("suggestions", []):
                 _add_global_id(locations, suggestion.get("id"), kind="ui", shard=entry, path=path)
@@ -980,6 +1090,7 @@ def compile_conversation_sources(
         "semantic": semantic,
         "behaviors": behaviors["records"],
         "beats": beats["records"],
+        "realization": realization["records"],
         "ui": ui,
     }
     whole_fingerprint = _fingerprint(semantic_payload)
@@ -994,6 +1105,7 @@ def compile_conversation_sources(
         "semantic": semantic,
         "behaviors": behaviors["records"],
         "beats": beats["records"],
+        "realization": realization["records"],
         "ui": ui,
         "uiTranslations": _ui_translations(ui),
         "shards": shard_reports,
@@ -1253,6 +1365,10 @@ def render_conversation_runtime_plan(
         owned(item, domain="social")
         for item in model.get("beats", [])
     ]
+    realization_records = [
+        owned(item, domain=str(item.get("domain") or "general"))
+        for item in model.get("realization", [])
+    ]
     ui_records = [
         owned(item, domain=str(item.get("topic") or "general"))
         for item in model["ui"]
@@ -1273,6 +1389,9 @@ def render_conversation_runtime_plan(
     beat_modules, beat_reports = _chunk_records(
         beat_records, kind="Beats", module_prefix=prefix
     )
+    realization_modules, realization_reports = _chunk_records(
+        realization_records, kind="Realization", module_prefix=prefix
+    )
     ui_modules, ui_reports = _chunk_records(
         ui_records, kind="UI", module_prefix=prefix
     )
@@ -1283,6 +1402,7 @@ def render_conversation_runtime_plan(
         *flow_modules,
         *behavior_modules,
         *beat_modules,
+        *realization_modules,
         *ui_modules,
     ]
     reports = [
@@ -1292,6 +1412,7 @@ def render_conversation_runtime_plan(
         *flow_reports,
         *behavior_reports,
         *beat_reports,
+        *realization_reports,
         *ui_reports,
     ]
     index_modules, index_reports, _ = render_conversation_discovery_indexes(
@@ -1325,6 +1446,7 @@ def _runtime_record_index(model: dict[str, Any]) -> dict[str, dict[str, Any]]:
     add(model.get("semantic", {}).get("flows", []))
     add(model.get("behaviors", []))
     add(model.get("beats", []))
+    add(model.get("realization", []))
     add(model.get("ui", []))
     return records
 

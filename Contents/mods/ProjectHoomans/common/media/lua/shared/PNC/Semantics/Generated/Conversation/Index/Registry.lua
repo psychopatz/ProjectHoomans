@@ -127,6 +127,12 @@ return {
         ["recordCount"] = 3,
     },
     {
+        ["domain"] = "social",
+        ["kind"] = "realization",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Realization/Social",
+        ["recordCount"] = 28,
+    },
+    {
         ["domain"] = "common",
         ["kind"] = "responsePool",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/ResponsePool/Common",

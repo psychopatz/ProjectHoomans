@@ -18,7 +18,9 @@ function Internal.RegisterDialogueConcepts()
     registerConcept("HELP", { "help" })
     registerConcept("TAKE", { "take" })
     registerConcept("THANK", { "thanks", "thank you" })
-    registerConcept("APOLOGIZE", { "sorry", "i am sorry", "apologies" })
+    registerConcept("APOLOGIZE", {
+        "sorry", "i'm sorry", "i am sorry", "apologies",
+    })
     registerConcept("ACCEPT", {
         "yes", "yeah", "yep", "yup", "sure", "okay", "ok",
         "yes please", "yeah please", "of course", "sure thing",

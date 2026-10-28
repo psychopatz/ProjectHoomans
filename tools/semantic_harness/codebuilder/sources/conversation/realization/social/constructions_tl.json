@@ -1,0 +1,135 @@
+{
+  "schema": "pnc.conversation.shard.v1",
+  "version": 1,
+  "kind": "realization",
+  "domain": "social",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dynamic Conversation Realization",
+    "version": "1"
+  },
+  "realizations": [
+    {
+      "id": "construction.tl.social.mirror_retort",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "MIRROR",
+      "dialogueAct": "RETORT",
+      "tokens": [
+        { "kind": "lexeme", "slot": "primary" },
+        { "kind": "literal", "value": " rin." }
+      ]
+    },
+    {
+      "id": "construction.tl.social.apologize",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "APOLOGIZE",
+      "dialogueAct": "APOLOGIZE",
+      "tokens": [
+        { "kind": "lexeme", "slot": "primary" },
+        { "kind": "literal", "value": " na." }
+      ]
+    },
+    {
+      "id": "construction.tl.social.deescalate",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "DEESCALATE",
+      "dialogueAct": "DEESCALATE",
+      "tokens": [
+        { "kind": "literal", "value": "Kumalma tayo." }
+      ]
+    },
+    {
+      "id": "construction.tl.social.challenge",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "CHALLENGE",
+      "dialogueAct": "CHALLENGE",
+      "tokens": [
+        { "kind": "literal", "value": "Ulitin mo nga." }
+      ]
+    },
+    {
+      "id": "construction.tl.social.dismiss",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "DISMISS",
+      "dialogueAct": "DISMISS",
+      "tokens": [
+        { "kind": "literal", "value": "Bahala ka." }
+      ]
+    },
+    {
+      "id": "construction.tl.social.ask_why",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "ASK_WHY",
+      "dialogueAct": "QUESTION",
+      "tokens": [
+        { "kind": "literal", "value": "Bakit mo sinabi 'yan?" }
+      ]
+    },
+    {
+      "id": "construction.tl.social.agree",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "AGREE",
+      "dialogueAct": "AGREE",
+      "tokens": [
+        { "kind": "literal", "value": "Oo, sang-ayon ako." }
+      ]
+    },
+    {
+      "id": "construction.tl.social.disagree",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "DISAGREE",
+      "dialogueAct": "DISAGREE",
+      "tokens": [
+        { "kind": "literal", "value": "Hindi ako sang-ayon." }
+      ]
+    },
+    {
+      "id": "construction.tl.social.acknowledge",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "ACKNOWLEDGE",
+      "dialogueAct": "ACKNOWLEDGE",
+      "tokens": [
+        { "kind": "literal", "value": "Naiintindihan ko." }
+      ]
+    },
+    {
+      "id": "construction.tl.social.ask_followup",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "ASK_FOLLOWUP",
+      "dialogueAct": "QUESTION",
+      "tokens": [
+        { "kind": "literal", "value": "Ano'ng ibig mong sabihin?" }
+      ]
+    },
+    {
+      "id": "construction.tl.social.call_bluff",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "CALL_BLUFF",
+      "dialogueAct": "HOSTILE_REMARK",
+      "tokens": [
+        { "kind": "literal", "value": "Puro salita ka lang." }
+      ]
+    },
+    {
+      "id": "construction.tl.social.comfort",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "COMFORT",
+      "dialogueAct": "QUESTION",
+      "tokens": [
+        { "kind": "literal", "value": "Ano ba talaga ang bumabagabag sa'yo?" }
+      ]
+    }
+  ]
+}

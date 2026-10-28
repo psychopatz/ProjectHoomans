@@ -53,6 +53,15 @@ function Engine.configure(context)
                 context.playerInventory
             )
         end,
+        getTraits = function()
+            local values = playerData.traits or playerData.socialTraits or {}
+            return {
+                size = function() return #values end,
+                get = function(_, index)
+                    return values[(tonumber(index) or 0) + 1]
+                end,
+            }
+        end,
     }
     player.characterUUID = playerData.characterUUID
     context.player = player

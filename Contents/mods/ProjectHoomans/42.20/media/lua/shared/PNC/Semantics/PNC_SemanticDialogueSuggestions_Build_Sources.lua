@@ -140,17 +140,19 @@ function Internal.CollectSuggestionBuildSources(state)
     -- orchestration spoke and retain their authoritative adapters.
     local providerTopic = topicFromIR(ir, nil)
         or canonicalTopic(context.currentTopic)
-    local providerContext = context
+    -- Providers consume an enriched, disposable projection.  The ordinary
+    -- context table remains untouched, and generated affordances receive only
+    -- already-selected semantic/discourse/interaction state rather than raw
+    -- text parsing authority.
+    local providerContext = {}
+    for key, value in pairs(context) do providerContext[key] = value end
+    providerContext.dialogueResult = result
+    providerContext.dialogueIR = ir
+    providerContext.dialogueDecision = decision
+    providerContext.interactionPlan = decision.interactionPlan
+    providerContext.discourseFrame = type(ir.extensions) == "table"
+        and ir.extensions.discourseFrame or nil
     local currentContextTopic = tostring(context.currentTopic or "")
-    local needsProviderContext = activeHubID ~= nil
-        or providerTopic ~= nil
-            and currentContextTopic ~= tostring(providerTopic)
-    if needsProviderContext then
-        providerContext = {}
-        for key, value in pairs(context) do
-            providerContext[key] = value
-        end
-    end
     if providerTopic ~= nil
         and currentContextTopic ~= tostring(providerTopic)
     then

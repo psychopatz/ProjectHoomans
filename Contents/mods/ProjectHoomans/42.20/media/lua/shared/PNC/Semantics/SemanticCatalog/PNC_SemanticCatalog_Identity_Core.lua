@@ -15,7 +15,7 @@ local IDENTITY_TAIL_WORDS = {
 -- wellbeing or need utterance cannot become a name claim.
 local IDENTITY_CAPTURE_STOP_WORDS = {
     "fine", "okay", "ok", "alright", "all", "right", "good", "well",
-    "thanks", "thank", "hungry", "starving", "famished", "thirsty", "parched",
+    "thanks", "thank", "sorry", "apologies", "hungry", "starving", "famished", "thirsty", "parched",
     "tired", "exhausted", "sleepy", "worn", "out", "really", "very", "so",
     "fucking", "damn", "now", "your", "turn", "btw",
     "nice", "to", "meet", "you", "please", "an",

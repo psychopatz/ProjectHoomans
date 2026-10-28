@@ -1,7 +1,7 @@
 # Progress — Coherent Emergent Conversation
 
 **Status:** IN PROGRESS.
-**Current phase:** C5 — storage topology and compiler context-health.
+**Current phase:** C9 — social effect / conduct-memory decoupling.
 **Branch:** existing `main`.
 
 ## Accepted foundation
@@ -55,29 +55,63 @@ Latest C5 validation:
 - C0 historical + C1–C4 live harness: **24/24 PASS** after C5 generation;
 - full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS** after C5 generation.
 
-## Immediate Next Chunk — C6
+## C6–C8 accepted — dynamic affordances, compositional realization and continuity
 
-Implement dynamic semantic player affordances through the existing DialogueSuggestions provider/ranking path.
+C6–C8 are developer-accepted as one coherent conversation slice.
 
-Read `DYNAMIC_CONVERSATION.md` before implementation.
+Accepted C6 behavior:
 
-Start by defining the bounded generated-affordance candidate contract and one provider that derives eligible positive/negative/neutral/contextual strategies from the current DiscourseFrame, active flow/beat, relationship/trait/world context and capability availability.
+- `DialogueSuggestions` remains the sole player-choice authority; generated choices enter through one registered `projecthoomans.generated_affordances` provider and the existing ranking/deduplication path;
+- generated candidates expose explicit `origin`, `stance`, `strategy`, typed semantic frame and bounded contextual evidence;
+- hostile conversational meaning can produce repair/challenge/dismiss/follow-up lanes, while player traits add only eligible contextual choices such as `CALL_BLUFF` for `Brave`;
+- player-trait provenance does not inspect or expose private NPC personality/trait values;
+- ordinary authored/static choices remain present and authored `await_player` offers suppress redundant generated alternatives;
+- generated button clicks submit their typed semantic frame directly through the existing semantic-click path. Display wording is never reparsed through NLU;
+- generated APOLOGIZE and typed `sorry` converge on the same social branch and reconciliation beat.
 
-Preserve authored/static candidates. Do not create a second button engine, do not generate free-form text as authority, and do not reparse displayed button wording through NLU.
+Accepted C7 behavior:
 
-C6 acceptance must prove:
+- compiler-owned `realization` shards are first-class C5 citizens with source ownership, generated semantic shard names and discovery-index routing;
+- `UtterancePlan` consumes canonical semantic concepts and safe slots only; arbitrary raw player text is not concatenated into output;
+- EN/TL locale constructions are independently authored and generated;
+- an aggressive NPC can receive recovered/fuzzy hostility and select `RETALIATE_VERBALLY/MIRROR`, producing EN `fuck you too.` or TL `Putang ina mo rin.` from reusable lexeme + construction records;
+- the authoritative response still retains its canonical Dialogue Content template/fallback; compositional realization affects presentation only and unsupported plans fall back to ordinary Dialogue Content;
+- grounded knowledge phrase families now preserve their concrete topic/answer arguments rather than collapsing to generic style text.
 
-- candidate origin, stance, strategy and contextual provenance are explicit;
-- authored choices remain available;
-- positive/negative/contextual generated choices appear only when semantically eligible;
-- trait/context-derived choices do not leak private NPC facts;
-- ranking/deduplication prevents near-duplicate button spam;
-- generated button clicks carry the typed semantic frame through the existing semantic-click path;
-- typed utterance and equivalent generated-button semantics converge on the same downstream result.
+Accepted C8 behavior:
+
+- short replies bind to the existing pending interaction through the C3 DiscourseFrame;
+- generated follow-up buttons explicitly reply to the current NPC response plan/topic and preserve canonical topic identity through semantic-click conversion;
+- hostility → generated apology exits argument escalation and enters reconciliation, with stale hostile affordances removed from the next surface;
+- grounded referents remain reusable through existing bounded mention/focus state;
+- topic interruption/resumption continues to use existing flow/dialogue state; no transcript store or new persistent conversation memory was added.
+
+Latest C6–C8 validation:
+
+- focused C6/C7 acceptance: **8/8 PASS**;
+- focused C8 acceptance: **5/5 PASS**;
+- combined C0–C8 / legacy continuity / C5 compiler acceptance: **64/64 PASS**;
+- full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS**;
+- canonical Conversation source tree remains byte-stable across two full generations;
+- generated Conversation tree: **136 files**, byte-identical across two consecutive full generations;
+- `git diff --check`: PASS.
+
+## Immediate Next Chunk — C9
+
+Decouple semantic/social reaction success from bounded conduct-memory persistence.
+
+Start from the existing conduct saturation baseline. Preserve bounded persistence, but represent separately:
+
+- interaction understood/accepted;
+- reaction/behavior selected;
+- relationship/social effect applied or rejected by its own authority;
+- durable conduct evidence persisted, coalesced, pruned or dropped by capacity policy.
+
+A full conduct ledger must never turn an otherwise understood social interaction into a semantic rejection merely because another evidence row cannot be retained.
 
 ## Remaining mandatory work
 
-C6 dynamic semantic affordances → C7 compositional utterance realization → C8 discourse continuity → C9 conduct-memory decoupling → C10 observability/fuzzing → C11 integrated acceptance.
+C9 conduct-memory decoupling → C10 observability/fuzzing → C11 integrated acceptance.
 
 ## Safety
 

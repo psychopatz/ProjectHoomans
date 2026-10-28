@@ -1,0 +1,255 @@
+-- Generated Conversation discovery index; do not edit by hand.
+return {
+    ["construction.en.social.acknowledge"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.acknowledge",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.agree"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.agree",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.apologize"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.apologize",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.ask_followup"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.ask_followup",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.ask_why"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.ask_why",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.call_bluff"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.call_bluff",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.challenge"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.challenge",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.comfort"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.comfort",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.deescalate"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.deescalate",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.disagree"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.disagree",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.dismiss"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.dismiss",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.mirror_retort"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.mirror_retort",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.tl.social.acknowledge"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.acknowledge",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.agree"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.agree",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.apologize"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.apologize",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.ask_followup"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.ask_followup",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.ask_why"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.ask_why",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.call_bluff"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.call_bluff",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.challenge"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.challenge",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.comfort"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.comfort",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.deescalate"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.deescalate",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.disagree"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.disagree",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.dismiss"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.dismiss",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.mirror_retort"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.mirror_retort",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["lexeme.social.agreement.yes"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes",
+        },
+        ["id"] = "lexeme.social.agreement.yes",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/lexemes.json",
+    },
+    ["lexeme.social.apology.sorry"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes",
+        },
+        ["id"] = "lexeme.social.apology.sorry",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/lexemes.json",
+    },
+    ["lexeme.social.disagreement.no"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes",
+        },
+        ["id"] = "lexeme.social.disagreement.no",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/lexemes.json",
+    },
+    ["lexeme.social.profanity.fuck"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes",
+        },
+        ["id"] = "lexeme.social.profanity.fuck",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/lexemes.json",
+    },
+}

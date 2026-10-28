@@ -97,7 +97,11 @@ function Ranking.ClassFor(candidate, actor, currentTopic)
     then
         return "BRANCH_CONTINUATION"
     end
-    if kind == "npc_response_plan" then return "DIRECT_RESPONSE" end
+    if kind == "npc_response_plan"
+        or kind == "generated_affordance"
+    then
+        return "DIRECT_RESPONSE"
+    end
     if kind == "permitted_capability" or kind == "dynamic_trading"
         or candidate and candidate.providerID == "dynamictrading.trader"
         or candidate and candidate.action ~= nil

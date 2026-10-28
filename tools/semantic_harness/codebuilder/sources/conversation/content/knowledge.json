@@ -236,32 +236,32 @@
         "guarded": [
           {
             "translations": {
-              "EN": "I know enough.",
-              "TL": "Sapat ang alam ko."
+              "EN": "I know enough about %1.",
+              "TL": "Sapat ang alam ko tungkol sa %1."
             }
           }
         ],
         "neutral": [
           {
             "translations": {
-              "EN": "I know about that.",
-              "TL": "May alam ako tungkol diyan."
+              "EN": "I know about %1.",
+              "TL": "May alam ako tungkol sa %1."
             }
           }
         ],
         "terse": [
           {
             "translations": {
-              "EN": "I know it.",
-              "TL": "Alam ko iyan."
+              "EN": "I know %1.",
+              "TL": "Alam ko ang %1."
             }
           }
         ],
         "warm": [
           {
             "translations": {
-              "EN": "I know about that. I can share what I remember.",
-              "TL": "May alam ako tungkol diyan. Maibabahagi ko ang naaalala ko."
+              "EN": "I know about %1.",
+              "TL": "May alam ako tungkol sa %1."
             }
           }
         ]

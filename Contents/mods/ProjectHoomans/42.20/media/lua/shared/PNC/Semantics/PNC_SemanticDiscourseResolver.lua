@@ -101,6 +101,15 @@ local function actFor(ir)
     return tostring(ir and (ir.intent or ir.speechAct) or "")
 end
 
+local function topicID(value)
+    if type(value) == "table" then
+        value = value.id or value.topic or value.subject
+    end
+    value = tostring(value or "")
+    if value == "" then return nil end
+    return value
+end
+
 local function replyLike(ir)
     return REPLY_ACTS[actFor(ir)] == true
         or REPLY_ACTS[tostring(ir and ir.speechAct or "")] == true
@@ -170,12 +179,12 @@ local function contextualAdjustment(candidate, snapshot)
         end
     end
 
-    local currentTopic = snapshot.currentTopic
+    local currentTopic = topicID(snapshot.currentTopic)
     local extensions = type(ir.extensions) == "table" and ir.extensions or {}
-    local irTopic = extensions.topic or ir.subject
+    local irTopic = topicID(extensions.topic) or topicID(ir.subject)
     if currentTopic and irTopic
-        and string.lower(tostring(currentTopic))
-            == string.lower(tostring(irTopic))
+        and string.lower(currentTopic)
+            == string.lower(irTopic)
     then
         adjustment = adjustment + 0.02
         appendEvidence(evidence, "current_topic_match")
@@ -195,7 +204,7 @@ local function frameFor(ir, snapshot, candidate, adjustment, evidence)
     local isReply = replyLike(ir)
     local extensions = type(ir.extensions) == "table" and ir.extensions or {}
 
-    local topic = extensions.topic or ir.subject
+    local topic = topicID(extensions.topic) or topicID(ir.subject)
     local topicSource = topic and "semantic" or nil
     if isReply and pending and pending.topic then
         topic = pending.topic

@@ -5,8 +5,8 @@ local Registry = PNC.Semantics.ConversationRegistry or {}
 PNC.Semantics.ConversationRegistry = Registry
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
-Registry.CONTENT_FINGERPRINT = "6382e5c7ffcfba83472edfd3e17d26f24773b1265901b712bcc8dc6843e87715"
-Registry.WHOLE_MODEL_FINGERPRINT = "44ae20a000ac64b7fc5f844f3e65d80c593e2bbdc2776184dd8d1675c9629e4d"
+Registry.CONTENT_FINGERPRINT = "7cda347c6e5953e99fa11b1c12832e7f52f7ccf3f033c7a9574d79cb3a349c57"
+Registry.WHOLE_MODEL_FINGERPRINT = "22a25c6e1076bf57efda558c9a5cf310f40d669207d425e2eae74fa33fb727b9"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -253,8 +253,11 @@ local loaded102 = require "PNC/Semantics/Generated/Conversation/Beats/Social/Rec
 appendBeats(loaded102)
 local loaded103 = require "PNC/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact"
 appendBeats(loaded103)
-local loaded104 = require "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"
-appendUI(loaded104)
+local loaded104 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn"
+local loaded105 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl"
+local loaded106 = require "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes"
+local loaded107 = require "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"
+appendUI(loaded107)
 for key, family in pairs(Registry.PHRASE_FAMILIES) do
     if type(family) == "table" and family.id then Registry.PHRASE_FAMILIES[key] = family end
 end

@@ -216,28 +216,28 @@ return {
         ["styles"] = {
             ["guarded"] = {
                 {
-                    ["fallback"] = "I know enough.",
+                    ["fallback"] = "I know enough about %1.",
                     ["id"] = "phrase.semantic.question.knowledge.known.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownGuarded01",
                 },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "I know about that.",
+                    ["fallback"] = "I know about %1.",
                     ["id"] = "phrase.semantic.question.knowledge.known.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownNeutral01",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "I know it.",
+                    ["fallback"] = "I know %1.",
                     ["id"] = "phrase.semantic.question.knowledge.known.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownTerse01",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "I know about that. I can share what I remember.",
+                    ["fallback"] = "I know about %1.",
                     ["id"] = "phrase.semantic.question.knowledge.known.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownWarm01",
                 },

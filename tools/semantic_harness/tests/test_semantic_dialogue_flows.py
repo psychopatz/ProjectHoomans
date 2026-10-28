@@ -71,7 +71,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             result = turn["result"]
             self.assertEqual(
                 result["candidateDiagnostics"]["reason"],
-                "eligible_candidate",
+                "contextual_discourse_candidate",
             )
             self.assertEqual(
                 result["candidates"]["selected"]["patternID"],

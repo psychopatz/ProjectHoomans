@@ -13,6 +13,8 @@ Realization.MAX_FAMILY_APPLICATIONS = 8
 
 local Style = PNC.Semantics.SpeechStyleContext
     or require "PNC/Semantics/PNC_SpeechStyleContext"
+local UtterancePlan = PNC.Semantics.UtterancePlan
+    or require "PNC/Semantics/PNC_SemanticUtterancePlan"
 local phraseRegistry
 do
     local ok, value = pcall(require,
@@ -268,12 +270,94 @@ local function applySegment(segment, style, blocked, context, salt, localSelecti
     }
 end
 
+local function compositionalInteractionResponse(
+    response, context, style, semanticPlan
+)
+    context = type(context) == "table" and context or {}
+    local interactionPlan = type(context.interactionPlan) == "table"
+        and context.interactionPlan or nil
+    local ir = type(context.dialogueIR) == "table"
+        and context.dialogueIR or nil
+    if not interactionPlan or not ir then
+        return nil, "interaction_context_unavailable"
+    end
+    local expectedTemplate = tostring(
+        interactionPlan.contentTemplateID or ""
+    )
+    if expectedTemplate == ""
+        or tostring(response.templateID or "") ~= expectedTemplate
+    then
+        return nil, "interaction_response_template_mismatch"
+    end
+
+    local plan, planReason = UtterancePlan.FromInteraction(
+        ir, interactionPlan, {
+            speaker = "npc",
+            target = "player",
+        }
+    )
+    if not plan then return nil, planReason end
+    local realized, reason = UtterancePlan.Realize(plan)
+    if not realized then return nil, reason end
+
+    local output = copy(response)
+    output.speechStyleContext = Style.PublicView(style)
+    output.utterancePlan = copy(plan)
+    output.utteranceRealization = copy(realized)
+    output.fallback = realized.text
+    output.renderPlan = {
+        schemaVersion = 1,
+        kind = "dialogue_act_plan",
+        dialogueAct = plan.dialogueAct ~= ""
+            and plan.dialogueAct or "REPLY",
+        groundedFactRefs = copy(
+            type(semanticPlan) == "table"
+                and semanticPlan.groundedFactRefs or {}
+        ) or {},
+        turns = {
+            {
+                id = "microplan",
+                separator = " ",
+                continuation = "end",
+                offers = {},
+                segments = {
+                    {
+                        kind = "literal",
+                        text = realized.text,
+                    },
+                },
+            },
+        },
+    }
+    if semanticPlan then output.plan = semanticPlan end
+    output.realization = {
+        family = "utterance_plan",
+        variant = tostring(realized.constructionID or ""),
+        applied = true,
+        applicationCount = 1,
+        neutralFallbackCount = 0,
+        maxApplications = Realization.MAX_FAMILY_APPLICATIONS,
+        compositional = true,
+    }
+    output.realizationFamily = "utterance_plan"
+    output.realizationVariant = realized.constructionID
+    output.semanticVariantID = output.selectionID
+    output.speechStyleVariant = style.variant
+    output.renderTemplateID = nil
+    return output, "utterance_plan_realized"
+end
+
 function Realization.Apply(response, context)
     if type(response) ~= "table" then return response end
     local style = Style.Resolve(context)
     local output = copy(response)
     local semanticPlan = type(response.plan) == "table"
         and copy(response.plan) or nil
+    local compositional, compositionalReason =
+        compositionalInteractionResponse(
+            response, context, style, semanticPlan
+        )
+    if compositional then return compositional end
     local renderPlan = output.plan
     local applications = 0
     local fallbackCount = 0
@@ -349,6 +433,9 @@ function Realization.Apply(response, context)
     }
     output.semanticVariantID = output.selectionID
     output.speechStyleVariant = style.variant
+    if type(context) == "table" and context.interactionPlan ~= nil then
+        output.utterancePlanFallbackReason = compositionalReason
+    end
     -- Keep the semantic response plan canonical while the renderer uses the
     -- realized copy. Queued payloads and decision results then share one
     -- stable plan identity without losing style-specific rendering.

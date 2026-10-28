@@ -111,6 +111,10 @@ end
 local function resolvedText(key, fallback)
     key = tostring(key or "")
     fallback = fallback or key
+    -- Provider-generated candidates may deliberately have no translation key
+    -- because their display sentence is already a locale realization. Never
+    -- cache those distinct fallbacks under one empty-string key.
+    if key == "" then return tostring(fallback or "") end
     local language = "EN"
     local manager = CustomTranslationManager
     if manager and type(manager.getLanguage) == "function" then
@@ -147,10 +151,13 @@ local ChoiceRegistry = require "PNC/Semantics/SemanticDialogueSuggestions/PNC_Se
 local StaticProvider = require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_StaticProvider"
 local CapabilityProvider = require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_CapabilityProvider"
 local SocialProvider = require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_SocialProvider"
+local GeneratedAffordanceProvider = require
+    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_GeneratedAffordanceProvider"
 
 ChoiceRegistry.RegisterProvider(StaticProvider)
 ChoiceRegistry.RegisterProvider(CapabilityProvider)
 ChoiceRegistry.RegisterProvider(SocialProvider)
+ChoiceRegistry.RegisterProvider(GeneratedAffordanceProvider)
 
 local function registerSourceProvider(id, sourceKind, order)
     ChoiceRegistry.RegisterProvider({
@@ -225,6 +232,7 @@ Internal.ChoiceRegistry = ChoiceRegistry
 Internal.StaticProvider = StaticProvider
 Internal.CapabilityProvider = CapabilityProvider
 Internal.SocialProvider = SocialProvider
+Internal.GeneratedAffordanceProvider = GeneratedAffordanceProvider
 Internal.DEFINITIONS = DEFINITIONS
 Internal.CAPABILITY_DEFINITIONS = CAPABILITY_DEFINITIONS
 Internal.CAMP_HERE_TEXT_KEY = CAMP_HERE_TEXT_KEY
