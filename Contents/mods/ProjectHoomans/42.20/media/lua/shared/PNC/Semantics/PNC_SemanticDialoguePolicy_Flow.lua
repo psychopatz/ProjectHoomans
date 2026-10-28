@@ -4,6 +4,8 @@ PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 local Semantic = require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local IR = Semantic.IR
+local SocialFeatures = require "PNC/Semantics/PNC_SemanticSocialFeatures"
+local RiskPolicy = require "PNC/Semantics/PNC_SemanticDialogueRiskPolicy"
 local Policy = PNC.Semantics.DialoguePolicy
 local Internal = Policy.Internal or {}
 Policy.Internal = Internal
@@ -30,6 +32,9 @@ local interactionDirector = Internal.InteractionDirector
 
 function Policy.Decide(ir, state, context, options)
     options = type(options) == "table" and options or {}
+    if SocialFeatures and type(SocialFeatures.Annotate) == "function" then
+        SocialFeatures.Annotate(ir)
+    end
     local limits = thresholds(options)
     local hasLLM = llmEnabled(context, options)
 
@@ -81,56 +86,34 @@ function Policy.Decide(ir, state, context, options)
     end
 
     local diagnostics = ir.diagnostics or {}
-    local confidence = tonumber(ir.confidence) or 0
     local giftOffer = classifyGiftOffer(ir)
-    if diagnostics.noMatch == true or confidence < limits.medium then
+    if diagnostics.noMatch == true then
         local result = decision(
             ir,
             hasLLM and "llm_fallback" or "deterministic",
             hasLLM and "AMBIGUOUS_INPUT" or "ASK_CLARIFICATION",
-            diagnostics.noMatch == true and "no_match" or "low_confidence",
+            "no_match",
             options
         )
         result.diagnostics.llmEligible = hasLLM
         return finish(result)
     end
 
-    -- A resolvable reference is required before a semantic action can be
-    -- handed to a downstream command adapter. The policy itself never
-    -- resolves world entities; it chooses clarification or fallback.
-    if (diagnostics.unresolvedEntity == true
-            and not unresolvedItemRequest(ir)
-            and not unresolvedOffer(ir)
-            and not isInventoryQuery(ir)
-            and not isLocalFactQuestion(ir)
-            and not isBackstoryContextQuestion(ir, context)
-            and not unresolvedWorldTargetRequest(ir)
-            and not isIdentityClaim(ir)
-            and not isEntityIndependentSocialAct(ir))
-        or (confidence < limits.high and not giftOffer)
-    then
+    local risk = RiskPolicy.Assess(ir, context, options)
+    if risk.accepted ~= true then
+        local llmEligibleForRisk = hasLLM
+            and risk.riskClass ~= "mutating"
+            and risk.riskClass ~= "identity_mutation"
+            and risk.riskClass ~= "transactional_offer"
         local result = decision(
             ir,
-            "deterministic",
-            "ASK_CLARIFICATION",
-            diagnostics.unresolvedEntity == true
-                and "unresolved_reference" or "medium_confidence",
+            llmEligibleForRisk and "llm_fallback" or "deterministic",
+            llmEligibleForRisk and "AMBIGUOUS_INPUT" or "ASK_CLARIFICATION",
+            risk.reason,
             options
         )
-        result.diagnostics.llmEligible = hasLLM
-        return finish(result)
-    end
-
-    if fuzzyActionNeedsConfirmation(ir, options) then
-        local result = decision(
-            ir,
-            "deterministic",
-            "ASK_CLARIFICATION",
-            "fuzzy_action_requires_confirmation",
-            options
-        )
-        result.diagnostics.llmEligible = hasLLM
-        result.diagnostics.fuzzyActionRequiresConfirmation = true
+        result.diagnostics.llmEligible = llmEligibleForRisk
+        result.diagnostics.riskAssessment = risk
         return finish(result)
     end
 
@@ -152,6 +135,7 @@ function Policy.Decide(ir, state, context, options)
     local result = decision(ir, "deterministic", branch, reason, options)
     result.giftConsent = giftConsent
     result.diagnostics.llmEligible = hasLLM
+    result.diagnostics.riskAssessment = risk
     if state then
         result.diagnostics.stateSequence = state.sequence
         result.diagnostics.currentTopic = state.currentTopic

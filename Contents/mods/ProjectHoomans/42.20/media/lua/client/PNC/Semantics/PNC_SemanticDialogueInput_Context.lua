@@ -56,6 +56,7 @@ local ContextProjection = require
     "PNC/Semantics/PNC_SemanticDialogueInput_ContextProjection"
 local SemanticHubPresentationState = require
     "PNC/Semantics/PNC_SemanticDialogueHubPresentationState"
+local SocialFeatures = require "PNC/Semantics/PNC_SemanticSocialFeatures"
 local Requests = require "PNC/Semantics/PNC_SemanticDialogueInput_Requests"
 local RouterLifecycle = require
     "PNC/Semantics/PNC_SemanticDialogueInput_RouterLifecycle"
@@ -121,6 +122,9 @@ function Internal.Parse(value, options)
     if ir and Topics and type(Topics.Annotate) == "function" then
         Topics.Annotate(ir, value)
     end
+    if ir and SocialFeatures and type(SocialFeatures.Annotate) == "function" then
+        SocialFeatures.Annotate(ir)
+    end
     return ir, reason
 end
 
@@ -139,6 +143,11 @@ function Internal.ParseCandidates(value, options)
             candidate = candidates[index]
             if candidate and candidate.ir then
                 Topics.Annotate(candidate.ir, value)
+                if SocialFeatures
+                    and type(SocialFeatures.Annotate) == "function"
+                then
+                    SocialFeatures.Annotate(candidate.ir)
+                end
             end
         end
         if bundle.selected and bundle.selected.ir then

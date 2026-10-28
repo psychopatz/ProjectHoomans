@@ -62,6 +62,71 @@ local function directedSocialEmit(speechAct, intensity)
     }
 end
 
+local function worldComplaintEmit(intensity)
+    return {
+        intent = "COMPLAIN",
+        speechAct = "COMPLAIN",
+        subject = "WORLD",
+        modifiers = {
+            directed = false,
+            worldDirected = true,
+        },
+        emotionalState = {
+            valence = "negative",
+            intensity = intensity or "moderate",
+        },
+        socialContext = {
+            directed = false,
+            worldDirected = true,
+            target = "WORLD",
+        },
+    }
+end
+
+local function maliciousWishEmit()
+    return {
+        intent = "HOSTILE_REMARK",
+        speechAct = "HOSTILE_REMARK",
+        subject = "RECIPIENT",
+        modifiers = {
+            directed = true,
+        },
+        emotionalState = {
+            valence = "negative",
+            intensity = "high",
+        },
+        socialContext = {
+            directed = true,
+            target = "RECIPIENT",
+            hostility = "high",
+            maliciousWish = true,
+            threat = false,
+        },
+    }
+end
+
+local function negatedNegativeAssessmentEmit()
+    return {
+        intent = "COMPLIMENT",
+        speechAct = "COMPLIMENT",
+        subject = "RECIPIENT",
+        modifiers = {
+            directed = true,
+            negated = true,
+        },
+        emotionalState = {
+            valence = "positive",
+            intensity = "mild",
+        },
+        socialContext = {
+            directed = true,
+            target = "RECIPIENT",
+            affiliative = true,
+            negatedNegative = true,
+        },
+    }
+end
+
 local function registerDirectedPattern(
     id,
     match,
@@ -386,6 +451,9 @@ Internal.RegisterConcept = registerConcept
 Internal.RegisterPattern = registerPattern
 Internal.RegisterSpeechAct = registerSpeechAct
 Internal.DirectedSocialEmit = directedSocialEmit
+Internal.WorldComplaintEmit = worldComplaintEmit
+Internal.MaliciousWishEmit = maliciousWishEmit
+Internal.NegatedNegativeAssessmentEmit = negatedNegativeAssessmentEmit
 Internal.RegisterDirectedPattern = registerDirectedPattern
 Internal.SelfReflectionEmit = selfReflectionEmit
 Internal.ComplimentEmit = complimentEmit

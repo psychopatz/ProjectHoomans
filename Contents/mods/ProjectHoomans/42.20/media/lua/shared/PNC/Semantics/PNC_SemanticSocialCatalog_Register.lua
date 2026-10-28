@@ -5,6 +5,9 @@ local registerSpeechAct = Internal.RegisterSpeechAct
 local registerConcept = Internal.RegisterConcept
 local registerPattern = Internal.RegisterPattern
 local registerDirectedPattern = Internal.RegisterDirectedPattern
+local worldComplaintEmit = Internal.WorldComplaintEmit
+local maliciousWishEmit = Internal.MaliciousWishEmit
+local negatedNegativeAssessmentEmit = Internal.NegatedNegativeAssessmentEmit
 local selfReflectionEmit = Internal.SelfReflectionEmit
 local complimentEmit = Internal.ComplimentEmit
 local relationshipStatusQuestionEmit = Internal.RelationshipStatusQuestionEmit
@@ -23,6 +26,7 @@ function Social.Register()
     registerSpeechAct("HOSTILE_REMARK")
     registerSpeechAct("SELF_REFLECTION")
     registerSpeechAct("COMPLIMENT")
+    registerSpeechAct("COMPLAIN")
 
     -- Keep hostile vocabulary in the catalog. Explicit hostile phrases may
     -- carry up to eight trailing words such as "then" without requiring each
@@ -62,6 +66,12 @@ function Social.Register()
         "i will kill you", "i'll kill you", "i am going to kill you",
         "i'm going to kill you", "you are going to die", "you're going to die",
     }, 4)
+    registerConcept("DEATH_OUTCOME", {
+        "die", "dead",
+    }, 4)
+    registerConcept("NEGATIVE_ASSESSMENT", {
+        "bad", "awful", "terrible", "horrible",
+    }, 3)
     registerConcept("SELF_BLAME", {
         "my fault", "it was my fault", "i messed up", "i screwed up",
         "i made a mistake", "i'm to blame", "i am to blame",
@@ -174,6 +184,95 @@ function Social.Register()
         0.97,
         145
     )
+    local complaintWithProfanity = worldComplaintEmit("high")
+    complaintWithProfanity.slots = {
+        complaintTarget = {
+            type = "TEXT",
+            value = "$capture.worldSubject.text",
+        },
+    }
+    registerPattern(
+        "pnc.social.world_complaint_profanity_hate",
+        {
+            { kind = "literal", value = "i" },
+            { kind = "concept", id = "PROFANITY" },
+            { kind = "literal", value = "hate" },
+            { kind = "literal", value = "this", optional = true },
+            {
+                kind = "any_phrase",
+                capture = "worldSubject",
+                minTokens = 1,
+                maxTokens = 4,
+            },
+        },
+        complaintWithProfanity,
+        0.98,
+        158
+    )
+
+    local complaint = worldComplaintEmit("moderate")
+    complaint.slots = {
+        complaintTarget = {
+            type = "TEXT",
+            value = "$capture.worldSubject.text",
+        },
+    }
+    registerPattern(
+        "pnc.social.world_complaint_hate",
+        {
+            { kind = "literal", value = "i" },
+            { kind = "literal", value = "hate" },
+            { kind = "literal", value = "this", optional = true },
+            {
+                kind = "any_phrase",
+                capture = "worldSubject",
+                minTokens = 1,
+                maxTokens = 4,
+            },
+        },
+        complaint,
+        0.96,
+        157
+    )
+
+    registerPattern(
+        "pnc.social.malicious_wish_death",
+        {
+            { kind = "literal", value = "i" },
+            { kind = "literal", value = "hope" },
+            { kind = "literal", value = "that", optional = true },
+            { kind = "literal", value = "you" },
+            { kind = "concept", id = "DEATH_OUTCOME" },
+        },
+        maliciousWishEmit(),
+        0.98,
+        160
+    )
+
+    registerPattern(
+        "pnc.social.negated_negative_youre",
+        {
+            { kind = "literal", value = "you're" },
+            { kind = "literal", value = "not" },
+            { kind = "concept", id = "NEGATIVE_ASSESSMENT" },
+        },
+        negatedNegativeAssessmentEmit(),
+        0.98,
+        159
+    )
+    registerPattern(
+        "pnc.social.negated_negative_you_are",
+        {
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "not" },
+            { kind = "concept", id = "NEGATIVE_ASSESSMENT" },
+        },
+        negatedNegativeAssessmentEmit(),
+        0.98,
+        159
+    )
+
     registerDirectedPattern(
         "pnc.social.insult_you_are",
         {

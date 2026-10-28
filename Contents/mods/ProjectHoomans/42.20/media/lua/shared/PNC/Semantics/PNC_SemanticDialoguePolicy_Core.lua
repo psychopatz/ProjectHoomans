@@ -5,6 +5,8 @@ local Semantic = require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local IR = Semantic.IR
 local CandidateEligibility = require
     "PNC/Semantics/PNC_SemanticDialogueCandidateEligibility"
+local DiscourseResolver = require
+    "PNC/Semantics/PNC_SemanticDiscourseResolver"
 local FlowKernel = require
     "PNC/Semantics/PNC_SemanticDialogueFlowKernel"
 local SemanticOffer = PNC.Gifts
@@ -222,10 +224,11 @@ Internal.FuzzySafeActions = FUZZY_SAFE_ACTIONS
 Internal.ItemRequestActions = ITEM_REQUEST_ACTIONS
 Internal.RegisterTextFallback = registerTextFallback
 Internal.CandidateEligibility = CandidateEligibility
+Internal.DiscourseResolver = DiscourseResolver
 Internal.FlowKernel = FlowKernel
 
 function Policy.SelectCandidate(bundle, state, context, options, contextResolver)
-    return CandidateEligibility.Select(
+    return DiscourseResolver.Select(
         bundle, state, context, options, contextResolver
     )
 end

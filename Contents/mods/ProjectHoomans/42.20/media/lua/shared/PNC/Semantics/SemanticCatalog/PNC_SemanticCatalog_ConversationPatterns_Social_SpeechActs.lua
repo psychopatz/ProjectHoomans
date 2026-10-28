@@ -71,6 +71,19 @@ function Internal.RegisterSocialSpeechActs()
     )
 
     registerPattern(
+        "pnc.social.skepticism",
+        { "@SKEPTICISM" },
+        {
+            intent = "DISAGREE",
+            speechAct = "DISAGREE",
+            modifiers = { skeptical = true },
+            socialContext = { skepticism = true },
+        },
+        0.91,
+        73
+    )
+
+    registerPattern(
         "pnc.social.greet",
         { "@GREET" },
         { intent = "GREET", speechAct = "GREET" },

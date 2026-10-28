@@ -51,6 +51,10 @@ function Internal.RegisterDialogueConcepts()
         "not this time", "that doesn't work", "that does not work",
         "i'd rather not",
     })
+    registerConcept("SKEPTICISM", {
+        "yeah right", "as if", "sure you did", "right sure",
+        "i don't believe that", "i do not believe that",
+    }, 3)
     registerConcept("GREET", {
         "hello", "hello there", "hi", "hi there", "hey", "hey there",
         "good morning", "good afternoon", "good evening",

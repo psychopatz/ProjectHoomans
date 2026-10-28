@@ -41,13 +41,23 @@ local function llmEnabled(context, options)
 end
 
 local function fuzzyActionNeedsConfirmation(ir, options)
-    if type(ir) ~= "table" or type(ir.diagnostics) ~= "table"
-        or ir.diagnostics.fuzzyMatch ~= true
-        or ir.intent ~= "REQUEST"
-    then
+    if type(ir) ~= "table" or ir.intent ~= "REQUEST" then
         return false
     end
-    if type(options) == "table" and options.allowFuzzyActions == true then
+    local diagnostics = type(ir.diagnostics) == "table"
+        and ir.diagnostics or {}
+    local provenance = type(ir.provenance) == "table"
+        and ir.provenance or {}
+    local fuzzy = diagnostics.fuzzyMatch == true
+    local recovered = diagnostics.recoveredMatch == true
+        or type(provenance.surfaceRecovery) == "table"
+    if not fuzzy and not recovered then return false end
+
+    options = type(options) == "table" and options or {}
+    if fuzzy and not recovered and options.allowFuzzyActions == true then
+        return false
+    end
+    if recovered and options.allowRecoveredActions == true then
         return false
     end
     return not FUZZY_SAFE_ACTIONS[ir.action]

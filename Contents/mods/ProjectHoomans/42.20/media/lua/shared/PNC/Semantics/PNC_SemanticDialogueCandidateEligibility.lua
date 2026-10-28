@@ -9,6 +9,7 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Semantic = require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local IR = Semantic.IR
+local ActionRisk = require "PNC/Semantics/PNC_SemanticActionRiskCatalog"
 
 local Eligibility = PNC.Semantics.DialogueCandidateEligibility or {}
 PNC.Semantics.DialogueCandidateEligibility = Eligibility
@@ -169,12 +170,27 @@ function Eligibility.Evaluate(candidate, state, context, options,
     -- A fuzzy interpretation may still be useful for conversation, but a
     -- mutating action must wait for an exact candidate or explicit
     -- confirmation. The ordinary policy remains the final safety gate.
-    if candidate.fuzzy == true and ir.action ~= nil
-        and options.allowFuzzyCandidates ~= true
-    then
-        return false, "fuzzy_mutating_action", {
-            action = ir.action,
-        }
+    if ir.action ~= nil then
+        local fuzzyUsed = candidate.fuzzy == true
+            and type(candidate.match) == "table"
+            and (tonumber(candidate.match.fuzzyCount) or 0) > 0
+        if fuzzyUsed
+            and options.allowFuzzyCandidates ~= true
+            and not ActionRisk.IsFuzzySafe(ir.action)
+        then
+            return false, "fuzzy_mutating_action", {
+                action = ir.action,
+                fuzzyCount = candidate.match.fuzzyCount,
+            }
+        end
+        if candidate.recovered == true
+            and options.allowRecoveredCandidates ~= true
+        then
+            return false, "recovered_mutating_action", {
+                action = ir.action,
+                recovery = copyValue(candidate.surfaceRecovery),
+            }
+        end
     end
 
     if metadata.requiresResolvedReferences == true then

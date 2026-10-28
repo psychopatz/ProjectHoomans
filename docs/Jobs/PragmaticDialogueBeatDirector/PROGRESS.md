@@ -1,49 +1,68 @@
 # Progress — Coherent Emergent Conversation
 
 **Status:** IN PROGRESS.
-**Current phase:** C0 — failure corpus, ownership audit and baselines.
+**Current phase:** C5 — storage topology and compiler context-health.
 **Branch:** existing `main`.
 
 ## Accepted foundation
 
-The prior Pragmatic Interaction Director recovery R0–R9 is developer-accepted at ProjectHoomans commit `ee825b71`.
+The prior Pragmatic Interaction Director recovery R0–R9 remains protected.
 
-Protected foundation:
+C0–C4 are now developer-accepted on the paired ProjectHoomans / PsychopatzCore checkout. C0A reports under `tools/semantic_harness/reports/c0a/` are immutable historical pre-C1 evidence; later phases must not rewrite them to match improved runtime behavior.
 
-- single ResponsePlan / Dialogue Content speech authority;
-- modular generated interaction registry;
-- shared predicates and typed stimuli/providers;
-- pragmatic resolver + Interaction Director;
-- bounded event-driven beats/scenes/LOD;
-- NPC-to-NPC and multi-NPC semantic interaction;
-- shared speech/emote/flavor outputs;
-- integrated Semantic Lab interaction authoring/trace;
-- deterministic generation and bounded semantic memory.
+PsychopatzCore C1 implementation is committed at `3744a7dfab00b2b97e86141f0fd25664523de92b`.
 
-## Verified C0A baseline
+Accepted behavior:
 
-Checked-in fixtures and bounded reports live under `tools/semantic_harness/fixtures/c0a/` and `tools/semantic_harness/reports/c0a/`. They use fresh sessions of the real Lua `LuaSemanticWorker`; Python only transports scenarios and projects returned fields.
+- Core `ParseCandidates()` supports bounded registry-derived compact/no-space recovery, conservative expressive elongation, common contraction recovery, unique vocabulary segmentation, recovery costs and provenance. Exact parsing remains the preferred path and recovered mutating actions are not silently authorized.
+- ProjectHoomans composes social features after semantic interpretation: recipient/self/world directedness, hostility, affiliation, threat, contempt, distress and intensity are bounded projections rather than a second sentiment parser.
+- Specific grammar now distinguishes malicious wish vs threat, world complaint vs recipient hostility, intensified self-state vs identity claim, and negated-negative assessment vs insult.
+- The Contextual Discourse Resolver consumes Core candidates plus existing bounded DialogueContextState. It attaches one explainable DiscourseFrame with pending interaction, topic, subject, reply-to, contextual support and evidence without reparsing raw text.
+- Risk-aware admission separates conversation/read-only interpretation from gameplay mutation. Context may reinforce safe conversation; exact high-confidence mutations stay strict; safe fuzzy movement preserves the existing FOLLOW/STOP/STAY contract; recovered mutation is blocked; exact open-text item/world binding may defer only to existing authoritative selectors; typo-like fuzzy inventory/task interpretations clarify.
+- C0A characterization tests now read the historical snapshots instead of comparing them to the continuously improving live worker.
 
-- Corpus: 23 cases cover compact/no-space, elongation/typo, hostility/threat/wish, self/world profanity, negation, short context replies, benign controls, and mutating-action safety. Current failures include all five compact hostility controls except `fuckyou`, `i hope you die` understood fuzzily at `0.83` but clarified, `i'm fucking starving` routed as an identity claim with an attempted mutation, and `give me waterr` reaching `SemanticTaskRequest`.
-- Multi-turn: the NPC greeting follow-up stores a pending question, but player `not really` selects generic `DISAGREE` and cancels the flow. Apology selects `behavior.reconcile`; `yeah right` remains clarification. Time/date continuation retains the time topic; changing to wellbeing starts a new flow.
-- Suggestions: current candidates mix authored/static `conversation_root`/`typed_input` rows with derived `active_flow`, `npc_response_plan`, and `social_context` rows. Frames carry intent/speech act/subject/topic, ranks are unique in the captured surfaces, no stance/polarity fields are present, and `question.time` clicks re-enter the typed semantic-click route.
-- Reply realization: retaliation, agreement, thanks, and apology use production phrase families; disagreement currently falls back without a phrase family; greeting follow-up is a two-turn plan using the same family. No composition behavior was added.
-- Storage: 54 canonical source files / 486 locations; source manifest 5,098 bytes; 53 planned generated shards. Largest current shards include `Event.lua` (32,486 bytes), `SocialPart03.lua` (32,168), `Command.lua` (32,129), and `Question.lua` (31,766). Numeric overflow includes every current `CommandPart02`, `EventPart02`, `SocialPart02`–`04`, `TaskPart02`, and `QuestionPart02`; opaque names remain `Massive.lua` and `Sgd.lua`. Exact flow IDs use the current `.flow` runtime alias; no unresolved alias, generated-definition collision, registry reference, or unplanned-runtime-module was detected.
-- Conduct: disposable production-service state reproduces `evidence_pruned_by_limit` for a weak 65th temporary record and `permanent_evidence_limit` for a 65th permanent record. Understanding, reaction selection, relationship effects, and durable evidence are reported separately.
+Current validation:
 
-Current relevant-suite baseline: C0A Python regression 9/9; required Semantic Harness Lua filters 12/12; full `pnc_semantic` Lua suite 98/98. Two pre-existing Python assertions remain: the speech registry family expectation for `semantic.flow.greeting.opening.default`, and the GUI lineage expectation for the stale `common_responses.json` source name. No C1+ behavior, generated shard, source save, Core semantic implementation, or persistence policy was changed.
+- Core surface-recovery smoke: PASS.
+- Core semantic pattern-matcher smoke: PASS.
+- C0 historical + C1–C4 live Python harness: 24/24 PASS.
+- C4 direct risk-policy smoke: PASS.
+- full ProjectHoomans `pnc_semantic` Lua suite: 99/99 PASS.
+- `git diff --check`: clean before phase transition.
+
+## C5 current truth
+
+The existing Conversation compiler already has deterministic recursive source-root discovery and 54 canonical source files, but runtime sharding still groups by broad domains. That creates numeric overflow modules such as `SocialPart02.lua`, `CommandPart02.lua`, `QuestionPart02.lua`, plus opaque pattern names such as `Massive.lua` and `Sgd.lua`.
+
+Measured canonical hard-budget issues before migration:
+
+- `content/social/emotes.json` is ~20.9 KB, above the planned ~16 KB hard canonical ceiling.
+- `content/command/lifecycle.json`, `content/social/tool_replies.json`, `content/task/lifecycle.json`, and `content/task/tool_replies.json` exceed the planned 32-definition hard shard budget if generated one source→one shard.
+- Generated broad-domain output currently contains 53 data shards and several ~32 KB overflow parts.
+
+## Immediate Next Chunk
+
+Use canonical source ownership as the generated-shard key instead of broad domain. Split only the canonical sources that violate hard context budgets into semantically named source directories, then add compiler-owned context-health and lightweight discovery/affected-closure indexes.
+
+C5 acceptance still requires:
+
+- zero numeric/opaque generated Conversation shard names;
+- no hard source/generated/index budget violations;
+- deterministic recursive discovery and lightweight ID→source→generated routing;
+- bounded affected-closure metadata;
+- two byte-identical full generations;
+- existing semantic/runtime behavior unchanged.
 
 ## Remaining mandatory work
 
-C1 surface recovery → C2 compositional social features → C3 Contextual Discourse Resolver → C4 risk-aware acceptance → C5 storage topology/context-health → C6 dynamic semantic affordances → C7 compositional utterance realization → C8 discourse continuity → C9 conduct-memory decoupling → C10 observability/fuzzing → C11 integrated acceptance.
+C5 storage/context-health → C6 dynamic semantic affordances → C7 compositional utterance realization → C8 discourse continuity → C9 conduct-memory decoupling → C10 observability/fuzzing → C11 integrated acceptance.
 
 ## Safety
 
 - no new branch;
-- verify both repositories before cross-repo edits;
 - preserve unrelated user work;
 - no Workshop publication;
 - no native PZ launch for ordinary developer acceptance;
 - no source-save mutation;
 - no root `AGENTS.md` goal-state edits;
-- no hand-editing generated artifacts.
+- no hand-editing generated runtime artifacts; generated Conversation output changes only through CodeBuilder.
