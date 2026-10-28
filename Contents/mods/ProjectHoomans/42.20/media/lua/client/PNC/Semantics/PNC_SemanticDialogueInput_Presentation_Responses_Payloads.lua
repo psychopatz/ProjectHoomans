@@ -99,6 +99,10 @@ local function payloadForPlanTurn(response, rendered, fallbackRendered)
             or response.phraseSemanticTemplateID,
         phraseSelection = response.phraseSelection,
         realizationFallbackReason = response.realizationFallbackReason,
+        utterancePlan = response.utterancePlan,
+        utteranceRealization = response.utteranceRealization,
+        utterancePlanFallbackReason =
+            response.utterancePlanFallbackReason,
         renderTemplateID = response.renderTemplateID,
     }
 end
@@ -175,6 +179,10 @@ local function payloadsForResponse(response)
             phraseSemanticTemplateID = response.phraseSemanticTemplateID,
             phraseSelection = response.phraseSelection,
             realizationFallbackReason = response.realizationFallbackReason,
+            utterancePlan = response.utterancePlan,
+            utteranceRealization = response.utteranceRealization,
+            utterancePlanFallbackReason =
+                response.utterancePlanFallbackReason,
             renderTemplateID = renderTemplateID,
         },
     }

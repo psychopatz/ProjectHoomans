@@ -1,7 +1,7 @@
 # Progress — Coherent Emergent Conversation
 
 **Status:** IN PROGRESS.
-**Current phase:** C10 — Semantic Lab observability and fuzz/regression tools.
+**Current phase:** C11 — integrated acceptance and live-test handoff.
 **Branch:** existing `main`.
 
 ## Accepted foundation
@@ -121,15 +121,37 @@ Latest C9 validation:
 - full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS**;
 - bounded conduct storage size is unchanged by pruned social evidence.
 
-## Immediate Next Chunk — C10
+## C10 accepted — Semantic Lab observability and fuzz/regression
 
-Expose a bounded end-to-end Semantic Lab observation contract for surface recovery → candidates → contextual discourse → affordances → semantic-click frame → pragmatic/interaction plan → UtterancePlan/realization → storage ownership → social/conduct outcome.
+C10 is developer-accepted.
 
-Add deterministic mutation/fuzz regression for spacing, repeated letters, punctuation, capitalization and safe typo classes. Keep reports queryable and bounded; do not create another monolithic snapshot.
+Accepted behavior:
+
+- the existing Conversation Inspector now exposes bounded sections for surface normalization/recovery, candidate arbitration, DiscourseFrame/social features, generated affordances, selected semantic-click frame, pragmatic/interaction state, UtterancePlan/realization, storage ownership and social-effect/conduct-memory outcomes;
+- queue-ready response payloads preserve presentation-only UtterancePlan/realization metadata for the inspector without changing semantic/action authority;
+- storage pointers resolve compiler-owned canonical IDs to source path, generated shard, bounded related/dependent IDs and context-health status through the C5 discovery model; unresolved non-Conversation catalog IDs remain explicitly unresolved instead of being guessed;
+- social interaction projection separates understood semantic act, selected reaction/beat/behavior, relationship effect and conduct persistence outcome;
+- the existing human-readable Conversation Inspector rendering shows the new bounded chain before the separate command-authority section;
+- the bounded real-worker mutation matrix covers compact spacing, repeated letters, punctuation/capitalization, safe social typos, safe fuzzy movement, unsafe item typos and intensified self-state controls;
+- fuzz rows report only compact semantic/risk/authority facts and never persist a transcript or giant worker snapshot.
+
+Latest C10 validation:
+
+- focused C10 chain/fuzz acceptance: **3/3 PASS**;
+- Conversation Inspector + Semantic Lab persona regression: **12/12 PASS** including C10;
+- full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS**;
+- fuzz safety controls: PASS, including zero transport for the unsafe item-typo case;
+- Python compilation, Lua syntax and `git diff --check`: PASS.
+
+## Immediate Next Chunk — C11
+
+Run the final integrated acceptance matrix across C0–C10 plus NPC-to-NPC interaction regression, generation idempotence/context-health, bounded performance, source/save immutability and no transcript/ModData bloat.
+
+Do not launch or publish Project Zomboid. When all developer gates pass, update this ledger to **READY FOR USER LIVE TEST** and leave native gameplay verification to the user.
 
 ## Remaining mandatory work
 
-C10 observability/fuzzing → C11 integrated acceptance.
+C11 integrated acceptance and live-test handoff.
 
 ## Safety
 

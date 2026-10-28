@@ -18,11 +18,18 @@ def conversation_first(value: Any) -> str:
 
     sections = (
         ("UNDERSTANDING", value.get("understanding", {})),
+        ("SURFACE + RECOVERY", value.get("surface", {})),
+        ("CANDIDATE SELECTION", value.get("candidateSelection", {})),
+        ("DISCOURSE FRAME", value.get("discourse", {})),
         ("CONTEXT", value.get("context", {})),
         ("SOCIAL CONTEXT", value.get("socialContext", {})),
+        ("DYNAMIC AFFORDANCES", value.get("affordances", {})),
         ("PERSONA + CHOICES", value.get("personaChoices", {})),
         ("FACTS AND PROVENANCE", value.get("facts", {})),
         ("DIALOGUE PLANNING", value.get("dialoguePlanning", {})),
+        ("UTTERANCE REALIZATION", value.get("realization", {})),
+        ("STORAGE OWNERSHIP", value.get("storagePointers", {})),
+        ("SOCIAL EFFECT + CONDUCT MEMORY", value.get("socialEffect", {})),
         ("FINAL NPC RESPONSE", value.get("finalResponse", {})),
         ("COMMAND AUTHORITY (SEPARATE)", value.get("commandAuthority", {})),
     )

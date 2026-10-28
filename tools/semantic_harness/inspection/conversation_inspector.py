@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 from .conversation_inspector_authority import project as project_authority
+from .conversation_inspector_chain import project as project_chain
 from .conversation_inspector_context import project as project_context
 from .conversation_inspector_persona import project as project_persona
 from .conversation_inspector_response import project as project_response
@@ -25,6 +26,7 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
     persona_choices = project_persona(state)
     semantic_projection = project_semantics(state)
     response_projection = project_response(state)
+    chain_projection = project_chain(state)
     authority_projection = project_authority(
         state, semantic_projection, response_projection
     )
@@ -38,6 +40,13 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
         "understanding": bounded(
             semantic_projection["understanding"], limit=16
         ),
+        "surface": chain_projection["surface"],
+        "candidateSelection": chain_projection["candidateSelection"],
+        "discourse": chain_projection["discourse"],
+        "affordances": chain_projection["affordances"],
+        "realization": chain_projection["realization"],
+        "storagePointers": chain_projection["storagePointers"],
+        "socialEffect": chain_projection["socialEffect"],
         "facts": bounded(semantic_projection["facts"], limit=32),
         "socialContext": bounded(
             semantic_projection["social_context"], limit=48
