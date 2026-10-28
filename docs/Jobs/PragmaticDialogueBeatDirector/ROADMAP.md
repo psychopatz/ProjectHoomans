@@ -4,7 +4,7 @@
 
 The completed R0–R9 recovery is accepted foundation and is intentionally not repeated here. Git history contains that implementation record.
 
-The remaining developer objective is C0–C10.
+The remaining developer objective is C0–C11.
 
 ## C0 — failure corpus, ownership audit and baselines
 
@@ -95,7 +95,43 @@ Fix the known class where a recognized `HOSTILE_REMARK` around 0.83 becomes gene
 
 **Gate:** conversational understanding improves without increasing unsafe action execution.
 
-## C5 — dynamic semantic player affordances
+## C5 — storage topology and compiler context-health
+
+Read `STORAGE_TOPOLOGY.md` for the detailed topology/budget contract.
+
+Harden CodeBuilder storage before dynamic affordances/utterance composition multiply the number of semantic building blocks.
+
+Canonical-source requirements:
+
+- one bounded semantic unit per source file where practical;
+- path hierarchy communicates kind/domain/subdomain/semantic purpose;
+- IDs mirror path ownership where practical;
+- deterministic recursive discovery from approved source roots;
+- root manifest remains configuration, not a giant catalog.
+
+Generated-output requirements:
+
+- semantic-family shards rather than giant aggregates;
+- indexes point to owning shards instead of embedding all definitions;
+- no numeric overflow names such as `SocialPart02.lua`, `CommandPart02.lua`, or `QuestionPart02.lua`;
+- no opaque generated conversation shard names that do not explain ownership;
+- oversized shards split by semantic subdomain.
+
+Add compiler-enforced context-health budgets and a report covering largest canonical record, largest generated shard, definitions per shard, oversized indexes, numeric/opaque shard-name violations, and orphan/collision/reference issues.
+
+Audit and migrate current generated names such as `Content/SocialPart02.lua`, `Content/CommandPart02.lua`, `Patterns/QuestionPart02.lua`, `Patterns/Massive.lua` and `Patterns/Sgd.lua` into semantic ownership paths without changing runtime semantics.
+
+Add lightweight tool/agent indexes that map stable IDs to source path, generated shard and bounded related/dependent IDs without duplicating full definitions.
+
+Support affected-closure discovery/targeted developer compilation where feasible; full deterministic generation remains the final correctness gate.
+
+Dynamic affordance candidates, UtterancePlans, realized sentences, traces and runtime combinations remain ephemeral and are not persisted to ModData.
+
+**Gate:** adding a new semantic record does not require editing a giant catalog, generated output contains no numeric overflow shards, context-health budgets pass, indexes remain lightweight, two full builds are byte-identical, and existing conversation behavior is unchanged.
+
+## C6 — dynamic semantic player affordances
+
+Read `DYNAMIC_CONVERSATION.md` for the detailed choice/realization contract.
 
 Extend the existing DialogueSuggestions candidate-provider/ranking pipeline; do not create a new button system.
 
@@ -121,7 +157,9 @@ Add bounded diversity/ranking so the surface does not become four near-identical
 
 **Gate:** after representative NPC replies, the production worker produces semantically distinct positive, negative and contextual continuations when eligible, preserves authored choices, and typed/button equivalents converge on the same semantic result.
 
-## C6 — compositional runtime utterance realization
+## C7 — compositional runtime utterance realization
+
+Continue using `DYNAMIC_CONVERSATION.md` as the detailed realization contract.
 
 Extend the existing SpeechRealization authority with bounded UtterancePlan/microplanning support for both NPC replies and generated player-button utterances.
 
@@ -136,7 +174,7 @@ Compose from:
 
 Do not echo arbitrary raw player text. Use canonical concepts captured by NLU/discourse interpretation.
 
-Compiler-owned construction/lexicon sources should generate runtime Lua tables, avoiding one full response definition for every possible combination.
+Compiler-owned construction/lexicon sources should generate bounded semantic runtime shards under the C5 storage rules, avoiding one full response definition for every possible combination.
 
 Example target:
 
@@ -146,9 +184,9 @@ Keep ordinary Dialogue Content as the fallback for unsupported composition, sign
 
 Optional PBrainZ may realize the same UtterancePlan, but cannot change semantics or authority.
 
-**Gate:** multiple runtime sentences are produced from reusable semantic strategies/lexemes with deterministic locale-aware output, while the semantic plan remains stable and no raw-input injection/reparse path exists.
+**Gate:** multiple runtime sentences are produced from reusable semantic strategies/lexemes with deterministic locale-aware output, while the semantic plan remains stable, storage/context-health budgets remain green, and no raw-input injection/reparse path exists.
 
-## C7 — coherent discourse continuity
+## C8 — coherent discourse continuity
 
 Make accepted conversation systems participate in one bounded discourse state.
 
@@ -168,7 +206,7 @@ Do not persist transcripts.
 
 **Gate:** multi-turn harness scenarios feel coherent because later meanings, buttons and replies derive from prior semantic state rather than independent sentence classification.
 
-## C8 — social effect / conduct-memory decoupling
+## C9 — social effect / conduct-memory decoupling
 
 Fix the `evidence_pruned_by_limit` class of failure.
 
@@ -183,7 +221,7 @@ Implement bounded aggregation/coalescing where appropriate and expose distinct o
 
 **Gate:** a saturated conduct ledger still permits coherent social reaction while persistence remains bounded.
 
-## C9 — Semantic Lab observability and fuzz/regression tools
+## C10 — Semantic Lab observability and fuzz/regression tools
 
 Expose the complete understanding/choice/realization chain in bounded form:
 
@@ -196,19 +234,21 @@ Expose the complete understanding/choice/realization chain in bounded form:
 - selected button semantic frame and realized player utterance;
 - pragmatic/interaction decision;
 - UtterancePlan and realization components;
+- source/generated shard identity and bounded context-health/dependency evidence where relevant;
 - social-effect and conduct-memory outcome.
 
 Add deterministic mutation/fuzz coverage for spacing, repeated letters, punctuation, capitalization and safe typo classes.
 
-**Gate:** an agent can diagnose why malformed/contextual input, a dynamic button, or a runtime-composed reply succeeded/failed without screenshots or monolithic JSON.
+**Gate:** an agent can diagnose why malformed/contextual input, a dynamic button, a runtime-composed reply or its owning storage shard succeeded/failed without screenshots, giant generated files or monolithic JSON.
 
-## C10 — integrated acceptance and live-test handoff
+## C11 — integrated acceptance and live-test handoff
 
 Run focused + broad real-worker regression across:
 
 - EN and supported additional locales where semantics are locale-independent;
 - surface recovery;
 - contextual discourse;
+- storage/context-health and semantic sharding;
 - dynamic semantic buttons;
 - compositional player/NPC realization;
 - multi-turn continuity;
@@ -225,7 +265,7 @@ Only after all developer gates pass return to **READY FOR USER LIVE TEST**.
 
 ## Continue / stop rule
 
-Under an autonomous goal, implement C0 first, validate it, update `PROGRESS.md`, and continue through C10 automatically.
+Under an autonomous goal, implement C0 first, validate it, update `PROGRESS.md`, and continue through C11 automatically.
 
 Stop early only for a genuine repository-ownership/safety blocker, an external dependency that prevents implementation, or completion of all developer-side gates.
 

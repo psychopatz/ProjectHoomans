@@ -115,6 +115,27 @@ Prove both directions:
 
 The known `HOSTILE_REMARK` around 0.83 → generic clarification failure must be eliminated without globally lowering action safety.
 
+## Storage/context-health acceptance
+
+CodeBuilder and Semantic Lab tooling must prove the catalog can scale without creating context-heavy monoliths.
+
+Required evidence:
+
+- canonical source records remain bounded and semantically named;
+- generated Conversation output is split by semantic family/subdomain;
+- no numeric overflow shards such as `Part02`, `Part03`, etc.;
+- no opaque new generated shard names whose domain/purpose cannot be inferred from path/name;
+- generated indexes contain routing/identity metadata rather than duplicate full definitions;
+- root manifest stays configuration/source-root oriented rather than enumerating every semantic object;
+- lightweight agent/tool indexes resolve ID → canonical source → generated shard → bounded related/dependent IDs;
+- context-health report exposes largest source, largest generated shard, definitions per shard, oversized indexes, orphan/collision/reference failures and forbidden names;
+- configured preferred/hard budgets are enforced;
+- runtime combinations/UtterancePlans/generated buttons do not become persisted catalog records or ModData;
+- targeted affected-closure compilation, if implemented, produces the same final result as a full deterministic build;
+- two consecutive full generations are byte-identical.
+
+Migration acceptance must remove current numeric/opaque generated patterns such as `SocialPart02.lua`, `CommandPart02.lua`, `QuestionPart02.lua`, `Massive.lua` and `Sgd.lua` from the Conversation output without changing semantic behavior.
+
 ## Dynamic button acceptance
 
 After representative NPC turns, inspect the same production suggestion pipeline and prove:
@@ -188,13 +209,14 @@ Measure and bound:
 
 No full transcript persistence and no all-NPC/all-definition per-tick scanning.
 
-## Final C10 gate
+## Final C11 gate
 
 Developer acceptance requires:
 
 - focused and broad real-worker corpus green;
 - action-safety controls green;
 - contextual multi-turn cases green;
+- storage/context-health budgets, semantic shard naming and lightweight indexes green;
 - dynamic authored/positive/negative/contextual button cases green;
 - typed/button semantic parity green;
 - compositional player/NPC UtterancePlan realization green with authored fallback coverage;

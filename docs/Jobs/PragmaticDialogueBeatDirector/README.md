@@ -20,6 +20,7 @@ The system must connect:
 - behavior arbitration;
 - dynamic semantic player affordances/buttons;
 - compositional runtime player/NPC utterance realization;
+- context-efficient modular compiler/storage topology for all new semantic building blocks;
 - Dialogue Content realization and authored fallbacks;
 - authoritative social/gameplay effects.
 
@@ -30,7 +31,7 @@ The result should remain deterministic and explainable offline, with optional PB
 The following are already developer-accepted and are treated as foundation:
 
 - one ordinary ResponsePlan / Dialogue Content speech path;
-- modular compiler-owned interaction behaviors/beats/content;
+- compiler-owned interaction behaviors/beats/content with atomic canonical records;
 - one generated Conversation registry plus worker-local draft overlay;
 - shared typed predicate semantics;
 - typed stimuli and bounded actor/relationship/world/knowledge projections;
@@ -46,6 +47,8 @@ Do not reopen these unless current code evidence proves a regression.
 ## Active architecture gap
 
 Human input is still too dependent on whitespace/exact phrase shape, candidate confidence is gated too globally, and discourse context does not yet participate strongly enough in choosing between plausible conversational meanings. The existing semantic suggestion surface and SpeechRealization path are authoritative but still rely too heavily on pre-authored button/reply wording instead of deriving reusable semantic continuations and bounded runtime utterances from the same discourse state.
+
+Before those dynamic systems expand the catalog, CodeBuilder storage must also be hardened against context bloat: canonical sources stay atomic, generated outputs are semantically sharded, indexes point instead of aggregate, paths/IDs explain ownership, and numeric/opaque overflow shards are forbidden.
 
 The active path is:
 
@@ -90,7 +93,11 @@ Read root `AGENTS.md`, then:
 2. `ARCHITECTURE.md`
 3. `AGENT_RUNBOOK.md`
 4. `ROADMAP.md`
-5. `HARNESS_ACCEPTANCE.md`
-6. `PROGRESS.md` last
+5. `PROGRESS.md` last
 
-`AUDIT.md` is supporting evidence for the current gap; read it only when implementing or disputing the audited failure paths.
+Supporting docs are phase-specific to protect agent context:
+
+- `AUDIT.md` — read only when implementing/disputing audited failure paths;
+- `STORAGE_TOPOLOGY.md` — C5 or compiler-storage work;
+- `DYNAMIC_CONVERSATION.md` — C6/C7 choices/realization;
+- `HARNESS_ACCEPTANCE.md` — acceptance implementation or C10/C11 validation.

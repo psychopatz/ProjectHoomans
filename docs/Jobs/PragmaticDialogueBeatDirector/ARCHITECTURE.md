@@ -161,130 +161,42 @@ The DiscourseFrame feeds the existing pragmatic resolver, which resolves current
 
 The director does not parse text and does not own wording.
 
-## 7. Dynamic player affordances
+## 7. Storage topology and context-health
 
-The existing DialogueSuggestions pipeline remains the one player-choice authority.
+Storage layout is an architectural constraint because humans and agents must find one semantic concern without loading unrelated catalogs.
 
-Generated choices are **semantic affordances**, not free-form strings. Keep two internal axes:
+Required invariants:
 
-- `origin = AUTHORED | GENERATED`;
-- `stance = POSITIVE | NEGATIVE | NEUTRAL`.
+- canonical records stay bounded, atomic and semantically named;
+- paths and stable IDs communicate kind/domain/subdomain ownership;
+- generated runtime output is sharded by semantic family/subdomain;
+- indexes route IDs to source/generated shards and do not aggregate full definitions;
+- numeric overflow shards (`Part02`, `Part03`, etc.) are forbidden;
+- opaque generated Conversation shard names are migrated to semantic ownership names;
+- CodeBuilder enforces configurable source/shard context budgets and reports violations;
+- the root manifest remains source-root/compiler configuration rather than a giant catalog;
+- affected-closure metadata supports targeted inspection/iteration while full deterministic generation remains authoritative;
+- generated buttons, UtterancePlans, realized text, traces and combinatorial runtime variants remain ephemeral and never become ModData catalogs.
 
-A third field, `strategy`, carries the actual conversational move such as:
+Detailed C5 topology, naming examples, migration targets, budget guidance and acceptance are in `STORAGE_TOPOLOGY.md`. Read that file only when implementing C5 or modifying Conversation storage/compiler sharding.
 
-- AGREE;
-- DISAGREE;
-- APOLOGIZE;
-- DEESCALATE;
-- CHALLENGE;
-- RETALIATE;
-- DISMISS;
-- ASK_WHY;
-- ASK_FOLLOWUP;
-- CHANGE_TOPIC;
-- OFFER_HELP;
-- CALL_BLUFF.
+## 8. Dynamic player affordances and utterance realization
 
-Traits, relationship, active beat, topic, world state and capabilities are **modifiers/providers**, not a fourth mutually exclusive semantic class. A brave trait may surface a negative `CALL_BLUFF`; empathy may surface a positive `COMFORT`; suspicious state may surface a neutral `PRESS_FOR_DETAILS`.
+The existing DialogueSuggestions and SpeechRealization paths remain authoritative.
 
-For presentation, the UI may expose four useful lanes:
+Required invariants:
 
-1. authored/static;
-2. positive-leading;
-3. negative-leading;
-4. contextual/neutral/trait-induced.
+- generated player choices are typed semantic affordances, not free-form strings;
+- origin (authored/generated), stance (positive/negative/neutral), strategy and contextual provenance stay separate;
+- trait/context evidence modifies candidate eligibility/rank without becoming a hidden fourth semantic authority;
+- displayed button text is presentation; clicks carry the typed semantic frame directly and are never reparsed;
+- NPC/player dynamic wording uses a bounded UtterancePlan built from semantic strategy, canonical lexemes and locale-aware constructions;
+- arbitrary raw player text is never spliced into generated dialogue;
+- ordinary Dialogue Content remains the fallback for unsupported, signature or high-risk wording;
+- optional PBrainZ consumes the same semantic plan and cannot change facts/intent/authority;
+- all affordance/realization sources obey C5 storage/context-health rules and runtime combinations remain ephemeral.
 
-Do not force one candidate from every lane. Rank all eligible semantic candidates, enforce diversity where useful, and backfill from the best remaining candidates.
-
-A generated candidate should carry roughly:
-
-```text
-candidateID
-origin
-stance
-strategy
-semantic frame
-topic / subject / replyTo
-target
-source evidence
-eligibility/provenance
-utterance plan
-```
-
-Clicking a generated button sends its typed semantic frame through the existing semantic-click path. The displayed sentence is presentation only and must never be reparsed by NLU.
-
-Typed input and button input should converge on the same DiscourseFrame / pragmatic semantics wherever they mean the same thing.
-
-## 8. Compositional runtime utterance realization
-
-Do not require a complete authored sentence for every semantic combination.
-
-Extend the existing SpeechRealization authority with a bounded `UtterancePlan` / microplanning mode.
-
-Conceptually:
-
-```text
-UtterancePlan
-- speaker
-- target
-- dialogueAct
-- strategy
-- stance
-- topic / subject
-- canonical lexical concepts
-- intensity
-- relationship/style hints
-- optional discourse marker
-- locale
-- fallbackContentTemplateID
-```
-
-The runtime realizer composes from compiler-owned locale constructions and canonical lexemes. It must not concatenate arbitrary raw player text.
-
-Example:
-
-```text
-PLAYER raw: "fuckyouuu!!!"
-Core recovery: INSULT
-canonical lexical payload: PROFANITY_FUCK + RECIPIENT
-DiscourseFrame: directed hostility, high intensity
-
-NPC behavior:
-  RETALIATE_VERBALLY
-
-UtterancePlan:
-  strategy = MIRROR
-  dialogueAct = RETORT
-  lexical payload = PROFANITY_FUCK + RECIPIENT
-  counter = TOO
-
-EN realization:
-  "Fuck you too."
-```
-
-The full sentence does not need its own response definition. Only the semantic strategy, canonical lexeme and locale construction are authored.
-
-Useful reusable construction strategies include:
-
-- MIRROR;
-- COUNTER;
-- AGREE;
-- DISAGREE;
-- ACKNOWLEDGE;
-- QUALIFY;
-- DENY;
-- APOLOGIZE;
-- ESCALATE;
-- DEESCALATE;
-- DEFLECT;
-- ASK_BACK;
-- FOLLOW_UP.
-
-Locale-specific construction rules are compiler-owned; do not build an English sentence and machine-translate it at runtime.
-
-If required lexemes/constructions are unavailable, ambiguous, unsafe or grammatically unsupported, fall back to ordinary Dialogue Content. Existing authored phrase families remain valuable for signature dialogue, high-risk wording and graceful fallback.
-
-Optional PBrainZ may realize the same UtterancePlan more freely when enabled, but it cannot change semantic intent, grounded facts or gameplay authority.
+Detailed C6/C7 design and examples are in `DYNAMIC_CONVERSATION.md`. Read that file only when implementing dynamic choices or compositional realization.
 
 ## 9. Social effects and durable memory
 

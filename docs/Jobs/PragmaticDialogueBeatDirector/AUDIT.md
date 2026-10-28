@@ -1,6 +1,6 @@
 # Audit — Current Conversation-Coherence Gap
 
-This file records only the evidence that justifies the active C0–C10 roadmap. Completed R0–R9 recovery history is available in Git and is not repeated here.
+This file records only the evidence that justifies the active C0–C11 roadmap. Completed R0–R9 recovery history is available in Git and is not repeated here.
 
 ## Current production findings
 
@@ -40,7 +40,23 @@ The accepted pragmatic resolver knows flows, topic and recent semantic state, bu
 
 The missing layer belongs between Core candidates and the existing pragmatic resolver.
 
-## Root cause 4 — suggestions and replies are still more authored than semantic
+## Root cause 4 — generated storage still leaks context-hostile aggregation
+
+Canonical beat/behavior source is already increasingly atomic, but generated Conversation output still contains numeric and opaque aggregate shards such as:
+
+- `Content/SocialPart02.lua`, `SocialPart03.lua`, `SocialPart04.lua`;
+- `Content/CommandPart02.lua`;
+- `Patterns/QuestionPart02.lua`;
+- `Patterns/Massive.lua`;
+- `Patterns/Sgd.lua`.
+
+These names do not communicate semantic ownership and encourage large aggregate files that are expensive for humans/agents to inspect.
+
+The upcoming dynamic-affordance and compositional-realization work will add many reusable semantic building blocks, so storage topology must be corrected before that expansion.
+
+The target is atomic canonical records, semantic-family generated shards, lightweight routing/dependency indexes and compiler-enforced context-health budgets. Numeric overflow splitting is not an acceptable long-term scaling strategy.
+
+## Root cause 5 — suggestions and replies are still more authored than semantic
 
 The existing PNC_SemanticDialogueSuggestions pipeline already has the correct execution authority: it gathers authored/root/flow/response-plan/provider candidates, ranks and deduplicates them, and clicks typed semantic_click_frame values through the existing conversation path.
 
@@ -50,7 +66,7 @@ Likewise, PNC_SpeechRealization.lua already owns style-aware phrase-family selec
 
 Therefore the next architecture should extend these existing authorities, not create a second button generator or response engine.
 
-## Root cause 5 — social persistence can masquerade as semantic failure
+## Root cause 6 — social persistence can masquerade as semantic failure
 
 Conduct evidence is bounded at 64 entries. `PNC_ConductService_EvidenceInternals.lua` inserts new evidence and calls `PruneEvidence`; when the new item itself is removed, the operation returns `evidence_pruned_by_limit`.
 
@@ -68,4 +84,4 @@ Do not fix this by:
 - globally lowering confidence thresholds;
 - expanding conduct evidence without bounds.
 
-Proceed through the C0–C10 roadmap using existing Core NLU, ParseCandidates, discourse state, pragmatic resolver, Interaction Director and Semantic Lab.
+Proceed through the C0–C11 roadmap using existing Core NLU, ParseCandidates, discourse state, pragmatic resolver, Interaction Director and Semantic Lab.

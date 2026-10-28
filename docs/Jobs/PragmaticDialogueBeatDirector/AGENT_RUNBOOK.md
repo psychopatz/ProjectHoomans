@@ -4,13 +4,13 @@ Use this runbook only for this job.
 
 ## Read order
 
-Read root `AGENTS.md`, then `README.md`, `ARCHITECTURE.md`, this runbook, `ROADMAP.md`, `HARNESS_ACCEPTANCE.md`, and `PROGRESS.md` last.
+Read root `AGENTS.md`, then `README.md`, `ARCHITECTURE.md`, this runbook, `ROADMAP.md`, and `PROGRESS.md` last.
 
-Read `AUDIT.md` only when you need the evidence behind the current failure taxonomy.
+Read `AUDIT.md` only when you need evidence behind the current failure taxonomy. Read `STORAGE_TOPOLOGY.md` only for C5/compiler-storage work. Read `DYNAMIC_CONVERSATION.md` only for C6/C7 choice/realization work. Read `HARNESS_ACCEPTANCE.md` when implementing acceptance tests/gates or preparing C10/C11 validation.
 
 ## Operating goal
 
-Complete C0–C10 so human text, semantic candidates, discourse context, dynamic choices, runtime utterance realization, pragmatic interaction, behavior selection and social effects behave as one coherent conversation system.
+Complete C0–C11 so human text, semantic candidates, discourse context, storage/context topology, dynamic choices, runtime utterance realization, pragmatic interaction, behavior selection and social effects behave as one coherent conversation system.
 
 The Next Chunk is a starting point, not a stop condition. After each accepted chunk, update `PROGRESS.md` concisely and continue automatically to the next mandatory phase.
 
@@ -108,11 +108,27 @@ Before changing ProjectHoomans, recheck its worktree as well.
 
 Never reset, rebase, stash or discard uncertain work.
 
-## Compiler/content discipline
+## Compiler/storage/content discipline
 
 Generated files are never hand-authored.
 
-If a semantic/catalog/content source changes, use the existing CodeBuilder and prove deterministic second generation.
+Canonical conversation source should stay atomic and semantically named. Generated output should stay semantically sharded and context-bounded.
+
+Do not create or preserve numeric overflow shards such as `Part02`, `Part03`, or opaque generated conversation filenames whose semantic ownership cannot be inferred from path/name.
+
+If a generated shard exceeds budget, split by semantic subdomain. Do not solve size by adding another numbered part.
+
+Generated indexes point to owning shards; they do not become another full-definition registry.
+
+The root manifest remains compiler/source-root configuration, not a growing list of every record.
+
+CodeBuilder must expose context-health checks for source/shard size, definitions per shard, oversized indexes, orphan/collision/reference failures, and forbidden numeric/opaque shard names. Budget values may be tuned from measured data but the guardrail itself is mandatory.
+
+Use lightweight ID→source→generated/dependency indexes for agent/tool discovery. Avoid duplicating definitions into discovery metadata.
+
+Dynamic candidates, UtterancePlans, realized sentences and runtime combinations are ephemeral; never pre-expand or persist their combinatorial products.
+
+If a semantic/catalog/content source changes, use the existing CodeBuilder and prove deterministic second generation. Full build idempotence remains mandatory even if targeted affected-closure compilation is added for developer speed.
 
 Do not add sentence lists to generated runtime files to bypass the canonical source model.
 
@@ -130,7 +146,7 @@ For each chunk:
 - `git diff --check`;
 - no source-save mutation.
 
-C10 performs broad final regression.
+C11 performs broad final regression.
 
 ## Documentation hygiene
 
