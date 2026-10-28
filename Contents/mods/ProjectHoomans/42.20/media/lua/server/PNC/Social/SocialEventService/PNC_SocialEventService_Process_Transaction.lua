@@ -11,6 +11,61 @@ local ConductDefinitions = PNC.ConductDefinitions
 local personalRelationshipCommands =
     Internal.PersonalRelationshipCommands
 
+local function finalizeConductPersistence(
+    rows,
+    details,
+    required
+)
+    rows = type(rows) == "table" and rows or {}
+    details = type(details) == "table" and details or {}
+    if not required then
+        return {
+            status = "not_required",
+            persisted = 0,
+            pruned = 0,
+            dropped = 0,
+            total = 0,
+        }, {}
+    end
+
+    local persisted = {}
+    for _, detail in ipairs(details) do
+        persisted[tostring(detail.evidenceID or "")] = true
+    end
+
+    local counts = {
+        persisted = 0,
+        pruned = 0,
+        dropped = 0,
+        total = #rows,
+    }
+    for _, row in ipairs(rows) do
+        if row.status == "prepared"
+            and persisted[tostring(row.evidenceID or "")]
+        then
+            row.status = "persisted"
+            row.reason = "applied"
+            row.durable = true
+        end
+        if row.status == "persisted" then
+            counts.persisted = counts.persisted + 1
+        elseif row.status == "pruned" then
+            counts.pruned = counts.pruned + 1
+        elseif row.status == "dropped" then
+            counts.dropped = counts.dropped + 1
+        end
+    end
+
+    if counts.pruned > 0 or counts.dropped > 0 then
+        counts.status = "bounded"
+    elseif counts.persisted > 0 then
+        counts.status = "persisted"
+    else
+        counts.status = "none"
+    end
+    return counts, rows
+end
+
 local function applyTransaction(event, definition, work)
     local index
     local prepared
@@ -23,6 +78,7 @@ local function applyTransaction(event, definition, work)
     local conductDefinition
     local conductRequired
     local conductApplied
+    local conductPersistence = {}
     conductDefinition = ConductDefinitions
         and ConductDefinitions[event.type] or nil
     conductRequired = not conductDefinition
@@ -38,10 +94,11 @@ local function applyTransaction(event, definition, work)
                 conductEvidenceCreated = 0,
             }
         end
-        conductPrepared, reason = Conduct.PrepareSocialEvent(
-            event,
-            conductDefinition
-        )
+        conductPrepared, reason, conductPersistence =
+            Conduct.PrepareSocialEvent(
+                event,
+                conductDefinition
+            )
         if not conductPrepared then
             return false, reason, {
                 eventID = event.id,
@@ -93,10 +150,18 @@ local function applyTransaction(event, definition, work)
             }
         end
     end
+    local conductOutcome
+    conductOutcome, conductPersistence = finalizeConductPersistence(
+        conductPersistence,
+        conductDetails,
+        conductRequired
+    )
     return true, nil, {
         details = details,
-        conductEvidenceCreated = #(conductDetails or {}),
+        conductEvidenceCreated = conductOutcome.persisted,
         conductDetails = conductDetails or {},
+        conductPersistence = conductPersistence,
+        conductEvidenceOutcome = conductOutcome,
     }
 end
 

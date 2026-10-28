@@ -122,6 +122,11 @@ function H.ApplySocialEvent(context)
         baseEffects = effectSummary(detail and detail.baseEffects),
         saturationBefore = copy(detail and detail.saturationBefore),
         saturationAfter = copy(detail and detail.saturationAfter),
+        conductEvidenceCreated =
+            tonumber(processed.conductEvidenceCreated) or 0,
+        conductEvidenceOutcome =
+            copy(processed.conductEvidenceOutcome),
+        conductPersistence = copy(processed.conductPersistence),
     }
 end
 

@@ -9,6 +9,28 @@ local Types = PNC.ConductTypes
 local Math = PNC.ConductMath
 local Constants = PNC.ConductConstants
 
+local CAPACITY_OUTCOMES = {
+    evidence_pruned_by_limit = "pruned",
+    permanent_evidence_limit = "dropped",
+}
+
+local function persistenceOutcome(
+    participant,
+    evidenceID,
+    status,
+    reason
+)
+    return {
+        entityKey = participant.actorKey,
+        subjectKey = participant.subjectKey,
+        role = participant.role,
+        evidenceID = evidenceID,
+        status = status,
+        reason = reason,
+        durable = status == "prepared" or status == "persisted",
+    }
+end
+
 function Conduct.PrepareSocialEvent(event, definition)
     local participants = {}
     local function add(actorKey, subjectKey, role)
@@ -28,6 +50,7 @@ function Conduct.PrepareSocialEvent(event, definition)
         add(event.actorKey, event.targetKey, definition.role)
     end
     local prepared = {}
+    local persistence = {}
     for _, participant in ipairs(participants) do
         local evidenceID = "conduct:" .. event.id .. ":"
             .. participant.actorKey .. ":" .. participant.role
@@ -50,10 +73,31 @@ function Conduct.PrepareSocialEvent(event, definition)
                 tags = definition.tags,
             }
         )
-        if not item then return nil, reason end
-        prepared[#prepared + 1] = item
+        if item then
+            prepared[#prepared + 1] = item
+            persistence[#persistence + 1] = persistenceOutcome(
+                participant,
+                evidenceID,
+                "prepared",
+                "prepared"
+            )
+        else
+            local capacityStatus = CAPACITY_OUTCOMES[reason]
+            if not capacityStatus then
+                return nil, reason, persistence
+            end
+            -- Conduct persistence is intentionally best-effort for an
+            -- otherwise valid social interaction. A bounded ledger refusing
+            -- another row must not veto the relationship/reaction authority.
+            persistence[#persistence + 1] = persistenceOutcome(
+                participant,
+                evidenceID,
+                capacityStatus,
+                reason
+            )
+        end
     end
-    return prepared
+    return prepared, nil, persistence
 end
 
 function Conduct.CommitPrepared(prepared)

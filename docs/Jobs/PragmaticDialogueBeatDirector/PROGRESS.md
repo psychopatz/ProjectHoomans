@@ -1,7 +1,7 @@
 # Progress — Coherent Emergent Conversation
 
 **Status:** IN PROGRESS.
-**Current phase:** C9 — social effect / conduct-memory decoupling.
+**Current phase:** C10 — Semantic Lab observability and fuzz/regression tools.
 **Branch:** existing `main`.
 
 ## Accepted foundation
@@ -96,22 +96,37 @@ Latest C6–C8 validation:
 - generated Conversation tree: **136 files**, byte-identical across two consecutive full generations;
 - `git diff --check`: PASS.
 
-## Immediate Next Chunk — C9
+## C9 accepted — social effect / conduct-memory decoupling
 
-Decouple semantic/social reaction success from bounded conduct-memory persistence.
+C9 is developer-accepted.
 
-Start from the existing conduct saturation baseline. Preserve bounded persistence, but represent separately:
+Accepted behavior:
 
-- interaction understood/accepted;
-- reaction/behavior selected;
-- relationship/social effect applied or rejected by its own authority;
-- durable conduct evidence persisted, coalesced, pruned or dropped by capacity policy.
+- direct `Conduct.AddEvidence()` remains a strict bounded-storage API and still reports `evidence_pruned_by_limit` / `permanent_evidence_limit` to callers that explicitly request durable evidence;
+- social-event preparation treats ordinary capacity pruning as a bounded persistence outcome rather than a reason to reject an otherwise valid relationship/social interaction;
+- authoritative social-event results now separate `relationshipsChanged` / relationship memory from `conductEvidenceCreated`;
+- `conductPersistence` records each evidence attempt as `persisted`, `pruned` or `dropped` with the original capacity reason and durable flag;
+- `conductEvidenceOutcome` summarizes persisted/pruned/dropped counts and reports `bounded` when storage capacity prevents retention;
+- the semantic-dialogue social authority forwards these conduct outcomes independently from its accepted relationship effect;
+- a saturated all-permanent player conduct ledger can receive a hostile social interaction, apply the NPC relationship/memory reaction, report zero durable conduct evidence created, and remain at the same bounded evidence count.
 
-A full conduct ledger must never turn an otherwise understood social interaction into a semantic rejection merely because another evidence row cannot be retained.
+Latest C9 validation:
+
+- authoritative social-event suite: **12/12 PASS**;
+- conduct suite: **2/2 PASS**;
+- C0A direct conduct-saturation characterization remains PASS;
+- full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS**;
+- bounded conduct storage size is unchanged by pruned social evidence.
+
+## Immediate Next Chunk — C10
+
+Expose a bounded end-to-end Semantic Lab observation contract for surface recovery → candidates → contextual discourse → affordances → semantic-click frame → pragmatic/interaction plan → UtterancePlan/realization → storage ownership → social/conduct outcome.
+
+Add deterministic mutation/fuzz regression for spacing, repeated letters, punctuation, capitalization and safe typo classes. Keep reports queryable and bounded; do not create another monolithic snapshot.
 
 ## Remaining mandatory work
 
-C9 conduct-memory decoupling → C10 observability/fuzzing → C11 integrated acceptance.
+C10 observability/fuzzing → C11 integrated acceptance.
 
 ## Safety
 

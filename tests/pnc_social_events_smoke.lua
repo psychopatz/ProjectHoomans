@@ -951,6 +951,113 @@ T.equal(
     "conduct-only relationship revision unchanged"
 )
 
+-- C9. Conduct capacity is a persistence outcome, not social rejection.
+-- Saturate the player conduct ledger entirely with permanent evidence so the
+-- next non-permanent social-event evidence is deterministically pruned.
+local saturationTarget = newRecord("npc_c9_conduct_saturation")
+local saturationTargetKey = PNC.EntityRef.ForNPC(saturationTarget.id)
+local playerRecord =
+    PNC.PlayerCharacters.Registry.byUUID.char_phase2
+local playerConductBeforeSaturation =
+    PNC.ConductTypes.NormalizeConductRecord(playerRecord.conduct)
+playerRecord.conduct = PNC.ConductTypes.NewConductRecord()
+for index = 1, PNC.ConductConstants.EVIDENCE_LIMIT do
+    playerRecord.conduct.evidence[index] =
+        PNC.ConductTypes.NewConductEvidence({
+            id = "conduct:social:c9_seed:" .. tostring(index),
+            eventID = "social:c9_seed:" .. tostring(index),
+            eventType = "c9_saturation_seed",
+            actorKey = playerKey,
+            subjectKey = saturationTargetKey,
+            createdAt = index,
+            lastEvaluatedAt = index,
+            effects = { compassion = 1 },
+            strength = 1,
+            decayPerDay = 0,
+            permanent = true,
+            visibility = "private",
+        })
+end
+playerRecord.conduct =
+    PNC.ConductTypes.NormalizeConductRecord(playerRecord.conduct)
+T.equal(
+    #playerRecord.conduct.evidence,
+    PNC.ConductConstants.EVIDENCE_LIMIT,
+    "C9 saturation fixture fills conduct evidence"
+)
+
+local relationshipBeforeSaturation =
+    PNC.Relationships.Get(saturationTarget.id, playerKey)
+local approvalBeforeSaturation =
+    relationshipBeforeSaturation
+        and relationshipBeforeSaturation.approval or 0
+local saturationResult = PNC.SocialEvents.Emit(insultEvent(
+    "social:c9_saturation:insult",
+    playerKey,
+    saturationTargetKey,
+    500
+))
+T.truthy(saturationResult.ok,
+    "conduct saturation does not reject social event")
+T.equal(
+    saturationResult.relationshipsChanged,
+    1,
+    "relationship effect still applies at conduct capacity"
+)
+T.equal(
+    saturationResult.memoriesCreated,
+    1,
+    "relationship memory still applies at conduct capacity"
+)
+T.equal(
+    saturationResult.conductEvidenceCreated,
+    0,
+    "no durable conduct evidence is falsely reported"
+)
+T.equal(
+    saturationResult.conductEvidenceOutcome.status,
+    "bounded",
+    "conduct outcome reports bounded persistence"
+)
+T.equal(
+    saturationResult.conductEvidenceOutcome.persisted,
+    0,
+    "bounded outcome reports zero persisted rows"
+)
+T.equal(
+    saturationResult.conductEvidenceOutcome.pruned,
+    1,
+    "bounded outcome reports pruned evidence"
+)
+T.equal(
+    saturationResult.conductPersistence[1].reason,
+    "evidence_pruned_by_limit",
+    "capacity reason remains observable"
+)
+T.equal(
+    saturationResult.conductPersistence[1].status,
+    "pruned",
+    "capacity result is persistence status, not rejection"
+)
+T.equal(
+    saturationResult.conductPersistence[1].durable,
+    false,
+    "pruned evidence is explicitly non-durable"
+)
+local relationshipAfterSaturation =
+    PNC.Relationships.Get(saturationTarget.id, playerKey)
+T.truthy(
+    relationshipAfterSaturation.approval
+        < approvalBeforeSaturation,
+    "social relationship reaction remains effective"
+)
+T.equal(
+    #playerRecord.conduct.evidence,
+    PNC.ConductConstants.EVIDENCE_LIMIT,
+    "bounded conduct storage remains unchanged at capacity"
+)
+playerRecord.conduct = playerConductBeforeSaturation
+
 -- The per-NPC dedupe cache is bounded and evicts oldest successful IDs.
 local cacheRecord = newRecord("npc_event_cache")
 for index = 1, 70 do

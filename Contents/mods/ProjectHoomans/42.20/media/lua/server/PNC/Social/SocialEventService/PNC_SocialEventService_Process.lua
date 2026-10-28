@@ -236,6 +236,8 @@ function SocialEvents.Process(eventSpec)
         details = details,
         conductEvidenceCreated = transactionDetails.conductEvidenceCreated,
         conductDetails = transactionDetails.conductDetails,
+        conductPersistence = transactionDetails.conductPersistence,
+        conductEvidenceOutcome = transactionDetails.conductEvidenceOutcome,
     })
     output = Internal.ApplyPostProcess(event, output, definition)
     recordLifecycleEvent(event, output)
