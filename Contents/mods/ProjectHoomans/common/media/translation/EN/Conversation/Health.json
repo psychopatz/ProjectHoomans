@@ -1,1 +1,14 @@
-{"UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded01":"I'm fine. Don't make a thing of it.","UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral01":"I'm doing okay.","UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse01":"I'm okay.","UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm01":"I'm doing okay. Thanks for checking in.","UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded01":"I'm hurt. Give me space.","UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral01":"I'm hurt, but I'm managing.","UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse01":"I'm hurt.","UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm01":"I'm hurt, but I'm managing. Thanks for asking.","UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01":"I can't confirm that.","UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01":"I can't confirm my health status right now.","UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01":"Can't confirm.","UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01":"I can't confirm it right now, but thanks for asking."}
+{
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded01": "I'm fine. Don't make a thing of it.",
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral01": "I'm doing okay.",
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse01": "I'm okay.",
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm01": "I'm doing okay. Thanks for checking in.",
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded01": "I'm hurt. Give me space.",
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral01": "I'm hurt, but I'm managing.",
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse01": "I'm hurt.",
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm01": "I'm hurt, but I'm managing. Thanks for asking.",
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01": "I can't confirm that.",
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01": "I can't confirm my health status right now.",
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01": "Can't confirm.",
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01": "I can't confirm it right now, but thanks for asking."
+}

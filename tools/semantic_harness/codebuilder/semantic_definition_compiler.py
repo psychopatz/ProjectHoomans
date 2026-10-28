@@ -20,6 +20,7 @@ from .dialogue_rendering import _lua_value
 from .lexicon_compiler import CompileError, _lua_string
 from .dialogue_contract import validate_branch_offers
 from .catalog_naming import ModuleNameRegistry, module_path, pascal_segment
+from .translation_support import DEFAULT_LANGUAGE, legacy_translation_map, normalize_translations
 
 SEMANTIC_SCHEMA = "pnc.semantic_authoring.v1"
 SEMANTIC_FRAME_FIELDS = frozenset({
@@ -243,7 +244,7 @@ def _semantic_responses(
     if not isinstance(variants, list) or not variants or len(variants) > 16:
         raise CompileError(f"response pool {pool_id} requires 1..16 variants")
     compiled: list[dict[str, Any]] = []
-    translations = {"EN": {}, "TL": {}}
+    translations: dict[str, dict[str, str]] = {}
     seen_ids: set[str] = set()
     for variant in variants:
         if not isinstance(variant, dict):
@@ -255,16 +256,41 @@ def _semantic_responses(
         key = variant.get("key")
         if not isinstance(key, str) or not key.startswith("UI_PNC_"):
             raise CompileError(f"response variant {pool_id}:{variant_id} requires UI_PNC key")
-        english = _semantic_text(variant.get("en"), f"response {key} EN")
-        tagalog = _semantic_text(variant.get("tl"), f"response {key} TL")
-        if key in translations["EN"] or key in translations["TL"]:
-            raise CompileError(f"duplicate translation key {key}")
-        translations["EN"][key] = english
-        translations["TL"][key] = tagalog
+
+        raw_translations = variant.get("translations")
+        legacy = legacy_translation_map(variant)
+        if raw_translations is not None:
+            localized = normalize_translations(
+                raw_translations,
+                f"response {key}.translations",
+            )
+            if legacy:
+                legacy_map = normalize_translations(
+                    legacy,
+                    f"response {key}.legacyTranslations",
+                )
+                for language, text in legacy_map.items():
+                    current = localized.get(language)
+                    if current is not None and current != text:
+                        raise CompileError(
+                            f"response {key} conflicts between translations and legacy {language} text"
+                        )
+                    localized.setdefault(language, text)
+        elif legacy:
+            localized = normalize_translations(legacy, f"response {key}.legacyTranslations")
+        else:
+            raise CompileError(f"response {key} requires translations")
+
+        for language, text in localized.items():
+            bucket = translations.setdefault(language, {})
+            if key in bucket:
+                raise CompileError(f"duplicate translation key {key}")
+            bucket[key] = text
+
         compiled_variant: dict[str, Any] = {
             "id": variant_id,
             "templateID": key,
-            "fallback": english,
+            "fallback": localized[DEFAULT_LANGUAGE],
         }
         if "when" in variant:
             compiled_variant["when"] = _validate_response_condition(
@@ -276,7 +302,10 @@ def _semantic_responses(
         if priority:
             compiled_variant["priority"] = priority
         compiled.append(compiled_variant)
-    return {"id": pool_id, "variants": compiled}, translations
+    return {"id": pool_id, "variants": compiled}, {
+        language: {key: values[key] for key in sorted(values)}
+        for language, values in sorted(translations.items())
+    }
 
 
 def compile_semantic_definitions(
@@ -303,7 +332,7 @@ def compile_semantic_definitions(
     patterns: list[dict[str, Any]] = []
     flows: list[dict[str, Any]] = []
     response_pools: list[dict[str, Any]] = []
-    translations = {"EN": {}, "TL": {}}
+    translations: dict[str, dict[str, str]] = {}
     seen_definition_ids: set[str] = set()
     seen_flow_ids: set[str] = set()
     seen_pool_ids: set[str] = set()
@@ -381,11 +410,12 @@ def compile_semantic_definitions(
         if response_pool["id"] in seen_pool_ids:
             raise CompileError(f"duplicate semantic response pool {response_pool['id']}")
         seen_pool_ids.add(response_pool["id"])
-        for language in ("EN", "TL"):
-            for key, text in definition_translations[language].items():
-                if key in translations[language]:
+        for language, localized in sorted(definition_translations.items()):
+            bucket = translations.setdefault(language, {})
+            for key, text in localized.items():
+                if key in bucket:
                     raise CompileError(f"duplicate semantic translation key {key}")
-                translations[language][key] = text
+                bucket[key] = text
         flow = _semantic_flow(
             definition.get("flow"),
             definition_id,
@@ -412,8 +442,8 @@ def compile_semantic_definitions(
         "flows": flows,
         "responsePools": response_pools,
         "translations": {
-            language: {key: translations[language][key] for key in sorted(translations[language])}
-            for language in ("EN", "TL")
+            language: {key: values[key] for key in sorted(values)}
+            for language, values in sorted(translations.items())
         },
     }
 

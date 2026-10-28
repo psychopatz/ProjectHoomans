@@ -68,7 +68,7 @@ def compile_dialogue_dataset(document: dict[str, Any]) -> dict[str, Any]:
         compiled_patterns.append(compiled)
 
     compiled_pools = []
-    translations = {"EN": {}, "TL": {}}
+    translations: dict[str, dict[str, str]] = {}
     seen_pool_ids: set[str] = set()
     seen_response_ids: set[str] = set()
     for pool in response_pools:
@@ -82,11 +82,12 @@ def compile_dialogue_dataset(document: dict[str, Any]) -> dict[str, Any]:
             if variant["id"] in seen_response_ids:
                 raise CompileError(f"duplicate dialogue response id {variant['id']}")
             seen_response_ids.add(variant["id"])
-        for language in ("EN", "TL"):
-            for key, text in pool_translations[language].items():
-                if key in translations[language]:
+        for language, localized in sorted(pool_translations.items()):
+            bucket = translations.setdefault(language, {})
+            for key, text in localized.items():
+                if key in bucket:
                     raise CompileError(f"duplicate dialogue translation key {key}")
-                translations[language][key] = text
+                bucket[key] = text
         compiled_pools.append(compiled)
 
     compiled_patterns.sort(key=lambda item: item["id"])
@@ -96,10 +97,7 @@ def compile_dialogue_dataset(document: dict[str, Any]) -> dict[str, Any]:
         "patterns": compiled_patterns,
         "responsePools": compiled_pools,
         "translations": {
-            language: {
-                key: translations[language][key]
-                for key in sorted(translations[language])
-            }
-            for language in ("EN", "TL")
+            language: {key: values[key] for key in sorted(values)}
+            for language, values in sorted(translations.items())
         },
     }

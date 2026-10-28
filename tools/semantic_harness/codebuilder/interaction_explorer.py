@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from .translation_support import legacy_translation_map
+
 import copy
 import json
 from typing import Any, Iterable
@@ -244,10 +246,12 @@ def build_interaction_rows(production_catalog: dict[str, Any] | None) -> list[di
                 "semanticAuthority": "PNC.Semantics.ResponseCatalog",
                 "inspection": "response_pool_detail provides variants, plans, provenance and offers",
                 "languages": sorted({
-                    language
+                    language.upper()
                     for variant in _iter_dicts(variants)
-                    for language in ("en", "tl")
-                    if variant.get(language)
+                    for language in (
+                        list((variant.get("translations") or {}).keys())
+                        + list(legacy_translation_map(variant))
+                    )
                 }),
             },
         ))

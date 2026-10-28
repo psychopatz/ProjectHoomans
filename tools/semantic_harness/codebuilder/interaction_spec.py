@@ -9,6 +9,7 @@ import re
 from typing import Any
 
 from .lexicon_compiler import CompileError
+from .translation_support import DEFAULT_LANGUAGE, legacy_translation_map, normalize_translations
 from .dialogue_contract import (
     DIALOGUE_BACKSTORY_KINDS,
     DIALOGUE_ID,
@@ -788,8 +789,14 @@ def _compile_backstory_interaction(
             raw_variant.get("key") or raw_variant.get("templateID"),
             "response variant key",
         )
-        english = _text(raw_variant.get("en"), "response variant en")
-        tagalog = _text(raw_variant.get("tl"), "response variant tl")
+        raw_translations = raw_variant.get("translations")
+        if raw_translations is None:
+            raw_translations = legacy_translation_map(raw_variant)
+        localized = normalize_translations(
+            raw_translations,
+            "response variant translations",
+        )
+        english = localized[DEFAULT_LANGUAGE]
         translation_args = raw_variant.get("translationArgs")
         if translation_args is None:
             translation_args = {"content": "fact_content"}
@@ -797,8 +804,7 @@ def _compile_backstory_interaction(
             "id": canonical_variant_id,
             "templateID": template_id,
             "fallback": english,
-            "en": english,
-            "tl": tagalog,
+            "translations": copy.deepcopy(localized),
             "translationArgs": copy.deepcopy(translation_args),
         })
 

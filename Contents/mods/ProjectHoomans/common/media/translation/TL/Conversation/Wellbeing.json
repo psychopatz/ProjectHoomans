@@ -1,1 +1,18 @@
-{"UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultGuarded01":"Kinakaya ko. Huwag mo nang ipilit.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultNeutral01":"Okay naman ako. Ikaw, kumusta?","UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultTerse01":"Ayos lang ako.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultWarm01":"Ayos lang ako. Salamat sa pagtatanong.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueAltNeutral01":"Pagod ako. Makakatulong ang kaunting pahinga.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueNeutral01":"Pagod na pagod ako, pero kaya ko pa.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerAltNeutral01":"Nagugutom na ako. Maaari ba akong makahingi ng makakain?","UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerNeutral01":"Medyo gutom ako, kung tutuusin. May makakain ka ba?","UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredGuarded01":"Nasaktan ako. Iyon lang ang masasabi ko.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredNeutral01":"Medyo may tama ako, pero kakayanin ko.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredTerse01":"Nasaktan ako. Kaya ko.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredWarm01":"Nasaktan ako, pero kaya ko pang magpatuloy.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingPanicNeutral01":"Nanginginig pa rin ako ngayon.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingStressNeutral01":"Tensiyonado ako, pero kaya ko pa.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstAltNeutral01":"Kailangan ko talaga ng maiinom. May tubig ka ba?","UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstNeutral01":"Uhaw na uhaw ako. Maaari ba akong makahingi ng tubig?"}
+{
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultGuarded01": "Kinakaya ko. Huwag mo nang ipilit.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultNeutral01": "Okay naman ako. Ikaw, kumusta?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultTerse01": "Ayos lang ako.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultWarm01": "Ayos lang ako. Salamat sa pagtatanong.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueAltNeutral01": "Pagod ako. Makakatulong ang kaunting pahinga.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueNeutral01": "Pagod na pagod ako, pero kaya ko pa.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerAltNeutral01": "Nagugutom na ako. Maaari ba akong makahingi ng makakain?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerNeutral01": "Medyo gutom ako, kung tutuusin. May makakain ka ba?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredGuarded01": "Nasaktan ako. Iyon lang ang masasabi ko.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredNeutral01": "Medyo may tama ako, pero kakayanin ko.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredTerse01": "Nasaktan ako. Kaya ko.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredWarm01": "Nasaktan ako, pero kaya ko pang magpatuloy.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingPanicNeutral01": "Nanginginig pa rin ako ngayon.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingStressNeutral01": "Tensiyonado ako, pero kaya ko pa.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstAltNeutral01": "Kailangan ko talaga ng maiinom. May tubig ka ba?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstNeutral01": "Uhaw na uhaw ako. Maaari ba akong makahingi ng tubig?"
+}

@@ -39,18 +39,18 @@
       "order": 133,
       "path": "content/health.json"
     },
- {
- "domain": "wellbeing",
- "kind": "content",
- "order": 135,
- "path": "content/wellbeing.json"
- },
- {
- "domain": "needs",
- "kind": "content",
- "order": 137,
- "path": "content/needs.json"
- },
+    {
+      "domain": "wellbeing",
+      "kind": "content",
+      "order": 135,
+      "path": "content/wellbeing.json"
+    },
+    {
+      "domain": "needs",
+      "kind": "content",
+      "order": 137,
+      "path": "content/needs.json"
+    },
     {
       "domain": "command",
       "kind": "content",

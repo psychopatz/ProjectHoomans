@@ -8,7 +8,6 @@ from pathlib import Path
 import unittest
 
 from tools.semantic_harness.codebuilder.dialogue_content import (
-    LANGUAGES,
     compile_dialogue_content,
     load_dialogue_content_source,
     render_dialogue_content_registry,
@@ -58,7 +57,7 @@ class DialogueContentRegistryP6BTests(unittest.TestCase):
         registry = render_dialogue_content_registry(first)
         self.assertIn("function Registry.FamilyFor", registry)
         self.assertIn("function Registry.PlayerChoice", registry)
-        for language in LANGUAGES:
+        for language in sorted(first["translations"]):
             rendered = render_dialogue_content_translation(first, language)
             decoded = json.loads(rendered)
             self.assertTrue(decoded)

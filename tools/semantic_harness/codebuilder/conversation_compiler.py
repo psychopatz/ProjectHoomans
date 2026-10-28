@@ -16,7 +16,6 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
 from .dialogue_content import (
-    LANGUAGES,
     _lua_value,
     _lua_string,
     compile_dialogue_content,
@@ -27,6 +26,7 @@ from .dialogue_content import (
 )
 from .dialogue_dataset import compile_dialogue_dataset
 from .lexicon_compiler import CompileError
+from .translation_support import DEFAULT_LANGUAGE, merge_language_sets, normalize_language
 from .semantic_definition_compiler import (
     compile_semantic_definitions,
     discover_registered_capability_ids,
@@ -256,7 +256,7 @@ def _merge_dialogue_sources(
             "source": {"name": "Project Hoomans Conversation", "version": "1", "references": []},
             "patterns": [],
             "responsePools": [],
-        }, {"EN": {}, "TL": {}}
+        }, {}
     source = _source_metadata(all_documents)
     patterns = [item for document in pattern_documents for item in document.get("patterns", [])]
     pools = [item for document in response_documents for item in document.get("responsePools", [])]
@@ -277,7 +277,7 @@ def _merge_semantic_sources(
 ) -> dict[str, Any]:
     documents = [document for document, entry, _ in shards if entry["kind"] == "flows"]
     if not documents:
-        return {"patterns": [], "flows": [], "responsePools": [], "translations": {"EN": {}, "TL": {}}}
+        return {"patterns": [], "flows": [], "responsePools": [], "translations": {}}
     source = _source_metadata(documents)
     source_owner = source.get("owner") or "ProjectHoomans"
     source_version = source.get("version") or "1"
@@ -352,18 +352,36 @@ def _add_global_id(
 
 
 def _ui_translations(ui: list[dict[str, Any]]) -> dict[str, dict[str, str]]:
-    translations = {language: {} for language in LANGUAGES}
+    languages: set[str] = {DEFAULT_LANGUAGE}
     for suggestion in ui:
         raw = suggestion.get("translations")
-        for language in LANGUAGES:
+        if isinstance(raw, dict):
+            for raw_language in raw:
+                languages.add(normalize_language(raw_language, "UI translation language"))
+    translations = {language: {} for language in sorted(languages)}
+    for suggestion in ui:
+        raw = suggestion.get("translations")
+        for language in sorted(languages):
             values = raw.get(language, {}) if isinstance(raw, dict) else {}
-            for field, key in (("label", suggestion.get("labelKey")), ("utterance", suggestion.get("utteranceKey"))):
+            for field, key in (
+                ("label", suggestion.get("labelKey")),
+                ("utterance", suggestion.get("utteranceKey")),
+            ):
                 value = values.get(field) if isinstance(values, dict) else None
                 if not isinstance(value, str) or not value.strip():
-                    value = suggestion.get("labelFallback" if field == "label" else "utteranceFallback")
+                    if language == DEFAULT_LANGUAGE:
+                        value = suggestion.get(
+                            "labelFallback" if field == "label" else "utteranceFallback"
+                        )
+                    else:
+                        continue
                 if isinstance(key, str) and isinstance(value, str):
                     translations[language][key] = value
-    return {language: {key: values[key] for key in sorted(values)} for language, values in translations.items()}
+    return {
+        language: {key: values[key] for key in sorted(values)}
+        for language, values in sorted(translations.items())
+        if values
+    }
 
 
 def compile_conversation_sources(
@@ -546,12 +564,26 @@ def render_conversation_snapshot(model: dict[str, Any]) -> str:
     return json.dumps(snapshot, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
 
+def conversation_languages(model: dict[str, Any]) -> tuple[str, ...]:
+    """Return locale codes present in the merged canonical Conversation model."""
+    languages = merge_language_sets(
+        model.get("content", {}).get("translations", {}),
+        model.get("uiTranslations", {}),
+        model.get("dialogue", {}).get("translations", {}),
+        model.get("semantic", {}).get("translations", {}),
+    )
+    if DEFAULT_LANGUAGE not in languages:
+        raise CompileError(f"Conversation content requires {DEFAULT_LANGUAGE} fallback translations")
+    return languages
+
+
 def conversation_translation_bundles(model: dict[str, Any]) -> dict[str, dict[str, dict[str, str]]]:
     """Partition generated translations by Conversation domain, not history."""
-    bundles = {language: {} for language in LANGUAGES}
+    languages = conversation_languages(model)
+    bundles = {language: {} for language in languages}
 
     def add(language: str, domain: str, key: str, value: Any) -> None:
-        if not isinstance(key, str) or not isinstance(value, str):
+        if language not in bundles or not isinstance(key, str) or not isinstance(value, str):
             return
         bundles[language].setdefault(domain, {})[key] = value
 
@@ -563,17 +595,17 @@ def conversation_translation_bundles(model: dict[str, Any]) -> dict[str, dict[st
             for phrase in phrases
             if isinstance(phrase, dict) and isinstance(phrase.get("key"), str)
         ]
-        for language in LANGUAGES:
-            values = model["content"]["translations"].get(language, {})
+        for language in languages:
+            values = model["content"].get("translations", {}).get(language, {})
             for key in keys:
                 add(language, domain, key, values.get(key))
     for choice in model["content"].get("playerChoices", []):
         domain = str(choice.get("conversationDomain") or "greeting").title()
-        for language in LANGUAGES:
-            values = model["content"]["translations"].get(language, {})
+        for language in languages:
+            values = model["content"].get("translations", {}).get(language, {})
             add(language, domain, choice.get("labelKey"), values.get(choice.get("labelKey")))
             add(language, domain, choice.get("choiceKey"), values.get(choice.get("choiceKey")))
-    for language in LANGUAGES:
+    for language in languages:
         for key, value in model.get("uiTranslations", {}).get(language, {}).items():
             add(language, "UI", key, value)
         for key, value in model.get("dialogue", {}).get("translations", {}).get(language, {}).items():
@@ -583,6 +615,7 @@ def conversation_translation_bundles(model: dict[str, Any]) -> dict[str, dict[st
         bundles[language] = {
             domain: {key: values[key] for key in sorted(values)}
             for domain, values in sorted(bundles[language].items())
+            if values
         }
     return bundles
 

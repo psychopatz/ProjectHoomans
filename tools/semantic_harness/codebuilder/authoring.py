@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from tools.semantic_harness.codebuilder.lexicon_compiler import CompileError
+from tools.semantic_harness.codebuilder.translation_support import pretty_json
 from tools.semantic_harness.codebuilder.dialogue_contract import (
     load_dialogue_dataset,
 )
@@ -490,7 +491,7 @@ def _dialogue_preview_paths(
             / (asset_stem + ".json")
         ):
         render_dialogue_translation(compiled, language)
-        for language in ("EN", "TL")
+        for language in sorted(compiled.get("translations", {}))
     })
     manifest_relative_path = (
         "Contents/mods/ProjectHoomans/common/media/translation/manifests/Conversation.json"
@@ -509,7 +510,7 @@ def _dialogue_preview_paths(
         )
     except (OSError, UnicodeError, json.JSONDecodeError):
         compatibility_snapshot = False
-    for language in ("EN", "TL"):
+    for language in sorted(compiled.get("translations", {})):
         relative_path = f"{language}/Conversation/Semantic/{asset_stem}.json"
         entries = manifest.setdefault("languages", {}).setdefault(language, [])
         if relative_path not in entries and not compatibility_snapshot:
@@ -716,7 +717,7 @@ def _merge_modular_conversation_translations(
 ) -> None:
     """Keep legacy dataset generation visible in an existing modular bundle."""
     translation_root = repository / TRANSLATION_RELATIVE_ROOT
-    for language in ("EN", "TL"):
+    for language in sorted(compiled.get("translations", {})):
         path = translation_root / language / "Conversation/Patterns.json"
         if not path.is_file():
             continue
@@ -731,7 +732,7 @@ def _merge_modular_conversation_translations(
             continue
         current.update({key: value for key, value in values.items() if isinstance(value, str)})
         path.write_text(
-            json.dumps(current, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n",
+            pretty_json(current),
             encoding="utf-8",
             newline="\n",
         )

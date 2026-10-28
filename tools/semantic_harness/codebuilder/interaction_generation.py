@@ -11,6 +11,7 @@ from . import authoring
 
 from .blocks import SemanticBlockRegistry
 from .lexicon_compiler import CompileError
+from .translation_support import pretty_json
 from .dialogue_rendering import (
     render_dialogue_lua,
     render_dialogue_lua_plan,
@@ -227,8 +228,8 @@ class SemanticInteractionAuthoring:
         flow_modules = [module for module, _source in rendered if "/Flows/" in module]
         response_modules = [module for module, _source in rendered if "/Responses/" in module]
         translation_paths = {
-            "EN": ["EN/Conversation/Semantic/Generated.json"],
-            "TL": ["TL/Conversation/Semantic/Generated.json"],
+            language: [f"{language}/Conversation/Semantic/Generated.json"]
+            for language in sorted(compiled.get("translations", {}))
         }
         semantic_root = Path(
             "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
@@ -257,13 +258,8 @@ class SemanticInteractionAuthoring:
         )
         expected_sources.update({
             str(translation_root / language / "Conversation/Semantic/Generated.json"):
-                json.dumps(
-                    compiled["translations"][language],
-                    ensure_ascii=False,
-                    sort_keys=True,
-                    separators=(",", ":"),
-                ) + "\n"
-            for language in ("EN", "TL")
+                pretty_json(compiled["translations"][language])
+            for language in sorted(compiled.get("translations", {}))
         })
         return {
             "canonicalSourceDiff": authoring._artifact_diff(

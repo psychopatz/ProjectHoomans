@@ -1,1 +1,15 @@
-{"UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous":"Which part of my past do you mean?","UI_PNC_Conversation_Semantic_QuestionBackstoryEducation":"I studied %1.","UI_PNC_Conversation_Semantic_QuestionBackstoryFamily":"My family was %1.","UI_PNC_Conversation_Semantic_QuestionBackstoryFear":"I have always been afraid of %1.","UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation":"I remember that part of my life, but I don't have more detail about where it was.","UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss":"Sometimes. I still think about that part of my life.","UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob":"I worked as %1 before all this.","UI_PNC_Conversation_Semantic_QuestionBackstoryHobby":"I used to enjoy %1.","UI_PNC_Conversation_Semantic_QuestionBackstoryHometown":"I grew up in %1.","UI_PNC_Conversation_Semantic_QuestionBackstoryKnown":"Before all this, I was %1.","UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal":"I'm not ready to talk about that yet.","UI_PNC_Conversation_Semantic_QuestionBackstorySuspected":"I think it was %1, but I could be mistaken.","UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy":"Something happened: %1."}
+{
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous": "Which part of my past do you mean?",
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation": "I studied %1.",
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryFamily": "My family was %1.",
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryFear": "I have always been afraid of %1.",
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation": "I remember that part of my life, but I don't have more detail about where it was.",
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss": "Sometimes. I still think about that part of my life.",
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob": "I worked as %1 before all this.",
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryHobby": "I used to enjoy %1.",
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryHometown": "I grew up in %1.",
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown": "Before all this, I was %1.",
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal": "I'm not ready to talk about that yet.",
+  "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected": "I think it was %1, but I could be mistaken.",
+  "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy": "Something happened: %1."
+}

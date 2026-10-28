@@ -14,9 +14,11 @@ from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_MAX_SHARD_BYTES,
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
+    conversation_translation_bundles,
     render_conversation_runtime_plan,
     render_conversation_snapshot,
 )
+from tools.semantic_harness.codebuilder.build import _write_conversation_translation_manifest
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 
 
@@ -126,6 +128,54 @@ class ConversationCompilerP11B0Tests(unittest.TestCase):
             hashlib.sha256(first.encode("utf-8")).hexdigest(),
             hashlib.sha256(second.encode("utf-8")).hexdigest(),
         )
+
+
+    def test_third_locale_is_discovered_without_code_whitelist(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            shutil.copytree(
+                REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
+                repository / CONVERSATION_SOURCE_RELATIVE,
+            )
+            greeting_path = (
+                repository
+                / CONVERSATION_SOURCE_RELATIVE
+                / "content/greeting.json"
+            )
+            greeting = json.loads(greeting_path.read_text(encoding="utf-8"))
+            phrase = greeting["phraseFamilies"][0]["styles"]["neutral"][0]
+            phrase["translations"]["XX"] = "Synthetic locale text."
+            greeting_path.write_text(
+                json.dumps(
+                    greeting,
+                    ensure_ascii=False,
+                    indent=2,
+                    sort_keys=True,
+                ) + "\n",
+                encoding="utf-8",
+            )
+            model = compile_conversation_sources(
+                repository,
+                runtime_root=REPOSITORY,
+            )
+            bundles = conversation_translation_bundles(model)
+            self.assertIn("XX", bundles)
+            self.assertTrue(any(bundles["XX"].values()))
+
+            translation_root = repository / "translation"
+            for language in ("EN", "XX"):
+                path = translation_root / language / "Conversation/Test.json"
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("{}\n", encoding="utf-8")
+            manifest_path = _write_conversation_translation_manifest(
+                translation_root
+            )
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            self.assertEqual(sorted(manifest["languages"]), ["EN", "XX"])
+            self.assertEqual(
+                manifest["languages"]["XX"],
+                ["XX/Conversation/Test.json"],
+            )
 
 
 if __name__ == "__main__":

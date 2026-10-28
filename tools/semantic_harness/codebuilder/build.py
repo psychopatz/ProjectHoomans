@@ -45,6 +45,10 @@ if __package__ in {None, ""}:
         render_semantic_lua_plan,
         render_semantic_manifest,
     )
+    from tools.semantic_harness.codebuilder.translation_support import (
+        normalize_language,
+        pretty_json,
+    )
     from tools.semantic_harness.codebuilder.conversation_compiler import (
         CONVERSATION_COMPATIBILITY_RUNTIME_RELATIVE,
         CONVERSATION_MANIFEST_RELATIVE,
@@ -90,6 +94,7 @@ else:
         render_semantic_lua_plan,
         render_semantic_manifest,
     )
+    from .translation_support import normalize_language, pretty_json
     from .conversation_compiler import (
         CONVERSATION_COMPATIBILITY_RUNTIME_RELATIVE,
         CONVERSATION_MANIFEST_RELATIVE,
@@ -157,8 +162,8 @@ def write_semantic_output(output_root: Path, compiled: dict) -> list[Path]:
     flow_modules = [module for module, _source in rendered if "/Flows/" in module]
     response_modules = [module for module, _source in rendered if "/Responses/" in module]
     translation_paths = {
-        "EN": ["EN/Conversation/Semantic/Generated.json"],
-        "TL": ["TL/Conversation/Semantic/Generated.json"],
+        language: [f"{language}/Conversation/Semantic/Generated.json"]
+        for language in sorted(compiled.get("translations", {}))
     }
     manifest = semantic_dir / "Catalog.lua"
     manifest.write_text(
@@ -177,45 +182,68 @@ def write_semantic_output(output_root: Path, compiled: dict) -> list[Path]:
     paths.extend(_write_modules(shared_root, rendered))
 
     translation_root = output_root / "Contents/mods/ProjectHoomans/common/media/translation"
-    for language in ("EN", "TL"):
+    for language in sorted(compiled.get("translations", {})):
         directory = translation_root / language / "Conversation" / "Semantic"
         directory.mkdir(parents=True, exist_ok=True)
         path = directory / "Generated.json"
         path.write_text(
-            json.dumps(
-                compiled["translations"][language],
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-            )
-            + "\n",
+            pretty_json(compiled["translations"][language]),
             encoding="utf-8",
             newline="\n",
         )
         paths.append(path)
 
-    manifest_path = translation_root / "manifests" / "Conversation.json"
-    if manifest_path.is_file():
-        translation_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        for language, relative_paths in translation_paths.items():
-            entries = translation_manifest.setdefault("languages", {}).setdefault(language, [])
-            for relative_path in relative_paths:
-                # The modular Conversation compiler owns this translation
-                # domain once its generated bundle is registered. Keep the
-                # legacy file as a compatibility artifact without loading it
-                # a second time at runtime.
-                modular_path = f"{language}/Conversation/Flows.json"
-                if relative_path not in entries and modular_path not in entries:
-                    entries.append(relative_path)
-        manifest_path.write_text(
-            json.dumps(translation_manifest, ensure_ascii=False, indent=2)
-            + "\n",
-            encoding="utf-8",
-            newline="\n",
-        )
-        paths.append(manifest_path)
+    manifest_path = _write_conversation_translation_manifest(translation_root)
+    paths.append(manifest_path)
     return paths
 
+
+
+_CONVERSATION_RETIRED_COMPATIBILITY = frozenset({
+    "Conversation/Semantic/Generated.json",
+    "Conversation/Semantic/CommonInteractions.json",
+    "Conversation/Semantic/GroundedPersonalDialogue.json",
+    "Conversation/Semantic/DialogueContent.json",
+    "Conversation/Semantic/Suggestions.json",
+})
+
+
+def _conversation_locale_directories(translation_root: Path) -> list[tuple[str, Path]]:
+    """Discover locale directories from actual Conversation translation trees."""
+    discovered: list[tuple[str, Path]] = []
+    if not translation_root.is_dir():
+        return discovered
+    for directory in translation_root.iterdir():
+        if not directory.is_dir() or not (directory / "Conversation").is_dir():
+            continue
+        try:
+            language = normalize_language(directory.name, "translation directory")
+        except CompileError:
+            continue
+        discovered.append((language, directory))
+    return sorted(discovered, key=lambda item: item[0])
+
+
+def _write_conversation_translation_manifest(translation_root: Path) -> Path:
+    """Generate Conversation.json from real locale files instead of mutating it."""
+    languages: dict[str, list[str]] = {}
+    for language, directory in _conversation_locale_directories(translation_root):
+        entries: list[str] = []
+        for path in sorted((directory / "Conversation").rglob("*.json")):
+            relative_from_language = path.relative_to(directory).as_posix()
+            if relative_from_language in _CONVERSATION_RETIRED_COMPATIBILITY:
+                continue
+            entries.append(path.relative_to(translation_root).as_posix())
+        if entries:
+            languages[language] = entries
+    manifest_path = translation_root / "manifests/Conversation.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        pretty_json({"version": 1, "languages": languages}),
+        encoding="utf-8",
+        newline="\n",
+    )
+    return manifest_path
 
 def _shared_lua_root(path: Path) -> Path:
     parts = path.parts
@@ -318,7 +346,7 @@ def write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
         manifest_path = translation_root / "manifests/Conversation.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8")) \
             if manifest_path.is_file() else {"version": 1, "languages": {}}
-        for language in ("EN", "TL"):
+        for language in sorted(compiled.get("translations", {})):
             relative_path = (
                 f"{language}/Conversation/Semantic/{translation_stem}.json"
             )
@@ -330,10 +358,6 @@ def write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
                 newline="\n",
             )
             paths.append(translation_path)
-            entries = manifest.setdefault("languages", {}).setdefault(language, [])
-            modular_path = f"{language}/Conversation/Patterns.json"
-            if relative_path not in entries and modular_path not in entries:
-                entries.append(relative_path)
         manifest_path.parent.mkdir(parents=True, exist_ok=True)
         manifest_path.write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
@@ -401,29 +425,13 @@ def write_conversation_output(
     paths.append(compatibility_ui)
 
     translation_root = repository / "Contents/mods/ProjectHoomans/common/media/translation"
-    translation_manifest_path = translation_root / "manifests/Conversation.json"
-    translation_manifest = (
-        json.loads(translation_manifest_path.read_text(encoding="utf-8"))
-        if translation_manifest_path.is_file()
-        else {"version": 1, "languages": {}}
-    )
     bundles = conversation_translation_bundles(model)
-    retired_translation_paths = {
-        f"{language}/Conversation/Semantic/{name}"
-        for language in ("EN", "TL")
-        for name in (
-            "Generated.json",
-            "CommonInteractions.json",
-            "GroundedPersonalDialogue.json",
-            "DialogueContent.json",
-            "Suggestions.json",
+    for language in sorted(bundles):
+        # Preserve contextual UI keys that are still owned outside the static
+        # Conversation UI shard until those providers migrate.
+        suggestions_path = (
+            translation_root / language / "Conversation/Semantic/Suggestions.json"
         )
-    }
-    for language in ("EN", "TL"):
-        # The existing Suggestions bundle also serves contextual UI outside
-        # the ten static definitions. Carry those compatibility keys into the
-        # generated UI-domain bundle before retiring its history-based path.
-        suggestions_path = translation_root / language / "Conversation/Semantic/Suggestions.json"
         if suggestions_path.is_file():
             try:
                 suggestions = json.loads(suggestions_path.read_text(encoding="utf-8"))
@@ -431,48 +439,43 @@ def write_conversation_output(
                 suggestions = {}
             if isinstance(suggestions, dict):
                 bundles[language].setdefault("UI", {}).update(
-                    {key: value for key, value in suggestions.items() if isinstance(value, str)}
+                    {
+                        key: value
+                        for key, value in suggestions.items()
+                        if isinstance(value, str)
+                    }
                 )
-        for domain, values in bundles[language].items():
+
+        for domain, values in sorted(bundles[language].items()):
             relative = f"{language}/Conversation/{domain}.json"
             path = translation_root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(
-                json.dumps(values, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n",
+                pretty_json(values),
                 encoding="utf-8",
                 newline="\n",
             )
             paths.append(path)
-            entries = translation_manifest.setdefault("languages", {}).setdefault(language, [])
-            if relative not in entries:
-                entries.append(relative)
-        compatibility_relative = f"{language}/Conversation/Semantic/DialogueContent.json"
-        compatibility_path = translation_root / compatibility_relative
-        compatibility_path.parent.mkdir(parents=True, exist_ok=True)
-        compatibility_path.write_text(
-            json.dumps(
-                model["content"]["translations"][language],
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-            ) + "\n",
-            encoding="utf-8",
-            newline="\n",
-        )
-        paths.append(compatibility_path)
-        entries = translation_manifest.setdefault("languages", {}).setdefault(language, [])
-        if compatibility_relative not in entries:
-            entries.append(compatibility_relative)
-    translation_manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    for language in ("EN", "TL"):
-        entries = translation_manifest.setdefault("languages", {}).setdefault(language, [])
-        translation_manifest["languages"][language] = [
-            entry for entry in entries if entry not in retired_translation_paths
-        ]
-    translation_manifest_path.write_text(
-        json.dumps(translation_manifest, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-        newline="\n",
+
+        # Compatibility snapshot only. The generated manifest intentionally
+        # excludes this path so runtime loads the modular domain bundles.
+        content_values = model["content"].get("translations", {}).get(language)
+        if isinstance(content_values, dict):
+            compatibility_path = (
+                translation_root
+                / language
+                / "Conversation/Semantic/DialogueContent.json"
+            )
+            compatibility_path.parent.mkdir(parents=True, exist_ok=True)
+            compatibility_path.write_text(
+                pretty_json(content_values),
+                encoding="utf-8",
+                newline="\n",
+            )
+            paths.append(compatibility_path)
+
+    translation_manifest_path = _write_conversation_translation_manifest(
+        translation_root
     )
     paths.append(translation_manifest_path)
 

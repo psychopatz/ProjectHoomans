@@ -9,6 +9,7 @@ from typing import Any
 from .lexicon_compiler import CompileError, _lua_string
 from .dialogue_contract import DIALOGUE_LUA_CHUNK_MAX_CHARS
 from .catalog_naming import ModuleNameRegistry, module_path, pascal_segment
+from .translation_support import pretty_json
 
 def _lua_value(value: Any, indent: int = 0) -> str:
     if value is None:
@@ -246,15 +247,10 @@ def render_dialogue_manifest(manifest: dict[str, Any]) -> str:
 
 
 def render_dialogue_translation(compiled: dict[str, Any], language: str) -> str:
-    """Render the small localized shard emitted beside generated dialogue Lua."""
-    if language not in ("EN", "TL"):
-        raise CompileError(f"unsupported dialogue translation language {language}")
+    """Render one localized shard discovered from compiled translations."""
+    language = str(language).strip().upper()
     translations = compiled.get("translations", {})
-    values = translations.get(language, {})
+    values = translations.get(language)
     if not isinstance(values, dict):
-        raise CompileError(f"dialogue translations for {language} must be an object")
-    return json.dumps(
-        {key: values[key] for key in sorted(values)},
-        ensure_ascii=False,
-        separators=(",", ":"),
-    ) + "\n"
+        raise CompileError(f"unsupported dialogue translation language {language}")
+    return pretty_json({key: values[key] for key in sorted(values)})

@@ -1,1 +1,18 @@
-{"UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultGuarded01":"I'm managing. Don't press me.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultNeutral01":"I'm okay. How about you?","UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultTerse01":"I'm okay.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultWarm01":"I'm doing okay. Thanks for asking.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueAltNeutral01":"I'm tired. A little rest would help.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueNeutral01":"I'm worn out, but I can still manage.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerAltNeutral01":"I'm getting hungry. Could you spare something to eat?","UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerNeutral01":"I'm pretty hungry, if I'm honest. Do you have anything to eat?","UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredGuarded01":"I'm hurt. That's all I can say.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredNeutral01":"A little banged up, but I'll manage.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredTerse01":"I'm hurt. I can manage.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredWarm01":"I took a hit, but I'm steady enough to keep going.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingPanicNeutral01":"I'm pretty shaken up right now.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingStressNeutral01":"I'm tense, but I can keep going.","UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstAltNeutral01":"I could really use a drink. Do you have any water?","UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstNeutral01":"I'm pretty thirsty. Could you spare some water?"}
+{
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultGuarded01": "I'm managing. Don't press me.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultNeutral01": "I'm okay. How about you?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultTerse01": "I'm okay.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultWarm01": "I'm doing okay. Thanks for asking.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueAltNeutral01": "I'm tired. A little rest would help.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingFatigueNeutral01": "I'm worn out, but I can still manage.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerAltNeutral01": "I'm getting hungry. Could you spare something to eat?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingHungerNeutral01": "I'm pretty hungry, if I'm honest. Do you have anything to eat?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredGuarded01": "I'm hurt. That's all I can say.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredNeutral01": "A little banged up, but I'll manage.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredTerse01": "I'm hurt. I can manage.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingInjuredWarm01": "I took a hit, but I'm steady enough to keep going.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingPanicNeutral01": "I'm pretty shaken up right now.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingStressNeutral01": "I'm tense, but I can keep going.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstAltNeutral01": "I could really use a drink. Do you have any water?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingThirstNeutral01": "I'm pretty thirsty. Could you spare some water?"
+}

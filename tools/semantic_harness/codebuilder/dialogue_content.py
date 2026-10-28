@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from .lexicon_compiler import CompileError, _lua_string
+from .translation_support import DEFAULT_LANGUAGE, normalize_translations, pretty_json
 
 
 CONTENT_SCHEMA = "pnc.semantic_dialogue_content.v2"
@@ -31,7 +32,6 @@ CONTENT_TRANSLATION_RELATIVE = Path(
     "Contents/mods/ProjectHoomans/common/media/translation"
 )
 CONTENT_TRANSLATION_STEM = "DialogueContent"
-LANGUAGES = ("EN", "TL")
 STYLES = ("neutral", "warm", "terse", "guarded")
 ID_PATTERN = re.compile(r"^[a-z][a-z0-9_.:-]{0,127}$")
 TRANSLATION_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,127}$")
@@ -96,17 +96,8 @@ def _translation_key(value: Any, label: str) -> str:
 
 
 def _translations(value: Any, label: str) -> dict[str, str]:
-    if not isinstance(value, dict):
-        raise CompileError(f"{label} requires EN and TL string values")
-    output: dict[str, str] = {}
-    for language in LANGUAGES:
-        output[language] = _text(value.get(language), f"{label}.{language}")
-    unsupported = set(value) - set(LANGUAGES)
-    if unsupported:
-        raise CompileError(
-            f"{label} contains unsupported languages: {', '.join(sorted(unsupported))}"
-        )
-    return output
+    """Validate one locale map; EN is the only required fallback locale."""
+    return normalize_translations(value, label)
 
 
 def _metadata(value: Any) -> dict[str, str]:
@@ -187,7 +178,7 @@ def _phrase_family(
                 "key": key,
                 # Keep the authored English fallback beside the key so a
                 # missing/late translation never exposes a key to players.
-                "fallback": values["EN"],
+                "fallback": values[DEFAULT_LANGUAGE],
             })
             translations.update({f"{key}:{language}": text for language, text in values.items()})
         compiled_styles[style] = compiled_phrases
@@ -226,9 +217,11 @@ def _player_content(
     label_values = _translations(value.get("labelTranslations"), f"{content_id}.labelTranslations")
     choice_values = _translations(value.get("choiceTranslations"), f"{content_id}.choiceTranslations")
     translations: dict[str, str] = {}
-    for language in LANGUAGES:
-        translations[f"{label_key}:{language}"] = label_values[language]
-        translations[f"{choice_key}:{language}"] = choice_values[language]
+    for language in sorted(set(label_values) | set(choice_values)):
+        if language in label_values:
+            translations[f"{label_key}:{language}"] = label_values[language]
+        if language in choice_values:
+            translations[f"{choice_key}:{language}"] = choice_values[language]
     return {
         "id": content_id,
         "kind": kind,
@@ -265,7 +258,7 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
     phrase_ids: set[str] = set()
     translation_keys: set[str] = set()
     compiled_families: list[dict[str, Any]] = []
-    translations_by_language = {language: {} for language in LANGUAGES}
+    translations_by_language: dict[str, dict[str, str]] = {}
     for raw_family in raw_families:
         family, values = _phrase_family(
             raw_family, groups, phrase_ids, translation_keys
@@ -279,7 +272,7 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
         compiled_families.append(family)
         for compound_key, text in values.items():
             key, language = compound_key.rsplit(":", 1)
-            translations_by_language[language][key] = text
+            translations_by_language.setdefault(language, {})[key] = text
 
     compiled_player: list[dict[str, Any]] = []
     for raw_choice in raw_player:
@@ -290,7 +283,7 @@ def compile_dialogue_content(document: dict[str, Any]) -> dict[str, Any]:
         compiled_player.append(choice)
         for compound_key, text in values.items():
             key, language = compound_key.rsplit(":", 1)
-            translations_by_language[language][key] = text
+            translations_by_language.setdefault(language, {})[key] = text
 
     # Translation output is deliberately a flat string map.  Arrays here
     # would turn equivalent wording into a different runtime contract.
@@ -575,24 +568,33 @@ def render_dialogue_content_manifest(
 
 
 def render_dialogue_content_translation(compiled: dict[str, Any], language: str) -> str:
-    language = str(language).upper()
-    if language not in LANGUAGES:
+    language = str(language).strip().upper()
+    values = compiled.get("translations", {}).get(language)
+    if not isinstance(values, dict):
         raise CompileError(f"unsupported dialogue content language: {language}")
-    return json.dumps(
-        compiled["translations"][language],
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    ) + "\n"
+    return pretty_json({key: values[key] for key in sorted(values)})
 
 
-def dialogue_content_artifact_paths(repository: Path) -> list[Path]:
+def dialogue_content_artifact_paths(
+    repository: Path,
+    compiled: dict[str, Any] | None = None,
+) -> list[Path]:
+    languages: list[str]
+    if isinstance(compiled, dict):
+        languages = sorted(compiled.get("translations", {}))
+    else:
+        manifest_path = repository / CONTENT_TRANSLATION_RELATIVE / "manifests/Conversation.json"
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            languages = sorted((manifest.get("languages") or {}).keys())
+        except (OSError, UnicodeError, json.JSONDecodeError, AttributeError):
+            languages = [DEFAULT_LANGUAGE]
     return [
         repository / CONTENT_RUNTIME_RELATIVE,
         *[
             repository / CONTENT_TRANSLATION_RELATIVE / language
             / "Conversation/Semantic" / f"{CONTENT_TRANSLATION_STEM}.json"
-            for language in LANGUAGES
+            for language in languages
         ],
         repository / CONTENT_TRANSLATION_RELATIVE / "manifests/Conversation.json",
     ]
@@ -618,7 +620,7 @@ def write_dialogue_content_output(
         "version": 1,
         "languages": {},
     }
-    for language in LANGUAGES:
+    for language in sorted(compiled.get("translations", {})):
         relative = f"{language}/Conversation/Semantic/{CONTENT_TRANSLATION_STEM}.json"
         path = translation_root / relative
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -633,7 +635,7 @@ def write_dialogue_content_output(
             entries.append(relative)
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+        pretty_json(manifest),
         encoding="utf-8",
         newline="\n",
     )

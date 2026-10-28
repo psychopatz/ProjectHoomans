@@ -11,18 +11,7 @@ return {
     },
     generator = "PNC/Semantics/PNC_SemanticAutomaticFlowGenerator",
     generatedDefinitions = "PNC/Semantics/PNC_SemanticGeneratedAutomaticFlows",
-    translationPaths = {
-        EN = {
-            "EN/Conversation/Semantic/Generated.json",
-            "EN/Conversation/Semantic/GeneratedTaskCommandContext.json",
-            "EN/Conversation/Semantic/GeneratedTaskCommands.json",
-            "EN/Conversation/Semantic/GeneratedTaskCommandMemory.json",
-        },
-        TL = {
-            "TL/Conversation/Semantic/Generated.json",
-            "TL/Conversation/Semantic/GeneratedTaskCommandContext.json",
-            "TL/Conversation/Semantic/GeneratedTaskCommands.json",
-            "TL/Conversation/Semantic/GeneratedTaskCommandMemory.json",
-        },
-    },
+    -- Translation loading is owned by media/translation/manifests/Conversation.json.
+    -- Automatic-flow generation describes semantics only; locales are discovered
+    -- by the translation catalog rather than duplicated here.
 }

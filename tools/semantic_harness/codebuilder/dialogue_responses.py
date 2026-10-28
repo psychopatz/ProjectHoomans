@@ -7,6 +7,7 @@ import re
 from typing import Any
 
 from .lexicon_compiler import CompileError
+from .translation_support import legacy_translation_map, normalize_translations
 from .dialogue_contract import (
     DIALOGUE_ID,
     DIALOGUE_TEMPLATE_ID,
@@ -23,6 +24,33 @@ from .dialogue_contract import (
     validate_branch_offers,
     _validate_source_refs,
 )
+
+
+def _variant_translations(
+    variant: dict[str, Any],
+    fallback: str,
+    label: str,
+) -> dict[str, str]:
+    """Normalize modern translation maps plus legacy en/tl fields."""
+    raw = variant.get("translations")
+    legacy = legacy_translation_map(variant)
+
+    if raw is not None and legacy:
+        modern = normalize_translations(raw, f"{label}.translations")
+        legacy_map = normalize_translations(legacy, f"{label}.legacyTranslations")
+        for language, text in legacy_map.items():
+            current = modern.get(language)
+            if current is not None and current != text:
+                raise CompileError(
+                    f"{label} conflicts between translations and legacy {language} text"
+                )
+            modern.setdefault(language, text)
+        return {language: modern[language] for language in sorted(modern)}
+    if raw is not None:
+        return normalize_translations(raw, f"{label}.translations")
+    if legacy:
+        return normalize_translations(legacy, f"{label}.legacyTranslations")
+    return {}
 
 def _validate_response_condition(value: Any, pool_id: str, variant_id: str) -> dict[str, Any]:
     if value is None:
@@ -240,7 +268,7 @@ def _compile_dialogue_response_pool(
                 f"response priority for {pool_id}:{variant_id} must be from -10 to 10")
         allowed_keys = {
             "id", "templateID", "fallback", "when", "priority", "en", "tl",
-            "plan", "reviewed", "sourceRefs", "translationArgs",
+            "translations", "plan", "reviewed", "sourceRefs", "translationArgs",
         }
         if set(variant) - allowed_keys:
             raise CompileError(
@@ -248,13 +276,11 @@ def _compile_dialogue_response_pool(
         if (not isinstance(template_id, str)
                 or not DIALOGUE_TEMPLATE_ID.fullmatch(template_id)):
             raise CompileError(f"invalid template id for {pool_id}:{variant_id}")
-        english = variant.get("en", fallback)
-        tagalog = variant.get("tl")
-        if "en" in variant or "tl" in variant:
-            if (not isinstance(english, str) or not english.strip()
-                    or not isinstance(tagalog, str) or not tagalog.strip()):
-                raise CompileError(
-                    f"dialogue response {pool_id}:{variant_id} requires both EN and TL text")
+        localized = _variant_translations(
+            variant,
+            fallback.strip(),
+            f"dialogue response {pool_id}:{variant_id}",
+        )
         reviewed = variant.get("reviewed", False)
         if not isinstance(reviewed, bool):
             raise CompileError(f"dialogue response {pool_id}:{variant_id} reviewed must be boolean")
@@ -292,18 +318,22 @@ def _compile_dialogue_response_pool(
                 "reviewed": True,
                 "sourceRefs": source_refs,
             }
-        if "en" in variant or "tl" in variant:
+        if localized:
             compiled_variant.setdefault("metadata", {})["translationKey"] = template_id
         compiled_variants.append(compiled_variant)
-    translations = {"EN": {}, "TL": {}}
+    translations: dict[str, dict[str, str]] = {}
     for variant in variants:
-        if "en" not in variant and "tl" not in variant:
-            continue
         variant_id = variant["id"]
         compiled_variant = next(item for item in compiled_variants if item["id"] == variant_id)
         key = compiled_variant["templateID"]
-        if key in translations["EN"] or key in translations["TL"]:
-            raise CompileError(f"duplicate dialogue translation key {key}")
-        translations["EN"][key] = variant["en"].strip()
-        translations["TL"][key] = variant["tl"].strip()
+        localized = _variant_translations(
+            variant,
+            compiled_variant["fallback"],
+            f"dialogue response {pool_id}:{variant_id}",
+        )
+        for language, text in localized.items():
+            bucket = translations.setdefault(language, {})
+            if key in bucket:
+                raise CompileError(f"duplicate dialogue translation key {key}")
+            bucket[key] = text
     return {"id": pool_id, "variants": compiled_variants}, translations
