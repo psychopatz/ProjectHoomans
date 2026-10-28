@@ -14,7 +14,6 @@ local DEBUG_EVENTS = {
     treated_wound = "health",
     saved_from_incapacitation = "health",
     protected_from_attacker = "combat",
-    witnessed_player_kill = "combat",
     witnessed_player_hurt = "combat",
     player_damaged_npc = "combat",
     survived_combat_together = "combat",

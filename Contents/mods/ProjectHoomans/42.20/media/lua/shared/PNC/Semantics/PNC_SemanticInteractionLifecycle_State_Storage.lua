@@ -104,10 +104,13 @@ local function hasDurableMeaning(thread)
 end
 
 local function activeThread(store, key)
-    return store.active[key] or store.pairs[key]
+    return store.transient and store.transient[key]
+        or store.active[key]
+        or store.pairs[key]
 end
 
 local removePair
+local removeTransient
 
 local function expireResidue(thread, hour)
     if not thread or not thread.residueExpiresHour then return false end
@@ -120,7 +123,15 @@ local function expireResidue(thread, hour)
 end
 
 local function expireThreadIfNeeded(store, key, hour)
-    local thread = activeThread(store, key)
+    local transient = store.transient and store.transient[key] or nil
+    if transient and transient.expiresHour
+        and (tonumber(hour) or 0) > tonumber(transient.expiresHour)
+    then
+        removeTransient(store, key)
+        store.metrics.expirations = store.metrics.expirations + 1
+        transient = nil
+    end
+    local thread = transient or store.active[key] or store.pairs[key]
     if thread and thread.expiresHour
         and (tonumber(hour) or 0) > tonumber(thread.expiresHour)
     then
@@ -148,12 +159,17 @@ local function topicStackIndex(thread, topic)
     return nil
 end
 
+removeTransient = function(store, key)
+    if store.transient then store.transient[key] = nil end
+end
+
 removePair = function(store, key)
     if store.pairs[key] then
         store.pairs[key] = nil
         store.metrics.pairRecordsDeleted = store.metrics.pairRecordsDeleted + 1
     end
     store.active[key] = nil
+    removeTransient(store, key)
 end
 
 local function capThread(thread, store)
@@ -197,6 +213,7 @@ function Lifecycle.New(options)
         worldHour = finite(options.worldHour) or 0,
         limits = boundedCopy(options.limits or Lifecycle.LIMITS, 0),
         active = {},
+        transient = {},
         pairs = {},
         sharedEvents = {},
         metrics = {
@@ -248,6 +265,7 @@ Internal.ExpireResidue = expireResidue
 Internal.ExpireThreadIfNeeded = expireThreadIfNeeded
 Internal.TopicStackIndex = topicStackIndex
 Internal.RemovePair = removePair
+Internal.RemoveTransient = removeTransient
 Internal.CapThread = capThread
 
 return Lifecycle

@@ -90,18 +90,33 @@ T.equal(playerSpoke.realizationFamily, "semantic.social.reaction",
     "player-spoke acknowledgement uses the semantic social pool")
 
 local witness = resolve(
-    "witnessed_player_kill",
+    "zombie_kill_witnessed",
     "event:p3:witness",
     {
+        combatReactionRole = "witness",
+        combatReactionStyle = "practical",
+        combatReactionMood = "steady",
+        combatPressure = "several",
+        killerActorKind = "player",
         factRefs = { "event:p3:witness" },
         semanticEventFacts = fact("event:p3:witness", {
-            summary = "the player killed a zombie",
-            happened = "the player killed a zombie",
+            summary = "the player killed a zombie nearby",
+            happened = "the player killed a zombie nearby",
+            countBand = "several",
+            quantity = "5 zombies are still close enough to matter.",
+            health = "I'm okay.",
+            nextAction = "Clear the nearby zombies before we relax.",
         }),
     }
 )
-T.truthy(witness.offerIDs and #witness.offerIDs == 1,
-    "witnessed kill exposes only the grounded event follow-up")
+T.truthy(string.find(
+    witness.realizationID,
+    "semantic.combat.reaction.kill_witness_practical_",
+    1,
+    true
+), "witnessed kill selects the practical witness reaction family")
+T.equal(#(witness.offerIDs or {}), 4,
+    "witnessed kill exposes the four grounded event follow-ups")
 
 local abandoned = resolve(
     "follower_abandoned_hostile_npc",

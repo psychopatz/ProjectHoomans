@@ -9,6 +9,384 @@ return {
         ["kind"] = "content",
         ["source"] = "content/event/reactions.json",
     },
+    ["phrase.semantic.combat.reaction.kill_killer_aggressive_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_aggressive_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_aggressive_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_aggressive_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_aggressive_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_aggressive_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_brave_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_brave_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_brave_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_brave_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_brave_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_brave_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_cold_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_cold_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_cold_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_cold_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_cold_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_cold_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_practical_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_practical_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_practical_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_practical_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_practical_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_practical_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_reserved_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_reserved_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_reserved_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_reserved_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_reserved_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_reserved_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_shaken_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_shaken_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_shaken_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_shaken_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_shaken_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_shaken_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_supportive_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_supportive_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_supportive_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_supportive_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_killer_supportive_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_killer_supportive_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_killer_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_aggressive_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_aggressive_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_aggressive_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_aggressive_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_aggressive_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_aggressive_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_brave_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_brave_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_brave_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_brave_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_brave_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_brave_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_cold_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_cold_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_cold_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_cold_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_cold_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_cold_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_practical_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_practical_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_practical_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_practical_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_practical_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_practical_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_reserved_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_reserved_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_reserved_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_reserved_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_reserved_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_reserved_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_shaken_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_shaken_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_shaken_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_shaken_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_shaken_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_shaken_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_supportive_01"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_supportive_01",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_supportive_02"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_supportive_02",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
+    ["phrase.semantic.combat.reaction.kill_witness_supportive_03"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+        },
+        ["id"] = "phrase.semantic.combat.reaction.kill_witness_supportive_03",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_kill_witness_reactions.json",
+    },
     ["phrase.semantic.combat.reaction.retreat"] = {
         ["domain"] = "event",
         ["generated"] = {

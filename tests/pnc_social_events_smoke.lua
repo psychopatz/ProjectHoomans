@@ -257,7 +257,7 @@ local definitionCount = 0
 for _, _ in pairs(PNC.SocialEventDefinitions) do
     definitionCount = definitionCount + 1
 end
-T.equal(definitionCount, 24, "social event definitions")
+T.equal(definitionCount, 23, "social event definitions")
 T.truthy(PNC.SocialEventDefinitions.necroa_mask_removed,
     "Necroa mask removal definition")
 T.truthy(PNC.SocialEventDefinitions.necroa_player_mask_removed,
@@ -574,43 +574,30 @@ T.truthy(unrelatedOK, "unrelated kill tracked as combat")
 T.equal(unrelatedReason, "neutralized_without_protection",
     "unrelated kill grants no protection")
 
-local witnessedKill = PNC.SocialEvents.Emit(event(
-    "social:witnessed_player_kill:1",
+-- Routine zombie kills no longer enter SocialEvents. They are ephemeral
+-- semantic presentation only; meaningful protection/shared-combat outcomes
+-- above remain the durable combat-memory boundary.
+T.falsy(PNC.SocialEventDefinitions.witnessed_player_kill,
+    "routine witnessed kill definition is retired")
+T.falsy(PNC.ConductDefinitions.witnessed_player_kill,
+    "routine witnessed kill conduct definition is retired")
+local retiredKill = PNC.SocialEvents.Emit(event(
+    "social:witnessed_player_kill:retired",
     "witnessed_player_kill",
     playerKey,
     aliceKey,
     216
 ))
-T.truthy(witnessedKill.ok, "witnessed player kill accepted")
-local witnessedLifecycle = Lifecycle.Project(
-    lifecycleStore,
-    playerKey,
-    witnessedKill.details[1].observerNPCID
-)
-T.equal(
-    witnessedLifecycle.thread.activeBeat.responsePlanID,
-    "social.reaction.witnessed_player_kill",
-    "witnessed combat retains its semantic response plan"
-)
-local witnessedEventRef = false
-for _, eventRef in ipairs(witnessedLifecycle.thread.eventRefs or {}) do
-    if eventRef == "social:witnessed_player_kill:1" then
-        witnessedEventRef = true
-        break
-    end
-end
-T.truthy(witnessedEventRef,
-    "witnessed combat retains a canonical event reference")
+T.equal(retiredKill.reason, "unknown_event_type",
+    "retired routine kill cannot mutate the social-event pipeline")
 T.equal(memoryCount(
     PNC.Relationships.Get(alice.id, playerKey),
     "witnessed_player_kill"
-), 1, "witnessed kill creates NPC relationship memory")
-T.equal(#PNC.Relationships.Get(alice.id, playerKey).interactionJournal,
-    1, "witnessed kill appears in interaction journal")
+), 0, "retired routine kill creates no relationship memory")
 T.equal(evidenceCount(
     PNC.Conduct.GetForEntity(playerKey),
     "witnessed_player_kill"
-), 1, "witnessed kill creates player conduct evidence")
+), 0, "retired routine kill creates no conduct evidence")
 local conductBeforeFactionAttack = PNC.Conduct.GetForEntity(playerKey)
 local restraintBeforeFactionAttack =
     conductBeforeFactionAttack.scores.restraint
@@ -638,20 +625,6 @@ T.equal(PNC.Conduct.GetForEntity(playerKey).scores.restraint,
 T.equal(PNC.Conduct.GetForEntity(playerKey).scores.compassion,
     compassionBeforeFactionAttack,
     "faction fanout does not multiply compassion conduct")
-local witnessedKillSecond = PNC.SocialEvents.Emit(event(
-    "social:witnessed_player_kill:2",
-    "witnessed_player_kill",
-    playerKey,
-    aliceKey,
-    216.1
-))
-T.truthy(witnessedKillSecond.ok,
-    "second witnessed player kill is not cooldown blocked")
-T.equal(memoryCount(
-    PNC.Relationships.Get(alice.id, playerKey),
-    "witnessed_player_kill"
-), 2, "witnessed kills are not contribution capped")
-
 -- 16-18. Shared combat is reciprocal for NPCs, one-sided for players, and
 -- trivial encounters do not qualify.
 PNC.SocialEncounterTracker.Reset()

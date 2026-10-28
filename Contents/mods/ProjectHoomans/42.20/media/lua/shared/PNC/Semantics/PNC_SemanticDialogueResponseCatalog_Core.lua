@@ -24,7 +24,8 @@ Core.CONDITION_FIELDS = {
     "projectALifeKind", "projectALifeStance",
     "projectALifeConflictDirection", "projectALifeConflictDamage",
     "companionDogSex", "companionDogFed", "npcType", "relationshipTier",
-    "greetingState",
+    "greetingState", "combatReactionRole", "combatReactionStyle",
+    "combatReactionMood", "combatPressure", "killerActorKind",
 }
 
 function Core.copy(value, depth)
@@ -249,6 +250,11 @@ function Core.conditionContext(context)
         npcType = context.npcType,
         relationshipTier = context.relationshipTier,
         greetingState = context.greetingState,
+        combatReactionRole = context.combatReactionRole,
+        combatReactionStyle = context.combatReactionStyle,
+        combatReactionMood = context.combatReactionMood,
+        combatPressure = context.combatPressure,
+        killerActorKind = context.killerActorKind,
     }
 end
 

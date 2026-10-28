@@ -61,7 +61,7 @@ Client.Reset()
 local accepted, reason = Presentation.Receive({
     eventID = "authority:event:missing-text",
     npcID = "npc-boundary",
-    flavorID = "social.witnessed_player_kill",
+    flavorID = "semantic.combat.reaction.kill_witness_practical_01",
     family = "semantic_boundary",
     responsePlanID = "semantic.combat.reaction.plan",
     realizationID = "semantic.combat.reaction.variant",
@@ -85,7 +85,7 @@ Client.Reset()
 local resolvedAccepted = Presentation.Receive({
     eventID = "authority:event:resolved-text",
     npcID = "npc-boundary",
-    flavorID = "social.witnessed_player_kill",
+    flavorID = "semantic.combat.reaction.kill_witness_practical_01",
     family = "semantic_boundary",
     resolvedText = "The selected meaning is delivered.",
     responsePlanID = "semantic.combat.reaction.plan",

@@ -3,27 +3,30 @@
 **Status:** DEVELOPER COMPLETE.
 
 ## O0 — live regression baseline — ACCEPTED
-
-Reproduced immediate `DOUBLE_DOWN` self-loop, single-surface realization, missing typed `I mean it` interpretation, behavior-gated horde awareness, player/NPC kill asymmetry and whole-roster player-kill witness discovery.
+Reproduced generated self-looping, behavior-gated zombie awareness, player/NPC kill asymmetry, whole-roster witness work, and routine-kill relationship/conduct mutation.
 
 ## O1 — open-ended generated frontier — ACCEPTED
-
-Record generated strategy/stance in bounded session turns, add recurrence policy, prioritize active hostility/pending-question families before generic relation rows, and preserve unrestricted typed semantic input.
+Bounded session strategy history, recurrence policy, focused hostility/pending-question frontiers, unrestricted typed input.
 
 ## O2 — contextual reaffirmation and realization — ACCEPTED
-
-Add exact neutral `REAFFIRM` surfaces, contextually reframe them in DiscourseResolver, and add deterministic EN/TL DOUBLE_DOWN realization variants through canonical CodeBuilder sources.
+Contextual `REAFFIRM` plus compiler-owned EN/TL continuation variation.
 
 ## O3 — canonical zombie observation — ACCEPTED
+Reuse Perception frames, one descriptive classifier, bounded SESSION evidence, no extra world census.
 
-Reuse Perception-frame counts, introduce one descriptive classifier, expose bounded network/context projection, and emit current zombie pressure as SESSION evidence. No population-wide scan added.
-
-## O4 — unified kill observation and spatial witnesses — ACCEPTED
-
-Publish player/NPC kills through `engine:zombie_killed`, preserve SocialEncounterTracker aggregation, and use SpatialIndex for normal player-kill witness discovery.
+## O4 — unified kill observation — ACCEPTED
+Player/NPC kills publish `engine:zombie_killed`; SocialEncounterTracker remains meaningful encounter authority.
 
 ## O5 — scale/regression acceptance — ACCEPTED
+Full Lua, semantic worker, Unified Evidence, deterministic CodeBuilder, Kahlua and static gates.
 
-Prove full Lua regressions, Unified Evidence regressions, semantic live regressions, grounded world knowledge, deterministic CodeBuilder generation, Kahlua compilation, static checks, and no new ModData/world-scan authority.
+## O6 — retire routine kill social mutation — ACCEPTED
+Remove Hoomans client kill audit, legacy witness adapter, `witnessed_player_kill` relationship/conduct definition and debug surfaces. Preserve PsychopatzCore detector as SP/MP authority bridge and make detector/server kill audits opt-in.
 
-Native Project Zomboid SP/MP verification is user-owned.
+## O7 — immersive bounded kill reactions — ACCEPTED
+Add reaction profile + semantic reaction service; cap/coalesce fanout; add 42 EN/TL witness/killer variants across seven styles; ground event follow-ups; keep routine speech non-LLM and non-memory.
+
+## O8 — transient follow-up lifecycle — ACCEPTED
+Add a reusable live-only interaction overlay so ambient semantic speech can support immediate typed/clicked follow-ups without entering lifecycle ModData. Close/TTL expiry discards it; only subsequent real player interaction may promote it.
+
+Native Project Zomboid SP/MP verification remains user-owned.

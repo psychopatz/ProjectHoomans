@@ -161,7 +161,6 @@ function Math.ModifySocialEvent(
         )
         breakdown.compassion = factor
     elseif eventType == "protected_from_attacker"
-        or eventType == "witnessed_player_kill"
         or eventType == "survived_combat_together"
         or eventType == "survived_horde_attack"
     then

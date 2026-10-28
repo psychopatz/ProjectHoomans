@@ -47,7 +47,7 @@ class UnifiedEvidenceE3Tests(unittest.TestCase):
     def test_salience_pressure_coalescing_and_day_rollover(self):
         churn = ["player_greeted", "npc_greeted_player", "player_farewelled",
                  "player_thanked", "player_praised", "player_saluted",
-                 "player_disapproved", "witnessed_player_kill", "witnessed_player_hurt"]
+                 "player_disapproved", "witnessed_player_hurt"]
         with saved_worker() as worker:
             storage(worker, project="saved_from_incapacitation")
             for _ in range(5):

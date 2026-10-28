@@ -2,116 +2,135 @@
 
 ## Conversation continuation
 
-Generated buttons are an ephemeral frontier over the current discourse state, not a dialogue tree.
+Generated buttons are an ephemeral frontier over bounded discourse state, not a dialogue tree.
 
 ```text
 typed/clicked semantic act
-        |
-        v
-DialogueContextState (bounded session turns)
-        |
-        +-- intent / speechAct
-        +-- generated strategy / stance when present
-        |
-        v
-AffordanceContinuationPolicy
-        |
-        v
-GeneratedAffordanceProvider
-        |
-        v
-new contextual frontier
+        -> DialogueContextState
+        -> AffordanceContinuationPolicy
+        -> GeneratedAffordanceProvider
+        -> next contextual frontier
 ```
 
-The recurrence policy suppresses only generated suggestions. It never blocks typed NLU.
-
-A typed reaffirmation such as `I mean it` enters as neutral `REAFFIRM`. DiscourseResolver maps it to `HOSTILE_REMARK` only when bounded conversation history establishes active hostility; otherwise it becomes ordinary acknowledgement. This preserves typed/button parity without making the phrase globally hostile.
-
-Strategy and stance live only in the existing bounded DialogueContextState turn history. They are never persisted.
+The recurrence policy suppresses only generated suggestions. Typed NLU remains unrestricted. A typed `I mean it` enters as neutral `REAFFIRM`; DiscourseResolver maps it to hostile reaffirmation only when bounded conversation history establishes active hostility. Strategy and stance remain session-only.
 
 ## Zombie observation
 
 ```text
 getCell():getZombieList()
-        |
-        v
-PNC_WorldCensus            <- only recurring population-wide traversal
-        |
-        v
-PNC_SpatialIndex
-        |
-        v
-PNC_Perception frame       <- per-NPC, cached
-        |
-        v
-PNC_ZombieObservation      <- two radius counts over same frame
-        |
-   +----+-----+----------------+
-   |          |                |
-combat       social         semantics
-thresholds   episode hook   SESSION evidence
+        -> PNC_WorldCensus          (only recurring population-wide traversal)
+        -> PNC_SpatialIndex
+        -> PNC_Perception frame     (per-NPC cached)
+        -> PNC_ZombieObservation
+              |-> combat thresholds
+              |-> semantic SESSION evidence
+              |-> event/presentation context
 ```
 
-`PNC_ZombieObservation` never calls `getCell()` or `getZombieList()`. It caches runtime observations and is invoked from the already scheduled live-NPC record processing lane.
+`PNC_ZombieObservation` performs no `getCell()` or `getZombieList()` traversal. Descriptive semantic bands are `none / few / several / horde / massive_horde`; tactical combat thresholds remain separate gameplay policy.
 
-Descriptive bands are canonical:
-
-- none: 0
-- few: 1–2
-- several: 3–5
-- horde: 6–11
-- massive_horde: 12+
-
-Compatibility labels for existing social/world-knowledge presentation are derived from this classifier. Tactical thresholds such as `COMBAT_HORDE_COUNT` remain independent gameplay policy.
-
-## Kill observation
+## Kill authority and retirement boundary
 
 ```text
-player kill
-PsychopatzCore ZombieKillDetector
-          |
-          +-------------------+
-                              v
-                       engine:zombie_killed
-                              ^
-          +-------------------+
-          |
-NPC CombatResolution -> authoritative killed result
+PLAYER KILL
+engine hit/death
+  -> PsychopatzCore ZombieKillDetector
+       |-> pure-client ZombieKillReport / server validation + dedupe
+       |-> Hoomans KillBridge
+              |-> threat attribution / SocialEncounterTracker
+              |     -> durable only when meaningful
+              |        (protection, shared danger, etc.)
+              |
+              -> SemanticCombatReactionService
+                    -> ephemeral optional speech only
+
+NPC KILL
+CombatResolution authoritative death
+  |-> engine:zombie_killed
+  |-> SocialEncounterTracker neutralization/protection owner
+  -> SemanticCombatReactionService
 ```
 
-Both paths carry actor kind and stable actor/threat identity when available. No routine kill is persisted merely because this event exists.
+Retired from normal production:
+- Hoomans `PNC_ClientZombieKillAudit`;
+- `CombatAdapter_Witnesses`;
+- `witnessed_player_kill` SocialEvent definition;
+- per-routine-kill relationship memory;
+- per-routine-kill conduct evidence;
+- routine-kill debug controls for that retired event.
 
-`SocialEncounterTracker` remains authoritative for encounter aggregation and `killsByParticipant`. Existing meaningful social outcomes such as protection/shared survival remain the persistence boundary.
+PsychopatzCore ZombieKillDetector is **not** retired: it is the reusable authority/MP transport mechanism. Its diagnostic printing is opt-in, so normal weapon hits/deaths do not perform console I/O.
 
-## Witness performance
+## Routine reaction performance contract
 
-Normal player-kill witness discovery:
+For a player kill:
+1. reserve one player reaction window;
+2. if within the 5-second window, increment the bounded suppressed-kill count and return before spatial lookup;
+3. when eligible, query `SpatialIndex.QueryNPCs` once;
+4. exact floor/distance/visibility gate;
+5. select at most two speakers;
+6. derive a bounded semantic profile;
+7. resolve authored semantic text and send presentation only for selected speakers.
+
+Suppressed kills are summarized into the next event fact as `killBurstCount`. Routine kill speech has `memoryEligible=false` and `llmEligible=false`.
+
+NPC self-kills use the same service, with per-speaker cooldown and at most two nearby player listeners.
+
+## Reaction profile and authored content
+
+`PNC_SemanticCombatReactionProfile` reads existing owners only:
 
 ```text
-kill position
-    -> SpatialIndex.QueryNPCs(radius)
-    -> exact floor/distance
-    -> existing bounded visibility checks
-    -> social event
+relationship + personality + NPCTraitContext
++ panic/stress + health + SpeechStyleContext
++ ZombieObservation
+        -> semantic.combat.reaction_profile.v1
+        -> role/style/mood/pressure
+        -> semantic.combat.kill.<role>.<style>
+        -> one of 3 authored variants
 ```
 
-`Registry.ForEachLive` is retained only as a compatibility fallback when the spatial index is unavailable.
+Styles: `aggressive, supportive, shaken, brave, reserved, cold, practical`.
+
+Two canonical CodeBuilder shards keep the library modular:
+- 21 witness families;
+- 21 NPC-killer families.
+
+Each style/role pool has three authored EN/TL variants. Selection uses existing bounded response-catalog anti-repeat behavior.
+
+## Grounded follow-ups
+
+Kill event facts may contain `happened/summary`, `quantity`, `health`, and `nextAction`. Existing semantic event-reference handling exposes only grounded offers:
+
+- What happened?
+- How many are around?
+- Are you okay?
+- What now?
+
+Answers are resolved from the same event fact rather than reparsing rendered speech. Unsupported/stale facts retain the existing safe unknown behavior.
+
+## Transient follow-up lifecycle
+
+Routine ambient kill speech records its beat with `transientInteraction=true` and `meaningful=false`. `InteractionLifecycle` keeps that beat in `store.transient`, which is visible to live `Project/Resume` resolution but is deliberately excluded from `Lifecycle.Export` and `sharedEvents`.
+
+Closing or TTL expiry discards the overlay. A subsequent real player semantic turn can promote the overlay into the normal pair/event store, because at that point the conversation itself—not the zombie kill alone—has become meaningful.
+
+This is a reusable semantic presentation contract; it must not be replaced with a kill-specific ModData cache.
 
 ## Persistence boundary
 
 Runtime-only:
-
 - generated strategy recurrence;
-- zombie observation snapshot;
-- current zombie-pressure evidence;
-- routine kill notifications;
-- derived relevance.
+- current zombie observation;
+- routine kill semantic events;
+- reaction profile/style;
+- coalescing/cooldown counters;
+- realized routine kill speech.
 
 Existing persistent owners only:
-
-- relationship/conduct memories;
-- compact Conversation Memory;
+- relationship/conduct memories for meaningful social events;
+- compact Conversation Memory where registered;
 - meaningful WorldKnowledge facts;
-- existing social encounter outcomes.
+- SocialEncounterTracker outcomes such as protection/shared survival.
 
-No new ModData root is allowed by this job.
+Routine zombie kills are deliberately absent from canonical durable social-event registration.

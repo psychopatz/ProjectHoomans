@@ -42,7 +42,7 @@ local item = {
         socialRole = "neutral",
         relationshipState = "neutral",
         relationshipTier = "reserved",
-        eventType = "witnessed_player_kill",
+        eventType = "zombie_kill_witnessed",
     },
 }
 T.truthy(Integration.SubmitAmbientFlavor(item, function(value)

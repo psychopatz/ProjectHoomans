@@ -26,6 +26,44 @@ local Persistence = T.load(
 )
 Persistence.Load(true)
 
+local transient = Persistence.RecordNPCSpeech({
+    npcID = "npc-transient",
+    targetID = "player-one",
+    playerUUID = "player-one",
+    act = "REACT",
+    topic = "combat",
+    beatID = "beat:kill:transient",
+    responsePlanID = "semantic.combat.kill.witness.practical",
+    eventType = "zombie_kill_witnessed",
+    eventRef = "combat:kill:transient",
+    factRefs = { "combat:kill:transient" },
+    offerIDs = { "semantic.followup.event.happened" },
+    worldHour = 99,
+    meaningful = false,
+    transient = true,
+    ttlHours = 15 / 3600,
+})
+T.truthy(transient and transient.accepted and not transient.persisted,
+    "transient NPC speech remains live without persistence")
+T.falsy(Persistence.Dirty,
+    "transient NPC speech does not dirty ModData")
+local transientSaved, transientSaveReason = Persistence.Save(false)
+T.falsy(transientSaved,
+    "transient-only lifecycle has nothing to save")
+T.equal(transientSaveReason, "not_dirty",
+    "transient-only save remains clean")
+T.falsy(modData[Persistence.MODDATA_KEY],
+    "transient-only lifecycle creates no ModData payload")
+T.truthy(Persistence.Project("player-one", "npc-transient").thread,
+    "transient lifecycle remains projectable for follow-up")
+T.equal(
+    Persistence.Close("player-one", "npc-transient", {
+        worldHour = 99.001,
+    }).reason,
+    "transient_closed",
+    "closing transient lifecycle does not promote it"
+)
+
 local envelope = Lifecycle.Envelope.TypedText({
     speechAct = "REQUEST",
     topic = "water",

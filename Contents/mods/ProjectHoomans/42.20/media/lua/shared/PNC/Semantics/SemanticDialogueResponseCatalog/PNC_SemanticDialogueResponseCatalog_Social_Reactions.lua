@@ -31,6 +31,12 @@ local FOLLOW_UP_OFFERS = {
     combat = {
         followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
     },
+    kill = {
+        followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
+        followUp("quantity", "How many are around?", "EVENT_QUANTITY"),
+        followUp("health", "Are you okay?", "EVENT_HEALTH"),
+        followUp("next", "What now?", "EVENT_NEXT"),
+    },
     retreat = {
         followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
     },
@@ -203,6 +209,32 @@ Catalog.Register("semantic.leader_loss.reaction", {
         ),
     },
 })
+
+local KILL_REACTION_STYLES = {
+    "aggressive", "supportive", "shaken", "brave",
+    "reserved", "cold", "practical",
+}
+for _, role in ipairs({ "witness", "killer" }) do
+    for _, style in ipairs(KILL_REACTION_STYLES) do
+        local poolID = "semantic.combat.kill." .. role .. "." .. style
+        local variants = {}
+        for variantIndex = 1, 3 do
+            variants[#variants + 1] = response(
+                poolID,
+                string.format(
+                    "kill_%s_%s_%02d", role, style, variantIndex
+                ),
+                nil,
+                0,
+                "REACT",
+                "combat",
+                FOLLOW_UP_OFFERS.kill,
+                "semantic.combat.reaction"
+            )
+        end
+        Catalog.Register(poolID, { variants = variants })
+    end
+end
 
 Catalog.Register("semantic.combat.reaction", {
     variants = {

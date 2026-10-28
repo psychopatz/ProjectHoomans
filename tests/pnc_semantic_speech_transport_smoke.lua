@@ -22,13 +22,13 @@ T.load("ProjectHoomans", "shared",
 local Network = PNC.Network
 local flavor = {
     speechEventID = "semantic.combat.reaction.threat",
-    eventType = "witnessed_player_kill",
+    eventType = "zombie_kill_witnessed",
     priority = 35,
 }
 Network.SendConversationRelationship(
     nil,
     { npcID = "npc-one", approval = 3 },
-    "witnessed_player_kill",
+    "zombie_kill_witnessed",
     {
         npcID = "npc-one",
         ambientFlavor = flavor,

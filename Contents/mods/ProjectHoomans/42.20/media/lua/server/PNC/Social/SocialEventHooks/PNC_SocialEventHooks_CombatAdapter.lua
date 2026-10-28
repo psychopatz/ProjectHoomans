@@ -7,6 +7,6 @@ PNC.SocialEventHooks = PNC.SocialEventHooks or {}
 PNC.SocialEventHooksInternal = PNC.SocialEventHooksInternal or {}
 
 require "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness"
-require "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Witnesses"
+require "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_KillBridge"
 
 return PNC.SocialEventHooks

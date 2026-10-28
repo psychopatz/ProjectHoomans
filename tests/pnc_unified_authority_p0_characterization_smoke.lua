@@ -30,7 +30,7 @@ T.load(
 
 local payload = PNC.SemanticSpeechPresentationInternal.BuildReceivePayload({
     ambientFlavor = {
-        flavorID = "social.witnessed_player_kill",
+        flavorID = "semantic.combat.reaction.kill_witness_practical_01",
         resolvedText = "The semantic selection was made here.",
         responsePlanID = "semantic.combat.reaction.plan",
         realizationID = "semantic.combat.reaction.variant",
@@ -44,12 +44,12 @@ local payload = PNC.SemanticSpeechPresentationInternal.BuildReceivePayload({
     role = "neutral",
     relationshipState = "neutral",
     relationshipTier = "reserved",
-    eventType = "witnessed_player_kill",
+    eventType = "zombie_kill_witnessed",
 })
 
 T.equal(payload.text, "The semantic selection was made here.",
     "resolvedText is projected into the native payload")
-T.equal(payload.flavorID, "social.witnessed_player_kill",
+T.equal(payload.flavorID, "semantic.combat.reaction.kill_witness_practical_01",
     "the presentation alias remains available without owning semantic text")
 T.equal(payload.responsePlanID, "semantic.combat.reaction.plan",
     "semantic provenance already crossed the presentation boundary")

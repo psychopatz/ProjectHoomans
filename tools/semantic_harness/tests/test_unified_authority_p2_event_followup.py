@@ -133,6 +133,73 @@ class UnifiedAuthorityP2EventFollowUpTests(unittest.TestCase):
                 "pnc.question.context_reference.event_location",
             )
 
+    def test_kill_reaction_followups_resolve_grounded_event_facts(self) -> None:
+        payload = {
+            "eventType": "zombie_kill_witnessed",
+            "eventRef": "combat:kill:worker-test",
+            "npcID": "npc_mara",
+            "factRefs": ["combat:kill:worker-test"],
+            "context": {
+                "eventType": "zombie_kill_witnessed",
+                "combatReactionRole": "witness",
+                "combatReactionStyle": "supportive",
+                "combatReactionMood": "steady",
+                "combatPressure": "several",
+                "killerActorKind": "player",
+            },
+            "semanticEventFacts": {
+                "combat:kill:worker-test": {
+                    "eventRef": "combat:kill:worker-test",
+                    "authoritative": True,
+                    "disclosure": "player",
+                    "summary": "The player killed a zombie nearby.",
+                    "quantity": "5 zombies are still close enough to matter.",
+                    "health": "I'm okay.",
+                    "nextAction": "Clear the nearby zombies before we relax.",
+                }
+            },
+        }
+        expected = {
+            "semantic.followup.event.happened":
+                "The player killed a zombie nearby.",
+            "semantic.followup.event.quantity":
+                "5 zombies are still close enough to matter.",
+            "semantic.followup.event.health": "I'm okay.",
+            "semantic.followup.event.next":
+                "Clear the nearby zombies before we relax.",
+        }
+
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            event = worker.interaction_npc_event(payload)
+            self.assertTrue(event["ok"])
+            realization = event["result"]["realization"]
+            self.assertIn(
+                "semantic.combat.kill.witness.supportive",
+                realization["realizationFamily"],
+            )
+            rows = self._event_rows(event["result"]["suggestions"])
+            self.assertEqual(set(rows), set(expected))
+
+        for candidate_id, content in expected.items():
+            with self.subTest(candidate_id=candidate_id):
+                with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+                    event = worker.interaction_npc_event(payload)
+                    rows = self._event_rows(event["result"]["suggestions"])
+                    clicked = worker.suggestion_click(
+                        rows[candidate_id]["frame"]
+                    )
+                    self.assertTrue(clicked["accepted"])
+                    response = clicked["result"]["decision"]["response"]
+                    self.assertEqual(
+                        response["selectionSource"],
+                        "event_follow_up",
+                    )
+                    self.assertEqual(response["args"]["content"], content)
+                    self.assertEqual(
+                        response["eventRef"],
+                        "combat:kill:worker-test",
+                    )
+
     def test_no_fact_refs_hide_followups_and_expire_the_window(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             event = worker.interaction_npc_event(

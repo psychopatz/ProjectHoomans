@@ -34,15 +34,6 @@ PNC.ConductDefinitions = {
         shareable = true,
         tags = { protection = true, combat = true },
     },
-    witnessed_player_kill = {
-        role = "combatant",
-        participants = "actor",
-        effects = { courage = 3, reliability = 1 },
-        decayPerDay = 0.02,
-        visibility = "direct",
-        shareable = true,
-        tags = { combat = true, witnessed = true },
-    },
     witnessed_player_hurt = {
         role = "combatant",
         participants = "actor",

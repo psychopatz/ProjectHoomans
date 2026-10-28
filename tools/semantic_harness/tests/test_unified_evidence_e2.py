@@ -8,8 +8,13 @@ class UnifiedEvidenceE2Tests(unittest.TestCase):
     def test_all_social_types_derive_canonical_registration(self):
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             audit = worker._request("TEST_EVIDENCE_METADATA")
-        self.assertEqual(len(audit["rows"]), 24)
+        self.assertEqual(len(audit["rows"]), 23)
         codes = {row["id"]: row["code"] for row in audit["rows"]}
+        self.assertNotIn(
+            "witnessed_player_kill",
+            codes,
+            "routine zombie kills are ephemeral semantic stimuli, not durable evidence",
+        )
         self.assertEqual(codes["saved_from_incapacitation"], 1101)
         self.assertEqual(codes["abandoned_in_combat"], 1102)
         self.assertEqual(codes["protected_from_attacker"], 1103)

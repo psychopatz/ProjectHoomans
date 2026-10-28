@@ -94,6 +94,18 @@
       "path": "content/event/reactions.json"
     },
     {
+      "domain": "event",
+      "kind": "content",
+      "order": 1502,
+      "path": "content/event/combat_kill_witness_reactions.json"
+    },
+    {
+      "domain": "event",
+      "kind": "content",
+      "order": 1503,
+      "path": "content/event/combat_kill_killer_reactions.json"
+    },
+    {
       "domain": "compatibility",
       "kind": "content",
       "order": 1600,

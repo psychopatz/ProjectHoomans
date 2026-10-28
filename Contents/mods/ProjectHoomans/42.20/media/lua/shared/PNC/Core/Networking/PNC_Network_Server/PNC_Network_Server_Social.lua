@@ -179,7 +179,9 @@ local function ensureNPCSpeechInteraction(
         factRefs = factRefs,
         expectedReplies = context.expectedReplies,
         worldHour = context.worldAgeHours,
-        meaningful = true,
+        meaningful = context.meaningful ~= false,
+        transient = context.transientInteraction == true,
+        ttlHours = context.interactionTTLHours,
     })
     if not recorded then return nil end
     context.interaction = envelope

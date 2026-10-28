@@ -1,0 +1,312 @@
+{
+  "domain": "event",
+  "groups": {
+    "events": {
+      "contentOwner": "projecthoomans.dialogue_content.events"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_aggressive_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Got one. Who's next?",
+              "TL": "Isa na. Sino'ng susunod?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_aggressive_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Down. Give me another.",
+              "TL": "Patay. May kasunod pa ba?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_aggressive_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's one. Keep them coming.",
+              "TL": "Isa na. Sige, lapit pa."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_supportive_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Got it. Stay close.",
+              "TL": "Patay na. Dito ka lang."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_supportive_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's down. You alright?",
+              "TL": "Tapos na. Okay ka lang?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_supportive_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "One less. I've got you.",
+              "TL": "Isa na lang ang nabawas. Kasama mo ako."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_shaken_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's down... give me a second.",
+              "TL": "Patay na... sandali lang."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_shaken_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Got it. I need a breath.",
+              "TL": "Nakuha ko. Kailangan ko munang huminga."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_shaken_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's dead. I really hate this.",
+              "TL": "Patay na. Ayoko talaga nito."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_brave_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Down. Keep moving.",
+              "TL": "Patay. Tuloy tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_brave_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Got it. Watch my side.",
+              "TL": "Nakuha ko. Bantayan mo ang gilid ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_brave_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "One less. Stay sharp.",
+              "TL": "Isa na lang ang nabawas. Magmatyag."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_reserved_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Down.",
+              "TL": "Patay."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_reserved_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Got it.",
+              "TL": "Nakuha ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_reserved_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Clear.",
+              "TL": "Malinis."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_cold_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Done. Keep up.",
+              "TL": "Tapos. Sumabay ka."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_cold_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's dead. Move.",
+              "TL": "Patay na. Galaw."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_cold_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "One less problem.",
+              "TL": "Isang problema na lang ang nawala."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_practical_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Got it. Check the area.",
+              "TL": "Nakuha ko. Suriin ang paligid."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_practical_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "One down. Let's keep moving.",
+              "TL": "Isa na. Tuloy tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_killer_practical_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's clear here. Watch for more.",
+              "TL": "Malinis dito. Bantayan ang iba."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Combat Kill Killer Reaction Content",
+    "version": "1"
+  },
+  "version": 1
+}

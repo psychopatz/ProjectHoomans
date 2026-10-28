@@ -20,6 +20,7 @@ local expireResidue = Internal.ExpireResidue
 local expireThreadIfNeeded = Internal.ExpireThreadIfNeeded
 local topicStackIndex = Internal.TopicStackIndex
 local removePair = Internal.RemovePair
+local removeTransient = Internal.RemoveTransient
 local capThread = Internal.CapThread
 local hasDurableMeaning = Internal.HasDurableMeaning
 
@@ -39,6 +40,29 @@ local function threadTurn(envelope, options, hour)
         provenance = boundedCopy(envelope.provenance, 0),
         worldHour = hour,
     }
+end
+
+local function storeTransient(store, key, thread)
+    store.transient = store.transient or {}
+    if not store.transient[key] then
+        local count = 0
+        local oldestKey
+        local oldestHour = math.huge
+        for candidateKey, candidate in pairs(store.transient) do
+            count = count + 1
+            local at = finite(candidate and candidate.lastHour) or 0
+            if at < oldestHour then
+                oldestHour = at
+                oldestKey = candidateKey
+            end
+        end
+        if count >= (tonumber(store.limits.pairs) or 64)
+            and oldestKey and removeTransient
+        then
+            removeTransient(store, oldestKey)
+        end
+    end
+    store.transient[key] = thread
 end
 
 local function recordRealization(thread, realizationID, limit)
@@ -71,9 +95,34 @@ function Lifecycle.Apply(store, rawEnvelope, options)
         and envelope.actorID or envelope.targetID
     local key = pairKey(envelope.playerUUID, npcID)
     if not key then return nil, "pair_identity_required" end
+    local transientRequested = options.transient == true
     local thread = expireThreadIfNeeded(store, key, hour)
-    if not thread then
-        thread = newThread(envelope.playerUUID, npcID, hour)
+    if transientRequested then
+        local liveTransient = store.transient and store.transient[key] or nil
+        if not liveTransient and thread then
+            thread = copyThread(thread)
+        end
+        if not thread then
+            thread = newThread(envelope.playerUUID, npcID, hour)
+        end
+        thread.transient = true
+    else
+        if thread and thread.transient == true then
+            local promotedBeat = thread.activeBeat
+            thread = copyThread(thread)
+            thread.transient = nil
+            if removeTransient then removeTransient(store, key) end
+            if promotedBeat and promotedBeat.eventRef then
+                Lifecycle.RegisterSharedEvent(store, {
+                    id = promotedBeat.eventRef,
+                    type = promotedBeat.eventType,
+                    occurredAt = thread.lastHour,
+                })
+            end
+        end
+        if not thread then
+            thread = newThread(envelope.playerUUID, npcID, hour)
+        end
     end
     expireResidue(thread, hour)
     local previousTopic = thread.topic
@@ -98,11 +147,13 @@ function Lifecycle.Apply(store, rawEnvelope, options)
         envelope, options, hour
     )
     if envelope.eventRef then
-        Lifecycle.RegisterSharedEvent(store, {
-            id = envelope.eventRef,
-            type = envelope.eventType,
-            occurredAt = envelope.worldHour,
-        })
+        if not transientRequested then
+            Lifecycle.RegisterSharedEvent(store, {
+                id = envelope.eventRef,
+                type = envelope.eventType,
+                occurredAt = envelope.worldHour,
+            })
+        end
         appendUnique(thread.eventRefs, envelope.eventRef, store.limits.eventRefs)
     end
     for index = 1, #(envelope.factRefs or {}) do
@@ -161,6 +212,16 @@ function Lifecycle.Apply(store, rawEnvelope, options)
         thread.topic = thread.activeBeat.topic or thread.topic
     end
     capThread(thread, store)
+    if transientRequested then
+        storeTransient(store, key, thread)
+        return {
+            accepted = true,
+            persisted = false,
+            reason = "transient_state",
+            envelope = envelope,
+            thread = copyThread(thread),
+        }
+    end
     store.metrics.applied = store.metrics.applied + 1
     local durable = options.meaningful == true or hasDurableMeaning(thread)
     if not durable and options.resolveBeat ~= true then
@@ -212,6 +273,14 @@ function Lifecycle.Close(store, playerUUID, npcID, options)
     local hour = finite(options.worldHour) or store.worldHour or 0
     local thread = key and expireThreadIfNeeded(store, key, hour) or nil
     if not thread then return { accepted = true, persisted = false, reason = "no_thread" } end
+    if thread.transient == true then
+        if removeTransient then removeTransient(store, key) end
+        return {
+            accepted = true,
+            persisted = false,
+            reason = "transient_closed",
+        }
+    end
     thread.lastHour = hour
     expireResidue(thread, hour)
     if hasDurableMeaning(thread) and options.destroy ~= true then
@@ -239,6 +308,23 @@ function Lifecycle.Resume(store, playerUUID, npcID, options)
     local thread = activeThread(store, key)
     if not thread then return nil, "thread_unavailable" end
     local hour = finite(options.worldHour) or store.worldHour or 0
+    if thread.transient == true then
+        if thread.expiresHour and hour > thread.expiresHour then
+            if removeTransient then removeTransient(store, key) end
+            store.metrics.expirations = store.metrics.expirations + 1
+            return nil, "thread_expired"
+        end
+        thread.status = "ACTIVE"
+        thread.lastHour = hour
+        thread.revision = (tonumber(thread.revision) or 0) + 1
+        storeTransient(store, key, thread)
+        return {
+            accepted = true,
+            persisted = false,
+            reason = "transient_resumed",
+            thread = copyThread(thread),
+        }
+    end
     if thread.expiresHour and hour > thread.expiresHour then
         removePair(store, key)
         store.metrics.expirations = store.metrics.expirations + 1
@@ -276,6 +362,27 @@ function Lifecycle.Compact(store, playerUUID, npcID, options)
     local before = #thread.recentTurns
     capThread(thread, store)
     if options.resolveBeat == true then thread.activeBeat = nil end
+    if thread.transient == true then
+        if options.resolveBeat == true
+            or (options.clearTrivial == true and not hasDurableMeaning(thread))
+        then
+            if removeTransient then removeTransient(store, key) end
+            store.metrics.compactions = store.metrics.compactions + 1
+            return {
+                accepted = true,
+                persisted = false,
+                reason = "transient_compacted",
+            }
+        end
+        storeTransient(store, key, thread)
+        store.metrics.compactions = store.metrics.compactions + 1
+        return {
+            accepted = true,
+            persisted = false,
+            reason = "transient_state",
+            thread = copyThread(thread),
+        }
+    end
     if options.clearTrivial == true and not hasDurableMeaning(thread) then
         removePair(store, key)
         store.metrics.compactions = store.metrics.compactions + 1
@@ -312,12 +419,22 @@ function Lifecycle.Maintenance(store, limit)
     limit = math.max(0, math.floor(tonumber(limit) or 8))
     local inspected = 0
     local expired = 0
-    for key, thread in pairs(store.pairs) do
+    for key, thread in pairs(store.transient or {}) do
         if inspected >= limit then break end
         inspected = inspected + 1
         if thread.expiresHour and store.worldHour > thread.expiresHour then
-            removePair(store, key)
+            if removeTransient then removeTransient(store, key) end
             expired = expired + 1
+        end
+    end
+    if inspected < limit then
+        for key, thread in pairs(store.pairs) do
+            if inspected >= limit then break end
+            inspected = inspected + 1
+            if thread.expiresHour and store.worldHour > thread.expiresHour then
+                removePair(store, key)
+                expired = expired + 1
+            end
         end
     end
     store.metrics.expirations = store.metrics.expirations + expired

@@ -14,7 +14,7 @@ local Authority = PNC.Semantics.RealizationAuthority
 local EVENT_OFFER_FIELDS = {
     EVENT_WHAT_HAPPENED = { "summary", "happened", "description" },
     EVENT_LOCATION = { "location", "locationLabel" },
-    EVENT_QUANTITY = { "countBand", "count", "quantity" },
+    EVENT_QUANTITY = { "quantity", "count", "countBand" },
     EVENT_ATTACKER = { "attackerName", "attacker" },
     EVENT_NEED = { "need", "needType" },
     EVENT_DECEASED = { "deceasedName", "deceased" },
@@ -112,6 +112,22 @@ end
 local function poolFor(spec)
     if spec.poolID then return tostring(spec.poolID) end
     local eventType = string.lower(tostring(spec.eventType or ""))
+    local context = type(spec.context) == "table" and spec.context or {}
+    if eventType == "zombie_kill_witnessed"
+        or eventType == "zombie_kill_self"
+    then
+        local role = tostring(context.combatReactionRole or (
+            eventType == "zombie_kill_self" and "killer" or "witness"
+        ))
+        local style = tostring(context.combatReactionStyle or "practical")
+        local allowed = {
+            aggressive = true, supportive = true, shaken = true,
+            brave = true, reserved = true, cold = true, practical = true,
+        }
+        if role ~= "killer" then role = "witness" end
+        if not allowed[style] then style = "practical" end
+        return "semantic.combat.kill." .. role .. "." .. style
+    end
     if eventType == "bandit_attack" then
         return "semantic.compat.bandits.hooman_hurt"
     end

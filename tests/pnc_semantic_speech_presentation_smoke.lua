@@ -111,7 +111,7 @@ end
 Client.Reset()
 local accepted = Presentation.Receive(semanticFlavor(
     "social:event:one",
-    "witnessed_player_kill"
+    "zombie_kill_witnessed"
 ), {
     npcID = "npc-one",
     state = "neutral",
@@ -126,7 +126,7 @@ T.equal(received.speakerName, "Mara", "adapter resolves NPC display name")
 T.truthy(received.text ~= "", "adapter resolves relationship-aware text")
 T.equal(received.source.kind, "semantic_speech",
     "event delivery preserves semantic speech ownership")
-T.equal(received.source.eventType, "witnessed_player_kill",
+T.equal(received.source.eventType, "zombie_kill_witnessed",
     "event delivery preserves the typed semantic event")
 local entries = Diary.Get("npc-one")
 T.equal(#entries, 1, "adapter records the delivered flavor in the diary")
@@ -182,7 +182,7 @@ end)
 Client.Reset()
 local voiceFlavor = semanticFlavor(
     "social:event:voice-binding",
-    "witnessed_player_kill"
+    "zombie_kill_witnessed"
 )
 voiceFlavor.llmEligible = true
 local llmAccepted = Presentation.Receive(voiceFlavor, {

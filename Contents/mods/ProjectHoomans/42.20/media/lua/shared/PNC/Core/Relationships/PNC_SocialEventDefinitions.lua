@@ -80,24 +80,6 @@ Definitions.protected_from_attacker = {
     contributionCaps = { approval = 50, respect = 70 },
 }
 
-Definitions.witnessed_player_kill = {
-    id = "witnessed_player_kill",
-    allowedSourceSystems = { combat = true },
-    targetMemory = {
-        type = "witnessed_player_kill",
-        approvalEffect = 2,
-        respectEffect = 4,
-        moraleEffect = 1,
-        familiarityGain = 2,
-        strength = 1,
-        decayPerDay = 0.03,
-        permanent = false,
-        shareable = true,
-        knowledgeSource = "experienced",
-        tags = { combat = true, witnessed = true },
-    },
-}
-
 Definitions.witnessed_player_hurt = {
     id = "witnessed_player_hurt",
     allowedSourceSystems = { combat = true },
@@ -446,7 +428,6 @@ local semanticByType = {
     protected_from_attacker = { code = 1103, retentionSalience = 215, longTerm = true, gossipEvent = "protection", classes = { "assistance" }, relations = { opens = { "gratitude" } } },
     survived_horde_attack = { code = 1104, retentionSalience = 245, longTerm = true, gossipEvent = "horde_survival", classes = { "shared_danger" }, relations = {} },
     abandoned_in_combat = { code = 1102, retentionSalience = 235, longTerm = true, gossipEvent = "abandonment", classes = { "grievance" }, relations = { opens = { "repair" } } },
-    witnessed_player_kill = { retentionSalience = 110, classes = { "witnessed_combat" }, relations = {} },
     witnessed_player_hurt = { retentionSalience = 120, classes = { "witnessed_harm" }, relations = {} },
     player_damaged_npc = { retentionSalience = 210, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
     faction_member_attacked = { retentionSalience = 200, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },

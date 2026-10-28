@@ -1,0 +1,312 @@
+{
+  "domain": "event",
+  "groups": {
+    "events": {
+      "contentOwner": "projecthoomans.dialogue_content.events"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_aggressive_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Nice. Hit the next one.",
+              "TL": "Ayos. Sunod naman."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_aggressive_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's how you do it. Keep going.",
+              "TL": "Ganyan dapat. Tuloy lang."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_aggressive_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good kill. Don't let up.",
+              "TL": "Maganda. Huwag kang titigil."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_supportive_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good one. You okay?",
+              "TL": "Ayos. Okay ka lang?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_supportive_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Nice hit. Stay close to me.",
+              "TL": "Maganda 'yon. Dito ka lang malapit."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_supportive_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You got it. I'm with you.",
+              "TL": "Napatumba mo. Kasama mo ako."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_shaken_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's down... but there are more.",
+              "TL": "Patay na... pero may iba pa."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_shaken_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good. Just—keep watching them.",
+              "TL": "Ayos. Basta—bantayan mo sila."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_shaken_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Okay. One less. I still don't like this.",
+              "TL": "Sige. Isa na lang ang nabawas. Ayoko pa rin nito."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_brave_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Clean kill. Check the flanks.",
+              "TL": "Malinis. Bantayan ang gilid."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_brave_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "One down. Keep your head up.",
+              "TL": "Isa na. Huwag magpakampante."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_brave_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good. Keep moving before they bunch up.",
+              "TL": "Ayos. Gumalaw tayo bago sila dumami."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_reserved_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "One down.",
+              "TL": "Isa na."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_reserved_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good.",
+              "TL": "Ayos."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_reserved_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Keep moving.",
+              "TL": "Tuloy."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_cold_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Don't expect applause.",
+              "TL": "Huwag kang umasa ng palakpak."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_cold_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You killed one. So what?",
+              "TL": "Napatay mo ang isa. Ano ngayon?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_cold_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Fine. One less.",
+              "TL": "Sige. Isa na lang ang nabawas."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_practical_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good. Check the area.",
+              "TL": "Ayos. Suriin natin ang paligid."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_practical_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "One down. Watch for more.",
+              "TL": "Isa na. Bantayan ang iba."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.kill_witness_practical_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Nice. Let's make sure it's clear.",
+              "TL": "Maganda. Siguraduhin nating malinaw ang paligid."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Combat Kill Witness Reaction Content",
+    "version": "1"
+  },
+  "version": 1
+}

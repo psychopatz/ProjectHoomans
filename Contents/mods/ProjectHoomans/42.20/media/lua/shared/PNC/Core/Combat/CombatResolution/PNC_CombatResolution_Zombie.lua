@@ -144,6 +144,18 @@ function Resolution.ApplyZombieDamage(attackerRecord, attackerZombie, target, hi
             source = "npc_combat_resolution",
         })
     end
+    local reactionService = PNC.SemanticCombatReactionService
+        or PNC.Semantics and PNC.Semantics.CombatReactionService or nil
+    if attackerRecord and killed and reactionService
+        and type(reactionService.OnNPCKill) == "function"
+    then
+        reactionService.OnNPCKill(attackerRecord, victim, {
+            x = victim:getX(),
+            y = victim:getY(),
+            z = victim:getZ(),
+            source = "npc_combat_resolution",
+        })
+    end
     return true, applied and "hit_zombie" or "hit_zombie_fallback", hit
 end
 

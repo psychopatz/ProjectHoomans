@@ -163,7 +163,7 @@ local function eventFacts(eventID)
 end
 
 for index, eventType in ipairs({
-    "conversation_safety", "witnessed_player_kill",
+    "conversation_safety", "zombie_kill_witnessed",
     "follower_abandoned_zombie", "zombie_horde_detected",
     "incapacitated_call", "incapacitated_update", "incapacitated_repeat",
     "witnessed_leader_death", "bandit_attack", "necroa_mask_removed",

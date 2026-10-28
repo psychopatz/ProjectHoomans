@@ -75,6 +75,7 @@ function Lifecycle.Import(store, payload)
     end
     store.worldHour = finite(payload.worldHour) or store.worldHour
     store.active = {}
+    store.transient = {}
     for key, thread in pairs(store.pairs) do
         if thread.status ~= "ARCHIVED" then store.active[key] = thread end
     end
