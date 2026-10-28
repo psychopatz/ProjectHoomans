@@ -1,20 +1,10 @@
 # Roadmap — Coherent Emergent Conversation
 
-**Parent status:** Existing C0–C11 + L0–L5 developer-accepted; **new contextual semantic expansion PLANNED / OPEN**. Scope/gates in `CONTEXTUAL_SEMANTIC_EXPANSION.md`; do not treat prior live-test handoff as completion of this new objective.
+**Parent status:** C0–C11 + L0–L5 developer-accepted foundation.
 **Accepted foundation:** preserve unless current runtime evidence disproves a specific invariant.
-**Active phase:** U0 — contextual-admission baseline, planned and unimplemented.
+**Active phase:** none. Contextual evidence/memory architecture is owned by `docs/Jobs/UnifiedSemanticEvidenceArchitecture/`.
 
-## New mandatory developer scope — U0–U4
-
-The legacy C0–C11/L0–L5 roadmap below remains accepted historical foundation. The new objective is specified in `CONTEXTUAL_SEMANTIC_EXPANSION.md`. These phases are mandatory and continuous after implementation begins; a single passing example does not close the parent goal.
-
-- **U0 — Reproducible semantic/context baseline (OPEN):** Trace reset SAVE/fixture `im sorry` from Core recovery/candidates through discourse, pragmatic selection, speech, and actual authority/effects. Capture positive and negative context controls; no source-save writes.
-- **U1 — Contextual social-act admission (PENDING):** Ground apology to real incident, target, recency and NPC disposition, reject phantom forgiveness; generalize the admission contract across social acts and preserve authoritative relationship policy.
-- **U2 — Compositional turn interpretation (PENDING):** Extend existing Core DialogueTurn and Hoomans discourse relations with multiple compatible acts, coordination, correction, contrast and counterquestion; retain strict action/mutation safety and explainable uncertainty.
-- **U3 — Choices, microplanning and lexicon (PENDING):** Expand contextual positive/negative/neutral generated affordances and NPC UtterancePlan coverage using canonical semantic concepts, compiler-owned EN/TL constructions and deterministic variation. Typed clicks must match native Response Channel.
-- **U4 — End-to-end developer acceptance (PENDING):** Run real Lua/paired-Core regression, scenario matrices, EN/TL, current-turn visible UI projection, server effects, CodeBuilder repeatability/context health, performance and source-save safety. Only then hand native SP/MP to user.
-
-**Next chunk:** U0. Never invent a parallel parser or gameplay authority, reopen accepted phases without evidence, launch PZ, publish Workshop content, or edit source saves.
+The former U0–U4 contextual expansion was moved to the dedicated Unified Semantic Evidence Architecture goal to avoid split ownership. `CONTEXTUAL_SEMANTIC_EXPANSION.md` remains evidence/history only; do not execute it as a separate roadmap.
 
 The native/live Semantic Lab test on the saved actor `npcDanapatz_Y5KK` proved that the coherent-conversation foundation exists but several accepted gates were too shallow: generated affordances can exist in worker diagnostics without becoming the visible Response Channel, bounded relationship-memory retention can still reject an otherwise valid social interaction, and common NPC behaviors still fall back to sparse authored wording.
 

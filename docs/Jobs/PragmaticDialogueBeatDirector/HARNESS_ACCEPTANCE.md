@@ -25,9 +25,9 @@ For human input expose a bounded chain:
 
 NPC semantic acts begin at the semantic-stimulus step and must show that no human NLU reparse occurred.
 
-## Next contextual-understanding gate (planned; NOT ACCEPTED)
+## Contextual evidence follow-on
 
-For the screenshot case, reproduce `im sorry` with no grounded grievance. Core may correctly recognize `APOLOGIZE` at high confidence, but the production Discourse/Pragmatic/InteractionPlan path must not infer an accepted apology, resolved offense, or relationship repair without justified context. Inspect the actual decision and server-authority/effects traces separately. Add prior-offense, unrelated-event, consumed/expired grievance, different-target, repeated-apology, and EN/TL controls; test actual native Response Channel and typed/button equivalence. Add safe multi-act cases and prove no invented gameplay consequences. Full contract and ordered acceptance: `CONTEXTUAL_SEMANTIC_EXPANSION.md`.
+The ungrounded-apology/contextual-memory follow-on is now owned by `docs/Jobs/UnifiedSemanticEvidenceArchitecture/`; its acceptance criteria are defined there and are not yet implementation acceptance. Do not execute a second acceptance matrix from this job.
 
 ## C0 regression corpus
 

@@ -1,6 +1,6 @@
 # Pragmatic Interaction Director & Coherent Conversation
 
-**Status:** Existing C0–C11 + L0–L5 foundation remains developer-accepted. New contextual semantic-understanding expansion is **PLANNED / NOT IMPLEMENTED**; see `CONTEXTUAL_SEMANTIC_EXPANSION.md`. The old live-test handoff does not constitute acceptance of the new scope.
+**Status:** C0–C11 + L0–L5 foundation remains developer-accepted. The later contextual-memory/admission expansion was moved to `docs/Jobs/UnifiedSemanticEvidenceArchitecture/`; this job is now an accepted foundation/adopter, not the owner of that new architecture.
 
 The directory name is retained for continuity. Git history is the archive for the completed R0–R9 recovery work; agents should not reread that implementation diary.
 
@@ -85,7 +85,7 @@ Cross-repository changes are allowed only when the owning layer genuinely requir
 
 ## Read order
 
-For U0–U4, read root `AGENTS.md`, then `README.md`, `CONTEXTUAL_SEMANTIC_EXPANSION.md`, `ROADMAP.md`, and `PROGRESS.md` last. Open the other job documents only for owning-area details. For unrelated post-completion maintenance, read root `AGENTS.md`, then only:
+For normal post-completion work, read root `AGENTS.md`, then only:
 
 1. `README.md`
 2. `PROGRESS.md`

@@ -1,9 +1,9 @@
 # Progress — Coherent Emergent Conversation
 
-**Status:** NEW IMPROVEMENT PLANNED — contextual social-act admission and compositional understanding. Existing C0–C11 + L0–L5 implementation remains developer-accepted; the new improvement has no implementation or acceptance evidence yet.
+**Status:** DEVELOPER-ACCEPTED FOUNDATION — C0–C11 + L0–L5. Contextual evidence/memory standardization is now owned by `docs/Jobs/UnifiedSemanticEvidenceArchitecture/`.
 **Developer phases:** C0–C11 + L0–L5 accepted.
 **Branch:** existing `main`.
-**Next exact chunk:** U0 — reproduce ungrounded apology in SAVE/fixture production worker and capture decision/effect evidence. Then continue U1–U4. Native SP/MP verification stays user-owned after developer acceptance.
+**Next authority:** no standing implementation chunk in this job; reopen only for a regression in its accepted owning layers.
 
 ## Current truth
 

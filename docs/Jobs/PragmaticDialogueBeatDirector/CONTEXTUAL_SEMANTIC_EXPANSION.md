@@ -1,6 +1,6 @@
 # Next design: compositional understanding and contextual social admission
 
-Status: PLANNED ONLY — not implemented or accepted. Audit anchor: ProjectHoomans `0aac93a8`, PsychopatzCore `3744a7d`. This document extends the accepted C0–C11/L0–L5 foundation; it does not restart it.
+Status: SUPERSEDED AS AN EXECUTION PLAN. The symptom/requirements remain useful evidence, but implementation ownership moved to `docs/Jobs/UnifiedSemanticEvidenceArchitecture/` so contextual memory, salience and pragmatic admission are standardized once rather than built as an apology/social-only subsystem. Existing C0–C11/L0–L5 foundation remains accepted.
 
 ## Live symptom and distinction
 
