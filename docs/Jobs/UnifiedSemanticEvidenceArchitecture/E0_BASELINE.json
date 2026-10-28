@@ -1,0 +1,392 @@
+{
+  "cases": {
+    "insult": {
+      "action": {
+        "accepted": true,
+        "authority": "server",
+        "baseEffects": {
+          "approval": -4,
+          "familiarity": 1,
+          "respect": -3
+        },
+        "conductEvidenceCreated": 1,
+        "conductEvidenceOutcome": {
+          "dropped": 0,
+          "persisted": 1,
+          "pruned": 0,
+          "status": "persisted",
+          "total": 1
+        },
+        "conductPersistence": [
+          {
+            "durable": true,
+            "entityKey": "player:Patrick Patz:char_1000_1000",
+            "evidenceID": "conduct:social:semantic_dialogue:player:Patrick Patz:char_1000_1000:npcP14B_seed_only:harness-conversation:2:player:Patrick Patz:char_1000_1000:antagonist",
+            "reason": "applied",
+            "role": "antagonist",
+            "status": "persisted",
+            "subjectKey": "npc:npcP14B_seed_only"
+          }
+        ],
+        "eventID": "social:semantic_dialogue:player:Patrick Patz:char_1000_1000:npcP14B_seed_only:harness-conversation:2",
+        "eventType": "player_dialogue_insult",
+        "memoryRecorded": true,
+        "npcID": "npcP14B_seed_only",
+        "reason": "relationship_clamped",
+        "relationshipAfter": {
+          "approval": -3.94,
+          "exists": true,
+          "familiarity": 1.0,
+          "npcID": "npcP14B_seed_only",
+          "previousState": "unknown",
+          "respect": -2.95,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "exists": true,
+          "familiarity": 0,
+          "npcID": "npcP14B_seed_only",
+          "previousState": "unknown",
+          "respect": 0,
+          "revision": 0,
+          "state": "unknown"
+        },
+        "relationshipDelta": {
+          "approval": -3.94,
+          "familiarity": 1.0,
+          "respect": -2.95
+        },
+        "relationshipMemoryOutcome": {
+          "durable": true,
+          "memoryID": "memory:social:semantic_dialogue:player:Patrick Patz:char_1000_1000:npcP14B_seed_only:harness-conversation:2:npcP14B_seed_only:target",
+          "memoryType": "player_spoke_insult",
+          "reason": "applied",
+          "status": "persisted"
+        },
+        "requestID": "2",
+        "requestedEffects": {
+          "approval": -3.94,
+          "familiarity": 1.0,
+          "respect": -2.95
+        },
+        "saturationAfter": {
+          "approval": -3.94,
+          "respect": -2.95
+        },
+        "saturationBefore": {
+          "approval": 0,
+          "respect": 0
+        },
+        "speechAct": "INSULT",
+        "status": "applied",
+        "visibleRelationshipChange": true
+      },
+      "confidence": 0.99,
+      "director": "behavior.warn",
+      "intent": "INSULT",
+      "pragmatic": null,
+      "response": "Keep talking like that and we're going to have a problem.",
+      "sessionShape": {
+        "agenda": 0,
+        "currentTopic": "str",
+        "director": 4,
+        "flowSessions": 0,
+        "focus": 2,
+        "lastIntent": "str",
+        "lastSpeaker": "str",
+        "mentions": 2,
+        "previousTopic": "str",
+        "priorTopics": 2,
+        "recentTurns": 4,
+        "sequence": "int",
+        "version": "int"
+      }
+    },
+    "reset_apology": {
+      "action": null,
+      "confidence": 0.95,
+      "director": null,
+      "intent": "APOLOGIZE",
+      "pragmatic": null,
+      "response": "Noted. Let's move on.",
+      "sessionShape": {
+        "agenda": 0,
+        "currentTopic": "str",
+        "director": 3,
+        "flowSessions": 0,
+        "focus": 1,
+        "lastIntent": "str",
+        "lastSpeaker": "str",
+        "mentions": 1,
+        "previousTopic": "str",
+        "priorTopics": 1,
+        "recentTurns": 2,
+        "sequence": "int",
+        "version": "int"
+      }
+    },
+    "serialized_today_apology": {
+      "action": null,
+      "confidence": 0.95,
+      "director": null,
+      "intent": "APOLOGIZE",
+      "pragmatic": null,
+      "response": "Noted. Let's move on.",
+      "sessionShape": {
+        "agenda": 0,
+        "currentTopic": "str",
+        "director": 3,
+        "flowSessions": 0,
+        "focus": 1,
+        "lastIntent": "str",
+        "lastSpeaker": "str",
+        "mentions": 1,
+        "previousTopic": "str",
+        "priorTopics": 1,
+        "recentTurns": 2,
+        "sequence": "int",
+        "version": "int"
+      }
+    },
+    "session_apology": {
+      "action": null,
+      "confidence": 0.95,
+      "director": "behavior.reconcile",
+      "intent": "APOLOGIZE",
+      "pragmatic": null,
+      "response": "I hear you.",
+      "sessionShape": {
+        "agenda": 0,
+        "currentTopic": "str",
+        "director": 4,
+        "flowSessions": 0,
+        "focus": 2,
+        "lastIntent": "str",
+        "lastSpeaker": "str",
+        "mentions": 2,
+        "previousTopic": "str",
+        "priorTopics": 3,
+        "recentTurns": 6,
+        "sequence": "int",
+        "version": "int"
+      }
+    },
+    "today_apology": {
+      "action": null,
+      "confidence": 0.95,
+      "director": null,
+      "intent": "APOLOGIZE",
+      "pragmatic": null,
+      "response": "Noted. Let's move on.",
+      "sessionShape": {
+        "agenda": 0,
+        "currentTopic": "str",
+        "director": 3,
+        "flowSessions": 0,
+        "focus": 1,
+        "lastIntent": "str",
+        "lastSpeaker": "str",
+        "mentions": 1,
+        "previousTopic": "str",
+        "priorTopics": 1,
+        "recentTurns": 2,
+        "sequence": "int",
+        "version": "int"
+      }
+    }
+  },
+  "durable": {
+    "after": {
+      "l": [
+        1101,
+        986985300,
+        765314,
+        2
+      ],
+      "v": 2
+    },
+    "before": {
+      "d": 765314,
+      "l": [
+        1101,
+        986985300,
+        765314,
+        2
+      ],
+      "s": [
+        1101,
+        986985300,
+        2
+      ],
+      "v": 2
+    },
+    "recall": {
+      "action": null,
+      "confidence": 0.95,
+      "director": null,
+      "intent": "APOLOGIZE",
+      "pragmatic": null,
+      "response": "Noted. Let's move on.",
+      "sessionShape": {
+        "agenda": 0,
+        "currentTopic": "str",
+        "director": 3,
+        "flowSessions": 0,
+        "focus": 1,
+        "lastIntent": "str",
+        "lastSpeaker": "str",
+        "mentions": 1,
+        "previousTopic": "str",
+        "priorTopics": 1,
+        "recentTurns": 2,
+        "sequence": "int",
+        "version": "int"
+      }
+    }
+  },
+  "saturated": {
+    "count": 20,
+    "memoryAfter": null,
+    "memoryBefore": null,
+    "recordByteDelta": 739,
+    "turn": {
+      "action": {
+        "accepted": true,
+        "authority": "server",
+        "baseEffects": {
+          "approval": -4,
+          "familiarity": 1,
+          "respect": -3
+        },
+        "conductEvidenceCreated": 1,
+        "conductEvidenceOutcome": {
+          "dropped": 0,
+          "persisted": 1,
+          "pruned": 0,
+          "status": "persisted",
+          "total": 1
+        },
+        "conductPersistence": [
+          {
+            "durable": true,
+            "entityKey": "player:Patrick Patz:char_1000_1000",
+            "evidenceID": "conduct:social:semantic_dialogue:player:Patrick Patz:char_1000_1000:npcP14B_seed_only:harness-conversation:1:player:Patrick Patz:char_1000_1000:antagonist",
+            "reason": "applied",
+            "role": "antagonist",
+            "status": "persisted",
+            "subjectKey": "npc:npcP14B_seed_only"
+          }
+        ],
+        "eventID": "social:semantic_dialogue:player:Patrick Patz:char_1000_1000:npcP14B_seed_only:harness-conversation:1",
+        "eventType": "player_dialogue_insult",
+        "memoryRecorded": false,
+        "npcID": "npcP14B_seed_only",
+        "reason": "relationship_clamped",
+        "relationshipAfter": {
+          "approval": -20,
+          "exists": true,
+          "familiarity": 1.0,
+          "npcID": "npcP14B_seed_only",
+          "previousState": "unknown",
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "exists": true,
+          "familiarity": 0,
+          "npcID": "npcP14B_seed_only",
+          "previousState": "unknown",
+          "respect": 0,
+          "revision": 0,
+          "state": "unknown"
+        },
+        "relationshipDelta": {
+          "approval": -20,
+          "familiarity": 1.0,
+          "respect": 0
+        },
+        "relationshipMemoryOutcome": {
+          "durable": false,
+          "memoryID": "memory:social:semantic_dialogue:player:Patrick Patz:char_1000_1000:npcP14B_seed_only:harness-conversation:1:npcP14B_seed_only:target",
+          "memoryType": "player_spoke_insult",
+          "reason": "memory_pruned_by_limit",
+          "status": "pruned"
+        },
+        "requestID": "1",
+        "requestedEffects": {
+          "approval": -3.94,
+          "familiarity": 1.0,
+          "respect": -2.95
+        },
+        "saturationAfter": {
+          "approval": -3.94,
+          "respect": -2.95
+        },
+        "saturationBefore": {
+          "approval": 0,
+          "respect": 0
+        },
+        "speechAct": "INSULT",
+        "status": "applied",
+        "visibleRelationshipChange": true
+      },
+      "confidence": 0.99,
+      "director": "behavior.warn",
+      "intent": "INSULT",
+      "pragmatic": null,
+      "response": "Cut that out.",
+      "sessionShape": {
+        "agenda": 0,
+        "currentTopic": "str",
+        "director": 4,
+        "flowSessions": 0,
+        "focus": 1,
+        "lastIntent": "str",
+        "lastSpeaker": "str",
+        "mentions": 1,
+        "previousTopic": "str",
+        "priorTopics": 1,
+        "recentTurns": 2,
+        "sequence": "int",
+        "version": "int"
+      }
+    }
+  },
+  "schema": "unified-evidence.e0.v1",
+  "storage": {
+    "after": {
+      "d": 765314,
+      "s": [
+        1026626453,
+        986985300,
+        0
+      ],
+      "v": 2
+    },
+    "afterReopen": null,
+    "before": null,
+    "limits": {
+      "compactDurable": 6,
+      "conduct": 64,
+      "relationship": 20,
+      "today": 8
+    },
+    "recordBytesAfter": 4354,
+    "recordBytesBefore": 2693,
+    "rootsAfter": [],
+    "rootsBefore": [],
+    "serializedTodayRecall": {
+      "d": 765314,
+      "s": [
+        1026626453,
+        986985300,
+        0
+      ],
+      "v": 2
+    }
+  }
+}

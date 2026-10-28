@@ -1,10 +1,21 @@
 # Progress — Unified Semantic Evidence Architecture
 
-**Status:** PLANNED / NOT IMPLEMENTED.
+**Status:** IN PROGRESS — E0 baseline accepted; architecture implementation pending.
 **Branch:** existing main.
 **Audit anchor:** ProjectHoomans 2bc4810f.
-**Current phase:** E0 — baseline, contracts and storage measurements.
-**Next exact chunk:** E0A — create production-worker baselines for reset/no-grievance apology, same-session insult->apology, same-day cross-session recall, durable-event recall and saturated relationship-memory behavior; record existing session/day/durable payload shapes and serialized byte deltas without changing production semantics.
+**Current phase:** E1 — canonical evidence schema and provider seam.
+**Next exact chunk:** E1A — extend InteractionProviders/InteractionContext with bounded normalized evidence and adapter registration; test SESSION/TODAY/DURABLE normalization before implementing tier adapters.
+
+## E0A accepted (2026-10-28)
+
+- Added disposable production-worker storage fixture and `test_unified_evidence_e0.py`; no native runtime or source saves are used.
+- Machine capture: `E0_BASELINE.json`, production semantics at bbaf2cd4. Reset APOLOGIZE gives “Noted. Let's move on.”; same-session insult/apology selects reconciliation; serialized same-day replay retains the compact insult triple but lacks contextual admission.
+- Saturation: 20 permanent memories; insult applies immediate effect while detailed memory is pruned and compact TODAY is missing. This confirms the E3 projection defect.
+- Durable event projection survives day rollover in `l`; `s` is removed. Existing limits are 8 triples, 6 quadruples, 20 relationship memories, 64 conduct evidence entries. Session shape is captured without copying text/history into persistence.
+- Ordinary serialized record: 2693 -> 4354 canonical JSON bytes (+1661). These measure production serializer output transported as canonical JSON, not Java binary allocation overhead. Root set unchanged.
+- Worker close/open reloads its source fixture, so cross-conversation persistence is additionally tested by serializing and importing into a new isolated worker. No source save mutation.
+- Validation: E0 worker test PASS; social-event smoke PASS. Graph generation 2026-10-24 is stale/untracked for newer semantics/harness files; direct source fallback used for those owners.
+- Ranking contracts remain as specified in ARCHITECTURE.md: confidence is certainty, salience retention importance, effective strength domain decay, recency age, contextual relevance ephemeral fit, priority deterministic catalog order.
 
 ## Accepted foundation
 

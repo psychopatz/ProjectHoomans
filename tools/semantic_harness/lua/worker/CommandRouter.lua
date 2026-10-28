@@ -12,6 +12,7 @@ local Talk = require "worker/CommandRouter_Talk"
 local InteractionLifecycle = require "worker/CommandRouter_InteractionLifecycle"
 
 local Handlers = {
+    require "worker/EvidenceAcceptance",
     Session,
     Conversation,
     Projection,
