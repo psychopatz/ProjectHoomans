@@ -1,0 +1,27 @@
+{
+  "algorithmChangesRequired": false,
+  "algorithms": {
+    "PNC_SemanticInteractionEvidence.lua": "f58cb534c031f9b7cb6d297cd4ebfefa665634cd1d89d80553e3bdcda0d794de",
+    "PNC_SemanticInteractionEvidenceAdapters.lua": "5f3b135ef4c7b91bd47b67e73a88b6d6e269d288bb6b0f71a417aca9b3799b83",
+    "PNC_SemanticInteractionRelations.lua": "0b778ea0e73150c4fce228be4cf502d64d9b6932d0c98abad07adb82bb75bac1",
+    "PNC_SemanticPragmaticResolver.lua": "c2640ec42776b7b677b39dacb28699a124dcb90c70aa03c1c5eb3e8619a3bc6f"
+  },
+  "content": "existing InteractionDirector, semantic.social.acknowledged and UtterancePlan ACKNOWLEDGE construction",
+  "domainChronologyRevision": "72c21000",
+  "e5Revision": "ff2f68ce",
+  "fixture": "tools/semantic_harness/lua/worker/FutureEvidenceFixture.lua",
+  "mechanic": [
+    "promise",
+    "fulfillment",
+    "breach",
+    "explanation",
+    "repair"
+  ],
+  "schema": "unified-evidence.extensibility.v1",
+  "stores": "existing DialogueContextState, record.memory.s/l, Relationship memories",
+  "tiers": [
+    "SESSION",
+    "TODAY",
+    "DURABLE"
+  ]
+}

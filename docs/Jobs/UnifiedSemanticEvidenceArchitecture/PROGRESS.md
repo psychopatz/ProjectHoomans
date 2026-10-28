@@ -1,10 +1,18 @@
 # Progress — Unified Semantic Evidence Architecture
 
-**Status:** IN PROGRESS — E0–E5 accepted; extensibility proof and scale gates pending.
+**Status:** IN PROGRESS — E0–E6 accepted; final scale and regression gates pending.
 **Branch:** existing main.
 **Audit anchor:** ProjectHoomans 2bc4810f.
-**Current phase:** E6 — extensibility proof.
-**Next exact chunk:** E6A — register a test-only promise/fulfillment/breach/explanation mechanic through public metadata/provider seams, prove SESSION/TODAY/DURABLE and director/UtterancePlan participation without editing generic query/resolver code or adding a store; then complete E7 storage/performance/regression gates.
+**Current phase:** E7 — scale/storage/regression acceptance.
+**Next exact chunk:** E7A — stress all existing memory limits/coalescing/rollover/salience, measure bounded serialized owner deltas and query cost, prove source immutability/no new roots/no derived or transcript persistence, complete broad Lua/worker/CodeBuilder regressions and deterministic generation, reconcile acceptance docs, then hand only native SP/MP acceptance to the user.
+
+## E6 accepted (2026-10-28)
+
+- Removable `FutureEvidenceFixture.lua` registers promise/fulfillment/breach/explanation/repair through public relation, act, compact-type and behavior APIs. It uses only DialogueContextState, compact Conversation Memory and owning Relationship memories.
+- Each SESSION/TODAY/DURABLE fixture grounds fulfillment, closes fulfilled commitments, reopens a new promise, derives repair/explanation after breach, closes explanation and repair independently, and drives the existing director/UtterancePlan/content path. The existing APOLOGIZE adopter repairs the synthetic breach without a new branch.
+- Query-only previews leave serialized owners unchanged. No store/root, parser, generated artifacts or production feature-specific algorithm is added. Fixture registrations disappear when its worker closes.
+- `E6_EXTENSIBILITY.json` records unchanged hashes for evidence query, tier adapters, relation registry and PragmaticResolver relative to E5. The equal-time owner chronology precondition was fixed separately at 72c21000; no generic query/resolver change was needed.
+- Production fixture PASS for all three tiers; first-party equal-time regression + fixture 5/5 PASS; full Lua 906/906 PASS. E6 does not complete the parent; E7 is mandatory next.
 
 ## E6 precondition — equal-time domain chronology repaired (2026-10-28)
 

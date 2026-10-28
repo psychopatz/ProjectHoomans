@@ -2,6 +2,10 @@
 local Handler = {}
 
 function Handler.handle(context, command, payload)
+    if command == "TEST_FUTURE_EVIDENCE" then
+        local Fixture = require "worker/FutureEvidenceFixture"
+        return Fixture.Run(context, payload)
+    end
     if command == "TEST_EVIDENCE_METADATA" then
         local rows = {}
         local Events = PNC.Conversation.Memory.Events
