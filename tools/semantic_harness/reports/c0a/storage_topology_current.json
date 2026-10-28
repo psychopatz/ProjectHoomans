@@ -1,0 +1,620 @@
+{
+  "concern": "storage_topology",
+  "discoverability": {
+    "generatedAliasResolved": {
+      "pnc.dialogue.follow": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Flows/Semantic.lua"
+      ],
+      "pnc.lab.stay_with_you": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Flows/Semantic.lua"
+      ]
+    },
+    "generatedDefinitionCollisions": {},
+    "generatedDefinitionMissing": [
+      "pnc.dialogue.follow",
+      "pnc.lab.stay_with_you"
+    ],
+    "generatedMissing": [
+      "pnc.dialogue.follow",
+      "pnc.lab.stay_with_you"
+    ],
+    "generatedReferenceCollisions": {
+      "behavior.challenge": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Beats/Social.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Behaviors/Social.lua"
+      ],
+      "behavior.deescalate": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Beats/Social.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Behaviors/Social.lua"
+      ],
+      "behavior.end_conversation": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Beats/Social.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Behaviors/Social.lua"
+      ],
+      "behavior.reconcile": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Beats/Social.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Behaviors/Social.lua"
+      ],
+      "behavior.retaliate_verbally": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Beats/Social.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Behaviors/Social.lua"
+      ],
+      "behavior.warn": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Beats/Social.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Behaviors/Social.lua"
+      ],
+      "pnc.dataset.question.weather.can_we_talk_about_the_weather": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/Question.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Responses/Flow.lua"
+      ],
+      "pnc.dataset.question.wellbeing.what_is_going_on_with_you": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/Question.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Responses/Question.lua"
+      ],
+      "pnc.dialogue.follow.keep_close_behind_me": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Flows/Semantic.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/Follow.lua"
+      ],
+      "pnc.dialogue.follow.please_keep_close_behind_me": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Flows/Semantic.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/Follow.lua"
+      ],
+      "pnc.lab.stay_with_you.stay_with_you": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Flows/Semantic.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/StayWithYou.lua"
+      ],
+      "question.activity": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/Activity.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/StaticSuggestions.lua"
+      ],
+      "question.date": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/Date.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/StaticSuggestions.lua"
+      ],
+      "question.gossip": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/Gossip.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/StaticSuggestions.lua"
+      ],
+      "question.health": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/Medical.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/StaticSuggestions.lua"
+      ],
+      "question.identity": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/Identity.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/StaticSuggestions.lua"
+      ],
+      "question.needs": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/Needs.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/StaticSuggestions.lua"
+      ],
+      "question.time": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/StaticSuggestions.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/Time.lua"
+      ],
+      "question.weather": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/StaticSuggestions.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/Weather.lua"
+      ],
+      "question.wellbeing": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/StaticSuggestions.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/Wellbeing.lua"
+      ],
+      "question.wellbeing_detail": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/StaticSuggestions.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/UI/Wellbeing.lua"
+      ],
+      "semantic.authored.follow": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Flows/Semantic.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Responses/Authored.lua"
+      ],
+      "semantic.lab.stay.with.you": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Flows/Semantic.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Responses/Lab.lua"
+      ],
+      "semantic.question.identity": [
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/Knowledge.lua",
+        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Responses/Question.lua"
+      ]
+    },
+    "idCount": 486,
+    "plannedModuleCount": 53,
+    "referenceFailures": [],
+    "registryRequireCount": 53,
+    "registryRequireMissing": [],
+    "samples": {
+      "beat.argument_escalation": {
+        "generated": [
+          "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Beats/Social.lua"
+        ],
+        "generatedDefinitions": [
+          "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Beats/Social.lua"
+        ],
+        "source": {
+          "domain": "social",
+          "id": "beat.argument_escalation",
+          "kind": "beat",
+          "sourceShard": "beats/social/argument_escalation.json"
+        }
+      },
+      "behavior.retaliate_verbally": {
+        "generated": [
+          "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Beats/Social.lua",
+          "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Behaviors/Social.lua"
+        ],
+        "generatedDefinitions": [
+          "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Behaviors/Social.lua"
+        ],
+        "source": {
+          "domain": "social",
+          "id": "behavior.retaliate_verbally",
+          "kind": "behavior",
+          "sourceShard": "behaviors/social/retaliate_verbally.json"
+        }
+      },
+      "phrase.semantic.social.acknowledged": {
+        "generated": [
+          "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/SocialPart02.lua"
+        ],
+        "generatedDefinitions": [
+          "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/SocialPart02.lua"
+        ],
+        "source": {
+          "domain": "social",
+          "id": "phrase.semantic.social.acknowledged",
+          "kind": "content",
+          "sourceShard": "content/social/reactions.json"
+        }
+      }
+    },
+    "sourceMissing": [],
+    "unplannedRuntimeModules": [],
+    "unresolvedGeneratedMissing": []
+  },
+  "generated": {
+    "explicitCases": [
+      {
+        "actualBytes": 19713,
+        "bytes": 19713,
+        "domain": "command",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/CommandPart02",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/CommandPart02.lua",
+        "recordCount": 25
+      },
+      {
+        "actualBytes": 31746,
+        "bytes": 31746,
+        "domain": "social",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/SocialPart02",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/SocialPart02.lua",
+        "recordCount": 15
+      },
+      {
+        "actualBytes": 32168,
+        "bytes": 32168,
+        "domain": "social",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/SocialPart03",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/SocialPart03.lua",
+        "recordCount": 35
+      },
+      {
+        "actualBytes": 12359,
+        "bytes": 12359,
+        "domain": "social",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/SocialPart04",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/SocialPart04.lua",
+        "recordCount": 18
+      },
+      {
+        "actualBytes": 3261,
+        "bytes": 3261,
+        "domain": "massive",
+        "exists": true,
+        "kind": "Patterns",
+        "module": "PNC/Semantics/Generated/Conversation/Patterns/Massive",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/Massive.lua",
+        "recordCount": 3
+      },
+      {
+        "actualBytes": 12035,
+        "bytes": 12035,
+        "domain": "question",
+        "exists": true,
+        "kind": "Patterns",
+        "module": "PNC/Semantics/Generated/Conversation/Patterns/QuestionPart02",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/QuestionPart02.lua",
+        "recordCount": 10
+      },
+      {
+        "actualBytes": 1588,
+        "bytes": 1588,
+        "domain": "sgd",
+        "exists": true,
+        "kind": "Patterns",
+        "module": "PNC/Semantics/Generated/Conversation/Patterns/Sgd",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/Sgd.lua",
+        "recordCount": 1
+      }
+    ],
+    "indexSizes": {
+      "Manifest.lua": 12759,
+      "Registry.lua": 8422,
+      "UI/StaticSuggestions.lua": 9667
+    },
+    "largestShards": [
+      {
+        "actualBytes": 32486,
+        "bytes": 32486,
+        "domain": "event",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/Event",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/Event.lua",
+        "recordCount": 45
+      },
+      {
+        "actualBytes": 32168,
+        "bytes": 32168,
+        "domain": "social",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/SocialPart03",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/SocialPart03.lua",
+        "recordCount": 35
+      },
+      {
+        "actualBytes": 32129,
+        "bytes": 32129,
+        "domain": "command",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/Command",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/Command.lua",
+        "recordCount": 31
+      },
+      {
+        "actualBytes": 31766,
+        "bytes": 31766,
+        "domain": "question",
+        "exists": true,
+        "kind": "Patterns",
+        "module": "PNC/Semantics/Generated/Conversation/Patterns/Question",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/Question.lua",
+        "recordCount": 31
+      },
+      {
+        "actualBytes": 31746,
+        "bytes": 31746,
+        "domain": "social",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/SocialPart02",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/SocialPart02.lua",
+        "recordCount": 15
+      },
+      {
+        "actualBytes": 31699,
+        "bytes": 31699,
+        "domain": "task",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/Task",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/Task.lua",
+        "recordCount": 48
+      },
+      {
+        "actualBytes": 29582,
+        "bytes": 29582,
+        "domain": "social",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/Social",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/Social.lua",
+        "recordCount": 17
+      },
+      {
+        "actualBytes": 26781,
+        "bytes": 26781,
+        "domain": "task",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/TaskPart02",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/TaskPart02.lua",
+        "recordCount": 38
+      },
+      {
+        "actualBytes": 21032,
+        "bytes": 21032,
+        "domain": "compatibility",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/Compatibility",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/Compatibility.lua",
+        "recordCount": 27
+      },
+      {
+        "actualBytes": 20641,
+        "bytes": 20641,
+        "domain": "question",
+        "exists": true,
+        "kind": "Responses",
+        "module": "PNC/Semantics/Generated/Conversation/Responses/Question",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Responses/Question.lua",
+        "recordCount": 19
+      },
+      {
+        "actualBytes": 20456,
+        "bytes": 20456,
+        "domain": "greeting",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/Greeting",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/Greeting.lua",
+        "recordCount": 7
+      },
+      {
+        "actualBytes": 19713,
+        "bytes": 19713,
+        "domain": "command",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/CommandPart02",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/CommandPart02.lua",
+        "recordCount": 25
+      }
+    ],
+    "numericOverflowShards": [
+      {
+        "actualBytes": 19713,
+        "bytes": 19713,
+        "domain": "command",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/CommandPart02",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/CommandPart02.lua",
+        "recordCount": 25
+      },
+      {
+        "actualBytes": 4414,
+        "bytes": 4414,
+        "domain": "event",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/EventPart02",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/EventPart02.lua",
+        "recordCount": 6
+      },
+      {
+        "actualBytes": 31746,
+        "bytes": 31746,
+        "domain": "social",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/SocialPart02",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/SocialPart02.lua",
+        "recordCount": 15
+      },
+      {
+        "actualBytes": 32168,
+        "bytes": 32168,
+        "domain": "social",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/SocialPart03",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/SocialPart03.lua",
+        "recordCount": 35
+      },
+      {
+        "actualBytes": 12359,
+        "bytes": 12359,
+        "domain": "social",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/SocialPart04",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/SocialPart04.lua",
+        "recordCount": 18
+      },
+      {
+        "actualBytes": 26781,
+        "bytes": 26781,
+        "domain": "task",
+        "exists": true,
+        "kind": "Content",
+        "module": "PNC/Semantics/Generated/Conversation/Content/TaskPart02",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Content/TaskPart02.lua",
+        "recordCount": 38
+      },
+      {
+        "actualBytes": 12035,
+        "bytes": 12035,
+        "domain": "question",
+        "exists": true,
+        "kind": "Patterns",
+        "module": "PNC/Semantics/Generated/Conversation/Patterns/QuestionPart02",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/QuestionPart02.lua",
+        "recordCount": 10
+      }
+    ],
+    "opaqueNamedShards": [
+      {
+        "actualBytes": 3261,
+        "bytes": 3261,
+        "domain": "massive",
+        "exists": true,
+        "kind": "Patterns",
+        "module": "PNC/Semantics/Generated/Conversation/Patterns/Massive",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/Massive.lua",
+        "recordCount": 3
+      },
+      {
+        "actualBytes": 1588,
+        "bytes": 1588,
+        "domain": "sgd",
+        "exists": true,
+        "kind": "Patterns",
+        "module": "PNC/Semantics/Generated/Conversation/Patterns/Sgd",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Patterns/Sgd.lua",
+        "recordCount": 1
+      }
+    ],
+    "runtimeRoot": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation",
+    "shardCount": 53
+  },
+  "schema": "projecthoomans.c0a.current.v1",
+  "source": {
+    "largestCanonicalRecords": [
+      {
+        "bytes": 2474,
+        "field": "phraseFamilies",
+        "id": "semantic.flow.greeting.opening.friendly",
+        "index": 3,
+        "sourceShard": "content/greeting.json"
+      },
+      {
+        "bytes": 1739,
+        "field": "phraseFamilies",
+        "id": "semantic.flow.greeting.opening.default",
+        "index": 2,
+        "sourceShard": "content/greeting.json"
+      },
+      {
+        "bytes": 1507,
+        "field": "responsePools",
+        "id": "semantic.question.wellbeing",
+        "index": 1,
+        "sourceShard": "flows/common/questions.json"
+      },
+      {
+        "bytes": 1213,
+        "field": "responsePools",
+        "id": "semantic.question.needs.proposal",
+        "index": 0,
+        "sourceShard": "flows/common/needs_weather.json"
+      },
+      {
+        "bytes": 1160,
+        "field": "responsePools",
+        "id": "semantic.flow.weather.raining",
+        "index": 2,
+        "sourceShard": "flows/common/needs_weather.json"
+      },
+      {
+        "bytes": 1145,
+        "field": "responsePools",
+        "id": "semantic.question.wellbeing.unknown",
+        "index": 3,
+        "sourceShard": "flows/common/questions.json"
+      },
+      {
+        "bytes": 1139,
+        "field": "phraseFamilies",
+        "id": "semantic.emote.reply.wavehi",
+        "index": 18,
+        "sourceShard": "content/social/emotes.json"
+      },
+      {
+        "bytes": 1127,
+        "field": "definitions",
+        "id": "pnc.dialogue.follow",
+        "index": 0,
+        "sourceShard": "flows/semantic_flows.json"
+      },
+      {
+        "bytes": 1037,
+        "field": "responsePools",
+        "id": "semantic.question.needs.quantity",
+        "index": 1,
+        "sourceShard": "flows/common/needs_weather.json"
+      },
+      {
+        "bytes": 999,
+        "field": "phraseFamilies",
+        "id": "semantic.emote.reply.wavebye",
+        "index": 17,
+        "sourceShard": "content/social/emotes.json"
+      },
+      {
+        "bytes": 987,
+        "field": "phraseFamilies",
+        "id": "semantic.gossip.unknown",
+        "index": 0,
+        "sourceShard": "content/knowledge.json"
+      },
+      {
+        "bytes": 986,
+        "field": "phraseFamilies",
+        "id": "semantic.emote.reply.thankyou",
+        "index": 13,
+        "sourceShard": "content/social/emotes.json"
+      },
+      {
+        "bytes": 971,
+        "field": "responsePools",
+        "id": "semantic.question.identity",
+        "index": 2,
+        "sourceShard": "flows/common/questions.json"
+      },
+      {
+        "bytes": 954,
+        "field": "phraseFamilies",
+        "id": "semantic.social.offer_friendly",
+        "index": 9,
+        "sourceShard": "content/social/reactions.json"
+      },
+      {
+        "bytes": 893,
+        "field": "beats",
+        "id": "beat.argument_escalation",
+        "index": 0,
+        "sourceShard": "beats/social/argument_escalation.json"
+      },
+      {
+        "bytes": 857,
+        "field": "behaviors",
+        "id": "behavior.acknowledge_memory",
+        "index": 0,
+        "sourceShard": "behaviors/social/acknowledge_memory.json"
+      },
+      {
+        "bytes": 857,
+        "field": "definitions",
+        "id": "pnc.lab.stay_with_you",
+        "index": 1,
+        "sourceShard": "flows/semantic_flows.json"
+      },
+      {
+        "bytes": 851,
+        "field": "behaviors",
+        "id": "behavior.end_conversation",
+        "index": 0,
+        "sourceShard": "behaviors/social/end_conversation.json"
+      },
+      {
+        "bytes": 848,
+        "field": "phraseFamilies",
+        "id": "semantic.emote.reply.insult",
+        "index": 11,
+        "sourceShard": "content/social/emotes.json"
+      },
+      {
+        "bytes": 830,
+        "field": "phraseFamilies",
+        "id": "semantic.social.acknowledged",
+        "index": 0,
+        "sourceShard": "content/social/reactions.json"
+      }
+    ],
+    "locationCount": 486,
+    "manifest": "tools/semantic_harness/codebuilder/sources/conversation/manifest.json",
+    "manifestBytes": 5098,
+    "sourceFileCount": 54,
+    "sourceRoot": "tools/semantic_harness/codebuilder/sources/conversation"
+  }
+}

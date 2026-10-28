@@ -1,0 +1,2920 @@
+{
+  "cases": [
+    {
+      "click": null,
+      "id": "greeting_reply",
+      "rawInput": "hello there",
+      "suggestions": {
+        "candidates": [
+          {
+            "display": {
+              "label": "Thank them",
+              "labelFallback": "Thank them",
+              "labelKey": "UI_PNC_Conversation_Suggestion_GreetingThank_Label",
+              "utterance": "Thanks.",
+              "utteranceFallback": "Thanks.",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_GreetingThank_Utterance"
+            },
+            "frame": {
+              "candidateID": "greeting.thanks",
+              "extensions": {},
+              "intent": "THANK",
+              "kind": "semantic_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_GreetingThank_Label",
+              "origin": {
+                "flowID": "greeting",
+                "kind": "active_flow",
+                "nodeID": "await_thanks"
+              },
+              "speechAct": "THANK",
+              "textFallback": "Thanks.",
+              "textKey": "UI_PNC_Conversation_Suggestion_GreetingThank_Utterance"
+            },
+            "groupID": "conversation_branch",
+            "id": "greeting.thanks",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": true
+            },
+            "providerID": "projecthoomans.active_flow",
+            "providerOrder": 30,
+            "rank": 1,
+            "ranking": {
+              "class": "BRANCH_CONTINUATION",
+              "classOrder": 1,
+              "order": 1,
+              "orderHint": 11,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "greeting.thanks"
+            },
+            "source": {
+              "classification": "derived",
+              "kind": "active_flow",
+              "providerID": "projecthoomans.active_flow",
+              "reason": "branch_offer",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "active_flow"
+              ],
+              "reasons": [
+                "branch_offer"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Say you're doing fine",
+              "labelFallback": "Say you're doing fine",
+              "labelKey": "UI_PNC_Conversation_Suggestion_GreetingReportFine_Label",
+              "utterance": "I'm fine, thank you.",
+              "utteranceFallback": "I'm fine, thank you.",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_GreetingReportFine_Utterance"
+            },
+            "frame": {
+              "candidateID": "greeting.check_in.report_wellbeing",
+              "extensions": {},
+              "intent": "INFORM",
+              "kind": "semantic_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_GreetingReportFine_Label",
+              "origin": {
+                "kind": "response_plan",
+                "sourcePoolID": "semantic.flow.greeting.opening",
+                "turnID": "check_in"
+              },
+              "selfDirected": true,
+              "speechAct": "INFORM",
+              "stateType": "WELLBEING",
+              "stateValue": "fine",
+              "subject": "WELLBEING",
+              "target": "SELF",
+              "textFallback": "I'm fine, thank you.",
+              "textKey": "UI_PNC_Conversation_Suggestion_GreetingReportFine_Utterance"
+            },
+            "groupID": "conversation_branch",
+            "id": "greeting.check_in.report_wellbeing",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": true
+            },
+            "providerID": "projecthoomans.response_plan",
+            "providerOrder": 40,
+            "rank": 2,
+            "ranking": {
+              "class": "DIRECT_RESPONSE",
+              "classOrder": 2,
+              "order": 2,
+              "orderHint": 12,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "greeting.check_in.report_wellbeing"
+            },
+            "source": {
+              "classification": "derived",
+              "kind": "npc_response_plan",
+              "providerID": "projecthoomans.response_plan",
+              "reason": "branch_offer",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 3,
+              "kinds": [
+                "npc_response_plan"
+              ],
+              "reasons": [
+                "branch_offer"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Ask what is wrong",
+              "labelFallback": "Can you tell me more?",
+              "labelKey": "UI_PNC_Conversation_Suggestion_WellbeingDetail_Label",
+              "utterance": "What's wrong?",
+              "utteranceFallback": "What's wrong?",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_WellbeingDetail_Utterance"
+            },
+            "frame": {
+              "candidateID": "question.wellbeing_detail",
+              "extensions": {},
+              "intent": "QUESTION",
+              "kind": "semantic_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_WellbeingDetail_Label",
+              "origin": {},
+              "patternID": "pnc.question.wellbeing_follow_up_what_is_wrong",
+              "speechAct": "QUESTION",
+              "subject": "WELLBEING",
+              "textFallback": "What's wrong?",
+              "textKey": "UI_PNC_Conversation_Suggestion_WellbeingDetail_Utterance",
+              "topic": "wellbeing"
+            },
+            "groupID": "topic:wellbeing",
+            "id": "question.wellbeing_detail",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": true
+            },
+            "providerID": "projecthoomans.response_plan",
+            "providerOrder": 40,
+            "rank": 3,
+            "ranking": {
+              "class": "DIRECT_RESPONSE",
+              "classOrder": 2,
+              "order": 3,
+              "orderHint": 14,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "question.wellbeing_detail"
+            },
+            "source": {
+              "classification": "derived",
+              "kind": "npc_response_plan",
+              "providerID": "projecthoomans.response_plan",
+              "reason": "response_plan_topic",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "npc_response_plan"
+              ],
+              "reasons": [
+                "response_plan_topic"
+              ]
+            },
+            "topic": "wellbeing",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Check in with them",
+              "labelFallback": "Check in with them",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CheckIn_Label",
+              "utterance": "How are we doing?",
+              "utteranceFallback": "How are we doing?",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_CheckIn_Utterance"
+            },
+            "frame": {
+              "candidateID": "social.check_in",
+              "extensions": {
+                "providerID": "projecthoomans.social_context",
+                "route": "semantic_provider"
+              },
+              "intent": "QUESTION",
+              "kind": "semantic_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CheckIn_Label",
+              "origin": {},
+              "speechAct": "QUESTION",
+              "subject": "WELLBEING",
+              "target": {
+                "kind": "conversation_actor",
+                "ref": "npc"
+              },
+              "textFallback": "How are we doing?",
+              "textKey": "UI_PNC_Conversation_Suggestion_CheckIn_Utterance",
+              "topic": "wellbeing"
+            },
+            "groupID": null,
+            "id": "social.check_in",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": true
+            },
+            "providerID": "projecthoomans.social_context",
+            "providerOrder": 55,
+            "rank": 4,
+            "ranking": {
+              "class": "CONTEXTUAL_SOCIAL",
+              "classOrder": 3,
+              "order": 4,
+              "orderHint": 13,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "social.check_in"
+            },
+            "source": {
+              "classification": "derived",
+              "kind": "social_context",
+              "providerID": "projecthoomans.social_context",
+              "reason": "provider_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "social_context"
+              ],
+              "reasons": [
+                "provider_eligible"
+              ]
+            },
+            "topic": "wellbeing",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "What's your name?",
+              "labelFallback": "What's your name?",
+              "utterance": "What's your name?",
+              "utteranceFallback": "What's your name?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:ask_name",
+              "extensions": {
+                "actionID": "ask_name",
+                "groupID": "conversation_utilities",
+                "origin": "conversation_root",
+                "route": "conversation_root_choice"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_ACTION",
+              "textFallback": "What's your name?"
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.root:menu:ask_name",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 5,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 5,
+              "orderHint": 1,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:ask_name"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "How are you doing?",
+              "labelFallback": "How are you doing?",
+              "utterance": "How are you doing?",
+              "utteranceFallback": "How are you doing?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:wellbeing",
+              "extensions": {
+                "authority": "semantic_response_flow",
+                "categoryID": "projecthoomans:wellbeing",
+                "groupID": "topic:wellbeing",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "How are you doing?",
+              "topic": "wellbeing"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:wellbeing",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 6,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 6,
+              "orderHint": 2,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:wellbeing"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "wellbeing",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Let's talk.",
+              "labelFallback": "Let's talk.",
+              "utterance": "Let's talk.",
+              "utteranceFallback": "Let's talk."
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:small_talk",
+              "extensions": {
+                "authority": "semantic_response_flow",
+                "categoryID": "projecthoomans:small_talk",
+                "groupID": "topic:small_talk",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "Let's talk.",
+              "topic": "small_talk"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:small_talk",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 7,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 7,
+              "orderHint": 3,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:small_talk"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "small_talk",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Ask about...",
+              "labelFallback": "Ask about...",
+              "utterance": "Ask about...",
+              "utteranceFallback": "Ask about..."
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:ask_about",
+              "extensions": {
+                "authority": "semantic_response_flow",
+                "categoryID": "projecthoomans:ask_about",
+                "groupID": "topic:ask_about",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "Ask about...",
+              "topic": "ask_about"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:ask_about",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 8,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 8,
+              "orderHint": 4,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:ask_about"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "ask_about",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Need anything?",
+              "labelFallback": "Need anything?",
+              "utterance": "Need anything?",
+              "utteranceFallback": "Need anything?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:needs",
+              "extensions": {
+                "categoryID": "projecthoomans:needs",
+                "groupID": "topic:needs",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "Need anything?",
+              "topic": "needs"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:needs",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 9,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 9,
+              "orderHint": 5,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:needs"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "needs",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Would you like to join us?",
+              "labelFallback": "Would you like to join us?",
+              "utterance": "Would you like to join us?",
+              "utteranceFallback": "Would you like to join us?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:recruit",
+              "extensions": {
+                "actionID": "recruit",
+                "groupID": "conversation_actions",
+                "origin": "conversation_root",
+                "route": "conversation_root_choice"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_ACTION",
+              "textFallback": "Would you like to join us?"
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.root:menu:recruit",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 10,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 10,
+              "orderHint": 6,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:recruit"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "That's all. Stay safe.",
+              "labelFallback": "That's all. Stay safe.",
+              "utterance": "That's all. Stay safe.",
+              "utteranceFallback": "That's all. Stay safe."
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:goodbye",
+              "extensions": {
+                "actionID": "goodbye",
+                "groupID": "conversation_utilities",
+                "origin": "conversation_root",
+                "route": "conversation_root_choice"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_ACTION",
+              "textFallback": "That's all. Stay safe."
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.root:menu:goodbye",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 11,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 11,
+              "orderHint": 7,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:goodbye"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "What's up?",
+              "labelFallback": "What's up?",
+              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "utterance": "What's up?",
+              "utteranceFallback": "What's up?"
+            },
+            "frame": {
+              "candidateID": "conversation.landing:whats_up",
+              "extensions": {
+                "origin": "conversation_landing",
+                "route": "semantic_hub"
+              },
+              "intent": "QUESTION",
+              "kind": "semantic_shortcut_frame",
+              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "origin": {},
+              "speechAct": "QUESTION",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "What's up?",
+              "topic": "whats_up"
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.landing:whats_up",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 12,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 12,
+              "orderHint": 8,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.landing:whats_up"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "conversation_landing_shortcut",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "conversation_landing_shortcut"
+              ]
+            },
+            "topic": "whats_up",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "I need you to do something...",
+              "labelFallback": "I need you to do something...",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionOrders_Label"
+            },
+            "frame": {
+              "candidateID": "semantic.group:companion.orders",
+              "extensions": {},
+              "kind": "semantic_group_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionOrders_Label",
+              "origin": {},
+              "textFallback": "I need you to do something..."
+            },
+            "groupID": "conversation_landing",
+            "id": "companion.orders:open",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": false,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 13,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 13,
+              "orderHint": 9,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "companion.orders:open"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "companion_orders_hub",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "companion_orders_hub"
+              ]
+            },
+            "topic": "movement",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Let's camp...",
+              "labelFallback": "Let's camp...",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionCamp_Label"
+            },
+            "frame": {
+              "candidateID": "semantic.group:companion.camp",
+              "extensions": {},
+              "kind": "semantic_group_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionCamp_Label",
+              "origin": {},
+              "textFallback": "Let's camp..."
+            },
+            "groupID": "companion.orders",
+            "id": "companion.orders:camp",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": false,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 14,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 14,
+              "orderHint": 10,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "companion.orders:camp"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "companion_camp_branch",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "companion_camp_branch"
+              ]
+            },
+            "topic": "movement",
+            "visibility": "player"
+          }
+        ],
+        "currentGroupID": "conversation_landing",
+        "currentTopic": "greeting",
+        "deduplication": {
+          "candidateCount": 14,
+          "duplicateIDs": [],
+          "rankSequence": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "uniqueIDCount": 14
+        },
+        "diversityObserved": {
+          "frameValues": {
+            "intent": [
+              "INFORM",
+              "QUESTION",
+              "REQUEST",
+              "THANK"
+            ],
+            "speechAct": [
+              "INFORM",
+              "QUESTION",
+              "REQUEST",
+              "THANK"
+            ],
+            "subject": [
+              "CONVERSATION_ACTION",
+              "CONVERSATION_TOPIC",
+              "WELLBEING"
+            ],
+            "topic": [
+              "ask_about",
+              "needs",
+              "small_talk",
+              "wellbeing",
+              "whats_up"
+            ]
+          },
+          "providerIDs": [
+            "projecthoomans.active_flow",
+            "projecthoomans.conversation_root",
+            "projecthoomans.response_plan",
+            "projecthoomans.social_context"
+          ],
+          "sourceKinds": [
+            "active_flow",
+            "conversation_root",
+            "npc_response_plan",
+            "social_context"
+          ],
+          "stanceFields": []
+        },
+        "groups": [
+          {
+            "candidateIDs": [
+              "conversation.root:menu:ask_name",
+              "conversation.root:menu:recruit",
+              "conversation.root:menu:goodbye",
+              "conversation.landing:whats_up",
+              "companion.orders:open"
+            ],
+            "id": "conversation_landing"
+          },
+          {
+            "candidateIDs": [
+              "greeting.thanks",
+              "greeting.check_in.report_wellbeing"
+            ],
+            "id": "conversation_branch"
+          },
+          {
+            "candidateIDs": [
+              "question.wellbeing_detail",
+              "social.check_in"
+            ],
+            "id": "topic:wellbeing"
+          },
+          {
+            "candidateIDs": [
+              "conversation.root:menu:projecthoomans:wellbeing",
+              "conversation.root:menu:projecthoomans:small_talk",
+              "conversation.root:menu:projecthoomans:ask_about",
+              "conversation.root:menu:projecthoomans:needs"
+            ],
+            "id": "conversation_context_index"
+          },
+          {
+            "candidateIDs": [
+              "companion.orders:camp"
+            ],
+            "id": "companion.orders"
+          },
+          {
+            "candidateIDs": [],
+            "id": "companion.camp"
+          }
+        ],
+        "providers": [
+          {
+            "enabled": true,
+            "id": "projecthoomans.conversation_root",
+            "order": 10,
+            "sourceKind": "conversation_root"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.conversation_registry",
+            "order": 20,
+            "sourceKind": "conversation_registry"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.active_flow",
+            "order": 30,
+            "sourceKind": "active_flow"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.response_plan",
+            "order": 40,
+            "sourceKind": "npc_response_plan"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.static_questions",
+            "order": 50,
+            "sourceKind": "typed_input"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.social_context",
+            "order": 55,
+            "sourceKind": "social_context"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.flow_topic",
+            "order": 60,
+            "sourceKind": "active_flow"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.capabilities",
+            "order": 80,
+            "sourceKind": "permitted_capability"
+          }
+        ],
+        "ranking": {
+          "candidateCount": 14,
+          "classOrder": {
+            "ACTIVE_TOPIC": 4,
+            "BRANCH_CONTINUATION": 1,
+            "CONTEXTUAL_SOCIAL": 3,
+            "DIRECT_RESPONSE": 2,
+            "GAMEPLAY_ACTION": 5,
+            "GENERAL_TOPIC": 6,
+            "UTILITY": 7
+          },
+          "schema": "semantic.choice.ranking.v1"
+        },
+        "revision": 1,
+        "rootGroupID": "conversation_landing",
+        "turnID": "turn-1"
+      }
+    },
+    {
+      "click": {
+        "accepted": true,
+        "candidateID": "question.time",
+        "input": "What time is it?",
+        "reenteredPattern": "pnc.question.time",
+        "turnEvidence": {
+          "authority": {
+            "attempted": false,
+            "permitted": [],
+            "relationshipAfter": {
+              "approval": 0,
+              "familiarity": 0,
+              "respect": 0,
+              "revision": 1,
+              "state": "unknown"
+            },
+            "relationshipBefore": {
+              "approval": 0,
+              "familiarity": 0,
+              "respect": 0,
+              "revision": 1,
+              "state": "unknown"
+            },
+            "relationshipChanged": false,
+            "sideEffects": {
+              "actionCount": 0,
+              "actionsTruncated": false,
+              "none": true,
+              "transportCount": 0,
+              "transportTruncated": false
+            },
+            "toolCalls": [],
+            "transportCommands": []
+          },
+          "normalizedInput": "what time is it",
+          "policy": {
+            "branch": "QUESTION_RECEIVED",
+            "clarification": false,
+            "confidence": 1,
+            "flow": {
+              "key": "char_patrick|npc_mara",
+              "reason": "no_flow_trigger",
+              "registryRevision": 40,
+              "topic": "time"
+            },
+            "intent": "QUESTION",
+            "llmEligible": false,
+            "reason": "recognized_question",
+            "route": "deterministic",
+            "speechAct": "QUESTION"
+          },
+          "responseTemplate": "semantic.question.time",
+          "selected": {
+            "confidence": 1,
+            "intent": "QUESTION",
+            "provenance": {
+              "parser": "semantic_click_frame",
+              "pattern": "pnc.question.time",
+              "provider": "suggestion"
+            },
+            "speechAct": "QUESTION",
+            "subject": "TIME"
+          }
+        },
+        "typedFrameKind": "semantic_click_frame"
+      },
+      "id": "time_reply_with_click",
+      "rawInput": "what time is it",
+      "suggestions": {
+        "candidates": [
+          {
+            "display": {
+              "label": "Ask about the time",
+              "labelFallback": "Ask about the time",
+              "labelKey": "UI_PNC_Conversation_Suggestion_Time_Label",
+              "utterance": "What time is it?",
+              "utteranceFallback": "What time is it?",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_Time_Utterance"
+            },
+            "frame": {
+              "candidateID": "question.time",
+              "extensions": {},
+              "intent": "QUESTION",
+              "kind": "semantic_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_Time_Label",
+              "origin": {},
+              "patternID": "pnc.question.time",
+              "speechAct": "QUESTION",
+              "subject": "TIME",
+              "textFallback": "What time is it?",
+              "textKey": "UI_PNC_Conversation_Suggestion_Time_Utterance",
+              "topic": "time"
+            },
+            "groupID": "topic:time",
+            "id": "question.time",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": true
+            },
+            "providerID": "projecthoomans.static_questions",
+            "providerOrder": 50,
+            "rank": 1,
+            "ranking": {
+              "class": "ACTIVE_TOPIC",
+              "classOrder": 4,
+              "order": 1,
+              "orderHint": 12,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "question.time"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "typed_input",
+              "providerID": "projecthoomans.static_questions",
+              "reason": "topic_branch",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "typed_input"
+              ],
+              "reasons": [
+                "topic_branch"
+              ]
+            },
+            "topic": "time",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Ask about the date",
+              "labelFallback": "Ask about the date",
+              "labelKey": "UI_PNC_Conversation_Suggestion_Date_Label",
+              "utterance": "What's today's date?",
+              "utteranceFallback": "What's today's date?",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_Date_Utterance"
+            },
+            "frame": {
+              "candidateID": "question.date",
+              "extensions": {},
+              "intent": "QUESTION",
+              "kind": "semantic_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_Date_Label",
+              "origin": {},
+              "patternID": "pnc.question.date",
+              "speechAct": "QUESTION",
+              "subject": "DATE",
+              "textFallback": "What's today's date?",
+              "textKey": "UI_PNC_Conversation_Suggestion_Date_Utterance",
+              "topic": "date"
+            },
+            "groupID": "topic:time",
+            "id": "question.date",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": true
+            },
+            "providerID": "projecthoomans.static_questions",
+            "providerOrder": 50,
+            "rank": 2,
+            "ranking": {
+              "class": "ACTIVE_TOPIC",
+              "classOrder": 4,
+              "order": 2,
+              "orderHint": 13,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "question.date"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "typed_input",
+              "providerID": "projecthoomans.static_questions",
+              "reason": "topic_branch",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "typed_input"
+              ],
+              "reasons": [
+                "topic_branch"
+              ]
+            },
+            "topic": "date",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "What's your name?",
+              "labelFallback": "What's your name?",
+              "utterance": "What's your name?",
+              "utteranceFallback": "What's your name?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:ask_name",
+              "extensions": {
+                "actionID": "ask_name",
+                "groupID": "conversation_utilities",
+                "origin": "conversation_root",
+                "route": "conversation_root_choice"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_ACTION",
+              "textFallback": "What's your name?"
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.root:menu:ask_name",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 3,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 3,
+              "orderHint": 1,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:ask_name"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "How are you doing?",
+              "labelFallback": "How are you doing?",
+              "utterance": "How are you doing?",
+              "utteranceFallback": "How are you doing?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:wellbeing",
+              "extensions": {
+                "authority": "semantic_response_flow",
+                "categoryID": "projecthoomans:wellbeing",
+                "groupID": "topic:wellbeing",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "How are you doing?",
+              "topic": "wellbeing"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:wellbeing",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 4,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 4,
+              "orderHint": 2,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:wellbeing"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "wellbeing",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Let's talk.",
+              "labelFallback": "Let's talk.",
+              "utterance": "Let's talk.",
+              "utteranceFallback": "Let's talk."
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:small_talk",
+              "extensions": {
+                "authority": "semantic_response_flow",
+                "categoryID": "projecthoomans:small_talk",
+                "groupID": "topic:small_talk",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "Let's talk.",
+              "topic": "small_talk"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:small_talk",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 5,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 5,
+              "orderHint": 3,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:small_talk"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "small_talk",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Ask about...",
+              "labelFallback": "Ask about...",
+              "utterance": "Ask about...",
+              "utteranceFallback": "Ask about..."
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:ask_about",
+              "extensions": {
+                "authority": "semantic_response_flow",
+                "categoryID": "projecthoomans:ask_about",
+                "groupID": "topic:ask_about",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "Ask about...",
+              "topic": "ask_about"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:ask_about",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 6,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 6,
+              "orderHint": 4,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:ask_about"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "ask_about",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Need anything?",
+              "labelFallback": "Need anything?",
+              "utterance": "Need anything?",
+              "utteranceFallback": "Need anything?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:needs",
+              "extensions": {
+                "categoryID": "projecthoomans:needs",
+                "groupID": "topic:needs",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "Need anything?",
+              "topic": "needs"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:needs",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 7,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 7,
+              "orderHint": 5,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:needs"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "needs",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Would you like to join us?",
+              "labelFallback": "Would you like to join us?",
+              "utterance": "Would you like to join us?",
+              "utteranceFallback": "Would you like to join us?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:recruit",
+              "extensions": {
+                "actionID": "recruit",
+                "groupID": "conversation_actions",
+                "origin": "conversation_root",
+                "route": "conversation_root_choice"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_ACTION",
+              "textFallback": "Would you like to join us?"
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.root:menu:recruit",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 8,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 8,
+              "orderHint": 6,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:recruit"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "That's all. Stay safe.",
+              "labelFallback": "That's all. Stay safe.",
+              "utterance": "That's all. Stay safe.",
+              "utteranceFallback": "That's all. Stay safe."
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:goodbye",
+              "extensions": {
+                "actionID": "goodbye",
+                "groupID": "conversation_utilities",
+                "origin": "conversation_root",
+                "route": "conversation_root_choice"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_ACTION",
+              "textFallback": "That's all. Stay safe."
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.root:menu:goodbye",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 9,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 9,
+              "orderHint": 7,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:goodbye"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "What's up?",
+              "labelFallback": "What's up?",
+              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "utterance": "What's up?",
+              "utteranceFallback": "What's up?"
+            },
+            "frame": {
+              "candidateID": "conversation.landing:whats_up",
+              "extensions": {
+                "origin": "conversation_landing",
+                "route": "semantic_hub"
+              },
+              "intent": "QUESTION",
+              "kind": "semantic_shortcut_frame",
+              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "origin": {},
+              "speechAct": "QUESTION",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "What's up?",
+              "topic": "whats_up"
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.landing:whats_up",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 10,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 10,
+              "orderHint": 8,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.landing:whats_up"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "conversation_landing_shortcut",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "conversation_landing_shortcut"
+              ]
+            },
+            "topic": "whats_up",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Talk again about",
+              "labelFallback": "Talk again about",
+              "labelKey": "UI_PNC_Conversation_Suggestion_TalkAgainAbout_Label"
+            },
+            "frame": {
+              "candidateID": "semantic.group:conversation_context_index",
+              "extensions": {},
+              "kind": "semantic_group_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_TalkAgainAbout_Label",
+              "origin": {},
+              "textFallback": "Talk again about"
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.landing:talk_again_about",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": false,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 11,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 11,
+              "orderHint": 9,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.landing:talk_again_about"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "conversation_context_index",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "conversation_context_index"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "I need you to do something...",
+              "labelFallback": "I need you to do something...",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionOrders_Label"
+            },
+            "frame": {
+              "candidateID": "semantic.group:companion.orders",
+              "extensions": {},
+              "kind": "semantic_group_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionOrders_Label",
+              "origin": {},
+              "textFallback": "I need you to do something..."
+            },
+            "groupID": "conversation_landing",
+            "id": "companion.orders:open",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": false,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 12,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 12,
+              "orderHint": 10,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "companion.orders:open"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "companion_orders_hub",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "companion_orders_hub"
+              ]
+            },
+            "topic": "movement",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Let's camp...",
+              "labelFallback": "Let's camp...",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionCamp_Label"
+            },
+            "frame": {
+              "candidateID": "semantic.group:companion.camp",
+              "extensions": {},
+              "kind": "semantic_group_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionCamp_Label",
+              "origin": {},
+              "textFallback": "Let's camp..."
+            },
+            "groupID": "companion.orders",
+            "id": "companion.orders:camp",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": false,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 13,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 13,
+              "orderHint": 11,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "companion.orders:camp"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "companion_camp_branch",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "companion_camp_branch"
+              ]
+            },
+            "topic": "movement",
+            "visibility": "player"
+          }
+        ],
+        "currentGroupID": "topic:time",
+        "currentTopic": "time",
+        "deduplication": {
+          "candidateCount": 13,
+          "duplicateIDs": [],
+          "rankSequence": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "uniqueIDCount": 13
+        },
+        "diversityObserved": {
+          "frameValues": {
+            "intent": [
+              "QUESTION",
+              "REQUEST"
+            ],
+            "speechAct": [
+              "QUESTION",
+              "REQUEST"
+            ],
+            "subject": [
+              "CONVERSATION_ACTION",
+              "CONVERSATION_TOPIC",
+              "DATE",
+              "TIME"
+            ],
+            "topic": [
+              "ask_about",
+              "date",
+              "needs",
+              "small_talk",
+              "time",
+              "wellbeing",
+              "whats_up"
+            ]
+          },
+          "providerIDs": [
+            "projecthoomans.conversation_root",
+            "projecthoomans.static_questions"
+          ],
+          "sourceKinds": [
+            "conversation_root",
+            "typed_input"
+          ],
+          "stanceFields": []
+        },
+        "groups": [
+          {
+            "candidateIDs": [
+              "conversation.root:menu:ask_name",
+              "conversation.root:menu:recruit",
+              "conversation.root:menu:goodbye",
+              "conversation.landing:whats_up",
+              "conversation.landing:talk_again_about",
+              "companion.orders:open"
+            ],
+            "id": "conversation_landing"
+          },
+          {
+            "candidateIDs": [
+              "question.time",
+              "question.date"
+            ],
+            "id": "topic:time"
+          },
+          {
+            "candidateIDs": [
+              "conversation.root:menu:projecthoomans:wellbeing",
+              "conversation.root:menu:projecthoomans:small_talk",
+              "conversation.root:menu:projecthoomans:ask_about",
+              "conversation.root:menu:projecthoomans:needs"
+            ],
+            "id": "conversation_context_index"
+          },
+          {
+            "candidateIDs": [
+              "companion.orders:camp"
+            ],
+            "id": "companion.orders"
+          },
+          {
+            "candidateIDs": [],
+            "id": "companion.camp"
+          }
+        ],
+        "providers": [
+          {
+            "enabled": true,
+            "id": "projecthoomans.conversation_root",
+            "order": 10,
+            "sourceKind": "conversation_root"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.conversation_registry",
+            "order": 20,
+            "sourceKind": "conversation_registry"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.active_flow",
+            "order": 30,
+            "sourceKind": "active_flow"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.response_plan",
+            "order": 40,
+            "sourceKind": "npc_response_plan"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.static_questions",
+            "order": 50,
+            "sourceKind": "typed_input"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.social_context",
+            "order": 55,
+            "sourceKind": "social_context"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.flow_topic",
+            "order": 60,
+            "sourceKind": "active_flow"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.capabilities",
+            "order": 80,
+            "sourceKind": "permitted_capability"
+          }
+        ],
+        "ranking": {
+          "candidateCount": 13,
+          "classOrder": {
+            "ACTIVE_TOPIC": 4,
+            "BRANCH_CONTINUATION": 1,
+            "CONTEXTUAL_SOCIAL": 3,
+            "DIRECT_RESPONSE": 2,
+            "GAMEPLAY_ACTION": 5,
+            "GENERAL_TOPIC": 6,
+            "UTILITY": 7
+          },
+          "schema": "semantic.choice.ranking.v1"
+        },
+        "revision": 1,
+        "rootGroupID": "conversation_landing",
+        "turnID": "turn-1"
+      }
+    },
+    {
+      "click": null,
+      "id": "hostility_reply",
+      "rawInput": "fuck you",
+      "suggestions": {
+        "candidates": [
+          {
+            "display": {
+              "label": "Check in with them",
+              "labelFallback": "Check in with them",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CheckIn_Label",
+              "utterance": "How are we doing?",
+              "utteranceFallback": "How are we doing?",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_CheckIn_Utterance"
+            },
+            "frame": {
+              "candidateID": "social.check_in",
+              "extensions": {
+                "providerID": "projecthoomans.social_context",
+                "route": "semantic_provider"
+              },
+              "intent": "QUESTION",
+              "kind": "semantic_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CheckIn_Label",
+              "origin": {},
+              "speechAct": "QUESTION",
+              "subject": "WELLBEING",
+              "target": {
+                "kind": "conversation_actor",
+                "ref": "npc"
+              },
+              "textFallback": "How are we doing?",
+              "textKey": "UI_PNC_Conversation_Suggestion_CheckIn_Utterance",
+              "topic": "wellbeing"
+            },
+            "groupID": null,
+            "id": "social.check_in",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": true
+            },
+            "providerID": "projecthoomans.social_context",
+            "providerOrder": 55,
+            "rank": 1,
+            "ranking": {
+              "class": "CONTEXTUAL_SOCIAL",
+              "classOrder": 3,
+              "order": 1,
+              "orderHint": 12,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "social.check_in"
+            },
+            "source": {
+              "classification": "derived",
+              "kind": "social_context",
+              "providerID": "projecthoomans.social_context",
+              "reason": "provider_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "social_context"
+              ],
+              "reasons": [
+                "provider_eligible"
+              ]
+            },
+            "topic": "wellbeing",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "What's your name?",
+              "labelFallback": "What's your name?",
+              "utterance": "What's your name?",
+              "utteranceFallback": "What's your name?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:ask_name",
+              "extensions": {
+                "actionID": "ask_name",
+                "groupID": "conversation_utilities",
+                "origin": "conversation_root",
+                "route": "conversation_root_choice"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_ACTION",
+              "textFallback": "What's your name?"
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.root:menu:ask_name",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 2,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 2,
+              "orderHint": 1,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:ask_name"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "How are you doing?",
+              "labelFallback": "How are you doing?",
+              "utterance": "How are you doing?",
+              "utteranceFallback": "How are you doing?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:wellbeing",
+              "extensions": {
+                "authority": "semantic_response_flow",
+                "categoryID": "projecthoomans:wellbeing",
+                "groupID": "topic:wellbeing",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "How are you doing?",
+              "topic": "wellbeing"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:wellbeing",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 3,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 3,
+              "orderHint": 2,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:wellbeing"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "wellbeing",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Let's talk.",
+              "labelFallback": "Let's talk.",
+              "utterance": "Let's talk.",
+              "utteranceFallback": "Let's talk."
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:small_talk",
+              "extensions": {
+                "authority": "semantic_response_flow",
+                "categoryID": "projecthoomans:small_talk",
+                "groupID": "topic:small_talk",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "Let's talk.",
+              "topic": "small_talk"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:small_talk",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 4,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 4,
+              "orderHint": 3,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:small_talk"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "small_talk",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Ask about...",
+              "labelFallback": "Ask about...",
+              "utterance": "Ask about...",
+              "utteranceFallback": "Ask about..."
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:ask_about",
+              "extensions": {
+                "authority": "semantic_response_flow",
+                "categoryID": "projecthoomans:ask_about",
+                "groupID": "topic:ask_about",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "Ask about...",
+              "topic": "ask_about"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:ask_about",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 5,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 5,
+              "orderHint": 4,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:ask_about"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "ask_about",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Need anything?",
+              "labelFallback": "Need anything?",
+              "utterance": "Need anything?",
+              "utteranceFallback": "Need anything?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:projecthoomans:needs",
+              "extensions": {
+                "categoryID": "projecthoomans:needs",
+                "groupID": "topic:needs",
+                "origin": "conversation_root",
+                "route": "conversation_category"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "Need anything?",
+              "topic": "needs"
+            },
+            "groupID": "conversation_context_index",
+            "id": "conversation.root:menu:projecthoomans:needs",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 6,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 6,
+              "orderHint": 5,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:projecthoomans:needs"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": "needs",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Would you like to join us?",
+              "labelFallback": "Would you like to join us?",
+              "utterance": "Would you like to join us?",
+              "utteranceFallback": "Would you like to join us?"
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:recruit",
+              "extensions": {
+                "actionID": "recruit",
+                "groupID": "conversation_actions",
+                "origin": "conversation_root",
+                "route": "conversation_root_choice"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_ACTION",
+              "textFallback": "Would you like to join us?"
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.root:menu:recruit",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 7,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 7,
+              "orderHint": 6,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:recruit"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "That's all. Stay safe.",
+              "labelFallback": "That's all. Stay safe.",
+              "utterance": "That's all. Stay safe.",
+              "utteranceFallback": "That's all. Stay safe."
+            },
+            "frame": {
+              "candidateID": "conversation.root:menu:goodbye",
+              "extensions": {
+                "actionID": "goodbye",
+                "groupID": "conversation_utilities",
+                "origin": "conversation_root",
+                "route": "conversation_root_choice"
+              },
+              "intent": "REQUEST",
+              "kind": "semantic_click_frame",
+              "origin": {},
+              "speechAct": "REQUEST",
+              "subject": "CONVERSATION_ACTION",
+              "textFallback": "That's all. Stay safe."
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.root:menu:goodbye",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": false,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 8,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 8,
+              "orderHint": 7,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.root:menu:goodbye"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "production_root_choice_eligible",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "production_root_choice_eligible"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "What's up?",
+              "labelFallback": "What's up?",
+              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "utterance": "What's up?",
+              "utteranceFallback": "What's up?"
+            },
+            "frame": {
+              "candidateID": "conversation.landing:whats_up",
+              "extensions": {
+                "origin": "conversation_landing",
+                "route": "semantic_hub"
+              },
+              "intent": "QUESTION",
+              "kind": "semantic_shortcut_frame",
+              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "origin": {},
+              "speechAct": "QUESTION",
+              "subject": "CONVERSATION_TOPIC",
+              "textFallback": "What's up?",
+              "topic": "whats_up"
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.landing:whats_up",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": true,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 9,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 9,
+              "orderHint": 8,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.landing:whats_up"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "conversation_landing_shortcut",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "conversation_landing_shortcut"
+              ]
+            },
+            "topic": "whats_up",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Talk again about",
+              "labelFallback": "Talk again about",
+              "labelKey": "UI_PNC_Conversation_Suggestion_TalkAgainAbout_Label"
+            },
+            "frame": {
+              "candidateID": "semantic.group:conversation_context_index",
+              "extensions": {},
+              "kind": "semantic_group_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_TalkAgainAbout_Label",
+              "origin": {},
+              "textFallback": "Talk again about"
+            },
+            "groupID": "conversation_landing",
+            "id": "conversation.landing:talk_again_about",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": false,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 10,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 10,
+              "orderHint": 9,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "conversation.landing:talk_again_about"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "conversation_context_index",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "conversation_context_index"
+              ]
+            },
+            "topic": null,
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "I need you to do something...",
+              "labelFallback": "I need you to do something...",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionOrders_Label"
+            },
+            "frame": {
+              "candidateID": "semantic.group:companion.orders",
+              "extensions": {},
+              "kind": "semantic_group_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionOrders_Label",
+              "origin": {},
+              "textFallback": "I need you to do something..."
+            },
+            "groupID": "conversation_landing",
+            "id": "companion.orders:open",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": false,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 11,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 11,
+              "orderHint": 10,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "companion.orders:open"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "companion_orders_hub",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "companion_orders_hub"
+              ]
+            },
+            "topic": "movement",
+            "visibility": "player"
+          },
+          {
+            "display": {
+              "label": "Let's camp...",
+              "labelFallback": "Let's camp...",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionCamp_Label"
+            },
+            "frame": {
+              "candidateID": "semantic.group:companion.camp",
+              "extensions": {},
+              "kind": "semantic_group_click_frame",
+              "labelKey": "UI_PNC_Conversation_Suggestion_CompanionCamp_Label",
+              "origin": {},
+              "textFallback": "Let's camp..."
+            },
+            "groupID": "companion.orders",
+            "id": "companion.orders:camp",
+            "labelUtteranceDependency": {
+              "hasLabelFallback": true,
+              "hasLabelKey": true,
+              "hasUtteranceFallback": false,
+              "hasUtteranceKey": false
+            },
+            "providerID": "projecthoomans.conversation_root",
+            "providerOrder": 10,
+            "rank": 12,
+            "ranking": {
+              "class": "GENERAL_TOPIC",
+              "classOrder": 6,
+              "order": 12,
+              "orderHint": 11,
+              "schema": "semantic.choice.ranking.v1",
+              "stableTieBreak": "companion.orders:camp"
+            },
+            "source": {
+              "classification": "authored_or_static",
+              "kind": "conversation_root",
+              "providerID": "projecthoomans.conversation_root",
+              "reason": "companion_camp_branch",
+              "revision": 1
+            },
+            "sourceEvidence": {
+              "count": 1,
+              "kinds": [
+                "conversation_root"
+              ],
+              "reasons": [
+                "companion_camp_branch"
+              ]
+            },
+            "topic": "movement",
+            "visibility": "player"
+          }
+        ],
+        "currentGroupID": "conversation_landing",
+        "currentTopic": "greeting",
+        "deduplication": {
+          "candidateCount": 12,
+          "duplicateIDs": [],
+          "rankSequence": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "uniqueIDCount": 12
+        },
+        "diversityObserved": {
+          "frameValues": {
+            "intent": [
+              "QUESTION",
+              "REQUEST"
+            ],
+            "speechAct": [
+              "QUESTION",
+              "REQUEST"
+            ],
+            "subject": [
+              "CONVERSATION_ACTION",
+              "CONVERSATION_TOPIC",
+              "WELLBEING"
+            ],
+            "topic": [
+              "ask_about",
+              "needs",
+              "small_talk",
+              "wellbeing",
+              "whats_up"
+            ]
+          },
+          "providerIDs": [
+            "projecthoomans.conversation_root",
+            "projecthoomans.social_context"
+          ],
+          "sourceKinds": [
+            "conversation_root",
+            "social_context"
+          ],
+          "stanceFields": []
+        },
+        "groups": [
+          {
+            "candidateIDs": [
+              "conversation.root:menu:ask_name",
+              "conversation.root:menu:recruit",
+              "conversation.root:menu:goodbye",
+              "conversation.landing:whats_up",
+              "conversation.landing:talk_again_about",
+              "companion.orders:open"
+            ],
+            "id": "conversation_landing"
+          },
+          {
+            "candidateIDs": [
+              "social.check_in"
+            ],
+            "id": "topic:wellbeing"
+          },
+          {
+            "candidateIDs": [
+              "conversation.root:menu:projecthoomans:wellbeing",
+              "conversation.root:menu:projecthoomans:small_talk",
+              "conversation.root:menu:projecthoomans:ask_about",
+              "conversation.root:menu:projecthoomans:needs"
+            ],
+            "id": "conversation_context_index"
+          },
+          {
+            "candidateIDs": [
+              "companion.orders:camp"
+            ],
+            "id": "companion.orders"
+          },
+          {
+            "candidateIDs": [],
+            "id": "companion.camp"
+          }
+        ],
+        "providers": [
+          {
+            "enabled": true,
+            "id": "projecthoomans.conversation_root",
+            "order": 10,
+            "sourceKind": "conversation_root"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.conversation_registry",
+            "order": 20,
+            "sourceKind": "conversation_registry"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.active_flow",
+            "order": 30,
+            "sourceKind": "active_flow"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.response_plan",
+            "order": 40,
+            "sourceKind": "npc_response_plan"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.static_questions",
+            "order": 50,
+            "sourceKind": "typed_input"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.social_context",
+            "order": 55,
+            "sourceKind": "social_context"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.flow_topic",
+            "order": 60,
+            "sourceKind": "active_flow"
+          },
+          {
+            "enabled": true,
+            "id": "projecthoomans.capabilities",
+            "order": 80,
+            "sourceKind": "permitted_capability"
+          }
+        ],
+        "ranking": {
+          "candidateCount": 12,
+          "classOrder": {
+            "ACTIVE_TOPIC": 4,
+            "BRANCH_CONTINUATION": 1,
+            "CONTEXTUAL_SOCIAL": 3,
+            "DIRECT_RESPONSE": 2,
+            "GAMEPLAY_ACTION": 5,
+            "GENERAL_TOPIC": 6,
+            "UTILITY": 7
+          },
+          "schema": "semantic.choice.ranking.v1"
+        },
+        "revision": 1,
+        "rootGroupID": "conversation_landing",
+        "turnID": "turn-1"
+      }
+    }
+  ],
+  "concern": "dynamic_suggestions",
+  "schema": "projecthoomans.c0a.current.v1"
+}

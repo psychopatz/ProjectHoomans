@@ -1,0 +1,6044 @@
+{
+  "cases": [
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "RECIPIENT",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "previousTopic": "greeting",
+          "priorTopics": [
+            {
+              "reason": "topic_interruption",
+              "topic": "greeting",
+              "turn": 1
+            }
+          ],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "RECIPIENT"
+            },
+            {
+              "intent": "INSULT",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "INSULT",
+              "topic": "RECIPIENT"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 2,
+          "eligibleCount": 2,
+          "reason": "eligible_candidate",
+          "rejectedCount": 0,
+          "selectedConfidence": 0.91,
+          "selectedPass": "fuzzy",
+          "selectedPattern": "pnc.social.insult",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 0.91,
+            "diagnostics": {
+              "candidatePass": "fuzzy",
+              "correctedTokens": [
+                {
+                  "candidates": [
+                    "INSULT"
+                  ],
+                  "editDistance": 1,
+                  "matchedAlias": "fuck-you",
+                  "text": "fuckyou"
+                }
+              ],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 1,
+                "fullCoverage": true,
+                "fuzzyCount": 1,
+                "skipped": 1,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.social.insult",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": false,
+            "fuzzy": true,
+            "intent": "INSULT",
+            "pass": "fuzzy",
+            "patternID": "pnc.social.insult",
+            "score": 0.91,
+            "selected": true,
+            "speechAct": "INSULT",
+            "subject": "RECIPIENT"
+          },
+          {
+            "confidence": 0.85,
+            "diagnostics": {
+              "candidatePass": "fuzzy",
+              "correctedTokens": [
+                {
+                  "candidates": [
+                    "INSULT"
+                  ],
+                  "editDistance": 1,
+                  "matchedAlias": "fuck-you",
+                  "text": "fuckyou"
+                }
+              ],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 1,
+                "fullCoverage": true,
+                "fuzzyCount": 1,
+                "skipped": 2,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.social.insult_prefixed",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": false,
+            "fuzzy": true,
+            "intent": "INSULT",
+            "pass": "fuzzy",
+            "patternID": "pnc.social.insult_prefixed",
+            "score": 0.85,
+            "selected": null,
+            "speechAct": "INSULT",
+            "subject": "RECIPIENT"
+          }
+        ],
+        "selected": {
+          "confidence": 0.91,
+          "confidenceBand": "high",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "fuzzy",
+            "candidateSelection": {
+              "candidateCount": 2,
+              "eligibleCount": 2,
+              "reason": "eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [
+              {
+                "candidates": [
+                  "INSULT"
+                ],
+                "editDistance": 1,
+                "matchedAlias": "fuck-you",
+                "text": "fuckyou"
+              }
+            ],
+            "entityResolutionFailures": [],
+            "exactMatch": false,
+            "fuzzyMatch": true,
+            "matchMetrics": {
+              "consumed": 1,
+              "fullCoverage": true,
+              "fuzzyCount": 1,
+              "skipped": 1,
+              "unmatchedCount": 0,
+              "unresolvedCount": 0
+            },
+            "matchedPattern": "pnc.social.insult",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "deterministic",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": false
+          },
+          "intent": "INSULT",
+          "normalizedText": "fuckyou",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "fuzzy",
+            "parser": "deterministic",
+            "pattern": "pnc.social.insult",
+            "provider": "lua"
+          },
+          "rawText": "fuckyou",
+          "speechAct": "INSULT",
+          "subject": "RECIPIENT"
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "topic": "RECIPIENT",
+        "transition": "hold"
+      },
+      "id": "compact_fuckyou",
+      "interactionDirector": {
+        "interactionPlan": {
+          "beatID": "beat.argument_escalation",
+          "behaviorID": "behavior.warn",
+          "contentTemplateID": "semantic.social.hostile_boundary",
+          "dialogueAct": "BOUNDARY_WARNING",
+          "sourceIntent": "INSULT",
+          "sourceSpeechAct": "INSULT",
+          "sourceStimulusType": "HUMAN_UTTERANCE",
+          "subject": "RECIPIENT",
+          "topic": "greeting"
+        },
+        "metrics": {
+          "beatCandidatesEvaluated": 3,
+          "canonicalBeatCount": 3,
+          "canonicalBehaviorCount": 11,
+          "catalogBeatCount": 3,
+          "catalogBehaviorCount": 11,
+          "indexedBeatCandidateCount": 3,
+          "predicateTraceRows": 17,
+          "stimulusType": "HUMAN_UTTERANCE"
+        },
+        "selectedBeat": {
+          "baseRelevance": 0.7,
+          "group": "beat_group.social_primary",
+          "id": "beat.argument_escalation"
+        },
+        "selectedBehavior": {
+          "act": "WARN",
+          "contentTemplateID": "semantic.social.hostile_boundary",
+          "dialogueAct": "BOUNDARY_WARNING",
+          "id": "behavior.warn",
+          "mode": "beat",
+          "score": 0.65
+        },
+        "stimulus": {
+          "semantic": {
+            "confidence": 0.91,
+            "intent": "INSULT",
+            "speechAct": "INSULT",
+            "subject": "RECIPIENT",
+            "topic": "greeting"
+          },
+          "source": {
+            "actorID": "char_patrick",
+            "kind": "human",
+            "providerID": "psychopatzcore.nlu"
+          },
+          "targets": [
+            "npc_mara"
+          ],
+          "text": "fuckyou",
+          "type": "HUMAN_UTTERANCE"
+        }
+      },
+      "normalizedInput": "fuckyou",
+      "policy": {
+        "branch": "HOSTILE_REMARK_RECEIVED",
+        "clarification": false,
+        "confidence": 0.91,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40,
+          "topic": "RECIPIENT"
+        },
+        "intent": "INSULT",
+        "llmEligible": false,
+        "reason": "recognized_hostile_social_act",
+        "route": "deterministic",
+        "speechAct": "INSULT"
+      },
+      "rawInput": "fuckyou",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "Watch your mouth.",
+          "plan": {
+            "dialogueAct": "BOUNDARY_WARNING",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.hostile_remark",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Watch your mouth.",
+                    "kind": "translation",
+                    "templateID": "semantic.social.hostile_boundary"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.hostile.short",
+          "selectionSource": "catalog",
+          "sourcePoolID": "semantic.hostile_remark",
+          "templateID": "semantic.social.hostile_boundary"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": "phrase.semantic.social.hostile_boundary",
+            "phraseID": "phrase.semantic.social.hostile_boundary.neutral.01",
+            "phrasePoolSize": 1,
+            "phraseSemanticTemplateID": "semantic.social.hostile_boundary",
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 2,
+              "applied": true,
+              "family": "semantic.social.hostile_boundary",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral01",
+            "semanticTemplateID": "semantic.social.hostile_boundary",
+            "text": "Don't talk to me like that."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "sequence": 1,
+              "speaker": "player",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 0,
+          "eligibleCount": 0,
+          "reason": "no_eligible_candidate",
+          "rejectedCount": 0,
+          "tiedEligibleCount": 0
+        },
+        "candidates": [],
+        "selected": {
+          "confidence": 0,
+          "confidenceBand": "low",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": null,
+            "candidateSelection": {
+              "candidateCount": 0,
+              "eligibleCount": 0,
+              "reason": "no_eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 0
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": null,
+            "fuzzyMatch": null,
+            "matchMetrics": {},
+            "matchedPattern": null,
+            "noMatch": true,
+            "parser": "lua_candidate_eligibility",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": null
+          },
+          "intent": null,
+          "normalizedText": "fuckyouuuu",
+          "provenance": {
+            "parser": "candidate_eligibility",
+            "provider": "lua"
+          },
+          "rawText": "fuckyouuuu",
+          "speechAct": null,
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "transition": "hold"
+      },
+      "id": "compact_fuckyou_elongated",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "fuckyouuuu",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40
+        },
+        "llmEligible": false,
+        "reason": "no_match",
+        "route": "deterministic"
+      },
+      "rawInput": "fuckyouuuu",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "sequence": 1,
+              "speaker": "player",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 0,
+          "eligibleCount": 0,
+          "reason": "no_eligible_candidate",
+          "rejectedCount": 0,
+          "tiedEligibleCount": 0
+        },
+        "candidates": [],
+        "selected": {
+          "confidence": 0,
+          "confidenceBand": "low",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": null,
+            "candidateSelection": {
+              "candidateCount": 0,
+              "eligibleCount": 0,
+              "reason": "no_eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 0
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": null,
+            "fuzzyMatch": null,
+            "matchMetrics": {},
+            "matchedPattern": null,
+            "noMatch": true,
+            "parser": "lua_candidate_eligibility",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": null
+          },
+          "intent": null,
+          "normalizedText": "shutthefuckup",
+          "provenance": {
+            "parser": "candidate_eligibility",
+            "provider": "lua"
+          },
+          "rawText": "shutthefuckup",
+          "speechAct": null,
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "transition": "hold"
+      },
+      "id": "compact_shutthefuckup",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "shutthefuckup",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40
+        },
+        "llmEligible": false,
+        "reason": "no_match",
+        "route": "deterministic"
+      },
+      "rawInput": "shutthefuckup",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "sequence": 1,
+              "speaker": "player",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 0,
+          "eligibleCount": 0,
+          "reason": "no_eligible_candidate",
+          "rejectedCount": 0,
+          "tiedEligibleCount": 0
+        },
+        "candidates": [],
+        "selected": {
+          "confidence": 0,
+          "confidenceBand": "low",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": null,
+            "candidateSelection": {
+              "candidateCount": 0,
+              "eligibleCount": 0,
+              "reason": "no_eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 0
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": null,
+            "fuzzyMatch": null,
+            "matchMetrics": {},
+            "matchedPattern": null,
+            "noMatch": true,
+            "parser": "lua_candidate_eligibility",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": null
+          },
+          "intent": null,
+          "normalizedText": "youidiot",
+          "provenance": {
+            "parser": "candidate_eligibility",
+            "provider": "lua"
+          },
+          "rawText": "youidiot",
+          "speechAct": null,
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "transition": "hold"
+      },
+      "id": "compact_youidiot",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "youidiot",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40
+        },
+        "llmEligible": false,
+        "reason": "no_match",
+        "route": "deterministic"
+      },
+      "rawInput": "youidiot",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "sequence": 1,
+              "speaker": "player",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 0,
+          "eligibleCount": 0,
+          "reason": "no_eligible_candidate",
+          "rejectedCount": 0,
+          "tiedEligibleCount": 0
+        },
+        "candidates": [],
+        "selected": {
+          "confidence": 0,
+          "confidenceBand": "low",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": null,
+            "candidateSelection": {
+              "candidateCount": 0,
+              "eligibleCount": 0,
+              "reason": "no_eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 0
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": null,
+            "fuzzyMatch": null,
+            "matchMetrics": {},
+            "matchedPattern": null,
+            "noMatch": true,
+            "parser": "lua_candidate_eligibility",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": null
+          },
+          "intent": null,
+          "normalizedText": "youreuseless",
+          "provenance": {
+            "parser": "candidate_eligibility",
+            "provider": "lua"
+          },
+          "rawText": "youreuseless",
+          "speechAct": null,
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "transition": "hold"
+      },
+      "id": "compact_youreuseless",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "youreuseless",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40
+        },
+        "llmEligible": false,
+        "reason": "no_match",
+        "route": "deterministic"
+      },
+      "rawInput": "youreuseless",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "sequence": 1,
+              "speaker": "player",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 0,
+          "eligibleCount": 0,
+          "reason": "no_eligible_candidate",
+          "rejectedCount": 0,
+          "tiedEligibleCount": 0
+        },
+        "candidates": [],
+        "selected": {
+          "confidence": 0,
+          "confidenceBand": "low",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": null,
+            "candidateSelection": {
+              "candidateCount": 0,
+              "eligibleCount": 0,
+              "reason": "no_eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 0
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": null,
+            "fuzzyMatch": null,
+            "matchMetrics": {},
+            "matchedPattern": null,
+            "noMatch": true,
+            "parser": "lua_candidate_eligibility",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": null
+          },
+          "intent": null,
+          "normalizedText": "illkillyou",
+          "provenance": {
+            "parser": "candidate_eligibility",
+            "provider": "lua"
+          },
+          "rawText": "illkillyou",
+          "speechAct": null,
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "transition": "hold"
+      },
+      "id": "compact_illkillyou",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "illkillyou",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40
+        },
+        "llmEligible": false,
+        "reason": "no_match",
+        "route": "deterministic"
+      },
+      "rawInput": "illkillyou",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "RECIPIENT",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "previousTopic": "greeting",
+          "priorTopics": [
+            {
+              "reason": "topic_interruption",
+              "topic": "greeting",
+              "turn": 1
+            }
+          ],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "RECIPIENT"
+            },
+            {
+              "intent": "HOSTILE_REMARK",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "HOSTILE_REMARK",
+              "topic": "RECIPIENT"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 1,
+          "eligibleCount": 1,
+          "reason": "eligible_candidate",
+          "rejectedCount": 0,
+          "selectedConfidence": 0.87,
+          "selectedPass": "exact",
+          "selectedPattern": "pnc.social.profanity",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 0.87,
+            "diagnostics": {
+              "candidatePass": "exact",
+              "correctedTokens": [],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 2,
+                "fullCoverage": true,
+                "fuzzyCount": 0,
+                "skipped": 0,
+                "unmatchedCount": 0,
+                "unresolvedCount": 1
+              },
+              "matchedPattern": "pnc.social.profanity",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": true
+            },
+            "exact": true,
+            "fuzzy": false,
+            "intent": "HOSTILE_REMARK",
+            "pass": "exact",
+            "patternID": "pnc.social.profanity",
+            "score": 0.87,
+            "selected": true,
+            "speechAct": "HOSTILE_REMARK",
+            "subject": "RECIPIENT"
+          }
+        ],
+        "selected": {
+          "confidence": 0.87,
+          "confidenceBand": "high",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "exact",
+            "candidateSelection": {
+              "candidateCount": 1,
+              "eligibleCount": 1,
+              "reason": "eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": true,
+            "fuzzyMatch": false,
+            "matchMetrics": {
+              "consumed": 2,
+              "fullCoverage": true,
+              "fuzzyCount": 0,
+              "skipped": 0,
+              "unmatchedCount": 0,
+              "unresolvedCount": 1
+            },
+            "matchedPattern": "pnc.social.profanity",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "deterministic",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": true
+          },
+          "intent": "HOSTILE_REMARK",
+          "normalizedText": "fuck youuuu",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "exact",
+            "parser": "deterministic",
+            "pattern": "pnc.social.profanity",
+            "provider": "lua"
+          },
+          "rawText": "fuck youuuu",
+          "speechAct": "HOSTILE_REMARK",
+          "subject": "RECIPIENT"
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "topic": "RECIPIENT",
+        "transition": "hold"
+      },
+      "id": "elongated_spaced_hostility",
+      "interactionDirector": {
+        "interactionPlan": {
+          "beatID": "beat.argument_escalation",
+          "behaviorID": "behavior.warn",
+          "contentTemplateID": "semantic.social.hostile_boundary",
+          "dialogueAct": "BOUNDARY_WARNING",
+          "sourceIntent": "HOSTILE_REMARK",
+          "sourceSpeechAct": "HOSTILE_REMARK",
+          "sourceStimulusType": "HUMAN_UTTERANCE",
+          "subject": "RECIPIENT",
+          "topic": "greeting"
+        },
+        "metrics": {
+          "beatCandidatesEvaluated": 3,
+          "canonicalBeatCount": 3,
+          "canonicalBehaviorCount": 11,
+          "catalogBeatCount": 3,
+          "catalogBehaviorCount": 11,
+          "indexedBeatCandidateCount": 3,
+          "predicateTraceRows": 17,
+          "stimulusType": "HUMAN_UTTERANCE"
+        },
+        "selectedBeat": {
+          "baseRelevance": 0.7,
+          "group": "beat_group.social_primary",
+          "id": "beat.argument_escalation"
+        },
+        "selectedBehavior": {
+          "act": "WARN",
+          "contentTemplateID": "semantic.social.hostile_boundary",
+          "dialogueAct": "BOUNDARY_WARNING",
+          "id": "behavior.warn",
+          "mode": "beat",
+          "score": 0.65
+        },
+        "stimulus": {
+          "semantic": {
+            "confidence": 0.87,
+            "intent": "HOSTILE_REMARK",
+            "speechAct": "HOSTILE_REMARK",
+            "subject": "RECIPIENT",
+            "topic": "greeting"
+          },
+          "source": {
+            "actorID": "char_patrick",
+            "kind": "human",
+            "providerID": "psychopatzcore.nlu"
+          },
+          "targets": [
+            "npc_mara"
+          ],
+          "text": "fuck youuuu",
+          "type": "HUMAN_UTTERANCE"
+        }
+      },
+      "normalizedInput": "fuck youuuu",
+      "policy": {
+        "branch": "HOSTILE_REMARK_RECEIVED",
+        "clarification": false,
+        "confidence": 0.87,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40,
+          "topic": "RECIPIENT"
+        },
+        "intent": "HOSTILE_REMARK",
+        "llmEligible": false,
+        "reason": "recognized_hostile_social_act",
+        "route": "deterministic",
+        "speechAct": "HOSTILE_REMARK"
+      },
+      "rawInput": "fuck youuuu",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "Watch your mouth.",
+          "plan": {
+            "dialogueAct": "BOUNDARY_WARNING",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.hostile_remark",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Watch your mouth.",
+                    "kind": "translation",
+                    "templateID": "semantic.social.hostile_boundary"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.hostile.short",
+          "selectionSource": "catalog",
+          "sourcePoolID": "semantic.hostile_remark",
+          "templateID": "semantic.social.hostile_boundary"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": "phrase.semantic.social.hostile_boundary",
+            "phraseID": "phrase.semantic.social.hostile_boundary.neutral.01",
+            "phrasePoolSize": 1,
+            "phraseSemanticTemplateID": "semantic.social.hostile_boundary",
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 2,
+              "applied": true,
+              "family": "semantic.social.hostile_boundary",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral01",
+            "semanticTemplateID": "semantic.social.hostile_boundary",
+            "text": "Don't talk to me like that."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "RECIPIENT",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "previousTopic": "greeting",
+          "priorTopics": [
+            {
+              "reason": "topic_interruption",
+              "topic": "greeting",
+              "turn": 1
+            }
+          ],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "RECIPIENT"
+            },
+            {
+              "intent": "INSULT",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "INSULT",
+              "topic": "RECIPIENT"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 1,
+          "eligibleCount": 1,
+          "reason": "eligible_candidate",
+          "rejectedCount": 0,
+          "selectedConfidence": 0.93,
+          "selectedPass": "fuzzy",
+          "selectedPattern": "pnc.social.insult_you_are",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 0.93,
+            "diagnostics": {
+              "candidatePass": "fuzzy",
+              "correctedTokens": [
+                {
+                  "candidates": [
+                    "INSULT"
+                  ],
+                  "editDistance": 1,
+                  "matchedAlias": "idiot",
+                  "text": "idot"
+                }
+              ],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 4,
+                "fullCoverage": true,
+                "fuzzyCount": 1,
+                "skipped": 2,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.social.insult_you_are",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": false,
+            "fuzzy": true,
+            "intent": "INSULT",
+            "pass": "fuzzy",
+            "patternID": "pnc.social.insult_you_are",
+            "score": 0.93,
+            "selected": true,
+            "speechAct": "INSULT",
+            "subject": "RECIPIENT"
+          }
+        ],
+        "selected": {
+          "confidence": 0.93,
+          "confidenceBand": "high",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "fuzzy",
+            "candidateSelection": {
+              "candidateCount": 1,
+              "eligibleCount": 1,
+              "reason": "eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [
+              {
+                "candidates": [
+                  "INSULT"
+                ],
+                "editDistance": 1,
+                "matchedAlias": "idiot",
+                "text": "idot"
+              }
+            ],
+            "entityResolutionFailures": [],
+            "exactMatch": false,
+            "fuzzyMatch": true,
+            "matchMetrics": {
+              "consumed": 4,
+              "fullCoverage": true,
+              "fuzzyCount": 1,
+              "skipped": 2,
+              "unmatchedCount": 0,
+              "unresolvedCount": 0
+            },
+            "matchedPattern": "pnc.social.insult_you_are",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "deterministic",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": false
+          },
+          "intent": "INSULT",
+          "normalizedText": "you are an idot",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "fuzzy",
+            "parser": "deterministic",
+            "pattern": "pnc.social.insult_you_are",
+            "provider": "lua"
+          },
+          "rawText": "you are an idot",
+          "speechAct": "INSULT",
+          "subject": "RECIPIENT"
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "topic": "RECIPIENT",
+        "transition": "hold"
+      },
+      "id": "typo_insult",
+      "interactionDirector": {
+        "interactionPlan": {
+          "beatID": "beat.argument_escalation",
+          "behaviorID": "behavior.warn",
+          "contentTemplateID": "semantic.social.hostile_boundary",
+          "dialogueAct": "BOUNDARY_WARNING",
+          "sourceIntent": "INSULT",
+          "sourceSpeechAct": "INSULT",
+          "sourceStimulusType": "HUMAN_UTTERANCE",
+          "subject": "RECIPIENT",
+          "topic": "greeting"
+        },
+        "metrics": {
+          "beatCandidatesEvaluated": 3,
+          "canonicalBeatCount": 3,
+          "canonicalBehaviorCount": 11,
+          "catalogBeatCount": 3,
+          "catalogBehaviorCount": 11,
+          "indexedBeatCandidateCount": 3,
+          "predicateTraceRows": 17,
+          "stimulusType": "HUMAN_UTTERANCE"
+        },
+        "selectedBeat": {
+          "baseRelevance": 0.7,
+          "group": "beat_group.social_primary",
+          "id": "beat.argument_escalation"
+        },
+        "selectedBehavior": {
+          "act": "WARN",
+          "contentTemplateID": "semantic.social.hostile_boundary",
+          "dialogueAct": "BOUNDARY_WARNING",
+          "id": "behavior.warn",
+          "mode": "beat",
+          "score": 0.65
+        },
+        "stimulus": {
+          "semantic": {
+            "confidence": 0.93,
+            "intent": "INSULT",
+            "speechAct": "INSULT",
+            "subject": "RECIPIENT",
+            "topic": "greeting"
+          },
+          "source": {
+            "actorID": "char_patrick",
+            "kind": "human",
+            "providerID": "psychopatzcore.nlu"
+          },
+          "targets": [
+            "npc_mara"
+          ],
+          "text": "you are an idot",
+          "type": "HUMAN_UTTERANCE"
+        }
+      },
+      "normalizedInput": "you are an idot",
+      "policy": {
+        "branch": "HOSTILE_REMARK_RECEIVED",
+        "clarification": false,
+        "confidence": 0.93,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40,
+          "topic": "RECIPIENT"
+        },
+        "intent": "INSULT",
+        "llmEligible": false,
+        "reason": "recognized_hostile_social_act",
+        "route": "deterministic",
+        "speechAct": "INSULT"
+      },
+      "rawInput": "you are an idot",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "Watch your mouth.",
+          "plan": {
+            "dialogueAct": "BOUNDARY_WARNING",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.hostile_remark",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Watch your mouth.",
+                    "kind": "translation",
+                    "templateID": "semantic.social.hostile_boundary"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.hostile.short",
+          "selectionSource": "catalog",
+          "sourcePoolID": "semantic.hostile_remark",
+          "templateID": "semantic.social.hostile_boundary"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": "phrase.semantic.social.hostile_boundary",
+            "phraseID": "phrase.semantic.social.hostile_boundary.neutral.01",
+            "phrasePoolSize": 1,
+            "phraseSemanticTemplateID": "semantic.social.hostile_boundary",
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 2,
+              "applied": true,
+              "family": "semantic.social.hostile_boundary",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral01",
+            "semanticTemplateID": "semantic.social.hostile_boundary",
+            "text": "Don't talk to me like that."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "RECIPIENT",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "previousTopic": "greeting",
+          "priorTopics": [
+            {
+              "reason": "topic_interruption",
+              "topic": "greeting",
+              "turn": 1
+            }
+          ],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "RECIPIENT"
+            },
+            {
+              "intent": "HOSTILE_REMARK",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "HOSTILE_REMARK",
+              "topic": "RECIPIENT"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 2,
+          "eligibleCount": 2,
+          "reason": "eligible_candidate",
+          "rejectedCount": 0,
+          "selectedConfidence": 0.91,
+          "selectedPass": "fuzzy",
+          "selectedPattern": "pnc.social.hostile_remark",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 0.91,
+            "diagnostics": {
+              "candidatePass": "fuzzy",
+              "correctedTokens": [
+                {
+                  "candidates": [
+                    "HOSTILE_REMARK"
+                  ],
+                  "editDistance": 2,
+                  "matchedAlias": "go away",
+                  "text": "gooo away"
+                }
+              ],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 1,
+                "fullCoverage": true,
+                "fuzzyCount": 1,
+                "skipped": 1,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.social.hostile_remark",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": false,
+            "fuzzy": true,
+            "intent": "HOSTILE_REMARK",
+            "pass": "fuzzy",
+            "patternID": "pnc.social.hostile_remark",
+            "score": 0.91,
+            "selected": true,
+            "speechAct": "HOSTILE_REMARK",
+            "subject": "RECIPIENT"
+          },
+          {
+            "confidence": 0.85,
+            "diagnostics": {
+              "candidatePass": "fuzzy",
+              "correctedTokens": [
+                {
+                  "candidates": [
+                    "HOSTILE_REMARK"
+                  ],
+                  "editDistance": 2,
+                  "matchedAlias": "go away",
+                  "text": "gooo away"
+                }
+              ],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 1,
+                "fullCoverage": true,
+                "fuzzyCount": 1,
+                "skipped": 2,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.social.hostile_remark_prefixed",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": false,
+            "fuzzy": true,
+            "intent": "HOSTILE_REMARK",
+            "pass": "fuzzy",
+            "patternID": "pnc.social.hostile_remark_prefixed",
+            "score": 0.85,
+            "selected": null,
+            "speechAct": "HOSTILE_REMARK",
+            "subject": "RECIPIENT"
+          }
+        ],
+        "selected": {
+          "confidence": 0.91,
+          "confidenceBand": "high",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "fuzzy",
+            "candidateSelection": {
+              "candidateCount": 2,
+              "eligibleCount": 2,
+              "reason": "eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [
+              {
+                "candidates": [
+                  "HOSTILE_REMARK"
+                ],
+                "editDistance": 2,
+                "matchedAlias": "go away",
+                "text": "gooo away"
+              }
+            ],
+            "entityResolutionFailures": [],
+            "exactMatch": false,
+            "fuzzyMatch": true,
+            "matchMetrics": {
+              "consumed": 1,
+              "fullCoverage": true,
+              "fuzzyCount": 1,
+              "skipped": 1,
+              "unmatchedCount": 0,
+              "unresolvedCount": 0
+            },
+            "matchedPattern": "pnc.social.hostile_remark",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "deterministic",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": false
+          },
+          "intent": "HOSTILE_REMARK",
+          "normalizedText": "gooo away",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "fuzzy",
+            "parser": "deterministic",
+            "pattern": "pnc.social.hostile_remark",
+            "provider": "lua"
+          },
+          "rawText": "gooo away",
+          "speechAct": "HOSTILE_REMARK",
+          "subject": "RECIPIENT"
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "topic": "RECIPIENT",
+        "transition": "hold"
+      },
+      "id": "elongated_hostility",
+      "interactionDirector": {
+        "interactionPlan": {
+          "beatID": "beat.argument_escalation",
+          "behaviorID": "behavior.warn",
+          "contentTemplateID": "semantic.social.hostile_boundary",
+          "dialogueAct": "BOUNDARY_WARNING",
+          "sourceIntent": "HOSTILE_REMARK",
+          "sourceSpeechAct": "HOSTILE_REMARK",
+          "sourceStimulusType": "HUMAN_UTTERANCE",
+          "subject": "RECIPIENT",
+          "topic": "greeting"
+        },
+        "metrics": {
+          "beatCandidatesEvaluated": 3,
+          "canonicalBeatCount": 3,
+          "canonicalBehaviorCount": 11,
+          "catalogBeatCount": 3,
+          "catalogBehaviorCount": 11,
+          "indexedBeatCandidateCount": 3,
+          "predicateTraceRows": 17,
+          "stimulusType": "HUMAN_UTTERANCE"
+        },
+        "selectedBeat": {
+          "baseRelevance": 0.7,
+          "group": "beat_group.social_primary",
+          "id": "beat.argument_escalation"
+        },
+        "selectedBehavior": {
+          "act": "WARN",
+          "contentTemplateID": "semantic.social.hostile_boundary",
+          "dialogueAct": "BOUNDARY_WARNING",
+          "id": "behavior.warn",
+          "mode": "beat",
+          "score": 0.65
+        },
+        "stimulus": {
+          "semantic": {
+            "confidence": 0.91,
+            "intent": "HOSTILE_REMARK",
+            "speechAct": "HOSTILE_REMARK",
+            "subject": "RECIPIENT",
+            "topic": "greeting"
+          },
+          "source": {
+            "actorID": "char_patrick",
+            "kind": "human",
+            "providerID": "psychopatzcore.nlu"
+          },
+          "targets": [
+            "npc_mara"
+          ],
+          "text": "gooo away",
+          "type": "HUMAN_UTTERANCE"
+        }
+      },
+      "normalizedInput": "gooo away",
+      "policy": {
+        "branch": "HOSTILE_REMARK_RECEIVED",
+        "clarification": false,
+        "confidence": 0.91,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40,
+          "topic": "RECIPIENT"
+        },
+        "intent": "HOSTILE_REMARK",
+        "llmEligible": false,
+        "reason": "recognized_hostile_social_act",
+        "route": "deterministic",
+        "speechAct": "HOSTILE_REMARK"
+      },
+      "rawInput": "gooo away",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "Don't talk to me like that.",
+          "plan": {
+            "dialogueAct": "BOUNDARY_WARNING",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.hostile_remark",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Don't talk to me like that.",
+                    "kind": "translation",
+                    "templateID": "semantic.social.hostile_boundary"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.hostile.default",
+          "selectionSource": "catalog",
+          "sourcePoolID": "semantic.hostile_remark",
+          "templateID": "semantic.social.hostile_boundary"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": "phrase.semantic.social.hostile_boundary",
+            "phraseID": "phrase.semantic.social.hostile_boundary.neutral.01",
+            "phrasePoolSize": 1,
+            "phraseSemanticTemplateID": "semantic.social.hostile_boundary",
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 2,
+              "applied": true,
+              "family": "semantic.social.hostile_boundary",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral01",
+            "semanticTemplateID": "semantic.social.hostile_boundary",
+            "text": "Don't talk to me like that."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "RECIPIENT",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "previousTopic": "greeting",
+          "priorTopics": [
+            {
+              "reason": "topic_interruption",
+              "topic": "greeting",
+              "turn": 1
+            }
+          ],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "RECIPIENT"
+            },
+            {
+              "intent": "HOSTILE_REMARK",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "HOSTILE_REMARK",
+              "topic": "RECIPIENT"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 2,
+          "eligibleCount": 2,
+          "reason": "eligible_candidate",
+          "rejectedCount": 0,
+          "selectedConfidence": 0.83,
+          "selectedPass": "fuzzy",
+          "selectedPattern": "pnc.social.hostile_remark",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 0.83,
+            "diagnostics": {
+              "candidatePass": "fuzzy",
+              "correctedTokens": [
+                {
+                  "candidates": [
+                    "HOSTILE_REMARK"
+                  ],
+                  "editDistance": 2,
+                  "matchedAlias": "i hate you",
+                  "text": "i hope you"
+                }
+              ],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 2,
+                "fullCoverage": true,
+                "fuzzyCount": 1,
+                "skipped": 0,
+                "unmatchedCount": 0,
+                "unresolvedCount": 1
+              },
+              "matchedPattern": "pnc.social.hostile_remark",
+              "recommendedRoute": "clarify_or_llm",
+              "unmatchedTokens": [],
+              "unresolvedEntity": true
+            },
+            "exact": false,
+            "fuzzy": true,
+            "intent": "HOSTILE_REMARK",
+            "pass": "fuzzy",
+            "patternID": "pnc.social.hostile_remark",
+            "score": 0.83,
+            "selected": true,
+            "speechAct": "HOSTILE_REMARK",
+            "subject": "RECIPIENT"
+          },
+          {
+            "confidence": 0.77,
+            "diagnostics": {
+              "candidatePass": "fuzzy",
+              "correctedTokens": [
+                {
+                  "candidates": [
+                    "HOSTILE_REMARK"
+                  ],
+                  "editDistance": 2,
+                  "matchedAlias": "i hate you",
+                  "text": "i hope you"
+                }
+              ],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 2,
+                "fullCoverage": true,
+                "fuzzyCount": 1,
+                "skipped": 1,
+                "unmatchedCount": 0,
+                "unresolvedCount": 1
+              },
+              "matchedPattern": "pnc.social.hostile_remark_prefixed",
+              "recommendedRoute": "clarify_or_llm",
+              "unmatchedTokens": [],
+              "unresolvedEntity": true
+            },
+            "exact": false,
+            "fuzzy": true,
+            "intent": "HOSTILE_REMARK",
+            "pass": "fuzzy",
+            "patternID": "pnc.social.hostile_remark_prefixed",
+            "score": 0.77,
+            "selected": null,
+            "speechAct": "HOSTILE_REMARK",
+            "subject": "RECIPIENT"
+          }
+        ],
+        "selected": {
+          "confidence": 0.83,
+          "confidenceBand": "medium",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "fuzzy",
+            "candidateSelection": {
+              "candidateCount": 2,
+              "eligibleCount": 2,
+              "reason": "eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [
+              {
+                "candidates": [
+                  "HOSTILE_REMARK"
+                ],
+                "editDistance": 2,
+                "matchedAlias": "i hate you",
+                "text": "i hope you"
+              }
+            ],
+            "entityResolutionFailures": [],
+            "exactMatch": false,
+            "fuzzyMatch": true,
+            "matchMetrics": {
+              "consumed": 2,
+              "fullCoverage": true,
+              "fuzzyCount": 1,
+              "skipped": 0,
+              "unmatchedCount": 0,
+              "unresolvedCount": 1
+            },
+            "matchedPattern": "pnc.social.hostile_remark",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": true
+          },
+          "intent": "HOSTILE_REMARK",
+          "normalizedText": "i hope you die",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "fuzzy",
+            "parser": "deterministic",
+            "pattern": "pnc.social.hostile_remark",
+            "provider": "lua"
+          },
+          "rawText": "i hope you die",
+          "speechAct": "HOSTILE_REMARK",
+          "subject": "RECIPIENT"
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "topic": "RECIPIENT",
+        "transition": "hold"
+      },
+      "id": "hope_you_die",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "i hope you die",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0.83,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40,
+          "topic": "RECIPIENT"
+        },
+        "intent": "HOSTILE_REMARK",
+        "llmEligible": false,
+        "reason": "unresolved_reference",
+        "route": "deterministic",
+        "speechAct": "HOSTILE_REMARK"
+      },
+      "rawInput": "i hope you die",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "RECIPIENT",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "previousTopic": "greeting",
+          "priorTopics": [
+            {
+              "reason": "topic_interruption",
+              "topic": "greeting",
+              "turn": 1
+            }
+          ],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "RECIPIENT"
+            },
+            {
+              "intent": "HOSTILE_REMARK",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "HOSTILE_REMARK",
+              "topic": "RECIPIENT"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 2,
+          "eligibleCount": 2,
+          "reason": "eligible_candidate",
+          "rejectedCount": 0,
+          "selectedConfidence": 0.99,
+          "selectedPass": "exact",
+          "selectedPattern": "pnc.social.hostile_remark",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 0.99,
+            "diagnostics": {
+              "candidatePass": "exact",
+              "correctedTokens": [],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 1,
+                "fullCoverage": true,
+                "fuzzyCount": 0,
+                "skipped": 1,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.social.hostile_remark",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": true,
+            "fuzzy": false,
+            "intent": "HOSTILE_REMARK",
+            "pass": "exact",
+            "patternID": "pnc.social.hostile_remark",
+            "score": 0.99,
+            "selected": true,
+            "speechAct": "HOSTILE_REMARK",
+            "subject": "RECIPIENT"
+          },
+          {
+            "confidence": 0.93,
+            "diagnostics": {
+              "candidatePass": "exact",
+              "correctedTokens": [],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 1,
+                "fullCoverage": true,
+                "fuzzyCount": 0,
+                "skipped": 2,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.social.hostile_remark_prefixed",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": true,
+            "fuzzy": false,
+            "intent": "HOSTILE_REMARK",
+            "pass": "exact",
+            "patternID": "pnc.social.hostile_remark_prefixed",
+            "score": 0.93,
+            "selected": null,
+            "speechAct": "HOSTILE_REMARK",
+            "subject": "RECIPIENT"
+          }
+        ],
+        "selected": {
+          "confidence": 0.99,
+          "confidenceBand": "high",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "exact",
+            "candidateSelection": {
+              "candidateCount": 2,
+              "eligibleCount": 2,
+              "reason": "eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": true,
+            "fuzzyMatch": false,
+            "matchMetrics": {
+              "consumed": 1,
+              "fullCoverage": true,
+              "fuzzyCount": 0,
+              "skipped": 1,
+              "unmatchedCount": 0,
+              "unresolvedCount": 0
+            },
+            "matchedPattern": "pnc.social.hostile_remark",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "deterministic",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": false
+          },
+          "intent": "HOSTILE_REMARK",
+          "normalizedText": "i hate you",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "exact",
+            "parser": "deterministic",
+            "pattern": "pnc.social.hostile_remark",
+            "provider": "lua"
+          },
+          "rawText": "i hate you",
+          "speechAct": "HOSTILE_REMARK",
+          "subject": "RECIPIENT"
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "topic": "RECIPIENT",
+        "transition": "hold"
+      },
+      "id": "hate_you",
+      "interactionDirector": {
+        "interactionPlan": {
+          "beatID": "beat.argument_escalation",
+          "behaviorID": "behavior.warn",
+          "contentTemplateID": "semantic.social.hostile_boundary",
+          "dialogueAct": "BOUNDARY_WARNING",
+          "sourceIntent": "HOSTILE_REMARK",
+          "sourceSpeechAct": "HOSTILE_REMARK",
+          "sourceStimulusType": "HUMAN_UTTERANCE",
+          "subject": "RECIPIENT",
+          "topic": "greeting"
+        },
+        "metrics": {
+          "beatCandidatesEvaluated": 3,
+          "canonicalBeatCount": 3,
+          "canonicalBehaviorCount": 11,
+          "catalogBeatCount": 3,
+          "catalogBehaviorCount": 11,
+          "indexedBeatCandidateCount": 3,
+          "predicateTraceRows": 17,
+          "stimulusType": "HUMAN_UTTERANCE"
+        },
+        "selectedBeat": {
+          "baseRelevance": 0.7,
+          "group": "beat_group.social_primary",
+          "id": "beat.argument_escalation"
+        },
+        "selectedBehavior": {
+          "act": "WARN",
+          "contentTemplateID": "semantic.social.hostile_boundary",
+          "dialogueAct": "BOUNDARY_WARNING",
+          "id": "behavior.warn",
+          "mode": "beat",
+          "score": 0.65
+        },
+        "stimulus": {
+          "semantic": {
+            "confidence": 0.99,
+            "intent": "HOSTILE_REMARK",
+            "speechAct": "HOSTILE_REMARK",
+            "subject": "RECIPIENT",
+            "topic": "greeting"
+          },
+          "source": {
+            "actorID": "char_patrick",
+            "kind": "human",
+            "providerID": "psychopatzcore.nlu"
+          },
+          "targets": [
+            "npc_mara"
+          ],
+          "text": "i hate you",
+          "type": "HUMAN_UTTERANCE"
+        }
+      },
+      "normalizedInput": "i hate you",
+      "policy": {
+        "branch": "HOSTILE_REMARK_RECEIVED",
+        "clarification": false,
+        "confidence": 0.99,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40,
+          "topic": "RECIPIENT"
+        },
+        "intent": "HOSTILE_REMARK",
+        "llmEligible": false,
+        "reason": "recognized_hostile_social_act",
+        "route": "deterministic",
+        "speechAct": "HOSTILE_REMARK"
+      },
+      "rawInput": "i hate you",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "Watch your mouth.",
+          "plan": {
+            "dialogueAct": "BOUNDARY_WARNING",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.hostile_remark",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Watch your mouth.",
+                    "kind": "translation",
+                    "templateID": "semantic.social.hostile_boundary"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.hostile.short",
+          "selectionSource": "catalog",
+          "sourcePoolID": "semantic.hostile_remark",
+          "templateID": "semantic.social.hostile_boundary"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": "phrase.semantic.social.hostile_boundary",
+            "phraseID": "phrase.semantic.social.hostile_boundary.neutral.01",
+            "phrasePoolSize": 1,
+            "phraseSemanticTemplateID": "semantic.social.hostile_boundary",
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 2,
+              "applied": true,
+              "family": "semantic.social.hostile_boundary",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral01",
+            "semanticTemplateID": "semantic.social.hostile_boundary",
+            "text": "Don't talk to me like that."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "sequence": 1,
+              "speaker": "player",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 0,
+          "eligibleCount": 0,
+          "reason": "no_eligible_candidate",
+          "rejectedCount": 0,
+          "tiedEligibleCount": 0
+        },
+        "candidates": [],
+        "selected": {
+          "confidence": 0,
+          "confidenceBand": "low",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": null,
+            "candidateSelection": {
+              "candidateCount": 0,
+              "eligibleCount": 0,
+              "reason": "no_eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 0
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": null,
+            "fuzzyMatch": null,
+            "matchMetrics": {},
+            "matchedPattern": null,
+            "noMatch": true,
+            "parser": "lua_candidate_eligibility",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": null
+          },
+          "intent": null,
+          "normalizedText": "i fucking hate this rain",
+          "provenance": {
+            "parser": "candidate_eligibility",
+            "provider": "lua"
+          },
+          "rawText": "i fucking hate this rain",
+          "speechAct": null,
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "transition": "hold"
+      },
+      "id": "hate_rain",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "i fucking hate this rain",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40
+        },
+        "llmEligible": false,
+        "reason": "no_match",
+        "route": "deterministic"
+      },
+      "rawInput": "i fucking hate this rain",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": true,
+        "permitted": [
+          {
+            "authority": "singleplayer",
+            "capabilityID": false,
+            "name": "SemanticIdentityRequest",
+            "status": "sent"
+          },
+          {
+            "accepted": true,
+            "authority": "server",
+            "capabilityID": false,
+            "name": "AdjustRelationship",
+            "status": "applied"
+          }
+        ],
+        "relationshipAfter": {
+          "approval": -4,
+          "familiarity": 1,
+          "respect": -6,
+          "revision": 2,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": true,
+        "sideEffects": {
+          "actionCount": 2,
+          "actionsTruncated": false,
+          "none": false,
+          "transportCount": 4,
+          "transportTruncated": false
+        },
+        "toolCalls": [
+          {
+            "authority": "singleplayer",
+            "capabilityID": false,
+            "name": "SemanticIdentityRequest",
+            "status": "sent"
+          },
+          {
+            "accepted": true,
+            "authority": "server",
+            "capabilityID": false,
+            "name": "AdjustRelationship",
+            "status": "applied"
+          }
+        ],
+        "transportCommands": [
+          {
+            "command": "SemanticIdentityRequest",
+            "direction": "client_to_server",
+            "mode": "singleplayer"
+          },
+          {
+            "command": "SemanticIdentityResult",
+            "direction": "server_to_client",
+            "mode": "singleplayer"
+          },
+          {
+            "command": "SemanticIdentityResult",
+            "direction": "event"
+          },
+          {
+            "command": "ConversationRelationship",
+            "direction": "event"
+          }
+        ]
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "IDENTITY",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "player",
+          "previousTopic": "greeting",
+          "priorTopics": [
+            {
+              "reason": "topic_interruption",
+              "topic": "greeting",
+              "turn": 1
+            }
+          ],
+          "recentTurnCount": 1,
+          "recentTurnTail": [
+            {
+              "intent": "INFORM",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "INFORM",
+              "topic": "IDENTITY"
+            }
+          ],
+          "sequence": 1
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 1,
+          "eligibleCount": 1,
+          "reason": "eligible_candidate",
+          "rejectedCount": 0,
+          "selectedConfidence": 0.93,
+          "selectedPass": "exact",
+          "selectedPattern": "pnc.identity.self_name_im",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 0.93,
+            "diagnostics": {
+              "candidatePass": "exact",
+              "correctedTokens": [],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 3,
+                "fullCoverage": true,
+                "fuzzyCount": 0,
+                "skipped": 10,
+                "unmatchedCount": 0,
+                "unresolvedCount": 1
+              },
+              "matchedPattern": "pnc.identity.self_name_im",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": true
+            },
+            "exact": true,
+            "fuzzy": false,
+            "intent": "INFORM",
+            "pass": "exact",
+            "patternID": "pnc.identity.self_name_im",
+            "score": 0.93,
+            "selected": true,
+            "speechAct": "INFORM",
+            "subject": "IDENTITY"
+          }
+        ],
+        "selected": {
+          "confidence": 0.93,
+          "confidenceBand": "high",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "exact",
+            "candidateSelection": {
+              "candidateCount": 1,
+              "eligibleCount": 1,
+              "reason": "eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": true,
+            "fuzzyMatch": false,
+            "matchMetrics": {
+              "consumed": 3,
+              "fullCoverage": true,
+              "fuzzyCount": 0,
+              "skipped": 10,
+              "unmatchedCount": 0,
+              "unresolvedCount": 1
+            },
+            "matchedPattern": "pnc.identity.self_name_im",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "deterministic",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": true
+          },
+          "intent": "INFORM",
+          "normalizedText": "i'm fucking starving",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "exact",
+            "parser": "deterministic",
+            "pattern": "pnc.identity.self_name_im",
+            "provider": "lua"
+          },
+          "rawText": "i'm fucking starving",
+          "speechAct": "INFORM",
+          "subject": "IDENTITY"
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "topic": "IDENTITY",
+        "transition": "hold"
+      },
+      "id": "starving_self_state",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {
+          "beatCandidatesEvaluated": 3,
+          "canonicalBeatCount": 3,
+          "canonicalBehaviorCount": 11,
+          "catalogBeatCount": 3,
+          "catalogBehaviorCount": 11,
+          "indexedBeatCandidateCount": 3,
+          "predicateTraceRows": 7,
+          "stimulusType": "HUMAN_UTTERANCE"
+        },
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {
+            "confidence": 0.93,
+            "intent": "INFORM",
+            "speechAct": "INFORM",
+            "subject": "IDENTITY",
+            "topic": "greeting"
+          },
+          "source": {
+            "actorID": "char_patrick",
+            "kind": "human",
+            "providerID": "psychopatzcore.nlu"
+          },
+          "targets": [
+            "npc_mara"
+          ],
+          "text": "i'm fucking starving",
+          "type": "HUMAN_UTTERANCE"
+        }
+      },
+      "normalizedInput": "i'm fucking starving",
+      "policy": {
+        "branch": "IDENTITY_CLAIM_RECEIVED",
+        "clarification": false,
+        "confidence": 0.93,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40,
+          "topic": "IDENTITY"
+        },
+        "intent": "INFORM",
+        "llmEligible": false,
+        "reason": "recognized_self_name_claim",
+        "route": "deterministic",
+        "speechAct": "INFORM"
+      },
+      "rawInput": "i'm fucking starving",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "Nice to meet you. What's your name?",
+          "plan": {
+            "dialogueAct": "IDENTITY_CLAIM_RECEIVED",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Nice to meet you. What's your name?",
+                    "kind": "translation",
+                    "templateID": "semantic.identity.exchange"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.identity.exchange"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": null,
+            "planTurnID": null,
+            "realization": {},
+            "renderTemplateID": null,
+            "semanticTemplateID": null,
+            "text": "I don't believe you."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "sequence": 1,
+              "speaker": "player",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 0,
+          "eligibleCount": 0,
+          "reason": "no_eligible_candidate",
+          "rejectedCount": 0,
+          "tiedEligibleCount": 0
+        },
+        "candidates": [],
+        "selected": {
+          "confidence": 0,
+          "confidenceBand": "low",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": null,
+            "candidateSelection": {
+              "candidateCount": 0,
+              "eligibleCount": 0,
+              "reason": "no_eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 0
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": null,
+            "fuzzyMatch": null,
+            "matchMetrics": {},
+            "matchedPattern": null,
+            "noMatch": true,
+            "parser": "lua_candidate_eligibility",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": null
+          },
+          "intent": null,
+          "normalizedText": "you're not bad",
+          "provenance": {
+            "parser": "candidate_eligibility",
+            "provider": "lua"
+          },
+          "rawText": "you're not bad",
+          "speechAct": null,
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "transition": "hold"
+      },
+      "id": "not_bad_affirmation",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "you're not bad",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40
+        },
+        "llmEligible": false,
+        "reason": "no_match",
+        "route": "deterministic"
+      },
+      "rawInput": "you're not bad",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "social",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "previousTopic": "greeting",
+          "priorTopics": [
+            {
+              "reason": "topic_interruption",
+              "topic": "greeting",
+              "turn": 1
+            }
+          ],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "social"
+            },
+            {
+              "intent": "DISAGREE",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "DISAGREE",
+              "topic": "social"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 1,
+          "eligibleCount": 1,
+          "reason": "eligible_candidate",
+          "rejectedCount": 0,
+          "selectedConfidence": 0.97,
+          "selectedPass": "exact",
+          "selectedPattern": "pnc.social.disagree",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 0.97,
+            "diagnostics": {
+              "candidatePass": "exact",
+              "correctedTokens": [],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 1,
+                "fullCoverage": true,
+                "fuzzyCount": 0,
+                "skipped": 0,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.social.disagree",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": true,
+            "fuzzy": false,
+            "intent": "DISAGREE",
+            "pass": "exact",
+            "patternID": "pnc.social.disagree",
+            "score": 0.97,
+            "selected": true,
+            "speechAct": "DISAGREE",
+            "subject": null
+          }
+        ],
+        "selected": {
+          "confidence": 0.97,
+          "confidenceBand": "high",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "exact",
+            "candidateSelection": {
+              "candidateCount": 1,
+              "eligibleCount": 1,
+              "reason": "eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": true,
+            "fuzzyMatch": false,
+            "matchMetrics": {
+              "consumed": 1,
+              "fullCoverage": true,
+              "fuzzyCount": 0,
+              "skipped": 0,
+              "unmatchedCount": 0,
+              "unresolvedCount": 0
+            },
+            "matchedPattern": "pnc.social.disagree",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "deterministic",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": false
+          },
+          "intent": "DISAGREE",
+          "normalizedText": "not really",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "exact",
+            "parser": "deterministic",
+            "pattern": "pnc.social.disagree",
+            "provider": "lua"
+          },
+          "rawText": "not really",
+          "speechAct": "DISAGREE",
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "topic": "social",
+        "transition": "hold"
+      },
+      "id": "not_really_contextual",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {
+          "beatCandidatesEvaluated": 3,
+          "canonicalBeatCount": 3,
+          "canonicalBehaviorCount": 11,
+          "catalogBeatCount": 3,
+          "catalogBehaviorCount": 11,
+          "indexedBeatCandidateCount": 3,
+          "predicateTraceRows": 7,
+          "stimulusType": "HUMAN_UTTERANCE"
+        },
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {
+            "confidence": 0.97,
+            "intent": "DISAGREE",
+            "speechAct": "DISAGREE",
+            "topic": "greeting"
+          },
+          "source": {
+            "actorID": "char_patrick",
+            "kind": "human",
+            "providerID": "psychopatzcore.nlu"
+          },
+          "targets": [
+            "npc_mara"
+          ],
+          "text": "not really",
+          "type": "HUMAN_UTTERANCE"
+        }
+      },
+      "normalizedInput": "not really",
+      "policy": {
+        "branch": "SOCIAL_ACKNOWLEDGED",
+        "clarification": false,
+        "confidence": 0.97,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40,
+          "topic": "social"
+        },
+        "intent": "DISAGREE",
+        "llmEligible": false,
+        "reason": "recognized_social_act",
+        "route": "deterministic",
+        "speechAct": "DISAGREE"
+      },
+      "rawInput": "not really",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "No.",
+          "plan": {
+            "dialogueAct": "SOCIAL_ACKNOWLEDGED",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.refuse",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "No.",
+                    "kind": "translation",
+                    "templateID": "semantic.social.acknowledged"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.refuse.default",
+          "selectionSource": "catalog",
+          "sourcePoolID": "semantic.refuse",
+          "templateID": "semantic.social.acknowledged"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.social.acknowledged",
+            "text": "No."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "sequence": 1,
+              "speaker": "player",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 0,
+          "eligibleCount": 0,
+          "reason": "no_eligible_candidate",
+          "rejectedCount": 0,
+          "tiedEligibleCount": 0
+        },
+        "candidates": [],
+        "selected": {
+          "confidence": 0,
+          "confidenceBand": "low",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": null,
+            "candidateSelection": {
+              "candidateCount": 0,
+              "eligibleCount": 0,
+              "reason": "no_eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 0
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": null,
+            "fuzzyMatch": null,
+            "matchMetrics": {},
+            "matchedPattern": null,
+            "noMatch": true,
+            "parser": "lua_candidate_eligibility",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": null
+          },
+          "intent": null,
+          "normalizedText": "yeah right",
+          "provenance": {
+            "parser": "candidate_eligibility",
+            "provider": "lua"
+          },
+          "rawText": "yeah right",
+          "speechAct": null,
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "transition": "hold"
+      },
+      "id": "yeah_right_contextual",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "yeah right",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40
+        },
+        "llmEligible": false,
+        "reason": "no_match",
+        "route": "deterministic"
+      },
+      "rawInput": "yeah right",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 1,
+          "flowSessionIDs": [
+            null
+          ],
+          "lastSpeaker": "npc",
+          "pendingFollowUp": {
+            "flowID": "greeting",
+            "id": "flow:greeting:await_thanks",
+            "kind": "QUESTION",
+            "nodeID": "await_thanks",
+            "openedTurn": 1,
+            "owner": "flow",
+            "status": "open",
+            "topic": "greeting"
+          },
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "intent": "GREET",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "GREET",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "start",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 1,
+          "eligibleCount": 1,
+          "reason": "eligible_candidate",
+          "rejectedCount": 0,
+          "selectedConfidence": 1,
+          "selectedPass": "exact",
+          "selectedPattern": "pnc.social.greet",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 1,
+            "diagnostics": {
+              "candidatePass": "exact",
+              "correctedTokens": [],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 1,
+                "fullCoverage": true,
+                "fuzzyCount": 0,
+                "skipped": 0,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.social.greet",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": true,
+            "fuzzy": false,
+            "intent": "GREET",
+            "pass": "exact",
+            "patternID": "pnc.social.greet",
+            "score": 1,
+            "selected": true,
+            "speechAct": "GREET",
+            "subject": null
+          }
+        ],
+        "selected": {
+          "confidence": 1,
+          "confidenceBand": "high",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "exact",
+            "candidateSelection": {
+              "candidateCount": 1,
+              "eligibleCount": 1,
+              "reason": "eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": true,
+            "fuzzyMatch": false,
+            "matchMetrics": {
+              "consumed": 1,
+              "fullCoverage": true,
+              "fuzzyCount": 0,
+              "skipped": 0,
+              "unmatchedCount": 0,
+              "unresolvedCount": 0
+            },
+            "matchedPattern": "pnc.social.greet",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "deterministic",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": false
+          },
+          "intent": "GREET",
+          "normalizedText": "hello there",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "exact",
+            "parser": "deterministic",
+            "pattern": "pnc.social.greet",
+            "provider": "lua"
+          },
+          "rawText": "hello there",
+          "speechAct": "GREET",
+          "subject": null
+        }
+      },
+      "flow": {
+        "generated": false,
+        "matched": true,
+        "nodeId": "await_thanks",
+        "pendingFollowUp": {
+          "flowID": "greeting",
+          "id": "flow:greeting:await_thanks",
+          "kind": "QUESTION",
+          "nodeID": "await_thanks",
+          "owner": "flow",
+          "topic": "greeting"
+        },
+        "status": "started",
+        "toNodeId": "await_thanks",
+        "topic": "greeting",
+        "transition": "start"
+      },
+      "id": "benign_greeting",
+      "interactionDirector": {
+        "interactionPlan": {
+          "beatID": "beat.suspicious_first_contact",
+          "behaviorID": "behavior.challenge",
+          "contentTemplateID": "semantic.interaction.first_contact.challenge",
+          "dialogueAct": "CHALLENGE",
+          "sourceIntent": "GREET",
+          "sourceSpeechAct": "GREET",
+          "sourceStimulusType": "HUMAN_UTTERANCE",
+          "topic": "greeting"
+        },
+        "metrics": {
+          "beatCandidatesEvaluated": 3,
+          "canonicalBeatCount": 3,
+          "canonicalBehaviorCount": 11,
+          "catalogBeatCount": 3,
+          "catalogBehaviorCount": 11,
+          "indexedBeatCandidateCount": 3,
+          "predicateTraceRows": 14,
+          "stimulusType": "HUMAN_UTTERANCE"
+        },
+        "selectedBeat": {
+          "baseRelevance": 0.55,
+          "group": "beat_group.social_primary",
+          "id": "beat.suspicious_first_contact"
+        },
+        "selectedBehavior": {
+          "act": "CHALLENGE",
+          "contentTemplateID": "semantic.interaction.first_contact.challenge",
+          "dialogueAct": "CHALLENGE",
+          "id": "behavior.challenge",
+          "mode": "beat",
+          "score": 0.55
+        },
+        "stimulus": {
+          "semantic": {
+            "confidence": 1,
+            "intent": "GREET",
+            "speechAct": "GREET",
+            "topic": "greeting"
+          },
+          "source": {
+            "actorID": "char_patrick",
+            "kind": "human",
+            "providerID": "psychopatzcore.nlu"
+          },
+          "targets": [
+            "npc_mara"
+          ],
+          "text": "hello there",
+          "type": "HUMAN_UTTERANCE"
+        }
+      },
+      "normalizedInput": "hello there",
+      "policy": {
+        "branch": "GREET_ACKNOWLEDGED",
+        "clarification": false,
+        "confidence": 1,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "start",
+          "registryRevision": 40,
+          "topic": "greeting"
+        },
+        "intent": "GREET",
+        "llmEligible": false,
+        "reason": "recognized_greeting",
+        "route": "deterministic",
+        "speechAct": "GREET"
+      },
+      "rawInput": "hello there",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "Hey there. Good to see you.",
+          "plan": {
+            "dialogueAct": "GREETING_OPENING",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.flow.greeting.opening",
+            "turns": [
+              {
+                "continuation": "continue",
+                "id": "greeting",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "",
+                    "kind": "translation",
+                    "templateID": "semantic.flow.greeting.opening.default"
+                  }
+                ],
+                "separator": " "
+              },
+              {
+                "continuation": "await_player",
+                "id": "check_in",
+                "offers": [
+                  {
+                    "id": "greeting.check_in.report_wellbeing",
+                    "labelKey": "UI_PNC_Conversation_Suggestion_GreetingReportFine_Label",
+                    "utteranceKey": "UI_PNC_Conversation_Suggestion_GreetingReportFine_Utterance"
+                  }
+                ],
+                "segments": [
+                  {
+                    "fallback": "",
+                    "kind": "translation",
+                    "templateID": "semantic.flow.greeting.opening.question.default"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.flow.greeting.opening.default",
+          "selectionSource": "flow",
+          "sourceFlowID": "greeting",
+          "sourcePoolID": "semantic.flow.greeting.opening",
+          "templateID": "semantic.flow.greeting.opening.default"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": "phrase.semantic.flow.greeting.opening.default",
+            "phraseID": "phrase.semantic.flow.greeting.opening.default.neutral.01",
+            "phrasePoolSize": 6,
+            "phraseSemanticTemplateID": "semantic.flow.greeting.opening.default",
+            "planTurn": 1,
+            "planTurnID": "greeting",
+            "realization": {
+              "applicationCount": 3,
+              "applied": true,
+              "family": "semantic.flow.greeting.opening.default",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
+            "semanticTemplateID": "semantic.flow.greeting.opening.default",
+            "text": "Hey there. Good to see you."
+          },
+          {
+            "phraseFamilyID": "phrase.semantic.flow.greeting.opening.default",
+            "phraseID": "phrase.semantic.flow.greeting.opening.default.neutral.01",
+            "phrasePoolSize": 6,
+            "phraseSemanticTemplateID": "semantic.flow.greeting.opening.default",
+            "planTurn": 2,
+            "planTurnID": "check_in",
+            "realization": {
+              "applicationCount": 3,
+              "applied": true,
+              "family": "semantic.flow.greeting.opening.default",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
+            "semanticTemplateID": "semantic.flow.greeting.opening.question.default",
+            "text": "How have you been?"
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "sequence": 1,
+              "speaker": "player",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 0,
+          "eligibleCount": 0,
+          "reason": "no_eligible_candidate",
+          "rejectedCount": 0,
+          "tiedEligibleCount": 0
+        },
+        "candidates": [],
+        "selected": {
+          "confidence": 0,
+          "confidenceBand": "low",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": null,
+            "candidateSelection": {
+              "candidateCount": 0,
+              "eligibleCount": 0,
+              "reason": "no_eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 0
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": null,
+            "fuzzyMatch": null,
+            "matchMetrics": {},
+            "matchedPattern": null,
+            "noMatch": true,
+            "parser": "lua_candidate_eligibility",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": null
+          },
+          "intent": null,
+          "normalizedText": "this is a beautiful day",
+          "provenance": {
+            "parser": "candidate_eligibility",
+            "provider": "lua"
+          },
+          "rawText": "this is a beautiful day",
+          "speechAct": null,
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "transition": "hold"
+      },
+      "id": "benign_beautiful_day",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "this is a beautiful day",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40
+        },
+        "llmEligible": false,
+        "reason": "no_match",
+        "route": "deterministic"
+      },
+      "rawInput": "this is a beautiful day",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "identity",
+          "flowSessionCount": 1,
+          "flowSessionIDs": [
+            null
+          ],
+          "lastSpeaker": "npc",
+          "pendingFollowUp": {
+            "flowID": "identity",
+            "id": "flow:identity:await_player_name",
+            "kind": "QUESTION",
+            "nodeID": "await_player_name",
+            "openedTurn": 1,
+            "owner": "flow",
+            "status": "open",
+            "topic": "identity"
+          },
+          "previousTopic": "greeting",
+          "priorTopics": [
+            {
+              "reason": "topic_interruption",
+              "topic": "greeting",
+              "turn": 1
+            }
+          ],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "identity"
+            },
+            {
+              "intent": "QUESTION",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "QUESTION",
+              "topic": "identity"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "start",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 1,
+          "eligibleCount": 1,
+          "reason": "eligible_candidate",
+          "rejectedCount": 0,
+          "selectedConfidence": 0.99,
+          "selectedPass": "exact",
+          "selectedPattern": "pnc.question.identity",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 0.99,
+            "diagnostics": {
+              "candidatePass": "exact",
+              "correctedTokens": [],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 1,
+                "fullCoverage": true,
+                "fuzzyCount": 0,
+                "skipped": 0,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.question.identity",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": true,
+            "fuzzy": false,
+            "intent": "QUESTION",
+            "pass": "exact",
+            "patternID": "pnc.question.identity",
+            "score": 0.99,
+            "selected": true,
+            "speechAct": "QUESTION",
+            "subject": "IDENTITY"
+          }
+        ],
+        "selected": {
+          "confidence": 0.99,
+          "confidenceBand": "high",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "exact",
+            "candidateSelection": {
+              "candidateCount": 1,
+              "eligibleCount": 1,
+              "reason": "eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": true,
+            "fuzzyMatch": false,
+            "matchMetrics": {
+              "consumed": 1,
+              "fullCoverage": true,
+              "fuzzyCount": 0,
+              "skipped": 0,
+              "unmatchedCount": 0,
+              "unresolvedCount": 0
+            },
+            "matchedPattern": "pnc.question.identity",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "deterministic",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": false
+          },
+          "intent": "QUESTION",
+          "normalizedText": "who are you",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "exact",
+            "parser": "deterministic",
+            "pattern": "pnc.question.identity",
+            "provider": "lua"
+          },
+          "rawText": "who are you",
+          "speechAct": "QUESTION",
+          "subject": "IDENTITY"
+        }
+      },
+      "flow": {
+        "generated": false,
+        "matched": true,
+        "nodeId": "await_player_name",
+        "pendingFollowUp": {
+          "flowID": "identity",
+          "id": "flow:identity:await_player_name",
+          "kind": "QUESTION",
+          "nodeID": "await_player_name",
+          "owner": "flow",
+          "topic": "identity"
+        },
+        "status": "started",
+        "toNodeId": "await_player_name",
+        "topic": "identity",
+        "transition": "start"
+      },
+      "id": "benign_identity_question",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {
+          "beatCandidatesEvaluated": 3,
+          "canonicalBeatCount": 3,
+          "canonicalBehaviorCount": 11,
+          "catalogBeatCount": 3,
+          "catalogBehaviorCount": 11,
+          "indexedBeatCandidateCount": 3,
+          "predicateTraceRows": 7,
+          "stimulusType": "HUMAN_UTTERANCE"
+        },
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {
+            "confidence": 0.99,
+            "intent": "QUESTION",
+            "speechAct": "QUESTION",
+            "subject": "IDENTITY",
+            "topic": "greeting"
+          },
+          "source": {
+            "actorID": "char_patrick",
+            "kind": "human",
+            "providerID": "psychopatzcore.nlu"
+          },
+          "targets": [
+            "npc_mara"
+          ],
+          "text": "who are you",
+          "type": "HUMAN_UTTERANCE"
+        }
+      },
+      "normalizedInput": "who are you",
+      "policy": {
+        "branch": "QUESTION_RECEIVED",
+        "clarification": false,
+        "confidence": 0.99,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "start",
+          "registryRevision": 40,
+          "topic": "identity"
+        },
+        "intent": "QUESTION",
+        "llmEligible": false,
+        "reason": "recognized_question",
+        "route": "deterministic",
+        "speechAct": "QUESTION"
+      },
+      "rawInput": "who are you",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "Let's get to know each other first. What do people call you?",
+          "plan": {
+            "dialogueAct": "QUESTION_RECEIVED",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.question.identity",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Let's get to know each other first. What do people call you?",
+                    "kind": "translation",
+                    "templateID": "semantic.question.identity.stranger_alt_2"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.question.identity.dataset.stranger_alt_2",
+          "selectionSource": "flow",
+          "sourceFlowID": "identity",
+          "sourcePoolID": "semantic.question.identity",
+          "templateID": "semantic.question.identity.stranger_alt_2"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.question.identity.stranger_alt_2",
+            "text": "Let's get to know each other first. What do people call you?"
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": true,
+        "permitted": [
+          {
+            "accepted": true,
+            "authority": "mock",
+            "capabilityID": "pnc:task.give",
+            "name": "GIVE",
+            "reason": "network_queued",
+            "status": "accepted"
+          },
+          {
+            "authority": "singleplayer",
+            "capabilityID": false,
+            "name": "SemanticTaskRequest",
+            "status": "sent"
+          }
+        ],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 2,
+          "actionsTruncated": false,
+          "none": false,
+          "transportCount": 1,
+          "transportTruncated": false
+        },
+        "toolCalls": [
+          {
+            "accepted": true,
+            "authority": "mock",
+            "capabilityID": "pnc:task.give",
+            "name": "GIVE",
+            "reason": "network_queued",
+            "status": "accepted"
+          },
+          {
+            "authority": "singleplayer",
+            "capabilityID": false,
+            "name": "SemanticTaskRequest",
+            "status": "sent"
+          }
+        ],
+        "transportCommands": [
+          {
+            "command": "SemanticTaskRequest",
+            "direction": "client_to_server",
+            "mode": "singleplayer"
+          }
+        ]
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "resources",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "pendingFollowUp": {
+            "flowID": "pnc.generated.parameterized_task.pnc.task.give",
+            "id": "flow:pnc.generated.parameterized_task.pnc.task.give:request",
+            "kind": "QUESTION",
+            "nodeID": "request",
+            "openedTurn": 1,
+            "owner": "flow",
+            "status": "open",
+            "topic": "resources"
+          },
+          "previousTopic": "greeting",
+          "priorTopics": [
+            {
+              "reason": "topic_interruption",
+              "topic": "greeting",
+              "turn": 1
+            }
+          ],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "resources"
+            },
+            {
+              "intent": "REQUEST",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "REQUEST",
+              "topic": "resources"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "start",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 1,
+          "eligibleCount": 1,
+          "reason": "eligible_candidate",
+          "rejectedCount": 0,
+          "selectedConfidence": 0.97,
+          "selectedPass": "exact",
+          "selectedPattern": "pnc.request.give",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 0.97,
+            "diagnostics": {
+              "candidatePass": "exact",
+              "correctedTokens": [],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 3,
+                "fullCoverage": true,
+                "fuzzyCount": 0,
+                "skipped": 12,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.request.give",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": true,
+            "fuzzy": false,
+            "intent": "REQUEST",
+            "pass": "exact",
+            "patternID": "pnc.request.give",
+            "score": 0.97,
+            "selected": true,
+            "speechAct": "REQUEST",
+            "subject": null
+          }
+        ],
+        "selected": {
+          "confidence": 0.97,
+          "confidenceBand": "high",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "exact",
+            "candidateSelection": {
+              "candidateCount": 1,
+              "eligibleCount": 1,
+              "reason": "eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": true,
+            "fuzzyMatch": false,
+            "matchMetrics": {
+              "consumed": 3,
+              "fullCoverage": true,
+              "fuzzyCount": 0,
+              "skipped": 12,
+              "unmatchedCount": 0,
+              "unresolvedCount": 0
+            },
+            "matchedPattern": "pnc.request.give",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "deterministic",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": false
+          },
+          "intent": "REQUEST",
+          "normalizedText": "give me water",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "exact",
+            "parser": "deterministic",
+            "pattern": "pnc.request.give",
+            "provider": "lua"
+          },
+          "rawText": "give me water",
+          "speechAct": "REQUEST",
+          "subject": null
+        }
+      },
+      "flow": {
+        "generated": true,
+        "matched": true,
+        "nodeId": "admitted",
+        "pendingFollowUp": {
+          "flowID": "pnc.generated.parameterized_task.pnc.task.give",
+          "id": "flow:pnc.generated.parameterized_task.pnc.task.give:request",
+          "kind": "QUESTION",
+          "nodeID": "request",
+          "owner": "flow",
+          "topic": "resources"
+        },
+        "status": "retired",
+        "toNodeId": "admitted",
+        "topic": "resources",
+        "transition": "result"
+      },
+      "id": "valid_mutating_request_control",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {
+          "beatCandidatesEvaluated": 3,
+          "canonicalBeatCount": 3,
+          "canonicalBehaviorCount": 11,
+          "catalogBeatCount": 3,
+          "catalogBehaviorCount": 11,
+          "indexedBeatCandidateCount": 3,
+          "predicateTraceRows": 7,
+          "stimulusType": "HUMAN_UTTERANCE"
+        },
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {
+            "confidence": 0.97,
+            "intent": "REQUEST",
+            "speechAct": "REQUEST",
+            "topic": "greeting"
+          },
+          "source": {
+            "actorID": "char_patrick",
+            "kind": "human",
+            "providerID": "psychopatzcore.nlu"
+          },
+          "targets": [
+            "npc_mara"
+          ],
+          "text": "give me water",
+          "type": "HUMAN_UTTERANCE"
+        }
+      },
+      "normalizedInput": "give me water",
+      "policy": {
+        "branch": "COMMAND_ACCEPTED",
+        "clarification": false,
+        "confidence": 0.97,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "start",
+          "registryRevision": 40,
+          "topic": "resources"
+        },
+        "intent": "REQUEST",
+        "llmEligible": false,
+        "reason": "recognized_registered_action",
+        "route": "deterministic",
+        "speechAct": "REQUEST"
+      },
+      "rawInput": "give me water",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "Okay.",
+          "plan": {
+            "dialogueAct": "COMMAND_ACCEPTED",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Okay.",
+                    "kind": "translation",
+                    "templateID": "semantic.command.accepted"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.command.accepted"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": "phrase.semantic.task.give.admitted",
+            "phraseID": "phrase.semantic.task.give.admitted.neutral.01",
+            "phrasePoolSize": 1,
+            "phraseSemanticTemplateID": "semantic.task.give.admitted",
+            "planTurn": 1,
+            "planTurnID": null,
+            "realization": {
+              "applicationCount": 1,
+              "applied": true,
+              "family": "semantic.task.give.admitted",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral01",
+            "semanticTemplateID": "default",
+            "text": "Okay, I'll give that to you."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "sequence": 1,
+              "speaker": "player",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 0,
+          "eligibleCount": 0,
+          "reason": "no_eligible_candidate",
+          "rejectedCount": 0,
+          "tiedEligibleCount": 0
+        },
+        "candidates": [],
+        "selected": {
+          "confidence": 0,
+          "confidenceBand": "low",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": null,
+            "candidateSelection": {
+              "candidateCount": 0,
+              "eligibleCount": 0,
+              "reason": "no_eligible_candidate",
+              "rejectedCount": 0,
+              "tiedEligibleCount": 0
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": null,
+            "fuzzyMatch": null,
+            "matchMetrics": {},
+            "matchedPattern": null,
+            "noMatch": true,
+            "parser": "lua_candidate_eligibility",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": null
+          },
+          "intent": null,
+          "normalizedText": "gimme wate",
+          "provenance": {
+            "parser": "candidate_eligibility",
+            "provider": "lua"
+          },
+          "rawText": "gimme wate",
+          "speechAct": null,
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "transition": "hold"
+      },
+      "id": "malformed_mutating_request_typo",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "gimme wate",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40
+        },
+        "llmEligible": false,
+        "reason": "no_match",
+        "route": "deterministic"
+      },
+      "rawInput": "gimme wate",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": false,
+        "permitted": [],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 0,
+          "actionsTruncated": false,
+          "none": true,
+          "transportCount": 0,
+          "transportTruncated": false
+        },
+        "toolCalls": [],
+        "transportCommands": []
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "greeting",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "priorTopics": [],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "greeting"
+            },
+            {
+              "sequence": 1,
+              "speaker": "player",
+              "topic": "greeting"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "no_flow_trigger",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 1,
+          "eligibleCount": 0,
+          "reason": "no_eligible_candidate",
+          "rejectedCount": 1,
+          "tiedEligibleCount": 0
+        },
+        "candidates": [
+          {
+            "confidence": 0.89,
+            "diagnostics": {
+              "candidatePass": "fuzzy",
+              "correctedTokens": [
+                {
+                  "candidates": [
+                    "GIVE"
+                  ],
+                  "editDistance": 1,
+                  "matchedAlias": "give",
+                  "text": "givee"
+                }
+              ],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 3,
+                "fullCoverage": true,
+                "fuzzyCount": 1,
+                "skipped": 12,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.request.give",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": false,
+            "fuzzy": true,
+            "intent": "REQUEST",
+            "pass": "fuzzy",
+            "patternID": "pnc.request.give",
+            "score": 0.89,
+            "selected": true,
+            "speechAct": "REQUEST",
+            "subject": null
+          }
+        ],
+        "selected": {
+          "confidence": 0,
+          "confidenceBand": "low",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": null,
+            "candidateSelection": {
+              "candidateCount": 1,
+              "eligibleCount": 0,
+              "reason": "no_eligible_candidate",
+              "rejectedCount": 1,
+              "tiedEligibleCount": 0
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [],
+            "exactMatch": null,
+            "fuzzyMatch": null,
+            "matchMetrics": {},
+            "matchedPattern": null,
+            "noMatch": true,
+            "parser": "lua_candidate_eligibility",
+            "recommendedRoute": "clarify_or_llm",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": null
+          },
+          "intent": null,
+          "normalizedText": "givee me water",
+          "provenance": {
+            "parser": "candidate_eligibility",
+            "provider": "lua"
+          },
+          "rawText": "givee me water",
+          "speechAct": null,
+          "subject": null
+        }
+      },
+      "flow": {
+        "matched": false,
+        "status": "held",
+        "transition": "hold"
+      },
+      "id": "malformed_mutating_request_elongated",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {},
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {},
+          "source": {}
+        }
+      },
+      "normalizedInput": "givee me water",
+      "policy": {
+        "branch": "ASK_CLARIFICATION",
+        "clarification": true,
+        "confidence": 0,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "no_flow_trigger",
+          "registryRevision": 40
+        },
+        "llmEligible": false,
+        "reason": "no_match",
+        "route": "deterministic"
+      },
+      "rawInput": "givee me water",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "I'm not sure what you mean.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "I'm not sure what you mean.",
+                    "kind": "translation",
+                    "templateID": "semantic.ask_clarification"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.ask_clarification"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": null,
+            "phraseID": null,
+            "phrasePoolSize": null,
+            "phraseSemanticTemplateID": null,
+            "planTurn": 1,
+            "planTurnID": "1",
+            "realization": {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": null,
+            "semanticTemplateID": "semantic.ask_clarification",
+            "text": "I'm not sure what you mean."
+          }
+        ]
+      }
+    },
+    {
+      "accepted": true,
+      "authority": {
+        "attempted": true,
+        "permitted": [
+          {
+            "accepted": true,
+            "authority": "mock",
+            "capabilityID": "pnc:task.give",
+            "name": "GIVE",
+            "reason": "network_queued",
+            "status": "accepted"
+          },
+          {
+            "authority": "singleplayer",
+            "capabilityID": false,
+            "name": "SemanticTaskRequest",
+            "status": "sent"
+          }
+        ],
+        "relationshipAfter": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipBefore": {
+          "approval": 0,
+          "familiarity": 0,
+          "respect": 0,
+          "revision": 1,
+          "state": "unknown"
+        },
+        "relationshipChanged": false,
+        "sideEffects": {
+          "actionCount": 2,
+          "actionsTruncated": false,
+          "none": false,
+          "transportCount": 1,
+          "transportTruncated": false
+        },
+        "toolCalls": [
+          {
+            "accepted": true,
+            "authority": "mock",
+            "capabilityID": "pnc:task.give",
+            "name": "GIVE",
+            "reason": "network_queued",
+            "status": "accepted"
+          },
+          {
+            "authority": "singleplayer",
+            "capabilityID": false,
+            "name": "SemanticTaskRequest",
+            "status": "sent"
+          }
+        ],
+        "transportCommands": [
+          {
+            "command": "SemanticTaskRequest",
+            "direction": "client_to_server",
+            "mode": "singleplayer"
+          }
+        ]
+      },
+      "contextAfter": {
+        "dialogue": {
+          "currentTopic": "GIVE",
+          "flowSessionCount": 0,
+          "flowSessionIDs": [],
+          "lastSpeaker": "npc",
+          "pendingFollowUp": {
+            "flowID": "pnc.generated.parameterized_task.pnc.task.give",
+            "id": "flow:pnc.generated.parameterized_task.pnc.task.give:request",
+            "kind": "QUESTION",
+            "nodeID": "request",
+            "openedTurn": 1,
+            "owner": "flow",
+            "status": "open",
+            "topic": "GIVE"
+          },
+          "previousTopic": "greeting",
+          "priorTopics": [
+            {
+              "reason": "topic_interruption",
+              "topic": "greeting",
+              "turn": 1
+            }
+          ],
+          "recentTurnCount": 2,
+          "recentTurnTail": [
+            {
+              "intent": "RESPONSE",
+              "sequence": 2,
+              "speaker": "npc",
+              "speechAct": "ANSWER",
+              "topic": "GIVE"
+            },
+            {
+              "intent": "REQUEST",
+              "sequence": 1,
+              "speaker": "player",
+              "speechAct": "REQUEST",
+              "topic": "GIVE"
+            }
+          ],
+          "sequence": 2
+        },
+        "stateSequence": 1
+      },
+      "contextBefore": {
+        "dialogue": {},
+        "stateSequence": null
+      },
+      "contextResolution": {
+        "flowReason": "start",
+        "resolvedReferences": [],
+        "unresolvedReferences": []
+      },
+      "currentSemantic": {
+        "candidateDiagnostics": {
+          "candidateCount": 2,
+          "eligibleCount": 1,
+          "reason": "eligible_candidate",
+          "rejectedCount": 1,
+          "selectedConfidence": 0.89,
+          "selectedPass": "exact",
+          "selectedPattern": "pnc.request.give",
+          "tiedEligibleCount": 1
+        },
+        "candidates": [
+          {
+            "confidence": 0.89,
+            "diagnostics": {
+              "candidatePass": "exact",
+              "correctedTokens": [],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 3,
+                "fullCoverage": true,
+                "fuzzyCount": 0,
+                "skipped": 12,
+                "unmatchedCount": 0,
+                "unresolvedCount": 1
+              },
+              "matchedPattern": "pnc.request.give",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": true
+            },
+            "exact": true,
+            "fuzzy": false,
+            "intent": "REQUEST",
+            "pass": "exact",
+            "patternID": "pnc.request.give",
+            "score": 0.89,
+            "selected": null,
+            "speechAct": "REQUEST",
+            "subject": null
+          },
+          {
+            "confidence": 0.89,
+            "diagnostics": {
+              "candidatePass": "fuzzy",
+              "correctedTokens": [
+                {
+                  "candidates": [
+                    "WATER"
+                  ],
+                  "editDistance": 1,
+                  "matchedAlias": "water",
+                  "text": "waterr"
+                }
+              ],
+              "matchMetrics": {
+                "ambiguousCount": 0,
+                "consumed": 3,
+                "fullCoverage": true,
+                "fuzzyCount": 1,
+                "skipped": 12,
+                "unmatchedCount": 0,
+                "unresolvedCount": 0
+              },
+              "matchedPattern": "pnc.request.give",
+              "recommendedRoute": "deterministic",
+              "unmatchedTokens": [],
+              "unresolvedEntity": false
+            },
+            "exact": false,
+            "fuzzy": true,
+            "intent": "REQUEST",
+            "pass": "fuzzy",
+            "patternID": "pnc.request.give",
+            "score": 0.89,
+            "selected": true,
+            "speechAct": "REQUEST",
+            "subject": null
+          }
+        ],
+        "selected": {
+          "confidence": 0.89,
+          "confidenceBand": "high",
+          "diagnostics": {
+            "ambiguous": null,
+            "candidatePass": "exact",
+            "candidateSelection": {
+              "candidateCount": 2,
+              "eligibleCount": 1,
+              "reason": "eligible_candidate",
+              "rejectedCount": 1,
+              "tiedEligibleCount": 1
+            },
+            "contextResolvedReferences": [],
+            "contextUnresolvedReferences": [],
+            "correctedTokens": [],
+            "entityResolutionFailures": [
+              {
+                "field": "object",
+                "reason": "unknown_entity",
+                "value": "waterr"
+              }
+            ],
+            "exactMatch": true,
+            "fuzzyMatch": false,
+            "matchMetrics": {
+              "consumed": 3,
+              "fullCoverage": true,
+              "fuzzyCount": 0,
+              "skipped": 12,
+              "unmatchedCount": 0,
+              "unresolvedCount": 1
+            },
+            "matchedPattern": "pnc.request.give",
+            "noMatch": false,
+            "parser": "lua_deterministic",
+            "recommendedRoute": "deterministic",
+            "truncated": null,
+            "unmatchedTokens": [],
+            "unresolvedEntity": true
+          },
+          "intent": "REQUEST",
+          "normalizedText": "give me waterr",
+          "provenance": {
+            "candidateEligibility": "contextual",
+            "candidatePass": "exact",
+            "parser": "deterministic",
+            "pattern": "pnc.request.give",
+            "provider": "lua"
+          },
+          "rawText": "give me waterr",
+          "speechAct": "REQUEST",
+          "subject": null
+        }
+      },
+      "flow": {
+        "generated": true,
+        "matched": true,
+        "nodeId": "admitted",
+        "pendingFollowUp": {
+          "flowID": "pnc.generated.parameterized_task.pnc.task.give",
+          "id": "flow:pnc.generated.parameterized_task.pnc.task.give:request",
+          "kind": "QUESTION",
+          "nodeID": "request",
+          "owner": "flow",
+          "topic": "GIVE"
+        },
+        "status": "retired",
+        "toNodeId": "admitted",
+        "topic": "GIVE",
+        "transition": "result"
+      },
+      "id": "malformed_mutating_request_tail_typo",
+      "interactionDirector": {
+        "interactionPlan": {},
+        "metrics": {
+          "beatCandidatesEvaluated": 3,
+          "canonicalBeatCount": 3,
+          "canonicalBehaviorCount": 11,
+          "catalogBeatCount": 3,
+          "catalogBehaviorCount": 11,
+          "indexedBeatCandidateCount": 3,
+          "predicateTraceRows": 7,
+          "stimulusType": "HUMAN_UTTERANCE"
+        },
+        "selectedBeat": {},
+        "selectedBehavior": {},
+        "stimulus": {
+          "semantic": {
+            "confidence": 0.89,
+            "intent": "REQUEST",
+            "speechAct": "REQUEST",
+            "topic": "greeting"
+          },
+          "source": {
+            "actorID": "char_patrick",
+            "kind": "human",
+            "providerID": "psychopatzcore.nlu"
+          },
+          "targets": [
+            "npc_mara"
+          ],
+          "text": "give me waterr",
+          "type": "HUMAN_UTTERANCE"
+        }
+      },
+      "normalizedInput": "give me waterr",
+      "policy": {
+        "branch": "COMMAND_ACCEPTED",
+        "clarification": false,
+        "confidence": 0.89,
+        "flow": {
+          "key": "char_patrick|npc_mara",
+          "reason": "start",
+          "registryRevision": 40,
+          "topic": "GIVE"
+        },
+        "intent": "REQUEST",
+        "llmEligible": false,
+        "reason": "recognized_registered_action",
+        "route": "deterministic",
+        "speechAct": "REQUEST"
+      },
+      "rawInput": "give me waterr",
+      "reason": null,
+      "responseLineage": {
+        "decision": {
+          "fallback": "Okay.",
+          "plan": {
+            "dialogueAct": "COMMAND_ACCEPTED",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Okay.",
+                    "kind": "translation",
+                    "templateID": "semantic.command.accepted"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "templateID": "semantic.command.accepted"
+        },
+        "messages": [
+          {
+            "phraseFamilyID": "phrase.semantic.task.give.admitted",
+            "phraseID": "phrase.semantic.task.give.admitted.neutral.01",
+            "phrasePoolSize": 1,
+            "phraseSemanticTemplateID": "semantic.task.give.admitted",
+            "planTurn": 1,
+            "planTurnID": null,
+            "realization": {
+              "applicationCount": 1,
+              "applied": true,
+              "family": "semantic.task.give.admitted",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral01",
+            "semanticTemplateID": "default",
+            "text": "Okay, I'll give that to you."
+          }
+        ]
+      }
+    }
+  ],
+  "concern": "semantic_corpus",
+  "schema": "projecthoomans.c0a.current.v1"
+}

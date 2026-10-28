@@ -12,8 +12,7 @@ Protected foundation:
 
 - single ResponsePlan / Dialogue Content speech authority;
 - modular generated interaction registry;
-- shared predicates;
-- typed stimuli/providers;
+- shared predicates and typed stimuli/providers;
 - pragmatic resolver + Interaction Director;
 - bounded event-driven beats/scenes/LOD;
 - NPC-to-NPC and multi-NPC semantic interaction;
@@ -21,48 +20,18 @@ Protected foundation:
 - integrated Semantic Lab interaction authoring/trace;
 - deterministic generation and bounded semantic memory.
 
-Do not reread or restore the old recovery diary unless current evidence shows a regression.
+## Verified C0A baseline
 
-## Current audit findings
+Checked-in fixtures and bounded reports live under `tools/semantic_harness/fixtures/c0a/` and `tools/semantic_harness/reports/c0a/`. They use fresh sessions of the real Lua `LuaSemanticWorker`; Python only transports scenarios and projects returned fields.
 
-Fresh production-worker checks show distinct remaining problems:
+- Corpus: 23 cases cover compact/no-space, elongation/typo, hostility/threat/wish, self/world profanity, negation, short context replies, benign controls, and mutating-action safety. Current failures include all five compact hostility controls except `fuckyou`, `i hope you die` understood fuzzily at `0.83` but clarified, `i'm fucking starving` routed as an identity claim with an attempted mutation, and `give me waterr` reaching `SemanticTaskRequest`.
+- Multi-turn: the NPC greeting follow-up stores a pending question, but player `not really` selects generic `DISAGREE` and cancels the flow. Apology selects `behavior.reconcile`; `yeah right` remains clarification. Time/date continuation retains the time topic; changing to wellbeing starts a new flow.
+- Suggestions: current candidates mix authored/static `conversation_root`/`typed_input` rows with derived `active_flow`, `npc_response_plan`, and `social_context` rows. Frames carry intent/speech act/subject/topic, ranks are unique in the captured surfaces, no stance/polarity fields are present, and `question.time` clicks re-enter the typed semantic-click route.
+- Reply realization: retaliation, agreement, thanks, and apology use production phrase families; disagreement currently falls back without a phrase family; greeting follow-up is a two-turn plan using the same family. No composition behavior was added.
+- Storage: 54 canonical source files / 486 locations; source manifest 5,098 bytes; 53 planned generated shards. Largest current shards include `Event.lua` (32,486 bytes), `SocialPart03.lua` (32,168), `Command.lua` (32,129), and `Question.lua` (31,766). Numeric overflow includes every current `CommandPart02`, `EventPart02`, `SocialPart02`–`04`, `TaskPart02`, and `QuestionPart02`; opaque names remain `Massive.lua` and `Sgd.lua`. Exact flow IDs use the current `.flow` runtime alias; no unresolved alias, generated-definition collision, registry reference, or unplanned-runtime-module was detected.
+- Conduct: disposable production-service state reproduces `evidence_pruned_by_limit` for a weak 65th temporary record and `permanent_evidence_limit` for a 65th permanent record. Understanding, reaction selection, relationship effects, and durable evidence are reported separately.
 
-- `fuckyou` currently recovers as `INSULT` at about 0.91, but this is not general no-space support;
-- `fuck u` and `fuck youuuu` are recognized;
-- `shutthefuckup`, `youidiot`, `illkillyou`, and `youreuseless` still fail as single unknown tokens;
-- `i hope you die` can be classified as `HOSTILE_REMARK` around 0.83 yet still becomes `ASK_CLARIFICATION` because policy applies a global high-confidence gate;
-- social events can be understood but later reported rejected when new conduct evidence is removed by the 64-entry evidence cap (`evidence_pruned_by_limit`);
-- canonical beat/behavior source is already reasonably atomic, but generated Conversation output still contains numeric/opaque shards including `SocialPart02.lua`, `CommandPart02.lua`, `QuestionPart02.lua`, `Massive.lua` and `Sgd.lua`, which must be migrated before dynamic affordance/realization growth.
-
-Relevant ownership verified in code:
-
-- PsychopatzCore `PsychopatzSemanticNormalizer.lua`, parser/candidate matcher and registry own generic surface parsing;
-- ProjectHoomans `PNC_SemanticDialogueCandidateEligibility.lua` and `PNC_SemanticDialoguePolicy_Flow.lua` own contextual admission/policy;
-- existing pragmatic/interaction layers are downstream and should not become parsers;
-- conduct persistence is separate server-side social state and must not define whether language was understood.
-
-## Immediate Next Chunk — C0A
-
-Create a compact real-worker regression corpus and diagnostics baseline before changing parsing behavior.
-
-Required initial groups:
-
-1. compact/no-space;
-2. elongation/typo;
-3. directed hostility vs self/world profanity;
-4. threat vs hostile wish;
-5. negation;
-6. context-dependent short replies;
-7. benign false positives;
-8. mutating-action safety;
-9. conduct-saturation reaction vs persistence;
-10. current post-NPC-reply button sources, stance diversity and authored/static dependence;
-11. current NPC response realization for mirror/counter/agreement/disagreement cases, including whether a full authored phrase is required;
-12. current canonical/generated storage metrics: largest records/shards, definitions per shard, manifest/index size, numeric overflow shards, opaque generated names and current ID→source→generated discoverability.
-
-Record expected semantic class, contextual outcome, allowed recovery type, semantic button continuations, realization strategy, storage ownership and whether authoritative mutation is permitted.
-
-Then use that corpus to drive C1 rather than adding one-off phrase aliases.
+Current relevant-suite baseline: C0A Python regression 9/9; required Semantic Harness Lua filters 12/12; full `pnc_semantic` Lua suite 98/98. Two pre-existing Python assertions remain: the speech registry family expectation for `semantic.flow.greeting.opening.default`, and the GUI lineage expectation for the stale `common_responses.json` source name. No C1+ behavior, generated shard, source save, Core semantic implementation, or persistence policy was changed.
 
 ## Remaining mandatory work
 

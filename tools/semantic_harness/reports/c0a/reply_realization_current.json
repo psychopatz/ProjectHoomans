@@ -1,0 +1,396 @@
+{
+  "cases": [
+    {
+      "current": {
+        "evidence": {
+          "messageCount": 1,
+          "messagePhraseFamilies": [
+            "phrase.semantic.interaction.argument.retaliate"
+          ],
+          "messagePhraseIDs": [
+            "phrase.semantic.interaction.argument.retaliate.guarded.01"
+          ],
+          "messageRealization": [
+            {
+              "applicationCount": 2,
+              "applied": true,
+              "family": "semantic.interaction.argument.retaliate",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "guarded"
+            }
+          ],
+          "messageTexts": [
+            "Say that again and see how far it gets you."
+          ],
+          "planSegmentCount": 1,
+          "planTurnCount": 1
+        },
+        "response": {
+          "fallback": "Don't talk to me like that.",
+          "plan": {
+            "dialogueAct": "RETALIATE_VERBALLY",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.hostile_remark",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Don't talk to me like that.",
+                    "kind": "translation",
+                    "templateID": "semantic.interaction.argument.retaliate"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.hostile.default",
+          "selectionSource": "catalog",
+          "sourcePoolID": "semantic.hostile_remark",
+          "templateID": "semantic.interaction.argument.retaliate"
+        },
+        "selectedIntent": "INSULT",
+        "selectedSpeechAct": "INSULT"
+      },
+      "id": "retaliation_mirror",
+      "rawInput": "fuck you"
+    },
+    {
+      "current": {
+        "evidence": {
+          "messageCount": 1,
+          "messagePhraseFamilies": [
+            "phrase.semantic.social.acknowledged"
+          ],
+          "messagePhraseIDs": [
+            "phrase.semantic.social.acknowledged.neutral.01"
+          ],
+          "messageRealization": [
+            {
+              "applicationCount": 2,
+              "applied": true,
+              "family": "semantic.social.acknowledged",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            }
+          ],
+          "messageTexts": [
+            "All right."
+          ],
+          "planSegmentCount": 1,
+          "planTurnCount": 1
+        },
+        "response": {
+          "fallback": "All right.",
+          "plan": {
+            "dialogueAct": "SOCIAL_ACKNOWLEDGED",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.accept",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "All right.",
+                    "kind": "translation",
+                    "templateID": "semantic.social.acknowledged"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.accept.default",
+          "selectionSource": "catalog",
+          "sourcePoolID": "semantic.accept",
+          "templateID": "semantic.social.acknowledged"
+        },
+        "selectedIntent": "ACCEPT",
+        "selectedSpeechAct": "ACCEPT"
+      },
+      "id": "agreement",
+      "rawInput": "yes"
+    },
+    {
+      "current": {
+        "evidence": {
+          "messageCount": 1,
+          "messagePhraseFamilies": [
+            null
+          ],
+          "messagePhraseIDs": [
+            null
+          ],
+          "messageRealization": [
+            {
+              "applicationCount": 0,
+              "applied": false,
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            }
+          ],
+          "messageTexts": [
+            "No."
+          ],
+          "planSegmentCount": 1,
+          "planTurnCount": 1
+        },
+        "response": {
+          "fallback": "No.",
+          "plan": {
+            "dialogueAct": "SOCIAL_ACKNOWLEDGED",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.refuse",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "No.",
+                    "kind": "translation",
+                    "templateID": "semantic.social.acknowledged"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.refuse.default",
+          "selectionSource": "catalog",
+          "sourcePoolID": "semantic.refuse",
+          "templateID": "semantic.social.acknowledged"
+        },
+        "selectedIntent": "DISAGREE",
+        "selectedSpeechAct": "DISAGREE"
+      },
+      "id": "disagreement",
+      "rawInput": "not really"
+    },
+    {
+      "current": {
+        "evidence": {
+          "messageCount": 1,
+          "messagePhraseFamilies": [
+            "phrase.semantic.social.acknowledged"
+          ],
+          "messagePhraseIDs": [
+            "phrase.semantic.social.acknowledged.neutral.01"
+          ],
+          "messageRealization": [
+            {
+              "applicationCount": 2,
+              "applied": true,
+              "family": "semantic.social.acknowledged",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            }
+          ],
+          "messageTexts": [
+            "All right."
+          ],
+          "planSegmentCount": 1,
+          "planTurnCount": 1
+        },
+        "response": {
+          "fallback": "Glad I could help.",
+          "plan": {
+            "dialogueAct": "ACKNOWLEDGE",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.thanks",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Glad I could help.",
+                    "kind": "translation",
+                    "templateID": "semantic.social.acknowledged"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.thanks.dataset.glady",
+          "selectionSource": "catalog",
+          "sourcePoolID": "semantic.thanks",
+          "templateID": "semantic.social.acknowledged"
+        },
+        "selectedIntent": "THANK",
+        "selectedSpeechAct": "THANK"
+      },
+      "id": "acknowledgement",
+      "rawInput": "thanks"
+    },
+    {
+      "current": {
+        "evidence": {
+          "messageCount": 1,
+          "messagePhraseFamilies": [
+            "phrase.semantic.social.apology.default"
+          ],
+          "messagePhraseIDs": [
+            "phrase.semantic.social.apology.default.neutral.01"
+          ],
+          "messageRealization": [
+            {
+              "applicationCount": 2,
+              "applied": true,
+              "family": "semantic.social.apology.default",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            }
+          ],
+          "messageTexts": [
+            "Noted. Let's move on."
+          ],
+          "planSegmentCount": 1,
+          "planTurnCount": 1
+        },
+        "response": {
+          "fallback": "Noted. Let's move on.",
+          "plan": {
+            "dialogueAct": "SOCIAL_ACKNOWLEDGED",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.apology",
+            "turns": [
+              {
+                "continuation": "end",
+                "id": "1",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "Noted. Let's move on.",
+                    "kind": "translation",
+                    "templateID": "semantic.social.apology.default"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.apology.default",
+          "selectionSource": "catalog",
+          "sourcePoolID": "semantic.apology",
+          "templateID": "semantic.social.apology.default"
+        },
+        "selectedIntent": "APOLOGIZE",
+        "selectedSpeechAct": "APOLOGIZE"
+      },
+      "id": "apology_deescalation",
+      "rawInput": "sorry"
+    },
+    {
+      "current": {
+        "evidence": {
+          "messageCount": 2,
+          "messagePhraseFamilies": [
+            "phrase.semantic.flow.greeting.opening.default",
+            "phrase.semantic.flow.greeting.opening.default"
+          ],
+          "messagePhraseIDs": [
+            "phrase.semantic.flow.greeting.opening.default.neutral.01",
+            "phrase.semantic.flow.greeting.opening.default.neutral.01"
+          ],
+          "messageRealization": [
+            {
+              "applicationCount": 3,
+              "applied": true,
+              "family": "semantic.flow.greeting.opening.default",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            },
+            {
+              "applicationCount": 3,
+              "applied": true,
+              "family": "semantic.flow.greeting.opening.default",
+              "maxApplications": 8,
+              "neutralFallbackCount": 0,
+              "variant": "neutral"
+            }
+          ],
+          "messageTexts": [
+            "Hey there. Good to see you.",
+            "How have you been?"
+          ],
+          "planSegmentCount": 2,
+          "planTurnCount": 2
+        },
+        "response": {
+          "fallback": "Hey there. Good to see you.",
+          "plan": {
+            "dialogueAct": "GREETING_OPENING",
+            "kind": "dialogue_act_plan",
+            "schemaVersion": 1,
+            "sourcePoolID": "semantic.flow.greeting.opening",
+            "turns": [
+              {
+                "continuation": "continue",
+                "id": "greeting",
+                "offers": [],
+                "segments": [
+                  {
+                    "fallback": "",
+                    "kind": "translation",
+                    "templateID": "semantic.flow.greeting.opening.default"
+                  }
+                ],
+                "separator": " "
+              },
+              {
+                "continuation": "await_player",
+                "id": "check_in",
+                "offers": [
+                  {
+                    "id": "greeting.check_in.report_wellbeing",
+                    "labelKey": "UI_PNC_Conversation_Suggestion_GreetingReportFine_Label",
+                    "utteranceKey": "UI_PNC_Conversation_Suggestion_GreetingReportFine_Utterance"
+                  }
+                ],
+                "segments": [
+                  {
+                    "fallback": "",
+                    "kind": "translation",
+                    "templateID": "semantic.flow.greeting.opening.question.default"
+                  }
+                ],
+                "separator": " "
+              }
+            ]
+          },
+          "selectionID": "semantic.flow.greeting.opening.default",
+          "selectionSource": "flow",
+          "sourceFlowID": "greeting",
+          "sourcePoolID": "semantic.flow.greeting.opening",
+          "templateID": "semantic.flow.greeting.opening.default"
+        },
+        "selectedIntent": "GREET",
+        "selectedSpeechAct": "GREET"
+      },
+      "id": "ask_back_follow_up",
+      "rawInput": "hello there"
+    }
+  ],
+  "concern": "reply_realization",
+  "schema": "projecthoomans.c0a.current.v1"
+}

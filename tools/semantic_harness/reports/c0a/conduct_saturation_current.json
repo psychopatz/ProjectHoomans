@@ -1,0 +1,57 @@
+{
+  "schema": "projecthoomans.c0a.current.v1",
+  "concern": "conduct_saturation",
+  "stateBoundary": {
+    "workerState": "disposable Semantic Lab fixture / isolated Lua smoke registry",
+    "productionPersistenceChanged": false,
+    "nativeProjectZomboidLaunched": false
+  },
+  "evidenceSeparation": {
+    "semanticUnderstanding": {
+      "source": "semantic_current.json",
+      "fields": ["currentSemantic.selected", "currentSemantic.candidates", "normalizedInput", "policy"],
+      "owner": "production Lua Core/Hoomans worker"
+    },
+    "interactionReactionSelection": {
+      "source": "semantic_current.json",
+      "fields": ["interactionDirector", "flow", "responseLineage"],
+      "owner": "production Lua Interaction Director and response policy"
+    },
+    "relationshipEffect": {
+      "source": "semantic_current.json",
+      "fields": ["authority.relationshipBefore", "authority.relationshipAfter", "authority.toolCalls", "authority.transportCommands"],
+      "owner": "production Lua authority seams"
+    },
+    "durableEvidenceRetentionAndPruning": {
+      "source": "pnc_c0a_conduct_saturation_baseline_smoke.lua",
+      "fields": ["evidence count", "rejection reason", "permanent retention"],
+      "owner": "production PNC Conduct service/math on disposable state"
+    }
+  },
+  "currentPolicy": {
+    "evidenceLimit": 64,
+    "recentEvidenceIDLimit": 64,
+    "fullTemporaryFixture": {
+      "seededEvidence": 64,
+      "permanentEvidence": 1,
+      "temporaryEvidence": 63,
+      "newEvidenceStrength": 0.01,
+      "addEvidenceResult": false,
+      "addEvidenceReason": "evidence_pruned_by_limit",
+      "ownerEvidenceCountAfter": 64
+    },
+    "fullPermanentFixture": {
+      "seededEvidence": 64,
+      "permanentEvidence": 64,
+      "newEvidencePermanent": true,
+      "addEvidenceResult": false,
+      "addEvidenceReason": "permanent_evidence_limit",
+      "ownerEvidenceCountAfter": 64
+    }
+  },
+  "test": {
+    "name": "pnc_c0a_conduct_saturation_baseline_smoke",
+    "result": "PASS",
+    "command": "python3 tests/run_tests.py pnc_c0a_conduct_saturation_baseline --verbose --jobs 1"
+  }
+}
