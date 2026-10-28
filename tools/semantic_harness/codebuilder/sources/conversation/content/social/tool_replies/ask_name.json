@@ -1,0 +1,130 @@
+{
+  "domain": "social",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.named.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am %s.",
+              "TL": "I am %s."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.named.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The name is %s.",
+              "TL": "The name is %s."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.named.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You can call me %s.",
+              "TL": "Maaari mo akong tawaging %s."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.prompt",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll tell you my name once we've established some trust. What's your name?",
+              "TL": "I'll tell you my name once we've established some trust. What's your name?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.rejected.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am not ready to share that yet.",
+              "TL": "I am not ready to share that yet."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.rejected.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Ask me again when we know each other better.",
+              "TL": "Ask me again when we know each other better."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.unnamed.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You want to know my name? Give me a second.",
+              "TL": "You want to know my name? Give me a second."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.ask_name.unnamed.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "My name is a longer story than you might expect.",
+              "TL": "My name is a longer story than you might expect."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

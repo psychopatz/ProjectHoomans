@@ -1,0 +1,46 @@
+{
+  "domain": "task",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_stay.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. I will hold here.",
+              "TL": "All right. I will hold here."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_stay.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will stay put.",
+              "TL": "I will stay put."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

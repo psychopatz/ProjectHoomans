@@ -1,0 +1,46 @@
+{
+  "domain": "task",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.rejected_generic.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That did not land well.",
+              "TL": "That did not land well."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.rejected_generic.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I am not taking that from you right now.",
+              "TL": "I am not taking that from you right now."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

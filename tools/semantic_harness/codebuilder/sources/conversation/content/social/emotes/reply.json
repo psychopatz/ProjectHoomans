@@ -1,0 +1,594 @@
+{
+  "domain": "social",
+  "groups": {
+    "commands_emotes": {
+      "contentOwner": "projecthoomans.dialogue_content.commands_emotes"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.clap",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Thanks.",
+              "TL": "Thanks."
+            }
+          },
+          {
+            "translations": {
+              "EN": "It was a small win.",
+              "TL": "It was a small win."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Glad you were there.",
+              "TL": "Glad you were there."
+            }
+          },
+          {
+            "translations": {
+              "EN": "We did it together.",
+              "TL": "We did it together."
+            }
+          },
+          {
+            "translations": {
+              "EN": "You make a good audience.",
+              "TL": "You make a good audience."
+            }
+          },
+          {
+            "translations": {
+              "EN": "That means a lot, love.",
+              "TL": "That means a lot, love."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "You're too kind.",
+              "TL": "You're too kind."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Nice to hear that from you.",
+              "TL": "Nice to hear that from you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.insult",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Keep it respectful.",
+              "TL": "Keep it respectful."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Say that again and you'll regret it.",
+              "TL": "Say that again and you'll regret it."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Careful. I'm not in the mood.",
+              "TL": "Careful. I'm not in the mood."
+            }
+          },
+          {
+            "translations": {
+              "EN": "That's unnecessary.",
+              "TL": "That's unnecessary."
+            }
+          },
+          {
+            "translations": {
+              "EN": "We're on the same side. Cut it out.",
+              "TL": "We're on the same side. Cut it out."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Don't talk to me like that.",
+              "TL": "Don't talk to me like that."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "You're lucky I know you.",
+              "TL": "You're lucky I know you."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Watch your mouth.",
+              "TL": "Watch your mouth."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.salute",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Stay sharp.",
+              "TL": "Stay sharp."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Acknowledged.",
+              "TL": "Acknowledged."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Stay sharp, survivor.",
+              "TL": "Stay sharp, survivor."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Right back at you.",
+              "TL": "Right back at you."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Don't salute me.",
+              "TL": "Don't salute me."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Stay sharp and stay away.",
+              "TL": "Stay sharp and stay away."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Always, love.",
+              "TL": "Always, love."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Stay safe for me.",
+              "TL": "Stay safe for me."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Take care.",
+              "TL": "Take care."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.thankyou",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You're welcome.",
+              "TL": "You're welcome."
+            }
+          },
+          {
+            "translations": {
+              "EN": "No trouble.",
+              "TL": "No trouble."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Anytime.",
+              "TL": "Anytime."
+            }
+          },
+          {
+            "translations": {
+              "EN": "You don't have to thank me.",
+              "TL": "You don't have to thank me."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Don't mistake this for friendship.",
+              "TL": "Don't mistake this for friendship."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Fine. It was nothing.",
+              "TL": "Fine. It was nothing."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Anytime. We look after our own.",
+              "TL": "Anytime. We look after our own."
+            }
+          },
+          {
+            "translations": {
+              "EN": "That's what we're here for.",
+              "TL": "That's what we're here for."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Always, love.",
+              "TL": "Always, love."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Anything for you.",
+              "TL": "Anything for you."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Of course.",
+              "TL": "Of course."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.thumbsdown",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I got the message. Tell me what's wrong.",
+              "TL": "I got the message. Tell me what's wrong."
+            }
+          },
+          {
+            "translations": {
+              "EN": "You could just say what's wrong.",
+              "TL": "You could just say what's wrong."
+            }
+          },
+          {
+            "translations": {
+              "EN": "If you have a problem, tell me.",
+              "TL": "If you have a problem, tell me."
+            }
+          },
+          {
+            "translations": {
+              "EN": "We need to work together.",
+              "TL": "We need to work together."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Tell me what bothered you, love.",
+              "TL": "Tell me what bothered you, love."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I see the disapproval.",
+              "TL": "I see the disapproval."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.thumbsup",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good.",
+              "TL": "Good."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Let's hope it holds.",
+              "TL": "Let's hope it holds."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good work.",
+              "TL": "Good work."
+            }
+          },
+          {
+            "translations": {
+              "EN": "That's how we get through this.",
+              "TL": "That's how we get through this."
+            }
+          },
+          {
+            "translations": {
+              "EN": "That's my survivor.",
+              "TL": "That's my survivor."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I knew you could do it.",
+              "TL": "I knew you could do it."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "That's the spirit.",
+              "TL": "That's the spirit."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Proud of you.",
+              "TL": "Proud of you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.thumbsup.active",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good. Let's keep moving on this.",
+              "TL": "Good. Let's keep moving on this."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good work.",
+              "TL": "Good work."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Let's keep moving.",
+              "TL": "Let's keep moving."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.wavebye",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Take care.",
+              "TL": "Take care."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Stay safe.",
+              "TL": "Stay safe."
+            }
+          },
+          {
+            "translations": {
+              "EN": "See you soon.",
+              "TL": "See you soon."
+            }
+          },
+          {
+            "translations": {
+              "EN": "You too. Stay safe.",
+              "TL": "You too. Stay safe."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Keep walking.",
+              "TL": "Keep walking."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Don't make this a conversation.",
+              "TL": "Don't make this a conversation."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Goodbye.",
+              "TL": "Goodbye."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Stay safe out there.",
+              "TL": "Stay safe out there."
+            }
+          },
+          {
+            "translations": {
+              "EN": "See you at camp.",
+              "TL": "See you at camp."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Come back safe, love.",
+              "TL": "Come back safe, love."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I'll see you soon.",
+              "TL": "I'll see you soon."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Take care of yourself.",
+              "TL": "Take care of yourself."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.emote.reply.wavehi",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Hey.",
+              "TL": "Hey."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I see you.",
+              "TL": "I see you."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Keep your distance.",
+              "TL": "Keep your distance."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I see you. Don't come closer.",
+              "TL": "I see you. Don't come closer."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hello.",
+              "TL": "Hello."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Morning.",
+              "TL": "Morning."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "There you are.",
+              "TL": "There you are."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good to see you.",
+              "TL": "Good to see you."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Hey again.",
+              "TL": "Hey again."
+            }
+          },
+          {
+            "translations": {
+              "EN": "There you are again.",
+              "TL": "There you are again."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Morning, good to see you.",
+              "TL": "Morning, good to see you."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hey, we're all here.",
+              "TL": "Hey, we're all here."
+            }
+          },
+          {
+            "translations": {
+              "EN": "There you are, love.",
+              "TL": "There you are, love."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Good morning, sweetheart.",
+              "TL": "Good morning, sweetheart."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

@@ -15,6 +15,11 @@ import re
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
+from .catalog_naming import (
+    ModuleNameRegistry,
+    pascal_segment,
+    source_owned_module,
+)
 from .dialogue_content import (
     _lua_value,
     _lua_string,
@@ -42,8 +47,13 @@ CONVERSATION_RUNTIME_RELATIVE = Path(
     "Semantics/Generated/Conversation"
 )
 CONVERSATION_UI_RUNTIME_RELATIVE = CONVERSATION_RUNTIME_RELATIVE / "UI/StaticSuggestions.lua"
-CONVERSATION_MAX_SHARD_BYTES = 32 * 1024
-CONVERSATION_MAX_RECORDS_PER_SHARD = 48
+CONVERSATION_PREFERRED_SOURCE_BYTES = 8 * 1024
+CONVERSATION_MAX_SOURCE_BYTES = 16 * 1024
+CONVERSATION_PREFERRED_SHARD_BYTES = 24 * 1024
+CONVERSATION_MAX_SHARD_BYTES = 48 * 1024
+CONVERSATION_PREFERRED_RECORDS_PER_SHARD = 16
+CONVERSATION_MAX_RECORDS_PER_SHARD = 32
+CONVERSATION_MAX_INDEX_BYTES = 48 * 1024
 _ID = re.compile(r"^[a-z][a-z0-9_.:-]{0,127}$")
 _SHARD_KINDS = frozenset(("content", "patterns", "responses", "flows", "beats", "behaviors", "ui"))
 
@@ -1093,6 +1103,17 @@ def render_conversation_lua_records(records: list[dict[str, Any]]) -> str:
     return "-- Generated; do not edit by hand.\nreturn " + _lua_value(records, 0) + "\n"
 
 
+def _runtime_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            key: _copy_json(value)
+            for key, value in record.items()
+            if key not in ("sourceShard", "conversationDomain")
+        }
+        for record in records
+    ]
+
+
 def _chunk_records(
     records: list[dict[str, Any]],
     *,
@@ -1100,65 +1121,587 @@ def _chunk_records(
     module_prefix: str,
     max_bytes: int = CONVERSATION_MAX_SHARD_BYTES,
 ) -> tuple[list[tuple[str, str]], list[dict[str, Any]]]:
+    """Render one bounded generated shard per canonical source owner.
+
+    Numeric overflow parts are intentionally forbidden. If a canonical source
+    owns too much generated runtime data, the canonical source must be split by
+    semantic subdomain instead.
+    """
     modules: list[tuple[str, str]] = []
     reports: list[dict[str, Any]] = []
     grouped: dict[str, list[dict[str, Any]]] = {}
     for record in records:
-        domain = str(record.get("conversationDomain") or record.get("domain") or "general")
-        grouped.setdefault(domain, []).append(record)
-    for domain in sorted(grouped):
-        items = sorted(grouped[domain], key=lambda item: str(item.get("id", "")))
-        part = 0
-        current: list[dict[str, Any]] = []
-        for item in items:
-            candidate = current + [item]
-            rendered = render_conversation_lua_records(candidate)
-            if current and (len(candidate) > CONVERSATION_MAX_RECORDS_PER_SHARD or len(rendered.encode("utf-8")) > max_bytes):
-                part += 1
-                name = domain.title().replace("_", "") + (f"Part{part:02d}" if part > 1 else "")
-                module = f"{module_prefix}/{kind}/{name}"
-                source = render_conversation_lua_records(current)
-                modules.append((module, source))
-                reports.append({"module": module, "kind": kind, "domain": domain, "recordCount": len(current), "bytes": len(source.encode("utf-8"))})
-                current = [item]
-            else:
-                current = candidate
-        if current:
-            part += 1
-            name = domain.title().replace("_", "") + (f"Part{part:02d}" if part > 1 else "")
-            module = f"{module_prefix}/{kind}/{name}"
-            source = render_conversation_lua_records(current)
-            size = len(source.encode("utf-8"))
-            if size > max_bytes:
-                raise CompileError(f"generated Conversation {kind} shard exceeds {max_bytes} bytes: {module}")
-            modules.append((module, source))
-            reports.append({"module": module, "kind": kind, "domain": domain, "recordCount": len(current), "bytes": size})
+        source_shard = str(
+            record.get("sourceShard")
+            or f"{kind.lower()}/{record.get('domain') or 'general'}.json"
+        )
+        grouped.setdefault(source_shard, []).append(record)
+
+    names = ModuleNameRegistry()
+    for source_shard in sorted(grouped):
+        items = sorted(
+            grouped[source_shard],
+            key=lambda item: str(item.get("id", "")),
+        )
+        if len(items) > CONVERSATION_MAX_RECORDS_PER_SHARD:
+            raise CompileError(
+                "canonical Conversation source exceeds the generated "
+                f"{CONVERSATION_MAX_RECORDS_PER_SHARD}-definition hard budget; "
+                f"split by semantic subdomain: {source_shard}"
+            )
+        runtime_items = _runtime_records(items)
+        source = render_conversation_lua_records(runtime_items)
+        size = len(source.encode("utf-8"))
+        if size > max_bytes:
+            raise CompileError(
+                "canonical Conversation source renders above the "
+                f"{max_bytes}-byte hard shard budget; split by semantic subdomain: "
+                f"{source_shard}"
+            )
+        module = source_owned_module(
+            f"{module_prefix}/{kind}",
+            source_shard,
+            names,
+        )
+        modules.append((module, source))
+        reports.append({
+            "module": module,
+            "kind": kind,
+            "domain": str(
+                items[0].get("conversationDomain")
+                or items[0].get("domain")
+                or "general"
+            ),
+            "sourceShard": source_shard,
+            "recordCount": len(items),
+            "recordIDs": [
+                str(item.get("id"))
+                for item in items
+                if isinstance(item.get("id"), str)
+            ],
+            "bytes": size,
+        })
     return modules, reports
 
 
-def render_conversation_runtime_plan(model: dict[str, Any]) -> tuple[list[tuple[str, str]], list[dict[str, Any]]]:
-    """Render bounded data modules for all merged Conversation domains."""
+def render_conversation_runtime_plan(
+    model: dict[str, Any],
+) -> tuple[list[tuple[str, str]], list[dict[str, Any]]]:
+    """Render bounded runtime modules using canonical source ownership."""
     prefix = "PNC/Semantics/Generated/Conversation"
     content_modules, content_reports = render_dialogue_content_shard_plan(
         model["content"], prefix, max_bytes=CONVERSATION_MAX_SHARD_BYTES
     )
-    patterns = [*model["dialogue"].get("patterns", []), *model["semantic"].get("patterns", [])]
-    patterns = [{**item, "domain": str(item.get("id", "general")).split(".")[2] if len(str(item.get("id", "")).split(".")) > 2 else "general"} for item in patterns]
-    response_pools = [*model["dialogue"].get("responsePools", []), *model["semantic"].get("responsePools", [])]
-    response_pools = [{**item, "domain": str(item.get("id", "general")).split(".")[1] if len(str(item.get("id", "")).split(".")) > 1 else "general"} for item in response_pools]
-    flow_records = [{**item, "domain": "semantic"} for item in model["semantic"].get("flows", [])]
-    behavior_records = list(model.get("behaviors", []))
-    beat_records = list(model.get("beats", []))
-    ui_records = [{**item, "domain": str(item.get("topic") or "general")} for item in model["ui"]]
-    pattern_modules, pattern_reports = _chunk_records(patterns, kind="Patterns", module_prefix=prefix)
-    response_modules, response_reports = _chunk_records(response_pools, kind="Responses", module_prefix=prefix)
-    flow_modules, flow_reports = _chunk_records(flow_records, kind="Flows", module_prefix=prefix)
-    behavior_modules, behavior_reports = _chunk_records(behavior_records, kind="Behaviors", module_prefix=prefix)
-    beat_modules, beat_reports = _chunk_records(beat_records, kind="Beats", module_prefix=prefix)
-    ui_modules, ui_reports = _chunk_records(ui_records, kind="UI", module_prefix=prefix)
-    modules = [*content_modules, *pattern_modules, *response_modules, *flow_modules, *behavior_modules, *beat_modules, *ui_modules]
-    reports = [*content_reports, *pattern_reports, *response_reports, *flow_reports, *behavior_reports, *beat_reports, *ui_reports]
+    locations = model.get("locations") or {}
+
+    def owned(item: dict[str, Any], *, domain: str) -> dict[str, Any]:
+        record_id = str(item.get("id") or "")
+        owner = locations.get(record_id) if record_id else None
+        source_shard = (
+            owner.get("sourceShard")
+            if isinstance(owner, dict)
+            else None
+        )
+        return {
+            **item,
+            "domain": domain,
+            "sourceShard": source_shard
+            or f"{domain}/{record_id or 'general'}.json",
+        }
+
+    patterns = [
+        *model["dialogue"].get("patterns", []),
+        *model["semantic"].get("patterns", []),
+    ]
+    patterns = [
+        owned(
+            item,
+            domain=(
+                str(item.get("id", "general")).split(".")[2]
+                if len(str(item.get("id", "")).split(".")) > 2
+                else "general"
+            ),
+        )
+        for item in patterns
+    ]
+
+    response_pools = [
+        *model["dialogue"].get("responsePools", []),
+        *model["semantic"].get("responsePools", []),
+    ]
+    response_pools = [
+        owned(
+            item,
+            domain=(
+                str(item.get("id", "general")).split(".")[1]
+                if len(str(item.get("id", "")).split(".")) > 1
+                else "general"
+            ),
+        )
+        for item in response_pools
+    ]
+
+    flow_records = [
+        owned(item, domain="semantic")
+        for item in model["semantic"].get("flows", [])
+    ]
+    behavior_records = [
+        owned(item, domain="social")
+        for item in model.get("behaviors", [])
+    ]
+    beat_records = [
+        owned(item, domain="social")
+        for item in model.get("beats", [])
+    ]
+    ui_records = [
+        owned(item, domain=str(item.get("topic") or "general"))
+        for item in model["ui"]
+    ]
+
+    pattern_modules, pattern_reports = _chunk_records(
+        patterns, kind="Patterns", module_prefix=prefix
+    )
+    response_modules, response_reports = _chunk_records(
+        response_pools, kind="Responses", module_prefix=prefix
+    )
+    flow_modules, flow_reports = _chunk_records(
+        flow_records, kind="Flows", module_prefix=prefix
+    )
+    behavior_modules, behavior_reports = _chunk_records(
+        behavior_records, kind="Behaviors", module_prefix=prefix
+    )
+    beat_modules, beat_reports = _chunk_records(
+        beat_records, kind="Beats", module_prefix=prefix
+    )
+    ui_modules, ui_reports = _chunk_records(
+        ui_records, kind="UI", module_prefix=prefix
+    )
+    modules = [
+        *content_modules,
+        *pattern_modules,
+        *response_modules,
+        *flow_modules,
+        *behavior_modules,
+        *beat_modules,
+        *ui_modules,
+    ]
+    reports = [
+        *content_reports,
+        *pattern_reports,
+        *response_reports,
+        *flow_reports,
+        *behavior_reports,
+        *beat_reports,
+        *ui_reports,
+    ]
+    index_modules, index_reports, _ = render_conversation_discovery_indexes(
+        model,
+        reports,
+        module_prefix=prefix,
+    )
+    modules.extend(index_modules)
+    reports.extend(index_reports)
     return modules, reports
+
+
+
+def _runtime_record_index(model: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    records: dict[str, dict[str, Any]] = {}
+
+    def add(values: Iterable[dict[str, Any]]) -> None:
+        for record in values:
+            if not isinstance(record, dict):
+                continue
+            record_id = record.get("id")
+            if isinstance(record_id, str) and record_id:
+                records[record_id] = record
+
+    add(model.get("content", {}).get("phraseFamilies", []))
+    add(model.get("content", {}).get("playerChoices", []))
+    add(model.get("dialogue", {}).get("patterns", []))
+    add(model.get("dialogue", {}).get("responsePools", []))
+    add(model.get("semantic", {}).get("patterns", []))
+    add(model.get("semantic", {}).get("responsePools", []))
+    add(model.get("semantic", {}).get("flows", []))
+    add(model.get("behaviors", []))
+    add(model.get("beats", []))
+    add(model.get("ui", []))
+    return records
+
+
+def _collect_known_ids(
+    value: Any,
+    known_ids: set[str],
+    output: set[str],
+    *,
+    depth: int = 0,
+) -> None:
+    if depth > 8:
+        return
+    if isinstance(value, str):
+        if value in known_ids:
+            output.add(value)
+        return
+    if isinstance(value, list):
+        for item in value[:64]:
+            _collect_known_ids(
+                item,
+                known_ids,
+                output,
+                depth=depth + 1,
+            )
+        return
+    if isinstance(value, dict):
+        for key in sorted(value, key=str)[:64]:
+            _collect_known_ids(
+                value[key],
+                known_ids,
+                output,
+                depth=depth + 1,
+            )
+
+
+def conversation_discovery_index(
+    model: dict[str, Any],
+    reports: list[dict[str, Any]],
+    *,
+    relation_limit: int = 8,
+    generated_limit: int = 6,
+) -> dict[str, dict[str, Any]]:
+    """Build a bounded ID->source->generated routing index."""
+    locations = model.get("locations") or {}
+    known_ids = set(locations)
+    generated_by_id: dict[str, str] = {}
+    generated_by_source: dict[str, list[str]] = {}
+    for report in reports:
+        if report.get("kind") in ("Index", "IndexRegistry"):
+            continue
+        module = report.get("module")
+        source_shard = report.get("sourceShard")
+        if isinstance(module, str) and isinstance(source_shard, str):
+            modules = generated_by_source.setdefault(source_shard, [])
+            if module not in modules:
+                modules.append(module)
+        for record_id in report.get("recordIDs", []):
+            if isinstance(record_id, str) and isinstance(module, str):
+                generated_by_id[record_id] = module
+
+    runtime_records = _runtime_record_index(model)
+    related: dict[str, list[str]] = {}
+    dependents: dict[str, set[str]] = {}
+    for record_id, record in sorted(runtime_records.items()):
+        refs: set[str] = set()
+        _collect_known_ids(record, known_ids, refs)
+        refs.discard(record_id)
+        selected = sorted(refs)[:relation_limit]
+        if selected:
+            related[record_id] = selected
+        for target in selected:
+            dependents.setdefault(target, set()).add(record_id)
+
+    index: dict[str, dict[str, Any]] = {}
+    for record_id in sorted(locations):
+        location = locations[record_id]
+        source_shard = str(location.get("sourceShard") or "")
+        direct = generated_by_id.get(record_id)
+        generated = (
+            [direct]
+            if direct
+            else sorted(generated_by_source.get(source_shard, []))[
+                :generated_limit
+            ]
+        )
+        entry = {
+            "id": record_id,
+            "kind": str(location.get("kind") or "unknown"),
+            "domain": str(location.get("domain") or "general"),
+            "source": source_shard,
+            "generated": generated,
+        }
+        if related.get(record_id):
+            entry["related"] = related[record_id]
+        reverse = sorted(dependents.get(record_id, set()))[:relation_limit]
+        if reverse:
+            entry["dependents"] = reverse
+        index[record_id] = entry
+    return index
+
+
+def render_conversation_discovery_indexes(
+    model: dict[str, Any],
+    reports: list[dict[str, Any]],
+    *,
+    module_prefix: str = "PNC/Semantics/Generated/Conversation",
+) -> tuple[
+    list[tuple[str, str]],
+    list[dict[str, Any]],
+    dict[str, dict[str, Any]],
+]:
+    """Render small source-routing indexes without aggregating definitions."""
+    index = conversation_discovery_index(model, reports)
+    grouped: dict[tuple[str, str], dict[str, dict[str, Any]]] = {}
+    for record_id, entry in index.items():
+        key = (entry["kind"], entry["domain"])
+        grouped.setdefault(key, {})[record_id] = entry
+
+    modules: list[tuple[str, str]] = []
+    index_reports: list[dict[str, Any]] = []
+    manifest_rows: list[dict[str, Any]] = []
+    for (kind, domain) in sorted(grouped):
+        payload = grouped[(kind, domain)]
+        source = (
+            "-- Generated Conversation discovery index; do not edit by hand.\n"
+            "return " + _lua_value(payload, 0) + "\n"
+        )
+        size = len(source.encode("utf-8"))
+        if size > CONVERSATION_MAX_INDEX_BYTES:
+            raise CompileError(
+                "Conversation discovery index exceeds the hard index budget; "
+                f"split the ownership domain: {kind}/{domain}"
+            )
+        module = (
+            f"{module_prefix}/Index/"
+            f"{pascal_segment(kind)}/{pascal_segment(domain)}"
+        )
+        modules.append((module, source))
+        ids = sorted(payload)
+        index_reports.append({
+            "module": module,
+            "kind": "Index",
+            "domain": domain,
+            "indexKind": kind,
+            "sourceShard": f"@index/{kind}/{domain}",
+            "recordCount": len(ids),
+            "recordIDs": ids,
+            "bytes": size,
+        })
+        manifest_rows.append({
+            "kind": kind,
+            "domain": domain,
+            "module": module,
+            "recordCount": len(ids),
+        })
+
+    registry_module = f"{module_prefix}/Index/Registry"
+    registry_source = (
+        "-- Generated Conversation discovery index registry; do not edit by hand.\n"
+        "return " + _lua_value(manifest_rows, 0) + "\n"
+    )
+    registry_size = len(registry_source.encode("utf-8"))
+    if registry_size > CONVERSATION_MAX_INDEX_BYTES:
+        raise CompileError(
+            "Conversation discovery index registry exceeds the hard index budget"
+        )
+    modules.append((registry_module, registry_source))
+    index_reports.append({
+        "module": registry_module,
+        "kind": "IndexRegistry",
+        "domain": "index",
+        "sourceShard": "@index/registry",
+        "recordCount": len(manifest_rows),
+        "recordIDs": [],
+        "bytes": registry_size,
+    })
+    return modules, index_reports, index
+
+
+def conversation_affected_closure(
+    model: dict[str, Any],
+    reports: list[dict[str, Any]],
+    canonical_id: str,
+    *,
+    limit: int = 24,
+) -> dict[str, Any] | None:
+    """Return a bounded one-hop dependency/source/generated closure."""
+    index = conversation_discovery_index(model, reports)
+    root = index.get(str(canonical_id))
+    if root is None:
+        return None
+    ids = [str(canonical_id)]
+    for field in ("related", "dependents"):
+        for value in root.get(field, []):
+            if value not in ids and len(ids) < limit:
+                ids.append(value)
+    entries = [index[value] for value in ids if value in index]
+    generated = sorted({
+        module
+        for entry in entries
+        for module in entry.get("generated", [])
+    })
+    sources = sorted({
+        entry["source"]
+        for entry in entries
+        if entry.get("source")
+    })
+    return {
+        "id": str(canonical_id),
+        "entry": root,
+        "closureIDs": ids,
+        "sources": sources,
+        "generated": generated,
+        "entries": entries,
+        "truncated": len(ids) >= limit,
+    }
+
+
+def conversation_context_health(
+    model: dict[str, Any],
+    reports: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Return configurable context-budget evidence for canonical/generated data."""
+    repository = model.get("_repository")
+    source_root = (
+        repository / CONVERSATION_SOURCE_RELATIVE
+        if isinstance(repository, Path)
+        else None
+    )
+    sources: list[dict[str, Any]] = []
+    warnings: list[dict[str, Any]] = []
+    errors: list[dict[str, Any]] = []
+
+    for report in model.get("shards", []):
+        path = str(report.get("path") or "")
+        size = 0
+        if source_root is not None:
+            source_path = source_root / path
+            if source_path.is_file():
+                size = source_path.stat().st_size
+        record_count = len(report.get("recordIDs", []))
+        row = {
+            "path": path,
+            "kind": report.get("kind"),
+            "domain": report.get("domain"),
+            "bytes": size,
+            "recordCount": record_count,
+        }
+        sources.append(row)
+        if size > CONVERSATION_MAX_SOURCE_BYTES:
+            errors.append({
+                "type": "source_bytes_hard",
+                "path": path,
+                "value": size,
+                "limit": CONVERSATION_MAX_SOURCE_BYTES,
+            })
+        elif size > CONVERSATION_PREFERRED_SOURCE_BYTES:
+            warnings.append({
+                "type": "source_bytes_preferred",
+                "path": path,
+                "value": size,
+                "limit": CONVERSATION_PREFERRED_SOURCE_BYTES,
+            })
+
+    generated: list[dict[str, Any]] = []
+    numeric: list[str] = []
+    opaque: list[str] = []
+    missing_ownership: list[str] = []
+    forbidden_opaque = {"Massive", "Sgd"}
+    for report in reports:
+        row = {
+            key: _copy_json(report.get(key))
+            for key in (
+                "module",
+                "kind",
+                "domain",
+                "sourceShard",
+                "recordCount",
+                "bytes",
+            )
+        }
+        generated.append(row)
+        module = str(report.get("module") or "")
+        final = module.rsplit("/", 1)[-1]
+        if re.search(r"Part\d+$", final):
+            numeric.append(module)
+        if final in forbidden_opaque:
+            opaque.append(module)
+        if report.get("kind") not in ("Index", "IndexRegistry") and not report.get(
+            "sourceShard"
+        ):
+            missing_ownership.append(module)
+        size = int(report.get("bytes") or 0)
+        count = int(report.get("recordCount") or 0)
+        limit = (
+            CONVERSATION_MAX_INDEX_BYTES
+            if report.get("kind") in ("Index", "IndexRegistry")
+            else CONVERSATION_MAX_SHARD_BYTES
+        )
+        if size > limit:
+            errors.append({
+                "type": "generated_bytes_hard",
+                "module": module,
+                "value": size,
+                "limit": limit,
+            })
+        elif (
+            report.get("kind") not in ("Index", "IndexRegistry")
+            and size > CONVERSATION_PREFERRED_SHARD_BYTES
+        ):
+            warnings.append({
+                "type": "generated_bytes_preferred",
+                "module": module,
+                "value": size,
+                "limit": CONVERSATION_PREFERRED_SHARD_BYTES,
+            })
+        if report.get("kind") not in ("Index", "IndexRegistry"):
+            if count > CONVERSATION_MAX_RECORDS_PER_SHARD:
+                errors.append({
+                    "type": "generated_records_hard",
+                    "module": module,
+                    "value": count,
+                    "limit": CONVERSATION_MAX_RECORDS_PER_SHARD,
+                })
+            elif count > CONVERSATION_PREFERRED_RECORDS_PER_SHARD:
+                warnings.append({
+                    "type": "generated_records_preferred",
+                    "module": module,
+                    "value": count,
+                    "limit": CONVERSATION_PREFERRED_RECORDS_PER_SHARD,
+                })
+
+    for module in numeric:
+        errors.append({"type": "numeric_shard_name", "module": module})
+    for module in opaque:
+        errors.append({"type": "opaque_shard_name", "module": module})
+    for module in missing_ownership:
+        errors.append({"type": "generated_owner_missing", "module": module})
+
+    largest_sources = sorted(
+        sources,
+        key=lambda item: (-int(item["bytes"]), item["path"]),
+    )[:12]
+    largest_generated = sorted(
+        generated,
+        key=lambda item: (-int(item["bytes"] or 0), str(item["module"])),
+    )[:12]
+
+    return {
+        "schema": "pnc.conversation.context-health.v1",
+        "status": "pass" if not errors else "fail",
+        "policy": {
+            "preferredSourceBytes": CONVERSATION_PREFERRED_SOURCE_BYTES,
+            "maxSourceBytes": CONVERSATION_MAX_SOURCE_BYTES,
+            "preferredGeneratedBytes": CONVERSATION_PREFERRED_SHARD_BYTES,
+            "maxGeneratedBytes": CONVERSATION_MAX_SHARD_BYTES,
+            "preferredDefinitionsPerShard":
+                CONVERSATION_PREFERRED_RECORDS_PER_SHARD,
+            "maxDefinitionsPerShard": CONVERSATION_MAX_RECORDS_PER_SHARD,
+            "maxIndexBytes": CONVERSATION_MAX_INDEX_BYTES,
+        },
+        "sourceCount": len(sources),
+        "generatedCount": len(generated),
+        "largestSources": largest_sources,
+        "largestGenerated": largest_generated,
+        "numericShardViolations": numeric,
+        "opaqueShardViolations": opaque,
+        "missingOwnership": missing_ownership,
+        "warnings": warnings,
+        "errors": errors,
+        # Cross-reference/collision/orphan checks are compile-time fatal in
+        # compile_conversation_sources; reaching this report means they passed.
+        "referenceFailures": [],
+        "collisionFailures": {},
+        "orphanFailures": [],
+    }
 
 
 def render_conversation_registry(model: dict[str, Any], reports: list[dict[str, Any]]) -> str:
@@ -1217,6 +1760,8 @@ def render_conversation_registry(model: dict[str, Any], reports: list[dict[str, 
     ])
     loaded_index = 0
     for report in reports:
+        if report.get("kind") in ("Index", "IndexRegistry"):
+            continue
         name = report["module"]
         loaded_index += 1
         loaded_name = f"loaded{loaded_index:02d}"

@@ -1,0 +1,60 @@
+{
+  "domain": "task",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_generic.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right.",
+              "TL": "All right."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_generic.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Understood.",
+              "TL": "Understood."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.order_generic.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I will handle it.",
+              "TL": "I will handle it."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

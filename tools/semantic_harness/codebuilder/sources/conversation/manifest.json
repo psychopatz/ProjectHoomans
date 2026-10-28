@@ -24,20 +24,8 @@
     {
       "domain": "social",
       "kind": "content",
-      "order": 1300,
-      "path": "content/social/emotes.json"
-    },
-    {
-      "domain": "social",
-      "kind": "content",
       "order": 1301,
       "path": "content/social/reactions.json"
-    },
-    {
-      "domain": "social",
-      "kind": "content",
-      "order": 1302,
-      "path": "content/social/tool_replies.json"
     },
     {
       "domain": "conversation",
@@ -94,12 +82,6 @@
       "path": "content/command/replies.json"
     },
     {
-      "domain": "command",
-      "kind": "content",
-      "order": 1402,
-      "path": "content/command/lifecycle.json"
-    },
-    {
       "domain": "event",
       "kind": "content",
       "order": 1500,
@@ -122,18 +104,6 @@
       "kind": "content",
       "order": 1650,
       "path": "content/quest.json"
-    },
-    {
-      "domain": "task",
-      "kind": "content",
-      "order": 1700,
-      "path": "content/task/lifecycle.json"
-    },
-    {
-      "domain": "task",
-      "kind": "content",
-      "order": 1701,
-      "path": "content/task/tool_replies.json"
     },
     {
       "domain": "common",
@@ -211,8 +181,38 @@
     {
       "domain": "social",
       "kind": "content",
+      "order": 1300,
+      "path": "content/social/emotes"
+    },
+    {
+      "domain": "social",
+      "kind": "content",
+      "order": 1302,
+      "path": "content/social/tool_replies"
+    },
+    {
+      "domain": "social",
+      "kind": "content",
       "order": 1303,
       "path": "content/social/interaction"
+    },
+    {
+      "domain": "command",
+      "kind": "content",
+      "order": 1402,
+      "path": "content/command/lifecycle"
+    },
+    {
+      "domain": "task",
+      "kind": "content",
+      "order": 1700,
+      "path": "content/task/lifecycle"
+    },
+    {
+      "domain": "task",
+      "kind": "content",
+      "order": 1701,
+      "path": "content/task/tool_replies"
     },
     {
       "domain": "social",

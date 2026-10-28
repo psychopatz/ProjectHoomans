@@ -1,0 +1,46 @@
+{
+  "domain": "task",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.cooldown.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You have had your turn with the compliments today.",
+              "TL": "You have had your turn with the compliments today."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.cooldown.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Save the sweet talk for tomorrow.",
+              "TL": "Save the sweet talk for tomorrow."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

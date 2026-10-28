@@ -1,0 +1,60 @@
+{
+  "domain": "social",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.insult.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Watch your mouth.",
+              "TL": "Watch your mouth."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.insult.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Try that again and see what happens.",
+              "TL": "Try that again and see what happens."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.insult.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I have heard worse, but do not make a habit of it.",
+              "TL": "I have heard worse, but do not make a habit of it."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

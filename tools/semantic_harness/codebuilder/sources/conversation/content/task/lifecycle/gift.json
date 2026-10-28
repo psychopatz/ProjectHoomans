@@ -1,0 +1,88 @@
+{
+  "domain": "task",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.gift.completed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Thank you for the gift.",
+              "TL": "Salamat sa regalo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.gift.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't accept that gift.",
+              "TL": "Hindi ko matanggap ang regalong iyan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.gift.pending",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll take a look at that gift.",
+              "TL": "Titingnan ko ang regalong iyan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.gift.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't accept that gift right now.",
+              "TL": "Hindi ko matanggap ang regalong iyan ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.gift.selection_required",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I need to see what you brought me first.",
+              "TL": "Kailangan ko munang makita ang dala mo."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

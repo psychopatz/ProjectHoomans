@@ -1,0 +1,60 @@
+{
+  "domain": "social",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.flirt.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Careful. You are making me smile.",
+              "TL": "Careful. You are making me smile."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.flirt.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You always know how to get my attention.",
+              "TL": "You always know how to get my attention."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.flirt.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is a dangerous thing to say to me.",
+              "TL": "That is a dangerous thing to say to me."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

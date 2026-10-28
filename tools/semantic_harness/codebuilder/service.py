@@ -34,6 +34,9 @@ from .conversation_compiler import (
     CONVERSATION_RUNTIME_RELATIVE,
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
+    conversation_affected_closure,
+    conversation_context_health,
+    conversation_discovery_index,
     conversation_record,
     conversation_translation_bundles,
     render_conversation_manifest_lua,
@@ -136,6 +139,52 @@ class SemanticLabAuthoringService:
         return compile_conversation_sources(
             self.repository,
             runtime_root=self.runtime_root,
+        )
+
+    def _conversation_plan(
+        self,
+    ) -> tuple[dict[str, Any], list[tuple[str, str]], list[dict[str, Any]]]:
+        model = self._conversation_model()
+        rendered, reports = render_conversation_runtime_plan(model)
+        return model, rendered, reports
+
+    def conversation_context_health(self) -> dict[str, Any]:
+        """Return bounded compiler-owned source/shard context-health evidence."""
+        model, _rendered, reports = self._conversation_plan()
+        return conversation_context_health(model, reports)
+
+    def conversation_discovery_record(
+        self,
+        canonical_id: str,
+    ) -> dict[str, Any] | None:
+        """Return one lightweight ID->source->generated routing record."""
+        model, _rendered, reports = self._conversation_plan()
+        index = conversation_discovery_index(model, reports)
+        record = index.get(str(canonical_id))
+        return (
+            json.loads(json.dumps(record, ensure_ascii=False))
+            if isinstance(record, dict)
+            else None
+        )
+
+    def conversation_affected_closure(
+        self,
+        canonical_id: str,
+        *,
+        limit: int = 24,
+    ) -> dict[str, Any] | None:
+        """Return the bounded one-hop authoring/runtime dependency closure."""
+        model, _rendered, reports = self._conversation_plan()
+        closure = conversation_affected_closure(
+            model,
+            reports,
+            canonical_id,
+            limit=limit,
+        )
+        return (
+            json.loads(json.dumps(closure, ensure_ascii=False))
+            if isinstance(closure, dict)
+            else None
         )
 
     @staticmethod

@@ -81,7 +81,11 @@ class ConversationCompilerP11B0Tests(unittest.TestCase):
             )
             before = compile_conversation_sources(repository)
             greeting_path = repository / CONVERSATION_SOURCE_RELATIVE / "content/greeting.json"
-            social_path = repository / CONVERSATION_SOURCE_RELATIVE / "content/social/emotes.json"
+            social_path = (
+                repository
+                / CONVERSATION_SOURCE_RELATIVE
+                / "content/social/emotes/player.json"
+            )
             greeting = json.loads(greeting_path.read_text(encoding="utf-8"))
             social = json.loads(social_path.read_text(encoding="utf-8"))
             moved = next(
@@ -125,7 +129,11 @@ class ConversationCompilerP11B0Tests(unittest.TestCase):
                 "phrase.semantic.flow.greeting.opening.default"
             )
             owning_path = repository / CONVERSATION_SOURCE_RELATIVE / "content/greeting.json"
-            other_path = repository / CONVERSATION_SOURCE_RELATIVE / "content/social/tool_replies.json"
+            other_path = (
+                repository
+                / CONVERSATION_SOURCE_RELATIVE
+                / "content/social/tool_replies/hostile.json"
+            )
             before_other = other_path.read_bytes()
             edited = copy.deepcopy(item)
             edited["styles"]["neutral"][0]["translations"]["EN"] = (

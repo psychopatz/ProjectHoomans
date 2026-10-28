@@ -1,0 +1,50 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["act"] = "RECONCILE",
+        ["baseRelevance"] = 0.6,
+        ["domain"] = "social",
+        ["id"] = "behavior.reconcile",
+        ["mode"] = "beat",
+        ["modifiers"] = {
+            {
+                ["delta"] = 0.15,
+                ["reason"] = "relationship_recoverable",
+                ["when"] = {
+                    ["op"] = "gte",
+                    ["path"] = "relationship.approval",
+                    ["value"] = -20,
+                },
+            },
+            {
+                ["delta"] = -0.2,
+                ["reason"] = "low_forgiveness",
+                ["when"] = {
+                    ["op"] = "lt",
+                    ["path"] = "actor.disposition.forgiveness",
+                    ["value"] = 0.35,
+                },
+            },
+        },
+        ["outputs"] = {
+            ["speech"] = {
+                ["contentTemplateID"] = "semantic.social.apology.friendly",
+                ["dialogueAct"] = "RECONCILE",
+            },
+        },
+        ["owner"] = "ProjectHoomans",
+        ["requiredCapabilities"] = {
+            "speech",
+        },
+        ["stimuli"] = {
+            "HUMAN_UTTERANCE",
+            "NPC_SEMANTIC_ACT",
+        },
+        ["version"] = 1,
+        ["when"] = {
+            ["op"] = "eq",
+            ["path"] = "stimulus.semantic.intent",
+            ["value"] = "APOLOGIZE",
+        },
+    },
+}

@@ -168,7 +168,7 @@ class C0AHistoricalEvidenceTests(unittest.TestCase):
             "content/social/reactions.json",
             REPOSITORY
             / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-            "PNC/Semantics/Generated/Conversation/Content/SocialPart03.lua",
+            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions.lua",
             REPOSITORY
             / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
             "PNC/Semantics/Generated/Conversation/Registry.lua",

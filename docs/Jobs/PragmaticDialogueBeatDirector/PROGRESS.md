@@ -30,32 +30,54 @@ Current validation:
 - full ProjectHoomans `pnc_semantic` Lua suite: 99/99 PASS.
 - `git diff --check`: clean before phase transition.
 
-## C5 current truth
+## C5 accepted — storage topology and compiler context-health
 
-The existing Conversation compiler already has deterministic recursive source-root discovery and 54 canonical source files, but runtime sharding still groups by broad domains. That creates numeric overflow modules such as `SocialPart02.lua`, `CommandPart02.lua`, `QuestionPart02.lua`, plus opaque pattern names such as `Massive.lua` and `Sgd.lua`.
+C5 is developer-accepted.
 
-Measured canonical hard-budget issues before migration:
+Accepted storage/compiler behavior:
 
-- `content/social/emotes.json` is ~20.9 KB, above the planned ~16 KB hard canonical ceiling.
-- `content/command/lifecycle.json`, `content/social/tool_replies.json`, `content/task/lifecycle.json`, and `content/task/tool_replies.json` exceed the planned 32-definition hard shard budget if generated one source→one shard.
-- Generated broad-domain output currently contains 53 data shards and several ~32 KB overflow parts.
+- canonical source ownership now drives generated semantic shard names instead of broad-domain numeric overflow splitting;
+- oversized canonical sources were split into semantically named source directories while preserving deterministic recursive discovery;
+- generated Conversation output contains no numeric `PartNN` shards and no opaque `Massive` / `Sgd` ownership names;
+- lightweight discovery indexes map stable IDs to canonical source, generated shard, bounded related IDs and dependents without duplicating full definitions;
+- bounded affected-closure metadata is exposed through the compiler/authoring service;
+- compiler-owned context-health checks enforce source/shard/index budgets and ownership/naming invariants before output is accepted;
+- runtime combinations remain ephemeral; C5 does not add transcript or ModData persistence.
 
-## Immediate Next Chunk
+Latest C5 validation:
 
-Use canonical source ownership as the generated-shard key instead of broad domain. Split only the canonical sources that violate hard context budgets into semantically named source directories, then add compiler-owned context-health and lightweight discovery/affected-closure indexes.
+- C5 context-health + compiler acceptance: **13/13 PASS**;
+- context-health status: **pass**, 0 errors, 0 numeric violations, 0 opaque violations, 0 missing ownership;
+- largest canonical source: `content/social/emotes/reply.json` at **14,624 bytes**;
+- largest generated artifact in the health report: bounded task index at **31,376 bytes**;
+- canonical source tree unchanged across two full builds;
+- generated Conversation tree: **132 files**, byte-identical across two consecutive full generations;
+- C0 historical + C1–C4 live harness: **24/24 PASS** after C5 generation;
+- full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS** after C5 generation.
 
-C5 acceptance still requires:
+## Immediate Next Chunk — C6
 
-- zero numeric/opaque generated Conversation shard names;
-- no hard source/generated/index budget violations;
-- deterministic recursive discovery and lightweight ID→source→generated routing;
-- bounded affected-closure metadata;
-- two byte-identical full generations;
-- existing semantic/runtime behavior unchanged.
+Implement dynamic semantic player affordances through the existing DialogueSuggestions provider/ranking path.
+
+Read `DYNAMIC_CONVERSATION.md` before implementation.
+
+Start by defining the bounded generated-affordance candidate contract and one provider that derives eligible positive/negative/neutral/contextual strategies from the current DiscourseFrame, active flow/beat, relationship/trait/world context and capability availability.
+
+Preserve authored/static candidates. Do not create a second button engine, do not generate free-form text as authority, and do not reparse displayed button wording through NLU.
+
+C6 acceptance must prove:
+
+- candidate origin, stance, strategy and contextual provenance are explicit;
+- authored choices remain available;
+- positive/negative/contextual generated choices appear only when semantically eligible;
+- trait/context-derived choices do not leak private NPC facts;
+- ranking/deduplication prevents near-duplicate button spam;
+- generated button clicks carry the typed semantic frame through the existing semantic-click path;
+- typed utterance and equivalent generated-button semantics converge on the same downstream result.
 
 ## Remaining mandatory work
 
-C5 storage/context-health → C6 dynamic semantic affordances → C7 compositional utterance realization → C8 discourse continuity → C9 conduct-memory decoupling → C10 observability/fuzzing → C11 integrated acceptance.
+C6 dynamic semantic affordances → C7 compositional utterance realization → C8 discourse continuity → C9 conduct-memory decoupling → C10 observability/fuzzing → C11 integrated acceptance.
 
 ## Safety
 

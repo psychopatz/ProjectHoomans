@@ -1,0 +1,56 @@
+{
+  "domain": "social",
+  "groups": {
+    "commands_emotes": {
+      "contentOwner": "projecthoomans.dialogue_content.commands_emotes"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.conversation.acknowledged.default",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Understood. We'll leave it there.",
+              "TL": "Naiintindihan ko. Tama na iyon."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. Ask if you want to talk more.",
+              "TL": "Sige. Magtanong ka kung gusto mo pang mag-usap."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "All right.",
+              "TL": "Sige."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "All right. I'm here if you want to talk more.",
+              "TL": "Sige. Narito ako kung gusto mo pang mag-usap."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

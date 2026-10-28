@@ -1,0 +1,46 @@
+{
+  "domain": "social",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.orientation.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is not the kind of interest I have in you.",
+              "TL": "That is not the kind of interest I have in you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.orientation.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Do not mistake my kindness for an invitation.",
+              "TL": "Do not mistake my kindness for an invitation."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

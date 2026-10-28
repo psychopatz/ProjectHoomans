@@ -1,0 +1,60 @@
+{
+  "domain": "social",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.apology.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. Let us move on.",
+              "TL": "All right. Let us move on."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.apology.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I accept the apology.",
+              "TL": "I accept the apology."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.apology.3",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Fine. We can put it behind us.",
+              "TL": "Fine. We can put it behind us."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

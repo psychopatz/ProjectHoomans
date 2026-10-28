@@ -30,6 +30,7 @@ if __package__ in {None, ""}:
         CONVERSATION_RUNTIME_RELATIVE,
         CONVERSATION_UI_RUNTIME_RELATIVE,
         compile_conversation_sources,
+        conversation_context_health,
         conversation_translation_bundles,
         render_conversation_registry,
         render_conversation_manifest_lua,
@@ -50,6 +51,7 @@ else:
         CONVERSATION_RUNTIME_RELATIVE,
         CONVERSATION_UI_RUNTIME_RELATIVE,
         compile_conversation_sources,
+        conversation_context_health,
         conversation_translation_bundles,
         render_conversation_registry,
         render_conversation_manifest_lua,
@@ -169,10 +171,27 @@ def write_conversation_output(
     model = model or compile_conversation_sources(repository)
     shared_root = repository / "Contents/mods/ProjectHoomans/common/media/lua/shared"
     runtime_dir = repository / CONVERSATION_RUNTIME_RELATIVE
+
+    # Validate the complete plan before deleting or writing any generated
+    # artifact. Hard context-health violations are compiler errors, not
+    # advisory cleanup work after generation.
+    rendered, reports = render_conversation_runtime_plan(model)
+    health = conversation_context_health(model, reports)
+    if health.get("status") != "pass":
+        errors = health.get("errors") or []
+        summary = "; ".join(
+            str(item.get("type") or "context_health_error")
+            + ":"
+            + str(item.get("path") or item.get("module") or "")
+            for item in errors[:8]
+        )
+        raise CompileError(
+            "Conversation context-health hard violations"
+            + (": " + summary if summary else "")
+        )
+
     runtime_dir.mkdir(parents=True, exist_ok=True)
     _clean_generated_tree(runtime_dir)
-
-    rendered, reports = render_conversation_runtime_plan(model)
     paths = _write_modules(shared_root, rendered)
     registry_path = runtime_dir / "Registry.lua"
     registry_path.write_text(

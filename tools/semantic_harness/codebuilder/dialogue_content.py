@@ -14,6 +14,7 @@ import math
 import re
 from typing import Any
 
+from .catalog_naming import ModuleNameRegistry, source_owned_module
 from .lexicon_compiler import CompileError, _lua_string
 from .translation_support import DEFAULT_LANGUAGE, normalize_translations
 
@@ -26,8 +27,8 @@ MAX_FAMILIES = 512
 MAX_PHRASES_PER_STYLE = 6
 MAX_PLAYER_CONTENT = 32
 MAX_TEXT = 256
-CONVERSATION_CONTENT_MAX_SHARD_BYTES = 32 * 1024
-CONVERSATION_CONTENT_MAX_FAMILIES_PER_SHARD = 48
+CONVERSATION_CONTENT_MAX_SHARD_BYTES = 48 * 1024
+CONVERSATION_CONTENT_MAX_FAMILIES_PER_SHARD = 32
 
 
 def _canonical_json(value: Any) -> str:
@@ -342,54 +343,59 @@ def render_dialogue_content_shard_plan(
     max_bytes: int = CONVERSATION_CONTENT_MAX_SHARD_BYTES,
     max_families: int = CONVERSATION_CONTENT_MAX_FAMILIES_PER_SHARD,
 ) -> tuple[list[tuple[str, str]], list[dict[str, Any]]]:
-    """Render bounded content and player-choice modules by semantic domain."""
+    """Render one bounded generated content shard per canonical source owner."""
     grouped: dict[str, list[dict[str, Any]]] = {}
     for family in compiled.get("phraseFamilies", []):
-        grouped.setdefault(str(family.get("conversationDomain") or family.get("group") or "general"), []).append(family)
+        source_shard = str(
+            family.get("sourceShard")
+            or f"content/{family.get('conversationDomain') or family.get('group') or 'general'}.json"
+        )
+        grouped.setdefault(source_shard, []).append(family)
+
     modules: list[tuple[str, str]] = []
     reports: list[dict[str, Any]] = []
-    for domain in sorted(grouped):
-        families = sorted(grouped[domain], key=lambda item: item["semanticTemplateID"])
-        part = 0
-        current: list[dict[str, Any]] = []
-        for family in families:
-            candidate = current + [family]
-            candidate_source = _content_shard_source(candidate)
-            if current and (
-                len(candidate) > max_families
-                or len(candidate_source.encode("utf-8")) > max_bytes
-            ):
-                part += 1
-                name = domain.title().replace("_", "") + (f"Part{part:02d}" if part > 1 else "")
-                module = f"{module_prefix}/Content/{name}"
-                source = _content_shard_source(current)
-                modules.append((module, source))
-                reports.append({
-                    "module": module,
-                    "kind": "Content",
-                    "domain": domain,
-                    "recordCount": len(current),
-                    "bytes": len(source.encode("utf-8")),
-                })
-                current = [family]
-            else:
-                current = candidate
-        if current:
-            part += 1
-            name = domain.title().replace("_", "") + (f"Part{part:02d}" if part > 1 else "")
-            module = f"{module_prefix}/Content/{name}"
-            source = _content_shard_source(current)
-            size = len(source.encode("utf-8"))
-            if size > max_bytes:
-                raise CompileError(f"generated Conversation content shard exceeds {max_bytes} bytes: {module}")
-            modules.append((module, source))
-            reports.append({
-                "module": module,
-                "kind": "Content",
-                "domain": domain,
-                "recordCount": len(current),
-                "bytes": size,
-            })
+    names = ModuleNameRegistry()
+    for source_shard in sorted(grouped):
+        families = sorted(
+            grouped[source_shard],
+            key=lambda item: item["semanticTemplateID"],
+        )
+        if len(families) > max_families:
+            raise CompileError(
+                "canonical Conversation content source exceeds the generated "
+                f"{max_families}-family hard budget; split by semantic subdomain: "
+                f"{source_shard}"
+            )
+        source = _content_shard_source(families)
+        size = len(source.encode("utf-8"))
+        if size > max_bytes:
+            raise CompileError(
+                "canonical Conversation content source renders above the "
+                f"{max_bytes}-byte hard shard budget; split by semantic subdomain: "
+                f"{source_shard}"
+            )
+        module = source_owned_module(
+            f"{module_prefix}/Content",
+            source_shard,
+            names,
+        )
+        modules.append((module, source))
+        reports.append({
+            "module": module,
+            "kind": "Content",
+            "domain": str(
+                families[0].get("conversationDomain")
+                or families[0].get("group")
+                or "general"
+            ),
+            "sourceShard": source_shard,
+            "recordCount": len(families),
+            "recordIDs": [
+                "phrase." + family["semanticTemplateID"]
+                for family in families
+            ],
+            "bytes": size,
+        })
 
     choices = compiled.get("playerChoices", [])
     if choices:
@@ -404,15 +410,25 @@ def render_dialogue_content_shard_plan(
             "-- Generated by the manifest-backed Conversation compiler; do not edit by hand.\n"
             "return " + _lua_value(payload, 0) + "\n"
         )
-        if len(source.encode("utf-8")) > max_bytes:
-            raise CompileError("generated Conversation player-choice shard exceeds its byte bound")
+        size = len(source.encode("utf-8"))
+        if size > max_bytes:
+            raise CompileError(
+                "generated Conversation player-choice shard exceeds its byte bound"
+            )
         module = f"{module_prefix}/Content/PlayerChoices"
         modules.append((module, source))
         reports.append({
             "module": module,
             "kind": "ContentChoices",
             "domain": "greeting",
+            "sourceShard": str(
+                choices[0].get("sourceShard") or "content/greeting.json"
+            ),
             "recordCount": len(choices),
-            "bytes": len(source.encode("utf-8")),
+            "recordIDs": [
+                choice["id"]
+                for choice in sorted(choices, key=lambda item: item["id"])
+            ],
+            "bytes": size,
         })
     return modules, reports

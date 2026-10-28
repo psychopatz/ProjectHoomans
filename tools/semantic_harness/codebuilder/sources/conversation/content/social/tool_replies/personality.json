@@ -1,0 +1,46 @@
+{
+  "domain": "social",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.personality.1",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That kind of attention is not welcome from me.",
+              "TL": "That kind of attention is not welcome from me."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.tool_reply.personality.2",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You are reading me wrong.",
+              "TL": "You are reading me wrong."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

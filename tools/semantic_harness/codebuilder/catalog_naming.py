@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import re
 from collections.abc import Iterable
+from pathlib import PurePosixPath
 
 
 class CatalogNameError(ValueError):
@@ -88,3 +89,41 @@ def module_path(
 def module_file(relative_module: str) -> str:
     """Convert a Lua module path into its repository-relative source path."""
     return relative_module.replace("/", "/") + ".lua"
+
+
+SOURCE_ROOT_SEGMENTS = frozenset({
+    "content",
+    "patterns",
+    "flows",
+    "ui",
+    "behaviors",
+    "beats",
+    "affordances",
+    "realization",
+})
+
+
+def source_owned_module(
+    parent: str,
+    source_shard: str,
+    registry: ModuleNameRegistry,
+) -> str:
+    """Map one canonical source shard to one readable generated module path."""
+    source = PurePosixPath(str(source_shard))
+    if source.suffix.lower() != ".json":
+        raise CatalogNameError(
+            f"canonical source shard must be a JSON path: {source_shard!r}"
+        )
+    parts = list(source.with_suffix("").parts)
+    if parts and parts[0] in SOURCE_ROOT_SEGMENTS:
+        parts = parts[1:]
+    if not parts:
+        raise CatalogNameError(
+            f"canonical source shard has no semantic path: {source_shard!r}"
+        )
+    return module_path(
+        parent,
+        parts,
+        source.as_posix(),
+        registry,
+    )
