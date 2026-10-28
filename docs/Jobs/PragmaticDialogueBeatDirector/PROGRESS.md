@@ -1,67 +1,65 @@
 # Progress — Coherent Emergent Conversation
 
 **Status:** IN PROGRESS — live-regression quality recovery.
-**Accepted foundation:** C0–C11.
-**Active phase:** L1 — direct-response presentation authority.
+**Accepted foundation:** C0–C11 + L1.
+**Active phase:** L2 — relationship-memory retention decoupling.
 **Branch:** existing `main`.
 
 ## Current truth
 
-The user's native Semantic Lab test disproved several acceptance assumptions without invalidating the underlying semantic architecture.
-
-Exact reproduced case:
+The exact user regression is reproduced against:
 
 - save: `Sandbox/2026-10-22_15-18-56/global_mod_data.bin`;
 - NPC: `npcDanapatz_Y5KK` / Dana patz;
 - input: `fuckyouuuu`.
 
-Verified runtime evidence:
+Current verified state:
 
-- NLU recovers `fuckyouuuu` → `fuck you` → directed `INSULT`, confidence 0.90;
-- generated affordances are produced: `APOLOGIZE`, `CHALLENGE`, `DISMISS`, `ASK_WHY`;
-- those candidates live in `conversation_branch`;
-- `buildGroups()` keeps `conversation_landing` selected because the current topic is still `greeting`;
-- the actual Response Channel therefore shows only landing/root actions;
-- Director selects `behavior.warn / BOUNDARY_WARNING` for Dana because WARN scores 0.65 vs RETALIATE 0.55;
-- `UtterancePlan.FromInteraction()` has no WARN mapping, so common boundary reactions fall back to sparse authored Dialogue Content;
-- the saved relationship memory is saturated enough that `ApplyEventMutation()` returns `memory_pruned_by_limit`;
-- that rejection causes presentation to replace the semantic response with the generic social-interaction rejection line.
+- NLU correctly recovers directed `INSULT` at confidence 0.90;
+- generated direct responses are produced by the existing DialogueSuggestions provider;
+- **L1 accepted:** `conversation_branch` now becomes the actual native Response Channel after the turn;
+- Back returns to `conversation_landing` and authored/root actions remain reachable;
+- exact Dana save + portable L1 regression passes;
+- L1/C6/C7/C8/conversation-composition focused batch: **18/18 PASS**;
+- full `pnc_semantic` Lua suite: **99/99 PASS**;
+- GUI-only parity module could not import under the local Homebrew Python because `_tkinter` is unavailable; this is an environment limitation, not an L1 failure.
 
-The earlier C6/C7 tests proved internal candidate generation and microplanning but did not require the generated candidates to become the native visible choice surface. C9 decoupled conduct evidence, but not relationship-memory retention.
+The next live-proven defect is persistence coupling:
 
-## Immediate Next Chunk — L1
+- Dana's relationship memory is saturated;
+- `Relationships.ApplyEventMutation()` appends/prunes then returns `memory_pruned_by_limit` when the new memory does not survive;
+- `SocialEventService` treats that storage outcome as failure of the whole social interaction;
+- presentation then replaces the Director's semantic reaction with `semantic.social.interaction.rejected`.
 
-Fix the selected-group rule in the existing DialogueSuggestions projection so current-turn `DIRECT_RESPONSE` / `conversation_branch` responses become the native visible Response Channel after a conversational turn.
+## Immediate Next Chunk — L2
 
-Constraints:
+Decouple bounded relationship-memory retention from the immediate social interaction/effect.
 
-- keep one DialogueSuggestions/button authority;
-- keep Core's existing native choice surface;
-- explicit semantic navigation must still win;
-- root/static actions remain reachable via existing Back/navigation;
-- do not render a second generated-button surface;
-- do not reparse generated display text.
+Required outcome:
 
-Add an exact save-backed regression proving:
+- relationship mutation/effect may apply or clamp even if the newly proposed durable memory is pruned;
+- bounded memory limits remain unchanged;
+- relationship-memory outcome is reported explicitly as persisted/coalesced/pruned/dropped;
+- conduct evidence remains independently reported;
+- storage capacity alone must not produce `accepted=false`;
+- the valid Director/SpeechRealization response must remain the player-facing NPC reaction.
 
-`fuckyouuuu` → generated direct responses → selected `conversation_branch` → native `session.choices` / TalkParity Response Channel contains those rows.
+Add both a portable saturation regression and the exact Dana save-backed regression.
 
 ## Remaining mandatory phases
 
-- **L2:** decouple relationship-memory retention from immediate social reaction/effect;
-- **L3:** add richer typed hostility continuations such as CLAIM_JOKE and DOUBLE_DOWN;
-- **L4:** expand NPC UtterancePlan coverage/diversity, including WARN and contextual MIRROR;
+- **L3:** richer typed hostility continuations such as CLAIM_JOKE and DOUBLE_DOWN;
+- **L4:** broader NPC UtterancePlan coverage/diversity, including WARN and contextual MIRROR;
 - **L5:** visible-surface + persistence + EN/TL integrated acceptance and user live handoff.
 
 ## Safety / architecture invariants
 
-- no parallel parser, button engine, response engine or gameplay authority;
+- one parser/discourse/button/response/gameplay authority;
 - no giant generated response catalog;
 - no raw player-text echo into composed speech;
 - no transcript persistence;
-- bounded memory/storage remains bounded;
-- generated files stay compiler output, not authoring surfaces;
-- no Workshop publication or native-game mutation;
-- source save remains read-only.
+- bounded relationship/conduct storage remains bounded;
+- generated files stay compiler output;
+- no Workshop publication or source-save mutation.
 
-Git history is the archive for completed C0–C11 details; do not re-expand this file with old phase narratives.
+Git history is the archive for completed phase detail; keep this file current and compact.

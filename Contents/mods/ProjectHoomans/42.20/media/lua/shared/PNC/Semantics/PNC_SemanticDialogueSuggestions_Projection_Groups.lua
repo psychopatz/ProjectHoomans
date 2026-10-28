@@ -265,6 +265,11 @@ local function buildGroups(
         and requestedGroupID ~= Suggestions.ROOT_GROUP_ID
     local currentGroupID = requestedNonRootGroup and byID[requestedGroupID]
         and requestedGroupID
+        -- A conversational turn owns the immediate response surface. The
+        -- root landing group is navigation/fallback, so it must not hide a
+        -- valid direct-response branch merely because the prior topic is the
+        -- authored greeting. Explicit non-root navigation still wins above.
+        or byID.conversation_branch and "conversation_branch"
         or not semanticTopicActive and rootGroupID
         or currentTopic == "whats_up"
         and byID["semantic_hub.whats_up"]
