@@ -176,6 +176,79 @@
           "value": "What's really bothering you?"
         }
       ]
+    },
+    {
+      "id": "construction.en.social.wellbeing_positive",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "WELLBEING_POSITIVE",
+      "dialogueAct": "INFORM",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "I'm doing pretty good."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.wellbeing_neutral",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "WELLBEING_NEUTRAL",
+      "dialogueAct": "INFORM",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "I'm doing okay."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.wellbeing_negative",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "WELLBEING_NEGATIVE",
+      "dialogueAct": "INFORM",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "I've had better days."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.disclose_name",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "DISCLOSE_NAME",
+      "dialogueAct": "INFORM",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "I'm "
+        },
+        {
+          "kind": "slot",
+          "slot": "name"
+        },
+        {
+          "kind": "literal",
+          "value": "."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.refuse_identity",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "REFUSE_IDENTITY",
+      "dialogueAct": "REFUSE",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "I'd rather not say."
+        }
+      ]
     }
   ]
 }

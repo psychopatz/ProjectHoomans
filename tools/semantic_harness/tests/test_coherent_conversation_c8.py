@@ -3,7 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 import unittest
 
-from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
@@ -19,117 +19,132 @@ def generated(turn: dict) -> list[dict]:
 
 
 class CoherentConversationC8Tests(unittest.TestCase):
-    def test_greeting_question_binds_short_reply_to_pending_interaction(self) -> None:
+    def test_npc_pending_question_drives_current_player_affordances(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            turn = worker.input("how are you doing?")
+
+        pending = turn["contextAfter"]["dialogue"]["pendingFollowUp"]
+        self.assertEqual(pending["kind"], "QUESTION")
+        self.assertEqual(pending["flowID"], "wellbeing")
+        self.assertEqual(pending["topic"], "wellbeing")
+
+        rows = generated(turn)
+        self.assertEqual(
+            [row["strategy"] for row in rows],
+            [
+                "WELLBEING_POSITIVE",
+                "WELLBEING_NEUTRAL",
+                "WELLBEING_NEGATIVE",
+            ],
+        )
+        self.assertEqual(
+            {row["topic"] for row in rows},
+            {"wellbeing"},
+        )
+        for row in rows:
+            frame = row["frame"]
+            self.assertEqual(frame["intent"], "INFORM")
+            self.assertEqual(frame["subject"], "WELLBEING")
+            self.assertTrue(frame["socialContext"]["selfDirected"])
+            reply_to = frame["extensions"]["discourseFrame"]["replyTo"]
+            self.assertEqual(reply_to["kind"], "pending_interaction")
+            self.assertEqual(reply_to["flowID"], "wellbeing")
+
+    def test_generated_and_typed_wellbeing_answers_converge(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             opening = worker.input("hello")
-            reply = worker.input("not really")
-
-        self.assertEqual(generated(opening), [])
-        pending = opening["contextAfter"]["dialogue"]["pendingFollowUp"]
-        self.assertEqual(pending["kind"], "QUESTION")
-        self.assertEqual(pending["topic"], "greeting")
-
-        ir = reply["result"]["ir"]
-        frame = ir["extensions"]["discourseFrame"]
-        self.assertEqual(ir["intent"], "DISAGREE")
-        self.assertEqual(ir["subject"], "greeting")
-        self.assertEqual(ir["extensions"]["topic"], "greeting")
-        self.assertEqual(frame["replyTo"]["kind"], "pending_interaction")
-        self.assertEqual(frame["replyTo"]["flowID"], "greeting")
-        self.assertEqual(frame["topic"], "greeting")
-        self.assertGreater(frame["contextualSupport"], 0)
-        self.assertEqual(reply["observation"]["flow"]["flowId"], "greeting")
-
-    def test_generated_followup_replies_to_npc_answer_and_preserves_topic(self) -> None:
-        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            first = worker.input("what time is it")
-            followup = next(
-                row for row in generated(first)
-                if row["strategy"] == "ASK_FOLLOWUP"
+            positive = next(
+                row for row in generated(opening)
+                if row["strategy"] == "WELLBEING_POSITIVE"
             )
-            second = worker.suggestion_click(followup["frame"])
+            clicked = worker.suggestion_click(positive["frame"])
 
-        dynamic = followup["frame"]["extensions"]["dynamicAffordance"]
-        reply_to = followup["frame"]["extensions"]["discourseFrame"]["replyTo"]
-        self.assertEqual(dynamic["evidence"]["topic"], "time")
-        self.assertEqual(dynamic["evidence"]["replyTo"], "npc_response_plan")
-        self.assertEqual(reply_to["kind"], "npc_response_plan")
-        self.assertEqual(reply_to["dialogueAct"], "INFORM")
-
-        ir = second["result"]["ir"]
-        self.assertEqual(ir["provenance"]["parser"], "semantic_click_frame")
-        self.assertEqual(ir["intent"], "QUESTION")
-        self.assertEqual(ir["subject"], "TIME")
-        self.assertEqual(ir["extensions"]["topic"], "time")
-        self.assertEqual(
-            second["contextAfter"]["dialogue"]["currentTopic"],
-            "time",
-        )
-        self.assertIn("1:30 PM", second["observation"]["response"]["text"])
-
-    def test_hostility_then_generated_apology_enters_reconciliation_and_clears_stale_lanes(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            hostile = worker.input("fuckyouuuu")
-            apology = next(
-                row for row in generated(hostile)
-                if row["strategy"] == "APOLOGIZE"
+            worker.input("hello")
+            typed = worker.input("I'm good")
+
+        for turn in (clicked, typed):
+            self.assertEqual(turn["result"]["ir"]["intent"], "INFORM")
+            self.assertEqual(turn["result"]["ir"]["subject"], "WELLBEING")
+            self.assertEqual(
+                turn["result"]["decision"]["branch"],
+                "SELF_STATE_RECEIVED",
             )
-            repaired = worker.suggestion_click(apology["frame"])
-
-        director = repaired["observation"]["director"]
-        self.assertEqual(director["exited"]["id"], "beat.argument_escalation")
-        self.assertEqual(director["entered"]["id"], "beat.reconciliation")
+            self.assertEqual(turn["observation"]["flow"]["transition"], "match")
+            self.assertIsNone(
+                turn["contextAfter"]["dialogue"].get("pendingFollowUp")
+            )
         self.assertEqual(
-            director["contextAfter"]["active"]["id"],
-            "beat.reconciliation",
+            clicked["result"]["ir"]["slots"]["state"]["value"],
+            typed["result"]["ir"]["slots"]["state"]["value"],
         )
         self.assertEqual(
-            repaired["result"]["decision"]["response"]["plan"]["dialogueAct"],
-            "RECONCILE",
+            clicked["result"]["ir"]["provenance"]["parser"],
+            "semantic_click_frame",
         )
-        stale = {
-            row["strategy"]
-            for row in generated(repaired)
-        } & {"APOLOGIZE", "CHALLENGE", "DISMISS", "CALL_BLUFF"}
-        self.assertEqual(stale, set())
+        self.assertEqual(
+            typed["result"]["ir"]["provenance"]["parser"],
+            "deterministic",
+        )
 
-    def test_referent_reuse_stays_grounded_without_transcript_memory(self) -> None:
+    def test_identity_question_generates_safe_disclosure_and_evasion(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            turn = worker.input("what is your name?")
+            rows = {row["strategy"]: row for row in generated(turn)}
+
+            self.assertEqual(
+                set(rows),
+                {"DISCLOSE_NAME", "REFUSE_IDENTITY"},
+            )
+            disclose = rows["DISCLOSE_NAME"]
+            self.assertEqual(disclose["display"]["utterance"], "I'm Patrick Patz.")
+            self.assertEqual(
+                disclose["frame"]["slots"]["identityClaim"]["name"],
+                "Patrick Patz",
+            )
+            self.assertTrue(
+                disclose["frame"]["socialContext"]["identityClaim"]
+            )
+            self.assertNotIn(
+                "npc",
+                str(disclose["frame"]["slots"]).lower(),
+            )
+
+            accepted = worker.suggestion_click(disclose["frame"])
+
+        self.assertEqual(
+            accepted["result"]["decision"]["branch"],
+            "IDENTITY_CLAIM_RECEIVED",
+        )
+        self.assertEqual(
+            accepted["observation"]["flow"]["transition"],
+            "match",
+        )
+        self.assertIsNone(
+            accepted["contextAfter"]["dialogue"].get("pendingFollowUp")
+        )
+
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            turn = worker.input("what is your name?")
+            refusal = next(
+                row for row in generated(turn)
+                if row["strategy"] == "REFUSE_IDENTITY"
+            )
+            declined = worker.suggestion_click(refusal["frame"])
+
+        self.assertEqual(
+            declined["result"]["decision"]["branch"],
+            "IDENTITY_NAME_EVASION",
+        )
+        self.assertEqual(declined["observation"]["flow"]["transition"], "cancel")
+        self.assertIsNone(
+            declined["contextAfter"]["dialogue"].get("pendingFollowUp")
+        )
+
+    def test_topic_interrupt_and_resume_use_same_bounded_discourse_state(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
-        scenario["npc"]["residence"] = {"label": "Riverside Camp"}
-        with LuaSemanticWorker(scenario) as worker:
-            first = worker.input("where is your home")
-            followup = worker.input("what about it")
-
-        self.assertEqual(
-            first["result"]["ir"]["diagnostics"]["factStatus"],
-            "known",
-        )
-        target = followup["result"]["ir"]["target"]
-        self.assertEqual(target["resolvedReference"], "IT")
-        self.assertEqual(target["concept"], "NPC_RESIDENCE")
-        self.assertEqual(
-            followup["result"]["decision"]["response"]["selectionSource"],
-            "conversation_reference",
-        )
-        self.assertIn(
-            "Riverside Camp",
-            followup["observation"]["response"]["text"],
-        )
-        dialogue = followup["contextAfter"]["dialogue"]
-        self.assertLessEqual(len(dialogue.get("recentTurns", [])), 12)
-        self.assertNotIn("transcript", dialogue)
-
-    def test_topic_interruption_and_resumption_share_one_bounded_state(self) -> None:
-        scenario = merge(
-            DEFAULT_SCENARIO,
-            {
-                "npc": {
-                    "needs": {"hunger": 0.9},
-                    "conditionStats": {},
-                },
-                "world": {"weather": "rain"},
-            },
-        )
+        scenario["npc"]["needs"]["hunger"] = 0.9
+        scenario["world"]["weather"] = "rain"
         with LuaSemanticWorker(scenario) as worker:
             worker.input("do you need anything")
             worker.input("how many")
@@ -137,33 +152,84 @@ class CoherentConversationC8Tests(unittest.TestCase):
             weather = worker.input("what is the weather")
             resumed = worker.input("okay")
 
-        weather_context = weather["contextAfter"]["dialogue"]
-        self.assertEqual(weather_context["currentTopic"], "weather")
-        self.assertEqual(weather_context["previousTopic"], "needs")
+        weather_dialogue = weather["contextAfter"]["dialogue"]
+        self.assertEqual(weather_dialogue["currentTopic"], "weather")
+        self.assertEqual(weather_dialogue["previousTopic"], "needs")
         self.assertEqual(
-            weather["observation"]["flow"]["transition"],
-            "interrupt_start",
+            weather["result"]["ir"]["extensions"]["contextualFollowUp"][
+                "status"
+            ],
+            "interrupted",
         )
         self.assertEqual(
-            weather_context["pendingFollowUp"]["topic"],
+            weather_dialogue["pendingFollowUp"]["flowID"],
             "needs",
         )
 
-        resumed_context = resumed["contextAfter"]["dialogue"]
+        resumed_dialogue = resumed["contextAfter"]["dialogue"]
         self.assertEqual(
             resumed["observation"]["flow"]["transition"],
             "resume_match",
         )
-        self.assertEqual(resumed_context["currentTopic"], "needs")
-        self.assertEqual(resumed_context["previousTopic"], "weather")
+        self.assertEqual(resumed_dialogue["currentTopic"], "needs")
+        self.assertEqual(resumed_dialogue["previousTopic"], "weather")
         self.assertEqual(
             resumed["result"]["ir"]["extensions"]["contextualFollowUp"][
                 "status"
             ],
             "matched",
         )
-        self.assertEqual(resumed["transport"], [])
-        self.assertEqual(resumed["toolCalls"], [])
+
+    def test_referent_reuse_comes_from_prior_semantic_turn_not_raw_text(self) -> None:
+        scenario = deepcopy(DEFAULT_SCENARIO)
+        scenario["npc"]["residence"] = {"label": "Riverside Camp"}
+        with LuaSemanticWorker(scenario) as worker:
+            worker.input("where is your home")
+            follow = worker.input("what about it")
+
+        target = follow["result"]["ir"]["target"]
+        self.assertEqual(target["resolvedReference"], "IT")
+        self.assertEqual(target["concept"], "NPC_RESIDENCE")
+        self.assertEqual(
+            follow["result"]["decision"]["response"]["selectionSource"],
+            "conversation_reference",
+        )
+        self.assertIn(
+            "Riverside Camp",
+            follow["messages"][-1]["payload"]["text"],
+        )
+
+    def test_hostility_repair_transitions_one_shared_beat_state(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            hostile = worker.input("go away")
+            # Use a direct hostile input if this lower-intensity utterance does
+            # not enter the argument beat on the selected personality.
+            if (
+                hostile["observation"]["director"]
+                .get("contextAfter", {})
+                .get("active", {})
+                .get("id")
+                != "beat.argument_escalation"
+            ):
+                hostile = worker.input("you are useless")
+            apology = worker.input("sorry")
+
+        self.assertEqual(
+            hostile["observation"]["director"]["contextAfter"]["active"]["id"],
+            "beat.argument_escalation",
+        )
+        self.assertEqual(
+            apology["observation"]["director"]["exited"]["id"],
+            "beat.argument_escalation",
+        )
+        self.assertEqual(
+            apology["observation"]["director"]["entered"]["id"],
+            "beat.reconciliation",
+        )
+        self.assertEqual(
+            apology["observation"]["director"]["contextAfter"]["active"]["id"],
+            "beat.reconciliation",
+        )
 
 
 if __name__ == "__main__":

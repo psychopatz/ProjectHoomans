@@ -108,7 +108,27 @@ local function responsePlan(context)
     return plan, response
 end
 
+local function pendingFollowUp(context)
+    context = type(context) == "table" and context or {}
+    local dialogue = type(context.semanticDialogueContext) == "table"
+        and context.semanticDialogueContext or {}
+    local pending = type(dialogue.pendingFollowUp) == "table"
+        and dialogue.pendingFollowUp
+        or type(context.pendingFollowUp) == "table"
+            and context.pendingFollowUp or nil
+    if type(pending) ~= "table"
+        or tostring(pending.status or "open") == "closed"
+    then
+        return nil
+    end
+    return pending
+end
+
 local function npcResponseAct(context)
+    local pending = pendingFollowUp(context)
+    if pending and upper(pending.kind) == "QUESTION" then
+        return "QUESTION"
+    end
     local plan = responsePlan(context)
     local turns = type(plan.turns) == "table" and plan.turns or {}
     local last = turns[#turns]
@@ -125,12 +145,24 @@ end
 local function currentFrame(context)
     local frame = copy(discourse(context)) or {}
     local plan, response = responsePlan(context)
-    local topic = topicID(plan.topic)
+    local pending = pendingFollowUp(context)
+    local topic = pending and topicID(pending.topic)
+        or topicID(plan.topic)
         or topicID(frame.topic)
         or topicID(frame.subject)
     frame.topic = topic
     local act = npcResponseAct(context)
-    if act then
+    if pending then
+        frame.replyTo = {
+            kind = "pending_interaction",
+            id = pending.id,
+            interactionKind = pending.kind,
+            topic = topicID(pending.topic),
+            owner = pending.owner,
+            flowID = pending.flowID,
+            nodeID = pending.nodeID,
+        }
+    elseif act then
         frame.replyTo = {
             kind = "npc_response_plan",
             dialogueAct = act,
@@ -173,42 +205,90 @@ local function hostilityContext(context)
         or (tonumber(features.hostility) or 0) >= 0.55
 end
 
-local function semanticFor(strategy, frame)
+local function semanticFor(strategy, frame, context)
     local topic = frame.topic or frame.subject or "conversation"
+    local details = {}
     if strategy == "APOLOGIZE" then
         return "APOLOGIZE", "APOLOGIZE", "RECIPIENT", {
             directed = true,
             repair = true,
-        }
+        }, details
     elseif strategy == "DEESCALATE" then
         return "APOLOGIZE", "APOLOGIZE", "RECIPIENT", {
             directed = true,
             repair = true,
             deescalate = true,
-        }
+        }, details
     elseif strategy == "CHALLENGE" or strategy == "CALL_BLUFF" then
         return "HOSTILE_REMARK", "HOSTILE_REMARK", "RECIPIENT", {
             directed = true,
             challenge = true,
-        }
+        }, details
     elseif strategy == "DISMISS" then
         return "DISAGREE", "DISAGREE", topic, {
             dismissive = true,
-        }
+        }, details
     elseif strategy == "ASK_WHY" then
         return "QUESTION", "QUESTION", "CONTEXT_REASON", {
             followUp = true,
-        }
+        }, details
     elseif strategy == "ASK_FOLLOWUP" or strategy == "COMFORT" then
         return "QUESTION", "QUESTION", frame.subject or topic, {
             followUp = true,
-        }
+        }, details
     elseif strategy == "AGREE" then
-        return "AGREE", "AGREE", frame.subject or topic, {}
+        return "AGREE", "AGREE", frame.subject or topic, {}, details
     elseif strategy == "DISAGREE" then
-        return "DISAGREE", "DISAGREE", frame.subject or topic, {}
+        return "DISAGREE", "DISAGREE", frame.subject or topic, {}, details
     elseif strategy == "ACKNOWLEDGE" then
-        return "ACKNOWLEDGE", "ACKNOWLEDGE", frame.subject or topic, {}
+        return "ACKNOWLEDGE", "ACKNOWLEDGE", frame.subject or topic, {}, details
+    elseif strategy == "WELLBEING_POSITIVE"
+        or strategy == "WELLBEING_NEUTRAL"
+        or strategy == "WELLBEING_NEGATIVE"
+    then
+        local state = strategy == "WELLBEING_POSITIVE" and "good"
+            or strategy == "WELLBEING_NEGATIVE" and "struggling"
+            or "okay"
+        details.slots = {
+            state = { type = "WELLBEING", value = state },
+        }
+        details.socialContext = {
+            directed = false,
+            selfDirected = true,
+            target = "SELF",
+        }
+        details.selfDirected = true
+        return "INFORM", "INFORM", "WELLBEING", {
+            selfState = true,
+        }, details
+    elseif strategy == "DISCLOSE_NAME" then
+        local playerName = tostring(
+            type(context) == "table" and context.playerName or ""
+        )
+        if playerName == "" then return nil end
+        details.slots = {
+            identityClaim = { name = playerName },
+        }
+        details.socialContext = {
+            directed = false,
+            selfDirected = true,
+            target = "SELF",
+            identityClaim = true,
+        }
+        details.selfDirected = true
+        details.utteranceSlots = { name = playerName }
+        details.safeSlots = { name = true }
+        return "INFORM", "INFORM", "IDENTITY", {
+            identityClaim = true,
+        }, details
+    elseif strategy == "REFUSE_IDENTITY" then
+        details.socialContext = {
+            directed = true,
+            target = "RECIPIENT",
+        }
+        return "REFUSE", "REFUSE", "IDENTITY", {
+            privacy = true,
+        }, details
     end
     return nil
 end
@@ -218,10 +298,13 @@ local function strategyPlan(strategy, stance, context, frame, ir)
     if strategy == "APOLOGIZE" then
         primary = "APOLOGY_SORRY"
     end
+    local _, speechAct, _, _, details =
+        semanticFor(strategy, frame, context)
+    details = type(details) == "table" and details or {}
     local plan = UtterancePlan.New({
         speaker = "player",
-        target = "recipient",
-        dialogueAct = select(2, semanticFor(strategy, frame)),
+        target = details.selfDirected and "self" or "recipient",
+        dialogueAct = speechAct,
         strategy = strategy,
         stance = stance,
         topic = frame.topic,
@@ -230,6 +313,8 @@ local function strategyPlan(strategy, stance, context, frame, ir)
             and type(ir.extensions.socialFeatures) == "table"
             and ir.extensions.socialFeatures.intensity or 0,
         lexemes = primary and { primary = primary } or {},
+        slots = details.utteranceSlots,
+        safeSlots = details.safeSlots,
         provenance = {
             providerID = Provider.id,
             discourseReplyTo = copy(frame.replyTo),
@@ -244,9 +329,10 @@ local function candidate(strategy, stance, context, reason)
     local frame = currentFrame(context)
     local ir = type(context.dialogueIR) == "table"
         and context.dialogueIR or {}
-    local intent, speechAct, subject, modifiers =
-        semanticFor(strategy, frame)
+    local intent, speechAct, subject, modifiers, details =
+        semanticFor(strategy, frame, context)
     if not intent then return nil end
+    details = type(details) == "table" and details or {}
     local plan, realized = strategyPlan(
         strategy, stance, context, frame, ir
     )
@@ -285,9 +371,12 @@ local function candidate(strategy, stance, context, reason)
             intent = intent,
             speechAct = speechAct,
             subject = subject,
-            target = { kind = "conversation_actor", ref = "npc" },
+            target = details.selfDirected
+                and nil
+                or { kind = "conversation_actor", ref = "npc" },
+            slots = copy(details.slots) or {},
             modifiers = modifiers,
-            socialContext = {
+            socialContext = copy(details.socialContext) or {
                 directed = subject == "RECIPIENT",
                 target = subject == "RECIPIENT"
                     and "RECIPIENT" or nil,
@@ -368,6 +457,39 @@ function Provider.collect(context)
             ))
         end
         return output
+    end
+
+    local pending = pendingFollowUp(context)
+    if pending and upper(pending.kind) == "QUESTION" then
+        local flowID = string.lower(tostring(pending.flowID or ""))
+        local pendingTopic = string.lower(tostring(pending.topic or ""))
+        if flowID == "wellbeing" or flowID == "greeting"
+            or pendingTopic == "wellbeing"
+        then
+            add(output, seen, candidate(
+                "WELLBEING_POSITIVE", "POSITIVE", context,
+                "pending_question:" .. (flowID ~= "" and flowID or pendingTopic)
+            ))
+            add(output, seen, candidate(
+                "WELLBEING_NEUTRAL", "NEUTRAL", context,
+                "pending_question:" .. (flowID ~= "" and flowID or pendingTopic)
+            ))
+            add(output, seen, candidate(
+                "WELLBEING_NEGATIVE", "NEGATIVE", context,
+                "pending_question:" .. (flowID ~= "" and flowID or pendingTopic)
+            ))
+            return output
+        elseif flowID == "identity" or pendingTopic == "identity" then
+            add(output, seen, candidate(
+                "DISCLOSE_NAME", "POSITIVE", context,
+                "pending_question:identity"
+            ))
+            add(output, seen, candidate(
+                "REFUSE_IDENTITY", "NEUTRAL", context,
+                "pending_question:identity"
+            ))
+            return output
+        end
     end
 
     local act = npcResponseAct(context)

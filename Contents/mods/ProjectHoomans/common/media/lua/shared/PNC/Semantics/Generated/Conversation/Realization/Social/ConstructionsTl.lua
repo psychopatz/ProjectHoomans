@@ -145,6 +145,28 @@ return {
         ["type"] = "construction",
     },
     {
+        ["dialogueAct"] = "INFORM",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.disclose_name",
+        ["locale"] = "TL",
+        ["strategy"] = "DISCLOSE_NAME",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Ako si ",
+            },
+            {
+                ["kind"] = "slot",
+                ["slot"] = "name",
+            },
+            {
+                ["kind"] = "literal",
+                ["value"] = ".",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
         ["dialogueAct"] = "DISMISS",
         ["domain"] = "social",
         ["id"] = "construction.tl.social.dismiss",
@@ -172,6 +194,62 @@ return {
             {
                 ["kind"] = "literal",
                 ["value"] = " rin.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "REFUSE",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.refuse_identity",
+        ["locale"] = "TL",
+        ["strategy"] = "REFUSE_IDENTITY",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Ayoko munang sabihin.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "INFORM",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.wellbeing_negative",
+        ["locale"] = "TL",
+        ["strategy"] = "WELLBEING_NEGATIVE",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Medyo mahirap ngayon.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "INFORM",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.wellbeing_neutral",
+        ["locale"] = "TL",
+        ["strategy"] = "WELLBEING_NEUTRAL",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Kinakaya ko.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "INFORM",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.wellbeing_positive",
+        ["locale"] = "TL",
+        ["strategy"] = "WELLBEING_POSITIVE",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Okay naman ako.",
             },
         },
         ["type"] = "construction",

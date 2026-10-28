@@ -81,19 +81,22 @@ Accepted C7 behavior:
 Accepted C8 behavior:
 
 - short replies bind to the existing pending interaction through the C3 DiscourseFrame;
-- generated follow-up buttons explicitly reply to the current NPC response plan/topic and preserve canonical topic identity through semantic-click conversion;
+- generated follow-up buttons prefer the current open NPC pending interaction over the preceding player classifier, so greeting/wellbeing questions yield typed positive/neutral/negative self-state answers and identity questions yield safe name-disclosure/evasion choices;
+- pending-question affordances carry explicit `replyTo=pending_interaction`, flow/topic identity, typed slots and self-directed social context; clicking them retires/cancels the same existing flow rather than starting a parallel button state machine;
+- generated wellbeing answers and equivalent typed self-state replies converge on `SELF_STATE_RECEIVED` and the same flow transition;
+- generated identity disclosure uses the already-known player name as a bounded safe slot; private NPC traits/personality are not exposed;
 - hostility → generated apology exits argument escalation and enters reconciliation, with stale hostile affordances removed from the next surface;
 - grounded referents remain reusable through existing bounded mention/focus state;
 - topic interruption/resumption continues to use existing flow/dialogue state; no transcript store or new persistent conversation memory was added.
 
 Latest C6–C8 validation:
 
-- focused C6/C7 acceptance: **8/8 PASS**;
-- focused C8 acceptance: **5/5 PASS**;
-- combined C0–C8 / legacy continuity / C5 compiler acceptance: **64/64 PASS**;
+- focused C6/C7 + C8 acceptance: **14/14 PASS**;
+- combined C0–C8 + legacy referent/interruption/flow continuity: **52/52 PASS**;
 - full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS**;
 - canonical Conversation source tree remains byte-stable across two full generations;
 - generated Conversation tree: **136 files**, byte-identical across two consecutive full generations;
+- context-health: **pass**, 0 errors, 0 numeric shard violations, 0 opaque shard violations;
 - `git diff --check`: PASS.
 
 ## C9 accepted — social effect / conduct-memory decoupling

@@ -83,10 +83,23 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
             {row["strategy"] for row in generated_rows(npc_only)},
         )
 
-    def test_generated_affordance_is_contextual_not_global(self) -> None:
+    def test_generated_affordance_follows_current_pending_question(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             greeting = worker.input("hello")
-        self.assertEqual(generated_rows(greeting), [])
+
+        rows = generated_rows(greeting)
+        self.assertEqual(
+            [row["strategy"] for row in rows],
+            ["WELLBEING_POSITIVE", "WELLBEING_NEUTRAL", "WELLBEING_NEGATIVE"],
+        )
+        self.assertFalse(
+            {"APOLOGIZE", "CHALLENGE", "DISMISS", "ASK_WHY"}
+            & {row["strategy"] for row in rows}
+        )
+        for row in rows:
+            reply_to = row["frame"]["extensions"]["discourseFrame"]["replyTo"]
+            self.assertEqual(reply_to["kind"], "pending_interaction")
+            self.assertEqual(reply_to["flowID"], "greeting")
 
     def test_generated_click_and_typed_apology_converge_downstream(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:

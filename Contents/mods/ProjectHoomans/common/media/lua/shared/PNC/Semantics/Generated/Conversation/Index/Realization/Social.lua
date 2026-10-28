@@ -90,6 +90,15 @@ return {
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_en.json",
     },
+    ["construction.en.social.disclose_name"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.disclose_name",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
     ["construction.en.social.dismiss"] = {
         ["domain"] = "social",
         ["generated"] = {
@@ -105,6 +114,42 @@ return {
             "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
         },
         ["id"] = "construction.en.social.mirror_retort",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.refuse_identity"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.refuse_identity",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.wellbeing_negative"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.wellbeing_negative",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.wellbeing_neutral"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.wellbeing_neutral",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.wellbeing_positive"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.wellbeing_positive",
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_en.json",
     },
@@ -198,6 +243,15 @@ return {
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_tl.json",
     },
+    ["construction.tl.social.disclose_name"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.disclose_name",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
     ["construction.tl.social.dismiss"] = {
         ["domain"] = "social",
         ["generated"] = {
@@ -213,6 +267,42 @@ return {
             "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
         },
         ["id"] = "construction.tl.social.mirror_retort",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.refuse_identity"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.refuse_identity",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.wellbeing_negative"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.wellbeing_negative",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.wellbeing_neutral"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.wellbeing_neutral",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.wellbeing_positive"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.wellbeing_positive",
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_tl.json",
     },

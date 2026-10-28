@@ -149,6 +149,28 @@ return {
         ["type"] = "construction",
     },
     {
+        ["dialogueAct"] = "INFORM",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.disclose_name",
+        ["locale"] = "EN",
+        ["strategy"] = "DISCLOSE_NAME",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "I'm ",
+            },
+            {
+                ["kind"] = "slot",
+                ["slot"] = "name",
+            },
+            {
+                ["kind"] = "literal",
+                ["value"] = ".",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
         ["dialogueAct"] = "DISMISS",
         ["domain"] = "social",
         ["id"] = "construction.en.social.dismiss",
@@ -176,6 +198,62 @@ return {
             {
                 ["kind"] = "literal",
                 ["value"] = " you too.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "REFUSE",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.refuse_identity",
+        ["locale"] = "EN",
+        ["strategy"] = "REFUSE_IDENTITY",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "I'd rather not say.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "INFORM",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.wellbeing_negative",
+        ["locale"] = "EN",
+        ["strategy"] = "WELLBEING_NEGATIVE",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "I've had better days.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "INFORM",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.wellbeing_neutral",
+        ["locale"] = "EN",
+        ["strategy"] = "WELLBEING_NEUTRAL",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "I'm doing okay.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "INFORM",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.wellbeing_positive",
+        ["locale"] = "EN",
+        ["strategy"] = "WELLBEING_POSITIVE",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "I'm doing pretty good.",
             },
         },
         ["type"] = "construction",

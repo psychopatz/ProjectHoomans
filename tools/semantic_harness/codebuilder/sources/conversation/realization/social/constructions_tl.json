@@ -16,8 +16,14 @@
       "strategy": "MIRROR",
       "dialogueAct": "RETORT",
       "tokens": [
-        { "kind": "lexeme", "slot": "primary" },
-        { "kind": "literal", "value": " rin." }
+        {
+          "kind": "lexeme",
+          "slot": "primary"
+        },
+        {
+          "kind": "literal",
+          "value": " rin."
+        }
       ]
     },
     {
@@ -27,8 +33,14 @@
       "strategy": "APOLOGIZE",
       "dialogueAct": "APOLOGIZE",
       "tokens": [
-        { "kind": "lexeme", "slot": "primary" },
-        { "kind": "literal", "value": " na." }
+        {
+          "kind": "lexeme",
+          "slot": "primary"
+        },
+        {
+          "kind": "literal",
+          "value": " na."
+        }
       ]
     },
     {
@@ -38,7 +50,10 @@
       "strategy": "DEESCALATE",
       "dialogueAct": "DEESCALATE",
       "tokens": [
-        { "kind": "literal", "value": "Kumalma tayo." }
+        {
+          "kind": "literal",
+          "value": "Kumalma tayo."
+        }
       ]
     },
     {
@@ -48,7 +63,10 @@
       "strategy": "CHALLENGE",
       "dialogueAct": "CHALLENGE",
       "tokens": [
-        { "kind": "literal", "value": "Ulitin mo nga." }
+        {
+          "kind": "literal",
+          "value": "Ulitin mo nga."
+        }
       ]
     },
     {
@@ -58,7 +76,10 @@
       "strategy": "DISMISS",
       "dialogueAct": "DISMISS",
       "tokens": [
-        { "kind": "literal", "value": "Bahala ka." }
+        {
+          "kind": "literal",
+          "value": "Bahala ka."
+        }
       ]
     },
     {
@@ -68,7 +89,10 @@
       "strategy": "ASK_WHY",
       "dialogueAct": "QUESTION",
       "tokens": [
-        { "kind": "literal", "value": "Bakit mo sinabi 'yan?" }
+        {
+          "kind": "literal",
+          "value": "Bakit mo sinabi 'yan?"
+        }
       ]
     },
     {
@@ -78,7 +102,10 @@
       "strategy": "AGREE",
       "dialogueAct": "AGREE",
       "tokens": [
-        { "kind": "literal", "value": "Oo, sang-ayon ako." }
+        {
+          "kind": "literal",
+          "value": "Oo, sang-ayon ako."
+        }
       ]
     },
     {
@@ -88,7 +115,10 @@
       "strategy": "DISAGREE",
       "dialogueAct": "DISAGREE",
       "tokens": [
-        { "kind": "literal", "value": "Hindi ako sang-ayon." }
+        {
+          "kind": "literal",
+          "value": "Hindi ako sang-ayon."
+        }
       ]
     },
     {
@@ -98,7 +128,10 @@
       "strategy": "ACKNOWLEDGE",
       "dialogueAct": "ACKNOWLEDGE",
       "tokens": [
-        { "kind": "literal", "value": "Naiintindihan ko." }
+        {
+          "kind": "literal",
+          "value": "Naiintindihan ko."
+        }
       ]
     },
     {
@@ -108,7 +141,10 @@
       "strategy": "ASK_FOLLOWUP",
       "dialogueAct": "QUESTION",
       "tokens": [
-        { "kind": "literal", "value": "Ano'ng ibig mong sabihin?" }
+        {
+          "kind": "literal",
+          "value": "Ano'ng ibig mong sabihin?"
+        }
       ]
     },
     {
@@ -118,7 +154,10 @@
       "strategy": "CALL_BLUFF",
       "dialogueAct": "HOSTILE_REMARK",
       "tokens": [
-        { "kind": "literal", "value": "Puro salita ka lang." }
+        {
+          "kind": "literal",
+          "value": "Puro salita ka lang."
+        }
       ]
     },
     {
@@ -128,7 +167,83 @@
       "strategy": "COMFORT",
       "dialogueAct": "QUESTION",
       "tokens": [
-        { "kind": "literal", "value": "Ano ba talaga ang bumabagabag sa'yo?" }
+        {
+          "kind": "literal",
+          "value": "Ano ba talaga ang bumabagabag sa'yo?"
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.wellbeing_positive",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "WELLBEING_POSITIVE",
+      "dialogueAct": "INFORM",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Okay naman ako."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.wellbeing_neutral",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "WELLBEING_NEUTRAL",
+      "dialogueAct": "INFORM",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Kinakaya ko."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.wellbeing_negative",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "WELLBEING_NEGATIVE",
+      "dialogueAct": "INFORM",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Medyo mahirap ngayon."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.disclose_name",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "DISCLOSE_NAME",
+      "dialogueAct": "INFORM",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Ako si "
+        },
+        {
+          "kind": "slot",
+          "slot": "name"
+        },
+        {
+          "kind": "literal",
+          "value": "."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.refuse_identity",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "REFUSE_IDENTITY",
+      "dialogueAct": "REFUSE",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Ayoko munang sabihin."
+        }
       ]
     }
   ]
