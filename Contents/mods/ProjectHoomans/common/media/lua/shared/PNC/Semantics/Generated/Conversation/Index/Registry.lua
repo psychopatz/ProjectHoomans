@@ -10,7 +10,7 @@ return {
         ["domain"] = "social",
         ["kind"] = "behavior",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Behavior/Social",
-        ["recordCount"] = 12,
+        ["recordCount"] = 14,
     },
     {
         ["domain"] = "apology",
@@ -130,7 +130,7 @@ return {
         ["domain"] = "social",
         ["kind"] = "realization",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Realization/Social",
-        ["recordCount"] = 56,
+        ["recordCount"] = 62,
     },
     {
         ["domain"] = "common",

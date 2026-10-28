@@ -18,6 +18,24 @@ return {
         ["kind"] = "behavior",
         ["source"] = "behaviors/social/acknowledge_news.json",
     },
+    ["behavior.acknowledge_repair"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeRepair",
+        },
+        ["id"] = "behavior.acknowledge_repair",
+        ["kind"] = "behavior",
+        ["source"] = "behaviors/social/acknowledge_repair.json",
+    },
+    ["behavior.acknowledge_reply"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeReply",
+        },
+        ["id"] = "behavior.acknowledge_reply",
+        ["kind"] = "behavior",
+        ["source"] = "behaviors/social/acknowledge_reply.json",
+    },
     ["behavior.acknowledge_thanks"] = {
         ["domain"] = "social",
         ["generated"] = {

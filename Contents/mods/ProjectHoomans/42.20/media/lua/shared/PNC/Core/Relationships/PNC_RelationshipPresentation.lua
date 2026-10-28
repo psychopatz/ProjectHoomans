@@ -196,6 +196,20 @@ function Presentation.BuildForConversation(player, npcID)
         relationshipRevision = summary.revision,
         interactionRevision = summary.interactionRevision or 0,
     }
+    local Providers = PNC.Semantics and PNC.Semantics.InteractionProviders
+    if Providers and type(Providers.QueryEvidence) == "function" then
+        local time = getGameTime and getGameTime() or nil
+        local at = time and time.getWorldAgeHours and time:getWorldAgeHours() or 0
+        local actorID = summary.identityDiagnostics.characterUUID
+        local projection = Providers.QueryEvidence({ npcID = record.id,
+            playerID = actorID, playerEntityKey = targetKey,
+            worldContext = { worldAgeHours = at } }, {})
+        local Events = PNC.Conversation and PNC.Conversation.Memory
+            and PNC.Conversation.Memory.Events
+        summary.semanticEvidence = { rows = projection.rows,
+            observedWorldAgeHours = at,
+            observedWorldDay = Events and Events.Internal.CurrentWorldDay() }
+    end
     return summary
 end
 

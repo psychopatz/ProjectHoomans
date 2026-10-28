@@ -32,9 +32,22 @@
       ],
       "version": 1,
       "when": {
-        "op": "eq",
-        "path": "stimulus.semantic.intent",
-        "value": "THANK"
+        "all": [
+          {
+            "op": "eq",
+            "path": "stimulus.semantic.intent",
+            "value": "THANK"
+          },
+          {
+            "path": "pragmatic.contextualAdmission.admitted",
+            "op": "truthy"
+          },
+          {
+            "path": "pragmatic.contextualAdmission.selected.relation",
+            "op": "eq",
+            "value": "gratitude"
+          }
+        ]
       }
     }
   ],

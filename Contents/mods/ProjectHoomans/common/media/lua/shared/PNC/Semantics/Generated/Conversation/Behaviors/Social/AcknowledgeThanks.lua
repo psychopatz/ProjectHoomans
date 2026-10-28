@@ -33,9 +33,22 @@ return {
         },
         ["version"] = 1,
         ["when"] = {
-            ["op"] = "eq",
-            ["path"] = "stimulus.semantic.intent",
-            ["value"] = "THANK",
+            ["all"] = {
+                {
+                    ["op"] = "eq",
+                    ["path"] = "stimulus.semantic.intent",
+                    ["value"] = "THANK",
+                },
+                {
+                    ["op"] = "truthy",
+                    ["path"] = "pragmatic.contextualAdmission.admitted",
+                },
+                {
+                    ["op"] = "eq",
+                    ["path"] = "pragmatic.contextualAdmission.selected.relation",
+                    ["value"] = "gratitude",
+                },
+            },
         },
     },
 }

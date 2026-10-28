@@ -329,6 +329,7 @@ local function loadConversationSemantic(load, registerEntryPointModule)
     )
     load("ProjectHoomans", "server", "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Identity.lua", "authority")
     load("ProjectHoomans", "server", "PNC/Networking/Handlers/PNC_ServerSemanticInteractionLifecycleCommandHandler.lua", "semantic_lifecycle_authority")
+    load("ProjectHoomans", "shared", "PNC/Core/Registry/PNC_Registry.lua", "record_dirty_authority")
 end
 
 return loadConversationSemantic

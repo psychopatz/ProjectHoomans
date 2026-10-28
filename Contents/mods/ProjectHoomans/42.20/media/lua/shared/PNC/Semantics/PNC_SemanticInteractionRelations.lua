@@ -52,6 +52,15 @@ function Relations.CompactTypes()
     return output
 end
 
+function Relations.ContextualActs()
+    local ids = {}
+    for id, metadata in pairs(acts) do
+        if #metadata.relations.addresses > 0 then ids[#ids + 1] = id end
+    end
+    table.sort(ids)
+    return ids
+end
+
 function Relations.GetAct(id)
     local Evidence = require "PNC/Semantics/PNC_SemanticInteractionEvidence"
     return Evidence.Normalize(acts[id], "semantic_act_catalog", "SESSION")
@@ -69,6 +78,10 @@ Relations.RegisterAct("THANK", { relations = { addresses = { "gratitude" } },
 for _, act in ipairs({ "OFFER", "REQUEST", "QUESTION" }) do
     Relations.RegisterAct(act, { classes = { "pending_response" }, relations = { opens = { "response" } },
         retentionSalience = 90, compactEvent = "semantic_" .. string.lower(act) })
+end
+for _, act in ipairs({ "INFORM", "ANSWER", "QUESTION_RECEIVED", "BOUNDARY_WARNING",
+    "RETALIATE_VERBALLY", "CHALLENGE", "ASK_CLARIFICATION", "RECONCILE", "ACKNOWLEDGE_REPAIR" }) do
+    Relations.RegisterAct(act, { classes = { "information" }, relations = { opens = { "response" } } })
 end
 for _, act in ipairs({ "ACCEPT", "REFUSE", "ACKNOWLEDGE", "AGREE", "DISAGREE" }) do
     Relations.RegisterAct(act, { relations = { addresses = { "response" } },

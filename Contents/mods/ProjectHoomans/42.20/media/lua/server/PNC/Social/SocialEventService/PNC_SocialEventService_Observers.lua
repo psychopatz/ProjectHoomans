@@ -85,7 +85,8 @@ local function preflightObserver(event, definition, observer)
         and Registry.Get(observer.observerNPCID) or nil
     local relationship
     local reason
-    local memoryDefinition = definition.targetMemory
+    local memoryDefinition = observer.role == "actor" and definition.actorMemory
+        or definition.targetMemory
     local approvalCurrent
     local respectCurrent
     local approvalEffect
@@ -144,7 +145,7 @@ local function preflightObserver(event, definition, observer)
         respectCurrent,
         cap.respect
     )
-    if approvalEffect == 0 and respectEffect == 0 then
+    if approvalEffect == 0 and respectEffect == 0 and memoryDefinition.recordOnly ~= true then
         return nil, "contribution_saturated", {
             observerNPCID = observer.observerNPCID,
             aboutKey = observer.aboutKey,

@@ -473,4 +473,19 @@ for _, definition in pairs(Definitions) do
     if metadata then metadata.retain = true end
 end
 
+-- An NPC helper also remembers providing aid. This is a zero-effect actor
+-- projection of the same authoritative event, with explicitly reversed roles.
+for _, id in ipairs({ "treated_wound", "saved_from_incapacitation" }) do
+    local definition = Definitions[id]
+    definition.reciprocalNPCObservers = true
+    definition.actorMemory = { type = "provided_" .. id,
+        recordOnly = true,
+        approvalEffect = 0, respectEffect = 0, moraleEffect = 0,
+        familiarityGain = 0, strength = 1, decayPerDay = 0.05,
+        semantic = { retain = true, actorRole = "observer",
+            retentionSalience = definition.semantic.retentionSalience,
+            classes = definition.semantic.classes, relations = definition.semantic.relations },
+    }
+end
+
 return Definitions

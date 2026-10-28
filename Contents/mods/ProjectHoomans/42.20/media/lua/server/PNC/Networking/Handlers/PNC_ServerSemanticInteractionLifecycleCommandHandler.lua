@@ -194,6 +194,11 @@ local function handle(player, args)
             end
         end
     end
+    if markerRecorded and PNC.Network
+        and type(PNC.Network.SendConversationRelationshipForNPC) == "function" then
+        PNC.Network.SendConversationRelationshipForNPC(player, npcID,
+            "semantic_relation_marker")
+    end
     return {
         accepted = true,
         authority = "server",

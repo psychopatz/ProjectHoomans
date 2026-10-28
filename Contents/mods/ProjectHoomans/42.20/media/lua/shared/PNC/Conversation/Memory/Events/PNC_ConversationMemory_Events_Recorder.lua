@@ -34,7 +34,9 @@ function Events.QuerySemanticEvidence(record, targetKey, actorID)
             rows[#rows + 1] = {
                 sourceRef = "today:" .. tostring(normalized.d) .. ":"
                     .. tostring(values[offset]) .. ":" .. tostring(target.seed),
-                eventType = entry.id, actorID = actorID, targetID = record.id,
+                eventType = entry.id,
+                actorID = metadata.actorRole == "observer" and record.id or actorID,
+                targetID = metadata.actorRole == "observer" and actorID or record.id,
                 classes = metadata.classes, relations = metadata.relations,
                 retentionSalience = metadata.retentionSalience,
                 sequence = (offset + 2) / 3, ageHours = 24,

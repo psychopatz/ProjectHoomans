@@ -16,6 +16,10 @@ Provider.MAX_CANDIDATES = 8
 
 local UtterancePlan = PNC.Semantics.UtterancePlan
     or require "PNC/Semantics/PNC_SemanticUtterancePlan"
+local EvidenceProviders = require "PNC/Semantics/PNC_SemanticInteractionProviders"
+local EvidenceResolver = require "PNC/Semantics/PNC_SemanticPragmaticResolver"
+local Stimulus = require "PNC/Semantics/PNC_SemanticInteractionStimulus"
+local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
 
 local HOSTILE_ACTS = {
     INSULT = true,
@@ -304,6 +308,9 @@ local function semanticFor(strategy, frame, context)
             privacy = true,
         }, details
     end
+    if Relations.GetAct(strategy) then
+        return strategy, strategy, frame.subject or topic, {}, details
+    end
     return nil
 end
 
@@ -346,6 +353,10 @@ local function candidate(strategy, stance, context, reason)
     local intent, speechAct, subject, modifiers, details =
         semanticFor(strategy, frame, context)
     if not intent then return nil end
+    local admission = EvidenceResolver.ResolveEvidence(Stimulus.FromIR({
+        intent = intent, speechAct = speechAct, subject = subject,
+    }, context), context.semanticEvidenceQuery or EvidenceProviders.QueryEvidence(context, {}))
+    if admission.status == "unresolved" or admission.status == "ambiguous" then return nil end
     details = type(details) == "table" and details or {}
     local plan, realized = strategyPlan(
         strategy, stance, context, frame, ir
@@ -357,6 +368,7 @@ local function candidate(strategy, stance, context, reason)
         reason = reason,
         topic = frame.topic,
         replyTo = frame.replyTo and frame.replyTo.kind or nil,
+        contextualAdmission = admission,
     }
     return {
         id = id,
@@ -431,13 +443,20 @@ end
 
 function Provider.collect(context)
     context = type(context) == "table" and context or {}
+    local projected = {}
+    for key, value in pairs(context) do projected[key] = value end
+    projected.semanticEvidenceQuery = EvidenceProviders.QueryEvidence(context, {})
+    context = projected
     local ir = type(context.dialogueIR) == "table"
         and context.dialogueIR or {}
     local frame = currentFrame(context)
-    if next(ir) == nil or next(frame) == nil then return {} end
+    if ir.intent == nil and ir.speechAct == nil and #context.semanticEvidenceQuery.rows == 0 then return {} end
 
     local output = {}
     local seen = {}
+    for _, act in ipairs(Relations.ContextualActs()) do
+        add(output, seen, candidate(act, "NEUTRAL", context, "semantic_relation"))
+    end
     if hostilityContext(context) then
         add(output, seen, candidate(
             "APOLOGIZE", "POSITIVE", context, "hostility_repair"

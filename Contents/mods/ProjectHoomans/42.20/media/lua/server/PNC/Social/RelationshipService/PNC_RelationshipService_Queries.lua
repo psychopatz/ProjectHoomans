@@ -55,7 +55,8 @@ function Relationships.QuerySemanticEvidence(observerNPCID, targetKey, actorID, 
         local strength = Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
         if metadata and strength > 0 and memory.aboutKey == targetKey then
             rows[#rows + 1] = { sourceRef = memory.id, eventType = memory.type,
-                actorID = actorID, targetID = observerNPCID,
+                actorID = metadata.actorRole == "observer" and observerNPCID or actorID,
+                targetID = metadata.actorRole == "observer" and actorID or observerNPCID,
                 classes = metadata.classes, relations = metadata.relations,
                 retentionSalience = metadata.retentionSalience,
                 effectiveStrength = strength, occurredAt = memory.createdAt,

@@ -10,8 +10,8 @@ local humanBefore = Catalog.IndexSnapshot("HUMAN_UTTERANCE")
 local worldBefore = Catalog.IndexSnapshot("WORLD_EVENT")
 T.equal(humanBefore.beatCount, 3,
     "human stimulus initially indexes only the three social beats")
-T.equal(humanBefore.oneShotBehaviorCount, 2,
-    "human stimulus indexes thanks and contextual clarification")
+T.equal(humanBefore.oneShotBehaviorCount, 4,
+    "human stimulus indexes grounded thanks, repair, reply and clarification")
 
 for index = 1, 10 do
     local id = string.format("behavior.world_probe_%02d", index)
@@ -72,7 +72,7 @@ local humanAfter = Catalog.IndexSnapshot("HUMAN_UTTERANCE")
 local worldAfter = Catalog.IndexSnapshot("WORLD_EVENT")
 T.equal(humanAfter.beatCount, 3,
     "WORLD_EVENT draft beats do not enter HUMAN_UTTERANCE index")
-T.equal(humanAfter.oneShotBehaviorCount, 2,
+T.equal(humanAfter.oneShotBehaviorCount, 4,
     "WORLD_EVENT one-shots do not enter HUMAN_UTTERANCE index")
 T.equal(worldAfter.beatCount, worldBefore.beatCount + 20,
     "WORLD_EVENT index adds its twenty draft beats to the canonical baseline")
@@ -217,7 +217,7 @@ T.truthy(
         < evaluated.preview.metrics.catalogBeatCount,
     "human event does not scan twenty unrelated WORLD_EVENT beats"
 )
-T.equal(evaluated.preview.metrics.indexedOneShotBehaviorCount, 2,
+T.equal(evaluated.preview.metrics.indexedOneShotBehaviorCount, 4,
     "human event does not scan ten unrelated WORLD_EVENT one-shots")
 T.truthy(
     evaluated.preview.metrics.beatCandidatesEvaluated <= 16,

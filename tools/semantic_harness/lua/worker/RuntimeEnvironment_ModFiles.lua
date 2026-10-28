@@ -77,6 +77,11 @@ function ModFiles.configure(context)
         end,
     }
     Events = Events or {}
+    Events.OnInitGlobalModData = Events.OnInitGlobalModData or { listeners = {} }
+    Events.OnInitGlobalModData.Add = Events.OnInitGlobalModData.Add or function(callback)
+        local listeners = Events.OnInitGlobalModData.listeners
+        listeners[#listeners + 1] = callback
+    end
     Events.OnGameBoot = Events.OnGameBoot or { listeners = {} }
     Events.OnGameBoot.listeners = Events.OnGameBoot.listeners or {}
     Events.OnGameBoot.Add = Events.OnGameBoot.Add or function(callback)

@@ -9,8 +9,8 @@ local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
 local Behaviors = Catalog.Behaviors
 local Beats = Catalog.Beats
 
-T.equal(#Behaviors.List(), 12,
-    "generated Conversation source registers twelve reusable behaviors")
+T.equal(#Behaviors.List(), 14,
+    "generated Conversation source registers fourteen reusable behaviors")
 T.equal(#Beats.List(), 3,
     "generated Conversation source registers three initial beats")
 

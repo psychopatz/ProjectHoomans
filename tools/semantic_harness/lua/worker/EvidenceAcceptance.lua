@@ -8,13 +8,18 @@ function Handler.handle(context, command, payload)
         for id, definition in pairs(PNC.SocialEventDefinitions) do
             local metadata = definition.semantic
             local entry = Events.GetType(definition.targetMemory.type)
+            local actorMemory = definition.actorMemory
+            local actorEntry = actorMemory and Events.GetType(actorMemory.type)
             rows[#rows + 1] = { id = id, described = type(metadata) == "table",
                 retained = metadata and metadata.retain,
                 code = entry and entry.code, dynamic = entry and entry.dynamic == true,
                 retentionSalience = entry and entry.salience,
                 canonical = entry and metadata
                     and entry.salience == metadata.retentionSalience
-                    and entry.longTerm == (metadata.longTerm == true) }
+                    and entry.longTerm == (metadata.longTerm == true),
+                actorPolicyRequired = actorMemory ~= nil,
+                actorCanonical = actorMemory and actorEntry and actorMemory.semantic
+                    and actorEntry.salience == actorMemory.semantic.retentionSalience or false }
         end
         table.sort(rows, function(a, b) return a.id < b.id end)
         local fallback = Events.Internal.ResolveEventType("addon_evidence_fixture")
@@ -45,6 +50,28 @@ function Handler.handle(context, command, payload)
     local target = PNC.PlayerCharacters.GetEntityKey(getPlayer(), {
         create = true,
     }) or Runtime.relationshipTargetKey
+    if payload.emitHelp then
+        local time = getGameTime()
+        local accepted, reason = PNC.SocialEvents.Emit({
+            id = "social:fixture:help:" .. tostring(payload.emitHelp), type = "treated_wound",
+            actorKey = "npc:" .. record.id, targetKey = target,
+            occurredAt = time:getWorldAgeHours(), sourceSystem = "health", context = {},
+        })
+        if not accepted or type(accepted) == "table" and accepted.ok ~= true then
+            return nil, "help_event_rejected:" .. tostring(type(accepted) == "table" and accepted.reason or reason)
+        end
+        record = PNC.Registry.Get(record.id) or record
+    end
+    if payload.openResponse then
+        local view = Runtime.view
+        local router = view and view.session and view.session.semanticDialogueRouter
+        local state = router and router.context and router.context.semanticContextState
+        if not state then return nil, "session_context_unavailable" end
+        state:RecordNPCResponse({ intent = payload.openResponse, speechAct = payload.openResponse,
+            confidence = 1 }, { speakerID = record.id })
+        state:SetPendingFollowUp({ id = "fixture:pending", kind = payload.openResponse,
+            topic = "supplies", openedTurn = state.sequence })
+    end
     if payload.advanceDays then
         Runtime.scenario.world.worldAgeHours =
             (tonumber(Runtime.scenario.world.worldAgeHours) or 0)
@@ -81,6 +108,8 @@ function Handler.handle(context, command, payload)
     local ContextProjection = require "worker/Conversation_Context"
     local dialogueContext = ContextProjection.buildContext(context)
     local roots = {}
+    local presentation = payload.presentation and PNC.RelationshipPresentation
+        and PNC.RelationshipPresentation.BuildForConversation(getPlayer(), record.id)
     local conduct = PNC.Conduct.GetForEntity(target) or {}
     local conductRows = {}
     for index = 1, math.min(#(conduct.evidence or {}), 4) do
@@ -94,6 +123,7 @@ function Handler.handle(context, command, payload)
         ok = true, memory = context.Values.copy(record.memory),
         relationship = context.Values.copy(relationship),
         serializedRecord = context.Values.copy(raw), roots = roots,
+        presentationEvidence = presentation and presentation.semanticEvidence,
         conduct = { count = #(conduct.evidence or {}), sample = conductRows },
         identity = { adapterTarget = Runtime.relationshipTargetKey, target = target,
             targetKind = dialogueContext.relationship and dialogueContext.relationship.targetKind,

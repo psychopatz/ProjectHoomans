@@ -155,7 +155,7 @@ local function submitLifecycleEnvelope(view, result, actionResult)
     local interaction = type(result) == "table"
         and result.interaction or nil
     if type(interaction) ~= "table"
-        or interaction.source ~= "typed_text"
+        or (interaction.source ~= "typed_text" and interaction.source ~= "semantic_choice")
         or not sendClientCommand
     then
         return false, "lifecycle_transport_unavailable"

@@ -14,7 +14,7 @@ class PragmaticInteractionP4WorkerTests(unittest.TestCase):
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             catalog = worker.beat_catalog()
             self.assertEqual(catalog["beatCount"], 3)
-            self.assertEqual(catalog["behaviorCount"], 12)
+            self.assertEqual(catalog["behaviorCount"], 14)
             argument = next(
                 item for item in catalog["beats"]
                 if item["id"] == "beat.argument_escalation"

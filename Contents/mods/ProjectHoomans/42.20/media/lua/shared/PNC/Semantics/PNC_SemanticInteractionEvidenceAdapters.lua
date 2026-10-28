@@ -13,6 +13,45 @@ local function identities(context)
 end
 
 function Adapters.Install(Providers)
+    for _, sourceTier in ipairs({ "TODAY", "DURABLE" }) do
+        local tier = sourceTier
+        Providers.RegisterEvidenceAdapter({ id = "projecthoomans.remote_" .. string.lower(tier),
+            sourceTier = tier, Query = function(context)
+                context = type(context) == "table" and context or {}
+                -- Local owning APIs take precedence. Remote rows are only the
+                -- existing player-scoped presentation, never client authority.
+                if tier == "DURABLE" and PNC.Relationships
+                    and type(PNC.Relationships.QuerySemanticEvidence) == "function" then return {} end
+                local record = context.npcID and PNC.Registry and PNC.Registry.Get
+                    and PNC.Registry.Get(context.npcID)
+                local authoritative = PNC.Core and type(PNC.Core.IsAuthority) == "function"
+                    and PNC.Core.IsAuthority() == true
+                if tier == "TODAY" and authoritative and record and record.memory then return {} end
+                local snapshot = context.relationship and context.relationship.semanticEvidence
+                if type(snapshot) ~= "table" then return {} end
+                local at = (context.worldContext or {}).worldAgeHours
+                local observed = tonumber(snapshot.observedWorldAgeHours)
+                if not observed or not tonumber(at) then return {} end
+                local elapsed = tonumber(at) - observed
+                if elapsed < 0 or elapsed > 1 then return {} end
+                local Events = PNC.Conversation and PNC.Conversation.Memory
+                    and PNC.Conversation.Memory.Events
+                if tier == "TODAY" and (not Events
+                    or snapshot.observedWorldDay ~= Events.Internal.CurrentWorldDay()) then return {} end
+                local rows = {}
+                for index = 1, math.min(#(snapshot.rows or {}), 16) do
+                    local value = snapshot.rows[index]
+                    if type(value) == "table" and value.sourceTier == tier then
+                        local row = Providers.NormalizeEvidence(value, value.providerID, tier)
+                        if row then
+                            row.ageHours = (row.ageHours or 0) + elapsed
+                            rows[#rows + 1] = row
+                        end
+                    end
+                end
+                return rows
+            end })
+    end
     Providers.RegisterEvidenceAdapter({ id = "projecthoomans.session", sourceTier = "SESSION",
         Query = function(context)
             context = type(context) == "table" and context or {}
@@ -41,11 +80,36 @@ function Adapters.Install(Providers)
                     }
                 end
             end
+            local pending = live and type(live.GetPendingFollowUp) == "function"
+                and live:GetPendingFollowUp() or snapshot.pendingFollowUp or context.pendingFollowUp
+            if type(pending) == "table" and pending.status ~= "closed" then
+                local metadata = Relations.GetAct(string.upper(tostring(pending.kind or "")))
+                if metadata then
+                    rows[#rows + 1] = { sourceRef = "pending:" .. tostring(pending.id or pending.kind),
+                        actorID = tostring(npcID), targetID = actorID,
+                        relations = metadata.relations, classes = metadata.classes,
+                        confidence = 1, ageHours = 0, sequence = pending.openedTurn,
+                        topic = pending.topic, provenance = "DialogueContextState.pendingFollowUp" }
+                end
+            end
+            local response = context.dialogueDecision and context.dialogueDecision.response
+            local plan = response and response.plan
+            local metadata = type(plan) == "table" and Relations.GetAct(plan.dialogueAct)
+            if metadata then
+                rows[#rows + 1] = { sourceRef = "session:npc_response",
+                    actorID = tostring(npcID), targetID = actorID,
+                    relations = metadata.relations, classes = metadata.classes,
+                    confidence = 1, ageHours = 0, topic = plan.topic,
+                    provenance = "ResponseChannel.UtterancePlan" }
+            end
             return rows
         end })
     Providers.RegisterEvidenceAdapter({ id = "projecthoomans.today", sourceTier = "TODAY",
         Query = function(context)
             context = type(context) == "table" and context or {}
+            local authoritative = PNC.Core and type(PNC.Core.IsAuthority) == "function"
+                and PNC.Core.IsAuthority() == true
+            if not authoritative and context.relationship and context.relationship.semanticEvidence then return {} end
             local actorID, npcID, targetKey = identities(context)
             local Events = PNC.Conversation and PNC.Conversation.Memory
                 and PNC.Conversation.Memory.Events

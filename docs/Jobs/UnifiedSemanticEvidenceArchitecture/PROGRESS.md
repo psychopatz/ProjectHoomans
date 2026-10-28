@@ -1,10 +1,19 @@
 # Progress — Unified Semantic Evidence Architecture
 
-**Status:** IN PROGRESS — E0–E4 accepted; first-party adopter integration and scale gates pending.
+**Status:** IN PROGRESS — E0–E5 accepted; extensibility proof and scale gates pending.
 **Branch:** existing main.
 **Audit anchor:** ProjectHoomans 2bc4810f.
-**Current phase:** E5 — first-party adopters.
-**Next exact chunk:** E5A — complete assistance/gratitude and offer/request/question reply integration (including direction-aware negative controls), native bounded evidence presentation/transport, shared player/NPC affordance admission and downstream policy preservation; then E6 extensibility proof and E7 full acceptance.
+**Current phase:** E6 — extensibility proof.
+**Next exact chunk:** E6A — register a test-only promise/fulfillment/breach/explanation mechanic through public metadata/provider seams, prove SESSION/TODAY/DURABLE and director/UtterancePlan participation without editing generic query/resolver code or adding a store; then complete E7 storage/performance/regression gates.
+
+## E5 accepted (2026-10-28)
+
+- Repair, gratitude and response families share normalization, relation matching and director admission. Gratitude requires reversed helper/recipient roles; request/offer/question replies reverse the initiating actor roles. Wrong direction and missing antecedents fail closed.
+- Existing SocialEvents now supports an explicitly record-only actor memory for NPC wound treatment/rescue, using the canonical event metadata and existing bounded Relationship/Conversation Memory owners. This remembers provided aid without approval/respect/familiarity rewards. Canonical actor metadata registration is audited too.
+- Pending follow-ups and current NPC response-plan semantic acts project through SESSION. Generated player strategies enumerate registered contextual acts, use the same admission query, and click through the existing semantic-frame route. Added EN/TL ACCEPT/REFUSE/THANK constructions through canonical CodeBuilder sources. Grounded repair has a one-shot acknowledgement when beat cooldown prevents reconciliation.
+- Existing player-scoped Relationship presentation carries at most 16 normalized evidence rows and an observation clock/day. MP adapters normalize them again, reject stale (>1 hour) or prior-day TODAY rows, and prefer available authoritative owners. Presentation does not mutate serialized records or send private full stores, transcripts or relevance scores.
+- Full Lua 906/906 PASS; combined E0–E5 worker 15/15 PASS; remote projection smoke PASS; metadata actor audit PASS. Broad pragmatic Python tests retain only the four independently reproduced pre-existing failures. Generation is byte-identical across 227 generated/translation files; runtime Kahlua/syntax/diff checks PASS.
+- Worker loads the production Registry dirty owner with an inert engine OnInitGlobalModData event seam; no native runtime/save IO is introduced.
 
 ## E4B / E4 accepted (2026-10-28)
 

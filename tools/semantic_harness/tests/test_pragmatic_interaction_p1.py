@@ -37,6 +37,8 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
                 "behavior.acknowledge_news",
                 "behavior.world_event_warn",
                 "behavior.clarify_context",
+                "behavior.acknowledge_reply",
+                "behavior.acknowledge_repair",
             },
         )
         self.assertEqual(

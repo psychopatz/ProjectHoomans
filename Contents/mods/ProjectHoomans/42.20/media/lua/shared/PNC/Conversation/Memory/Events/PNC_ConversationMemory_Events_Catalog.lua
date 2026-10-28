@@ -176,7 +176,14 @@ local socialDefinitions = require "PNC/Core/Relationships/PNC_SocialEventDefinit
 local socialIDs = {}
 for id in pairs(socialDefinitions) do socialIDs[#socialIDs + 1] = id end
 table.sort(socialIDs)
-for _, id in ipairs(socialIDs) do Events.RegisterSocialType(id) end
+for _, id in ipairs(socialIDs) do
+    Events.RegisterSocialType(id)
+    local memory = socialDefinitions[id].actorMemory
+    if memory and memory.semantic and memory.semantic.retain then
+        Events.RegisterType({ id = memory.type, salience = memory.semantic.retentionSalience,
+            semantic = memory.semantic, longTerm = memory.semantic.longTerm })
+    end
+end
 local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
 for _, spec in ipairs(Relations.CompactTypes()) do Events.RegisterType(spec) end
 

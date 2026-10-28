@@ -155,6 +155,9 @@ function Projection.Build(view, getProviderStatus)
         -- Prefer the authoritative client projection on every turn so a
         -- deception/evasion result affects the very next response.
         output.relationship = relationship
+        output.playerEntityKey = relationship.identityKey or output.playerEntityKey
+        output.playerIdentitySeed = relationship.identityDiagnostics
+            and relationship.identityDiagnostics.characterUUID or output.playerIdentitySeed
         output.identityTrust = relationship.identityTrust
             or relationship.trustLabel or output.identityTrust
         output.relationshipState = relationship.relationshipState

@@ -20,4 +20,6 @@ class UnifiedEvidenceE2Tests(unittest.TestCase):
             self.assertTrue(row["canonical"], row)
             self.assertFalse(row["dynamic"], row)
             self.assertGreater(row["retentionSalience"], 0)
+            if row["actorPolicyRequired"]:
+                self.assertTrue(row["actorCanonical"], row)
         self.assertTrue(audit["fallbackDynamic"])

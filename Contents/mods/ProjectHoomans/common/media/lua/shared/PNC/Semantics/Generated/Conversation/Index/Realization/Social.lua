@@ -81,6 +81,33 @@ return {
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_en.json",
     },
+    ["construction.en.social.contextual_accept"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesEn",
+        },
+        ["id"] = "construction.en.social.contextual_accept",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/contextual_replies_en.json",
+    },
+    ["construction.en.social.contextual_refuse"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesEn",
+        },
+        ["id"] = "construction.en.social.contextual_refuse",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/contextual_replies_en.json",
+    },
+    ["construction.en.social.contextual_thank"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesEn",
+        },
+        ["id"] = "construction.en.social.contextual_thank",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/contextual_replies_en.json",
+    },
     ["construction.en.social.deescalate"] = {
         ["domain"] = "social",
         ["generated"] = {
@@ -314,6 +341,33 @@ return {
         ["id"] = "construction.tl.social.comfort",
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.contextual_accept"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesTl",
+        },
+        ["id"] = "construction.tl.social.contextual_accept",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/contextual_replies_tl.json",
+    },
+    ["construction.tl.social.contextual_refuse"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesTl",
+        },
+        ["id"] = "construction.tl.social.contextual_refuse",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/contextual_replies_tl.json",
+    },
+    ["construction.tl.social.contextual_thank"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesTl",
+        },
+        ["id"] = "construction.tl.social.contextual_thank",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/contextual_replies_tl.json",
     },
     ["construction.tl.social.deescalate"] = {
         ["domain"] = "social",
