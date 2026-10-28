@@ -1,12 +1,3 @@
-local memory = PNC.Conversation.Memory
-
-memory.Events.RegisterType({
-    id = "protected_from_attacker",
-    code = 1103,
-    sourceTypes = { "protected_from_attacker" },
-    salience = 215,
-    longTerm = true,
-    gossipEvent = "protection",
-})
-
+-- Compatibility load path; metadata is owned by SocialEventDefinitions.
+PNC.Conversation.Memory.Events.RegisterSocialType("protected_from_attacker")
 return true

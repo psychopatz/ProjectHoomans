@@ -1,10 +1,17 @@
 # Progress — Unified Semantic Evidence Architecture
 
-**Status:** IN PROGRESS — E0/E1 accepted; tier adapters and relations pending.
+**Status:** IN PROGRESS — E0/E1/E2 accepted; tier adapters and relations pending.
 **Branch:** existing main.
 **Audit anchor:** ProjectHoomans 2bc4810f.
-**Current phase:** E2 — canonical owning-domain metadata.
-**Next exact chunk:** E2A — describe all first-party social events in their authoritative definitions and derive compact registration, preserving stable numeric codes and compatibility aliases.
+**Current phase:** E3 — tier query and bounded retention.
+**Next exact chunk:** E3A — salience-aware eight-slot retention and TODAY projection independent of detailed retention; then wire bounded production tier adapters through the E1 seam.
+
+## E2 accepted (2026-10-28)
+
+- All 24 first-party social event definitions explicitly carry domain-owned semantic/retention metadata (23 distinct memory types; praise is shared). Conversation Memory derives registration. Four former metadata files remain compatibility load delegates only.
+- Preserved codes 1101..1104, existing hash aliases and `player_spoke_insult` code 1026626453. Unknown addons retain bounded hashed fallback. Existing persisted tuples need no migration.
+- Retention salience, classes and relations are defined independently of effect strength, decay and NLU confidence. Intended grievance/help adopters no longer silently use salience zero.
+- Production-worker metadata audit PASS for every first-party definition, existing fallback and stable codes. E0/E1 worker regressions PASS, semantic Lua 100/100 PASS, relationship 5/5 PASS, social events and compact memory smoke PASS, Kahlua/diff checks PASS.
 
 ## E1 accepted (2026-10-28)
 

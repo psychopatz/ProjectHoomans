@@ -2,6 +2,24 @@
 local Handler = {}
 
 function Handler.handle(context, command, payload)
+    if command == "TEST_EVIDENCE_METADATA" then
+        local rows = {}
+        local Events = PNC.Conversation.Memory.Events
+        for id, definition in pairs(PNC.SocialEventDefinitions) do
+            local metadata = definition.semantic
+            local entry = Events.GetType(definition.targetMemory.type)
+            rows[#rows + 1] = { id = id, described = type(metadata) == "table",
+                retained = metadata and metadata.retain,
+                code = entry and entry.code, dynamic = entry and entry.dynamic == true,
+                retentionSalience = entry and entry.salience,
+                canonical = entry and metadata
+                    and entry.salience == metadata.retentionSalience
+                    and entry.longTerm == (metadata.longTerm == true) }
+        end
+        table.sort(rows, function(a, b) return a.id < b.id end)
+        local fallback = Events.Internal.ResolveEventType("addon_evidence_fixture")
+        return { ok = true, rows = rows, fallbackDynamic = fallback and fallback.dynamic }
+    end
     if command == "TEST_EVIDENCE_PROVIDERS" then
         local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
         for _, tier in ipairs({ "SESSION", "TODAY", "DURABLE" }) do

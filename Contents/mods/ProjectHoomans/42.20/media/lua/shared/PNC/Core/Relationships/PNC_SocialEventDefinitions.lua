@@ -438,4 +438,39 @@ Definitions.player_emote_salute = positiveEmoteDefinition(
     { approval = 10, respect = 25 }, { respect = true, emote = true }
 )
 
+-- Semantic/retention policy belongs to this domain alongside its effects.
+-- Compact Conversation Memory derives registration from these definitions.
+local semanticByType = {
+    treated_wound = { retentionSalience = 180, classes = { "assistance" }, relations = { opens = { "gratitude" } } },
+    saved_from_incapacitation = { code = 1101, retentionSalience = 245, longTerm = true, gossipEvent = "rescue", classes = { "assistance" }, relations = { opens = { "gratitude" } } },
+    protected_from_attacker = { code = 1103, retentionSalience = 215, longTerm = true, gossipEvent = "protection", classes = { "assistance" }, relations = { opens = { "gratitude" } } },
+    survived_horde_attack = { code = 1104, retentionSalience = 245, longTerm = true, gossipEvent = "horde_survival", classes = { "shared_danger" }, relations = {} },
+    abandoned_in_combat = { code = 1102, retentionSalience = 235, longTerm = true, gossipEvent = "abandonment", classes = { "grievance" }, relations = { opens = { "repair" } } },
+    witnessed_player_kill = { retentionSalience = 110, classes = { "witnessed_combat" }, relations = {} },
+    witnessed_player_hurt = { retentionSalience = 120, classes = { "witnessed_harm" }, relations = {} },
+    player_damaged_npc = { retentionSalience = 210, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
+    faction_member_attacked = { retentionSalience = 200, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
+    survived_combat_together = { retentionSalience = 160, classes = { "shared_danger" }, relations = {} },
+    player_insulted = { retentionSalience = 150, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
+    player_spoke_hostile_remark = { retentionSalience = 130, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
+    player_spoke_insult = { retentionSalience = 150, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
+    player_threatened_npc = { retentionSalience = 200, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
+    player_disapproved = { retentionSalience = 60, classes = { "disapproval" }, relations = {} },
+    player_greeted = { retentionSalience = 30, classes = { "greeting" }, relations = {} },
+    npc_greeted_player = { retentionSalience = 30, classes = { "greeting" }, relations = {} },
+    necroa_mask_removed = { retentionSalience = 140, classes = { "grievance" }, relations = { opens = { "repair" } } },
+    necroa_player_mask_removed = { retentionSalience = 170, classes = { "grievance" }, relations = { opens = { "repair" } } },
+    player_farewelled = { retentionSalience = 20, classes = { "farewell" }, relations = {} },
+    player_thanked = { retentionSalience = 70, classes = { "gratitude" }, relations = { addresses = { "gratitude" } } },
+    player_praised = { retentionSalience = 60, classes = { "praise" }, relations = {} },
+    player_saluted = { retentionSalience = 50, classes = { "respect" }, relations = {} },
+}
+for _, definition in pairs(Definitions) do
+    local metadata = semanticByType[definition.targetMemory.type]
+    -- Missing policy stays visible to validation rather than silently becoming
+    -- first-party salience zero through the addon compatibility path.
+    definition.semantic = metadata
+    if metadata then metadata.retain = true end
+end
+
 return Definitions

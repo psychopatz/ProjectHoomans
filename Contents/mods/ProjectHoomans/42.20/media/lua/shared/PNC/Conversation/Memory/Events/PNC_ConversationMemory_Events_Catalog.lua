@@ -151,4 +151,30 @@ end
 
 Internal.ResolveEventType = resolveEventType
 
+function Events.RegisterSocialType(eventID)
+    local definitions = require "PNC/Core/Relationships/PNC_SocialEventDefinitions"
+    local definition = definitions[eventID]
+    local metadata = definition and definition.semantic
+    if type(metadata) ~= "table" or metadata.retain == nil then
+        return false, "social_semantic_policy_missing"
+    end
+    if metadata.retain == false then return true, "retention_disabled" end
+    local source = definition.targetMemory.type
+    local ok, entry = Events.RegisterType({
+        id = source, code = metadata.code, sourceTypes = { source },
+        salience = metadata.retentionSalience, longTerm = metadata.longTerm,
+        gossipEvent = metadata.gossipEvent,
+    })
+    if ok and type(entry) == "table" then entry.semantic = metadata end
+    return ok, entry
+end
+
+-- Stable sorted registration also preserves deterministic hash collision
+-- handling. Explicit codes 1101..1104 and existing hashed aliases are retained.
+local socialDefinitions = require "PNC/Core/Relationships/PNC_SocialEventDefinitions"
+local socialIDs = {}
+for id in pairs(socialDefinitions) do socialIDs[#socialIDs + 1] = id end
+table.sort(socialIDs)
+for _, id in ipairs(socialIDs) do Events.RegisterSocialType(id) end
+
 return true

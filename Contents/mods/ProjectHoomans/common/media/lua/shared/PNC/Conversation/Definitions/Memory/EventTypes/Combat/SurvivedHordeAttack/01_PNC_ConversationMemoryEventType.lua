@@ -1,12 +1,3 @@
-local memory = PNC.Conversation.Memory
-
-memory.Events.RegisterType({
-    id = "survived_horde_attack",
-    code = 1104,
-    sourceTypes = { "survived_horde_attack" },
-    salience = 245,
-    longTerm = true,
-    gossipEvent = "horde_survival",
-})
-
+-- Compatibility load path; metadata is owned by SocialEventDefinitions.
+PNC.Conversation.Memory.Events.RegisterSocialType("survived_horde_attack")
 return true
