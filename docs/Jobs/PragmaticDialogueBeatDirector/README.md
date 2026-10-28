@@ -1,6 +1,6 @@
 # Pragmatic Interaction Director & Coherent Conversation
 
-**Status:** DEVELOPER COMPLETE — C0–C11 accepted; READY FOR USER LIVE TEST.
+**Status:** IN PROGRESS — L0–L5 live-regression quality recovery; C0–C11 remains accepted foundation.
 
 The directory name is retained for continuity. Git history is the archive for the completed R0–R9 recovery work; agents should not reread that implementation diary.
 
@@ -44,9 +44,11 @@ The following are already developer-accepted and are treated as foundation:
 
 Do not reopen these unless current code evidence proves a regression.
 
-## Accepted architecture
+## Active live-regression gap
 
-The previously active coherent-conversation gap is implemented and developer-accepted. The path is now:
+The semantic foundation is working, but the native user test proved that internal success is not sufficient: direct generated responses can be hidden behind the landing group, bounded relationship-memory retention can still reject an otherwise valid social interaction, and common behavior acts such as WARN still lack compositional realization diversity.
+
+The corrected path remains:
 
 ```text
 human text
@@ -83,15 +85,16 @@ Cross-repository changes are allowed only when the owning layer genuinely requir
 
 ## Read order
 
-For normal post-completion work, read root `AGENTS.md`, then only:
+For the active L0–L5 recovery, read root `AGENTS.md`, then:
 
 1. `README.md`
-2. `PROGRESS.md`
+2. `ROADMAP.md`
+3. `PROGRESS.md` last
 
-Load deeper documents only when a live regression points at their owning area:
+Load deeper documents only for the owning phase:
 
 - `ARCHITECTURE.md` / `AGENT_RUNBOOK.md` — architecture or authority regression;
-- `ROADMAP.md` — historical phase/gate audit, not a task list to rerun;
+- `ROADMAP.md` — active L0–L5 recovery phases plus compact accepted-foundation context;
 - `AUDIT.md` — original failure evidence;
 - `STORAGE_TOPOLOGY.md` — compiler/storage regression;
 - `DYNAMIC_CONVERSATION.md` — generated-choice or UtterancePlan regression;

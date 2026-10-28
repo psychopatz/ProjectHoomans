@@ -26,6 +26,19 @@ Trait-driven is a presentation/source category, not a mutually exclusive sentime
 
 Do not force one candidate from every lane. Rank all eligible candidates, enforce semantic diversity, deduplicate near-equivalents and backfill from the best remaining candidates.
 
+### Native surface priority
+
+Current-turn direct responses must become the selected semantic group after a conversational turn. A generated `conversation_branch` / DIRECT_RESPONSE group must not exist only in diagnostics while Core's native choice surface remains on the root landing group.
+
+Priority contract:
+
+1. explicit user-selected semantic navigation/group remains selected while valid;
+2. otherwise an eligible current-turn direct-response group becomes current;
+3. otherwise active flow/response-plan groups may become current;
+4. otherwise fall back to the root landing group.
+
+Root/static actions remain reachable through the existing Back/navigation model. Do not create a second renderer or duplicate response strip.
+
 A generated candidate should carry bounded semantic data such as:
 
 ```text
@@ -94,7 +107,9 @@ EN realization:
 
 The full sentence does not need its own response definition. Only the semantic strategy, canonical lexeme and locale construction are authored.
 
-Reusable construction strategies may include MIRROR, COUNTER, AGREE, DISAGREE, ACKNOWLEDGE, QUALIFY, DENY, APOLOGIZE, ESCALATE, DEESCALATE, DEFLECT, ASK_BACK and FOLLOW_UP.
+Reusable construction strategies may include MIRROR, COUNTER, WARN, CHALLENGE, CLAIM_JOKE, DOUBLE_DOWN, DISMISS, AGREE, DISAGREE, ACKNOWLEDGE, QUALIFY, DENY, APOLOGIZE, ESCALATE, DEESCALATE, DEFLECT, ASK_BACK, CHANGE_TOPIC and FOLLOW_UP.
+
+Common Director behaviors such as WARN / BOUNDARY_WARNING must have compositional mappings; composition must not be reserved for rare RETALIATE/MIRROR cases. Multiple bounded constructions may exist per strategy, selected deterministically from semantic/style/relationship context and a stable turn salt.
 
 Locale-specific construction rules are compiler-owned. Do not construct English and machine-translate it at runtime.
 

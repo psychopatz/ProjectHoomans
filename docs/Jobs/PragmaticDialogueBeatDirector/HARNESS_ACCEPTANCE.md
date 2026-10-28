@@ -138,7 +138,7 @@ Migration acceptance must remove current numeric/opaque generated patterns such 
 
 ## Dynamic button acceptance
 
-After representative NPC turns, inspect the same production suggestion pipeline and prove:
+Internal candidate existence is not acceptance. After representative NPC turns, inspect the same production suggestion pipeline and prove:
 
 - authored/static choices remain available when intentionally authored;
 - eligible positive-leading continuations can be generated from semantic/discourse state;
@@ -148,6 +148,9 @@ After representative NPC turns, inspect the same production suggestion pipeline 
 - candidates expose origin, stance, strategy, source evidence and eligibility;
 - deterministic ranking/deduplication prevents near-duplicate button spam;
 - the UI need not force one choice from every lane when a lane has no valid candidate;
+- current-turn DIRECT_RESPONSE candidates become the selected semantic group unless explicit user navigation owns the surface;
+- the same rows appear through `groups/currentGroupID` → native `session.choices` → TalkParity `conversationPresentation.responseChannel.rows`;
+- the root landing group remains reachable through typed Back/navigation rather than hiding current-turn responses;
 - clicking a generated choice sends its typed semantic frame directly and does not pass its displayed utterance back through NLU;
 - a typed utterance with equivalent meaning and the generated button converge on the same DiscourseFrame / authoritative outcome.
 
@@ -175,14 +178,18 @@ Also test non-mirroring strategies so dynamic realization is not merely an insul
 
 ## Social-memory saturation acceptance
 
-Construct a disposable saturated conduct record and prove:
+Test both bounded relationship memory and conduct evidence. At minimum reproduce the exact saved Dana case when the local save is available.
+
+Prove:
 
 - the hostile/social act is still understood;
 - a reaction can still be selected;
 - relationship effect reports applied/clamped/none independently;
-- durable evidence reports persisted/coalesced/pruned independently;
-- no unbounded evidence growth occurs;
-- no player-facing `I couldn't apply that social reaction` merely because the evidence ledger is full.
+- relationship memory reports persisted/coalesced/pruned/dropped independently;
+- conduct evidence reports persisted/coalesced/pruned/dropped independently;
+- neither relationship-memory nor conduct-evidence capacity alone rejects the immediate social interaction;
+- no unbounded memory/evidence growth occurs;
+- no player-facing `I couldn't apply that social reaction` merely because bounded durable storage is full.
 
 ## Multi-system coherence acceptance
 

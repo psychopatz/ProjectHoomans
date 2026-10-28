@@ -1,20 +1,20 @@
 # Agent Runbook — Coherent Emergent Conversation
 
-Use this runbook only when a reproduced live regression requires reopening this completed job.
+Use this runbook for the active L0–L5 live-regression quality recovery.
 
-**Completion guard:** C0–C11 are developer-accepted. Do not execute the roadmap again as an autonomous goal without new regression evidence.
+**Foundation guard:** C0–C11 are developer-accepted. Do not rerun them wholesale; reopen only the specific invariant disproved by current live/runtime evidence.
 
 ## Read order
 
-Normal post-completion work reads root `AGENTS.md`, then `README.md` and `PROGRESS.md` only.
+Read root `AGENTS.md`, then `README.md`, `ROADMAP.md`, this runbook, and `PROGRESS.md` last.
 
-If a regression requires this runbook, load only the owning support document: `ARCHITECTURE.md` for authority/architecture, `AUDIT.md` for original failure evidence, `STORAGE_TOPOLOGY.md` for compiler/storage, `DYNAMIC_CONVERSATION.md` for affordance/realization, or `HARNESS_ACCEPTANCE.md` for acceptance/debugging.
+Load phase-specific support only when needed: `DYNAMIC_CONVERSATION.md` for L1/L3/L4, `HARNESS_ACCEPTANCE.md` for L1–L5 gates, `ARCHITECTURE.md` for authority disputes, and `STORAGE_TOPOLOGY.md` only if compiler/storage behavior changes.
 
 ## Operating goal
 
-Preserve the accepted coherent conversation architecture and repair only reproduced regressions through the owning authority.
+Complete L1–L5 so the already-correct semantic understanding becomes the actual visible conversation: current-turn direct responses reach Core's native choice surface, bounded memory retention cannot erase a valid social reaction, and common behavior acts have contextual compositional wording.
 
-Do not reopen adjacent completed phases merely because one live case fails.
+After each accepted phase, update `PROGRESS.md` concisely and continue automatically to the next mandatory L phase.
 
 ## Authority rules
 
@@ -83,9 +83,9 @@ Dynamic NPC/player wording must use a bounded UtterancePlan / compositional real
 
 ## Social-memory rules
 
-Immediate conversation understanding/reaction is not the same as durable conduct persistence.
+Immediate conversation understanding/reaction is not the same as durable relationship-memory or conduct-evidence retention.
 
-If evidence is coalesced or pruned, expose that persistence result without converting the semantic interaction into a rejection.
+If bounded relationship memory or conduct evidence is coalesced, pruned or dropped, expose that persistence outcome independently. Storage capacity alone must not convert an already-understood/selected social interaction into a rejection.
 
 Keep durable state bounded and do not persist full transcripts.
 

@@ -1,81 +1,67 @@
 # Progress — Coherent Emergent Conversation
 
-**Status:** READY FOR USER LIVE TEST.
-**Developer phase:** C0–C11 accepted.
+**Status:** IN PROGRESS — live-regression quality recovery.
+**Accepted foundation:** C0–C11.
+**Active phase:** L1 — direct-response presentation authority.
 **Branch:** existing `main`.
-**Next authority:** user live in-game verification only.
 
 ## Current truth
 
-The coherent conversation roadmap is developer-complete. Do not rerun or reimplement C0–C11 unless a live/runtime regression supplies new evidence.
+The user's native Semantic Lab test disproved several acceptance assumptions without invalidating the underlying semantic architecture.
 
-Accepted architecture now includes:
+Exact reproduced case:
 
-- PsychopatzCore-owned bounded compact/typo/elongation/contraction surface recovery with provenance and conservative mutation safety;
-- one ProjectHoomans Contextual Discourse Resolver over the existing bounded DialogueContextState;
-- risk-aware conversational vs gameplay-mutation admission;
-- compositional social features for directedness, hostility, threat, affiliation, self/world context and negation;
-- semantically sharded CodeBuilder output with compiler context-health budgets, lightweight discovery indexes and no numeric/opaque overflow shards;
-- generated semantic player affordances through the existing DialogueSuggestions authority;
-- typed semantic-click execution with no display-text NLU reparse;
-- compiler-owned EN/TL UtterancePlan constructions/lexemes inside the existing SpeechRealization authority with Dialogue Content fallback;
-- pending-question, topic, referent, interruption/resumption and hostility→repair continuity through the existing bounded discourse/flow/beat state;
-- social reaction/effect decoupled from bounded conduct-evidence retention;
-- bounded Conversation Inspector/fuzz observability across recovery → discourse → affordance → interaction → realization → effect/persistence.
+- save: `Sandbox/2026-10-22_15-18-56/global_mod_data.bin`;
+- NPC: `npcDanapatz_Y5KK` / Dana patz;
+- input: `fuckyouuuu`.
 
-No parallel parser, button engine, response engine, transcript store, persistent dynamic-combination catalog or gameplay authority was introduced.
+Verified runtime evidence:
 
-## Phase commits
+- NLU recovers `fuckyouuuu` → `fuck you` → directed `INSULT`, confidence 0.90;
+- generated affordances are produced: `APOLOGIZE`, `CHALLENGE`, `DISMISS`, `ASK_WHY`;
+- those candidates live in `conversation_branch`;
+- `buildGroups()` keeps `conversation_landing` selected because the current topic is still `greeting`;
+- the actual Response Channel therefore shows only landing/root actions;
+- Director selects `behavior.warn / BOUNDARY_WARNING` for Dana because WARN scores 0.65 vs RETALIATE 0.55;
+- `UtterancePlan.FromInteraction()` has no WARN mapping, so common boundary reactions fall back to sparse authored Dialogue Content;
+- the saved relationship memory is saturated enough that `ApplyEventMutation()` returns `memory_pruned_by_limit`;
+- that rejection causes presentation to replace the semantic response with the generic social-interaction rejection line.
 
-Key implementation checkpoints:
+The earlier C6/C7 tests proved internal candidate generation and microplanning but did not require the generated candidates to become the native visible choice surface. C9 decoupled conduct evidence, but not relationship-memory retention.
 
-- PsychopatzCore C1 surface recovery: `3744a7d`;
-- ProjectHoomans C1–C4 contextual/risk foundation: `83d5133c`;
-- C5 storage/context-health migration: `39768538`;
-- C6–C8 dynamic conversation slice: `b2890449`, `6fc49bd1`;
-- C9 conduct/social-effect decoupling: `ffc12f2c`;
-- C10 bounded diagnostics/fuzzing: `e9721815`;
-- C11 acceptance fixes: `6bd01300`.
+## Immediate Next Chunk — L1
 
-Git history is the implementation diary. Do not expand this file with completed-phase narratives.
+Fix the selected-group rule in the existing DialogueSuggestions projection so current-turn `DIRECT_RESPONSE` / `conversation_branch` responses become the native visible Response Channel after a conversational turn.
 
-## Latest revalidation
+Constraints:
 
-The current paired checkout was revalidated after C11:
+- keep one DialogueSuggestions/button authority;
+- keep Core's existing native choice surface;
+- explicit semantic navigation must still win;
+- root/static actions remain reachable via existing Back/navigation;
+- do not render a second generated-button surface;
+- do not reparse generated display text.
 
-- C0–C8 focused/current harness: **46/46 PASS**;
-- full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS**;
-- C5 compiler/context-health: **13/13 PASS**;
-- two full Conversation generations are byte-identical;
-- compiler context-health: **pass**, 0 errors, 0 numeric shard violations, 0 opaque shard violations;
-- C9 social events: **1/1 PASS**;
-- C9 conduct: **2/2 PASS**;
-- C0A conduct-saturation characterization: **1/1 PASS**;
-- C10 Conversation Inspector + pragmatic R6 focused batch: **12/12 PASS**;
-- PsychopatzCore semantic dialogue-turn, pattern-matcher and surface-recovery suites: PASS;
-- `git diff --check`: PASS before documentation cleanup.
+Add an exact save-backed regression proving:
 
-The accepted C11 ledger additionally records broader save-backed/lifecycle/NPC-scene/performance acceptance. Read git history or `HARNESS_ACCEPTANCE.md` only if that evidence becomes relevant to a regression.
+`fuckyouuuu` → generated direct responses → selected `conversation_branch` → native `session.choices` / TalkParity Response Channel contains those rows.
 
-## Live-test handoff
+## Remaining mandatory phases
 
-User-owned native Project Zomboid testing is the only remaining gate.
+- **L2:** decouple relationship-memory retention from immediate social reaction/effect;
+- **L3:** add richer typed hostility continuations such as CLAIM_JOKE and DOUBLE_DOWN;
+- **L4:** expand NPC UtterancePlan coverage/diversity, including WARN and contextual MIRROR;
+- **L5:** visible-surface + persistence + EN/TL integrated acceptance and user live handoff.
 
-For a live failure, capture the smallest reproducible case:
+## Safety / architecture invariants
 
-- exact typed input or clicked semantic choice;
-- language;
-- preceding NPC line/interaction when context-sensitive;
-- visible result versus expected result;
-- relevant Semantic Lab/Conversation Inspector trace if available.
+- no parallel parser, button engine, response engine or gameplay authority;
+- no giant generated response catalog;
+- no raw player-text echo into composed speech;
+- no transcript persistence;
+- bounded memory/storage remains bounded;
+- generated files stay compiler output, not authoring surfaces;
+- no Workshop publication or native-game mutation;
+- source save remains read-only.
 
-Then reopen only the owning subsystem and its phase-specific document. Do not reopen the full roadmap by default.
-
-## Safety
-
-- no Workshop publication;
-- no native PZ launch for ordinary developer acceptance;
-- no source-save mutation;
-- no root `AGENTS.md` goal-state edits;
-- no hand-editing generated Conversation runtime artifacts;
-- no full transcript/UtterancePlan/button-combination persistence.
+Git history is the archive for completed C0–C11 details; do not re-expand this file with old phase narratives.
