@@ -1,57 +1,54 @@
 # Progress — Coherent Emergent Conversation
 
 **Status:** IN PROGRESS — live-regression quality recovery.
-**Accepted foundation:** C0–C11 + L1 + L2.
-**Active phase:** L3 — richer typed hostility continuations.
+**Accepted foundation:** C0–C11 + L1 + L2 + L3.
+**Active phase:** L4 — NPC microplanning, mirroring and dialogue diversity.
 **Branch:** existing `main`.
 
 ## Current truth
 
-Exact regression anchor:
+The exact Dana regression remains the acceptance anchor.
 
-- save: `Sandbox/2026-10-22_15-18-56/global_mod_data.bin`;
-- NPC: `npcDanapatz_Y5KK` / Dana patz;
-- input: `fuckyouuuu`.
+Accepted recovery:
 
-Accepted recovery so far:
-
-- **L1:** generated `conversation_branch` rows now become the actual native Response Channel; Back restores `conversation_landing` and authored/root actions;
-- **L2:** bounded relationship-memory retention is independent from immediate social-event acceptance; pruned memory reports `relationshipMemoryOutcome=pruned` instead of rejecting the interaction;
-- Dana now returns `accepted=true`, `reason=relationship_clamped`, `memoryRecorded=false`, relationship memory `pruned`, conduct evidence `bounded/pruned`, and keeps the Director's real NPC response;
-- source save remains read-only;
-- L2 exact save regression: **1/1 PASS**;
-- portable `pnc_social_events`: **1/1 PASS**;
+- **L1:** current-turn generated direct responses are the native Response Channel; Back restores authored/root navigation;
+- **L2:** relationship-memory and conduct-evidence capacity no longer reject an otherwise valid social interaction;
+- **L3:** hostility now exposes typed `CLAIM_JOKE` and `DOUBLE_DOWN` strategies alongside apology/challenge/dismiss/follow-up, using compiler-owned EN/TL constructions;
+- `CLAIM_JOKE` is a repair semantic frame and enters `beat.reconciliation`;
+- `DOUBLE_DOWN` is a hostile semantic frame and remains in `beat.argument_escalation`;
+- exact Dana surface includes the new repair/escalation choices;
+- L3/C6-C7/L1/L2 focused batch: **16/16 PASS**;
 - full `pnc_semantic`: **99/99 PASS**.
 
-The remaining visible-quality gap is that the hostility branch still offers only generic `APOLOGIZE / CHALLENGE / DISMISS / ASK_WHY`, and common NPC WARN responses remain sparsely realized.
+The remaining quality defect is NPC realization. Dana commonly selects `behavior.warn / BOUNDARY_WARNING`; `UtterancePlan.FromInteraction()` does not map WARN, so the response falls back to sparse authored Dialogue Content. MIRROR works only when `RETALIATE_VERBALLY` wins and currently has one construction per locale.
 
-## Immediate Next Chunk — L3
+## Immediate Next Chunk — L4
 
-Expand the existing generated-affordance provider with typed hostility strategies that express genuinely different intentions.
+Expand the existing UtterancePlan/SpeechRealization authority rather than adding response definitions.
 
 Required first slice:
 
-- `CLAIM_JOKE` — positive/reparative but distinct from apology;
-- `DOUBLE_DOWN` — negative/escalating and distinct from challenge;
-- retain `APOLOGIZE`, `CHALLENGE`, `DISMISS`, `ASK_WHY` as eligible alternatives;
-- preserve the provider's bounded candidate cap and semantic diversity;
-- strategies carry typed semantic frames and direct semantic-click execution;
-- generated wording comes from compiler-owned UtterancePlan constructions, not hardcoded execution text;
-- EN/TL constructions remain locale-owned;
-- typed/button downstream behavior must remain coherent with the current beat.
+- map `WARN / BOUNDARY_WARNING` to a compositional WARN strategy;
+- retain contextual `RETALIATE_VERBALLY / MIRROR`, `DEESCALATE`, reconciliation and acknowledgement mappings;
+- add several bounded EN/TL WARN constructions and more than one MIRROR/retort construction where semantically safe;
+- construction selection is deterministic for stable semantic/style/relationship/turn context;
+- style/relationship hints may choose wording but may not change semantic intent;
+- canonical lexemes remain semantic-derived; raw input is never concatenated;
+- unsupported composition still falls back to Dialogue Content;
+- Inspector/response projection exposes the selected construction/strategy.
 
-Exact Dana Response Channel should expose contrasting repair/escalation/neutral choices without returning to the static landing surface.
+Director behavior arbitration remains separate from realization. Do not force MIRROR for every insult; Dana may legitimately WARN while a more aggressive/confident NPC retaliates.
 
-## Remaining mandatory phases
+## Remaining mandatory phase
 
-- **L4:** broader NPC UtterancePlan coverage/diversity, including WARN and contextual MIRROR;
-- **L5:** visible-surface + persistence + EN/TL integrated acceptance and user live handoff.
+- **L5:** visible-surface + persistence + EN/TL integrated acceptance, deterministic generation/context-health, broad regression and user live-test handoff.
 
 ## Safety / architecture invariants
 
 - one parser/discourse/button/response/gameplay authority;
+- one SpeechRealization authority;
 - no giant generated response catalog;
-- no raw player-text echo into composed speech;
+- no raw player-text echo;
 - no transcript persistence;
 - bounded relationship/conduct storage remains bounded;
 - generated files stay compiler output;

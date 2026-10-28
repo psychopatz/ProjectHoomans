@@ -63,6 +63,15 @@ return {
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_en.json",
     },
+    ["construction.en.social.claim_joke"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.claim_joke",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
     ["construction.en.social.comfort"] = {
         ["domain"] = "social",
         ["generated"] = {
@@ -105,6 +114,15 @@ return {
             "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
         },
         ["id"] = "construction.en.social.dismiss",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.double_down"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.double_down",
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_en.json",
     },
@@ -216,6 +234,15 @@ return {
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_tl.json",
     },
+    ["construction.tl.social.claim_joke"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.claim_joke",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
     ["construction.tl.social.comfort"] = {
         ["domain"] = "social",
         ["generated"] = {
@@ -258,6 +285,15 @@ return {
             "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
         },
         ["id"] = "construction.tl.social.dismiss",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.double_down"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.double_down",
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_tl.json",
     },

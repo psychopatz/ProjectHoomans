@@ -107,6 +107,20 @@ return {
         ["type"] = "construction",
     },
     {
+        ["dialogueAct"] = "APOLOGIZE",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.claim_joke",
+        ["locale"] = "EN",
+        ["strategy"] = "CLAIM_JOKE",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "I was joking.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
         ["dialogueAct"] = "QUESTION",
         ["domain"] = "social",
         ["id"] = "construction.en.social.comfort",
@@ -180,6 +194,20 @@ return {
             {
                 ["kind"] = "literal",
                 ["value"] = "Whatever.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "HOSTILE_REMARK",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.double_down",
+        ["locale"] = "EN",
+        ["strategy"] = "DOUBLE_DOWN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Yeah, I meant it.",
             },
         },
         ["type"] = "construction",

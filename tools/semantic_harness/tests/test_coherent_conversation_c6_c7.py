@@ -33,11 +33,18 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
 
         rows = generated_rows(turn)
         self.assertEqual(
-            [row["strategy"] for row in rows],
-            ["APOLOGIZE", "CHALLENGE", "DISMISS", "ASK_WHY"],
+            {row["strategy"] for row in rows},
+            {
+                "APOLOGIZE",
+                "CLAIM_JOKE",
+                "DOUBLE_DOWN",
+                "CHALLENGE",
+                "DISMISS",
+                "ASK_WHY",
+            },
         )
         self.assertEqual(len({row["strategy"] for row in rows}), len(rows))
-        self.assertLessEqual(len(rows), 6)
+        self.assertLessEqual(len(rows), 8)
         self.assertEqual(
             {row["stance"] for row in rows},
             {"POSITIVE", "NEGATIVE", "NEUTRAL"},
@@ -93,7 +100,10 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
             ["WELLBEING_POSITIVE", "WELLBEING_NEUTRAL", "WELLBEING_NEGATIVE"],
         )
         self.assertFalse(
-            {"APOLOGIZE", "CHALLENGE", "DISMISS", "ASK_WHY"}
+            {
+                "APOLOGIZE", "CLAIM_JOKE", "DOUBLE_DOWN",
+                "CHALLENGE", "DISMISS", "ASK_WHY",
+            }
             & {row["strategy"] for row in rows}
         )
         for row in rows:
@@ -156,6 +166,10 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
         self.assertEqual(set(surfaces["EN"]), set(surfaces["TL"]))
         self.assertEqual(surfaces["EN"]["APOLOGIZE"], "I'm sorry.")
         self.assertEqual(surfaces["TL"]["APOLOGIZE"], "pasensya na.")
+        self.assertEqual(surfaces["EN"]["CLAIM_JOKE"], "I was joking.")
+        self.assertEqual(surfaces["TL"]["CLAIM_JOKE"], "Nagbibiro lang ako.")
+        self.assertEqual(surfaces["EN"]["DOUBLE_DOWN"], "Yeah, I meant it.")
+        self.assertEqual(surfaces["TL"]["DOUBLE_DOWN"], "Oo, sinadya ko 'yon.")
         self.assertNotEqual(
             surfaces["EN"]["ASK_WHY"],
             surfaces["TL"]["ASK_WHY"],

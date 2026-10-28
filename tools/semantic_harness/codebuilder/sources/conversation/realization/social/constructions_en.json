@@ -249,6 +249,32 @@
           "value": "I'd rather not say."
         }
       ]
+    },
+    {
+      "id": "construction.en.social.claim_joke",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "CLAIM_JOKE",
+      "dialogueAct": "APOLOGIZE",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "I was joking."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.double_down",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "DOUBLE_DOWN",
+      "dialogueAct": "HOSTILE_REMARK",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Yeah, I meant it."
+        }
+      ]
     }
   ]
 }

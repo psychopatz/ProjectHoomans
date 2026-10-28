@@ -245,6 +245,32 @@
           "value": "Ayoko munang sabihin."
         }
       ]
+    },
+    {
+      "id": "construction.tl.social.claim_joke",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "CLAIM_JOKE",
+      "dialogueAct": "APOLOGIZE",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Nagbibiro lang ako."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.double_down",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "DOUBLE_DOWN",
+      "dialogueAct": "HOSTILE_REMARK",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Oo, sinadya ko 'yon."
+        }
+      ]
     }
   ]
 }

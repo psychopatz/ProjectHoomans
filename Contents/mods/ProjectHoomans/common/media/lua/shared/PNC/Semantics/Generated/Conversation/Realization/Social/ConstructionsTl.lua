@@ -103,6 +103,20 @@ return {
         ["type"] = "construction",
     },
     {
+        ["dialogueAct"] = "APOLOGIZE",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.claim_joke",
+        ["locale"] = "TL",
+        ["strategy"] = "CLAIM_JOKE",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Nagbibiro lang ako.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
         ["dialogueAct"] = "QUESTION",
         ["domain"] = "social",
         ["id"] = "construction.tl.social.comfort",
@@ -176,6 +190,20 @@ return {
             {
                 ["kind"] = "literal",
                 ["value"] = "Bahala ka.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "HOSTILE_REMARK",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.double_down",
+        ["locale"] = "TL",
+        ["strategy"] = "DOUBLE_DOWN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Oo, sinadya ko 'yon.",
             },
         },
         ["type"] = "construction",

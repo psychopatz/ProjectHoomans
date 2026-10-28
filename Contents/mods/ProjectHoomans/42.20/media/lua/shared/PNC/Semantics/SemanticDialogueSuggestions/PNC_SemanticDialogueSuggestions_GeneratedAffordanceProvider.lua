@@ -12,7 +12,7 @@ PNC.Semantics.DialogueGeneratedAffordanceProvider = Provider
 Provider.id = "projecthoomans.generated_affordances"
 Provider.sourceKind = "generated_affordance"
 Provider.order = 45
-Provider.MAX_CANDIDATES = 6
+Provider.MAX_CANDIDATES = 8
 
 local UtterancePlan = PNC.Semantics.UtterancePlan
     or require "PNC/Semantics/PNC_SemanticUtterancePlan"
@@ -212,6 +212,20 @@ local function semanticFor(strategy, frame, context)
         return "APOLOGIZE", "APOLOGIZE", "RECIPIENT", {
             directed = true,
             repair = true,
+        }, details
+    elseif strategy == "CLAIM_JOKE" then
+        return "APOLOGIZE", "APOLOGIZE", "RECIPIENT", {
+            directed = true,
+            repair = true,
+            joking = true,
+            soften = true,
+        }, details
+    elseif strategy == "DOUBLE_DOWN" then
+        return "HOSTILE_REMARK", "HOSTILE_REMARK", "RECIPIENT", {
+            directed = true,
+            challenge = true,
+            escalation = true,
+            doubledDown = true,
         }, details
     elseif strategy == "DEESCALATE" then
         return "APOLOGIZE", "APOLOGIZE", "RECIPIENT", {
@@ -427,6 +441,12 @@ function Provider.collect(context)
     if hostilityContext(context) then
         add(output, seen, candidate(
             "APOLOGIZE", "POSITIVE", context, "hostility_repair"
+        ))
+        add(output, seen, candidate(
+            "CLAIM_JOKE", "POSITIVE", context, "hostility_reframe_joke"
+        ))
+        add(output, seen, candidate(
+            "DOUBLE_DOWN", "NEGATIVE", context, "hostility_double_down"
         ))
         add(output, seen, candidate(
             "CHALLENGE", "NEGATIVE", context, "hostility_challenge"
