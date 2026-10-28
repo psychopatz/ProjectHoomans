@@ -1,0 +1,317 @@
+{
+  "domain": "knowledge",
+  "groups": {
+    "knowledge": {
+      "contentOwner": "projecthoomans.dialogue_content.knowledge"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "knowledge",
+      "semanticTemplateID": "semantic.gossip.unknown",
+      "styles": {
+        "bond_guarded": [
+          {
+            "translations": {
+              "EN": "%s, I don't have anything to share.",
+              "TL": "%s, wala akong maibabahagi."
+            }
+          }
+        ],
+        "bond_neutral": [
+          {
+            "translations": {
+              "EN": "%s, I haven't heard any news lately.",
+              "TL": "%s, wala akong narinig na balita kamakailan."
+            }
+          }
+        ],
+        "bond_terse": [
+          {
+            "translations": {
+              "EN": "%s, no news.",
+              "TL": "%s, walang balita."
+            }
+          }
+        ],
+        "bond_warm": [
+          {
+            "translations": {
+              "EN": "%s, I haven't heard any news, sorry.",
+              "TL": "%s, wala akong narinig na balita, pasensya."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I don't have anything to share.",
+              "TL": "Wala akong maibabahagi."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I haven't heard any news lately.",
+              "TL": "Wala akong narinig na balita kamakailan."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "No news.",
+              "TL": "Walang balita."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I haven't heard any news, sorry.",
+              "TL": "Wala akong narinig na balita, pasensya."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "knowledge",
+      "semanticTemplateID": "semantic.question.activity.dataset.keep_moving",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I'm keeping busy. Don't distract me.",
+              "TL": "Abala ako. Huwag mo akong gambalain."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm doing what I can to keep things moving.",
+              "TL": "Ginagawa ko ang kaya ko para magpatuloy ang lahat."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Keeping busy.",
+              "TL": "Nagiging abala."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm doing what I can to keep things moving. Thanks for asking.",
+              "TL": "Ginagawa ko ang kaya ko para magpatuloy ang lahat. Salamat sa pagtatanong."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "knowledge",
+      "semanticTemplateID": "semantic.question.activity.fishing",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I'm fishing. Don't distract me.",
+              "TL": "Nangingisda ako. Huwag mo akong gambalain."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm trying to catch something.",
+              "TL": "Sinusubukan kong makahuli ng anuman."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Fishing.",
+              "TL": "Nangingisda."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm trying to catch something. Give me a moment.",
+              "TL": "Sinusubukan kong makahuli. Bigyan mo ako ng sandali."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "knowledge",
+      "semanticTemplateID": "semantic.question.identity",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I don't share my name yet. What's yours?",
+              "TL": "Hindi ko pa sinasabi ang pangalan ko. Ano ang iyo?"
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll tell you my name once we've established some trust. What's yours?",
+              "TL": "Sasabihin ko ang pangalan ko kapag may tiwala na tayo. Ano ang iyo?"
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Not yet. Your name?",
+              "TL": "Hindi pa. Ano ang pangalan mo?"
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'll tell you my name once we know each other. What should I call you?",
+              "TL": "Sasabihin ko ang pangalan ko kapag magkakilala na tayo. Ano ang itatawag ko sa iyo?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "knowledge",
+      "semanticTemplateID": "semantic.question.identity.known",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I'm %s. You should already know that.",
+              "TL": "Ako si %s. Dapat kilala mo na ako."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm %s. We already know each other.",
+              "TL": "Ako si %s. Kilala na natin ang isa't isa."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "You know me. I'm %s.",
+              "TL": "Kilala mo ako. Ako si %s."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm %s. Good to see you again.",
+              "TL": "Ako si %s. Mabuti at nakita kita ulit."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "knowledge",
+      "semanticTemplateID": "semantic.question.knowledge.known",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I know enough.",
+              "TL": "Sapat ang alam ko."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I know about that.",
+              "TL": "May alam ako tungkol diyan."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I know it.",
+              "TL": "Alam ko iyan."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I know about that. I can share what I remember.",
+              "TL": "May alam ako tungkol diyan. Maibabahagi ko ang naaalala ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "knowledge",
+      "semanticTemplateID": "semantic.question.knowledge.unknown",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I don't know that. Don't guess.",
+              "TL": "Hindi ko alam iyan. Huwag manghula."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't have reliable information about that.",
+              "TL": "Wala akong maaasahang impormasyon tungkol diyan."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I don't know.",
+              "TL": "Hindi ko alam."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I don't know enough about that to help.",
+              "TL": "Hindi sapat ang alam ko para makatulong."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

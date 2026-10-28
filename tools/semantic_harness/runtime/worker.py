@@ -313,14 +313,14 @@ class LuaSemanticWorker:
 
         return self._conversation.set_language(language)
 
-    def tool_reply(
+    def tool_result_speech(
         self,
         results: list[dict[str, Any]],
         context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Resolve a production dedicated tool reply through the real catalog."""
+        """Realize authoritative tool-result speech through production semantics."""
 
-        return self._conversation.tool_reply(results, context)
+        return self._conversation.tool_result_speech(results, context)
 
     def interaction_envelope(self, payload: dict[str, Any]) -> dict[str, Any]:
         """Build a canonical envelope in the production Lua lifecycle."""

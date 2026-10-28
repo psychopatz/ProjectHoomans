@@ -1,0 +1,500 @@
+{
+  "domain": "social",
+  "groups": {
+    "commands_emotes": {
+      "contentOwner": "projecthoomans.dialogue_content.commands_emotes"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.social.acknowledged",
+      "styles": {
+        "bond_guarded": [
+          {
+            "translations": {
+              "EN": "%s, understood. We'll leave it there.",
+              "TL": "%s, naiintindihan ko. Tama na iyon."
+            }
+          }
+        ],
+        "bond_neutral": [
+          {
+            "translations": {
+              "EN": "%s, all right.",
+              "TL": "%s, sige."
+            }
+          }
+        ],
+        "bond_terse": [
+          {
+            "translations": {
+              "EN": "%s, all right.",
+              "TL": "%s, sige."
+            }
+          }
+        ],
+        "bond_warm": [
+          {
+            "translations": {
+              "EN": "%s, all right. I hear you.",
+              "TL": "%s, sige. Narinig kita."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Understood. We'll leave it there.",
+              "TL": "Naiintindihan ko. Tama na iyon."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right.",
+              "TL": "Sige."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "All right.",
+              "TL": "Sige."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "All right. I hear you.",
+              "TL": "Sige. Narinig kita."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.social.dispute_friendly",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I disagree. Leave it there.",
+              "TL": "Hindi ako sang-ayon. Tama na."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I see it differently, but we're okay.",
+              "TL": "Iba ang tingin ko, pero ayos tayo."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I disagree.",
+              "TL": "Hindi ako sang-ayon."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I see it differently, but we're still okay.",
+              "TL": "Iba ang tingin ko, pero ayos pa rin tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.social.dispute_stressed",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I hear you. Not now.",
+              "TL": "Naririnig kita. Hindi ngayon."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you, but I need a moment.",
+              "TL": "Naririnig kita, pero kailangan ko ng sandali."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Need a moment.",
+              "TL": "Kailangan ng sandali."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I hear you, but I need a moment before we continue.",
+              "TL": "Naririnig kita, pero kailangan ko ng sandali bago magpatuloy."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.social.dispute_trusted",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I still don't agree. Leave it there.",
+              "TL": "Hindi pa rin ako sang-ayon. Tama na."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I respect that. I still don't agree.",
+              "TL": "Iginagalang ko iyon. Hindi pa rin ako sang-ayon."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I still disagree.",
+              "TL": "Hindi pa rin ako sang-ayon."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I respect that. I still don't agree, but we can talk it through.",
+              "TL": "Iginagalang ko iyon. Hindi pa rin ako sang-ayon, pero maaari natin itong pag-usapan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.social.dispute_withdrawn",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Let's leave it there.",
+              "TL": "Tama na iyon."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Let's leave it there.",
+              "TL": "Tama na iyon."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Leave it.",
+              "TL": "Tama na."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Let's leave it there for now.",
+              "TL": "Tama na muna iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.social.hostile_boundary",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Don't talk to me like that.",
+              "TL": "Huwag mo akong kausapin nang ganyan."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Don't talk to me like that.",
+              "TL": "Huwag mo akong kausapin nang ganyan."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Don't.",
+              "TL": "Huwag."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Please don't talk to me like that.",
+              "TL": "Pakiusap, huwag mo akong kausapin nang ganyan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.social.hostile_short",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Watch your mouth. Now.",
+              "TL": "Bantayan mo ang pananalita mo. Ngayon."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Watch your mouth.",
+              "TL": "Bantayan mo ang pananalita mo."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Watch it.",
+              "TL": "Mag-ingat ka."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Watch your mouth, please.",
+              "TL": "Pakiusap, bantayan mo ang pananalita mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.social.hostile_stressed",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "That's enough. Back away.",
+              "TL": "Tama na. Umatras ka."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's enough. Keep it up and we're done.",
+              "TL": "Tama na. Ipagpatuloy mo at tapos na tayo."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Enough. Back off.",
+              "TL": "Tama na. Lumayo ka."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "That's enough. Step back and we'll keep this calm.",
+              "TL": "Tama na. Umatras ka at mananatili tayong mahinahon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.social.hostile_withdrawn",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Leave me alone. Now.",
+              "TL": "Iwan mo ako. Ngayon."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Then leave me alone.",
+              "TL": "Iwan mo na ako."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Leave me alone.",
+              "TL": "Iwan mo ako."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Please leave me alone for now.",
+              "TL": "Pakiusap, iwan mo muna ako."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.social.offer_friendly",
+      "styles": {
+        "bond_guarded": [
+          {
+            "translations": {
+              "EN": "%s, no thanks. I'll handle it.",
+              "TL": "%s, hindi salamat. Ako na ang bahala."
+            }
+          }
+        ],
+        "bond_neutral": [
+          {
+            "translations": {
+              "EN": "%s, that's kind of you. I'll keep it in mind.",
+              "TL": "%s, mabuti iyon. Tatandaan ko."
+            }
+          }
+        ],
+        "bond_terse": [
+          {
+            "translations": {
+              "EN": "%s, thanks.",
+              "TL": "%s, salamat."
+            }
+          }
+        ],
+        "bond_warm": [
+          {
+            "translations": {
+              "EN": "%s, thank you. I'll keep it in mind.",
+              "TL": "%s, salamat. Tatandaan ko."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "No, thanks. I'll handle it.",
+              "TL": "Hindi, salamat. Ako na ang bahala."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's kind of you. I'll keep it in mind.",
+              "TL": "Mabuti iyon. Tatandaan ko."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Thanks.",
+              "TL": "Salamat."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Thank you. I'll keep it in mind.",
+              "TL": "Salamat. Tatandaan ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.social.threat_boundary",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Back away. Now.",
+              "TL": "Umatras ka. Ngayon."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Back off.",
+              "TL": "Lumayo ka."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Back off.",
+              "TL": "Lumayo ka."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Step back, please.",
+              "TL": "Pakiusap, umatras ka."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

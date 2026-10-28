@@ -79,7 +79,7 @@ local function loadConversationSemantic(load, registerEntryPointModule)
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticInventoryQuery.lua", "inventory")
     load("ProjectHoomans", "server", "PNC/Semantics/Inventory/PNC_SemanticItemSelector.lua", "inventory")
     load("ProjectHoomans", "server", "PNC/Semantics/Inventory/PNC_SemanticInventoryQueryService.lua", "inventory")
-    load("ProjectHoomans", "shared", "PNC/Conversation/PNC_ConversationToolReplies.lua", "tool_replies")
+    load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticToolResultRealization.lua", "tool_result_realization")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticCatalog.lua", "semantic")
     for _, spoke in ipairs({
         "PNC_SemanticCatalog_QuestionPatterns_ContextQuestions_Environment.lua",

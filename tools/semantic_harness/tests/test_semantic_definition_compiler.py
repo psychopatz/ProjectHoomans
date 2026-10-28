@@ -48,8 +48,10 @@ class SemanticAuthoringCompilerTests(unittest.TestCase):
                     "variants": [{
                         "id": "accepted",
                         "key": "UI_PNC_Conversation_Semantic_TestFollow",
-                        "en": "Okay, I will follow.",
-                        "tl": "Sige, susunod ako.",
+                        "translations": {
+                            "EN": "Okay, I will follow.",
+                            "TL": "Sige, susunod ako.",
+                        },
                     }],
                 },
             }],

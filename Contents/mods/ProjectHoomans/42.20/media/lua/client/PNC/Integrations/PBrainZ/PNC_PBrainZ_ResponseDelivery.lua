@@ -110,13 +110,13 @@ local function liveResponse(pending, arguments)
         pending.npcID,
         pending.view.session
     )
-    local forceToolReply = tostring(arguments.presentation_reason or "")
+    local forceToolAcknowledgement = tostring(arguments.presentation_reason or "")
         == "tool_ack"
-    local response = forceToolReply and ""
+    local response = forceToolAcknowledgement and ""
         or Runtime.CleanResponseText(arguments.response_text)
     local failed = providerFailed(arguments)
-    -- Provider failures may still carry a legacy/generic response from an
-    -- older bridge. Let the authoritative semantic result own presentation.
+    -- Provider failures may still carry a generic response. Let the
+    -- authoritative semantic result own presentation.
     if failed then response = "" end
     if response == "" then
         response, failed = Fallback.OrFailure(
@@ -125,7 +125,7 @@ local function liveResponse(pending, arguments)
             #semanticResults > 0,
             semanticResults,
             pending.packet,
-            forceToolReply
+            forceToolAcknowledgement
         )
     end
     return response, failed, Runtime.DeclinedPortraitAnimation(semanticResults)

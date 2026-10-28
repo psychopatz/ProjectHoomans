@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import math
 import re
 from typing import Any
@@ -33,7 +34,7 @@ def _compile_dialogue_pattern(
         raise CompileError("dialogue patterns must be objects")
     allowed_fields = {
         "id", "utterance", "emit", "confidence", "priority", "negatives",
-        "reviewed", "sourceRefs", "mapping", "match",
+        "reviewed", "sourceRefs", "mapping", "match", "semanticLabGraph",
     }
     if set(value) - allowed_fields:
         raise CompileError("dialogue pattern contains unsupported fields")
@@ -298,4 +299,27 @@ def _compile_dialogue_pattern(
         }
     if normalized_mapping is not None:
         compiled.setdefault("metadata", {})["mapping"] = normalized_mapping
+    graph_metadata = value.get("semanticLabGraph")
+    if graph_metadata is not None:
+        if not isinstance(graph_metadata, dict):
+            raise CompileError(
+                f"dialogue pattern {pattern_id} semanticLabGraph must be an object"
+            )
+        try:
+            encoded_graph = json.dumps(
+                graph_metadata,
+                ensure_ascii=False,
+                sort_keys=True,
+            )
+        except (TypeError, ValueError) as error:
+            raise CompileError(
+                f"dialogue pattern {pattern_id} semanticLabGraph must be JSON-serializable"
+            ) from error
+        if len(encoded_graph) > 16_384:
+            raise CompileError(
+                f"dialogue pattern {pattern_id} semanticLabGraph exceeds the metadata size bound"
+            )
+        compiled.setdefault("metadata", {})["semanticLabGraph"] = json.loads(
+            encoded_graph
+        )
     return compiled, normalized_negatives

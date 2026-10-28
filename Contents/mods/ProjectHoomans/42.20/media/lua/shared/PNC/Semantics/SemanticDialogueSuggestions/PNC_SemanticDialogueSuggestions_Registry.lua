@@ -15,10 +15,10 @@ Registry.MAX_PROVIDERS = 32
 Registry.MAX_CANDIDATES = 24
 Registry.MAX_COLLECTION_DIAGNOSTICS = 8
 
--- Generic collection consumes the already-presented candidate contract. The
--- legacy Project Hoomans static/capability providers remain registered for
--- their authoritative eligibility adapters, but raw definitions must not
--- bypass those adapters merely because they are discoverable in the registry.
+-- Generic collection consumes the already-presented candidate contract.
+-- Static/capability providers retain their authoritative eligibility adapters;
+-- raw definitions must not bypass those adapters merely because they are
+-- discoverable in the registry.
 local function isCanonicalCandidate(candidate)
     return type(candidate) == "table"
         and type(candidate.frame) == "table"

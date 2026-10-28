@@ -18,97 +18,187 @@
     {
       "domain": "greeting",
       "kind": "content",
-      "order": 120,
+      "order": 1200,
       "path": "content/greeting.json"
     },
     {
       "domain": "social",
       "kind": "content",
-      "order": 130,
-      "path": "content/social.json"
+      "order": 1300,
+      "path": "content/social/emotes.json"
+    },
+    {
+      "domain": "social",
+      "kind": "content",
+      "order": 1301,
+      "path": "content/social/reactions.json"
+    },
+    {
+      "domain": "social",
+      "kind": "content",
+      "order": 1302,
+      "path": "content/social/tool_replies.json"
+    },
+    {
+      "domain": "conversation",
+      "kind": "content",
+      "order": 1310,
+      "path": "content/conversation.json"
     },
     {
       "domain": "apology",
       "kind": "content",
-      "order": 132,
+      "order": 1320,
       "path": "content/social_apology.json"
     },
     {
       "domain": "health",
       "kind": "content",
-      "order": 133,
+      "order": 1330,
       "path": "content/health.json"
+    },
+    {
+      "domain": "knowledge",
+      "kind": "content",
+      "order": 1340,
+      "path": "content/knowledge.json"
     },
     {
       "domain": "wellbeing",
       "kind": "content",
-      "order": 135,
+      "order": 1350,
       "path": "content/wellbeing.json"
     },
     {
       "domain": "needs",
       "kind": "content",
-      "order": 137,
+      "order": 1370,
       "path": "content/needs.json"
+    },
+    {
+      "domain": "navigation",
+      "kind": "content",
+      "order": 1390,
+      "path": "content/navigation.json"
     },
     {
       "domain": "command",
       "kind": "content",
-      "order": 140,
-      "path": "content/command.json"
+      "order": 1400,
+      "path": "content/command/player.json"
+    },
+    {
+      "domain": "command",
+      "kind": "content",
+      "order": 1401,
+      "path": "content/command/replies.json"
+    },
+    {
+      "domain": "command",
+      "kind": "content",
+      "order": 1402,
+      "path": "content/command/lifecycle.json"
     },
     {
       "domain": "event",
       "kind": "content",
-      "order": 150,
-      "path": "content/event.json"
+      "order": 1500,
+      "path": "content/event/medical.json"
+    },
+    {
+      "domain": "event",
+      "kind": "content",
+      "order": 1501,
+      "path": "content/event/reactions.json"
     },
     {
       "domain": "compatibility",
       "kind": "content",
-      "order": 160,
+      "order": 1600,
       "path": "content/compatibility.json"
+    },
+    {
+      "domain": "quest",
+      "kind": "content",
+      "order": 1650,
+      "path": "content/quest.json"
     },
     {
       "domain": "task",
       "kind": "content",
-      "order": 170,
-      "path": "content/task.json"
+      "order": 1700,
+      "path": "content/task/lifecycle.json"
+    },
+    {
+      "domain": "task",
+      "kind": "content",
+      "order": 1701,
+      "path": "content/task/tool_replies.json"
     },
     {
       "domain": "common",
       "kind": "patterns",
-      "order": 180,
-      "path": "patterns/common.json"
+      "order": 1800,
+      "path": "patterns/common/greeting_whats_up.json"
+    },
+    {
+      "domain": "common",
+      "kind": "patterns",
+      "order": 1801,
+      "path": "patterns/common/wellbeing_activity.json"
+    },
+    {
+      "domain": "common",
+      "kind": "patterns",
+      "order": 1802,
+      "path": "patterns/common/identity.json"
+    },
+    {
+      "domain": "common",
+      "kind": "patterns",
+      "order": 1803,
+      "path": "patterns/common/weather_needs.json"
     },
     {
       "domain": "common",
       "kind": "responses",
-      "order": 190,
-      "path": "flows/common_responses.json"
+      "order": 1900,
+      "path": "flows/common/social.json"
+    },
+    {
+      "domain": "common",
+      "kind": "responses",
+      "order": 1901,
+      "path": "flows/common/questions.json"
+    },
+    {
+      "domain": "common",
+      "kind": "responses",
+      "order": 1902,
+      "path": "flows/common/needs_weather.json"
     },
     {
       "domain": "grounded_personal",
       "kind": "patterns",
-      "order": 200,
+      "order": 2000,
       "path": "patterns/grounded_personal.json"
     },
     {
       "domain": "grounded_personal",
       "kind": "responses",
-      "order": 210,
+      "order": 2100,
       "path": "flows/grounded_personal_responses.json"
     },
     {
       "domain": "semantic",
       "kind": "flows",
-      "order": 220,
-      "path": "flows/semantic_definitions.json"
+      "order": 2200,
+      "path": "flows/semantic_flows.json"
     },
     {
       "domain": "static_suggestions",
       "kind": "ui",
-      "order": 230,
+      "order": 2300,
       "path": "ui/static_suggestions.json"
     }
   ],

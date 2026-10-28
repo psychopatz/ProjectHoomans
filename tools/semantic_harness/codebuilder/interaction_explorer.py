@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from .translation_support import legacy_translation_map
 
 import copy
 import json
@@ -249,8 +248,7 @@ def build_interaction_rows(production_catalog: dict[str, Any] | None) -> list[di
                     language.upper()
                     for variant in _iter_dicts(variants)
                     for language in (
-                        list((variant.get("translations") or {}).keys())
-                        + list(legacy_translation_map(variant))
+                        variant.get("translations") or {}
                     )
                 }),
             },

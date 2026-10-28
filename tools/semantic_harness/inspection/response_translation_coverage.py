@@ -11,8 +11,8 @@ from pathlib import Path
 from typing import Any
 
 from ..runtime.worker import LuaSemanticWorker
+from ..codebuilder.translation_support import DEFAULT_LANGUAGE, normalize_language
 
-LANGUAGES = ("EN", "TL")
 MAX_MANIFEST_ASSETS = 64
 MAX_TRANSLATION_ASSET_BYTES = 256 * 1024
 MAX_CONVERSATION_MANIFEST_BYTES = 64 * 1024
@@ -34,14 +34,32 @@ def translation_coverage(
         raise ValueError("oversized production Conversation manifest")
     manifest_bytes = manifest_path.read_bytes()
     manifest = json.loads(manifest_bytes.decode("utf-8"))
-    if not isinstance(manifest, dict) or not isinstance(manifest.get("languages"), dict):
+    raw_languages = manifest.get("languages") if isinstance(manifest, dict) else None
+    if not isinstance(raw_languages, dict) or not raw_languages:
         raise ValueError("invalid production Conversation manifest")
-    index: dict[str, dict[str, list[str]]] = {language: {} for language in LANGUAGES}
-    for language in LANGUAGES:
-        paths = manifest["languages"].get(language)
+
+    normalized_languages: dict[str, list[str]] = {}
+    for raw_language, paths in raw_languages.items():
+        language = normalize_language(raw_language, "Conversation manifest language")
+        if language in normalized_languages:
+            raise ValueError("duplicate normalized Conversation manifest language")
         if not isinstance(paths, list) or len(paths) > MAX_MANIFEST_ASSETS:
             raise ValueError("missing or unbounded translation manifest language")
-        for name in paths:
+        normalized_languages[language] = paths
+    if DEFAULT_LANGUAGE not in normalized_languages:
+        raise ValueError(
+            f"Conversation manifest requires {DEFAULT_LANGUAGE} fallback language"
+        )
+    languages = (
+        DEFAULT_LANGUAGE,
+        *sorted(set(normalized_languages) - {DEFAULT_LANGUAGE}),
+    )
+
+    index: dict[str, dict[str, list[str]]] = {
+        language: {} for language in languages
+    }
+    for language in languages:
+        for name in normalized_languages[language]:
             if (not isinstance(name, str)
                     or not name.startswith(language + "/")
                     or not name.endswith(".json")
@@ -59,45 +77,58 @@ def translation_coverage(
                 if not isinstance(key, str) or not isinstance(text, str):
                     raise ValueError("translation catalog contains non-text entry")
                 index[language].setdefault(key, []).append(name)
+
     rows = []
     counts = {
-        "BOTH_MANIFESTED": 0, "MISSING_EN": 0, "MISSING_TL": 0,
-        "NOT_IN_CONVERSATION_MANIFEST": 0, "DUPLICATE_MANIFEST_KEY": 0,
+        "ALL_MANIFESTED": 0,
+        "PARTIAL_MANIFESTED": 0,
+        "NOT_IN_CONVERSATION_MANIFEST": 0,
+        "DUPLICATE_MANIFEST_KEY": 0,
     }
     for variant in detail["variants"]:
         key = variant.get("templateID")
-        paths = {language: index[language].get(key, []) if isinstance(key, str)
-                 else [] for language in LANGUAGES}
-        if any(len(paths[lang]) > 1 for lang in LANGUAGES):
+        paths = {
+            language: index[language].get(key, []) if isinstance(key, str) else []
+            for language in languages
+        }
+        if any(len(paths[language]) > 1 for language in languages):
             status = "DUPLICATE_MANIFEST_KEY"
-        elif paths["EN"] and paths["TL"]:
-            status = "BOTH_MANIFESTED"
-        elif paths["EN"]:
-            status = "MISSING_TL"
-        elif paths["TL"]:
-            status = "MISSING_EN"
+        elif all(paths[language] for language in languages):
+            status = "ALL_MANIFESTED"
+        elif any(paths[language] for language in languages):
+            status = "PARTIAL_MANIFESTED"
         else:
             status = "NOT_IN_CONVERSATION_MANIFEST"
         counts[status] += 1
         rows.append({
-            "variantID": variant["id"], "templateID": key,
+            "variantID": variant["id"],
+            "templateID": key,
             "sourceKind": variant.get("sourceKind", "UNKNOWN"),
-            "status": status, "manifestAssets": paths,
+            "status": status,
+            "manifestAssets": paths,
+            "missingLocales": [
+                language for language in languages if not paths[language]
+            ],
             "actualRuntimeLookupObserved": False,
             "fallbackEvidence": "UNTESTED",
         })
     return {
-        "ok": True, "type": "response_translation_manifest_coverage",
-        "schemaVersion": 1, "poolID": pool_id,
+        "ok": True,
+        "type": "response_translation_manifest_coverage",
+        "schemaVersion": 2,
+        "poolID": pool_id,
         "sourceKind": "CANONICAL_MANIFEST_STATIC",
+        "languages": list(languages),
         "manifestSHA256": hashlib.sha256(manifest_bytes).hexdigest(),
         "contentFingerprint": detail["contentFingerprint"],
         "registryRevision": detail["registryRevision"],
-        "variantCount": len(rows), "summary": counts, "variants": rows,
+        "variantCount": len(rows),
+        "summary": counts,
+        "variants": rows,
         "limitations": [
             "Manifest membership is not a runtime translation lookup",
             "A templateID may intentionally use fallback or nonmanifested keys",
-            "Runtime EN/TL text and fallback must be established by Lua replay",
+            "Runtime localized text and fallback must be established by Lua replay",
         ],
         "writes": 0,
     }

@@ -325,7 +325,7 @@ def promote_reviewed_candidates(
         "diagnostics": diagnostics,
         "writes": [],
         "canonicalSource": (
-            "tools/semantic_harness/codebuilder/sources/common_interactions.json"
+            "tools/semantic_harness/codebuilder/sources/conversation/patterns/common/"
         ),
         "runtimePackaged": False,
     }

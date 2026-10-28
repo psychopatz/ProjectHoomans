@@ -53,22 +53,13 @@ class V1VisualAuthoringTests(unittest.TestCase):
             REPOSITORY / "Contents" / "mods" / "ProjectHoomans",
             root / "Contents" / "mods" / "ProjectHoomans",
         )
-        (root / "tools" / "semantic_harness" / "codebuilder" / "sources").mkdir(
-            parents=True
+        source_target = (
+            root / "tools/semantic_harness/codebuilder/sources/conversation"
         )
-        shutil.copy2(
-            REPOSITORY
-            / "tools"
-            / "semantic_harness"
-            / "codebuilder"
-            / "sources"
-            / "grounded_personal_dialogue.json",
-            root
-            / "tools"
-            / "semantic_harness"
-            / "codebuilder"
-            / "sources"
-            / "grounded_personal_dialogue.json",
+        source_target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(
+            REPOSITORY / "tools/semantic_harness/codebuilder/sources/conversation",
+            source_target,
         )
         shutil.copytree(
             REPOSITORY / "tools" / "semantic_harness" / "lua",
@@ -83,13 +74,6 @@ class V1VisualAuthoringTests(unittest.TestCase):
             REPOSITORY / "tests" / "test_config.lua",
             root / "tests" / "test_config.lua",
         )
-        source = REPOSITORY / (
-            "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
-        )
-        target = root / (
-            "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
-        )
-        target.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
 
     def test_backstory_and_registered_action_share_preview_approval_generation_and_worker(self) -> None:
         backstory = backstory_spec(
@@ -107,8 +91,8 @@ class V1VisualAuthoringTests(unittest.TestCase):
         action["blocks"][1]["parameters"]["action"] = "FOLLOW"
         action["blocks"][2]["parameters"]["poolID"] = "semantic.lab.v1.follow"
         action["blocks"][2]["parameters"]["variants"][0]["key"] = "UI_PNC_Conversation_Semantic_LabV1Follow"
-        action["blocks"][2]["parameters"]["variants"][0]["en"] = "Okay, I will follow you for V1."
-        action["blocks"][2]["parameters"]["variants"][0]["tl"] = "Sige, susunod ako sa iyo para sa V1."
+        action["blocks"][2]["parameters"]["variants"][0]["translations"]["EN"] = "Okay, I will follow you for V1."
+        action["blocks"][2]["parameters"]["variants"][0]["translations"]["TL"] = "Sige, susunod ako sa iyo para sa V1."
 
         with tempfile.TemporaryDirectory(prefix="project-hoomans-v1-") as directory:
             root = Path(directory)
@@ -118,13 +102,13 @@ class V1VisualAuthoringTests(unittest.TestCase):
                 catalog = catalog_worker.flow_catalog()
 
             backstory_preview = service.preview_workflow(
-                "grounded_personal_dialogue",
+                "grounded_personal",
                 BACKSTORY_BLOCKS,
                 production_catalog=catalog,
                 interaction_spec=backstory,
             )
             action_preview = service.preview_workflow(
-                "semantic_definitions",
+                "semantic_flows",
                 ACTION_BLOCKS,
                 production_catalog=catalog,
                 interaction_spec=action,
@@ -142,14 +126,14 @@ class V1VisualAuthoringTests(unittest.TestCase):
             self.assertIn("semanticLabGraph", backstory_preview["sourcePreview"]["compiled"])
 
             generated_backstory = service.generate_workflow(
-                "grounded_personal_dialogue",
+                "grounded_personal",
                 BACKSTORY_BLOCKS,
                 production_catalog=catalog,
                 interaction_spec=backstory,
                 approved=True,
             )
             generated_action = service.generate_workflow(
-                "semantic_definitions",
+                "semantic_flows",
                 ACTION_BLOCKS,
                 production_catalog=catalog,
                 interaction_spec=action,
@@ -188,11 +172,11 @@ class V1VisualAuthoringTests(unittest.TestCase):
             )
 
             changed_action = deepcopy(action)
-            changed_action["blocks"][2]["parameters"]["variants"][0]["en"] = (
+            changed_action["blocks"][2]["parameters"]["variants"][0]["translations"]["EN"] = (
                 "I will follow you after this graph edit."
             )
             changed_generated = service.generate_workflow(
-                "semantic_definitions",
+                "semantic_flows",
                 ACTION_BLOCKS,
                 production_catalog=catalog,
                 interaction_spec=changed_action,

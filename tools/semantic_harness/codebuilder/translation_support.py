@@ -9,7 +9,6 @@ from typing import Any
 from .lexicon_compiler import CompileError
 
 DEFAULT_LANGUAGE = "EN"
-LEGACY_TRANSLATION_FIELDS = {"en": "EN", "tl": "TL"}
 _LANGUAGE = re.compile(r"^[A-Z][A-Z0-9_-]{1,15}$")
 
 
@@ -66,14 +65,3 @@ def pretty_json(value: Any) -> str:
         indent=2,
         sort_keys=True,
     ) + "\n"
-
-
-def legacy_translation_map(record: Any) -> dict[str, Any]:
-    """Extract pre-generic locale fields for backward-compatible source reads."""
-    if not isinstance(record, dict):
-        return {}
-    return {
-        language: record[field]
-        for field, language in LEGACY_TRANSLATION_FIELDS.items()
-        if field in record
-    }

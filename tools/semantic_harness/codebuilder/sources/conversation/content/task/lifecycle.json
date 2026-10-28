@@ -1,0 +1,578 @@
+{
+  "domain": "task",
+  "groups": {
+    "tool_replies": {
+      "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.gift.completed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Thank you for the gift.",
+              "TL": "Salamat sa regalo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.gift.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't accept that gift.",
+              "TL": "Hindi ko matanggap ang regalong iyan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.gift.pending",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll take a look at that gift.",
+              "TL": "Titingnan ko ang regalong iyan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.gift.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't accept that gift right now.",
+              "TL": "Hindi ko matanggap ang regalong iyan ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.gift.selection_required",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I need to see what you brought me first.",
+              "TL": "Kailangan ko munang makita ang dala mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.consume.active",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm using that now.",
+              "TL": "Ginagamit ko na iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.consume.admitted",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll use that.",
+              "TL": "Gagamitin ko iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.consume.completed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's done.",
+              "TL": "Tapos na iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.consume.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't use that.",
+              "TL": "Hindi ko nagamit iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.consume.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't use that right now.",
+              "TL": "Hindi ko magamit iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.drink.active",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm drinking that now.",
+              "TL": "Ini-inom ko na iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.drink.admitted",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll drink that.",
+              "TL": "Iinumin ko iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.drink.completed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I feel better.",
+              "TL": "Mas mabuti na ang pakiramdam ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.drink.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't drink that.",
+              "TL": "Hindi ko nainom iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.drink.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't drink that right now.",
+              "TL": "Hindi ko mainom iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.eat.active",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm eating that now.",
+              "TL": "Kinakain ko na iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.eat.admitted",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll eat that.",
+              "TL": "Kakainin ko iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.eat.completed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That hit the spot.",
+              "TL": "Sakto iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.eat.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't eat that.",
+              "TL": "Hindi ko nakain iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.eat.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't eat that right now.",
+              "TL": "Hindi ko makain iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.fetch.active",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm working on that now.",
+              "TL": "Inaayos ko na iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.fetch.admitted",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll fetch that.",
+              "TL": "Kukunin ko iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.fetch.completed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Here you go.",
+              "TL": "Heto na."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.fetch.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't fetch that.",
+              "TL": "Hindi ko nakuha iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.fetch.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't fetch that right now.",
+              "TL": "Hindi ko makuha iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.give.active",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm handing that over now.",
+              "TL": "Ibinibigay ko na iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.give.admitted",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Okay, I'll give that to you.",
+              "TL": "Sige, ibibigay ko iyon sa iyo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.give.completed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Here you go.",
+              "TL": "Heto na."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.give.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't give that.",
+              "TL": "Hindi ko naibigay iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.give.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't give that right now.",
+              "TL": "Hindi ko maibigay iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.refill.active",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm refilling that now.",
+              "TL": "Pinupuno ko na iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.refill.admitted",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll refill that.",
+              "TL": "Pupunuin ko iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.refill.completed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's full now.",
+              "TL": "Puno na ito ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.refill.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't refill that.",
+              "TL": "Hindi ko napuno iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.refill.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't refill that right now.",
+              "TL": "Hindi ko mapuno iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.wait_at.active",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm waiting there now.",
+              "TL": "Naghihintay na ako roon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.wait_at.admitted",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Okay, I'll wait there.",
+              "TL": "Sige, maghihintay ako roon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.wait_at.completed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm here.",
+              "TL": "Narito na ako."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.wait_at.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't wait there.",
+              "TL": "Hindi ako nakapaghintay roon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "tool_replies",
+      "semanticTemplateID": "semantic.task.wait_at.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't wait there right now.",
+              "TL": "Hindi ako makapaghihintay roon ngayon."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

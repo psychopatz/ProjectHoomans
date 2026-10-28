@@ -1,0 +1,14 @@
+{
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesAcceptFailedNeutral01": "I couldn't accept that request.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesAcceptQueuedNeutral01": "I'll bring the clinic supplies.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesAcceptRejectedNeutral01": "I can't accept that request right now.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesOfferFailedNeutral01": "I couldn't check that clinic-supplies request.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesOfferQueuedNeutral01": "I can help with the clinic supplies.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesOfferRejectedNeutral01": "I can't take that clinic-supplies request right now.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesStatusFailedNeutral01": "I couldn't check that request.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesStatusQueuedNeutral01": "I'll check the clinic-supplies request.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesStatusRejectedNeutral01": "I can't check that request right now.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesTurnInFailedNeutral01": "I couldn't turn in the clinic supplies.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesTurnInQueuedNeutral01": "I'll turn in the clinic supplies.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesTurnInRejectedNeutral01": "I can't turn that in yet."
+}

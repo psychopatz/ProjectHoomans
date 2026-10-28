@@ -21,7 +21,7 @@ local function summaryFor(rows)
         eligible = 0,
         metadata_incomplete = 0,
         recognition_only = 0,
-        legacy = 0,
+        dispatchable_unmodeled = 0,
         unsupported_workflow = 0,
         conflicting = 0,
     }
@@ -55,7 +55,6 @@ local function build(capabilityCatalog)
             permissionGate = copyValue(action.permissionGate),
             outcomeMapping = copyValue(action.outcomeMapping),
             responsePools = copyValue(action.responsePools),
-            translationOwner = action.translationOwner,
             recognized = action.recognized == true,
             dispatchable = action.dispatchable == true,
             sources = copyValue(action.sources),
@@ -93,7 +92,7 @@ local function build(capabilityCatalog)
                 or "task_adapter_requires_parameterized_task_template"
             row.missingMetadata = {}
         elseif action.dispatchable == true then
-            row.classification = "legacy"
+            row.classification = "dispatchable_unmodeled"
             row.reason = "registered_dispatch_route_has_no_versioned_generation_metadata"
             row.missingMetadata = {}
         else

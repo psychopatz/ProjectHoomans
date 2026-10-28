@@ -42,7 +42,7 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
             "Canonical source editor",
             "Block contracts",
             "Interaction composer",
-            "Legacy build workflow",
+            "Workflow composer",
         ])
         self.assertTrue(hasattr(app, "developer_tools_button"))
         self.assertTrue(hasattr(app, "dialogue_content"))

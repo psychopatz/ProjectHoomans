@@ -10,5 +10,17 @@
   "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01": "I can't confirm that.",
   "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01": "I can't confirm my health status right now.",
   "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01": "Can't confirm.",
-  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01": "I can't confirm it right now, but thanks for asking."
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01": "I can't confirm it right now, but thanks for asking.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded01": "No bite. Leave it there.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral01": "No, I don't have a recorded bite.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse01": "No bite.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm01": "No, I don't have a recorded bite. Thanks for checking.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded01": "Yes. I've been bitten. That's all.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral01": "Yes, I've been bitten.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse01": "Yes. I've been bitten.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm01": "Yes. I've been bitten, and I appreciate you checking.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded01": "I can't confirm that. Don't press me.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral01": "I can't confirm whether I've been bitten.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse01": "Can't confirm.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm01": "I can't confirm it, but thanks for checking."
 }

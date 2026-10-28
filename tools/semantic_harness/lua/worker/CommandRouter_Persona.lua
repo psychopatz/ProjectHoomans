@@ -93,21 +93,20 @@ local function speechRealizationCatalog(context)
     if type(realization) ~= "table" then
         return { schema = "pnc.speech.realization.catalog.v1", coverage = {}, families = {} }
     end
+    local phraseContent = type(realization.PhraseCoverage) == "function"
+        and realization.PhraseCoverage() or {}
     local families = {}
-    if type(realization.Families) == "function" then
-        for templateID in pairs(realization.Families() or {}) do
-            families[#families + 1] = tostring(templateID)
-            if #families >= 64 then break end
-        end
-        table.sort(families)
+    for templateID in pairs(phraseContent.families or {}) do
+        families[#families + 1] = tostring(templateID)
+        if #families >= 64 then break end
     end
+    table.sort(families)
     return {
         schema = "pnc.speech.realization.catalog.v1",
         coverage = type(realization.Coverage) == "function"
             and realization.Coverage() or {},
         families = families,
-        phraseContent = type(realization.PhraseCoverage) == "function"
-            and realization.PhraseCoverage() or {},
+        phraseContent = phraseContent,
     }
 end
 

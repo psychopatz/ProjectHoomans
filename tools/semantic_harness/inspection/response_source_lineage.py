@@ -7,6 +7,7 @@ existing authoring service, its compiler and its preview parity can qualify.
 from __future__ import annotations
 
 import hashlib
+import json
 from typing import Any
 
 from ..codebuilder.dialogue_dataset import compile_dialogue_dataset
@@ -59,22 +60,27 @@ def inspect_codebuilder_lineage(
         if kind not in ("dialogue", "semantic") or not source.get("exists"):
             continue
         source_id = source["id"]
-        path = service._dataset_path(source_id)
-        # Reuse CodeBuilder's own validation and deterministic rendered-artifact
-        # comparison. Generated Lua files are never edited or used as input.
-        preview = (service.preview_dialogue_source(path) if kind == "dialogue"
-                   else service.preview_semantic_source(path))
+        spec = service._dataset_spec(source_id)
+        # Validate this logical dataset through the one canonical Conversation
+        # generation plan. No legacy aggregate or standalone generator is read.
+        preview = service.preview_dataset_generation(source_id)
         if not preview.get("ok"):
-            checked_sources.append({"sourceID": source_id, "verified": False,
-                                    "reason": "canonical_codebuilder_preview_failed"})
+            checked_sources.append({
+                "sourceID": source_id,
+                "verified": False,
+                "reason": "canonical_conversation_preview_failed",
+            })
             continue
-        diffs = preview.get("artifactDiffs") or []
-        artifacts_current = (kind == "semantic"
-                             or bool(diffs) and all(
-                                 row.get("status") == "unchanged" for row in diffs))
+        diffs = preview.get("generatedArtifactDiffs") or []
+        artifacts_current = bool(diffs) and all(
+            row.get("status") == "unchanged" for row in diffs
+        )
         if not artifacts_current:
-            checked_sources.append({"sourceID": source_id, "verified": False,
-                                    "reason": "generated_artifact_differs_from_source"})
+            checked_sources.append({
+                "sourceID": source_id,
+                "verified": False,
+                "reason": "generated_conversation_differs_from_source",
+            })
             continue
         source_document = service.load_dataset_document(source_id)
         compiled = (compile_dialogue_dataset(source_document) if kind == "dialogue"
@@ -85,20 +91,49 @@ def inspect_codebuilder_lineage(
             for variant in pool.get("variants", []):
                 loaded_variant = by_id.get(variant.get("id"))
                 if loaded_variant is not None and _matches(variant, loaded_variant):
+                    if kind == "dialogue":
+                        source_path = None
+                        for relative in spec.get("responsePaths", ()):
+                            candidate_path = service.repository / relative
+                            candidate_document = json.loads(
+                                candidate_path.read_text(encoding="utf-8")
+                            )
+                            for candidate_pool in candidate_document.get(
+                                "responsePools", []
+                            ):
+                                if candidate_pool.get("id") != pool_id:
+                                    continue
+                                if any(
+                                    isinstance(candidate_variant, dict)
+                                    and candidate_variant.get("id")
+                                    == loaded_variant["id"]
+                                    for candidate_variant in candidate_pool.get(
+                                        "variants", []
+                                    )
+                                ):
+                                    source_path = candidate_path
+                                    break
+                            if source_path is not None:
+                                break
+                        if source_path is None:
+                            continue
+                    else:
+                        source_path = service.repository / spec["path"]
                     matches[loaded_variant["id"]].append({
                         "sourceID": source_id,
-                        "sourcePath": str(path.relative_to(service.repository)),
-                        "sourceSHA256": hashlib.sha256(path.read_bytes()).hexdigest(),
-                        "validatedBy": "existing_CodeBuilder_preview_and_compiler",
-                        "generatedArtifactParity": (
-                            "unchanged" if kind == "dialogue"
-                            else "not_reported_by_semantic_preview"
+                        "sourcePath": str(
+                            source_path.relative_to(service.repository)
                         ),
+                        "sourceSHA256": hashlib.sha256(
+                            source_path.read_bytes()
+                        ).hexdigest(),
+                        "validatedBy": "canonical_Conversation_preview_and_compiler",
+                        "generatedArtifactParity": "unchanged",
                     })
         checked_sources.append({
-            "sourceID": source_id, "verified": True,
-            "generatedArtifactParity": "unchanged" if kind == "dialogue"
-                else "not_reported_by_semantic_preview",
+            "sourceID": source_id,
+            "verified": True,
+            "generatedArtifactParity": "unchanged",
         })
     owners = []
     for variant in loaded:

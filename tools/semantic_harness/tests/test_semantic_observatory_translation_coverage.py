@@ -8,15 +8,17 @@ from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class TranslationManifestTests(unittest.TestCase):
-    def test_generated_key_has_one_owner_in_en_tl(self):
+    def test_generated_key_has_one_owner_in_every_manifest_locale(self):
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             report = translation_coverage(worker, "semantic.question.backstory.ambiguous")
         self.assertTrue(report["ok"])
-        self.assertEqual(report["summary"]["BOTH_MANIFESTED"], 1)
+        self.assertEqual(report["summary"]["ALL_MANIFESTED"], 1)
         row = report["variants"][0]
-        self.assertEqual(row["status"], "BOTH_MANIFESTED")
-        self.assertEqual(len(row["manifestAssets"]["EN"]), 1)
-        self.assertEqual(len(row["manifestAssets"]["TL"]), 1)
+        self.assertEqual(row["status"], "ALL_MANIFESTED")
+        self.assertEqual(report["languages"], ["EN", "TL"])
+        for language in report["languages"]:
+            self.assertEqual(len(row["manifestAssets"][language]), 1)
+        self.assertEqual(row["missingLocales"], [])
         self.assertEqual(row["fallbackEvidence"], "UNTESTED")
         self.assertFalse(row["actualRuntimeLookupObserved"])
         self.assertEqual(report["writes"], 0)
@@ -57,9 +59,9 @@ class TranslationManifestTkTests(unittest.TestCase):
                 pane.selected_pool = "semantic.question.backstory.ambiguous"
                 pane.verify_translation_manifest()
                 text = pane.views["Review"].get("1.0", "end")
-                self.assertIn("BOTH_MANIFESTED", text)
+                self.assertIn("ALL_MANIFESTED", text)
                 self.assertIn("Static manifest membership", text)
-                self.assertIn("TL/Conversation/Semantic/GroundedPersonalDialogue.json", text)
+                self.assertIn("TL/Conversation/Patterns.json", text)
         finally:
             root.destroy()
 

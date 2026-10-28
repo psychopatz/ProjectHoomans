@@ -13,6 +13,15 @@ import re
 import tempfile
 from typing import Any
 
+from ..codebuilder.conversation_compiler import (
+    CONVERSATION_SOURCE_RELATIVE,
+    compile_conversation_sources,
+    conversation_record,
+)
+from ..codebuilder.translation_support import (
+    DEFAULT_LANGUAGE,
+    normalize_translations,
+)
 from ..runtime.scenario import DEFAULT_SCENARIO, merge
 from ..runtime.worker import LuaSemanticWorker
 from .conversation_inspector import build_conversation_inspector
@@ -162,10 +171,20 @@ def preview_authored_variant(
         root = (repository / "Contents/mods/ProjectHoomans").resolve()
         if not owner_source.is_relative_to(root) or not owner_source.name.endswith(".lua"):
             raise ValueError("source ownership is outside the checked-out mod")
+        conversation_model = compile_conversation_sources(repository)
+        template_id = str(
+            variant.get("templateID") or variant.get("semanticTemplateID") or ""
+        )
+        content_location = conversation_record(
+            conversation_model,
+            "phrase." + template_id,
+        )
+        if not isinstance(content_location, dict) or content_location.get("kind") != "content":
+            raise ValueError("selected variant has no canonical Conversation content owner")
         content_source = (
             repository
-            / "tools/semantic_harness/codebuilder/sources/"
-            / "semantic_dialogue_content.json"
+            / CONVERSATION_SOURCE_RELATIVE
+            / Path(content_location["sourceShard"])
         ).resolve(strict=True)
         original_bytes = content_source.read_bytes()
         original_hash = _sha256(original_bytes)
@@ -179,10 +198,14 @@ def preview_authored_variant(
         source_diff: list[str] = []
         evidence = source_evidence(worker)
 
+    proposed_translations = normalize_translations(
+        entries[0].get("translations"),
+        "isolated preview translations",
+    )
     original_translation_hashes: dict[str, tuple[Path, str]] = {}
     baseline_content: dict[str, str] = {}
     cases: list[tuple[str, dict[str, Any], dict[str, Any], str]] = []
-    for language in ("EN", "TL"):
+    for language in proposed_translations:
         scenario = merge(DEFAULT_SCENARIO, overrides)
         scenario.setdefault("runtime", {})["language"] = language
         observed = _real_case(scenario, utterance)
@@ -216,13 +239,13 @@ def preview_authored_variant(
             if relative != confirmed:
                 raise ValueError("translation source changed during review")
             before = data[key]
-            data[key] = entries[0][language]
+            data[key] = proposed_translations[language]
             dest = overlay / relative
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
             translation_diff.append({
                 "language": language, "key": key, "manifestPath": relative,
-                "before": before, "candidate": entries[0][language],
+                "before": before, "candidate": proposed_translations[language],
             })
 
         result_cases = []
@@ -265,7 +288,7 @@ def preview_authored_variant(
             new_variant = _semantic_variant_metadata(candidate_variant)
             if base_variant != new_variant:
                 raise ValueError("candidate unexpectedly changed variant metadata")
-            expected_new = entries[0][language]
+            expected_new = proposed_translations[language]
             before_text = [m["text"] for m in baseline["messages"]
                            if m["id"] == variant_id]
             after_text = [m["text"] for m in candidate["messages"]
@@ -279,9 +302,9 @@ def preview_authored_variant(
                 or [m["id"] for m in baseline["messages"]]
                    != [m["id"] for m in candidate["messages"]]):
                 raise ValueError("candidate altered gameplay effects or selected keys")
-            selected_fingerprint = _content_fingerprint({
-                language: entries[0][language] for language in ("EN", "TL")
-            })
+            selected_fingerprint = _content_fingerprint(
+                proposed_translations
+            )
             result_cases.append({
                 "language": language, "status": "PASS",
                 "baseline": baseline, "candidate": candidate,
@@ -319,7 +342,7 @@ def preview_authored_variant(
         "languageCases": result_cases, "checks": {
             "sameSelectedKey": True, "unchangedGameplayEffects": True,
             "unchangedSelectionMetadata": True,
-            "authoritativeWorkerRenderedENandTL": True,
+            "authoritativeWorkerRenderedTranslations": True,
             "productionSourceUnchanged": True,
         },
         "sourceEvidence": evidence,

@@ -5,137 +5,87 @@
 local TASK_RESPONSE_POOLS = {
     GIVE = {
         admitted = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGiveAdmitted",
-            en = "Okay, I'll give that to you.",
-            tl = "Sige, ibibigay ko iyon sa iyo.",
+            templateID = "semantic.task.give.admitted",
         },
         active = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGiveActive",
-            en = "I'm handing that over now.",
-            tl = "Ibinibigay ko na iyon ngayon.",
+            templateID = "semantic.task.give.active",
         },
         completed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGiveCompleted",
-            en = "Here you go.",
-            tl = "Heto na.",
+            templateID = "semantic.task.give.completed",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGiveRejected",
-            en = "I can't give that right now.",
-            tl = "Hindi ko maibigay iyon ngayon.",
+            templateID = "semantic.task.give.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGiveFailed",
-            en = "I couldn't give that.",
-            tl = "Hindi ko naibigay iyon.",
+            templateID = "semantic.task.give.failed",
         },
     },
     EAT = {
         admitted = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedEatAdmitted",
-            en = "I'll eat that.",
-            tl = "Kakainin ko iyon.",
+            templateID = "semantic.task.eat.admitted",
         },
         active = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedEatActive",
-            en = "I'm eating that now.",
-            tl = "Kinakain ko na iyon ngayon.",
+            templateID = "semantic.task.eat.active",
         },
         completed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedEatCompleted",
-            en = "That hit the spot.",
-            tl = "Sakto iyon.",
+            templateID = "semantic.task.eat.completed",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedEatRejected",
-            en = "I can't eat that right now.",
-            tl = "Hindi ko makain iyon ngayon.",
+            templateID = "semantic.task.eat.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedEatFailed",
-            en = "I couldn't eat that.",
-            tl = "Hindi ko nakain iyon.",
+            templateID = "semantic.task.eat.failed",
         },
     },
     DRINK = {
         admitted = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedDrinkAdmitted",
-            en = "I'll drink that.",
-            tl = "Iinumin ko iyon.",
+            templateID = "semantic.task.drink.admitted",
         },
         active = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedDrinkActive",
-            en = "I'm drinking that now.",
-            tl = "Ini-inom ko na iyon ngayon.",
+            templateID = "semantic.task.drink.active",
         },
         completed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedDrinkCompleted",
-            en = "I feel better.",
-            tl = "Mas mabuti na ang pakiramdam ko.",
+            templateID = "semantic.task.drink.completed",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedDrinkRejected",
-            en = "I can't drink that right now.",
-            tl = "Hindi ko mainom iyon ngayon.",
+            templateID = "semantic.task.drink.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedDrinkFailed",
-            en = "I couldn't drink that.",
-            tl = "Hindi ko nainom iyon.",
+            templateID = "semantic.task.drink.failed",
         },
     },
     REFILL = {
         admitted = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedRefillAdmitted",
-            en = "I'll refill that.",
-            tl = "Pupunuin ko iyon.",
+            templateID = "semantic.task.refill.admitted",
         },
         active = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedRefillActive",
-            en = "I'm refilling that now.",
-            tl = "Pinupuno ko na iyon ngayon.",
+            templateID = "semantic.task.refill.active",
         },
         completed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedRefillCompleted",
-            en = "It's full now.",
-            tl = "Puno na ito ngayon.",
+            templateID = "semantic.task.refill.completed",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedRefillRejected",
-            en = "I can't refill that right now.",
-            tl = "Hindi ko mapuno iyon ngayon.",
+            templateID = "semantic.task.refill.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedRefillFailed",
-            en = "I couldn't refill that.",
-            tl = "Hindi ko napuno iyon.",
+            templateID = "semantic.task.refill.failed",
         },
     },
     CONSUME = {
         admitted = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedConsumeAdmitted",
-            en = "I'll use that.",
-            tl = "Gagamitin ko iyon.",
+            templateID = "semantic.task.consume.admitted",
         },
         active = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedConsumeActive",
-            en = "I'm using that now.",
-            tl = "Ginagamit ko na iyon ngayon.",
+            templateID = "semantic.task.consume.active",
         },
         completed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedConsumeCompleted",
-            en = "That's done.",
-            tl = "Tapos na iyon.",
+            templateID = "semantic.task.consume.completed",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedConsumeRejected",
-            en = "I can't use that right now.",
-            tl = "Hindi ko magamit iyon ngayon.",
+            templateID = "semantic.task.consume.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedConsumeFailed",
-            en = "I couldn't use that.",
-            tl = "Hindi ko nagamit iyon.",
+            templateID = "semantic.task.consume.failed",
         },
     },
 }

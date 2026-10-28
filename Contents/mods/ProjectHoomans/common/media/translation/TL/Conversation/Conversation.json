@@ -1,0 +1,22 @@
+{
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpBusyGuarded01": "Abala ako. Huwag mo akong gambalain.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpBusyNeutral01": "Abala ako at sinusubukan kong maging kapaki-pakinabang.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpBusyTerse01": "Abala ako.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpBusyWarm01": "Abala ako at sinusubukan kong maging kapaki-pakinabang. Laging may kailangang gawin.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultAltGuarded01": "Basta buhay. Maging mapagmatyag.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultAltNeutral01": "Gaya ng dati. Nanatiling buhay at binabantayan ang daan.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultAltTerse01": "Basta buhay.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultAltWarm01": "Gaya ng dati. Nanatiling buhay at binabantayan ang daan. Ikaw, kumusta?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultGuarded01": "Walang mahalagang pag-usapan. Manatiling alerto.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultNeutral01": "Wala naman. Sinusubukan ko lang na panatilihing maayos ang lahat.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultTerse01": "Kinakaya lang.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultWarm01": "Wala naman. Sinusubukan ko lang na panatilihing maayos ang lahat. Mabuti at nakita kita.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpTravelingGuarded01": "Patuloy lang sa paggalaw. Huwag mo akong pabagalin.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpTravelingNeutral01": "Patuloy akong gumagalaw at binabantayan ang nasa unahan.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpTravelingTerse01": "Patuloy lang sa paggalaw.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpTravelingWarm01": "Patuloy akong gumagalaw at binabantayan ang nasa unahan. Sumama ka kung gusto mo.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpWeatherGuarded01": "Binabantayan ko ang panahon. Manatiling nakatutok.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpWeatherNeutral01": "Ang panahon ang pangunahing iniisip ko ngayon.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpWeatherTerse01": "Binabantayan ang panahon.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpWeatherWarm01": "Ang panahon ang pangunahing iniisip ko ngayon. Kumusta ka naman?"
+}

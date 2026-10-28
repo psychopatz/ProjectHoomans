@@ -66,11 +66,11 @@ end
 
 local function contentFallback(templateID)
     local registry = PNC.Semantics
-        and PNC.Semantics.DialogueContentRegistry or nil
+        and PNC.Semantics.ConversationRegistry or nil
     if type(registry) ~= "table" then
         local ok, loaded = pcall(
             require,
-            "PNC/Semantics/Generated/DialogueContent/Registry"
+            "PNC/Semantics/Generated/Conversation/Registry"
         )
         registry = ok and loaded or nil
     end

@@ -14,10 +14,10 @@ local Realization = T.load(
     "shared",
     "PNC/Semantics/PNC_SpeechRealization.lua"
 )
-local Registry = PNC.Semantics.DialogueContentRegistry
+local Registry = PNC.Semantics.ConversationRegistry
 
 T.truthy(Registry and Registry.FamilyFor,
-    "generated Dialogue Content registry is available to production realization")
+    "generated Conversation registry is available to production realization")
 T.truthy(Registry.PHRASE_FAMILIES["semantic.leader_loss.default"],
     "migrated leader-loss variant has a stable phrase family")
 T.equal(

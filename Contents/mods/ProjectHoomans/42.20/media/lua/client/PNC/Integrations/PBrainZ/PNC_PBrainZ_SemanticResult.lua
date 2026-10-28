@@ -1,6 +1,5 @@
 -- Optional structured semantic result handoff from PBrainZ.
--- Legacy response_text and semantic_tool_calls remain valid; this module only
--- activates when the provider includes a semantic IR payload.
+-- The structured path activates only when the provider includes semantic_ir.
 PNC = PNC or {}
 PNC.PBrainZ = PNC.PBrainZ or {}
 PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
@@ -17,9 +16,7 @@ end
 
 local function hasPayload(arguments)
     return type(arguments) == "table"
-        and (type(arguments.semantic_ir) == "table"
-            or type(arguments.semanticIR) == "table"
-            or type(arguments.ir) == "table")
+        and type(arguments.semantic_ir) == "table"
 end
 
 local function now()

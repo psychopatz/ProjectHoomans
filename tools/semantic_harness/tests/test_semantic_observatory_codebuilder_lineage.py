@@ -21,7 +21,7 @@ class ObservatoryCodeBuilderLineageTests(unittest.TestCase):
             entry = owned["semantic.accept.dataset.pending_started"]
             self.assertTrue(entry["verifiedCanonicalSource"])
             self.assertEqual(entry["canonicalSource"]["sourceID"],
-                             "common_interactions")
+                             "common_dialogue")
             self.assertEqual(entry["canonicalSource"]["generatedArtifactParity"],
                              "unchanged")
             self.assertFalse(owned["semantic.accept.request"]["verifiedCanonicalSource"])
@@ -38,11 +38,11 @@ class ObservatoryCodeBuilderLineageTests(unittest.TestCase):
                      if row["variantID"] ==
                      "semantic.question.backstory.ambiguous.generated")
         self.assertEqual(a_row["canonicalSource"]["sourceID"],
-                         "semantic_definitions")
+                         "semantic_flows")
         self.assertEqual(b_row["canonicalSource"]["sourceID"],
-                         "grounded_personal_dialogue")
+                         "grounded_personal")
         self.assertEqual(a_row["canonicalSource"]["generatedArtifactParity"],
-                         "not_reported_by_semantic_preview")
+                         "unchanged")
 
     def test_falsified_canonical_content_never_becomes_verified_owner(self):
         from tools.semantic_harness.codebuilder.service import (
@@ -52,7 +52,7 @@ class ObservatoryCodeBuilderLineageTests(unittest.TestCase):
         original = service.load_dataset_document
         def tampered_source(source_id):
             doc = deepcopy(original(source_id))
-            if source_id == "common_interactions":
+            if source_id == "common_dialogue":
                 variant = next(pool for pool in doc["responsePools"]
                                if pool["id"] == "semantic.accept")["variants"][0]
                 variant["fallback"] = "Invented sentence not in actual Lua"
@@ -98,7 +98,7 @@ class ObservatoryLineageTkTests(unittest.TestCase):
                 pane.selected_pool = "semantic.accept"
                 pane.verify_source_lineage()
                 report = pane.views["Review"].get("1.0", "end")
-                self.assertIn("common_interactions.json", report)
+                self.assertIn("common_responses.json", report)
                 self.assertIn("UNKNOWN", report)
                 self.assertIn("approval still required", report)
         finally:

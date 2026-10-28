@@ -167,13 +167,9 @@ from .suggestion_actions import (
     submit,
 )
 from .authoring_actions import (
-    compile_semantic_source,
-    generate_dialogue_source,
     generate_interaction_spec,
-    generate_semantic_source,
     generate_workflow,
     preview_interaction_spec,
-    review_dialogue_source,
 )
 from .scenario_persistence import load, reset, save
 from .runtime_actions import (
@@ -800,18 +796,6 @@ class SemanticHarnessApp:
 
     def register_flow_draft(self, definition: dict[str, Any]) -> None:
         register_flow_draft(self, definition)
-
-    def compile_semantic_source(self, source_path: Path) -> None:
-        compile_semantic_source(self, source_path)
-
-    def review_dialogue_source(self, source_path: Path) -> None:
-        review_dialogue_source(self, source_path)
-
-    def generate_dialogue_source(self, source_path: Path) -> None:
-        generate_dialogue_source(self, source_path)
-
-    def generate_semantic_source(self, source_path: Path) -> None:
-        generate_semantic_source(self, source_path)
 
     def preview_interaction_spec(self, spec: dict[str, Any]) -> dict[str, Any]:
         return preview_interaction_spec(self, spec)

@@ -297,8 +297,10 @@ class SemanticLabWorkflowPane:
                 "variants": [{
                     "id": "answer",
                     "key": "UI_PNC_Conversation_SemanticLabResponse",
-                    "en": self._english_var.get().strip(),
-                    "tl": self._tagalog_var.get().strip(),
+                    "translations": {
+                        "EN": self._english_var.get().strip(),
+                        "TL": self._tagalog_var.get().strip(),
+                    },
                     "translationArgs": {"content": "fact_content"},
                 }],
             }
@@ -440,9 +442,9 @@ class SemanticLabWorkflowPane:
         self._graph_connections = []
         self._mode_var.set(kind)
         wanted_source = (
-            "grounded_personal_dialogue"
+            "grounded_personal"
             if kind == "NPC backstory"
-            else "semantic_definitions"
+            else "semantic_flows"
         )
         source_ids = [str(source.get("id")) for source in self._sources]
         if wanted_source in source_ids:
@@ -464,13 +466,13 @@ class SemanticLabWorkflowPane:
             if raise_errors:
                 raise ValueError("add at least one registered block to the graph")
             return None
-        if self._mode_var.get() == "NPC backstory" and source_id != "grounded_personal_dialogue":
+        if self._mode_var.get() == "NPC backstory" and source_id != "grounded_personal":
             if raise_errors:
                 raise ValueError("NPC backstory graphs require the grounded personal dialogue source")
             return None
-        if self._mode_var.get() == "registered capability" and source_id == "grounded_personal_dialogue":
+        if self._mode_var.get() == "registered capability" and source_id == "grounded_personal":
             if raise_errors:
-                raise ValueError("registered capability graphs require the semantic definitions source")
+                raise ValueError("registered capability graphs require the semantic flows source")
             return None
         spec_id = self._spec_id_var.get().strip()
         if not spec_id:

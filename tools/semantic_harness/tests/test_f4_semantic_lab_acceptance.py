@@ -68,22 +68,13 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             REPOSITORY / "Contents" / "mods" / "ProjectHoomans",
             root / "Contents" / "mods" / "ProjectHoomans",
         )
-        (root / "tools" / "semantic_harness" / "codebuilder" / "sources").mkdir(
-            parents=True
+        source_target = (
+            root / "tools/semantic_harness/codebuilder/sources/conversation"
         )
-        shutil.copy2(
-            REPOSITORY
-            / "tools"
-            / "semantic_harness"
-            / "codebuilder"
-            / "sources"
-            / "grounded_personal_dialogue.json",
-            root
-            / "tools"
-            / "semantic_harness"
-            / "codebuilder"
-            / "sources"
-            / "grounded_personal_dialogue.json",
+        source_target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(
+            REPOSITORY / "tools/semantic_harness/codebuilder/sources/conversation",
+            source_target,
         )
         shutil.copytree(
             REPOSITORY / "tools" / "semantic_harness" / "lua",
@@ -134,7 +125,7 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             service = SemanticLabAuthoringService(repository=root, runtime_root=REPOSITORY)
 
             preview = service.preview_workflow(
-                "grounded_personal_dialogue",
+                "grounded_personal",
                 BACKSTORY_BLOCKS,
                 interaction_spec=former_job,
             )
@@ -145,15 +136,13 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             self.assertTrue(preview["sourcePreview"]["generatedPaths"])
             self.assertTrue(
                 any(
-                    path.endswith(
-                        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Dialogue/GroundedPersonalDialogue.lua"
-                    )
+                    "Generated/Conversation/" in path
                     for path in preview["sourcePreview"]["generatedPaths"]
                 )
             )
 
             not_approved = service.generate_workflow(
-                "grounded_personal_dialogue",
+                "grounded_personal",
                 BACKSTORY_BLOCKS,
                 interaction_spec=former_job,
                 approved=False,
@@ -162,7 +151,7 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             self.assertEqual(not_approved["writes"], [])
 
             generated_former = service.generate_workflow(
-                "grounded_personal_dialogue",
+                "grounded_personal",
                 BACKSTORY_BLOCKS,
                 interaction_spec=former_job,
                 approved=True,
@@ -171,11 +160,11 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             self.assertTrue(generated_former["generationApproved"])
             self.assertEqual(generated_former["reloadedBy"], "caller_restart_required")
             self.assertTrue(
-                any(path.endswith("EN/Conversation/Semantic/GroundedPersonalDialogue.json")
+                any(path.endswith("EN/Conversation/Patterns.json")
                     for path in generated_former["writes"])
             )
             self.assertTrue(
-                any(path.endswith("TL/Conversation/Semantic/GroundedPersonalDialogue.json")
+                any(path.endswith("TL/Conversation/Patterns.json")
                     for path in generated_former["writes"])
             )
             first_bytes = self._written_bytes(generated_former, root)
@@ -234,7 +223,7 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
                 )
 
             changed_preview = service.preview_workflow(
-                "grounded_personal_dialogue",
+                "grounded_personal",
                 BACKSTORY_BLOCKS,
                 interaction_spec=hometown,
             )
@@ -248,7 +237,7 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
                 changed_preview["sourcePreview"]["compiledSummary"]["patternIDs"],
             )
             generated_hometown = service.generate_workflow(
-                "grounded_personal_dialogue",
+                "grounded_personal",
                 BACKSTORY_BLOCKS,
                 interaction_spec=hometown,
                 approved=True,
@@ -263,7 +252,7 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
                 )
             )
             generated_hometown_again = service.generate_workflow(
-                "grounded_personal_dialogue",
+                "grounded_personal",
                 BACKSTORY_BLOCKS,
                 interaction_spec=hometown,
                 approved=True,

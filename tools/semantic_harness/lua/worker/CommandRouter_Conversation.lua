@@ -151,8 +151,8 @@ function Conversation.handle(context, command, payload)
         end
         response.suggestions = context.Values.copy(suggestions)
         return response
-    elseif command == "TOOL_REPLY" then
-        return context.OutputProjection.toolReply(context, payload)
+    elseif command == "TOOL_RESULT_SPEECH" then
+        return context.OutputProjection.toolResultSpeech(context, payload)
     elseif command == "CONVERSATION_GRAPH" then
         return {
             ok = true,

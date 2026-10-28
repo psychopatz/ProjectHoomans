@@ -1177,17 +1177,20 @@ T.truthy(option, "Talk option created")
 option.callback()
 T.equal(opened.npcID, "npc-12", "Talk opens selected NPC")
 
-local contentCatalog = T.read(
+local commandContent = T.read(
     "ProjectHoomans", "common_mod",
-    "media/translation/EN/Conversation/Semantic/DialogueContent.json")
+    "media/translation/EN/Conversation/Command.json")
 T.truthy(string.find(
-    contentCatalog,
+    commandContent,
     "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackAutoNeutral01",
-    1, true), "command wording lives in canonical Dialogue Content")
+    1, true), "command wording lives in generated Conversation domain content")
+local greetingContent = T.read(
+    "ProjectHoomans", "common_mod",
+    "media/translation/EN/Conversation/Greeting.json")
 T.truthy(string.find(
-    contentCatalog,
+    greetingContent,
     "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
-    1, true), "greeting wording lives in canonical Dialogue Content")
+    1, true), "greeting wording lives in generated Conversation domain content")
 T.finish("pnc_conversation_smoke")
 
 T.finish("pnc_conversation_smoke")

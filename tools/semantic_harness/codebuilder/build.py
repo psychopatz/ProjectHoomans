@@ -21,50 +21,20 @@ if __package__ in {None, ""}:
         load_allowlist,
         render_lua_shards,
     )
-    from tools.semantic_harness.codebuilder.dialogue_contract import (
-        load_dialogue_dataset,
-    )
-    from tools.semantic_harness.codebuilder.dialogue_dataset import (
-        compile_dialogue_dataset,
-    )
-    from tools.semantic_harness.codebuilder.dialogue_rendering import (
-        render_dialogue_lua,
-        render_dialogue_lua_plan,
-        render_dialogue_manifest,
-        render_dialogue_translation,
-    )
-    from tools.semantic_harness.codebuilder.dialogue_content import (
-        compile_dialogue_content,
-        load_dialogue_content_source,
-        write_dialogue_content_output,
-    )
-    from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
-        compile_semantic_definitions,
-        load_semantic_source,
-        discover_registered_capability_ids,
-        render_semantic_lua_plan,
-        render_semantic_manifest,
-    )
     from tools.semantic_harness.codebuilder.translation_support import (
         normalize_language,
         pretty_json,
     )
     from tools.semantic_harness.codebuilder.conversation_compiler import (
-        CONVERSATION_COMPATIBILITY_RUNTIME_RELATIVE,
         CONVERSATION_MANIFEST_RELATIVE,
         CONVERSATION_RUNTIME_RELATIVE,
-        CONVERSATION_SNAPSHOT_RELATIVE,
-        CONVERSATION_UI_COMPATIBILITY_RELATIVE,
         CONVERSATION_UI_RUNTIME_RELATIVE,
         compile_conversation_sources,
         conversation_translation_bundles,
-        render_conversation_compatibility_source,
         render_conversation_registry,
         render_conversation_manifest_lua,
         render_conversation_runtime_plan,
-        render_conversation_snapshot,
-        render_conversation_ui_compatibility_module,
-        render_conversation_ui_compatibility_shim,
+        render_conversation_ui_module,
     )
 else:
     from .lexicon_compiler import (  # noqa: E402
@@ -74,43 +44,17 @@ else:
         load_allowlist,
         render_lua_shards,
     )
-    from .dialogue_contract import load_dialogue_dataset
-    from .dialogue_dataset import compile_dialogue_dataset
-    from .dialogue_rendering import (
-        render_dialogue_lua,
-        render_dialogue_lua_plan,
-        render_dialogue_manifest,
-        render_dialogue_translation,
-    )
-    from .dialogue_content import (
-        compile_dialogue_content,
-        load_dialogue_content_source,
-        write_dialogue_content_output,
-    )
-    from .semantic_definition_compiler import (
-        compile_semantic_definitions,
-        load_semantic_source,
-        discover_registered_capability_ids,
-        render_semantic_lua_plan,
-        render_semantic_manifest,
-    )
     from .translation_support import normalize_language, pretty_json
     from .conversation_compiler import (
-        CONVERSATION_COMPATIBILITY_RUNTIME_RELATIVE,
         CONVERSATION_MANIFEST_RELATIVE,
         CONVERSATION_RUNTIME_RELATIVE,
-        CONVERSATION_SNAPSHOT_RELATIVE,
-        CONVERSATION_UI_COMPATIBILITY_RELATIVE,
         CONVERSATION_UI_RUNTIME_RELATIVE,
         compile_conversation_sources,
         conversation_translation_bundles,
-        render_conversation_compatibility_source,
         render_conversation_registry,
         render_conversation_manifest_lua,
         render_conversation_runtime_plan,
-        render_conversation_snapshot,
-        render_conversation_ui_compatibility_module,
-        render_conversation_ui_compatibility_shim,
+        render_conversation_ui_module,
     )
 
 
@@ -119,19 +63,18 @@ DEFAULT_OUTPUT = (
     / "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/"
     / "Generated/Lexicon/Catalog.lua"
 )
-DEFAULT_DIALOGUE_OUTPUT = (
-    ROOT
-    / "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/"
-    / "Generated/Dialogue/CommonInteractions.lua"
-)
-CANONICAL_SOURCE_ROOT = (
+CONVERSATION_SOURCE_ROOT = (
     ROOT / "tools" / "semantic_harness" / "codebuilder" / "sources"
+    / "conversation"
 )
-DEFAULT_SEMANTIC_SOURCE = CANONICAL_SOURCE_ROOT / "semantic_definitions.json"
-DEFAULT_CONTENT_SOURCE = CANONICAL_SOURCE_ROOT / "semantic_dialogue_content.json"
-DEFAULT_CONVERSATION_MANIFEST = CANONICAL_SOURCE_ROOT / "conversation/manifest.json"
-DEFAULT_SEMANTIC_OUTPUT_ROOT = ROOT
+DEFAULT_CONVERSATION_MANIFEST = CONVERSATION_SOURCE_ROOT / "manifest.json"
 
+
+# Suggestions.json remains a source for contextual UI keys merged into the
+# generated Conversation/UI.json bundle. Runtime loads only the generated bundle.
+_CONVERSATION_SOURCE_ONLY_TRANSLATIONS = frozenset({
+    "Conversation/Semantic/Suggestions.json",
+})
 
 def write_lexicon_output(output: Path, compiled) -> list[Path]:
     """Write the stable lexicon hub and bounded generated data shards."""
@@ -143,69 +86,6 @@ def write_lexicon_output(output: Path, compiled) -> list[Path]:
     # future generated catalogs beside it.
     _clean_generated_tree(output.with_suffix(""))
     return _write_modules(shared_root, rendered)
-
-
-def write_semantic_output(output_root: Path, compiled: dict) -> list[Path]:
-    semantic_dir = output_root / (
-        "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-        "Semantics/Generated/SemanticAuthoring"
-    )
-    semantic_dir.mkdir(parents=True, exist_ok=True)
-    shared_root = output_root / "Contents/mods/ProjectHoomans/common/media/lua/shared"
-    module_prefix = "PNC/Semantics/Generated/SemanticAuthoring/Catalog"
-    rendered, module_manifest = render_semantic_lua_plan(compiled, module_prefix)
-    # Keep the shared SemanticAuthoring directory extensible for additional
-    # catalogs; only the Catalog hub's owned subtree is regenerated here.
-    _clean_generated_tree(semantic_dir / "Catalog")
-    paths: list[Path] = []
-    pattern_modules = [module for module, _source in rendered if "/Patterns/" in module]
-    flow_modules = [module for module, _source in rendered if "/Flows/" in module]
-    response_modules = [module for module, _source in rendered if "/Responses/" in module]
-    translation_paths = {
-        language: [f"{language}/Conversation/Semantic/Generated.json"]
-        for language in sorted(compiled.get("translations", {}))
-    }
-    manifest = semantic_dir / "Catalog.lua"
-    manifest.write_text(
-        render_semantic_manifest(
-            compiled,
-            pattern_modules,
-            flow_modules,
-            response_modules,
-            translation_paths,
-            module_manifest,
-        ),
-        encoding="utf-8",
-        newline="\n",
-    )
-    paths.append(manifest)
-    paths.extend(_write_modules(shared_root, rendered))
-
-    translation_root = output_root / "Contents/mods/ProjectHoomans/common/media/translation"
-    for language in sorted(compiled.get("translations", {})):
-        directory = translation_root / language / "Conversation" / "Semantic"
-        directory.mkdir(parents=True, exist_ok=True)
-        path = directory / "Generated.json"
-        path.write_text(
-            pretty_json(compiled["translations"][language]),
-            encoding="utf-8",
-            newline="\n",
-        )
-        paths.append(path)
-
-    manifest_path = _write_conversation_translation_manifest(translation_root)
-    paths.append(manifest_path)
-    return paths
-
-
-
-_CONVERSATION_RETIRED_COMPATIBILITY = frozenset({
-    "Conversation/Semantic/Generated.json",
-    "Conversation/Semantic/CommonInteractions.json",
-    "Conversation/Semantic/GroundedPersonalDialogue.json",
-    "Conversation/Semantic/DialogueContent.json",
-    "Conversation/Semantic/Suggestions.json",
-})
 
 
 def _conversation_locale_directories(translation_root: Path) -> list[tuple[str, Path]]:
@@ -231,7 +111,7 @@ def _write_conversation_translation_manifest(translation_root: Path) -> Path:
         entries: list[str] = []
         for path in sorted((directory / "Conversation").rglob("*.json")):
             relative_from_language = path.relative_to(directory).as_posix()
-            if relative_from_language in _CONVERSATION_RETIRED_COMPATIBILITY:
+            if relative_from_language in _CONVERSATION_SOURCE_ONLY_TRANSLATIONS:
                 continue
             entries.append(path.relative_to(translation_root).as_posix())
         if entries:
@@ -280,94 +160,6 @@ def _write_modules(shared_root: Path, rendered: list[tuple[str, str]]) -> list[P
     return paths
 
 
-def _dialogue_module_prefix(output: Path) -> str:
-    parts = output.parts
-    for index in range(len(parts) - 2):
-        if parts[index:index + 3] != ("media", "lua", "shared"):
-            continue
-        root = Path(*parts[:index + 3])
-        return output.relative_to(root).with_suffix("").as_posix()
-    raise ValueError(
-        "dialogue output must be under a Project Zomboid media/lua/shared tree")
-
-
-def _dialogue_translation_root(output: Path) -> Path | None:
-    parts = output.parts
-    for index in range(len(parts) - 4):
-        if parts[index:index + 3] != ("Contents", "mods", "ProjectHoomans"):
-            continue
-        if parts[index + 3] not in {"common", "42.20"}:
-            continue
-        return Path(*parts[:index]) / (
-            "Contents/mods/ProjectHoomans/common/media/translation"
-        )
-    return None
-
-
-def _dialogue_translation_stem(output: Path) -> str:
-    """Return the stable translation shard name for one dialogue asset."""
-    return output.stem or "Dialogue"
-
-
-def write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
-    module_prefix = _dialogue_module_prefix(output)
-    shards, module_manifest = render_dialogue_lua_plan(compiled, module_prefix)
-    pattern_modules = [module for module, _ in shards if "/Patterns/" in module]
-    response_modules = [module for module, _ in shards if "/Responses/" in module]
-    # Each named catalog owns its hub sibling directory. Do not clean the
-    # shared Dialogue directory: multiple independently generated catalogs
-    # live beside one another there.
-    _clean_generated_tree(output.with_suffix(""))
-    shared_root = _shared_lua_root(output)
-    manifest_module = module_prefix + "/Manifest"
-    manifest_path = shared_root / (manifest_module + ".lua")
-    manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text(
-        render_dialogue_manifest(module_manifest),
-        encoding="utf-8",
-        newline="\n",
-    )
-    output.write_text(
-        render_dialogue_lua(
-            compiled,
-            pattern_modules,
-            response_modules,
-            module_manifest,
-            manifest_module,
-        ),
-        encoding="utf-8",
-        newline="\n",
-    )
-    paths = [output, manifest_path]
-    paths.extend(path for path in _write_modules(shared_root, shards) if path != output)
-    translation_root = _dialogue_translation_root(output)
-    if translation_root is not None:
-        translation_stem = _dialogue_translation_stem(output)
-        manifest_path = translation_root / "manifests/Conversation.json"
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8")) \
-            if manifest_path.is_file() else {"version": 1, "languages": {}}
-        for language in sorted(compiled.get("translations", {})):
-            relative_path = (
-                f"{language}/Conversation/Semantic/{translation_stem}.json"
-            )
-            translation_path = translation_root / relative_path
-            translation_path.parent.mkdir(parents=True, exist_ok=True)
-            translation_path.write_text(
-                render_dialogue_translation(compiled, language),
-                encoding="utf-8",
-                newline="\n",
-            )
-            paths.append(translation_path)
-        manifest_path.parent.mkdir(parents=True, exist_ok=True)
-        manifest_path.write_text(
-            json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-            newline="\n",
-        )
-        paths.append(manifest_path)
-    return paths
-
-
 def write_conversation_output(
     repository: Path,
     model: dict | None = None,
@@ -400,52 +192,15 @@ def write_conversation_output(
     ui_runtime_path = repository / CONVERSATION_UI_RUNTIME_RELATIVE
     ui_runtime_path.parent.mkdir(parents=True, exist_ok=True)
     ui_runtime_path.write_text(
-        render_conversation_ui_compatibility_module(model),
+        render_conversation_ui_module(model),
         encoding="utf-8",
         newline="\n",
     )
     paths.append(ui_runtime_path)
 
-    compatibility_registry = repository / CONVERSATION_COMPATIBILITY_RUNTIME_RELATIVE
-    compatibility_registry.parent.mkdir(parents=True, exist_ok=True)
-    compatibility_registry.write_text(
-        '-- Generated compatibility shim; edit manifest-backed Conversation shards.\n'
-        'return require "PNC/Semantics/Generated/Conversation/Registry"\n',
-        encoding="utf-8",
-        newline="\n",
-    )
-    paths.append(compatibility_registry)
-    compatibility_ui = repository / CONVERSATION_UI_COMPATIBILITY_RELATIVE
-    compatibility_ui.parent.mkdir(parents=True, exist_ok=True)
-    compatibility_ui.write_text(
-        render_conversation_ui_compatibility_shim(),
-        encoding="utf-8",
-        newline="\n",
-    )
-    paths.append(compatibility_ui)
-
     translation_root = repository / "Contents/mods/ProjectHoomans/common/media/translation"
     bundles = conversation_translation_bundles(model)
     for language in sorted(bundles):
-        # Preserve contextual UI keys that are still owned outside the static
-        # Conversation UI shard until those providers migrate.
-        suggestions_path = (
-            translation_root / language / "Conversation/Semantic/Suggestions.json"
-        )
-        if suggestions_path.is_file():
-            try:
-                suggestions = json.loads(suggestions_path.read_text(encoding="utf-8"))
-            except (OSError, UnicodeError, json.JSONDecodeError):
-                suggestions = {}
-            if isinstance(suggestions, dict):
-                bundles[language].setdefault("UI", {}).update(
-                    {
-                        key: value
-                        for key, value in suggestions.items()
-                        if isinstance(value, str)
-                    }
-                )
-
         for domain, values in sorted(bundles[language].items()):
             relative = f"{language}/Conversation/{domain}.json"
             path = translation_root / relative
@@ -457,57 +212,12 @@ def write_conversation_output(
             )
             paths.append(path)
 
-        # Compatibility snapshot only. The generated manifest intentionally
-        # excludes this path so runtime loads the modular domain bundles.
-        content_values = model["content"].get("translations", {}).get(language)
-        if isinstance(content_values, dict):
-            compatibility_path = (
-                translation_root
-                / language
-                / "Conversation/Semantic/DialogueContent.json"
-            )
-            compatibility_path.parent.mkdir(parents=True, exist_ok=True)
-            compatibility_path.write_text(
-                pretty_json(content_values),
-                encoding="utf-8",
-                newline="\n",
-            )
-            paths.append(compatibility_path)
 
     translation_manifest_path = _write_conversation_translation_manifest(
         translation_root
     )
     paths.append(translation_manifest_path)
 
-    snapshot_path = repository / CONVERSATION_SNAPSHOT_RELATIVE
-    snapshot_path.parent.mkdir(parents=True, exist_ok=True)
-    snapshot_path.write_text(
-        render_conversation_snapshot(model),
-        encoding="utf-8",
-        newline="\n",
-    )
-    paths.append(snapshot_path)
-
-    compatibility_sources = {
-        "semantic_dialogue_content.json": "content",
-        "common_interactions.json": "common_interactions",
-        "grounded_personal_dialogue.json": "grounded_personal_dialogue",
-        "semantic_definitions.json": "semantic_definitions",
-    }
-    source_root = repository / CANONICAL_SOURCE_ROOT.relative_to(ROOT)
-    for filename, kind in compatibility_sources.items():
-        path = source_root / filename
-        path.write_text(
-            json.dumps(
-                render_conversation_compatibility_source(model, kind),
-                ensure_ascii=False,
-                indent=2,
-                sort_keys=True,
-            ) + "\n",
-            encoding="utf-8",
-            newline="\n",
-        )
-        paths.append(path)
     return paths
 
 
@@ -527,48 +237,6 @@ def main(arguments: list[str] | None = None) -> int:
     )
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument(
-        "--dialogue-source",
-        type=Path,
-        default=None,
-        help="reviewed Hoomans interaction dataset JSON (compiled into bounded Lua data)",
-    )
-    parser.add_argument(
-        "--dialogue-output",
-        type=Path,
-        default=DEFAULT_DIALOGUE_OUTPUT,
-        help="generated dialogue catalog output path",
-    )
-    parser.add_argument(
-        "--semantic-source",
-        type=Path,
-        default=None,
-        help="canonical pnc.semantic_authoring.v1 definition source",
-    )
-    parser.add_argument(
-        "--semantic-output-root",
-        type=Path,
-        default=DEFAULT_SEMANTIC_OUTPUT_ROOT,
-        help="repository root receiving modular semantic source and translations",
-    )
-    parser.add_argument(
-        "--semantic-runtime-root",
-        type=Path,
-        default=ROOT,
-        help="repository root used to discover existing capability registrations",
-    )
-    parser.add_argument(
-        "--content-source",
-        type=Path,
-        default=None,
-        help="canonical phrase and player-facing dialogue content source",
-    )
-    parser.add_argument(
-        "--content-output-root",
-        type=Path,
-        default=ROOT,
-        help="repository root receiving generated dialogue content artifacts",
-    )
-    parser.add_argument(
         "--conversation-manifest",
         type=Path,
         default=None,
@@ -582,44 +250,16 @@ def main(arguments: list[str] | None = None) -> int:
     )
     options = parser.parse_args(arguments)
 
-    if (
-        options.wordnet_home is None
-        and options.dialogue_source is None
-        and options.semantic_source is None
-        and options.content_source is None
-        and options.conversation_manifest is None
-    ):
-        parser.error(
-            "provide --wordnet-home, --dialogue-source, --semantic-source, "
-            "--content-source, or a combination"
-        )
+    if options.wordnet_home is None and options.conversation_manifest is None:
+        parser.error("provide --wordnet-home and/or --conversation-manifest")
 
     compiled_lexicon = None
-    compiled_dialogue = None
-    compiled_semantic = None
-    compiled_content = None
     compiled_conversation = None
-
     try:
         if options.wordnet_home is not None:
             compiled_lexicon = compile_wordnet(
                 options.wordnet_home,
                 load_allowlist(options.allowlist),
-            )
-        if options.dialogue_source is not None:
-            compiled_dialogue = compile_dialogue_dataset(
-                load_dialogue_dataset(options.dialogue_source)
-            )
-        if options.semantic_source is not None:
-            compiled_semantic = compile_semantic_definitions(
-                load_semantic_source(options.semantic_source),
-                registered_capability_ids=discover_registered_capability_ids(
-                    options.semantic_runtime_root.expanduser().resolve()
-                ),
-            )
-        if options.content_source is not None:
-            compiled_content = compile_dialogue_content(
-                load_dialogue_content_source(options.content_source)
             )
         if options.conversation_manifest is not None:
             output_root = options.conversation_output_root.expanduser().resolve()
@@ -627,7 +267,7 @@ def main(arguments: list[str] | None = None) -> int:
             compiled_conversation = compile_conversation_sources(
                 output_root,
                 manifest_path=manifest_path,
-                runtime_root=options.semantic_runtime_root.expanduser().resolve(),
+                runtime_root=output_root,
             )
     except CompileError as error:
         print(f"semantic compiler error: {error}", file=sys.stderr)
@@ -637,7 +277,9 @@ def main(arguments: list[str] | None = None) -> int:
         output = options.output.expanduser().resolve()
         paths = write_lexicon_output(output, compiled_lexicon)
         alias_count = sum(
-            len(aliases) for aliases in compiled_lexicon.aliases_by_concept.values())
+            len(aliases)
+            for aliases in compiled_lexicon.aliases_by_concept.values()
+        )
         form_count = len(compiled_lexicon.verb_forms_by_surface)
         print(
             f"wrote {output} plus {len(paths) - 1} data shards "
@@ -645,46 +287,14 @@ def main(arguments: list[str] | None = None) -> int:
             f"across {len(compiled_lexicon.aliases_by_concept)} concepts)"
         )
 
-    if compiled_dialogue is not None:
-        output = options.dialogue_output.expanduser().resolve()
-        output.parent.mkdir(parents=True, exist_ok=True)
-        paths = write_dialogue_output(output, compiled_dialogue)
-        pattern_count = len(compiled_dialogue["patterns"])
-        variant_count = sum(
-            len(pool["variants"]) for pool in compiled_dialogue["responsePools"])
-        print(
-            f"wrote {output} and {len(paths) - 1} data shards "
-            f"({pattern_count} exact interaction patterns, {variant_count} "
-            "response variants)"
-        )
-    if compiled_semantic is not None:
-        output_root = options.semantic_output_root.expanduser().resolve()
-        paths = write_semantic_output(output_root, compiled_semantic)
-        print(
-            f"wrote semantic source manifest and {len(paths) - 1} generated files "
-            f"({len(compiled_semantic['patterns'])} patterns, "
-            f"{len(compiled_semantic['flows'])} flows, "
-            f"{sum(len(pool['variants']) for pool in compiled_semantic['responsePools'])} responses)"
-        )
-    if compiled_content is not None:
-        output_root = options.content_output_root.expanduser().resolve()
-        paths = write_dialogue_content_output(output_root, compiled_content)
-        phrase_count = sum(
-            len(phrases)
-            for family in compiled_content["phraseFamilies"]
-            for phrases in family["styles"].values()
-        )
-        print(
-            f"wrote dialogue content registry and {len(paths) - 1} translation artifacts "
-            f"({len(compiled_content['phraseFamilies'])} phrase families, "
-            f"{phrase_count} phrases, {len(compiled_content['playerChoices'])} player choices)"
-        )
     if compiled_conversation is not None:
         output_root = options.conversation_output_root.expanduser().resolve()
         paths = write_conversation_output(output_root, compiled_conversation)
         print(
-            f"wrote manifest-backed Conversation output and {len(paths) - 1} generated files "
-            f"({len(compiled_conversation['content']['phraseFamilies'])} phrase families, "
+            "wrote manifest-backed Conversation output and "
+            f"{len(paths) - 1} generated files "
+            f"({len(compiled_conversation['content']['phraseFamilies'])} "
+            "phrase families, "
             f"{len(compiled_conversation['dialogue']['patterns'])} patterns, "
             f"{len(compiled_conversation['ui'])} UI definitions)"
         )

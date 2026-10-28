@@ -20,9 +20,23 @@ from .dialogue_rendering import _lua_value
 from .lexicon_compiler import CompileError, _lua_string
 from .dialogue_contract import validate_branch_offers
 from .catalog_naming import ModuleNameRegistry, module_path, pascal_segment
-from .translation_support import DEFAULT_LANGUAGE, legacy_translation_map, normalize_translations
+from .translation_support import DEFAULT_LANGUAGE, normalize_translations
 
 SEMANTIC_SCHEMA = "pnc.semantic_authoring.v1"
+
+
+def _semantic_metadata(value: Any, label: str) -> dict[str, Any]:
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise CompileError(f"{label} must be an object")
+    try:
+        encoded = json.dumps(value, ensure_ascii=False, sort_keys=True)
+    except (TypeError, ValueError) as error:
+        raise CompileError(f"{label} must be JSON-serializable") from error
+    if len(encoded) > 16_384:
+        raise CompileError(f"{label} exceeds the metadata size bound")
+    return json.loads(encoded)
 SEMANTIC_FRAME_FIELDS = frozenset({
     "intent", "speechAct", "action", "subject", "target", "reference",
     "identityClaim", "selfDirected", "stateType", "stateValue", "pattern",
@@ -257,29 +271,10 @@ def _semantic_responses(
         if not isinstance(key, str) or not key.startswith("UI_PNC_"):
             raise CompileError(f"response variant {pool_id}:{variant_id} requires UI_PNC key")
 
-        raw_translations = variant.get("translations")
-        legacy = legacy_translation_map(variant)
-        if raw_translations is not None:
-            localized = normalize_translations(
-                raw_translations,
-                f"response {key}.translations",
-            )
-            if legacy:
-                legacy_map = normalize_translations(
-                    legacy,
-                    f"response {key}.legacyTranslations",
-                )
-                for language, text in legacy_map.items():
-                    current = localized.get(language)
-                    if current is not None and current != text:
-                        raise CompileError(
-                            f"response {key} conflicts between translations and legacy {language} text"
-                        )
-                    localized.setdefault(language, text)
-        elif legacy:
-            localized = normalize_translations(legacy, f"response {key}.legacyTranslations")
-        else:
-            raise CompileError(f"response {key} requires translations")
+        localized = normalize_translations(
+            variant.get("translations"),
+            f"response {key}.translations",
+        )
 
         for language, text in localized.items():
             bucket = translations.setdefault(language, {})
@@ -350,6 +345,10 @@ def compile_semantic_definitions(
                 f"semantic definition {definition_id} references unregistered capability "
                 f"{capability!r}"
             )
+        metadata = _semantic_metadata(
+            definition.get("metadata"),
+            f"semantic definition {definition_id} metadata",
+        )
         emit = definition.get("emit")
         if not isinstance(emit, dict):
             raise CompileError(f"semantic definition {definition_id} requires emit")
@@ -397,16 +396,25 @@ def compile_semantic_definitions(
             seen_utterances[normalized] = definition_id
             pattern_id = f"{definition_id}.{_semantic_slug(normalized)}"
             definition_pattern_ids.add(pattern_id)
-            patterns.append({
+            pattern = {
                 "id": pattern_id,
                 "match": _semantic_match(normalized),
                 "emit": normalized_emit,
                 "confidence": definition.get("confidence", 0.99),
                 "priority": definition.get("priority", 160),
-            })
+            }
+            if metadata:
+                pattern["metadata"] = json.loads(
+                    json.dumps(metadata, ensure_ascii=False)
+                )
+            patterns.append(pattern)
         response_pool, definition_translations = _semantic_responses(
             definition.get("responses"), definition_id
         )
+        if metadata:
+            response_pool["metadata"] = json.loads(
+                json.dumps(metadata, ensure_ascii=False)
+            )
         if response_pool["id"] in seen_pool_ids:
             raise CompileError(f"duplicate semantic response pool {response_pool['id']}")
         seen_pool_ids.add(response_pool["id"])
@@ -422,6 +430,10 @@ def compile_semantic_definitions(
             seen_pool_ids | {response_pool["id"]},
             definition_pattern_ids,
         )
+        if metadata:
+            flow["metadata"] = json.loads(
+                json.dumps(metadata, ensure_ascii=False)
+            )
         if flow["id"] in seen_flow_ids:
             raise CompileError(f"duplicate semantic flow id {flow['id']}")
         seen_flow_ids.add(flow["id"])

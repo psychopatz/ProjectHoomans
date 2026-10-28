@@ -5,6 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 import json
+import shutil
 import tempfile
 import unittest
 
@@ -20,6 +21,18 @@ from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
+
+
+def _copy_conversation_sources(repository: Path) -> None:
+    target = (
+        repository
+        / "tools/semantic_harness/codebuilder/sources/conversation"
+    )
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(
+        REPOSITORY / "tools/semantic_harness/codebuilder/sources/conversation",
+        target,
+    )
 
 
 def stay_spec() -> dict:
@@ -58,8 +71,10 @@ def stay_spec() -> dict:
                         {
                             "id": "accepted",
                             "key": "UI_PNC_Conversation_Semantic_LabStayAccepted",
-                            "en": "Okay, I will stay with you.",
-                            "tl": "Sige, mananatili ako sa iyo.",
+                            "translations": {
+                                "EN": "Okay, I will stay with you.",
+                                "TL": "Sige, mananatili ako sa iyo.",
+                            },
                         },
                     ],
                 },
@@ -125,8 +140,7 @@ def backstory_spec(
                     "variants": [{
                         "id": "answer",
                         "key": key,
-                        "en": english,
-                        "tl": tagalog,
+                        "translations": {"EN": english, "TL": tagalog},
                         "translationArgs": {"content": "fact_content"},
                     }],
                 },
@@ -198,7 +212,7 @@ class InteractionSpecTests(unittest.TestCase):
         service = SemanticLabAuthoringService(repository=REPOSITORY)
         original = service.preview_interaction_spec(stay_spec())
         changed_spec = deepcopy(stay_spec())
-        changed_spec["blocks"][2]["parameters"]["variants"][0]["en"] = (
+        changed_spec["blocks"][2]["parameters"]["variants"][0]["translations"]["EN"] = (
             "Sure, I will stay with you."
         )
         changed = service.preview_interaction_spec(changed_spec)
@@ -216,17 +230,10 @@ class InteractionSpecTests(unittest.TestCase):
     def test_approved_spec_persists_canonical_source_and_reports_artifact_diffs(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
+            _copy_conversation_sources(repository)
             source_path = repository / (
-                "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
-            )
-            source_path.parent.mkdir(parents=True)
-            source_path.write_text(
-                (
-                    REPOSITORY
-                    / "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
-                )
-                .read_text(encoding="utf-8"),
-                encoding="utf-8",
+                "tools/semantic_harness/codebuilder/sources/conversation/"
+                "flows/semantic_flows.json"
             )
             service = SemanticLabAuthoringService(
                 repository=repository,
@@ -238,7 +245,7 @@ class InteractionSpecTests(unittest.TestCase):
             self.assertEqual(preview["canonicalSourceDiff"]["status"], "changed")
             self.assertTrue(
                 any(
-                    row["path"].endswith("EN/Conversation/Semantic/Generated.json")
+                    row["path"].endswith("EN/Conversation/Flows.json")
                     and row["status"] == "added"
                     for row in preview["generatedArtifactDiffs"]
                 )
@@ -301,7 +308,7 @@ class InteractionSpecTests(unittest.TestCase):
     def test_backstory_blocks_control_grounded_dialogue_dataset(self) -> None:
         service = SemanticLabAuthoringService(repository=REPOSITORY)
         former_job = service.preview_interaction_spec(
-            backstory_spec(), source_id="grounded_personal_dialogue",
+            backstory_spec(), source_id="grounded_personal",
         )
         hometown = service.preview_interaction_spec(
             backstory_spec(
@@ -313,7 +320,7 @@ class InteractionSpecTests(unittest.TestCase):
                 english="I grew up in %1.",
                 tagalog="Lumaki ako sa %1.",
             ),
-            source_id="grounded_personal_dialogue",
+            source_id="grounded_personal",
         )
         self.assertTrue(former_job["ok"], former_job)
         self.assertTrue(hometown["ok"], hometown)
@@ -339,7 +346,7 @@ class InteractionSpecTests(unittest.TestCase):
         spec = backstory_spec()
         spec["connections"].pop()
         report = service.preview_interaction_spec(
-            spec, source_id="grounded_personal_dialogue",
+            spec, source_id="grounded_personal",
         )
         self.assertFalse(report["ok"])
         self.assertEqual(report["writes"], [])
@@ -349,43 +356,42 @@ class InteractionSpecTests(unittest.TestCase):
     def test_backstory_generation_writes_real_lua_and_en_tl_assets(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
+            _copy_conversation_sources(repository)
             source_path = repository / (
-                "tools/semantic_harness/codebuilder/sources/grounded_personal_dialogue.json"
-            )
-            source_path.parent.mkdir(parents=True)
-            source_path.write_text(
-                (
-                    REPOSITORY
-                    / "tools/semantic_harness/codebuilder/sources/grounded_personal_dialogue.json"
-                )
-                .read_text(encoding="utf-8"),
-                encoding="utf-8",
+                "tools/semantic_harness/codebuilder/sources/conversation/"
+                "flows/grounded_personal_responses.json"
             )
             service = SemanticLabAuthoringService(repository=repository, runtime_root=REPOSITORY)
             spec = backstory_spec()
             preview = service.preview_interaction_spec(
-                spec, source_id="grounded_personal_dialogue",
+                spec, source_id="grounded_personal",
             )
             self.assertTrue(preview["ok"], preview)
             self.assertTrue(preview["previewOnly"])
             self.assertEqual(preview["writes"], [])
             generated = service.generate_interaction_spec(
-                spec, approved=True, source_id="grounded_personal_dialogue",
+                spec, approved=True, source_id="grounded_personal",
             )
             self.assertTrue(generated["ok"], generated)
             self.assertTrue(generated["generationApproved"])
-            self.assertTrue(any(path.endswith("Generated/Dialogue/GroundedPersonalDialogue.lua")
-                                for path in generated["writes"]))
-            self.assertTrue(any(path.endswith("EN/Conversation/Semantic/GroundedPersonalDialogue.json")
-                                for path in generated["writes"]))
-            self.assertTrue(any(path.endswith("TL/Conversation/Semantic/GroundedPersonalDialogue.json")
-                                for path in generated["writes"]))
+            self.assertTrue(any(
+                "Generated/Conversation/" in path
+                for path in generated["writes"]
+            ))
+            self.assertTrue(any(
+                path.endswith("EN/Conversation/Patterns.json")
+                for path in generated["writes"]
+            ))
+            self.assertTrue(any(
+                path.endswith("TL/Conversation/Patterns.json")
+                for path in generated["writes"]
+            ))
             first_bytes = {
                 Path(path).relative_to(repository): Path(path).read_bytes()
                 for path in generated["writes"]
             }
             second = service.generate_interaction_spec(
-                spec, approved=True, source_id="grounded_personal_dialogue",
+                spec, approved=True, source_id="grounded_personal",
             )
             self.assertTrue(second["ok"], second)
             self.assertEqual(
@@ -407,7 +413,7 @@ class InteractionSpecTests(unittest.TestCase):
             "add_block",
             block=graph_block("response", "dialogue_responses.response_pool", {
                 "poolID": "semantic.lab.graph",
-                "variants": [{"id": "answer", "key": "UI_PNC_Graph", "en": "Graph", "tl": "Grap"}],
+                "variants": [{"id": "answer", "key": "UI_PNC_Graph", "translations": {"EN": "Graph", "TL": "Grap"}}],
             }),
         )
         spec = edit_interaction_graph(
@@ -439,7 +445,7 @@ class InteractionSpecTests(unittest.TestCase):
             block_id="response",
             parameters={
                 "poolID": "semantic.lab.graph.changed",
-                "variants": [{"id": "answer", "key": "UI_PNC_GraphChanged", "en": "Changed", "tl": "Nagbago"}],
+                "variants": [{"id": "answer", "key": "UI_PNC_GraphChanged", "translations": {"EN": "Changed", "TL": "Nagbago"}}],
             },
         )
         self.assertEqual(spec["blocks"][1]["parameters"]["poolID"], "semantic.lab.graph.changed")

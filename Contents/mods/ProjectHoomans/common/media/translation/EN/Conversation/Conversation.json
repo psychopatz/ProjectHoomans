@@ -1,0 +1,22 @@
+{
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpBusyGuarded01": "Keeping busy. Don't distract me.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpBusyNeutral01": "I'm keeping busy and trying to stay useful.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpBusyTerse01": "Keeping busy.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpBusyWarm01": "I'm keeping busy and trying to stay useful. There's always something to do.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultAltGuarded01": "Staying alive. Keep your eyes open.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultAltNeutral01": "Same as ever. Staying alive and watching the road.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultAltTerse01": "Staying alive.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultAltWarm01": "Same as ever. Staying alive and watching the road. What about you?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultGuarded01": "Nothing worth discussing. Stay alert.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultNeutral01": "Not much. I'm just trying to keep things together.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultTerse01": "Just getting by.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpDefaultWarm01": "Not much. I'm just trying to keep things together. Good to see you, though.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpTravelingGuarded01": "Keeping moving. Don't slow me down.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpTravelingNeutral01": "I'm keeping moving and watching what is ahead.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpTravelingTerse01": "Keeping moving.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpTravelingWarm01": "I'm keeping moving and watching what is ahead. Come along if you want.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpWeatherGuarded01": "Watching the weather. Stay focused.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpWeatherNeutral01": "The weather is the main thing on my mind right now.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpWeatherTerse01": "Watching the weather.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWhatsUpWeatherWarm01": "The weather is the main thing on my mind right now. How are you holding up?"
+}

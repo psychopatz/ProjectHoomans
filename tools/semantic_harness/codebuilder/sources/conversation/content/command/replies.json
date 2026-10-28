@@ -1,0 +1,290 @@
+{
+  "domain": "command",
+  "groups": {
+    "commands_emotes": {
+      "contentOwner": "projecthoomans.dialogue_content.commands_emotes"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.attack_auto",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll handle it.",
+              "TL": "Ako na ang bahala."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I'll stay alert.",
+              "TL": "Mananatili akong alerto."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Leave it to me.",
+              "TL": "Ipaubaya mo sa akin."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.attack_melee",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Going in close.",
+              "TL": "Lalapit ako."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I'll take the front.",
+              "TL": "Ako sa unahan."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Keeping it quiet.",
+              "TL": "Tahimik lang ako."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.attack_none",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll avoid trouble.",
+              "TL": "Iiwas ako sa gulo."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I won't engage.",
+              "TL": "Hindi ako sasali."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Staying out of it.",
+              "TL": "Hindi ako makikialam."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.attack_ranged",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll cover you.",
+              "TL": "Bibigyan kita ng takip."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Keeping my distance.",
+              "TL": "Mananatili akong malayo."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I've got a clear shot.",
+              "TL": "May malinaw akong tira."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.camp",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We'll make camp here.",
+              "TL": "Magkakampo tayo rito."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Settling in here.",
+              "TL": "Mananatili tayo rito."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I'll hold this camp.",
+              "TL": "Babantayan ko ang kampong ito."
+            }
+          },
+          {
+            "translations": {
+              "EN": "A roof sounds good. Let's settle in.",
+              "TL": "Ayos ang bubong. Manatili tayo rito."
+            }
+          },
+          {
+            "translations": {
+              "EN": "This works for me. We can camp here.",
+              "TL": "Ayos ito sa akin. Maaari tayong magkampo rito."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.camp_rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't find a safe room or campfire nearby.",
+              "TL": "Wala akong makitang ligtas na silid o apoy dito."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Not here. We need a nearby room or campfire.",
+              "TL": "Hindi rito. Kailangan natin ng malapit na silid o apoy."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I can't see a usable camp site from here.",
+              "TL": "Wala akong makitang angkop na kampo rito."
+            }
+          },
+          {
+            "translations": {
+              "EN": "We're too exposed out here. Let's find a room or campfire.",
+              "TL": "Masyado tayong lantad. Humanap tayo ng silid o apoy."
+            }
+          },
+          {
+            "translations": {
+              "EN": "No usable camp site is visible from here.",
+              "TL": "Walang angkop na lugar ng kampo rito."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.follow",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Right behind you.",
+              "TL": "Susunod ako sa iyo."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I'm with you.",
+              "TL": "Kasama mo ako."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Lead the way.",
+              "TL": "Ikaw ang manguna."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.generic_rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't do that right now.",
+              "TL": "Hindi ko iyan magagawa ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.return_home",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Heading home.",
+              "TL": "Uuwi na ako."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I'll return to the base.",
+              "TL": "Babalik ako sa base."
+            }
+          },
+          {
+            "translations": {
+              "EN": "On my way home.",
+              "TL": "Papauwi na ako."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.command.reply.stay",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll stay here.",
+              "TL": "Mananatili ako rito."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Holding position.",
+              "TL": "Hawak ko ang posisyon."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I'll keep watch.",
+              "TL": "Magbabantay ako."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

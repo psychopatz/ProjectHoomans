@@ -45,22 +45,15 @@ Adapter.RegisterAction("FOLLOW", {
     },
     responsePools = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
-            en = "Okay, I'll follow you.",
-            tl = "Sige, susundan kita.",
+            templateID = "semantic.command.follow.queued",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedFollowRejected",
-            en = "I can't follow you right now.",
-            tl = "Hindi kita masusundan ngayon.",
+            templateID = "semantic.command.follow.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedFollowFailed",
-            en = "I couldn't start following you.",
-            tl = "Hindi ko masimulan ang pagsunod sa iyo.",
+            templateID = "semantic.command.follow.failed",
         },
     },
-    translationOwner = "ProjectHoomans",
     arguments = {
         npcID = "actor_target",
         scope = "single_or_group",
@@ -113,22 +106,15 @@ Adapter.RegisterAction("STAY", {
     },
     responsePools = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStayQueued",
-            en = "Okay, I'll stay here.",
-            tl = "Sige, mananatili ako rito.",
+            templateID = "semantic.command.stay.queued",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStayRejected",
-            en = "I can't stay here right now.",
-            tl = "Hindi ako makapananatili rito ngayon.",
+            templateID = "semantic.command.stay.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStayFailed",
-            en = "I couldn't start the stay order.",
-            tl = "Hindi ko masimulan ang utos na manatili.",
+            templateID = "semantic.command.stay.failed",
         },
     },
-    translationOwner = "ProjectHoomans",
     arguments = {
         npcID = "actor_target",
         scope = "single_or_group",
@@ -184,22 +170,15 @@ Adapter.RegisterAction("STOP", {
     },
     responsePools = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStopQueued",
-            en = "Okay, I'll stop following.",
-            tl = "Sige, titigil ako sa pagsunod.",
+            templateID = "semantic.command.stop_following.queued",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStopRejected",
-            en = "I can't stop following right now.",
-            tl = "Hindi ako makapaghinto sa pagsunod ngayon.",
+            templateID = "semantic.command.stop_following.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedStopFailed",
-            en = "I couldn't stop following.",
-            tl = "Hindi ako nakahinto sa pagsunod.",
+            templateID = "semantic.command.stop_following.failed",
         },
     },
-    translationOwner = "ProjectHoomans",
     arguments = {
         npcID = "actor_target",
         scope = "single_or_group",
@@ -255,22 +234,15 @@ Adapter.RegisterAction("GO", {
     },
     responsePools = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGoQueued",
-            en = "Okay, I'll head home.",
-            tl = "Sige, uuwi ako.",
+            templateID = "semantic.command.return_home.queued",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGoRejected",
-            en = "I can't head home right now.",
-            tl = "Hindi ako makauuwi ngayon.",
+            templateID = "semantic.command.return_home.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedGoFailed",
-            en = "I couldn't head home.",
-            tl = "Hindi ako nakauwi.",
+            templateID = "semantic.command.return_home.failed",
         },
     },
-    translationOwner = "ProjectHoomans",
     arguments = {
         npcID = "actor_target",
         destination = "resolved_destination",
@@ -329,22 +301,15 @@ Adapter.RegisterAction("CAMP", {
     },
     responsePools = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedCampQueued",
-            en = "Okay, I'll set up camp there.",
-            tl = "Sige, magse-set up ako ng kampo roon.",
+            templateID = "semantic.command.camp.queued",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedCampRejected",
-            en = "I can't set up camp there right now.",
-            tl = "Hindi ako makapag-set up ng kampo roon ngayon.",
+            templateID = "semantic.command.camp.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_GeneratedCampFailed",
-            en = "I couldn't set up camp there.",
-            tl = "Hindi ako nakapag-set up ng kampo roon.",
+            templateID = "semantic.command.camp.failed",
         },
     },
-    translationOwner = "ProjectHoomans",
     arguments = {
         npcID = "actor_target",
         target = "resolved_camp_site",

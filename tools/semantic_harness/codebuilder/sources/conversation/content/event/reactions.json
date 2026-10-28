@@ -1,0 +1,284 @@
+{
+  "domain": "event",
+  "groups": {
+    "events": {
+      "contentOwner": "projecthoomans.dialogue_content.events"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good work. Keep watching the area.",
+              "TL": "Good work. Keep watching the area."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.retreat",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I need a moment before I can swing again.",
+              "TL": "I need a moment before I can swing again."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.reaction.threat",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That threat is down. Stay alert.",
+              "TL": "That threat is down. Stay alert."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.companion.reaction.abandonment",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Stay with me next time. We watch each other's backs.",
+              "TL": "Stay with me next time. We watch each other's backs."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.companion.reaction.camp_rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't find a safe room or campfire nearby.",
+              "TL": "I can't find a safe room or campfire nearby."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.companion.reaction.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard you. We will handle it together.",
+              "TL": "I heard you. We will handle it together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.conversation.safety.danger",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Watch out. We need to move now.",
+              "TL": "Watch out. We need to move now."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.conversation.safety.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Stay alert.",
+              "TL": "Stay alert."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.corpse.reaction.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Someone died here. We should remember that.",
+              "TL": "Someone died here. We should remember that."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.corpse.reaction.revenge",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Someone is going to answer for this.",
+              "TL": "Someone is going to answer for this."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.flow.farewell.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Take care.",
+              "TL": "Take care."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.flow.farewell.friendly",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Take care. I will see you soon.",
+              "TL": "Take care. I will see you soon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.close",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We lost someone close to us. We need to stay together.",
+              "TL": "We lost someone close to us. We need to stay together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.colonist",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Our leader is gone. We keep the group together.",
+              "TL": "Our leader is gone. We keep the group together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We lost our leader. We need to decide what comes next.",
+              "TL": "We lost our leader. We need to decide what comes next."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.devoted",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We lost someone important. We need to stay together.",
+              "TL": "We lost someone important. We need to stay together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.dissent",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The old order is gone. What happens next is up to us.",
+              "TL": "The old order is gone. What happens next is up to us."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.leader_loss.distant",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The leader is gone. Someone needs to decide what comes next.",
+              "TL": "The leader is gone. Someone needs to decide what comes next."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.social.reaction.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "I hear you."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

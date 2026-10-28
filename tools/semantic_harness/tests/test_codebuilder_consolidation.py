@@ -1,4 +1,4 @@
-"""S0A/S1 proof for the unified CodeBuilder and Dataset Library boundaries."""
+"""Current CodeBuilder/Dataset Library consolidation contracts."""
 
 from __future__ import annotations
 
@@ -6,61 +6,19 @@ from contextlib import redirect_stdout
 import io
 import json
 from pathlib import Path
-import tempfile
 import unittest
 from unittest.mock import patch
 
 from tools.semantic_harness import app
 from tools.semantic_harness.cli import _parser, cli
 from tools.semantic_harness.codebuilder.dialogue_contract import (
-    load_dialogue_dataset,
-)
-from tools.semantic_harness.codebuilder.dialogue_dataset import (
-    compile_dialogue_dataset,
-)
-from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
-    compile_semantic_definitions,
-    load_semantic_source,
-)
-from tools.semantic_harness.codebuilder.build import (
-    write_dialogue_output,
-    write_semantic_output,
-)
-from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
-from tools.semantic_harness.codebuilder.dialogue_contract import (
     validate_branch_offers,
 )
 from tools.semantic_harness.codebuilder.lexicon_compiler import CompileError
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
-DIALOGUE_SOURCE = REPOSITORY / (
-    "tools/semantic_harness/codebuilder/sources/common_interactions.json"
-)
-SEMANTIC_SOURCE = REPOSITORY / (
-    "tools/semantic_harness/codebuilder/sources/semantic_definitions.json"
-)
-DIALOGUE_OUTPUT = Path(
-    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/"
-    "Generated/Dialogue/CommonInteractions.lua"
-)
-SEMANTIC_MANIFEST = Path(
-    "Contents/mods/ProjectHoomans/common/media/translation/manifests/Conversation.json"
-)
-
-
-def _files(root: Path, paths: list[Path]) -> dict[Path, bytes]:
-    return {
-        path.relative_to(root): path.read_bytes()
-        for path in paths
-    }
-
-
-def _seed_translation_manifest(root: Path) -> None:
-    target = root / SEMANTIC_MANIFEST
-    target.parent.mkdir(parents=True, exist_ok=True)
-    source = REPOSITORY / SEMANTIC_MANIFEST
-    target.write_bytes(source.read_bytes())
 
 
 class CodeBuilderConsolidationTests(unittest.TestCase):
@@ -77,8 +35,18 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
                     {"path": "ir.intent", "op": "eq", "value": "GREET"},
                     {
                         "any": [
-                            {"path": "npcState.activeBehavior", "op": "eq", "value": "idle"},
-                            {"not": {"path": "npcState.healthState", "op": "eq", "value": "dead"}},
+                            {
+                                "path": "npcState.activeBehavior",
+                                "op": "eq",
+                                "value": "idle",
+                            },
+                            {
+                                "not": {
+                                    "path": "npcState.healthState",
+                                    "op": "eq",
+                                    "value": "dead",
+                                }
+                            },
                         ],
                     },
                 ],
@@ -87,7 +55,6 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
         normalized = validate_branch_offers([offer], "lab.offers")
         self.assertEqual(normalized[0]["id"], "lab.branch.offer")
         self.assertEqual(normalized[0]["frame"]["intent"], "THANK")
-
         with self.assertRaises(CompileError):
             validate_branch_offers(
                 [{**offer, "visibility": "private"}],
@@ -95,94 +62,58 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
             )
         with self.assertRaises(CompileError):
             validate_branch_offers(
-                [{
-                    **offer,
-                    "constraints": {"mystery": True},
-                }],
+                [{**offer, "constraints": {"mystery": True}}],
                 "lab.unknown",
             )
 
-    def test_dialogue_writer_matches_checked_in_artifacts(self) -> None:
-        source = load_dialogue_dataset(DIALOGUE_SOURCE)
-        compiled = compile_dialogue_dataset(source)
-        with tempfile.TemporaryDirectory() as directory:
-            directory = Path(directory)
-            _seed_translation_manifest(directory)
-            output = directory / DIALOGUE_OUTPUT
-            output.parent.mkdir(parents=True, exist_ok=True)
-            written = write_dialogue_output(output, compiled)
-            snapshot = _files(directory, written)
-        for relative, content in snapshot.items():
-            expected = REPOSITORY / relative
-            if relative.name.endswith("Generated.json"):
-                # These two files are shared translation catalogs and contain
-                # other approved generation families in the checked-in tree.
-                self.assertTrue(content, relative)
-                continue
-            self.assertTrue(expected.is_file(), relative)
-            self.assertEqual(content, expected.read_bytes(), relative)
-
-    def test_semantic_writer_matches_checked_in_artifacts(self) -> None:
-        source = load_semantic_source(SEMANTIC_SOURCE)
-        compiled = compile_semantic_definitions(source)
-        with tempfile.TemporaryDirectory() as directory:
-            directory = Path(directory)
-            _seed_translation_manifest(directory)
-            written = write_semantic_output(directory, compiled)
-            snapshot = _files(directory, written)
-        for relative, content in snapshot.items():
-            expected = REPOSITORY / relative
-            if relative.name.endswith("Generated.json"):
-                # The checked-in translation files are shared with the larger
-                # generated dialogue catalog; wrapper parity is the exact
-                # comparison for this source-scoped build.
-                self.assertTrue(content, relative)
-                continue
-            self.assertTrue(expected.is_file(), relative)
-            self.assertEqual(content, expected.read_bytes(), relative)
-
-    def test_headless_cli_routes_source_preview_through_authoring_service(self) -> None:
-        arguments = _parser().parse_args([
-            "--compile-source", str(SEMANTIC_SOURCE), "--jsonl",
-        ])
-        output = io.StringIO()
-        report = {"ok": True, "type": "semantic_compile_preview", "writes": []}
-        with patch.object(
-            SemanticLabAuthoringService,
-            "preview_semantic_source",
-            return_value=report,
-        ) as preview:
-            with redirect_stdout(output):
-                self.assertEqual(cli(arguments), 0)
-        preview.assert_called_once()
-        self.assertEqual(json.loads(output.getvalue()), report)
-
-    def test_authoring_service_binds_repository_for_direct_callers(self) -> None:
-        service = SemanticLabAuthoringService(repository=REPOSITORY)
+    def test_authoring_service_uses_manifest_backed_datasets(self) -> None:
+        service = SemanticLabAuthoringService(
+            repository=REPOSITORY,
+            runtime_root=REPOSITORY,
+        )
         self.assertEqual(service.repository, REPOSITORY.resolve())
-        report = service.preview_semantic_source(SEMANTIC_SOURCE)
-        self.assertTrue(report["ok"])
+        report = service.preview_dataset_generation("semantic_flows")
+        self.assertTrue(report["ok"], report)
         self.assertTrue(report["previewOnly"])
         self.assertEqual(report["writes"], [])
+        self.assertTrue(report["generatedPaths"])
+        self.assertTrue(
+            all("Generated/Dialogue/" not in path for path in report["generatedPaths"])
+        )
+        self.assertTrue(
+            all(
+                "Generated/SemanticAuthoring/" not in path
+                for path in report["generatedPaths"]
+            )
+        )
 
     def test_dataset_library_catalog_search_and_validation_use_canonical_sources(self) -> None:
-        service = SemanticLabAuthoringService(repository=REPOSITORY)
+        service = SemanticLabAuthoringService(
+            repository=REPOSITORY,
+            runtime_root=REPOSITORY,
+        )
         sources = service.list_dataset_sources()
         self.assertEqual(
             [source["id"] for source in sources],
             [
-                "semantic_definitions",
-                "common_interactions",
-                "grounded_personal_dialogue",
+                "semantic_flows",
+                "common_dialogue",
+                "grounded_personal",
                 "wordnet_concepts",
             ],
         )
-        self.assertTrue(all(source["exists"] and source["editable"] for source in sources))
+        self.assertTrue(
+            all(source["exists"] and source["editable"] for source in sources)
+        )
 
         matches = service.search_dataset("follow", limit=8)
         self.assertTrue(matches)
-        self.assertTrue(any(row["sourceID"] == "semantic_definitions" for row in matches))
-        self.assertTrue(any(row["sourceID"] == "wordnet_concepts" for row in matches))
+        self.assertTrue(
+            any(row["sourceID"] == "semantic_flows" for row in matches)
+        )
+        self.assertTrue(
+            any(row["sourceID"] == "wordnet_concepts" for row in matches)
+        )
 
         for source in sources:
             report = service.preview_dataset_edit(
@@ -197,54 +128,53 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
     def test_headless_cli_routes_dataset_library_operation(self) -> None:
         arguments = _parser().parse_args(["--list-datasets", "--jsonl"])
         output = io.StringIO()
-        report = {"ok": True, "type": "dataset_library", "sources": []}
-        with patch.object(
-            SemanticLabAuthoringService,
-            "list_dataset_sources",
-            return_value=[],
-        ) as list_sources:
-            with redirect_stdout(output):
-                self.assertEqual(cli(arguments), 0)
-        list_sources.assert_called_once()
+        with redirect_stdout(output):
+            self.assertEqual(cli(arguments), 0)
         record = json.loads(output.getvalue())
-        self.assertEqual(record["type"], report["type"])
-        self.assertEqual(record["sources"], report["sources"])
+        self.assertEqual(record["type"], "dataset_library")
+        self.assertEqual(
+            [source["id"] for source in record["sources"]][:3],
+            ["semantic_flows", "common_dialogue", "grounded_personal"],
+        )
 
     def test_headless_cli_routes_block_registry_operation(self) -> None:
         arguments = _parser().parse_args(["--list-blocks", "--jsonl"])
         output = io.StringIO()
-        report = {"ok": True, "type": "semantic_block_registry", "blocks": []}
-        with patch.object(
-            SemanticLabAuthoringService,
-            "list_semantic_blocks",
-            return_value=report,
-        ) as list_blocks:
-            with redirect_stdout(output):
-                self.assertEqual(cli(arguments), 0)
-        list_blocks.assert_called_once()
-        self.assertEqual(json.loads(output.getvalue()), report)
+        with redirect_stdout(output):
+            self.assertEqual(cli(arguments), 0)
+        record = json.loads(output.getvalue())
+        self.assertEqual(record["type"], "semantic_block_registry")
+        self.assertTrue(record["blocks"])
 
-    def test_workflow_service_composes_blocks_and_previews_existing_artifacts(self) -> None:
-        service = SemanticLabAuthoringService(repository=REPOSITORY)
+    def test_workflow_service_previews_conversation_generation(self) -> None:
+        service = SemanticLabAuthoringService(
+            repository=REPOSITORY,
+            runtime_root=REPOSITORY,
+        )
         report = service.preview_workflow(
-            "common_interactions",
+            "common_dialogue",
             ["language.speech_act", "dialogue_responses.response_pool"],
         )
         self.assertTrue(report["ok"], report)
         self.assertTrue(report["previewOnly"])
         self.assertTrue(report["effectFree"])
         self.assertEqual(report["writes"], [])
-        self.assertEqual(report["workflow"]["datasetID"], "common_interactions")
-        self.assertEqual(report["selection"]["blocks"]["blockIDs"], [
-            "language.speech_act",
-            "dialogue_responses.response_pool",
-        ])
+        self.assertEqual(report["workflow"]["datasetID"], "common_dialogue")
         self.assertTrue(report["sourcePreview"]["generatedPaths"])
+        self.assertTrue(
+            any(
+                "Generated/Conversation/" in path
+                for path in report["sourcePreview"]["generatedPaths"]
+            )
+        )
 
     def test_workflow_generation_requires_explicit_approval(self) -> None:
-        service = SemanticLabAuthoringService(repository=REPOSITORY)
+        service = SemanticLabAuthoringService(
+            repository=REPOSITORY,
+            runtime_root=REPOSITORY,
+        )
         report = service.generate_workflow(
-            "common_interactions",
+            "common_dialogue",
             ["language.speech_act"],
             approved=False,
         )
@@ -255,24 +185,25 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
 
     def test_headless_cli_routes_workflow_preview_through_semantic_lab(self) -> None:
         arguments = _parser().parse_args([
-            "--workflow-preview", "common_interactions",
-            "--workflow-blocks", "language.speech_act",
+            "--workflow-preview",
+            "common_dialogue",
+            "--workflow-blocks",
+            "language.speech_act",
             "--jsonl",
         ])
         output = io.StringIO()
-        report = {"ok": True, "type": "semantic_lab_workflow_preview", "writes": []}
-        with patch.object(
-            SemanticLabAuthoringService,
-            "preview_workflow",
-            return_value=report,
-        ) as preview:
-            with redirect_stdout(output):
-                self.assertEqual(cli(arguments), 0)
-        preview.assert_called_once_with("common_interactions", ["language.speech_act"])
-        self.assertEqual(json.loads(output.getvalue()), report)
+        with redirect_stdout(output):
+            self.assertEqual(cli(arguments), 0)
+        report = json.loads(output.getvalue())
+        self.assertTrue(report["ok"])
+        self.assertEqual(report["workflow"]["datasetID"], "common_dialogue")
 
     def test_app_selects_headless_mode_for_authoring_operation(self) -> None:
-        with patch.object(app, "install_shutdown_handler"), patch.object(app, "cli", return_value=0) as run_cli:
+        with patch.object(app, "install_shutdown_handler"), patch.object(
+            app,
+            "cli",
+            return_value=0,
+        ) as run_cli:
             self.assertEqual(app.main(["--list-datasets"]), 0)
         run_cli.assert_called_once()
 

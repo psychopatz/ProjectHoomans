@@ -17,17 +17,7 @@ local Reset = (PNC.Persistence and PNC.Persistence.Reset)
 function Outbox.New(config)
     config = config or {}
     local owner = config.owner or {}
-    local hasExplicitStorageKey = config.storageKey ~= nil
     local storageKey = tostring(config.storageKey or "PNC_PBrainZOutbox")
-    local legacyStorageKeys = config.legacyStorageKeys or {}
-    if type(legacyStorageKeys) == "string" then
-        legacyStorageKeys = { legacyStorageKeys }
-    end
-    if not hasExplicitStorageKey then
-        -- Compatibility boundary for callers of the old default key. Legacy
-        -- roots are read once only when the canonical root is empty.
-        legacyStorageKeys = { "PNC_HoomansLLMOutbox" }
-    end
     local version = tonumber(config.version) or 1
     local idField = tostring(config.idField or "id")
     local resetOwner = tostring(config.resetOwner or storageKey)
@@ -52,38 +42,6 @@ function Outbox.New(config)
         local raw = Reset.Read(storageKey)
         local reason = Reset.Check(raw, version, "version",
             function(value) return type(value.records) == "table" end)
-        if reason == "empty_state" then
-            for _, legacyKey in ipairs(legacyStorageKeys) do
-                local candidate = tostring(legacyKey or "")
-                if candidate ~= "" and candidate ~= storageKey then
-                    local legacyRaw = Reset.Read(candidate)
-                    local legacyReason = Reset.Check(
-                        legacyRaw,
-                        version,
-                        "version",
-                        function(value) return type(value.records) == "table" end
-                    )
-                    if legacyReason == nil then
-                        local migrated = false
-                        if ModData and ModData.getOrCreate then
-                            local written = Reset.Write(storageKey, legacyRaw)
-                            migrated = written == true
-                        else
-                            copyFallback(legacyRaw)
-                            migrated = true
-                        end
-                        if migrated then
-                            owner.LastMigration = {
-                                from = candidate,
-                                to = storageKey,
-                            }
-                            reason = nil
-                            break
-                        end
-                    end
-                end
-            end
-        end
         if reason ~= nil and reason ~= "empty_state" then
             owner.LastReset = Reset.Info(raw, version, reason,
                 resetOwner, "version")

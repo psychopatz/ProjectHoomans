@@ -193,17 +193,17 @@ T.equal(DiscoveryPresentation.Faction({
 T.equal(DiscoveryPresentation.Population(4), "Populasyon: 4",
     "world discovery formatted values preserve arguments")
 
-local ToolReplies = T.load(
+local ToolResultRealization = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Conversation/PNC_ConversationToolReplies.lua")
-local localizedNameReply = ToolReplies.Build({
+    "PNC/Semantics/PNC_SemanticToolResultRealization.lua")
+local localizedNameReply = ToolResultRealization.Text({
     { name = "ask_name", accepted = true, reason = "dispatched" },
 }, { request_id = "translation-name-1", npc_name = "Harley" })
 T.truthy(localizedNameReply and string.find(localizedNameReply, "Harley", 1, true),
     "tool reply keeps the authoritative NPC name")
 T.falsy(string.find(localizedNameReply or "", "I am ", 1, true),
     "ask-name tool reply uses the localized catalog")
-local localizedSocialReply = ToolReplies.Build({
+local localizedSocialReply = ToolResultRealization.Text({
     {
         name = "social_react", reaction = "admire", subtype = "admire",
         accepted = true, authoritative = true, reason = "applied",
@@ -211,7 +211,7 @@ local localizedSocialReply = ToolReplies.Build({
 }, { request_id = "translation-social-1", npc_name = "Harley" })
 T.falsy(string.find(localizedSocialReply or "", "I ", 1, true),
     "social tool reply uses the localized catalog")
-local localizedOrderReply = ToolReplies.Build({
+local localizedOrderReply = ToolResultRealization.Text({
     {
         name = "order_follow", commandID = "follow", accepted = true,
         reason = "submitted",

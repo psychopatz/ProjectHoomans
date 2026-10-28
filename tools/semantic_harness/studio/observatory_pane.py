@@ -92,7 +92,7 @@ class SemanticObservatoryPane:
             text="Static production registry metadata · selection context lives in Simulation",
         ).pack(side="left")
         ttk.Button(
-            controls, text="EN/TL coverage", command=self.verify_translation_manifest
+            controls, text="Locale coverage", command=self.verify_translation_manifest
         ).pack(side="right", padx=4)
         ttk.Button(
             controls, text="Verify source owner", command=self.verify_source_lineage
@@ -160,7 +160,7 @@ class SemanticObservatoryPane:
         self.views["Review"] = self.review_view
         self._display(
             "Review",
-            "Select a proposal to see exact source, current EN/TL, proposed EN/TL, "
+            "Select a proposal to see exact source, current and proposed localized wording, "
             "preserved runtime metadata, isolated Lua results, and effect parity.\n"
             "No review action writes production files by itself.",
         )
@@ -458,7 +458,7 @@ class SemanticObservatoryPane:
             self.status_var.set("No source/review dialog configured")
             return
         selected = self._filedialog.askopenfilename(
-            title="Select read-only EN/TL candidate proposal",
+            title="Select read-only localized candidate proposal",
             filetypes=[("JSON proposal", "*.json")],
         )
         if not selected:
@@ -547,10 +547,12 @@ class SemanticObservatoryPane:
         )
 
     def _on_translation_coverage(self, report: dict[str, Any]) -> None:
+        languages = report.get("languages") or []
         lines = [
-            f"Canonical EN/TL manifests: {report['poolID']}",
+            f"Canonical locale manifests: {report['poolID']}",
             "Static manifest membership, not runtime translation evidence.",
             "Not in manifest does not imply untranslated in actual dialogue.",
+            "Locales: " + ", ".join(languages),
             "",
         ]
         for variant in report.get("variants", []):
@@ -558,10 +560,13 @@ class SemanticObservatoryPane:
             lines.extend((
                 f"{variant['variantID']} · {variant['status']}",
                 f"  Template: {variant['templateID']}",
-                f"  EN: {', '.join(paths.get('EN', [])) or 'NOT MANIFESTED'}",
-                f"  TL: {', '.join(paths.get('TL', [])) or 'NOT MANIFESTED'}",
-                "",
             ))
+            for language in languages:
+                lines.append(
+                    f"  {language}: "
+                    + (", ".join(paths.get(language, [])) or "NOT MANIFESTED")
+                )
+            lines.append("")
         self._display("Explore", "\n".join(lines))
         self._display("Review", "\n".join(lines))
 

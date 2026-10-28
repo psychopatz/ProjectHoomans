@@ -1,0 +1,209 @@
+{
+  "domain": "conversation",
+  "groups": {
+    "conversation": {
+      "contentOwner": "projecthoomans.dialogue_content.conversation"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "conversation",
+      "semanticTemplateID": "semantic.question.whats_up.busy",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Keeping busy. Don't distract me.",
+              "TL": "Abala ako. Huwag mo akong gambalain."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm keeping busy and trying to stay useful.",
+              "TL": "Abala ako at sinusubukan kong maging kapaki-pakinabang."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Keeping busy.",
+              "TL": "Abala ako."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm keeping busy and trying to stay useful. There's always something to do.",
+              "TL": "Abala ako at sinusubukan kong maging kapaki-pakinabang. Laging may kailangang gawin."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "conversation",
+      "semanticTemplateID": "semantic.question.whats_up.default",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Nothing worth discussing. Stay alert.",
+              "TL": "Walang mahalagang pag-usapan. Manatiling alerto."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Not much. I'm just trying to keep things together.",
+              "TL": "Wala naman. Sinusubukan ko lang na panatilihing maayos ang lahat."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Just getting by.",
+              "TL": "Kinakaya lang."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Not much. I'm just trying to keep things together. Good to see you, though.",
+              "TL": "Wala naman. Sinusubukan ko lang na panatilihing maayos ang lahat. Mabuti at nakita kita."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "conversation",
+      "semanticTemplateID": "semantic.question.whats_up.default_alt",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Staying alive. Keep your eyes open.",
+              "TL": "Basta buhay. Maging mapagmatyag."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Same as ever. Staying alive and watching the road.",
+              "TL": "Gaya ng dati. Nanatiling buhay at binabantayan ang daan."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Staying alive.",
+              "TL": "Basta buhay."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Same as ever. Staying alive and watching the road. What about you?",
+              "TL": "Gaya ng dati. Nanatiling buhay at binabantayan ang daan. Ikaw, kumusta?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "conversation",
+      "semanticTemplateID": "semantic.question.whats_up.traveling",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Keeping moving. Don't slow me down.",
+              "TL": "Patuloy lang sa paggalaw. Huwag mo akong pabagalin."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm keeping moving and watching what is ahead.",
+              "TL": "Patuloy akong gumagalaw at binabantayan ang nasa unahan."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Keeping moving.",
+              "TL": "Patuloy lang sa paggalaw."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm keeping moving and watching what is ahead. Come along if you want.",
+              "TL": "Patuloy akong gumagalaw at binabantayan ang nasa unahan. Sumama ka kung gusto mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "conversation",
+      "semanticTemplateID": "semantic.question.whats_up.weather",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Watching the weather. Stay focused.",
+              "TL": "Binabantayan ko ang panahon. Manatiling nakatutok."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The weather is the main thing on my mind right now.",
+              "TL": "Ang panahon ang pangunahing iniisip ko ngayon."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Watching the weather.",
+              "TL": "Binabantayan ang panahon."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "The weather is the main thing on my mind right now. How are you holding up?",
+              "TL": "Ang panahon ang pangunahing iniisip ko ngayon. Kumusta ka naman?"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

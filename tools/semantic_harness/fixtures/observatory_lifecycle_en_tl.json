@@ -1,120 +1,120 @@
 {
   "cases": [
     {
+      "expected": {
+        "conversationClosed": true,
+        "lastKey": "response.goodbye",
+        "maxActions": 0,
+        "maxFallbackLookups": 0
+      },
+      "interaction": {
+        "choiceID": "goodbye",
+        "kind": "conversation_root_choice"
+      },
       "label": "Goodbye root choice EN",
-      "language": "EN",
-      "interaction": {
-        "kind": "conversation_root_choice",
-        "choiceID": "goodbye"
-      },
-      "expected": {
-        "lastKey": "response.goodbye",
-        "conversationClosed": true,
-        "maxActions": 0,
-        "maxFallbackLookups": 0
-      }
+      "language": "EN"
     },
     {
+      "expected": {
+        "conversationClosed": true,
+        "lastKey": "response.goodbye",
+        "maxActions": 0,
+        "maxFallbackLookups": 0
+      },
+      "interaction": {
+        "choiceID": "goodbye",
+        "kind": "conversation_root_choice"
+      },
       "label": "Goodbye root choice TL",
-      "language": "TL",
-      "interaction": {
-        "kind": "conversation_root_choice",
-        "choiceID": "goodbye"
-      },
-      "expected": {
-        "lastKey": "response.goodbye",
-        "conversationClosed": true,
-        "maxActions": 0,
-        "maxFallbackLookups": 0
-      }
+      "language": "TL"
     },
     {
+      "expected": {
+        "conversationClosed": false,
+        "lastKey": "semantic.ask_clarification",
+        "maxActions": 0
+      },
       "label": "Bare typed goodbye EN separate route",
       "language": "EN",
-      "utterance": "goodbye",
-      "expected": {
-        "lastKey": "semantic.ask_clarification",
-        "maxActions": 0,
-        "conversationClosed": false
-      }
+      "utterance": "goodbye"
     },
     {
+      "expected": {
+        "conversationClosed": false,
+        "lastKey": "semantic.ask_clarification",
+        "maxActions": 0
+      },
       "label": "Bare typed goodbye TL separate route",
       "language": "TL",
-      "utterance": "goodbye",
-      "expected": {
-        "lastKey": "semantic.ask_clarification",
-        "maxActions": 0,
-        "conversationClosed": false
-      }
+      "utterance": "goodbye"
     },
     {
+      "expected": {
+        "lastKey": "semantic.command.stay.queued",
+        "minActions": 1
+      },
       "label": "Follow then Wait EN",
       "language": "EN",
       "utterances": [
         "follow me",
         "wait here"
-      ],
-      "expected": {
-        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayQueued",
-        "minActions": 1
-      }
+      ]
     },
     {
+      "expected": {
+        "lastKey": "semantic.command.stay.queued",
+        "maxFallbackLookups": 0,
+        "minActions": 1
+      },
       "label": "Follow then Wait TL",
       "language": "TL",
       "utterances": [
         "follow me",
         "wait here"
-      ],
-      "expected": {
-        "lastKey": "UI_PNC_Conversation_Semantic_GeneratedStayQueued",
-        "minActions": 1,
-        "maxFallbackLookups": 0
-      }
+      ]
     },
     {
+      "expected": {
+        "conversationClosed": false,
+        "lastKey": "response.departure.rejected",
+        "maxActions": 0,
+        "maxFallbackLookups": 0,
+        "maxTransportCount": 1,
+        "minTransportCount": 1
+      },
+      "interaction": {
+        "choiceID": "disband",
+        "kind": "conversation_root_choice"
+      },
       "label": "Leave Group unowned/unknown faction EN",
       "language": "EN",
       "scenario": {
         "npc": {
-          "recruited": true,
-          "identityState": "known"
+          "identityState": "known",
+          "recruited": true
         }
-      },
-      "interaction": {
-        "kind": "conversation_root_choice",
-        "choiceID": "disband"
-      },
-      "expected": {
-        "lastKey": "response.departure.rejected",
-        "conversationClosed": false,
-        "maxActions": 0,
-        "minTransportCount": 1,
-        "maxTransportCount": 1,
-        "maxFallbackLookups": 0
       }
     },
     {
+      "expected": {
+        "conversationClosed": false,
+        "lastKey": "response.departure.rejected",
+        "maxActions": 0,
+        "maxFallbackLookups": 0,
+        "maxTransportCount": 1,
+        "minTransportCount": 1
+      },
+      "interaction": {
+        "choiceID": "disband",
+        "kind": "conversation_root_choice"
+      },
       "label": "Leave Group unowned/unknown faction TL",
       "language": "TL",
       "scenario": {
         "npc": {
-          "recruited": true,
-          "identityState": "known"
+          "identityState": "known",
+          "recruited": true
         }
-      },
-      "interaction": {
-        "kind": "conversation_root_choice",
-        "choiceID": "disband"
-      },
-      "expected": {
-        "lastKey": "response.departure.rejected",
-        "conversationClosed": false,
-        "maxActions": 0,
-        "minTransportCount": 1,
-        "maxTransportCount": 1,
-        "maxFallbackLookups": 0
       }
     }
   ]

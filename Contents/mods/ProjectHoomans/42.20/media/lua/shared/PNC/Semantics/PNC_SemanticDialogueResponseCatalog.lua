@@ -6,12 +6,8 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Catalog = PNC.Semantics.ResponseCatalog or {}
 PNC.Semantics.ResponseCatalog = Catalog
-local GeneratedDialogue = require
-    "PNC/Semantics/Generated/Dialogue/CommonInteractions"
-local GeneratedPersonalDialogue = require
-    "PNC/Semantics/Generated/Dialogue/GroundedPersonalDialogue"
-local GeneratedDefinitions = require
-    "PNC/Semantics/Generated/SemanticAuthoring/Catalog"
+local ConversationRegistry = require
+    "PNC/Semantics/Generated/Conversation/Registry"
 
 local Core = require
     "PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Core"
@@ -19,8 +15,8 @@ local registerCatalog = require
     "PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Registration"
 local installSelection = require
     "PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Selection"
-local registerGenerated = require
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Generated"
+local registerConversationPools = require
+    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Conversation"
 
 Core.install(Catalog)
 registerCatalog(Catalog, Core)
@@ -39,9 +35,9 @@ require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueRespo
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_CompanionCommands"
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Navigation"
 
-registerGenerated(Catalog, {
-    GeneratedDialogue,
-    GeneratedPersonalDialogue,
-}, GeneratedDefinitions)
+registerConversationPools(
+    Catalog,
+    ConversationRegistry and ConversationRegistry.RESPONSE_POOLS
+)
 
 return Catalog

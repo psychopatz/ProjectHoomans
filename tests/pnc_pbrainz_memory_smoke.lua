@@ -41,20 +41,20 @@ ModData = {
         return modData[key]
     end,
 }
--- Intentional compatibility fixture: emulate the pre-rename persisted key.
-local legacyMemoryKey = "PNC_HoomansLLM" .. "Memory"
-modData[legacyMemoryKey] = {
+-- A retired pre-canonical root must not be imported into current state.
+local retiredMemoryKey = "PNC_HoomansLLM" .. "Memory"
+modData[retiredMemoryKey] = {
     version = 1,
     records = {
         {
-            event_id = "legacy-memory-event",
+            event_id = "retired-memory-event",
             primitive_type = "first_meeting",
             player_uuid = "player-one",
-            npc_uuid = "npc-legacy",
+            npc_uuid = "npc-retired",
             event_time = { kind = "pre_outbreak" },
         },
     },
-    index = { ["legacy-memory-event"] = true },
+    index = { ["retired-memory-event"] = true },
     indexReady = true,
 }
 
@@ -64,15 +64,13 @@ T.load("ProjectHoomans", "client",
     "PNC/Integrations/PBrainZ/PNC_PBrainZ_Memory.lua")
 
 local Memory = PNC.PBrainZ.Memory
-local migratedBatch = Memory.Poll()
+local initialBatch = Memory.Poll()
 T.truthy(modData.PNC_PBrainZMemory,
-    "legacy memory storage is copied into the canonical key")
-T.equal(modData.PNC_PBrainZMemory.records[1].event_id,
-    "legacy-memory-event", "legacy memory record is preserved")
-T.equal(migratedBatch.pendingCount, 1,
-    "migrated memory record remains pending")
-T.equal(Memory.Ack({ event_ids = { "legacy-memory-event" } }), 1,
-    "migrated memory record acknowledges normally")
+    "canonical memory storage is created directly")
+T.equal(#modData.PNC_PBrainZMemory.records, 0,
+    "retired memory root is not imported")
+T.equal(initialBatch.pendingCount, 0,
+    "canonical memory starts empty when only a retired root exists")
 T.truthy(Memory.IsNameQuestion("What's your name?"),
     "natural-language name question is recognized")
 T.truthy(Memory.IsNameQuestion("what is your name"),

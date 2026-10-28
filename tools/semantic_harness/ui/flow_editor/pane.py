@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import copy
 import json
-from pathlib import Path
 from typing import Any, Callable
 
 from ...codebuilder.blocks import GATE_TYPES, TRANSITION_FIELDS
@@ -43,10 +42,6 @@ class FlowEditorPane:
         on_refresh: Callable[[], Any],
         on_validate: Callable[[dict[str, Any]], Any],
         on_register: Callable[[dict[str, Any]], Any],
-        on_compile_source: Callable[[Path], Any] | None = None,
-        on_generate_source: Callable[[Path], Any] | None = None,
-        on_review_dataset: Callable[[Path], Any] | None = None,
-        on_generate_dataset: Callable[[Path], Any] | None = None,
     ) -> None:
         self._tk = tk_module
         self._ttk = ttk
@@ -56,10 +51,6 @@ class FlowEditorPane:
         self._on_refresh = on_refresh
         self._on_validate = on_validate
         self._on_register = on_register
-        self._on_compile_source = on_compile_source
-        self._on_generate_source = on_generate_source
-        self._on_review_dataset = on_review_dataset
-        self._on_generate_dataset = on_generate_dataset
         self._catalog: dict[str, dict[str, Any]] = {}
         self._flow_id_to_label: dict[str, str] = {}
         self._flow_label_to_id: dict[str, str] = {}
@@ -168,23 +159,6 @@ class FlowEditorPane:
             secondary_toolbar, text="Add action", command=self.add_command_trigger
         )
         self.command_button.grid(row=0, column=5, padx=(4, 0))
-        self.compile_source_button = ttk.Button(
-            secondary_toolbar, text="Compile source…", command=self.compile_source
-        )
-        self.compile_source_button.grid(row=0, column=6, padx=(8, 0))
-        self.generate_source_button = ttk.Button(
-            secondary_toolbar, text="Generate source…", command=self.generate_source
-        )
-        self.generate_source_button.grid(row=0, column=7, padx=(4, 0))
-        self.review_dataset_button = ttk.Button(
-            secondary_toolbar, text="Review dataset…", command=self.review_dataset
-        )
-        self.review_dataset_button.grid(row=0, column=8, padx=(8, 0))
-        self.generate_dataset_button = ttk.Button(
-            secondary_toolbar, text="Generate dialogue…", command=self.generate_dataset
-        )
-        self.generate_dataset_button.grid(row=0, column=9, padx=(4, 0))
-
         self.status_var = self._tk.StringVar()
         ttk.Label(toolbar, textvariable=self.status_var).grid(
             row=2, column=0, sticky="w", pady=(4, 0)
@@ -207,10 +181,6 @@ class FlowEditorPane:
             self.zoom_button,
             self.load_button,
             self.save_button,
-            self.compile_source_button,
-            self.generate_source_button,
-            self.review_dataset_button,
-            self.generate_dataset_button,
         )
 
     def _build_body(self) -> None:
@@ -799,18 +769,6 @@ class FlowEditorPane:
 
     def register_draft(self) -> None:
         self._actions_controller.register_draft()
-
-    def compile_source(self) -> None:
-        self._actions_controller.compile_source()
-
-    def generate_source(self) -> None:
-        self._actions_controller.generate_source()
-
-    def review_dataset(self) -> None:
-        self._actions_controller.review_dataset()
-
-    def generate_dataset(self) -> None:
-        self._actions_controller.generate_dataset()
 
     def show_source_report(self, report: dict[str, Any]) -> None:
         self._actions_controller.show_source_report(report)

@@ -19,9 +19,6 @@ from .dialogue_content import (
     _lua_value,
     _lua_string,
     compile_dialogue_content,
-    render_dialogue_content_compatibility_shim,
-    render_dialogue_content_hub,
-    render_dialogue_content_manifest,
     render_dialogue_content_shard_plan,
 )
 from .dialogue_dataset import compile_dialogue_dataset
@@ -35,29 +32,17 @@ from .semantic_definition_compiler import (
 
 CONVERSATION_MANIFEST_SCHEMA = "pnc.conversation.manifest.v1"
 CONVERSATION_SHARD_SCHEMA = "pnc.conversation.shard.v1"
-CONVERSATION_SNAPSHOT_SCHEMA = "pnc.conversation.snapshot.v1"
+CONVERSATION_MODEL_SCHEMA = "pnc.conversation.model.v1"
 CONVERSATION_SOURCE_RELATIVE = Path(
     "tools/semantic_harness/codebuilder/sources/conversation"
 )
 CONVERSATION_MANIFEST_RELATIVE = CONVERSATION_SOURCE_RELATIVE / "manifest.json"
-CONVERSATION_SNAPSHOT_RELATIVE = Path(
-    "tools/semantic_harness/codebuilder/generated/conversation/ConversationSnapshot.json"
-)
 CONVERSATION_RUNTIME_RELATIVE = Path(
     "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
     "Semantics/Generated/Conversation"
 )
-CONVERSATION_COMPATIBILITY_RUNTIME_RELATIVE = Path(
-    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-    "Semantics/Generated/DialogueContent/Registry.lua"
-)
-CONVERSATION_UI_COMPATIBILITY_RELATIVE = Path(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/"
-    "Semantics/SemanticDialogueSuggestions/"
-    "PNC_SemanticDialogueSuggestions_StaticProvider_Definitions.lua"
-)
 CONVERSATION_UI_RUNTIME_RELATIVE = CONVERSATION_RUNTIME_RELATIVE / "UI/StaticSuggestions.lua"
-CONVERSATION_MAX_SHARD_BYTES = 64 * 1024
+CONVERSATION_MAX_SHARD_BYTES = 32 * 1024
 CONVERSATION_MAX_RECORDS_PER_SHARD = 48
 _ID = re.compile(r"^[a-z][a-z0-9_.:-]{0,127}$")
 _SHARD_KINDS = frozenset(("content", "patterns", "responses", "flows", "ui"))
@@ -323,10 +308,6 @@ def _content_source(
     return compiled, source
 
 
-def _record_key(kind: str, record_id: str) -> str:
-    return f"{kind}:{record_id}"
-
-
 def _add_global_id(
     locations: dict[str, dict[str, Any]],
     record_id: Any,
@@ -389,17 +370,37 @@ def compile_conversation_sources(
     *,
     manifest_path: Path | None = None,
     runtime_root: Path | None = None,
+    source_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """Load, validate, merge, sort, fingerprint, and index Conversation shards."""
+    """Load, validate, merge, sort, fingerprint, and index Conversation shards.
+
+    source_overrides is an effect-free preview hook keyed by manifest-relative
+    shard path. It never writes to disk and is used by the shared authoring
+    service to validate edits against the complete Conversation model.
+    """
     repository = repository.expanduser().resolve()
     manifest_path = (manifest_path or repository / CONVERSATION_MANIFEST_RELATIVE).expanduser().resolve()
     runtime_root = (runtime_root or repository).expanduser().resolve()
     manifest, entries = _load_manifest(repository, manifest_path)
+    overrides = source_overrides or {}
+    unknown_overrides = set(overrides) - {entry["path"] for entry in entries}
+    if unknown_overrides:
+        raise CompileError(
+            "Conversation source override targets unknown shard(s): "
+            + ", ".join(sorted(unknown_overrides))
+        )
     loaded: list[tuple[dict[str, Any], dict[str, Any], str]] = []
     shard_reports: list[dict[str, Any]] = []
     for entry in entries:
         path = manifest_path.parent / Path(*PurePosixPath(entry["path"]).parts)
-        document = _read_json(path, "Conversation shard")
+        if entry["path"] in overrides:
+            document = _copy_json(overrides[entry["path"]])
+            if not isinstance(document, dict):
+                raise CompileError(
+                    f"Conversation source override must be an object: {entry['path']}"
+                )
+        else:
+            document = _read_json(path, "Conversation shard")
         compiled = _compile_shard(document, entry, runtime_root=runtime_root)
         record_ids: list[str] = []
         if entry["kind"] == "content":
@@ -438,9 +439,13 @@ def compile_conversation_sources(
         path = entry["path"]
         if entry["kind"] == "content":
             for family in document.get("phraseFamilies", []):
-                shard = entry
-                _add_global_id(locations, "phrase." + str(family.get("semanticTemplateID")), kind="content", shard=shard, path=path)
-                _add_global_id(locations, family.get("semanticTemplateID"), kind="content", shard=shard, path=path)
+                _add_global_id(
+                    locations,
+                    "phrase." + str(family.get("semanticTemplateID")),
+                    kind="content",
+                    shard=entry,
+                    path=path,
+                )
             for choice in document.get("playerChoices", []):
                 _add_global_id(locations, choice.get("id"), kind="content", shard=entry, path=path)
         elif entry["kind"] == "patterns":
@@ -476,7 +481,7 @@ def compile_conversation_sources(
             )
 
     for family in content["phraseFamilies"]:
-        owner = locations.get(family["semanticTemplateID"])
+        owner = locations.get("phrase." + str(family["semanticTemplateID"]))
         if owner is not None:
             family["conversationDomain"] = owner["domain"]
             family["sourceShard"] = owner["sourceShard"]
@@ -523,7 +528,7 @@ def compile_conversation_sources(
     whole_fingerprint = _fingerprint(semantic_payload)
     locations = {key: locations[key] for key in sorted(locations)}
     model = {
-        "schema": CONVERSATION_SNAPSHOT_SCHEMA,
+        "schema": CONVERSATION_MODEL_SCHEMA,
         "manifestPath": str(manifest_path.relative_to(repository)),
         "manifest": manifest,
         "source": content_source,
@@ -535,9 +540,8 @@ def compile_conversation_sources(
         "shards": shard_reports,
         "locations": locations,
         "wholeModelFingerprint": whole_fingerprint,
-        # Private build-time provenance used only for generated compatibility
-        # snapshots and shard-targeted authoring.  render_conversation_snapshot
-        # intentionally strips these fields from the published audit artifact.
+        # Private build-time provenance used for shard-targeted authoring.
+        # Private fields are never written into generated runtime artifacts.
         "_repository": repository,
         "_source_documents": {
             entry["path"]: document for document, entry, _ in loaded
@@ -551,17 +555,6 @@ def conversation_record(model: dict[str, Any], canonical_id: str) -> dict[str, A
     if not isinstance(location, dict):
         return None
     return _copy_json(location)
-
-
-def render_conversation_snapshot(model: dict[str, Any]) -> str:
-    snapshot = {
-        key: _copy_json(value)
-        for key, value in model.items()
-        if not key.startswith("_")
-    }
-    snapshot["generatedOnly"] = True
-    snapshot["sourceOfTruth"] = "manifest-backed Conversation shards"
-    return json.dumps(snapshot, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
 
 def conversation_languages(model: dict[str, Any]) -> tuple[str, ...]:
@@ -605,9 +598,27 @@ def conversation_translation_bundles(model: dict[str, Any]) -> dict[str, dict[st
             values = model["content"].get("translations", {}).get(language, {})
             add(language, domain, choice.get("labelKey"), values.get(choice.get("labelKey")))
             add(language, domain, choice.get("choiceKey"), values.get(choice.get("choiceKey")))
+    repository = model.get("_repository")
     for language in languages:
         for key, value in model.get("uiTranslations", {}).get(language, {}).items():
             add(language, "UI", key, value)
+        if isinstance(repository, Path):
+            suggestions_path = (
+                repository
+                / "Contents/mods/ProjectHoomans/common/media/translation"
+                / language
+                / "Conversation/Semantic/Suggestions.json"
+            )
+            if suggestions_path.is_file():
+                try:
+                    suggestions = json.loads(
+                        suggestions_path.read_text(encoding="utf-8")
+                    )
+                except (OSError, UnicodeError, json.JSONDecodeError):
+                    suggestions = {}
+                if isinstance(suggestions, dict):
+                    for key, value in suggestions.items():
+                        add(language, "UI", key, value)
         for key, value in model.get("dialogue", {}).get("translations", {}).get(language, {}).items():
             add(language, "Patterns", key, value)
         for key, value in model.get("semantic", {}).get("translations", {}).get(language, {}).items():
@@ -620,19 +631,13 @@ def conversation_translation_bundles(model: dict[str, Any]) -> dict[str, dict[st
     return bundles
 
 
-def render_conversation_ui_compatibility_module(model: dict[str, Any]) -> str:
-    """Render the generated list consumed by the legacy static provider."""
+def render_conversation_ui_module(model: dict[str, Any]) -> str:
+    """Render the canonical generated static Conversation UI list."""
     return (
         "-- Generated by the manifest-backed Conversation compiler; do not edit by hand.\n"
         "return " + _lua_value(model["ui"], 0) + "\n"
     )
 
-
-def render_conversation_ui_compatibility_shim() -> str:
-    return (
-        "-- Generated compatibility shim; edit manifest-backed Conversation UI shards.\n"
-        'return require "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"\n'
-    )
 
 
 def render_conversation_lua_records(records: list[dict[str, Any]]) -> str:
@@ -710,8 +715,7 @@ def render_conversation_registry(model: dict[str, Any], reports: list[dict[str, 
         "PNC.Semantics = PNC.Semantics or {}",
         "local Registry = PNC.Semantics.ConversationRegistry or {}",
         "PNC.Semantics.ConversationRegistry = Registry",
-        "PNC.Semantics.DialogueContentRegistry = Registry",
-        f"Registry.SCHEMA = {_lua_string(CONVERSATION_SNAPSHOT_SCHEMA)}",
+        f"Registry.SCHEMA = {_lua_string(CONVERSATION_MODEL_SCHEMA)}",
         "Registry.VERSION = 1",
         f"Registry.CONTENT_FINGERPRINT = {_lua_string(model['content']['contentFingerprint'])}",
         f"Registry.WHOLE_MODEL_FINGERPRINT = {_lua_string(model['wholeModelFingerprint'])}",
@@ -800,238 +804,3 @@ def render_conversation_manifest_lua(model: dict[str, Any], reports: list[dict[s
         "-- Generated by the manifest-backed Conversation compiler; do not edit by hand.\n"
         "return " + _lua_value(payload, 0) + "\n"
     )
-
-
-def render_conversation_compatibility_source(model: dict[str, Any], kind: str) -> dict[str, Any]:
-    """Return the old source shape as a generated, read-only compatibility snapshot."""
-    marker = {
-        "generatedCompatibility": {
-            "owner": "manifest-backed Conversation compiler",
-            "sourceManifest": str(CONVERSATION_MANIFEST_RELATIVE),
-            "readOnly": True,
-        }
-    }
-    if kind == "content":
-        document = {
-            "schemaVersion": 2,
-            "source": _copy_json(model["content"]["source"]),
-            "groups": {},
-            "phraseFamilies": [],
-            "playerChoices": [],
-        }
-        for shard in model["shards"]:
-            if shard["kind"] != "content":
-                continue
-            shard_path = Path(*PurePosixPath(shard["path"]).parts)
-            source = _read_json(model["_repository"] / CONVERSATION_SOURCE_RELATIVE / shard_path, "Conversation shard") if "_repository" in model else None
-            if source is not None:
-                document["groups"].update(_copy_json(source.get("groups", {})))
-                document["phraseFamilies"].extend(_copy_json(source.get("phraseFamilies", [])))
-                document["playerChoices"].extend(_copy_json(source.get("playerChoices", [])))
-        document["groups"] = {key: document["groups"][key] for key in sorted(document["groups"])}
-        document["phraseFamilies"].sort(key=lambda item: str(item.get("semanticTemplateID", "")))
-        document["playerChoices"].sort(key=lambda item: str(item.get("id", "")))
-    elif kind in ("common_interactions", "grounded_personal_dialogue"):
-        wanted = "common" if kind == "common_interactions" else "grounded_personal"
-        source_documents = [
-            document for path, document in model.get("_source_documents", {}).items()
-            if (
-                (wanted == "common" and path in ("patterns/common.json", "flows/common_responses.json"))
-                or (wanted == "grounded_personal" and path in ("patterns/grounded_personal.json", "flows/grounded_personal_responses.json"))
-            )
-        ]
-        document = {
-            "schemaVersion": 1,
-            "source": _copy_json(
-                source_documents[0].get("source")
-                if source_documents
-                else model["dialogue"]["source"]
-            ),
-            "patterns": [],
-            "responsePools": [],
-        }
-        for shard in model["shards"]:
-            if shard["kind"] not in ("patterns", "responses") or shard["domain"] != wanted:
-                continue
-            source = model.get("_source_documents", {}).get(shard["path"])
-            if source:
-                document["patterns"].extend(_copy_json(source.get("patterns", [])))
-                document["responsePools"].extend(_copy_json(source.get("responsePools", [])))
-        # Preserve the legacy dataset's authored order in this compatibility
-        # view. The merged runtime model is canonical-sorted; the snapshot is
-        # only for old review/report consumers whose bounded window depends
-        # on the historical order.
-    else:
-        document = {
-            "schema": "pnc.semantic_authoring.v1",
-            "source": _copy_json(model["semantic"].get("source", {"owner": "ProjectHoomans", "version": "1"})),
-            "definitions": [],
-        }
-        for shard in model["shards"]:
-            if shard["kind"] != "flows":
-                continue
-            source = model.get("_source_documents", {}).get(shard["path"])
-            if source:
-                document["definitions"].extend(_copy_json(source.get("definitions", [])))
-        document["definitions"].sort(key=lambda item: str(item.get("id", "")))
-    document.update(marker)
-    return document
-
-
-def bootstrap_conversation_sources(repository: Path, *, overwrite: bool = False) -> list[Path]:
-    """Create the initial cohesive shards from the verified clean source set.
-
-    This is a one-time mechanical migration helper.  Subsequent edits target
-    the manifest-backed shards; the old files are generated compatibility
-    snapshots and are never used as authoring write targets.
-    """
-    repository = repository.expanduser().resolve()
-    source_root = repository / CONVERSATION_SOURCE_RELATIVE
-    source_root.mkdir(parents=True, exist_ok=True)
-    old_root = repository / "tools/semantic_harness/codebuilder/sources"
-    content_source = _read_json(old_root / "semantic_dialogue_content.json", "legacy content source")
-    common_source = _read_json(old_root / "common_interactions.json", "legacy dialogue source")
-    grounded_source = _read_json(old_root / "grounded_personal_dialogue.json", "legacy dialogue source")
-    semantic_source = _read_json(old_root / "semantic_definitions.json", "legacy semantic source")
-    ui_path = repository / CONVERSATION_UI_COMPATIBILITY_RELATIVE
-
-    def content_domain(family: dict[str, Any]) -> str:
-        semantic_id = str(family.get("semanticTemplateID", ""))
-        group = str(family.get("group", ""))
-        if semantic_id.startswith("semantic.flow.greeting"):
-            return "greeting"
-        if semantic_id.startswith("semantic.command"):
-            return "command"
-        if group == "compatibility":
-            return "compatibility"
-        if group == "events":
-            return "event"
-        if group == "commands_emotes":
-            return "social"
-        if group == "tool_replies":
-            if any(token in semantic_id for token in (".order_", ".queued_", ".rejected_", ".cooldown")):
-                return "task"
-            return "social"
-        return group or "compatibility"
-
-    domains: dict[str, list[dict[str, Any]]] = {}
-    for family in content_source.get("phraseFamilies", []):
-        domains.setdefault(content_domain(family), []).append(family)
-    choices_by_domain = {"greeting": content_source.get("playerChoices", [])}
-    source_metadata = content_source.get("source")
-    shard_specs: list[tuple[str, str, str, dict[str, Any]]] = []
-    order = 10
-    for domain in ("greeting", "social", "command", "event", "compatibility", "task"):
-        families = sorted(domains.get(domain, []), key=lambda item: str(item.get("semanticTemplateID", "")))
-        if not families:
-            continue
-        shard_specs.append((f"content/{domain}.json", "content", domain, {
-            "groups": {group: content_source["groups"][group] for group in sorted({item["group"] for item in families})},
-            "phraseFamilies": families,
-            "playerChoices": choices_by_domain.get(domain, []),
-        }))
-        order += 10
-    for path, kind, domain, records in (
-        ("patterns/common.json", "patterns", "common", {"patterns": common_source["patterns"]}),
-        ("flows/common_responses.json", "responses", "common", {"responsePools": common_source["responsePools"]}),
-        ("patterns/grounded_personal.json", "patterns", "grounded_personal", {"patterns": grounded_source["patterns"]}),
-        ("flows/grounded_personal_responses.json", "responses", "grounded_personal", {"responsePools": grounded_source["responsePools"]}),
-        ("flows/semantic_definitions.json", "flows", "semantic", {"definitions": semantic_source["definitions"]}),
-    ):
-        source = common_source.get("source") if domain == "common" else grounded_source.get("source") if domain == "grounded_personal" else semantic_source.get("source")
-        shard_specs.append((path, kind, domain, {"source": source, **records}))
-        order += 10
-
-    ui_records = _extract_static_ui_definitions(ui_path, repository)
-    ui_translations = _load_ui_translation_values(repository)
-    for record in ui_records:
-        record["translations"] = ui_translations.get(record["id"], {})
-    shard_specs.append(("ui/static_suggestions.json", "ui", "static_suggestions", {"suggestions": ui_records}))
-
-    manifest = {
-        "schema": CONVERSATION_MANIFEST_SCHEMA,
-        "version": 1,
-        "source": {
-            "name": "Project Hoomans Conversation Authoring",
-            "version": "1",
-            "contentLicense": "Project Hoomans authored content",
-        },
-        "externalReferences": {
-            "patternIDs": sorted({str(item.get("patternID")) for item in ui_records if item.get("patternID")}),
-        },
-        "shards": [],
-    }
-    written: list[Path] = []
-    for path_value, kind, domain, records in shard_specs:
-        relative = Path(*PurePosixPath(path_value).parts)
-        path = source_root / relative
-        if path.exists() and not overwrite:
-            raise CompileError(f"refusing to overwrite existing Conversation shard: {path}")
-        document = {
-            "schema": CONVERSATION_SHARD_SCHEMA,
-            "version": 1,
-            "kind": kind,
-            "domain": domain,
-            "source": records.pop("source", source_metadata if kind == "content" else manifest["source"]),
-            **records,
-        }
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
-        written.append(path)
-        manifest["shards"].append({"path": path_value, "kind": kind, "domain": domain, "order": order})
-        order += 10
-    manifest["shards"].sort(key=lambda item: (item["order"], item["path"]))
-    manifest_path = source_root / "manifest.json"
-    if manifest_path.exists() and not overwrite:
-        raise CompileError(f"refusing to overwrite existing Conversation manifest: {manifest_path}")
-    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
-    written.append(manifest_path)
-    return written
-
-
-def _extract_static_ui_definitions(path: Path, repository: Path) -> list[dict[str, Any]]:
-    """Parse the existing declarative Lua table for the one-time migration."""
-    try:
-        text = path.read_text(encoding="utf-8")
-    except (OSError, UnicodeError) as error:
-        raise CompileError(f"cannot read static Conversation UI definitions {path}: {error}") from error
-    records: list[dict[str, Any]] = []
-    blocks = re.findall(r"\n    \{(.*?)\n    \},", text, re.DOTALL)
-    for block in blocks:
-        record: dict[str, Any] = {}
-        for key, value in re.findall(r"^\s*([A-Za-z][A-Za-z0-9_]*)\s*=\s*\"([^\"]*)\",?\s*$", block, re.MULTILINE):
-            record[key] = value
-        for key, value in re.findall(r"^\s*([A-Za-z][A-Za-z0-9_]*)\s*=\s*(\d+),?\s*$", block, re.MULTILINE):
-            record[key] = int(value)
-        for key in ("hubOnly", "hubRequiresSafeGossip"):
-            if re.search(rf"^\s*{key}\s*=\s*true,?\s*$", block, re.MULTILINE):
-                record[key] = True
-        for name, pairs in re.findall(r"^\s*(extensions|slots)\s*=\s*\{(.*?)\},?\s*$", block, re.MULTILINE):
-            nested: dict[str, Any] = {}
-            for key, value in re.findall(r"([A-Za-z][A-Za-z0-9_]*)\s*=\s*\"([^\"]*)\"", pairs):
-                nested[key] = value
-            for key in re.findall(r"([A-Za-z][A-Za-z0-9_]*)\s*=\s*true", pairs):
-                nested[key] = True
-            record[name] = nested
-        if record.get("id"):
-            records.append(record)
-    if not records:
-        raise CompileError(f"static Conversation UI definitions contain no records: {path}")
-    return sorted(records, key=lambda item: (int(item.get("order", 0)), str(item.get("id"))))
-
-
-def _load_ui_translation_values(repository: Path) -> dict[str, dict[str, dict[str, str]]]:
-    result: dict[str, dict[str, dict[str, str]]] = {}
-    for language in LANGUAGES:
-        path = repository / "Contents/mods/ProjectHoomans/common/media/translation" / language / "Conversation/Semantic/Suggestions.json"
-        values = _read_json(path, "Conversation suggestion translations")
-        for key, value in values.items():
-            if not isinstance(value, str):
-                continue
-            match = re.fullmatch(r"UI_PNC_Conversation_Suggestion_(.+)_(Label|Utterance)", key)
-            if not match:
-                continue
-            suggestion_name, field = match.groups()
-            suggestion_id = "question." + re.sub(r"(?<!^)([A-Z])", r"_\1", suggestion_name).lower()
-            result.setdefault(suggestion_id, {}).setdefault(language, {})[field.lower()] = value
-    return result

@@ -10,5 +10,17 @@
   "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01": "Hindi ko makumpirma iyon.",
   "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01": "Hindi ko makumpirma ang kalagayan ko ngayon.",
   "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01": "Hindi makumpirma.",
-  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01": "Hindi ko makumpirma ngayon, pero salamat sa pagtatanong."
+  "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01": "Hindi ko makumpirma ngayon, pero salamat sa pagtatanong.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded01": "Walang kagat. Tama na.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral01": "Hindi, wala akong naitalang kagat.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse01": "Walang kagat.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm01": "Hindi, wala akong naitalang kagat. Salamat sa pagsuri.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded01": "Oo. Nakagat ako. Tama na.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral01": "Oo, nakagat ako.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse01": "Oo. Nakagat ako.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm01": "Oo. Nakagat ako, at salamat sa pagsuri.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded01": "Hindi ko makumpirma. Huwag mo nang ipilit.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral01": "Hindi ko makumpirma kung nakagat ako.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse01": "Hindi makumpirma.",
+  "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm01": "Hindi ko makumpirma, pero salamat sa pagsuri."
 }

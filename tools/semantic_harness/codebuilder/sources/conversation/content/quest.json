@@ -1,0 +1,187 @@
+{
+  "domain": "quest",
+  "groups": {
+    "quest": {
+      "contentOwner": "projecthoomans.dialogue_content.quest"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.accept.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't accept that request.",
+              "TL": "Hindi ko matanggap ang kahilingang iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.accept.queued",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll bring the clinic supplies.",
+              "TL": "Dadalahin ko ang mga suplay ng klinika."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.accept.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't accept that request right now.",
+              "TL": "Hindi ko matatanggap ang kahilingang iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.offer.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't check that clinic-supplies request.",
+              "TL": "Hindi ko masuri ang kahilingan para sa suplay."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.offer.queued",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can help with the clinic supplies.",
+              "TL": "Matutulungan kita sa mga suplay ng klinika."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.offer.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't take that clinic-supplies request right now.",
+              "TL": "Hindi ko matatanggap ang kahilingan para sa suplay ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.status.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't check that request.",
+              "TL": "Hindi ko masuri ang kahilingang iyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.status.queued",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll check the clinic-supplies request.",
+              "TL": "Susuriin ko ang kahilingan para sa suplay ng klinika."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.status.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't check that request right now.",
+              "TL": "Hindi ko masuri ang kahilingang iyon ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.turn_in.failed",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I couldn't turn in the clinic supplies.",
+              "TL": "Hindi ko maipasa ang mga suplay ng klinika."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.turn_in.queued",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'll turn in the clinic supplies.",
+              "TL": "Ipapasa ko ang mga suplay ng klinika."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "quest",
+      "semanticTemplateID": "semantic.quest.clinic_supplies.turn_in.rejected",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't turn that in yet.",
+              "TL": "Hindi ko pa maipapasa iyon."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

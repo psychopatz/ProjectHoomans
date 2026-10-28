@@ -31,7 +31,7 @@ local TEMPLATES = {
 local REQUIRED_FIELDS = {
     "capabilityID", "workflowKind", "templateVersion", "contractVersion",
     "targetScope", "triggerFrames", "requiredSlots", "permissionGate",
-    "outcomeMapping", "responsePools", "translationOwner",
+    "outcomeMapping", "responsePools",
 }
 
 local function copyValue(value, depth)
@@ -96,18 +96,14 @@ local function missingMetadata(row, template)
             local outcome = template.outcomes[index]
             local response = row.responsePools[outcome]
             if type(response) ~= "table"
-                or tostring(response.key or "") == ""
-                or tostring(response.en or "") == ""
-                or tostring(response.tl or "") == ""
+                or tostring(response.templateID or "") == ""
             then
                 missing[#missing + 1] = "responsePools." .. outcome
             elseif type(response.variants) == "table" then
                 for variantIndex = 1, #response.variants do
                     local variant = response.variants[variantIndex]
                     if type(variant) ~= "table"
-                        or tostring(variant.key or "") == ""
-                        or tostring(variant.en or "") == ""
-                        or tostring(variant.tl or "") == ""
+                        or tostring(variant.templateID or "") == ""
                     then
                         missing[#missing + 1] = "responsePools."
                             .. outcome .. ".variants." .. tostring(variantIndex)

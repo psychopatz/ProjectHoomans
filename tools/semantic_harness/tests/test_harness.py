@@ -386,12 +386,12 @@ class SemanticHarnessTests(unittest.TestCase):
     def test_real_tagalog_tool_catalog_and_live_language_switch(self) -> None:
         scenario = merge(DEFAULT_SCENARIO, {"runtime": {"language": "TL"}})
         with LuaSemanticWorker(scenario) as worker:
-            name_reply = worker.tool_reply(
+            name_reply = worker.tool_result_speech(
                 [{"name": "ask_name", "accepted": True}],
                 {"npc_name": "Mara Vale"},
             )
             language = worker.set_language("EN")
-            camp_reply = worker.tool_reply(
+            camp_reply = worker.tool_result_speech(
                 [{"name": "order_camp", "commandID": "order_camp", "accepted": True}],
                 {"npc_name": "Mara Vale"},
             )
@@ -496,7 +496,7 @@ class SemanticHarnessTests(unittest.TestCase):
             manifest_paths,
         )
         self.assertIn(
-            "ProjectHoomans:shared:PNC/Conversation/PNC_ConversationToolReplies.lua",
+            "ProjectHoomans:shared:PNC/Semantics/PNC_SemanticToolResultRealization.lua",
             manifest_paths,
         )
         self.assertIn(

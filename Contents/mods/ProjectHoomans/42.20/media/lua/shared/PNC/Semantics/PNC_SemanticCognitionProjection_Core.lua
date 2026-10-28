@@ -11,7 +11,7 @@ PNC.Semantics.CognitionProjection = Projection
 
 Projection.VERSION = 1
 -- Storage/wire codec version. VERSION describes the expanded fact contract;
--- COMPACT_VERSION lets readers distinguish packed data from legacy projections.
+-- COMPACT_VERSION identifies the packed wire representation for readers.
 Projection.COMPACT_VERSION = 1
 Projection.MAX_FACTS = 64
 Projection.MAX_VALUE_DEPTH = 3

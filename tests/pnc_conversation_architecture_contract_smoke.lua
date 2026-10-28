@@ -89,19 +89,36 @@ T.falsy(composition:find("PNC_Necroa_ZombieFlavor", 1, true),
 T.truthy(composition:find("PNC_Necroa_ZombieCaptionAdapter", 1, true),
     "client composition loads the provider caption adapter")
 
-local sourcePath = T.repository
-    .. "/tools/semantic_harness/codebuilder/sources/"
-    .. "semantic_dialogue_content.json"
-local sourceHandle = assert(io.open(sourcePath, "rb"))
-local contentSource = sourceHandle:read("*a")
-sourceHandle:close()
-for _, marker in ipairs({
-    ".migrated.", "MIGRATED_", "legacySource", "migrated_events",
-    "semanticAuthority", "responsePoolID", "semanticVariantID",
-}) do
-    T.falsy(contentSource:find(marker, 1, true),
-        "canonical Conversation content retains migration marker: " .. marker)
+local sourceRoot = T.repository
+    .. "/tools/semantic_harness/codebuilder/sources/conversation/content"
+local quotedRoot = "'" .. sourceRoot:gsub("'", "'\\''") .. "'"
+local contentFiles = {}
+local finder = assert(io.popen(
+    "find " .. quotedRoot .. " -type f -name '*.json' -print | sort",
+    "r"
+))
+for fileName in finder:lines() do
+    table.insert(contentFiles, fileName)
 end
+finder:close()
+T.truthy(#contentFiles >= 1, "Conversation content shards are discoverable")
+for _, fileName in ipairs(contentFiles) do
+    local sourceHandle = assert(io.open(fileName, "rb"))
+    local contentSource = sourceHandle:read("*a")
+    sourceHandle:close()
+    for _, marker in ipairs({
+        ".migrated.", "MIGRATED_", "legacySource", "migrated_events",
+        "semanticAuthority", "responsePoolID", "semanticVariantID",
+        "generatedCompatibility",
+    }) do
+        T.falsy(contentSource:find(marker, 1, true),
+            fileName .. " retains migration marker: " .. marker)
+    end
+end
+T.falsy(io.open(
+    T.repository .. "/tools/semantic_harness/codebuilder/sources/"
+        .. "semantic_dialogue_content.json", "rb"),
+    "monolithic Dialogue Content source is retired")
 
 -- Current metadata contains the real authority boundary, never the phase
 -- vocabulary that described how the repository got here.

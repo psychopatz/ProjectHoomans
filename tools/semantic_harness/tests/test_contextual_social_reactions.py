@@ -331,14 +331,14 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 "friendly",
                 {"personality": {"socialStyle": "friendly"}},
                 "semantic.social.offer_friendly",
-                "UI_PNC_Conversation_Semantic_OfferFriendly",
+                None,
                 "friendly",
             ),
             (
                 "withdrawn",
                 {"personality": {"socialStyle": "withdrawn"}},
                 "semantic.social.offer_withdrawn",
-                "UI_PNC_Conversation_Semantic_OfferWithdrawn",
+                None,
                 "withdrawn",
             ),
             (
@@ -363,7 +363,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "personality": {"socialStyle": "friendly"},
                 },
                 "semantic.social.offer_stressed",
-                "UI_PNC_Conversation_Semantic_OfferStressed",
+                None,
                 "friendly",
             ),
         )
@@ -385,11 +385,11 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     self.assertIn(actual_template, expected_template)
                 else:
                     self.assertEqual(actual_template, expected_template)
-                if translation_key is not None:
-                    self.assertEqual(
-                        result["messages"][0]["payload"]["translationKey"],
-                        translation_key,
-                    )
+                payload = result["messages"][0]["payload"]
+                self.assertEqual(
+                    payload.get("semanticTemplateID"),
+                    actual_template,
+                )
                 self.assertEqual(
                     result["routedSituation"]["social"]["style"], social_style
                 )
@@ -407,14 +407,14 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 "friendly",
                 {"personality": {"socialStyle": "friendly"}},
                 "semantic.social.dispute_friendly",
-                "UI_PNC_Conversation_Semantic_DisputeFriendly",
+                None,
                 "friendly",
             ),
             (
                 "withdrawn",
                 {"personality": {"socialStyle": "withdrawn"}},
                 "semantic.social.dispute_withdrawn",
-                "UI_PNC_Conversation_Semantic_RealizationDisputeWithdrawnTerse",
+                None,
                 "withdrawn",
             ),
             (
@@ -424,7 +424,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "personality": {"socialStyle": "neutral"},
                 },
                 "semantic.social.dispute_stressed",
-                "UI_PNC_Conversation_Semantic_DisputeStressed",
+                None,
                 "neutral",
             ),
         )
@@ -446,8 +446,8 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     template,
                 )
                 self.assertEqual(
-                    result["messages"][0]["payload"]["translationKey"],
-                    translation_key,
+                    result["messages"][0]["payload"].get("semanticTemplateID"),
+                    template,
                 )
                 self.assertEqual(
                     result["routedSituation"]["social"]["style"], social_style

@@ -7,7 +7,7 @@ import re
 from typing import Any
 
 from .lexicon_compiler import CompileError
-from .translation_support import legacy_translation_map, normalize_translations
+from .translation_support import normalize_translations
 from .dialogue_contract import (
     DIALOGUE_ID,
     DIALOGUE_TEMPLATE_ID,
@@ -31,26 +31,11 @@ def _variant_translations(
     fallback: str,
     label: str,
 ) -> dict[str, str]:
-    """Normalize modern translation maps plus legacy en/tl fields."""
+    """Normalize an optional generic translation map."""
     raw = variant.get("translations")
-    legacy = legacy_translation_map(variant)
-
-    if raw is not None and legacy:
-        modern = normalize_translations(raw, f"{label}.translations")
-        legacy_map = normalize_translations(legacy, f"{label}.legacyTranslations")
-        for language, text in legacy_map.items():
-            current = modern.get(language)
-            if current is not None and current != text:
-                raise CompileError(
-                    f"{label} conflicts between translations and legacy {language} text"
-                )
-            modern.setdefault(language, text)
-        return {language: modern[language] for language in sorted(modern)}
-    if raw is not None:
-        return normalize_translations(raw, f"{label}.translations")
-    if legacy:
-        return normalize_translations(legacy, f"{label}.legacyTranslations")
-    return {}
+    if raw is None:
+        return {}
+    return normalize_translations(raw, f"{label}.translations")
 
 def _validate_response_condition(value: Any, pool_id: str, variant_id: str) -> dict[str, Any]:
     if value is None:
@@ -267,7 +252,7 @@ def _compile_dialogue_response_pool(
             raise CompileError(
                 f"response priority for {pool_id}:{variant_id} must be from -10 to 10")
         allowed_keys = {
-            "id", "templateID", "fallback", "when", "priority", "en", "tl",
+            "id", "templateID", "fallback", "when", "priority",
             "translations", "plan", "reviewed", "sourceRefs", "translationArgs",
         }
         if set(variant) - allowed_keys:

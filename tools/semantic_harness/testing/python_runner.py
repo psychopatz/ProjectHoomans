@@ -25,6 +25,17 @@ import weakref
 from typing import Iterable, Sequence
 
 
+HARNESS_ROOT = Path(__file__).resolve().parents[1]
+_VENV_PYTHON_CANDIDATES = (
+    HARNESS_ROOT / ".venv/bin/python",
+    HARNESS_ROOT / ".venv/Scripts/python.exe",
+)
+DEFAULT_PYTHON = str(
+    next(
+        (candidate for candidate in _VENV_PYTHON_CANDIDATES if candidate.is_file()),
+        Path(sys.executable),
+    )
+)
 DEFAULT_JOBS = min(4, os.cpu_count() or 1)
 DEFAULT_TIMEOUT_SECONDS = 300.0
 DEFAULT_MAX_OUTPUT_BYTES = 256 * 1024
@@ -119,7 +130,7 @@ class PythonAcceptanceRunner:
         self,
         root: Path,
         *,
-        python: str = sys.executable,
+        python: str = DEFAULT_PYTHON,
         jobs: int = DEFAULT_JOBS,
         timeout: float = DEFAULT_TIMEOUT_SECONDS,
         max_output_bytes: int = DEFAULT_MAX_OUTPUT_BYTES,
@@ -308,7 +319,13 @@ class PythonAcceptanceRunner:
         if timed_out:
             status = "FAIL"
         elif returncode == 0:
-            status = "SKIP" if self._ran_count(rendered_output) == 0 else "PASS"
+            ran_count = self._ran_count(rendered_output)
+            skip_count = self._skip_count(rendered_output)
+            status = (
+                "SKIP"
+                if ran_count is not None and ran_count <= skip_count
+                else "PASS"
+            )
         else:
             status = "FAIL"
         result = PythonModuleResult(
@@ -477,7 +494,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("filters", nargs="*", help="case-insensitive module filters")
     parser.add_argument("--jobs", type=int, default=DEFAULT_JOBS)
     parser.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT_SECONDS)
-    parser.add_argument("--python", default=sys.executable)
+    parser.add_argument("--python", default=DEFAULT_PYTHON)
     parser.add_argument("--report", type=Path)
     parser.add_argument("--fail-fast", action="store_true")
     parser.add_argument("--keep-display", action="store_true")

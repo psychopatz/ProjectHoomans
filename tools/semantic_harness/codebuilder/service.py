@@ -32,7 +32,6 @@ from .conversation_compiler import (
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
     conversation_record,
-    render_conversation_compatibility_source,
 )
 from .lexicon_compiler import CompileError
 
@@ -107,6 +106,20 @@ class SemanticLabAuthoringService:
     ) -> dict[str, Any]:
         return self.dataset_catalog.write_dataset_document(source_id, document)
 
+    def preview_dataset_generation(self, source_id: str) -> dict[str, Any]:
+        """Validate a logical canonical dataset through the full Conversation plan."""
+        document = self.load_dataset_document(source_id)
+        report = self.preview_dataset_edit(source_id, document)
+        if report.get("ok") is True and self._dataset_spec(source_id)["kind"] in {
+            "semantic", "dialogue"
+        }:
+            report.update(
+                self.interaction_authoring._conversation_preview_artifacts(
+                    source_id, document
+                )
+            )
+        return report
+
     @property
     def dialogue_content_source_path(self) -> Path:
         """Return the manifest, never a generated compatibility snapshot."""
@@ -129,8 +142,54 @@ class SemanticLabAuthoringService:
         return self.repository / CONVERSATION_SOURCE_RELATIVE / Path(source_shard)
 
     def _conversation_content_document(self, model: dict[str, Any]) -> dict[str, Any]:
-        """Expose the merged authored shape to compatibility UI helpers."""
-        return render_conversation_compatibility_source(model, "content")
+        """Merge authored content shards in memory without creating an aggregate file."""
+        groups: dict[str, Any] = {}
+        phrase_families: list[dict[str, Any]] = []
+        player_choices: list[dict[str, Any]] = []
+        source_metadata: dict[str, Any] | None = None
+
+        for source_path, document in sorted(
+            model.get("_source_documents", {}).items()
+        ):
+            if not str(source_path).startswith("content/"):
+                continue
+            if not isinstance(document, dict):
+                continue
+            if source_metadata is None and isinstance(document.get("source"), dict):
+                source_metadata = json.loads(
+                    json.dumps(document["source"], ensure_ascii=False)
+                )
+            for group_id, definition in (document.get("groups") or {}).items():
+                existing = groups.get(group_id)
+                if existing is not None and existing != definition:
+                    raise CompileError(
+                        f"Conversation content group {group_id} conflicts across shards"
+                    )
+                groups[group_id] = json.loads(
+                    json.dumps(definition, ensure_ascii=False)
+                )
+            phrase_families.extend(
+                json.loads(
+                    json.dumps(document.get("phraseFamilies", []), ensure_ascii=False)
+                )
+            )
+            player_choices.extend(
+                json.loads(
+                    json.dumps(document.get("playerChoices", []), ensure_ascii=False)
+                )
+            )
+
+        phrase_families.sort(
+            key=lambda item: str(item.get("semanticTemplateID") or item.get("id") or "")
+        )
+        player_choices.sort(key=lambda item: str(item.get("id") or ""))
+        return {
+            "schemaVersion": 2,
+            "source": source_metadata or {"owner": "ProjectHoomans"},
+            "groups": {key: groups[key] for key in sorted(groups)},
+            "phraseFamilies": phrase_families,
+            "playerChoices": player_choices,
+        }
 
     def _raw_content_item(
         self,
@@ -278,7 +337,7 @@ class SemanticLabAuthoringService:
             if not isinstance(family, dict):
                 continue
             location = conversation_record(
-                model, str(family.get("semanticTemplateID") or "")
+                model, self._family_id(family)
             ) or {}
             source_shard = str(location.get("sourceShard") or "")
             report = self._content_shard_report(model, source_shard)
@@ -425,7 +484,6 @@ class SemanticLabAuthoringService:
             )
             aggregate_target.clear()
             aggregate_target.update(json.loads(json.dumps(target, ensure_ascii=False)))
-        aggregate.pop("generatedCompatibility", None)
         compiled_aggregate = compile_dialogue_content(aggregate)
         return aggregate, {
             "ok": True,
@@ -481,7 +539,6 @@ class SemanticLabAuthoringService:
                     "Semantics/Generated/Conversation/Registry.lua",
                     "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
                     "Semantics/Generated/Conversation/Manifest.lua",
-                    "tools/semantic_harness/codebuilder/generated/conversation/ConversationSnapshot.json",
                 )
             ],
         }
@@ -619,31 +676,11 @@ class SemanticLabAuthoringService:
             **kwargs,
         )
 
-    def _semantic_preview_artifacts(
-        self,
-        compiled: dict[str, Any],
-        source_document: dict[str, Any],
-        source_path: Path,
-    ) -> dict[str, Any]:
-        return self.interaction_authoring._semantic_preview_artifacts(
-            compiled, source_document, source_path
-        )
-
-    def _dialogue_preview_artifacts(
-        self,
-        compiled: dict[str, Any],
-        source_document: dict[str, Any],
-        source_path: Path,
-    ) -> dict[str, Any]:
-        return self.interaction_authoring._dialogue_preview_artifacts(
-            compiled, source_document, source_path
-        )
-
     def preview_interaction_spec(
         self,
         spec: dict[str, Any],
         *,
-        source_id: str = "semantic_definitions",
+        source_id: str = "semantic_flows",
         production_catalog: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         return self.interaction_authoring.preview_interaction_spec(
@@ -657,7 +694,7 @@ class SemanticLabAuthoringService:
         spec: dict[str, Any],
         *,
         approved: bool,
-        source_id: str = "semantic_definitions",
+        source_id: str = "semantic_flows",
         production_catalog: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         return self.interaction_authoring.generate_interaction_spec(
@@ -671,7 +708,7 @@ class SemanticLabAuthoringService:
         self,
         collection: dict[str, Any],
         *,
-        source_id: str = "semantic_definitions",
+        source_id: str = "semantic_flows",
         production_catalog: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         return self.interaction_authoring.preview_interaction_collection(
@@ -685,7 +722,7 @@ class SemanticLabAuthoringService:
         collection: dict[str, Any],
         *,
         approved: bool,
-        source_id: str = "semantic_definitions",
+        source_id: str = "semantic_flows",
         production_catalog: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         return self.interaction_authoring.generate_interaction_collection(
@@ -768,29 +805,3 @@ class SemanticLabAuthoringService:
     ) -> dict[str, Any]:
         """Convert explicit license-cleared review decisions to canonical records."""
         return promote_reviewed_candidates(report, decisions)
-
-    def preview_semantic_source(self, source_path: Path) -> dict[str, Any]:
-        return authoring.preview_semantic_source(
-            source_path,
-            repository=self.repository,
-            runtime_root=self.runtime_root,
-        )
-
-    def generate_semantic_source(self, source_path: Path) -> dict[str, Any]:
-        return authoring.generate_semantic_source(
-            source_path,
-            repository=self.repository,
-            runtime_root=self.runtime_root,
-        )
-
-    def preview_dialogue_source(self, source_path: Path) -> dict[str, Any]:
-        return authoring.preview_dialogue_source(
-            source_path,
-            repository=self.repository,
-        )
-
-    def generate_dialogue_source(self, source_path: Path) -> dict[str, Any]:
-        return authoring.generate_dialogue_source(
-            source_path,
-            repository=self.repository,
-        )

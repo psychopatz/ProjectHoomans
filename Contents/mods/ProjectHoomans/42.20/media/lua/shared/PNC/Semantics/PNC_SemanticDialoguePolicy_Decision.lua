@@ -27,7 +27,7 @@ local function flowResponseEligible(result, context)
         return false
     end
     -- Identity claims and other authoritative turns must keep their existing
-    -- server-result response path. A verified identity also keeps the legacy
+    -- server-result response path. A verified identity also keeps the
     -- known-name presentation instead of reopening the strangers' pool.
     if result.branch == "IDENTITY_CLAIM_RECEIVED"
         or result.branch == "GIFT_OFFER_DISPATCHED"

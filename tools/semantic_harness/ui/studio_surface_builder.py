@@ -30,7 +30,7 @@ def build_studio_editors(
     Explore is read-only and combines the response, interaction, and source
     browsers. Dialogue Content owns bounded wording edits. Review owns
     candidate-source evidence. Developer Tools contains the existing
-    structural authoring tools, including the temporary legacy workflow. All
+    structural authoring tools, including the canonical workflow composer. All
     worker callbacks remain the existing shell/services; this function only
     changes their navigation home.
     """
@@ -114,14 +114,11 @@ def build_studio_editors(
     advanced_notebook.add(library_frame, text="Canonical source editor")
     advanced_notebook.add(blocks_frame, text="Block contracts")
     advanced_notebook.add(composer_frame, text="Interaction composer")
-    advanced_notebook.add(workflow_frame, text="Legacy build workflow")
+    advanced_notebook.add(workflow_frame, text="Workflow composer")
     app.flow_editor_frame = flow_frame
     app.library_tab = library_frame
     app.blocks_tab = blocks_frame
     app.composer_tab = composer_frame
-    app.workflow_tab = workflow_frame
-    # Compatibility for callers that used the former nested editor notebook.
-    app.editor_notebook = advanced_notebook
 
     app.flow_editor = FlowEditorPane(
         flow_frame,
@@ -133,10 +130,6 @@ def build_studio_editors(
         on_refresh=app.refresh_flow_catalog,
         on_validate=app.validate_flow_draft,
         on_register=app.register_flow_draft,
-        on_compile_source=app.compile_semantic_source,
-        on_generate_source=app.generate_semantic_source,
-        on_review_dataset=app.review_dialogue_source,
-        on_generate_dataset=app.generate_dialogue_source,
     )
     app.interaction_composer = InteractionSpecPane(
         composer_frame,

@@ -1,0 +1,22 @@
+{
+  "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded01": "Walang ligtas na mapagpuwestuhan dito.",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral01": "Wala akong nakikitang magandang mapagpuwestuhan dito.",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse01": "Walang magandang puwesto rito.",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm01": "Wala akong nakikitang ligtas na mapagpuwestuhan dito.",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded01": "Saan mo gustong makipagsapalaran?",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral01": "Saan tayo pupuwesto?",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampTerse01": "Saan?",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampWarm01": "Saan tayo magtatayo ng kampo?",
+  "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded01": "Sige. Ano ngayon?",
+  "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral01": "Sige. Ano ang gusto mong pag-usapan?",
+  "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse01": "Ano?",
+  "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm01": "Sige. Ano ang gusto mong pag-usapan?",
+  "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded01": "Sige. Ano iyon?",
+  "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral01": "Sige. Ano ang kailangan mo?",
+  "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse01": "Ano ang kailangan mo?",
+  "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm01": "Sige. Ano ang kailangan mo?",
+  "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded01": "Sige. Ano iyon?",
+  "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral01": "Sige. Ano ang gusto mong pag-usapan?",
+  "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse01": "Ano pa?",
+  "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm01": "Sige. Ano ang gusto mong pag-usapan?"
+}

@@ -48,15 +48,15 @@ function Runtime.GetProviderStatus()
         }
     end
     -- The test harness and tools that load Lua outside Project Zomboid do not
-    -- expose getFileReader.  Preserve their bridge-only behavior; the game
+    -- expose getFileReader.  Use explicit harness behavior; the game
     -- itself always has getFileReader, so production remains fail-closed when
     -- the pbrainz heartbeat is missing or stale.
     if type(getFileReader) ~= "function" then
         return {
-            source = "bridge_legacy",
+            source = "harness_bridge",
             available = true,
             ready = true,
-            status = "legacy_bridge",
+            status = "harness_ready",
         }
     end
     return Availability.Read()

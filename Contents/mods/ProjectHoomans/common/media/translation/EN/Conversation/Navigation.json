@@ -1,0 +1,22 @@
+{
+  "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded01": "There is nowhere safe to set up here.",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral01": "I don't see a good place to set up here.",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse01": "No good place here.",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm01": "I don't see a safe place to set up here.",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded01": "Where do you want to risk it?",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral01": "Where should we set up?",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampTerse01": "Where?",
+  "UI_PNC_Conversation_Content_SemanticNavigationCampWarm01": "Where should we set up camp?",
+  "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded01": "All right. What now?",
+  "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral01": "All right. What would you like to discuss?",
+  "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse01": "What is it?",
+  "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm01": "Sure. What would you like to discuss?",
+  "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded01": "All right. What is it?",
+  "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral01": "All right. What do you need?",
+  "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse01": "What do you need?",
+  "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm01": "Sure. What do you need?",
+  "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded01": "All right. What is it?",
+  "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral01": "All right. What did you want to talk about?",
+  "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse01": "What else?",
+  "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm01": "Sure. What did you want to talk about?"
+}

@@ -18,7 +18,16 @@ class ContextualRuntimeSpeechP11GTests(unittest.TestCase):
         self.assertIn("semantic.flow.greeting.opening.default", families)
         self.assertIn("semantic.question.wellbeing.default", families)
         self.assertIn("semantic.question.knowledge.known", families)
-        self.assertIn("UI_PNC_Conversation_Semantic_GeneratedFollowQueued", families)
+        self.assertNotIn(
+            "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
+            families,
+        )
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            follow = worker.input("Follow me")
+        self.assertEqual(
+            follow["messages"][0]["payload"]["phraseFamilyID"],
+            "phrase.semantic.command.follow.queued",
+        )
         phrase_content = catalog["phraseContent"]
         self.assertTrue(phrase_content["families"])
         self.assertEqual(len(phrase_content["fingerprint"]), 64)

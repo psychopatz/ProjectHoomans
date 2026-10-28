@@ -176,7 +176,7 @@ function Payload.Build(view, message)
         and DialogueSituation
         and type(DialogueSituation.Build) == "function"
     then
-        -- Legacy/debug callers may enter the provider path without the
+        -- Diagnostic/direct callers may enter the provider path without the
         -- semantic input's pending context. Reconstruct only the bounded
         -- situation projection from authorized presentation sources; never
         -- expose the full NPC record to the payload.

@@ -10,8 +10,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.semantic_harness.codebuilder.dialogue_contract import load_dialogue_dataset
 from tools.semantic_harness.codebuilder.dialogue_dataset import compile_dialogue_dataset
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.semantic_harness.codebuilder.dataset_adapters import (
     preview_dataset_adapter,
     promote_reviewed_candidates,
@@ -20,10 +20,6 @@ from tools.semantic_harness.cli import _parser, cli
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
-CANONICAL_DIALOGUE = REPOSITORY / (
-    "tools/semantic_harness/codebuilder/sources/common_interactions.json"
-)
-
 
 def _write_manifest(
     directory: Path,
@@ -164,7 +160,10 @@ class DatasetAdapterTests(unittest.TestCase):
 
         self.assertTrue(promoted["ok"], promoted)
         self.assertEqual(promoted["promotedCount"], 1)
-        document = load_dialogue_dataset(CANONICAL_DIALOGUE)
+        document = SemanticLabAuthoringService(
+            repository=REPOSITORY,
+            runtime_root=REPOSITORY,
+        ).load_dataset_document("common_dialogue")
         document["patterns"].append(promoted["patterns"][0])
         compiled = compile_dialogue_dataset(document)
         self.assertTrue(any(item["id"] == promoted["patterns"][0]["id"] for item in compiled["patterns"]))

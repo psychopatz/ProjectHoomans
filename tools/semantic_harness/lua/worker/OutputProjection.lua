@@ -113,19 +113,19 @@ function OutputProjection.translationSnapshot(context)
     return context.Translations.snapshot(context)
 end
 
-function OutputProjection.toolReply(context, payload)
+function OutputProjection.toolResultSpeech(context, payload)
     local Runtime = context.Runtime
     local Values = context.Values
     payload = type(payload) == "table" and payload or {}
     local results = type(payload.results) == "table"
         and payload.results or {}
-    local replies = PNC.Conversation
-        and PNC.Conversation.ToolReplies or nil
-    if not replies or type(replies.Build) ~= "function" then
-        return { ok = false, error = "tool_reply_catalog_unavailable" }
+    local realization = PNC.Semantics
+        and PNC.Semantics.ToolResultRealization or nil
+    if not realization or type(realization.Text) ~= "function" then
+        return { ok = false, error = "tool_result_realization_unavailable" }
     end
     local before = #Runtime.translationLookups
-    local value = replies.Build(results, payload.context or {})
+    local value = realization.Text(results, payload.context or {})
     local toolName = ""
     for _, result in ipairs(results) do
         local name = tostring(result and result.name or "")
@@ -145,7 +145,7 @@ function OutputProjection.toolReply(context, payload)
     end
     return {
         ok = true,
-        type = "tool_reply",
+        type = "tool_result_speech",
         language = context.Translations.currentLanguage(context),
         text = value,
         results = Values.copy(results),
@@ -155,7 +155,7 @@ function OutputProjection.toolReply(context, payload)
                 name = toolName,
                 label = toolName,
                 status = "resolved",
-                source = "production_tool_reply_catalog",
+                source = "production_semantic_tool_result_realization",
             },
         },
         translationLookups = lookups,

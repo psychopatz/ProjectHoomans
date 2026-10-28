@@ -6,14 +6,14 @@ PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
 local Integration = PNC.PBrainZ
 local Internal = Integration.Internal
 local Runtime = Internal.Runtime
-local ToolReplies = PNC.Conversation and PNC.Conversation.ToolReplies
+local ToolResultRealization = PNC.Semantics and PNC.Semantics.ToolResultRealization
 local Fallback = Internal.ResponseFallback or {}
 Internal.ResponseFallback = Fallback
 
-function Fallback.DedicatedToolReply(packet, semanticResults)
-    if not ToolReplies or not ToolReplies.Build then return nil end
+function Fallback.ToolResultText(packet, semanticResults)
+    if not ToolResultRealization or not ToolResultRealization.Text then return nil end
     local context = packet and packet.conversation_context or {}
-    return ToolReplies.Build(semanticResults, context)
+    return ToolResultRealization.Text(semanticResults, context)
 end
 
 function Fallback.OrFailure(
@@ -22,7 +22,7 @@ function Fallback.OrFailure(
     actionAttempted,
     semanticResults,
     packet,
-    forceToolReply
+    forceToolAcknowledgement
 )
     local response = Runtime.CleanResponseText(arguments and arguments.response_text)
     local providerFailure = arguments and (
@@ -31,14 +31,14 @@ function Fallback.OrFailure(
         or arguments.context_eligible == false
         or arguments.contextEligible == false
     )
-    if forceToolReply then
-        local dedicated = Fallback.DedicatedToolReply(packet, semanticResults)
+    if forceToolAcknowledgement then
+        local dedicated = Fallback.ToolResultText(packet, semanticResults)
         if dedicated and dedicated ~= "" then
             return dedicated, providerFailure == true
         end
     end
     if providerFailure then
-        local dedicated = Fallback.DedicatedToolReply(packet, semanticResults)
+        local dedicated = Fallback.ToolResultText(packet, semanticResults)
         if dedicated and dedicated ~= "" then
             return dedicated, true
         end
@@ -47,7 +47,7 @@ function Fallback.OrFailure(
         return response, providerFailure == true
     end
 
-    local dedicated = Fallback.DedicatedToolReply(packet, semanticResults)
+    local dedicated = Fallback.ToolResultText(packet, semanticResults)
     if dedicated and dedicated ~= "" then
         return dedicated, providerFailure == true
     end

@@ -58,15 +58,16 @@ class WorkerConversationOperations:
         self._host.scenario.setdefault("runtime", {})["language"] = value
         return response
 
-    def tool_reply(
+    def tool_result_speech(
         self,
         results: list[dict[str, Any]],
         context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Resolve a production dedicated tool reply through the real catalog."""
+        """Realize authoritative tool-result speech through production semantics."""
 
         return self._host._request(
-            "TOOL_REPLY", {"results": results, "context": context or {}}
+            "TOOL_RESULT_SPEECH",
+            {"results": results, "context": context or {}},
         )
 
     def snapshot(self) -> dict[str, Any]:

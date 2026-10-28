@@ -30,9 +30,6 @@ Memory.MAX_EVENT_ID = 256
 local outbox = Outbox.New({
     owner = Memory,
     storageKey = Memory.STORAGE_KEY,
-    -- One-time save compatibility boundary. Normal runtime reads and writes
-    -- use only PNC_PBrainZMemory after this migration succeeds.
-    legacyStorageKeys = { "PNC_HoomansLLMMemory" },
     version = Memory.VERSION,
     idField = "event_id",
     resetOwner = "llm_memory",

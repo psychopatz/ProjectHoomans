@@ -9,7 +9,7 @@ import re
 from typing import Any
 
 from .lexicon_compiler import CompileError
-from .translation_support import DEFAULT_LANGUAGE, legacy_translation_map, normalize_translations
+from .translation_support import DEFAULT_LANGUAGE, normalize_translations
 from .dialogue_contract import (
     DIALOGUE_BACKSTORY_KINDS,
     DIALOGUE_ID,
@@ -200,18 +200,26 @@ def _connection_contract(source_type: str, target_type: str) -> tuple[str, str, 
     return CONNECTION_CONTRACTS.get((source_type, target_type))
 
 
-def _attach_graph_metadata(compiled: dict[str, Any], spec: dict[str, Any]) -> dict[str, Any]:
-    """Make approved graph edits visible in generated data without execution."""
-
+def _graph_metadata(spec: dict[str, Any]) -> dict[str, Any]:
     graph = normalize_interaction_spec({
         "schema": SCHEMA,
         "blocks": spec.get("blocks", []),
         "connections": spec.get("connections", []),
     })
     digest = hashlib.sha256(
-        json.dumps(graph, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        json.dumps(
+            graph,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
     ).hexdigest()
-    metadata = {"schema": SCHEMA, "fingerprint": digest, "graph": graph}
+    return {"schema": SCHEMA, "fingerprint": digest, "graph": graph}
+
+
+def _attach_graph_metadata(compiled: dict[str, Any], spec: dict[str, Any]) -> dict[str, Any]:
+    """Attach graph metadata to an in-memory compiled preview."""
+    metadata = _graph_metadata(spec)
     for key in ("patterns", "flows", "responsePools"):
         for record in compiled.get(key, []):
             if isinstance(record, dict):
@@ -396,8 +404,12 @@ def validate_interaction_spec(
                 for variant in variants:
                     if not isinstance(variant, dict):
                         raise CompileError(f"response {block_id} variants must be objects")
-                    for key in ("id", "key", "en", "tl"):
+                    for key in ("id", "key"):
                         _text(variant.get(key), f"response {block_id} variant {key}")
+                    normalize_translations(
+                        variant.get("translations"),
+                        f"response {block_id} variant translations",
+                    )
             except CompileError as error:
                 diagnostics.append({"severity": "error", "blockID": block_id, "message": str(error)})
 
@@ -671,6 +683,7 @@ def compile_interaction_spec(
     frame["action"] = action
     definition = {
         "id": definition_id,
+        "metadata": {"semanticLabGraph": _graph_metadata(spec)},
         "owner": spec.get("owner", "SemanticLab"),
         "capability": _text(capability_parameters["capabilityID"], "capabilityID"),
         "utterances": {
@@ -789,11 +802,8 @@ def _compile_backstory_interaction(
             raw_variant.get("key") or raw_variant.get("templateID"),
             "response variant key",
         )
-        raw_translations = raw_variant.get("translations")
-        if raw_translations is None:
-            raw_translations = legacy_translation_map(raw_variant)
         localized = normalize_translations(
-            raw_translations,
+            raw_variant.get("translations"),
             "response variant translations",
         )
         english = localized[DEFAULT_LANGUAGE]
@@ -815,6 +825,7 @@ def _compile_backstory_interaction(
     )
     pattern = {
         "id": pattern_id,
+        "semanticLabGraph": _graph_metadata(spec),
         "utterance": utterance,
         "emit": frame,
         "reviewed": True,

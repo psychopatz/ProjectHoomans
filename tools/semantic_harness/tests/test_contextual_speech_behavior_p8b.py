@@ -178,7 +178,21 @@ class ContextualSpeechBehaviorP8BTests(unittest.TestCase):
         self.assertNotIn("semantic.question.health_state.healthy", families)
         self.assertTrue(phrase_content["families"])
         self.assertEqual(len(phrase_content["fingerprint"]), 64)
-        self.assertIn("UI_PNC_Conversation_Semantic_GeneratedFollowQueued", families)
+        self.assertNotIn(
+            "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
+            families,
+        )
+        with LuaSemanticWorker(self._scenario("friendly")) as worker:
+            follow = worker.input("Follow me")
+        payload = follow["messages"][0]["payload"]
+        self.assertEqual(
+            payload["phraseFamilyID"],
+            "phrase.semantic.command.follow.queued",
+        )
+        self.assertEqual(
+            payload["phraseSemanticTemplateID"],
+            "semantic.command.follow.queued",
+        )
 
 
 if __name__ == "__main__":

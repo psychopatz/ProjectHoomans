@@ -161,8 +161,10 @@ class InteractionSpecPane:
                         "variants": [{
                             "id": "accepted",
                             "key": response_key,
-                            "en": self._english_var.get().strip(),
-                            "tl": self._tagalog_var.get().strip(),
+                            "translations": {
+                                "EN": self._english_var.get().strip(),
+                                "TL": self._tagalog_var.get().strip(),
+                            },
                         }],
                     },
                 },

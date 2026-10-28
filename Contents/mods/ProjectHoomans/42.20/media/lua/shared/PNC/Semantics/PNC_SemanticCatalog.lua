@@ -6,12 +6,8 @@ local Registry = Semantic.Registry
 local Normalizer = Semantic.Normalizer
 local GeneratedLexicon = require
     "PNC/Semantics/Generated/Lexicon/Catalog"
-local GeneratedDialogue = require
-    "PNC/Semantics/Generated/Dialogue/CommonInteractions"
-local GeneratedPersonalDialogue = require
-    "PNC/Semantics/Generated/Dialogue/GroundedPersonalDialogue"
-local GeneratedDefinitions = require
-    "PNC/Semantics/Generated/SemanticAuthoring/Catalog"
+local ConversationRegistry = require
+    "PNC/Semantics/Generated/Conversation/Registry"
 local CampSite = PNC.Semantics.CampSite
     or require "PNC/Semantics/PNC_SemanticCampSite"
 local Catalog = PNC.Semantics.Catalog or {}
@@ -175,47 +171,10 @@ end
 Catalog.Internal.RegisterPattern = registerPattern
 Catalog.Internal.RegisterConcept = registerConcept
 
-function Catalog.Internal.RegisterGeneratedDialoguePatterns()
-    local sources = { GeneratedDialogue, GeneratedPersonalDialogue }
-    local sourceIndex
-    local patterns
-    local index
-    local pattern
-    local registered
-    local reason
-    local count = 0
-    for sourceIndex = 1, #sources do
-        patterns = sources[sourceIndex] and sources[sourceIndex].patterns
-        if type(patterns) ~= "table" then
-            error("generated dialogue dataset requires exact patterns")
-        end
-        for index = 1, #patterns do
-            pattern = patterns[index]
-            if type(pattern) ~= "table" then
-                error("generated dialogue dataset contains an invalid pattern")
-            end
-            registered, reason = registerPattern(
-                pattern.id,
-                pattern.match,
-                pattern.emit,
-                pattern.confidence,
-                pattern.priority,
-                { metadata = pattern.metadata }
-            )
-            if registered ~= true then
-                error("generated dialogue pattern could not be registered: "
-                    .. tostring(pattern.id) .. " (" .. tostring(reason) .. ")")
-            end
-            count = count + 1
-        end
-    end
-    return count
-end
-
-function Catalog.Internal.RegisterGeneratedSemanticPatterns()
-    local patterns = GeneratedDefinitions and GeneratedDefinitions.patterns
+function Catalog.Internal.RegisterConversationPatterns()
+    local patterns = ConversationRegistry and ConversationRegistry.PATTERNS
     if type(patterns) ~= "table" then
-        error("generated semantic definitions require patterns")
+        error("Conversation registry requires patterns")
     end
     local index
     local pattern
@@ -224,7 +183,7 @@ function Catalog.Internal.RegisterGeneratedSemanticPatterns()
     for index = 1, #patterns do
         pattern = patterns[index]
         if type(pattern) ~= "table" then
-            error("generated semantic definitions contain an invalid pattern")
+            error("Conversation registry contains an invalid pattern")
         end
         registered, reason = registerPattern(
             pattern.id,
@@ -235,12 +194,13 @@ function Catalog.Internal.RegisterGeneratedSemanticPatterns()
             { metadata = pattern.metadata }
         )
         if registered ~= true then
-            error("generated semantic pattern could not be registered: "
+            error("Conversation pattern could not be registered: "
                 .. tostring(pattern.id) .. " (" .. tostring(reason) .. ")")
         end
     end
     return #patterns
 end
+
 require "PNC/Semantics/SemanticCatalog/PNC_SemanticCatalog_Identity"
 
 local function registerSpeechAct(id)
@@ -262,8 +222,7 @@ require "PNC/Semantics/SemanticCatalog/PNC_SemanticCatalog_QuestionPatterns"
 
 function Catalog.Register()
     Catalog.Internal.RegisterVocabulary()
-    Catalog.Internal.RegisterGeneratedDialoguePatterns()
-    Catalog.Internal.RegisterGeneratedSemanticPatterns()
+    Catalog.Internal.RegisterConversationPatterns()
     registerGeneratedVerbForms()
     validateGeneratedAliasTargets()
     validateGeneratedVerbForms()

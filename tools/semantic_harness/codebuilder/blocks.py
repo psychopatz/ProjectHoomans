@@ -457,16 +457,23 @@ class SemanticBlockRegistry:
 
     def _response_blocks(self) -> list[dict[str, Any]]:
         blocks: list[dict[str, Any]] = []
-        for source_id in ("semantic_definitions", "common_interactions"):
+        for source_id in ("semantic_flows", "common_dialogue"):
             spec = self.dataset_specs.get(source_id)
             if not spec:
                 continue
-            path = self.repository / spec["path"]
+            source_path = (
+                spec.get("responsePath")
+                if source_id == "common_dialogue"
+                else spec.get("path")
+            )
+            if source_path is None:
+                continue
+            path = self.repository / source_path
             try:
                 document = json.loads(path.read_text(encoding="utf-8"))
             except (OSError, UnicodeError, json.JSONDecodeError):
                 continue
-            if source_id == "semantic_definitions":
+            if source_id == "semantic_flows":
                 pools = []
                 for definition in document.get("definitions", []):
                     if isinstance(definition, dict) and isinstance(definition.get("responses"), dict):
@@ -484,8 +491,8 @@ class SemanticBlockRegistry:
                     "kind": "response_pool",
                     "label": pool_id,
                     "owner": "Project Hoomans CodeBuilder",
-                    "source": str(spec["path"]),
-                    "contract": "reviewed EN/TL localized response pool",
+                    "source": str(source_path),
+                    "contract": "reviewed localized response pool",
                     "reusable": True,
                     "available": True,
                     "variantCount": len(variants) if isinstance(variants, list) else 0,

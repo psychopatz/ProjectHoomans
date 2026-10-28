@@ -1,4 +1,8 @@
 {
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDatasetGettingByGuarded01": "I'm getting by. Leave it there.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDatasetGettingByNeutral01": "I'm getting by, one day at a time. How about you?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDatasetGettingByTerse01": "Getting by.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDatasetGettingByWarm01": "I'm getting by. Thanks for asking.",
   "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultGuarded01": "I'm managing. Don't press me.",
   "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultNeutral01": "I'm okay. How about you?",
   "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultTerse01": "I'm okay.",

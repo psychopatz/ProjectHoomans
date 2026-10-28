@@ -32,20 +32,16 @@ local function buildFlow(row)
         local variants = {
             {
                 id = "default",
-                templateID = response.key,
-                fallback = response.en,
+                templateID = response.templateID,
             },
         }
         for variantIndex, variant in ipairs(response.variants or {}) do
             if type(variant) == "table"
-                and tostring(variant.key or "") ~= ""
-                and tostring(variant.en or "") ~= ""
-                and tostring(variant.tl or "") ~= ""
+                and tostring(variant.templateID or "") ~= ""
             then
                 variants[#variants + 1] = {
                     id = variant.id or ("context." .. tostring(variantIndex)),
-                    templateID = variant.key,
-                    fallback = variant.en,
+                    templateID = variant.templateID,
                     priority = tonumber(variant.priority) or 0,
                     when = copyValue(variant.when),
                 }
@@ -102,7 +98,7 @@ local function buildFlow(row)
     return {
         id = flowID(capabilityID, workflowKind),
         version = tonumber(row.contractVersion) or 1,
-        owner = binding.owner or row.translationOwner or "ProjectHoomans",
+        owner = binding.owner or "ProjectHoomans",
         workflowKind = workflowKind,
         templateVersion = tonumber(row.templateVersion) or template.version,
         templateFingerprint = template.fingerprint,

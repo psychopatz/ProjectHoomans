@@ -115,7 +115,7 @@ local function addAction(rows, byID, action, source, definition)
             "workflowKind", "templateVersion", "contractVersion",
             "targetScope", "triggerFrames", "requiredSlots",
             "optionalSlots", "permissionGate", "outcomeMapping",
-            "responsePools", "translationOwner",
+            "responsePools",
         }) do
             if definition[field] ~= nil then
                 row[field] = copyPublic(definition[field])

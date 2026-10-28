@@ -50,33 +50,22 @@ local TASK_METADATA = {
         },
         responsePools = {
             admitted = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedFetchAdmitted",
-                en = "I'll fetch that.",
-                tl = "Kukunin ko iyon.",
+                templateID = "semantic.task.fetch.admitted",
             },
             active = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedFetchActive",
-                en = "I'm working on that now.",
-                tl = "Inaayos ko na iyon ngayon.",
+                templateID = "semantic.task.fetch.active",
             },
             completed = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedFetchCompleted",
-                en = "Here you go.",
-                tl = "Heto na.",
+                templateID = "semantic.task.fetch.completed",
             },
             rejected = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedFetchRejected",
-                en = "I can't fetch that right now.",
-                tl = "Hindi ko makuha iyon ngayon.",
+                templateID = "semantic.task.fetch.rejected",
             },
             failed = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedFetchFailed",
-                en = "I couldn't fetch that.",
-                tl = "Hindi ko nakuha iyon.",
+                templateID = "semantic.task.fetch.failed",
             },
         },
-        translationOwner = "ProjectHoomans",
-    },
+        },
     WAIT_AT = {
         capabilityID = "pnc:task.wait_at",
         owner = "PNC.Semantics.TaskAdapter",
@@ -124,33 +113,22 @@ local TASK_METADATA = {
         },
         responsePools = {
             admitted = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedWaitAtAdmitted",
-                en = "Okay, I'll wait there.",
-                tl = "Sige, maghihintay ako roon.",
+                templateID = "semantic.task.wait_at.admitted",
             },
             active = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedWaitAtActive",
-                en = "I'm waiting there now.",
-                tl = "Naghihintay na ako roon.",
+                templateID = "semantic.task.wait_at.active",
             },
             completed = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedWaitAtCompleted",
-                en = "I'm here.",
-                tl = "Narito na ako.",
+                templateID = "semantic.task.wait_at.completed",
             },
             rejected = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedWaitAtRejected",
-                en = "I can't wait there right now.",
-                tl = "Hindi ako makapaghihintay roon ngayon.",
+                templateID = "semantic.task.wait_at.rejected",
             },
             failed = {
-                key = "UI_PNC_Conversation_Semantic_GeneratedWaitAtFailed",
-                en = "I couldn't wait there.",
-                tl = "Hindi ako nakapaghintay roon.",
+                templateID = "semantic.task.wait_at.failed",
             },
         },
-        translationOwner = "ProjectHoomans",
-    },
+        },
 }
 
 local TASK_RESPONSE_POOLS = require
@@ -210,8 +188,7 @@ local function parameterizedTaskMetadata(action)
             failed = "failed",
         },
         responsePools = TASK_RESPONSE_POOLS[action],
-        translationOwner = "ProjectHoomans",
-    }
+        }
 end
 
 for _, action in ipairs({ "GIVE", "EAT", "DRINK", "REFILL", "CONSUME" }) do

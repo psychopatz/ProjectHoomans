@@ -7,8 +7,8 @@ local Predicates = Internal.Predicates
 local resolvedText = Internal.resolvedText
 local normalizeCandidate = Internal.normalizeCandidate
 local sourceRecord = Internal.sourceRecord
-local Content = PNC.Semantics.DialogueContentRegistry
-    or require "PNC/Semantics/Generated/DialogueContent/Registry"
+local Content = PNC.Semantics.ConversationRegistry
+    or require "PNC/Semantics/Generated/Conversation/Registry"
 local WhatsUpContent = Content.PlayerChoice
     and Content.PlayerChoice("conversation.landing:whats_up") or {}
 

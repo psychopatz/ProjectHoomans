@@ -18,7 +18,7 @@ Provider.id = "projecthoomans.static_questions"
 Provider.sourceKind = "typed_input"
 Provider.order = 50
 Provider.Definitions = require
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_StaticProvider_Definitions"
+    "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"
 
 function Provider.Find(id)
     for _, definition in ipairs(Provider.Definitions) do

@@ -10,26 +10,23 @@ from tools.semantic_harness.codebuilder.c7f_holdout import (
     load_c7f_holdout,
     score_c7f_holdout,
 )
-from tools.semantic_harness.codebuilder.dialogue_contract import (
-    load_dialogue_dataset,
-)
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.semantic_harness.codebuilder.dialogue_dataset import (
     compile_dialogue_dataset,
 )
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
-from tools.semantic_harness.codebuilder.authoring import preview_dialogue_source
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
-CANONICAL_DIALOGUE = REPOSITORY / (
-    "tools/semantic_harness/codebuilder/sources/common_interactions.json"
-)
-
 
 class C7FDatasetPrecisionTests(unittest.TestCase):
     def test_codebuilder_compiles_reviewed_concept_match_and_new_patterns(self) -> None:
-        source = load_dialogue_dataset(CANONICAL_DIALOGUE)
+        service = SemanticLabAuthoringService(
+            repository=REPOSITORY,
+            runtime_root=REPOSITORY,
+        )
+        source = service.load_dataset_document("common_dialogue")
         compiled = compile_dialogue_dataset(source)
         pattern = next(
             item for item in compiled["patterns"]
@@ -48,16 +45,13 @@ class C7FDatasetPrecisionTests(unittest.TestCase):
                 for item in compiled["patterns"]
             )
         )
-        report = preview_dialogue_source(CANONICAL_DIALOGUE)
+        report = service.preview_dataset_generation("common_dialogue")
         self.assertTrue(report["ok"], report)
-        self.assertEqual(report["patternCount"], 47)
-        self.assertEqual(
-            (report["candidateReview"] or {})["summary"]["rejected"],
-            0,
-        )
+        self.assertEqual(report["summary"]["patterns"], 47)
         self.assertTrue(report["previewOnly"])
         self.assertTrue(report["effectFree"])
         self.assertEqual(report["writes"], [])
+        self.assertTrue(report["generatedArtifactDiffs"])
 
     def test_heldout_reviewed_sources_measure_real_worker_precision_recall(self) -> None:
         document = load_c7f_holdout(HOLDOUT_PATH)

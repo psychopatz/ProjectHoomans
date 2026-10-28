@@ -136,8 +136,8 @@ function Internal.CollectSuggestionBuildSources(state)
     )
 
     -- All optional/domain providers use the generic registry lane. The
-    -- registry filters raw legacy definitions, so providers remain outside
-    -- this orchestration spoke and retain their authoritative adapters.
+    -- registry filters raw definitions, so providers remain outside this
+    -- orchestration spoke and retain their authoritative adapters.
     local providerTopic = topicFromIR(ir, nil)
         or canonicalTopic(context.currentTopic)
     local providerContext = context

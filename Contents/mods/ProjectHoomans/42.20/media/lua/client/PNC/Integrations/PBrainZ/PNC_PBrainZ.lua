@@ -6,7 +6,7 @@ require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
 require "PsychopatzCore/Conversation/PsychopatzNameParts"
 require "PNC/Semantics/PNC_SemanticAddressResolver"
 require "PNC/Conversation/PNC_ConversationLLMTools"
-require "PNC/Conversation/PNC_ConversationToolReplies"
+require "PNC/Semantics/PNC_SemanticToolResultRealization"
 require "PNC/Integrations/PNC_VoiceGateway"
 require "PNC/UI/Nameplates/PNC_NameplateSpeech"
 

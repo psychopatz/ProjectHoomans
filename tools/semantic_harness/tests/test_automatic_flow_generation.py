@@ -143,7 +143,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
 
         coverage = {row["id"]: row for row in catalog["generation"]["coverage"]}
         self.assertEqual(catalog["generation"]["summary"]["generated"], 17)
-        self.assertEqual(catalog["generation"]["summary"]["legacy"], 0)
+        self.assertEqual(catalog["generation"]["summary"]["dispatchable_unmodeled"], 0)
         self.assertEqual(catalog["generation"]["summary"]["unsupported_workflow"], 0)
         self.assertEqual(coverage["HELP"]["classification"], "generated")
         self.assertEqual(coverage["TAKE"]["classification"], "recognition_only")
@@ -212,8 +212,8 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             stay = worker.input("Stay here")
 
         for result, action, response_key in (
-            (follow, "follow", "UI_PNC_Conversation_Semantic_GeneratedFollowQueued"),
-            (stay, "stay", "UI_PNC_Conversation_Semantic_GeneratedStayQueued"),
+            (follow, "follow", "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral01"),
+            (stay, "stay", "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral01"),
         ):
             flow = result["result"]["flow"]
             self.assertTrue(flow["generated"])
@@ -261,17 +261,17 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
 
         self.assertEqual(
             friendly["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm",
+            "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral01",
         )
         self.assertEqual(
             trusted["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm",
+            "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral01",
         )
         self.assertEqual(
             tagalog["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm",
+            "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral01",
         )
-        self.assertEqual(tagalog["messages"][0]["payload"]["text"], "Siyempre, susunod ako sa iyo.")
+        self.assertEqual(tagalog["messages"][0]["payload"]["text"], "Siyempre, susundan kita.")
         for result in (friendly, trusted, tagalog):
             self.assertTrue(result["result"]["flow"]["generated"])
             self.assertEqual(result["result"]["flow"]["resultOutcome"], "queued")
@@ -285,11 +285,11 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
 
         self.assertEqual(
             first["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
+            "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral01",
         )
         self.assertEqual(
             repeated["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedRepeated",
+            "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral01",
         )
         self.assertEqual(repeated["result"]["flow"]["resultOutcome"], "queued")
         self.assertEqual(repeated["result"]["flow"]["dispatchCount"], 1)

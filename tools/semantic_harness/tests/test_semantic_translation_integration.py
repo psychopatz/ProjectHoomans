@@ -46,7 +46,7 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                     greeting = worker.input("hello there")
                     identity = worker.input("what is your name")
                     wellbeing = worker.input("how are you doing?")
-                    tool = worker.tool_reply(
+                    tool = worker.tool_result_speech(
                         [{"name": "ask_name", "accepted": True}],
                         {"npc_name": "Mara Vale"},
                     )

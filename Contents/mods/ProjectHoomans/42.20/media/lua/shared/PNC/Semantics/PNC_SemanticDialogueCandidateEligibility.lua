@@ -275,7 +275,7 @@ function Eligibility.Select(bundle, state, context, options, contextResolver)
         and bundle.selected.eligibility
         and bundle.selected.eligibility.eligible == true
     then
-        -- Core's selected candidate mirrors the legacy Parse winner (and can
+        -- Core's selected candidate is the authoritative parse winner (and can
         -- intentionally be the fuzzy pass for one pattern). Prefer it over a
         -- separately exposed exact/fuzzy inspection row.
         selected = bundle.selected

@@ -12,6 +12,8 @@ import re
 import subprocess
 from typing import Any
 
+from ..codebuilder.translation_support import DEFAULT_LANGUAGE, normalize_language, normalize_translations
+
 from .conversation_inspector import build_conversation_inspector
 from ..runtime.scenario import DEFAULT_SCENARIO, merge
 from ..runtime.worker import LuaSemanticWorker
@@ -35,9 +37,10 @@ def run_quality_matrix(
         overrides = case.get("scenario") or {}
         if not isinstance(overrides, dict):
             raise ValueError("matrix scenario must be an object")
-        language = str(case.get("language", "EN")).upper()
-        if language not in ("EN", "TL"):
-            raise ValueError("matrix language must be EN or TL")
+        language = normalize_language(
+            case.get("language", DEFAULT_LANGUAGE),
+            "matrix language",
+        )
         interaction = case.get("interaction")
         if interaction is not None:
             if (not isinstance(interaction, dict)
@@ -318,31 +321,46 @@ def review_variant_proposal(
     diffs = []
     proposed_text = set()
     for entry in entries:
-        if not isinstance(entry, dict) or set(entry) != {"id", "EN", "TL"}:
-            errors.append("only id, EN and TL are allowed; metadata edits forbidden")
+        if not isinstance(entry, dict) or set(entry) != {"id", "translations"}:
+            errors.append(
+                "only id and translations are allowed; metadata edits forbidden"
+            )
             continue
         id_value = entry["id"]
         if not isinstance(id_value, str) or id_value not in by_id or id_value in seen:
             errors.append("unknown_or_duplicate_variant_id")
             continue
         seen.add(id_value)
-        en, tl = entry["EN"], entry["TL"]
-        if any(not isinstance(line, str) or not 1 <= len(line) <= 256
-               for line in (en, tl)):
+        try:
+            localized = normalize_translations(
+                entry["translations"],
+                f"variant proposal {id_value}.translations",
+            )
+        except Exception as error:
+            errors.append(str(error))
+            continue
+        if any(len(line) > 256 for line in localized.values()):
             errors.append("invalid_response_text_length")
             continue
-        placeholders = lambda line: sorted(set(re.findall(r"%[1-9][0-9]*", line)))
-        if placeholders(en) != placeholders(tl):
+        placeholders = lambda line: sorted(
+            set(re.findall(r"%[1-9][0-9]*", line))
+        )
+        fallback_placeholders = placeholders(localized[DEFAULT_LANGUAGE])
+        if any(
+            placeholders(line) != fallback_placeholders
+            for line in localized.values()
+        ):
             errors.append("placeholder_parity_mismatch")
             continue
-        if (en, tl) in proposed_text:
-            errors.append("duplicate_proposed_translation_pair")
+        fingerprint = tuple(sorted(localized.items()))
+        if fingerprint in proposed_text:
+            errors.append("duplicate_proposed_translation_set")
             continue
-        proposed_text.add((en, tl))
+        proposed_text.add(fingerprint)
         diffs.append({
             "variantID": id_value,
             "beforeFallbackEN": by_id[id_value]["fallback"],
-            "proposedEN": en, "proposedTL": tl,
+            "proposedTranslations": localized,
             "preservedWhen": by_id[id_value].get("when"),
             "preservedPriority": by_id[id_value].get("priority"),
             "preservedPlanSummary": by_id[id_value].get("planSummary"),

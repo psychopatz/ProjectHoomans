@@ -9,59 +9,21 @@
   "phraseFamilies": [
     {
       "group": "facts",
-      "semanticTemplateID": "semantic.question.health_state.injured",
+      "semanticTemplateID": "semantic.question.health_state.healthy",
       "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I'm hurt, but I'm managing.",
-              "TL": "Nasaktan ako, pero kinakaya ko."
-            }
-          }
-        ],
-        "warm": [
-          {
-            "translations": {
-              "EN": "I'm hurt, but I'm managing. Thanks for asking.",
-              "TL": "Nasaktan ako, pero kinakaya ko. Salamat sa pagtatanong."
-            }
-          }
-        ],
-        "terse": [
-          {
-            "translations": {
-              "EN": "I'm hurt.",
-              "TL": "Nasaktan ako."
-            }
-          }
-        ],
         "guarded": [
           {
             "translations": {
-              "EN": "I'm hurt. Give me space.",
-              "TL": "Nasaktan ako. Bigyan mo ako ng espasyo."
+              "EN": "I'm fine. Don't make a thing of it.",
+              "TL": "Mabuti ako. Huwag mo nang palakihin."
             }
           }
-        ]
-      }
-    },
-    {
-      "group": "facts",
-      "semanticTemplateID": "semantic.question.health_state.healthy",
-      "styles": {
+        ],
         "neutral": [
           {
             "translations": {
               "EN": "I'm doing okay.",
               "TL": "Ayos lang ako."
-            }
-          }
-        ],
-        "warm": [
-          {
-            "translations": {
-              "EN": "I'm doing okay. Thanks for checking in.",
-              "TL": "Ayos lang ako. Salamat sa pagsuri."
             }
           }
         ],
@@ -73,11 +35,49 @@
             }
           }
         ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm doing okay. Thanks for checking in.",
+              "TL": "Ayos lang ako. Salamat sa pagsuri."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "facts",
+      "semanticTemplateID": "semantic.question.health_state.injured",
+      "styles": {
         "guarded": [
           {
             "translations": {
-              "EN": "I'm fine. Don't make a thing of it.",
-              "TL": "Mabuti ako. Huwag mo nang palakihin."
+              "EN": "I'm hurt. Give me space.",
+              "TL": "Nasaktan ako. Bigyan mo ako ng espasyo."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm hurt, but I'm managing.",
+              "TL": "Nasaktan ako, pero kinakaya ko."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "I'm hurt.",
+              "TL": "Nasaktan ako."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm hurt, but I'm managing. Thanks for asking.",
+              "TL": "Nasaktan ako, pero kinakaya ko. Salamat sa pagtatanong."
             }
           }
         ]
@@ -87,19 +87,19 @@
       "group": "facts",
       "semanticTemplateID": "semantic.question.health_state.unknown",
       "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I can't confirm that.",
+              "TL": "Hindi ko makumpirma iyon."
+            }
+          }
+        ],
         "neutral": [
           {
             "translations": {
               "EN": "I can't confirm my health status right now.",
               "TL": "Hindi ko makumpirma ang kalagayan ko ngayon."
-            }
-          }
-        ],
-        "warm": [
-          {
-            "translations": {
-              "EN": "I can't confirm it right now, but thanks for asking.",
-              "TL": "Hindi ko makumpirma ngayon, pero salamat sa pagtatanong."
             }
           }
         ],
@@ -111,11 +111,125 @@
             }
           }
         ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I can't confirm it right now, but thanks for asking.",
+              "TL": "Hindi ko makumpirma ngayon, pero salamat sa pagtatanong."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "facts",
+      "semanticTemplateID": "semantic.question.medical_bite.negative",
+      "styles": {
         "guarded": [
           {
             "translations": {
-              "EN": "I can't confirm that.",
-              "TL": "Hindi ko makumpirma iyon."
+              "EN": "No bite. Leave it there.",
+              "TL": "Walang kagat. Tama na."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "No, I don't have a recorded bite.",
+              "TL": "Hindi, wala akong naitalang kagat."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "No bite.",
+              "TL": "Walang kagat."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "No, I don't have a recorded bite. Thanks for checking.",
+              "TL": "Hindi, wala akong naitalang kagat. Salamat sa pagsuri."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "facts",
+      "semanticTemplateID": "semantic.question.medical_bite.positive",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Yes. I've been bitten. That's all.",
+              "TL": "Oo. Nakagat ako. Tama na."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Yes, I've been bitten.",
+              "TL": "Oo, nakagat ako."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Yes. I've been bitten.",
+              "TL": "Oo. Nakagat ako."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Yes. I've been bitten, and I appreciate you checking.",
+              "TL": "Oo. Nakagat ako, at salamat sa pagsuri."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "facts",
+      "semanticTemplateID": "semantic.question.medical_bite.unknown",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I can't confirm that. Don't press me.",
+              "TL": "Hindi ko makumpirma. Huwag mo nang ipilit."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I can't confirm whether I've been bitten.",
+              "TL": "Hindi ko makumpirma kung nakagat ako."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Can't confirm.",
+              "TL": "Hindi makumpirma."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I can't confirm it, but thanks for checking.",
+              "TL": "Hindi ko makumpirma, pero salamat sa pagsuri."
             }
           }
         ]

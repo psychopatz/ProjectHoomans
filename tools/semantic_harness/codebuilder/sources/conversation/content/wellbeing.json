@@ -9,21 +9,59 @@
   "phraseFamilies": [
     {
       "group": "commands_emotes",
-      "semanticTemplateID": "semantic.question.wellbeing.default",
+      "semanticTemplateID": "semantic.question.wellbeing.dataset.getting_by",
       "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I'm getting by. Leave it there.",
+              "TL": "Kinakaya ko. Tama na iyon."
+            }
+          }
+        ],
         "neutral": [
           {
             "translations": {
-              "EN": "I'm okay. How about you?",
-              "TL": "Okay naman ako. Ikaw, kumusta?"
+              "EN": "I'm getting by, one day at a time. How about you?",
+              "TL": "Kinakaya ko, isang araw bawat pagkakataon. Ikaw?"
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Getting by.",
+              "TL": "Kinakaya."
             }
           }
         ],
         "warm": [
           {
             "translations": {
-              "EN": "I'm doing okay. Thanks for asking.",
-              "TL": "Ayos lang ako. Salamat sa pagtatanong."
+              "EN": "I'm getting by. Thanks for asking.",
+              "TL": "Kinakaya ko. Salamat sa pagtatanong."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.wellbeing.default",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I'm managing. Don't press me.",
+              "TL": "Kinakaya ko. Huwag mo nang ipilit."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm okay. How about you?",
+              "TL": "Okay naman ako. Ikaw, kumusta?"
             }
           }
         ],
@@ -35,11 +73,67 @@
             }
           }
         ],
-        "guarded": [
+        "warm": [
           {
             "translations": {
-              "EN": "I'm managing. Don't press me.",
-              "TL": "Kinakaya ko. Huwag mo nang ipilit."
+              "EN": "I'm doing okay. Thanks for asking.",
+              "TL": "Ayos lang ako. Salamat sa pagtatanong."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.wellbeing.fatigue",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm worn out, but I can still manage.",
+              "TL": "Pagod na pagod ako, pero kaya ko pa."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.wellbeing.fatigue_alt",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm tired. A little rest would help.",
+              "TL": "Pagod ako. Makakatulong ang kaunting pahinga."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.wellbeing.hunger",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm pretty hungry, if I'm honest. Do you have anything to eat?",
+              "TL": "Medyo gutom ako, kung tutuusin. May makakain ka ba?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.question.wellbeing.hunger_alt",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm getting hungry. Could you spare something to eat?",
+              "TL": "Nagugutom na ako. Maaari ba akong makahingi ng makakain?"
             }
           }
         ]
@@ -49,19 +143,19 @@
       "group": "commands_emotes",
       "semanticTemplateID": "semantic.question.wellbeing.injured",
       "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I'm hurt. That's all I can say.",
+              "TL": "Nasaktan ako. Iyon lang ang masasabi ko."
+            }
+          }
+        ],
         "neutral": [
           {
             "translations": {
               "EN": "A little banged up, but I'll manage.",
               "TL": "Medyo may tama ako, pero kakayanin ko."
-            }
-          }
-        ],
-        "warm": [
-          {
-            "translations": {
-              "EN": "I took a hit, but I'm steady enough to keep going.",
-              "TL": "Nasaktan ako, pero kaya ko pang magpatuloy."
             }
           }
         ],
@@ -73,11 +167,11 @@
             }
           }
         ],
-        "guarded": [
+        "warm": [
           {
             "translations": {
-              "EN": "I'm hurt. That's all I can say.",
-              "TL": "Nasaktan ako. Iyon lang ang masasabi ko."
+              "EN": "I took a hit, but I'm steady enough to keep going.",
+              "TL": "Nasaktan ako, pero kaya ko pang magpatuloy."
             }
           }
         ]
@@ -134,62 +228,6 @@
             "translations": {
               "EN": "I could really use a drink. Do you have any water?",
               "TL": "Kailangan ko talaga ng maiinom. May tubig ka ba?"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "group": "commands_emotes",
-      "semanticTemplateID": "semantic.question.wellbeing.hunger",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I'm pretty hungry, if I'm honest. Do you have anything to eat?",
-              "TL": "Medyo gutom ako, kung tutuusin. May makakain ka ba?"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "group": "commands_emotes",
-      "semanticTemplateID": "semantic.question.wellbeing.hunger_alt",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I'm getting hungry. Could you spare something to eat?",
-              "TL": "Nagugutom na ako. Maaari ba akong makahingi ng makakain?"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "group": "commands_emotes",
-      "semanticTemplateID": "semantic.question.wellbeing.fatigue",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I'm worn out, but I can still manage.",
-              "TL": "Pagod na pagod ako, pero kaya ko pa."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "group": "commands_emotes",
-      "semanticTemplateID": "semantic.question.wellbeing.fatigue_alt",
-      "styles": {
-        "neutral": [
-          {
-            "translations": {
-              "EN": "I'm tired. A little rest would help.",
-              "TL": "Pagod ako. Makakatulong ang kaunting pahinga."
             }
           }
         ]

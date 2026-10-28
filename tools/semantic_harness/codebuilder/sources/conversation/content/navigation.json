@@ -1,0 +1,209 @@
+{
+  "domain": "navigation",
+  "groups": {
+    "navigation": {
+      "contentOwner": "projecthoomans.dialogue_content.navigation"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "navigation",
+      "semanticTemplateID": "semantic.navigation.camp",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Where do you want to risk it?",
+              "TL": "Saan mo gustong makipagsapalaran?"
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Where should we set up?",
+              "TL": "Saan tayo pupuwesto?"
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Where?",
+              "TL": "Saan?"
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Where should we set up camp?",
+              "TL": "Saan tayo magtatayo ng kampo?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "navigation",
+      "semanticTemplateID": "semantic.navigation.camp_empty",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "There is nowhere safe to set up here.",
+              "TL": "Walang ligtas na mapagpuwestuhan dito."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I don't see a good place to set up here.",
+              "TL": "Wala akong nakikitang magandang mapagpuwestuhan dito."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "No good place here.",
+              "TL": "Walang magandang puwesto rito."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I don't see a safe place to set up here.",
+              "TL": "Wala akong nakikitang ligtas na mapagpuwestuhan dito."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "navigation",
+      "semanticTemplateID": "semantic.navigation.default",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "All right. What now?",
+              "TL": "Sige. Ano ngayon?"
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. What would you like to discuss?",
+              "TL": "Sige. Ano ang gusto mong pag-usapan?"
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "What is it?",
+              "TL": "Ano?"
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Sure. What would you like to discuss?",
+              "TL": "Sige. Ano ang gusto mong pag-usapan?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "navigation",
+      "semanticTemplateID": "semantic.navigation.orders",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "All right. What is it?",
+              "TL": "Sige. Ano iyon?"
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. What do you need?",
+              "TL": "Sige. Ano ang kailangan mo?"
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "What do you need?",
+              "TL": "Ano ang kailangan mo?"
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Sure. What do you need?",
+              "TL": "Sige. Ano ang kailangan mo?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "navigation",
+      "semanticTemplateID": "semantic.navigation.subject_change",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "All right. What is it?",
+              "TL": "Sige. Ano iyon?"
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "All right. What did you want to talk about?",
+              "TL": "Sige. Ano ang gusto mong pag-usapan?"
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "What else?",
+              "TL": "Ano pa?"
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Sure. What did you want to talk about?",
+              "TL": "Sige. Ano ang gusto mong pag-usapan?"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Dialogue Content Registry",
+    "version": "3"
+  },
+  "version": 1
+}

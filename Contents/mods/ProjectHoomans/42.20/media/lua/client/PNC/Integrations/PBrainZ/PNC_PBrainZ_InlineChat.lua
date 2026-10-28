@@ -40,7 +40,7 @@ end
 
 local function stateFor(view)
     -- The compact/headless widget and the full-screen widget must share the
-    -- same interaction gate.  The legacy inline gate treats Session.busy as
+    -- same interaction gate. The simple pending-request gate treats Session.busy as
     -- a complete input lock, which is appropriate for a single outstanding
     -- LLM request but not for the local semantic channel: deterministic
     -- turns are already queued and the player should be able to continue
@@ -80,9 +80,9 @@ local function submitHybrid(view, value, part)
     if input and type(input.Submit) == "function" then
         return input.Submit(view, value, part)
     end
-    -- The legacy submit path always assumes an LLM request. Falling through
-    -- to it would let a partial load-order failure turn a local utterance
-    -- into the old waiting placeholder. Keep the hybrid entry point fail
+    -- A direct provider submit path would always assume an LLM request.
+    -- Falling through on partial load would turn a local utterance into a
+    -- waiting placeholder. Keep the hybrid entry point fail
     -- closed; the semantic module owns the only valid remote fallback route.
     return false, "semantic_input_unavailable"
 end

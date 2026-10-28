@@ -12,15 +12,17 @@ from . import authoring
 from .blocks import SemanticBlockRegistry
 from .lexicon_compiler import CompileError
 from .translation_support import pretty_json
-from .dialogue_rendering import (
-    render_dialogue_lua,
-    render_dialogue_lua_plan,
-    render_dialogue_manifest,
-)
-from .semantic_definition_compiler import (
-    discover_registered_capability_ids,
-    render_semantic_lua_plan,
-    render_semantic_manifest,
+from .semantic_definition_compiler import discover_registered_capability_ids
+from .conversation_compiler import (
+    CONVERSATION_RUNTIME_RELATIVE,
+    CONVERSATION_SOURCE_RELATIVE,
+    CONVERSATION_UI_RUNTIME_RELATIVE,
+    compile_conversation_sources,
+    conversation_translation_bundles,
+    render_conversation_manifest_lua,
+    render_conversation_registry,
+    render_conversation_runtime_plan,
+    render_conversation_ui_module,
 )
 from .dataset_catalog import WORKFLOW_DATASET_KINDS, SemanticDatasetCatalog
 from .interaction_spec import (
@@ -80,32 +82,6 @@ class SemanticInteractionAuthoring:
             production_catalog=production_catalog,
         )
 
-    def preview_semantic_source(self, source_path: Path) -> dict[str, Any]:
-        return authoring.preview_semantic_source(
-            source_path,
-            repository=self.repository,
-            runtime_root=self.runtime_root,
-        )
-
-    def generate_semantic_source(self, source_path: Path) -> dict[str, Any]:
-        return authoring.generate_semantic_source(
-            source_path,
-            repository=self.repository,
-            runtime_root=self.runtime_root,
-        )
-
-    def preview_dialogue_source(self, source_path: Path) -> dict[str, Any]:
-        return authoring.preview_dialogue_source(
-            source_path,
-            repository=self.repository,
-        )
-
-    def generate_dialogue_source(self, source_path: Path) -> dict[str, Any]:
-        return authoring.generate_dialogue_source(
-            source_path,
-            repository=self.repository,
-        )
-
     def validate_workflow_selection(
         self,
         source_id: str,
@@ -120,7 +96,10 @@ class SemanticInteractionAuthoring:
             "type": "semantic_lab_workflow_selection",
             "workflow": {
                 "datasetID": source_id,
-                "sourcePath": str(spec["path"]),
+                "sourcePath": ", ".join(
+                    str(path)
+                    for path in self.dataset_catalog._spec_paths(spec)
+                ),
                 "generationKind": spec["kind"],
                 "blockIDs": [str(block_id) for block_id in block_ids],
             },
@@ -210,138 +189,99 @@ class SemanticInteractionAuthoring:
             "writes": [],
         }
 
-    def _semantic_preview_artifacts(
+    def _conversation_preview_artifacts(
         self,
-        compiled: dict[str, Any],
+        source_id: str,
         source_document: dict[str, Any],
-        source_path: Path,
     ) -> dict[str, Any]:
-        """Expose canonical-source and generated Lua/translation diffs effect-free."""
+        """Preview one logical dataset edit through the canonical Conversation compiler."""
 
-        source_text = json.dumps(source_document, ensure_ascii=False, indent=2) + "\n"
-        source_relative = str(source_path.resolve().relative_to(self.repository))
-        rendered, module_manifest = render_semantic_lua_plan(
-            compiled,
-            "PNC/Semantics/Generated/SemanticAuthoring/Catalog",
+        overrides = self.dataset_catalog.conversation_source_overrides(
+            source_id, source_document
         )
-        pattern_modules = [module for module, _source in rendered if "/Patterns/" in module]
-        flow_modules = [module for module, _source in rendered if "/Flows/" in module]
-        response_modules = [module for module, _source in rendered if "/Responses/" in module]
-        translation_paths = {
-            language: [f"{language}/Conversation/Semantic/Generated.json"]
-            for language in sorted(compiled.get("translations", {}))
-        }
-        semantic_root = Path(
-            "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-            "Semantics/Generated/SemanticAuthoring"
+        model = compile_conversation_sources(
+            self.repository,
+            runtime_root=self.runtime_root,
+            source_overrides=overrides,
         )
+        rendered, reports = render_conversation_runtime_plan(model)
         shared_root = Path(
             "Contents/mods/ProjectHoomans/common/media/lua/shared"
         )
         expected_sources: dict[str, str] = {
-            str(semantic_root / "Catalog.lua"):
-                render_semantic_manifest(
-                    compiled,
-                    pattern_modules,
-                    flow_modules,
-                    response_modules,
-                    translation_paths,
-                    module_manifest,
-                ),
-        }
-        expected_sources.update({
             str(shared_root / (module + ".lua")): source
             for module, source in rendered
-        })
+        }
+        expected_sources[
+            str(CONVERSATION_RUNTIME_RELATIVE / "Registry.lua")
+        ] = render_conversation_registry(model, reports)
+        expected_sources[
+            str(CONVERSATION_RUNTIME_RELATIVE / "Manifest.lua")
+        ] = render_conversation_manifest_lua(model, reports)
+        expected_sources[
+            str(CONVERSATION_UI_RUNTIME_RELATIVE)
+        ] = render_conversation_ui_module(model)
+
         translation_root = Path(
             "Contents/mods/ProjectHoomans/common/media/translation"
         )
-        expected_sources.update({
-            str(translation_root / language / "Conversation/Semantic/Generated.json"):
-                pretty_json(compiled["translations"][language])
-            for language in sorted(compiled.get("translations", {}))
-        })
-        return {
-            "canonicalSourceDiff": authoring._artifact_diff(
+        for language, domains in sorted(
+            conversation_translation_bundles(model).items()
+        ):
+            for domain, values in sorted(domains.items()):
+                expected_sources[
+                    str(
+                        translation_root
+                        / language
+                        / "Conversation"
+                        / f"{domain}.json"
+                    )
+                ] = pretty_json(values)
+
+        source_diffs = [
+            authoring._artifact_diff(
                 self.repository,
-                source_relative,
-                source_text,
-            ),
-            "generatedArtifactDiffs": [
-                authoring._artifact_diff(self.repository, path, expected)
-                for path, expected in expected_sources.items()
-            ],
-            "generatedPaths": list(expected_sources),
-        }
-
-    def _dialogue_preview_artifacts(
-        self,
-        compiled: dict[str, Any],
-        source_document: dict[str, Any],
-        source_path: Path,
-    ) -> dict[str, Any]:
-        """Expose grounded-dialogue source and real asset diffs effect-free."""
-
-        source_relative = str(source_path.resolve().relative_to(self.repository))
-        source_text = json.dumps(source_document, ensure_ascii=False, indent=2) + "\n"
-        generated_paths, artifacts, artifact_diffs = authoring._dialogue_preview_paths(
-            compiled,
-            self.repository,
-            source_path,
+                str(CONVERSATION_SOURCE_RELATIVE / Path(path)),
+                pretty_json(document),
+            )
+            for path, document in sorted(overrides.items())
+        ]
+        generated_diffs = [
+            authoring._artifact_diff(self.repository, path, expected)
+            for path, expected in sorted(expected_sources.items())
+        ]
+        generated_lua = [
+            {
+                "module": path[
+                    len(str(shared_root)) + 1 : -4
+                ].replace("\\", "/"),
+                "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
+                "source": source,
+            }
+            for path, source in sorted(expected_sources.items())
+            if path.startswith(str(shared_root) + "/") and path.endswith(".lua")
+        ]
+        fingerprint_payload = "\n".join(
+            f"{path}\0{expected_sources[path]}"
+            for path in sorted(expected_sources)
         )
-        asset_stem = authoring._dialogue_asset_stem(source_path)
-        module_prefix = "PNC/Semantics/Generated/Dialogue/" + asset_stem
-        rendered, module_manifest = render_dialogue_lua_plan(compiled, module_prefix)
-        pattern_modules = [module for module, _source in rendered if "/Patterns/" in module]
-        response_modules = [module for module, _source in rendered if "/Responses/" in module]
-        entry_module = module_prefix
-        generated_lua = [{
-            "module": entry_module,
-            "sha256": hashlib.sha256(
-                render_dialogue_lua(
-                    compiled,
-                    pattern_modules,
-                    response_modules,
-                    module_manifest,
-                    module_prefix + "/Manifest",
-                ).encode("utf-8")
-            ).hexdigest(),
-            "source": render_dialogue_lua(
-                compiled,
-                pattern_modules,
-                response_modules,
-                module_manifest,
-                module_prefix + "/Manifest",
-            ),
-        }]
-        manifest_source = render_dialogue_manifest(module_manifest)
-        generated_lua.append({
-            "module": module_prefix + "/Manifest",
-            "sha256": hashlib.sha256(manifest_source.encode("utf-8")).hexdigest(),
-            "source": manifest_source,
-        })
-        generated_lua.extend({
-            "module": module,
-            "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
-            "source": source,
-        } for module, source in rendered)
         return {
-            "canonicalSourceDiff": authoring._artifact_diff(
-                self.repository,
-                source_relative,
-                source_text,
-            ),
-            "generatedArtifactDiffs": artifact_diffs,
-            "generatedArtifacts": artifacts,
-            "generatedPaths": generated_paths,
+            "canonicalSourceDiff": source_diffs[0] if source_diffs else None,
+            "canonicalSourceDiffs": source_diffs,
+            "generatedArtifactDiffs": generated_diffs,
+            "generatedPaths": sorted(expected_sources),
             "generatedLua": generated_lua,
+            "generatedSourceFingerprint": hashlib.sha256(
+                fingerprint_payload.encode("utf-8")
+            ).hexdigest(),
+            "conversationFingerprint": model["wholeModelFingerprint"],
         }
 
     def preview_interaction_spec(
         self,
         spec: dict[str, Any],
         *,
-        source_id: str = "semantic_definitions",
+        source_id: str = "semantic_flows",
         production_catalog: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Compile one canonical typed spec without writing or reloading Lua."""
@@ -376,7 +316,10 @@ class SemanticInteractionAuthoring:
                 else "dialogue_interaction_spec_preview"
             ),
             "sourceID": source_id,
-            "sourcePath": str(source_spec["path"]),
+            "sourcePath": ", ".join(
+                str(path)
+                for path in self.dataset_catalog._spec_paths(source_spec)
+            ),
             "previewOnly": True,
             "effectFree": True,
             "writes": [],
@@ -384,39 +327,12 @@ class SemanticInteractionAuthoring:
         compiled = report.get("compiled")
         if not isinstance(compiled, dict):
             return report
-        if source_spec["kind"] == "semantic":
-            rendered, _module_manifest = render_semantic_lua_plan(
-                compiled,
-                "PNC/Semantics/Generated/SemanticAuthoring/Catalog",
-            )
-            report["generatedLua"] = [
-                {
-                    "module": module,
-                    "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
-                    "source": source,
-                }
-                for module, source in rendered
-            ]
-            report["generatedSourceFingerprint"] = hashlib.sha256(
-                "\n".join(source for _module, source in rendered).encode("utf-8")
-            ).hexdigest()
-            report.update(
-                self._semantic_preview_artifacts(
-                    compiled,
-                    report["sourceDocument"],
-                    self._dataset_path(source_id),
-                )
-            )
-        else:
-            artifact_report = self._dialogue_preview_artifacts(
-                compiled,
+        report.update(
+            self._conversation_preview_artifacts(
+                source_id,
                 report["sourceDocument"],
-                self._dataset_path(source_id),
             )
-            report.update(artifact_report)
-            report["generatedSourceFingerprint"] = hashlib.sha256(
-                "\n".join(item["source"] for item in artifact_report["generatedLua"]).encode("utf-8")
-            ).hexdigest()
+        )
         report["compiledSummary"] = {
             "patternIDs": [item["id"] for item in compiled["patterns"]],
             "flowIDs": [item["id"] for item in compiled.get("flows", [])],
@@ -429,7 +345,7 @@ class SemanticInteractionAuthoring:
         spec: dict[str, Any],
         *,
         approved: bool,
-        source_id: str = "semantic_definitions",
+        source_id: str = "semantic_flows",
         production_catalog: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Write an approved spec through the existing canonical Lua writer."""
@@ -459,7 +375,7 @@ class SemanticInteractionAuthoring:
                 "type": "semantic_interaction_spec_generation",
                 "generationApproved": False,
             }
-        from .build import write_dialogue_output, write_semantic_output
+        from .build import write_conversation_output
 
         canonical = self.write_dataset_document(source_id, preview["sourceDocument"])
         if canonical.get("ok") is not True:
@@ -472,19 +388,11 @@ class SemanticInteractionAuthoring:
                 "writes": [],
             }
         writes = [Path(path) for path in canonical.get("writes", [])]
-        if self._dataset_spec(source_id)["kind"] == "semantic":
-            writes.extend(write_semantic_output(self.repository, preview["compiled"]))
-        else:
-            output = authoring._dialogue_output_path(
-                self._dataset_path(source_id),
-                self.repository,
-            )
-            output.parent.mkdir(parents=True, exist_ok=True)
-            writes.extend(write_dialogue_output(output, preview["compiled"]))
-            authoring._merge_modular_conversation_translations(
-                self.repository,
-                preview["compiled"],
-            )
+        model = compile_conversation_sources(
+            self.repository,
+            runtime_root=self.runtime_root,
+        )
+        writes.extend(write_conversation_output(self.repository, model))
         post_write = self.preview_interaction_spec(
             spec,
             source_id=source_id,
@@ -504,7 +412,7 @@ class SemanticInteractionAuthoring:
         self,
         collection: dict[str, Any],
         *,
-        source_id: str = "semantic_definitions",
+        source_id: str = "semantic_flows",
         production_catalog: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Preview several specs that reuse shared typed block instances."""
@@ -534,7 +442,10 @@ class SemanticInteractionAuthoring:
         report.update({
             "type": "semantic_interaction_collection_preview",
             "sourceID": source_id,
-            "sourcePath": str(source_spec["path"]),
+            "sourcePath": ", ".join(
+                str(path)
+                for path in self.dataset_catalog._spec_paths(source_spec)
+            ),
             "previewOnly": True,
             "effectFree": True,
             "writes": [],
@@ -542,33 +453,17 @@ class SemanticInteractionAuthoring:
         compiled = report.get("compiled")
         if not isinstance(compiled, dict):
             return report
-        rendered, _module_manifest = render_semantic_lua_plan(
-            compiled,
-            "PNC/Semantics/Generated/SemanticAuthoring/Catalog",
+        report.update(
+            self._conversation_preview_artifacts(
+                source_id,
+                report["sourceDocument"],
+            )
         )
-        report["generatedLua"] = [
-            {
-                "module": module,
-                "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
-                "source": source,
-            }
-            for module, source in rendered
-        ]
-        report["generatedSourceFingerprint"] = hashlib.sha256(
-            "\n".join(source for _module, source in rendered).encode("utf-8")
-        ).hexdigest()
         report["compiledSummary"] = {
             "patternIDs": [item["id"] for item in compiled["patterns"]],
             "flowIDs": [item["id"] for item in compiled["flows"]],
             "responsePoolIDs": [item["id"] for item in compiled["responsePools"]],
         }
-        report.update(
-            self._semantic_preview_artifacts(
-                compiled,
-                report["sourceDocument"],
-                self._dataset_path(source_id),
-            )
-        )
         return report
 
     def generate_interaction_collection(
@@ -576,7 +471,7 @@ class SemanticInteractionAuthoring:
         collection: dict[str, Any],
         *,
         approved: bool,
-        source_id: str = "semantic_definitions",
+        source_id: str = "semantic_flows",
         production_catalog: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Write an approved shared-block collection through the canonical writer."""
@@ -606,7 +501,7 @@ class SemanticInteractionAuthoring:
                 "type": "semantic_interaction_collection_generation",
                 "generationApproved": False,
             }
-        from .build import write_semantic_output
+        from .build import write_conversation_output
 
         canonical = self.write_dataset_document(source_id, preview["sourceDocument"])
         if canonical.get("ok") is not True:
@@ -619,7 +514,11 @@ class SemanticInteractionAuthoring:
                 "writes": [],
             }
         writes = [Path(path) for path in canonical.get("writes", [])]
-        writes.extend(write_semantic_output(self.repository, preview["compiled"]))
+        model = compile_conversation_sources(
+            self.repository,
+            runtime_root=self.runtime_root,
+        )
+        writes.extend(write_conversation_output(self.repository, model))
         post_write = self.preview_interaction_collection(
             collection,
             source_id=source_id,
@@ -675,12 +574,12 @@ class SemanticInteractionAuthoring:
                 "readyForApproval": composition.get("ok") is True,
             })
             return report
-        spec = self._dataset_spec(source_id)
-        source_path = self._dataset_path(source_id)
-        if spec["kind"] == "semantic":
-            source_preview = self.preview_semantic_source(source_path)
-        else:
-            source_preview = self.preview_dialogue_source(source_path)
+        document = self.load_dataset_document(source_id)
+        source_preview = self.preview_dataset_edit(source_id, document)
+        if source_preview.get("ok") is True:
+            source_preview.update(
+                self._conversation_preview_artifacts(source_id, document)
+            )
         report.update({
             "ok": source_preview.get("ok") is True,
             "sourcePreview": source_preview,
@@ -738,12 +637,25 @@ class SemanticInteractionAuthoring:
                 "selection": preview["selection"],
                 "sourcePreview": preview.get("sourcePreview"),
             }
-        spec = self._dataset_spec(source_id)
-        source_path = self._dataset_path(source_id)
-        if spec["kind"] == "semantic":
-            generation = self.generate_semantic_source(source_path)
+        from .build import write_conversation_output
+
+        document = self.load_dataset_document(source_id)
+        canonical = self.write_dataset_document(source_id, document)
+        if canonical.get("ok") is not True:
+            generation = canonical
         else:
-            generation = self.generate_dialogue_source(source_path)
+            model = compile_conversation_sources(
+                self.repository,
+                runtime_root=self.runtime_root,
+            )
+            written = [Path(path) for path in canonical.get("writes", [])]
+            written.extend(write_conversation_output(self.repository, model))
+            generation = {
+                **canonical,
+                "generationApproved": True,
+                "writes": [str(path) for path in written],
+                "reloadedBy": "caller_restart_required",
+            }
         return {
             "ok": generation.get("ok") is True,
             "type": "semantic_lab_workflow_generation",

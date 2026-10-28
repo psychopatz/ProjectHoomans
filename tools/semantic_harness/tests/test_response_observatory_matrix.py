@@ -123,7 +123,10 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                 "expectedContentFingerprint": original["contentFingerprint"],
                 "variants": [{
                     "id": "semantic.flow.greeting.opening.default",
-                    "EN": "Hi there, friend.", "TL": "Kumusta, kaibigan.",
+                    "translations": {
+                        "EN": "Hi there, friend.",
+                        "TL": "Kumusta, kaibigan.",
+                    },
                 }],
             }
             good = review_variant_proposal(worker, candidate)
@@ -156,8 +159,10 @@ class ResponseQualityMatrixTests(unittest.TestCase):
             "expectedContentFingerprint": original["contentFingerprint"],
             "variants": [{
                 "id": "semantic.flow.greeting.opening.default",
-                "EN": "Welcome back. Good to see you.",
-                "TL": "Maligayang balik. Mabuti at nakita kita.",
+                "translations": {
+                    "EN": "Welcome back. Good to see you.",
+                    "TL": "Maligayang balik. Mabuti at nakita kita.",
+                },
             }],
             "case": {"utterance": "hello"},
         }
@@ -295,8 +300,13 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         proposal = {
             "poolID": original["poolID"],
             "expectedContentFingerprint": original["contentFingerprint"],
-            "variants": [{"id": original["variants"][0]["id"],
-                          "EN": "I can follow.", "TL": "Susunod ako."}],
+            "variants": [{
+                "id": original["variants"][0]["id"],
+                "translations": {
+                    "EN": "I can follow.",
+                    "TL": "Susunod ako.",
+                },
+            }],
             "case": {"utterance": "follow me"},
         }
         with self.assertRaisesRegex(ValueError, "no verified canonical authored"):
@@ -313,11 +323,20 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                     data = json.loads((media / rel).read_text(encoding="utf-8"))
                     for key in data:
                         occurrence.setdefault(key, []).append(rel)
-                for suffix in ("FollowQueued", "StayQueued", "FollowRejected",
-                               "StayRejected", "FollowFailed", "StayFailed"):
-                    key = "UI_PNC_Conversation_Semantic_Generated" + suffix
-                    self.assertEqual(len(occurrence.get(key, [])), 1,
-                                     (language, key, occurrence.get(key)))
+                keys = (
+                    "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral01",
+                    "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral01",
+                    "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral01",
+                    "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral01",
+                    "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral01",
+                    "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral01",
+                )
+                for key in keys:
+                    self.assertEqual(
+                        len(occurrence.get(key, [])),
+                        1,
+                        (language, key, occurrence.get(key)),
+                    )
 
     def test_en_tl_follow_wait_use_production_catalog_not_english_fallback(self):
         from tools.semantic_harness.runtime.worker import LuaSemanticWorker
@@ -435,7 +454,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
 
     def test_invalid_language_and_large_case_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "language"):
-            run_quality_matrix([{"language": "XX"}])
+            run_quality_matrix([{"language": "x"}])
         with self.assertRaisesRegex(ValueError, "utterance"):
             run_quality_matrix([{"utterance": "a" * 201}])
 
@@ -540,8 +559,10 @@ class ObservatoryTkTests(unittest.TestCase):
             "expectedContentFingerprint": detail["contentFingerprint"],
             "variants": [{
                 "id": "semantic.flow.greeting.opening.default",
-                "EN": "Hello. Good to see you.",
-                "TL": "Kumusta. Mabuti at nakita kita.",
+                "translations": {
+                    "EN": "Hello. Good to see you.",
+                    "TL": "Kumusta. Mabuti at nakita kita.",
+                },
             }],
             "case": {"utterance": "hello"},
         }

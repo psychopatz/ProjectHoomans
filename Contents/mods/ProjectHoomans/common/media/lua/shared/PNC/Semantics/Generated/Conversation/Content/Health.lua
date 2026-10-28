@@ -108,4 +108,112 @@ return {
             },
         },
     },
+    ["semantic.question.medical_bite.negative"] = {
+        ["canonicalConcept"] = "SEMANTIC_QUESTION_MEDICAL_BITE_NEGATIVE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.facts",
+        ["id"] = "phrase.semantic.question.medical_bite.negative",
+        ["semanticTemplateID"] = "semantic.question.medical_bite.negative",
+        ["styles"] = {
+            ["guarded"] = {
+                {
+                    ["fallback"] = "No bite. Leave it there.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.guarded.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded01",
+                },
+            },
+            ["neutral"] = {
+                {
+                    ["fallback"] = "No, I don't have a recorded bite.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral01",
+                },
+            },
+            ["terse"] = {
+                {
+                    ["fallback"] = "No bite.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.terse.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse01",
+                },
+            },
+            ["warm"] = {
+                {
+                    ["fallback"] = "No, I don't have a recorded bite. Thanks for checking.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm01",
+                },
+            },
+        },
+    },
+    ["semantic.question.medical_bite.positive"] = {
+        ["canonicalConcept"] = "SEMANTIC_QUESTION_MEDICAL_BITE_POSITIVE",
+        ["contentOwner"] = "projecthoomans.dialogue_content.facts",
+        ["id"] = "phrase.semantic.question.medical_bite.positive",
+        ["semanticTemplateID"] = "semantic.question.medical_bite.positive",
+        ["styles"] = {
+            ["guarded"] = {
+                {
+                    ["fallback"] = "Yes. I've been bitten. That's all.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.guarded.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded01",
+                },
+            },
+            ["neutral"] = {
+                {
+                    ["fallback"] = "Yes, I've been bitten.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral01",
+                },
+            },
+            ["terse"] = {
+                {
+                    ["fallback"] = "Yes. I've been bitten.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.terse.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse01",
+                },
+            },
+            ["warm"] = {
+                {
+                    ["fallback"] = "Yes. I've been bitten, and I appreciate you checking.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm01",
+                },
+            },
+        },
+    },
+    ["semantic.question.medical_bite.unknown"] = {
+        ["canonicalConcept"] = "SEMANTIC_QUESTION_MEDICAL_BITE_UNKNOWN",
+        ["contentOwner"] = "projecthoomans.dialogue_content.facts",
+        ["id"] = "phrase.semantic.question.medical_bite.unknown",
+        ["semanticTemplateID"] = "semantic.question.medical_bite.unknown",
+        ["styles"] = {
+            ["guarded"] = {
+                {
+                    ["fallback"] = "I can't confirm that. Don't press me.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.guarded.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded01",
+                },
+            },
+            ["neutral"] = {
+                {
+                    ["fallback"] = "I can't confirm whether I've been bitten.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.neutral.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral01",
+                },
+            },
+            ["terse"] = {
+                {
+                    ["fallback"] = "Can't confirm.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.terse.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse01",
+                },
+            },
+            ["warm"] = {
+                {
+                    ["fallback"] = "I can't confirm it, but thanks for checking.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.warm.01",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm01",
+                },
+            },
+        },
+    },
 }

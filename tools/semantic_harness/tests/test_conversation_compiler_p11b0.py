@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import copy
-import hashlib
 import json
 import shutil
 import tempfile
@@ -16,7 +15,6 @@ from tools.semantic_harness.codebuilder.conversation_compiler import (
     compile_conversation_sources,
     conversation_translation_bundles,
     render_conversation_runtime_plan,
-    render_conversation_snapshot,
 )
 from tools.semantic_harness.codebuilder.build import _write_conversation_translation_manifest
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
@@ -28,12 +26,39 @@ REPOSITORY = Path(__file__).resolve().parents[3]
 class ConversationCompilerP11B0Tests(unittest.TestCase):
     def test_manifest_merge_and_fingerprints_are_bounded(self) -> None:
         model = compile_conversation_sources(REPOSITORY)
-        self.assertEqual(len(model["content"]["phraseFamilies"]), 243)
-        self.assertEqual(len(model["dialogue"]["patterns"]), 54)
-        self.assertEqual(len(model["dialogue"]["responsePools"]), 26)
-        self.assertEqual(len(model["semantic"]["flows"]), 2)
-        self.assertEqual(len(model["ui"]), 10)
-        self.assertEqual(len(model["shards"]), 16)
+        source_documents = model["_source_documents"]
+        expected_families = sum(
+            len(document.get("phraseFamilies", []))
+            for path, document in source_documents.items()
+            if path.startswith("content/")
+        )
+        expected_patterns = sum(
+            len(document.get("patterns", []))
+            for path, document in source_documents.items()
+            if path.startswith("patterns/")
+        )
+        expected_pools = sum(
+            len(document.get("responsePools", []))
+            for path, document in source_documents.items()
+            if path.startswith("flows/")
+        )
+        expected_ui = sum(
+            len(document.get("suggestions", []))
+            for path, document in source_documents.items()
+            if path.startswith("ui/")
+        )
+        self.assertEqual(
+            len(model["content"]["phraseFamilies"]),
+            expected_families,
+        )
+        self.assertEqual(len(model["dialogue"]["patterns"]), expected_patterns)
+        self.assertEqual(
+            len(model["dialogue"]["responsePools"]),
+            expected_pools,
+        )
+        self.assertGreaterEqual(len(model["semantic"]["flows"]), 1)
+        self.assertEqual(len(model["ui"]), expected_ui)
+        self.assertEqual(len(model["shards"]), len(source_documents))
         self.assertEqual(len(model["wholeModelFingerprint"]), 64)
         modules, reports = render_conversation_runtime_plan(model)
         self.assertEqual(len(modules), len(reports))
@@ -56,7 +81,7 @@ class ConversationCompilerP11B0Tests(unittest.TestCase):
             )
             before = compile_conversation_sources(repository)
             greeting_path = repository / CONVERSATION_SOURCE_RELATIVE / "content/greeting.json"
-            social_path = repository / CONVERSATION_SOURCE_RELATIVE / "content/social.json"
+            social_path = repository / CONVERSATION_SOURCE_RELATIVE / "content/social/emotes.json"
             greeting = json.loads(greeting_path.read_text(encoding="utf-8"))
             social = json.loads(social_path.read_text(encoding="utf-8"))
             moved = next(
@@ -81,8 +106,8 @@ class ConversationCompilerP11B0Tests(unittest.TestCase):
         self.assertEqual(runtime_content(before), runtime_content(after))
         self.assertEqual(before["wholeModelFingerprint"], after["wholeModelFingerprint"])
         self.assertNotEqual(
-            before["locations"]["semantic.emote.player.clap"]["sourceShard"],
-            after["locations"]["semantic.emote.player.clap"]["sourceShard"],
+            before["locations"]["phrase.semantic.emote.player.clap"]["sourceShard"],
+            after["locations"]["phrase.semantic.emote.player.clap"]["sourceShard"],
         )
 
     def test_targeted_service_edit_writes_only_owning_shard(self) -> None:
@@ -100,7 +125,7 @@ class ConversationCompilerP11B0Tests(unittest.TestCase):
                 "phrase.semantic.flow.greeting.opening.default"
             )
             owning_path = repository / CONVERSATION_SOURCE_RELATIVE / "content/greeting.json"
-            other_path = repository / CONVERSATION_SOURCE_RELATIVE / "content/social.json"
+            other_path = repository / CONVERSATION_SOURCE_RELATIVE / "content/social/tool_replies.json"
             before_other = other_path.read_bytes()
             edited = copy.deepcopy(item)
             edited["styles"]["neutral"][0]["translations"]["EN"] = (
@@ -116,17 +141,26 @@ class ConversationCompilerP11B0Tests(unittest.TestCase):
             self.assertEqual(other_path.read_bytes(), before_other)
             self.assertIn(str(owning_path), report["writes"])
 
-    def test_snapshot_is_generated_only_and_deterministic(self) -> None:
-        model = compile_conversation_sources(REPOSITORY)
-        first = render_conversation_snapshot(model)
-        second = render_conversation_snapshot(model)
-        self.assertEqual(first, second)
-        decoded = json.loads(first)
-        self.assertTrue(decoded["generatedOnly"])
-        self.assertNotIn("_repository", decoded)
-        self.assertEqual(
-            hashlib.sha256(first.encode("utf-8")).hexdigest(),
-            hashlib.sha256(second.encode("utf-8")).hexdigest(),
+    def test_generation_plan_has_no_whole_model_snapshot(self) -> None:
+        service = SemanticLabAuthoringService(
+            repository=REPOSITORY,
+            runtime_root=REPOSITORY,
+        )
+        report = service.preview_dataset_generation("common_dialogue")
+        self.assertTrue(report["ok"], report)
+        paths = report["generatedPaths"]
+        self.assertTrue(paths)
+        self.assertFalse(
+            any("ConversationSnapshot" in path for path in paths),
+            paths,
+        )
+        self.assertFalse(
+            any(
+                "tools/semantic_harness/codebuilder/generated/conversation"
+                in path
+                for path in paths
+            ),
+            paths,
         )
 
 

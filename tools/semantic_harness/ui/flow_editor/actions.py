@@ -439,66 +439,6 @@ class FlowEditorActions:
             return
         self._on_register(flow_draft(draft))
 
-    def compile_source(self) -> None:
-        filename = self._filedialog.askopenfilename(
-            title="Preview canonical semantic source",
-            filetypes=[("Semantic definitions", "*.json"), ("All files", "*")],
-        )
-        if not filename:
-            return
-        if self._on_compile_source is None:
-            self.set_status("Compiler preview is unavailable")
-            return
-        self._on_compile_source(Path(filename))
-
-    def generate_source(self) -> None:
-        filename = self._filedialog.askopenfilename(
-            title="Generate approved semantic source",
-            filetypes=[("Semantic definitions", "*.json"), ("All files", "*")],
-        )
-        if not filename:
-            return
-        if self._on_generate_source is None:
-            self.set_status("Source generation is unavailable")
-            return
-        if not self._messagebox.askyesno(
-            "Generate semantic source",
-            "Write the validated Lua, EN/TL, and manifest artifacts and restart the worker?",
-        ):
-            self.set_status("Source generation cancelled; preview remains unchanged")
-            return
-        self._on_generate_source(Path(filename))
-
-    def review_dataset(self) -> None:
-        filename = self._filedialog.askopenfilename(
-            title="Review dialogue dataset candidates",
-            filetypes=[("Dialogue datasets", "*.json"), ("All files", "*")],
-        )
-        if not filename:
-            return
-        if self._on_review_dataset is None:
-            self.set_status("Dataset review is unavailable")
-            return
-        self._on_review_dataset(Path(filename))
-
-    def generate_dataset(self) -> None:
-        filename = self._filedialog.askopenfilename(
-            title="Generate approved dialogue artifacts",
-            filetypes=[("Dialogue datasets", "*.json"), ("All files", "*")],
-        )
-        if not filename:
-            return
-        if self._on_generate_dataset is None:
-            self.set_status("Dialogue generation is unavailable")
-            return
-        if not self._messagebox.askyesno(
-            "Generate dialogue artifacts",
-            "Write the reviewed Lua, EN/TL, and manifest artifacts and restart the worker?",
-        ):
-            self.set_status("Dialogue generation cancelled; diff preview remains unchanged")
-            return
-        self._on_generate_dataset(Path(filename))
-
     def show_source_report(self, report: dict[str, Any]) -> None:
         if report.get("ok") is True:
             writes = report.get("writes") or []

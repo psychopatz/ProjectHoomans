@@ -14,70 +14,46 @@ local Adapter = PNC.Semantics.CommandAdapter
 local QUEST_RESPONSE_POOLS = {
     offer = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_QuestOfferQueued",
-            en = "I can help with the clinic supplies.",
-            tl = "Matutulungan kita sa mga suplay ng klinika.",
+            templateID = "semantic.quest.clinic_supplies.offer.queued",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_QuestOfferRejected",
-            en = "I can't take that clinic-supplies request right now.",
-            tl = "Hindi ko matatanggap ang kahilingan para sa suplay ngayon.",
+            templateID = "semantic.quest.clinic_supplies.offer.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_QuestOfferFailed",
-            en = "I couldn't check that clinic-supplies request.",
-            tl = "Hindi ko masuri ang kahilingan para sa suplay.",
+            templateID = "semantic.quest.clinic_supplies.offer.failed",
         },
     },
     accept = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_QuestAcceptedQueued",
-            en = "I'll bring the clinic supplies.",
-            tl = "Dadalahin ko ang mga suplay ng klinika.",
+            templateID = "semantic.quest.clinic_supplies.accept.queued",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_QuestAcceptedRejected",
-            en = "I can't accept that request right now.",
-            tl = "Hindi ko matatanggap ang kahilingang iyon ngayon.",
+            templateID = "semantic.quest.clinic_supplies.accept.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_QuestAcceptedFailed",
-            en = "I couldn't accept that request.",
-            tl = "Hindi ko matanggap ang kahilingang iyon.",
+            templateID = "semantic.quest.clinic_supplies.accept.failed",
         },
     },
     status = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_QuestStatusQueued",
-            en = "I'll check the clinic-supplies request.",
-            tl = "Susuriin ko ang kahilingan para sa suplay ng klinika.",
+            templateID = "semantic.quest.clinic_supplies.status.queued",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_QuestStatusRejected",
-            en = "I can't check that request right now.",
-            tl = "Hindi ko masuri ang kahilingang iyon ngayon.",
+            templateID = "semantic.quest.clinic_supplies.status.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_QuestStatusFailed",
-            en = "I couldn't check that request.",
-            tl = "Hindi ko masuri ang kahilingang iyon.",
+            templateID = "semantic.quest.clinic_supplies.status.failed",
         },
     },
     turn_in = {
         queued = {
-            key = "UI_PNC_Conversation_Semantic_QuestTurnInQueued",
-            en = "I'll turn in the clinic supplies.",
-            tl = "Ipapasa ko ang mga suplay ng klinika.",
+            templateID = "semantic.quest.clinic_supplies.turn_in.queued",
         },
         rejected = {
-            key = "UI_PNC_Conversation_Semantic_QuestTurnInRejected",
-            en = "I can't turn that in yet.",
-            tl = "Hindi ko pa maipapasa iyon.",
+            templateID = "semantic.quest.clinic_supplies.turn_in.rejected",
         },
         failed = {
-            key = "UI_PNC_Conversation_Semantic_QuestTurnInFailed",
-            en = "I couldn't turn in the clinic supplies.",
-            tl = "Hindi ko maipasa ang mga suplay ng klinika.",
+            templateID = "semantic.quest.clinic_supplies.turn_in.failed",
         },
     },
 }
@@ -161,8 +137,7 @@ local function registerQuestOperation(operation)
             failed = "failed",
         },
         responsePools = operation.responses,
-        translationOwner = "ProjectHoomans",
-        arguments = {
+            arguments = {
             npcID = "giver_npc",
             questID = "pnc.quest.clinic_supplies",
             operation = operation.operation,

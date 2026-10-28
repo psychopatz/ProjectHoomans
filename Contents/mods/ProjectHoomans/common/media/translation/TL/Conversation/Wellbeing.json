@@ -1,4 +1,8 @@
 {
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDatasetGettingByGuarded01": "Kinakaya ko. Tama na iyon.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDatasetGettingByNeutral01": "Kinakaya ko, isang araw bawat pagkakataon. Ikaw?",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDatasetGettingByTerse01": "Kinakaya.",
+  "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDatasetGettingByWarm01": "Kinakaya ko. Salamat sa pagtatanong.",
   "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultGuarded01": "Kinakaya ko. Huwag mo nang ipilit.",
   "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultNeutral01": "Okay naman ako. Ikaw, kumusta?",
   "UI_PNC_Conversation_Content_SemanticQuestionWellbeingDefaultTerse01": "Ayos lang ako.",

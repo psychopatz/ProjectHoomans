@@ -1,0 +1,14 @@
+{
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesAcceptFailedNeutral01": "Hindi ko matanggap ang kahilingang iyon.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesAcceptQueuedNeutral01": "Dadalahin ko ang mga suplay ng klinika.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesAcceptRejectedNeutral01": "Hindi ko matatanggap ang kahilingang iyon ngayon.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesOfferFailedNeutral01": "Hindi ko masuri ang kahilingan para sa suplay.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesOfferQueuedNeutral01": "Matutulungan kita sa mga suplay ng klinika.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesOfferRejectedNeutral01": "Hindi ko matatanggap ang kahilingan para sa suplay ngayon.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesStatusFailedNeutral01": "Hindi ko masuri ang kahilingang iyon.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesStatusQueuedNeutral01": "Susuriin ko ang kahilingan para sa suplay ng klinika.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesStatusRejectedNeutral01": "Hindi ko masuri ang kahilingang iyon ngayon.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesTurnInFailedNeutral01": "Hindi ko maipasa ang mga suplay ng klinika.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesTurnInQueuedNeutral01": "Ipapasa ko ang mga suplay ng klinika.",
+  "UI_PNC_Conversation_Content_SemanticQuestClinicSuppliesTurnInRejectedNeutral01": "Hindi ko pa maipapasa iyon."
+}

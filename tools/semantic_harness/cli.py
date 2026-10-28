@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 
 from .codebuilder.service import SemanticLabAuthoringService
+from .codebuilder.translation_support import normalize_language
 from .inspection.rendering import print_result as _print_result
 from .inspection.response_candidate import preview_authored_variant
 from .inspection.response_turn_trace import inspect_response_turn
@@ -33,10 +34,6 @@ from .runtime.activity import (
 
 PARSER_DESCRIPTION = "Tkinter chat UI and CLI for the real-Lua semantic dialogue harness."
 AUTHORING_OPERATIONS = (
-    "compile_source",
-    "generate_source",
-    "review_dataset",
-    "generate_dataset",
     "list_datasets",
     "search_datasets",
     "show_dataset",
@@ -380,22 +377,6 @@ def _run_authoring_operation(
             arguments.adapt_dataset,
             _resolve_authoring_source(service, arguments.dataset_source),
             _resolve_authoring_source(service, arguments.dataset_manifest),
-        )
-    if arguments.compile_source:
-        return service.preview_semantic_source(
-            _resolve_authoring_source(service, arguments.compile_source)
-        )
-    if arguments.generate_source:
-        return service.generate_semantic_source(
-            _resolve_authoring_source(service, arguments.generate_source)
-        )
-    if arguments.review_dataset:
-        return service.preview_dialogue_source(
-            _resolve_authoring_source(service, arguments.review_dataset)
-        )
-    if arguments.generate_dataset:
-        return service.generate_dialogue_source(
-            _resolve_authoring_source(service, arguments.generate_dataset)
         )
     return None
 
@@ -851,7 +832,7 @@ def _parser() -> argparse.ArgumentParser:
     )
     observatory.add_argument(
         "--response-translation-coverage", metavar="POOL_ID",
-        help="inspect EN/TL canonical manifest membership of loaded Lua variants",
+        help="inspect canonical locale-manifest membership of loaded Lua variants",
     )
     observatory.add_argument(
         "--response-codebuilder-lineage", metavar="POOL_ID",
@@ -867,11 +848,11 @@ def _parser() -> argparse.ArgumentParser:
     )
     observatory.add_argument(
         "--preview-response-proposal", metavar="PATH",
-        help="isolated real-Lua EN/TL candidate replay; no production edits",
+        help="isolated real-Lua localized candidate replay; no production edits",
     )
     observatory.add_argument(
         "--review-response-proposal", metavar="PATH",
-        help="read-only EN/TL variant proposal preflight; never writes source",
+        help="read-only localized variant proposal preflight; never writes source",
     )
     parser.add_argument("--response-offset", type=int, default=0)
     parser.add_argument("--response-limit", type=int, default=8)
@@ -890,26 +871,6 @@ def _parser() -> argparse.ArgumentParser:
         help="write the shared harness activity timeline to stderr",
     )
     authoring = parser.add_mutually_exclusive_group()
-    authoring.add_argument(
-        "--compile-source",
-        metavar="PATH",
-        help="preview one canonical semantic source through the embedded CodeBuilder",
-    )
-    authoring.add_argument(
-        "--generate-source",
-        metavar="PATH",
-        help="write one approved canonical semantic source through the embedded CodeBuilder",
-    )
-    authoring.add_argument(
-        "--review-dataset",
-        metavar="PATH",
-        help="preview one reviewed dialogue dataset through the embedded CodeBuilder",
-    )
-    authoring.add_argument(
-        "--generate-dataset",
-        metavar="PATH",
-        help="write one approved dialogue dataset through the embedded CodeBuilder",
-    )
     authoring.add_argument(
         "--list-datasets",
         action="store_true",
@@ -1062,7 +1023,7 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="reread --save from disk into a fresh isolated source snapshot",
     )
-    parser.add_argument("--language", choices=("EN", "TL"), help="production translation language")
+    parser.add_argument("--language", type=lambda value: normalize_language(value, "--language"), help="production translation locale code")
     talk = parser.add_mutually_exclusive_group()
     talk.add_argument(
         "--talk-start",

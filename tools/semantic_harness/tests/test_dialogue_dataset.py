@@ -5,10 +5,8 @@ import json
 import unittest
 from pathlib import Path
 
-from tools.semantic_harness.codebuilder.dialogue_contract import (
-    CompileError,
-    load_dialogue_dataset,
-)
+from tools.semantic_harness.codebuilder.dialogue_contract import CompileError
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.semantic_harness.codebuilder.dialogue_dataset import (
     compile_dialogue_dataset,
 )
@@ -20,10 +18,10 @@ from tools.semantic_harness.codebuilder.dialogue_rendering import (
 
 class DialogueDatasetCompilerTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.source = load_dialogue_dataset(
-            REPOSITORY
-            / "tools/semantic_harness/codebuilder/sources/common_interactions.json"
-        )
+        self.source = SemanticLabAuthoringService(
+            repository=REPOSITORY,
+            runtime_root=REPOSITORY,
+        ).load_dataset_document("common_dialogue")
 
     def test_reviewed_needs_promise_mapping_is_compact_and_localized(self) -> None:
         compiled = compile_dialogue_dataset(self.source)
