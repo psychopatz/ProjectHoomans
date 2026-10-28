@@ -13,6 +13,8 @@ def saved_worker(raw=None):
     if raw is not None:
         fixture["record"] = raw
     scenario = deepcopy(DEFAULT_SCENARIO)
+    if raw is not None:
+        scenario["conversation"]["id"] = "evidence-replay:" + str(raw.get("recordRevision", 1))
     scenario["npc"]["id"] = scenario["npc"]["npcID"] = fixture["record"]["id"]
     worker.import_source(scenario, source="SAVE", mode="offline_save",
                          source_id="fixture:unified-evidence-e0",

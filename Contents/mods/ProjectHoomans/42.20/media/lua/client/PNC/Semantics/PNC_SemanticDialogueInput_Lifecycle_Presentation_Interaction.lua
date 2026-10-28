@@ -167,10 +167,12 @@ local function submitLifecycleEnvelope(view, result, actionResult)
     -- effect for commands and proposal turns that already have their own
     -- authoritative route.
     local provenance = interaction.provenance or {}
+    local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
+    local compactAct = Relations.GetCompactType(interaction.act)
     if not provenance.beatID
         and not provenance.responsePlanID
         and not provenance.flowID
-        and not provenance.poolID
+        and not provenance.poolID and not compactAct
     then
         return false, "lifecycle_context_unavailable"
     end

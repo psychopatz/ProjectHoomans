@@ -53,6 +53,18 @@ function Provider.configure(deps)
         end
     end
     sendClientCommand = function(_, module, command, payload)
+        -- PZ exposes both (module, command, payload) and player-prefixed forms.
+        if payload == nil and type(command) == "table" then
+            payload, command, module = command, module, _
+        end
+        if module == PNC.Const.MODULE
+            and command == PNC.Const.CMD_SEMANTIC_INTERACTION_LIFECYCLE then
+            Runtime.transport[#Runtime.transport + 1] = {
+                direction = "client_to_server", module = module,
+                command = command, payload = Values.copy(payload),
+            }
+            return PNC.ServerCommandRouter.Handle(command, player, payload)
+        end
         local questRequest = module == PNC.Const.MODULE
             and command == PNC.Const.CMD_SEMANTIC_QUEST_REQUEST
         local knowledgeRequest = module == PNC.Const.MODULE

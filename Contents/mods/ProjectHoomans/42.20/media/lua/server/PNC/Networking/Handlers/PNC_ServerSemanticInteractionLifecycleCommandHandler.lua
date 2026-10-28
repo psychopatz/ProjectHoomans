@@ -158,6 +158,42 @@ local function handle(player, args)
     if not applied then
         return rejected(requestID, npcID, applyReason or "lifecycle_rejected")
     end
+    -- The existing leased server lifecycle owns compact semantic-act markers.
+    -- Client plans/relevance are not trusted or persisted: recompute admission
+    -- through the same bounded providers using server-owned day/domain facts.
+    local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
+    local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
+    local Resolver = require "PNC/Semantics/PNC_SemanticPragmaticResolver"
+    local metadata = Relations.GetAct(envelope.act)
+    local compact = Relations.GetCompactType(envelope.act)
+    local markerRecorded = false
+    if metadata and compact then
+        local evidence = Providers.QueryEvidence({ npcID = npcID,
+            playerID = playerKey, playerEntityKey = playerKey,
+            worldContext = { worldAgeHours = at } }, {})
+        local admission = Resolver.ResolveEvidence({ semantic = { intent = envelope.act,
+            speechAct = envelope.act }, source = { actorID = playerKey }, targets = { npcID } }, evidence)
+        local Events = PNC.Conversation.Memory and PNC.Conversation.Memory.Events
+        if Events and (#metadata.relations.opens > 0 or admission.admitted) then
+            local registered = Events.RegisterType(compact)
+            if registered then
+                record = PNC.Registry.Get(npcID) or record
+                markerRecorded = Events.RecordRelationshipMemory(record, {
+                    type = compact.id, aboutKey = playerKey,
+                }, playerKey) == true
+                if PNC.Relationships and type(PNC.Relationships.AddMemory) == "function" then
+                    -- A zero-effect owning-domain memory records the fact of
+                    -- addressing a relation, never forgiveness or permission.
+                    -- Compact TODAY remains independent if this is pruned.
+                    PNC.Relationships.AddMemory(npcID, playerKey, {
+                        id = "semantic_marker:" .. requestID, type = compact.id,
+                        aboutKey = playerKey, createdAt = at, strength = 1,
+                        decayPerDay = 0.05,
+                    })
+                end
+            end
+        end
+    end
     return {
         accepted = true,
         authority = "server",
@@ -165,6 +201,7 @@ local function handle(player, args)
         npcID = npcID,
         lifecycleReason = applyReason,
         persisted = applied.persisted == true,
+        semanticMarkerRecorded = markerRecorded,
     }
 end
 

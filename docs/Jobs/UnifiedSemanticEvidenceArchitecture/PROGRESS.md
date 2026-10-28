@@ -1,10 +1,19 @@
 # Progress — Unified Semantic Evidence Architecture
 
-**Status:** IN PROGRESS — E0–E3 accepted; generic relation resolution and adopters pending.
+**Status:** IN PROGRESS — E0–E4 accepted; first-party adopter integration and scale gates pending.
 **Branch:** existing main.
 **Audit anchor:** ProjectHoomans 2bc4810f.
-**Current phase:** E4 — generic relation resolution.
-**Next exact chunk:** E4B — record bounded authoritative relation markers through the existing server InteractionLifecycle/Conversation Memory path and derive closure across conversations; finish E4 then continue E5 adopters. E4 is not yet accepted as a phase.
+**Current phase:** E5 — first-party adopters.
+**Next exact chunk:** E5A — complete assistance/gratitude and offer/request/question reply integration (including direction-aware negative controls), native bounded evidence presentation/transport, shared player/NPC affordance admission and downstream policy preservation; then E6 extensibility proof and E7 full acceptance.
+
+## E4B / E4 accepted (2026-10-28)
+
+- Registered compact semantic-act markers are written through the existing leased server InteractionLifecycle handler. Server admission is recomputed from owning-domain evidence; client plans/scores are not trusted. Unresolved apology writes no marker. Zero-effect Relationship memories retain the fact of addressing a relation; compact TODAY survives detailed pruning. No forgiveness/permission effect was added.
+- Generic relation policies declare same/reverse/either actor direction. Repair is same-direction; gratitude/replies reverse the initiating roles. Matching uses policy data, not act/event conditionals.
+- Closure derives from ordered SESSION/TODAY evidence and durable owning Relationship records; repeated repair remains closed across serialize/reimport and day rollover, while a newer grievance reopens it. Compact markers use explicitly registered stable hashes rather than dynamic fallback. Retention priority of closure markers prevents lower-salience churn from resurrecting retained antecedents.
+- Worker now loads/routes the actual lifecycle server handler and supports both PZ sendClientCommand signatures. SAVE conduct persistence delegates to the production PlayerCharacters owner instead of a fixture stub; normal turns now expose real Conduct evidence. Configurable fixture conversation IDs prevent replay request-ID collisions.
+- Full Lua 905/905 PASS; E0–E4 production worker 10/10 PASS; P12J SAVE-backed 2/2 PASS; prior P2/P3/R6 11/11 PASS. E4A's four independently reproduced pre-existing Python failures remain documented for E7 cleanup.
+- Native evidence transport is a developer implementation task still pending E5 (not a native-user handoff).
 
 ## E4A accepted (2026-10-28)
 

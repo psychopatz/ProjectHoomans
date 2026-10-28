@@ -18,12 +18,12 @@ class UnifiedEvidenceE3Tests(unittest.TestCase):
     def test_production_turn_exposes_all_tiers_and_cross_session_recall(self):
         with saved_worker() as worker:
             worker.input("fuck you")
+            serialized = storage(worker)["serializedRecord"]
             result = worker.input("im sorry")
             evidence = result["observation"]["director"]["pragmatic"]["evidence"]
             tiers = {row["sourceTier"] for row in evidence["rows"]}
             self.assertEqual(tiers, {"SESSION", "TODAY", "DURABLE"})
             self.assertTrue(all(row["status"] == "queried" for row in evidence["providers"]))
-            serialized = storage(worker)["serializedRecord"]
         with saved_worker(serialized) as replay:
             evidence = storage(replay)["evidence"]
             self.assertEqual({row["sourceTier"] for row in evidence["rows"]}, {"TODAY", "DURABLE"})

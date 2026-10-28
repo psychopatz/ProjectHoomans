@@ -18,7 +18,9 @@ end
 T.equal(Resolver.ResolveEvidence(stimulus("APOLOGIZE"), {rows={}}).status, "unresolved",
     "no grievance does not ground repair")
 for act, relation in pairs({ APOLOGIZE = "repair", THANK = "gratitude", ACCEPT = "response" }) do
-    local result = Resolver.ResolveEvidence(stimulus(act), { rows = { evidence(relation, "opens", 1) } })
+    local reverse = Relations.Direction(relation) == "reverse"
+    local result = Resolver.ResolveEvidence(stimulus(act), { rows = {
+        evidence(relation, "opens", 1, reverse and "npc:b" or nil, reverse and "player:a" or nil) } })
     T.equal(result.status, "grounded", "shared relation algorithm grounds " .. act)
     T.equal(result.selected.relation, relation, "registered relation selected")
     T.equal(result.selected.retentionSalience, 200, "retention signal exposed separately")

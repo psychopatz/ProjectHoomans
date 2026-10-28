@@ -168,10 +168,15 @@ local function hasRelation(row, kind, relation)
     return false
 end
 
-local function compatibleActors(row, actor, target)
-    return row.actorID and row.targetID and (
-        row.actorID == actor and row.targetID == target
-        or row.actorID == target and row.targetID == actor)
+local function compatibleActors(row, actor, target, relation)
+    if not row.actorID or not row.targetID then return false end
+    if row.effectiveStrength ~= nil and row.effectiveStrength <= 0
+        or row.confidence ~= nil and row.confidence < 0.25 then return false end
+    local direction = hasRelation(row, "opens", relation) and Relations.Direction(relation) or "same"
+    return (direction == "same" or direction == "either")
+            and row.actorID == actor and row.targetID == target
+        or (direction == "reverse" or direction == "either")
+            and row.actorID == target and row.targetID == actor
 end
 
 -- Pure relation matching over the provider read model. No event-name lookup,
@@ -195,20 +200,38 @@ function Resolver.ResolveEvidence(stimulus, evidence)
     local rows = evidence and evidence.rows or {}
     local tierOrder = { SESSION = 1, TODAY = 2, DURABLE = 3 }
     for _, relation in ipairs(wanted) do
-        local latestSession
+        local latestSession, latestToday, latestDurable, todayHasClosure
         for index = 1, math.min(#rows, 16) do
             local row = rows[index]
-            if row.sourceTier == "SESSION" and compatibleActors(row, actor, target)
+            if row.sourceTier == "SESSION" and compatibleActors(row, actor, target, relation)
                 and (hasRelation(row, "opens", relation) or hasRelation(row, "addresses", relation)
                     or hasRelation(row, "resolves", relation))
                 and (not latestSession or (row.sequence or 0) > (latestSession.sequence or 0)) then
                 latestSession = row
             end
+            if compatibleActors(row, actor, target, relation)
+                and (hasRelation(row, "opens", relation) or hasRelation(row, "addresses", relation)
+                    or hasRelation(row, "resolves", relation)) then
+                if row.sourceTier == "TODAY" then
+                    if not hasRelation(row, "opens", relation) then todayHasClosure = true end
+                    if not latestToday or (row.sequence or 0) > (latestToday.sequence or 0) then latestToday = row end
+                elseif row.sourceTier == "DURABLE" and (not latestDurable
+                    or (row.occurredAt or 0) > (latestDurable.occurredAt or 0)
+                    or (row.occurredAt or 0) == (latestDurable.occurredAt or 0)
+                        and (row.sequence or 0) > (latestDurable.sequence or 0)) then
+                    latestDurable = row
+                end
+            end
         end
         local sessionClosed = latestSession and not hasRelation(latestSession, "opens", relation)
+        if latestToday and todayHasClosure then
+            sessionClosed = not hasRelation(latestToday, "opens", relation)
+        elseif not latestSession and not latestToday and latestDurable then
+            sessionClosed = not hasRelation(latestDurable, "opens", relation)
+        end
         for index = 1, math.min(#rows, 16) do
             local row = rows[index]
-            if compatibleActors(row, actor, target) and hasRelation(row, "opens", relation)
+            if compatibleActors(row, actor, target, relation) and hasRelation(row, "opens", relation)
                 and (row.effectiveStrength == nil or row.effectiveStrength > 0)
                 and (row.confidence == nil or row.confidence >= 0.25)
                 and not sessionClosed and #result.candidates < 8 then

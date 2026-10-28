@@ -83,6 +83,7 @@ function Events.RegisterType(definition)
         salience = salience,
         longTerm = definition.longTerm == true,
         gossipEvent = gossipEvent,
+        semantic = type(definition.semantic) == "table" and definition.semantic or nil,
     }
     Data.eventByID[id] = entry
     Data.eventByCode[code] = entry
@@ -176,5 +177,7 @@ local socialIDs = {}
 for id in pairs(socialDefinitions) do socialIDs[#socialIDs + 1] = id end
 table.sort(socialIDs)
 for _, id in ipairs(socialIDs) do Events.RegisterSocialType(id) end
+local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
+for _, spec in ipairs(Relations.CompactTypes()) do Events.RegisterType(spec) end
 
 return true

@@ -211,12 +211,17 @@ local function configureContext(state)
             forename = playerData.forename,
             surname = playerData.surname,
             socialProfile = Values.copy(playerData.socialProfile),
+            conduct = Values.copy(Runtime.playerConduct),
         }
     end
     PNC.PlayerCharacters.Registry = PNC.PlayerCharacters.Registry or {
         uuidAliases = {},
     }
-    PNC.PlayerCharacters.ApplyConductRecord = function(_, conduct)
+    PNC.PlayerCharacters.ApplyConductRecord = function(characterUUID, conduct)
+        if sourceKind == "SAVE" and productionPlayers
+            and type(productionPlayers.ApplyConductRecord) == "function" then
+            return productionPlayers.ApplyConductRecord(characterUUID, conduct)
+        end
         Runtime.playerConduct = Values.copy(conduct)
         return true, "updated"
     end

@@ -8,6 +8,25 @@ def admission(result):
 
 
 class UnifiedEvidenceE4Tests(unittest.TestCase):
+    def test_authoritative_marker_closes_replay_and_new_grievance_reopens(self):
+        with saved_worker() as worker:
+            before = storage(worker)
+            worker.input("im sorry")
+            self.assertFalse((storage(worker).get("memory") or {}).get("s"))
+            worker.input("fuck you")
+            worker.input("im sorry")
+            after = storage(worker)
+            self.assertEqual(before["roots"], after["roots"])
+            self.assertIn("semantic_apologize", [row["eventType"] for row in after["evidence"]["rows"]])
+            raw = after["serializedRecord"]
+        with saved_worker(raw) as worker:
+            self.assertFalse(admission(worker.input("im sorry"))["admitted"])
+            worker.input("fuck you")
+            self.assertTrue(admission(worker.input("im sorry"))["admitted"])
+        with saved_worker(raw) as worker:
+            storage(worker, advanceDays=1)
+            self.assertFalse(admission(worker.input("im sorry"))["admitted"])
+
     def test_reset_session_repeat_and_newer_grievance(self):
         with saved_worker() as worker:
             result = worker.input("im sorry")

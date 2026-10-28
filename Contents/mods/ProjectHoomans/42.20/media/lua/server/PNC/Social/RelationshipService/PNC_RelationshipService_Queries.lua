@@ -59,6 +59,7 @@ function Relationships.QuerySemanticEvidence(observerNPCID, targetKey, actorID, 
                 classes = metadata.classes, relations = metadata.relations,
                 retentionSalience = metadata.retentionSalience,
                 effectiveStrength = strength, occurredAt = memory.createdAt,
+                sequence = index,
                 ageHours = math.max(0, (tonumber(worldAgeHours) or memory.createdAt) - memory.createdAt),
                 provenance = "relationship.memories", visibility = memory.knowledgeSource }
             if #rows >= 16 then break end

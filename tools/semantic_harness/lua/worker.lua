@@ -132,6 +132,8 @@ Runtime.productionPlayerCharactersService = {
         and PNC.PlayerCharacters.GetEntityKey,
     GetRegistryRecord = PNC.PlayerCharacters
         and PNC.PlayerCharacters.GetRegistryRecord,
+    ApplyConductRecord = PNC.PlayerCharacters
+        and PNC.PlayerCharacters.ApplyConductRecord,
 }
 ScenarioSession.importSource(
     Context,

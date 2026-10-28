@@ -1,6 +1,23 @@
 -- Declarative participation of semantic acts; no parser or gameplay policy.
 local Relations = {}
-local acts, count = {}, 0
+local acts, compact, count = {}, {}, 0
+local relationPolicies, relationCount = {}, 0
+
+function Relations.RegisterRelation(id, spec)
+    if type(id) ~= "string" or #id == 0 or #id > 64 or type(spec) ~= "table"
+        or (spec.direction ~= "same" and spec.direction ~= "reverse" and spec.direction ~= "either") then
+        return false, "relation_policy_invalid"
+    end
+    if relationPolicies[id] then return false, "relation_policy_duplicate" end
+    if relationCount >= 64 then return false, "relation_policy_limit" end
+    relationPolicies[id], relationCount = spec.direction, relationCount + 1
+    return true
+end
+
+function Relations.Direction(id) return relationPolicies[id] or "same" end
+Relations.RegisterRelation("repair", { direction = "same" })
+Relations.RegisterRelation("gratitude", { direction = "reverse" })
+Relations.RegisterRelation("response", { direction = "reverse" })
 
 function Relations.RegisterAct(id, metadata)
     if type(id) ~= "string" or #id == 0 or #id > 64
@@ -13,7 +30,26 @@ function Relations.RegisterAct(id, metadata)
         classes = metadata.classes, relations = metadata.relations,
         retentionSalience = metadata.retentionSalience }, "semantic_act_catalog")
     acts[id], count = normalized, count + 1
+    if type(metadata.compactEvent) == "string" and #metadata.compactEvent <= 64 then
+        compact[id] = { id = metadata.compactEvent, salience = normalized.retentionSalience or 0,
+            longTerm = metadata.longTerm == true, semantic = normalized }
+    end
     return true
+end
+
+function Relations.GetCompactType(id)
+    local spec = compact[id]
+    if not spec then return nil end
+    return { id = spec.id, salience = spec.salience, longTerm = spec.longTerm,
+        semantic = Relations.GetAct(id), sourceTypes = { spec.id } }
+end
+
+function Relations.CompactTypes()
+    local ids, output = {}, {}
+    for id in pairs(compact) do ids[#ids + 1] = id end
+    table.sort(ids)
+    for _, id in ipairs(ids) do output[#output + 1] = Relations.GetCompactType(id) end
+    return output
 end
 
 function Relations.GetAct(id)
@@ -26,12 +62,16 @@ for act, event in pairs({ INSULT = "player_dialogue_insult",
     HOSTILE_REMARK = "player_dialogue_hostile_remark", THREATEN = "player_dialogue_threat" }) do
     Relations.RegisterAct(act, definitions[event].semantic)
 end
-Relations.RegisterAct("APOLOGIZE", { relations = { addresses = { "repair" } } })
-Relations.RegisterAct("THANK", { relations = { addresses = { "gratitude" } } })
+Relations.RegisterAct("APOLOGIZE", { relations = { addresses = { "repair" } },
+    retentionSalience = 255, compactEvent = "semantic_apologize", longTerm = true })
+Relations.RegisterAct("THANK", { relations = { addresses = { "gratitude" } },
+    retentionSalience = 255, compactEvent = "semantic_thank", longTerm = true })
 for _, act in ipairs({ "OFFER", "REQUEST", "QUESTION" }) do
-    Relations.RegisterAct(act, { classes = { "pending_response" }, relations = { opens = { "response" } } })
+    Relations.RegisterAct(act, { classes = { "pending_response" }, relations = { opens = { "response" } },
+        retentionSalience = 90, compactEvent = "semantic_" .. string.lower(act) })
 end
 for _, act in ipairs({ "ACCEPT", "REFUSE", "ACKNOWLEDGE", "AGREE", "DISAGREE" }) do
-    Relations.RegisterAct(act, { relations = { addresses = { "response" } } })
+    Relations.RegisterAct(act, { relations = { addresses = { "response" } },
+        retentionSalience = 100, compactEvent = "semantic_" .. string.lower(act) })
 end
 return Relations

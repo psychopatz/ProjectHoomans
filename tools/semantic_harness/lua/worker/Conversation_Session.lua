@@ -10,7 +10,9 @@ function Session.new(Runtime, Values, player)
         _runtime = Runtime,
         _values = Values,
         characterUUID = player.characterUUID,
-        conversationID = "harness-conversation",
+        conversationID = string.sub(tostring(Runtime.scenario
+            and Runtime.scenario.conversation and Runtime.scenario.conversation.id
+            or "harness-conversation"), 1, 96),
         queue = {},
         currentNodeID = "menu",
         currentNode = nil,

@@ -81,12 +81,20 @@ function Handler.handle(context, command, payload)
     local ContextProjection = require "worker/Conversation_Context"
     local dialogueContext = ContextProjection.buildContext(context)
     local roots = {}
+    local conduct = PNC.Conduct.GetForEntity(target) or {}
+    local conductRows = {}
+    for index = 1, math.min(#(conduct.evidence or {}), 4) do
+        local row = conduct.evidence[index]
+        conductRows[#conductRows + 1] = { eventType = row.eventType,
+            actorKey = row.actorKey, subjectKey = row.subjectKey, strength = row.strength }
+    end
     for key in pairs(Runtime.modData or {}) do roots[#roots + 1] = key end
     table.sort(roots)
     return {
         ok = true, memory = context.Values.copy(record.memory),
         relationship = context.Values.copy(relationship),
         serializedRecord = context.Values.copy(raw), roots = roots,
+        conduct = { count = #(conduct.evidence or {}), sample = conductRows },
         identity = { adapterTarget = Runtime.relationshipTargetKey, target = target,
             targetKind = dialogueContext.relationship and dialogueContext.relationship.targetKind,
             targetID = dialogueContext.relationship and dialogueContext.relationship.targetID },
