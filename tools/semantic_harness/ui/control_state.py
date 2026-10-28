@@ -89,6 +89,8 @@ def set_controls(app: Any, enabled: bool) -> None:
         state="normal" if app.session.ready and not app.busy else "disabled"
     )
     app.flow_editor.set_enabled(enabled and not app.busy)
+    if hasattr(app, "interaction_modules"):
+        app.interaction_modules.set_enabled(enabled and not app.busy)
     app.interaction_explorer.set_enabled(enabled and not app.busy)
     if hasattr(app, "source_explorer"):
         app.source_explorer.set_enabled(enabled and not app.busy)

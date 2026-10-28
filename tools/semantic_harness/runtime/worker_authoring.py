@@ -20,6 +20,43 @@ class WorkerAuthoringOperations:
 
         return self._host._request("FLOW_CATALOG")
 
+    def beat_catalog(self) -> dict[str, Any]:
+        """Read production beat and behavior definitions from the Lua registries."""
+
+        return self._host._request("BEAT_CATALOG")
+
+    def validate_beat(self, definition: dict[str, Any]) -> dict[str, Any]:
+        """Validate a draft through the production Lua beat registry."""
+
+        return self._host._request("BEAT_VALIDATE", definition)
+
+    def register_beat(self, definition: dict[str, Any]) -> dict[str, Any]:
+        """Register a validated beat draft in this disposable worker."""
+
+        return self._host._request("BEAT_REGISTER", definition)
+
+    def preview_beat(
+        self, definition: dict[str, Any], text: str
+    ) -> dict[str, Any]:
+        """Preview a draft beat against a real non-mutating production turn."""
+
+        return self._host._request(
+            "BEAT_PREVIEW", {"definition": definition, "text": text}
+        )
+
+    def preview_interaction(
+        self, stimulus: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Preview a typed semantic stimulus without parsing or recording a turn."""
+
+        return self._host._request("INTERACTION_PREVIEW", stimulus)
+
+    def validate_behavior(self, definition: dict[str, Any]) -> dict[str, Any]:
+        return self._host._request("BEHAVIOR_VALIDATE", definition)
+
+    def register_behavior(self, definition: dict[str, Any]) -> dict[str, Any]:
+        return self._host._request("BEHAVIOR_REGISTER", definition)
+
     def response_key_lookup(self, key: str) -> dict[str, Any]:
         return self._host._request("RESPONSE_KEY_LOOKUP", {"key": key})
 

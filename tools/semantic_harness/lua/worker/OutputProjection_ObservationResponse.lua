@@ -41,6 +41,8 @@ local function initial(Values, response)
         selectionID = response.selectionID,
         selectionSource = response.selectionSource,
         sourceFlowID = response.sourceFlowID,
+        sourceBeatID = response.sourceBeatID,
+        sourceBehaviorID = response.sourceBehaviorID,
         flowTransition = response.flowTransition,
         plan = Values.copy(response.plan),
         planTurnCount = type(response.plan) == "table"

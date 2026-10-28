@@ -207,5 +207,25 @@
     "name": "Project Hoomans Conversation Authoring",
     "version": "1"
   },
+  "sourceRoots": [
+    {
+      "domain": "social",
+      "kind": "content",
+      "order": 1303,
+      "path": "content/social/interaction"
+    },
+    {
+      "domain": "social",
+      "kind": "behaviors",
+      "order": 2250,
+      "path": "behaviors/social"
+    },
+    {
+      "domain": "social",
+      "kind": "beats",
+      "order": 2260,
+      "path": "beats/social"
+    }
+  ],
   "version": 1
 }

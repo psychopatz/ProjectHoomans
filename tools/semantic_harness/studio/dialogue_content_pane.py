@@ -147,6 +147,61 @@ class DialogueContentPane:
                 self.load_selected()
         self._status_var.set(f"{len(self._items)} verified content records")
 
+    def select_content(self, content_ref: str) -> bool:
+        """Select a canonical content record by ID or semantic template ID."""
+
+        content_ref = str(content_ref or "").strip()
+        if not content_ref:
+            return False
+        if not self._items:
+            self.refresh()
+        match = next(
+            (
+                item
+                for item in self._items
+                if str(item.get("id") or "") == content_ref
+                or str(item.get("semanticTemplateID") or "") == content_ref
+            ),
+            None,
+        )
+        if not isinstance(match, dict):
+            self._status_var.set(f"Dialogue Content not found: {content_ref}")
+            return False
+
+        # Clear a filter that may hide the requested canonical record.
+        if self._filter_var.get().strip():
+            self._filter_var.set("")
+            self._render_tree()
+
+        match_id = str(match.get("id") or "")
+        target_iid = next(
+            (
+                iid
+                for iid, item in self._tree_rows.items()
+                if str(item.get("id") or "") == match_id
+            ),
+            None,
+        )
+        if target_iid is None:
+            self._render_tree()
+            target_iid = next(
+                (
+                    iid
+                    for iid, item in self._tree_rows.items()
+                    if str(item.get("id") or "") == match_id
+                ),
+                None,
+            )
+        if target_iid is None:
+            self._status_var.set(f"Dialogue Content row unavailable: {content_ref}")
+            return False
+
+        self._tree.selection_set(target_iid)
+        self._tree.focus(target_iid)
+        self._tree.see(target_iid)
+        self.load_selected()
+        return True
+
     def _render_tree(self) -> None:
         tree = filter_semantic_tree(
             build_semantic_tree(

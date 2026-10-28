@@ -1,0 +1,57 @@
+{
+  "schema": "pnc.conversation.shard.v1",
+  "version": 1,
+  "kind": "content",
+  "domain": "social",
+  "source": {
+    "name": "Project Hoomans Pragmatic Interaction Content",
+    "version": "1",
+    "contentLicense": "Project Hoomans authored content"
+  },
+  "groups": {
+    "interaction": {
+      "contentOwner": "projecthoomans.dialogue_content.social_interaction"
+    }
+  },
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.interaction.world_event.warning",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Heads up. Something's wrong out there.",
+              "TL": "Mag-ingat. May mali sa labas."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Stay close. Something's wrong out there.",
+              "TL": "Manatili kang malapit. May mali sa labas."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Heads up!",
+              "TL": "Mag-ingat!"
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Stay sharp. We've got trouble.",
+              "TL": "Mag-ingat ka. May problema tayo."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": []
+}

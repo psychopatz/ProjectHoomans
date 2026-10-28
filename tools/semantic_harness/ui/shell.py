@@ -202,6 +202,18 @@ from .flow_catalog_controller import (
     register_flow_draft,
     validate_flow_draft,
 )
+from .interaction_module_controller import (
+    beat_catalog_finished,
+    load_canonical_interaction_definition,
+    preview_beat_draft,
+    preview_interaction_promotion,
+    promote_interaction_definition,
+    refresh_beat_catalog,
+    register_beat_draft,
+    register_behavior_draft,
+    validate_beat_draft,
+    validate_behavior_draft,
+)
 from .lifecycle_controller import close_app, run_gui as run_gui_app
 from .worker_lifecycle import start_worker, worker_kwargs
 
@@ -784,6 +796,54 @@ class SemanticHarnessApp:
 
     def inspect_world_knowledge(self) -> None:
         inspect_world_knowledge(self)
+
+    def refresh_beat_catalog(self) -> None:
+        refresh_beat_catalog(self)
+
+    def _beat_catalog_finished(self, response: dict[str, Any]) -> None:
+        beat_catalog_finished(self, response)
+
+    def validate_beat_draft(self, definition: dict[str, Any]) -> None:
+        validate_beat_draft(self, definition)
+
+    def preview_beat_draft(
+        self, definition: dict[str, Any], text: str
+    ) -> None:
+        preview_beat_draft(self, definition, text)
+
+    def register_beat_draft(self, definition: dict[str, Any]) -> None:
+        register_beat_draft(self, definition)
+
+    def validate_behavior_draft(self, definition: dict[str, Any]) -> None:
+        validate_behavior_draft(self, definition)
+
+    def register_behavior_draft(self, definition: dict[str, Any]) -> None:
+        register_behavior_draft(self, definition)
+
+    def load_canonical_interaction_definition(
+        self, record_id: str
+    ) -> dict[str, Any]:
+        return load_canonical_interaction_definition(self, record_id)
+
+    def preview_interaction_promotion(
+        self,
+        record_id: str,
+        definition: dict[str, Any],
+        source_fingerprint: str | None,
+    ) -> None:
+        preview_interaction_promotion(
+            self, record_id, definition, source_fingerprint
+        )
+
+    def promote_interaction_definition(
+        self,
+        record_id: str,
+        definition: dict[str, Any],
+        source_fingerprint: str | None,
+    ) -> None:
+        promote_interaction_definition(
+            self, record_id, definition, source_fingerprint
+        )
 
     def refresh_flow_catalog(self) -> None:
         refresh_flow_catalog(self)

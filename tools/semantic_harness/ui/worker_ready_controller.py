@@ -58,6 +58,7 @@ def worker_ready(app: Any, result: WorkerReady) -> None:
 
     capabilities = result.capabilities or {}
     flow_catalog = capabilities.get("flowCatalog", {})
+    beat_catalog = capabilities.get("beatCatalog", {})
     app._set_text(
         app.inspector,
         pretty(
@@ -65,6 +66,8 @@ def worker_ready(app: Any, result: WorkerReady) -> None:
                 "state": "ready",
                 "worker": result.status,
                 "flows": flow_catalog.get("flowCount", 0),
+                "beats": beat_catalog.get("beatCount", 0),
+                "behaviors": beat_catalog.get("behaviorCount", 0),
                 "engineFacts": len(flow_catalog.get("factCatalog", [])),
                 "engineEvents": len(flow_catalog.get("eventCatalog", [])),
                 "commands": len(flow_catalog.get("commandCatalog", [])),
@@ -74,6 +77,8 @@ def worker_ready(app: Any, result: WorkerReady) -> None:
     )
     app._set_text(app.trace, pretty(capabilities))
     app.flow_editor.set_catalog(flow_catalog)
+    app.interaction_modules.set_catalog(beat_catalog)
+    app._beat_catalog = beat_catalog
     app.interaction_explorer.set_catalog(flow_catalog)
     app.interaction_composer.set_production_catalog(flow_catalog)
     app.block_registry.set_catalog(flow_catalog)

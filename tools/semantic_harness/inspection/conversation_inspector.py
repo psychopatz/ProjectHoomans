@@ -67,6 +67,12 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
         },
         "dialoguePlan": bounded(state["plan"], limit=32),
         "selectedFlow": bounded(state["flow"], limit=32),
+        "dialogueDirector": bounded(
+            state["observation"].get("director", {}), limit=64
+        ),
+        "interactionPlan": bounded(
+            state["observation"].get("interactionPlan", {}), limit=32
+        ),
         "visibleResponse": bounded(response_projection["visible"]),
         "execution": bounded(
             authority_projection["execution"], limit=24

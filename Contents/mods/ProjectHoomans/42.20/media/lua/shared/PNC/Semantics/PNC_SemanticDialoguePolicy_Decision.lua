@@ -157,10 +157,42 @@ local function applyLocalResponse(result, ir, state, context)
     if ResponsePlan and type(ResponsePlan.Attach) == "function"
         and type(result.response) == "table"
     then
+        local interactionPlan = type(result.interactionPlan) == "table"
+            and result.interactionPlan or nil
+        local dialogueAct = result.branch
+        if not flowSelected
+            and result.action == nil
+            and interactionPlan
+            and type(interactionPlan.dialogueAct) == "string"
+        then
+            dialogueAct = interactionPlan.dialogueAct
+            if type(interactionPlan.contentTemplateID) == "string"
+                and interactionPlan.contentTemplateID ~= ""
+            then
+                result.response.templateID =
+                    interactionPlan.contentTemplateID
+            end
+            result.diagnostics.interactionPlan = {
+                applied = true,
+                behaviorID = interactionPlan.behaviorID,
+                beatID = interactionPlan.beatID,
+                dialogueAct = interactionPlan.dialogueAct,
+                contentTemplateID = interactionPlan.contentTemplateID,
+            }
+        elseif interactionPlan then
+            result.diagnostics.interactionPlan = {
+                applied = false,
+                behaviorID = interactionPlan.behaviorID,
+                beatID = interactionPlan.beatID,
+                reason = flowSelected
+                    and "flow_response_authority"
+                    or "authoritative_action_response",
+            }
+        end
         ResponsePlan.Attach(
             result.response,
-            result.branch,
-            result.flow and result.flow.responsePool
+            dialogueAct,
+            flowSelected and result.flow and result.flow.responsePool or nil
         )
     end
     return result

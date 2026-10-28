@@ -1,0 +1,57 @@
+{
+  "schema": "pnc.conversation.shard.v1",
+  "version": 1,
+  "kind": "content",
+  "domain": "social",
+  "source": {
+    "name": "Project Hoomans Pragmatic Interaction Content",
+    "version": "1",
+    "contentLicense": "Project Hoomans authored content"
+  },
+  "groups": {
+    "interaction": {
+      "contentOwner": "projecthoomans.dialogue_content.social_interaction"
+    }
+  },
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.interaction.memory.followup",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You did? What happened after that?",
+              "TL": "Talaga? Ano ang nangyari pagkatapos noon?"
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Really? Tell me more about that.",
+              "TL": "Talaga? Kuwento mo pa sa akin."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "And then?",
+              "TL": "Tapos?"
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Why are you telling me that?",
+              "TL": "Bakit mo sinasabi sa akin iyan?"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": []
+}

@@ -1,0 +1,57 @@
+{
+  "schema": "pnc.conversation.shard.v1",
+  "version": 1,
+  "kind": "content",
+  "domain": "social",
+  "source": {
+    "name": "Project Hoomans Pragmatic Interaction Content",
+    "version": "1",
+    "contentLicense": "Project Hoomans authored content"
+  },
+  "groups": {
+    "interaction": {
+      "contentOwner": "projecthoomans.dialogue_content.social_interaction"
+    }
+  },
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.interaction.memory.acknowledge_flavor",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The listener gives a small acknowledging nod.",
+              "TL": "Bahagyang tumango ang nakikinig bilang pagkilala."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "The listener softens and nods with quiet understanding.",
+              "TL": "Lumambot ang ekspresyon ng nakikinig at tahimik na tumango."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "A brief nod follows.",
+              "TL": "Isang maikling tango ang sumunod."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "The listener gives a guarded nod.",
+              "TL": "Maingat na tumango ang nakikinig."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": []
+}

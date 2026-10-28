@@ -45,7 +45,7 @@ CONVERSATION_UI_RUNTIME_RELATIVE = CONVERSATION_RUNTIME_RELATIVE / "UI/StaticSug
 CONVERSATION_MAX_SHARD_BYTES = 32 * 1024
 CONVERSATION_MAX_RECORDS_PER_SHARD = 48
 _ID = re.compile(r"^[a-z][a-z0-9_.:-]{0,127}$")
-_SHARD_KINDS = frozenset(("content", "patterns", "responses", "flows", "ui"))
+_SHARD_KINDS = frozenset(("content", "patterns", "responses", "flows", "beats", "behaviors", "ui"))
 
 
 def _canonical_json(value: Any) -> str:
@@ -115,6 +115,88 @@ def _validate_id(value: Any, label: str) -> str:
     return value
 
 
+def _validate_relative_directory_path(value: Any, label: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise CompileError(f"{label} must be a relative source directory")
+    path = PurePosixPath(value)
+    if path.is_absolute() or ".." in path.parts or "\\" in value:
+        raise CompileError(f"{label} must stay below the Conversation source root")
+    normalized = path.as_posix().rstrip("/")
+    if not normalized or normalized != value.rstrip("/"):
+        raise CompileError(f"{label} must be a normalized relative directory")
+    if PurePosixPath(normalized).suffix:
+        raise CompileError(f"{label} must be a directory, not a file")
+    return normalized
+
+
+def _manifest_entry(raw, *, label, root, seen_paths):
+    path_value = _validate_relative_json_path(raw.get("path"), f"{label}.path")
+    if path_value in seen_paths:
+        raise CompileError(f"duplicate Conversation shard path: {path_value}")
+    kind = raw.get("kind")
+    if kind not in _SHARD_KINDS:
+        raise CompileError(f"unsupported Conversation shard kind: {kind!r}")
+    domain = _validate_id(raw.get("domain"), f"{label}.domain")
+    order = raw.get("order")
+    if isinstance(order, bool) or not isinstance(order, int) or order < 0:
+        raise CompileError(f"{label}.order must be a non-negative integer")
+    path = root / Path(*PurePosixPath(path_value).parts)
+    if not path.is_file():
+        raise CompileError(f"Conversation manifest shard is missing: {path_value}")
+    seen_paths.add(path_value)
+    return {**_copy_json(raw), "path": path_value, "kind": kind, "domain": domain, "order": order}
+
+
+def _source_root_entries(manifest, *, root, seen_paths):
+    raw_roots = manifest.get("sourceRoots", [])
+    if raw_roots is None:
+        raw_roots = []
+    if not isinstance(raw_roots, list):
+        raise CompileError("Conversation manifest sourceRoots must be a list")
+    roots = []
+    seen_roots = set()
+    for index, raw in enumerate(raw_roots):
+        label = f"sourceRoots[{index}]"
+        if not isinstance(raw, dict):
+            raise CompileError(f"{label} must be an object")
+        root_path = _validate_relative_directory_path(raw.get("path"), f"{label}.path")
+        if root_path in seen_roots:
+            raise CompileError(f"duplicate Conversation source root: {root_path}")
+        seen_roots.add(root_path)
+        kind = raw.get("kind")
+        if kind not in _SHARD_KINDS:
+            raise CompileError(f"unsupported Conversation source-root kind: {kind!r}")
+        domain = _validate_id(raw.get("domain"), f"{label}.domain")
+        order = raw.get("order")
+        if isinstance(order, bool) or not isinstance(order, int) or order < 0:
+            raise CompileError(f"{label}.order must be a non-negative integer")
+        directory = root / Path(*PurePosixPath(root_path).parts)
+        if not directory.is_dir():
+            raise CompileError(f"Conversation source root is missing: {root_path}")
+        roots.append({"path": root_path, "kind": kind, "domain": domain, "order": order})
+    if roots != sorted(roots, key=lambda item: (item["order"], item["path"])):
+        raise CompileError("Conversation sourceRoots must use canonical order")
+    entries = []
+    for source_root in roots:
+        directory = root / Path(*PurePosixPath(source_root["path"]).parts)
+        files = sorted(path for path in directory.rglob("*.json") if path.is_file())
+        if not files:
+            raise CompileError(f"Conversation source root contains no JSON shards: {source_root['path']}")
+        for file_path in files:
+            relative = file_path.relative_to(root).as_posix()
+            if relative in seen_paths:
+                raise CompileError(f"Conversation source-root shard is already registered: {relative}")
+            seen_paths.add(relative)
+            entries.append({
+                "path": relative,
+                "kind": source_root["kind"],
+                "domain": source_root["domain"],
+                "order": source_root["order"],
+                "discoveredFrom": source_root["path"],
+            })
+    return entries
+
+
 def _load_manifest(repository: Path, manifest_path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     manifest = _read_json(manifest_path, "Conversation manifest")
     if manifest.get("schema") != CONVERSATION_MANIFEST_SCHEMA:
@@ -125,30 +207,22 @@ def _load_manifest(repository: Path, manifest_path: Path) -> tuple[dict[str, Any
     if not isinstance(shards, list) or not shards:
         raise CompileError("Conversation manifest requires at least one shard")
     root = manifest_path.parent
-    entries: list[dict[str, Any]] = []
-    seen_paths: set[str] = set()
+    seen_paths = set()
+    explicit_entries = []
     for index, raw in enumerate(shards):
         if not isinstance(raw, dict):
             raise CompileError(f"Conversation manifest shard {index} must be an object")
-        path_value = _validate_relative_json_path(raw.get("path"), f"shards[{index}].path")
-        if path_value in seen_paths:
-            raise CompileError(f"duplicate Conversation shard path: {path_value}")
-        seen_paths.add(path_value)
-        kind = raw.get("kind")
-        if kind not in _SHARD_KINDS:
-            raise CompileError(f"unsupported Conversation shard kind: {kind!r}")
-        domain = _validate_id(raw.get("domain"), f"shards[{index}].domain")
-        order = raw.get("order")
-        if isinstance(order, bool) or not isinstance(order, int) or order < 0:
-            raise CompileError(f"shards[{index}].order must be a non-negative integer")
-        path = root / Path(*PurePosixPath(path_value).parts)
-        if not path.is_file():
-            raise CompileError(f"Conversation manifest shard is missing: {path_value}")
-        entries.append({**_copy_json(raw), "path": path_value, "kind": kind, "domain": domain, "order": order})
-
-    canonical_entries = sorted(entries, key=lambda item: (item["order"], item["path"]))
-    if [item["path"] for item in entries] != [item["path"] for item in canonical_entries]:
+        explicit_entries.append(_manifest_entry(
+            raw, label=f"shards[{index}]", root=root, seen_paths=seen_paths
+        ))
+    if explicit_entries != sorted(explicit_entries, key=lambda item: (item["order"], item["path"])):
         raise CompileError("Conversation manifest shards must use canonical order")
+
+    discovered_entries = _source_root_entries(manifest, root=root, seen_paths=seen_paths)
+    entries = sorted(
+        [*explicit_entries, *discovered_entries],
+        key=lambda item: (item["order"], item["path"]),
+    )
 
     discovered = {
         path.relative_to(root).as_posix()
@@ -184,6 +258,329 @@ def _validate_ui_shard(document: dict[str, Any], path: str) -> list[dict[str, An
             raise CompileError(f"{path}.{suggestion_id}.order must be an integer")
         result.append(_copy_json(suggestion))
     return result
+
+
+_DIRECTOR_PREDICATE_OPS = frozenset((
+    "eq", "neq", "gt", "gte", "lt", "lte", "in", "not_in", "truthy", "falsy",
+))
+
+
+def _validate_director_predicate(value: Any, label: str, *, depth: int = 0) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise CompileError(f"{label} must be an object")
+    if depth > 4:
+        raise CompileError(f"{label} exceeds predicate depth")
+    structural = [key for key in ("all", "any", "not") if key in value]
+    if structural:
+        if len(structural) != 1 or len(value) != 1:
+            raise CompileError(f"{label} must contain exactly one structural predicate")
+        key = structural[0]
+        if key == "not":
+            return {"not": _validate_director_predicate(value[key], f"{label}.not", depth=depth + 1)}
+        items = value[key]
+        if not isinstance(items, list) or not items or len(items) > 16:
+            raise CompileError(f"{label}.{key} must contain 1-16 predicates")
+        return {
+            key: [
+                _validate_director_predicate(item, f"{label}.{key}[{index}]", depth=depth + 1)
+                for index, item in enumerate(items)
+            ]
+        }
+    path = value.get("path")
+    op = value.get("op")
+    if not isinstance(path, str) or not path or len(path) > 128:
+        raise CompileError(f"{label}.path must be a bounded field path")
+    if op not in _DIRECTOR_PREDICATE_OPS:
+        raise CompileError(f"{label}.op is unsupported: {op!r}")
+    result: dict[str, Any] = {"path": path, "op": op}
+    if op in ("truthy", "falsy"):
+        return result
+    if op in ("in", "not_in"):
+        values = value.get("values")
+        if not isinstance(values, list) or not values or len(values) > 16:
+            raise CompileError(f"{label}.values must contain 1-16 values")
+        result["values"] = _copy_json(values)
+        return result
+    if "value" not in value:
+        raise CompileError(f"{label}.value is required")
+    result["value"] = _copy_json(value["value"])
+    return result
+
+
+def _validate_behavior_shard(document: dict[str, Any], path: str) -> dict[str, Any]:
+    values = document.get("behaviors")
+    if not isinstance(values, list):
+        raise CompileError(f"Behavior shard {path} requires a behaviors list")
+    records: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    token = re.compile(r"^[A-Z][A-Z0-9_]{0,63}$")
+    for index, raw in enumerate(values):
+        label = f"{path}.behaviors[{index}]"
+        if not isinstance(raw, dict):
+            raise CompileError(f"{label} must be an object")
+        record_id = _validate_id(raw.get("id"), f"{label}.id")
+        if not record_id.startswith("behavior."):
+            raise CompileError(f"{label}.id must start with behavior.")
+        if record_id in seen:
+            raise CompileError(f"duplicate behavior id: {record_id}")
+        seen.add(record_id)
+
+        act = raw.get("act")
+        if not isinstance(act, str) or not token.fullmatch(act):
+            raise CompileError(f"{label}.act must be a bounded semantic token")
+
+        mode = raw.get("mode", "beat")
+        if mode not in ("beat", "one_shot"):
+            raise CompileError(f"{label}.mode must be beat or one_shot")
+
+        raw_stimuli = raw.get("stimuli")
+        if not isinstance(raw_stimuli, list) or not raw_stimuli or len(raw_stimuli) > 16:
+            raise CompileError(f"{label}.stimuli must contain 1-16 stimulus tokens")
+        stimuli: list[str] = []
+        stimulus_seen: set[str] = set()
+        for stimulus_index, value in enumerate(raw_stimuli):
+            if not isinstance(value, str) or not token.fullmatch(value):
+                raise CompileError(
+                    f"{label}.stimuli[{stimulus_index}] must be a bounded semantic token"
+                )
+            if value in stimulus_seen:
+                raise CompileError(f"{label}.stimuli contains duplicate {value}")
+            stimulus_seen.add(value)
+            stimuli.append(value)
+
+        raw_capabilities = raw.get("requiredCapabilities", [])
+        if not isinstance(raw_capabilities, list) or len(raw_capabilities) > 8:
+            raise CompileError(
+                f"{label}.requiredCapabilities must contain at most 8 capabilities"
+            )
+        required_capabilities: list[str] = []
+        capability_seen: set[str] = set()
+        for capability_index, value in enumerate(raw_capabilities):
+            capability = _validate_id(
+                value, f"{label}.requiredCapabilities[{capability_index}]"
+            )
+            if capability in capability_seen:
+                raise CompileError(
+                    f"{label}.requiredCapabilities contains duplicate {capability}"
+                )
+            capability_seen.add(capability)
+            required_capabilities.append(capability)
+
+        raw_outputs = raw.get("outputs", {})
+        if not isinstance(raw_outputs, dict):
+            raise CompileError(f"{label}.outputs must be an object")
+        outputs: dict[str, Any] = {}
+        speech = raw_outputs.get("speech")
+        if speech is not None:
+            if not isinstance(speech, dict):
+                raise CompileError(f"{label}.outputs.speech must be an object")
+            dialogue_act = speech.get("dialogueAct")
+            if not isinstance(dialogue_act, str) or not token.fullmatch(dialogue_act):
+                raise CompileError(
+                    f"{label}.outputs.speech.dialogueAct must be a bounded semantic token"
+                )
+            outputs["speech"] = {
+                "dialogueAct": dialogue_act,
+                "contentTemplateID": _validate_id(
+                    speech.get("contentTemplateID"),
+                    f"{label}.outputs.speech.contentTemplateID",
+                ),
+            }
+        emote = raw_outputs.get("emote")
+        if emote is not None:
+            if not isinstance(emote, dict):
+                raise CompileError(f"{label}.outputs.emote must be an object")
+            emote_id = _validate_id(emote.get("id"), f"{label}.outputs.emote.id")
+            outputs["emote"] = {"id": emote_id}
+        flavor = raw_outputs.get("flavor")
+        if flavor is not None:
+            if not isinstance(flavor, dict):
+                raise CompileError(f"{label}.outputs.flavor must be an object")
+            presentation_act = flavor.get("presentationAct", "AMBIENT_FLAVOR")
+            if (
+                not isinstance(presentation_act, str)
+                or not token.fullmatch(presentation_act)
+            ):
+                raise CompileError(
+                    f"{label}.outputs.flavor.presentationAct must be a bounded semantic token"
+                )
+            outputs["flavor"] = {
+                "presentationAct": presentation_act,
+                "contentTemplateID": _validate_id(
+                    flavor.get("contentTemplateID"),
+                    f"{label}.outputs.flavor.contentTemplateID",
+                ),
+            }
+        gameplay = raw_outputs.get("gameplayIntent")
+        if gameplay is not None:
+            if not isinstance(gameplay, dict):
+                raise CompileError(f"{label}.outputs.gameplayIntent must be an object")
+            intent_id = _validate_id(
+                gameplay.get("id"), f"{label}.outputs.gameplayIntent.id"
+            )
+            outputs["gameplayIntent"] = {"id": intent_id}
+        unsupported_outputs = sorted(
+            set(raw_outputs) - {"speech", "emote", "flavor", "gameplayIntent"}
+        )
+        if unsupported_outputs:
+            raise CompileError(
+                f"{label}.outputs contains unsupported keys: "
+                + ", ".join(unsupported_outputs)
+            )
+
+        when = raw.get("when")
+        if when is not None:
+            when = _validate_director_predicate(when, f"{label}.when")
+        relevance = raw.get("baseRelevance", 0.5)
+        if (
+            isinstance(relevance, bool)
+            or not isinstance(relevance, (int, float))
+            or not 0 <= relevance <= 1
+        ):
+            raise CompileError(f"{label}.baseRelevance must be between 0 and 1")
+        modifiers = raw.get("modifiers", [])
+        if not isinstance(modifiers, list) or len(modifiers) > 16:
+            raise CompileError(
+                f"{label}.modifiers must be a list of at most 16 entries"
+            )
+        normalized_modifiers: list[dict[str, Any]] = []
+        for modifier_index, modifier in enumerate(modifiers):
+            modifier_label = f"{label}.modifiers[{modifier_index}]"
+            if not isinstance(modifier, dict):
+                raise CompileError(f"{modifier_label} must be an object")
+            delta = modifier.get("delta")
+            if (
+                isinstance(delta, bool)
+                or not isinstance(delta, (int, float))
+                or not -1 <= delta <= 1
+            ):
+                raise CompileError(
+                    f"{modifier_label}.delta must be between -1 and 1"
+                )
+            normalized_modifiers.append(
+                {
+                    "when": _validate_director_predicate(
+                        modifier.get("when"), f"{modifier_label}.when"
+                    ),
+                    "delta": delta,
+                    "reason": str(modifier.get("reason") or "")[:96],
+                }
+            )
+        records.append(
+            {
+                "id": record_id,
+                "version": int(raw.get("version", 1)),
+                "owner": str(raw.get("owner") or "ProjectHoomans"),
+                "act": act,
+                "mode": mode,
+                "stimuli": stimuli,
+                "requiredCapabilities": required_capabilities,
+                "outputs": outputs,
+                "when": when,
+                "baseRelevance": float(relevance),
+                "modifiers": normalized_modifiers,
+            }
+        )
+    return {"records": records}
+
+
+def _validate_beat_shard(document: dict[str, Any], path: str) -> dict[str, Any]:
+    values = document.get("beats")
+    if not isinstance(values, list):
+        raise CompileError(f"Beat shard {path} requires a beats list")
+    records: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    token = re.compile(r"^[A-Z][A-Z0-9_]{0,63}$")
+    for index, raw in enumerate(values):
+        label = f"{path}.beats[{index}]"
+        if not isinstance(raw, dict):
+            raise CompileError(f"{label} must be an object")
+        record_id = _validate_id(raw.get("id"), f"{label}.id")
+        if not record_id.startswith("beat."):
+            raise CompileError(f"{label}.id must start with beat.")
+        if record_id in seen:
+            raise CompileError(f"duplicate beat id: {record_id}")
+        seen.add(record_id)
+        raw_stimuli = raw.get("stimuli")
+        if (
+            not isinstance(raw_stimuli, list)
+            or not raw_stimuli
+            or len(raw_stimuli) > 16
+        ):
+            raise CompileError(
+                f"{label}.stimuli must contain 1-16 stimulus tokens"
+            )
+        stimuli: list[str] = []
+        stimulus_seen: set[str] = set()
+        for stimulus_index, value in enumerate(raw_stimuli):
+            if not isinstance(value, str) or not token.fullmatch(value):
+                raise CompileError(
+                    f"{label}.stimuli[{stimulus_index}] must be a bounded semantic token"
+                )
+            if value in stimulus_seen:
+                raise CompileError(
+                    f"{label}.stimuli contains duplicate {value}"
+                )
+            stimulus_seen.add(value)
+            stimuli.append(value)
+        candidates = raw.get("candidates")
+        if not isinstance(candidates, list) or not candidates or len(candidates) > 16:
+            raise CompileError(f"{label}.candidates must contain 1-16 behaviors")
+        normalized_candidates: list[dict[str, Any]] = []
+        for candidate_index, candidate in enumerate(candidates):
+            candidate_label = f"{label}.candidates[{candidate_index}]"
+            if not isinstance(candidate, dict):
+                raise CompileError(f"{candidate_label} must be an object")
+            behavior = _validate_id(candidate.get("behavior"), f"{candidate_label}.behavior")
+            relevance = candidate.get("relevance", 0.5)
+            if isinstance(relevance, bool) or not isinstance(relevance, (int, float)) or not 0 <= relevance <= 1:
+                raise CompileError(f"{candidate_label}.relevance must be between 0 and 1")
+            normalized_candidates.append({"behavior": behavior, "relevance": float(relevance)})
+        relevance = raw.get("baseRelevance", 0.5)
+        if isinstance(relevance, bool) or not isinstance(relevance, (int, float)) or not 0 <= relevance <= 1:
+            raise CompileError(f"{label}.baseRelevance must be between 0 and 1")
+        cooldown = raw.get("cooldownTurns", 0)
+        max_turns = raw.get("maxTurns", 6)
+        for field, value, maximum in (("cooldownTurns", cooldown, 64), ("maxTurns", max_turns, 64)):
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0 or value > maximum:
+                raise CompileError(f"{label}.{field} must be an integer from 0 to {maximum}")
+        record = {
+            "id": record_id,
+            "version": int(raw.get("version", 1)),
+            "owner": str(raw.get("owner") or "ProjectHoomans"),
+            "stimuli": stimuli,
+            "entry": _validate_director_predicate(raw.get("entry"), f"{label}.entry"),
+            "maintain": _validate_director_predicate(raw.get("maintain"), f"{label}.maintain"),
+            "exit": _validate_director_predicate(raw.get("exit"), f"{label}.exit"),
+            "candidates": normalized_candidates,
+            "baseRelevance": float(relevance),
+            "cooldownTurns": cooldown,
+            "maxTurns": max_turns,
+        }
+        group = raw.get("group")
+        if group is not None:
+            record["group"] = _validate_id(group, f"{label}.group")
+        records.append(record)
+    return {"records": records}
+
+
+def _merge_director_sources(
+    shards: list[tuple[dict[str, Any], dict[str, Any], str]],
+    kind: str,
+) -> dict[str, Any]:
+    records: list[dict[str, Any]] = []
+    for document, entry, _ in shards:
+        if entry["kind"] != kind:
+            continue
+        compiled = (
+            _validate_behavior_shard(document, entry["path"])
+            if kind == "behaviors"
+            else _validate_beat_shard(document, entry["path"])
+        )
+        for record in compiled["records"]:
+            records.append({**record, "domain": entry["domain"]})
+    records.sort(key=lambda item: item["id"])
+    return {"records": records}
 
 
 def _compile_shard(
@@ -225,6 +622,10 @@ def _compile_shard(
             },
             registered_capability_ids=discover_registered_capability_ids(runtime_root),
         )
+    elif kind == "behaviors":
+        compiled = _validate_behavior_shard(document, path)
+    elif kind == "beats":
+        compiled = _validate_beat_shard(document, path)
     else:
         compiled = {"suggestions": _validate_ui_shard(document, path)}
     return compiled
@@ -412,6 +813,10 @@ def compile_conversation_sources(
             record_ids.extend(str(item["id"]) for item in document.get("responsePools", []))
         elif entry["kind"] == "flows":
             record_ids.extend(str(item["id"]) for item in document.get("definitions", []))
+        elif entry["kind"] == "behaviors":
+            record_ids.extend(str(item["id"]) for item in document.get("behaviors", []))
+        elif entry["kind"] == "beats":
+            record_ids.extend(str(item["id"]) for item in document.get("beats", []))
         else:
             record_ids.extend(str(item["id"]) for item in document.get("suggestions", []))
         record_ids.sort()
@@ -429,6 +834,8 @@ def compile_conversation_sources(
     content, content_source = _content_source(loaded)
     dialogue, _dialogue_translations = _merge_dialogue_sources(loaded)
     semantic = _merge_semantic_sources(loaded, runtime_root)
+    behaviors = _merge_director_sources(loaded, "behaviors")
+    beats = _merge_director_sources(loaded, "beats")
     ui = sorted(
         [item for document, entry, _ in loaded if entry["kind"] == "ui" for item in document.get("suggestions", [])],
         key=lambda item: (item.get("order", 0), item.get("id", "")),
@@ -463,9 +870,47 @@ def compile_conversation_sources(
                 responses = definition.get("responses") if isinstance(definition, dict) else None
                 if isinstance(responses, dict):
                     _add_global_id(locations, responses.get("poolID"), kind="responsePool", shard=entry, path=path)
+        elif entry["kind"] == "behaviors":
+            for behavior in document.get("behaviors", []):
+                _add_global_id(locations, behavior.get("id"), kind="behavior", shard=entry, path=path)
+        elif entry["kind"] == "beats":
+            for beat in document.get("beats", []):
+                _add_global_id(locations, beat.get("id"), kind="beat", shard=entry, path=path)
         else:
             for suggestion in document.get("suggestions", []):
                 _add_global_id(locations, suggestion.get("id"), kind="ui", shard=entry, path=path)
+
+    behavior_ids = {record["id"] for record in behaviors["records"]}
+    available_content_templates = {
+        str(item.get("semanticTemplateID"))
+        for item in content.get("phraseFamilies", [])
+        if isinstance(item, dict)
+    }
+    behavior_by_id = {
+        record["id"]: record for record in behaviors["records"]
+    }
+    for behavior in behaviors["records"]:
+        outputs = behavior.get("outputs", {})
+        for output_name in ("speech", "flavor"):
+            output = outputs.get(output_name)
+            if isinstance(output, dict):
+                content_template_id = output.get("contentTemplateID")
+                if content_template_id not in available_content_templates:
+                    raise CompileError(
+                        f"behavior {behavior.get('id')} {output_name} output references "
+                        f"unknown Dialogue Content template {content_template_id}"
+                    )
+    for beat in beats["records"]:
+        for candidate in beat.get("candidates", []):
+            behavior_id = candidate.get("behavior")
+            if behavior_id not in behavior_ids:
+                raise CompileError(
+                    f"beat {beat.get('id')} references unknown behavior {behavior_id}"
+                )
+            if behavior_by_id[behavior_id].get("mode") != "beat":
+                raise CompileError(
+                    f"beat {beat.get('id')} references non-beat behavior {behavior_id}"
+                )
 
     available_patterns = {
         str(item.get("id")) for item in dialogue.get("patterns", [])
@@ -523,6 +968,8 @@ def compile_conversation_sources(
         },
         "dialogue": dialogue,
         "semantic": semantic,
+        "behaviors": behaviors["records"],
+        "beats": beats["records"],
         "ui": ui,
     }
     whole_fingerprint = _fingerprint(semantic_payload)
@@ -535,6 +982,8 @@ def compile_conversation_sources(
         "content": content,
         "dialogue": dialogue,
         "semantic": semantic,
+        "behaviors": behaviors["records"],
+        "beats": beats["records"],
         "ui": ui,
         "uiTranslations": _ui_translations(ui),
         "shards": shard_reports,
@@ -698,13 +1147,17 @@ def render_conversation_runtime_plan(model: dict[str, Any]) -> tuple[list[tuple[
     response_pools = [*model["dialogue"].get("responsePools", []), *model["semantic"].get("responsePools", [])]
     response_pools = [{**item, "domain": str(item.get("id", "general")).split(".")[1] if len(str(item.get("id", "")).split(".")) > 1 else "general"} for item in response_pools]
     flow_records = [{**item, "domain": "semantic"} for item in model["semantic"].get("flows", [])]
+    behavior_records = list(model.get("behaviors", []))
+    beat_records = list(model.get("beats", []))
     ui_records = [{**item, "domain": str(item.get("topic") or "general")} for item in model["ui"]]
     pattern_modules, pattern_reports = _chunk_records(patterns, kind="Patterns", module_prefix=prefix)
     response_modules, response_reports = _chunk_records(response_pools, kind="Responses", module_prefix=prefix)
     flow_modules, flow_reports = _chunk_records(flow_records, kind="Flows", module_prefix=prefix)
+    behavior_modules, behavior_reports = _chunk_records(behavior_records, kind="Behaviors", module_prefix=prefix)
+    beat_modules, beat_reports = _chunk_records(beat_records, kind="Beats", module_prefix=prefix)
     ui_modules, ui_reports = _chunk_records(ui_records, kind="UI", module_prefix=prefix)
-    modules = [*content_modules, *pattern_modules, *response_modules, *flow_modules, *ui_modules]
-    reports = [*content_reports, *pattern_reports, *response_reports, *flow_reports, *ui_reports]
+    modules = [*content_modules, *pattern_modules, *response_modules, *flow_modules, *behavior_modules, *beat_modules, *ui_modules]
+    reports = [*content_reports, *pattern_reports, *response_reports, *flow_reports, *behavior_reports, *beat_reports, *ui_reports]
     return modules, reports
 
 
@@ -724,6 +1177,8 @@ def render_conversation_registry(model: dict[str, Any], reports: list[dict[str, 
         "Registry.PATTERNS = {}",
         "Registry.RESPONSE_POOLS = {}",
         "Registry.FLOWS = {}",
+        "Registry.BEHAVIORS = {}",
+        "Registry.BEATS = {}",
         "Registry.UI = {}",
     ]
     lines.extend([
@@ -747,6 +1202,14 @@ def render_conversation_registry(model: dict[str, Any], reports: list[dict[str, 
         "    if type(loaded) ~= \"table\" then return end",
         "    for _, value in ipairs(loaded) do Registry.FLOWS[#Registry.FLOWS + 1] = value end",
         "end",
+        "local function appendBehaviors(loaded)",
+        "    if type(loaded) ~= \"table\" then return end",
+        "    for _, value in ipairs(loaded) do Registry.BEHAVIORS[#Registry.BEHAVIORS + 1] = value end",
+        "end",
+        "local function appendBeats(loaded)",
+        "    if type(loaded) ~= \"table\" then return end",
+        "    for _, value in ipairs(loaded) do Registry.BEATS[#Registry.BEATS + 1] = value end",
+        "end",
         "local function appendUI(loaded)",
         "    if type(loaded) ~= \"table\" then return end",
         "    for _, value in ipairs(loaded) do Registry.UI[#Registry.UI + 1] = value end",
@@ -768,6 +1231,10 @@ def render_conversation_registry(model: dict[str, Any], reports: list[dict[str, 
             lines.append(f"appendResponses({loaded_name})")
         elif report["kind"] == "Flows":
             lines.append(f"appendFlows({loaded_name})")
+        elif report["kind"] == "Behaviors":
+            lines.append(f"appendBehaviors({loaded_name})")
+        elif report["kind"] == "Beats":
+            lines.append(f"appendBeats({loaded_name})")
         elif report["kind"] == "UI":
             lines.append(f"appendUI({loaded_name})")
     lines.extend([

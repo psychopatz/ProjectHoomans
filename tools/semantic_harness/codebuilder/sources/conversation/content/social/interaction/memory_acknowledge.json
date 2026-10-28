@@ -1,0 +1,57 @@
+{
+  "schema": "pnc.conversation.shard.v1",
+  "version": 1,
+  "kind": "content",
+  "domain": "social",
+  "source": {
+    "name": "Project Hoomans Pragmatic Interaction Content",
+    "version": "1",
+    "contentLicense": "Project Hoomans authored content"
+  },
+  "groups": {
+    "interaction": {
+      "contentOwner": "projecthoomans.dialogue_content.social_interaction"
+    }
+  },
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.interaction.memory.acknowledge",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I hear you.",
+              "TL": "Naririnig kita."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Yeah. I can see why that stayed with you.",
+              "TL": "Oo. Naiintindihan ko kung bakit hindi mo iyon makalimutan."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Mm.",
+              "TL": "Mm."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "All right. I heard you.",
+              "TL": "Sige. Narinig kita."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": []
+}

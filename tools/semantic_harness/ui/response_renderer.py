@@ -7,6 +7,7 @@ from typing import Any
 from ..inspection.conversation_inspector import build_conversation_inspector
 from ..inspection.rendering import conversation_first, pretty
 from .suggestion_projection import semantic_hub_diagnostic_projection
+from .interaction_inspector import update_interaction_inspector
 
 def show_response(self, response: dict[str, Any]) -> None:
     self.last_response = response if isinstance(response, dict) else {}
@@ -34,6 +35,8 @@ def show_response(self, response: dict[str, Any]) -> None:
     self._set_text(self.authority, pretty(view.get("commandAuthority", {})))
     self._set_text(self.trace, pretty(response))
     observation = response.get("observation") or {}
+    if hasattr(self, "interaction_inspector_text"):
+        update_interaction_inspector(self, response)
     conversation_graph = observation.get("conversationGraph")
     if conversation_graph is None:
         conversation_graph = response.get("conversationGraph")

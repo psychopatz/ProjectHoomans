@@ -155,6 +155,14 @@ T.equal(profanity.intent, "HOSTILE_REMARK",
 T.equal(profanity.diagnostics.matchedPattern, "pnc.social.profanity",
     "standalone profanity uses the local profanity pattern")
 
+local typoProfanity = Parser.Parse("fuck ypuuuu")
+T.equal(typoProfanity.intent, "HOSTILE_REMARK",
+    "directed profanity survives an unresolved trailing typo")
+T.equal(typoProfanity.diagnostics.matchedPattern, "pnc.social.profanity",
+    "typoed profanity uses the generic profanity pattern")
+T.truthy(typoProfanity.diagnostics.unresolvedEntity == true,
+    "baseline preserves the unresolved trailing token diagnostic")
+
 local threat = Parser.Parse("I'll kill you")
 T.equal(threat.intent, "THREATEN", "explicit threat remains distinct from insult")
 T.equal(threat.diagnostics.matchedPattern, "pnc.social.threaten",
@@ -211,6 +219,17 @@ T.equal(decision.branch, "HOSTILE_REMARK_RECEIVED",
     "insult selects a dedicated social response branch")
 T.truthy(decision.response.fallback ~= "I'm not sure what you mean.",
     "recognized insult does not use generic clarification")
+
+local typoDecision = Policy.Decide(typoProfanity, state, {
+    llmEnabled = false,
+    npcID = "mara-typo-hostility",
+})
+T.equal(typoDecision.branch, "HOSTILE_REMARK_RECEIVED",
+    "recognized hostile profanity is not erased by an unrelated unresolved token")
+T.equal(typoDecision.diagnostics.reason, "recognized_hostile_social_act",
+    "typoed profanity keeps the dedicated hostile routing reason")
+T.truthy(typoDecision.response.fallback ~= "I'm not sure what you mean.",
+    "recognized typoed hostility does not use generic clarification")
 
 local threatDecision = Policy.Decide(threat, state, {
     llmEnabled = false,

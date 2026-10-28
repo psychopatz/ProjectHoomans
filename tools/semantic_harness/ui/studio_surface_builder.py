@@ -13,6 +13,7 @@ from ..studio.source_explorer_pane import CanonicalSourceExplorerPane
 from ..studio.workflow import SemanticLabWorkflowPane
 from ..studio.observatory_pane import SemanticObservatoryPane
 from .flow_editor.pane import FlowEditorPane
+from .interaction_modules.pane import InteractionModulesPane
 
 
 def build_studio_editors(
@@ -67,6 +68,7 @@ def build_studio_editors(
     )
     app.explore_source_frame = source_frame
 
+    app.dialogue_content_tab = dialogue_content_tab
     app.dialogue_content = DialogueContentPane(
         dialogue_content_tab,
         app._tk,
@@ -100,6 +102,9 @@ def build_studio_editors(
     developer_tools_parent.columnconfigure(0, weight=1)
     app.advanced_notebook = advanced_notebook
 
+    interaction_modules_frame = ttk.Frame(advanced_notebook)
+    interaction_modules_frame.rowconfigure(0, weight=1)
+    interaction_modules_frame.columnconfigure(0, weight=1)
     flow_frame = ttk.Frame(advanced_notebook)
     flow_frame.rowconfigure(0, weight=1)
     flow_frame.columnconfigure(0, weight=1)
@@ -110,16 +115,40 @@ def build_studio_editors(
     for panel in (library_frame, blocks_frame, composer_frame, workflow_frame):
         panel.rowconfigure(0, weight=1)
         panel.columnconfigure(0, weight=1)
+    advanced_notebook.add(interaction_modules_frame, text="Interaction Modules")
     advanced_notebook.add(flow_frame, text="Flow editor")
     advanced_notebook.add(library_frame, text="Canonical source editor")
     advanced_notebook.add(blocks_frame, text="Block contracts")
     advanced_notebook.add(composer_frame, text="Interaction composer")
     advanced_notebook.add(workflow_frame, text="Workflow composer")
+    app.interaction_modules_frame = interaction_modules_frame
     app.flow_editor_frame = flow_frame
     app.library_tab = library_frame
     app.blocks_tab = blocks_frame
     app.composer_tab = composer_frame
 
+    app.interaction_modules = InteractionModulesPane(
+        interaction_modules_frame,
+        app._tk,
+        ttk,
+        scrolled_text,
+        app._filedialog,
+        app._messagebox,
+        on_refresh=app.refresh_beat_catalog,
+        on_validate=app.validate_beat_draft,
+        on_preview=app.preview_beat_draft,
+        on_register=app.register_beat_draft,
+        on_validate_behavior=app.validate_behavior_draft,
+        on_register_behavior=app.register_behavior_draft,
+        on_load_canonical=app.load_canonical_interaction_definition,
+        on_preview_promotion=app.preview_interaction_promotion,
+        on_promote=app.promote_interaction_definition,
+        on_open_content=lambda content_id: (
+            app.main_tabs.select(app.studio_tab),
+            app.studio_notebook.select(dialogue_content_tab),
+            app.dialogue_content.select_content(content_id),
+        ),
+    )
     app.flow_editor = FlowEditorPane(
         flow_frame,
         app._tk,

@@ -1,0 +1,57 @@
+{
+  "schema": "pnc.conversation.shard.v1",
+  "version": 1,
+  "kind": "content",
+  "domain": "social",
+  "source": {
+    "name": "Project Hoomans Pragmatic Interaction Content",
+    "version": "1",
+    "contentLicense": "Project Hoomans authored content"
+  },
+  "groups": {
+    "interaction": {
+      "contentOwner": "projecthoomans.dialogue_content.social_interaction"
+    }
+  },
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.interaction.world_event.warning_flavor",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "The NPC snaps to attention and scans the area.",
+              "TL": "Biglang naging alerto ang NPC at sinuri ang paligid."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "The NPC motions for the others to stay close.",
+              "TL": "Sinenyasan ng NPC ang iba na manatiling malapit."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "The NPC jerks a warning gesture.",
+              "TL": "Biglang nagsenyas ng babala ang NPC."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "The NPC stiffens and watches the approaches.",
+              "TL": "Nanigas ang NPC at binantayan ang mga posibleng lapitan."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": []
+}

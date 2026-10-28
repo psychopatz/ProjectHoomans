@@ -1,0 +1,57 @@
+{
+  "domain": "social",
+  "groups": {
+    "interaction": {
+      "contentOwner": "projecthoomans.dialogue_content.social_interaction"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "interaction",
+      "semanticTemplateID": "semantic.interaction.argument.retaliate",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Say that again and see how far it gets you.",
+              "TL": "Sabihin mo ulit at tingnan natin kung saan ka aabot."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "You're really testing me right now.",
+              "TL": "Talagang sinusubok mo ang pasensya ko ngayon."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Keep talking.",
+              "TL": "Sige, magsalita ka pa."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "You're pushing this too far.",
+              "TL": "Sobra na ang ginagawa mo."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Pragmatic Interaction Content",
+    "version": "1"
+  },
+  "version": 1
+}

@@ -182,6 +182,34 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 self.assertEqual(result["llmCalls"], 0)
                 self.assertEqual(result["toolCalls"], [])
 
+    def test_typoed_hostility_keeps_recognized_social_route(self) -> None:
+        with LuaSemanticWorker(self.scenario({})) as worker:
+            result = worker.input("fuck ypuuuu")
+        self.assertTrue(result["accepted"], result.get("reason"))
+        ir = result["result"]["ir"]
+        self.assertEqual(ir["intent"], "HOSTILE_REMARK")
+        self.assertEqual(ir["speechAct"], "HOSTILE_REMARK")
+        self.assertEqual(ir["provenance"]["pattern"], "pnc.social.profanity")
+        self.assertTrue(ir["diagnostics"]["unresolvedEntity"])
+        self.assertGreaterEqual(ir["confidence"], 0.85)
+        self.assertEqual(
+            result["result"]["decision"]["branch"],
+            "HOSTILE_REMARK_RECEIVED",
+        )
+        self.assertNotEqual(
+            result["result"]["decision"]["response"]["templateID"],
+            "semantic.ask_clarification",
+        )
+        self.assertNotEqual(
+            result["messages"][0]["payload"]["text"],
+            "I'm not sure what you mean.",
+        )
+        action = result["result"]["actionResult"]
+        self.assertTrue(action["accepted"], action)
+        self.assertEqual(action["status"], "applied")
+        self.assertEqual(action["speechAct"], "HOSTILE_REMARK")
+        self.assertLess(action["relationshipDelta"]["approval"], 0)
+
     def test_rejected_and_unavailable_insults_are_truthful_and_social_specific(self) -> None:
         denied_scenario = merge(
             DEFAULT_SCENARIO,

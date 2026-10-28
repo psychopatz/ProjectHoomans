@@ -167,6 +167,38 @@ local function isIdentityClaim(ir)
         and ir.socialContext.identityClaim == true
 end
 
+local ENTITY_INDEPENDENT_SOCIAL_ACTS = {
+    GREET = true,
+    COMPLIMENT = true,
+    SELF_REFLECTION = true,
+    INSULT = true,
+    HOSTILE_REMARK = true,
+    THREATEN = true,
+    THANK = true,
+    ACKNOWLEDGE = true,
+    APOLOGIZE = true,
+    AGREE = true,
+    DISAGREE = true,
+    ACCEPT = true,
+    REFUSE = true,
+}
+
+local function isEntityIndependentSocialAct(ir)
+    if type(ir) ~= "table" then return false end
+    local intent = tostring(ir.intent or "")
+    local speechAct = tostring(ir.speechAct or "")
+    if ENTITY_INDEPENDENT_SOCIAL_ACTS[intent] ~= true
+        and ENTITY_INDEPENDENT_SOCIAL_ACTS[speechAct] ~= true
+    then
+        return false
+    end
+    -- These acts are conversationally meaningful without resolving a world
+    -- entity. A trailing typo may be exposed as an unresolved parser token,
+    -- but it must not erase a high-confidence social interpretation such as
+    -- directed profanity. Gameplay actions still use their own stricter gates.
+    return ir.action == nil
+end
+
 local function pendingIdentityExchange(state, context)
     local semanticState = context and context.semanticContextState
     local pending = context and context.pendingIdentityExchange
@@ -251,6 +283,7 @@ Internal.IsLocalFactQuestion = isLocalFactQuestion
 Internal.IsBackstoryContextQuestion = isBackstoryContextQuestion
 Internal.UnresolvedWorldTargetRequest = unresolvedWorldTargetRequest
 Internal.IsIdentityClaim = isIdentityClaim
+Internal.IsEntityIndependentSocialAct = isEntityIndependentSocialAct
 Internal.IsIdentityEvasion = isIdentityEvasion
 Internal.GiftConsentFor = giftConsentFor
 

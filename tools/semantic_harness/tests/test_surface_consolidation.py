@@ -38,6 +38,7 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
             "Responses", "Interactions", "Sources",
         ])
         self.assertEqual(_labels(app.advanced_notebook), [
+            "Interaction Modules",
             "Flow editor",
             "Canonical source editor",
             "Block contracts",
@@ -53,7 +54,8 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
         self.assertNotIn("Coverage", _labels(app.observatory.tabs))
 
         self.assertEqual(_labels(app.trace_tabs), [
-            "Inspect", "Graph", "Compare / Regression", "World", "Debug",
+            "Inspect", "Graph", "Interactions",
+            "Compare / Regression", "World", "Debug",
         ])
         self.assertEqual(_labels(app.inspect_tabs), [
             "Understanding", "Authority / effects", "Predicates", "Provenance",
@@ -83,11 +85,34 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
         app.developer_tools_button.invoke()
         root.update_idletasks()
         self.assertTrue(app.developer_tools_host.winfo_ismapped())
-        self.assertEqual(_labels(app.advanced_notebook)[0], "Flow editor")
+        self.assertEqual(
+            _labels(app.advanced_notebook)[0],
+            "Interaction Modules",
+        )
 
         app.developer_tools_button.invoke()
         root.update_idletasks()
         self.assertFalse(app.developer_tools_host.winfo_ismapped())
+
+    def test_interaction_module_content_link_uses_dialogue_content_home(self) -> None:
+        root = tk.Tk()
+        app = self.make_gui_app(root)
+        root.update()
+
+        app.interaction_modules._on_open_content(
+            "semantic.interaction.memory.acknowledge"
+        )
+        root.update_idletasks()
+
+        self.assertEqual(
+            app.studio_notebook.index(app.studio_notebook.select()),
+            1,
+        )
+        selected = app.dialogue_content._selected or {}
+        self.assertEqual(
+            selected.get("semanticTemplateID"),
+            "semantic.interaction.memory.acknowledge",
+        )
 
     def test_dialogue_content_review_uses_shared_review_home(self) -> None:
         root = tk.Tk()

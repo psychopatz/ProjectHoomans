@@ -21,6 +21,11 @@ if type(LocalResponse) ~= "table" then
     local loaded = require "PNC/Semantics/PNC_SemanticDialogueLocalResponse"
     LocalResponse = type(loaded) == "table" and loaded or nil
 end
+local InteractionDirector = PNC.Semantics.InteractionDirector
+if type(InteractionDirector) ~= "table" then
+    local loaded = require "PNC/Semantics/PNC_SemanticInteractionDirector"
+    InteractionDirector = type(loaded) == "table" and loaded or nil
+end
 
 Policy.VERSION = 1
 Policy.DEFAULT_HIGH_THRESHOLD = 0.85
@@ -211,6 +216,7 @@ local Internal = Policy.Internal
 Internal.IR = IR
 Internal.SemanticOffer = SemanticOffer
 Internal.LocalResponse = LocalResponse
+Internal.InteractionDirector = InteractionDirector
 Internal.CommandActions = COMMAND_ACTIONS
 Internal.FuzzySafeActions = FUZZY_SAFE_ACTIONS
 Internal.ItemRequestActions = ITEM_REQUEST_ACTIONS
@@ -225,9 +231,29 @@ function Policy.SelectCandidate(bundle, state, context, options, contextResolver
 end
 
 function Policy.CommitFlow(decisionResult, ir, state, context, options)
+    local committedFlow
+    local flowReason = "no_flow_preview"
     local preview = decisionResult and decisionResult.flow or nil
-    if not preview then return nil, "no_flow_preview" end
-    return FlowKernel.Commit(preview, ir, state, context, options)
+    if preview then
+        committedFlow, flowReason = FlowKernel.Commit(
+            preview, ir, state, context, options
+        )
+    end
+    local directorPreview = decisionResult and decisionResult.director or nil
+    if directorPreview
+        and InteractionDirector
+        and type(InteractionDirector.Commit) == "function"
+    then
+        local committedDirector, directorReason = InteractionDirector.Commit(
+            directorPreview, context
+        )
+        if type(committedDirector) == "table" then
+            decisionResult.director = committedDirector
+        elseif type(decisionResult.diagnostics) == "table" then
+            decisionResult.diagnostics.directorCommitReason = directorReason
+        end
+    end
+    return committedFlow, flowReason
 end
 
 return Policy

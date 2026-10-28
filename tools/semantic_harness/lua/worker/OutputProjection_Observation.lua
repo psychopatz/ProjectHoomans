@@ -39,6 +39,13 @@ function Observation.build(context, record, semanticContext)
         response = responseObservation,
         suggestions = Suggestions.build(context, record, result, semanticContext),
         conversationBlock = Values.copy(record.conversationBlock),
+        interactionPlan = Values.copy(decision.interactionPlan),
+        director = Bounds.director(
+            context,
+            decision.director,
+            record.contextBefore,
+            record.contextAfter
+        ),
         flow = {
             flowId = flow.flowId,
             generated = flow.generated == true,

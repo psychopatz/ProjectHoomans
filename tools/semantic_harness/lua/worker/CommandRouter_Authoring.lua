@@ -8,6 +8,38 @@ function Authoring.handle(context, command, payload)
 
     if command == "FLOW_CATALOG" then
         return context.FlowEditor.catalog(context)
+    elseif command == "BEAT_CATALOG" then
+        return context.InteractionEditor.catalog(context)
+    elseif command == "BEAT_VALIDATE" then
+        if type(payload) ~= "table" then
+            return nil, "beat_definition_must_be_object"
+        end
+        return context.InteractionEditor.validateBeat(context, payload)
+    elseif command == "BEAT_REGISTER" then
+        if type(payload) ~= "table" then
+            return nil, "beat_definition_must_be_object"
+        end
+        return context.InteractionEditor.registerBeat(context, payload)
+    elseif command == "BEAT_PREVIEW" then
+        if type(payload) ~= "table" then
+            return nil, "beat_preview_must_be_object"
+        end
+        return context.InteractionEditor.previewBeat(context, payload)
+    elseif command == "INTERACTION_PREVIEW" then
+        if type(payload) ~= "table" then
+            return nil, "interaction_stimulus_must_be_object"
+        end
+        return context.InteractionEditor.previewInteraction(context, payload)
+    elseif command == "BEHAVIOR_VALIDATE" then
+        if type(payload) ~= "table" then
+            return nil, "behavior_definition_must_be_object"
+        end
+        return context.InteractionEditor.validateBehavior(context, payload)
+    elseif command == "BEHAVIOR_REGISTER" then
+        if type(payload) ~= "table" then
+            return nil, "behavior_definition_must_be_object"
+        end
+        return context.InteractionEditor.registerBehavior(context, payload)
     elseif command == "RESPONSE_KEY_LOOKUP" then
         return context.FlowEditor.responseKeyLookup(context, payload)
     elseif command == "RESPONSE_POOL_LIST" then

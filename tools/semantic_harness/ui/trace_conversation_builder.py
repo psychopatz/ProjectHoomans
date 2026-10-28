@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from .conversation_graph import ConversationGraphPane
+from .interaction_inspector import show_selected_interaction_timeline_turn
 
 
 def build_conversation_trace(
@@ -215,6 +216,67 @@ def build_conversation_trace(
         app.regression_rejection_button,
         app.regression_selection_button,
     )
+
+    interaction_trace_frame = ttk.Frame(app.trace_tabs, padding=4)
+    interaction_trace_frame.rowconfigure(0, weight=1)
+    interaction_trace_frame.columnconfigure(0, weight=1)
+    interaction_trace_frame.columnconfigure(1, weight=1)
+    app.interaction_trace_frame = interaction_trace_frame
+    app.interaction_timeline_records = []
+
+    explanation = ttk.LabelFrame(
+        interaction_trace_frame, text="Current pragmatic interaction arbitration"
+    )
+    explanation.grid(row=0, column=0, sticky="nsew", padx=(0, 4))
+    explanation.rowconfigure(0, weight=1)
+    explanation.columnconfigure(0, weight=1)
+    app.interaction_inspector_text = scrolled_text(
+        explanation, wrap="word", state="disabled"
+    )
+    app.interaction_inspector_text.grid(row=0, column=0, sticky="nsew")
+
+    timeline = ttk.LabelFrame(
+        interaction_trace_frame, text="Interaction timeline · real worker evidence"
+    )
+    timeline.grid(row=0, column=1, sticky="nsew", padx=(4, 0))
+    timeline.rowconfigure(0, weight=1)
+    timeline.rowconfigure(1, weight=1)
+    timeline.columnconfigure(0, weight=1)
+    app.interaction_timeline_tree = ttk.Treeview(
+        timeline,
+        columns=(
+            "stimulus", "intent", "flow", "beat",
+            "transition", "behavior", "source",
+        ),
+        show="tree headings",
+        height=9,
+    )
+    app.interaction_timeline_tree.heading("#0", text="Turn")
+    app.interaction_timeline_tree.heading("stimulus", text="Stimulus")
+    app.interaction_timeline_tree.heading("intent", text="Intent")
+    app.interaction_timeline_tree.heading("flow", text="Flow")
+    app.interaction_timeline_tree.heading("beat", text="Situation")
+    app.interaction_timeline_tree.heading("transition", text="±Situation")
+    app.interaction_timeline_tree.heading("behavior", text="Behavior")
+    app.interaction_timeline_tree.heading("source", text="Behavior source")
+    app.interaction_timeline_tree.column("#0", width=48, stretch=False)
+    app.interaction_timeline_tree.column("stimulus", width=120)
+    app.interaction_timeline_tree.column("intent", width=110)
+    app.interaction_timeline_tree.column("flow", width=100)
+    app.interaction_timeline_tree.column("beat", width=150)
+    app.interaction_timeline_tree.column("transition", width=150)
+    app.interaction_timeline_tree.column("behavior", width=160)
+    app.interaction_timeline_tree.column("source", width=90)
+    app.interaction_timeline_tree.grid(row=0, column=0, sticky="nsew")
+    app.interaction_timeline_tree.bind(
+        "<<TreeviewSelect>>",
+        lambda _event: show_selected_interaction_timeline_turn(app),
+    )
+    app.interaction_turn_details = scrolled_text(
+        timeline, wrap="none", state="disabled", height=12
+    )
+    app.interaction_turn_details.grid(row=1, column=0, sticky="nsew", pady=(4, 0))
+    app.trace_tabs.add(interaction_trace_frame, text="Interactions")
 
     app.trace_tabs.add(compare_frame, text="Compare / Regression")
 

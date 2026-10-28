@@ -101,18 +101,25 @@ return {
             ["recordCount"] = 17,
         },
         {
-            ["bytes"] = 32652,
+            ["bytes"] = 31746,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/SocialPart02",
-            ["recordCount"] = 19,
+            ["recordCount"] = 15,
         },
         {
-            ["bytes"] = 27542,
+            ["bytes"] = 32168,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/SocialPart03",
-            ["recordCount"] = 40,
+            ["recordCount"] = 35,
+        },
+        {
+            ["bytes"] = 12359,
+            ["domain"] = "social",
+            ["kind"] = "Content",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Content/SocialPart04",
+            ["recordCount"] = 18,
         },
         {
             ["bytes"] = 31699,
@@ -290,6 +297,20 @@ return {
             ["recordCount"] = 2,
         },
         {
+            ["bytes"] = 15236,
+            ["domain"] = "social",
+            ["kind"] = "Behaviors",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social",
+            ["recordCount"] = 11,
+        },
+        {
+            ["bytes"] = 5707,
+            ["domain"] = "social",
+            ["kind"] = "Beats",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Beats/Social",
+            ["recordCount"] = 3,
+        },
+        {
             ["bytes"] = 1110,
             ["domain"] = "activity",
             ["kind"] = "UI",
@@ -353,5 +374,5 @@ return {
             ["recordCount"] = 2,
         },
     },
-    ["wholeModelFingerprint"] = "79afa07cb423cee580b9af6363084ba236125ab7b5983f676e75395b8b849eb7",
+    ["wholeModelFingerprint"] = "44ae20a000ac64b7fc5f844f3e65d80c593e2bbdc2776184dd8d1675c9629e4d",
 }

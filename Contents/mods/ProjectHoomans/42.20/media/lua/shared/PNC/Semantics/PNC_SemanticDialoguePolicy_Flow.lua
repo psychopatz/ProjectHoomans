@@ -23,7 +23,10 @@ local isLocalFactQuestion = Internal.IsLocalFactQuestion
 local isBackstoryContextQuestion = Internal.IsBackstoryContextQuestion
 local unresolvedWorldTargetRequest = Internal.UnresolvedWorldTargetRequest
 local isIdentityClaim = Internal.IsIdentityClaim
+local isEntityIndependentSocialAct =
+    Internal.IsEntityIndependentSocialAct
 local flowKernel = Internal.FlowKernel
+local interactionDirector = Internal.InteractionDirector
 
 function Policy.Decide(ir, state, context, options)
     options = type(options) == "table" and options or {}
@@ -54,6 +57,26 @@ function Policy.Decide(ir, state, context, options)
             result.flow = flowPreview
             result.diagnostics.flow = flowPreview.diagnostics
         end
+        if state
+            and type(context) == "table"
+            and context.semanticContextState ~= nil
+            and interactionDirector
+            and type(interactionDirector.Preview) == "function"
+            and result.branch ~= "ASK_CLARIFICATION"
+            and result.branch ~= "AMBIGUOUS_INPUT"
+        then
+            result.director = interactionDirector.Preview(
+                ir, state, context, options
+            )
+            result.interactionPlan = result.director
+                and result.director.interactionPlan or nil
+            result.diagnostics.director = {
+                selectedBeat = result.director.selectedBeat
+                    and result.director.selectedBeat.id,
+                selectedBehavior = result.director.selectedBehavior
+                    and result.director.selectedBehavior.id,
+            }
+        end
         return applyLocalResponse(result, ir, state, context)
     end
 
@@ -82,7 +105,8 @@ function Policy.Decide(ir, state, context, options)
             and not isLocalFactQuestion(ir)
             and not isBackstoryContextQuestion(ir, context)
             and not unresolvedWorldTargetRequest(ir)
-            and not isIdentityClaim(ir))
+            and not isIdentityClaim(ir)
+            and not isEntityIndependentSocialAct(ir))
         or (confidence < limits.high and not giftOffer)
     then
         local result = decision(

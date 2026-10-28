@@ -1,0 +1,57 @@
+{
+  "domain": "social",
+  "groups": {
+    "interaction": {
+      "contentOwner": "projecthoomans.dialogue_content.social_interaction"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "interaction",
+      "semanticTemplateID": "semantic.interaction.first_contact.challenge",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "That's close enough. What do you want?",
+              "TL": "Hanggang diyan ka lang. Ano ang gusto mo?"
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Hold it. Who are you?",
+              "TL": "Sandali. Sino ka?"
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Who are you?",
+              "TL": "Sino ka?"
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Easy. I don't know you yet.",
+              "TL": "Dahan-dahan. Hindi pa kita kilala."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Pragmatic Interaction Content",
+    "version": "1"
+  },
+  "version": 1
+}

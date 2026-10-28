@@ -9,6 +9,8 @@ implementation for its report shapes and public helper functions.
 from __future__ import annotations
 
 import json
+import shutil
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -29,9 +31,14 @@ from .dialogue_content import (
 )
 from .conversation_compiler import (
     CONVERSATION_MANIFEST_RELATIVE,
+    CONVERSATION_RUNTIME_RELATIVE,
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
     conversation_record,
+    conversation_translation_bundles,
+    render_conversation_manifest_lua,
+    render_conversation_registry,
+    render_conversation_runtime_plan,
 )
 from .lexicon_compiler import CompileError
 
@@ -587,6 +594,332 @@ class SemanticLabAuthoringService:
             "writes": [str(source_path), *(str(path) for path in generated)],
             "reloadedBy": "caller_restart_required",
         }
+    @staticmethod
+    def _interaction_collection(kind: str) -> str:
+        if kind == "beat":
+            return "beats"
+        if kind == "behavior":
+            return "behaviors"
+        raise KeyError(f"unsupported interaction record kind: {kind}")
+
+    def _raw_interaction_item(
+        self,
+        model: dict[str, Any],
+        record_id: str,
+    ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]] | None:
+        location = conversation_record(model, str(record_id))
+        if not isinstance(location, dict) or location.get("kind") not in {
+            "beat", "behavior"
+        }:
+            return None
+        source_shard = str(location["sourceShard"])
+        document = model.get("_source_documents", {}).get(source_shard)
+        if not isinstance(document, dict):
+            return None
+        collection = self._interaction_collection(str(location["kind"]))
+        for record in document.get(collection, []):
+            if isinstance(record, dict) and record.get("id") == record_id:
+                return record, document, location
+        return None
+
+    def load_interaction_definition(self, record_id: str) -> dict[str, Any]:
+        """Load one canonical beat/behavior record with source provenance."""
+        model = self._conversation_model()
+        resolved = self._raw_interaction_item(model, str(record_id))
+        if resolved is None:
+            raise KeyError(f"unknown interaction definition id: {record_id}")
+        record, _document, location = resolved
+        source_shard = str(location["sourceShard"])
+        report = self._content_shard_report(model, source_shard)
+        return {
+            **json.loads(json.dumps(record, ensure_ascii=False)),
+            "kind": location["kind"],
+            "sourceShard": source_shard,
+            "sourcePath": str(self._content_source_path(source_shard)),
+            "sourceFingerprint": report["fingerprint"],
+            "verifiedOwner": "CodeBuilder → Conversation Registry",
+        }
+
+    @staticmethod
+    def _interaction_canonical_edit(
+        current: dict[str, Any],
+        edited: dict[str, Any],
+        *,
+        kind: str,
+    ) -> dict[str, Any]:
+        """Merge worker structural fields while keeping canonical translations."""
+        if not isinstance(edited, dict):
+            raise CompileError("interaction definition edit must be an object")
+        if str(edited.get("id") or "") != str(current.get("id") or ""):
+            raise CompileError("canonical interaction record id is locked")
+        allowed = {
+            "beat": {
+                "id", "version", "owner", "group", "baseRelevance",
+                "entry", "maintain", "exit", "candidates",
+                "cooldownTurns", "maxTurns",
+            },
+            "behavior": {
+                "id", "version", "owner", "act", "mode", "stimuli",
+                "requiredCapabilities", "outputs", "when",
+                "baseRelevance", "modifiers",
+            },
+        }[kind]
+        output = json.loads(json.dumps(current, ensure_ascii=False))
+        for key in allowed:
+            if key in edited:
+                output[key] = json.loads(
+                    json.dumps(edited[key], ensure_ascii=False)
+                )
+            elif key in output and key not in {"id", "version", "owner"}:
+                # Optional canonical fields may deliberately be removed.
+                if key in {"group", "when"}:
+                    output.pop(key, None)
+        # Translation text remains canonical source ownership. A future
+        # dedicated wording editor can update it without allowing a worker
+        # draft to replace locale maps with generated label keys.
+        if isinstance(current.get("translations"), dict):
+            output["translations"] = json.loads(
+                json.dumps(current["translations"], ensure_ascii=False)
+            )
+        return output
+
+    def _interaction_edit_model(
+        self,
+        record_id: str,
+        edited: dict[str, Any],
+        *,
+        expected_source_fingerprint: str | None = None,
+    ) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+        model = self._conversation_model()
+        resolved = self._raw_interaction_item(model, str(record_id))
+        if resolved is None:
+            return None, {
+                "ok": False,
+                "type": "interaction_definition_edit_preview",
+                "recordID": record_id,
+                "diagnostics": [{
+                    "severity": "error",
+                    "message": "unknown canonical interaction definition",
+                }],
+                "writes": [],
+            }
+        current, source_document, location = resolved
+        source_shard = str(location["sourceShard"])
+        shard_report = self._content_shard_report(model, source_shard)
+        actual_fingerprint = str(shard_report["fingerprint"])
+        if (
+            expected_source_fingerprint
+            and expected_source_fingerprint != actual_fingerprint
+        ):
+            return None, {
+                "ok": False,
+                "type": "interaction_definition_edit_preview",
+                "recordID": record_id,
+                "stale": True,
+                "reason": "source_fingerprint_mismatch",
+                "expectedSourceFingerprint": expected_source_fingerprint,
+                "sourceFingerprint": actual_fingerprint,
+                "sourceShard": source_shard,
+                "writes": [],
+            }
+        kind = str(location["kind"])
+        try:
+            canonical = self._interaction_canonical_edit(
+                current, edited, kind=kind
+            )
+        except (KeyError, TypeError, CompileError) as error:
+            return None, {
+                "ok": False,
+                "type": "interaction_definition_edit_preview",
+                "recordID": record_id,
+                "diagnostics": [{
+                    "severity": "error",
+                    "message": str(error),
+                }],
+                "writes": [],
+            }
+        updated_shard = json.loads(json.dumps(source_document, ensure_ascii=False))
+        collection = self._interaction_collection(kind)
+        found = False
+        for index, record in enumerate(updated_shard.get(collection, [])):
+            if isinstance(record, dict) and record.get("id") == record_id:
+                updated_shard[collection][index] = canonical
+                found = True
+                break
+        if not found:
+            raise CompileError(f"interaction record vanished from {source_shard}")
+
+        with tempfile.TemporaryDirectory() as directory:
+            candidate_repo = Path(directory)
+            source_root = self.repository / CONVERSATION_SOURCE_RELATIVE
+            candidate_root = candidate_repo / CONVERSATION_SOURCE_RELATIVE
+            shutil.copytree(source_root, candidate_root)
+            candidate_path = candidate_root / source_shard
+            candidate_path.write_text(
+                json.dumps(
+                    updated_shard,
+                    ensure_ascii=False,
+                    indent=2,
+                    sort_keys=True,
+                ) + "\n",
+                encoding="utf-8",
+                newline="\n",
+            )
+            try:
+                candidate_model = compile_conversation_sources(
+                    candidate_repo,
+                    runtime_root=self.runtime_root,
+                )
+            except (OSError, ValueError, TypeError, CompileError) as error:
+                return None, {
+                    "ok": False,
+                    "type": "interaction_definition_edit_preview",
+                    "recordID": record_id,
+                    "kind": kind,
+                    "sourceShard": source_shard,
+                    "sourceFingerprint": actual_fingerprint,
+                    "diagnostics": [{
+                        "severity": "error",
+                        "message": str(error),
+                    }],
+                    "writes": [],
+                }
+
+        return candidate_model, {
+            "ok": True,
+            "type": "interaction_definition_edit_preview",
+            "recordID": record_id,
+            "kind": kind,
+            "sourceShard": source_shard,
+            "sourcePath": str(self._content_source_path(source_shard)),
+            "sourceFingerprint": actual_fingerprint,
+            "current": json.loads(json.dumps(current, ensure_ascii=False)),
+            "candidate": canonical,
+            "_updatedShard": updated_shard,
+            "writes": [],
+        }
+
+    def _interaction_generated_diffs(
+        self, model: dict[str, Any]
+    ) -> list[dict[str, Any]]:
+        """Return bounded effect-free diffs for generated structural artifacts."""
+        rendered, reports = render_conversation_runtime_plan(model)
+        artifacts: list[tuple[str, str]] = []
+        shared_prefix = (
+            "Contents/mods/ProjectHoomans/common/media/lua/shared/"
+        )
+        for module, source in rendered:
+            if "/Beats/" in module or "/Behaviors/" in module:
+                artifacts.append((shared_prefix + module + ".lua", source))
+        runtime_prefix = str(CONVERSATION_RUNTIME_RELATIVE).rstrip("/")
+        artifacts.extend([
+            (
+                runtime_prefix + "/Registry.lua",
+                render_conversation_registry(model, reports),
+            ),
+            (
+                runtime_prefix + "/Manifest.lua",
+                render_conversation_manifest_lua(model, reports),
+            ),
+        ])
+        return [
+            authoring._artifact_diff(self.repository, path, expected)
+            for path, expected in artifacts
+        ]
+
+    def preview_interaction_definition_edit(
+        self,
+        record_id: str,
+        edited: dict[str, Any],
+        *,
+        expected_source_fingerprint: str | None = None,
+    ) -> dict[str, Any]:
+        model, report = self._interaction_edit_model(
+            record_id,
+            edited,
+            expected_source_fingerprint=expected_source_fingerprint,
+        )
+        if model is None or report.get("ok") is not True:
+            return report
+        diffs = self._interaction_generated_diffs(model)
+        return {
+            **{
+                key: value for key, value in report.items()
+                if not key.startswith("_")
+            },
+            "previewOnly": True,
+            "effectFree": True,
+            "wholeModelFingerprint": model["wholeModelFingerprint"],
+            "generatedDiffs": diffs,
+            "changedGeneratedPaths": [
+                row["path"] for row in diffs
+                if row.get("status") != "unchanged"
+            ],
+            "diagnostics": [],
+        }
+
+    def write_interaction_definition_edit(
+        self,
+        record_id: str,
+        edited: dict[str, Any],
+        *,
+        expected_source_fingerprint: str | None = None,
+    ) -> dict[str, Any]:
+        model, report = self._interaction_edit_model(
+            record_id,
+            edited,
+            expected_source_fingerprint=expected_source_fingerprint,
+        )
+        if model is None or report.get("ok") is not True:
+            return report
+        updated_shard = report.get("_updatedShard")
+        source_shard = str(report.get("sourceShard") or "")
+        if not isinstance(updated_shard, dict) or not source_shard:
+            raise CompileError("interaction edit did not resolve an owning source shard")
+        source_path = self._content_source_path(source_shard)
+        try:
+            source_path.write_text(
+                json.dumps(
+                    updated_shard,
+                    ensure_ascii=False,
+                    indent=2,
+                    sort_keys=True,
+                ) + "\n",
+                encoding="utf-8",
+                newline="\n",
+            )
+            from .build import write_conversation_output
+            generated = write_conversation_output(
+                self.repository,
+                self._conversation_model(),
+            )
+        except (OSError, ValueError, TypeError, CompileError) as error:
+            return {
+                **{
+                    key: value for key, value in report.items()
+                    if not key.startswith("_")
+                },
+                "ok": False,
+                "diagnostics": [{
+                    "severity": "error",
+                    "message": str(error),
+                }],
+                "writes": [str(source_path)],
+            }
+        refreshed = self.load_interaction_definition(record_id)
+        return {
+            **{
+                key: value for key, value in report.items()
+                if not key.startswith("_")
+            },
+            "previewOnly": False,
+            "effectFree": False,
+            "sourceFingerprint": refreshed["sourceFingerprint"],
+            "writes": [str(source_path), *(str(path) for path in generated)],
+            "reloadedBy": "caller_restart_required",
+            "diagnostics": [],
+        }
+
     def list_semantic_blocks(
         self,
         production_catalog: dict[str, Any] | None = None,

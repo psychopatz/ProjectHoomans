@@ -192,6 +192,7 @@ end
 
 require "PNC/Semantics/PNC_SemanticDialogueContextState_Mentions"
 require "PNC/Semantics/PNC_SemanticDialogueContextState_Turns"
+require "PNC/Semantics/PNC_SemanticDialogueContextState_Director"
 require "PNC/Semantics/PNC_SemanticDialogueContextState_Snapshot"
 
 function Context.MakeFlowKey(speakerID, addresseeID)
@@ -304,6 +305,12 @@ function Context.New(spec)
         mentionsByKey = {},
         flowSessions = {},
         flowOrder = {},
+        directorState = copyValue(spec.directorState) or {
+            active = nil,
+            recent = {},
+            cooldowns = {},
+            revision = 0,
+        },
     }
     setmetatable(self, { __index = Context })
     return self
@@ -328,6 +335,12 @@ function Context:Reset()
     self.mentionsByKey = {}
     self.flowSessions = {}
     self.flowOrder = {}
+    self.directorState = {
+        active = nil,
+        recent = {},
+        cooldowns = {},
+        revision = 0,
+    }
     return self
 end
 

@@ -658,6 +658,31 @@ class LuaSemanticWorker:
     def flow_catalog(self) -> dict[str, Any]:
         return self._authoring.flow_catalog()
 
+    def beat_catalog(self) -> dict[str, Any]:
+        return self._authoring.beat_catalog()
+
+    def validate_beat(self, definition: dict[str, Any]) -> dict[str, Any]:
+        return self._authoring.validate_beat(definition)
+
+    def register_beat(self, definition: dict[str, Any]) -> dict[str, Any]:
+        return self._authoring.register_beat(definition)
+
+    def preview_beat(
+        self, definition: dict[str, Any], text: str
+    ) -> dict[str, Any]:
+        return self._authoring.preview_beat(definition, text)
+
+    def preview_interaction(
+        self, stimulus: dict[str, Any]
+    ) -> dict[str, Any]:
+        return self._authoring.preview_interaction(stimulus)
+
+    def validate_behavior(self, definition: dict[str, Any]) -> dict[str, Any]:
+        return self._authoring.validate_behavior(definition)
+
+    def register_behavior(self, definition: dict[str, Any]) -> dict[str, Any]:
+        return self._authoring.register_behavior(definition)
+
     def response_key_lookup(self, key: str) -> dict[str, Any]:
         return self._authoring.response_key_lookup(key)
 
@@ -717,6 +742,10 @@ class LuaSemanticWorker:
         if "flowCatalog" not in capabilities:
             capabilities["flowCatalog"] = self.runtime.request(
                 "FLOW_CATALOG", timeout=self.config.startup_timeout
+            )
+        if "beatCatalog" not in capabilities:
+            capabilities["beatCatalog"] = self.runtime.request(
+                "BEAT_CATALOG", timeout=self.config.startup_timeout
             )
         return capabilities
 

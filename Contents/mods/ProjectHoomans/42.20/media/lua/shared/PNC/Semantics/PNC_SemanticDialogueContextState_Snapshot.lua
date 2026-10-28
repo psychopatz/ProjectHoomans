@@ -77,6 +77,7 @@ function Context:ToContext()
         agenda = self:AgendaSnapshot(self.maxAgenda),
         priorTopics = copyValue(self.priorTopics or {}),
         flowSessions = self:FlowSnapshot(),
+        director = self:DirectorSnapshot(),
         sequence = self.sequence,
         recentTurns = self:RecentTurns(6, true),
         focus = self:GetFocus(self.maxFocus),

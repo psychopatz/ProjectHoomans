@@ -1,0 +1,57 @@
+{
+  "domain": "social",
+  "groups": {
+    "interaction": {
+      "contentOwner": "projecthoomans.dialogue_content.social_interaction"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "interaction",
+      "semanticTemplateID": "semantic.interaction.argument.deescalate",
+      "styles": {
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Fine. Just lower your voice.",
+              "TL": "Sige. Hinaan mo lang ang boses mo."
+            }
+          }
+        ],
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Easy. We don't need to make this worse.",
+              "TL": "Dahan-dahan. Hindi natin kailangang palalain pa ito."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Easy.",
+              "TL": "Dahan-dahan."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Calm down. This isn't helping either of us.",
+              "TL": "Kumalma ka. Walang naitutulong ito sa atin."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Pragmatic Interaction Content",
+    "version": "1"
+  },
+  "version": 1
+}
