@@ -8,6 +8,18 @@ def admission(result):
 
 
 class UnifiedEvidenceE4Tests(unittest.TestCase):
+    def test_equal_timestamp_new_grievance_survives_durable_roundtrip(self):
+        with saved_worker() as worker:
+            worker.input("fuck you")
+            worker.input("im sorry")
+            worker.input("fuck you")
+            raw = storage(worker)["serializedRecord"]
+        with saved_worker(raw) as worker:
+            storage(worker, advanceDays=1)
+            result = admission(worker.input("im sorry"))
+            self.assertTrue(result["admitted"])
+            self.assertEqual(result["selected"]["sourceTier"], "DURABLE")
+
     def test_authoritative_marker_closes_replay_and_new_grievance_reopens(self):
         with saved_worker() as worker:
             before = storage(worker)

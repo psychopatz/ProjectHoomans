@@ -143,6 +143,7 @@ local function memorySignature(memory)
         encode(memory.type),
         encode(memory.aboutKey),
         encode(memory.createdAt),
+        encode(memory.eventSequence),
         encode(memory.lastEvaluatedAt),
         encode(memory.approvalEffect),
         encode(memory.respectEffect),

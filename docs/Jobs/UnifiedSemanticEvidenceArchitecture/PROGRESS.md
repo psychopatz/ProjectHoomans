@@ -6,6 +6,12 @@
 **Current phase:** E6 — extensibility proof.
 **Next exact chunk:** E6A — register a test-only promise/fulfillment/breach/explanation mechanic through public metadata/provider seams, prove SESSION/TODAY/DURABLE and director/UtterancePlan participation without editing generic query/resolver code or adding a store; then complete E7 storage/performance/regression gates.
 
+## E6 precondition — equal-time domain chronology repaired (2026-10-28)
+
+- The future-mechanic fixture exposed ID sorting of equal-world-time durable memories. Relationship mutations now stamp optional `eventSequence` using existing owner revision/retained sequences, capped and bounded to 20 reads. Normalization/fingerprints preserve it; the owner query exposes it instead of treating normalized array order as chronology.
+- No occurrence timestamp is fabricated, no new counter/root exists, and legacy memories remain readable. Generic InteractionEvidence.Query and PragmaticResolver source are unchanged from E5.
+- A first-party regression proves insult -> repair -> newer insult at the same timestamp remains open after serialize/reimport and day rollover. Future mechanic passes all three tiers after the owner fix. Full Lua 906/906 and relationship 5/5 pass.
+
 ## E5 accepted (2026-10-28)
 
 - Repair, gratitude and response families share normalization, relation matching and director admission. Gratitude requires reversed helper/recipient roles; request/offer/question replies reverse the initiating actor roles. Wrong direction and missing antecedents fail closed.

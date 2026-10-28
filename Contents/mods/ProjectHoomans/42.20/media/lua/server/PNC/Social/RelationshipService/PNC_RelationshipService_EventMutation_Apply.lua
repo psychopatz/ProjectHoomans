@@ -108,6 +108,7 @@ function Relationships.ApplyEventMutation(
             respect = finiteNumber(saturation.respect) or 0,
         }
     end
+    memory.eventSequence = Math.NextMemorySequence(relationship)
     relationship.memories[#relationship.memories + 1] = memory
     relationship.familiarity = math.max(
         Constants.FAMILIARITY_MIN,

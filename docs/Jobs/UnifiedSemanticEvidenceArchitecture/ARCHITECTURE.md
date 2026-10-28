@@ -81,6 +81,13 @@ A successfully authoritative social/game event may project into TODAY memory eve
 
 ### DURABLE
 
+New Relationship memories carry an optional owner-stamped `eventSequence` for
+causal ordering when world time is equal (including paused conversations).
+It derives from the existing relationship revision and at most 20 retained
+memory sequences. It adds no counter/root, does not change occurrence time,
+and is distinct from retention salience, relevance and priority. Legacy
+memories remain readable without the field.
+
 Do not centralize durable truth into a new semantic store. Query the owning relationship, conduct, knowledge or other domain through bounded provider APIs. Existing record.memory.l may remain a lightweight recall/gossip/routing projection, but cannot override authoritative domain truth.
 
 ## Generic semantic relations

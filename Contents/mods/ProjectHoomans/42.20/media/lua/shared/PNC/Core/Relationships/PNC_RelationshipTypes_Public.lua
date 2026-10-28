@@ -137,6 +137,8 @@ function Types.NormalizeMemory(value)
         type = memoryType,
         aboutKey = aboutKey,
         createdAt = nonNegative(source.createdAt, 0),
+        eventSequence = source.eventSequence ~= nil
+            and math.max(1, math.min(2147483646, revision(source.eventSequence))) or nil,
         lastEvaluatedAt = nonNegative(
             source.lastEvaluatedAt,
             nonNegative(source.createdAt, 0)

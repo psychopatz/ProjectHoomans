@@ -54,6 +54,7 @@ function Relationships.AddMemory(observerNPCID, targetKey, memorySpec)
     if findMemory(relationship, memory.id) then
         return false, "duplicate_memory_id"
     end
+    memory.eventSequence = Math.NextMemorySequence(relationship)
     relationship.memories[#relationship.memories + 1] = memory
     worldAgeHours = math.max(
         tonumber(relationship.lastEvaluatedAt) or 0,

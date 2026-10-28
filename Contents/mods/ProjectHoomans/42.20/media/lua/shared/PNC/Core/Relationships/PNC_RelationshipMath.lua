@@ -22,6 +22,16 @@ function Math.Clamp(value, minimum, maximum)
     return value
 end
 
+function Math.NextMemorySequence(relationship)
+    local memories = relationship and relationship.memories or {}
+    local sequence = math.max(tonumber(relationship and relationship.revision) or 0,
+        math.min(#memories, Constants.MEMORY_LIMIT))
+    for index = 1, math.min(#memories, Constants.MEMORY_LIMIT) do
+        sequence = math.max(sequence, tonumber(memories[index].eventSequence) or 0)
+    end
+    return math.min(2147483646, sequence + 1)
+end
+
 function Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
     local normalized = Types.NormalizeMemory(memory)
     local elapsedDays
