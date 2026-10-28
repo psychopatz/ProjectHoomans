@@ -94,9 +94,7 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
     local detail
     local presentationSent
     local presentationReason
-    if not killer or not zombie or not Registry
-        or type(Registry.ForEachLive) ~= "function"
-    then
+    if not killer or not zombie or not Registry then
         return 0, 0, "witness_registry_unavailable"
     end
     playerKey = Hooks.ResolvePlayerKey(killer)
@@ -117,7 +115,7 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
     then
         return 0, 0, "kill_position_unavailable"
     end
-    Registry.ForEachLive(function(record, body, npcID)
+    local function considerWitness(record, body, npcID)
         local targetKey
         if not record or record.alive == false or not body
             or (body.isDead and body:isDead())
@@ -340,7 +338,25 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
             "witnessNPCID=" .. tostring(npcID),
             "threatID=" .. threatID,
         })
-    end)
+    end
+
+    local spatial = PNC and PNC.SpatialIndex or nil
+    if spatial and type(spatial.QueryNPCs) == "function" then
+        local nearby = spatial.QueryNPCs(zombieX, zombieY, WITNESS_RADIUS)
+        for index = 1, #(type(nearby) == "table" and nearby or {}) do
+            local record = nearby[index]
+            local npcID = record and record.id or nil
+            local body = npcID and type(Registry.GetLiveZombie) == "function"
+                and Registry.GetLiveZombie(npcID) or nil
+            considerWitness(record, body, npcID)
+        end
+    elseif type(Registry.ForEachLive) == "function" then
+        -- Compatibility fallback only. Normal production uses the spatial
+        -- index so one zombie death never scans the whole live NPC roster.
+        Registry.ForEachLive(considerWitness)
+    else
+        return 0, 0, "witness_registry_unavailable"
+    end
     return emitted, candidates, emitted > 0 and "witnesses_notified"
         or "no_witness_event_emitted"
 end

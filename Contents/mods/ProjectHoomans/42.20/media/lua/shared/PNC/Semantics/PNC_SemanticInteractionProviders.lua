@@ -152,6 +152,9 @@ function Providers.NormalizeWorld(value, providerID)
         timeOfDay = text(value.timeOfDay, 32),
         locationType = text(value.locationType, 64),
         zombiePressure = text(value.zombiePressure, 32),
+        nearbyZombieCount = finite(value.nearbyZombieCount),
+        hordeZombieCount = finite(value.hordeZombieCount),
+        tacticalHorde = booleanOrNil(value.tacticalHorde),
         worldAgeHours = finite(value.worldAgeHours),
     }
 end
@@ -188,6 +191,9 @@ local function immediateDanger(context)
         and context.dialogueSituation or {}
     local npc = type(situation.npc) == "table" and situation.npc or {}
     if npc.inCombat == true then return true end
+    local zombieObservation = type(context.zombieObservation) == "table"
+        and context.zombieObservation or {}
+    if zombieObservation.tacticalHorde == true then return true end
     local tactical = type(context.tacticalHostility) == "table"
         and context.tacticalHostility or {}
     if tactical.attackPlayers == true then return true end
@@ -262,6 +268,8 @@ function Providers.ProjectDialogue(context, evidenceQuery)
             and context.factionRelationship.state,
     }, "projecthoomans.relationship")
 
+    local zombieObservation = type(context.zombieObservation) == "table"
+        and context.zombieObservation or {}
     local world = Providers.NormalizeWorld({
         immediateDanger = immediateDanger(context),
         worldAgeHours = worldContext.worldAgeHours,
@@ -271,7 +279,10 @@ function Providers.ProjectDialogue(context, evidenceQuery)
         season = context.season,
         timeOfDay = context.timeOfDay,
         locationType = context.locationType,
-        zombiePressure = context.zombiePressure,
+        zombiePressure = context.zombiePressure or zombieObservation.band,
+        nearbyZombieCount = zombieObservation.nearbyCount,
+        hordeZombieCount = zombieObservation.hordeCount,
+        tacticalHorde = zombieObservation.tacticalHorde,
     }, "projectzomboid.world")
 
     local knowledgeProjection = Providers.NormalizeKnowledge({

@@ -45,8 +45,9 @@ def warning_sequence(scenario: dict, count: int = 4) -> list[tuple[str, str]]:
                     current["realizationVariant"],
                 )
             )
-            double_down = generated(turn, "DOUBLE_DOWN")
-            turn = worker.suggestion_click(double_down["frame"])
+            # Repeated typed hostility remains valid even when the generated
+            # frontier suppresses an immediate DOUBLE_DOWN self-loop.
+            turn = worker.input("fuckyouuuu")
     return rows
 
 

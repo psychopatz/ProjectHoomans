@@ -39,6 +39,7 @@ local function onServerKill(killer, zombie, context)
     local zombieID = call(zombie, "getOnlineID")
     return Events.Publish("engine:zombie_killed", {
         actorKey = playerKey(killer),
+        actorKind = "player",
         nativeKillCount = nativeKills,
         zombieKey = zombieID and tostring(zombieID) or nil,
         occurredAt = worldAgeHours(),

@@ -52,6 +52,41 @@ function Adapters.Install(Providers)
                 return rows
             end })
     end
+    Providers.RegisterEvidenceAdapter({
+        id = "projecthoomans.zombie_observation",
+        sourceTier = "SESSION",
+        Query = function(context, query)
+            context = type(context) == "table" and context or {}
+            local observation = type(context.zombieObservation) == "table"
+                and context.zombieObservation or nil
+            local count = observation
+                and math.max(0, tonumber(observation.hordeCount
+                    or observation.nearbyCount) or 0) or 0
+            if not observation or count <= 0 then return {} end
+            return {
+                {
+                    sourceRef = "runtime:zombie_pressure:"
+                        .. tostring(observation.band or "unknown"),
+                    eventType = "zombie_pressure_current",
+                    actorID = tostring(context.npcID or context.targetNPCID or "npc"),
+                    classes = { "world_danger", "zombie_pressure" },
+                    relations = {},
+                    tags = {
+                        tostring(observation.band or "unknown"),
+                        observation.tacticalHorde == true
+                            and "tactical_horde" or "local_pressure",
+                    },
+                    retentionSalience = 0,
+                    confidence = 1,
+                    effectiveStrength = math.min(1, count / 12),
+                    ageHours = 0,
+                    topic = "combat",
+                    visibility = "direct",
+                    provenance = "ZombieObservation",
+                },
+            }
+        end,
+    })
     Providers.RegisterEvidenceAdapter({ id = "projecthoomans.session", sourceTier = "SESSION",
         Query = function(context, query)
             context = type(context) == "table" and context or {}

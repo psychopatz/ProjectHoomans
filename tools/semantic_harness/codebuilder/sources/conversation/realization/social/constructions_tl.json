@@ -273,6 +273,32 @@
       ]
     },
     {
+      "id": "construction.tl.social.double_down_direct",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "DOUBLE_DOWN",
+      "dialogueAct": "HOSTILE_REMARK",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Sinadya ko talaga 'yon."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.double_down_stand",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "DOUBLE_DOWN",
+      "dialogueAct": "HOSTILE_REMARK",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Paninindigan ko 'yon."
+        }
+      ]
+    },
+    {
       "id": "construction.tl.social.warn_direct",
       "type": "construction",
       "locale": "TL",

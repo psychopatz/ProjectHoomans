@@ -277,6 +277,32 @@
       ]
     },
     {
+      "id": "construction.en.social.double_down_direct",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "DOUBLE_DOWN",
+      "dialogueAct": "HOSTILE_REMARK",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "I meant what I said."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.double_down_stand",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "DOUBLE_DOWN",
+      "dialogueAct": "HOSTILE_REMARK",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "I stand by it."
+        }
+      ]
+    },
+    {
       "id": "construction.en.social.warn_direct",
       "type": "construction",
       "locale": "EN",

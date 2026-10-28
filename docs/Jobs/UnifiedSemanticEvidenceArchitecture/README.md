@@ -48,3 +48,5 @@ Do not restart accepted C0-C11/L0-L5 work unless new evidence identifies a regre
 ## Current steady state
 
 The unified evidence architecture is now the accepted semantic-context foundation. New mechanics should register domain-owned evidence metadata/adapters and semantic relations, then reuse the existing provider → InteractionContext → PragmaticResolver → InteractionDirector path. The remaining acceptance surface is user-owned native SP/MP verification; implementation history and exact final test evidence live in `PROGRESS.md`.
+
+Accepted follow-on adopter: `docs/Jobs/OpenEndedSemanticCombatAwareness/` uses this foundation for open-ended generated continuations plus current zombie/combat evidence without adding a memory store or world scanner.

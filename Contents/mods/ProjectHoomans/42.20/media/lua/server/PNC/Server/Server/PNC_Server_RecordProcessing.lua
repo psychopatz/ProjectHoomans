@@ -17,6 +17,7 @@ local Network = PNC.Network
 local Stamina = PNC.Stamina
 local Animation = PNC.Animation
 local ConversationScene = PNC.ConversationScene
+local ZombieObservation = PNC.ZombieObservation
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 
 function H.GetSyncInterval(record)
@@ -157,6 +158,15 @@ function H.ProcessRecord(record, now)
             now - (tonumber(record.lastThinkAt) or now)
         )
         Behavior.Tick(record, zombie, now)
+        -- Ambient zombie awareness is a bounded consumer of the same cached
+        -- Perception frame used by combat/follow behavior. The scheduler/LOD
+        -- cadence controls how often an idle NPC reaches this point; there is
+        -- no per-frame or population-wide zombie scan here.
+        if zombie and ZombieObservation
+            and type(ZombieObservation.ObserveRecord) == "function"
+        then
+            ZombieObservation.ObserveRecord(record, now)
+        end
         -- A behavior may abstract a boarding companion or materialize a
         -- disembarking one. Refresh the lease-bound body before any pathing or
         -- animation work so this tick never pumps a removed IsoZombie (and a

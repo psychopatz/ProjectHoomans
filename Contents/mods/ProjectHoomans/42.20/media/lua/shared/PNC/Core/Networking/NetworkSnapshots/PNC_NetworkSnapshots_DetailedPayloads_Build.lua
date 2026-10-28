@@ -87,6 +87,9 @@ function Network.BuildSnapshot(record, inventorySummaryOverride)
         and Settings.CanZombieTargetRecord
         and Settings.CanZombieTargetRecord(record)
         or false
+    snapshot.zombieObservation = PNC.ZombieObservation
+        and type(PNC.ZombieObservation.Snapshot) == "function"
+        and PNC.ZombieObservation.Snapshot(record) or nil
     snapshot.alive = record.alive
     snapshot.hpCurrent = record.health and record.health.current or nil
     snapshot.hpMax = record.health and record.health.max or nil

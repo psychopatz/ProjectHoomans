@@ -142,6 +142,16 @@ function Context:RecordTurn(ir, options)
     end
 
     local extensions = type(ir.extensions) == "table" and ir.extensions or {}
+    local dynamicAffordance = type(extensions.dynamicAffordance) == "table"
+        and extensions.dynamicAffordance or {}
+    local utterancePlan = type(extensions.utterancePlan) == "table"
+        and extensions.utterancePlan or {}
+    event.strategy = Internal.TextValue(
+        dynamicAffordance.strategy or utterancePlan.strategy
+    )
+    event.stance = Internal.TextValue(
+        dynamicAffordance.stance or utterancePlan.stance
+    )
     local mentionOptions = {
         turn = sequence,
         timestamp = timestamp,

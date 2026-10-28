@@ -153,6 +153,24 @@ return {
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_en.json",
     },
+    ["construction.en.social.double_down_direct"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.double_down_direct",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.double_down_stand"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.double_down_stand",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
     ["construction.en.social.end_conversation_done"] = {
         ["domain"] = "social",
         ["generated"] = {
@@ -411,6 +429,24 @@ return {
             "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
         },
         ["id"] = "construction.tl.social.double_down",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.double_down_direct"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.double_down_direct",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.double_down_stand"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.double_down_stand",
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_tl.json",
     },

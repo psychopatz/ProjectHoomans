@@ -111,12 +111,20 @@ class LiveRegressionL3Tests(unittest.TestCase):
     def test_en_tl_new_strategies_are_locale_owned(self) -> None:
         expected = {
             "EN": {
-                "CLAIM_JOKE": "I was joking.",
-                "DOUBLE_DOWN": "Yeah, I meant it.",
+                "CLAIM_JOKE": {"I was joking."},
+                "DOUBLE_DOWN": {
+                    "Yeah, I meant it.",
+                    "I meant what I said.",
+                    "I stand by it.",
+                },
             },
             "TL": {
-                "CLAIM_JOKE": "Nagbibiro lang ako.",
-                "DOUBLE_DOWN": "Oo, sinadya ko 'yon.",
+                "CLAIM_JOKE": {"Nagbibiro lang ako."},
+                "DOUBLE_DOWN": {
+                    "Oo, sinadya ko 'yon.",
+                    "Sinadya ko talaga 'yon.",
+                    "Paninindigan ko 'yon.",
+                },
             },
         }
         for language, values in expected.items():
@@ -124,10 +132,10 @@ class LiveRegressionL3Tests(unittest.TestCase):
             scenario["runtime"]["language"] = language
             with LuaSemanticWorker(scenario) as worker:
                 turn = worker.input("fuckyouuuu")
-            for strategy, text in values.items():
-                self.assertEqual(
+            for strategy, texts in values.items():
+                self.assertIn(
                     candidate(turn, strategy)["display"]["utterance"],
-                    text,
+                    texts,
                 )
 
 

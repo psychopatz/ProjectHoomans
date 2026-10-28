@@ -108,12 +108,12 @@ function Resolution.ApplyZombieDamage(attackerRecord, attackerZombie, target, hi
     if PNC.Network and PNC.Network.BroadcastZombieReaction then
         PNC.Network.BroadcastZombieReaction(victim, attackerZombie, reactionOptions)
     end
+    local killed = ((victim.isDead and victim:isDead())
+        or (victim.getHealth and (tonumber(victim:getHealth()) or 1) <= 0))
     if actorKey
         and socialNow
         and threatID ~= nil
-        and ((victim.isDead and victim:isDead())
-            or (victim.getHealth
-                and (tonumber(victim:getHealth()) or 1) <= 0))
+        and killed
         and PNC.SocialEventHooks
         and PNC.SocialEventHooks.OnThreatNeutralized
     then
@@ -126,6 +126,22 @@ function Resolution.ApplyZombieDamage(attackerRecord, attackerZombie, target, hi
             x = victim:getX(),
             y = victim:getY(),
             z = victim:getZ(),
+        })
+    end
+    local engineEvents = PNC.Semantics and PNC.Semantics.EngineEvents or nil
+    if actorKey and killed and engineEvents
+        and type(engineEvents.Publish) == "function"
+    then
+        engineEvents.Publish("engine:zombie_killed", {
+            actorKey = actorKey,
+            actorKind = "npc",
+            npcID = attackerRecord and tostring(attackerRecord.id) or nil,
+            zombieKey = threatID and tostring(threatID) or nil,
+            occurredAt = socialNow,
+            x = victim:getX(),
+            y = victim:getY(),
+            z = victim:getZ(),
+            source = "npc_combat_resolution",
         })
     end
     return true, applied and "hit_zombie" or "hit_zombie_fallback", hit

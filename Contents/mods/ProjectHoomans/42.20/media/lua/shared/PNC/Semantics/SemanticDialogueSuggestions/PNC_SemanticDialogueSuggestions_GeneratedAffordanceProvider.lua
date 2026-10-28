@@ -20,6 +20,8 @@ local EvidenceProviders = require "PNC/Semantics/PNC_SemanticInteractionProvider
 local EvidenceResolver = require "PNC/Semantics/PNC_SemanticPragmaticResolver"
 local Stimulus = require "PNC/Semantics/PNC_SemanticInteractionStimulus"
 local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
+local ContinuationPolicy = require
+    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticAffordanceContinuationPolicy"
 
 local HOSTILE_ACTS = {
     INSULT = true,
@@ -330,6 +332,13 @@ local function strategyPlan(strategy, stance, context, frame, ir)
         stance = stance,
         topic = frame.topic,
         subject = frame.subject,
+        selectionSalt = tostring(
+            type(context.semanticDialogueContext) == "table"
+                and context.semanticDialogueContext.sequence
+                or type(context.semanticContextState) == "table"
+                    and context.semanticContextState.sequence
+                or 0
+        ),
         intensity = type(ir.extensions) == "table"
             and type(ir.extensions.socialFeatures) == "table"
             and ir.extensions.socialFeatures.intensity or 0,
@@ -347,6 +356,8 @@ local function strategyPlan(strategy, stance, context, frame, ir)
 end
 
 local function candidate(strategy, stance, context, reason)
+    local allowed = ContinuationPolicy.Allowed(strategy, context)
+    if allowed ~= true then return nil end
     local frame = currentFrame(context)
     local ir = type(context.dialogueIR) == "table"
         and context.dialogueIR or {}
@@ -465,15 +476,19 @@ function Provider.collect(context)
 
     local output = {}
     local seen = {}
-    for _, act in ipairs(Relations.ContextualActs()) do
-        add(output, seen, candidate(act, "NEUTRAL", context, "semantic_relation"))
-    end
+    -- A strong current-turn pragmatic family owns the direct-response
+    -- frontier before generic relation acts. This prevents broad ACCEPT /
+    -- AGREE / REFUSE rows from crowding out the actual repair/escalation
+    -- choices that answer the NPC's current reaction.
     if hostilityContext(context) then
         add(output, seen, candidate(
             "APOLOGIZE", "POSITIVE", context, "hostility_repair"
         ))
         add(output, seen, candidate(
             "CLAIM_JOKE", "POSITIVE", context, "hostility_reframe_joke"
+        ))
+        add(output, seen, candidate(
+            "DEESCALATE", "POSITIVE", context, "hostility_deescalate"
         ))
         add(output, seen, candidate(
             "DOUBLE_DOWN", "NEGATIVE", context, "hostility_double_down"
@@ -540,6 +555,10 @@ function Provider.collect(context)
             ))
             return output
         end
+    end
+
+    for _, act in ipairs(Relations.ContextualActs()) do
+        add(output, seen, candidate(act, "NEUTRAL", context, "semantic_relation"))
     end
 
     local act = npcResponseAct(context)

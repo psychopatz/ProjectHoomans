@@ -47,6 +47,15 @@ local PROPOSAL_REPLY_ACTS = {
     DISAGREE = true,
 }
 
+local HOSTILE_REAFFIRM_CONTEXT = {
+    INSULT = true,
+    HOSTILE_REMARK = true,
+    THREATEN = true,
+    BOUNDARY_WARNING = true,
+    RETALIATE_VERBALLY = true,
+    CHALLENGE = true,
+}
+
 local function copyValue(value, depth)
     if type(value) ~= "table" then return value end
     depth = tonumber(depth) or 0
@@ -418,6 +427,50 @@ function Resolver.Select(bundle, state, context, options, contextResolver)
     end
 
     local output = IR.Clone(selected.candidate.ir)
+    if actFor(output) == "REAFFIRM" then
+        local hostileContext = HOSTILE_REAFFIRM_CONTEXT[
+            string.upper(tostring(snapshot.lastIntent or ""))
+        ] == true
+        if not hostileContext then
+            local recent = type(snapshot.recentTurns) == "table"
+                and snapshot.recentTurns or {}
+            for index = 1, math.min(#recent, 4) do
+                local turn = recent[index]
+                if type(turn) == "table"
+                    and tostring(turn.speaker or "") == "player"
+                    and HOSTILE_REAFFIRM_CONTEXT[string.upper(tostring(
+                        turn.speechAct or turn.intent or ""
+                    ))] == true
+                then
+                    hostileContext = true
+                    break
+                end
+            end
+        end
+        output.provenance = type(output.provenance) == "table"
+            and output.provenance or {}
+        if hostileContext then
+            output.intent = "HOSTILE_REMARK"
+            output.speechAct = "HOSTILE_REMARK"
+            output.subject = "RECIPIENT"
+            output.modifiers = type(output.modifiers) == "table"
+                and output.modifiers or {}
+            output.modifiers.reaffirm = true
+            output.modifiers.doubledDown = true
+            output.modifiers.escalation = true
+            output.socialContext = {
+                directed = true,
+                target = "RECIPIENT",
+            }
+            output.provenance.contextualReframe =
+                "hostile_reaffirmation"
+        else
+            output.intent = "ACKNOWLEDGE"
+            output.speechAct = "ACKNOWLEDGE"
+            output.provenance.contextualReframe =
+                "neutral_reaffirmation"
+        end
+    end
     if type(contextResolver) == "function" then
         local ok, resolved = pcall(
             contextResolver, output, state, context, options

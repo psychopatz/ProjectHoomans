@@ -94,12 +94,15 @@ function Adapter.Publish(specification, options)
 end
 
 function Adapter.PublishZombiePressure(record, count, source, at)
-    local band
     local value = math.max(0, tonumber(count) or 0)
-    if value >= 12 then band = "horde"
-    elseif value >= 6 then band = "heavy"
-    elseif value >= 3 then band = "moderate"
-    else band = "light" end
+    local classified = PNC.ZombieObservation
+        and type(PNC.ZombieObservation.Classify) == "function"
+        and PNC.ZombieObservation.Classify(value) or nil
+    local band = classified and classified.knowledgeBand
+        or value >= 12 and "horde"
+        or value >= 6 and "heavy"
+        or value >= 3 and "moderate"
+        or "light"
     local fact = Adapter.Publish({
         producer = "hoomans:zombie", kind = "zombie.pressure",
         subject = { id = actorID(record) or tostring(record and record.id or "unknown"), kind = "npc" },
@@ -107,7 +110,12 @@ function Adapter.PublishZombiePressure(record, count, source, at)
             .. ":" .. tostring(math.floor((tonumber(at) or now()) / 24)),
         occurredAt = tonumber(at) or now(), observedAt = tonumber(at) or now(),
         severity = math.min(1, value / 12), retention = "historical",
-        payload = { band = band, count = value, source = tostring(source or "combat") },
+        payload = {
+            band = band,
+            pressureBand = classified and classified.band or nil,
+            count = value,
+            source = tostring(source or "combat"),
+        },
     })
     if fact then acquire(record, fact.factID, "experienced", {
         confidence = 1, source = "zombie_hazard_sensing",

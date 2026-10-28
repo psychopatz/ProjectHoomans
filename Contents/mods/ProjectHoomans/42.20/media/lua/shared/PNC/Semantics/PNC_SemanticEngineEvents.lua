@@ -138,9 +138,9 @@ function Events.Reset()
 end
 
 Events.RegisterType("engine:zombie_killed", {
-    scope = "player",
+    scope = "actor",
     authority = "server",
-    description = "A server-observed player zombie kill.",
+    description = "A server-observed player or NPC zombie kill.",
 })
 
 return Events

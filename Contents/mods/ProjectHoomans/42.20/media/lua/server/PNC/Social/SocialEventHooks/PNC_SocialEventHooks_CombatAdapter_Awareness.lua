@@ -262,6 +262,11 @@ local function reserveAwarenessPresentation(playerKey, now)
 end
 
 local function countBand(count)
+    local classifier = PNC and PNC.ZombieObservation
+    if classifier and type(classifier.Classify) == "function" then
+        local classified = classifier.Classify(count)
+        return classified and classified.socialBand or nil
+    end
     count = math.max(0, tonumber(count) or 0)
     if count < 3 then return nil end
     if count >= 8 then return "large" end

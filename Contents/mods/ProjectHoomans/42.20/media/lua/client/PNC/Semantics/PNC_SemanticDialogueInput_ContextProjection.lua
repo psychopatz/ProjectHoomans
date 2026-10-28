@@ -201,6 +201,22 @@ function Projection.Build(view, getProviderStatus)
             memoryTargetID
         )
     end
+    local snapshot = type(output.entry) == "table"
+        and type(output.entry.snapshot) == "table"
+        and output.entry.snapshot or nil
+    local zombieObservation = type(output.zombieObservation) == "table"
+        and output.zombieObservation
+        or snapshot and type(snapshot.zombieObservation) == "table"
+            and snapshot.zombieObservation
+        or type(output.npcState) == "table"
+            and type(output.npcState.zombieObservation) == "table"
+            and output.npcState.zombieObservation
+        or nil
+    if type(zombieObservation) == "table" then
+        output.zombieObservation = zombieObservation
+        output.zombiePressure = zombieObservation.band
+            or output.zombiePressure
+    end
     local state = session and session.semanticDialogueState or nil
     if state and type(state.ToContext) == "function" then
         output.semanticDialogueState = state:ToContext()

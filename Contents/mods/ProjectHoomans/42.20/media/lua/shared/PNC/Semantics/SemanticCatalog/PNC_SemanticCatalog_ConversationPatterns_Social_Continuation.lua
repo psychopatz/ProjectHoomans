@@ -14,6 +14,31 @@ if type(registerPattern) ~= "function" then
 end
 
 function Internal.RegisterContinuationSignals()
+    local reaffirm = {
+        intent = "REAFFIRM",
+        speechAct = "REAFFIRM",
+        subject = "CONVERSATION",
+        modifiers = { reaffirm = true },
+    }
+    for index, tokens in ipairs({
+        { "i", "mean", "it" },
+        { "i", "meant", "it" },
+        { "yeah", "i", "mean", "it" },
+        { "yeah", "i", "meant", "it" },
+    }) do
+        local pattern = {}
+        for tokenIndex = 1, #tokens do
+            pattern[tokenIndex] = { kind = "literal", value = tokens[tokenIndex] }
+        end
+        registerPattern(
+            "pnc.social.reaffirm." .. tostring(index),
+            pattern,
+            reaffirm,
+            0.99,
+            146
+        )
+    end
+
     local continuation = {
         intent = "QUESTION",
         speechAct = "QUESTION",

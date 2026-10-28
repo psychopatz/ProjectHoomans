@@ -37,6 +37,7 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
             {
                 "APOLOGIZE",
                 "CLAIM_JOKE",
+                "DEESCALATE",
                 "DOUBLE_DOWN",
                 "CHALLENGE",
                 "DISMISS",
@@ -168,8 +169,14 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
         self.assertEqual(surfaces["TL"]["APOLOGIZE"], "pasensya na.")
         self.assertEqual(surfaces["EN"]["CLAIM_JOKE"], "I was joking.")
         self.assertEqual(surfaces["TL"]["CLAIM_JOKE"], "Nagbibiro lang ako.")
-        self.assertEqual(surfaces["EN"]["DOUBLE_DOWN"], "Yeah, I meant it.")
-        self.assertEqual(surfaces["TL"]["DOUBLE_DOWN"], "Oo, sinadya ko 'yon.")
+        self.assertIn(
+            surfaces["EN"]["DOUBLE_DOWN"],
+            {"Yeah, I meant it.", "I meant what I said.", "I stand by it."},
+        )
+        self.assertIn(
+            surfaces["TL"]["DOUBLE_DOWN"],
+            {"Oo, sinadya ko 'yon.", "Sinadya ko talaga 'yon.", "Paninindigan ko 'yon."},
+        )
         self.assertNotEqual(
             surfaces["EN"]["ASK_WHY"],
             surfaces["TL"]["ASK_WHY"],

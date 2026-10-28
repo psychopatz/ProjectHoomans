@@ -209,6 +209,34 @@ return {
         ["type"] = "construction",
     },
     {
+        ["dialogueAct"] = "HOSTILE_REMARK",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.double_down_direct",
+        ["locale"] = "TL",
+        ["strategy"] = "DOUBLE_DOWN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Sinadya ko talaga 'yon.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "HOSTILE_REMARK",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.double_down_stand",
+        ["locale"] = "TL",
+        ["strategy"] = "DOUBLE_DOWN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Paninindigan ko 'yon.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
         ["dialogueAct"] = "END_CONVERSATION",
         ["domain"] = "social",
         ["id"] = "construction.tl.social.end_conversation_done",

@@ -46,3 +46,6 @@ Const.COMBAT_TACTICAL_DIAGNOSTIC_MS = 200
 Const.COMBAT_DEBUG_CONE_RADIUS = 8.5
 Const.COMBAT_DEBUG_CONE_HALF_ANGLE_DEGREES = 55
 Const.COMBAT_DEBUG_VISIBLE_ZOMBIE_LIMIT = 6
+-- Runtime-only semantic/ambient zombie observation reuses the existing
+-- perception frame and never performs its own world census.
+Const.ZOMBIE_OBSERVATION_CACHE_MS = 750

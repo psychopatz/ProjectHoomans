@@ -213,6 +213,34 @@ return {
         ["type"] = "construction",
     },
     {
+        ["dialogueAct"] = "HOSTILE_REMARK",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.double_down_direct",
+        ["locale"] = "EN",
+        ["strategy"] = "DOUBLE_DOWN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "I meant what I said.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "HOSTILE_REMARK",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.double_down_stand",
+        ["locale"] = "EN",
+        ["strategy"] = "DOUBLE_DOWN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "I stand by it.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
         ["dialogueAct"] = "END_CONVERSATION",
         ["domain"] = "social",
         ["id"] = "construction.en.social.end_conversation_done",
