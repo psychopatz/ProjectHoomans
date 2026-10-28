@@ -185,7 +185,14 @@ function Resolver.Resolve(stimulus, state, context, root)
 
     local subject = semantic.subject
     local subjectSource = subject and "stimulus" or nil
-    if not subject and replyLike and pending and pending.topic then
+    if replyLike and pending and pending.topic
+        and (not subject
+            or string.lower(tostring(subject))
+                == string.lower(tostring(pending.topic)))
+    then
+        -- The discourse resolver may already have materialized the pending
+        -- topic into semantic.subject. Preserve where that subject came from
+        -- instead of relabeling it as an independent stimulus subject.
         subject = pending.topic
         subjectSource = "pending_interaction"
     end

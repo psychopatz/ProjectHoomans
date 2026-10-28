@@ -103,9 +103,12 @@ local function riskClass(ir)
     local social = type(ir.socialContext) == "table"
         and ir.socialContext or {}
     if social.identityClaim == true then return "identity_mutation" end
+    -- An OFFER with a gameplay action is still only a proposed transaction.
+    -- Existing gift/trade consent and selector authority performs the actual
+    -- mutation later, so classify it before generic mutating requests.
+    if ir.intent == "OFFER" then return "transactional_offer" end
     if ir.action ~= nil then return "mutating" end
     if ir.intent == "QUESTION" then return "read_only" end
-    if ir.intent == "OFFER" then return "transactional_offer" end
     return "conversation"
 end
 

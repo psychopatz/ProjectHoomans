@@ -1,7 +1,7 @@
 # Progress — Coherent Emergent Conversation
 
-**Status:** IN PROGRESS.
-**Current phase:** C11 — integrated acceptance and live-test handoff.
+**Status:** READY FOR USER LIVE TEST.
+**Current phase:** C11 accepted — developer-side acceptance complete.
 **Branch:** existing `main`.
 
 ## Accepted foundation
@@ -143,15 +143,34 @@ Latest C10 validation:
 - fuzz safety controls: PASS, including zero transport for the unsafe item-typo case;
 - Python compilation, Lua syntax and `git diff --check`: PASS.
 
-## Immediate Next Chunk — C11
+## C11 accepted — integrated developer acceptance
 
-Run the final integrated acceptance matrix across C0–C10 plus NPC-to-NPC interaction regression, generation idempotence/context-health, bounded performance, source/save immutability and no transcript/ModData bloat.
+C11 is developer-accepted. The job is **READY FOR USER LIVE TEST**.
 
-Do not launch or publish Project Zomboid. When all developer gates pass, update this ledger to **READY FOR USER LIVE TEST** and leave native gameplay verification to the user.
+Final acceptance caught and fixed two real integration regressions before handoff:
 
-## Remaining mandatory work
+- risk classification now treats exact high-confidence OFFER actions as transactional proposals before generic mutation risk, restoring the existing gift consent/inventory-selection lifecycle without weakening actual transfer authority;
+- the Pragmatic Resolver preserves pending_interaction subject provenance when the Discourse Resolver has already materialized the pending topic into a contextual short reply.
 
-C11 integrated acceptance and live-test handoff.
+One stale R6 assertion was also updated to the accepted C7 presentation contract: compositional one-shot speech exposes the canonical semantic template through semanticTemplateID plus realizationFamily=utterance_plan instead of requiring the old phrase-family-only field.
+
+Final validation:
+
+- exact C0–C10 integrated Python matrix after the fixes: **89/89 PASS**;
+- additional lifecycle/save-backed/transcript/performance batch: **19/19 PASS**;
+- NPC semantic-scene + conduct/social-event saturation batch: **5/5 PASS**;
+- full ProjectHoomans pnc_semantic Lua suite: **99/99 PASS**;
+- PsychopatzCore semantic dialogue-turn, pattern-matcher and surface-recovery suites: PASS;
+- exact gift-offer/save-source regression plus R6 pragmatic regression: **6/6 PASS** and C4 risk smoke PASS;
+- canonical Conversation source tree: **105 files**, byte-identical before/after two full builds;
+- generated Conversation tree: **136 files**, byte-identical across two consecutive builds;
+- compiler context-health: **pass**, 0 errors, 0 numeric shard violations, 0 opaque shard violations, 0 missing ownership;
+- largest canonical source remains content/social/emotes/reply.json at **14,624 bytes**; largest generated/index artifact remains bounded at **31,376 bytes**;
+- save-backed working-world tests preserve the immutable imported source while resets restore the working baseline;
+- visible transcript buffers remain explicitly bounded and no new persistent conversation transcript or dynamic UtterancePlan/button combination is written to ModData;
+- Python compilation, Lua syntax and git diff --check: PASS.
+
+No native Project Zomboid instance was launched and no Workshop publication was performed. The remaining acceptance is the user's live in-game verification.
 
 ## Safety
 

@@ -39,8 +39,12 @@ class PragmaticInteractionR6Tests(unittest.TestCase):
             "ACKNOWLEDGE",
         )
         self.assertEqual(
-            result["observation"]["response"]["phraseSemanticTemplateID"],
+            result["observation"]["response"]["semanticTemplateID"],
             "semantic.social.acknowledged",
+        )
+        self.assertEqual(
+            result["observation"]["response"]["realizationFamily"],
+            "utterance_plan",
         )
 
     def test_generic_npc_semantic_act_preview_bypasses_nlu(self) -> None:
