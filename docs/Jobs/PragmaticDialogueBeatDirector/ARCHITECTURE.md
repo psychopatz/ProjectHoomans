@@ -1,317 +1,486 @@
-# Architecture — Pragmatic Dialogue Beat Director
+# Architecture — Pragmatic Interaction Director
 
-## Core separation
+## Design principle
+
+The system is a reusable semantic interaction layer, not a dialogue-only
+subsystem.
 
 ```text
-Core NLU candidates
-        ↓
-Pragmatic Resolver
-        ↓
-Conversation Context / references / obligations / salience
-        ↓
-Flow Kernel ───────────────┐
-                           │
-Beat Registry + Director ──┤
-                           ▼
-                  Behavior Arbitration
-                           ↓
-                    ResponsePlan
-                           ↓
-              Dialogue Content / Catalog
-                           ↓
-                       Speech
+                INPUT / STIMULUS SOURCES
 
-Authoritative gameplay effects remain on their existing domain/action paths.
+ human text      engine/world       NPC semantic act      emote/task
+     │               │                    │                  │
+     ▼               │                    │                  │
+ PsychopatzCore NLU  │                    │                  │
+     └───────────────┴────────────────────┴──────────────────┘
+                              │
+                              ▼
+                        Typed Stimulus
+                              │
+                              ▼
+                    Context Projection Hub
+          actor / relationship / world / knowledge / scene
+                              │
+                              ▼
+                     Pragmatic Interpretation
+                              │
+                              ▼
+                     Behavior Arbitration
+                              │
+                    ┌─────────┴─────────┐
+                    │                   │
+              one-shot behavior   optional Beat State
+                    │                   │
+                    └─────────┬─────────┘
+                              ▼
+                       InteractionPlan
+              ┌───────────────┼──────────────┐
+              ▼               ▼              ▼
+          ResponsePlan     EmotePlan      GameplayIntent
+              │               │              │
+      Dialogue Content     presentation   existing domain
+              │                            authority
+        presentation /
+        optional PBrainZ
 ```
 
-## Flow vs Beat vs Behavior
+## Authority boundaries
 
-### Flow
+### PsychopatzCore
 
-A **Flow** owns a bounded conversational obligation or protocol.
+Owns human free-form NLU and candidate semantic interpretations.
 
-Examples:
+Do not reparse NPC-generated text internally.
 
-- awaiting a name;
-- awaiting wellbeing status;
-- a multi-stage gift;
-- a parameterized task request.
+### Context providers/adapters
 
-Flows can suspend/resume/complete/cancel and may capture slots.
+Own projection of authoritative subsystem state into bounded semantic snapshots.
 
-### Beat
+They do not transfer authority to the director.
 
-A **Beat** describes a higher-level social/dramatic situation spanning one or
-more turns.
+### Pragmatic resolver
 
-Examples:
+Resolves what a semantic act means **in the current interaction**.
 
-- suspicious first contact;
-- argument escalation;
-- reconciliation;
-- reacting to danger;
-- help request pressure.
+Inputs may include:
 
-A beat does not own final prose and does not directly mutate gameplay state.
+- pending questions/offers/requests;
+- active/suspended flows;
+- current/recent topic;
+- referenced actors/entities;
+- recent semantic acts;
+- participant roles;
+- salient grounded events.
 
-### Behavior
+This is where context-sensitive meaning belongs.
 
-A **Behavior** is a reusable conversational intention available to a director.
+### Behavior arbiter
+
+Chooses a semantic actor intention.
 
 Examples:
 
 - WARN;
 - RETALIATE_VERBALLY;
 - DEESCALATE;
-- CHALLENGE;
+- ACKNOWLEDGE;
 - ASK_FOLLOWUP;
-- END_CONVERSATION;
-- RETURN_TO_TOPIC.
+- SHARE_MEMORY;
+- SHARE_NEWS;
+- CHALLENGE;
+- RECONCILE;
+- EMOTE_GLARE;
+- END_INTERACTION.
 
-The same behavior may be eligible in more than one beat.
+A behavior may be a one-shot reaction.
 
-### ResponsePlan
+### Beat state
 
-The existing `ResponsePlan` owns the grounded communication plan that will be
-realized through Dialogue Content. Beats/behaviors select intentions and
-metadata; wording remains separate.
+A beat exists only when a temporary situation needs multi-interaction state.
 
-## Production beat contract
+Examples:
 
-Exact field names may be adapted to existing Lua conventions, but the contract
-must support:
+- argument escalation;
+- reconciliation;
+- suspicious first contact;
+- grief discussion;
+- help-request pressure.
+
+A beat changes behavior relevance over multiple interactions.
+
+It does not own final prose or gameplay effects.
+
+### InteractionPlan
+
+The director output is a semantic plan, not wording.
+
+Conceptually:
 
 ```text
-BeatDefinition
-- id / version / owner
-- entry predicates
-- maintain predicates
-- exit predicates
-- candidate behavior IDs
-- bounded relevance/weight metadata
-- cooldown / minimum / maximum turn policy
-- optional mutual-exclusion or priority group
-- provenance
+InteractionPlan
+- actor
+- targets
+- selected behavior
+- topic
+- grounded fact/event references
+- tone/style hints
+- optional emote intents
+- optional gameplay intents
+- explanation/provenance
 ```
 
-Predicates must use typed/bounded existing context/fact paths rather than
-arbitrary Lua expressions.
+### ResponsePlan / Dialogue Content
 
-## Director contract
+Existing ResponsePlan and Dialogue Content remain the single speech planning and
+realization authority.
 
-Per relevant conversation turn:
+The director must not own response pools.
 
-1. consume real semantic candidates/selected IR and current dialogue context;
-2. update bounded pragmatic context (topic/reference/obligation/salience where
-   needed);
-3. evaluate beat entry/maintain/exit predicates;
-4. preserve active beat state and explain transitions;
-5. rank eligible behavior candidates;
-6. apply bounded contextual modifiers from personality, relationship,
-   world/needs/danger, flow state, and recent conversational events;
-7. choose one deterministic/explainable behavior or an explicit no-behavior;
-8. produce/augment the existing ResponsePlan;
-9. let existing response/translation/presentation layers realize wording;
-10. dispatch gameplay effects only through existing authority paths.
+### Gameplay authority
 
-A high-confidence social understanding may result in a conversational reply
-without granting authority for an ambiguous gameplay mutation.
+Gameplay mutation remains in existing domain/action services.
 
-## Pragmatic context
+The director may submit an intent only where the target system allows it.
 
-Keep context bounded and event-driven. Candidate fields include:
+## Actor/world agnosticism
 
-- current/recent topic;
-- pending questions/offers/requests;
-- recent dialogue acts;
-- recent social events;
-- recent referenced entities;
-- active/suspended flows;
-- active/recent beats;
-- compact topic salience;
-- commitments;
-- cooldown state.
+The director must not depend directly on Project Hoomans private NPC fields.
 
-Do not persist full transcripts or unbounded beat histories in NPC ModData.
+Use bounded semantic provider contracts.
 
-## Arbitration
+### Actor snapshot
 
-Do not turn the system into one unbounded giant score.
-
-Use staged arbitration:
+Conceptual normalized fields:
 
 ```text
-eligibility
+actor.id
+actor.capabilities
+
+disposition.aggression
+disposition.confidence
+disposition.forgiveness
+disposition.sociability
+disposition.empathy
+disposition.riskTolerance
+
+condition.panic
+condition.injury
+condition.hunger
+condition.fatigue
+
+activity.currentTask
+activity.idle
+
+traits/tags (only where semantically meaningful)
+```
+
+Project Hoomans may derive these values from its own traits. A third-party mod
+may derive them differently.
+
+### Relationship snapshot
+
+Conceptually:
+
+```text
+familiarity
+approval
+trust
+respect
+factionRelation
+relationshipTags
+```
+
+### World snapshot
+
+Conceptually:
+
+```text
+immediateDanger
+powerStatus
+waterStatus
+weather
+season
+timeOfDay
+locationTags
+zombiePressure
+recentWorldEvents
+recentFactionEvents
+```
+
+### Knowledge snapshot
+
+Only grounded actor-known facts/events.
+
+Unknown remains unknown.
+
+## Typed stimuli
+
+Stimuli are semantic events that wake only relevant interaction logic.
+
+Examples:
+
+```text
+PLAYER_UTTERANCE
+SOCIAL_HOSTILITY
+APOLOGY
+GREETING
+EMOTE_RECEIVED
+AMBIENT_SOCIAL_OPPORTUNITY
+WITNESSED_DEATH
+ACTOR_JOINED
+ACTOR_LEFT
+DANGER_CHANGED
+WORLD_EVENT
+FACTION_EVENT
+TASK_EVENT
+```
+
+The exact taxonomy should reuse existing event contracts where possible.
+
+## Indexed arbitration
+
+Never scan every definition on every tick.
+
+Target:
+
+```text
+stimulus type
     ↓
-beat group/precedence
+generated/indexed candidate IDs
     ↓
-beat relevance + contextual modifiers
+eligibility predicates
     ↓
-active-beat stickiness / cooldown
+situation/beat precedence
     ↓
 behavior eligibility
     ↓
-behavior relevance + contextual modifiers
+context modifiers
     ↓
-deterministic tie-break
+deterministic winner / explicit no-op
 ```
 
-Every failed predicate and applied modifier needed to explain the winner must be
-available to the harness.
+## Simulation level of detail
 
-## Initial reference beats
+### Player interaction
 
-The architecture must be generic. Initial content exists only to prove it:
+- full pragmatic evaluation;
+- full behavior/beat trace;
+- speech/emote realization;
+- complete harness explanation.
 
-- `suspicious_first_contact`;
-- `argument_escalation`;
-- `reconciliation`.
+### Nearby/audible NPC scene
 
-Do not hardwire these IDs into the director.
+- bounded semantic scene;
+- speech/emote realization because the player can perceive it;
+- low participant/turn caps.
 
-## Canonical authoring and compiler ownership
+### Nearby but not perceived
 
-Target canonical source model:
+- semantic acts/outcomes only;
+- skip wording realization unless required.
+
+### Distant actors
+
+- no turn-by-turn flavor conversation;
+- retain only meaningful semantic outcomes if another authoritative system needs
+  them.
+
+## NPC-to-NPC interaction
+
+NPC-generated interactions remain semantic internally.
 
 ```text
-tools/semantic_harness/codebuilder/sources/conversation/
-├─ manifest.json
+NPC A behavior: SHARE_MEMORY
+topic: FORMER_JOB
+fact: occupation=mechanic
+
+        ↓ semantic event
+
+NPC B receives:
+DISCLOSURE_RECEIVED
+topic: FORMER_JOB
+speaker: A
+
+        ↓
+
+ACKNOWLEDGE / ASK_FOLLOWUP / SHARE_RELATED_MEMORY / DISMISS
+```
+
+Only perceived presentation is realized into text/emote.
+
+Do not generate text and feed it back through NLU.
+
+## Multi-participant scenes
+
+A scene must support 2+ actors without assuming a player participant.
+
+Bounded scene state may include:
+
+- participants;
+- roles/speaker;
+- active topic;
+- active beat;
+- recent semantic acts ring;
+- turn count;
+- cooldowns;
+- salient grounded facts;
+- deterministic seed.
+
+Do not persist full transcripts.
+
+## Emote and flavor reuse
+
+One behavior may have multiple presentation adapters.
+
+Example:
+
+```text
+behavior: REACT_TO_INSULT
+
+speech:
+  ResponsePlan → Dialogue Content
+
+emote:
+  GLARE_AT speaker
+
+ambient flavor:
+  "X shoots Y an irritated look."
+
+PBrainZ:
+  realize the same grounded plan naturally
+```
+
+The semantic decision remains shared.
+
+## Third-party adapters
+
+Third-party NPCs integrate by implementing supported actor/context interfaces.
+
+The director should query capabilities before selecting behaviors.
+
+Examples:
+
+- speech unavailable → speech-only behavior ineligible;
+- emote unavailable → use another presentation or no-op;
+- relationship unavailable → value is unknown, not fabricated.
+
+## Source architecture
+
+Canonical source should remain modular.
+
+Target shape:
+
+```text
+sources/conversation/
 ├─ content/
-├─ patterns/
+│  └─ social/
+│     ├─ argument/
+│     ├─ reconciliation/
+│     └─ first_contact/
+├─ beats/
+│  └─ social/
+│     ├─ argument_escalation.json
+│     ├─ reconciliation.json
+│     └─ suspicious_first_contact.json
+├─ behaviors/
+│  └─ social/
+│     ├─ warn.json
+│     ├─ retaliate_verbal.json
+│     ├─ deescalate.json
+│     └─ ...
 ├─ flows/
-├─ beats/          # if schema extension is selected
-├─ behaviors/      # if schema extension is selected
-└─ ui/
-        ↓
-one Conversation compiler
-        ↓
-validated/generated production Lua registries/shards
-generated translation keys and locale bundles
-generated manifests/indexes/fingerprints
-audit/provenance projections
+├─ patterns/
+├─ ui/
+└─ manifest.json
 ```
 
-Physical folders are not runtime identity. A different cohesive shard layout is
-acceptable if it preserves one manifest/compiler and stable canonical IDs.
+Avoid giant `social.json` catch-all files.
 
-### String rule
+## Source discovery
 
-Beat-related first-party semantic/domain strings are compiler-owned:
+Prefer deterministic compiler-side recursive discovery of approved source roots
+over manually appending every new shard to one growing manifest.
 
-- NPC response variants;
-- player suggestions/utterances;
-- beat/behavior labels displayed by the mod;
-- localized descriptions or player-facing status text;
-- response-pool text associated with beat behaviors.
+Project Zomboid runtime still receives explicit generated modules/indexes.
 
-Canonical source uses generic `translations` maps. CodeBuilder derives
-translation keys and writes locale bundles. EN is required fallback. New locales
-must not require Python/Lua whitelist edits.
+Authoring discovery and runtime loading are separate concerns.
 
-Generic developer-tool chrome is not semantic content and may remain ordinary
-UI code.
+## Runtime registry
 
-## Semantic Lab authoring lifecycle
+Target one canonical Conversation Registry/index authority.
 
-Three visible states:
+Temporary Semantic Lab changes use a worker-local overlay.
+
+Do not copy generated definitions into separate production registries.
+
+## Shared predicate engine
+
+Before adding a new condition evaluator, audit and reconcile existing:
+
+- flow predicates;
+- suggestion eligibility;
+- semantic/context constraints;
+- prototype beat predicates.
+
+The final interaction layer should use one typed/bounded predicate contract where
+practical.
+
+## Runtime modularity
+
+The final interaction director should be a small composition root over focused
+providers such as:
 
 ```text
-DRAFT
-    editable harness definition
-
-WORKER REGISTERED
-    validated definition executing in the disposable real Lua worker
-
-CANONICAL
-    compiler-owned production source, generated and reloaded
+InteractionDirector/
+├─ Context.lua
+├─ Predicate.lua
+├─ Pragmatics.lua
+├─ SituationArbitration.lua
+├─ BehaviorArbitration.lua
+├─ BeatState.lua
+├─ StimulusIndex.lua
+└─ Trace.lua
 ```
 
-A draft based on canonical production must be labeled as such.
+Exact filenames depend on existing conventions.
 
-### Draft operations
+Do not create these blindly if an existing module already owns the concern.
 
-The worker should expose bounded equivalents of the current Flow Editor:
+## Harness architecture
 
-- beat catalog;
-- validate beat;
-- preview beat;
-- register beat;
-- behavior catalog;
-- explain director arbitration.
+Use one integrated interaction/conversation authoring workflow.
 
-Registration is worker-local and must not write packaged source.
+Structural view:
 
-### Promotion
+- beat/situation predicates;
+- behaviors;
+- stimulus bindings;
+- capability requirements;
+- contextual modifiers.
 
-Canonical promotion must delegate to the existing CodeBuilder authoring service:
+Content view:
 
-```text
-draft
-→ validate
-→ diff
-→ canonical source edit
-→ compiler preview
-→ explicit validated write
-→ regenerate
-→ restart worker
-→ replay acceptance
-```
+- links to existing Dialogue Content records;
+- existing Dialogue Content editor remains the wording editor.
 
-No direct generated-Lua or translation edit.
+Simulation:
 
-## Observation contract
-
-Extend the existing worker observation with a bounded director projection,
-conceptually:
-
-```text
-observation.director
-- pragmatic interpretation
-- beat candidates
-- predicate trace
-- activeBefore / activeAfter
-- entered / exited
-- behavior candidates
-- applied modifiers
-- selectedBehavior
-- responsePlan lineage
-- override status
-```
-
-CLI, GUI, tests, and agents consume this same observation. Python must not infer
-a second decision.
-
-## Harness override semantics
-
-For focused tests, support:
-
-- Natural;
-- Force eligible;
-- Force active;
-- Disable.
-
-Forced states must be visibly marked `HARNESS_OVERRIDE` and must never count
-as proof that natural production arbitration works.
-
-## Performance
-
-- evaluate beats on conversation-relevant events/turns, never every NPC tick;
-- bound registered beats, predicates, candidate behaviors, trace size, salience,
-  cooldown history, and timeline;
-- compile indexes where useful;
-- avoid whole-catalog scans in ordinary turns;
-- no new save database.
+- natural arbitration;
+- active flows;
+- active beat;
+- behavior candidates;
+- actor/world snapshots;
+- trace/timeline;
+- speech/emote/flavor output.
 
 ## Optional PBrainZ
 
-PBrainZ may receive the same selected grounded ResponsePlan and realize it more
-flexibly. Offline authored/compositional realization and PBrainZ must share:
+PBrainZ receives the same grounded InteractionPlan/ResponsePlan.
 
-- semantic meaning;
-- beat selection;
-- behavior selection;
-- facts;
-- authority;
-- side effects.
+It does not become:
 
-The LLM is never the director of authoritative gameplay state.
+- NLU authority for offline behavior;
+- beat authority;
+- fact authority;
+- gameplay authority;
+- relationship/task/inventory authority.

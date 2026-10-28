@@ -1,145 +1,287 @@
-# Audit — Pragmatic Dialogue Beat Director
+# Audit — Pragmatic Interaction Director Recovery
 
-**Audited ProjectHoomans checkpoint:** `6fa471dec0fc1caec2d3b4871f56d4b102ae0e6f` on existing `main`.
+**Repository baseline before the prototype:** `bd98962a2358ed904a382669b2187c7f20c0fa29`.
 
-This audit is source/harness evidence. It is not native Project Zomboid live
-acceptance.
+**Audit state:** the interaction/director implementation is currently
+**uncommitted**. This is intentional and useful: it can be surgically reworked
+before becoming repository history.
 
-## Verified foundation
+## What the prototype proved
 
-### Production flow architecture
+The experimental implementation established several valuable behavioral facts.
 
-`PNC_SemanticDialogueFlowRegistry.lua` is a bounded data-only registry.
-Its runtime owns validation-backed `Register`, generated replacement, lookup,
-list, revision tracking, reset, and frame matching.
+### Keep as acceptance requirements
 
-Current authored flows include bounded examples such as:
+- typoed hostility such as `fuck ypuuuu` can remain `HOSTILE_REMARK` rather
+  than falling into generic clarification;
+- the same hostile semantic meaning can yield different reactions from grounded
+  NPC state:
+  - default → warning;
+  - aggressive/confident → verbal retaliation;
+  - panicked → de-escalation;
+- hostility followed by apology can transition from an argument situation into
+  reconciliation;
+- low forgiveness can legitimately favor ending the interaction;
+- a suspicious-first-contact situation can persist across multiple turns;
+- bounded director state can live in existing conversation/session context;
+- worker observations can expose candidate situations, predicate failures,
+  modifiers, transitions, selected behavior, and resulting presentation lineage;
+- a non-mutating draft preview / disposable worker-registration workflow is
+  feasible.
 
-- `greeting`;
-- `identity`;
-- `wellbeing`.
+These behaviors are useful. The current architecture underneath them is not
+accepted.
 
-They demonstrate triggers, accepted frames, response pools, branch offers,
-terminal states, suspension, cancellation, and slot capture.
+## Mechanically working does not mean architecturally accepted
 
-### Existing live authoring seam
+The focused prototype verification passed at audit time:
 
-`tools/semantic_harness/lua/worker/FlowEditor.lua` already:
+- 20 focused Python tests;
+- 3/3 focused Lua tests;
+- new Lua syntax checks;
+- `git diff --check`.
 
-- reads the production Flow Registry;
-- exposes production policy, semantic, response-pool, fact/event/capability
-  catalogs;
-- calls the real `Registry.Validate`;
-- worker-registers a valid draft through the real `Registry.Register`;
-- keeps the registration disposable and worker-local.
+The recovery work must preserve useful behavioral acceptance while replacing
+incorrect ownership boundaries.
 
-Existing tests prove a new draft flow can be validated, registered, and then
-selected by a real Lua-worker conversation turn.
+## Architectural drift found
 
-The Semantic Lab README explicitly defines the Flow Editor as an authoring
-surface over production Lua rather than a second Python flow engine.
+### 1. Director became a second response authority
 
-### Existing observability
-
-The Interaction Explorer is built from the live worker catalog and already
-projects policy branches, triggers, flows, capabilities, generated definitions,
-response pools, concepts, and speech acts.
-
-Worker turn observations already include IR/candidates, response, active flow
-state, translation, and side effects. This is the correct seam to extend with
-beat/director evidence.
-
-### Existing response composition
-
-`PNC_SemanticDialogueResponsePlan.lua` already provides a bounded,
-validated dialogue-act plan with:
-
-- dialogue act;
-- topic;
-- grounded fact references;
-- uncertainty;
-- tone/personality style;
-- bounded turns/segments/offers;
-- composition and rendering support.
-
-The beat/director system should produce or influence this existing plan rather
-than own final prose.
-
-### Existing compiler/translation authority
-
-The current Unified Semantic Dialogue Authority job has established:
+Current prototype logic effectively added:
 
 ```text
-tools/semantic_harness/codebuilder/sources/conversation/
-    content/
-    patterns/
-    flows/
-    ui/
-    manifest.json
-        ↓
-Conversation CodeBuilder
-        ↓
-generated runtime shards
-generated Conversation translation bundles
-generated manifests/indexes/fingerprints
+flow response
+    ↓ else
+director response
+    ↓ else
+LocalResponse
 ```
 
-EN is the required fallback. Additional locales are data-driven. Generated
-artifacts are downstream-only.
+and `DialogueDirector.ResolveResponse()` chooses director-specific response
+pools.
 
-## Verified current product gap
+This violates the target architecture.
 
-The current runtime has no first-class production concept corresponding to a
-social/dramatic **beat** that spans turns and biases reaction selection.
+The director may choose semantic behavior. It must not choose a parallel
+response catalog.
 
-There is no verified production:
+### 2. Director-specific wording/content authority appeared
 
-- `DialogueBeatRegistry`;
-- `DialogueDirector` with beat arbitration;
-- beat/behavior candidate explanation contract;
-- active-beat timeline;
-- Beat Studio draft editor;
-- beat scenario matrix;
-- beat draft preview/register protocol;
-- canonical compiler source type for beats/behaviors.
+Current prototype source includes director-specific wording pools and generated
+`Conversation/Director.json` metadata.
 
-Current flows model bounded conversational obligations well, but a flow such as
-identity or wellbeing is not the same thing as an argument, reconciliation,
-suspicious first contact, grief withdrawal, or other cross-turn social
-situation.
+This risks becoming a monolithic catch-all as new situations are added.
 
-## Important parity/regression signal
+Actual dialogue wording belongs in modular Dialogue Content records.
 
-The repository contains tests asserting that recognized hostile language routes
-to `HOSTILE_REMARK_RECEIVED` and must not use the generic clarification
-response. The user-observed Semantic Lab trace classified a typoed hostile
-utterance as `HOSTILE_REMARK` with high confidence but displayed generic
-clarification.
+### 3. Generated registry is copied into second production registries
 
-P0 must reproduce and explain that path through the current real worker before
-adding director intelligence. Recognized semantic meaning being discarded by a
-later layer is a parity bug, not a vocabulary problem.
+Current prototype:
 
-## Missing compiler/string contract
+```text
+Generated Conversation Registry
+→ DialogueDirectorCatalog
+→ DialogueBehaviorRegistry
+→ DialogueBeatRegistry
+```
 
-The new system must not introduce manually maintained Lua strings for beat
-labels, behavior labels, NPC reactions, suggestions, or response text.
+This duplicates canonical production identity.
 
-The existing modular Conversation compiler is the correct authority. This job
-may extend the manifest/schema with cohesive `beats` and `behaviors` source
-shards if that is the cleanest implementation, while keeping actual wording in
-Dialogue Content records and generating translation keys/bundles mechanically.
+Target:
 
-Do not create a separate beat translation pipeline.
+```text
+Generated Conversation Registry / indexes
+        ↓
+one production registry view
+        +
+worker-local draft overlay
+```
 
-## Constraints
+### 4. Runtime director is already too large
 
-- reuse PsychopatzCore NLU/candidates and existing Project Hoomans semantic
-  context/flows/ResponsePlan;
-- no second Python decision engine;
-- no arbitrary runtime JSON interpreter;
-- no direct beat mutation of relationship/inventory/task/world state;
-- no hardcoded EN/TL locale list;
-- no generated-file hand edits;
-- no per-NPC/per-tick global beat scans;
-- no native PZ launch or Workshop publication for developer acceptance.
+The prototype `PNC_SemanticDialogueDirector.lua` is already hundreds of lines
+with only three initial situations.
+
+The final architecture must separate:
+
+- context projection;
+- shared predicate evaluation;
+- situation/beat arbitration;
+- behavior arbitration;
+- bounded state;
+- trace/explanation.
+
+Before extracting new modules, audit existing flow/suggestion predicate logic to
+avoid creating multiple predicate engines.
+
+### 5. Beat Studio became a separate authoring universe
+
+The prototype Beat Studio handles structural editing and special canonical
+promotion logic, while ordinary Dialogue Content already has a dedicated,
+validated harness editing workflow.
+
+Target UI:
+
+```text
+Conversation / Interaction Module view
+├─ situation/beat structure
+├─ behaviors
+├─ linked Dialogue Content
+└─ Simulation / trace
+```
+
+Structural editing must link into the existing Dialogue Content editor for
+wording.
+
+Do not create a second wording editor.
+
+### 6. Compiler and authoring service accumulated director special cases
+
+The prototype added dedicated beat/behavior validation/merge/generation paths
+and a large director-specific canonical edit service.
+
+Some structural schema support is necessary, but the final design should favor:
+
+- small modular source shards;
+- shared schema helpers;
+- generic canonical-record authoring where possible;
+- deterministic source-root discovery;
+- shared generated registry/index infrastructure.
+
+### 7. Missing broader interaction abstraction
+
+The old implementation was still dialogue-centric.
+
+The actual requirement includes:
+
+- player dialogue;
+- NPC-to-NPC semantic scenes;
+- multi-NPC scenes;
+- emotes;
+- ambient flavor;
+- world-event reactions;
+- gossip;
+- third-party actors.
+
+The accepted abstraction therefore needs a **Pragmatic Interaction Director**,
+not a dialogue-response director.
+
+## Desired normalized input contracts
+
+The interaction layer should consume read-only, bounded provider projections
+rather than arbitrary subsystem internals.
+
+Conceptual contracts:
+
+```text
+ActorSnapshot
+- stable ID
+- capabilities
+- normalized disposition
+- condition/emotion
+- current activity
+- semantic traits/tags
+
+RelationshipSnapshot
+- familiarity
+- trust/respect/approval
+- faction relation
+- other bounded social factors
+
+WorldSnapshot
+- danger
+- power/water
+- weather/season/time
+- semantic location
+- local zombie pressure
+- relevant world events
+
+KnowledgeSnapshot
+- actor-known grounded facts/events
+- source/provenance where required
+
+SceneContext
+- participants/roles
+- current topic
+- recent bounded semantic acts
+- active beat
+- cooldowns
+- salience
+```
+
+Missing information remains unknown. The director must never fabricate it.
+
+## Third-party actor requirement
+
+Third-party NPCs should integrate through an adapter/provider contract rather
+than exposing private internals to beats.
+
+Conceptually:
+
+```text
+GetStableID()
+GetPosition()
+GetCapabilities()
+ProjectDisposition()
+ProjectCondition()
+ProjectRelationships(otherActor)
+ProjectKnowledge()
+ProjectActivity()
+CanSpeak()
+CanEmote()
+SubmitAuthorizedIntent(intent)
+```
+
+Exact APIs may differ after codebase audit.
+
+## Performance requirement
+
+Never:
+
+```text
+every tick
+  every NPC
+    every beat
+```
+
+Use:
+
+```text
+typed stimulus
+→ stimulus index
+→ small candidate set
+→ bounded evaluation
+```
+
+Examples of stimuli:
+
+- social hostility;
+- greeting;
+- apology;
+- idle social opportunity;
+- actor enters/leaves;
+- witnessed death;
+- faction event;
+- power/water change;
+- helicopter event;
+- danger changed;
+- emote;
+- task/world event.
+
+## Persistence requirement
+
+Do not persist rendered transcripts.
+
+If a meaningful interaction creates durable knowledge, persist the compact
+semantic fact/event through the system that owns that memory.
+
+Example:
+
+```text
+speaker = Bob
+fact = formerOccupation(mechanic)
+source = witnessed_conversation
+```
+
+not the sentence Bob happened to say.

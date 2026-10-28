@@ -1,193 +1,215 @@
-# Harness Acceptance — Pragmatic Dialogue Beat Director
+# Harness Acceptance — Pragmatic Interaction Director
 
-The Semantic Lab is not optional tooling for this goal. It is the primary
-developer acceptance surface for beat/director behavior.
+The Semantic Lab/harness is the primary developer acceptance surface.
 
-## Authority rule
+## Truth source
 
-Acceptance must run through the existing real production Lua worker and the
-same Core + Project Hoomans semantic modules used by the harness.
+All semantic/pragmatic/behavior/beat decisions must come from the real production
+Lua worker and shared production providers.
 
-Python may present, edit, schedule, compare, or project worker evidence. It must
-not implement a second beat selector or response policy.
+Python may:
 
-## Required per-turn evidence
+- display;
+- edit canonical source;
+- schedule scenarios;
+- compare;
+- filter;
+- visualize.
 
-A director-enabled worker turn must expose enough bounded evidence to recover:
+Python must not implement a second interaction director.
 
-1. original player text/frame;
-2. Core candidates and selected semantic IR;
-3. active/suspended flow state before/after;
-4. pragmatic interpretation/context references used;
-5. every beat considered in the bounded candidate set;
-6. predicate pass/fail reasons;
-7. beat activeBefore/activeAfter and entry/exit reason;
-8. candidate behaviors;
-9. contextual modifiers actually applied;
-10. selected behavior or explicit no-selection;
-11. resulting ResponsePlan;
-12. response-pool/content lineage;
-13. translation lookup and final rendered NPC text;
-14. authoritative side effects/transport, if any;
-15. any harness override marker.
+## Required per-interaction evidence
 
-A selected beat without final rendered text is not end-to-end acceptance.
+For a direct player turn or NPC semantic act, expose enough bounded evidence to
+recover:
 
-## Beat Studio acceptance
+1. source stimulus;
+2. human NLU candidates/IR when applicable;
+3. actor/relationship/world/knowledge projections actually used;
+4. active/suspended flows;
+5. pragmatic interpretation;
+6. one-shot behavior candidates;
+7. situation/beat candidates where applicable;
+8. failed predicates;
+9. contextual modifiers;
+10. active beat before/after;
+11. selected behavior or explicit no-op;
+12. InteractionPlan;
+13. ResponsePlan / EmotePlan / GameplayIntent projections;
+14. Dialogue Content lineage when speech is realized;
+15. translation lookup;
+16. final player-visible speech/emote/flavor;
+17. authoritative side effects;
+18. harness override status.
 
-The existing Semantic Lab must support, inside the same application:
+## String/content acceptance
 
-- list/search production beats and behaviors;
-- open a canonical beat;
-- clone/new draft;
-- edit entry/maintain/exit predicates;
-- edit candidate behaviors and bounded relevance metadata;
-- edit cooldown/turn/group metadata;
-- inspect normalized advanced data;
-- Validate Draft through production Lua validation;
-- Preview Draft against the current scenario without committing a normal turn;
-- Register Draft worker-locally;
-- run a real multi-turn conversation against the registered draft;
-- Save/Open bounded draft files for review;
-- show Draft / Worker Registered / Canonical provenance.
+All speech/flavor wording must be editable through ordinary Dialogue Content
+authoring.
 
-Registration must disappear on worker restart unless promoted through canonical
-CodeBuilder source.
+Acceptance must prove:
 
-## Compiler/string acceptance
+- open a content family referenced by a behavior;
+- edit EN and one additional locale;
+- validate;
+- preview;
+- write canonical source;
+- compile;
+- regenerate;
+- reload worker;
+- select it through the intended interaction behavior.
 
-Beat/behavior authoring must prove the complete source→generated→worker loop.
+No director-specific string editor is required.
 
-At least one acceptance case must:
+## Structural authoring acceptance
 
-1. modify a canonical beat/behavior/content source record;
-2. change first-party EN wording and one additional available locale;
-3. regenerate through the existing Conversation compiler;
-4. show generated translation key/bundle/runtime artifacts;
-5. show no manual generated-file edit;
-6. regenerate again byte-identically;
-7. restart/reload the worker;
-8. prove the new generated wording is selected through the intended beat and
-   behavior.
+The integrated interaction module view must support bounded editing of:
 
-Also prove a synthetic additional locale is discovered/generated without adding
-a language whitelist in Python/Lua.
+- situation/beat definitions;
+- behavior definitions;
+- stimulus bindings;
+- predicates;
+- contextual modifiers;
+- capability requirements;
+- references to Dialogue Content IDs.
 
-## Natural vs override testing
+It must expose:
 
-Simulation may provide:
+- canonical source;
+- draft;
+- worker overlay;
+- provenance;
+- generated diff.
 
-- Natural;
-- Force eligible;
-- Force active;
-- Disable.
+## Natural vs forced acceptance
 
-Any forced/disabled result must visibly carry `HARNESS_OVERRIDE`.
+Harness diagnostic modes may force or disable eligibility for focused testing.
 
-Forced cases are useful for behavior isolation but **cannot** prove natural beat
-entry/selection.
+Every forced result must show a visible `HARNESS_OVERRIDE` marker.
 
-Every initial reference beat must have at least one natural production path.
+Forced cases do not satisfy natural-selection acceptance.
 
-## Required scenario families
+## Direct dialogue scenarios
 
-### Baseline parity
+Protect at minimum:
 
-Protect:
+- typoed recognized hostility;
+- ambiguous low-confidence clarification;
+- active flow response ownership;
+- argument escalation;
+- reconciliation;
+- first-contact context;
+- interruption and resumption of unrelated grounded flows where applicable.
 
-- recognized hostile language does not fall into generic clarification;
-- truly ambiguous/low-confidence language can still clarify safely;
-- existing command/quest/gift/needs/wellbeing flows remain functional.
+## NPC-to-NPC acceptance
 
-### Argument escalation
+At least one 2-NPC scene must prove:
 
-Use multiple paraphrases/typos rather than one exact insult.
+- no player participant required;
+- NPC A emits a semantic act/fact/topic;
+- NPC B consumes the semantic event directly;
+- generated English is not reparsed;
+- response behavior depends on B's projected state/relationship/knowledge;
+- only perceived speech/emote is realized.
+
+## Multi-NPC acceptance
+
+At least one 3+ actor scene must prove:
+
+- bounded participant count;
+- explicit speaker/target roles;
+- no pairwise explosion;
+- bounded turn count;
+- interruption/exit works.
+
+## Emote/flavor acceptance
+
+At least one semantic behavior must be presented in more than one mode, such as:
+
+- speech;
+- emote;
+- ambient flavor.
+
+The semantic decision must remain shared.
+
+## World-event/gossip acceptance
+
+At least one real/synthetic grounded world event must:
+
+- enter through a typed stimulus;
+- become available only to actors allowed to know it;
+- influence interaction behavior/topic;
+- never invent unsupported world facts.
+
+## Third-party adapter acceptance
+
+Provide a synthetic adapter that does not use Project Hoomans NPC internals.
+
+Prove it can:
+
+- project actor capability/disposition/condition;
+- project relationship/knowledge as available;
+- participate in the same behavior/beat system;
+- remain valid with some fields unknown.
+
+## LOD/performance acceptance
+
+Instrument and verify:
+
+- definitions considered per stimulus;
+- predicates evaluated;
+- behaviors considered;
+- scene participants;
+- active scenes;
+- turns per scene;
+- trace bytes;
+- semantic-memory writes.
+
+Required proof:
+
+- no whole-catalog/all-NPC per-tick scan;
+- nearby perceived scenes may realize text;
+- non-perceived scenes can skip realization;
+- distant actors do not simulate flavor conversation turn-by-turn;
+- candidate evaluation remains bounded under synthetic high-NPC scenarios.
+
+## Persistence acceptance
+
+No full transcript persistence.
+
+If a scene creates durable knowledge, assert the persisted result is a bounded
+semantic fact/event rather than rendered prose.
+
+## Compiler acceptance
 
 Prove:
 
-- hostility is understood;
-- argument beat naturally enters under its conditions;
-- behavior choice changes with grounded personality/relationship context;
-- no unauthorized gameplay mutation occurs.
+- modular source-root discovery;
+- stable canonical IDs;
+- deterministic generated indexes;
+- duplicate/collision/reference validation;
+- EN fallback;
+- data-driven additional locale;
+- two-pass byte-identical generation;
+- no manual generated-file edits.
 
-### Reconciliation
+## Final developer acceptance
 
-After prior hostility:
+R9 completes only when the harness can explain and exercise:
 
-- apology/repair language is interpreted;
-- reconciliation can become eligible;
-- NPC may accept, remain guarded, refuse, or end topic according to context;
-- behavior is not scripted solely by one apology phrase.
+- direct conversation;
+- NPC-to-NPC interaction;
+- multi-NPC scene;
+- emote/flavor reuse;
+- grounded world stimulus;
+- third-party adapter;
+- bounded performance;
 
-### Suspicious first contact
+while also proving:
 
-Prove first-contact context can bias questioning/warning/de-escalation without
-turning every unrelated utterance into identity evasion.
+- one semantic authority;
+- one interaction/context authority;
+- one ResponsePlan/Dialogue Content speech path;
+- one gameplay authority.
 
-### Flow coexistence
-
-At least one case must show a beat interrupting/coexisting with a flow and the
-flow later resuming/retiring correctly.
-
-## Timeline acceptance
-
-The GUI must offer a bounded turn timeline that can show, at minimum:
-
-- player/NPC turn;
-- active flow;
-- active beat;
-- entered/exited beat;
-- selected behavior.
-
-Selecting a turn must expose the real worker evidence for that turn.
-
-## Regression capture
-
-From a successful conversation, the workbench should be able to save a bounded
-regression case containing:
-
-- scenario inputs/identity;
-- turn sequence;
-- expected semantic/beat/behavior constraints;
-- allowed response pool(s) or semantic content IDs;
-- forbidden side effects;
-- natural vs override mode.
-
-Where wording intentionally varies, do not require one exact sentence.
-
-Headless replay must use the same production Lua worker.
-
-## Scenario matrix
-
-The harness must support a bounded matrix over useful context dimensions such
-as:
-
-- aggression/confidence/fear;
-- relationship/trust/respect;
-- safe vs dangerous situation;
-- relevant active flow state.
-
-The matrix should report beat/behavior outcomes and failures without launching
-one unbounded worker per combinatorial possibility.
-
-## Performance/bounds
-
-Measure and cap:
-
-- beat count;
-- predicates per beat;
-- behavior candidates per beat;
-- active/recent beat state;
-- pragmatic topic/reference state;
-- trace rows/bytes;
-- timeline turns;
-- catalog page sizes.
-
-No per-NPC/per-tick whole-catalog evaluation is allowed.
-
-## Developer completion
-
-Developer-side acceptance is complete only when P8 in `ROADMAP.md` passes.
-
-Native Project Zomboid SP/MP validation is user-owned unless the user explicitly
-reassigns it.
+Native Project Zomboid SP/MP remains user-owned unless explicitly reassigned.

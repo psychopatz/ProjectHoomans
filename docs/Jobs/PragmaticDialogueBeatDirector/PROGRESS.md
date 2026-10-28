@@ -1,77 +1,128 @@
-# Progress — Pragmatic Dialogue Beat Director
+# Progress — Pragmatic Interaction Director Recovery
 
-**Status:** READY TO IMPLEMENT.
+**Status:** RECOVERY / RE-ARCHITECTURE REQUIRED.
 **Current branch:** `main`.
-**Audited baseline:** `6fa471dec0fc1caec2d3b4871f56d4b102ae0e6f`.
-**Current phase:** P0 — baseline, parity, and contracts.
+**Documentation baseline commit:** `bd98962a2358ed904a382669b2187c7f20c0fa29`.
+**Current phase:** R0 — freeze, classify, and protect useful evidence.
 
-## Verified starting foundation
+## Important worktree state
 
-- root repository policy is compact and job-local;
-- worktree was clean and `main` matched `origin/main` at documentation start;
-- production DialogueFlowRegistry exists and is data-only/validated;
-- worker FlowEditor already exposes real production catalogs and worker-local
-  flow validation/registration;
-- existing tests prove a registered draft flow runs in a real worker turn;
-- ResponsePlan is bounded and composable;
-- Semantic Lab already has Flow Editor and live Interaction Explorer seams;
-- modular Conversation CodeBuilder source is canonical;
-- generated runtime/translation artifacts are downstream-only;
-- EN fallback + data-driven locale generation already exist.
+The current implementation prototype is uncommitted.
 
-## Parent product gap
+Do not commit it wholesale.
 
-Project Hoomans still lacks a first-class pragmatic/dramatic beat layer and an
-explainable director that can use semantic meaning + context + personality/
-relationship/world state to choose among reusable conversational behaviors.
+It contains useful experiments mixed with architecture that must be replaced.
 
-It also lacks a Beat Studio and compiler-owned beat/behavior source/string
-workflow.
+## Audit findings
 
-## Immediate Next Chunk — P0A
+### Protected useful behavior
 
-1. Recheck exact local `main`/upstream/status and actual Core checkout used by
-   the worker.
-2. Reproduce the hostile-language case through the real Lua worker, including
-   typo/paraphrase variants.
-3. Capture selected Core candidates/IR, policy branch, flow state, response
-   source/plan, translation, final text, and side effects.
-4. Reconcile the result against the existing hostile-language tests that forbid
-   generic clarification.
-5. If the worker/runtime path is wrong, repair that parity defect with focused
-   regression coverage before implementing beats.
-6. Map the exact compiler/manifest extension points for beat/behavior canonical
-   sources and generated strings.
-7. Record P0A evidence here, then continue automatically into P0B/P1.
+Keep acceptance coverage for:
 
-## Mandatory continuation
+- typoed `fuck ypuuuu` preserving recognized `HOSTILE_REMARK`;
+- same semantic hostility selecting different grounded reactions:
+  - warning;
+  - retaliation;
+  - de-escalation;
+- argument → apology → reconciliation;
+- low-forgiveness refusal/exit behavior;
+- suspicious first-contact persistence;
+- bounded director session state;
+- candidate/predicate/modifier worker observations;
+- multi-turn timeline concept;
+- non-mutating draft preview concept.
 
-The autonomous goal owns P0–P8. After each accepted chunk:
+### Rework
 
-- update this file to current truth;
-- select the next mandatory roadmap chunk;
-- continue automatically.
+- director state/context integration;
+- structural beat/behavior definitions;
+- compiler support for structural records;
+- worker-local draft overlay;
+- structural harness authoring;
+- explanation/trace UI;
+- prototype predicate logic;
+- behavior scoring.
 
-Do not return merely because a registry, editor panel, test, or one initial beat
-is complete.
+These concepts may survive but their APIs/ownership are not frozen.
+
+### Remove/replace
+
+Do not preserve these as accepted architecture:
+
+- `DialogueDirector.ResolveResponse` as a response authority;
+- director-specific response pools;
+- `responses/director.json` as wording authority;
+- catch-all `Conversation/Director.json` wording bucket;
+- `flow response → director response → LocalResponse` realization precedence;
+- generated registry copied into separate production Beat/Behavior registries;
+- giant catch-all `beats/social.json` and `behaviors/social.json`;
+- special-case director canonical-authoring service as the long-term model;
+- standalone Beat Studio as a separate wording workflow;
+- partially implemented old P7 override path.
+
+## Immediate Next Chunk — R0A
+
+1. Produce a file/hunk recovery matrix for every current prototype change:
+   `KEEP`, `REWORK`, or `REMOVE`.
+2. Identify the exact hostile-recognition parity fix and its minimum regression
+   coverage independently from the rest of the prototype.
+3. Identify the exact worker-observation/timeline pieces worth retaining.
+4. Map existing:
+   - ResponsePlan/Dialogue Content authority;
+   - Flow predicate/state machinery;
+   - suggestion eligibility;
+   - Conversation Registry/index;
+   - Dialogue Content harness authoring;
+   - world/context/relationship/knowledge providers.
+5. Map which prototype files can be reverted/replaced without losing protected
+   behavioral tests.
+6. Record the recovery matrix here.
+7. Continue into R1 automatically.
+
+## Mandatory R1 direction
+
+The first implementation recovery after R0 is:
+
+> restore one ResponsePlan / Dialogue Content realization path.
+
+Do not begin third-party adapters, ambient scenes, or performance scheduling
+until the split response authority is removed.
+
+## Later required capabilities
+
+The parent goal still owns R0–R9, including:
+
+- typed stimuli;
+- normalized actor/world/social projections;
+- third-party actor adapters;
+- pragmatic resolver;
+- one-shot behavior arbitration;
+- optional beat state;
+- event-driven candidate indexing;
+- LOD;
+- NPC-to-NPC semantic scenes;
+- multi-NPC scenes;
+- emote/flavor reuse;
+- grounded gossip/world events;
+- integrated interaction workbench.
 
 ## Stop conditions
 
-Stop early only for:
+Under autonomous implementation, stop early only for:
 
-- unsafe concurrent ownership/divergence that cannot be reconciled;
-- a required external capability/auth boundary with no accepted fallback;
-- a proven architecture conflict requiring user choice;
-- completion of all P8 developer-side gates.
+- unsafe concurrent worktree ownership;
+- irreconcilable external dependency;
+- an architecture choice that genuinely requires user direction;
+- completion of all R9 developer gates.
 
-Do not stop merely for native user-owned PZ acceptance.
+Do not stop merely because a recovery chunk or one example scene works.
 
 ## Safety
 
 - no new branch;
 - no push without explicit authorization;
 - no Workshop publication;
-- no native PZ launch;
+- no native PZ launch for ordinary developer acceptance;
 - no source-save mutation;
 - no root `AGENTS.md` goal-state edits;
-- no generated-file hand fixes.
+- no hand-editing generated artifacts.

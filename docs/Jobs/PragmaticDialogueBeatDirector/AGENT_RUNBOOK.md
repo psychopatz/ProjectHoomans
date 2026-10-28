@@ -1,6 +1,6 @@
-# Agent Runbook — Pragmatic Dialogue Beat Director
+# Agent Runbook — Pragmatic Interaction Director Recovery
 
-Use this runbook only while implementing this job.
+Use this runbook only for the job in this directory.
 
 ## Read order
 
@@ -14,156 +14,182 @@ Read root `AGENTS.md`, then:
 6. `HARNESS_ACCEPTANCE.md`;
 7. `PROGRESS.md` last.
 
-Do not reread historical semantic-job archaeology unless a specific regression
-requires it.
+## Critical recovery rule
 
-## Parent-goal rule
+The current uncommitted director/Beat Studio implementation is an experimental
+prototype.
 
-The complete developer objective is P0–P8.
+Do **not**:
 
-A phase or bounded chunk completing is not a stop condition. Under the provided
-autonomous `/goal`:
+- continue the old P7/P8 roadmap;
+- commit it wholesale;
+- assume green prototype tests mean the architecture is accepted;
+- preserve a file/API merely because it already exists.
 
-```text
-implement current chunk
-→ validate
-→ update PROGRESS
-→ select next mandatory roadmap chunk
-→ continue
-```
+Start from R0 in `PROGRESS.md`.
 
-Stop early only for a genuine technical/authorization/scope blocker or after
-all developer-implementable P8 gates pass.
+## Preserve behavior, not accidental architecture
 
-## Reuse before extension
+Protected outcomes include:
 
-Start from existing owners:
+- recognized typoed hostility remains understood;
+- grounded actor context can change reaction;
+- multi-interaction situations can transition naturally;
+- state remains bounded;
+- the harness can explain decisions.
 
-- PsychopatzCore semantic parser/candidates;
-- Project Hoomans DialogueFlowRegistry/FlowKernel;
-- ContextState and existing fact/context projection;
-- DialoguePolicy/LocalResponse;
-- ResponsePlan and ResponseCatalog;
-- worker FlowEditor and production observation;
-- Semantic Lab Studio/Simulation/Inspector;
-- modular Conversation CodeBuilder and authoring service.
+You may replace the implementation underneath those outcomes.
 
-Do not create a second parser, conversation runtime, Python director, compiler,
-translation system, or save database.
+## Single-authority rules
 
-## Compiler/source discipline
+Never create a second:
 
-Canonical authoring is under the existing modular Conversation CodeBuilder
-source model.
+- NLU parser;
+- conversation/context authority;
+- response planner;
+- dialogue-content authority;
+- translation system;
+- gameplay-effect authority.
 
-When this job introduces beats/behaviors:
+The interaction director ends at semantic behavior/InteractionPlan.
 
-1. extend the canonical schema/manifest cleanly;
-2. author beat/behavior definitions and Dialogue Content in canonical source;
-3. derive translation keys/locale bundles mechanically;
-4. compile generated Lua/JSON/manifests;
-5. inspect the generated diff;
-6. run focused tests;
-7. run a second generation and prove idempotence;
-8. commit source plus generated outputs together.
+Speech continues through existing ResponsePlan + Dialogue Content.
 
-Generated output is never an authoring surface.
+## Content rules
 
-### String rule
+All first-party wording is ordinary Dialogue Content.
 
-Do not hardcode beat-specific first-party semantic/domain strings in production
-Lua or Python.
+Do not introduce director-specific content pools or translation buckets.
 
-Compiler-owned strings include:
+Structural situation/behavior definitions may reference canonical content IDs.
 
-- NPC response variants;
-- player suggestions/utterances;
-- beat/behavior labels displayed by the mod;
-- localized descriptions/status text tied to semantic content;
-- response text selected by beat behavior.
+Use the existing Dialogue Content authoring workflow for text changes.
 
-Use generic `translations` maps. EN is fallback. Do not add TL-specific normal
-control flow or a fixed locale list.
+## Generic interaction rules
 
-Generic Semantic Lab chrome is not semantic content and may remain in Python UI
-code.
+The target is not dialogue-only.
 
-## Beat/runtime discipline
+All architecture must be evaluated for reuse by:
 
-- Beat definitions are data, not custom imperative scripts.
-- Flows own bounded obligations/protocols; beats own social/dramatic situations.
-- Behaviors are reusable across beats.
-- Final prose remains Dialogue Content/ResponseCatalog responsibility.
-- Gameplay effects remain on existing domain/action authority paths.
-- High-confidence social interpretation does not imply authorization for an
-  ambiguous gameplay effect.
-- All beat/behavior selection must be inspectable from real worker evidence.
-- Keep context, beat state, cooldowns, candidate counts, trace and timeline
-  bounded.
+- player ↔ NPC;
+- NPC ↔ NPC;
+- multi-NPC scenes;
+- emotes;
+- ambient flavor;
+- gossip;
+- world events;
+- third-party actors.
 
-## Harness authoring discipline
+If a design only works cleanly for player text conversations, it is not the
+accepted abstraction.
 
-Temporary beat drafts may be validated, previewed and registered only inside
-the disposable worker.
+## NPC-generated semantics
 
-Clearly distinguish:
+Do not generate English for an NPC and parse it again internally.
 
-- Draft;
-- Worker Registered;
-- Canonical.
+Pass semantic acts/facts/topics directly between interaction participants.
 
-Diagnostic force/disable modes must emit a visible `HARNESS_OVERRIDE` marker
-and cannot satisfy natural-arbitration acceptance.
+Realize text only for presentation.
 
-Canonical promotion must delegate to the existing CodeBuilder authoring/write
-path, then restart/reload the worker and replay acceptance.
+## Adapter/provider discipline
 
-## Validation discipline
+Interaction definitions consume bounded semantic projections.
 
-At minimum for each coherent slice:
+They must not read arbitrary private subsystem state.
+
+Project Hoomans and third-party NPCs may provide different backing data but
+should project into common normalized semantics/capabilities.
+
+Unknown stays unknown.
+
+## Performance discipline
+
+No:
+
+- all-NPC/all-beat per-frame loops;
+- unbounded nearby-pair combinatorics;
+- whole-catalog scans per stimulus;
+- unbounded transcripts;
+- unbounded scene memory.
+
+Use:
+
+- typed event/stimulus wakeups;
+- generated indexes;
+- candidate caps;
+- scene caps;
+- turn caps;
+- cooldowns;
+- simulation LOD;
+- semantic-memory promotion only for meaningful outcomes.
+
+## Source/compiler discipline
+
+Prefer small modular authoring shards.
+
+Avoid giant catch-all `social.json`, `Director.json`, or equivalent files.
+
+Prefer deterministic compiler-side discovery of approved source roots.
+
+Generated runtime still uses explicit deterministic manifests/indexes.
+
+Generated files are never hand-authored.
+
+## Harness discipline
+
+The final workbench is integrated.
+
+Structural interaction editing should link to the existing Dialogue Content
+editor for wording.
+
+Python presents and edits bounded source definitions. It must not implement a
+parallel interaction engine.
+
+All decision truth comes from the real Lua worker/production providers.
+
+Harness-only overrides must be visibly marked and never count as natural
+acceptance.
+
+## Validation cadence
+
+For every accepted recovery slice:
 
 - focused Python tests;
-- focused production Lua tests;
-- real Lua-worker conversation cases;
+- focused Lua tests;
+- real-worker semantic cases;
 - negative/ambiguous cases;
-- compiler schema/build tests where source changes;
-- two-pass CodeBuilder idempotence when generated outputs change;
-- full native Lua suite for accepted runtime/compiler slices;
-- Kahlua/static verifier when available;
+- compiler tests where canonical source changes;
+- deterministic second generation;
+- source/generated diff review;
 - `git diff --check`;
 - no source-save mutation.
 
-Do not count:
+Performance slices must include instrumentation, not only functional tests.
 
-- JSON shape checks alone;
-- Python-only simulations;
-- forced-beat override alone;
-- selected IR without final rendered response;
-- one exact scripted dialogue as proof of emergence.
-
-## Git and environment
+## Git discipline
 
 Use existing `main` only.
 
-Before each coherent edit/commit:
+The current worktree is intentionally dirty from the prototype.
 
-- inspect branch/HEAD/status/upstream;
+Before modifying it:
+
+- inspect status;
 - preserve unrelated work;
-- do not reset/rebase/stash/discard uncertain changes;
-- do not create a branch;
+- never reset/rebase/stash/discard uncertain changes;
+- stage/commit only coherent accepted recovery slices;
 - do not push unless explicitly authorized;
 - do not publish Workshop content;
-- do not launch native Project Zomboid for ordinary developer acceptance.
+- do not launch native PZ for ordinary developer acceptance.
 
-Local coherent commits are allowed after validation.
+## Documentation
 
-## Documentation updates
+`PROGRESS.md` is the current truth.
 
-Keep:
+After each accepted R-phase/chunk:
 
-- `ROADMAP.md` = full objective and phase gates;
-- `PROGRESS.md` = current evidence, current phase, immediate Next Chunk;
-- `ARCHITECTURE.md` = stable contracts;
-- `HARNESS_ACCEPTANCE.md` = real-worker/GUI acceptance rules.
+- record actual evidence;
+- update the immediate next chunk;
+- continue automatically under an autonomous `/goal`.
 
-Do not add current progress to root `AGENTS.md`.
+Do not put job progress into root `AGENTS.md`.

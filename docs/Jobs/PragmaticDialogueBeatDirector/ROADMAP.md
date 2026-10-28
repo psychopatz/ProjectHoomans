@@ -1,227 +1,252 @@
-# Roadmap — Pragmatic Dialogue Beat Director
+# Roadmap — Pragmatic Interaction Director Recovery
 
-**Parent status:** READY TO IMPLEMENT.
-**Developer completion boundary:** P8.
+**Parent status:** RECOVERY / RE-ARCHITECTURE REQUIRED.
 
-A phase or chunk completing is not completion of this parent goal. When running
-under the autonomous `/goal`, accept each phase, update `PROGRESS.md`, then
-continue automatically through the next mandatory phase.
+The old P0–P8 dialogue-director roadmap is superseded.
 
-## P0 — baseline, parity, and contracts
+Do not continue from the prototype's partially implemented P7.
 
-### P0A — reproduce the current conversation seam
+The mandatory developer objective is R0–R9.
 
-Using the real production Lua worker:
+## R0 — freeze, classify, and protect useful evidence
 
-- reproduce the recognized-hostile → displayed-response path represented by the
-  user-observed Semantic Lab case and protected hostile-language tests;
-- record Core candidates/IR, selected policy branch, flow state, response pool,
-  ResponsePlan, translation, rendered text, and side effects;
-- repair any verified production/harness parity defect causing recognized
-  hostile meaning to fall into generic clarification;
-- preserve ambiguous-input clarification behavior.
+Audit the entire current uncommitted prototype.
 
-### P0B — freeze director/compiler contracts
+For every modified/new implementation file or coherent hunk classify:
 
-- map existing FlowRegistry/FlowKernel/ContextState/ResponsePlan and CodeBuilder
-  seams;
-- define bounded beat/behavior schemas and observation envelope;
-- define canonical compiler ownership for beat/behavior metadata and strings;
-- prove no duplicate parser/compiler/decision authority is needed.
+- `KEEP` — behavior/test/observability worth retaining;
+- `REWORK` — useful concept with wrong ownership/API;
+- `REMOVE` — parallel authority or dead-end implementation.
 
-**Gate:** baseline behavior is truthful and the new contracts map to existing
-owners rather than parallel systems.
+Mandatory protected acceptance:
 
-## P1 — compiler-backed Beat/Behavior registries
+- typoed recognized hostility does not become generic clarification;
+- context can change behavior while semantic meaning remains stable;
+- argument → apology → reconciliation transition;
+- bounded session state;
+- explainable worker trace.
 
-Implement production data-only registries and compiler support.
+Do not commit the prototype as-is.
+
+**Gate:** a written recovery matrix exists and no old-P7 work continues.
+
+## R1 — restore single response/content authority
+
+Remove prototype ownership that lets the director directly select its own
+response pools.
 
 Required:
 
-- validated beat definitions;
-- reusable behavior definitions;
+- no `DialogueDirector.ResolveResponse` response authority;
+- no `flow → director response → local response` competing realization path;
+- behavior output becomes semantic intent/InteractionPlan;
+- existing ResponsePlan/Dialogue Content becomes the only speech path;
+- preserve prototype behavioral acceptance through the unified path.
+
+**Gate:** a selected behavior can alter ResponsePlan semantics without creating
+a second response catalog.
+
+## R2 — migrate director wording into ordinary modular Dialogue Content
+
+Remove the architectural idea of director-owned response strings.
+
+Required:
+
+- migrate warning/retaliation/de-escalation/reconciliation/first-contact wording
+  into modular Dialogue Content records;
+- existing Dialogue Content harness editing works for those strings;
+- compiler generates locales normally;
+- no catch-all `responses/director.json`;
+- no catch-all `Conversation/Director.json` for dialogue wording;
+- labels/descriptions only exist when an actual player-facing UI needs them.
+
+**Gate:** change one interaction phrase through the normal Dialogue Content
+authoring workflow and prove generated EN + additional-locale output.
+
+## R3 — modular canonical situation/behavior source model
+
+Replace catch-all beat/behavior shards with small modular source records.
+
+Required:
+
+- one bounded situation/beat record per file or tiny coherent family;
+- one reusable behavior record per file or tiny coherent family;
 - stable canonical IDs;
-- manifest-backed canonical source shards;
-- generated bounded Lua artifacts;
-- generated audit/provenance metadata;
-- compiler-generated first-party beat/behavior strings and translation keys;
-- locale bundles discovered data-first with EN fallback;
-- deterministic second generation;
-- collision/duplicate/reachability/reference validation.
+- behavior references semantic content identity, not a director-specific response
+  pool;
+- deterministic compiler-side discovery of approved source roots;
+- no ever-growing manual manifest entry per file;
+- deterministic generated indexes/modules.
 
-No beat-specific production wording may be hardcoded in Lua/Python.
+**Gate:** adding one new beat/behavior source file requires no root compiler code
+or manifest list edit beyond approved source-root configuration.
 
-**Gate:** edit one canonical beat/content source record, regenerate, and prove
-the expected Lua + locale artifact changes deterministically while unrelated
-artifacts remain stable.
+## R4 — one registry, one predicate contract, modular runtime
 
-## P2 — Pragmatic Resolver and Dialogue Director
+### Registry
 
-Implement production runtime arbitration.
+Use one canonical Conversation Registry/index view.
 
-Required:
+Harness drafts use a worker-local overlay.
 
-- pragmatic interpretation consumes real NLU/context, not a second parser;
-- bounded topic/obligation/reference/social-event context;
-- beat entry/maintain/exit;
-- active-beat stickiness/cooldowns;
-- behavior eligibility and contextual modifiers;
-- deterministic/explainable winner;
-- explicit no-behavior path;
-- existing ResponsePlan output/augmentation;
-- no direct unauthorized gameplay mutations.
+Remove duplicate production beat/behavior registries if they no longer add
+unique authority.
 
-**Gate:** the same utterance can select meaningfully different behaviors under
-different grounded NPC/relationship contexts while semantic meaning remains
-constant.
+### Predicates
 
-## P3 — worker observation and headless inspection
+Audit existing flow/suggestion/context predicate engines.
 
-Extend the real worker observation/CLI with:
+Converge on one typed/bounded predicate evaluator where practical.
 
-- pragmatic interpretation;
-- beat candidates;
-- failed predicates;
-- activeBefore/activeAfter;
-- entered/exited beats;
-- behavior candidates and applied modifiers;
-- selected behavior;
-- ResponsePlan/content lineage;
-- explicit harness override markers.
+### Runtime
 
-No Python re-interpretation.
+Split the large prototype director into focused providers/reused modules.
 
-**Gate:** an agent can explain one turn end-to-end from text → semantic meaning
-→ context → beat → behavior → plan → rendered text/side effects using bounded
-worker evidence.
+**Gate:** production has one canonical registry identity and no giant
+dialogue-director composition module owns unrelated concerns.
 
-## P4 — Semantic Lab Beat Studio
+## R5 — typed stimuli and provider/adaptor projections
 
-Add Beat Studio inside the existing Semantic Lab/Studio.
+Implement the generic interaction input contract.
 
 Required:
 
-- browse/search canonical production beats/behaviors;
-- visual entry/maintain/exit predicate editing;
-- candidate behavior editing;
-- cooldown/limit/group editing;
-- raw normalized advanced view;
-- Validate Draft;
-- Preview Draft against current scenario/turn;
-- worker-local Register Draft;
-- Open/Save bounded draft;
-- visible Draft / Worker Registered / Canonical status;
-- no direct packaged-source mutation from worker registration.
+- typed stimuli for human semantic input, engine/world events, NPC semantic acts,
+  emotes/tasks/social events;
+- bounded ActorSnapshot;
+- RelationshipSnapshot;
+- WorldSnapshot;
+- KnowledgeSnapshot;
+- SceneContext;
+- explicit unknown handling;
+- provider capability/provenance visibility;
+- third-party adapter contract.
 
-Reuse existing Flow Editor/session/service patterns.
+No beat may read arbitrary subsystem internals directly.
 
-**Gate:** create or modify a draft beat, validate and preview it, worker-register
-it, then exercise it through a real multi-turn production Lua conversation
-without restarting native PZ.
+**Gate:** Project Hoomans and a synthetic third-party actor adapter can project
+into the same interaction contract.
 
-## P5 — Simulation beat inspector, timeline, and compiler promotion
+## R6 — pragmatic resolver and behavior arbitration
 
-### Inspector
+Implement the missing original intelligence layer.
 
-Show human-readable:
+Required pragmatic inputs:
 
-- why each beat was eligible/ineligible;
-- why a beat entered/exited/remained;
-- behavior candidate ranking and modifiers;
-- selected behavior;
-- resulting ResponsePlan and content source.
+- semantic candidates/IR;
+- pending questions/offers/requests;
+- current/recent topic;
+- referenced actors/entities;
+- active/suspended flows;
+- recent semantic acts;
+- relevant grounded world/social events.
 
-### Timeline
+Behavior arbitration must:
 
-Provide a bounded turn timeline showing at least player/NPC turns, active flow,
-active beat, and beat transitions.
+- support one-shot reactions without beats;
+- support optional stateful beats;
+- use normalized disposition/relationship/world factors;
+- produce a grounded InteractionPlan;
+- remain deterministic/explainable under the harness.
 
-### Promotion
+**Gate:** underspecified/context-sensitive turns resolve against prior
+interaction state without hardcoded phrase-specific branches.
 
-Beat Studio promotion must use the shared CodeBuilder authoring API:
+## R7 — event-driven beat/scene engine and performance LOD
 
-- canonical-ID edit;
-- validation;
-- generated diff preview;
-- explicit write/compile;
-- worker restart/reload;
-- post-generation replay.
+Implement the scalable runtime scheduling model.
 
-All semantic/domain strings come from canonical compiler inputs.
+Required:
 
-**Gate:** an accepted draft can be promoted without hand-editing generated Lua
-or translation JSON, and the reloaded worker behavior matches the promoted
-canonical definition.
+- stimulus → candidate index;
+- no whole-catalog scans on every NPC tick;
+- no global social simulation every frame;
+- bounded candidate counts;
+- bounded active scenes;
+- bounded turns;
+- cooldowns;
+- nearby/perceived vs distant LOD;
+- no transcript persistence;
+- compact semantic outcomes only when needed.
 
-## P6 — initial emergent beat set
+**Gate:** instrumentation proves candidate evaluation is event-driven and
+bounded under synthetic high-NPC scenarios.
 
-Implement enough real content to prove generality, initially:
+## R8 — NPC-to-NPC, multi-NPC, emote, flavor, and world-event reuse
 
-- suspicious first contact;
-- argument escalation;
-- reconciliation.
+Prove the generic interaction layer outside direct player dialogue.
 
-Use reusable behaviors rather than beat-specific bespoke code.
+Required:
 
-Required demonstrations include:
+- 2-NPC ambient scene;
+- 3+ participant bounded scene;
+- NPC-generated semantic acts delivered directly, without reparsing generated
+  English;
+- emote reaction using the same semantic behavior;
+- ambient/flavor presentation using the same semantic behavior;
+- grounded world-event reaction;
+- grounded gossip/news topic;
+- interruption by danger/world stimulus;
+- optional speech skipped where actor capability or LOD says not to realize it.
 
-- hostile remark can escalate an argument;
-- aggression/confidence/relationship context can favor warning or retaliation;
-- fear/danger context can favor de-escalation or exit;
-- apology can enable reconciliation;
-- unrelated active flows can suspend/resume where appropriate;
-- no beat invents facts or bypasses gameplay authority;
-- response wording varies through compiler-owned Dialogue Content.
+**Gate:** the same underlying behavior/beat machinery works across direct
+dialogue, ambient NPC scenes, emotes, and flavor presentation.
 
-**Gate:** multi-turn behavior emerges from definitions/context, not a handwritten
-conversation tree.
+## R9 — integrated Semantic Lab workbench and final acceptance
 
-## P7 — authoring/test workbench
+Replace the standalone Beat Studio concept with an integrated interaction module
+workflow.
 
-Add:
+Structural authoring:
 
-- Natural / Force eligible / Force active / Disable diagnostic modes;
-- visible `HARNESS_OVERRIDE` markings;
-- scenario matrix runner over personality/relationship/world variants;
-- Save as Regression Case from a successful conversation;
-- expectations based on semantic/beat/behavior/allowed response pools and
-  forbidden side effects rather than exact wording where variation is intended;
-- headless replay using the same real worker.
+- situations/beats;
+- behaviors;
+- stimuli;
+- predicates;
+- capability requirements;
+- contextual modifiers.
 
-**Gate:** focused override testing and natural arbitration are clearly
-distinguished, and captured cases replay deterministically enough to catch
-semantic/director regressions.
+Wording:
 
-## P8 — integrated developer acceptance
+- linked ordinary Dialogue Content records;
+- existing Dialogue Content editor remains canonical wording editor.
 
-Acceptance must prove:
+Simulation:
 
-- real Core + Project Hoomans Lua worker path;
-- hostile-recognition parity regression fixed/preserved;
-- flows and beats coexist without duplicated ownership;
-- three initial beats run naturally across multi-turn cases;
-- personality/relationship/danger variation changes behavior appropriately;
-- beat/behavior strings and response wording are compiler-owned;
-- EN fallback and TL/current additional locale behavior remain valid;
-- adding a synthetic locale requires no locale whitelist code;
-- CodeBuilder two-pass idempotence;
-- source/generated ownership and provenance are inspectable;
-- no direct generated-file authoring;
-- no unintended authoritative side effects;
-- optional PBrainZ consumes the same plan/authority when exercised;
-- bounded memory/trace/catalog behavior;
-- relevant Python, native Lua, Kahlua/static verification, diff checks, and
-  source/save safety pass.
+- actor/world/context projections;
+- pragmatic resolution;
+- behavior candidates;
+- active beat;
+- multi-participant scene timeline;
+- flow coexistence;
+- output adapters;
+- natural vs harness override clearly distinguished.
 
-Only after P8 developer gates pass may the job become **READY FOR USER LIVE
-TEST**. Native PZ SP/MP remains user-owned unless explicitly reassigned.
+Final acceptance must prove:
+
+- one NLU authority;
+- one context/conversation authority;
+- one semantic interaction decision pipeline;
+- one ResponsePlan/Dialogue Content speech path;
+- one gameplay authority;
+- modular compiler-owned source;
+- data-driven locales;
+- deterministic two-pass generation;
+- no generated-file hand editing;
+- no transcript/save bloat;
+- event-driven bounded performance;
+- Project Hoomans + synthetic third-party adapter compatibility;
+- direct dialogue + NPC scene + emote/flavor reuse;
+- no required PBrainZ dependency.
+
+Only then mark **READY FOR USER LIVE TEST**.
 
 ## Non-goals
 
-- do not reproduce Façade scripts or content;
-- do not create a general LLM as the offline director;
-- do not make beats a replacement for flows;
-- do not encode final prose inside beat definitions;
-- do not move relationship/inventory/task/world mutation into the director;
-- do not resume unrelated P11 wording migrations merely because this job uses
-  the same compiler foundation.
+- do not recreate Façade scripts/content;
+- do not use an LLM as authoritative offline interaction logic;
+- do not simulate irrelevant distant conversations turn-by-turn;
+- do not make every reaction a beat;
+- do not make beats response pools;
+- do not make the director a parser;
+- do not let interaction definitions mutate gameplay state directly.

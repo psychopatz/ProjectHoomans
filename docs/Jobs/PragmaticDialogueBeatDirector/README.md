@@ -1,95 +1,168 @@
-# Pragmatic Dialogue Beat Director
+# Pragmatic Interaction Director
 
-**Status:** READY TO IMPLEMENT.
+**Job directory:** `docs/Jobs/PragmaticDialogueBeatDirector/`
 
-This job adds a production-owned pragmatic conversation layer and first-class
-dialogue beats to Project Hoomans, with live authoring/debugging in the existing
-Semantic Lab and compiler-owned first-party strings.
+**Status:** RECOVERY / RE-ARCHITECTURE REQUIRED.
+
+The folder name is retained for continuity, but the accepted parent objective is
+now broader than a dialogue-only beat system.
 
 ## Parent objective
 
-Make offline Project Hoomans conversation feel less like intent → canned reply
-and more like an emergent social interaction:
+Upgrade the existing unified semantic interaction pipeline with:
+
+- pragmatic interpretation;
+- reusable behavior arbitration;
+- optional bounded beat state for multi-interaction situations;
+- typed actor/world/social stimuli;
+- shared actor/world/relationship/knowledge projections;
+- reusable semantic interaction plans that can drive dialogue, emotes, ambient
+  flavor, NPC-to-NPC scenes, and existing gameplay-authority intents.
+
+The target must remain modular, performant, agnostic, compiler-owned where
+content is concerned, and compatible with both Project Hoomans and third-party
+NPC implementations.
+
+## Non-negotiable authority model
 
 ```text
-player utterance
-    ↓
-Core semantic candidates
-    ↓
-pragmatic/context resolution
-    ↓
-dialogue state + active/suspended flows
-    ↓
-beat arbitration
-    ↓
-behavior arbitration
-    ↓
-grounded ResponsePlan
-    ↓
-Dialogue Content realization
-    ↓
-speech and separately-authorized gameplay effects
+human free-form text
+        ↓
+PsychopatzCore NLU
+        │
+engine/world event ───────────────┐
+NPC semantic act ─────────────────┤
+emote/task/social event ──────────┤
+                                  ▼
+                            Typed Stimulus
+                                  ↓
+                        Context Projection
+               actor / social / world / knowledge
+                                  ↓
+                       Pragmatic Resolution
+                                  ↓
+                       Behavior Arbitration
+                                  ↓
+                    optional bounded Beat State
+                                  ↓
+                        InteractionPlan
+                     ┌────────┼───────────┐
+                     ▼        ▼           ▼
+                 ResponsePlan EmotePlan GameplayIntent
+                     │        │           │
+               Dialogue Content       existing authority
+                     │
+               presentation / optional PBrainZ
 ```
 
-The full goal includes both runtime intelligence and the developer workflow
-needed to iterate on it safely.
+There must be **one semantic authority, one conversation/context authority, one
+ResponsePlan/Dialogue Content realization path, and one gameplay authority**.
 
-## Required product results
+A director is allowed to be a decision layer. It is not allowed to become a
+parallel response engine, translation system, content catalog, parser, or
+gameplay authority.
 
-- A validated production `DialogueBeatRegistry` for data-defined social/dramatic
-  situations.
-- A production `DialogueDirector` that explains beat eligibility, entry/exit,
-  active beat state, candidate behaviors, modifiers, and the winner.
-- Clear separation between **Flow**, **Beat**, **Behavior**, **ResponsePlan**, and
-  authoritative gameplay effects.
-- A Semantic Lab **Beat Studio** that can browse production beats, edit drafts,
-  validate, preview, worker-register, disable/force for diagnostics, run
-  scenario matrices, and inspect real multi-turn behavior without restarting
-  Project Zomboid.
-- Simulation/Inspector views that show beat transitions and why candidates won
-  or lost, including a turn timeline.
-- Canonical beat/behavior/content authoring in the existing modular Conversation
-  CodeBuilder source model.
-- Compiler-generated first-party beat/dialogue strings, translation keys,
-  locale bundles, generated registries/manifests, and runtime artifacts.
-- Data-driven locales with EN fallback; no new hardcoded TL branch.
-- Regression capture and headless replay over the same production Lua worker.
-- Optional PBrainZ may realize the same validated plan, but never becomes beat,
-  fact, relationship, task, inventory, or gameplay authority.
+## What a beat means
 
-## Existing foundation to reuse
+A beat is:
 
-At source checkpoint `6fa471dec0fc1caec2d3b4871f56d4b102ae0e6f`:
+> A bounded, temporary semantic situation that changes the relevance of
+> available actor behaviors across multiple interactions.
 
-- `DialogueFlowRegistry` already validates and stores data-only flows.
-- the worker `FlowEditor` already exposes live production catalogs and
-  worker-local draft validation/registration;
-- Semantic Lab already has a Flow Editor and Interaction Explorer;
-- `ResponsePlan` already represents bounded dialogue-act plans;
-- the modular Conversation CodeBuilder source tree is the canonical first-party
-  wording/flow/pattern/UI authoring source;
-- CodeBuilder already generates deterministic runtime shards and locale bundles.
+A beat is **not**:
 
-This job extends those seams. It must not create a second parser, second
-conversation engine, second compiler, or Python-owned decision engine.
+- a dialogue tree;
+- a response pool;
+- a random flavor-text generator;
+- a parser;
+- a gameplay-authority system;
+- mandatory for every interaction.
 
-## Compiler/string rule
+Simple reactions such as a wave or one-shot emote may use behavior arbitration
+without creating a beat.
 
-All beat-related **first-party Conversation content** must be authored through
-canonical compiler inputs and generated downstream. This includes NPC wording,
-player-facing suggestions/utterances, behavior/beat labels or descriptions
-shown by the mod, and localized response variants.
+## Required reuse
 
-Beat-specific phrases must not be hardcoded into production Lua or Python.
-Harness-only generic developer chrome such as “Validate draft” may remain UI
-code; semantic/domain content belongs to the Conversation compiler.
+The interaction layer must be reusable for:
 
-## Scope relationship to Unified Semantic Dialogue Authority
+- direct player ↔ NPC conversations;
+- NPC ↔ NPC and multi-NPC ambient scenes;
+- emote reactions;
+- nearby ambient/flavor text;
+- gossip/news reactions grounded in real world state;
+- world-event reactions;
+- optional PBrainZ realization;
+- third-party NPC actors through adapter/provider contracts.
 
-The accepted modular Conversation/compiler foundation is a dependency, not a
-reason to resume unrelated paused P11 domain migrations. Implement only the
-compiler extensions and content migrations required by this job. Do not hand
-edit generated artifacts.
+## NPC-generated interactions
+
+NPC-generated interactions must remain semantic internally.
+
+Do not:
+
+```text
+NPC A generates English
+→ NLU parses the generated English again
+→ NPC B reacts
+```
+
+Use:
+
+```text
+NPC A semantic act / fact / topic
+→ typed semantic event
+→ NPC B behavior arbitration
+→ optional realization for the player
+```
+
+Only human free-form input requires NLU.
+
+## Performance model
+
+The system must be:
+
+- event-driven;
+- stimulus-indexed;
+- bounded;
+- level-of-detail aware;
+- free of whole-world/per-NPC/per-tick beat scans.
+
+Only candidate situations indexed for the triggering stimulus should be
+evaluated.
+
+Nearby/audible scenes may realize speech/emotes. Distant scenes should retain
+only meaningful semantic outcomes when required by an authoritative system.
+
+Do not persist unbounded transcripts. Persist compact semantic facts/events only
+when another system legitimately owns that memory.
+
+## Compiler and content rule
+
+First-party wording remains ordinary **Dialogue Content**.
+
+Do not create a director-owned wording authority such as:
+
+- `responses/director.json`;
+- `Conversation/Director.json` as a catch-all content bucket;
+- director-specific response-pool selection.
+
+Beat/behavior structural definitions may be compiler-owned, but their wording
+must resolve through the same modular Dialogue Content system used elsewhere.
+
+The existing Dialogue Content harness editor remains the wording authoring
+surface.
+
+## Current prototype warning
+
+The current uncommitted worktree contains an experimental dialogue-director
+prototype.
+
+Useful behavior and observability tests exist, but the implementation is **not
+accepted as the architecture**.
+
+Agents must read `AUDIT.md` and `PROGRESS.md` before modifying that prototype.
+
+Do not continue the old P7/P8 implementation path.
 
 ## Read order
 
@@ -101,5 +174,3 @@ edit generated artifacts.
 6. `ROADMAP.md`;
 7. `HARNESS_ACCEPTANCE.md`;
 8. `PROGRESS.md` **last**.
-
-The executable `/goal` remains chat-only per repository policy.
