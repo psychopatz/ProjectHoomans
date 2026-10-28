@@ -1,6 +1,6 @@
 # Pragmatic Interaction Director & Coherent Conversation
 
-**Status:** IN PROGRESS — L0–L5 live-regression quality recovery; C0–C11 remains accepted foundation.
+**Status:** DEVELOPER COMPLETE — C0–C11 + L0–L5 accepted; READY FOR USER LIVE TEST.
 
 The directory name is retained for continuity. Git history is the archive for the completed R0–R9 recovery work; agents should not reread that implementation diary.
 
@@ -44,11 +44,11 @@ The following are already developer-accepted and are treated as foundation:
 
 Do not reopen these unless current code evidence proves a regression.
 
-## Active live-regression gap
+## Accepted live-regression recovery
 
-The semantic foundation is working, but the native user test proved that internal success is not sufficient: direct generated responses can be hidden behind the landing group, bounded relationship-memory retention can still reject an otherwise valid social interaction, and common behavior acts such as WARN still lack compositional realization diversity.
+The native user test exposed three gaps that are now developer-accepted: direct generated responses reach the actual Core Response Channel, bounded relationship/conduct memory retention no longer erases a valid immediate social reaction, and common behaviors such as WARN use bounded compositional realization with deterministic variation.
 
-The corrected path remains:
+The accepted path remains:
 
 ```text
 human text
@@ -85,19 +85,18 @@ Cross-repository changes are allowed only when the owning layer genuinely requir
 
 ## Read order
 
-For the active L0–L5 recovery, read root `AGENTS.md`, then:
+For normal post-completion work, read root `AGENTS.md`, then only:
 
 1. `README.md`
-2. `ROADMAP.md`
-3. `PROGRESS.md` last
+2. `PROGRESS.md`
 
-Load deeper documents only for the owning phase:
+Load deeper documents only when a reproduced live regression points at their owning area:
 
-- `ARCHITECTURE.md` / `AGENT_RUNBOOK.md` — architecture or authority regression;
-- `ROADMAP.md` — active L0–L5 recovery phases plus compact accepted-foundation context;
-- `AUDIT.md` — original failure evidence;
+- `ROADMAP.md` — historical L0–L5 gate evidence;
+- `ARCHITECTURE.md` / `AGENT_RUNBOOK.md` — authority or architecture regression;
+- `DYNAMIC_CONVERSATION.md` — generated-choice / UtterancePlan regression;
+- `HARNESS_ACCEPTANCE.md` — acceptance/debugging evidence;
 - `STORAGE_TOPOLOGY.md` — compiler/storage regression;
-- `DYNAMIC_CONVERSATION.md` — generated-choice or UtterancePlan regression;
-- `HARNESS_ACCEPTANCE.md` — acceptance/debugging evidence.
+- `AUDIT.md` — original failure evidence.
 
 This keeps completed-phase context out of ordinary agent bootstrap.

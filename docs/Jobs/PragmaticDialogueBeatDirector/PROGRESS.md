@@ -1,71 +1,74 @@
 # Progress — Coherent Emergent Conversation
 
-**Status:** IN PROGRESS — live-regression quality recovery.
-**Accepted foundation:** C0–C11 + L1 + L2 + L3 + L4.
-**Active phase:** L5 — integrated visible-surface acceptance and live handoff.
+**Status:** READY FOR USER LIVE TEST.
+**Developer phases:** C0–C11 + L0–L5 accepted.
 **Branch:** existing `main`.
+**Next authority:** user-owned native Project Zomboid verification.
 
 ## Current truth
 
-The exact Dana regression remains the acceptance anchor:
+The live regression reported against Dana is developer-fixed and accepted.
+
+Regression anchor:
 
 - save: `Sandbox/2026-10-22_15-18-56/global_mod_data.bin`;
 - NPC: `npcDanapatz_Y5KK` / Dana patz;
 - input: `fuckyouuuu`.
 
-Accepted recovery:
+The accepted chain now proves:
 
-- **L1:** current-turn generated direct responses reach Core's actual Response Channel; Back restores root/static navigation;
-- **L2:** bounded relationship-memory and conduct-evidence retention are persistence outcomes, not rejection authority for a valid social interaction;
-- **L3:** hostility exposes typed repair/escalation/neutral continuations including `CLAIM_JOKE` and `DOUBLE_DOWN` with compiler-owned EN/TL wording;
-- **L4:** common `WARN / BOUNDARY_WARNING` now uses UtterancePlan composition, while aggressive/confident NPCs can still select contextual `RETALIATE_VERBALLY / MIRROR`;
-- repeated same-behavior WARN turns rotate deterministically across bounded compiler-owned constructions without persisted dialogue history;
-- style resolution reuses the existing SpeechStyleContext; style changes wording selection only, never semantic behavior;
-- EN/TL realization remains locale-owned and unsupported/non-owned responses still fall back to Dialogue Content.
+- compact/elongated input recovers to directed `INSULT`;
+- Director selects behavior independently from wording;
+- common `WARN / BOUNDARY_WARNING` uses bounded compiler-owned UtterancePlan realization;
+- aggressive/confident NPCs may still select contextual `RETALIATE_VERBALLY / MIRROR`;
+- bounded relationship-memory and conduct-evidence pruning are reported independently and do not reject the immediate social reaction;
+- current-turn generated direct responses become Core's actual Response Channel;
+- hostility exposes distinct typed repair/escalation/neutral choices including `CLAIM_JOKE` and `DOUBLE_DOWN`;
+- generated clicks submit `semantic_click_frame` directly;
+- `CLAIM_JOKE` enters `beat.reconciliation`;
+- EN/TL wording is locale-owned;
+- Back restores authored/root navigation;
+- source save remains immutable.
 
-Latest L4 verification:
+No parallel parser, button renderer, response engine, gameplay authority, transcript store, or persistent generated-combination catalog was introduced.
 
-- L1–L4/C6-C7 focused realization batch: **21/21 PASS**;
-- full `pnc_semantic`: **99/99 PASS**;
+## Final developer acceptance
+
+Latest paired-checkout evidence:
+
+- combined C0–C8 + L1–L5 focused Python suite: **61/61 PASS**;
+- exact integrated L5 Dana/save chain: **2/2 PASS**;
+- full ProjectHoomans `pnc_semantic`: **99/99 PASS**;
+- social events: **1/1 PASS**;
+- conduct: **2/2 PASS**;
+- conduct-saturation baseline: **1/1 PASS**;
 - compiler/context-health: **13/13 PASS**;
-- two full Conversation generations are byte-identical;
-- context-health: PASS, 0 numeric shard violations, 0 opaque shard violations;
-- source realization catalog remains modular/bounded.
+- two consecutive Conversation generations: byte-identical;
+- context-health: PASS, **0** numeric shard violations, **0** opaque shard violations;
+- PsychopatzCore semantic dialogue-turn, pattern-matcher and surface-recovery suites: PASS;
+- source save hash unchanged;
+- Lua/Python syntax and `git diff --check`: PASS before final documentation commit.
 
-## Immediate Next Chunk — L5
+The local Homebrew Python lacks `_tkinter`, so the Tk GUI parity module could not be imported in that interpreter. This is not treated as native visual acceptance; the exact production TalkParity / `conversationPresentation.responseChannel` projection is covered headlessly, and final native GUI/game verification remains user-owned.
 
-Run one integrated live-regression acceptance that proves the whole visible chain together:
+## Live-test handoff
 
-`fuckyouuuu`
-→ recovered directed INSULT
-→ Director behavior selected
-→ compositional NPC realization
-→ social event accepted even when relationship memory/conduct evidence are pruned
-→ visible Response Channel contains repair/escalation/neutral generated choices
-→ clicking `CLAIM_JOKE` enters reconciliation through a typed semantic frame
-→ source save hash remains unchanged.
+Re-test the same Dana case first. Expected visible behavior after `fuckyouuuu`:
 
-Then rerun:
+- NPC gives a real contextual reaction, not “I couldn't apply that social reaction”;
+- Response Channel switches to current-turn options such as `I'm sorry.`, `I was joking.`, `Yeah, I meant it.`, challenge/dismiss/follow-up choices;
+- selecting `I was joking.` repairs into reconciliation;
+- repeated WARN-style hostility can vary deterministically instead of repeating one stock line;
+- a sufficiently aggressive/confident NPC may MIRROR instead of WARN.
 
-- L1–L5 focused tests;
-- C0–C8/current coherent-conversation focused suites;
-- full `pnc_semantic`;
-- social-event/conduct saturation;
-- compiler/context-health and deterministic generation;
-- paired PsychopatzCore semantic suites;
-- syntax / `git diff --check`.
+If a native failure remains, capture the exact input/click, preceding NPC line, visible Response Channel, and relevant Conversation Inspector trace. Reopen only the owning subsystem.
 
-Only after all developer gates pass return this job to **READY FOR USER LIVE TEST**.
+## Safety
 
-## Safety / architecture invariants
+- no Workshop publication;
+- no source-save mutation;
+- no root `AGENTS.md` goal-state edits;
+- no hand-editing generated Conversation artifacts;
+- no transcript/dynamic-combination persistence.
 
-- one parser/discourse/button/response/gameplay authority;
-- one SpeechRealization authority;
-- no giant generated response catalog;
-- no raw player-text echo;
-- no transcript persistence;
-- bounded relationship/conduct storage remains bounded;
-- generated files stay compiler output;
-- no Workshop publication or source-save mutation.
-
-Git history is the archive for completed phase detail; keep this file current and compact.
+Git history is the implementation diary; keep this file compact.

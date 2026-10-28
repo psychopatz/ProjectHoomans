@@ -1,20 +1,18 @@
 # Agent Runbook — Coherent Emergent Conversation
 
-Use this runbook for the active L0–L5 live-regression quality recovery.
+Use this runbook only when a reproduced live regression requires reopening this completed job.
 
-**Foundation guard:** C0–C11 are developer-accepted. Do not rerun them wholesale; reopen only the specific invariant disproved by current live/runtime evidence.
+**Completion guard:** C0–C11 and L0–L5 are developer-accepted. Do not execute either roadmap wholesale without new runtime evidence.
 
 ## Read order
 
-Read root `AGENTS.md`, then `README.md`, `ROADMAP.md`, this runbook, and `PROGRESS.md` last.
+Normal post-completion work reads root `AGENTS.md`, then `README.md` and `PROGRESS.md` only.
 
-Load phase-specific support only when needed: `DYNAMIC_CONVERSATION.md` for L1/L3/L4, `HARNESS_ACCEPTANCE.md` for L1–L5 gates, `ARCHITECTURE.md` for authority disputes, and `STORAGE_TOPOLOGY.md` only if compiler/storage behavior changes.
+If a regression requires this runbook, load only its owning support document: `DYNAMIC_CONVERSATION.md` for generated-choice/UtterancePlan behavior, `HARNESS_ACCEPTANCE.md` for acceptance evidence, `ARCHITECTURE.md` for authority disputes, or `STORAGE_TOPOLOGY.md` for compiler/storage behavior.
 
 ## Operating goal
 
-Complete L1–L5 so the already-correct semantic understanding becomes the actual visible conversation: current-turn direct responses reach Core's native choice surface, bounded memory retention cannot erase a valid social reaction, and common behavior acts have contextual compositional wording.
-
-After each accepted phase, update `PROGRESS.md` concisely and continue automatically to the next mandatory L phase.
+Preserve the accepted coherent-conversation architecture and repair only reproduced regressions through the owning authority. Do not reopen adjacent completed phases merely because one live case fails.
 
 ## Authority rules
 

@@ -1,8 +1,8 @@
 # Roadmap — Coherent Emergent Conversation
 
-**Parent status:** IN PROGRESS — live-regression quality recovery.
-**Accepted foundation:** C0–C11 remains accepted unless current runtime evidence disproves a specific invariant.
-**Active phase:** L1 — direct-response presentation authority.
+**Parent status:** DEVELOPER COMPLETE — C0–C11 + L0–L5 accepted; READY FOR USER LIVE TEST.
+**Accepted foundation:** preserve unless current runtime evidence disproves a specific invariant.
+**Active phase:** none; user-owned live verification.
 
 The native/live Semantic Lab test on the saved actor `npcDanapatz_Y5KK` proved that the coherent-conversation foundation exists but several accepted gates were too shallow: generated affordances can exist in worker diagnostics without becoming the visible Response Channel, bounded relationship-memory retention can still reject an otherwise valid social interaction, and common NPC behaviors still fall back to sparse authored wording.
 
@@ -29,6 +29,8 @@ Required baseline evidence:
 
 ## L1 — direct-response presentation authority
 
+**Status:** ACCEPTED.
+
 Make the existing DialogueSuggestions authority surface the current turn's direct semantic responses in the same native Core choice surface.
 
 Requirements:
@@ -44,6 +46,8 @@ Requirements:
 **Gate:** on the exact Dana save after `fuckyouuuu`, the visible Response Channel contains the generated direct responses instead of only landing actions.
 
 ## L2 — relationship-memory retention decoupling
+
+**Status:** ACCEPTED.
 
 Apply the same semantic principle already used for conduct evidence to relationship-memory retention.
 
@@ -62,6 +66,8 @@ Requirements:
 **Gate:** the saturated Dana save still receives a coherent NPC reaction and a truthful bounded-memory outcome.
 
 ## L3 — richer semantic player continuations
+
+**Status:** ACCEPTED.
 
 Expand generated affordances from generic repair/challenge choices into contextual conversational strategies without hardcoding a full sentence catalog.
 
@@ -84,6 +90,8 @@ Requirements:
 **Gate:** representative hostile turns expose meaningfully different positive, negative and contextual continuations on the actual Response Channel.
 
 ## L4 — NPC microplanning, mirroring and dialogue diversity
+
+**Status:** ACCEPTED.
 
 Extend `UtterancePlan.FromInteraction` and compiler-owned realization data so common Director behaviors do not collapse to one bland authored line.
 
@@ -111,6 +119,8 @@ Requirements:
 
 ## L5 — visible-surface acceptance and live handoff
 
+**Status:** ACCEPTED.
+
 Run focused and broad acceptance across the real production worker and actual presentation projection.
 
 Mandatory evidence:
@@ -129,8 +139,6 @@ Mandatory evidence:
 
 Only then return to **READY FOR USER LIVE TEST**.
 
-## Continue / stop rule
+## Reopen rule
 
-Implement L1 first. After each accepted phase, update `PROGRESS.md` concisely and continue automatically through L5.
-
-Stop early only for a genuine ownership/safety blocker or after all developer-side L1–L5 gates pass. Do not stop because internal candidates exist if the visible native surface is still wrong.
+Do not rerun L0–L5 as a standing task. Reopen only the smallest owning phase when a native/live regression supplies new evidence. Internal candidate existence is still not sufficient acceptance when the visible native surface is wrong.
