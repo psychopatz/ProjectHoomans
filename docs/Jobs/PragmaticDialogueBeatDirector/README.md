@@ -1,6 +1,6 @@
 # Pragmatic Interaction Director & Coherent Conversation
 
-**Status:** IN PROGRESS — accepted interaction infrastructure is retained; the active gap is contextual language/discourse understanding and coherent conversation behavior.
+**Status:** DEVELOPER COMPLETE — C0–C11 accepted; READY FOR USER LIVE TEST.
 
 The directory name is retained for continuity. Git history is the archive for the completed R0–R9 recovery work; agents should not reread that implementation diary.
 
@@ -44,13 +44,9 @@ The following are already developer-accepted and are treated as foundation:
 
 Do not reopen these unless current code evidence proves a regression.
 
-## Active architecture gap
+## Accepted architecture
 
-Human input is still too dependent on whitespace/exact phrase shape, candidate confidence is gated too globally, and discourse context does not yet participate strongly enough in choosing between plausible conversational meanings. The existing semantic suggestion surface and SpeechRealization path are authoritative but still rely too heavily on pre-authored button/reply wording instead of deriving reusable semantic continuations and bounded runtime utterances from the same discourse state.
-
-Before those dynamic systems expand the catalog, CodeBuilder storage must also be hardened against context bloat: canonical sources stay atomic, generated outputs are semantically sharded, indexes point instead of aggregate, paths/IDs explain ownership, and numeric/opaque overflow shards are forbidden.
-
-The active path is:
+The previously active coherent-conversation gap is implemented and developer-accepted. The path is now:
 
 ```text
 human text
@@ -87,17 +83,18 @@ Cross-repository changes are allowed only when the owning layer genuinely requir
 
 ## Read order
 
-Read root `AGENTS.md`, then:
+For normal post-completion work, read root `AGENTS.md`, then only:
 
 1. `README.md`
-2. `ARCHITECTURE.md`
-3. `AGENT_RUNBOOK.md`
-4. `ROADMAP.md`
-5. `PROGRESS.md` last
+2. `PROGRESS.md`
 
-Supporting docs are phase-specific to protect agent context:
+Load deeper documents only when a live regression points at their owning area:
 
-- `AUDIT.md` — read only when implementing/disputing audited failure paths;
-- `STORAGE_TOPOLOGY.md` — C5 or compiler-storage work;
-- `DYNAMIC_CONVERSATION.md` — C6/C7 choices/realization;
-- `HARNESS_ACCEPTANCE.md` — acceptance implementation or C10/C11 validation.
+- `ARCHITECTURE.md` / `AGENT_RUNBOOK.md` — architecture or authority regression;
+- `ROADMAP.md` — historical phase/gate audit, not a task list to rerun;
+- `AUDIT.md` — original failure evidence;
+- `STORAGE_TOPOLOGY.md` — compiler/storage regression;
+- `DYNAMIC_CONVERSATION.md` — generated-choice or UtterancePlan regression;
+- `HARNESS_ACCEPTANCE.md` — acceptance/debugging evidence.
+
+This keeps completed-phase context out of ordinary agent bootstrap.

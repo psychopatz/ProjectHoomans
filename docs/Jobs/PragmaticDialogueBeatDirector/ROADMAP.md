@@ -1,10 +1,10 @@
 # Roadmap — Coherent Emergent Conversation
 
-**Parent status:** IN PROGRESS.
+**Parent status:** DEVELOPER COMPLETE — C0–C11 accepted; READY FOR USER LIVE TEST.
 
-The completed R0–R9 recovery is accepted foundation and is intentionally not repeated here. Git history contains that implementation record.
+The completed R0–R9 recovery and C0–C11 coherent-conversation work are accepted foundation. Git history contains the implementation record.
 
-The remaining developer objective is C0–C11.
+This roadmap is historical gate documentation, not an active task list. Reopen only the phase owning a reproduced live regression.
 
 ## C0 — failure corpus, ownership audit and baselines
 

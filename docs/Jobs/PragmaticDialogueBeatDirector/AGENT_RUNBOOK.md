@@ -1,18 +1,20 @@
 # Agent Runbook — Coherent Emergent Conversation
 
-Use this runbook only for this job.
+Use this runbook only when a reproduced live regression requires reopening this completed job.
+
+**Completion guard:** C0–C11 are developer-accepted. Do not execute the roadmap again as an autonomous goal without new regression evidence.
 
 ## Read order
 
-Read root `AGENTS.md`, then `README.md`, `ARCHITECTURE.md`, this runbook, `ROADMAP.md`, and `PROGRESS.md` last.
+Normal post-completion work reads root `AGENTS.md`, then `README.md` and `PROGRESS.md` only.
 
-Read `AUDIT.md` only when you need evidence behind the current failure taxonomy. Read `STORAGE_TOPOLOGY.md` only for C5/compiler-storage work. Read `DYNAMIC_CONVERSATION.md` only for C6/C7 choice/realization work. Read `HARNESS_ACCEPTANCE.md` when implementing acceptance tests/gates or preparing C10/C11 validation.
+If a regression requires this runbook, load only the owning support document: `ARCHITECTURE.md` for authority/architecture, `AUDIT.md` for original failure evidence, `STORAGE_TOPOLOGY.md` for compiler/storage, `DYNAMIC_CONVERSATION.md` for affordance/realization, or `HARNESS_ACCEPTANCE.md` for acceptance/debugging.
 
 ## Operating goal
 
-Complete C0–C11 so human text, semantic candidates, discourse context, storage/context topology, dynamic choices, runtime utterance realization, pragmatic interaction, behavior selection and social effects behave as one coherent conversation system.
+Preserve the accepted coherent conversation architecture and repair only reproduced regressions through the owning authority.
 
-The Next Chunk is a starting point, not a stop condition. After each accepted chunk, update `PROGRESS.md` concisely and continue automatically to the next mandatory phase.
+Do not reopen adjacent completed phases merely because one live case fails.
 
 ## Authority rules
 

@@ -1,183 +1,81 @@
 # Progress — Coherent Emergent Conversation
 
 **Status:** READY FOR USER LIVE TEST.
-**Current phase:** C11 accepted — developer-side acceptance complete.
+**Developer phase:** C0–C11 accepted.
 **Branch:** existing `main`.
+**Next authority:** user live in-game verification only.
 
-## Accepted foundation
+## Current truth
 
-The prior Pragmatic Interaction Director recovery R0–R9 remains protected.
+The coherent conversation roadmap is developer-complete. Do not rerun or reimplement C0–C11 unless a live/runtime regression supplies new evidence.
 
-C0–C4 are now developer-accepted on the paired ProjectHoomans / PsychopatzCore checkout. C0A reports under `tools/semantic_harness/reports/c0a/` are immutable historical pre-C1 evidence; later phases must not rewrite them to match improved runtime behavior.
+Accepted architecture now includes:
 
-PsychopatzCore C1 implementation is committed at `3744a7dfab00b2b97e86141f0fd25664523de92b`.
+- PsychopatzCore-owned bounded compact/typo/elongation/contraction surface recovery with provenance and conservative mutation safety;
+- one ProjectHoomans Contextual Discourse Resolver over the existing bounded DialogueContextState;
+- risk-aware conversational vs gameplay-mutation admission;
+- compositional social features for directedness, hostility, threat, affiliation, self/world context and negation;
+- semantically sharded CodeBuilder output with compiler context-health budgets, lightweight discovery indexes and no numeric/opaque overflow shards;
+- generated semantic player affordances through the existing DialogueSuggestions authority;
+- typed semantic-click execution with no display-text NLU reparse;
+- compiler-owned EN/TL UtterancePlan constructions/lexemes inside the existing SpeechRealization authority with Dialogue Content fallback;
+- pending-question, topic, referent, interruption/resumption and hostility→repair continuity through the existing bounded discourse/flow/beat state;
+- social reaction/effect decoupled from bounded conduct-evidence retention;
+- bounded Conversation Inspector/fuzz observability across recovery → discourse → affordance → interaction → realization → effect/persistence.
 
-Accepted behavior:
+No parallel parser, button engine, response engine, transcript store, persistent dynamic-combination catalog or gameplay authority was introduced.
 
-- Core `ParseCandidates()` supports bounded registry-derived compact/no-space recovery, conservative expressive elongation, common contraction recovery, unique vocabulary segmentation, recovery costs and provenance. Exact parsing remains the preferred path and recovered mutating actions are not silently authorized.
-- ProjectHoomans composes social features after semantic interpretation: recipient/self/world directedness, hostility, affiliation, threat, contempt, distress and intensity are bounded projections rather than a second sentiment parser.
-- Specific grammar now distinguishes malicious wish vs threat, world complaint vs recipient hostility, intensified self-state vs identity claim, and negated-negative assessment vs insult.
-- The Contextual Discourse Resolver consumes Core candidates plus existing bounded DialogueContextState. It attaches one explainable DiscourseFrame with pending interaction, topic, subject, reply-to, contextual support and evidence without reparsing raw text.
-- Risk-aware admission separates conversation/read-only interpretation from gameplay mutation. Context may reinforce safe conversation; exact high-confidence mutations stay strict; safe fuzzy movement preserves the existing FOLLOW/STOP/STAY contract; recovered mutation is blocked; exact open-text item/world binding may defer only to existing authoritative selectors; typo-like fuzzy inventory/task interpretations clarify.
-- C0A characterization tests now read the historical snapshots instead of comparing them to the continuously improving live worker.
+## Phase commits
 
-Current validation:
+Key implementation checkpoints:
 
-- Core surface-recovery smoke: PASS.
-- Core semantic pattern-matcher smoke: PASS.
-- C0 historical + C1–C4 live Python harness: 24/24 PASS.
-- C4 direct risk-policy smoke: PASS.
-- full ProjectHoomans `pnc_semantic` Lua suite: 99/99 PASS.
-- `git diff --check`: clean before phase transition.
+- PsychopatzCore C1 surface recovery: `3744a7d`;
+- ProjectHoomans C1–C4 contextual/risk foundation: `83d5133c`;
+- C5 storage/context-health migration: `39768538`;
+- C6–C8 dynamic conversation slice: `b2890449`, `6fc49bd1`;
+- C9 conduct/social-effect decoupling: `ffc12f2c`;
+- C10 bounded diagnostics/fuzzing: `e9721815`;
+- C11 acceptance fixes: `6bd01300`.
 
-## C5 accepted — storage topology and compiler context-health
+Git history is the implementation diary. Do not expand this file with completed-phase narratives.
 
-C5 is developer-accepted.
+## Latest revalidation
 
-Accepted storage/compiler behavior:
+The current paired checkout was revalidated after C11:
 
-- canonical source ownership now drives generated semantic shard names instead of broad-domain numeric overflow splitting;
-- oversized canonical sources were split into semantically named source directories while preserving deterministic recursive discovery;
-- generated Conversation output contains no numeric `PartNN` shards and no opaque `Massive` / `Sgd` ownership names;
-- lightweight discovery indexes map stable IDs to canonical source, generated shard, bounded related IDs and dependents without duplicating full definitions;
-- bounded affected-closure metadata is exposed through the compiler/authoring service;
-- compiler-owned context-health checks enforce source/shard/index budgets and ownership/naming invariants before output is accepted;
-- runtime combinations remain ephemeral; C5 does not add transcript or ModData persistence.
-
-Latest C5 validation:
-
-- C5 context-health + compiler acceptance: **13/13 PASS**;
-- context-health status: **pass**, 0 errors, 0 numeric violations, 0 opaque violations, 0 missing ownership;
-- largest canonical source: `content/social/emotes/reply.json` at **14,624 bytes**;
-- largest generated artifact in the health report: bounded task index at **31,376 bytes**;
-- canonical source tree unchanged across two full builds;
-- generated Conversation tree: **132 files**, byte-identical across two consecutive full generations;
-- C0 historical + C1–C4 live harness: **24/24 PASS** after C5 generation;
-- full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS** after C5 generation.
-
-## C6–C8 accepted — dynamic affordances, compositional realization and continuity
-
-C6–C8 are developer-accepted as one coherent conversation slice.
-
-Accepted C6 behavior:
-
-- `DialogueSuggestions` remains the sole player-choice authority; generated choices enter through one registered `projecthoomans.generated_affordances` provider and the existing ranking/deduplication path;
-- generated candidates expose explicit `origin`, `stance`, `strategy`, typed semantic frame and bounded contextual evidence;
-- hostile conversational meaning can produce repair/challenge/dismiss/follow-up lanes, while player traits add only eligible contextual choices such as `CALL_BLUFF` for `Brave`;
-- player-trait provenance does not inspect or expose private NPC personality/trait values;
-- ordinary authored/static choices remain present and authored `await_player` offers suppress redundant generated alternatives;
-- generated button clicks submit their typed semantic frame directly through the existing semantic-click path. Display wording is never reparsed through NLU;
-- generated APOLOGIZE and typed `sorry` converge on the same social branch and reconciliation beat.
-
-Accepted C7 behavior:
-
-- compiler-owned `realization` shards are first-class C5 citizens with source ownership, generated semantic shard names and discovery-index routing;
-- `UtterancePlan` consumes canonical semantic concepts and safe slots only; arbitrary raw player text is not concatenated into output;
-- EN/TL locale constructions are independently authored and generated;
-- an aggressive NPC can receive recovered/fuzzy hostility and select `RETALIATE_VERBALLY/MIRROR`, producing EN `fuck you too.` or TL `Putang ina mo rin.` from reusable lexeme + construction records;
-- the authoritative response still retains its canonical Dialogue Content template/fallback; compositional realization affects presentation only and unsupported plans fall back to ordinary Dialogue Content;
-- grounded knowledge phrase families now preserve their concrete topic/answer arguments rather than collapsing to generic style text.
-
-Accepted C8 behavior:
-
-- short replies bind to the existing pending interaction through the C3 DiscourseFrame;
-- generated follow-up buttons prefer the current open NPC pending interaction over the preceding player classifier, so greeting/wellbeing questions yield typed positive/neutral/negative self-state answers and identity questions yield safe name-disclosure/evasion choices;
-- pending-question affordances carry explicit `replyTo=pending_interaction`, flow/topic identity, typed slots and self-directed social context; clicking them retires/cancels the same existing flow rather than starting a parallel button state machine;
-- generated wellbeing answers and equivalent typed self-state replies converge on `SELF_STATE_RECEIVED` and the same flow transition;
-- generated identity disclosure uses the already-known player name as a bounded safe slot; private NPC traits/personality are not exposed;
-- hostility → generated apology exits argument escalation and enters reconciliation, with stale hostile affordances removed from the next surface;
-- grounded referents remain reusable through existing bounded mention/focus state;
-- topic interruption/resumption continues to use existing flow/dialogue state; no transcript store or new persistent conversation memory was added.
-
-Latest C6–C8 validation:
-
-- focused C6/C7 + C8 acceptance: **14/14 PASS**;
-- combined C0–C8 + legacy referent/interruption/flow continuity: **52/52 PASS**;
+- C0–C8 focused/current harness: **46/46 PASS**;
 - full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS**;
-- canonical Conversation source tree remains byte-stable across two full generations;
-- generated Conversation tree: **136 files**, byte-identical across two consecutive full generations;
-- context-health: **pass**, 0 errors, 0 numeric shard violations, 0 opaque shard violations;
-- `git diff --check`: PASS.
-
-## C9 accepted — social effect / conduct-memory decoupling
-
-C9 is developer-accepted.
-
-Accepted behavior:
-
-- direct `Conduct.AddEvidence()` remains a strict bounded-storage API and still reports `evidence_pruned_by_limit` / `permanent_evidence_limit` to callers that explicitly request durable evidence;
-- social-event preparation treats ordinary capacity pruning as a bounded persistence outcome rather than a reason to reject an otherwise valid relationship/social interaction;
-- authoritative social-event results now separate `relationshipsChanged` / relationship memory from `conductEvidenceCreated`;
-- `conductPersistence` records each evidence attempt as `persisted`, `pruned` or `dropped` with the original capacity reason and durable flag;
-- `conductEvidenceOutcome` summarizes persisted/pruned/dropped counts and reports `bounded` when storage capacity prevents retention;
-- the semantic-dialogue social authority forwards these conduct outcomes independently from its accepted relationship effect;
-- a saturated all-permanent player conduct ledger can receive a hostile social interaction, apply the NPC relationship/memory reaction, report zero durable conduct evidence created, and remain at the same bounded evidence count.
-
-Latest C9 validation:
-
-- authoritative social-event suite: **12/12 PASS**;
-- conduct suite: **2/2 PASS**;
-- C0A direct conduct-saturation characterization remains PASS;
-- full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS**;
-- bounded conduct storage size is unchanged by pruned social evidence.
-
-## C10 accepted — Semantic Lab observability and fuzz/regression
-
-C10 is developer-accepted.
-
-Accepted behavior:
-
-- the existing Conversation Inspector now exposes bounded sections for surface normalization/recovery, candidate arbitration, DiscourseFrame/social features, generated affordances, selected semantic-click frame, pragmatic/interaction state, UtterancePlan/realization, storage ownership and social-effect/conduct-memory outcomes;
-- queue-ready response payloads preserve presentation-only UtterancePlan/realization metadata for the inspector without changing semantic/action authority;
-- storage pointers resolve compiler-owned canonical IDs to source path, generated shard, bounded related/dependent IDs and context-health status through the C5 discovery model; unresolved non-Conversation catalog IDs remain explicitly unresolved instead of being guessed;
-- social interaction projection separates understood semantic act, selected reaction/beat/behavior, relationship effect and conduct persistence outcome;
-- the existing human-readable Conversation Inspector rendering shows the new bounded chain before the separate command-authority section;
-- the bounded real-worker mutation matrix covers compact spacing, repeated letters, punctuation/capitalization, safe social typos, safe fuzzy movement, unsafe item typos and intensified self-state controls;
-- fuzz rows report only compact semantic/risk/authority facts and never persist a transcript or giant worker snapshot.
-
-Latest C10 validation:
-
-- focused C10 chain/fuzz acceptance: **3/3 PASS**;
-- Conversation Inspector + Semantic Lab persona regression: **12/12 PASS** including C10;
-- full ProjectHoomans `pnc_semantic` Lua suite: **99/99 PASS**;
-- fuzz safety controls: PASS, including zero transport for the unsafe item-typo case;
-- Python compilation, Lua syntax and `git diff --check`: PASS.
-
-## C11 accepted — integrated developer acceptance
-
-C11 is developer-accepted. The job is **READY FOR USER LIVE TEST**.
-
-Final acceptance caught and fixed two real integration regressions before handoff:
-
-- risk classification now treats exact high-confidence OFFER actions as transactional proposals before generic mutation risk, restoring the existing gift consent/inventory-selection lifecycle without weakening actual transfer authority;
-- the Pragmatic Resolver preserves pending_interaction subject provenance when the Discourse Resolver has already materialized the pending topic into a contextual short reply.
-
-One stale R6 assertion was also updated to the accepted C7 presentation contract: compositional one-shot speech exposes the canonical semantic template through semanticTemplateID plus realizationFamily=utterance_plan instead of requiring the old phrase-family-only field.
-
-Final validation:
-
-- exact C0–C10 integrated Python matrix after the fixes: **89/89 PASS**;
-- additional lifecycle/save-backed/transcript/performance batch: **19/19 PASS**;
-- NPC semantic-scene + conduct/social-event saturation batch: **5/5 PASS**;
-- full ProjectHoomans pnc_semantic Lua suite: **99/99 PASS**;
+- C5 compiler/context-health: **13/13 PASS**;
+- two full Conversation generations are byte-identical;
+- compiler context-health: **pass**, 0 errors, 0 numeric shard violations, 0 opaque shard violations;
+- C9 social events: **1/1 PASS**;
+- C9 conduct: **2/2 PASS**;
+- C0A conduct-saturation characterization: **1/1 PASS**;
+- C10 Conversation Inspector + pragmatic R6 focused batch: **12/12 PASS**;
 - PsychopatzCore semantic dialogue-turn, pattern-matcher and surface-recovery suites: PASS;
-- exact gift-offer/save-source regression plus R6 pragmatic regression: **6/6 PASS** and C4 risk smoke PASS;
-- canonical Conversation source tree: **105 files**, byte-identical before/after two full builds;
-- generated Conversation tree: **136 files**, byte-identical across two consecutive builds;
-- compiler context-health: **pass**, 0 errors, 0 numeric shard violations, 0 opaque shard violations, 0 missing ownership;
-- largest canonical source remains content/social/emotes/reply.json at **14,624 bytes**; largest generated/index artifact remains bounded at **31,376 bytes**;
-- save-backed working-world tests preserve the immutable imported source while resets restore the working baseline;
-- visible transcript buffers remain explicitly bounded and no new persistent conversation transcript or dynamic UtterancePlan/button combination is written to ModData;
-- Python compilation, Lua syntax and git diff --check: PASS.
+- `git diff --check`: PASS before documentation cleanup.
 
-No native Project Zomboid instance was launched and no Workshop publication was performed. The remaining acceptance is the user's live in-game verification.
+The accepted C11 ledger additionally records broader save-backed/lifecycle/NPC-scene/performance acceptance. Read git history or `HARNESS_ACCEPTANCE.md` only if that evidence becomes relevant to a regression.
+
+## Live-test handoff
+
+User-owned native Project Zomboid testing is the only remaining gate.
+
+For a live failure, capture the smallest reproducible case:
+
+- exact typed input or clicked semantic choice;
+- language;
+- preceding NPC line/interaction when context-sensitive;
+- visible result versus expected result;
+- relevant Semantic Lab/Conversation Inspector trace if available.
+
+Then reopen only the owning subsystem and its phase-specific document. Do not reopen the full roadmap by default.
 
 ## Safety
 
-- no new branch;
-- preserve unrelated user work;
 - no Workshop publication;
 - no native PZ launch for ordinary developer acceptance;
 - no source-save mutation;
 - no root `AGENTS.md` goal-state edits;
-- no hand-editing generated runtime artifacts; generated Conversation output changes only through CodeBuilder.
+- no hand-editing generated Conversation runtime artifacts;
+- no full transcript/UtterancePlan/button-combination persistence.
