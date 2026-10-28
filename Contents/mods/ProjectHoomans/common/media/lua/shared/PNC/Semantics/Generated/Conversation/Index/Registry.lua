@@ -130,7 +130,7 @@ return {
         ["domain"] = "social",
         ["kind"] = "realization",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Realization/Social",
-        ["recordCount"] = 42,
+        ["recordCount"] = 56,
     },
     {
         ["domain"] = "common",

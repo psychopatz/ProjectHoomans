@@ -42,6 +42,22 @@ local function copy(value, depth)
     return output
 end
 
+local function stableHash(value)
+    local output = 0
+    value = tostring(value or "")
+    for index = 1, #value do
+        output = (output * 31 + string.byte(value, index)) % 2147483647
+    end
+    return output
+end
+
+local STYLE_OFFSETS = {
+    neutral = 0,
+    warm = 1,
+    terse = 2,
+    guarded = 3,
+}
+
 local function canonicalAlias(value)
     value = string.lower(tostring(value or ""))
     value = string.gsub(value, "%s+", " ")
@@ -178,6 +194,8 @@ function UtterancePlan.New(spec)
         subject = spec.subject and bounded(spec.subject, 96) or nil,
         intensity = tonumber(spec.intensity) or 0,
         locale = spec.locale and string.upper(tostring(spec.locale)) or nil,
+        styleVariant = string.lower(tostring(spec.styleVariant or "neutral")),
+        selectionSalt = bounded(spec.selectionSalt or "", 96),
         fallbackContentTemplateID = spec.fallbackContentTemplateID,
         lexemes = {},
         slots = {},
@@ -208,14 +226,32 @@ local function constructionFor(plan, locale)
     local values = byLocale and byLocale[plan.strategy] or nil
     if type(values) ~= "table" or #values == 0 then return nil end
     local dialogueAct = string.upper(tostring(plan.dialogueAct or ""))
+    local eligible = {}
     for _, record in ipairs(values) do
         if dialogueAct == ""
             or string.upper(tostring(record.dialogueAct or "")) == dialogueAct
         then
-            return record
+            eligible[#eligible + 1] = record
         end
     end
-    return values[1]
+    if #eligible == 0 then eligible = values end
+    if #eligible == 1 then return eligible[1] end
+
+    local style = string.lower(tostring(plan.styleVariant or "neutral"))
+    local styleOffset = STYLE_OFFSETS[style] or 0
+    local selectionSalt = tostring(plan.selectionSalt or "")
+    local turnOffset = tonumber(string.match(selectionSalt, "^(%d+)"))
+        or stableHash(selectionSalt)
+    local seed = table.concat({
+        style,
+        tostring(plan.strategy or ""),
+        tostring(plan.dialogueAct or ""),
+        tostring(locale or ""),
+    }, ":")
+    local index = (
+        (stableHash(seed) + turnOffset + styleOffset) % #eligible
+    ) + 1
+    return eligible[index]
 end
 
 function UtterancePlan.Realize(plan)
@@ -292,7 +328,11 @@ function UtterancePlan.FromInteraction(ir, interactionPlan, spec)
     local stance = "NEUTRAL"
     local lexemes = {}
 
-    if behaviorAct == "RETALIATE_VERBALLY"
+    if behaviorAct == "WARN" or dialogueAct == "BOUNDARY_WARNING" then
+        strategy = "WARN"
+        planDialogueAct = "BOUNDARY_WARNING"
+        stance = "NEGATIVE"
+    elseif behaviorAct == "RETALIATE_VERBALLY"
         or dialogueAct == "RETALIATE_VERBALLY"
     then
         local concepts = UtterancePlan.CanonicalLexemesFromIR(ir)
@@ -306,6 +346,15 @@ function UtterancePlan.FromInteraction(ir, interactionPlan, spec)
     elseif behaviorAct == "DEESCALATE" or dialogueAct == "DEESCALATE" then
         strategy = "DEESCALATE"
         stance = "POSITIVE"
+    elseif behaviorAct == "CHALLENGE" or dialogueAct == "CHALLENGE" then
+        strategy = "CHALLENGE"
+        stance = "NEGATIVE"
+    elseif behaviorAct == "END_INTERACTION"
+        or dialogueAct == "END_CONVERSATION"
+    then
+        strategy = "END_CONVERSATION"
+        planDialogueAct = "END_CONVERSATION"
+        stance = "NEGATIVE"
     elseif behaviorAct == "RECONCILE" then
         strategy = "ACKNOWLEDGE"
         planDialogueAct = "ACKNOWLEDGE"
@@ -332,6 +381,8 @@ function UtterancePlan.FromInteraction(ir, interactionPlan, spec)
             and type(ir.extensions.socialFeatures) == "table"
             and ir.extensions.socialFeatures.intensity or 0,
         locale = spec.locale,
+        styleVariant = spec.styleVariant,
+        selectionSalt = spec.selectionSalt,
         fallbackContentTemplateID =
             interactionPlan.contentTemplateID,
         lexemes = lexemes,

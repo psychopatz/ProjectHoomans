@@ -271,6 +271,105 @@
           "value": "Oo, sinadya ko 'yon."
         }
       ]
+    },
+    {
+      "id": "construction.tl.social.warn_direct",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "WARN",
+      "dialogueAct": "BOUNDARY_WARNING",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Huwag mo akong kausapin nang ganyan."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.warn_mouth",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "WARN",
+      "dialogueAct": "BOUNDARY_WARNING",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Ayusin mo ang pananalita mo."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.warn_stop",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "WARN",
+      "dialogueAct": "BOUNDARY_WARNING",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Tigilan mo 'yan."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.warn_consequence",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "WARN",
+      "dialogueAct": "BOUNDARY_WARNING",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Kapag itinuloy mo 'yan, magkakaproblema tayo."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.mirror_retort_challenge",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "MIRROR",
+      "dialogueAct": "RETORT",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Ha? "
+        },
+        {
+          "kind": "lexeme",
+          "slot": "primary"
+        },
+        {
+          "kind": "literal",
+          "value": " rin."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.end_conversation_done",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "END_CONVERSATION",
+      "dialogueAct": "END_CONVERSATION",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Tapos na tayo rito."
+        }
+      ]
+    },
+    {
+      "id": "construction.tl.social.end_conversation_withdraw",
+      "type": "construction",
+      "locale": "TL",
+      "strategy": "END_CONVERSATION",
+      "dialogueAct": "END_CONVERSATION",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Ayoko na nito."
+        }
+      ]
     }
   ]
 }

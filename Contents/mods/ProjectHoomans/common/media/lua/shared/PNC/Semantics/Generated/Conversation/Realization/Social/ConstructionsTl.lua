@@ -209,12 +209,62 @@ return {
         ["type"] = "construction",
     },
     {
+        ["dialogueAct"] = "END_CONVERSATION",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.end_conversation_done",
+        ["locale"] = "TL",
+        ["strategy"] = "END_CONVERSATION",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Tapos na tayo rito.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "END_CONVERSATION",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.end_conversation_withdraw",
+        ["locale"] = "TL",
+        ["strategy"] = "END_CONVERSATION",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Ayoko na nito.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
         ["dialogueAct"] = "RETORT",
         ["domain"] = "social",
         ["id"] = "construction.tl.social.mirror_retort",
         ["locale"] = "TL",
         ["strategy"] = "MIRROR",
         ["tokens"] = {
+            {
+                ["kind"] = "lexeme",
+                ["slot"] = "primary",
+            },
+            {
+                ["kind"] = "literal",
+                ["value"] = " rin.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "RETORT",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.mirror_retort_challenge",
+        ["locale"] = "TL",
+        ["strategy"] = "MIRROR",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Ha? ",
+            },
             {
                 ["kind"] = "lexeme",
                 ["slot"] = "primary",
@@ -236,6 +286,62 @@ return {
             {
                 ["kind"] = "literal",
                 ["value"] = "Ayoko munang sabihin.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "BOUNDARY_WARNING",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.warn_consequence",
+        ["locale"] = "TL",
+        ["strategy"] = "WARN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Kapag itinuloy mo 'yan, magkakaproblema tayo.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "BOUNDARY_WARNING",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.warn_direct",
+        ["locale"] = "TL",
+        ["strategy"] = "WARN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Huwag mo akong kausapin nang ganyan.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "BOUNDARY_WARNING",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.warn_mouth",
+        ["locale"] = "TL",
+        ["strategy"] = "WARN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Ayusin mo ang pananalita mo.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "BOUNDARY_WARNING",
+        ["domain"] = "social",
+        ["id"] = "construction.tl.social.warn_stop",
+        ["locale"] = "TL",
+        ["strategy"] = "WARN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Tigilan mo 'yan.",
             },
         },
         ["type"] = "construction",

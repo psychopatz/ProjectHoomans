@@ -275,6 +275,105 @@
           "value": "Yeah, I meant it."
         }
       ]
+    },
+    {
+      "id": "construction.en.social.warn_direct",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "WARN",
+      "dialogueAct": "BOUNDARY_WARNING",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Don't talk to me like that."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.warn_mouth",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "WARN",
+      "dialogueAct": "BOUNDARY_WARNING",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Watch your mouth."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.warn_stop",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "WARN",
+      "dialogueAct": "BOUNDARY_WARNING",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Cut that out."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.warn_consequence",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "WARN",
+      "dialogueAct": "BOUNDARY_WARNING",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Keep talking like that and we're going to have a problem."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.mirror_retort_challenge",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "MIRROR",
+      "dialogueAct": "RETORT",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "Yeah? "
+        },
+        {
+          "kind": "lexeme",
+          "slot": "primary"
+        },
+        {
+          "kind": "literal",
+          "value": " you too."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.end_conversation_done",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "END_CONVERSATION",
+      "dialogueAct": "END_CONVERSATION",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "We're done here."
+        }
+      ]
+    },
+    {
+      "id": "construction.en.social.end_conversation_withdraw",
+      "type": "construction",
+      "locale": "EN",
+      "strategy": "END_CONVERSATION",
+      "dialogueAct": "END_CONVERSATION",
+      "tokens": [
+        {
+          "kind": "literal",
+          "value": "I'm done with this."
+        }
+      ]
     }
   ]
 }

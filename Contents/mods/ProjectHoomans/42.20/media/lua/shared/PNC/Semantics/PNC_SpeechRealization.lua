@@ -294,6 +294,10 @@ local function compositionalInteractionResponse(
         ir, interactionPlan, {
             speaker = "npc",
             target = "player",
+            styleVariant = style and style.variant or "neutral",
+            selectionSalt = context.utterancePlanSalt
+                or response.selectionID
+                or interactionPlan.behaviorID,
         }
     )
     if not plan then return nil, planReason end

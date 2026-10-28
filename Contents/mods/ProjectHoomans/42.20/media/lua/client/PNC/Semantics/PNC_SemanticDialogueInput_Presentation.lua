@@ -216,6 +216,12 @@ function Internal.QueueDeterministicResponse(
     presentationContext.dialogueIR = result.ir
     presentationContext.dialogueDecision = decision
     presentationContext.interactionPlan = decision.interactionPlan
+    presentationContext.utterancePlanSalt = table.concat({
+        tostring(result.sequence or 0),
+        tostring(decision.branch or ""),
+        tostring(decision.interactionPlan
+            and decision.interactionPlan.behaviorID or ""),
+    }, ":")
     local responses
     if type(options.responses) == "table" and #options.responses > 0 then
         responses = options.responses

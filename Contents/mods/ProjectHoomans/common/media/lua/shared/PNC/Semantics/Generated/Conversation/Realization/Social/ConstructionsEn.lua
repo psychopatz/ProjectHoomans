@@ -213,12 +213,62 @@ return {
         ["type"] = "construction",
     },
     {
+        ["dialogueAct"] = "END_CONVERSATION",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.end_conversation_done",
+        ["locale"] = "EN",
+        ["strategy"] = "END_CONVERSATION",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "We're done here.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "END_CONVERSATION",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.end_conversation_withdraw",
+        ["locale"] = "EN",
+        ["strategy"] = "END_CONVERSATION",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "I'm done with this.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
         ["dialogueAct"] = "RETORT",
         ["domain"] = "social",
         ["id"] = "construction.en.social.mirror_retort",
         ["locale"] = "EN",
         ["strategy"] = "MIRROR",
         ["tokens"] = {
+            {
+                ["kind"] = "lexeme",
+                ["slot"] = "primary",
+            },
+            {
+                ["kind"] = "literal",
+                ["value"] = " you too.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "RETORT",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.mirror_retort_challenge",
+        ["locale"] = "EN",
+        ["strategy"] = "MIRROR",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Yeah? ",
+            },
             {
                 ["kind"] = "lexeme",
                 ["slot"] = "primary",
@@ -240,6 +290,62 @@ return {
             {
                 ["kind"] = "literal",
                 ["value"] = "I'd rather not say.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "BOUNDARY_WARNING",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.warn_consequence",
+        ["locale"] = "EN",
+        ["strategy"] = "WARN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Keep talking like that and we're going to have a problem.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "BOUNDARY_WARNING",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.warn_direct",
+        ["locale"] = "EN",
+        ["strategy"] = "WARN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Don't talk to me like that.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "BOUNDARY_WARNING",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.warn_mouth",
+        ["locale"] = "EN",
+        ["strategy"] = "WARN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Watch your mouth.",
+            },
+        },
+        ["type"] = "construction",
+    },
+    {
+        ["dialogueAct"] = "BOUNDARY_WARNING",
+        ["domain"] = "social",
+        ["id"] = "construction.en.social.warn_stop",
+        ["locale"] = "EN",
+        ["strategy"] = "WARN",
+        ["tokens"] = {
+            {
+                ["kind"] = "literal",
+                ["value"] = "Cut that out.",
             },
         },
         ["type"] = "construction",

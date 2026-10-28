@@ -126,6 +126,24 @@ return {
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_en.json",
     },
+    ["construction.en.social.end_conversation_done"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.end_conversation_done",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.end_conversation_withdraw"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.end_conversation_withdraw",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
     ["construction.en.social.mirror_retort"] = {
         ["domain"] = "social",
         ["generated"] = {
@@ -135,12 +153,57 @@ return {
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_en.json",
     },
+    ["construction.en.social.mirror_retort_challenge"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.mirror_retort_challenge",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
     ["construction.en.social.refuse_identity"] = {
         ["domain"] = "social",
         ["generated"] = {
             "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
         },
         ["id"] = "construction.en.social.refuse_identity",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.warn_consequence"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.warn_consequence",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.warn_direct"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.warn_direct",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.warn_mouth"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.warn_mouth",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_en.json",
+    },
+    ["construction.en.social.warn_stop"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+        },
+        ["id"] = "construction.en.social.warn_stop",
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_en.json",
     },
@@ -297,6 +360,24 @@ return {
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_tl.json",
     },
+    ["construction.tl.social.end_conversation_done"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.end_conversation_done",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.end_conversation_withdraw"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.end_conversation_withdraw",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
     ["construction.tl.social.mirror_retort"] = {
         ["domain"] = "social",
         ["generated"] = {
@@ -306,12 +387,57 @@ return {
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_tl.json",
     },
+    ["construction.tl.social.mirror_retort_challenge"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.mirror_retort_challenge",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
     ["construction.tl.social.refuse_identity"] = {
         ["domain"] = "social",
         ["generated"] = {
             "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
         },
         ["id"] = "construction.tl.social.refuse_identity",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.warn_consequence"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.warn_consequence",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.warn_direct"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.warn_direct",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.warn_mouth"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.warn_mouth",
+        ["kind"] = "realization",
+        ["source"] = "realization/social/constructions_tl.json",
+    },
+    ["construction.tl.social.warn_stop"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+        },
+        ["id"] = "construction.tl.social.warn_stop",
         ["kind"] = "realization",
         ["source"] = "realization/social/constructions_tl.json",
     },

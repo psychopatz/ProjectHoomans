@@ -177,10 +177,22 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
 
     def test_runtime_retaliation_uses_canonical_microplan_en_and_tl(self) -> None:
         expected = {
-            "EN": ("fuck you too.", "construction.en.social.mirror_retort"),
-            "TL": ("Putang ina mo rin.", "construction.tl.social.mirror_retort"),
+            "EN": {
+                ("fuck you too.", "construction.en.social.mirror_retort"),
+                (
+                    "Yeah? fuck you too.",
+                    "construction.en.social.mirror_retort_challenge",
+                ),
+            },
+            "TL": {
+                ("Putang ina mo rin.", "construction.tl.social.mirror_retort"),
+                (
+                    "Ha? Putang ina mo rin.",
+                    "construction.tl.social.mirror_retort_challenge",
+                ),
+            },
         }
-        for language, (text, construction) in expected.items():
+        for language, allowed in expected.items():
             with self.subTest(language=language):
                 scenario = deepcopy(DEFAULT_SCENARIO)
                 scenario["runtime"]["language"] = language
@@ -205,14 +217,13 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
                 self.assertEqual(canonical["fallback"], "Watch your mouth.")
 
                 payload = turn["messages"][0]["payload"]
-                self.assertEqual(payload["text"], text)
+                self.assertIn(
+                    (payload["text"], payload["realizationVariant"]),
+                    allowed,
+                )
                 self.assertEqual(
                     payload["realizationFamily"],
                     "utterance_plan",
-                )
-                self.assertEqual(
-                    payload["realizationVariant"],
-                    construction,
                 )
                 self.assertNotIn("uuu", payload["text"].lower())
                 self.assertEqual(
@@ -220,12 +231,16 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
                     "semantic.interaction.argument.retaliate",
                 )
 
-    def test_unsupported_microplan_falls_back_to_dialogue_content(self) -> None:
+    def test_non_owned_interaction_response_falls_back_to_dialogue_content(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            turn = worker.input("fuckyouuuu")
+            turn = worker.input("hello")
         payload = turn["messages"][0]["payload"]
         self.assertNotEqual(payload.get("realizationFamily"), "utterance_plan")
         self.assertTrue(payload["text"])
+        self.assertEqual(
+            payload.get("utterancePlanFallbackReason"),
+            "interaction_response_template_mismatch",
+        )
 
     def test_realization_records_are_compiler_owned_and_routable(self) -> None:
         model = compile_conversation_sources(REPOSITORY)
