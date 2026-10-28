@@ -14,6 +14,12 @@ local currentWorldDay = Internal.CurrentWorldDay
 
 local NORMALIZE_LONG_LIMIT = 64
 
+local function salienceFor(code, flags)
+    local entry = Data.eventByCode[code]
+    if entry and entry.salience > 0 then return entry.salience end
+    return hasFlag(flags, Events.FLAG_DURABLE) and 220 or 0
+end
+
 local function removeSegment(values, index, width)
     local count
     for count = 1, width do
@@ -45,21 +51,21 @@ local function upsertShort(values, code, seed, flags)
     values[#values + 1] = code
     values[#values + 1] = seed
     values[#values + 1] = flags
-    while #values > Events.SHORT_LIMIT * 3 do
-        removeSegment(values, 1, 3)
+    if #values > Events.SHORT_LIMIT * 3 then
+        local weakest, score = 1, math.huge
+        for position = 1, #values, 3 do
+            local candidate = salienceFor(values[position], values[position + 2])
+            -- Strict comparison evicts the oldest equal-salience row.
+            if candidate < score then weakest, score = position, candidate end
+        end
+        local incomingDropped = weakest == #values - 2
+        removeSegment(values, weakest, 3)
+        if incomingDropped then return false end
     end
     return true
 end
 
 Internal.UpsertShort = upsertShort
-
-local function salienceFor(code, flags)
-    local entry = Data.eventByCode[code]
-    if entry and entry.salience > 0 then
-        return entry.salience
-    end
-    return hasFlag(flags, Events.FLAG_DURABLE) and 220 or 0
-end
 
 local function upsertLong(values, code, seed, day, flags)
     local count = math.floor(#values / 4)

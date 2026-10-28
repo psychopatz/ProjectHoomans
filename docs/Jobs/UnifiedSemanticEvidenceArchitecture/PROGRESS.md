@@ -4,7 +4,13 @@
 **Branch:** existing main.
 **Audit anchor:** ProjectHoomans 2bc4810f.
 **Current phase:** E3 — tier query and bounded retention.
-**Next exact chunk:** E3A — salience-aware eight-slot retention and TODAY projection independent of detailed retention; then wire bounded production tier adapters through the E1 seam.
+**Next exact chunk:** E3B — wire bounded production SESSION/TODAY/DURABLE readers through the E1 seam and owning-domain query APIs. E3 is not yet accepted as a phase.
+
+## E3A accepted (2026-10-28)
+
+- TODAY eviction uses canonical retention salience and oldest-first equal-salience ties; storage remains numeric triples with the eight-entry limit. Duplicate pairs still coalesce.
+- Successful authoritative social events project compact memory even when detailed relationship retention prunes the proposed memory. No gameplay effect, new ModData root or persistence field was added.
+- Production-worker tests prove 20-memory saturation with immediate effect and retained TODAY insult; high-salience rescue survives 45 lower-salience events, bounds/coalescing and day rollover pass. Serialized delta remains below 4000 canonical JSON bytes and roots unchanged. Relationship 5/5 and social-event smoke pass.
 
 ## E2 accepted (2026-10-28)
 

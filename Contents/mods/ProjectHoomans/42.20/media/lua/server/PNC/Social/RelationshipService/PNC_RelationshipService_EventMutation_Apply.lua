@@ -207,8 +207,7 @@ function Relationships.ApplyEventMutation(
     local memoryEvents = PNC.Conversation
         and PNC.Conversation.Memory
         and PNC.Conversation.Memory.Events or nil
-    if memoryOutcome.durable == true
-        and memoryEvents
+    if memoryEvents
         and type(memoryEvents.RecordRelationshipMemory) == "function"
     then
         -- The compact journal is an additional projection. A failure here must
