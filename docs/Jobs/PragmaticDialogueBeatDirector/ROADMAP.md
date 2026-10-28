@@ -1,252 +1,171 @@
-# Roadmap — Pragmatic Interaction Director Recovery
+# Roadmap — Coherent Emergent Conversation
 
-**Parent status:** RECOVERY / RE-ARCHITECTURE REQUIRED.
+**Parent status:** IN PROGRESS.
 
-The old P0–P8 dialogue-director roadmap is superseded.
+The completed R0–R9 recovery is accepted foundation and is intentionally not repeated here. Git history contains that implementation record.
 
-Do not continue from the prototype's partially implemented P7.
+The remaining developer objective is C0–C8.
 
-The mandatory developer objective is R0–R9.
+## C0 — failure corpus, ownership audit and baselines
 
-## R0 — freeze, classify, and protect useful evidence
+Build a compact checked-in regression corpus around the actual production worker.
 
-Audit the entire current uncommitted prototype.
+Cover at minimum:
 
-For every modified/new implementation file or coherent hunk classify:
+- exact, typo, missing-space and elongated forms;
+- profanity used toward NPC / self / world;
+- insult vs hostile remark vs threat;
+- negation and intensification;
+- context-dependent short replies;
+- ambiguous references;
+- benign false-positive controls;
+- mutating-action negative controls.
 
-- `KEEP` — behavior/test/observability worth retaining;
-- `REWORK` — useful concept with wrong ownership/API;
-- `REMOVE` — parallel authority or dead-end implementation.
+Required explicit cases include:
 
-Mandatory protected acceptance:
+`fuckyou`, `fuckyouuuu`, `shutthefuckup`, `youidiot`, `youreuseless`, `illkillyou`, `i hope you die`, `i fucking hate this rain`, `i'm fucking starving`, `you're not bad`, `not really`, `yeah right`.
 
-- typoed recognized hostility does not become generic clarification;
-- context can change behavior while semantic meaning remains stable;
-- argument → apology → reconciliation transition;
-- bounded session state;
-- explainable worker trace.
+Audit current PsychopatzCore normalization/candidate APIs, ProjectHoomans candidate eligibility/policy thresholds, discourse/pragmatic state, and conduct-evidence saturation.
 
-Do not commit the prototype as-is.
+**Gate:** failures are reproducible in the real worker, ownership is explicit, and no implementation starts in the wrong repository.
 
-**Gate:** a written recovery matrix exists and no old-P7 work continues.
+## C1 — PsychopatzCore bounded surface recovery
 
-## R1 — restore single response/content authority
+Implement generic recovery in the Core NLU owner:
 
-Remove prototype ownership that lets the director directly select its own
-response pools.
+- registry-derived compact/no-space lookup;
+- conservative repeated-character recovery;
+- common contraction/apostrophe recovery where safe;
+- bounded segmentation fallback for single unknown tokens;
+- recovery provenance and confidence penalties;
+- ambiguity preservation.
 
-Required:
+Exact parsing remains first and unchanged.
 
-- no `DialogueDirector.ResolveResponse` response authority;
-- no `flow → director response → local response` competing realization path;
-- behavior output becomes semantic intent/InteractionPlan;
-- existing ResponsePlan/Dialogue Content becomes the only speech path;
-- preserve prototype behavioral acceptance through the unified path.
+**Gate:** required compact/no-space cases recover automatically from registered vocabulary while benign false-positive controls and mutating-action safety remain green.
 
-**Gate:** a selected behavior can alter ResponsePlan semantics without creating
-a second response catalog.
+## C2 — semantic/social feature composition
 
-## R2 — migrate director wording into ordinary modular Dialogue Content
+Add generic compositional cues needed for discourse interpretation without creating a standalone sentiment engine.
 
-Remove the architectural idea of director-owned response strings.
+Cover:
 
-Required:
+- directedness;
+- target/self/world distinction;
+- negation;
+- intensification;
+- hostility/affiliation/threat-like features;
+- idiom/specific-pattern suppression of misleading lower-level cues.
 
-- migrate warning/retaliation/de-escalation/reconciliation/first-contact wording
-  into modular Dialogue Content records;
-- existing Dialogue Content harness editing works for those strings;
-- compiler generates locales normally;
-- no catch-all `responses/director.json`;
-- no catch-all `Conversation/Director.json` for dialogue wording;
-- labels/descriptions only exist when an actual player-facing UI needs them.
+ProjectHoomans social catalogs may add domain meanings, but Core remains the generic matcher.
 
-**Gate:** change one interaction phrase through the normal Dialogue Content
-authoring workflow and prove generated EN + additional-locale output.
+**Gate:** profanity in self/world contexts does not become recipient hostility; threat, insult and hostile wish remain distinguishable; negation behaves correctly.
 
-## R3 — modular canonical situation/behavior source model
+## C3 — Contextual Discourse Resolver
 
-Replace catch-all beat/behavior shards with small modular source records.
+Add one ProjectHoomans layer between Core candidates and the existing pragmatic resolver.
 
-Required:
+It consumes candidates plus bounded conversation/interaction context and emits one explainable DiscourseFrame.
 
-- one bounded situation/beat record per file or tiny coherent family;
-- one reusable behavior record per file or tiny coherent family;
-- stable canonical IDs;
-- behavior references semantic content identity, not a director-specific response
-  pool;
-- deterministic compiler-side discovery of approved source roots;
-- no ever-growing manual manifest entry per file;
-- deterministic generated indexes/modules.
+Required context:
 
-**Gate:** adding one new beat/behavior source file requires no root compiler code
-or manifest list edit beyond approved source-root configuration.
-
-## R4 — one registry, one predicate contract, modular runtime
-
-### Registry
-
-Use one canonical Conversation Registry/index view.
-
-Harness drafts use a worker-local overlay.
-
-Remove duplicate production beat/behavior registries if they no longer add
-unique authority.
-
-### Predicates
-
-Audit existing flow/suggestion/context predicate engines.
-
-Converge on one typed/bounded predicate evaluator where practical.
-
-### Runtime
-
-Split the large prototype director into focused providers/reused modules.
-
-**Gate:** production has one canonical registry identity and no giant
-dialogue-director composition module owns unrelated concerns.
-
-## R5 — typed stimuli and provider/adaptor projections
-
-Implement the generic interaction input contract.
-
-Required:
-
-- typed stimuli for human semantic input, engine/world events, NPC semantic acts,
-  emotes/tasks/social events;
-- bounded ActorSnapshot;
-- RelationshipSnapshot;
-- WorldSnapshot;
-- KnowledgeSnapshot;
-- SceneContext;
-- explicit unknown handling;
-- provider capability/provenance visibility;
-- third-party adapter contract.
-
-No beat may read arbitrary subsystem internals directly.
-
-**Gate:** Project Hoomans and a synthetic third-party actor adapter can project
-into the same interaction contract.
-
-## R6 — pragmatic resolver and behavior arbitration
-
-Implement the missing original intelligence layer.
-
-Required pragmatic inputs:
-
-- semantic candidates/IR;
+- previous/recent semantic acts;
 - pending questions/offers/requests;
 - current/recent topic;
-- referenced actors/entities;
-- active/suspended flows;
-- recent semantic acts;
-- relevant grounded world/social events.
+- reply-to / adjacency;
+- active/suspended flow;
+- references/targets;
+- current beat/scene;
+- actor/relationship/world/knowledge projections.
 
-Behavior arbitration must:
+It must not reparse raw text.
 
-- support one-shot reactions without beats;
-- support optional stateful beats;
-- use normalized disposition/relationship/world factors;
-- produce a grounded InteractionPlan;
-- remain deterministic/explainable under the harness.
+**Gate:** context-sensitive short replies resolve from prior interaction state without phrase-specific hardcoded response branches.
 
-**Gate:** underspecified/context-sensitive turns resolve against prior
-interaction state without hardcoded phrase-specific branches.
+## C4 — risk-aware candidate acceptance
 
-## R7 — event-driven beat/scene engine and performance LOD
+Replace the global conversation confidence cliff with risk-aware policy.
 
-Implement the scalable runtime scheduling model.
+- social/conversational acts may accept medium-confidence candidates when context strongly supports them;
+- read-only questions remain permissive enough for natural conversation;
+- unresolved/ambiguous meanings still clarify;
+- mutating actions retain strict high/exact/confirmation requirements.
 
-Required:
+Fix the known class where a recognized `HOSTILE_REMARK` around 0.83 becomes generic clarification.
 
-- stimulus → candidate index;
-- no whole-catalog scans on every NPC tick;
-- no global social simulation every frame;
-- bounded candidate counts;
-- bounded active scenes;
-- bounded turns;
-- cooldowns;
-- nearby/perceived vs distant LOD;
-- no transcript persistence;
-- compact semantic outcomes only when needed.
+**Gate:** conversational understanding improves without increasing unsafe action execution.
 
-**Gate:** instrumentation proves candidate evaluation is event-driven and
-bounded under synthetic high-NPC scenarios.
+## C5 — coherent discourse continuity
 
-## R8 — NPC-to-NPC, multi-NPC, emote, flavor, and world-event reuse
+Make accepted conversation systems participate in one bounded discourse state.
 
-Prove the generic interaction layer outside direct player dialogue.
+Prove:
 
-Required:
+- question → answer/disagreement relevance;
+- topic continuation and topic shift;
+- apology after hostility;
+- greeting/first-contact continuity;
+- referent reuse;
+- interruptions and resumption where valid;
+- actor/world events influencing the same conversation without replacing semantic authority.
 
-- 2-NPC ambient scene;
-- 3+ participant bounded scene;
-- NPC-generated semantic acts delivered directly, without reparsing generated
-  English;
-- emote reaction using the same semantic behavior;
-- ambient/flavor presentation using the same semantic behavior;
-- grounded world-event reaction;
-- grounded gossip/news topic;
-- interruption by danger/world stimulus;
-- optional speech skipped where actor capability or LOD says not to realize it.
+Do not persist transcripts.
 
-**Gate:** the same underlying behavior/beat machinery works across direct
-dialogue, ambient NPC scenes, emotes, and flavor presentation.
+**Gate:** multi-turn harness scenarios feel coherent because later turns derive meaning from earlier semantic state rather than independent sentence classification.
 
-## R9 — integrated Semantic Lab workbench and final acceptance
+## C6 — social effect / conduct-memory decoupling
 
-Replace the standalone Beat Studio concept with an integrated interaction module
-workflow.
+Fix the `evidence_pruned_by_limit` class of failure.
 
-Structural authoring:
+An understood/selected social interaction must not be reported as semantically rejected merely because durable conduct evidence cannot retain another record.
 
-- situations/beats;
-- behaviors;
-- stimuli;
-- predicates;
-- capability requirements;
-- contextual modifiers.
+Implement bounded aggregation/coalescing where appropriate and expose distinct outcomes for:
 
-Wording:
+- interaction understood;
+- reaction selected;
+- relationship effect;
+- durable evidence persisted/coalesced/pruned.
 
-- linked ordinary Dialogue Content records;
-- existing Dialogue Content editor remains canonical wording editor.
+**Gate:** a saturated conduct ledger still permits coherent social reaction while persistence remains bounded.
 
-Simulation:
+## C7 — Semantic Lab observability and fuzz/regression tools
 
-- actor/world/context projections;
-- pragmatic resolution;
-- behavior candidates;
-- active beat;
-- multi-participant scene timeline;
-- flow coexistence;
-- output adapters;
-- natural vs harness override clearly distinguished.
+Expose the complete understanding chain in bounded form:
 
-Final acceptance must prove:
+- raw/normalized/recovered surface;
+- candidate list;
+- recovery provenance;
+- contextual score/reason changes;
+- DiscourseFrame;
+- pragmatic/interaction decision;
+- social-effect and conduct-memory outcome.
 
-- one NLU authority;
-- one context/conversation authority;
-- one semantic interaction decision pipeline;
-- one ResponsePlan/Dialogue Content speech path;
-- one gameplay authority;
-- modular compiler-owned source;
-- data-driven locales;
-- deterministic two-pass generation;
-- no generated-file hand editing;
-- no transcript/save bloat;
-- event-driven bounded performance;
-- Project Hoomans + synthetic third-party adapter compatibility;
-- direct dialogue + NPC scene + emote/flavor reuse;
-- no required PBrainZ dependency.
+Add deterministic mutation/fuzz coverage for spacing, repeated letters, punctuation, capitalization and safe typo classes.
 
-Only then mark **READY FOR USER LIVE TEST**.
+**Gate:** an agent can diagnose why a malformed or contextual utterance succeeded/failed without screenshots or monolithic JSON.
 
-## Non-goals
+## C8 — integrated acceptance and live-test handoff
 
-- do not recreate Façade scripts/content;
-- do not use an LLM as authoritative offline interaction logic;
-- do not simulate irrelevant distant conversations turn-by-turn;
-- do not make every reaction a beat;
-- do not make beats response pools;
-- do not make the director a parser;
-- do not let interaction definitions mutate gameplay state directly.
+Run focused + broad real-worker regression across:
+
+- EN and supported additional locales where semantics are locale-independent;
+- surface recovery;
+- contextual discourse;
+- interaction behavior;
+- action-safety controls;
+- social-effect saturation;
+- NPC-to-NPC regression;
+- generation idempotence;
+- performance/bounds;
+- no save mutation;
+- no transcript/ModData bloat.
+
+Only after all developer gates pass return to **READY FOR USER LIVE TEST**.
+
+## Continue / stop rule
+
+Under an autonomous goal, implement C0 first, validate it, update `PROGRESS.md`, and continue through C8 automatically.
+
+Stop early only for a genuine repository-ownership/safety blocker, an external dependency that prevents implementation, or completion of all developer-side gates.
+
+Do not stop merely because one malformed phrase works.

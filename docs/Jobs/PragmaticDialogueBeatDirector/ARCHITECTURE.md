@@ -1,486 +1,212 @@
-# Architecture — Pragmatic Interaction Director
+# Architecture — Coherent Semantic Conversation
 
-## Design principle
+## Principle
 
-The system is a reusable semantic interaction layer, not a dialogue-only
-subsystem.
-
-```text
-                INPUT / STIMULUS SOURCES
-
- human text      engine/world       NPC semantic act      emote/task
-     │               │                    │                  │
-     ▼               │                    │                  │
- PsychopatzCore NLU  │                    │                  │
-     └───────────────┴────────────────────┴──────────────────┘
-                              │
-                              ▼
-                        Typed Stimulus
-                              │
-                              ▼
-                    Context Projection Hub
-          actor / relationship / world / knowledge / scene
-                              │
-                              ▼
-                     Pragmatic Interpretation
-                              │
-                              ▼
-                     Behavior Arbitration
-                              │
-                    ┌─────────┴─────────┐
-                    │                   │
-              one-shot behavior   optional Beat State
-                    │                   │
-                    └─────────┬─────────┘
-                              ▼
-                       InteractionPlan
-              ┌───────────────┼──────────────┐
-              ▼               ▼              ▼
-          ResponsePlan     EmotePlan      GameplayIntent
-              │               │              │
-      Dialogue Content     presentation   existing domain
-              │                            authority
-        presentation /
-        optional PBrainZ
-```
-
-## Authority boundaries
-
-### PsychopatzCore
-
-Owns human free-form NLU and candidate semantic interpretations.
-
-Do not reparse NPC-generated text internally.
-
-### Context providers/adapters
-
-Own projection of authoritative subsystem state into bounded semantic snapshots.
-
-They do not transfer authority to the director.
-
-### Pragmatic resolver
-
-Resolves what a semantic act means **in the current interaction**.
-
-Inputs may include:
-
-- pending questions/offers/requests;
-- active/suspended flows;
-- current/recent topic;
-- referenced actors/entities;
-- recent semantic acts;
-- participant roles;
-- salient grounded events.
-
-This is where context-sensitive meaning belongs.
-
-### Behavior arbiter
-
-Chooses a semantic actor intention.
-
-Examples:
-
-- WARN;
-- RETALIATE_VERBALLY;
-- DEESCALATE;
-- ACKNOWLEDGE;
-- ASK_FOLLOWUP;
-- SHARE_MEMORY;
-- SHARE_NEWS;
-- CHALLENGE;
-- RECONCILE;
-- EMOTE_GLARE;
-- END_INTERACTION.
-
-A behavior may be a one-shot reaction.
-
-### Beat state
-
-A beat exists only when a temporary situation needs multi-interaction state.
-
-Examples:
-
-- argument escalation;
-- reconciliation;
-- suspicious first contact;
-- grief discussion;
-- help-request pressure.
-
-A beat changes behavior relevance over multiple interactions.
-
-It does not own final prose or gameplay effects.
-
-### InteractionPlan
-
-The director output is a semantic plan, not wording.
-
-Conceptually:
+Conversation meaning is layered. No single subsystem should try to solve every problem from raw text to gameplay effect.
 
 ```text
+RAW HUMAN TEXT
+      ↓
+Surface understanding                PsychopatzCore
+      ↓
+Semantic candidates                  PsychopatzCore
+      ↓
+Contextual discourse interpretation  Project Hoomans
+      ↓
+Pragmatic interaction frame          Project Hoomans
+      ↓
+Behavior / beat arbitration          Project Hoomans
+      ↓
 InteractionPlan
-- actor
-- targets
-- selected behavior
-- topic
-- grounded fact/event references
-- tone/style hints
-- optional emote intents
-- optional gameplay intents
-- explanation/provenance
+   ┌──┼────────────┐
+   ↓  ↓            ↓
+speech emote   gameplay intent
+   ↓              ↓
+Dialogue       existing domain
+Content        authority
 ```
 
-### ResponsePlan / Dialogue Content
+NPC-generated semantic acts bypass human-text NLU and enter at the semantic-stimulus layer.
 
-Existing ResponsePlan and Dialogue Content remain the single speech planning and
-realization authority.
+## 1. Surface understanding — PsychopatzCore
 
-The director must not own response pools.
+Core remains the sole generic NLU owner.
 
-### Gameplay authority
+Ordinary exact normalization stays the first path. Recovery is additive and bounded; it never destroys the original input.
 
-Gameplay mutation remains in existing domain/action services.
+Preferred recovery order:
 
-The director may submit an intent only where the target system allows it.
+1. exact normalized text;
+2. registry-derived compact/no-space alias recovery;
+3. conservative repeated-character / common contraction recovery;
+4. bounded segmentation only when a single unknown token plausibly maps to registered vocabulary;
+5. existing fuzzy concept matching.
 
-## Actor/world agnosticism
+Examples that should be recoverable without manually authoring every malformed spelling:
 
-The director must not depend directly on Project Hoomans private NPC fields.
+- `fuckyou` → `fuck you`;
+- `shutthefuckup` → `shut the fuck up`;
+- `youidiot` → `you idiot`;
+- `youreuseless` → `you're useless`;
+- `illkillyou` → `i'll kill you`;
+- `youuuu` → `you` as a bounded elongation alternative.
 
-Use bounded semantic provider contracts.
+Each transformation must expose provenance, confidence cost and ambiguity. Ambiguous recoveries remain candidates rather than silently rewriting the text.
 
-### Actor snapshot
+Recovery must be registry-driven where possible so new registered phrases inherit it automatically.
 
-Conceptual normalized fields:
+## 2. Semantic candidates — PsychopatzCore
 
-```text
-actor.id
-actor.capabilities
+`ParseCandidates()` is the bridge to contextual understanding.
 
-disposition.aggression
-disposition.confidence
-disposition.forgiveness
-disposition.sociability
-disposition.empathy
-disposition.riskTolerance
+Do not collapse useful alternatives before Project Hoomans can evaluate conversation context.
 
-condition.panic
-condition.injury
-condition.hunger
-condition.fatigue
+Candidate evidence should remain bounded and include:
 
-activity.currentTask
-activity.idle
+- pattern/concept identity;
+- exact/fuzzy/recovery pass;
+- normalized/recovered surface;
+- confidence and recovery cost;
+- typed captures;
+- unmatched/unresolved material;
+- provenance.
 
-traits/tags (only where semantically meaningful)
-```
+Core should recognize generic semantic structure; it should not know Project Hoomans relationships, beats, pending conversation obligations or NPC personalities.
 
-Project Hoomans may derive these values from its own traits. A third-party mod
-may derive them differently.
+## 3. Intermediate social/pragmatic features
 
-### Relationship snapshot
+A conversational turn may carry multiple features without those features becoming the final intent.
 
-Conceptually:
+Useful bounded features include:
 
-```text
-familiarity
-approval
-trust
-respect
-factionRelation
-relationshipTags
-```
+- valence;
+- hostility;
+- affiliation;
+- threat;
+- contempt;
+- distress;
+- intensity;
+- directedness: SELF / RECIPIENT / THIRD_PARTY / WORLD;
+- negation;
+- intensification;
+- target/referent hints.
 
-### World snapshot
-
-Conceptually:
-
-```text
-immediateDanger
-powerStatus
-waterStatus
-weather
-season
-timeOfDay
-locationTags
-zombiePressure
-recentWorldEvents
-recentFactionEvents
-```
-
-### Knowledge snapshot
-
-Only grounded actor-known facts/events.
-
-Unknown remains unknown.
-
-## Typed stimuli
-
-Stimuli are semantic events that wake only relevant interaction logic.
+These features support interpretation; they are not a standalone sentiment authority.
 
 Examples:
 
-```text
-PLAYER_UTTERANCE
-SOCIAL_HOSTILITY
-APOLOGY
-GREETING
-EMOTE_RECEIVED
-AMBIENT_SOCIAL_OPPORTUNITY
-WITNESSED_DEATH
-ACTOR_JOINED
-ACTOR_LEFT
-DANGER_CHANGED
-WORLD_EVENT
-FACTION_EVENT
-TASK_EVENT
-```
+- `fuck you` → directed insult + hostility;
+- `I hope you die` → directed hostile/malicious wish, not automatically the same as a threat;
+- `I'll kill you` → threat;
+- `this fucking rain` → complaint/profanity toward WORLD, not the NPC;
+- `I'm fucking starving` → self-state hunger with intensification;
+- `you're not bad` → negation must suppress naive negative scoring.
 
-The exact taxonomy should reuse existing event contracts where possible.
+Specific/compositional meanings should suppress misleading lower-level cues.
 
-## Indexed arbitration
+## 4. Contextual Discourse Resolver — Project Hoomans
 
-Never scan every definition on every tick.
+This is the active missing layer.
 
-Target:
+It consumes semantic candidates plus bounded interaction context. It must not tokenize or reparse raw text.
 
-```text
-stimulus type
-    ↓
-generated/indexed candidate IDs
-    ↓
-eligibility predicates
-    ↓
-situation/beat precedence
-    ↓
-behavior eligibility
-    ↓
-context modifiers
-    ↓
-deterministic winner / explicit no-op
-```
+Relevant context may include:
 
-## Simulation level of detail
+- current and recent topic;
+- previous NPC/player semantic act;
+- pending question/offer/request;
+- active/suspended flow;
+- reply-to / adjacency relationship;
+- referenced actor/entity;
+- recent bounded semantic acts;
+- current beat/scene;
+- actor roles;
+- relationship;
+- actor disposition/condition;
+- grounded world/social events;
+- actor-known facts.
 
-### Player interaction
-
-- full pragmatic evaluation;
-- full behavior/beat trace;
-- speech/emote realization;
-- complete harness explanation.
-
-### Nearby/audible NPC scene
-
-- bounded semantic scene;
-- speech/emote realization because the player can perceive it;
-- low participant/turn caps.
-
-### Nearby but not perceived
-
-- semantic acts/outcomes only;
-- skip wording realization unless required.
-
-### Distant actors
-
-- no turn-by-turn flavor conversation;
-- retain only meaningful semantic outcomes if another authoritative system needs
-  them.
-
-## NPC-to-NPC interaction
-
-NPC-generated interactions remain semantic internally.
-
-```text
-NPC A behavior: SHARE_MEMORY
-topic: FORMER_JOB
-fact: occupation=mechanic
-
-        ↓ semantic event
-
-NPC B receives:
-DISCLOSURE_RECEIVED
-topic: FORMER_JOB
-speaker: A
-
-        ↓
-
-ACKNOWLEDGE / ASK_FOLLOWUP / SHARE_RELATED_MEMORY / DISMISS
-```
-
-Only perceived presentation is realized into text/emote.
-
-Do not generate text and feed it back through NLU.
-
-## Multi-participant scenes
-
-A scene must support 2+ actors without assuming a player participant.
-
-Bounded scene state may include:
-
-- participants;
-- roles/speaker;
-- active topic;
-- active beat;
-- recent semantic acts ring;
-- turn count;
-- cooldowns;
-- salient grounded facts;
-- deterministic seed.
-
-Do not persist full transcripts.
-
-## Emote and flavor reuse
-
-One behavior may have multiple presentation adapters.
+Output is a `DiscourseFrame` or equivalent projection containing the selected/combined semantic meaning, contextual subject/topic/reply-to, social features, confidence/evidence and provenance.
 
 Example:
 
 ```text
-behavior: REACT_TO_INSULT
+NPC: Do you trust me?
+PLAYER: not really
 
-speech:
-  ResponsePlan → Dialogue Content
-
-emote:
-  GLARE_AT speaker
-
-ambient flavor:
-  "X shoots Y an irritated look."
-
-PBrainZ:
-  realize the same grounded plan naturally
+surface: DISAGREE
+context: replyTo=TRUST question
+result: DISAGREE subject=TRUST
 ```
 
-The semantic decision remains shared.
+## 5. Confidence policy
 
-## Third-party adapters
+Do not use one global confidence cliff for all semantic acts.
 
-Third-party NPCs integrate by implementing supported actor/context interfaces.
+Acceptance must reflect risk:
 
-The director should query capabilities before selecting behaviors.
+- conversational/social acts may proceed at moderate confidence when contextual support is strong and alternatives are non-dangerous;
+- read-only questions may use moderate thresholds;
+- ambiguous references may request clarification;
+- mutating gameplay actions remain strict and require high/exact confidence or explicit confirmation;
+- fuzzy/recovered text must never silently authorize dangerous or inventory/world mutation.
 
-Examples:
+A recognized conversational act must not become `ASK_CLARIFICATION` solely because it is slightly below a gameplay-grade threshold.
 
-- speech unavailable → speech-only behavior ineligible;
-- emote unavailable → use another presentation or no-op;
-- relationship unavailable → value is unknown, not fabricated.
+## 6. Pragmatic Resolver and Interaction Director
 
-## Source architecture
+These accepted layers remain downstream.
 
-Canonical source should remain modular.
+The DiscourseFrame feeds the existing pragmatic resolver, which resolves current interaction meaning. The Interaction Director then chooses behavior/beat relevance from typed stimuli and bounded projections.
 
-Target shape:
+The director does not parse text and does not own wording.
+
+## 7. Social effects and durable memory
+
+Understanding, immediate reaction, relationship effect and durable conduct persistence are separate outcomes.
+
+A full conduct ledger must not turn an understood social act into a rejected conversation.
+
+Required separation:
 
 ```text
-sources/conversation/
-├─ content/
-│  └─ social/
-│     ├─ argument/
-│     ├─ reconciliation/
-│     └─ first_contact/
-├─ beats/
-│  └─ social/
-│     ├─ argument_escalation.json
-│     ├─ reconciliation.json
-│     └─ suspicious_first_contact.json
-├─ behaviors/
-│  └─ social/
-│     ├─ warn.json
-│     ├─ retaliate_verbal.json
-│     ├─ deescalate.json
-│     └─ ...
-├─ flows/
-├─ patterns/
-├─ ui/
-└─ manifest.json
+understood                 true/false
+interaction reaction       selected/no-op
+relationship effect        applied/clamped/none
+durable conduct evidence   persisted/coalesced/pruned
 ```
 
-Avoid giant `social.json` catch-all files.
+Repeated low-value social evidence should be coalesced/compacted where possible rather than stored as unbounded near-duplicates.
 
-## Source discovery
+No full transcript persistence.
 
-Prefer deterministic compiler-side recursive discovery of approved source roots
-over manually appending every new shard to one growing manifest.
+## 8. Observability
 
-Project Zomboid runtime still receives explicit generated modules/indexes.
-
-Authoring discovery and runtime loading are separate concerns.
-
-## Runtime registry
-
-Target one canonical Conversation Registry/index authority.
-
-Temporary Semantic Lab changes use a worker-local overlay.
-
-Do not copy generated definitions into separate production registries.
-
-## Shared predicate engine
-
-Before adding a new condition evaluator, audit and reconcile existing:
-
-- flow predicates;
-- suggestion eligibility;
-- semantic/context constraints;
-- prototype beat predicates.
-
-The final interaction layer should use one typed/bounded predicate contract where
-practical.
-
-## Runtime modularity
-
-The final interaction director should be a small composition root over focused
-providers such as:
+Simulation → Interactions/Inspect must make the chain inspectable without giant dumps:
 
 ```text
-InteractionDirector/
-├─ Context.lua
-├─ Predicate.lua
-├─ Pragmatics.lua
-├─ SituationArbitration.lua
-├─ BehaviorArbitration.lua
-├─ BeatState.lua
-├─ StimulusIndex.lua
-└─ Trace.lua
+raw
+→ normalized/recovered surfaces
+→ semantic candidates
+→ contextual adjustments
+→ selected DiscourseFrame
+→ pragmatic frame
+→ beat/behavior candidates
+→ InteractionPlan
+→ response/content lineage
+→ authoritative effects
+→ durable-memory outcome
 ```
 
-Exact filenames depend on existing conventions.
+The harness may display this chain but must not implement a duplicate evaluator.
 
-Do not create these blindly if an existing module already owns the concern.
+## Non-goals
 
-## Harness architecture
-
-Use one integrated interaction/conversation authoring workflow.
-
-Structural view:
-
-- beat/situation predicates;
-- behaviors;
-- stimulus bindings;
-- capability requirements;
-- contextual modifiers.
-
-Content view:
-
-- links to existing Dialogue Content records;
-- existing Dialogue Content editor remains the wording editor.
-
-Simulation:
-
-- natural arbitration;
-- active flows;
-- active beat;
-- behavior candidates;
-- actor/world snapshots;
-- trace/timeline;
-- speech/emote/flavor output.
-
-## Optional PBrainZ
-
-PBrainZ receives the same grounded InteractionPlan/ResponsePlan.
-
-It does not become:
-
-- NLU authority for offline behavior;
-- beat authority;
-- fact authority;
-- gameplay authority;
-- relationship/task/inventory authority.
+- no Façade content/script recreation;
+- no authoritative runtime LLM;
+- no keyword-only profanity detector as the final solution;
+- no unrestricted substring matching;
+- no second ProjectHoomans tokenizer/parser;
+- no lowering gameplay-action safety to improve conversation recall;
+- no transcript database;
+- no reopening accepted interaction infrastructure without evidence.

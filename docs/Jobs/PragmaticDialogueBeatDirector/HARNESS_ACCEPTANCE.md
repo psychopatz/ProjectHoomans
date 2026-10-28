@@ -1,215 +1,165 @@
-# Harness Acceptance — Pragmatic Interaction Director
+# Harness Acceptance — Coherent Emergent Conversation
 
-The Semantic Lab/harness is the primary developer acceptance surface.
+The Semantic Lab / production Lua worker is the primary developer acceptance surface.
 
-## Truth source
+## Required trace chain
 
-All semantic/pragmatic/behavior/beat decisions must come from the real production
-Lua worker and shared production providers.
+For human input expose a bounded chain:
 
-Python may:
+1. raw text;
+2. normalized text;
+3. alternate recovered surfaces and recovery provenance;
+4. semantic candidates;
+5. candidate confidence/eligibility;
+6. discourse-context evidence and adjustments;
+7. selected DiscourseFrame or explicit ambiguity;
+8. pragmatic frame;
+9. beat/behavior candidates and selected InteractionPlan;
+10. Dialogue Content / emote / gameplay projection;
+11. final presentation;
+12. authoritative relationship/gameplay result;
+13. durable conduct-memory result.
 
-- display;
-- edit canonical source;
-- schedule scenarios;
-- compare;
-- filter;
-- visualize.
+NPC semantic acts begin at the semantic-stimulus step and must show that no human NLU reparse occurred.
 
-Python must not implement a second interaction director.
+## C0 regression corpus
 
-## Required per-interaction evidence
+At minimum cover these classes.
 
-For a direct player turn or NPC semantic act, expose enough bounded evidence to
-recover:
+### Compact / no-space
 
-1. source stimulus;
-2. human NLU candidates/IR when applicable;
-3. actor/relationship/world/knowledge projections actually used;
-4. active/suspended flows;
-5. pragmatic interpretation;
-6. one-shot behavior candidates;
-7. situation/beat candidates where applicable;
-8. failed predicates;
-9. contextual modifiers;
-10. active beat before/after;
-11. selected behavior or explicit no-op;
-12. InteractionPlan;
-13. ResponsePlan / EmotePlan / GameplayIntent projections;
-14. Dialogue Content lineage when speech is realized;
-15. translation lookup;
-16. final player-visible speech/emote/flavor;
-17. authoritative side effects;
-18. harness override status.
+- `fuckyou`;
+- `shutthefuckup`;
+- `youidiot`;
+- `youreuseless`;
+- `illkillyou`.
 
-## String/content acceptance
+### Elongation / typo
 
-All speech/flavor wording must be editable through ordinary Dialogue Content
-authoring.
+- `fuck youuuu`;
+- existing typoed-hostility regressions;
+- benign elongated greetings.
 
-Acceptance must prove:
+### Directedness and profanity context
 
-- open a content family referenced by a behavior;
-- edit EN and one additional locale;
-- validate;
-- preview;
-- write canonical source;
-- compile;
-- regenerate;
-- reload worker;
-- select it through the intended interaction behavior.
+- `fuck you` → recipient hostility;
+- `this fucking rain` → world complaint, not recipient hostility;
+- `I'm fucking starving` → self-state/intensifier, not recipient hostility.
 
-No director-specific string editor is required.
+### Threat / hostile wish
 
-## Structural authoring acceptance
+- `I'll kill you` → threat;
+- `I hope you die` → hostile/malicious directed act but not falsely promoted to an explicit actor threat unless the semantic evidence supports it.
 
-The integrated interaction module view must support bounded editing of:
+### Negation
 
-- situation/beat definitions;
-- behavior definitions;
-- stimulus bindings;
-- predicates;
-- contextual modifiers;
-- capability requirements;
-- references to Dialogue Content IDs.
+- `you're not bad` must not become a negative insult merely from the word `bad`;
+- add equivalent positive/negative controls.
 
-It must expose:
+### Context-dependent replies
 
-- canonical source;
-- draft;
-- worker overlay;
-- provenance;
-- generated diff.
+Use multi-turn cases such as:
 
-## Natural vs forced acceptance
+```text
+NPC: Do you trust me?
+PLAYER: not really
+```
 
-Harness diagnostic modes may force or disable eligibility for focused testing.
+and prove the final meaning includes the prior question/topic rather than only a standalone `DISAGREE`.
 
-Every forced result must show a visible `HARNESS_OVERRIDE` marker.
+Also cover apology after hostility, topic continuation, interruption and valid resumption.
 
-Forced cases do not satisfy natural-selection acceptance.
+### Safety controls
 
-## Direct dialogue scenarios
+Malformed/fuzzy text must not silently authorize:
 
-Protect at minimum:
+- item transfer;
+- inventory mutation;
+- movement/task command;
+- recruitment/relationship mutation;
+- other gameplay side effects.
 
-- typoed recognized hostility;
-- ambiguous low-confidence clarification;
-- active flow response ownership;
-- argument escalation;
-- reconciliation;
+## Surface-recovery acceptance
+
+Recovery must prove:
+
+- exact path still wins;
+- compact aliases are derived from registered vocabulary;
+- recovery is bounded;
+- ambiguity is retained;
+- recovered text/provenance is visible;
+- no unrestricted substring matching;
+- benign single tokens do not become hostile/commands merely because they contain a semantic substring.
+
+## Contextual resolver acceptance
+
+For each contextual case show:
+
+- candidate set before context;
+- relevant bounded context used;
+- score/eligibility change or composition reason;
+- selected DiscourseFrame;
+- no raw-text reparsing in ProjectHoomans.
+
+Context may disambiguate conversation meaning but must not invent unknown facts.
+
+## Risk-aware policy acceptance
+
+Prove both directions:
+
+- a valid medium-confidence conversational/social act can proceed when context supports it;
+- an equally fuzzy/uncertain mutating action still clarifies or requires confirmation.
+
+The known `HOSTILE_REMARK` around 0.83 → generic clarification failure must be eliminated without globally lowering action safety.
+
+## Social-memory saturation acceptance
+
+Construct a disposable saturated conduct record and prove:
+
+- the hostile/social act is still understood;
+- a reaction can still be selected;
+- relationship effect reports applied/clamped/none independently;
+- durable evidence reports persisted/coalesced/pruned independently;
+- no unbounded evidence growth occurs;
+- no player-facing `I couldn't apply that social reaction` merely because the evidence ledger is full.
+
+## Multi-system coherence acceptance
+
+Protect the already-accepted interaction foundation:
+
+- argument → apology → reconciliation;
 - first-contact context;
-- interruption and resumption of unrelated grounded flows where applicable.
+- flows and Interaction Director coexist;
+- world/grounded events may affect conversation;
+- NPC-to-NPC semantics bypass text NLU;
+- speech/emote/flavor share the semantic decision.
 
-## NPC-to-NPC acceptance
+## Performance and persistence
 
-At least one 2-NPC scene must prove:
+Measure and bound:
 
-- no player participant required;
-- NPC A emits a semantic act/fact/topic;
-- NPC B consumes the semantic event directly;
-- generated English is not reparsed;
-- response behavior depends on B's projected state/relationship/knowledge;
-- only perceived speech/emote is realized.
-
-## Multi-NPC acceptance
-
-At least one 3+ actor scene must prove:
-
-- bounded participant count;
-- explicit speaker/target roles;
-- no pairwise explosion;
-- bounded turn count;
-- interruption/exit works.
-
-## Emote/flavor acceptance
-
-At least one semantic behavior must be presented in more than one mode, such as:
-
-- speech;
-- emote;
-- ambient flavor.
-
-The semantic decision must remain shared.
-
-## World-event/gossip acceptance
-
-At least one real/synthetic grounded world event must:
-
-- enter through a typed stimulus;
-- become available only to actors allowed to know it;
-- influence interaction behavior/topic;
-- never invent unsupported world facts.
-
-## Third-party adapter acceptance
-
-Provide a synthetic adapter that does not use Project Hoomans NPC internals.
-
-Prove it can:
-
-- project actor capability/disposition/condition;
-- project relationship/knowledge as available;
-- participate in the same behavior/beat system;
-- remain valid with some fields unknown.
-
-## LOD/performance acceptance
-
-Instrument and verify:
-
-- definitions considered per stimulus;
-- predicates evaluated;
-- behaviors considered;
-- scene participants;
-- active scenes;
-- turns per scene;
+- recovery candidates;
+- parser candidates;
+- discourse candidates/context rows;
+- predicate rows;
 - trace bytes;
-- semantic-memory writes.
+- active scene/turn limits;
+- durable evidence writes.
 
-Required proof:
+No full transcript persistence and no all-NPC/all-definition per-tick scanning.
 
-- no whole-catalog/all-NPC per-tick scan;
-- nearby perceived scenes may realize text;
-- non-perceived scenes can skip realization;
-- distant actors do not simulate flavor conversation turn-by-turn;
-- candidate evaluation remains bounded under synthetic high-NPC scenarios.
+## Final C8 gate
 
-## Persistence acceptance
+Developer acceptance requires:
 
-No full transcript persistence.
-
-If a scene creates durable knowledge, assert the persisted result is a bounded
-semantic fact/event rather than rendered prose.
-
-## Compiler acceptance
-
-Prove:
-
-- modular source-root discovery;
-- stable canonical IDs;
-- deterministic generated indexes;
-- duplicate/collision/reference validation;
-- EN fallback;
-- data-driven additional locale;
-- two-pass byte-identical generation;
-- no manual generated-file edits.
-
-## Final developer acceptance
-
-R9 completes only when the harness can explain and exercise:
-
-- direct conversation;
-- NPC-to-NPC interaction;
-- multi-NPC scene;
-- emote/flavor reuse;
-- grounded world stimulus;
-- third-party adapter;
-- bounded performance;
-
-while also proving:
-
-- one semantic authority;
-- one interaction/context authority;
-- one ResponsePlan/Dialogue Content speech path;
-- one gameplay authority.
+- focused and broad real-worker corpus green;
+- action-safety controls green;
+- contextual multi-turn cases green;
+- social-memory saturation green;
+- accepted NPC-scene/interaction regressions green;
+- deterministic generation where relevant;
+- no source-save mutation;
+- no transcript/ModData bloat;
+- `git diff --check` clean.
 
 Native Project Zomboid SP/MP remains user-owned unless explicitly reassigned.

@@ -1,195 +1,124 @@
-# Agent Runbook — Pragmatic Interaction Director Recovery
+# Agent Runbook — Coherent Emergent Conversation
 
-Use this runbook only for the job in this directory.
+Use this runbook only for this job.
 
 ## Read order
 
-Read root `AGENTS.md`, then:
+Read root `AGENTS.md`, then `README.md`, `ARCHITECTURE.md`, this runbook, `ROADMAP.md`, `HARNESS_ACCEPTANCE.md`, and `PROGRESS.md` last.
 
-1. `README.md`;
-2. `AUDIT.md`;
-3. `ARCHITECTURE.md`;
-4. this runbook;
-5. `ROADMAP.md`;
-6. `HARNESS_ACCEPTANCE.md`;
-7. `PROGRESS.md` last.
+Read `AUDIT.md` only when you need the evidence behind the current failure taxonomy.
 
-## Critical recovery rule
+## Operating goal
 
-The current uncommitted director/Beat Studio implementation is an experimental
-prototype.
+Complete C0–C8 so human text, semantic candidates, discourse context, pragmatic interaction, behavior selection and social effects behave as one coherent conversation system.
 
-Do **not**:
+The Next Chunk is a starting point, not a stop condition. After each accepted chunk, update `PROGRESS.md` concisely and continue automatically to the next mandatory phase.
 
-- continue the old P7/P8 roadmap;
-- commit it wholesale;
-- assume green prototype tests mean the architecture is accepted;
-- preserve a file/API merely because it already exists.
-
-Start from R0 in `PROGRESS.md`.
-
-## Preserve behavior, not accidental architecture
-
-Protected outcomes include:
-
-- recognized typoed hostility remains understood;
-- grounded actor context can change reaction;
-- multi-interaction situations can transition naturally;
-- state remains bounded;
-- the harness can explain decisions.
-
-You may replace the implementation underneath those outcomes.
-
-## Single-authority rules
+## Authority rules
 
 Never create a second:
 
-- NLU parser;
-- conversation/context authority;
-- response planner;
-- dialogue-content authority;
+- human-text parser/tokenizer in ProjectHoomans;
+- conversation/discourse authority;
+- pragmatic interaction director;
+- ResponsePlan/Dialogue Content path;
 - translation system;
 - gameplay-effect authority.
 
-The interaction director ends at semantic behavior/InteractionPlan.
+PsychopatzCore owns generic human-text surface recovery and semantic candidates.
 
-Speech continues through existing ResponsePlan + Dialogue Content.
+ProjectHoomans owns conversation-specific contextual interpretation and downstream interaction behavior.
 
-## Content rules
+NPC-generated semantic acts are never rendered to English and reparsed internally.
 
-All first-party wording is ordinary Dialogue Content.
+## Surface-recovery rules
 
-Do not introduce director-specific content pools or translation buckets.
+Recovery is fallback, bounded and explainable.
 
-Structural situation/behavior definitions may reference canonical content IDs.
+- exact matches win;
+- derive compact aliases from registered vocabulary instead of manually hardcoding malformed copies;
+- preserve original text;
+- expose recovered surface and recovery kind;
+- penalize uncertain recovery;
+- keep ambiguous recoveries as candidates;
+- never use unrestricted substring matching;
+- never let recovery weaken mutating-action safety.
 
-Use the existing Dialogue Content authoring workflow for text changes.
+## Discourse rules
 
-## Generic interaction rules
+The Contextual Discourse Resolver consumes semantic candidates plus existing bounded interaction context. It does not tokenize raw text.
 
-The target is not dialogue-only.
+Use existing pending questions, flows, topics, recent semantic acts, references, actor/relationship/world/knowledge projections and beat/scene state.
 
-All architecture must be evaluated for reuse by:
+Prefer semantic composition and context over sentence-by-sentence phrase branches.
 
-- player ↔ NPC;
-- NPC ↔ NPC;
-- multi-NPC scenes;
-- emotes;
-- ambient flavor;
-- gossip;
-- world events;
-- third-party actors.
+## Risk rules
 
-If a design only works cleanly for player text conversations, it is not the
-accepted abstraction.
+Conversation recall and gameplay safety have different thresholds.
 
-## NPC-generated semantics
+A moderate-confidence social act may be accepted when contextual evidence is strong and there is no dangerous mutation.
 
-Do not generate English for an NPC and parse it again internally.
+Inventory/world/task/gameplay mutation remains conservative and requires the existing exact/high-confidence/confirmation protections.
 
-Pass semantic acts/facts/topics directly between interaction participants.
+Do not globally lower thresholds to make conversation examples pass.
 
-Realize text only for presentation.
+## Social-memory rules
 
-## Adapter/provider discipline
+Immediate conversation understanding/reaction is not the same as durable conduct persistence.
 
-Interaction definitions consume bounded semantic projections.
+If evidence is coalesced or pruned, expose that persistence result without converting the semantic interaction into a rejection.
 
-They must not read arbitrary private subsystem state.
-
-Project Hoomans and third-party NPCs may provide different backing data but
-should project into common normalized semantics/capabilities.
-
-Unknown stays unknown.
-
-## Performance discipline
-
-No:
-
-- all-NPC/all-beat per-frame loops;
-- unbounded nearby-pair combinatorics;
-- whole-catalog scans per stimulus;
-- unbounded transcripts;
-- unbounded scene memory.
-
-Use:
-
-- typed event/stimulus wakeups;
-- generated indexes;
-- candidate caps;
-- scene caps;
-- turn caps;
-- cooldowns;
-- simulation LOD;
-- semantic-memory promotion only for meaningful outcomes.
-
-## Source/compiler discipline
-
-Prefer small modular authoring shards.
-
-Avoid giant catch-all `social.json`, `Director.json`, or equivalent files.
-
-Prefer deterministic compiler-side discovery of approved source roots.
-
-Generated runtime still uses explicit deterministic manifests/indexes.
-
-Generated files are never hand-authored.
+Keep durable state bounded and do not persist full transcripts.
 
 ## Harness discipline
 
-The final workbench is integrated.
+All acceptance uses the real production Lua worker and real providers.
 
-Structural interaction editing should link to the existing Dialogue Content
-editor for wording.
+Python may display, compare, edit canonical source and schedule scenarios. It must not implement semantic decisions.
 
-Python presents and edits bounded source definitions. It must not implement a
-parallel interaction engine.
+Every understanding trace should stay bounded and lazy; do not replace observability with monolithic JSON dumps or routine screenshots.
 
-All decision truth comes from the real Lua worker/production providers.
+## Cross-repository discipline
 
-Harness-only overrides must be visibly marked and never count as natural
-acceptance.
+Before changing PsychopatzCore:
+
+- inspect its `AGENTS.md`, branch/status/HEAD and concurrent work;
+- change only generic NLU-owned behavior there;
+- add Core-local tests for generic behavior;
+- then verify ProjectHoomans against the paired checkout.
+
+Before changing ProjectHoomans, recheck its worktree as well.
+
+Never reset, rebase, stash or discard uncertain work.
+
+## Compiler/content discipline
+
+Generated files are never hand-authored.
+
+If a semantic/catalog/content source changes, use the existing CodeBuilder and prove deterministic second generation.
+
+Do not add sentence lists to generated runtime files to bypass the canonical source model.
 
 ## Validation cadence
 
-For every accepted recovery slice:
+For each chunk:
 
-- focused Python tests;
-- focused Lua tests;
-- real-worker semantic cases;
-- negative/ambiguous cases;
-- compiler tests where canonical source changes;
-- deterministic second generation;
-- source/generated diff review;
+- focused Core tests when Core changes;
+- focused ProjectHoomans Lua/Python tests;
+- real-worker corpus cases;
+- negative/ambiguous controls;
+- action-safety controls;
+- generation/idempotence checks when sources change;
+- bounded performance evidence where relevant;
 - `git diff --check`;
 - no source-save mutation.
 
-Performance slices must include instrumentation, not only functional tests.
+C8 performs broad final regression.
 
-## Git discipline
+## Documentation hygiene
 
-Use existing `main` only.
+Keep `PROGRESS.md` as current truth only: current phase, accepted evidence, immediate Next Chunk, remaining mandatory work and real blockers.
 
-The current worktree is intentionally dirty from the prototype.
+Do not append completed-phase diaries. Git history is the archive.
 
-Before modifying it:
-
-- inspect status;
-- preserve unrelated work;
-- never reset/rebase/stash/discard uncertain changes;
-- stage/commit only coherent accepted recovery slices;
-- do not push unless explicitly authorized;
-- do not publish Workshop content;
-- do not launch native PZ for ordinary developer acceptance.
-
-## Documentation
-
-`PROGRESS.md` is the current truth.
-
-After each accepted R-phase/chunk:
-
-- record actual evidence;
-- update the immediate next chunk;
-- continue automatically under an autonomous `/goal`.
-
-Do not put job progress into root `AGENTS.md`.
+Do not put active job state in root `AGENTS.md`.

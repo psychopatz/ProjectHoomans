@@ -1,287 +1,61 @@
-# Audit — Pragmatic Interaction Director Recovery
+# Audit — Current Conversation-Coherence Gap
 
-**Repository baseline before the prototype:** `bd98962a2358ed904a382669b2187c7f20c0fa29`.
+This file records only the evidence that justifies the active C0–C8 roadmap. Completed R0–R9 recovery history is available in Git and is not repeated here.
 
-**Audit state:** the interaction/director implementation is currently
-**uncommitted**. This is intentional and useful: it can be surgically reworked
-before becoming repository history.
+## Current production findings
 
-## What the prototype proved
+Fresh Semantic Harness worker checks on the current ProjectHoomans checkout show:
 
-The experimental implementation established several valuable behavioral facts.
+| Input | Current semantic result | Current visible outcome |
+| --- | --- | --- |
+| `fuckyou` | `INSULT`, ~0.91 | hostile response |
+| `fuck u` | `INSULT`, ~0.99 | hostile response |
+| `fuck youuuu` | `HOSTILE_REMARK`, ~0.87 | hostile response |
+| `i hate you` | `HOSTILE_REMARK`, ~0.99 | hostile response |
+| `i hope you die` | `HOSTILE_REMARK`, ~0.83 | generic clarification |
+| `shutthefuckup` | no match | clarification |
+| `youidiot` | no match | clarification |
+| `illkillyou` | no match | clarification |
+| `youreuseless` | no match | clarification |
 
-### Keep as acceptance requirements
+The exact values are baselines, not permanent contracts.
 
-- typoed hostility such as `fuck ypuuuu` can remain `HOSTILE_REMARK` rather
-  than falling into generic clarification;
-- the same hostile semantic meaning can yield different reactions from grounded
-  NPC state:
-  - default → warning;
-  - aggressive/confident → verbal retaliation;
-  - panicked → de-escalation;
-- hostility followed by apology can transition from an argument situation into
-  reconciliation;
-- low forgiveness can legitimately favor ending the interaction;
-- a suspicious-first-contact situation can persist across multiple turns;
-- bounded director state can live in existing conversation/session context;
-- worker observations can expose candidate situations, predicate failures,
-  modifiers, transitions, selected behavior, and resulting presentation lineage;
-- a non-mutating draft preview / disposable worker-registration workflow is
-  feasible.
+## Root cause 1 — whitespace/token boundaries
 
-These behaviors are useful. The current architecture underneath them is not
-accepted.
+PsychopatzCore `PsychopatzSemanticNormalizer.lua` lowercases, cleans punctuation and tokenizes on whitespace. Joined words therefore remain one token unless fuzzy matching happens to rescue a particular case.
 
-## Mechanically working does not mean architecturally accepted
+The correct owner for generic no-space/elongation recovery is PsychopatzCore, not a ProjectHoomans phrase patch.
 
-The focused prototype verification passed at audit time:
+## Root cause 2 — candidate interpretation is richer than final policy
 
-- 20 focused Python tests;
-- 3/3 focused Lua tests;
-- new Lua syntax checks;
-- `git diff --check`.
+ProjectHoomans already consumes Core candidate parsing, but `PNC_SemanticDialoguePolicy_Flow.lua` applies a broad high-confidence gate after unresolved-reference handling.
 
-The recovery work must preserve useful behavioral acceptance while replacing
-incorrect ownership boundaries.
+A recognized social act below the high threshold can therefore become `ASK_CLARIFICATION` even when it is entity-independent and conversation-safe.
 
-## Architectural drift found
+This policy should become risk-aware rather than globally lowered.
 
-### 1. Director became a second response authority
+## Root cause 3 — discourse context is underused
 
-Current prototype logic effectively added:
+The accepted pragmatic resolver knows flows, topic and recent semantic state, but candidate selection/admission still happens before a dedicated conversation-context interpretation layer can use adjacency, pending questions and related discourse evidence.
 
-```text
-flow response
-    ↓ else
-director response
-    ↓ else
-LocalResponse
-```
+The missing layer belongs between Core candidates and the existing pragmatic resolver.
 
-and `DialogueDirector.ResolveResponse()` chooses director-specific response
-pools.
+## Root cause 4 — social persistence can masquerade as semantic failure
 
-This violates the target architecture.
+Conduct evidence is bounded at 64 entries. `PNC_ConductService_EvidenceInternals.lua` inserts new evidence and calls `PruneEvidence`; when the new item itself is removed, the operation returns `evidence_pruned_by_limit`.
 
-The director may choose semantic behavior. It must not choose a parallel
-response catalog.
+That persistence outcome can surface as a rejected social action even though NLU and interaction selection succeeded.
 
-### 2. Director-specific wording/content authority appeared
+Language understanding, immediate reaction, relationship change and durable evidence retention must be reported separately.
 
-Current prototype source includes director-specific wording pools and generated
-`Conversation/Director.json` metadata.
+## Architectural conclusion
 
-This risks becoming a monolithic catch-all as new situations are added.
+Do not fix this by:
 
-Actual dialogue wording belongs in modular Dialogue Content records.
+- adding every malformed spelling as a new social alias;
+- adding a ProjectHoomans tokenizer;
+- introducing a standalone sentiment classifier;
+- globally lowering confidence thresholds;
+- expanding conduct evidence without bounds.
 
-### 3. Generated registry is copied into second production registries
-
-Current prototype:
-
-```text
-Generated Conversation Registry
-→ DialogueDirectorCatalog
-→ DialogueBehaviorRegistry
-→ DialogueBeatRegistry
-```
-
-This duplicates canonical production identity.
-
-Target:
-
-```text
-Generated Conversation Registry / indexes
-        ↓
-one production registry view
-        +
-worker-local draft overlay
-```
-
-### 4. Runtime director is already too large
-
-The prototype `PNC_SemanticDialogueDirector.lua` is already hundreds of lines
-with only three initial situations.
-
-The final architecture must separate:
-
-- context projection;
-- shared predicate evaluation;
-- situation/beat arbitration;
-- behavior arbitration;
-- bounded state;
-- trace/explanation.
-
-Before extracting new modules, audit existing flow/suggestion predicate logic to
-avoid creating multiple predicate engines.
-
-### 5. Beat Studio became a separate authoring universe
-
-The prototype Beat Studio handles structural editing and special canonical
-promotion logic, while ordinary Dialogue Content already has a dedicated,
-validated harness editing workflow.
-
-Target UI:
-
-```text
-Conversation / Interaction Module view
-├─ situation/beat structure
-├─ behaviors
-├─ linked Dialogue Content
-└─ Simulation / trace
-```
-
-Structural editing must link into the existing Dialogue Content editor for
-wording.
-
-Do not create a second wording editor.
-
-### 6. Compiler and authoring service accumulated director special cases
-
-The prototype added dedicated beat/behavior validation/merge/generation paths
-and a large director-specific canonical edit service.
-
-Some structural schema support is necessary, but the final design should favor:
-
-- small modular source shards;
-- shared schema helpers;
-- generic canonical-record authoring where possible;
-- deterministic source-root discovery;
-- shared generated registry/index infrastructure.
-
-### 7. Missing broader interaction abstraction
-
-The old implementation was still dialogue-centric.
-
-The actual requirement includes:
-
-- player dialogue;
-- NPC-to-NPC semantic scenes;
-- multi-NPC scenes;
-- emotes;
-- ambient flavor;
-- world-event reactions;
-- gossip;
-- third-party actors.
-
-The accepted abstraction therefore needs a **Pragmatic Interaction Director**,
-not a dialogue-response director.
-
-## Desired normalized input contracts
-
-The interaction layer should consume read-only, bounded provider projections
-rather than arbitrary subsystem internals.
-
-Conceptual contracts:
-
-```text
-ActorSnapshot
-- stable ID
-- capabilities
-- normalized disposition
-- condition/emotion
-- current activity
-- semantic traits/tags
-
-RelationshipSnapshot
-- familiarity
-- trust/respect/approval
-- faction relation
-- other bounded social factors
-
-WorldSnapshot
-- danger
-- power/water
-- weather/season/time
-- semantic location
-- local zombie pressure
-- relevant world events
-
-KnowledgeSnapshot
-- actor-known grounded facts/events
-- source/provenance where required
-
-SceneContext
-- participants/roles
-- current topic
-- recent bounded semantic acts
-- active beat
-- cooldowns
-- salience
-```
-
-Missing information remains unknown. The director must never fabricate it.
-
-## Third-party actor requirement
-
-Third-party NPCs should integrate through an adapter/provider contract rather
-than exposing private internals to beats.
-
-Conceptually:
-
-```text
-GetStableID()
-GetPosition()
-GetCapabilities()
-ProjectDisposition()
-ProjectCondition()
-ProjectRelationships(otherActor)
-ProjectKnowledge()
-ProjectActivity()
-CanSpeak()
-CanEmote()
-SubmitAuthorizedIntent(intent)
-```
-
-Exact APIs may differ after codebase audit.
-
-## Performance requirement
-
-Never:
-
-```text
-every tick
-  every NPC
-    every beat
-```
-
-Use:
-
-```text
-typed stimulus
-→ stimulus index
-→ small candidate set
-→ bounded evaluation
-```
-
-Examples of stimuli:
-
-- social hostility;
-- greeting;
-- apology;
-- idle social opportunity;
-- actor enters/leaves;
-- witnessed death;
-- faction event;
-- power/water change;
-- helicopter event;
-- danger changed;
-- emote;
-- task/world event.
-
-## Persistence requirement
-
-Do not persist rendered transcripts.
-
-If a meaningful interaction creates durable knowledge, persist the compact
-semantic fact/event through the system that owns that memory.
-
-Example:
-
-```text
-speaker = Bob
-fact = formerOccupation(mechanic)
-source = witnessed_conversation
-```
-
-not the sentence Bob happened to say.
+Proceed through the C0–C8 roadmap using existing Core NLU, ParseCandidates, discourse state, pragmatic resolver, Interaction Director and Semantic Lab.
