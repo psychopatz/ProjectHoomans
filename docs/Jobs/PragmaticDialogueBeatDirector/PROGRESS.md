@@ -1,54 +1,49 @@
 # Progress — Coherent Emergent Conversation
 
 **Status:** IN PROGRESS — live-regression quality recovery.
-**Accepted foundation:** C0–C11 + L1.
-**Active phase:** L2 — relationship-memory retention decoupling.
+**Accepted foundation:** C0–C11 + L1 + L2.
+**Active phase:** L3 — richer typed hostility continuations.
 **Branch:** existing `main`.
 
 ## Current truth
 
-The exact user regression is reproduced against:
+Exact regression anchor:
 
 - save: `Sandbox/2026-10-22_15-18-56/global_mod_data.bin`;
 - NPC: `npcDanapatz_Y5KK` / Dana patz;
 - input: `fuckyouuuu`.
 
-Current verified state:
+Accepted recovery so far:
 
-- NLU correctly recovers directed `INSULT` at confidence 0.90;
-- generated direct responses are produced by the existing DialogueSuggestions provider;
-- **L1 accepted:** `conversation_branch` now becomes the actual native Response Channel after the turn;
-- Back returns to `conversation_landing` and authored/root actions remain reachable;
-- exact Dana save + portable L1 regression passes;
-- L1/C6/C7/C8/conversation-composition focused batch: **18/18 PASS**;
-- full `pnc_semantic` Lua suite: **99/99 PASS**;
-- GUI-only parity module could not import under the local Homebrew Python because `_tkinter` is unavailable; this is an environment limitation, not an L1 failure.
+- **L1:** generated `conversation_branch` rows now become the actual native Response Channel; Back restores `conversation_landing` and authored/root actions;
+- **L2:** bounded relationship-memory retention is independent from immediate social-event acceptance; pruned memory reports `relationshipMemoryOutcome=pruned` instead of rejecting the interaction;
+- Dana now returns `accepted=true`, `reason=relationship_clamped`, `memoryRecorded=false`, relationship memory `pruned`, conduct evidence `bounded/pruned`, and keeps the Director's real NPC response;
+- source save remains read-only;
+- L2 exact save regression: **1/1 PASS**;
+- portable `pnc_social_events`: **1/1 PASS**;
+- full `pnc_semantic`: **99/99 PASS**.
 
-The next live-proven defect is persistence coupling:
+The remaining visible-quality gap is that the hostility branch still offers only generic `APOLOGIZE / CHALLENGE / DISMISS / ASK_WHY`, and common NPC WARN responses remain sparsely realized.
 
-- Dana's relationship memory is saturated;
-- `Relationships.ApplyEventMutation()` appends/prunes then returns `memory_pruned_by_limit` when the new memory does not survive;
-- `SocialEventService` treats that storage outcome as failure of the whole social interaction;
-- presentation then replaces the Director's semantic reaction with `semantic.social.interaction.rejected`.
+## Immediate Next Chunk — L3
 
-## Immediate Next Chunk — L2
+Expand the existing generated-affordance provider with typed hostility strategies that express genuinely different intentions.
 
-Decouple bounded relationship-memory retention from the immediate social interaction/effect.
+Required first slice:
 
-Required outcome:
+- `CLAIM_JOKE` — positive/reparative but distinct from apology;
+- `DOUBLE_DOWN` — negative/escalating and distinct from challenge;
+- retain `APOLOGIZE`, `CHALLENGE`, `DISMISS`, `ASK_WHY` as eligible alternatives;
+- preserve the provider's bounded candidate cap and semantic diversity;
+- strategies carry typed semantic frames and direct semantic-click execution;
+- generated wording comes from compiler-owned UtterancePlan constructions, not hardcoded execution text;
+- EN/TL constructions remain locale-owned;
+- typed/button downstream behavior must remain coherent with the current beat.
 
-- relationship mutation/effect may apply or clamp even if the newly proposed durable memory is pruned;
-- bounded memory limits remain unchanged;
-- relationship-memory outcome is reported explicitly as persisted/coalesced/pruned/dropped;
-- conduct evidence remains independently reported;
-- storage capacity alone must not produce `accepted=false`;
-- the valid Director/SpeechRealization response must remain the player-facing NPC reaction.
-
-Add both a portable saturation regression and the exact Dana save-backed regression.
+Exact Dana Response Channel should expose contrasting repair/escalation/neutral choices without returning to the static landing surface.
 
 ## Remaining mandatory phases
 
-- **L3:** richer typed hostility continuations such as CLAIM_JOKE and DOUBLE_DOWN;
 - **L4:** broader NPC UtterancePlan coverage/diversity, including WARN and contextual MIRROR;
 - **L5:** visible-surface + persistence + EN/TL integrated acceptance and user live handoff.
 

@@ -98,7 +98,14 @@ function H.ApplySocialEvent(context)
         npcID
     ) or nil
     local delta = relationshipDelta(beforeSummary, afterSummary)
-    local memoryRecorded = (tonumber(processed.relationshipsChanged) or 0) > 0
+    local memoryOutcome = type(detail) == "table"
+        and type(detail.relationshipMemoryOutcome) == "table"
+        and detail.relationshipMemoryOutcome or nil
+    local memoryRecorded = memoryOutcome
+        and (memoryOutcome.durable == true
+            or memoryOutcome.status == "persisted"
+            or memoryOutcome.status == "coalesced")
+        or false
     local visibleChange = hasVisibleRelationshipChange(delta)
     local accepted = (tonumber(processed.relationshipsChanged) or 0) > 0
     return {
@@ -117,6 +124,7 @@ function H.ApplySocialEvent(context)
         relationshipAfter = afterSummary,
         relationshipDelta = delta,
         memoryRecorded = memoryRecorded,
+        relationshipMemoryOutcome = copy(memoryOutcome),
         visibleRelationshipChange = visibleChange,
         requestedEffects = effectSummary(detail and detail.modifiedEffects),
         baseEffects = effectSummary(detail and detail.baseEffects),

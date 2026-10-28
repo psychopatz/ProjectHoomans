@@ -79,6 +79,8 @@ local function applyTransaction(event, definition, work)
     local conductRequired
     local conductApplied
     local conductPersistence = {}
+    local relationshipMemoriesPersisted = 0
+    local relationshipMemoryOutcomes = {}
     conductDefinition = ConductDefinitions
         and ConductDefinitions[event.type] or nil
     conductRequired = not conductDefinition
@@ -123,10 +125,26 @@ local function applyTransaction(event, definition, work)
                 relationshipsChanged = #details,
             }
         end
+        local memoryOutcome = type(mutationResult.relationshipMemoryOutcome)
+            == "table" and mutationResult.relationshipMemoryOutcome or {
+                status = mutationResult.memoryID and "persisted" or "unknown",
+                durable = mutationResult.memoryID ~= nil,
+                memoryID = mutationResult.memoryID,
+            }
+        if memoryOutcome.durable == true
+            or memoryOutcome.status == "persisted"
+            or memoryOutcome.status == "coalesced"
+        then
+            relationshipMemoriesPersisted = relationshipMemoriesPersisted + 1
+        end
+        relationshipMemoryOutcomes[#relationshipMemoryOutcomes + 1] =
+            memoryOutcome
         details[#details + 1] = {
             observerNPCID = prepared.observerNPCID,
             aboutKey = prepared.aboutKey,
             memoryID = mutationResult.memoryID,
+            proposedMemoryID = mutationResult.proposedMemoryID,
+            relationshipMemoryOutcome = memoryOutcome,
             relationshipBefore = prepared.relationshipBefore,
             relationshipAfter = mutationResult.relationship,
             moraleAfter = mutationResult.morale,
@@ -158,6 +176,8 @@ local function applyTransaction(event, definition, work)
     )
     return true, nil, {
         details = details,
+        relationshipMemoriesPersisted = relationshipMemoriesPersisted,
+        relationshipMemoryOutcomes = relationshipMemoryOutcomes,
         conductEvidenceCreated = conductOutcome.persisted,
         conductDetails = conductDetails or {},
         conductPersistence = conductPersistence,

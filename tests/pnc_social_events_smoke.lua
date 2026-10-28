@@ -1058,6 +1058,84 @@ T.equal(
 )
 playerRecord.conduct = playerConductBeforeSaturation
 
+-- L2. Relationship-memory capacity is also persistence outcome, not social
+-- rejection. Fill the relationship with permanent memories so the new
+-- temporary insult memory is deterministically the only removable entry.
+local relationshipCapacityTarget =
+    newRecord("npc_l2_relationship_memory_saturation")
+local relationshipCapacityKey =
+    PNC.EntityRef.ForNPC(relationshipCapacityTarget.id)
+local capacityRelationship =
+    PNC.RelationshipTypes.NewRelationship(playerKey)
+for index = 1, PNC.RelationshipConstants.MEMORY_LIMIT do
+    capacityRelationship.memories[index] =
+        PNC.RelationshipTypes.NewMemory({
+            id = "memory:l2_seed:" .. tostring(index),
+            type = "l2_capacity_seed",
+            aboutKey = playerKey,
+            createdAt = 520 + index,
+            lastEvaluatedAt = 520 + index,
+            approvalEffect = 0,
+            respectEffect = 0,
+            strength = 1,
+            decayPerDay = 0,
+            permanent = true,
+            shareable = false,
+            knowledgeSource = "experienced",
+            tags = { test = true },
+        })
+end
+capacityRelationship = select(1,
+    PNC.RelationshipMath.RecalculateRelationship(
+        capacityRelationship, playerKey, 600
+    )
+)
+relationshipCapacityTarget.social.relationships[playerKey] =
+    capacityRelationship
+
+local relationshipCapacityResult = PNC.SocialEvents.Emit(insultEvent(
+    "social:l2_relationship_capacity:insult",
+    playerKey,
+    relationshipCapacityKey,
+    700
+))
+T.truthy(relationshipCapacityResult.ok,
+    "relationship memory capacity does not reject social event")
+T.equal(relationshipCapacityResult.relationshipsChanged, 1,
+    "relationship event still processes at memory capacity")
+T.equal(relationshipCapacityResult.memoriesCreated, 0,
+    "pruned relationship memory is not reported as persisted")
+T.equal(
+    relationshipCapacityResult.relationshipMemoryOutcomes[1].status,
+    "pruned",
+    "relationship memory outcome reports pruning"
+)
+T.equal(
+    relationshipCapacityResult.relationshipMemoryOutcomes[1].reason,
+    "memory_pruned_by_limit",
+    "relationship capacity reason remains observable"
+)
+T.equal(
+    relationshipCapacityResult.relationshipMemoryOutcomes[1].durable,
+    false,
+    "pruned relationship memory is explicitly non-durable"
+)
+local relationshipAfterCapacity = PNC.Relationships.Get(
+    relationshipCapacityTarget.id, playerKey
+)
+T.equal(
+    #relationshipAfterCapacity.memories,
+    PNC.RelationshipConstants.MEMORY_LIMIT,
+    "bounded relationship memory remains at capacity"
+)
+T.equal(relationshipAfterCapacity.familiarity, 1,
+    "non-memory interaction state still applies at capacity")
+T.equal(
+    relationshipAfterCapacity.saturation.player_emote_insult.approval,
+    -4,
+    "social saturation still records bounded interaction contribution"
+)
+
 -- The per-NPC dedupe cache is bounded and evicts oldest successful IDs.
 local cacheRecord = newRecord("npc_event_cache")
 for index = 1, 70 do

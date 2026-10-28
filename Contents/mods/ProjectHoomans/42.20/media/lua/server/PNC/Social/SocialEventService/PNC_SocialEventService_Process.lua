@@ -231,9 +231,13 @@ function SocialEvents.Process(eventSpec)
         eventType = event.type,
         actorKey = event.actorKey,
         targetKey = event.targetKey,
-        memoriesCreated = #details,
+        memoriesCreated = tonumber(
+            transactionDetails.relationshipMemoriesPersisted
+        ) or #details,
         relationshipsChanged = #details,
         details = details,
+        relationshipMemoryOutcomes =
+            transactionDetails.relationshipMemoryOutcomes,
         conductEvidenceCreated = transactionDetails.conductEvidenceCreated,
         conductDetails = transactionDetails.conductDetails,
         conductPersistence = transactionDetails.conductPersistence,

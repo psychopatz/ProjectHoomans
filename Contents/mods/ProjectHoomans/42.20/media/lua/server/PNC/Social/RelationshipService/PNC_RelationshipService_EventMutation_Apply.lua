@@ -44,6 +44,8 @@ function Relationships.ApplyEventMutation(
     local cooldownType
     local cooldownUntil
     local withinLimit
+    local memoryIndex
+    local memoryOutcome
     if not isAuthority() then
         return false, "not_authority"
     end
@@ -125,11 +127,38 @@ function Relationships.ApplyEventMutation(
         worldAgeHours,
         Constants.MEMORY_LIMIT
     )
+    memoryIndex = findMemory(relationship, memory.id)
     if not withinLimit then
-        return false, "permanent_memory_limit"
-    end
-    if not findMemory(relationship, memory.id) then
-        return false, "memory_pruned_by_limit"
+        -- Existing permanent-memory saturation cannot be repaired by this
+        -- interaction. Never grow it further and never convert storage
+        -- capacity into rejection of the immediate social event.
+        if memoryIndex then
+            table.remove(relationship.memories, memoryIndex)
+            memoryIndex = nil
+        end
+        memoryOutcome = {
+            status = "dropped",
+            reason = "permanent_memory_limit",
+            durable = false,
+            memoryID = memory.id,
+            memoryType = memory.type,
+        }
+    elseif not memoryIndex then
+        memoryOutcome = {
+            status = "pruned",
+            reason = "memory_pruned_by_limit",
+            durable = false,
+            memoryID = memory.id,
+            memoryType = memory.type,
+        }
+    else
+        memoryOutcome = {
+            status = "persisted",
+            reason = "applied",
+            durable = true,
+            memoryID = memory.id,
+            memoryType = memory.type,
+        }
     end
     relationship = Math.RecalculateRelationship(
         relationship,
@@ -154,17 +183,21 @@ function Relationships.ApplyEventMutation(
         {
             kind = "social_event",
             eventID = eventID,
-            memoryID = memory.id,
+            memoryID = memoryOutcome.durable and memory.id or nil,
+            proposedMemoryID = memory.id,
             memoryType = memory.type,
             interactionType = interactionType,
             knowledgeSource = memory.knowledgeSource,
+            relationshipMemoryOutcome = memoryOutcome,
             interaction = mutation.interaction or {
                 kind = mutation.sourceSystem or "social_event",
                 source = mutation.sourceSystem,
                 interactionType = interactionType,
                 eventID = eventID,
-                memoryID = memory.id,
+                memoryID = memoryOutcome.durable and memory.id or nil,
+                proposedMemoryID = memory.id,
                 memoryType = memory.type,
+                relationshipMemoryOutcome = memoryOutcome,
                 at = worldAgeHours,
                 worldAgeHours = worldAgeHours,
                 applied = true,
@@ -174,7 +207,8 @@ function Relationships.ApplyEventMutation(
     local memoryEvents = PNC.Conversation
         and PNC.Conversation.Memory
         and PNC.Conversation.Memory.Events or nil
-    if memoryEvents
+    if memoryOutcome.durable == true
+        and memoryEvents
         and type(memoryEvents.RecordRelationshipMemory) == "function"
     then
         -- The compact journal is an additional projection. A failure here must
@@ -192,7 +226,9 @@ function Relationships.ApplyEventMutation(
             targetKey
         ),
         morale = record.social.morale,
-        memoryID = memory.id,
+        memoryID = memoryOutcome.durable and memory.id or nil,
+        proposedMemoryID = memory.id,
+        relationshipMemoryOutcome = memoryOutcome,
         eventID = eventID,
         memoryType = memory.type,
         interactionType = interactionType,
