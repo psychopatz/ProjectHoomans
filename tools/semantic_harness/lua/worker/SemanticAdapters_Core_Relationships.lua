@@ -14,6 +14,14 @@ local function configureRelationships(state)
 
     local relationshipTargetKey = playerData.entityKey
         or ("player:harness:" .. tostring(playerData.characterUUID))
+    if sourceKind == "SAVE" and not playerData.entityKey then
+        -- Synthetic serialized records may omit the player registry. Use the
+        -- same production identity owner as social-command admission rather
+        -- than querying a different harness-only relationship target.
+        relationshipTargetKey = PNC.PlayerCharacters.GetEntityKey(getPlayer(), {
+            callback = "semantic_lab_relationship_context",
+        }) or relationshipTargetKey
+    end
     Runtime.relationshipTargetKey = relationshipTargetKey
     if sourceKind ~= "SAVE" then
         -- Developer fixtures use the compact scenario relationship seam.

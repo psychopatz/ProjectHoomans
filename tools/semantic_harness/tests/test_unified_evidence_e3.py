@@ -4,6 +4,34 @@ from tools.semantic_harness.tests.test_unified_evidence_e0 import saved_worker, 
 
 
 class UnifiedEvidenceE3Tests(unittest.TestCase):
+    def test_durable_owner_survives_day_without_compact_today(self):
+        with saved_worker() as worker:
+            storage(worker, addMemory="abandoned_in_combat")
+            after = storage(worker, advanceDays=1)
+            rows = after["evidence"]["rows"]
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["sourceTier"], "DURABLE")
+            self.assertEqual(rows[0]["relations"]["opens"], ["repair"])
+            self.assertEqual(rows[0]["effectiveStrength"], 1)
+            self.assertFalse((after.get("memory") or {}).get("s"))
+
+    def test_production_turn_exposes_all_tiers_and_cross_session_recall(self):
+        with saved_worker() as worker:
+            worker.input("fuck you")
+            result = worker.input("im sorry")
+            evidence = result["observation"]["director"]["pragmatic"]["evidence"]
+            tiers = {row["sourceTier"] for row in evidence["rows"]}
+            self.assertEqual(tiers, {"SESSION", "TODAY", "DURABLE"})
+            self.assertTrue(all(row["status"] == "queried" for row in evidence["providers"]))
+            serialized = storage(worker)["serializedRecord"]
+        with saved_worker(serialized) as replay:
+            evidence = storage(replay)["evidence"]
+            self.assertEqual({row["sourceTier"] for row in evidence["rows"]}, {"TODAY", "DURABLE"})
+            rows = evidence["rows"]
+            self.assertTrue(all(row["relations"]["opens"] == ["repair"] for row in rows))
+            self.assertTrue(all(row["retentionSalience"] == 150 for row in rows))
+            self.assertFalse(any("contextualRelevance" in row for row in rows))
+
     def test_today_survives_relationship_saturation(self):
         with saved_worker() as worker:
             before = storage(worker, saturate=True)

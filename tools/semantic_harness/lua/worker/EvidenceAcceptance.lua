@@ -68,8 +68,18 @@ function Handler.handle(context, command, payload)
             permanent = payload.permanent == true,
         }, target)
     end
+    if payload.addMemory then
+        PNC.Relationships.AddMemory(record.id, target, {
+            id = "fixture:durable:" .. payload.addMemory,
+            type = payload.addMemory, aboutKey = target,
+            strength = 1, permanent = true, createdAt = 0,
+        })
+        record = PNC.Registry.Get(record.id) or record
+    end
     local relationship = PNC.Relationships.Get(record.id, target) or {}
     local raw = PNC.Persistence.SerializeRecord(record)
+    local ContextProjection = require "worker/Conversation_Context"
+    local dialogueContext = ContextProjection.buildContext(context)
     local roots = {}
     for key in pairs(Runtime.modData or {}) do roots[#roots + 1] = key end
     table.sort(roots)
@@ -77,6 +87,10 @@ function Handler.handle(context, command, payload)
         ok = true, memory = context.Values.copy(record.memory),
         relationship = context.Values.copy(relationship),
         serializedRecord = context.Values.copy(raw), roots = roots,
+        identity = { adapterTarget = Runtime.relationshipTargetKey, target = target,
+            targetKind = dialogueContext.relationship and dialogueContext.relationship.targetKind,
+            targetID = dialogueContext.relationship and dialogueContext.relationship.targetID },
+        evidence = PNC.Semantics.InteractionProviders.QueryEvidence(dialogueContext, {}),
         limits = { today = 8, compactDurable = 6,
             relationship = PNC.RelationshipConstants.MEMORY_LIMIT,
             conduct = PNC.ConductConstants.EVIDENCE_LIMIT },

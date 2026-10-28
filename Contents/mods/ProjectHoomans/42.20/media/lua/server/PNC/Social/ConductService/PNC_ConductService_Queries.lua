@@ -9,6 +9,31 @@ local Types = PNC.ConductTypes
 local Math = PNC.ConductMath
 local Constants = PNC.ConductConstants
 
+-- Selective semantic read through the conduct owner; never exports its store.
+function Conduct.QuerySemanticEvidence(entityKey, subjectKey, actorID, targetID, at)
+    local owner = H.Resolve(entityKey)
+    local evidence = owner and owner.conduct and owner.conduct.evidence or {}
+    local rows = {}
+    for index = math.min(#evidence, Constants.EVIDENCE_LIMIT), 1, -1 do
+        local item = evidence[index]
+        local definition = PNC.SocialEventDefinitions and PNC.SocialEventDefinitions[item.eventType]
+        local metadata = definition and definition.semantic
+        local strength = Math.CalculateEvidenceStrengthAtTime(item, at)
+        if metadata and strength > 0 and item.actorKey == entityKey
+            and item.subjectKey == subjectKey then
+            rows[#rows + 1] = { sourceRef = item.id, eventType = item.eventType,
+                actorID = actorID, targetID = targetID,
+                classes = metadata.classes, relations = metadata.relations,
+                retentionSalience = metadata.retentionSalience,
+                effectiveStrength = strength, occurredAt = item.createdAt,
+                ageHours = math.max(0, (tonumber(at) or item.createdAt) - item.createdAt),
+                provenance = "conduct.evidence", visibility = item.visibility }
+            if #rows >= 16 then break end
+        end
+    end
+    return rows
+end
+
 function Conduct.GetForEntity(entityKey)
     local owner, reason = H.Resolve(entityKey)
     return owner and H.Copy(owner.conduct) or nil, reason

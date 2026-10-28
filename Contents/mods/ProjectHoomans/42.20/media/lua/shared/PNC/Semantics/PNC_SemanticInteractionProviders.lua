@@ -393,4 +393,6 @@ function Providers.AdapterIDs()
     return output
 end
 
+local EvidenceAdapters = require "PNC/Semantics/PNC_SemanticInteractionEvidenceAdapters"
+EvidenceAdapters.Install(Providers)
 return Providers

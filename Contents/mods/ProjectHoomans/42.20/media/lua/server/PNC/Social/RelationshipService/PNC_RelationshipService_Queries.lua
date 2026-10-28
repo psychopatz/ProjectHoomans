@@ -38,6 +38,35 @@ function Relationships.Get(observerNPCID, targetKey)
     return Types.NormalizeRelationship(relationship, targetKey)
 end
 
+-- Bounded read API: never copies journals or exposes mutable owner tables.
+function Relationships.QuerySemanticEvidence(observerNPCID, targetKey, actorID, worldAgeHours)
+    local record = resolveObserver(observerNPCID)
+    if not record or not validateTarget(targetKey) then return {} end
+    local relationship = getRelationship(record, targetKey)
+    local memories = relationship and relationship.memories or {}
+    local Events = PNC.Conversation and PNC.Conversation.Memory
+        and PNC.Conversation.Memory.Events
+    if not Events then return {} end
+    local rows = {}
+    for index = math.min(#memories, Constants.MEMORY_LIMIT), 1, -1 do
+        local memory = memories[index]
+        local entry = Events.GetType(memory.type)
+        local metadata = entry and entry.semantic
+        local strength = Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
+        if metadata and strength > 0 and memory.aboutKey == targetKey then
+            rows[#rows + 1] = { sourceRef = memory.id, eventType = memory.type,
+                actorID = actorID, targetID = observerNPCID,
+                classes = metadata.classes, relations = metadata.relations,
+                retentionSalience = metadata.retentionSalience,
+                effectiveStrength = strength, occurredAt = memory.createdAt,
+                ageHours = math.max(0, (tonumber(worldAgeHours) or memory.createdAt) - memory.createdAt),
+                provenance = "relationship.memories", visibility = memory.knowledgeSource }
+            if #rows >= 16 then break end
+        end
+    end
+    return rows
+end
+
 function Relationships.GetOrCreate(observerNPCID, targetKey)
     local record
     local reason

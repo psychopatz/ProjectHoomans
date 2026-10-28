@@ -21,6 +21,30 @@ local function hasAuthority()
     return type(isServer) == "function" and isServer() == true
 end
 
+-- Compact read projection, independent of relationship-memory survival.
+function Events.QuerySemanticEvidence(record, targetKey, actorID)
+    local target = Events.ResolveTarget(targetKey)
+    if not target or not target.seed or type(record) ~= "table" then return {} end
+    local normalized = Events.Normalize(record.memory) or {}
+    local values, rows = normalized.s or {}, {}
+    for offset = #values - 2, 1, -3 do
+        local entry = Events.GetType(values[offset])
+        local metadata = entry and entry.semantic
+        if values[offset + 1] == target.seed and metadata then
+            rows[#rows + 1] = {
+                sourceRef = "today:" .. tostring(normalized.d) .. ":"
+                    .. tostring(values[offset]) .. ":" .. tostring(target.seed),
+                eventType = entry.id, actorID = actorID, targetID = record.id,
+                classes = metadata.classes, relations = metadata.relations,
+                retentionSalience = metadata.retentionSalience,
+                sequence = (offset + 2) / 3, ageHours = 24,
+                provenance = "record.memory.s", visibility = "direct",
+            }
+        end
+    end
+    return rows
+end
+
 function Events.RecordRelationshipMemory(record, relationshipMemory, targetKey)
     local sourceType
     local day

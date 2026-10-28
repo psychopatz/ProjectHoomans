@@ -96,7 +96,9 @@ function Context.Project(stimulus, state, context, snapshot)
         relationship = relationship,
         world = providers.world or {},
         knowledge = providers.knowledge or {},
-        evidence = providers.evidence or { rows = {}, providers = {} },
+        evidence = type(context.interactionProjection) == "table"
+            and Providers.QueryEvidence(context, context.evidenceQuery)
+            or providers.evidence or { rows = {}, providers = {} },
         providers = providers.provenance or {},
         scene = {
             firstContact = familiarity <= 0 and sequence <= 1,

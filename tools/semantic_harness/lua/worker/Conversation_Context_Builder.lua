@@ -170,6 +170,7 @@ function Builder.build(context)
         ),
         playerGender = player.gender,
         playerIdentitySeed = player.characterUUID,
+        playerEntityKey = Runtime.relationshipTargetKey,
         characterUUID = player.characterUUID,
         conversationTopic = conversation.topic
             or priorContext and priorContext.conversationTopic

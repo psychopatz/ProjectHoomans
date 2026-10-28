@@ -1,10 +1,19 @@
 # Progress — Unified Semantic Evidence Architecture
 
-**Status:** IN PROGRESS — E0/E1/E2 accepted; tier adapters and relations pending.
+**Status:** IN PROGRESS — E0–E3 accepted; generic relation resolution and adopters pending.
 **Branch:** existing main.
 **Audit anchor:** ProjectHoomans 2bc4810f.
-**Current phase:** E3 — tier query and bounded retention.
-**Next exact chunk:** E3B — wire bounded production SESSION/TODAY/DURABLE readers through the E1 seam and owning-domain query APIs. E3 is not yet accepted as a phase.
+**Current phase:** E4 — generic relation resolution.
+**Next exact chunk:** E4A — resolve declaratively registered semantic act relations against normalized tier evidence, exposing grounded/unresolved/unrelated/ambiguous admission and separate ranking signals; then gate pragmatic content/behavior through canonical sources.
+
+## E3B / E3 accepted (2026-10-28)
+
+- Production adapters read at most 12 session turns, 8 TODAY triples, 20 relationship memories and 64 conduct entries; the shared result remains capped at 16. Relationship and Conduct expose bounded owner queries without journals/full-store export. No durable truth is inferred from compact `l`.
+- Added bounded semantic-act relation registration for session projection. Owning social metadata is reused for hostility; reply/repair act participation is declarative. Resolver matching is still pending E4.
+- Pragmatic diagnostics expose normalized rows and provider statuses. Production turn tests show SESSION/TODAY/DURABLE; serialize/reimport retains TODAY/DURABLE; permanent authoritative relationship evidence survives rollover without TODAY.
+- Corrected SAVE synthetic-fixture actor identity alignment through the production PlayerCharacters owner and supplied its entity key to the existing dialogue context. Cached actor projections refresh evidence rather than reusing stale evidence rows.
+- Full Lua suite 904/904 PASS; E0–E3 worker suite 6/6 PASS before final conduct adapter (E3 4/4 PASS after it); SAVE-backed P12J 2/2 PASS; conduct 2/2 PASS. Runtime Kahlua/syntax and diff checks PASS. Host-only test `package` use is intentionally outside PZ sandbox validation.
+- Native client availability/transport and SP/MP acceptance remain to be checked with E5/E7; absent owner APIs currently contribute no evidence. No native process or source save was used.
 
 ## E3A accepted (2026-10-28)
 

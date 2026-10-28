@@ -236,6 +236,7 @@ function Resolver.Resolve(stimulus, state, context, root)
         recentActs = recentActs(snapshot),
         groundedFactRefs = factRefs(stimulus),
         groundedEventRefs = eventRefs(stimulus),
+        evidence = copy(root.evidence or { rows = {}, providers = {} }),
     }
 end
 
