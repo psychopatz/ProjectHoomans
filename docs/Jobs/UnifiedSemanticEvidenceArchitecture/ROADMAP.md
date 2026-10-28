@@ -1,12 +1,14 @@
 # Roadmap — Unified Semantic Evidence Architecture
 
-**Parent status:** PLANNED / OPEN.
+**Parent status:** DEVELOPER COMPLETE — E0–E7 accepted; READY FOR USER LIVE TEST.
 **Accepted foundation:** existing parser, DialogueContextState, Conversation Memory, relationship/conduct systems, InteractionProviders, Pragmatic Resolver, Interaction Director, generated affordances and UtterancePlan.
-**Active phase:** E0.
+**Active phase:** none; user-owned native SP/MP verification is the remaining handoff.
 
-All E0-E7 phases are mandatory. Completing one adopter or fixing im sorry does not complete the parent goal.
+All E0-E7 phases are accepted on the developer side. Reopen only the smallest owning phase if native evidence disproves a specific invariant.
 
 ## E0 — Baseline, contracts and storage measurements
+
+**Status:** ACCEPTED.
 
 Reproduce and machine-capture:
 
@@ -25,6 +27,8 @@ Measure representative serialized ModData deltas without mutating source saves. 
 
 ## E1 — Canonical evidence schema and provider seam
 
+**Status:** ACCEPTED.
+
 Define a bounded normalized evidence descriptor and query contract. Extend existing InteractionProviders/InteractionContext with evidence and add adapter registration consistent with existing provider patterns.
 
 Requirements: runtime read model only; bounded fields/lists; provenance/source tier; targeted query by relation/class/target; no raw transcript/context copying; no gameplay mutation from provider/query code.
@@ -32,6 +36,8 @@ Requirements: runtime read model only; bounded fields/lists; provenance/source t
 **Gate:** session, today and durable fixture providers normalize into one schema; existing consumers remain compatible.
 
 ## E2 — Canonical event metadata and salience unification
+
+**Status:** ACCEPTED.
 
 Remove first-party dual authoring between social-event definitions and Conversation Memory EventTypes.
 
@@ -42,6 +48,8 @@ Standardize names/contracts for retention salience versus confidence/relevance/s
 **Gate:** every first-party social event is explicitly semantically described or explicitly opts out; no silent salience-0 drift for intended adopters; stable codes/migrations remain safe.
 
 ## E3 — Tiered evidence query and salience-aware bounded retention
+
+**Status:** ACCEPTED.
 
 Implement one bounded query path over SESSION -> TODAY -> DURABLE.
 
@@ -59,6 +67,8 @@ Decouple TODAY projection from detailed relationship-memory retention: successfu
 
 ## E4 — Generic semantic relation/obligation resolution
 
+**Status:** ACCEPTED.
+
 Introduce data-driven relations between semantic acts and evidence: opens, addresses, resolves and other small canonical relation types.
 
 Use the existing Pragmatic Resolver as interpretation owner. It receives evidence/relation matches and produces grounded, unresolved, unrelated or ambiguous pragmatic outcomes. It does not tokenize text or mutate gameplay.
@@ -68,6 +78,8 @@ Current relation state is derived at read time from ordered session/day evidence
 **Gate:** no-grievance apology clarifies rather than fabricating forgiveness; same-session and same-day grievance cases ground correctly; repeated repair does not reopen a resolved event without newer evidence.
 
 ## E5 — First-party adopters
+
+**Status:** ACCEPTED.
 
 Migrate representative existing mechanics onto the generic path:
 
@@ -82,6 +94,8 @@ Generated player affordances and NPC behavior consume the same pragmatic evidenc
 
 ## E6 — Extensibility proof and content integration
 
+**Status:** ACCEPTED.
+
 Add one synthetic/test future mechanic such as promise -> fulfillment/breach -> repair/explanation using registration/metadata only.
 
 A new evidence type/relation must not require editing generic evidence query, Pragmatic Resolver algorithm or creating a store.
@@ -91,6 +105,8 @@ Integrate required Dialogue Content/affordance/UtterancePlan data through canoni
 **Gate:** synthetic adopter passes through real Lua worker and existing Response Channel/Director pipeline with resolver implementation unchanged.
 
 ## E7 — Scale, storage and full acceptance
+
+**Status:** ACCEPTED.
 
 Stress repeated conversations/events across multiple world days and saturated stores.
 

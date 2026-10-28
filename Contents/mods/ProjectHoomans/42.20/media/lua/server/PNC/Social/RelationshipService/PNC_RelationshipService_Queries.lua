@@ -39,7 +39,14 @@ function Relationships.Get(observerNPCID, targetKey)
 end
 
 -- Bounded read API: never copies journals or exposes mutable owner tables.
-function Relationships.QuerySemanticEvidence(observerNPCID, targetKey, actorID, worldAgeHours)
+function Relationships.QuerySemanticEvidence(observerNPCID, targetKey, actorID, worldAgeHours, query)
+    local Evidence = require "PNC/Semantics/PNC_SemanticInteractionEvidence"
+    worldAgeHours = finiteNumber(worldAgeHours)
+    if worldAgeHours == nil then
+        local time = getGameTime and getGameTime() or nil
+        worldAgeHours = time and time.getWorldAgeHours and finiteNumber(time:getWorldAgeHours())
+    end
+    if worldAgeHours == nil or worldAgeHours < 0 then return {} end
     local record = resolveObserver(observerNPCID)
     if not record or not validateTarget(targetKey) then return {} end
     local relationship = getRelationship(record, targetKey)
@@ -53,7 +60,7 @@ function Relationships.QuerySemanticEvidence(observerNPCID, targetKey, actorID, 
         local entry = Events.GetType(memory.type)
         local metadata = entry and entry.semantic
         local strength = Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
-        if metadata and strength > 0 and memory.aboutKey == targetKey then
+        if metadata and strength > 0 and memory.aboutKey == targetKey and Evidence.MatchesMeaning(metadata, query) then
             rows[#rows + 1] = { sourceRef = memory.id, eventType = memory.type,
                 actorID = metadata.actorRole == "observer" and observerNPCID or actorID,
                 targetID = metadata.actorRole == "observer" and actorID or observerNPCID,
@@ -63,9 +70,14 @@ function Relationships.QuerySemanticEvidence(observerNPCID, targetKey, actorID, 
                 sequence = memory.eventSequence or index,
                 ageHours = math.max(0, (tonumber(worldAgeHours) or memory.createdAt) - memory.createdAt),
                 provenance = "relationship.memories", visibility = memory.knowledgeSource }
-            if #rows >= 16 then break end
         end
     end
+    table.sort(rows, function(a, b)
+        if a.occurredAt ~= b.occurredAt then return a.occurredAt > b.occurredAt end
+        if a.sequence ~= b.sequence then return a.sequence > b.sequence end
+        return a.sourceRef < b.sourceRef
+    end)
+    while #rows > 16 do table.remove(rows) end
     return rows
 end
 

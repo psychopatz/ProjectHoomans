@@ -62,7 +62,7 @@ class PragmaticInteractionR9Tests(unittest.TestCase):
         self.assertTrue(
             any(
                 path.endswith(
-                    "Generated/Conversation/Behaviors/Social.lua"
+                    "Generated/Conversation/Behaviors/Social/AcknowledgeMemory.lua"
                 )
                 for path in report["changedGeneratedPaths"]
             ),

@@ -1,0 +1,78 @@
+{
+  "benchmark": {
+    "iterations": 200,
+    "providers": 6,
+    "rows": 16,
+    "wallSecondsIncludingRPC": 0.3821570170111954
+  },
+  "rollover": {
+    "durableCount": 6,
+    "shortRemoved": true,
+    "topicsRemoved": true
+  },
+  "samples": [
+    {
+      "compactJSONBytes": 4,
+      "counts": {
+        "conduct": 0,
+        "durable": 0.0,
+        "journal": 0,
+        "relationship": 0,
+        "today": 0.0,
+        "topicPlayers": 0.0
+      },
+      "npcSerializedJSONBytes": 2693,
+      "playerRegistryJSONBytes": 894,
+      "roots": [],
+      "stage": "before"
+    },
+    {
+      "compactJSONBytes": 450,
+      "counts": {
+        "conduct": 64,
+        "durable": 6.0,
+        "journal": 0,
+        "relationship": 20,
+        "today": 8.0,
+        "topicPlayers": 4.0
+      },
+      "npcSerializedJSONBytes": 10152,
+      "playerRegistryJSONBytes": 24648,
+      "roots": [],
+      "stage": "128"
+    },
+    {
+      "compactJSONBytes": 450,
+      "counts": {
+        "conduct": 64,
+        "durable": 6.0,
+        "journal": 0,
+        "relationship": 20,
+        "today": 8.0,
+        "topicPlayers": 4.0
+      },
+      "npcSerializedJSONBytes": 10152,
+      "playerRegistryJSONBytes": 24648,
+      "roots": [],
+      "stage": "256"
+    },
+    {
+      "compactJSONBytes": 448,
+      "counts": {
+        "conduct": 64,
+        "durable": 6.0,
+        "journal": 0,
+        "relationship": 20,
+        "today": 8.0,
+        "topicPlayers": 4.0
+      },
+      "npcSerializedJSONBytes": 10152,
+      "playerRegistryJSONBytes": 24648,
+      "roots": [],
+      "stage": "repeat"
+    }
+  ],
+  "schema": "unified-evidence.storage.v1",
+  "serialization": "canonical JSON of production serialized NPC and owning player registry records",
+  "sourceSnapshotUnchanged": true
+}

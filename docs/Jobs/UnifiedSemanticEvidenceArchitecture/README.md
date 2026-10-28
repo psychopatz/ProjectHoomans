@@ -1,6 +1,6 @@
 # Unified Semantic Evidence Architecture
 
-**Status:** PLANNED / NOT IMPLEMENTED.
+**Status:** DEVELOPER COMPLETE — E0–E7 accepted; READY FOR USER LIVE TEST.
 
 ## Parent objective
 
@@ -44,3 +44,7 @@ Read AUDIT.md only when a baseline/ownership question needs revision-specific ev
 docs/Jobs/PragmaticDialogueBeatDirector owns the accepted conversation/director foundation. Its previously planned contextual U0-U4 expansion is superseded as an execution plan by this job; the apology symptom becomes the first adopter/regression here.
 
 Do not restart accepted C0-C11/L0-L5 work unless new evidence identifies a regression in that owner.
+
+## Current steady state
+
+The unified evidence architecture is now the accepted semantic-context foundation. New mechanics should register domain-owned evidence metadata/adapters and semantic relations, then reuse the existing provider → InteractionContext → PragmaticResolver → InteractionDirector path. The remaining acceptance surface is user-owned native SP/MP verification; implementation history and exact final test evidence live in `PROGRESS.md`.

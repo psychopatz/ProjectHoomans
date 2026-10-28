@@ -14,6 +14,20 @@ Providers.MAX_KNOWLEDGE_REFS = 16
 Providers.NormalizeEvidence = Evidence.Normalize
 Providers.RegisterEvidenceAdapter = Evidence.Register
 Providers.QueryEvidence = Evidence.Query
+function Providers.EvidenceQueryForStimulus(stimulus)
+    local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
+    local semantic = type(stimulus) == "table" and stimulus.semantic or {}
+    local metadata = Relations.GetAct(semantic and (semantic.speechAct or semantic.intent))
+    local wanted, seen = {}, {}
+    for _, kind in ipairs({ "addresses", "resolves", "violates", "explains" }) do
+        for _, relation in ipairs(metadata and metadata.relations[kind] or {}) do
+            if not seen[relation] and #wanted < 8 then
+                wanted[#wanted + 1], seen[relation] = relation, true
+            end
+        end
+    end
+    return #wanted > 0 and { relations = wanted } or nil
+end
 
 local adapters = {}
 
@@ -194,7 +208,7 @@ local function relationshipSource(context)
         and social.personalRelationship or {}
 end
 
-function Providers.ProjectDialogue(context)
+function Providers.ProjectDialogue(context, evidenceQuery)
     context = type(context) == "table" and context or {}
     local personality = type(context.npcPersonality) == "table"
         and context.npcPersonality or {}
@@ -271,7 +285,7 @@ function Providers.ProjectDialogue(context)
         relationship = relation,
         world = world,
         knowledge = knowledgeProjection,
-        evidence = Evidence.Query(context, context.evidenceQuery),
+        evidence = Evidence.Query(context, evidenceQuery or context.evidenceQuery),
         provenance = {
             actor = actor.providerID,
             relationship = relation.providerID,

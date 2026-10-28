@@ -22,7 +22,8 @@ local function hasAuthority()
 end
 
 -- Compact read projection, independent of relationship-memory survival.
-function Events.QuerySemanticEvidence(record, targetKey, actorID)
+function Events.QuerySemanticEvidence(record, targetKey, actorID, query)
+    local Evidence = require "PNC/Semantics/PNC_SemanticInteractionEvidence"
     local target = Events.ResolveTarget(targetKey)
     if not target or not target.seed or type(record) ~= "table" then return {} end
     local normalized = Events.Normalize(record.memory) or {}
@@ -30,7 +31,7 @@ function Events.QuerySemanticEvidence(record, targetKey, actorID)
     for offset = #values - 2, 1, -3 do
         local entry = Events.GetType(values[offset])
         local metadata = entry and entry.semantic
-        if values[offset + 1] == target.seed and metadata then
+        if values[offset + 1] == target.seed and metadata and Evidence.MatchesMeaning(metadata, query) then
             rows[#rows + 1] = {
                 sourceRef = "today:" .. tostring(normalized.d) .. ":"
                     .. tostring(values[offset]) .. ":" .. tostring(target.seed),

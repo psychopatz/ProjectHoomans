@@ -353,9 +353,19 @@ local function candidate(strategy, stance, context, reason)
     local intent, speechAct, subject, modifiers, details =
         semanticFor(strategy, frame, context)
     if not intent then return nil end
-    local admission = EvidenceResolver.ResolveEvidence(Stimulus.FromIR({
+    local stimulus = Stimulus.FromIR({
         intent = intent, speechAct = speechAct, subject = subject,
-    }, context), context.semanticEvidenceQuery or EvidenceProviders.QueryEvidence(context, {}))
+    }, context)
+    local query = EvidenceProviders.EvidenceQueryForStimulus(stimulus)
+    local evidence = context.semanticEvidenceQuery
+    if query then
+        local signature = table.concat(query.relations, ":")
+        local cache = context.semanticEvidenceCache or {}
+        evidence = cache[signature] or EvidenceProviders.QueryEvidence(context, query)
+        cache[signature] = evidence
+    end
+    local admission = EvidenceResolver.ResolveEvidence(stimulus,
+        evidence or EvidenceProviders.QueryEvidence(context, {}))
     if admission.status == "unresolved" or admission.status == "ambiguous" then return nil end
     details = type(details) == "table" and details or {}
     local plan, realized = strategyPlan(
@@ -446,6 +456,7 @@ function Provider.collect(context)
     local projected = {}
     for key, value in pairs(context) do projected[key] = value end
     projected.semanticEvidenceQuery = EvidenceProviders.QueryEvidence(context, {})
+    projected.semanticEvidenceCache = {}
     context = projected
     local ir = type(context.dialogueIR) == "table"
         and context.dialogueIR or {}

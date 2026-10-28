@@ -36,6 +36,19 @@ local function contains(values, wanted)
     return false
 end
 
+function Evidence.MatchesMeaning(value, query)
+    query = type(query) == "table" and query or {}
+    if not contains(value.classes or {}, query.class) then return false end
+    if query.relation and not contains((value.relations or {})[query.relationKind or "opens"] or {}, query.relation) then return false end
+    if type(query.relations) ~= "table" or #query.relations == 0 then return true end
+    for index = 1, math.min(#query.relations, Evidence.MAX_TERMS) do
+        for _, kind in ipairs({ "opens", "addresses", "resolves", "violates", "explains" }) do
+            if contains((value.relations or {})[kind] or {}, query.relations[index]) then return true end
+        end
+    end
+    return false
+end
+
 function Evidence.Normalize(value, providerID, tier)
     if type(value) ~= "table" or not text(value.sourceRef)
         or not tiers[tier or value.sourceTier] then return nil end
@@ -84,33 +97,59 @@ function Evidence.Query(context, query)
     local limit = math.floor(number(query.limit, Evidence.MAX_ROWS) or Evidence.MAX_ROWS)
     local filter = { relation = text(query.relation), relationKind = text(query.relationKind),
         class = text(query.class), actorID = text(query.actorID), targetID = text(query.targetID),
-        limit = Evidence.MAX_ROWS }
-    local output, diagnostics, seen = {}, {}, {}
+        relations = terms(query.relations), limit = Evidence.MAX_ROWS }
+    local output, diagnostics, seen, buckets = {}, {}, {}, {}
+    local matched = 0
+    local function newer(a, b)
+        if (a.occurredAt or 0) ~= (b.occurredAt or 0) then return (a.occurredAt or 0) > (b.occurredAt or 0) end
+        if (a.sequence or 0) ~= (b.sequence or 0) then return (a.sequence or 0) > (b.sequence or 0) end
+        if (a.ageHours or math.huge) ~= (b.ageHours or math.huge) then return (a.ageHours or math.huge) < (b.ageHours or math.huge) end
+        return a.sourceRef < b.sourceRef
+    end
     for index = 1, #adapters do
         local adapter = adapters[index]
         -- Addon-owned callbacks are an external failure boundary. A failed
         -- provider contributes no evidence and cannot authorize an effect.
         local adapterFilter = {}
         for key, value in pairs(filter) do adapterFilter[key] = value end
+        adapterFilter.relations = terms(filter.relations)
         local ok, rows = pcall(adapter.Query, context, adapterFilter)
         diagnostics[#diagnostics + 1] = { providerID = adapter.id,
             sourceTier = adapter.sourceTier, status = ok and "queried" or "unavailable" }
+        local bucket = {}
         if ok and type(rows) == "table" then
             for rowIndex = 1, math.min(#rows, Evidence.MAX_ROWS) do
                 local row = Evidence.Normalize(rows[rowIndex], adapter.id, adapter.sourceTier)
                 if row and not seen[row.sourceRef]
                     and (not filter.actorID or row.actorID == filter.actorID)
                     and (not filter.targetID or row.targetID == filter.targetID)
-                    and contains(row.classes, filter.class)
-                    and (not filter.relation or contains(
-                        row.relations[filter.relationKind or "opens"] or {}, filter.relation))
-                    and #output < limit then
-                    output[#output + 1], seen[row.sourceRef] = row, true
+                    and Evidence.MatchesMeaning(row, filter) then
+                    bucket[#bucket + 1], seen[row.sourceRef] = row, true
                 end
             end
         end
+        table.sort(bucket, newer)
+        buckets[#buckets + 1] = bucket
+        matched = matched + #bucket
+        diagnostics[#diagnostics].rowsMatched = #bucket
+        diagnostics[#diagnostics].providerLimited = ok and type(rows) == "table" and #rows > Evidence.MAX_ROWS or false
     end
-    return { schemaVersion = 1, rows = output, providers = diagnostics, limit = limit }
+    -- Reserve representation across providers before spending remaining rows.
+    -- A busy earlier tier/domain cannot hide another owner's closing fact.
+    for position = 1, Evidence.MAX_ROWS do
+        for index = 1, #buckets do
+            local row = buckets[index][position]
+            if row and #output < limit then output[#output + 1] = row end
+        end
+        if #output >= limit then break end
+    end
+    table.sort(output, function(a, b)
+        if a.sourceTier ~= b.sourceTier then return tiers[a.sourceTier] < tiers[b.sourceTier] end
+        if a.providerID ~= b.providerID then return a.providerID < b.providerID end
+        return newer(a, b)
+    end)
+    return { schemaVersion = 1, rows = output, providers = diagnostics, limit = limit,
+        truncated = matched > #output, matched = matched }
 end
 
 return Evidence

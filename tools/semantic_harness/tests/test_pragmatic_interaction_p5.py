@@ -40,7 +40,7 @@ class PragmaticInteractionP5Tests(unittest.TestCase):
         self.assertTrue(report["effectFree"])
         self.assertIn(
             "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-            "Semantics/Generated/Conversation/Beats/Social.lua",
+            "Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation.lua",
             report["changedGeneratedPaths"],
         )
         self.assertEqual(source.read_bytes(), before)
@@ -101,7 +101,7 @@ class PragmaticInteractionP5Tests(unittest.TestCase):
                 (
                     repository
                     / "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-                    "Semantics/Generated/Conversation/Beats/Social.lua"
+                    "Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation.lua"
                 ).is_file()
             )
             for language in ("EN", "TL"):

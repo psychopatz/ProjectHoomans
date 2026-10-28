@@ -61,6 +61,20 @@ function Relations.ContextualActs()
     return ids
 end
 
+function Relations.ContextualRelations()
+    local ids, seen = {}, {}
+    for _, metadata in pairs(acts) do
+        for _, kind in ipairs({ "addresses", "resolves", "violates", "explains" }) do
+            for _, id in ipairs(metadata.relations[kind]) do
+                if not seen[id] then ids[#ids + 1], seen[id] = id, true end
+            end
+        end
+    end
+    table.sort(ids)
+    while #ids > 8 do table.remove(ids) end
+    return ids
+end
+
 function Relations.GetAct(id)
     local Evidence = require "PNC/Semantics/PNC_SemanticInteractionEvidence"
     return Evidence.Normalize(acts[id], "semantic_act_catalog", "SESSION")

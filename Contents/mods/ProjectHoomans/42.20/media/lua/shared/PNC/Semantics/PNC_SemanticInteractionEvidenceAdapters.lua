@@ -53,7 +53,7 @@ function Adapters.Install(Providers)
             end })
     end
     Providers.RegisterEvidenceAdapter({ id = "projecthoomans.session", sourceTier = "SESSION",
-        Query = function(context)
+        Query = function(context, query)
             context = type(context) == "table" and context or {}
             local actorID, npcID = identities(context)
             local live = context.semanticContextState
@@ -105,7 +105,7 @@ function Adapters.Install(Providers)
             return rows
         end })
     Providers.RegisterEvidenceAdapter({ id = "projecthoomans.today", sourceTier = "TODAY",
-        Query = function(context)
+        Query = function(context, query)
             context = type(context) == "table" and context or {}
             local authoritative = PNC.Core and type(PNC.Core.IsAuthority) == "function"
                 and PNC.Core.IsAuthority() == true
@@ -118,27 +118,27 @@ function Adapters.Install(Providers)
                 and PNC.Registry.Get(npcID) or nil
             local snapshot = context.entry and context.entry.snapshot
             record = record or { id = npcID, memory = snapshot and snapshot.memory }
-            return Events.QuerySemanticEvidence(record, targetKey, actorID)
+            return Events.QuerySemanticEvidence(record, targetKey, actorID, query)
         end })
     Providers.RegisterEvidenceAdapter({ id = "projecthoomans.relationship", sourceTier = "DURABLE",
-        Query = function(context)
+        Query = function(context, query)
             context = type(context) == "table" and context or {}
             local actorID, npcID, targetKey = identities(context)
             local Relationships = PNC.Relationships
             if not Relationships or type(Relationships.QuerySemanticEvidence) ~= "function"
                 or not targetKey or not npcID then return {} end
             local world = context.worldContext or {}
-            return Relationships.QuerySemanticEvidence(npcID, targetKey, actorID, world.worldAgeHours)
+            return Relationships.QuerySemanticEvidence(npcID, targetKey, actorID, world.worldAgeHours, query)
         end })
     Providers.RegisterEvidenceAdapter({ id = "projecthoomans.conduct", sourceTier = "DURABLE",
-        Query = function(context)
+        Query = function(context, query)
             context = type(context) == "table" and context or {}
             local actorID, npcID, targetKey = identities(context)
             local Conduct = PNC.Conduct
             if not Conduct or type(Conduct.QuerySemanticEvidence) ~= "function"
                 or not targetKey or not npcID then return {} end
             return Conduct.QuerySemanticEvidence(targetKey, "npc:" .. tostring(npcID),
-                actorID, npcID, (context.worldContext or {}).worldAgeHours)
+                actorID, npcID, (context.worldContext or {}).worldAgeHours, query)
         end })
 end
 return Adapters

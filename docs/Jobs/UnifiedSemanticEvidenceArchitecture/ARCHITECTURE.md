@@ -122,6 +122,15 @@ A domain may explicitly declare no semantic retention. Dynamic hash fallback rem
 
 ## Provider architecture
 
+Contextual acts query all participating relation operations (open and closing
+markers) before owner/result limits are applied. Owning queries filter within
+their existing hard bounds; Relationship rows use occurrence time and the
+owner's event sequence. Collection reserves representation across providers,
+then returns at most 16 rows in deterministic tier order, with matched/truncated
+diagnostics. The existing player-scoped presentation allocates this same budget
+across at most eight registered contextual relation families. Generated choices
+reuse per-family queries ephemerally within one collection.
+
 Extend existing PNC_SemanticInteractionProviders with bounded evidence projection and evidence adapters. External/adopter systems register providers/adapters instead of patching PragmaticResolver.
 
 Provider queries must be selective and bounded: ask for relevant classes/relations/target rather than dump all relationship memories, conduct records or journals into every turn.

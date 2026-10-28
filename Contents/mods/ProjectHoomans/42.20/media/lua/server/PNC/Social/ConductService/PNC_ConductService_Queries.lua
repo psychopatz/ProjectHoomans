@@ -10,7 +10,11 @@ local Math = PNC.ConductMath
 local Constants = PNC.ConductConstants
 
 -- Selective semantic read through the conduct owner; never exports its store.
-function Conduct.QuerySemanticEvidence(entityKey, subjectKey, actorID, targetID, at)
+function Conduct.QuerySemanticEvidence(entityKey, subjectKey, actorID, targetID, at, query)
+    local Evidence = require "PNC/Semantics/PNC_SemanticInteractionEvidence"
+    local time = getGameTime and getGameTime() or nil
+    at = tonumber(at) or time and time.getWorldAgeHours and tonumber(time:getWorldAgeHours())
+    if not at or at ~= at or at < 0 or at == math.huge or at == -math.huge then return {} end
     local owner = H.Resolve(entityKey)
     local evidence = owner and owner.conduct and owner.conduct.evidence or {}
     local rows = {}
@@ -20,7 +24,7 @@ function Conduct.QuerySemanticEvidence(entityKey, subjectKey, actorID, targetID,
         local metadata = definition and definition.semantic
         local strength = Math.CalculateEvidenceStrengthAtTime(item, at)
         if metadata and strength > 0 and item.actorKey == entityKey
-            and item.subjectKey == subjectKey then
+            and item.subjectKey == subjectKey and Evidence.MatchesMeaning(metadata, query) then
             rows[#rows + 1] = { sourceRef = item.id, eventType = item.eventType,
                 actorID = actorID, targetID = targetID,
                 classes = metadata.classes, relations = metadata.relations,

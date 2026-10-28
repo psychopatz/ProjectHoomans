@@ -201,12 +201,24 @@ function Presentation.BuildForConversation(player, npcID)
         local time = getGameTime and getGameTime() or nil
         local at = time and time.getWorldAgeHours and time:getWorldAgeHours() or 0
         local actorID = summary.identityDiagnostics.characterUUID
-        local projection = Providers.QueryEvidence({ npcID = record.id,
+        local queryContext = { npcID = record.id,
             playerID = actorID, playerEntityKey = targetKey,
-            worldContext = { worldAgeHours = at } }, {})
+            worldContext = { worldAgeHours = at } }
+        local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
+        local families = Relations.ContextualRelations()
+        local rows, seen = {}, {}
+        local limit = math.max(1, math.floor(16 / math.max(1, #families)))
+        for _, relation in ipairs(families) do
+            local projection = Providers.QueryEvidence(queryContext, { relations = { relation }, limit = limit })
+            for _, row in ipairs(projection.rows) do
+                if not seen[row.sourceRef] and #rows < 16 then
+                    rows[#rows + 1], seen[row.sourceRef] = row, true
+                end
+            end
+        end
         local Events = PNC.Conversation and PNC.Conversation.Memory
             and PNC.Conversation.Memory.Events
-        summary.semanticEvidence = { rows = projection.rows,
+        summary.semanticEvidence = { rows = rows,
             observedWorldAgeHours = at,
             observedWorldDay = Events and Events.Internal.CurrentWorldDay() }
     end

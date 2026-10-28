@@ -27,6 +27,8 @@ def interaction_summary(observation: dict[str, Any]) -> str:
     semantic = pragmatic.get("semantic") or {}
     providers = pragmatic.get("providers") or {}
     reply_to = pragmatic.get("replyTo") or {}
+    admission = pragmatic.get("contextualAdmission") or {}
+    evidence = pragmatic.get("evidence") or {}
     lines.extend(
         [
             "Typed stimulus",
@@ -57,6 +59,24 @@ def interaction_summary(observation: dict[str, Any]) -> str:
             "",
         ]
     )
+    lines.extend(["", "Semantic evidence",
+        f"  contextual admission: {_id(admission.get('status'))} / {_id(admission.get('reason'))}",
+        f"  rows: {len(evidence.get('rows') or [])}/{evidence.get('limit', 16)}; matched: {evidence.get('matched', 0)}; truncated: {evidence.get('truncated', False)}"])
+    candidates = {row.get("sourceRef"): row for row in admission.get("candidates", [])[:8]
+                  if isinstance(row, dict)}
+    def metric(value: Any) -> str:
+        return "—" if value is None else str(value)
+    for row in (evidence.get("rows") or [])[:16]:
+        if not isinstance(row, dict):
+            continue
+        derived = candidates.get(row.get("sourceRef"), {})
+        lines.extend([
+            f"  [{_id(row.get('sourceTier'))}] {_id(row.get('providerID'))}: {_id(row.get('sourceRef'))}",
+            f"    semantic relations: {row.get('relations') or {}}",
+            f"    retention salience: {metric(row.get('retentionSalience'))}; confidence: {metric(row.get('confidence'))}",
+            f"    effective strength: {metric(row.get('effectiveStrength'))}; recency hours: {metric(row.get('ageHours'))}",
+            f"    contextual relevance: {metric(derived.get('contextualRelevance'))}; priority: {metric(derived.get('priority'))}",
+        ])
     before = director.get("activeBefore") or {}
     after = director.get("activeAfter") or {}
     entered = director.get("entered") or {}

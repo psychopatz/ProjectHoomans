@@ -169,7 +169,7 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
         )
         visible = result["observation"]["response"]
         self.assertEqual(
-            visible["phraseSemanticTemplateID"],
+            visible["semanticTemplateID"],
             "semantic.interaction.argument.retaliate",
         )
         self.assertTrue(visible["text"])

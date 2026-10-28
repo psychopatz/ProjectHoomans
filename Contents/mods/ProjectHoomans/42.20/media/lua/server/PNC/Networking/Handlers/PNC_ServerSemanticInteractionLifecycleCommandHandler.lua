@@ -168,11 +168,12 @@ local function handle(player, args)
     local compact = Relations.GetCompactType(envelope.act)
     local markerRecorded = false
     if metadata and compact then
+        local stimulus = { semantic = { intent = envelope.act, speechAct = envelope.act },
+            source = { actorID = playerKey }, targets = { npcID } }
         local evidence = Providers.QueryEvidence({ npcID = npcID,
             playerID = playerKey, playerEntityKey = playerKey,
-            worldContext = { worldAgeHours = at } }, {})
-        local admission = Resolver.ResolveEvidence({ semantic = { intent = envelope.act,
-            speechAct = envelope.act }, source = { actorID = playerKey }, targets = { npcID } }, evidence)
+            worldContext = { worldAgeHours = at } }, Providers.EvidenceQueryForStimulus(stimulus))
+        local admission = Resolver.ResolveEvidence(stimulus, evidence)
         local Events = PNC.Conversation.Memory and PNC.Conversation.Memory.Events
         if Events and (#metadata.relations.opens > 0 or admission.admitted) then
             local registered = Events.RegisterType(compact)

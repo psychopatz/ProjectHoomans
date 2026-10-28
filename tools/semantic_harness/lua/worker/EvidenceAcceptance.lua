@@ -2,6 +2,10 @@
 local Handler = {}
 
 function Handler.handle(context, command, payload)
+    if command == "TEST_EVIDENCE_STRESS" then
+        local Fixture = require "worker/EvidenceStressFixture"
+        return Fixture.Run(context, payload)
+    end
     if command == "TEST_FUTURE_EVIDENCE" then
         local Fixture = require "worker/FutureEvidenceFixture"
         return Fixture.Run(context, payload)
@@ -76,6 +80,10 @@ function Handler.handle(context, command, payload)
         state:SetPendingFollowUp({ id = "fixture:pending", kind = payload.openResponse,
             topic = "supplies", openedTurn = state.sequence })
     end
+    if payload.clearSession then
+        local router = Runtime.view.session.semanticDialogueRouter
+        if router and router.context.semanticContextState then router.context.semanticContextState:Reset() end
+    end
     if payload.advanceDays then
         Runtime.scenario.world.worldAgeHours =
             (tonumber(Runtime.scenario.world.worldAgeHours) or 0)
@@ -105,6 +113,15 @@ function Handler.handle(context, command, payload)
             type = payload.addMemory, aboutKey = target,
             strength = 1, permanent = true, createdAt = 0,
         })
+        record = PNC.Registry.Get(record.id) or record
+    end
+    if payload.fillUnrelated then
+        for index = 1, math.min(18, tonumber(payload.fillUnrelated) or 0) do
+            PNC.Relationships.AddMemory(record.id, target, {
+                id = "z_unrelated:" .. tostring(index), type = "provided_treated_wound",
+                aboutKey = target, createdAt = getGameTime():getWorldAgeHours(), strength = 0.5,
+            })
+        end
         record = PNC.Registry.Get(record.id) or record
     end
     local relationship = PNC.Relationships.Get(record.id, target) or {}

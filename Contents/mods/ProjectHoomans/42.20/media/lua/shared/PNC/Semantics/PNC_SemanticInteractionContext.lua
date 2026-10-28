@@ -81,9 +81,10 @@ function Context.Project(stimulus, state, context, snapshot)
     context = type(context) == "table" and context or {}
     snapshot = type(snapshot) == "table" and snapshot or {}
     stimulus = type(stimulus) == "table" and stimulus or {}
+    local evidenceQuery = context.evidenceQuery or Providers.EvidenceQueryForStimulus(stimulus)
     local providers = type(context.interactionProjection) == "table"
         and context.interactionProjection
-        or Providers.ProjectDialogue(context)
+        or Providers.ProjectDialogue(context, evidenceQuery)
     local relationship = type(providers.relationship) == "table"
         and providers.relationship or {}
     local sequence = tonumber(state and state.sequence) or 0
@@ -97,7 +98,7 @@ function Context.Project(stimulus, state, context, snapshot)
         world = providers.world or {},
         knowledge = providers.knowledge or {},
         evidence = type(context.interactionProjection) == "table"
-            and Providers.QueryEvidence(context, context.evidenceQuery)
+            and Providers.QueryEvidence(context, evidenceQuery)
             or providers.evidence or { rows = {}, providers = {} },
         providers = providers.provenance or {},
         scene = {
