@@ -133,3 +133,10 @@ Finish M0 engine-boundary/snapshot fixtures and SP lifecycle evidence; audit bod
 - Updated legacy/restart tests to require protection of zero-ID coincident zombies before/after settle and while companions are canonical. Identifiable restart/population/carrier lanes remain tested separately.
 - Full Lua: 966/966 (8.22s). Changed runtime sources compile under installed-PZ Kahlua. git diff --check clean.
 - Remaining M5 audit: population/carrier legacy lanes and complete same-session/multi-client convergence. Next implement M6 client-isolation fixture and M7 pre-conversion death retirement; M8 must audit all retained heuristic paths, budgets and persistence before completion.
+
+## M6 multi-client identity fixture checkpoint
+
+- Added a three-client fixture using real server descriptor construction and independent canonical reconciler instances. Covers message-first A, replica-first B, late-interest C, local reconnect without server respawn, client isolation, simulation-owner/movement changes, replacement convergence and stale-incarnation rejection. Repeats the same protocol for companion, neutral, raider and faction roles.
+- Focused MP body/replica/streaming/follow/player-damage/combat-target selection: 33/33. This proves protocol/client isolation, not native movement or combat execution; existing focused movement/combat regressions remain part of final acceptance.
+- No runtime source changed in this chunk, so no additional changed-runtime compiler invocation is required. git diff --check passes.
+- Next mandatory work: M7 pre-conversion corpse lease capture and death/reanimation stale-proof matrix; then complete retained M5 heuristic audit and M8 requirement-by-requirement full acceptance. Parent remains active.
