@@ -16,6 +16,8 @@ local Factions = PNC.Factions
 local Communities = PNC.Communities
 local Store = PNC.AbstractWorldStore
 
+Service.ArrivalListeners = Service.ArrivalListeners or {}
+
 local function copy(value)
     return PNC.Core and PNC.Core.DeepCopy and PNC.Core.DeepCopy(value)
         or value
@@ -165,6 +167,52 @@ function Service.IsVisitActive(visit, at)
     return type(visit) == "table"
         and tostring(visit.kind or "") == "settlement_admission"
         and (tonumber(visit.expiresAt) or 0) > worldAge(at)
+end
+
+-- Generic settlement-arrival notification for server integrations. The
+-- mobile-settlement service remains authoritative for eligibility, movement,
+-- admission, and persistent visit state; listeners only observe an accepted
+-- arrival and must not mutate the supplied snapshot.
+function Service.RegisterArrivalListener(listener)
+    local listeners = Service.ArrivalListeners
+    local index
+    if type(listener) ~= "function" then return false end
+    for index = 1, #listeners do
+        if listeners[index] == listener then return true end
+    end
+    listeners[#listeners + 1] = listener
+    return true
+end
+
+function Service.UnregisterArrivalListener(listener)
+    local listeners = Service.ArrivalListeners
+    local index
+    if type(listener) ~= "function" then return false end
+    for index = #listeners, 1, -1 do
+        if listeners[index] == listener then
+            table.remove(listeners, index)
+            return true
+        end
+    end
+    return false
+end
+
+function Service.NotifySettlementArrival(details)
+    local listeners = Service.ArrivalListeners
+    local index
+    local ok
+    local reason
+    if type(details) ~= "table" then return false end
+    for index = 1, #listeners do
+        ok, reason = pcall(listeners[index], copy(details))
+        if not ok and Core and type(Core.LogWarn) == "function" then
+            Core.LogWarn(
+                "PNC settlement arrival listener failed index="
+                    .. tostring(index) .. " error=" .. tostring(reason)
+            )
+        end
+    end
+    return true
 end
 
 

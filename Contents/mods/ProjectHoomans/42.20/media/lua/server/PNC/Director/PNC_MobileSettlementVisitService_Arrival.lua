@@ -62,6 +62,22 @@ function Service.OnSettlementArrival(factionOrID, target, travel, at, group, rep
     eligible, reason, community, destination =
         Service.IsAdmissionEligible(faction, target, at)
     if not eligible then return false, reason end
+
+    -- The arrival is now accepted by the Hoomans-owned lifecycle. Notify
+    -- observers before any optional admission transfer; the source faction,
+    -- target community, and travel revision are the stable context that
+    -- downstream systems need, while Hoomans retains all movement authority.
+    Service.NotifySettlementArrival({
+        faction = copy(faction),
+        target = copy(target),
+        travel = copy(travel),
+        at = worldAge(at),
+        group = copy(group),
+        reports = copy(reports),
+        community = copy(community),
+        destination = copy(destination),
+    })
+
     ids = memberIDs(faction, group)
     if target.kind == "ai_settlement" then
         joinChance = aiJoinChance()

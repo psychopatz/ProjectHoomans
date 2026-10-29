@@ -281,6 +281,13 @@ PNC.AbstractWorldStore.Registry.encounters[1] = {
     outcome = "QUEUED",
 }
 
+local arrivalNotifications = {}
+local arrivalListener = function(details)
+    arrivalNotifications[#arrivalNotifications + 1] = details
+end
+T.truthy(Service.RegisterArrivalListener(arrivalListener),
+    "settlement arrival observer registers")
+
 local noVisit, noVisitReason = Service.OnSettlementArrival(
     factions.faction_mobile,
     target,
@@ -318,6 +325,16 @@ T.equal(Service.PumpPendingArrivals(at, 4), 1,
     "resolved non-hostile encounters release the admission retry")
 T.truthy(factions.faction_mobile.mobile.visit,
     "resolved arrival creates the bounded player visit")
+T.equal(#arrivalNotifications, 1,
+    "accepted Hoomans arrival emits one observer notification")
+T.equal(arrivalNotifications[1].community.id, "community_player",
+    "arrival notification carries the canonical community")
+T.equal(arrivalNotifications[1].faction.id, "faction_mobile",
+    "arrival notification carries the source faction")
+T.equal(arrivalNotifications[1].travel.revision, 1,
+    "arrival notification carries the travel revision")
+T.truthy(Service.UnregisterArrivalListener(arrivalListener),
+    "settlement arrival observer unregisters")
 
 T.equal(factions.faction_mobile.mobile.visit.expiresAt, 22,
     "visit has a bounded expiry")
