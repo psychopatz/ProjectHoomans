@@ -31,6 +31,25 @@ Internal.RegisterServerCommand(Const.CMD_SEMANTIC_COGNITION, function(args)
     Cognition.ApplyPayload(args or {})
 end)
 
+if Const.CMD_SEMANTIC_SCENE_SPEECH then
+    Internal.RegisterServerCommand(
+        Const.CMD_SEMANTIC_SCENE_SPEECH,
+        function(args)
+            local presentation = PNC.Semantics
+                and PNC.Semantics.InteractionScenePresentation or nil
+            if type(presentation) ~= "table"
+                or type(presentation.Receive) ~= "function"
+            then
+                presentation = require
+                    "PNC/Conversation/PNC_SemanticInteractionScenePresentation"
+            end
+            if presentation and type(presentation.Receive) == "function" then
+                presentation.Receive(args or {})
+            end
+        end
+    )
+end
+
 if Const.CMD_COMBAT_ENCOUNTER_INTENT_STATE then
     Internal.RegisterServerCommand(
         Const.CMD_COMBAT_ENCOUNTER_INTENT_STATE,

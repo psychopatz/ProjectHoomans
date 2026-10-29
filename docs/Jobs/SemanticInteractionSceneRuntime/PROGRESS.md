@@ -1,6 +1,6 @@
 # Progress — Semantic Interaction Scene Runtime
 
-**Status:** ACTIVE — S0–S3 accepted; S4 recipient/observer/player handoff is next.
+**Status:** ACTIVE — S0–S4 accepted; S5 opportunity-provider admission is next.
 
 **Planning base:** ProjectHoomans `47aaad69`, existing `main`.
 
@@ -107,18 +107,38 @@ S3 evidence:
 - changed Lua through installed Kahlua compiler: **6/6 PASS**;
 - Python compilation and `git diff --check`: clean.
 
-## ONE current Next Chunk — S4
+## S4 accepted — recipient/observer/player handoff
 
-Productionize recipient/observer/player handoff without creating a second semantic authority.
+Accepted implementation:
+- one resolved Scene turn is projected through a bounded `InteractionSceneTransport`; audience fanout never reruns Director/catalog/realization;
+- speaker and semantic recipient are derived from Scene history while participant and listener roles remain separate;
+- observer packets carry the already-selected speech but no interaction capsule, response plan, offers or Scene resume token;
+- addressed participating players receive the existing InteractionLifecycle envelope plus the selected Scene ResponsePlan and a turn-bound resume token;
+- client delivery reuses the canonical SemanticSpeechPresentation queue/nameplate/TTS path;
+- observer-only delivery is explicitly barred from synthesizing a player interaction;
+- the existing suggestion builder/generated-affordance provider can consume an addressed Scene ResponsePlan;
+- semantic-click responses are converted through the existing `Suggestions.FrameToIR` + predicate checks and bypass local duplicate NPC resolution;
+- the server resumes only the exact waiting player/turn, rejects stale/wrong/action-bearing responses, and routes the meaning through the same Scene/Director;
+- multiplayer/local fanout is capped at 8 listeners.
 
-S4 must:
-1. represent speaker, semantic recipient, participants and observers separately in Scene/presentation transport;
-2. deliver NPC->NPC presentation through existing NPC speech rendering;
-3. let nearby players observe without becoming semantic recipients;
-4. expose zero player response affordances for overheard-only speech;
-5. when an NPC addresses a participating player, project the same semantic lifecycle/offers into existing player response surfaces;
-6. allow a canonical player semantic response to resume the waiting Scene;
-7. bound multiplayer/local observer fanout and never rerun the semantic decision per observer.
+S4 evidence:
+- focused audience/runtime/constants matrix: **6/6 PASS**;
+- full `pnc_semantic` selection: **128/128 PASS**;
+- changed S4 Lua through installed Kahlua compiler: **16/16 PASS**;
+- `git diff --check`: clean.
+
+## ONE current Next Chunk — S5
+
+Implement the generic event-driven Opportunity Provider registry and admission path.
+
+S5 must:
+1. define a bounded provider registration/evaluation contract with deterministic priority/order;
+2. accept caller-supplied authoritative event/context, never scan the world itself;
+3. allow providers to propose participants, initial stimulus, topic, TTL/turn budget, LOD hints and bounded audience;
+4. validate/cap all proposals before Runtime.Open;
+5. dedupe/cool down opportunities generically so repeated event pulses do not scene-spam;
+6. expose accepted/rejected provider/admission reasons and metrics;
+7. keep domain-specific combat/social/task policy out of the core registry; those adopters arrive in S6.
 
 ## Remaining mandatory phases
 

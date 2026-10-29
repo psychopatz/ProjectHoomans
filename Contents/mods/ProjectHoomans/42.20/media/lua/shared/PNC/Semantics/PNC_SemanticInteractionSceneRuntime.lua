@@ -201,6 +201,58 @@ function Runtime.New(options)
         return scene:UpdateVisibility(spec)
     end
 
+    function Methods:ResumePlayer(id, playerID, expectedSequence, semantic)
+        local scene, reason = self:Get(id)
+        if not scene then return nil, reason end
+        playerID = cleanID(playerID)
+        if not playerID then return nil, "scene_player_id_invalid" end
+        semantic = type(semantic) == "table" and semantic or {}
+        if semantic.action ~= nil then
+            return nil, "scene_player_action_unsupported"
+        end
+        local participant = scene.participants
+            and scene.participants[playerID] or nil
+        if not participant or participant.isPlayer ~= true then
+            return nil, "scene_player_not_participant"
+        end
+        local continuation = type(scene.lastContinuation) == "table"
+            and scene.lastContinuation or {}
+        if continuation.mode ~= "wait"
+            or continuation.reason ~= "player_input_required"
+            or continuation.targetID ~= playerID
+        then
+            return nil, "scene_not_waiting_for_player"
+        end
+        local sequence = scene.lastTurn
+            and tonumber(scene.lastTurn.sequence) or nil
+        if tonumber(expectedSequence) ~= sequence then
+            return nil, "scene_player_response_stale"
+        end
+        local responderID = cleanID(continuation.sourceID)
+        if not responderID or not scene.participants[responderID] then
+            return nil, "scene_responder_unavailable"
+        end
+        local intent = tostring(semantic.intent or "")
+        local speechAct = tostring(semantic.speechAct or semantic.intent or "")
+        if intent == "" or speechAct == "" then
+            return nil, "scene_player_semantic_act_required"
+        end
+        local result, emitReason = scene:EmitSemanticAct({
+            sourceID = playerID,
+            responderID = responderID,
+            intent = intent,
+            speechAct = speechAct,
+            subject = semantic.subject,
+            topic = semantic.topic,
+            factRefs = semantic.factRefs,
+            eventRefs = semantic.eventRefs,
+            modifiers = semantic.modifiers,
+            providerID = "interaction.scene.player_response",
+        })
+        if not result then return nil, emitReason end
+        return result
+    end
+
     function Methods:Sweep(at)
         at = tonumber(at) or self:Now()
         local expired = {}
@@ -304,6 +356,12 @@ end
 
 function Runtime.UpdateVisibility(id, spec)
     return Runtime.Default():UpdateVisibility(id, spec)
+end
+
+function Runtime.ResumePlayer(id, playerID, expectedSequence, semantic)
+    return Runtime.Default():ResumePlayer(
+        id, playerID, expectedSequence, semantic
+    )
 end
 
 function Runtime.Sweep(at)

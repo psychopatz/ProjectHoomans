@@ -117,6 +117,16 @@ function Internal.CollectSuggestionBuildSources(state)
     appendBranchOffers(
         candidates,
         seen,
+        offersFromPlan(context.sceneResponsePlan),
+        "npc_response_plan",
+        revision,
+        context,
+        ir,
+        predicateTrace
+    )
+    appendBranchOffers(
+        candidates,
+        seen,
         offersFromPlan(response.plan),
         "npc_response_plan",
         revision,

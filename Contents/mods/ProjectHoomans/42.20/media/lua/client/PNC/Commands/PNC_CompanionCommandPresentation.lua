@@ -572,8 +572,12 @@ function Presentation.ShowAmbientNPCSpeech(actor, speechEventID, context)
     if type(context) ~= "table" then context = {} end
     context.playerActor = player
     context.speechEventID = speechEventID
-    ensureAmbientInteraction(context, context.npcID
-        or context.target and (context.target.id or context.target.npcID), player)
+    if context.observerOnly ~= true
+        and tostring(context.recipientKind or "player") ~= "npc"
+    then
+        ensureAmbientInteraction(context, context.npcID
+            or context.target and (context.target.id or context.target.npcID), player)
+    end
     published = publishNPCMessage(actor, text, context)
     if not published then speak(actor, text) end
     return true, text

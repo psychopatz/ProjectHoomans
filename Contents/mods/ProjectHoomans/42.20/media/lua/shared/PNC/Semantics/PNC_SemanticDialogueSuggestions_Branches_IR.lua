@@ -90,6 +90,17 @@ local function branchOfferForFrame(frame, view)
         end
     end
 
+    local context = view and view.spec and view.spec.context or nil
+    for _, item in ipairs(offersFromPlan(
+        context and context.sceneResponsePlan
+    )) do
+        if item.offer and item.offer.id == frame.candidateID
+            and sameBranchOrigin(frame, item.origin)
+        then
+            return item.offer, item.origin
+        end
+    end
+
     -- A live view may only expose the most recent queued payload. Inspect
     -- that bounded payload as a compatibility fallback without reparsing.
     for _, item in ipairs(offersFromMessages(result and result.messages)) do
@@ -103,7 +114,6 @@ local function branchOfferForFrame(frame, view)
     local lifecycle = view and view.session
         and view.session.semanticInteractionLifecycle or nil
     if type(lifecycle) ~= "table" then
-        local context = view and view.spec and view.spec.context or nil
         lifecycle = context and context.interactionLifecycle or nil
     end
     for _, item in ipairs(offersFromLifecycle({

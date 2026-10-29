@@ -503,6 +503,7 @@ function Scene.New(spec)
                 confidence = tonumber(request.confidence) or 1,
                 factID = factID,
                 eventID = eventID,
+                modifiers = copy(request.modifiers) or {},
             },
             payload = {
                 factRefs = factRefs,

@@ -8,6 +8,7 @@ local Suggestions = Internal.Suggestions
 
 require "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames_Conversation"
 require "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames_Navigation"
+require "PNC/Semantics/PNC_SemanticDialogueInput_SceneHandoff"
 
 function Input.Submit(view, value, part)
     if not DialogueRuntime.IsEnabled() then
@@ -25,7 +26,16 @@ function Input.SubmitSemanticFrame(view, frame, options)
         return false, "semantic_dialogue_disabled"
     end
 
-    local handled, accepted, reason = Internal.SubmitCoreAuthoredFrame(
+    local handled
+    local accepted
+    local reason
+    if type(Internal.SubmitSceneHandoffFrame) == "function" then
+        handled, accepted, reason = Internal.SubmitSceneHandoffFrame(
+            view, frame)
+        if handled then return accepted, reason end
+    end
+
+    handled, accepted, reason = Internal.SubmitCoreAuthoredFrame(
         view, frame, options)
     if handled then return accepted, reason end
     handled, accepted, reason = Internal.SubmitNavigationFrame(

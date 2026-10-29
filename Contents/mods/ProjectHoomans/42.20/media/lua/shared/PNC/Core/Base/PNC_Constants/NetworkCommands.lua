@@ -57,6 +57,8 @@ Const.CMD_SEMANTIC_QUEST_RESULT = "SemanticQuestResult"
 Const.CMD_SEMANTIC_SOCIAL_EVENT_REQUEST = "SemanticSocialEventRequest"
 Const.CMD_SEMANTIC_INTERACTION_LIFECYCLE =
     "SemanticInteractionLifecycle"
+Const.CMD_SEMANTIC_SCENE_SPEECH = "SemanticSceneSpeech"
+Const.CMD_SEMANTIC_SCENE_RESPONSE = "SemanticSceneResponse"
 Const.CMD_SEMANTIC_INVENTORY_QUERY_REQUEST =
     "SemanticInventoryQueryRequest"
 Const.CMD_SEMANTIC_INVENTORY_QUERY_RESULT =

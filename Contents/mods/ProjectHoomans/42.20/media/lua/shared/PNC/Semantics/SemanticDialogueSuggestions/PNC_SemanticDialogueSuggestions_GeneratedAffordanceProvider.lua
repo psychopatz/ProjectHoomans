@@ -106,6 +106,14 @@ local function topicID(value)
 end
 
 local function responsePlan(context)
+    context = type(context) == "table" and context or {}
+    if type(context.sceneResponsePlan) == "table" then
+        return context.sceneResponsePlan, {
+            source = "interaction_scene",
+            sourcePoolID = context.sceneResponsePlan.sourcePoolID,
+            selectionID = context.sceneResponsePlan.selectionID,
+        }
+    end
     local decision = type(context.dialogueDecision) == "table"
         and context.dialogueDecision or {}
     local response = type(decision.response) == "table"
@@ -472,7 +480,14 @@ function Provider.collect(context)
     local ir = type(context.dialogueIR) == "table"
         and context.dialogueIR or {}
     local frame = currentFrame(context)
-    if ir.intent == nil and ir.speechAct == nil and #context.semanticEvidenceQuery.rows == 0 then return {} end
+    local scenePlan = type(context.sceneResponsePlan) == "table"
+        and context.sceneResponsePlan or nil
+    if ir.intent == nil and ir.speechAct == nil
+        and #context.semanticEvidenceQuery.rows == 0
+        and scenePlan == nil
+    then
+        return {}
+    end
 
     local output = {}
     local seen = {}

@@ -26,6 +26,13 @@ end
 
 local function presentationInteraction(ambientFlavor, context, npcID,
     eventID, eventType)
+    if ambientFlavor.observerOnly == true
+        or context and context.observerOnly == true
+        or tostring(ambientFlavor.recipientKind
+            or context and context.recipientKind or "") == "npc"
+    then
+        return nil
+    end
     local existing = ambientFlavor.interaction
         or context and context.interaction
     if existing then return existing end
@@ -89,6 +96,11 @@ local function projectEventIntoConversation(receive)
     local view = receive.view
     local ambientFlavor = receive.ambientFlavor
     local context = receive.context
+    if ambientFlavor.observerOnly == true
+        or context and context.observerOnly == true
+    then
+        return
+    end
     local eventRef = tostring(
         ambientFlavor.eventRef or receive.eventID or ""
     )
@@ -134,11 +146,19 @@ local function projectEventIntoConversation(receive)
         ),
     }
     root.interactionLifecycle = lifecycle
+    root.sceneResponsePlan = type(context.sceneResponsePlan) == "table"
+        and context.sceneResponsePlan or nil
+    root.sceneHandoff = type(context.sceneHandoff) == "table"
+        and context.sceneHandoff or nil
     root.semanticEventFacts = context.semanticEventFacts
     root.presentationClass = context.presentationClass
         or ambientFlavor.presentationClass
     if type(root.conversationBlockContext) == "table" then
         root.conversationBlockContext.interactionLifecycle = lifecycle
+        root.conversationBlockContext.sceneResponsePlan =
+            root.sceneResponsePlan
+        root.conversationBlockContext.sceneHandoff =
+            root.sceneHandoff
         root.conversationBlockContext.semanticEventFacts =
             context.semanticEventFacts
         root.conversationBlockContext.presentationClass =
