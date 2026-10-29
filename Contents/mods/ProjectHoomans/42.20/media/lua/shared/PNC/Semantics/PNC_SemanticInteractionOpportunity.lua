@@ -388,17 +388,30 @@ function Opportunity.Evaluate(event, context, maximum)
 
     local proposals = {}
     local diagnostics = {}
+    local function retainProposal(proposal)
+        proposals[#proposals + 1] = proposal
+        table.sort(proposals, proposalOrder)
+        while #proposals > maximum do
+            table.remove(proposals)
+        end
+    end
+    local function diagnostic(row)
+        if #diagnostics < 16 then diagnostics[#diagnostics + 1] = row end
+    end
+
+    -- Evaluate all registered providers before applying the output cap.
+    -- Capping raw provider order first would let many low-priority proposals
+    -- starve a later urgent provider as the registry grows.
     for _, summary in ipairs(Opportunity.ListProviders()) do
-        if #proposals >= maximum then break end
         local provider = providers[summary.id]
         if provider and providerAccepts(provider, eventType) then
             -- Provider callbacks are the explicit external/adopter boundary.
             local ok, value = pcall(provider.propose, event, context)
             if not ok then
-                diagnostics[#diagnostics + 1] = {
+                diagnostic({
                     providerID = provider.id,
                     reason = "provider_error",
-                }
+                })
             else
                 local raw = type(value) == "table"
                     and value.proposals or value
@@ -408,8 +421,9 @@ function Opportunity.Evaluate(event, context, maximum)
                     raw = { raw }
                 end
                 if type(raw) == "table" then
-                    for index = 1, #raw do
-                        if #proposals >= maximum then break end
+                    for index = 1, math.min(
+                        #raw, Opportunity.MAX_PROPOSALS
+                    ) do
                         local normalized, reason =
                             Opportunity.NormalizeProposal(
                                 raw[index],
@@ -417,13 +431,13 @@ function Opportunity.Evaluate(event, context, maximum)
                                 provider.order
                             )
                         if normalized then
-                            proposals[#proposals + 1] = normalized
+                            retainProposal(normalized)
                         else
-                            diagnostics[#diagnostics + 1] = {
+                            diagnostic({
                                 providerID = provider.id,
                                 proposalIndex = index,
                                 reason = reason,
-                            }
+                            })
                         end
                     end
                 end

@@ -51,6 +51,11 @@ end
 
 local combatA = record("npc-combat-a", 10, "faction-red", 0.5, 0.5)
 local combatB = record("npc-combat-b", 11, "faction-red", 0.9, 0.5)
+local followerA = record("npc-follow-a", 50, "faction-follow-a", 0.5, 0.5)
+local followerB = record("npc-follow-b", 51, "faction-follow-b", 0.7, 0.5)
+followerA.ownerOnlineID = 77
+followerB.ownerOnlineID = 77
+local soloA = record("npc-solo-a", 80, "faction-solo", 0.5, 0.5)
 local newsFact = "wkg:death:scene-s6"
 local newsA = record(
     "npc-news-a", 500, "faction-blue", 0.5, 0.5, { newsFact }
@@ -75,10 +80,22 @@ PNC = {
     SpatialIndex = {
         QueryActors = function(x, _y, _radius)
             spatialQueries = spatialQueries + 1
-            if x < 100 then
+            if x < 30 then
                 return {
                     npcs = { combatA, combatB },
                     players = { combatObserver },
+                }
+            end
+            if x < 65 then
+                return {
+                    npcs = { followerA, followerB },
+                    players = {},
+                }
+            end
+            if x < 100 then
+                return {
+                    npcs = { soloA },
+                    players = {},
                 }
             end
             if x < 800 then
@@ -252,6 +269,37 @@ T.falsy(repeatAccepted,
     "non-initial horde transition does not create another group scene")
 T.equal(repeatReason, "scene_horde_not_initial_transition",
     "horde scene start is episode-bounded")
+
+Banter.ResetRuntime()
+local followerAccepted, followerScene = Adopters.OnHordeTransition(followerA, {
+    phase = "started",
+    episodeID = "horde:episode:follower-s6",
+    eventID = "horde:event:follower-s6",
+    pressureBand = "horde",
+    nearbyCount = 7,
+    source = "perception",
+    now = 2000,
+})
+T.truthy(followerAccepted,
+    followerScene and followerScene.reason
+        or "same-owner followers form a combat conversation cohort")
+T.equal(#followerScene.proposal.participants, 2,
+    "same-owner follower cohort does not require matching faction IDs")
+
+Banter.ResetRuntime()
+local soloAccepted, soloReason = Adopters.OnHordeTransition(soloA, {
+    phase = "started",
+    episodeID = "horde:episode:solo-s6",
+    eventID = "horde:event:solo-s6",
+    pressureBand = "horde",
+    nearbyCount = 7,
+    source = "perception",
+    now = 3000,
+})
+T.falsy(soloAccepted,
+    "solo combatant does not fabricate a second scene participant")
+T.equal(soloReason, "scene_horde_no_local_teammate",
+    "solo cohort rejection is explicit and non-mutating")
 
 local beforeNewsQueries = spatialQueries
 local newsAccepted, news = Adopters.OnWorldKnowledgeFact({

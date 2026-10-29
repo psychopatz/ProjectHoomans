@@ -1,102 +1,70 @@
 # Semantic Interaction Scene Runtime
 
-This job productionizes the existing generic semantic interaction-scene foundation so NPCs, players, world events and future gameplay systems can participate in one bounded semantic conversation framework.
+**Status:** DEVELOPER COMPLETE — S0–S8 accepted; READY FOR USER LIVE TEST.
 
 ## Parent objective
 
-Make autonomous and multi-actor conversation a first-class subsystem of the existing semantic architecture rather than a collection of combat-, faction-, settlement-, gossip-, trading- or task-specific dialogue systems.
+Productionize Project Hoomans' existing generic Interaction Scene foundation into the canonical bounded, event-driven autonomous/multi-actor semantic conversation subsystem without creating combat-, gossip-, faction-, settlement- or task-specific dialogue engines.
 
-The subsystem must support:
-- NPC -> NPC;
-- NPC -> player;
-- player -> NPC;
-- multi-NPC scenes;
-- world/faction/task/social event stimuli;
-- observer-only nearby players;
-- bounded semantic continuation across turns;
-- shared Interaction Director / Pragmatic Resolver / Dialogue Content;
-- event-driven admission and LOD;
-- transient-by-default NPC scene state with no rendered transcript persistence.
+The normal player conversation session remains the mature player-facing frontend. Interaction Scene Runtime is the autonomous/multi-actor frontend. Both reuse the same semantic providers/evidence, Pragmatic Resolver, Interaction Director, generated behavior/content catalog, plans and gameplay-authority boundaries.
 
-Combat squad talk is a required production adopter, not the definition of the subsystem.
+## Accepted steady state
 
-## Audit conclusion
+The subsystem now provides:
 
-The core is **not missing**. Project Hoomans already contains a tested generic foundation:
+- one production Project Hoomans managed-NPC actor adapter over existing identity, personality, relationship, faction, condition, activity and knowledge authorities;
+- one global bounded Scene Runtime/Scheduler with deterministic IDs, active-scene/participant/turn/history caps, TTL expiry, actor-unavailable closure and explicit visibility/LOD updates;
+- semantic continuation driven only by selected plan/behavior metadata, including deterministic prior-source and other-participant targets, player-input waits and loop/turn guards;
+- directed speaker/recipient/observer transport where nearby observers receive already-selected speech but no response authority, while an addressed player can resume the exact waiting Scene through the existing semantic response surface;
+- a bounded public Opportunity registry/admission manager with deterministic priority ranking, active-key/cooldown suppression and no polling/world scan;
+- one server-side adopter hub over the same Runtime for combat horde exchanges, grounded WorldKnowledge disclosure and community excursion phase chatter;
+- a read-only bounded Scene Observatory plus real Semantic Harness worker fixture/inspection commands;
+- a synthetic fourth-domain proof that public Catalog/Opportunity seams are sufficient without changes to SceneRuntime, InteractionDirector, Scheduler or generic continuation algorithms.
 
-- `PNC_SemanticInteractionStimulus`;
-- `PNC_SemanticInteractionProviders`;
-- `PNC_SemanticInteractionContext`;
-- `PNC_SemanticPragmaticResolver`;
-- `PNC_SemanticInteractionDirector`;
-- `PNC_SemanticInteractionPlan`;
-- `PNC_SemanticInteractionPresentation`;
-- `PNC_SemanticInteractionScene`;
-- `PNC_SemanticInteractionScheduler`;
-- `PNC_SemanticInteractionCatalog`.
+## Production adopter behavior
 
-`PNC_SemanticInteractionScene.lua` is already explicitly a bounded semantic scene for NPC-to-NPC and multi-NPC interaction. Existing tests prove grounded memory/news sharing, personality-sensitive follow-ups, world-event interruption, targeted multi-NPC turns, bounded semantic history and semantic-only LOD.
+Combat horde conversation is triggered only at the authoritative horde episode transition. Existing Encounter Intent remains engage/avoid/hold gameplay authority and Combat Banter Arbiter remains chatter-budget authority. Local same-owner or same-faction NPC cohorts are selected through bounded spatial actor lookup; solo actors do not fabricate partners.
 
-The missing work is **productionization and unification**:
-- no production Project Hoomans actor adapter is registered for scenes;
-- there is no global production scene runtime/registry;
-- selected NPC behavior does not yet generically become the next semantic scene turn;
-- actor/recipient/observer transport is not a first-class production contract;
-- the useful generic stimulus types are mostly unused outside tests;
-- current player conversation and autonomous scenes share the semantic Director but use different session frontends;
-- combat/faction/team use cases still need adopter adapters rather than their own conversation engine;
-- no Scene Observatory exists for live production state.
+Grounded social news requires the speaker to know the exact WorldKnowledge fact. Follow-up remains semantic and grounded; unknown facts fail before disclosure.
 
-## Core architecture rule
+Community excursion conversation listens to the existing authoritative excursion phase-change boundary and uses the excursion's participant IDs. Dialogue does not mutate excursion state.
 
-**One semantic reasoning substrate, multiple bounded frontends.**
+## Core invariants
 
-The existing player conversation session remains the mature player-facing frontend for typed input, buttons, response windows and durable player/NPC continuity.
+- no rendered-dialogue reparsing;
+- no autonomous Scene ModData root;
+- no transcript, generated-choice, InteractionPlan or reasoning-trace persistence;
+- no routine autonomous-scene LLM opt-in;
+- no SceneRuntime tick loop, full NPC scan or global zombie scan;
+- no per-observer semantic rerun;
+- no pairwise sub-scene explosion;
+- at most one bounded local actor query where an adopter needs locality;
+- generated/authored dialogue remains downstream of canonical CodeBuilder source;
+- player conversation remains compatible rather than being rewritten for symmetry.
 
-The Interaction Scene Runtime becomes the autonomous/multi-actor frontend for bounded NPC/NPC and event-driven scenes.
+## Minimal read order
 
-Both reuse the same semantic:
-- stimuli and envelopes;
-- providers/evidence;
-- pragmatic relations;
-- Interaction Director;
-- behavior/beat catalog;
-- InteractionPlan;
-- Dialogue Content / realization;
-- gameplay authority boundaries.
+1. root `AGENTS.md`;
+2. this README;
+3. `ARCHITECTURE.md`;
+4. `AGENT_RUNBOOK.md`;
+5. `ROADMAP.md`;
+6. `HARNESS_ACCEPTANCE.md` only when revisiting an acceptance invariant;
+7. `PROGRESS.md` last for final evidence and live handoff.
 
-Do not rewrite the player conversation UI merely for architectural symmetry.
+Read `AUDIT.md` or `S0_BASELINE.md` only when revision-specific historical evidence is needed.
 
-## Product consequences
+## Live handoff
 
-A future feature should not implement “NPC dialogue logic.” It should normally register or expose:
-1. a grounded semantic opportunity/event/fact;
-2. eligible actors/targets or a bounded participant source;
-3. semantic behaviors/beats/content if existing ones are insufficient;
-4. optional authorized gameplay intent integration.
+Developer-side S0–S8 is complete. Native Project Zomboid SP/MP timing, readability and feel are user-owned.
 
-Examples:
-- combat: horde warning / tactical proposal / acknowledgement;
-- gossip: grounded news / follow-up / reaction;
-- community excursion: member-away news / return question;
-- task coordination: request / accept / decline / acknowledgement;
-- faction event: warning / challenge / reconciliation;
-- settlement social scene: memory disclosure / follow-up.
+Representative live checks should cover:
+- brave/cautious/steady horde teammate reactions;
+- follower, faction/raider/neutral-team and solo behavior;
+- nearby player overhearing with no response buttons;
+- addressed-player response handoff;
+- grounded NPC news with coherent follow-up;
+- community excursion departure/return chatter;
+- burst combat/social activity without duplicate scene spam or noticeable new lag.
 
-The generic runtime owns scene lifecycle, turn limits, targeting, continuation, LOD, suppression and observability.
-
-## Planning base
-
-ProjectHoomans `47aaad69`, existing `main`.
-
-The earlier combat-shaped successor plan was replaced by this broader goal before production work began; there is no competing active NPC-group-conversation job.
-
-The completed `SemanticCombatBanterTacticalIntent` job remains accepted foundation and later becomes a combat adopter of this runtime; B0-B9 must not be reopened.
-
-Read:
-- `AUDIT.md` for verified current code;
-- `ARCHITECTURE.md` for stable ownership;
-- `ROADMAP.md` for mandatory S0-S8 implementation;
-- `HARNESS_ACCEPTANCE.md` for developer acceptance;
-- `AGENT_RUNBOOK.md` for execution rules;
-- `PROGRESS.md` last for the current exact chunk.
+A native failure should reopen only the smallest owning adapter/runtime/presentation/content layer supported by Observatory evidence. Do not restart S0–S8 wholesale.

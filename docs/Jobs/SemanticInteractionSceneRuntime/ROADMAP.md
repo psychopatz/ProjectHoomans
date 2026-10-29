@@ -1,5 +1,7 @@
 # Roadmap — Semantic Interaction Scene Runtime
 
+**Status:** DEVELOPER COMPLETE — S0–S8 accepted; READY FOR USER LIVE TEST.
+
 **Parent objective:** productionize the existing generic Interaction Scene foundation into the canonical event-driven autonomous/multi-actor semantic conversation subsystem, then prove it across combat, grounded social knowledge and a non-combat gameplay domain without creating feature-specific dialogue engines.
 
 All S0-S8 phases are mandatory.
