@@ -15,7 +15,10 @@ local function buildSnapshotList()
     end)
     if registry.ForEachDeathMarker and network.BuildDeathMarkerSnapshot then
         registry.ForEachDeathMarker(function(marker)
-            list[#list + 1] = network.BuildDeathMarkerSnapshot(marker)
+            local snapshot = network.BuildDeathMarkerSnapshot(marker)
+            if snapshot then
+                list[#list + 1] = snapshot
+            end
         end)
     end
     return list

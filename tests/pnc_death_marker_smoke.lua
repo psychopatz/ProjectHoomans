@@ -23,6 +23,7 @@ PNC = {
         Now = function() return now end,
         IsAuthority = function() return authority end,
         GenerateID = function(prefix) return tostring(prefix) .. "_token" end,
+        DeepCopy = function(value) return value end,
         LogWarn = function() end,
     },
     Const = {
@@ -134,6 +135,43 @@ local communityMarker = PNC.Registry.AddDeathMarker(communityRecord)
 T.equal(communityMarker, nil,
     "unaffiliated community NPC received a colony death marker")
 
+local infectedWorldRecord = {
+    id = "infected_world_npc",
+    name = "Infected World NPC",
+    x = 14, y = 15, z = 0,
+    colonyOwned = false,
+    corpse = {
+        token = "infected_world_corpse",
+        x = 14, y = 15, z = 0,
+        createdWorldHour = 50,
+    },
+    health = {
+        body = { infection = { fatal = true } },
+    },
+}
+local lifecycleMarker = PNC.Registry.AddDeathMarker(infectedWorldRecord)
+T.truthy(lifecycleMarker,
+    "infected unowned NPC did not receive reanimation lifecycle marker")
+T.equal(lifecycleMarker.lifecycleOnly, true,
+    "infected unowned NPC marker became player-visible")
+T.equal(lifecycleMarker.colonyOwned, false,
+    "infected unowned NPC marker was misclassified as colony-owned")
+T.equal(lifecycleMarker.infected, true,
+    "infected unowned NPC lifecycle marker lost infection state")
+
+PNC.Network.Internal = PNC.Network.Internal or {}
+PNC.Network.Internal.SnapshotParts =
+    PNC.Network.Internal.SnapshotParts or {}
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Networking/NetworkSnapshots/PNC_NetworkSnapshots_RosterPayloads.lua"
+)
+T.equal(PNC.Network.BuildDeathMarkerSnapshot(lifecycleMarker), nil,
+    "lifecycle-only reanimation marker leaked into roster/map replication")
+T.truthy(PNC.Network.BuildDeathMarkerSnapshot(marker),
+    "colony death marker was hidden from normal replication")
+
 PNC.BodyLifecycle.CreateVanillaCorpse = function(killedRecord)
     killedRecord.corpse = killedRecord.corpse or {
         token = "health_kill_token",
@@ -180,6 +218,36 @@ T.equal(deathRetirementOrder[#deathRetirementOrder - 1], "broadcast",
     "death snapshot was broadcast after registry retirement")
 T.equal(deathRetirementOrder[#deathRetirementOrder], "remove",
     "death record was not retired after its final snapshot")
+
+local infectedUnowned = {
+    id = "infected_unowned_kill",
+    name = "Infected Unowned",
+    x = 6, y = 7, z = 0,
+    alive = true,
+    colonyOwned = false,
+    recruited = false,
+    tacticalClass = "hostile",
+    presenceState = "live",
+    runtime = {},
+    health = {
+        current = 5, max = 100, state = "normal",
+        body = { infection = { fatal = true } },
+    },
+}
+PNC.Registry.Data[infectedUnowned.id] = infectedUnowned
+local infectedRetired, infectedMarker = PNC.Health.Kill(
+    infectedUnowned,
+    sourceBody,
+    "zombie_infection"
+)
+T.equal(infectedRetired, true,
+    "infected unowned NPC was not retired through lifecycle marker")
+T.truthy(infectedMarker,
+    "infected unowned death lost reanimation lifecycle state")
+T.equal(infectedMarker.lifecycleOnly, true,
+    "infected unowned death exposed a player-visible death marker")
+T.equal(PNC.Registry.Data[infectedUnowned.id], nil,
+    "infected unowned dead NPC retained the full live record")
 
 getGameTime = function()
     return { getWorldAgeHours = function() return 50 end }

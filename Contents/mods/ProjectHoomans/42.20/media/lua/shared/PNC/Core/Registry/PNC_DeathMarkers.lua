@@ -49,6 +49,8 @@ local function normalizeMarker(source, fallbackID)
         infected = source.infected == true,
         colonyOwned = colonyOwned,
         colonist = colonyOwned,
+        lifecycleOnly = source.lifecycleOnly == true
+            or (source.infected == true and colonyOwned ~= true),
         portrait = PNC.Identity
             and PNC.Identity.NormalizePortraitSummary
             and PNC.Identity.NormalizePortraitSummary(source.portrait)
@@ -97,7 +99,9 @@ function Registry.LoadDeathMarkers(directory)
     for id, marker in pairs(source) do
         marker = normalizeMarker(marker, id)
         if marker then
-            if marker.colonyOwned == true then
+            if marker.colonyOwned == true
+                or (marker.lifecycleOnly == true and marker.infected == true)
+            then
                 loaded[marker.id] = marker
                 runtimeFor(marker, false)
             else
@@ -122,11 +126,18 @@ function Registry.AddDeathMarker(record)
         and record.health.body.infection or nil
     local corpse = record and record.corpse or nil
     local marker
+    local colonyOwned
+    local infected
     if Core.IsAuthority and not Core.IsAuthority() then return nil end
     if not record or not record.id or not Registry.GetStorageDirectory then
         return nil
     end
-    if not Registry.IsColonyOwnedNPC(record) then return nil end
+    colonyOwned = Registry.IsColonyOwnedNPC(record) == true
+    infected = infection and infection.fatal == true or false
+    -- Death markers have two consumers: player-visible colony death records
+    -- and the short-lived corpse lifecycle needed for Knox reanimation.
+    -- Unowned NPCs only receive the latter when infected.
+    if not colonyOwned and not infected then return nil end
     directory = Registry.GetStorageDirectory()
     marker = normalizeMarker({
         id = record.id,
@@ -136,9 +147,10 @@ function Registry.AddDeathMarker(record)
         z = corpse and corpse.z or record.z,
         corpseToken = corpse and corpse.token,
         createdWorldHour = corpse and corpse.createdWorldHour,
-        infected = infection and infection.fatal == true or false,
-        colonyOwned = true,
-        colonist = true,
+        infected = infected,
+        colonyOwned = colonyOwned,
+        colonist = colonyOwned,
+        lifecycleOnly = not colonyOwned and infected or false,
         factionID = PNC.Identity and PNC.Identity.Verifier
             and PNC.Identity.Verifier.GetFactionID(record)
             or record.affiliation and record.affiliation.factionID,
@@ -179,21 +191,25 @@ end
 
 function Registry.RemoveDeathMarker(id, reason)
     local directory
+    local marker
     if Core.IsAuthority and not Core.IsAuthority() then return false end
     if id == nil or not Registry.GetStorageDirectory then return false end
     id = tostring(id)
     directory = Registry.GetStorageDirectory()
+    marker = Registry.DeathMarkers[id]
     Registry.DeathMarkers[id] = nil
     Registry.DeathMarkerRuntime[id] = nil
     directory.deathMarkers[id] = nil
     Registry.DirectoryDirty = true
-    if PNC.Network and PNC.Network.BroadcastDeathMarkerRemoval then
-        PNC.Network.BroadcastDeathMarkerRemoval(
-            id,
-            reason or "corpse_removed"
-        )
-    elseif PNC.Network and PNC.Network.BroadcastRemoval then
-        PNC.Network.BroadcastRemoval(id, reason or "corpse_removed")
+    if not (marker and marker.lifecycleOnly == true) then
+        if PNC.Network and PNC.Network.BroadcastDeathMarkerRemoval then
+            PNC.Network.BroadcastDeathMarkerRemoval(
+                id,
+                reason or "corpse_removed"
+            )
+        elseif PNC.Network and PNC.Network.BroadcastRemoval then
+            PNC.Network.BroadcastRemoval(id, reason or "corpse_removed")
+        end
     end
     return true
 end

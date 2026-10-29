@@ -94,7 +94,10 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
 end
 
 function Network.BuildDeathMarkerSnapshot(marker)
-    if type(marker) ~= "table" or marker.id == nil then
+    if type(marker) ~= "table"
+        or marker.id == nil
+        or marker.lifecycleOnly == true
+    then
         return nil
     end
     return {

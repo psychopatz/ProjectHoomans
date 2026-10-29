@@ -78,8 +78,17 @@ local function deathRemovalSnapshot(id)
 end
 
 local function broadcastDeathRemoval(id, reason)
-    local snapshot = deathRemovalSnapshot(id)
+    local marker = PNC.Registry
+        and PNC.Registry.GetDeathMarker
+        and PNC.Registry.GetDeathMarker(id) or nil
+    local snapshot
     local payload
+    -- Lifecycle-only markers exist solely to drive infected corpse
+    -- reanimation. They must not become player-visible roster/map deaths.
+    if marker and marker.lifecycleOnly == true then
+        return false
+    end
+    snapshot = deathRemovalSnapshot(id)
     if not snapshot then return false end
     Network.QueueRosterSnapshot(id, snapshot, false, reason)
     payload = { event = "death", snapshot = snapshot }

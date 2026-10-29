@@ -135,9 +135,12 @@ local function retireDeadRecord(record)
         and Registry.IsColonyOwnedNPC
         and Registry.IsColonyOwnedNPC(record)
     if not terminalUnique and Registry and Registry.AddDeathMarker then
-        if colonyOwned ~= false then
-            deathMarker = Registry.AddDeathMarker(record)
-        end
+        -- AddDeathMarker owns the visibility policy. It returns a normal
+        -- player-visible colony marker for colony NPCs, a lifecycle-only
+        -- marker for infected unowned NPCs, and nil for ordinary unowned
+        -- deaths. Keeping that decision there prevents UI policy from
+        -- accidentally disabling Knox reanimation.
+        deathMarker = Registry.AddDeathMarker(record)
     end
     if deathMarker and Registry and Registry.RemoveRecord then
         record.runtime.deathRetired = true
