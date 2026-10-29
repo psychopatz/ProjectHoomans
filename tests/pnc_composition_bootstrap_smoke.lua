@@ -121,7 +121,7 @@ T.equal(serverCalls[factionCoreIndex - 1], "PNC/Social/PNC_ConductDebug",
 T.equal(serverCalls[factionCoreIndex + 1], "PNC/Communities/PNC_CommunityService",
     "server Faction core initialization successor")
 local settlementIndex = indexOf(serverCalls, "PNC/Settlement/PNC_Settlement")
-T.equal(serverCalls[settlementIndex - 1], "PNC/Communities/PNC_CommunityService",
+T.equal(serverCalls[settlementIndex - 1], "PNC/Communities/PNC_CommunityExcursionService",
     "server Settlement initialization predecessor")
 local facilityJobsIndex = indexOf(serverCalls,
     "PNC/Settlement/FacilityJobs/PNC_FacilityJobs_Service")

@@ -161,6 +161,92 @@ local function normalizeTargetPoint(value, fallbackKind)
     return output
 end
 
+local function normalizeExcursion(value)
+    local source = type(value) == "table" and value or nil
+    local participants = {}
+    local participantSeen = {}
+    local itinerary = {}
+    local homeFactionID
+    local homeCommunityID
+    local purpose
+    local publicReason
+    local failure
+    if not source then return nil end
+    homeFactionID = Internal.SafeString(
+        source.homeFactionID,
+        Constants.ID_MAX_LENGTH
+    )
+    homeCommunityID = Internal.SafeString(
+        source.homeCommunityID,
+        Constants.ID_MAX_LENGTH
+    )
+    if not homeFactionID or not homeCommunityID then return nil end
+    for index = 1, math.min(
+        Constants.EXCURSION_MAX_PARTICIPANTS or 24,
+        #(type(source.participants) == "table" and source.participants or {})
+    ) do
+        local npcID = source.participants[index]
+        if Types.IsValidNPCID(npcID) and not participantSeen[npcID] then
+            participantSeen[npcID] = true
+            participants[#participants + 1] = npcID
+        end
+    end
+    for index = 1, math.min(
+        Constants.EXCURSION_MAX_ITINERARY or 16,
+        #(type(source.itinerary) == "table" and source.itinerary or {})
+    ) do
+        local target = normalizeTargetPoint(source.itinerary[index], "location")
+        if target then itinerary[#itinerary + 1] = target end
+    end
+    purpose = Internal.SafeString(
+        source.purpose,
+        Constants.EXCURSION_MAX_PURPOSE_LENGTH or 96
+    ) or "general"
+    publicReason = Internal.SafeString(
+        source.publicReason,
+        Constants.EXCURSION_MAX_REASON_LENGTH or 128
+    )
+    if type(source.failure) == "table" then
+        local code = Internal.SafeString(
+            source.failure.code,
+            Constants.EXCURSION_MAX_REASON_LENGTH or 128
+        )
+        if code then
+            failure = {
+                code = code,
+                at = Internal.Timestamp(source.failure.at, 0),
+                retryAt = Internal.Timestamp(source.failure.retryAt, 0),
+            }
+        end
+    end
+    return {
+        schemaVersion = Constants.EXCURSION_SCHEMA_VERSION or 1,
+        id = Internal.SafeString(source.id, Constants.ID_MAX_LENGTH * 2),
+        homeFactionID = homeFactionID,
+        homeCommunityID = homeCommunityID,
+        state = Constants.EXCURSION_STATES[source.state]
+            and source.state or Constants.EXCURSION_STATE_AT_HOME,
+        purpose = purpose,
+        publicReason = publicReason,
+        participants = participants,
+        itinerary = itinerary,
+        currentLeg = math.max(0, math.floor(
+            Internal.Finite(source.currentLeg, 0)
+        )),
+        destination = normalizeTargetPoint(source.destination, "location"),
+        createdAt = Internal.Timestamp(source.createdAt, 0),
+        stateAt = Internal.Timestamp(source.stateAt, 0),
+        preparedAt = Internal.Timestamp(source.preparedAt, 0),
+        departedAt = Internal.Timestamp(source.departedAt, 0),
+        visitedAt = Internal.Timestamp(source.visitedAt, 0),
+        returnStartedAt = Internal.Timestamp(source.returnStartedAt, 0),
+        expectedReturnAt = Internal.Timestamp(source.expectedReturnAt, 0),
+        completedAt = Internal.Timestamp(source.completedAt, 0),
+        failure = failure,
+        revision = Internal.Revision(source.revision),
+    }
+end
+
 local function normalizeAmbient(value)
     if type(value) ~= "table" then return nil end
     local phase = Constants.VALID_MOBILE_AMBIENT_PHASES[value.phase]
@@ -336,6 +422,7 @@ end
 -- or home claim; the snapshot is only its current abstract staging point.
 
 Internal.NormalizeTargetPoint = normalizeTargetPoint
+Internal.NormalizeExcursion = normalizeExcursion
 Internal.NormalizeAmbient = normalizeAmbient
 Internal.NormalizeStrategicTarget = normalizeStrategicTarget
 Internal.NormalizePlayerRoam = normalizePlayerRoam

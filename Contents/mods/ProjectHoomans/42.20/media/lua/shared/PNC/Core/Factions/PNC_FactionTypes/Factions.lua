@@ -54,6 +54,8 @@ function Types.NormalizeFaction(value, factionID)
             Types.NormalizePlayerPacifications(
                 source.playerPacifications
             ),
+        excursion = Types.Internal.NormalizeExcursion
+            and Types.Internal.NormalizeExcursion(source.excursion) or nil,
         relations = {},
         tags = Internal.NormalizeTags(source.tags),
         mobile = Types.NormalizeMobileGroup(source.mobile),

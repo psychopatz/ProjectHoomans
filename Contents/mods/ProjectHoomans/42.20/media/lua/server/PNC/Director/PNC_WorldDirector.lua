@@ -17,6 +17,7 @@ local MobileAccidents = PNC.AbstractMobileAccidents
 local MobileGroupDirector = PNC.MobileGroupDirector
 local MobileGroupDirectorInternal = PNC.MobileGroupDirectorInternal
 local MobileSettlementVisitService = PNC.MobileSettlementVisitService
+local CommunityExcursionService = PNC.CommunityExcursionService
 local AmbientVisitService = PNC.AmbientVisitService
 local Scheduler = PNC.Scheduler
 local Config = PNC.DirectorConfig
@@ -156,6 +157,24 @@ function Director.Initialize(force)
         { budget = Config.DIRECTOR_JOB_BUDGET,
             startAt = now + (Config.MOBILE_SETTLEMENT_VISIT_INTERVAL_HOURS
                 or 1) })
+    Scheduler.RegisterJob("CommunityExcursions",
+        Config.COMMUNITY_EXCURSION_INTERVAL_HOURS or 1,
+        function(at, budget)
+            if Director.Paused or not CommunityExcursionService
+                or not CommunityExcursionService.ReconcileAll
+            then
+                return 0
+            end
+            return CommunityExcursionService.ReconcileAll(
+                at,
+                math.min(
+                    tonumber(budget) or Config.DIRECTOR_JOB_BUDGET,
+                    Config.COMMUNITY_EXCURSION_BUDGET or 8
+                )
+            )
+        end,
+        { budget = Config.COMMUNITY_EXCURSION_BUDGET or 8,
+            startAt = now + (Config.COMMUNITY_EXCURSION_INTERVAL_HOURS or 1) })
     Scheduler.RegisterJob("AbstractTraversal", Config.TRAVERSAL_INTERVAL_HOURS,
         function(at, budget)
             if Director.Paused then return 0 end

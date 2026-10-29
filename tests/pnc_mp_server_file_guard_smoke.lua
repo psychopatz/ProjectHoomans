@@ -64,6 +64,8 @@ listing:close()
 -- by the LumberWorkAdapter composition root.
 -- PNC_WorldEffectService_Context, Registry, Reconciliation, Snapshot and
 -- Bootstrap are loaded by the world-effect service composition root.
+-- PNC_CommunityExcursionService is guarded by the standard server-only
+-- authority entry path and loaded by the server composition root.
 -- PNC_WorkService_Queue and Claims are loaded by QueueAndClaims.
 -- PNC_WorkService_Scheduler_Orders and Scheduler_Pump are loaded by
 -- the Scheduler composition root.
@@ -149,7 +151,7 @@ listing:close()
 -- activity root.
 -- The three need-facility effect spokes are loaded by its guarded root.
 -- The four UniqueNPCRegistry providers are loaded by its guarded root.
-T.equal(#serverOnlyFiles, 998,
+T.equal(#serverOnlyFiles, 999,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 
