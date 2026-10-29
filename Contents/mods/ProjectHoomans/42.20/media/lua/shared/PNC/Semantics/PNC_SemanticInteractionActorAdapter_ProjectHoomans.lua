@@ -234,10 +234,34 @@ function Adapter.ProjectRelationship(actor, other)
     }
 end
 
-function Adapter.ProjectKnowledge(actor)
+function Adapter.ProjectKnowledge(actor, context)
     local record = managedRecord(actor)
     if not record then return { available = false } end
     local refs = knowledgeRefs(record)
+    local seen = {}
+    for _, factID in ipairs(refs) do seen[tostring(factID)] = true end
+
+    local requested = type(context) == "table"
+        and type(context.requestedFactRefs) == "table"
+        and context.requestedFactRefs or {}
+    local world = PNC.WorldKnowledge
+    if world and type(world.Explain) == "function" then
+        for index = 1, math.min(#requested, 8) do
+            local factID = tostring(requested[index] or "")
+            if factID ~= "" and not seen[factID] then
+                local ok, explanation = pcall(
+                    world.Explain,
+                    record,
+                    factID
+                )
+                if ok and explanation ~= nil then
+                    refs[#refs + 1] = factID
+                    seen[factID] = true
+                    if #refs >= 16 then break end
+                end
+            end
+        end
+    end
     return {
         available = true,
         factRefs = refs,

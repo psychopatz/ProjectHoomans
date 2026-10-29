@@ -282,6 +282,36 @@ function Spatial.QueryPlayers(x, y, radius)
     return results
 end
 
+-- Combined local actor lookup for systems that need both semantic
+-- participants and presentation observers at the same admission boundary.
+-- It walks the relevant spatial cells once and never scans either registry.
+function Spatial.QueryActors(x, y, radius)
+    local size = Const.SPATIAL_CELL_SIZE
+    local minCellX = math.floor((x - radius) / size)
+    local maxCellX = math.floor((x + radius) / size)
+    local minCellY = math.floor((y - radius) / size)
+    local maxCellY = math.floor((y + radius) / size)
+    local output = {
+        players = {},
+        npcs = {},
+    }
+    for cellX = minCellX, maxCellX do
+        local playerColumn = Spatial.PlayerCells[cellX]
+        local npcColumn = Spatial.NPCCells[cellX]
+        for cellY = minCellY, maxCellY do
+            local playerBucket = playerColumn and playerColumn[cellY] or nil
+            for index = 1, #(playerBucket or {}) do
+                output.players[#output.players + 1] = playerBucket[index]
+            end
+            local npcBucket = npcColumn and npcColumn[cellY] or nil
+            for index = 1, #(npcBucket or {}) do
+                output.npcs[#output.npcs + 1] = npcBucket[index]
+            end
+        end
+    end
+    return output
+end
+
 function Spatial.QueryNPCs(x, y, radius)
     local results = queryGrid(Spatial.NPCCells, x, y, radius)
     return results

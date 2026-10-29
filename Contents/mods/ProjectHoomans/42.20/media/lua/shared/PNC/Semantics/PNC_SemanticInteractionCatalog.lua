@@ -114,7 +114,10 @@ local function normalizeContinuation(value)
     local target = tostring(
         value.target or (mode == "terminate" and "none" or "source")
     )
-    if target ~= "source" and target ~= "none" then
+    if target ~= "source"
+        and target ~= "other"
+        and target ~= "none"
+    then
         return false, "behavior_continuation_target_invalid"
     end
     if mode == "emit" and target == "none" then

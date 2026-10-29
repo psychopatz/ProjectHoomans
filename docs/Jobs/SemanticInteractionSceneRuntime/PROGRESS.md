@@ -1,6 +1,6 @@
 # Progress — Semantic Interaction Scene Runtime
 
-**Status:** ACTIVE — S0–S5 accepted; S6 cross-domain production adopters are next.
+**Status:** ACTIVE — S0–S6 accepted; S7 Scene Observatory and Semantic Lab support are next.
 
 **Planning base:** ProjectHoomans `47aaad69`, existing `main`.
 
@@ -146,26 +146,61 @@ S5 evidence:
 - changed S5 Lua through installed Kahlua compiler: **3/3 PASS**;
 - `git diff --check`: clean.
 
-## ONE current Next Chunk — S6
+## S6 accepted — cross-domain production adopters
 
-Implement three real production adopter families using the S5 public seam and existing authorities.
+Accepted production architecture:
+- one server-side `PNC_SemanticInteractionSceneAdopters` hub owns one Opportunity manager over the global Scene Runtime;
+- no adopter owns a scheduler, scene history, continuation engine, parser, persistence store or polling hook;
+- event-triggered continuation supports declarative `target="other"` for the first deterministic eligible scene peer;
+- one-shot arbitration applies its bounded output cap after semantic eligibility, preventing catalog growth from starving valid later providers;
+- `SpatialIndex.QueryActors` discovers local NPC participants and nearby player observers in one bounded spatial-cell walk;
+- observer players hear the already-selected exchange but receive no response authority.
 
-S6A combat:
-- reuse existing combat/perception/cohort/Encounter Intent/Banter authority;
-- submit bounded tactical/horde opportunities without a new scan or Combat Exchange Director;
-- dialogue must express actual tactical state only.
+### S6A combat
+- authoritative horde episode start is the only combat Scene trigger;
+- Encounter Intent remains engage/avoid/hold gameplay authority and Combat Banter Arbiter remains chatter-budget authority;
+- same-owner/same-faction local NPCs are selected from one bounded actor query, capped at four;
+- generated brave/cautious/steady teammate replies express engage/avoid/hold semantics with trait-appropriate wording;
+- nearby players can overhear the exchange through S4 observer transport;
+- no global zombie/NPC scan or combat-only conversation engine was added.
 
-S6B grounded social knowledge:
-- submit real known memory/news/gossip facts;
-- source cannot disclose unknown/private facts;
-- allow semantic follow-up/acknowledgement through generic continuation.
+### S6B grounded social knowledge
+- authoritative WorldKnowledge death publication notifies the adopter after fact commit/acquisition;
+- a local speaker/listener pair is selected with one combined actor query;
+- `WorldKnowledge.Explain` must confirm the speaker knows the exact fact;
+- requested fact refs are projected through the existing actor adapter without mutating durable knowledge;
+- sociable listeners can ask a semantic follow-up and the knowledgeable speaker answers with the same grounded fact;
+- unknown facts fail before disclosure;
+- authored news prose stays generic unless the semantic fact supports a more specific claim.
 
-S6C non-combat gameplay:
-- use a real task/community/excursion authority;
-- submit request/status/news opportunity without mutating gameplay outside its owner;
-- prove NPC->NPC semantic follow-up.
+### S6C community excursion
+- the existing `CommunityExcursionService.RegisterListener` supplies real phase-change events;
+- participant IDs come from the authoritative excursion record, not faction/world scanning;
+- PREPARING / OUTBOUND / RETURNING_HOME / AT_HOME / FAILED map to semantic status turns;
+- another NPC acknowledges through generic continuation;
+- Scene dialogue does not mutate excursion state.
 
-All adopters must register through Opportunity and canonical conversation content seams; none may own scheduler/history/continuation.
+S6 evidence:
+- focused S3–S6 plus arbitration-capacity matrix: **5/5 PASS**;
+- combat/world-knowledge/excursion/spatial regressions: **5/5 PASS**;
+- full `pnc_semantic` selection: **133/133 PASS**;
+- continuation compiler contract: **5/5 PASS**;
+- deterministic CodeBuilder double generation: **190 files / 493 phrase families / 54 patterns / 10 UI definitions**, byte-identical;
+- all changed/untracked S6 Lua, including generated artifacts, through installed Kahlua compiler: **21/21 PASS**;
+- `git diff --check`: clean.
+
+## ONE current Next Chunk — S7
+
+Implement the generic read-only Scene Observatory and real Semantic Lab/worker inspection support.
+
+S7 must:
+1. expose bounded runtime/admission metrics and active Scene IDs/status/LOD;
+2. expose participant IDs/roles, semantic source/recipient and observer policy without transcript text;
+3. expose topic, bounded semantic history acts/IDs, grounded fact/event refs, active beat/selected behavior and continuation decision;
+4. expose Opportunity provider provenance, admission/rejection/suppression reason, query/fanout counters and termination reason;
+5. provide narrow real-worker inspection commands/fixtures instead of a monolithic state dump;
+6. explain why a Scene opened, who spoke to whom, why continuation happened/stopped, and why a player did/did not receive choices;
+7. remain read-only, bounded, no ModData and no rendered transcript.
 
 ## Remaining mandatory phases
 

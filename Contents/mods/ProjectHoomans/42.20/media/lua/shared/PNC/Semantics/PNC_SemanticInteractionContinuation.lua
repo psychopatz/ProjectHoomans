@@ -114,7 +114,21 @@ function Continuation.Decide(scene, turn)
 
     local previousSource = boundedID(turn.sourceID)
     local previousResponder = boundedID(turn.responderID)
-    local targetID = policy.target == "source" and previousSource or nil
+    local targetID
+    if policy.target == "source" then
+        targetID = previousSource
+    elseif policy.target == "other" and previousResponder then
+        for _, participantID in ipairs(
+            type(scene.participantOrder) == "table"
+                and scene.participantOrder or {}
+        ) do
+            participantID = boundedID(participantID)
+            if participantID and participantID ~= previousResponder then
+                targetID = participantID
+                break
+            end
+        end
+    end
     if not previousResponder or not targetID then
         return {
             schemaVersion = Continuation.VERSION,

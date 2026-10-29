@@ -829,6 +829,21 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
             and EncounterIntent.IsPromptSpeaker(
                 record, state.episodeID
             ) == true
+        local sceneAdopters = PNC.Semantics
+            and PNC.Semantics.InteractionSceneAdopters or nil
+        if sceneAdopters
+            and type(sceneAdopters.OnHordeTransition) == "function"
+        then
+            sceneAdopters.OnHordeTransition(record, {
+                phase = "started",
+                episodeID = state.episodeID,
+                eventID = eventID,
+                pressureBand = band,
+                nearbyCount = count,
+                source = source or "zombie_observation",
+                now = now,
+            })
+        end
         emitZombieAwareness(
             record,
             eventType,

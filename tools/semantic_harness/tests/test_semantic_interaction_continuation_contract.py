@@ -65,6 +65,18 @@ class InteractionContinuationCompilerTests(unittest.TestCase):
         self.assertEqual(continuation["mode"], "terminate")
         self.assertEqual(continuation["target"], "none")
 
+    def test_event_continuation_can_target_other_participant(self) -> None:
+        compiled = _validate_behavior_shard(
+            behavior({
+                "mode": "emit",
+                "target": "other",
+                "intent": "ACKNOWLEDGE",
+            }),
+            "test.json",
+        )
+        continuation = compiled["records"][0]["continuation"]
+        self.assertEqual(continuation["target"], "other")
+
     def test_invalid_continuation_fails_source_validation(self) -> None:
         with self.assertRaisesRegex(CompileError, "continuation.mode"):
             _validate_behavior_shard(

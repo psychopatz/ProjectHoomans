@@ -85,8 +85,13 @@ local function turnIdentity(scene, result)
         history.sourceActorID or history.sourceID,
         96
     )
+    if not recipientID then
+        local continuation = type(result.continuation) == "table"
+            and result.continuation or {}
+        recipientID = clean(continuation.targetID, 96)
+    end
     local sequence = tonumber(history.sequence) or 0
-    if not speakerID or not recipientID or sequence <= 0 then
+    if not speakerID or sequence <= 0 then
         return nil, "scene_turn_identity_invalid"
     end
     return {

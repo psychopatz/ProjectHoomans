@@ -449,8 +449,9 @@ function Scene.New(spec)
         if stimulusType == "NPC_SEMANTIC_ACT" then
             return self:EmitSemanticAct(request)
         end
-        if stimulusType == "WORLD_EVENT"
-            or stimulusType == "DANGER_CHANGED"
+        if (stimulusType == "WORLD_EVENT"
+            or stimulusType == "DANGER_CHANGED")
+            and request.sourceID == nil
         then
             return self:EmitWorldEvent(request)
         end

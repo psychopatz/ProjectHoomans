@@ -144,6 +144,21 @@ function Adapter.PublishDeath(record, damageEvent, reason, at)
         source = "faction_death_record", acquisitionPath = "faction",
         confidence = known and 0.95 or 0.7, learnedAt = at,
     }) end
+    local sceneAdopters = PNC.Semantics
+        and PNC.Semantics.InteractionSceneAdopters or nil
+    if sceneAdopters
+        and type(sceneAdopters.OnWorldKnowledgeFact) == "function"
+    then
+        sceneAdopters.OnWorldKnowledgeFact({
+            factID = fact.factID,
+            eventID = fact.eventID,
+            kind = fact.kind,
+            factionID = faction and faction.id or nil,
+            x = tonumber(record and record.x),
+            y = tonumber(record and record.y),
+            z = tonumber(record and record.z),
+        })
+    end
     return fact
 end
 

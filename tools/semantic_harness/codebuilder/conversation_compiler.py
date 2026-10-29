@@ -456,9 +456,9 @@ def _validate_behavior_shard(document: dict[str, Any], path: str) -> dict[str, A
                     "none" if continuation_mode == "terminate" else "source"
                 )
             )
-            if continuation_target not in ("source", "none"):
+            if continuation_target not in ("source", "other", "none"):
                 raise CompileError(
-                    f"{label}.continuation.target must be source or none"
+                    f"{label}.continuation.target must be source, other, or none"
                 )
             if continuation_mode == "emit" and continuation_target == "none":
                 raise CompileError(

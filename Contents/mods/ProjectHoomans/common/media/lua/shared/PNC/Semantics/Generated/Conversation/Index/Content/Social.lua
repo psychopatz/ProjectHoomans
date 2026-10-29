@@ -243,6 +243,105 @@ return {
         ["kind"] = "content",
         ["source"] = "content/social/interaction/news_acknowledge.json",
     },
+    ["phrase.semantic.interaction.scene.excursion_departing"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.excursion_departing",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.interaction.scene.excursion_failed"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.excursion_failed",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.interaction.scene.excursion_home"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.excursion_home",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.interaction.scene.excursion_preparing"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.excursion_preparing",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.interaction.scene.excursion_returning"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.excursion_returning",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.interaction.scene.grounded_news_answer"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.grounded_news_answer",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.interaction.scene.grounded_news_share"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.grounded_news_share",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.interaction.scene.horde_prompt"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.horde_prompt",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.interaction.scene.horde_reply_brave"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.horde_reply_brave",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.interaction.scene.horde_reply_cautious"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.horde_reply_cautious",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.interaction.scene.horde_reply_steady"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.horde_reply_steady",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
     ["phrase.semantic.interaction.world_event.warning"] = {
         ["domain"] = "social",
         ["generated"] = {

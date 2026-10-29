@@ -1,0 +1,485 @@
+{
+  "schema": "pnc.conversation.shard.v1",
+  "version": 1,
+  "kind": "content",
+  "domain": "social",
+  "source": {
+    "name": "Project Hoomans Scene Runtime Adopter Content",
+    "version": "1",
+    "contentLicense": "Project Hoomans authored content"
+  },
+  "groups": {
+    "interaction": {
+      "contentOwner": "projecthoomans.dialogue_content.social_interaction"
+    }
+  },
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.interaction.scene.horde_prompt",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's a horde. We fighting through or pulling back?",
+              "TL": "Kawan iyan. Lalaban ba tayo o uurong?"
+            }
+          },
+          {
+            "translations": {
+              "EN": "That's a lot of them. Fight or fall back?",
+              "TL": "Ang dami nila. Lalaban o uurong?"
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "That's a lot of them. Stay close—fight or fall back?",
+              "TL": "Ang dami nila. Dumikit ka—lalaban o uurong?"
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Horde. Fight or fall back?",
+              "TL": "Kawan. Laban o urong?"
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Big group ahead. We decide now: engage or avoid.",
+              "TL": "Malaking grupo sa harap. Magpasya tayo ngayon: lumaban o umiwas."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.horde_reply_brave",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We can take them.",
+              "TL": "Kaya natin sila."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I say we hit them before they spread out.",
+              "TL": "Sabi ko salubungin natin sila bago sila kumalat."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'm with you. We can take them.",
+              "TL": "Kasama mo ako. Kaya natin sila."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Fuck yeah. We take them.",
+              "TL": "Oo, puta. Laban tayo."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Hell yeah. Hit them hard.",
+              "TL": "Sige. Todo ang tira natin."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "If we commit, we hit hard and stay together.",
+              "TL": "Kung lalaban tayo, sabay at todo ang tira."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.horde_reply_cautious",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Too many. We should pull back.",
+              "TL": "Sobra sila. Dapat umatras tayo."
+            }
+          },
+          {
+            "translations": {
+              "EN": "I don't like those numbers. Back off.",
+              "TL": "Hindi maganda ang dami nila. Umatras tayo."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I'd rather get us out of this alive. Pull back.",
+              "TL": "Mas gusto kong makaalis tayong buhay. Umatras tayo."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Fuck... too many. Back.",
+              "TL": "Puta... sobra sila. Umatras."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Nope. Too many. Move.",
+              "TL": "Hindi. Sobra sila. Alis."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Bad odds. Give them space.",
+              "TL": "Masama ang tsansa. Lumayo tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.horde_reply_steady",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Hold here. Don't rush it.",
+              "TL": "Dito muna. Huwag padalos-dalos."
+            }
+          },
+          {
+            "translations": {
+              "EN": "Let's hold and read the situation first.",
+              "TL": "Humawak muna tayo at tingnan ang sitwasyon."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Stay together. Let's hold before we commit.",
+              "TL": "Magkakasama tayo. Humawak muna bago sumugod."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Hold. Watch them.",
+              "TL": "Hawak. Bantayan sila."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "No rush. Hold position and watch the pressure.",
+              "TL": "Walang pagmamadali. Humawak at bantayan ang galaw nila."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.grounded_news_share",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I heard something worth passing on.",
+              "TL": "May narinig akong mahalagang ipasa sa iyo."
+            }
+          },
+          {
+            "translations": {
+              "EN": "There is some news you should hear.",
+              "TL": "May balita kang dapat marinig."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I thought you should hear what I learned.",
+              "TL": "Naisip kong dapat mong marinig ang nalaman ko."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Got some news for you.",
+              "TL": "May balita ako para sa iyo."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "I have something I can confirm.",
+              "TL": "May bagay akong makukumpirma."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.grounded_news_answer",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That is what I can confirm right now.",
+              "TL": "Iyan ang makukumpirma ko sa ngayon."
+            }
+          },
+          {
+            "translations": {
+              "EN": "That is everything I know for certain.",
+              "TL": "Iyan lang ang tiyak kong alam."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I wish I knew more, but that is what I can confirm.",
+              "TL": "Sana mas marami akong alam, pero iyan ang makukumpirma ko."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "That is all I can confirm.",
+              "TL": "Iyan lang ang makukumpirma ko."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Nothing else I can verify yet.",
+              "TL": "Wala pa akong ibang mapapatunayan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.excursion_preparing",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We're getting ready to head out.",
+              "TL": "Naghahanda na tayong umalis."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "We're getting ready. Make sure you've got what you need.",
+              "TL": "Naghahanda na tayo. Siguraduhin mong dala mo ang kailangan mo."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Get ready. We leave soon.",
+              "TL": "Maghanda. Aalis tayo agad."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Prep first. We move when everyone's ready.",
+              "TL": "Maghanda muna. Aalis tayo kapag handa na ang lahat."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.excursion_departing",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We're moving out. Keep close.",
+              "TL": "Aalis na tayo. Dumikit ka."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "We're heading out. Stay close and we'll get through it.",
+              "TL": "Aalis na tayo. Dumikit ka at malalampasan natin ito."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Moving out. Stay close.",
+              "TL": "Aalis na. Dumikit."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "We're outbound. Keep the group tight.",
+              "TL": "Papunta na tayo. Panatilihing dikit ang grupo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.excursion_returning",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We're heading home.",
+              "TL": "Pauwi na tayo."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Time to head home. Let's get everyone back safe.",
+              "TL": "Oras nang umuwi. Iuwi nating ligtas ang lahat."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Heading home.",
+              "TL": "Pauwi na."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "We're returning. Stay alert until we're home.",
+              "TL": "Pabalik na tayo. Mag-ingat hanggang makauwi."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.excursion_home",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "We're back. Good.",
+              "TL": "Nakabalik na tayo. Mabuti."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "We're home. Good to have everyone back.",
+              "TL": "Nasa bahay na tayo. Mabuting nakabalik ang lahat."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Back home.",
+              "TL": "Nakauwi na."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "We're back. Check in and settle down.",
+              "TL": "Nakabalik na tayo. Mag-check in at magpahinga."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.excursion_failed",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Trip's off. Something went wrong.",
+              "TL": "Kanselado ang biyahe. May nangyaring mali."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "We're calling it off. Better safe than forcing it.",
+              "TL": "Ititigil muna natin. Mas mabuting ligtas kaysa pilitin."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Trip's off.",
+              "TL": "Kanselado ang biyahe."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Excursion failed. We regroup here.",
+              "TL": "Bigo ang paglalakbay. Magtipon ulit tayo rito."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": []
+}

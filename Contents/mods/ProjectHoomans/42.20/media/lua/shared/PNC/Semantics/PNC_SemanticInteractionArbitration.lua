@@ -209,17 +209,41 @@ function Arbitration.BehaviorRows(beat, root)
 end
 
 function Arbitration.OneShotBehaviorRows(root)
-    local rows = {}
+    local eligibleRows = {}
+    local ineligibleRows = {}
     local stimulusType = type(root) == "table"
         and type(root.stimulus) == "table"
         and root.stimulus.type or nil
     local ids = Catalog.Behaviors.OneShotForStimulus(stimulusType)
+
+    -- The output is capped, but eligibility must be evaluated before that
+    -- cap is applied. Capping raw registration order lets unrelated
+    -- ineligible behaviors starve a valid later provider as the catalog
+    -- grows. Keep only the best bounded eligible rows, plus bounded
+    -- ineligible diagnostics when space remains.
     for index = 1, #ids do
-        if #rows >= Arbitration.MAX_ONE_SHOT_CANDIDATES then break end
         local behavior = Catalog.Behaviors.Get(ids[index])
         if behavior and behavior.mode == "one_shot" then
-            rows[#rows + 1] = scoredBehavior(behavior, root, nil)
+            local row = scoredBehavior(behavior, root, nil)
+            if row.eligible == true then
+                eligibleRows[#eligibleRows + 1] = row
+                sortRows(eligibleRows)
+                while #eligibleRows > Arbitration.MAX_ONE_SHOT_CANDIDATES do
+                    table.remove(eligibleRows)
+                end
+            elseif #ineligibleRows < Arbitration.MAX_ONE_SHOT_CANDIDATES then
+                ineligibleRows[#ineligibleRows + 1] = row
+            end
         end
+    end
+
+    local rows = {}
+    for index = 1, #eligibleRows do
+        rows[#rows + 1] = eligibleRows[index]
+    end
+    for index = 1, #ineligibleRows do
+        if #rows >= Arbitration.MAX_ONE_SHOT_CANDIDATES then break end
+        rows[#rows + 1] = ineligibleRows[index]
     end
     return sortRows(rows)
 end
