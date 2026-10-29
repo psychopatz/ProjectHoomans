@@ -88,10 +88,11 @@ function H.PathMode(value, fallback)
     return Constants.MOBILE_PATH_RANDOM
 end
 
--- `override` requests a different role sequence for this one group: a trading
--- caravan roams as a trader plus guards while its faction leader stays at the
--- base. The caller validates every token against the archetype's allowed roles,
--- so an override can never assign a role the faction may not hold.
+-- `override` requests a different role sequence for this one group. A
+-- base-less commercial caravan may roam as a trader plus guards without
+-- implying a hidden base or an offscreen faction leader. The caller validates
+-- every token against the archetype's allowed roles, so an override can never
+-- assign a role the faction may not hold.
 function H.FactionRole(faction, index, override)
     if type(override) == "table" and override[index] then
         return override[index]

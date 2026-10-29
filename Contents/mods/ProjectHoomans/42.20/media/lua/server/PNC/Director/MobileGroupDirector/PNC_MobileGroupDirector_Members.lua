@@ -78,7 +78,8 @@ function H.ActiveMembers(faction)
     return output
 end
 
-function H.BuildMobileState(site, mode, at, previous, moved, controlMode)
+function H.BuildMobileState(site, mode, at, previous, moved, controlMode,
+    mobilityIntent)
     local interval = tonumber(previous and previous.relocationHours)
         or Constants.MOBILE_GROUP_RELOCATION_HOURS
     local relocationCount = tonumber(previous
@@ -114,6 +115,10 @@ function H.BuildMobileState(site, mode, at, previous, moved, controlMode)
         pendingSettlementArrival = previous
             and H.Copy(previous.pendingSettlementArrival) or nil,
         visit = previous and H.Copy(previous.visit) or nil,
+        mobilityIntent = mobilityIntent
+            or previous and previous.mobilityIntent or nil,
+        settlementHistory = previous
+            and H.Copy(previous.settlementHistory) or {},
         playerRoam = playerRoam,
         lastDepartureAt = previous and previous.lastDepartureAt or -1,
         site = site,

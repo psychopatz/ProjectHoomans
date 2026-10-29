@@ -161,6 +161,9 @@ T.equal(serverCalls[directorIndex + 1],
     "PNC/Director/PNC_MobileSettlementVisitService",
     "server Director initialization successor")
 T.equal(serverCalls[directorIndex + 2],
+    "PNC/Director/PNC_CommercialMobilityService",
+    "generic commercial mobility initializes after settlement visits")
+T.equal(serverCalls[directorIndex + 3],
     "PNC/Needs/PNC_NeedsScheduler",
     "server settlement visit service initializes before need scheduling")
 T.equal(serverCalls[#serverCalls - 2], "<install-server-profiler>",

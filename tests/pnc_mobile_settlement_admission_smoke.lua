@@ -301,6 +301,15 @@ T.equal(factions.faction_commercial.mobile.visit.kind, "settlement_visit",
     "temporary visit is distinct from admission")
 T.equal(factions.faction_commercial.mobile.visit.intent, "commercial",
     "temporary visit preserves its extensible intent")
+T.equal(#factions.faction_commercial.mobile.settlementHistory, 1,
+    "accepted settlement visit records bounded recent history")
+T.equal(factions.faction_commercial.mobile.settlementHistory[1].communityID,
+    "community_player",
+    "recent history uses the canonical community identity")
+T.truthy(
+    factions.faction_commercial.mobile.settlementHistory[1].cooldownUntil
+        > at,
+    "recent history carries a bounded revisit cooldown")
 local commercialPresentation = Service.GetNPCVisit(
     "npc_commercial", {}, at)
 T.truthy(commercialPresentation,

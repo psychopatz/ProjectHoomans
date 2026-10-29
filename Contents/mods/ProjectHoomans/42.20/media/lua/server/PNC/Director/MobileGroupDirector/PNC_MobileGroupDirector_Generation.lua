@@ -201,7 +201,8 @@ function Director.GenerateForFaction(factionID, spec)
         at,
         previous,
         previous ~= nil,
-        controlMode
+        controlMode,
+        spec.mobilityIntent
     )
     local ok, reason, mobile = Factions.SetMobileGroup(
         faction.id,
@@ -212,9 +213,9 @@ function Director.GenerateForFaction(factionID, spec)
         rollbackCreated(reason or "mobile_group_commit_failed")
         return false, reason
     end
-    -- `spec.assignLeader == false` keeps the group leaderless: a trading
-    -- caravan is led from its faction's base, so the roaming members must not
-    -- silently become the faction leader.
+    -- `spec.assignLeader == false` keeps an explicitly leaderless group from
+    -- silently becoming a faction leader. Base-less roaming groups do not
+    -- imply a hidden home or an offscreen leader.
     if spec.assignLeader ~= false
         and not faction.leaderNPCID
         and created[1]

@@ -192,6 +192,53 @@ function Service.IsVisitActive(visit, at)
         and (tonumber(visit.expiresAt) or 0) > worldAge(at)
 end
 
+-- Persist only a bounded, normalized recent-visit ledger on the mobile group.
+-- It is generic Hoomans travel memory: consumers may use it for cooldowns,
+-- but it never chooses a destination or transfers membership.
+function Service.RecordSettlementVisit(factionOrID, target, at)
+    local faction = type(factionOrID) == "table" and factionOrID
+        or Factions and Factions.Get and Factions.Get(factionOrID)
+    local mobile = faction and faction.mobile or nil
+    local history = {}
+    local entry
+    local key
+    local index
+    local existing
+    local limit = Constants.MOBILE_SETTLEMENT_HISTORY_LIMIT or 8
+    local cooldown = Constants.MOBILE_SETTLEMENT_REVISIT_COOLDOWN_HOURS
+        or 24
+    local visitedAt = worldAge(at)
+    if not faction or not mobile or type(target) ~= "table"
+        or not Factions or not Factions.UpdateMobileGroup
+    then
+        return false, "mobile_visit_history_unavailable"
+    end
+    entry = {
+        communityID = target.communityID,
+        locationID = target.locationID or target.id,
+        siteID = target.siteID,
+        visitedAt = visitedAt,
+        cooldownUntil = visitedAt + cooldown,
+    }
+    key = tostring(entry.communityID or entry.locationID or "")
+    for index = 1, #(mobile.settlementHistory or {}) do
+        existing = mobile.settlementHistory[index]
+        if type(existing) == "table"
+            and tostring(existing.communityID or existing.locationID or "")
+                ~= key
+        then
+            history[#history + 1] = copy(existing)
+        end
+    end
+    table.insert(history, 1, entry)
+    while #history > limit do table.remove(history) end
+    return Factions.UpdateMobileGroup(
+        faction.id,
+        { settlementHistory = history },
+        "mobile_settlement_visit_history"
+    )
+end
+
 -- Generic settlement-arrival notification for server integrations. The
 -- mobile-settlement service remains authoritative for eligibility, movement,
 -- admission, and persistent visit state; listeners only observe an accepted

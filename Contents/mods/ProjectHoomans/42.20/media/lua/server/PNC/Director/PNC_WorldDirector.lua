@@ -157,6 +157,29 @@ function Director.Initialize(force)
         { budget = Config.DIRECTOR_JOB_BUDGET,
             startAt = now + (Config.MOBILE_SETTLEMENT_VISIT_INTERVAL_HOURS
                 or 1) })
+    -- The service is loaded after this director module in the composition
+    -- root, so resolve it at execution time. Hoomans remains functional when
+    -- no external commercial scorer or consumer is installed.
+    Scheduler.RegisterJob("CommercialMobility",
+        Config.COMMERCIAL_MOBILITY_INTERVAL_HOURS or 6,
+        function(at, budget)
+            local commercial = PNC.CommercialMobilityService
+            if Director.Paused or not commercial
+                or not commercial.Pump
+            then
+                return 0
+            end
+            return commercial.Pump(
+                at,
+                math.min(
+                    tonumber(budget) or Config.DIRECTOR_JOB_BUDGET,
+                    Config.COMMERCIAL_MOBILITY_BUDGET or 4
+                )
+            )
+        end,
+        { budget = Config.COMMERCIAL_MOBILITY_BUDGET or 4,
+            startAt = now + (Config.COMMERCIAL_MOBILITY_INTERVAL_HOURS
+                or 6) })
     Scheduler.RegisterJob("CommunityExcursions",
         Config.COMMUNITY_EXCURSION_INTERVAL_HOURS or 1,
         function(at, budget)

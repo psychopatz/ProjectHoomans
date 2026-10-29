@@ -142,6 +142,11 @@ function Service.OnSettlementArrival(factionOrID, target, travel, at, group, rep
             "mobile_settlement_visit_started"
         )
         if not updated then return false, updatedReason end
+        Service.RecordSettlementVisit(
+            faction,
+            travel.destination or target,
+            at
+        )
         return true, "settlement_visit_started", updatedMobile
     end
     if target.kind == "ai_settlement" then
@@ -207,11 +212,18 @@ function Service.OnSettlementArrival(factionOrID, target, travel, at, group, rep
     if not hasEntries(visit.pendingMemberIDs) then
         return false, "no_admission_members"
     end
-    return Factions.UpdateMobileGroup(
+    updated, updatedReason, updatedMobile = Factions.UpdateMobileGroup(
         faction.id,
         { visit = visit },
         "mobile_settlement_visit_started"
     )
+    if not updated then return false, updatedReason end
+    Service.RecordSettlementVisit(
+        faction,
+        travel.destination or target,
+        at
+    )
+    return true, "settlement_visit_started", updatedMobile
 end
 
 return Service

@@ -15,6 +15,58 @@ local normalizeSettlementArrival = Internal.NormalizeSettlementArrival
 local normalizeSettlementVisit = Internal.NormalizeSettlementVisit
 local normalizePlayerRoam = Internal.NormalizePlayerRoam
 
+local function normalizeMobilityIntent(value)
+    return Internal.SafeString(
+        value,
+        Constants.MOBILE_MOBILITY_INTENT_MAX_LENGTH or 96
+    )
+end
+
+local function normalizeSettlementHistory(value)
+    local output = {}
+    local seen = {}
+    local limit = Constants.MOBILE_SETTLEMENT_HISTORY_LIMIT or 8
+    local source = type(value) == "table" and value or {}
+    local index
+    local entry
+    local communityID
+    local locationID
+    local key
+    for index = 1, math.min(#source, limit * 2) do
+        entry = source[index]
+        if type(entry) == "table" then
+            communityID = Internal.SafeString(
+                entry.communityID, Constants.ID_MAX_LENGTH)
+            locationID = Internal.SafeString(
+                entry.locationID, Constants.ID_MAX_LENGTH)
+            if communityID or locationID then
+                key = tostring(communityID or locationID or "")
+                if not seen[key] then
+                    seen[key] = true
+                    output[#output + 1] = {
+                        communityID = communityID,
+                        locationID = locationID,
+                        siteID = Internal.SafeString(
+                            entry.siteID, Constants.ID_MAX_LENGTH),
+                        visitedAt = Internal.Timestamp(entry.visitedAt, 0),
+                        cooldownUntil = Internal.Timestamp(
+                            entry.cooldownUntil, 0),
+                    }
+                end
+            end
+        end
+    end
+    table.sort(output, function(left, right)
+        if left.visitedAt ~= right.visitedAt then
+            return left.visitedAt > right.visitedAt
+        end
+        return tostring(left.communityID or left.locationID or "")
+            < tostring(right.communityID or right.locationID or "")
+    end)
+    while #output > limit do table.remove(output) end
+    return output
+end
+
 function Types.NormalizeMobileGroup(value)
     local source = type(value) == "table" and value or {}
     local CommunityTypes = PNC.CommunityTypes
@@ -31,6 +83,8 @@ function Types.NormalizeMobileGroup(value)
     local pendingSettlementArrival
     local visit
     local playerRoam
+    local mobilityIntent
+    local settlementHistory
     if source.active ~= true then return nil end
     if not CommunityTypes or not CommunityTypes.NormalizeSite then
         return nil
@@ -86,6 +140,8 @@ function Types.NormalizeMobileGroup(value)
         activity = Constants.MOBILE_ACTIVITY_STREET_ROAMING
     end
     playerRoam = normalizePlayerRoam(source.playerRoam)
+    mobilityIntent = normalizeMobilityIntent(source.mobilityIntent)
+    settlementHistory = normalizeSettlementHistory(source.settlementHistory)
     if pathMode == Constants.MOBILE_PATH_PLAYER then
         playerRoam = playerRoam or {
             phase = Constants.MOBILE_PLAYER_ROAM_PHASE_APPROACH,
@@ -109,6 +165,8 @@ function Types.NormalizeMobileGroup(value)
         pendingSettlementArrival = pendingSettlementArrival,
         visit = visit,
         playerRoam = playerRoam,
+        mobilityIntent = mobilityIntent,
+        settlementHistory = settlementHistory,
         lastDepartureAt = source.lastDepartureAt == nil
             and -1 or math.max(-1, math.floor(Internal.Finite(
                 source.lastDepartureAt,

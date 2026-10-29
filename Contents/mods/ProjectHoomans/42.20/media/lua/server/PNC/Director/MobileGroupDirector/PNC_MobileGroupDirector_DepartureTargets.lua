@@ -7,6 +7,7 @@ PNC.MobileGroupDirectorInternal = PNC.MobileGroupDirectorInternal or {}
 
 local H = PNC.MobileGroupDirectorInternal
 local Factions = PNC.Factions
+local Constants = PNC.FactionConstants
 
 local function finite(value, fallback)
     value = tonumber(value)
@@ -93,8 +94,10 @@ local function targetFromLocation(location, kind, ids)
     }
 end
 
-local function addCommunityTargets(output, faction)
+local function addCommunityTargets(output, faction, options)
     local communities = PNC.Communities
+    local commercial = type(options) == "table"
+        and options.commercial == true
     if not communities or not communities.ListSites
         or not communities.Get
     then
@@ -112,6 +115,7 @@ local function addCommunityTargets(output, faction)
             if ownerFaction and ownerFaction.id ~= faction.id then
                 local playerOwned = isPlayerOwnedFaction(ownerFaction)
                 local eligible = not playerOwned
+                    or commercial
                     or hasPlayerBase(ownerFaction.id)
                 if eligible then
                     local location = locationForSite(site)
@@ -123,6 +127,9 @@ local function addCommunityTargets(output, faction)
                         factionID = ownerFaction.id,
                     })
                     if target then
+                        target.playerOwned = playerOwned
+                        target.hasPlayerMembers = hasPlayerMembers(
+                            ownerFaction)
                         target.distanceSq = distanceSq(
                             faction.mobile.site.home,
                             target
@@ -187,9 +194,10 @@ local function addPlayerBaseTargets(output, faction)
     end
 end
 
-function H.ResolveSettlementDepartureTarget(faction)
+function H.ResolveSettlementDepartureTargets(faction, options)
     local output = {}
-    addCommunityTargets(output, faction)
+    options = type(options) == "table" and options or {}
+    addCommunityTargets(output, faction, options)
     addPlayerBaseTargets(output, faction)
     local hostile = faction.archetypeID == "looter"
     table.sort(output, function(left, right)
@@ -205,7 +213,16 @@ function H.ResolveSettlementDepartureTarget(faction)
         end
         return tostring(left.locationID) < tostring(right.locationID)
     end)
-    return output[1]
+    local limit = math.floor(tonumber(options.candidateLimit)
+        or Constants and Constants.COMMERCIAL_DESTINATION_CANDIDATE_LIMIT
+        or 16)
+    limit = math.max(1, math.min(64, limit))
+    while #output > limit do table.remove(output) end
+    return output
+end
+
+function H.ResolveSettlementDepartureTarget(faction)
+    return H.ResolveSettlementDepartureTargets(faction)[1]
 end
 
 return H

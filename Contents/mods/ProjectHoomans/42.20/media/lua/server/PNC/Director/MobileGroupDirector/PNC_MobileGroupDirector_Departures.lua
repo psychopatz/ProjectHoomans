@@ -43,6 +43,40 @@ function H.IsStreetRoaming(faction)
         and mobile.ambient.objective == Constants.MOBILE_AMBIENT_ROAD
 end
 
+-- Admission departures remain ambient-only. Generic purpose-specific mobility
+-- may opt into this same settlement-travel primitive when it supplies an
+-- explicit mobility intent; no consumer gets a second movement controller.
+function H.CanStartSettlementTravel(faction, options)
+    local mobile = faction and faction.mobile or nil
+    local expectedIntent = type(options) == "table"
+        and options.mobilityIntent or nil
+    if H.IsStreetRoaming(faction) then return true end
+    if type(options) ~= "table"
+        or options.allowNonStreetRoaming ~= true
+        or not mobile
+        or mobile.active ~= true
+        or mobile.travel
+        or mobile.pendingSettlementArrival
+        or mobile.controlMode ~= Constants.MOBILE_CONTROL_STRATEGIC
+        or mobile.pathMode == Constants.MOBILE_PATH_PLAYER
+    then
+        return false
+    end
+    if mobile.visit
+        and (tonumber(mobile.visit.expiresAt) or 0) > H.WorldAge()
+    then
+        return false
+    end
+    if expectedIntent ~= nil
+        and tostring(mobile.mobilityIntent or "")
+            ~= tostring(expectedIntent)
+    then
+        return false
+    end
+    return mobile.activity == nil
+        or mobile.activity == Constants.MOBILE_ACTIVITY_STREET_ROAMING
+end
+
 function H.DepartureDay(at)
     return math.floor(math.max(0, finite(at, 0)) / 24)
 end
@@ -98,14 +132,15 @@ local function targetLocation(target)
     return nil
 end
 
-function Director.StartSettlementTravel(factionID, target, at)
+function Director.StartSettlementTravel(factionID, target, at, options)
     if not H.Authority() then return false, "not_authority" end
     local faction = Factions.Get(factionID)
     if not faction then return false, "faction_not_found" end
     if not Factions.IsMobileGroup(faction) then
         return false, "not_mobile_group"
     end
-    if not H.IsStreetRoaming(faction) then
+    options = type(options) == "table" and options or {}
+    if not H.CanStartSettlementTravel(faction, options) then
         return false, "mobile_group_not_street_roaming"
     end
     target = type(target) == "table" and H.Copy(target)
@@ -115,11 +150,17 @@ function Director.StartSettlementTravel(factionID, target, at)
         return false, "no_settlement_target"
     end
     at = H.WorldAge(at)
+    local purpose = options.purpose
+        and Constants.VALID_MOBILE_TRAVEL_PURPOSES[options.purpose]
+        and options.purpose
+        or faction.archetypeID == "looter"
+            and Constants.MOBILE_TRAVEL_PURPOSE_HOSTILE_CONTACT
+            or Constants.MOBILE_TRAVEL_PURPOSE_ADMISSION
     local travel = {
         kind = Constants.MOBILE_TRAVEL_SETTLEMENT,
-        purpose = faction.archetypeID == "looter"
-            and Constants.MOBILE_TRAVEL_PURPOSE_HOSTILE_CONTACT
-            or Constants.MOBILE_TRAVEL_PURPOSE_ADMISSION,
+        purpose = purpose,
+        intent = options.intent
+            and tostring(options.intent) or nil,
         destination = target,
         startedAt = at,
         departureDay = H.DepartureDay(at),
