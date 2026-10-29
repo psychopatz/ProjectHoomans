@@ -178,6 +178,37 @@ local function continuationProjection(scene)
     }
 end
 
+local function tacticalSpatialProjection(scene)
+    local world = type(scene) == "table"
+        and type(scene.world) == "table" and scene.world or {}
+    local danger = type(world.danger) == "table" and world.danger or {}
+    local spatial = type(danger.spatial) == "table"
+        and danger.spatial or nil
+    if not spatial then
+        return {
+            available = false,
+            presentationMode = "omitted",
+            suppressionReason = "tactical_spatial_unavailable",
+        }
+    end
+    return {
+        available = true,
+        targetKind = clean(spatial.targetKind, 64),
+        targetRef = clean(spatial.targetRef, 128),
+        targetPositionSource = clean(spatial.targetPositionSource, 64),
+        headingSource = clean(spatial.headingSource, 64),
+        clockToken = clean(spatial.clockToken, 16),
+        relativeSector8 = clean(spatial.relativeSector8, 32),
+        distanceBand = clean(spatial.distanceBand, 32),
+        freshnessMs = number(spatial.freshnessMs),
+        presentationMode = clean(spatial.presentationMode, 16) or "omitted",
+        presentationReason = clean(spatial.presentationReason, 96),
+        suppressionReason = (
+            clean(spatial.presentationMode, 16) == "omitted"
+        ) and clean(spatial.presentationReason, 96) or nil,
+    }
+end
+
 local function currentTurn(history, continuation)
     local row = history[#history]
     if not row then return nil end
@@ -324,6 +355,7 @@ local function sceneProjection(runtime, scene, historyLimit, admission)
             factRefs = groundedRefs(history, "factRefs"),
             eventRefs = groundedRefs(history, "eventRefs"),
         },
+        tacticalSpatial = tacticalSpatialProjection(scene),
         director = directorProjection(scene),
         continuation = continuation,
         audience = {

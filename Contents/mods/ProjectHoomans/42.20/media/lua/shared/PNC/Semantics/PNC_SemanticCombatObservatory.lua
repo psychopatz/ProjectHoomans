@@ -143,6 +143,55 @@ local function boundedOffers(planID, realizationID)
     return output
 end
 
+local function tacticalProjection(presentation, gate, options)
+    options = type(options) == "table" and options or {}
+    local spatial = options.tacticalSpatial
+        or presentation and presentation.tacticalSpatial
+        or gate and gate.tacticalSpatial
+    local realized = options.tacticalPresentation
+        or presentation and presentation.tacticalPresentation
+        or gate and gate.tacticalPresentation
+    spatial = copyRow(spatial)
+    realized = copyRow(realized)
+
+    local mode = clean(
+        realized and realized.mode
+            or spatial and spatial.presentationMode
+    )
+    local reason = clean(
+        realized and realized.reason
+            or spatial and spatial.presentationReason
+    )
+    if not mode and not spatial and not realized then
+        return {
+            available = false,
+            presentationMode = "omitted",
+            suppressionReason = "tactical_spatial_unavailable",
+        }
+    end
+    return {
+        available = spatial ~= nil,
+        targetKind = clean(spatial and spatial.targetKind),
+        targetRef = clean(spatial and spatial.targetRef),
+        targetPositionSource = clean(
+            spatial and spatial.targetPositionSource
+        ),
+        headingSource = clean(spatial and spatial.headingSource),
+        clockToken = clean(spatial and spatial.clockToken),
+        relativeSector8 = clean(spatial and spatial.relativeSector8),
+        distanceBand = clean(spatial and spatial.distanceBand),
+        freshnessMs = number(spatial and spatial.freshnessMs),
+        presentationMode = mode or "omitted",
+        presentationReason = reason,
+        presentationTemplateID = clean(realized and realized.templateID),
+        presentationTranslationKey = clean(
+            realized and realized.translationKey
+        ),
+        suppressionReason = (mode == "omitted" or mode == nil)
+            and reason or nil,
+    }
+end
+
 local function weaponPredicates(moment)
     moment = type(moment) == "table" and moment or {}
     local family = clean(moment.weaponFamily)
@@ -263,6 +312,9 @@ function Observatory.Inspect(record, options)
             offers = offers,
         },
         weapon = weaponPredicates(moment),
+        tacticalSpatial = tacticalProjection(
+            presentation, gate, options
+        ),
         explanation = explanation(
             gate, presentation, presentationClass, offers
         ),

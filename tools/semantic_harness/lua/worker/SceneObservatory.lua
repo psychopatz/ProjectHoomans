@@ -79,6 +79,21 @@ local function projection(Providers, row)
     }
 end
 
+local function fixtureWorld(payload)
+    local spatial = type(payload.tacticalSpatial) == "table"
+        and payload.tacticalSpatial or nil
+    if not spatial then return nil end
+    return {
+        danger = {
+            kind = tostring(payload.dangerKind or "zombie_horde"),
+            pressureBand = tostring(payload.pressureBand or "horde"),
+            nearbyCount = tonumber(payload.nearbyCount) or 8,
+            phase = tostring(payload.dangerPhase or "started"),
+            spatial = spatial,
+        },
+    }
+end
+
 local function participants(Providers, values)
     values = type(values) == "table" and values or {}
     if #values < 2 or #values > MAX_PARTICIPANTS then
@@ -110,6 +125,7 @@ function SceneObservatory.fixture(context, payload)
         payload.responderID or rows[1].id
     )
     local topic = tostring(payload.topic or "EXCURSION")
+    local world = fixtureWorld(payload)
 
     Opportunity.ResetProvidersForTests()
     local registered, registerReason = Opportunity.RegisterProvider({
@@ -136,6 +152,7 @@ function SceneObservatory.fixture(context, payload)
                         )
                     )
                 ),
+                world = world,
                 worldEvents = { eventID },
                 stimulus = {
                     type = stimulusType,
@@ -146,6 +163,7 @@ function SceneObservatory.fixture(context, payload)
                     topic = topic,
                     eventID = eventID,
                     eventRefs = { eventID },
+                    worldPatch = world,
                 },
             }
         end,

@@ -230,6 +230,20 @@ local combatAccepted, combat = Adopters.OnHordeTransition(combatA, {
     nearbyCount = 9,
     source = "perception",
     now = 1000,
+    spatial = {
+        targetKind = "zombie_group",
+        targetRef = "horde:episode:s6",
+        targetPositionSource = "combat_centroid",
+        headingSource = "live_body",
+        clockHour = 8,
+        clockToken = "CLOCK_08",
+        relativeSector8 = "REAR_LEFT",
+        distance = 10,
+        sameArea = false,
+        freshnessMs = 0,
+        presentationMode = "clock",
+        presentationReason = "tactical_role:guard",
+    },
 })
 T.truthy(combatAccepted, combat and combat.reason or "combat scene admitted")
 T.equal(spatialQueries - beforeCombatQueries, 1,
@@ -249,6 +263,15 @@ T.equal(combat.initialResult.stimulus.type, "DANGER_CHANGED",
 T.equal(combat.initialResult.interactionPlan.behaviorID,
     "behavior.scene_horde_prompt",
     "first speaker uses generated horde prompt behavior")
+T.equal(combat.proposal.world.danger.spatial.clockToken, "CLOCK_08",
+    "scene world receives canonical tactical spatial snapshot")
+T.contains(combat.initialResult.presentation.speech.fallback, "8 o'clock",
+    "initial semantic scene warning is spatially grounded")
+T.equal(
+    combat.initialResult.presentation.speech.tacticalSpatialPresentation.mode,
+    "clock",
+    "scene presentation records tactical clock mode"
+)
 T.equal(combat.finalResult.interactionPlan.behaviorID,
     "behavior.scene_horde_reply_brave",
     "brave teammate selects trait-sensitive engage reply")

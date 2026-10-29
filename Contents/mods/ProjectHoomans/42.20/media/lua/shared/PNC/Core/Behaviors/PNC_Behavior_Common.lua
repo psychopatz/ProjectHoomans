@@ -18,6 +18,57 @@ local NavigationRouter = PNC.NavigationRouter
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 local ActorControl = PNC.ActorControl
 
+Common.MAX_COMBAT_TARGET_LISTENERS = 16
+Common._combatTargetListeners = Common._combatTargetListeners or {}
+
+function Common.RegisterCombatTargetListener(id, listener)
+    id = tostring(id or "")
+    if id == "" or #id > 96 or type(listener) ~= "function" then
+        return false, "combat_target_listener_invalid"
+    end
+    local listeners = Common._combatTargetListeners
+    if listeners[id] == nil then
+        local count = 0
+        for _ in pairs(listeners) do count = count + 1 end
+        if count >= Common.MAX_COMBAT_TARGET_LISTENERS then
+            return false, "combat_target_listener_limit"
+        end
+    end
+    listeners[id] = listener
+    return true
+end
+
+function Common.UnregisterCombatTargetListener(id)
+    id = tostring(id or "")
+    if Common._combatTargetListeners[id] == nil then
+        return false, "combat_target_listener_missing"
+    end
+    Common._combatTargetListeners[id] = nil
+    return true
+end
+
+local function notifyCombatTargetChanged(record, target, previousTarget, source, at)
+    local event = {
+        type = "COMBAT_TARGET_CHANGED",
+        actorID = tostring(record and record.id or ""),
+        target = target,
+        previousTarget = previousTarget,
+        source = tostring(source or "combat"),
+        at = at,
+    }
+    local ids = {}
+    for id in pairs(Common._combatTargetListeners) do ids[#ids + 1] = id end
+    table.sort(ids)
+    for index = 1, math.min(#ids, Common.MAX_COMBAT_TARGET_LISTENERS) do
+        local listener = Common._combatTargetListeners[ids[index]]
+        if type(listener) == "function" then
+            -- Listener hooks are a generic extension boundary; presentation
+            -- failures must never break combat target ownership.
+            pcall(listener, event, record)
+        end
+    end
+end
+
 local function resolveMoveIntent()
     return PNC.BehaviorMoveIntent
 end
@@ -78,6 +129,11 @@ function Common.SetCombatTarget(record, target, source)
             "proximityAlert=" .. tostring(target.proximityAlert == true),
             "alertOnly=" .. tostring(target.alertOnly == true),
         })
+    end
+    if targetChanged then
+        notifyCombatTargetChanged(
+            record, target, previousTarget, runtime.targetSource, runtime.targetAt
+        )
     end
     return true
 end

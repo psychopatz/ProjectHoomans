@@ -48,6 +48,25 @@ local function clean(value, maximum)
     return string.sub(value, 1, maximum or 128)
 end
 
+local function spatialSnapshot(value)
+    if type(value) ~= "table" then return nil end
+    return {
+        targetKind = clean(value.targetKind, 64),
+        targetRef = clean(value.targetRef, 128),
+        targetPositionSource = clean(value.targetPositionSource, 64),
+        headingSource = clean(value.headingSource, 64),
+        clockHour = tonumber(value.clockHour),
+        clockToken = clean(value.clockToken, 16),
+        relativeSector8 = clean(value.relativeSector8, 32),
+        distance = tonumber(value.distance),
+        distanceBand = clean(value.distanceBand, 32),
+        sameArea = value.sameArea == true,
+        freshnessMs = tonumber(value.freshnessMs),
+        presentationMode = clean(value.presentationMode, 16),
+        presentationReason = clean(value.presentationReason, 96),
+    }
+end
+
 local function distanceSq(first, second)
     local ax = tonumber(first and first.x)
     local ay = tonumber(first and first.y)
@@ -334,6 +353,7 @@ local function registerProviders()
             if not speakerID then return {} end
             local episodeID = clean(event.episodeID or event.id, 128)
             if not episodeID then return {} end
+            local spatial = spatialSnapshot(event.spatial)
             return {
                 id = "combat-horde:" .. episodeID,
                 dedupeKey = "combat-horde:" .. episodeID,
@@ -353,6 +373,7 @@ local function registerProviders()
                         pressureBand = event.pressureBand,
                         nearbyCount = tonumber(event.nearbyCount) or 0,
                         phase = event.phase,
+                        spatial = spatial,
                     },
                 },
                 worldEvents = { episodeID },
@@ -371,6 +392,7 @@ local function registerProviders()
                             pressureBand = event.pressureBand,
                             nearbyCount = tonumber(event.nearbyCount) or 0,
                             phase = event.phase,
+                            spatial = spatial,
                         },
                     },
                 },
@@ -556,6 +578,7 @@ function Adopters.OnHordeTransition(record, spec)
         phase = "started",
         pressureBand = spec.pressureBand,
         nearbyCount = tonumber(spec.nearbyCount) or 0,
+        spatial = spatialSnapshot(spec.spatial),
     }, {
         authority = "combat_horde_awareness",
         participants = participants,

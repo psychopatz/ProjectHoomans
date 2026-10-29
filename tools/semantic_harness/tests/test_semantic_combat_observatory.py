@@ -76,6 +76,27 @@ def tactical_fixture() -> dict:
                     "responsePlanID": "semantic.combat.horde.prompt",
                     "realizationID": "semantic.combat.horde.prompt.default",
                     "presentationClass": "TACTICAL_PROMPT",
+                    "tacticalSpatial": {
+                        "targetKind": "zombie_group",
+                        "targetRef": event_ref,
+                        "targetPositionSource": "combat_centroid",
+                        "headingSource": "live_body",
+                        "clockToken": "CLOCK_08",
+                        "relativeSector8": "REAR_LEFT",
+                        "distanceBand": "NEAR",
+                        "freshnessMs": 0,
+                        "presentationMode": "clock",
+                        "presentationReason": "tactical_role:guard",
+                    },
+                    "tacticalPresentation": {
+                        "mode": "clock",
+                        "clockToken": "CLOCK_08",
+                        "relativeSector8": "REAR_LEFT",
+                        "templateID":
+                            "semantic.combat.tactical_spatial.zombie.clock",
+                        "translationKey":
+                            "UI_PNC_Conversation_Content_SemanticCombatTacticalSpatialZombieClockNeutral01",
+                    },
                     "offerIDs": [
                         "semantic.combat.horde.choice.engage",
                         "semantic.combat.horde.choice.avoid",
@@ -198,6 +219,24 @@ class SemanticCombatObservatoryTests(unittest.TestCase):
         )
         self.assertEqual(first["explanation"]["outcome"], "asked")
         self.assertEqual(first["explanation"]["reason"], "presentation_sent")
+        self.assertTrue(first["tacticalSpatial"]["available"])
+        self.assertEqual(first["tacticalSpatial"]["clockToken"], "CLOCK_08")
+        self.assertEqual(
+            first["tacticalSpatial"]["relativeSector8"], "REAR_LEFT"
+        )
+        self.assertEqual(
+            first["tacticalSpatial"]["targetPositionSource"], "combat_centroid"
+        )
+        self.assertEqual(
+            first["tacticalSpatial"]["headingSource"], "live_body"
+        )
+        self.assertEqual(
+            first["tacticalSpatial"]["presentationMode"], "clock"
+        )
+        self.assertIsNone(
+            first["tacticalSpatial"].get("suppressionReason")
+        )
+        self.assertNotIn("fallback", first["tacticalSpatial"])
         self.assertLessEqual(len(first["arbiter"]["decisions"]), 4)
 
         # Inspection is read-only over the same bounded production owners.
@@ -207,6 +246,7 @@ class SemanticCombatObservatoryTests(unittest.TestCase):
             "combatMoment",
             "presentation",
             "weapon",
+            "tacticalSpatial",
             "explanation",
         ):
             self.assertEqual(first[key], again[key], key)

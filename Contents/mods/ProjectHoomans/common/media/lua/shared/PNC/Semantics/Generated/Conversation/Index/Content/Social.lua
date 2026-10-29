@@ -1,5 +1,41 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
+    ["phrase.semantic.combat.tactical_spatial.hostile.clock"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.combat.tactical_spatial.hostile.clock",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.combat.tactical_spatial.hostile.coarse"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.combat.tactical_spatial.hostile.coarse",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.combat.tactical_spatial.zombie.clock"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.combat.tactical_spatial.zombie.clock",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
+    ["phrase.semantic.combat.tactical_spatial.zombie.coarse"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+        },
+        ["id"] = "phrase.semantic.combat.tactical_spatial.zombie.coarse",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/scene_runtime_adopters.json",
+    },
     ["phrase.semantic.conversation.acknowledged.default"] = {
         ["domain"] = "social",
         ["generated"] = {

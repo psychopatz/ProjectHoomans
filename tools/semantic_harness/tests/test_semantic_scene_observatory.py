@@ -33,6 +33,56 @@ def scene_fixture() -> dict:
     }
 
 
+
+
+def tactical_scene_fixture() -> dict:
+    fixture = scene_fixture()
+    fixture.update(
+        {
+            "eventID": "scene:worker:horde",
+            "stimulusType": "DANGER_CHANGED",
+            "intent": "COMBAT_HORDE_ALERT",
+            "speechAct": "WARN",
+            "subject": "ZOMBIE_HORDE",
+            "topic": "COMBAT",
+            "dangerKind": "zombie_horde",
+            "pressureBand": "horde",
+            "nearbyCount": 8,
+            "tacticalSpatial": {
+                "targetKind": "zombie_group",
+                "targetRef": "horde:worker",
+                "targetPositionSource": "combat_centroid",
+                "headingSource": "live_body",
+                "clockToken": "CLOCK_08",
+                "relativeSector8": "REAR_LEFT",
+                "distanceBand": "NEAR",
+                "freshnessMs": 0,
+                "presentationMode": "clock",
+                "presentationReason": "tactical_role:guard",
+            },
+        }
+    )
+    return fixture
+
+
+def coarse_scene_fixture() -> dict:
+    fixture = tactical_scene_fixture()
+    fixture["eventID"] = "scene:worker:horde:coarse"
+    fixture["tacticalSpatial"]["presentationMode"] = "coarse"
+    fixture["tacticalSpatial"]["presentationReason"] = "civilian_fallback"
+    return fixture
+
+
+def omitted_scene_fixture() -> dict:
+    fixture = tactical_scene_fixture()
+    fixture["eventID"] = "scene:worker:horde:omitted"
+    fixture["tacticalSpatial"].pop("clockToken", None)
+    fixture["tacticalSpatial"].pop("headingSource", None)
+    fixture["tacticalSpatial"]["presentationMode"] = "omitted"
+    fixture["tacticalSpatial"]["presentationReason"] = "heading_unavailable"
+    return fixture
+
+
 def assert_no_transcript_fields(test: unittest.TestCase, value: object) -> None:
     forbidden = {
         "rawText",
@@ -106,6 +156,48 @@ class SemanticSceneObservatoryTests(unittest.TestCase):
         self.assertEqual(first["scenes"], again["scenes"])
         self.assertEqual(first["runtime"], again["runtime"])
         self.assertEqual(first["opportunity"], again["opportunity"])
+
+
+    def test_worker_exposes_bounded_tactical_spatial_without_transcript(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            view = worker.scene_observatory_fixture(tactical_scene_fixture())
+
+        self.assertTrue(view["ok"])
+        self.assertEqual(view["sceneCount"], 1)
+        spatial = view["scenes"][0]["tacticalSpatial"]
+        self.assertTrue(spatial["available"])
+        self.assertEqual(spatial["clockToken"], "CLOCK_08")
+        self.assertEqual(spatial["relativeSector8"], "REAR_LEFT")
+        self.assertEqual(spatial["headingSource"], "live_body")
+        self.assertEqual(spatial["presentationMode"], "clock")
+        self.assertEqual(
+            spatial["presentationReason"], "tactical_role:guard"
+        )
+        self.assertIsNone(spatial.get("suppressionReason"))
+        assert_no_transcript_fields(self, view)
+
+
+    def test_worker_explains_coarse_and_omitted_tactical_modes(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            coarse = worker.scene_observatory_fixture(coarse_scene_fixture())
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            omitted = worker.scene_observatory_fixture(omitted_scene_fixture())
+
+        coarse_spatial = coarse["scenes"][0]["tacticalSpatial"]
+        self.assertEqual(coarse_spatial["presentationMode"], "coarse")
+        self.assertEqual(
+            coarse_spatial["presentationReason"], "civilian_fallback"
+        )
+        self.assertIsNone(coarse_spatial.get("suppressionReason"))
+
+        omitted_spatial = omitted["scenes"][0]["tacticalSpatial"]
+        self.assertEqual(omitted_spatial["presentationMode"], "omitted")
+        self.assertEqual(
+            omitted_spatial["suppressionReason"], "heading_unavailable"
+        )
+        self.assertIsNone(omitted_spatial.get("clockToken"))
+        assert_no_transcript_fields(self, coarse)
+        assert_no_transcript_fields(self, omitted)
 
     def test_worker_api_enforces_scene_observatory_bounds(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:

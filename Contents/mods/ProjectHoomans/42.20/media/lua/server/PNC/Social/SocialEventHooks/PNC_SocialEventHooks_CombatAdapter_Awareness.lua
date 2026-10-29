@@ -27,6 +27,11 @@ local CombatMoment = PNC.Semantics
 local BanterArbiter = PNC.Semantics
     and PNC.Semantics.CombatBanterArbiter
     or require "PNC/Semantics/PNC_SemanticCombatBanterArbiter"
+local TacticalSpatial = PNC.TacticalSpatialProjection
+    or require "PNC/Core/Spatial/PNC_TacticalSpatialProjection"
+local TacticalLanguage = PNC.Semantics
+    and PNC.Semantics.TacticalSpatialLanguage
+    or require "PNC/Semantics/PNC_SemanticTacticalSpatialLanguage"
 local SocialReactions = PNC.Semantics
     and PNC.Semantics.SocialReactions or nil
 if not SocialReactions then
@@ -353,6 +358,55 @@ local function locationFact(record)
     )
 end
 
+local function buildHordeSpatial(record, now, episodeID)
+    local tactics = PNC.CombatTactics
+    local internal = tactics and tactics.Internal or nil
+    if not internal
+        or type(internal.BuildZombieThreatCentroid) ~= "function"
+        or not TacticalSpatial
+        or type(TacticalSpatial.Project) ~= "function"
+    then
+        return nil, "tactical_spatial_unavailable"
+    end
+
+    local radius = tonumber(Const and Const.ZOMBIE_TARGET_RADIUS) or 12
+    local x, y, count = internal.BuildZombieThreatCentroid(record, radius)
+    if not x or not y or (tonumber(count) or 0) <= 0 then
+        return nil, "horde_centroid_unavailable"
+    end
+
+    local spatial, reason = TacticalSpatial.Project(record, {
+        kind = "zombie_group",
+        id = episodeID,
+        x = x,
+        y = y,
+        z = tonumber(record and record.z) or 0,
+        observedAt = now,
+        positionSource = "combat_centroid",
+    }, {
+        now = now,
+        sameAreaThreshold = 0.5,
+        maxThreatAgeMs = 2000,
+    })
+    if not spatial then return nil, reason end
+
+    local profile = CombatReactionProfile
+        and type(CombatReactionProfile.Build) == "function"
+        and CombatReactionProfile.Build(record, "", {
+            role = "witness",
+            actorKind = "npc",
+            inCombat = true,
+            zombieObservation = record.runtime
+                and record.runtime.zombieObservation,
+        }) or nil
+    local mode, modeReason = TacticalLanguage.SelectMode(
+        record, profile, spatial
+    )
+    spatial.presentationMode = mode
+    spatial.presentationReason = modeReason
+    return spatial
+end
+
 local function awarenessFacts(
     record,
     eventID,
@@ -361,7 +415,8 @@ local function awarenessFacts(
     count,
     reason,
     phase,
-    episodeID
+    episodeID,
+    tacticalSpatial
 )
     local pressure = pressureBand(count)
     local fact = {
@@ -381,6 +436,7 @@ local function awarenessFacts(
         retreatReason = reason,
         hordePhase = phase,
         hordeEpisodeID = episodeID,
+        spatial = tacticalSpatial,
     }
     if count ~= nil then fact.countBand = countBand(count) end
     return { [tostring(eventID)] = fact }
@@ -469,7 +525,8 @@ local function emitZombieAwareness(
     reason,
     phase,
     episodeID,
-    tacticalPrompt
+    tacticalPrompt,
+    tacticalSpatial
 )
     local npcID = tostring(record and record.id or "")
     local radiusSq = WITNESS_RADIUS * WITNESS_RADIUS
@@ -597,6 +654,11 @@ local function emitZombieAwareness(
             hordePhase = phase,
             hordeEpisodeID = episodeID,
             combatTacticalPrompt = tacticalPrompt == true,
+            tacticalSpatial = tacticalSpatial,
+            tacticalPresentationMode = tacticalSpatial
+                and tacticalSpatial.presentationMode or "omitted",
+            tacticalPresentationReason = tacticalSpatial
+                and tacticalSpatial.presentationReason or "spatial_unavailable",
             presentationClass = presentationClass,
             combatMoment = CombatMoment.Snapshot(combatMoment),
             combatReactionStyle = combatProfile
@@ -612,7 +674,8 @@ local function emitZombieAwareness(
                 count,
                 reason,
                 phase,
-                episodeID
+                episodeID,
+                tacticalSpatial
             ),
             retreatReason = reason,
             npcType = role,
@@ -635,6 +698,23 @@ local function emitZombieAwareness(
                 eventID = eventID,
                 npcID = npcID,
             }) or nil
+        if realization and tacticalSpatial then
+            local decorated, spatialReason, spatialMetadata =
+                TacticalLanguage.Decorate(
+                    realization.fallback,
+                    "zombie_group",
+                    tacticalSpatial,
+                    tacticalSpatial.presentationMode
+                )
+            if spatialMetadata then
+                realization.fallback = decorated
+                realization.tacticalSpatialPresentation = spatialMetadata
+                context.tacticalSpatialPresentation = spatialMetadata
+            else
+                context.tacticalPresentationReason =
+                    spatialReason or context.tacticalPresentationReason
+            end
+        end
         if not realization
             or type(realization.fallback) ~= "string"
             or realization.fallback == ""
@@ -651,6 +731,12 @@ local function emitZombieAwareness(
                     family = awarenessFamily,
                     moment = combatMoment,
                     eventRef = eventID,
+                    tacticalSpatial = tacticalSpatial,
+                    tacticalPresentation = {
+                        mode = tacticalSpatial
+                            and tacticalSpatial.presentationMode or "omitted",
+                        reason = context.tacticalPresentationReason,
+                    },
                 })
             end
             audit({
@@ -748,6 +834,13 @@ local function emitZombieAwareness(
                 realizationID = realization.realizationID,
                 presentationClass = presentationClass,
                 offerIDs = realization.offerIDs,
+                tacticalSpatial = tacticalSpatial,
+                tacticalPresentation = context.tacticalSpatialPresentation
+                    or {
+                        mode = tacticalSpatial
+                            and tacticalSpatial.presentationMode or "omitted",
+                        reason = context.tacticalPresentationReason,
+                    },
             })
         end
         if delivered then emitted = emitted + 1 end
@@ -829,6 +922,9 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
             and EncounterIntent.IsPromptSpeaker(
                 record, state.episodeID
             ) == true
+        local tacticalSpatial = buildHordeSpatial(
+            record, now, state.episodeID
+        )
         local sceneAdopters = PNC.Semantics
             and PNC.Semantics.InteractionSceneAdopters or nil
         if sceneAdopters
@@ -842,6 +938,7 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
                 nearbyCount = count,
                 source = source or "zombie_observation",
                 now = now,
+                spatial = tacticalSpatial,
             })
         end
         emitZombieAwareness(
@@ -855,7 +952,8 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
             nil,
             "started",
             state.episodeID,
-            tacticalPrompt
+            tacticalPrompt,
+            tacticalSpatial
         )
         return true, eventID, "started"
     end
@@ -881,6 +979,9 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
         )
     end
     eventID = newZombieAwarenessEventID(record, eventType, now)
+    local tacticalSpatial = buildHordeSpatial(
+        record, now, state.episodeID
+    )
     emitZombieAwareness(
         record,
         eventType,
@@ -891,7 +992,9 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
         count,
         nil,
         phase,
-        state.episodeID
+        state.episodeID,
+        nil,
+        tacticalSpatial
     )
     return true, eventID, phase
 end

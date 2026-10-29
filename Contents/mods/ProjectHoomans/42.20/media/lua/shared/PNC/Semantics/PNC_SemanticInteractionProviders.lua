@@ -139,6 +139,36 @@ function Providers.NormalizeRelationship(value, providerID)
     return output
 end
 
+local function normalizeDangerSpatial(value)
+    if type(value) ~= "table" then return nil end
+    return {
+        targetKind = text(value.targetKind, 64),
+        targetRef = text(value.targetRef, 128),
+        targetPositionSource = text(value.targetPositionSource, 64),
+        headingSource = text(value.headingSource, 64),
+        clockHour = finite(value.clockHour),
+        clockToken = text(value.clockToken, 16),
+        relativeSector8 = text(value.relativeSector8, 32),
+        distance = finite(value.distance),
+        distanceBand = text(value.distanceBand, 32),
+        sameArea = booleanOrNil(value.sameArea),
+        freshnessMs = finite(value.freshnessMs),
+        presentationMode = text(value.presentationMode, 16),
+        presentationReason = text(value.presentationReason, 96),
+    }
+end
+
+local function normalizeDanger(value)
+    if type(value) ~= "table" then return nil end
+    return {
+        kind = text(value.kind, 64),
+        pressureBand = text(value.pressureBand, 32),
+        nearbyCount = finite(value.nearbyCount),
+        phase = text(value.phase, 32),
+        spatial = normalizeDangerSpatial(value.spatial),
+    }
+end
+
 function Providers.NormalizeWorld(value, providerID)
     value = type(value) == "table" and value or {}
     return {
@@ -156,6 +186,7 @@ function Providers.NormalizeWorld(value, providerID)
         hordeZombieCount = finite(value.hordeZombieCount),
         tacticalHorde = booleanOrNil(value.tacticalHorde),
         worldAgeHours = finite(value.worldAgeHours),
+        danger = normalizeDanger(value.danger),
     }
 end
 

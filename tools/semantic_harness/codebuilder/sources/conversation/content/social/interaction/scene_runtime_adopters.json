@@ -479,6 +479,62 @@
           }
         ]
       }
+    },
+    {
+      "semanticTemplateID": "semantic.combat.tactical_spatial.zombie.clock",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Zombies, {clock}!",
+              "TL": "Mga zombie, {clock}!"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.combat.tactical_spatial.zombie.coarse",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Zombies {relative}!",
+              "TL": "Mga zombie {relative}!"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.combat.tactical_spatial.hostile.clock",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Hostiles at {clock}!",
+              "TL": "Mga kalaban sa {clock}!"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.combat.tactical_spatial.hostile.coarse",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Hostiles {relative}!",
+              "TL": "Mga kalaban {relative}!"
+            }
+          }
+        ]
+      }
     }
   ],
   "playerChoices": []

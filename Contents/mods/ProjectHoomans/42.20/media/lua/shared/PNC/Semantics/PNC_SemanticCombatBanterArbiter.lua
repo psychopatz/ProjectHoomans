@@ -63,6 +63,34 @@ local function momentSummary(moment)
     return output
 end
 
+local function tacticalSpatialSummary(value)
+    if type(value) ~= "table" then return nil end
+    return {
+        targetKind = clean(value.targetKind),
+        targetRef = clean(value.targetRef),
+        targetPositionSource = clean(value.targetPositionSource),
+        headingSource = clean(value.headingSource),
+        clockToken = clean(value.clockToken),
+        relativeSector8 = clean(value.relativeSector8),
+        distanceBand = clean(value.distanceBand),
+        freshnessMs = tonumber(value.freshnessMs),
+        presentationMode = clean(value.presentationMode),
+        presentationReason = clean(value.presentationReason),
+    }
+end
+
+local function tacticalPresentationSummary(value)
+    if type(value) ~= "table" then return nil end
+    return {
+        mode = clean(value.mode),
+        clockToken = clean(value.clockToken),
+        relativeSector8 = clean(value.relativeSector8),
+        templateID = clean(value.templateID),
+        translationKey = clean(value.translationKey),
+        reason = clean(value.reason),
+    }
+end
+
 local function boundedState(map, order, key)
     key = clean(key)
     if not key then return nil end
@@ -102,6 +130,10 @@ local function recordDecision(spec)
             or clean(spec.moment and spec.moment.presentationClass),
         offerIDs = boundedList(spec.offerIDs, 8),
         moment = momentSummary(spec.moment),
+        tacticalSpatial = tacticalSpatialSummary(spec.tacticalSpatial),
+        tacticalPresentation = tacticalPresentationSummary(
+            spec.tacticalPresentation
+        ),
     }
     while #Arbiter.Decisions >= Arbiter.DECISION_LIMIT do
         table.remove(Arbiter.Decisions, 1)
@@ -295,6 +327,8 @@ function Arbiter.RecordPresentation(spec)
         realizationID = spec.realizationID,
         presentationClass = spec.presentationClass,
         offerIDs = spec.offerIDs,
+        tacticalSpatial = spec.tacticalSpatial,
+        tacticalPresentation = spec.tacticalPresentation,
     })
 end
 

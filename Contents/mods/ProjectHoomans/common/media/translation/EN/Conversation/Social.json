@@ -1,4 +1,8 @@
 {
+  "UI_PNC_Conversation_Content_SemanticCombatTacticalSpatialHostileClockNeutral01": "Hostiles at {clock}!",
+  "UI_PNC_Conversation_Content_SemanticCombatTacticalSpatialHostileCoarseNeutral01": "Hostiles {relative}!",
+  "UI_PNC_Conversation_Content_SemanticCombatTacticalSpatialZombieClockNeutral01": "Zombies, {clock}!",
+  "UI_PNC_Conversation_Content_SemanticCombatTacticalSpatialZombieCoarseNeutral01": "Zombies {relative}!",
   "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded01": "Understood. We'll leave it there.",
   "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral01": "All right. Ask if you want to talk more.",
   "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse01": "All right.",

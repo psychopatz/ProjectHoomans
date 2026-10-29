@@ -9,6 +9,8 @@ local ResponsePlan = require
     "PNC/Semantics/PNC_SemanticDialogueResponsePlan"
 local SpeechRealization = require "PNC/Semantics/PNC_SpeechRealization"
 local ValueBounds = require "PNC/Semantics/PNC_SemanticValueBounds"
+local TacticalLanguage = require
+    "PNC/Semantics/PNC_SemanticTacticalSpatialLanguage"
 
 local Presentation = PNC.Semantics.InteractionPresentation or {}
 PNC.Semantics.InteractionPresentation = Presentation
@@ -68,6 +70,35 @@ local function initialFallback(templateID)
         return nil, "dialogue_content_family_unavailable"
     end
     return tostring(phrases[1].fallback or "")
+end
+
+local function decorateTacticalSpeech(realized, plan, projection)
+    if type(realized) ~= "table" or type(plan) ~= "table"
+        or tostring(plan.behaviorID or "") ~= "behavior.scene_horde_prompt"
+    then
+        return realized
+    end
+    local world = type(projection) == "table"
+        and type(projection.world) == "table" and projection.world or {}
+    local danger = type(world.danger) == "table" and world.danger or {}
+    local spatial = type(danger.spatial) == "table" and danger.spatial or nil
+    if not spatial then
+        realized.tacticalSpatialSuppressionReason = "spatial_unavailable"
+        return realized
+    end
+    local text, reason, metadata = TacticalLanguage.Decorate(
+        realized.fallback,
+        "zombie_group",
+        spatial,
+        spatial.presentationMode
+    )
+    if metadata then
+        realized.fallback = text
+        realized.tacticalSpatialPresentation = metadata
+    else
+        realized.tacticalSpatialSuppressionReason = reason
+    end
+    return realized
 end
 
 local function realizeContent(
@@ -131,7 +162,9 @@ function Presentation.Build(plan, policy, projection, actorID)
                 "interaction.speech"
             )
             if realized then
-                result.speech = realized
+                result.speech = decorateTacticalSpeech(
+                    realized, plan, projection
+                )
             else
                 result.suppressed[#result.suppressed + 1] = {
                     output = "speech",

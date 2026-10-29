@@ -1,4 +1,8 @@
 {
+  "UI_PNC_Conversation_Content_SemanticCombatTacticalSpatialHostileClockNeutral01": "Mga kalaban sa {clock}!",
+  "UI_PNC_Conversation_Content_SemanticCombatTacticalSpatialHostileCoarseNeutral01": "Mga kalaban {relative}!",
+  "UI_PNC_Conversation_Content_SemanticCombatTacticalSpatialZombieClockNeutral01": "Mga zombie, {clock}!",
+  "UI_PNC_Conversation_Content_SemanticCombatTacticalSpatialZombieCoarseNeutral01": "Mga zombie {relative}!",
   "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded01": "Naiintindihan ko. Tama na iyon.",
   "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral01": "Sige. Magtanong ka kung gusto mo pang mag-usap.",
   "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse01": "Sige.",

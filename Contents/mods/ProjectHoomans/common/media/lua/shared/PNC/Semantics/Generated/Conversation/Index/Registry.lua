@@ -94,7 +94,7 @@ return {
         ["domain"] = "social",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Social",
-        ["recordCount"] = 97,
+        ["recordCount"] = 101,
     },
     {
         ["domain"] = "task",
