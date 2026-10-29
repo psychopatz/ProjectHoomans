@@ -122,50 +122,6 @@ function Lifecycle.RefreshLiveBodyIdentity(record, zombie, source)
     return outfitID ~= nil or validEngineIdentity(populationID)
 end
 
--- Stamp the minimum authoritative identity immediately after the engine
--- creates an IsoZombie shell. Multiplayer can replicate the Java object before
--- the later visual/equipment materialization finishes, so the shell must never
--- spend an observable server frame looking like an ordinary unowned zombie.
-function Lifecycle.PreclaimLiveBody(record, zombie)
-    local modData
-    local runtime
-    local factionID
-    if not record or not zombie or not zombie.getModData then
-        return nil
-    end
-    runtime = record.runtime or {}
-    record.runtime = runtime
-    if not runtime.bodyLease or tostring(runtime.bodyLease) == "" then
-        if not Core or not Core.GenerateID then return nil end
-        runtime.bodyLease = Core.GenerateID("body")
-    end
-    modData = zombie:getModData()
-    if not modData then return nil end
-    modData.PNC_Owner = "ProjectHoomans"
-    modData.PNC_OwnerVersion = 1
-    modData.PNC_NPC = true
-    modData.PNC_UUID = tostring(record.id)
-    modData.PNC_BodyKind = "live"
-    factionID = PNC.Factions
-        and type(PNC.Factions.GetFactionID) == "function"
-        and PNC.Factions.GetFactionID(record) or nil
-    modData.PNC_FactionID = factionID and tostring(factionID) or nil
-    modData.PNC_BodyLease = tostring(runtime.bodyLease)
-    modData.PNC_CorpseToken = nil
-    modData.PNC_TagVersion = Const.BODY_TAG_VERSION
-    modData.PNC_PersistedShell = true
-    modData.PNC_ShellVersion = Const.BODY_SHELL_VERSION
-    modData.PNC_ShellCarrier = Const.BODY_SHELL_OUTFIT
-    modData.PNC_ShellCarrierVersion = Const.BODY_SHELL_CARRIER_VERSION
-    modData.PNC_BaseOutfit = Const.BODY_SHELL_OUTFIT
-    if PNC.LiveBodyControl
-        and PNC.LiveBodyControl.SetManagedBodyUseless
-    then
-        PNC.LiveBodyControl.SetManagedBodyUseless(zombie, true)
-    end
-    return runtime.bodyLease
-end
-
 function Lifecycle.StampLiveBody(record, zombie)
     local modData
     local runtime
@@ -178,8 +134,8 @@ function Lifecycle.StampLiveBody(record, zombie)
     record.runtime = runtime
     restoredBodyRebind = runtime.restoredBodyRebindPending == true
     startupBodyHint = restoredBodyRebind and runtime.startupBodyHint or nil
-    if not Lifecycle.PreclaimLiveBody(record, zombie) then
-        return nil
+    if not runtime.bodyLease or tostring(runtime.bodyLease) == "" then
+        runtime.bodyLease = Core.GenerateID("body")
     end
     modData = zombie:getModData()
     modData.PNC_Owner = "ProjectHoomans"

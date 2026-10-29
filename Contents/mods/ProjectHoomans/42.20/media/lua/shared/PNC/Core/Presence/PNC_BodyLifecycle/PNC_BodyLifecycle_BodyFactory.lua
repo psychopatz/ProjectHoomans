@@ -435,8 +435,8 @@ function Lifecycle.SpawnLiveBody(record, position, reason)
             "PNC body factory fallback blocked; keeping NPC abstract"
                 .. " reason=" .. tostring(reason or "unknown"))
     end
+    Internal.SpawnInProgress = false
     if not zombie then
-        Internal.SpawnInProgress = false
         factory.failedSpawns = (tonumber(factory.failedSpawns) or 0) + 1
         noteIncrement("BodyFactory.FailedSpawns")
         disabled = Lifecycle.AreZombieSpawnsDisabled()
@@ -453,42 +453,15 @@ function Lifecycle.SpawnLiveBody(record, position, reason)
         factory.failedSpawns = (tonumber(factory.failedSpawns) or 0) + 1
         noteIncrement("BodyFactory.InvulnerableRejected")
         abortSpawnedBody(zombie)
-        Internal.SpawnInProgress = false
         logOnce("invulnerableLogged", "warn",
             "PNC body factory rejected invulnerable engine body")
         return nil, "spawn_invulnerable_body_rejected"
     end
+    factory.lastFactory = factoryName
     if PNC.Compatibility and PNC.Compatibility.ActorOwnership
         and PNC.Compatibility.ActorOwnership.MarkHoomansOwned
     then
         pcall(PNC.Compatibility.ActorOwnership.MarkHoomansOwned, zombie)
     end
-    -- Claim the engine object before the spawn suppression window closes.
-    -- In MP, the raw IsoZombie can otherwise be replicated to clients before
-    -- finishMaterialization() stamps its PNC UUID/lease, creating the visible
-    -- "zombie first, NPC second" race.
-    if Lifecycle.PreclaimLiveBody then
-        local claimed, lease = pcall(
-            Lifecycle.PreclaimLiveBody,
-            record,
-            zombie
-        )
-        if not claimed or lease == nil then
-            factory.failedSpawns = (tonumber(factory.failedSpawns) or 0) + 1
-            noteIncrement("BodyFactory.PreclaimRejected")
-            abortSpawnedBody(zombie)
-            Internal.SpawnInProgress = false
-            return nil, "spawn_preclaim_failed"
-        end
-    end
-    if PNC.LiveBodyControl and PNC.LiveBodyControl.EnforceManagedSafety then
-        pcall(
-            PNC.LiveBodyControl.EnforceManagedSafety,
-            zombie,
-            "body_factory_preclaim"
-        )
-    end
-    Internal.SpawnInProgress = false
-    factory.lastFactory = factoryName
     return zombie, factoryName
 end

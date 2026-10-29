@@ -1,6 +1,6 @@
 # Progress — Multiplayer Body Binding Migration
 
-**Status:** PLANNED — implementation not started.
+**Status:** IN PROGRESS — M0A local factory restoration committed; remaining gates pending.
 **Branch:** existing main only.
 **Planning anchor:** 2a24bc59d36c845af51097642c55180434680cb7.
 **Current phase:** M0 — restore/freeze SP baseline and engine-ground the MP identity contract.
@@ -54,3 +54,14 @@
 Do not mark complete after M0, a working binding prototype, or a passing focused suite.
 
 Developer completion requires all M0-M8 gates plus final full-suite/static/compiler evidence. Native SP/MP remains user-owned final acceptance.
+
+## M0A local factory restoration — 2026-10-30
+
+- Clean existing main verified at e3614241; unrelated character ownership remains untouched.
+- Both lifecycle files were unchanged since 5dbbadc4. Restored precisely their pre-5dbbadc4 contents, removing early preclaim/safety from construction and restoring lease assignment to StampLiveBody. This is a source-level baseline restoration, not a claim of native SP acceptance.
+- Factory regression now supplies throwing preclaim/safety hooks and asserts primary/fallback return unstamped bodies; normal materialization remains the identity owner.
+- Focused body_factory/presence/restart/husk/reanimation suite: 126/126 before and after. Lifecycle Kahlua static scan: 39 files, zero errors. Installed PZ Kahlua compiler: both changed runtime files pass. git diff --check passes.
+- Java harness reports installed baseline current. Graph project project-hoomans generation 2026-10-24 has metadata_changed for touched source; direct current-file reads and Git comparison used. Graph does not resolve SpawnLiveBody, so no complete call-graph claim.
+
+### Next mandatory chunk
+Finish M0 engine-boundary/snapshot fixtures and SP lifecycle evidence; audit bodyLease for M1, then continue M2–M8. No migration phase is yet accepted in full.
