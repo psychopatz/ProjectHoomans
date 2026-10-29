@@ -208,15 +208,15 @@ local population = makeBody({
 
 PNC.BodyLifecycle.BeginStartupBodyCleanup(now)
 local first = PNC.BodyLifecycle.PumpStartupBodyCleanup(now, true)
-T.equal(first.removed, 2, "stale startup shells removed")
+T.equal(first.removed, 1, "stale startup shells removed")
 T.equal(marked.wasRemoved(), true, "marked persisted shell removed")
-T.equal(legacyNaked.wasRemoved(), true, "naked body-hint shell removed")
+T.equal(legacyNaked.wasRemoved(), false, "outfit plus position cannot authorize deletion")
 T.equal(unrelatedNaked.wasRemoved(), false, "unrelated naked zombie preserved")
 T.equal(canonical.wasRemoved(), false, "canonical body preserved")
 T.equal(population.wasRemoved(), false, "population body was rebound")
 T.equal(reboundBodies, 1, "population body rebind was attempted once")
-T.equal(#removals, 2, "instance removal packets sent")
-T.equal(#warnings, 2, "repair logs emitted")
+T.equal(#removals, 1, "instance removal packets sent")
+T.equal(#warnings, 1, "repair logs emitted")
 
 now = now + 16
 PNC.BodyLifecycle.PumpStartupBodyCleanup(now, false)
@@ -261,7 +261,7 @@ T.equal(
 )
 T.equal(earlyNaked.wasRemoved(), false,
     "anonymous naked zombie was preserved")
-T.equal(directSafetyApplications, 2,
+T.equal(directSafetyApplications, 1,
     "only identified shells made harmless before removal")
 local synchronous = PNC.BodyLifecycle.RunStartupBodyCleanupNow(
     now,

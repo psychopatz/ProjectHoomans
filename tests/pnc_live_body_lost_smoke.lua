@@ -80,6 +80,7 @@ local function makeBody(id, outfitId, attached)
         },
         getModData = function() return body.modData end,
         getPersistentOutfitID = function() return outfitId end,
+        persistentId = id == "npc_lost" and 901 or nil,
         getX = function() return 12.5 end,
         getY = function() return 34.5 end,
         getZ = function() return 0 end,

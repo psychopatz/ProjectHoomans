@@ -1,6 +1,6 @@
 # Roadmap — Multiplayer Body Binding Migration
 
-**Status:** PLANNED — implementation not started.
+**Status:** Developer implementation accepted; user-owned native SP/MP acceptance pending. See DEVELOPER_ACCEPTANCE.md for gate evidence.
 
 **Parent objective:** successfully migrate Project Hoomans from implicit cross-network IsoZombie identity to an explicit, incarnation-safe multiplayer body-binding protocol, while restoring and preserving single-player behavior, keeping the durable PNC record authoritative, making MP shell replacement/reconnect/multi-client streaming robust, and retiring obsolete husk/identity assumptions superseded by the new protocol.
 

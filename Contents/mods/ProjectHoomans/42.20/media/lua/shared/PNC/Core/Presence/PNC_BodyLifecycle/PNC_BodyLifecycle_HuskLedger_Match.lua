@@ -366,15 +366,9 @@ local function matchesEntry(entry, zombie, radiusSq, includeAbandoned)
     then
         return true
     end
-    if not validEngineIdentity(entry.outfitId) then
-        return false
-    end
-    if outfitId == nil
-        or tostring(entry.outfitId) ~= tostring(outfitId)
-    then
-        return false
-    end
-    return samePosition(entry, zombie, radiusSq)
+    -- An arbitrary outfit ID plus position cannot prove a historical shell.
+    -- Only the exact population record or known PNC carrier lane above can.
+    return false
 end
 
 local function findInChunk(ledger, key, zombie, radiusSq)

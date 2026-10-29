@@ -1,9 +1,9 @@
 # Progress — Multiplayer Body Binding Migration
 
-**Status:** IN PROGRESS — M0A local factory restoration committed; remaining gates pending.
+**Status:** Developer M0–M8 accepted; user-owned native acceptance pending.
 **Branch:** existing main only.
 **Planning anchor:** 2a24bc59d36c845af51097642c55180434680cb7.
-**Current phase:** M0 — restore/freeze SP baseline and engine-ground the MP identity contract.
+**Current phase:** Developer handoff — native SP/MP checklist remains user-owned.
 **Parent objective:** M0-M8 complete migration to explicit MP body binding, with SP preserved and full developer-side acceptance.
 
 ## Verified starting evidence
@@ -157,3 +157,14 @@ Finish M0 engine-boundary/snapshot fixtures and SP lifecycle evidence; audit bod
 - Added fixed-size server/client diagnostic counters and last-reason views without per-tick logging, per-NPC persistent telemetry or new persistence roots.
 - Full isolated Lua: 968/968 (6.85s). Focused binding/provider/network/client: 22/22. All 6 changed runtime files pass installed-PZ Kahlua compilation. git diff --check clean. Current graph metadata remains stale/untracked for these paths; direct source is evidence.
 - **Outstanding before developer completion:** final classification of retained carrier/outfit/population startup adoption/cleanup against identity invariants; complete gameplay consumer/interest-exit audit; evidence matrix and static budget/persistence checks; final all-changed-runtime compiler/static verification and clean-worktree full-suite acceptance. A green suite does not close these audit gaps. Continue automatically.
+
+## M8 final developer acceptance — 2026-10-30
+
+- Closed remaining outfit+position actor-attribution and arbitrary-outfit cleanup paths. Startup actor adoption now requires UUID or exact population identity; positively learned PNC carriers remain disposable-orphan cleanup evidence, not actor identity. Updated fixtures distinguish strong provenance from ordinary outfit coincidence.
+- Interest exit/record removal now releases local cache immediately without deleting a live server shell. Old proof cannot rebind; fresh interest-enter proof restores presentation. Full post-bind ownership/cache tags clear only for an exact owned receipt.
+- MP player-hit reports must match the current runtime lease, shell lease and online ID; online-ID-only reports fail closed. Valid MP reports retain damage behavior.
+- Added behavioral 10,000-input cache stress, TTL drain, no-scan/no-new-ModData source checks, A-Life dependency guard and actual descriptor payload estimation.
+- Final source validation: 969/969 full Lua tests (6.81s); 220/220 complete focused body/presence/husk/restart/replica/network/player-damage/movement/combat/infection/corpse/reanimation/follow set. All 25 runtime files changed since e3614241 compile under installed-PZ Kahlua and pass static Kahlua ERROR checks. git diff --check clean.
+- Requirement-by-requirement developer evidence is in DEVELOPER_ACCEPTANCE.md; roadmap status updated. Remaining work is the user-owned native checklist, including real visual precursor, multiplayer streaming and death/reanimation behavior. No native game was launched or Workshop content published.
+- Anonymous historical saves remain fail-closed: position/outfit/gender/ownership alone cannot safely reclaim an old shell. Current identifiable shells retain lifecycle/lease/population evidence.
+- Next mandatory action belongs to native user acceptance. Any contradictory native result reopens its corresponding implementation gate. No further developer implementation gap is known after this audit.

@@ -191,6 +191,14 @@ function Binding.NewClient(options)
             end
         end
     end
+    function client.DropInterest(npcId)
+        local entry = entries[tostring(npcId)]
+        if entry then
+            release(entry)
+            entry.operation = "unbind"
+            entry.incarnation, entry.onlineId = nil, nil
+        end
+    end
     function client.Reset()
         for _, entry in pairs(entries) do release(entry) end
         reset()

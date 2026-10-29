@@ -1,3 +1,4 @@
+local BodyBinding = require "PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime"
 local Internal = PNC.Client.Internal
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
@@ -68,6 +69,7 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_DELTA, function(args)
                     "roster_delta"
                 )
             end
+            BodyBinding.Forget(entryID)
             ClientState.snapshots[entryID] = nil
             ClientState.snapshots[entry.id] = nil
             if ClientState.characterPayloads then
@@ -149,6 +151,7 @@ Internal.RegisterServerCommand(Const.CMD_REMOVE_RECORD, function(args)
     if Diagnostics and Diagnostics.FollowerPresenceAuditEnabled == true then
         logClientPresenceRemoval(current, id, args.reason, "remove_record")
     end
+    BodyBinding.Forget(id)
     ClientState.snapshots[id] = nil
     if ClientState.characterPayloads then
         ClientState.characterPayloads[id] = nil

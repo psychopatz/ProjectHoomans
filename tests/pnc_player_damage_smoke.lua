@@ -205,6 +205,14 @@ local staleBody, staleBodyReason = PNC.PlayerDamage.HandleClientReport(player, {
 T.equal(staleBody, false, "stale managed-body lease rejected")
 T.equal(staleBodyReason, "body_lease_mismatch", "stale lease reason")
 
+isServer = function() return true end
+records.neutral_1.runtime.bodyLease = "lease_1"
+local missingLease, missingLeaseReason = PNC.PlayerDamage.HandleClientReport(player, {
+    id="neutral_1", attackerOnlineID=12, bodyOnlineID=77, weaponFullType="Base.Axe", damage=1,
+})
+T.equal(missingLease, false, "MP hit cannot identify a shell from online ID alone")
+T.equal(missingLeaseReason, "body_lease_mismatch")
+isServer = nil
 local validReport = {
     id = "neutral_1",
     attackerOnlineID = 12,
@@ -214,10 +222,12 @@ local validReport = {
     weaponFullType = "Base.Axe",
     damage = 1,
 }
+isServer = function() return true end
 local afterLease, afterLeaseReason =
     PNC.PlayerDamage.HandleClientReport(player, validReport)
 T.equal(afterLease, true, "valid report after stale lease accepted")
 T.equal(afterLeaseReason, "damaged", "accepted report reason")
+isServer = nil
 T.equal(records.neutral_1.health.current, 75,
     "valid report applies server-scaled damage")
 local duplicate, duplicateReason =

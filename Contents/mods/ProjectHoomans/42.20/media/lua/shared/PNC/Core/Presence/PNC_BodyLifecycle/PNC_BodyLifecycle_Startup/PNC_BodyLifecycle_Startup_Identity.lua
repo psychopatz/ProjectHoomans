@@ -199,36 +199,6 @@ local function distanceSqToRecord(zombie, record)
     return dx * dx + dy * dy
 end
 
-local function bodyHintMatches(record, zombie)
-    local hint = record and record.runtime and record.runtime.startupBodyHint or nil
-    local wantedPopulation = hint and hint.populationId or nil
-    local wanted = hint and hint.instanceID
-    local actualPopulation
-    local dx
-    local dy
-    local dz
-    if wantedPopulation ~= nil then
-        actualPopulation = getBodyPopulationID(zombie)
-        return actualPopulation ~= nil
-            and tostring(actualPopulation) == tostring(wantedPopulation)
-    end
-    if wanted == nil
-        or tostring(wanted) ~= tostring(getBodyInstanceID(zombie) or "")
-    then
-        return false
-    end
-    -- Persistent outfit/body IDs are collision-prone engine hints, not actor
-    -- identity. Accept one only when it is also close to the saved body/record
-    -- position, as Dynamic Trading V2 does for startup recovery.
-    dx = (tonumber(zombie:getX()) or 0)
-        - (tonumber(hint.x) or tonumber(record.x) or 0)
-    dy = (tonumber(zombie:getY()) or 0)
-        - (tonumber(hint.y) or tonumber(record.y) or 0)
-    dz = (tonumber(zombie:getZ()) or 0)
-        - (tonumber(hint.z) or tonumber(record.z) or 0)
-    return math.abs(dz) <= 1 and (dx * dx + dy * dy) <= (3.5 * 3.5)
-end
-
 local function populationHintMatches(record, zombie)
     local hint = record and record.runtime and record.runtime.startupBodyHint
         or nil
@@ -281,20 +251,6 @@ local function startupRecordCandidates(
                 score = 200000
                 reason = "population_id"
                 identity = true
-            elseif bodyHintMatches(record, zombie) then
-                score = 100000
-                reason = "body_hint"
-                identity = true
-            elseif strongSignature then
-                distSq = distanceSqToRecord(zombie, record)
-                if distSq and distSq <= (3.5 * 3.5) then
-                    -- A PNCShellCarrier proves that this is a PNC shell, but
-                    -- its carrier id is shared by NPCs. Position is therefore
-                    -- only a candidate and must pass the batch one-to-one
-                    -- check before any deletion is authorized.
-                    score = math.floor((3.5 * 3.5 - distSq) * 100) + 1
-                    reason = "signature_position"
-                end
             elseif naked then
                 -- A naked zombie has no PNC identity. It is deliberately not
                 -- a cleanup candidate: ordinary zombies can have the same

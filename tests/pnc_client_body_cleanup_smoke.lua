@@ -69,6 +69,22 @@ T.equal(PNC.ClientPresenceSync.RemoveBodyInstance(exact), 0)
 T.equal(removed, 1, "duplicate removal is idempotent")
 T.equal(R.Resolve(s), nil)
 T.equal(R.AcceptSnapshot(s), false, "old live binding cannot revive removed incarnation")
+s.bodyBinding.revision = 8
+T.truthy(R.AcceptSnapshot(s))
+T.equal(md.PNC_UUID, "npc_a")
+local beforeExit = removed
+PNC.Client.Internal.StoreSnapshot({id="npc_a", alive=true, presenceState="live",
+    interestDetailed=false, replicaSequence=2}, true)
+T.equal(md.PNC_UUID, nil, "interest exit releases local cache immediately")
+T.equal(removed, beforeExit, "interest exit cannot delete a server-live shell")
+T.equal(R.Resolve(s), nil)
+T.falsy(R.AcceptSnapshot(s), "same old proof cannot bind after interest exit")
+s.bodyBinding.revision = 9
+s.replicaSequence = 3
+s.interestDetailed = true
+PNC.Client.Internal.StoreSnapshot(s)
+T.equal(PNC.ClientPresenceSync.ResolveBodyForNPC("npc_a"), body,
+    "fresh interest-enter proof reconstructs client identity")
 PNC.Core.IsClientOnly = function() return false end
 T.equal(R.AcceptSnapshot(s), false, "SP cannot enter MP admission")
 return T.finish("pnc_client_body_cleanup_smoke")

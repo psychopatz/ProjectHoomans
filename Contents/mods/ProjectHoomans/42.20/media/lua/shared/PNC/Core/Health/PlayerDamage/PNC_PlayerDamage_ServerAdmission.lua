@@ -109,6 +109,17 @@ function PlayerDamage.HandleClientReport(player, args)
     then
         return reject(record, player, report, "body_lease_mismatch")
     end
+    if isServer and isServer() == true then
+        local currentLease = record.runtime and record.runtime.bodyLease
+        if currentLease == nil or modData.PNC_BodyLease == nil
+            or tostring(modData.PNC_BodyLease) ~= tostring(currentLease)
+            or report.bodyLease ~= tostring(currentLease) then
+            return reject(record, player, report, "body_lease_mismatch")
+        end
+        if currentOnlineID == nil or report.bodyOnlineID ~= tonumber(currentOnlineID) then
+            return reject(record, player, report, "online_id_mismatch")
+        end
+    end
     weapon = resolveHeldWeapon(player, report.weaponFullType)
     if report.weaponFullType ~= "" and not weapon then
         return reject(record, player, report, "weapon_mismatch")

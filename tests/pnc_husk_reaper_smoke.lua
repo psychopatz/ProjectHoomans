@@ -97,6 +97,8 @@ local function makeRecord(id, x, y, z, hint)
 end
 
 local function armLoss(id, x, y, z, outfitId)
+    -- These fixtures represent carriers positively learned from PNC creation.
+    PNC.BodyLifecycle.NoteShellCarrierID(outfitId)
     local record = makeRecord(id, x, y, z, tostring(outfitId))
     return PNC.BodyLifecycle.NoteLostBody(
         record, makeHusk(x, y, z, outfitId), "removal_after_virtualization")
@@ -153,6 +155,7 @@ T.truthy(Lifecycle.ConsumeHuskEntry(startupSeed),
 -- 2b. A persisted non-seed loss is only a future population-manager hint
 -- when no matching unmarked body is loaded. It must not strand the record in
 -- abstract mode for the ledger TTL.
+Lifecycle.NoteShellCarrierID(43)
 local staleEntry = Lifecycle.NoteLostBody(
     makeRecord("npc_stale_ledger", 1200.4, 1300.6, 0, "43"),
     makeHusk(1200.4, 1300.6, 0, 43),
@@ -247,10 +250,10 @@ T.equal(sweepHusk.removedFromWorld, true, "swept husk was not removed")
 -- 10. Positive carrier fallback. Spawn settings are not ownership evidence:
 -- ordinary zombies may already exist in an existing save. Only a learned
 -- PNC-only carrier id can trigger the no-ledger fallback.
-T.truthy(Lifecycle.NoteShellOutfitID(42), "shell outfit id was not learned")
+T.truthy(Lifecycle.IsShellOutfitID(42), "shell outfit id was not learned")
 T.truthy(Lifecycle.IsShellOutfitID(42), "learned shell outfit not recognized")
 T.falsy(Lifecycle.IsShellOutfitID(7), "unrelated outfit recognized as a shell")
-T.truthy(Lifecycle.NoteShellCarrierID(42), "shell carrier id was not learned")
+T.truthy(Lifecycle.IsShellCarrierID(42), "shell carrier id was not learned")
 
 -- The spawn gate is cached for a short window, so advance the clock past it
 -- before changing the configuration.
@@ -301,7 +304,7 @@ Lifecycle.PumpHuskReaper(31000, true)
 T.falsy(vanillaSafe.removedFromWorld, "vanilla-eligible body was removed")
 
 local report = Lifecycle.DebugHuskReport()
-T.contains(report, "shellOutfits=1", "husk report shell outfit count")
+T.contains(report, "shellOutfits=2", "husk report shell outfit count")
 T.contains(report, "orphans=", "husk report orphan census")
 T.contains(report, "fingerprint=", "husk report fingerprint census")
 T.contains(report, "reaped=", "husk report reap count")
@@ -317,7 +320,7 @@ T.equal(diagnostics.abandoned, 1, "reaper diagnostics abandon count")
 -- map back to the same NPC.
 local vanishedEntry = armLoss("npc_requeue", 1800.4, 1900.6, 0, 45)
 T.truthy(vanishedEntry, "vanishing husk loss was not armed")
-T.truthy(Lifecycle.NoteShellCarrierID(45),
+T.truthy(Lifecycle.IsShellCarrierID(45),
     "historical carrier id was not learned")
 local vanished = makeHusk(1800.4, 1900.6, 0, 45)
 Lifecycle.OnZombieCreate(vanished)
@@ -347,9 +350,9 @@ local firstHistory = armLoss("npc_history", 2400.4, 2500.6, 0, 46)
 local secondHistory = armLoss("npc_history", 2401.4, 2501.6, 0, 47)
 T.truthy(firstHistory and secondHistory,
     "repeated carrier losses were not recorded")
-T.truthy(Lifecycle.NoteShellCarrierID(46),
+T.truthy(Lifecycle.IsShellCarrierID(46),
     "first repeated carrier id was not learned")
-T.truthy(Lifecycle.NoteShellCarrierID(47),
+T.truthy(Lifecycle.IsShellCarrierID(47),
     "second repeated carrier id was not learned")
 T.equal(Lifecycle.FindHuskEntry(makeHusk(2400.4, 2500.6, 0, 46)),
     firstHistory,

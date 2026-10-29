@@ -37,3 +37,5 @@ Project A-Life is a read-only architecture reference, not a code dependency:
 /home/psychopatz/.steam/debian-installation/steamapps/workshop/content/108600/3803984183/mods/ProjectALifeNPCs
 
 Do not edit the Workshop mod and do not copy its implementation verbatim. Reproduce only independently justified architectural guarantees in Project Hoomans.
+
+Developer acceptance evidence and the remaining native handoff are recorded in [DEVELOPER_ACCEPTANCE.md](DEVELOPER_ACCEPTANCE.md). Synthetic validation does not establish zero MP visual precursor.

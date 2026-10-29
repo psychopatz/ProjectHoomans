@@ -95,7 +95,7 @@ Ledger.store = nil
 Ledger.entries = {}
 Ledger.index = {}
 T.equal(Lifecycle.HuskLedgerCount(), 1, "packed ledger did not reload")
-T.truthy(Lifecycle.FindHuskEntry(makeZombie(100.4, 200.6, 0, 42)),
+T.truthy(Lifecycle.FindHuskEntry(makeZombie(100.4, 200.6, 0, 42, 901)),
     "reloaded loss is not matchable")
 local reloaded = Ledger.entries[1]
 T.equal(reloaded.npcId, "npc_a", "reloaded npc id")
@@ -122,7 +122,7 @@ T.falsy(hintless, "identity-less loss armed a reap")
 T.equal(Ledger.skipped, 1, "identity-less loss was not counted as skipped")
 
 -- Matching is strict: outfit identity, radius and level must all agree.
-T.equal(Lifecycle.FindHuskEntry(makeZombie(101.2, 201.1, 0, 42)),
+T.equal(Lifecycle.FindHuskEntry(makeZombie(101.2, 201.1, 0, 42, 901)),
     Ledger.entries[1], "matching husk body was not found")
 T.falsy(Lifecycle.FindHuskEntry(makeZombie(100.4, 200.6, 0, 77)),
     "husk matched with the wrong persistent outfit")
@@ -130,8 +130,10 @@ T.falsy(Lifecycle.FindHuskEntry(makeZombie(100.4, 200.6, 0, 42, 902)),
     "husk matched with the wrong population identity")
 T.falsy(Lifecycle.FindHuskEntry(makeZombie(110, 200.6, 0, 42)),
     "husk matched outside the recorded radius")
-T.truthy(Lifecycle.FindHuskEntry(makeZombie(100.4, 200.6, 1, 42)),
-    "husk on an adjacent level was not tolerated")
+T.falsy(Lifecycle.FindHuskEntry(makeZombie(100.4, 200.6, 1, 42)),
+    "outfit and adjacent position must not identify an ordinary zombie")
+T.truthy(Lifecycle.FindHuskEntry(makeZombie(800, 900, 2, 99, 901)),
+    "exact population identity survives movement/outfit changes")
 T.falsy(Lifecycle.FindHuskEntry(makeZombie(100.4, 200.6, 2, 42)),
     "husk matched on another level")
 
@@ -189,6 +191,7 @@ local seededRecord = makeRecord("npc_seed", 600, 700, 0, nil)
 seededRecord.presenceState = "abstract"
 seededRecord.runtime.startupBodyHint = {
     instanceID = "42",
+    populationId = "928",
     x = 600.5,
     y = 700.5,
     z = 0,
@@ -205,7 +208,7 @@ T.equal(Lifecycle.SeedHuskLedgerFromRecords(3000), 1,
     "persisted body hint was not seeded")
 T.equal(Lifecycle.SeedHuskLedgerFromRecords(3000), 0,
     "seeding was not once per session")
-local seededEntry = Lifecycle.FindHuskEntry(makeZombie(600.5, 700.5, 0, 42))
+local seededEntry = Lifecycle.FindHuskEntry(makeZombie(600.5, 700.5, 0, 42, 928))
 T.truthy(seededEntry, "seeded loss is not matchable")
 T.equal(seededEntry.npcId, "npc_seed", "seeded loss npc id")
 T.near(seededEntry.x, 600.5, 0.001, "seeded loss uses the persisted position")

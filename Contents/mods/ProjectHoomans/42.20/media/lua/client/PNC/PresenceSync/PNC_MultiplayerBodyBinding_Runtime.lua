@@ -52,6 +52,11 @@ local function getClient()
                 and md.PNC_BodyLease == entry.incarnation then
                 md.PNC_UUID, md.PNC_NPC, md.PNC_BodyLease = nil, nil, nil
                 md.PNC_BodyKind, md.PNC_MPBound = nil, nil
+                md.PNC_Owner, md.PNC_OwnerVersion = nil, nil
+                md.PNC_PersistedShell, md.PNC_TagVersion = nil, nil
+                md.PNC_ShellVersion, md.PNC_ShellCarrier = nil, nil
+                md.PNC_ShellCarrierVersion, md.PNC_BaseOutfit = nil, nil
+                md.PNC_LiveBodyOnlineID, md.PNC_LiveBodyInstanceID = nil, nil
                 if body.setVariable then
                     body:setVariable("PNCActor", false)
                     body:setVariable("PNCLive", false)
@@ -74,6 +79,11 @@ end
 function Runtime.AcceptSnapshot(snapshot)
     if not remote() or type(snapshot) ~= "table" then return false end
     local message = snapshot.bodyBinding
+    if snapshot.interestDetailed == false or (snapshot.alive == false
+        and type(message) ~= "table") then
+        if client then client.DropInterest(snapshot.id) end
+        return false
+    end
     if type(message) ~= "table" or message.npcId ~= tostring(snapshot.id) then return false end
     if message.operation == "bind" and (snapshot.alive == false
         or snapshot.presenceState ~= PNC.Const.PRESENCE_LIVE
@@ -81,6 +91,9 @@ function Runtime.AcceptSnapshot(snapshot)
         or message.incarnation ~= tostring(snapshot.liveBodyLease)
         or message.onlineId ~= snapshot.liveBodyOnlineID) then return false end
     return getClient().Receive(message, now())
+end
+function Runtime.Forget(npcId)
+    if remote() and client then client.DropInterest(npcId) end
 end
 function Runtime.Remove(args)
     if not remote() or type(args) ~= "table" or type(args.bodyBinding) ~= "table"
@@ -123,4 +136,8 @@ function Binding.IsClientBody(body)
         and state.snapshots[tostring(md.PNC_UUID)]
     return snapshot ~= nil and Runtime.Resolve(snapshot) == body
 end
+function Runtime.Diagnostics()
+    return client and client.Diagnostics() or { entries=0, observed=0, ready=false }
+end
+Binding.ClientDiagnostics = Runtime.Diagnostics
 return Runtime
