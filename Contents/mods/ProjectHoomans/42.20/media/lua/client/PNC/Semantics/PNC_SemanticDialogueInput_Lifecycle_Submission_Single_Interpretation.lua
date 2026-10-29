@@ -7,6 +7,55 @@ local Suggestions = Internal.Suggestions
 local audit = Internal.audit
 local attachInteractionEnvelope = Internal.attachInteractionEnvelope
 
+local function normalizedChoice(value)
+    value = string.lower(tostring(value or ""))
+    value = string.gsub(value, "[%p%c]+", " ")
+    value = string.gsub(value, "%s+", " ")
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    return value
+end
+
+local function tacticalFrameForTyped(view, value, context)
+    if type(context) ~= "table"
+        or tostring(context.presentationClass or "")
+            ~= "TACTICAL_PROMPT"
+    then
+        return nil
+    end
+    local lifecycle = view and view.session
+        and view.session.semanticInteractionLifecycle or nil
+    if type(lifecycle) ~= "table" then
+        lifecycle = context.interactionLifecycle
+    end
+    local beat = type(lifecycle) == "table"
+        and lifecycle.activeBeat or nil
+    local eventRef = tostring(beat and beat.eventRef or "")
+    if eventRef == "" then return nil end
+    local wanted = normalizedChoice(value)
+    if wanted == "" then return nil end
+    local projection = view and view.semanticSuggestions or nil
+    for _, candidate in ipairs(
+        type(projection) == "table" and projection.candidates or {}
+    ) do
+        local frame = type(candidate) == "table"
+            and candidate.frame or nil
+        local origin = type(frame) == "table"
+            and type(frame.origin) == "table" and frame.origin or nil
+        if type(frame) == "table"
+            and tostring(frame.kind or "") == "semantic_click_frame"
+            and tostring(frame.eventRef
+                or origin and origin.eventRef or "") == eventRef
+            and normalizedChoice(Suggestions.ResolveFrameText(frame)) == wanted
+        then
+            return frame
+        end
+    end
+    return nil
+end
+
+Internal.TacticalFrameForTyped = tacticalFrameForTyped
+
 local function rejected(view, value, reason)
     audit("semantic.input.rejected", {
         npcID = view.spec and view.spec.npcID,
@@ -33,6 +82,12 @@ function Internal.InterpretSingleSubmission(view, prepared)
     local service = Internal.ActorConversationService
         and Internal.ActorConversationService(view) or nil
     local context = Internal.ShallowContext(view)
+    if not semanticFrame then
+        semanticFrame = tacticalFrameForTyped(view, value, context)
+        if semanticFrame then
+            prepared.semanticFrame = semanticFrame
+        end
+    end
     local options = {
         timestamp = Internal.Now(),
     }

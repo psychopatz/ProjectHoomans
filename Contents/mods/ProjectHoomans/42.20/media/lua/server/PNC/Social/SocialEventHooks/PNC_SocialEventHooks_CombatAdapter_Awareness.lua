@@ -650,6 +650,9 @@ local function emitZombieAwareness(
             })
             return
         end
+        presentationClass = realization.presentationClass
+            or presentationClass
+        context.presentationClass = presentationClass
         context.eventRef = eventID
         context.offerIDs = realization.offerIDs or {}
         result = {

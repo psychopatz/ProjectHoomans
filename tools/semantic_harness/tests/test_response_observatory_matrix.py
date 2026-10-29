@@ -37,7 +37,10 @@ class ResponseQualityMatrixTests(unittest.TestCase):
             result["cases"][0]["responseTexts"][-1],
             result["cases"][1]["responseTexts"][-1],
         )
-        self.assertEqual(result["cases"][2]["transportCount"], 1)
+        self.assertEqual(result["cases"][2]["transportCount"], 2)
+        self.assertEqual(
+            result["cases"][2]["companionCommandTransportCount"], 1
+        )
 
     def test_goodbye_root_closes_while_typed_goodbye_does_not(self):
         from tools.semantic_harness.inspection.response_observatory import (
@@ -91,7 +94,8 @@ class ResponseQualityMatrixTests(unittest.TestCase):
             self.assertEqual(case["rejectionReason"], "permission_denied")
             self.assertEqual(case["actions"], 1)
             self.assertEqual(case["actionCountKind"], "attempted_dispatch")
-            self.assertEqual(case["transportCount"], 1)
+            self.assertEqual(case["transportCount"], 2)
+            self.assertEqual(case["companionCommandTransportCount"], 1)
             self.assertEqual(case["commandDecisionKind"],
                              "CONFIGURED_FIXTURE_NETWORK_REPLY")
             self.assertFalse(case["nativeServerAuthorityVerified"])

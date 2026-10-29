@@ -324,7 +324,70 @@ Adapter.RegisterAction("CAMP", {
     },
 })
 
+local COMBAT_INTENT_RESPONSES = {
+    combat_engage = {
+        default = "semantic.combat.horde.ack.engage_default",
+        variants = {
+            {
+                id = "eager",
+                templateID = "semantic.combat.horde.ack.engage_eager",
+                priority = 4,
+                when = {
+                    combatReactionStyle = { "aggressive", "brave" },
+                },
+            },
+            {
+                id = "hesitant",
+                templateID = "semantic.combat.horde.ack.engage_hesitant",
+                priority = 4,
+                when = { combatReactionStyle = "shaken" },
+            },
+            {
+                id = "reserved",
+                templateID = "semantic.combat.horde.ack.engage_reserved",
+                priority = 3,
+                when = {
+                    combatReactionStyle = { "reserved", "cold" },
+                },
+            },
+        },
+    },
+    combat_avoid = {
+        default = "semantic.combat.horde.ack.avoid_default",
+        variants = {
+            {
+                id = "relief",
+                templateID = "semantic.combat.horde.ack.avoid_relief",
+                priority = 4,
+                when = {
+                    combatReactionStyle = { "shaken", "supportive" },
+                },
+            },
+        },
+    },
+    combat_hold = {
+        default = "semantic.combat.horde.ack.hold_default",
+        variants = {
+            {
+                id = "eager",
+                templateID = "semantic.combat.horde.ack.hold_eager",
+                priority = 3,
+                when = {
+                    combatReactionStyle = { "aggressive", "brave" },
+                },
+            },
+            {
+                id = "hesitant",
+                templateID = "semantic.combat.horde.ack.hold_hesitant",
+                priority = 3,
+                when = { combatReactionStyle = "shaken" },
+            },
+        },
+    },
+}
+
 local function registerCombatIntentAction(action, commandID)
+    local responses = COMBAT_INTENT_RESPONSES[commandID] or {}
     Adapter.RegisterAction(action, {
         capabilityID = "pnc:companion." .. string.lower(action),
         owner = "PNC.CompanionCommands",
@@ -361,13 +424,15 @@ local function registerCombatIntentAction(action, commandID)
         },
         responsePools = {
             queued = {
-                templateID = "semantic.command.accepted",
+                templateID = responses.default
+                    or "semantic.command.reply.generic_rejected",
+                variants = responses.variants,
             },
             rejected = {
-                templateID = "semantic.action.unavailable",
+                templateID = "semantic.command.reply.generic_rejected",
             },
             failed = {
-                templateID = "semantic.action.unavailable",
+                templateID = "semantic.command.reply.generic_rejected",
             },
         },
         arguments = {

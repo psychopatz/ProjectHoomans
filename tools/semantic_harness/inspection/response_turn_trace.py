@@ -63,6 +63,12 @@ def inspect_response_turn(
         } for item in looked_up[-16:] if isinstance(item, dict)
     ]
     effects = (view.get("effects") or {}).get("sideEffects") or {}
+    companion_command_transport_count = sum(
+        1 for event in effects.get("transport", [])
+        if isinstance(event, dict)
+        and event.get("command") == "CompanionCommand"
+        and event.get("direction") == "client_to_server"
+    )
     execution = view.get("execution") or {}
     return {
         "ok": True, "type": "response_turn_observatory",
@@ -76,6 +82,8 @@ def inspect_response_turn(
         "effects": {
             "actionCount": effects.get("actionCount", 0),
             "transportCount": effects.get("transportCount", 0),
+            "companionCommandTransportCount":
+                companion_command_transport_count,
             "none": effects.get("none", True),
             "actions": (effects.get("actions") or [])[:4],
         },

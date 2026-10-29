@@ -1,6 +1,6 @@
 # Progress — Semantic Combat Banter & Tactical Intent
 
-**Status:** ACTIVE — B0–B6 accepted; B7 combat-language quality and branching standardization is next.
+**Status:** ACTIVE — B0–B7 accepted; B8 Semantic Lab / Observatory observability is next.
 **Planning base:** ProjectHoomans `8632bc30`, existing `main`.
 **Parent foundation:** `docs/Jobs/OpenEndedSemanticCombatAwareness/` is developer-complete and remains accepted unless this job reproduces a regression in an owning layer.
 **Native PZ:** user live regression supplied; new job's developer implementation/acceptance not yet run.
@@ -166,16 +166,39 @@ B6 evidence:
 - changed/untracked Lua through installed Kahlua compiler: **12/12 PASS**;
 - `git diff --check`: clean.
 
-## ONE current Next Chunk — B7
+## B7 accepted — combat presentation/language/branching standardization
 
-Standardize combat presentation class and language/branching contracts:
-1. make combat response plans/families explicitly declare `BARK`, `TACTICAL_PROMPT`, or intentional `TERMINAL`;
-2. require tactical prompts to carry grounded executable offers while bark/terminal families remain valid with zero required offers;
-3. keep optional contextual continuations on barks distinct from response-required prompts;
-4. audit all non-legacy combat pools to zero unclassified families;
-5. strengthen personality/intensity/profanity variation without single-trait deterministic stereotypes;
-6. ensure semantic-click and typed equivalent tactical replies still converge on the same gameplay action;
-7. add catalog/compiler/harness checks for EN/TL coverage, presentation classification and anti-repeat behavior.
+Accepted implementation:
+- response plans now carry an explicit validated presentation class: `BARK`, `TACTICAL_PROMPT`, or `TERMINAL`;
+- every non-legacy `semantic.combat.*` response family is classified; tactical horde prompts require grounded executable `COMBAT_ENGAGE / COMBAT_AVOID / COMBAT_HOLD` offers while barks remain valid without required replies;
+- already-open conversation projections preserve the server-selected presentation class, so the full Response Channel and compact surface share the same semantic contract;
+- typed tactical equivalents resolve only against the active lifecycle offer set and current encounter event ref, then reuse the canonical semantic click frame instead of creating a second parser/action authority;
+- the existing multi-signal combat reaction profile remains the tone authority, combining relationship, condition, personality, traits, pressure and speech style rather than one-trait stereotypes;
+- combat catalog anti-repeat remains bounded through the existing response-catalog selection history;
+- automatic tactical command flows now bind to authored CodeBuilder-backed horde acknowledgement/rejection templates, repairing a latent B2 worker-boot failure without weakening response catalog validation;
+- Semantic Harness safety accounting distinguishes one authoritative `CompanionCommand` transport from the separate interaction-lifecycle envelope, preserving exactly-once command assertions;
+- translation integration accepts both canonical CodeBuilder content keys and still-supported semantic dataset keys while requiring resolved EN/TL lookups and semantic-family ownership.
+
+B7 evidence:
+- focused presentation/tactical/dialogue/speech regression set: **4/4 PASS**;
+- focused command-adapter/horde-ack/presentation set: **3/3 PASS**;
+- full `pnc_semantic`: **122/122 PASS**;
+- headless CodeBuilder/translation/Response Observatory batch: **45 tests green, 3 expected Tk/X11 skips**;
+- real worker automatic-flow registration boots; generated combat-engage queued pool has **4** variants and brave context selects `semantic.combat.horde.ack.engage_eager`;
+- installed Kahlua compiler: **10/10 changed/untracked Lua PASS**;
+- Python compilation and `git diff --check`: clean.
+
+## ONE current Next Chunk — B8
+
+Expose bounded, read-only Combat Observatory inspection from real production state:
+1. horde episode state/transitions and current encounter intent;
+2. current combat moment context;
+3. arbiter speak/silence decisions and rejection reason;
+4. selected presentation class and response-plan offers;
+5. weapon family/skill/name-eligibility predicates;
+6. cooldown/team/speaker/family budget reasons;
+7. a compact agent-facing explanation of why the NPC spoke, stayed silent, asked, or selected a line;
+8. reuse existing `CombatMoment.Snapshot`, `CombatEncounterIntent.Snapshot`, `CombatBanterArbiter.Snapshot` and response-catalog APIs; do not add a monolithic trace dump or a second state owner.
 
 ## Remaining mandatory phases
 
@@ -194,6 +217,6 @@ B0 baseline -> B1 horde episode/routing -> B2 team tactical intent -> B3 non-mod
 
 ## Evidence status
 
-B0–B6 are developer-accepted with focused and broad evidence above. B7–B9 remain mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
+B0–B7 are developer-accepted with focused and broad evidence above. B8–B9 remain mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
 
 Git history is the implementation diary; keep this file as current truth rather than appending per-commit narratives.

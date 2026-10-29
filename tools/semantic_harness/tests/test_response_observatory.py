@@ -83,7 +83,10 @@ class ResponseObservatoryTests(unittest.TestCase):
                              "TEMPLATE_CANDIDATES_ONLY")
             self.assertEqual(reply["registeredVariants"][0]["sourceKind"],
                              "GENERATED_REGISTRATION_SITE")
-            self.assertEqual(follow["effects"]["transportCount"], 1)
+            self.assertEqual(follow["effects"]["transportCount"], 2)
+            self.assertEqual(
+                follow["effects"]["companionCommandTransportCount"], 1
+            )
             self.assertEqual(follow["effects"]["actionCount"], 1)
             with self.assertRaisesRegex(HarnessError, "invalid_response_key"):
                 worker.response_key_lookup("")

@@ -102,7 +102,7 @@ local function whenFor(row)
     return when
 end
 
-local function variants(rows, poolID, act)
+local function variants(rows, poolID, act, presentationClass)
     local output = {}
     for index, row in ipairs(rows) do
         local semanticID = "semantic." .. poolID .. "." .. row.id
@@ -120,6 +120,7 @@ local function variants(rows, poolID, act)
                 dialogueAct = row.act or act or "REPLY",
                 sourcePoolID = "semantic." .. poolID,
                 topic = topic,
+                presentationClass = presentationClass,
                 turns = { { segments = {
                     { kind = "translation", templateID = semanticID },
                 } } },
@@ -136,7 +137,7 @@ Catalog.Register("semantic.command.reply", {
     variants = variants(REPLY, "command.reply", "ACK"),
 })
 Catalog.Register("semantic.combat.horde.ack", {
-    variants = variants(HORDE_ACK, "combat.horde.ack", "ACK"),
+    variants = variants(HORDE_ACK, "combat.horde.ack", "ACK", "BARK"),
 })
 
 return true

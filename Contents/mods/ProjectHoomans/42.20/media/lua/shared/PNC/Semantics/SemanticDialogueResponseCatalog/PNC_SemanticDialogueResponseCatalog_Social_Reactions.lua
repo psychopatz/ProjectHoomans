@@ -99,11 +99,14 @@ local FOLLOW_UP_OFFERS = {
     },
 }
 
-local function plan(poolID, act, topic, templateID, offers)
+local function plan(
+    poolID, act, topic, templateID, offers, presentationClass
+)
     return {
         dialogueAct = act,
         sourcePoolID = poolID,
         topic = topic,
+        presentationClass = presentationClass,
         turns = { {
             segments = {
                 { kind = "translation", templateID = templateID },
@@ -113,8 +116,10 @@ local function plan(poolID, act, topic, templateID, offers)
     }
 end
 
-local function response(poolID, id, when, priority, act, topic, offers,
-    templatePrefix)
+local function response(
+    poolID, id, when, priority, act, topic, offers,
+    templatePrefix, presentationClass
+)
     local templateID = (templatePrefix or poolID) .. "." .. id
     return {
         id = templateID,
@@ -122,7 +127,9 @@ local function response(poolID, id, when, priority, act, topic, offers,
         contentOwner = CONTENT_OWNER,
         when = when,
         priority = priority or 0,
-        plan = plan(poolID, act, topic, templateID, offers),
+        plan = plan(
+            poolID, act, topic, templateID, offers, presentationClass
+        ),
     }
 end
 
@@ -370,7 +377,8 @@ for _, role in ipairs({ "witness", "killer" }) do
                     "REACT",
                     "combat",
                     FOLLOW_UP_OFFERS.kill,
-                    poolID
+                    poolID,
+                    "BARK"
                 )
             end
         end
@@ -385,7 +393,8 @@ for _, role in ipairs({ "witness", "killer" }) do
                 "REACT",
                 "combat",
                 FOLLOW_UP_OFFERS.kill,
-                "semantic.combat.reaction"
+                "semantic.combat.reaction",
+                "BARK"
             )
         end
         Catalog.Register(poolID, { variants = variants })
@@ -404,7 +413,8 @@ for _, style in ipairs(KILL_REACTION_STYLES) do
             "REACT",
             "combat",
             FOLLOW_UP_OFFERS.humanKill,
-            poolID
+            poolID,
+            "BARK"
         )
     end
     Catalog.Register(poolID, { variants = variants })
@@ -419,7 +429,9 @@ Catalog.Register("semantic.combat.horde.prompt", {
             4,
             "QUESTION",
             "combat",
-            HORDE_TACTICAL_OFFERS
+            HORDE_TACTICAL_OFFERS,
+            nil,
+            "TACTICAL_PROMPT"
         ),
         response(
             "semantic.combat.horde.prompt",
@@ -428,7 +440,9 @@ Catalog.Register("semantic.combat.horde.prompt", {
             4,
             "QUESTION",
             "combat",
-            HORDE_TACTICAL_OFFERS
+            HORDE_TACTICAL_OFFERS,
+            nil,
+            "TACTICAL_PROMPT"
         ),
         response(
             "semantic.combat.horde.prompt",
@@ -437,7 +451,9 @@ Catalog.Register("semantic.combat.horde.prompt", {
             3,
             "QUESTION",
             "combat",
-            HORDE_TACTICAL_OFFERS
+            HORDE_TACTICAL_OFFERS,
+            nil,
+            "TACTICAL_PROMPT"
         ),
         response(
             "semantic.combat.horde.prompt",
@@ -446,7 +462,9 @@ Catalog.Register("semantic.combat.horde.prompt", {
             0,
             "QUESTION",
             "combat",
-            HORDE_TACTICAL_OFFERS
+            HORDE_TACTICAL_OFFERS,
+            nil,
+            "TACTICAL_PROMPT"
         ),
     },
 })
@@ -460,7 +478,9 @@ Catalog.Register("semantic.combat.horde", {
             4,
             "WARN",
             "combat",
-            FOLLOW_UP_OFFERS.horde
+            FOLLOW_UP_OFFERS.horde,
+            nil,
+            "BARK"
         ),
         response(
             "semantic.combat.horde",
@@ -469,7 +489,9 @@ Catalog.Register("semantic.combat.horde", {
             3,
             "REACT",
             "combat",
-            FOLLOW_UP_OFFERS.horde
+            FOLLOW_UP_OFFERS.horde,
+            nil,
+            "BARK"
         ),
         response(
             "semantic.combat.horde",
@@ -478,7 +500,9 @@ Catalog.Register("semantic.combat.horde", {
             2,
             "WARN",
             "combat",
-            FOLLOW_UP_OFFERS.horde
+            FOLLOW_UP_OFFERS.horde,
+            nil,
+            "BARK"
         ),
         response(
             "semantic.combat.horde",
@@ -487,7 +511,9 @@ Catalog.Register("semantic.combat.horde", {
             0,
             "WARN",
             "combat",
-            FOLLOW_UP_OFFERS.horde
+            FOLLOW_UP_OFFERS.horde,
+            nil,
+            "BARK"
         ),
     },
 })
@@ -501,7 +527,9 @@ Catalog.Register("semantic.combat.reaction", {
             4,
             "REACT",
             "combat",
-            FOLLOW_UP_OFFERS.retreat
+            FOLLOW_UP_OFFERS.retreat,
+            nil,
+            "BARK"
         ),
         response(
             "semantic.combat.reaction",
@@ -510,7 +538,9 @@ Catalog.Register("semantic.combat.reaction", {
             3,
             "REACT",
             "combat",
-            FOLLOW_UP_OFFERS.horde
+            FOLLOW_UP_OFFERS.horde,
+            nil,
+            "BARK"
         ),
         response(
             "semantic.combat.reaction",
@@ -519,7 +549,9 @@ Catalog.Register("semantic.combat.reaction", {
             0,
             "REACT",
             "combat",
-            FOLLOW_UP_OFFERS.combat
+            FOLLOW_UP_OFFERS.combat,
+            nil,
+            "BARK"
         ),
     },
 })

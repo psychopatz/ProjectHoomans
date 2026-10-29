@@ -135,10 +135,14 @@ local function projectEventIntoConversation(receive)
     }
     root.interactionLifecycle = lifecycle
     root.semanticEventFacts = context.semanticEventFacts
+    root.presentationClass = context.presentationClass
+        or ambientFlavor.presentationClass
     if type(root.conversationBlockContext) == "table" then
         root.conversationBlockContext.interactionLifecycle = lifecycle
         root.conversationBlockContext.semanticEventFacts =
             context.semanticEventFacts
+        root.conversationBlockContext.presentationClass =
+            root.presentationClass
     end
     if session then session.semanticInteractionLifecycle = lifecycle end
 end

@@ -90,7 +90,15 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                 identity_payload = identity["messages"][0]["payload"]
                 self.assertTrue(
                     identity_payload["translationKey"].startswith(
+                        "UI_PNC_Conversation_Content_SemanticQuestionIdentity"
+                    )
+                    or identity_payload["translationKey"].startswith(
                         "UI_PNC_Conversation_Semantic_QuestionIdentity"
+                    )
+                )
+                self.assertTrue(
+                    identity_payload["semanticTemplateID"].startswith(
+                        "semantic.question.identity"
                     )
                 )
                 self.assertEqual(
@@ -104,7 +112,15 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                 wellbeing_payload = wellbeing["messages"][0]["payload"]
                 self.assertTrue(
                     wellbeing_payload["translationKey"].startswith(
-                        "UI_PNC_Conversation_Semantic_QuestionWellbeing"
+                        "UI_PNC_Conversation_Content_SemanticQuestionWellbeing"
+                    )
+                    or wellbeing_payload["translationKey"].startswith(
+                        "UI_PNC_Conversation_Semantic_QuestionWellbeingDataset"
+                    )
+                )
+                self.assertTrue(
+                    wellbeing_payload["semanticTemplateID"].startswith(
+                        "semantic.question.wellbeing."
                     )
                 )
                 if language == "TL":
@@ -122,7 +138,15 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                 self.assertEqual(tool["toolCalls"][0]["status"], "resolved")
 
                 for turn in (greeting, identity, wellbeing):
-                    self.assertEqual(turn["transport"], [])
+                    self.assertTrue(
+                        all(
+                            event.get("command")
+                            == "SemanticInteractionLifecycle"
+                            for event in turn["transport"]
+                            if isinstance(event, dict)
+                        ),
+                        turn["transport"],
+                    )
                     self.assertEqual(turn["toolCalls"], [])
 
 

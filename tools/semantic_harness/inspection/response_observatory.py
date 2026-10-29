@@ -69,6 +69,8 @@ def run_quality_matrix(
             "maxFallbackLookups", "minFallbackLookups",
             "textContains", "textNotContains",
             "minTransportCount", "maxTransportCount",
+            "minCompanionCommandTransportCount",
+            "maxCompanionCommandTransportCount",
             "commandAccepted", "executionStatus", "rejectionReason",
         }
         if set(expected) - allowed_expectations:
@@ -76,7 +78,9 @@ def run_quality_matrix(
                              + ", ".join(sorted(set(expected) - allowed_expectations)))
         for limit_name in (
             "minActions", "maxActions", "minTransportCount",
-            "maxTransportCount", "minFallbackLookups", "maxFallbackLookups",
+            "maxTransportCount", "minCompanionCommandTransportCount",
+            "maxCompanionCommandTransportCount",
+            "minFallbackLookups", "maxFallbackLookups",
         ):
             if limit_name in expected and (
                 type(expected[limit_name]) is not int
@@ -138,6 +142,12 @@ def run_quality_matrix(
         effects = inspector.get("effects", {}).get("sideEffects", {})
         actions = effects.get("actionCount", 0)
         transport_count = effects.get("transportCount", 0)
+        companion_command_transport_count = sum(
+            1 for event in effects.get("transport", [])
+            if isinstance(event, dict)
+            and event.get("command") == "CompanionCommand"
+            and event.get("direction") == "client_to_server"
+        )
         execution = inspector.get("execution") or {}
         command_accepted = execution.get("accepted")
         command_status = execution.get("status")
@@ -163,6 +173,16 @@ def run_quality_matrix(
             checks["minTransportCount"] = transport_count >= expected["minTransportCount"]
         if "maxTransportCount" in expected:
             checks["maxTransportCount"] = transport_count <= expected["maxTransportCount"]
+        if "minCompanionCommandTransportCount" in expected:
+            checks["minCompanionCommandTransportCount"] = (
+                companion_command_transport_count
+                >= expected["minCompanionCommandTransportCount"]
+            )
+        if "maxCompanionCommandTransportCount" in expected:
+            checks["maxCompanionCommandTransportCount"] = (
+                companion_command_transport_count
+                <= expected["maxCompanionCommandTransportCount"]
+            )
         if "commandAccepted" in expected:
             checks["commandAccepted"] = command_accepted is expected["commandAccepted"]
         if "executionStatus" in expected:
@@ -222,6 +242,8 @@ def run_quality_matrix(
             "actions": actions,
             "actionCountKind": "attempted_dispatch",
             "transportCount": transport_count,
+            "companionCommandTransportCount":
+                companion_command_transport_count,
             "commandAccepted": command_accepted,
             "executionStatus": command_status,
             "rejectionReason": rejection_reason,

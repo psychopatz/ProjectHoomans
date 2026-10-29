@@ -190,6 +190,9 @@ local function ambientPayload(
     if not realization or type(realization.fallback) ~= "string"
         or realization.fallback == ""
     then return nil, "semantic_realization_unavailable" end
+    local presentationClass = realization.presentationClass
+        or context.presentationClass or "BARK"
+    context.presentationClass = presentationClass
     if context.combatWeaponDisplayName then
         realization.fallback = string.gsub(
             realization.fallback,
@@ -248,7 +251,7 @@ local function ambientPayload(
             ttlMs = 7000,
             holdMs = 1600,
             context = context,
-            presentationClass = "BARK",
+            presentationClass = presentationClass,
             combatMoment = Moment.Snapshot(moment),
             source = {
                 kind = "semantic_speech",

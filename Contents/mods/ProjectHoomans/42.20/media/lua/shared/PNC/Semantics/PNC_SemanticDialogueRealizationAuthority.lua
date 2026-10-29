@@ -85,6 +85,7 @@ function Authority.Resolve(spec)
         topic = topic or selected.topic,
         responsePlanID = clean(spec.responsePlanID or poolID, 128),
         responsePlan = plan,
+        presentationClass = clean(plan.presentationClass, 32),
         realizationFamily = clean(
             spec.realizationFamily or poolID,
             128

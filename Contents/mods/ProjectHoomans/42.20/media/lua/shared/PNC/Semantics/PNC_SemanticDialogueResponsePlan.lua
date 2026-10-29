@@ -16,6 +16,11 @@ Plan.MAX_ARGS_FIELDS = 12
 Plan.MAX_ARGS_DEPTH = 3
 Plan.MAX_FACT_REFS = 8
 Plan.MAX_FACT_REF_LENGTH = 128
+Plan.PRESENTATION_CLASSES = {
+    BARK = true,
+    TACTICAL_PROMPT = true,
+    TERMINAL = true,
+}
 
 local function boundedText(value, limit)
     value = tostring(value or "")
@@ -63,6 +68,7 @@ local function normalizedMetadata(spec)
     local uncertainty = spec.uncertainty
     local tone = spec.tone
     local personalityStyle = spec.personalityStyle
+    local presentationClass = spec.presentationClass
     local factRefs, reason
     if topic ~= nil and not validID(topic) then
         return nil, "response_plan_topic_invalid"
@@ -87,6 +93,12 @@ local function normalizedMetadata(spec)
     if personalityStyle ~= nil and not validID(personalityStyle) then
         return nil, "response_plan_personality_style_invalid"
     end
+    if presentationClass ~= nil then
+        presentationClass = tostring(presentationClass)
+        if Plan.PRESENTATION_CLASSES[presentationClass] ~= true then
+            return nil, "response_plan_presentation_class_invalid"
+        end
+    end
     return {
         topic = topic and tostring(topic) or nil,
         groundedFactRefs = factRefs,
@@ -94,6 +106,7 @@ local function normalizedMetadata(spec)
         tone = tone and tostring(tone) or nil,
         personalityStyle = personalityStyle
             and tostring(personalityStyle) or nil,
+        presentationClass = presentationClass,
     }
 end
 
@@ -281,6 +294,7 @@ function Plan.Build(spec)
         uncertainty = metadata.uncertainty,
         tone = metadata.tone,
         personalityStyle = metadata.personalityStyle,
+        presentationClass = metadata.presentationClass,
         turns = {},
     }
     local index
@@ -310,6 +324,7 @@ function Plan.FromResponse(response, dialogueAct, sourcePoolID)
         uncertainty = response.uncertainty,
         tone = response.tone,
         personalityStyle = response.personalityStyle,
+        presentationClass = response.presentationClass,
         segments = {
             {
                 kind = "translation",
@@ -366,6 +381,8 @@ function Plan.Compose(first, second)
         tone = first.tone or second.tone,
         personalityStyle = first.personalityStyle
             or second.personalityStyle,
+        presentationClass = first.presentationClass == second.presentationClass
+            and first.presentationClass or nil,
         turns = turns,
     })
 end
