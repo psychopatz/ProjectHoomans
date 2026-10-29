@@ -35,6 +35,7 @@ function Plan.Build(beat, behavior, stimulus, state, pragmatic)
         sourceSpeechAct = semantic.speechAct,
         groundedFactRefs = ValueBounds.Copy(pragmatic.groundedFactRefs) or {},
         groundedEventRefs = ValueBounds.Copy(pragmatic.groundedEventRefs) or {},
+        continuation = ValueBounds.Copy(behavior.continuation),
         outputs = outputs,
         -- Compatibility aliases while ResponsePlan consumes speech output.
         dialogueAct = speech and speech.dialogueAct or nil,

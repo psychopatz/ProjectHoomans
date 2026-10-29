@@ -102,6 +102,43 @@ local function indexedList(canonicalIndex, overlayIndex, stimulus)
     return output
 end
 
+local function normalizeContinuation(value)
+    if value == nil then return true, nil end
+    if type(value) ~= "table" then
+        return false, "behavior_continuation_invalid"
+    end
+    local mode = tostring(value.mode or "")
+    if mode ~= "emit" and mode ~= "wait" and mode ~= "terminate" then
+        return false, "behavior_continuation_mode_invalid"
+    end
+    local target = tostring(
+        value.target or (mode == "terminate" and "none" or "source")
+    )
+    if target ~= "source" and target ~= "none" then
+        return false, "behavior_continuation_target_invalid"
+    end
+    if mode == "emit" and target == "none" then
+        return false, "behavior_continuation_target_required"
+    end
+    for _, field in ipairs({ "intent", "speechAct", "expectedResponse" }) do
+        if value[field] ~= nil and not validToken(value[field]) then
+            return false, "behavior_continuation_" .. field .. "_invalid"
+        end
+    end
+    local normalized = {
+        mode = mode,
+        target = target,
+        inheritFactRefs = value.inheritFactRefs ~= false,
+        inheritEventRefs = value.inheritEventRefs ~= false,
+    }
+    if value.intent ~= nil then normalized.intent = value.intent end
+    if value.speechAct ~= nil then normalized.speechAct = value.speechAct end
+    if value.expectedResponse ~= nil then
+        normalized.expectedResponse = value.expectedResponse
+    end
+    return true, normalized
+end
+
 local function validateBehavior(definition)
     if type(definition) ~= "table" then return false, "behavior_invalid" end
     if not validID(definition.id, "behavior.") then
@@ -256,6 +293,11 @@ local function validateBehavior(definition)
         if not ok then return false, reason end
     end
 
+    local continuationOK, continuation = normalizeContinuation(
+        definition.continuation
+    )
+    if not continuationOK then return false, continuation end
+
     local output = copy(definition, 0)
     output.version = tonumber(output.version) or 1
     output.owner = tostring(output.owner or "ProjectHoomans")
@@ -264,6 +306,7 @@ local function validateBehavior(definition)
     output.stimuli = normalizedStimuli
     output.requiredCapabilities = normalizedCapabilities
     output.outputs = normalizedOutputs
+    output.continuation = continuation
     output.baseRelevance = base
     output.modifiers = copy(modifiers, 0) or {}
     return true, output

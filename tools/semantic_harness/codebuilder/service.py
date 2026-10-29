@@ -709,7 +709,7 @@ class SemanticLabAuthoringService:
             },
             "behavior": {
                 "id", "version", "owner", "act", "mode", "stimuli",
-                "requiredCapabilities", "outputs", "when",
+                "requiredCapabilities", "outputs", "continuation", "when",
                 "baseRelevance", "modifiers",
             },
         }[kind]

@@ -1,6 +1,6 @@
 # Progress — Semantic Interaction Scene Runtime
 
-**Status:** ACTIVE — S0–S2 accepted; S3 semantic continuation is next.
+**Status:** ACTIVE — S0–S3 accepted; S4 recipient/observer/player handoff is next.
 
 **Planning base:** ProjectHoomans `47aaad69`, existing `main`.
 
@@ -85,18 +85,40 @@ S2 evidence:
 - S2 Lua through installed Kahlua compiler: **4/4 PASS**;
 - focused `git diff --check`: clean.
 
-## ONE current Next Chunk — S3
+## S3 accepted — semantic continuation
 
-Implement generic semantic continuation from a selected InteractionPlan/behavior into a subsequent Scene stimulus.
+Accepted implementation:
+- behavior definitions now have a validated optional `continuation` contract shared by CodeBuilder and runtime catalog;
+- supported generic modes are `emit / wait / terminate`, with bounded target/intent/speechAct/expected-response metadata;
+- selected behavior continuation survives InteractionArbitration into InteractionPlan;
+- Scene computes continuation from semantic plan metadata only and exposes explicit `Continue` / bounded `RunContinuations` APIs;
+- responder becomes the next semantic source and target policy can address the prior source;
+- grounded fact/event refs are inherited without reparsing realized speech;
+- scene-local disclosed facts/events allow follow-up about what was just disclosed without mutating durable knowledge;
+- player targets become `wait:player_input_required`; the runtime never invents a player reply;
+- explicit terminate closes the scene; undeclared continuation remains external/no-op rather than forcing closure;
+- bounded repeat history suppresses continuation loops.
 
-S3 must:
-1. project continuation from semantic behavior/plan metadata, never rendered text;
-2. keep explicit source/target and grounded fact/event refs;
-3. support terminate, wait-for-external-input and emit-next-act outcomes;
-4. never auto-answer on behalf of a player participant;
-5. enforce live-participant target validity, max turns, TTL and bounded loop/strategy anti-repeat;
-6. expose continuation decision/reason in Scene result/snapshot;
-7. prove multi-turn memory/news and warning/proposal chains without Parser/NLU calls.
+S3 evidence:
+- continuation/Scene/Scheduler/Provider/Director Lua matrix: **5/5 PASS**;
+- CodeBuilder continuation compiler contract: **4/4 PASS**;
+- full `pnc_semantic` selection: **127/127 PASS**;
+- deterministic CodeBuilder double generation: **188 files / 482 phrase families**, byte-identical;
+- changed Lua through installed Kahlua compiler: **6/6 PASS**;
+- Python compilation and `git diff --check`: clean.
+
+## ONE current Next Chunk — S4
+
+Productionize recipient/observer/player handoff without creating a second semantic authority.
+
+S4 must:
+1. represent speaker, semantic recipient, participants and observers separately in Scene/presentation transport;
+2. deliver NPC->NPC presentation through existing NPC speech rendering;
+3. let nearby players observe without becoming semantic recipients;
+4. expose zero player response affordances for overheard-only speech;
+5. when an NPC addresses a participating player, project the same semantic lifecycle/offers into existing player response surfaces;
+6. allow a canonical player semantic response to resume the waiting Scene;
+7. bound multiplayer/local observer fanout and never rerun the semantic decision per observer.
 
 ## Remaining mandatory phases
 

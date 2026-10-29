@@ -7,6 +7,8 @@ local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
 local Presentation = require
     "PNC/Semantics/PNC_SemanticInteractionPresentation"
 local Scheduler = require "PNC/Semantics/PNC_SemanticInteractionScheduler"
+local Continuation = require
+    "PNC/Semantics/PNC_SemanticInteractionContinuation"
 local ValueBounds = require "PNC/Semantics/PNC_SemanticValueBounds"
 
 local Scene = PNC.Semantics.InteractionScene or {}
@@ -34,6 +36,20 @@ local function hasValue(values, target)
         if values[index] == target then return true end
     end
     return false
+end
+
+local function boundedRefs(values, limit)
+    local output = {}
+    local seen = {}
+    for _, value in ipairs(type(values) == "table" and values or {}) do
+        local id = boundedID(value)
+        if id and not seen[id] then
+            output[#output + 1] = id
+            seen[id] = true
+            if #output >= (limit or Scene.MAX_FACT_REFS) then break end
+        end
+    end
+    return output
 end
 
 local function boundedDirectorState(value)
@@ -150,6 +166,10 @@ local function participantMap(spec)
             projection = type(raw.projection) == "table"
                 and copy(raw.projection) or nil,
             adapterContext = copy(raw.adapterContext) or {},
+            isPlayer = raw.isPlayer == true
+                or tostring(raw.kind or "") == "player",
+            kind = raw.isPlayer == true
+                and "player" or tostring(raw.kind or "npc"),
         }
         order[#order + 1] = id
     end
@@ -179,12 +199,49 @@ end
 
 local function sourceKnowsFact(scene, source, target, factID)
     if not factID then return true end
+    local localFacts = scene.disclosedFacts
+        and scene.disclosedFacts[source.id] or nil
+    if localFacts and localFacts[factID] == true then return true end
     local projection, reason = projectionFor(scene, source, target)
     if not projection then return false, reason end
     local knowledge = type(projection.knowledge) == "table"
         and projection.knowledge or {}
     if hasValue(knowledge.factRefs, factID) then return true end
     return false, "source_fact_unknown:" .. tostring(factID)
+end
+
+local function sourceKnowsFacts(scene, source, target, factRefs)
+    for _, factID in ipairs(factRefs or {}) do
+        local known, reason = sourceKnowsFact(scene, source, target, factID)
+        if not known then return false, reason end
+    end
+    return true
+end
+
+local function rememberDisclosure(scene, targetID, stimulus)
+    if not targetID or type(stimulus) ~= "table" then return end
+    local payload = type(stimulus.payload) == "table"
+        and stimulus.payload or {}
+    local facts = boundedRefs(payload.factRefs, Scene.MAX_FACT_REFS)
+    local events = boundedRefs(payload.eventRefs, Scene.MAX_WORLD_EVENTS)
+    scene.disclosedFacts[targetID] = scene.disclosedFacts[targetID] or {}
+    scene.disclosedEvents[targetID] = scene.disclosedEvents[targetID] or {}
+    local factMap = scene.disclosedFacts[targetID]
+    local eventMap = scene.disclosedEvents[targetID]
+    for _, id in ipairs(facts) do factMap[id] = true end
+    for _, id in ipairs(events) do eventMap[id] = true end
+
+    local function trim(map, limit)
+        local keys = {}
+        for key in pairs(map) do keys[#keys + 1] = key end
+        table.sort(keys)
+        while #keys > limit do
+            map[keys[1]] = nil
+            table.remove(keys, 1)
+        end
+    end
+    trim(factMap, Scene.MAX_FACT_REFS)
+    trim(eventMap, Scene.MAX_WORLD_EVENTS)
 end
 
 local function appendHistory(scene, stimulus, preview, sourceID, targetID)
@@ -206,6 +263,14 @@ local function appendHistory(scene, stimulus, preview, sourceID, targetID)
         topic = semantic.topic,
         factID = semantic.factID,
         eventID = semantic.eventID,
+        factRefs = boundedRefs(
+            stimulus.payload and stimulus.payload.factRefs,
+            Scene.MAX_FACT_REFS
+        ),
+        eventRefs = boundedRefs(
+            stimulus.payload and stimulus.payload.eventRefs,
+            Scene.MAX_WORLD_EVENTS
+        ),
         behaviorID = preview.interactionPlan
             and preview.interactionPlan.behaviorID or nil,
         behaviorAct = preview.interactionPlan
@@ -281,6 +346,16 @@ local function process(
     local history = appendHistory(
         scene, stimulus, preview, sourceID, responderID
     )
+    rememberDisclosure(scene, responderID, stimulus)
+    scene.lastTurn = {
+        sequence = history.sequence,
+        sourceID = sourceID,
+        responderID = responderID,
+        stimulus = copy(stimulus),
+        plan = copy(preview.interactionPlan),
+    }
+    local continuation = Continuation.Decide(scene, scene.lastTurn)
+    scene.lastContinuation = copy(continuation)
     return {
         schemaVersion = Scene.VERSION,
         sceneID = scene.id,
@@ -291,6 +366,7 @@ local function process(
         semanticHistoryEvent = copy(history),
         realizationPolicy = copy(handled.realization),
         sceneTurn = handled.sceneTurn,
+        continuation = copy(continuation),
     }
 end
 
@@ -355,6 +431,11 @@ function Scene.New(spec)
         worldEvents = worldEvents,
         scheduler = scheduler,
         ownsScheduler = ownsScheduler,
+        disclosedFacts = {},
+        disclosedEvents = {},
+        continuationHistory = {},
+        lastTurn = nil,
+        lastContinuation = nil,
     }
     instance.semanticState = makeSemanticState(instance)
 
@@ -373,11 +454,32 @@ function Scene.New(spec)
             return nil, "scene_self_response_invalid"
         end
 
-        local factID = request.factID and boundedID(request.factID) or nil
-        local knows, knowledgeReason = sourceKnowsFact(
-            self, source, responder, factID
+        local factRefs = boundedRefs(
+            request.factRefs, Scene.MAX_FACT_REFS
+        )
+        local factID = request.factID and boundedID(request.factID)
+            or factRefs[1]
+        if factID and not hasValue(factRefs, factID) then
+            table.insert(factRefs, 1, factID)
+            while #factRefs > Scene.MAX_FACT_REFS do
+                table.remove(factRefs)
+            end
+        end
+        local knows, knowledgeReason = sourceKnowsFacts(
+            self, source, responder, factRefs
         )
         if not knows then return nil, knowledgeReason end
+        local eventRefs = boundedRefs(
+            request.eventRefs, Scene.MAX_WORLD_EVENTS
+        )
+        local eventID = request.eventID and boundedID(request.eventID)
+            or eventRefs[1]
+        if eventID and not hasValue(eventRefs, eventID) then
+            table.insert(eventRefs, 1, eventID)
+            while #eventRefs > Scene.MAX_WORLD_EVENTS do
+                table.remove(eventRefs)
+            end
+        end
 
         local projection, projectionReason = projectionFor(
             self, responder, source
@@ -387,7 +489,7 @@ function Scene.New(spec)
         local stimulus = {
             type = "NPC_SEMANTIC_ACT",
             source = {
-                kind = "npc",
+                kind = source.isPlayer == true and "player" or "npc",
                 actorID = sourceID,
                 providerID = request.providerID
                     or "interaction.scene.semantic_act",
@@ -400,10 +502,11 @@ function Scene.New(spec)
                 topic = request.topic or self.topic,
                 confidence = tonumber(request.confidence) or 1,
                 factID = factID,
-                eventID = request.eventID,
+                eventID = eventID,
             },
             payload = {
-                factRefs = factID and { factID } or {},
+                factRefs = factRefs,
+                eventRefs = eventRefs,
             },
         }
         return process(
@@ -471,6 +574,93 @@ function Scene.New(spec)
         )
     end
 
+    function Methods:Continue(result)
+        if self.status ~= "active" then return nil, "scene_closed" end
+        result = type(result) == "table" and result or {}
+        local sequence = result.semanticHistoryEvent
+            and tonumber(result.semanticHistoryEvent.sequence) or nil
+        if not self.lastTurn or sequence ~= self.lastTurn.sequence then
+            return nil, "scene_continuation_stale"
+        end
+
+        local decision = Continuation.Decide(self, self.lastTurn)
+        self.lastContinuation = copy(decision)
+        if decision.mode == "terminate" then
+            local closed, closeReason = self:Close(
+                decision.reason or "continuation_terminate"
+            )
+            return {
+                decision = copy(decision),
+                terminated = closed ~= nil,
+                closeReason = closeReason,
+            }
+        end
+        if decision.mode == "wait" or decision.mode == "none" then
+            return {
+                decision = copy(decision),
+                emitted = false,
+            }
+        end
+        if decision.mode ~= "emit" then
+            return nil, "scene_continuation_invalid"
+        end
+
+        local emitted, emitReason = self:EmitSemanticAct({
+            sourceID = decision.sourceID,
+            responderID = decision.targetID,
+            intent = decision.intent,
+            speechAct = decision.speechAct,
+            topic = decision.topic,
+            subject = decision.subject,
+            factRefs = decision.factRefs,
+            eventRefs = decision.eventRefs,
+            providerID = "interaction.scene.continuation",
+        })
+        if not emitted then return nil, emitReason end
+        Continuation.Remember(self, decision, sequence)
+        return {
+            decision = copy(decision),
+            emitted = true,
+            result = emitted,
+        }
+    end
+
+    function Methods:RunContinuations(result, options)
+        options = type(options) == "table" and options or {}
+        local maxSteps = math.min(
+            Continuation.MAX_STEPS,
+            math.max(1, math.floor(tonumber(options.maxSteps) or 4))
+        )
+        local current = result
+        local steps = {}
+        for _ = 1, maxSteps do
+            local advanced, reason = self:Continue(current)
+            if not advanced then
+                return {
+                    steps = steps,
+                    stopped = true,
+                    reason = reason,
+                }
+            end
+            steps[#steps + 1] = advanced
+            if not advanced.emitted or not advanced.result then
+                return {
+                    steps = steps,
+                    stopped = true,
+                    reason = advanced.decision
+                        and advanced.decision.reason
+                        or "continuation_stopped",
+                }
+            end
+            current = advanced.result
+        end
+        return {
+            steps = steps,
+            stopped = true,
+            reason = "continuation_step_limit",
+        }
+    end
+
     function Methods:UpdateVisibility(specification)
         local updated, updateReason = self.scheduler:UpdateVisibility(
             self.id, specification
@@ -500,6 +690,7 @@ function Scene.New(spec)
             semanticHistoryCount = #self.semanticHistory,
             sequence = self.semanticState.sequence,
             director = self.semanticState:GetDirectorState(),
+            continuation = Continuation.Snapshot(self),
             scheduler = schedulerSnapshot,
             transcriptStored = false,
         }

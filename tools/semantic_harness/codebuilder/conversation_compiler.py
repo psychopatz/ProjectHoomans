@@ -441,6 +441,66 @@ def _validate_behavior_shard(document: dict[str, Any], path: str) -> dict[str, A
                 + ", ".join(unsupported_outputs)
             )
 
+        continuation = raw.get("continuation")
+        normalized_continuation: dict[str, Any] | None = None
+        if continuation is not None:
+            if not isinstance(continuation, dict):
+                raise CompileError(f"{label}.continuation must be an object")
+            continuation_mode = str(continuation.get("mode") or "")
+            if continuation_mode not in ("emit", "wait", "terminate"):
+                raise CompileError(
+                    f"{label}.continuation.mode must be emit, wait, or terminate"
+                )
+            continuation_target = str(
+                continuation.get("target") or (
+                    "none" if continuation_mode == "terminate" else "source"
+                )
+            )
+            if continuation_target not in ("source", "none"):
+                raise CompileError(
+                    f"{label}.continuation.target must be source or none"
+                )
+            if continuation_mode == "emit" and continuation_target == "none":
+                raise CompileError(
+                    f"{label}.continuation emit requires a target"
+                )
+            continuation_intent = continuation.get("intent")
+            if continuation_intent is not None and (
+                not isinstance(continuation_intent, str)
+                or not token.fullmatch(continuation_intent)
+            ):
+                raise CompileError(
+                    f"{label}.continuation.intent must be a bounded semantic token"
+                )
+            continuation_speech_act = continuation.get("speechAct")
+            if continuation_speech_act is not None and (
+                not isinstance(continuation_speech_act, str)
+                or not token.fullmatch(continuation_speech_act)
+            ):
+                raise CompileError(
+                    f"{label}.continuation.speechAct must be a bounded semantic token"
+                )
+            expected_response = continuation.get("expectedResponse")
+            if expected_response is not None and (
+                not isinstance(expected_response, str)
+                or not token.fullmatch(expected_response)
+            ):
+                raise CompileError(
+                    f"{label}.continuation.expectedResponse must be a bounded semantic token"
+                )
+            normalized_continuation = {
+                "mode": continuation_mode,
+                "target": continuation_target,
+                "inheritFactRefs": continuation.get("inheritFactRefs", True) is not False,
+                "inheritEventRefs": continuation.get("inheritEventRefs", True) is not False,
+            }
+            if continuation_intent is not None:
+                normalized_continuation["intent"] = continuation_intent
+            if continuation_speech_act is not None:
+                normalized_continuation["speechAct"] = continuation_speech_act
+            if expected_response is not None:
+                normalized_continuation["expectedResponse"] = expected_response
+
         when = raw.get("when")
         if when is not None:
             when = _validate_director_predicate(when, f"{label}.when")
@@ -479,21 +539,22 @@ def _validate_behavior_shard(document: dict[str, Any], path: str) -> dict[str, A
                     "reason": str(modifier.get("reason") or "")[:96],
                 }
             )
-        records.append(
-            {
-                "id": record_id,
-                "version": int(raw.get("version", 1)),
-                "owner": str(raw.get("owner") or "ProjectHoomans"),
-                "act": act,
-                "mode": mode,
-                "stimuli": stimuli,
-                "requiredCapabilities": required_capabilities,
-                "outputs": outputs,
-                "when": when,
-                "baseRelevance": float(relevance),
-                "modifiers": normalized_modifiers,
-            }
-        )
+        record = {
+            "id": record_id,
+            "version": int(raw.get("version", 1)),
+            "owner": str(raw.get("owner") or "ProjectHoomans"),
+            "act": act,
+            "mode": mode,
+            "stimuli": stimuli,
+            "requiredCapabilities": required_capabilities,
+            "outputs": outputs,
+            "when": when,
+            "baseRelevance": float(relevance),
+            "modifiers": normalized_modifiers,
+        }
+        if normalized_continuation is not None:
+            record["continuation"] = normalized_continuation
+        records.append(record)
     return {"records": records}
 
 

@@ -171,6 +171,7 @@ local function scoredBehavior(behavior, root, beatRelevance)
         stimuli = copy(behavior.stimuli) or {},
         requiredCapabilities = copy(behavior.requiredCapabilities) or {},
         outputs = outputs,
+        continuation = copy(behavior.continuation),
         -- Compatibility projection for current response-plan/harness consumers.
         dialogueAct = speech and speech.dialogueAct or nil,
         contentTemplateID = speech and speech.contentTemplateID or nil,
