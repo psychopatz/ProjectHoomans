@@ -248,3 +248,23 @@ Forbidden:
 - matching its module structure merely for similarity.
 
 Project Hoomans' Registry, Presence, BodyLifecycle, NetworkSnapshots and ClientPresenceSync remain the owning architecture.
+
+## Implemented lease issuance contract (M1)
+
+`runtime.bodyLease` remains the sole physical incarnation token. On an MP
+server, BodyLifecycle keeps weak, process-local shell receipts. The first
+stamp of a physical shell allocates a lease even if a restored save or optional
+Core provider supplied an old lease. Repeated stamps of the same shell keep
+the receipt lease. Clearing the runtime lease releases it; stamping a recycled
+object then allocates a new lease. A process-local serial suffix prevents
+same-clock/random collisions during issuance. Receipts are not persisted.
+
+SP retains pre-5dbbadc4 allocation/restoration behavior. Core provider leases
+remain provider ownership contracts; their identity does not establish an MP
+physical shell incarnation.
+
+Opaque lease strings must never be lexically ordered. Network reconciliation
+must pair lease equality with the existing replicaSequence/presenceRevision
+ordering and a server-session boundary. This ordering is transport freshness,
+not a parallel physical generation authority. Death invalidation, ordering and
+reconnect integration remain mandatory in later phases.

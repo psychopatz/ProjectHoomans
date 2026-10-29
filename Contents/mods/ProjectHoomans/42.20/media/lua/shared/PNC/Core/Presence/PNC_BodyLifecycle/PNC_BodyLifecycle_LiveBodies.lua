@@ -9,6 +9,28 @@ local Internal = Lifecycle.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
+-- MP replicas cannot inherit server object identity. Keep one process-local,
+-- weak shell receipt so restored/provider leases cannot be reused for a new
+-- physical incarnation. SP deliberately retains its local lease semantics.
+local shellReceipts = setmetatable({}, { __mode = "k" })
+local shellSerial = 0
+local function ensureIncarnation(record, zombie, runtime)
+    if not isServer or isServer() ~= true then
+        if not runtime.bodyLease or tostring(runtime.bodyLease) == "" then
+            runtime.bodyLease = Core.GenerateID("body")
+        end
+        return
+    end
+    local receipt = shellReceipts[zombie]
+    if receipt and receipt.id == record.id and runtime.bodyLease ~= nil then
+        runtime.bodyLease = receipt.lease
+        return
+    end
+    shellSerial = shellSerial + 1
+    runtime.bodyLease = Core.GenerateID("body") .. "_" .. tostring(shellSerial)
+    shellReceipts[zombie] = { id = record.id, lease = runtime.bodyLease }
+end
+
 local function validEngineIdentity(value)
     local numeric
     if value == nil or tostring(value) == "" or tostring(value) == "0" then
@@ -134,9 +156,7 @@ function Lifecycle.StampLiveBody(record, zombie)
     record.runtime = runtime
     restoredBodyRebind = runtime.restoredBodyRebindPending == true
     startupBodyHint = restoredBodyRebind and runtime.startupBodyHint or nil
-    if not runtime.bodyLease or tostring(runtime.bodyLease) == "" then
-        runtime.bodyLease = Core.GenerateID("body")
-    end
+    ensureIncarnation(record, zombie, runtime)
     modData = zombie:getModData()
     modData.PNC_Owner = "ProjectHoomans"
     modData.PNC_OwnerVersion = 1

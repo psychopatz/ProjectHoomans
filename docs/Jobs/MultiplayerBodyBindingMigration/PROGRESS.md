@@ -15,7 +15,7 @@
 - Project A-Life independently demonstrates a viable logical actor + disposable IsoZombie shell + explicit onlineId/uid/generation client-reconciliation pattern.
 - Current repository worktree was clean at planning time.
 
-## Immediate Next Chunk — M0A
+## Original M0A checklist (historical; evidence below)
 
 1. Recheck branch/HEAD/status and current native logs.
 2. Characterize the SP regression around 5dbbadc4 with focused body factory/presence/restart tests.
@@ -74,3 +74,12 @@ Finish M0 engine-boundary/snapshot fixtures and SP lifecycle evidence; audit bod
 - Expanded focused suite: 131/131. Full isolated Lua suite: 963/963 (7.32s). git diff --check clean.
 - Preliminary lease audit: beginMaterialization clears runtime.bodyLease; StampLiveBody assigns it; detach/unregister clear it; RebindRestoredBody may restore startupBodyHint.lease. M1 must explicitly address restored leases plus unordered opaque tokens before accepting incarnation safety.
 - Next: finish snapshot/local lifecycle contract evidence for M0; complete M1 lease audit and then implement canonical binding M2–M8. Parent remains active.
+
+## M1 lease issuance checkpoint — 2026-10-30
+
+- Audited all Hoomans bodyLease assignments: lifecycle stamp/detach, Presence materialize/restored rebind, Registry unregister, and optional CoreProvider adapter. The adapter can copy a Core provider lease which survives physical materialization cycles; it is therefore insufficient to blindly transmit an existing runtime value.
+- BodyLifecycle now normalizes MP shell incarnation at stamp time using weak process-local shell receipts. New/replaced/restored MP shells receive a fresh bodyLease; repeated same-shell stamps retain it; cleared leases on recycled objects rotate. No parallel generation or persistence root was introduced. SP allocation/restored lease behavior remains unchanged.
+- New regression covers restored/provider lease rejection, stable repeated stamp, borrowed provider projection, replacement, constant-generator collisions, released object reuse and unchanged SP restoration.
+- Focused body/incarnation/restored/foundation/presence/restart/husk/reanimation: 151/151. Installed-PZ Kahlua compilation and static ERROR scan of changed runtime file pass. git diff --check passes.
+- M0 local restoration is established by factory regression plus existing presence/restart/restored lifecycle suites; native SP remains user-owned. Protocol snapshot projection itself remains unchanged so far.
+- Next mandatory chunk: M2 canonical MultiplayerBodyBinding shared/server protocol and snapshot publication, including transport freshness/session handling. M1 death invalidation/complete lifecycle acceptance remains to be proved with M7; do not claim full migration acceptance.
