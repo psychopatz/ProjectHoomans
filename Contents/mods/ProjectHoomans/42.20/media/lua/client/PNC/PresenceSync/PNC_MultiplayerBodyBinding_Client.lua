@@ -52,10 +52,11 @@ function Binding.NewClient(options)
             or type(message.revision) ~= "number" or message.revision ~= message.revision
             or message.revision < 1 or message.revision > 9007199254740991
             or message.revision ~= math.floor(message.revision)
-            or (message.operation ~= "bind" and message.operation ~= "unbind")
+            or (message.operation ~= "bind" and message.operation ~= "unbind"
+                and message.operation ~= "remove")
         then return false, "invalid" end
         if session and session ~= message.session then return false, "session" end
-        if message.operation == "bind" and (
+        if (message.operation == "bind" or message.operation == "remove") and (
             type(message.incarnation) ~= "string" or #message.incarnation == 0
             or #message.incarnation > 256 or type(message.onlineId) ~= "number"
             or not Binding.ValidOnlineID(message.onlineId)
@@ -67,12 +68,25 @@ function Binding.NewClient(options)
         end
         if not current and message.revision <= retiredRevision then return false, "retired" end
         if not current and count >= limit then return false, "capacity" end
+        if message.operation == "remove" and current and current.operation == "bind"
+            and (current.incarnation ~= message.incarnation
+                or current.onlineId ~= message.onlineId)
+        then return false, "different_incarnation" end
         local owner = message.operation == "bind" and owners[message.onlineId] or nil
         if owner and owner ~= message.npcId then return false, "conflict" end
         session = message.session
         local same = current and matches(current, message)
         local usedRevision = same and current.usedRevision or nil
-        if current and not same then release(current) end
+        if current and not same then
+            local body = bodies[current.npcId]
+            local retiresShell = message.operation == "remove"
+                or (message.operation == "bind" and current.operation == "bind")
+            if retiresShell and body and options.onRemove
+                and (not options.isValid or options.isValid(body, current)) then
+                options.onRemove(body, current)
+            end
+            release(current)
+        end
         local entry = {
             npcId = message.npcId, incarnation = message.incarnation,
             onlineId = message.onlineId, revision = message.revision,

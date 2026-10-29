@@ -85,7 +85,10 @@ end
 function Cleanup.RemoveBodyInstance(args)
     -- MP removals require canonical incarnation proof. Legacy online/outfit
     -- hints cannot authorize deletion of a potentially recycled vanilla ID.
-    if Core and Core.IsClientOnly and Core.IsClientOnly() then return 0 end
+    if Core and Core.IsClientOnly and Core.IsClientOnly() then
+        local binding = require "PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime"
+        return binding.Remove(args)
+    end
     local cell
     local zombieList
     local wantedInstance

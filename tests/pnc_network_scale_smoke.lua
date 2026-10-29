@@ -936,16 +936,22 @@ T.equal(sent[1].payload.entries[1].removed, true,
     "death marker removal delta was not terminal")
 
 sent = {}
-T.equal(
-    PNC.Network.BroadcastBodyRemoval("npc_near", 707, 77, "startup_uuid"),
-    true,
-    "body-instance removal broadcast"
-)
-T.equal(#sent, 16, "body-instance removal reaches all players")
-T.equal(sent[1].command, "RemoveBody", "body-instance removal command")
-T.equal(sent[1].payload.id, "npc_near", "body-instance removal NPC id")
-T.equal(sent[1].payload.bodyInstanceID, "707", "body-instance removal outfit id")
-T.equal(sent[1].payload.bodyOnlineID, 77, "body-instance removal online id")
+T.equal(PNC.Network.BroadcastBodyRemoval("npc_near", 707, 77, "legacy"), false,
+    "legacy removal without incarnation fails closed")
+T.equal(#sent, 0, "legacy removal cannot broadcast")
+local savedInterests = PNC.Network.ServerState.interests
+PNC.Network.ServerState.interests = {}
+for i = 1, 8 do
+    PNC.Network.ServerState.interests[i] = { player = players[i], ids = { npc_near = true } }
+end
+T.equal(PNC.Network.BroadcastBodyRemoval("npc_near", 707, 77, "release", "lease_exact"), true)
+T.equal(#sent, 8, "exact body removal stays within interest routing")
+T.equal(sent[1].command, "RemoveBody")
+T.equal(sent[1].payload.bodyBinding.npcId, "npc_near")
+T.equal(sent[1].payload.bodyBinding.incarnation, "lease_exact")
+T.equal(sent[1].payload.bodyBinding.onlineId, 77)
+T.equal(sent[1].payload.bodyBinding.operation, "remove")
+PNC.Network.ServerState.interests = savedInterests
 
 sent = {}
 T.equal(PNC.Network.BroadcastFirearmShot({

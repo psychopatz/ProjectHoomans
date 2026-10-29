@@ -33,4 +33,31 @@ T.truthy(c ~= b, "released and recycled object gets new incarnation")
 isServer = function() return false end
 r.runtime.bodyLease = "sp_restored_lease"
 T.equal(L.StampLiveBody(r, body()), "sp_restored_lease", "SP restoration unchanged")
+isServer = function() return true end
+PNC.Const.PRESENCE_LIVE, PNC.Const.PRESENCE_ABSTRACT = "live", "abstract"
+local shell = body()
+shell.getOnlineID = function() return 77 end
+local lease = L.StampLiveBody(r, shell)
+r.presenceState = "live"
+local notified = {}
+PNC.Network = { BroadcastBodyRemoval = function(id, instance, online, reason, token)
+    notified[#notified+1] = { id=id, online=online, lease=token }
+end }
+local reg = { LiveByID = { [r.id] = shell } }
+L.Internal.registry = function() return reg end
+L.Internal.matchesRecordBody = function() return true end
+L.Internal.isBodyAttached = function() return true end
+L.Internal.removeZombie = function() return false end
+T.equal(L.RemoveLiveBody(r, shell, "retry"), false)
+T.equal(#notified, 0, "failed physical removal cannot retire client binding")
+T.equal(r.runtime.bodyLease, lease, "failed removal retains authority")
+L.Internal.removeZombie = function()
+    shell:getModData().PNC_BodyLease = nil
+    return true
+end
+T.truthy(L.RemoveLiveBody(r, shell, "abstract"))
+T.equal(#notified, 1)
+T.equal(notified[1].lease, lease, "removal captures lease before engine mutation")
+T.equal(notified[1].online, 77)
+T.equal(r.runtime.bodyLease, nil, "verified removal clears incarnation")
 return T.finish("pnc_mp_body_incarnation_smoke")

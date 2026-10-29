@@ -391,10 +391,15 @@ function Lifecycle.RemoveLiveBody(record, zombie, reason)
     local attached
     local verified
     local runtime
+    local removalOnlineID
+    local removalLease
     if zombie and Internal.matchesRecordBody
         and Internal.matchesRecordBody(record, zombie)
     then
         attached = Internal.isBodyAttached(zombie)
+        local md = zombie.getModData and zombie:getModData()
+        removalLease = md and md.PNC_BodyLease
+        removalOnlineID = zombie.getOnlineID and zombie:getOnlineID()
         verified = Internal.removeZombie(zombie) == true
         if Lifecycle.IdentityAudit and Lifecycle.IdentityAudit.RecordRemoval then
             Lifecycle.IdentityAudit.RecordRemoval(
@@ -431,6 +436,11 @@ function Lifecycle.RemoveLiveBody(record, zombie, reason)
                 )
             end
             return false
+        end
+        if verified and isServer and isServer() == true
+            and PNC.Network and PNC.Network.BroadcastBodyRemoval then
+            PNC.Network.BroadcastBodyRemoval(record.id, nil, removalOnlineID,
+                reason or "body_release", removalLease)
         end
         if (not attached or not verified) and Lifecycle.NoteLostBody then
             Lifecycle.NoteLostBody(

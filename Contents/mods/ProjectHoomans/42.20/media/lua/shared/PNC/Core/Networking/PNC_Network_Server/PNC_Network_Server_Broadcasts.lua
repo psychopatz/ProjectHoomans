@@ -152,47 +152,19 @@ function Network.BroadcastDeathMarkerRemoval(id, reason)
     return true
 end
 
-function Network.BroadcastBodyRemoval(id, bodyInstanceID, bodyOnlineID, reason)
-    local payload
-    local normalizedInstanceID
-    if not Core.IsAuthority() then
-        return false
-    end
-    normalizedInstanceID = bodyInstanceID ~= nil
-        and tostring(bodyInstanceID) or nil
-    if normalizedInstanceID == "" or normalizedInstanceID == "0" then
-        normalizedInstanceID = nil
-    end
-    payload = {
-        id = id and tostring(id) or nil,
-        bodyInstanceID = normalizedInstanceID,
-        bodyOnlineID = tonumber(bodyOnlineID),
-        reason = tostring(reason or "stale_body"),
-    }
-    if payload.id == nil
-        and payload.bodyInstanceID == nil
-        and payload.bodyOnlineID == nil
-    then
-        if Core.LogWarn then
-            Core.LogWarn("PNC body removal suppressed without identity reason="
-                .. tostring(payload.reason))
-        end
-        return false
-    end
-    if isServer and isServer() then
-        -- A stale engine zombie can be present on a client before that client
-        -- has entered the NPC interest set. Send instance removals to every
-        -- connected player instead of relying on roster interest membership.
-        Core.ForEachPlayer(function(player)
-            Internal.SendToPlayer(player, Const.CMD_REMOVE_BODY, payload)
-        end)
-    else
-        -- Integrated singleplayer shares the authoritative body with the
-        -- client. A loopback command would make the client scan every local
-        -- IsoZombie and can match ordinary zombies through instance ID 0.
-        if Core.LogDebug then
-            Core.LogDebug("PNC body removal kept local authority reason="
-                .. tostring(payload.reason))
+function Network.BroadcastBodyRemoval(id, bodyInstanceID, bodyOnlineID, reason, bodyLease)
+    if not Core.IsAuthority() then return false end
+    if not isServer or isServer() ~= true then return true end
+    local binding = require "PNC/Core/Networking/PNC_MultiplayerBodyBinding"
+    local message = binding.Removal(id, bodyLease, bodyOnlineID)
+    if not message then return false end
+    local payload = { id = tostring(id), bodyBinding = message,
+        reason = tostring(reason or "stale_body") }
+    -- Only clients with this NPC in their interest set can possess a bound
+    -- replica. Other clients never gain identity from a removal message.
+    for _, state in pairs(ServerState.interests) do
+        if state.player and state.ids and state.ids[tostring(id)] then
+            Internal.SendToPlayer(state.player, Const.CMD_REMOVE_BODY, payload)
         end
     end
     return true

@@ -3,14 +3,15 @@ local Internal = Lifecycle.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
-local function notifyBodyRemoval(record, zombie, reason)
+local function notifyBodyRemoval(record, instanceID, onlineID, lease, reason)
     local network = PNC.Network
     if network and network.BroadcastBodyRemoval then
         network.BroadcastBodyRemoval(
             record and record.id or nil,
-            Internal.GetStartupBodyInstanceID(zombie),
-            Internal.normalizeOnlineID(zombie),
-            reason
+            instanceID,
+            onlineID,
+            reason,
+            lease
         )
     end
 end
@@ -23,6 +24,8 @@ local function removeShell(record, zombie, reason, ledgerEntry)
         and Internal.GetStartupBodyPopulationID(zombie) or nil
     local onlineID = Internal.normalizeOnlineID
         and Internal.normalizeOnlineID(zombie) or nil
+    local md = zombie and zombie.getModData and zombie:getModData()
+    local shellLease = md and md.PNC_UUID == id and md.PNC_BodyLease or nil
     local reg
     local removed
     if not zombie then
@@ -65,7 +68,7 @@ local function removeShell(record, zombie, reason, ledgerEntry)
         end
         return false
     end
-    notifyBodyRemoval(record, zombie, reason)
+    notifyBodyRemoval(record, instanceID, onlineID, shellLease, reason)
     if ledgerEntry and Lifecycle.ConsumeHuskEntry then
         Lifecycle.ConsumeHuskEntry(ledgerEntry)
     end

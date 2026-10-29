@@ -62,4 +62,16 @@ function Binding.Build(record)
     return message
 end
 
+-- Exact removal proof is constructed from identity captured BEFORE engine
+-- detach/corpse conversion. Anonymous legacy hints deliberately fail closed.
+function Binding.Removal(npcId, incarnation, onlineId)
+    if not isServer or isServer() ~= true or npcId == nil
+        or type(incarnation) ~= "string" or incarnation == ""
+        or not Binding.ValidOnlineID(onlineId) then return nil end
+    if not session then session = PNC.Core.GenerateID("body_binding_session") end
+    revision = revision + 1
+    return { protocol = 1, session = session, revision = revision,
+        npcId = tostring(npcId), incarnation = incarnation,
+        onlineId = tonumber(onlineId), operation = "remove" }
+end
 return Binding

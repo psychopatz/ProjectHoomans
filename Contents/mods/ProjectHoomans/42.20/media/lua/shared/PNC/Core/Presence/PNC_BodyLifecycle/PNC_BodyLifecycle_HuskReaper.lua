@@ -492,6 +492,10 @@ end
 
 local function removeHusk(record)
     local zombie = record.zombie
+    local md = zombie and zombie.getModData and zombie:getModData()
+    local npcId = record.entry and record.entry.npcId or nil
+    local shellLease = md and tostring(md.PNC_UUID or "") == tostring(npcId)
+        and md.PNC_BodyLease or nil
     record.identity = record.identity or bodyIdentity(zombie)
     if Lifecycle.ClearEngineInvulnerability then
         pcall(Lifecycle.ClearEngineInvulnerability, zombie)
@@ -521,7 +525,8 @@ local function removeHusk(record)
             record.entry and record.entry.npcId or nil,
             record.identity and record.identity.outfitID or nil,
             record.identity and record.identity.onlineID or nil,
-            record.reason or "husk_reaper_removal"
+            record.reason or "husk_reaper_removal",
+            shellLease
         )
     end
     return detached

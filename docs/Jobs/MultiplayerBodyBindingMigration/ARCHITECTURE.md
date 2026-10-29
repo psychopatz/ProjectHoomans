@@ -289,3 +289,14 @@ different local object requires fresh proof after the previous observation.
 This reconciler never mutates Registry or deletes an engine object. Admission,
 cache stamping/clearing and local body validity are supplied by the client
 presence integration, which must remain the only runtime consumer adapter.
+
+## Exact removal admission
+
+`remove` descriptors carry the same session/revision/npcId/incarnation/onlineId
+proof as bindings. A removal for an old incarnation cannot retire a different
+current incarnation, even if the removal publication itself is newer. Physical
+client deletion requires a currently bound, still-valid exact tuple. An
+unobserved/expired/anonymous shell is never deleted using online ID alone.
+Server removal routing stays within existing NPC interest sets. Legacy startup
+and husk hints may still inform server save-migration cleanup, but cannot create
+client identity or authorize anonymous replica deletion.

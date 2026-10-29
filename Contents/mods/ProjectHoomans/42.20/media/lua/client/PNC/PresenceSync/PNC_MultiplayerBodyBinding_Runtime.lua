@@ -29,6 +29,11 @@ local function getClient()
                 and md.PNC_UUID == entry.npcId and md.PNC_BodyLease == entry.incarnation
                 and md.PNC_MPBound == true
         end,
+        onRemove = function(body)
+            -- Called only for a currently bound, still-valid exact tuple.
+            if body.removeFromWorld then body:removeFromWorld() end
+            if body.removeFromSquare then body:removeFromSquare() end
+        end,
         onBind = function(body, entry)
             local md = data(body)
             md.PNC_UUID, md.PNC_NPC = entry.npcId, true
@@ -76,6 +81,15 @@ function Runtime.AcceptSnapshot(snapshot)
         or message.incarnation ~= tostring(snapshot.liveBodyLease)
         or message.onlineId ~= snapshot.liveBodyOnlineID) then return false end
     return getClient().Receive(message, now())
+end
+function Runtime.Remove(args)
+    if not remote() or type(args) ~= "table" or type(args.bodyBinding) ~= "table"
+        or args.bodyBinding.operation ~= "remove"
+        or args.bodyBinding.npcId ~= tostring(args.id) then return 0 end
+    local m = args.bodyBinding
+    local body = getClient().Resolve(m.npcId, m.incarnation, now())
+    local accepted = getClient().Receive(m, now())
+    return accepted and body and 1 or 0
 end
 function Runtime.Observe(body)
     if not remote() or not body or not body.getOnlineID then return end

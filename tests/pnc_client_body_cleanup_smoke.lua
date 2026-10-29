@@ -52,7 +52,23 @@ T.equal(md.PNC_UUID, nil, "connection reset clears only owned cache")
 T.equal(PNC.ClientPresenceSync.BodyByID.npc_a, nil)
 T.truthy(state.releasePending, "unbind retires stale movement control")
 T.equal(R.Resolve(s), nil, "reset requires new authoritative binding")
+-- Reconstruct from fresh server proof; exact tuple removal retires only it.
 now = 200
+R.Observe(body)
+s.bodyBinding.revision = 5
+T.truthy(R.AcceptSnapshot(s))
+local wrong = {id="npc_a",bodyBinding={protocol=1,session="s",revision=6,
+    npcId="npc_a",operation="remove",incarnation="old_lease",onlineId=50}}
+T.equal(PNC.ClientPresenceSync.RemoveBodyInstance(wrong), 0)
+T.equal(removed, 0, "old incarnation cannot remove current body even with later publication")
+local exact = {id="npc_a",bodyBinding={protocol=1,session="s",revision=7,
+    npcId="npc_a",operation="remove",incarnation="l1",onlineId=50}}
+T.equal(PNC.ClientPresenceSync.RemoveBodyInstance(exact), 1)
+T.equal(removed, 1, "exact current tuple is removed once")
+T.equal(PNC.ClientPresenceSync.RemoveBodyInstance(exact), 0)
+T.equal(removed, 1, "duplicate removal is idempotent")
+T.equal(R.Resolve(s), nil)
+T.equal(R.AcceptSnapshot(s), false, "old live binding cannot revive removed incarnation")
 PNC.Core.IsClientOnly = function() return false end
 T.equal(R.AcceptSnapshot(s), false, "SP cannot enter MP admission")
 return T.finish("pnc_client_body_cleanup_smoke")
