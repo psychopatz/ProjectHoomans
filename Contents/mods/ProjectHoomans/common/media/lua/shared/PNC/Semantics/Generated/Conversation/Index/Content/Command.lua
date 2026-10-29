@@ -1,5 +1,86 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
+    ["phrase.semantic.combat.horde.ack.avoid_default"] = {
+        ["domain"] = "command",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Command/Replies",
+        },
+        ["id"] = "phrase.semantic.combat.horde.ack.avoid_default",
+        ["kind"] = "content",
+        ["source"] = "content/command/replies.json",
+    },
+    ["phrase.semantic.combat.horde.ack.avoid_relief"] = {
+        ["domain"] = "command",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Command/Replies",
+        },
+        ["id"] = "phrase.semantic.combat.horde.ack.avoid_relief",
+        ["kind"] = "content",
+        ["source"] = "content/command/replies.json",
+    },
+    ["phrase.semantic.combat.horde.ack.engage_default"] = {
+        ["domain"] = "command",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Command/Replies",
+        },
+        ["id"] = "phrase.semantic.combat.horde.ack.engage_default",
+        ["kind"] = "content",
+        ["source"] = "content/command/replies.json",
+    },
+    ["phrase.semantic.combat.horde.ack.engage_eager"] = {
+        ["domain"] = "command",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Command/Replies",
+        },
+        ["id"] = "phrase.semantic.combat.horde.ack.engage_eager",
+        ["kind"] = "content",
+        ["source"] = "content/command/replies.json",
+    },
+    ["phrase.semantic.combat.horde.ack.engage_hesitant"] = {
+        ["domain"] = "command",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Command/Replies",
+        },
+        ["id"] = "phrase.semantic.combat.horde.ack.engage_hesitant",
+        ["kind"] = "content",
+        ["source"] = "content/command/replies.json",
+    },
+    ["phrase.semantic.combat.horde.ack.engage_reserved"] = {
+        ["domain"] = "command",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Command/Replies",
+        },
+        ["id"] = "phrase.semantic.combat.horde.ack.engage_reserved",
+        ["kind"] = "content",
+        ["source"] = "content/command/replies.json",
+    },
+    ["phrase.semantic.combat.horde.ack.hold_default"] = {
+        ["domain"] = "command",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Command/Replies",
+        },
+        ["id"] = "phrase.semantic.combat.horde.ack.hold_default",
+        ["kind"] = "content",
+        ["source"] = "content/command/replies.json",
+    },
+    ["phrase.semantic.combat.horde.ack.hold_eager"] = {
+        ["domain"] = "command",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Command/Replies",
+        },
+        ["id"] = "phrase.semantic.combat.horde.ack.hold_eager",
+        ["kind"] = "content",
+        ["source"] = "content/command/replies.json",
+    },
+    ["phrase.semantic.combat.horde.ack.hold_hesitant"] = {
+        ["domain"] = "command",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Command/Replies",
+        },
+        ["id"] = "phrase.semantic.combat.horde.ack.hold_hesitant",
+        ["kind"] = "content",
+        ["source"] = "content/command/replies.json",
+    },
     ["phrase.semantic.command.camp.failed"] = {
         ["domain"] = "command",
         ["generated"] = {

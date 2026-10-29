@@ -1,4 +1,13 @@
 {
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckAvoidDefaultNeutral01": "Copy. We go around.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckAvoidReliefNeutral01": "Good. Let's go around.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckEngageDefaultNeutral01": "I'm with you. Let's go.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckEngageEagerNeutral01": "Fuck yeah. Let's go.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckEngageHesitantNeutral01": "Fuck... alright. I'm with you.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckEngageReservedNeutral01": "Alright. Moving.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckHoldDefaultNeutral01": "Holding for now.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckHoldEagerNeutral01": "Holding. Say when.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckHoldHesitantNeutral01": "Okay. Holding here.",
   "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral01": "I couldn't set up camp there.",
   "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral01": "Sure, I'll set up camp there.",
   "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral01": "Okay, I'll set up camp there.",

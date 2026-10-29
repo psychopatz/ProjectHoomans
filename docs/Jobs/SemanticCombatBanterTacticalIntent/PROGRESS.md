@@ -1,6 +1,6 @@
 # Progress — Semantic Combat Banter & Tactical Intent
 
-**Status:** ACTIVE — B0 and B1 accepted; B2 tactical follower encounter intent is next.
+**Status:** ACTIVE — B0–B2 accepted; B3 non-modal combat response surface is next.
 **Planning base:** ProjectHoomans `8632bc30`, existing `main`.
 **Parent foundation:** `docs/Jobs/OpenEndedSemanticCombatAwareness/` is developer-complete and remains accepted unless this job reproduces a regression in an owning layer.
 **Native PZ:** user live regression supplied; new job's developer implementation/acceptance not yet run.
@@ -59,16 +59,39 @@ B1 evidence:
 - `git diff --check`: clean;
 - no new global zombie scan.
 
-## ONE current Next Chunk — B2
+## B2 accepted — tactical follower encounter intent
 
-Implement runtime-only follower tactical encounter intent:
-1. add a bounded current-horde intent owner with `undecided / engage / avoid / hold`, separate from permanent `record.attackType`;
-2. bind intent to the active horde episode and clear it when that episode clears;
-3. choose at most one eligible follower spokesperson for the unresolved prompt;
-4. expose semantic engage/avoid/hold offers through the existing response-plan/click authority;
-5. let owner attack behavior resolve `engage` implicitly and clear stale prompt state;
-6. preserve immediate self-defense regardless of intent;
-7. add personality-aware acknowledgement strategy after engage/avoid/hold without blocking combat.
+Accepted implementation:
+- new runtime-only `PNC_SemanticCombatEncounterIntent` owns team `undecided / engage / avoid / hold` state keyed to the current owner/horde episode;
+- first eligible follower is the sole prompt spokesperson; additional followers join the same team state without duplicate prompts;
+- prompt choices are typed semantic branch offers: `COMBAT_ENGAGE / COMBAT_AVOID / COMBAT_HOLD`;
+- branch clicks preserve the active horde event reference as a stale-episode guard and bind `SELF` to the speaking follower without reparsing text;
+- actions reuse the existing semantic command adapter and server companion-command authority through transient `combat_engage / combat_avoid / combat_hold` commands;
+- stale encounter choices are rejected by the live intent owner;
+- permanent `record.attackType` is unchanged;
+- owner combat implicitly resolves `undecided -> engage`;
+- `avoid / hold / undecided` gate proactive engagement only; immediate self-defense remains before the encounter-intent gate;
+- successful tactical command acknowledgements use personality-aware horde ack content: eager/brave may say `Fuck yeah. Let's go.`, shaken may say `Fuck... alright. I'm with you.`, with distinct avoid/hold replies;
+- tactical prompt, acknowledgements and choice labels are compiler-owned EN/TL content.
+
+B2 evidence:
+- focused prompt/intent/command/companion/follow matrix: **6/6 PASS**;
+- full `pnc_semantic` selection: **114/114 PASS**;
+- tactical choice localization: EN/TL complete (`Take them. / Sugurin natin.`, `Go around. / Umikot tayo.`, `Hold for now. / Hinto muna.`);
+- two consecutive CodeBuilder generations: byte-identical, **180 files / 435 phrase families**;
+- changed/untracked Lua through installed Kahlua compiler: **30/30 PASS**;
+- static guard: no added ModData root, `getZombieList()`, or `getCell()` hot-path traversal;
+- `git diff --check`: clean.
+
+## ONE current Next Chunk — B3
+
+Implement a non-modal combat response surface for active `TACTICAL_PROMPT` offers:
+1. expose the same active lifecycle/offer projection while the full conversation UI is closed;
+2. render a small combat-choice strip without creating a second semantic candidate or action authority;
+3. submit the existing typed semantic click frame through the normal dialogue input/command path;
+4. when the full conversation UI is open, keep using its existing Response Channel instead of duplicating the strip;
+5. resolution, implicit owner action, timeout or episode clear must remove/disable stale combat choices;
+6. add headless UI-model parity tests; native visual feel remains user-owned.
 
 ## Remaining mandatory phases
 

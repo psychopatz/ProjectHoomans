@@ -1,4 +1,13 @@
 {
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckAvoidDefaultNeutral01": "Sige. Iikot tayo.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckAvoidReliefNeutral01": "Mabuti. Umikot tayo.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckEngageDefaultNeutral01": "Kasama mo ako. Tara.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckEngageEagerNeutral01": "Pucha, sige! Tara.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckEngageHesitantNeutral01": "Pucha... sige. Kasama mo ako.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckEngageReservedNeutral01": "Sige. Galaw.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckHoldDefaultNeutral01": "Hinto muna tayo.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckHoldEagerNeutral01": "Hawak muna. Sabihin mo kung kailan.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeAckHoldHesitantNeutral01": "Sige. Dito muna ako.",
   "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral01": "Hindi ako nakapag-set up ng kampo roon.",
   "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral01": "Sige, magse-set up ako ng kampo roon.",
   "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral01": "Sige, magse-set up ako ng kampo roon.",

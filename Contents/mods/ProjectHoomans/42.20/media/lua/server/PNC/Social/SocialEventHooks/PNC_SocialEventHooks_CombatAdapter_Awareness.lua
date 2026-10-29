@@ -15,6 +15,12 @@ local Registry = PNC.Registry
 local Perception = PNC.Perception
 local Const = PNC.Const
 local Network = PNC.Network
+local EncounterIntent = PNC.Semantics
+    and PNC.Semantics.CombatEncounterIntent
+    or require "PNC/Semantics/PNC_SemanticCombatEncounterIntent"
+local CombatReactionProfile = PNC.Semantics
+    and PNC.Semantics.CombatReactionProfile
+    or require "PNC/Semantics/PNC_SemanticCombatReactionProfile"
 local SocialReactions = PNC.Semantics
     and PNC.Semantics.SocialReactions or nil
 if not SocialReactions then
@@ -452,7 +458,8 @@ local function emitZombieAwareness(
     count,
     reason,
     phase,
-    episodeID
+    episodeID,
+    tacticalPrompt
 )
     local npcID = tostring(record and record.id or "")
     local radiusSq = WITNESS_RADIUS * WITNESS_RADIUS
@@ -479,6 +486,13 @@ local function emitZombieAwareness(
         if not player or not playerCanHearNPC(player, record, radiusSq) then
             return
         end
+        if tacticalPrompt == true
+            and EncounterIntent
+            and type(EncounterIntent.MatchesOwner) == "function"
+            and EncounterIntent.MatchesOwner(record, player) ~= true
+        then
+            return
+        end
         playerKey = Hooks.ResolvePlayerKey(player)
         if not playerKey then return end
         memoryID = rememberZombieAwareness(
@@ -503,6 +517,14 @@ local function emitZombieAwareness(
         speakerRole = (state == "enemy" or state == "rival")
             and "hostile" or role
         tier = relationshipTier(relationship)
+        local combatProfile = CombatReactionProfile
+            and type(CombatReactionProfile.Build) == "function"
+            and CombatReactionProfile.Build(record, playerKey, {
+                role = "witness",
+                actorKind = "player",
+                zombieObservation = record.runtime
+                    and record.runtime.zombieObservation,
+            }) or nil
         context = {
             eventType = eventType,
             memoryID = memoryID,
@@ -515,6 +537,13 @@ local function emitZombieAwareness(
             ),
             hordePhase = phase,
             hordeEpisodeID = episodeID,
+            combatTacticalPrompt = tacticalPrompt == true,
+            presentationClass = tacticalPrompt == true
+                and "TACTICAL_PROMPT" or "BARK",
+            combatReactionStyle = combatProfile
+                and combatProfile.combatReactionStyle or "practical",
+            combatReactionMood = combatProfile
+                and combatProfile.combatReactionMood or "steady",
             factRefs = { eventID },
             semanticEventFacts = awarenessFacts(
                 record,
@@ -568,6 +597,10 @@ local function emitZombieAwareness(
             source = eventType,
             eventID = eventID,
             npcID = npcID,
+            meaningful = false,
+            transientInteraction = true,
+            interactionTTLHours = tacticalPrompt == true and 15 / 3600
+                or 10 / 3600,
             ambientFlavor = {
                 eventID = eventID,
                 eventRef = eventID,
@@ -666,7 +699,15 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
             state.lastPhase = "cleared"
             state.clearedAt = now
             state.lastEpisodeID = state.episodeID
+            local clearedEpisodeID = state.episodeID
             state.episodeID = nil
+            if EncounterIntent
+                and type(EncounterIntent.OnHordeTransition) == "function"
+            then
+                EncounterIntent.OnHordeTransition(
+                    record, "cleared", clearedEpisodeID, now
+                )
+            end
             return false, "horde_episode_cleared"
         end
         state.lastPhase = "clear"
@@ -683,6 +724,18 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
         state.lastPhase = "started"
         eventID = newZombieAwarenessEventID(record, eventType, now)
         state.episodeID = eventID
+        if EncounterIntent
+            and type(EncounterIntent.OnHordeTransition) == "function"
+        then
+            EncounterIntent.OnHordeTransition(
+                record, "started", state.episodeID, now
+            )
+        end
+        local tacticalPrompt = EncounterIntent
+            and type(EncounterIntent.IsPromptSpeaker) == "function"
+            and EncounterIntent.IsPromptSpeaker(
+                record, state.episodeID
+            ) == true
         emitZombieAwareness(
             record,
             eventType,
@@ -693,7 +746,8 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
             count,
             nil,
             "started",
-            state.episodeID
+            state.episodeID,
+            tacticalPrompt
         )
         return true, eventID, "started"
     end
@@ -711,6 +765,13 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
     end
 
     state.lastPhase = phase
+    if EncounterIntent
+        and type(EncounterIntent.OnHordeTransition) == "function"
+    then
+        EncounterIntent.OnHordeTransition(
+            record, phase, state.episodeID, now
+        )
+    end
     eventID = newZombieAwarenessEventID(record, eventType, now)
     emitZombieAwareness(
         record,

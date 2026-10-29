@@ -413,6 +413,42 @@ Commands.Register({
     apply = manualCorpseHaul,
 })
 
+local function applyCombatEncounterIntent(intent)
+    return function(record, _, commandContext)
+        local service = PNC.Semantics
+            and PNC.Semantics.CombatEncounterIntent or nil
+        if not service or type(service.Resolve) ~= "function" then
+            return false, "combat_encounter_intent_unavailable"
+        end
+        local accepted, reason = service.Resolve(
+            record,
+            intent,
+            commandContext and commandContext.encounterEpisodeID,
+            "semantic_command",
+            PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+        )
+        return accepted == true, reason
+    end
+end
+
+Commands.Register({
+    id = "combat_engage",
+    semanticOnly = true,
+    apply = applyCombatEncounterIntent("engage"),
+})
+
+Commands.Register({
+    id = "combat_avoid",
+    semanticOnly = true,
+    apply = applyCombatEncounterIntent("avoid"),
+})
+
+Commands.Register({
+    id = "combat_hold",
+    semanticOnly = true,
+    apply = applyCombatEncounterIntent("hold"),
+})
+
 Commands.Register({
     id = "attack_auto",
     group = "attack_type",

@@ -17,6 +17,7 @@ local cancelledTaskCount = 0
 local cancelledFishingCount = 0
 local manualProvisionRequests = 0
 local manualCorpseHaulRequests = 0
+local encounterIntentCalls = {}
 local validatedCampOrigin
 local validatedCampRadius
 
@@ -105,6 +106,18 @@ PNC = {
         end,
     },
     Semantics = {
+        CombatEncounterIntent = {
+            Resolve = function(record, intent, eventRef, source, now)
+                encounterIntentCalls[#encounterIntentCalls + 1] = {
+                    id = record and record.id,
+                    intent = intent,
+                    eventRef = eventRef,
+                    source = source,
+                    now = now,
+                }
+                return eventRef == "horde:active", intent
+            end,
+        },
         CampSiteResolver = {
             ValidateClientSite = function(target, context)
                 validatedCampOrigin = context and context.selectionOrigin
@@ -361,6 +374,31 @@ records.owned.affiliation = { factionID = "faction_alice" }
 T.equal(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
     true, "single-player faction ownership uses canonical account key")
 
+local combatAffected, combatReason = PNC.CompanionCommands.Execute(player, {
+    id = "owned",
+    commandID = "combat_engage",
+    encounterEpisodeID = "horde:active",
+})
+T.equal(combatAffected, 1,
+    "valid transient combat intent affects exactly one owned companion")
+T.equal(combatReason, "commanded",
+    "successful transient intent uses the normal companion command receipt")
+T.equal(encounterIntentCalls[1].eventRef, "horde:active",
+    "server command forwards active encounter identity")
+T.equal(encounterIntentCalls[1].source, "semantic_command",
+    "server command records semantic source")
+T.equal(records.owned.attackType, nil,
+    "transient combat command never mutates permanent attackType")
+
+local staleAffected, staleReason = PNC.CompanionCommands.Execute(player, {
+    id = "owned",
+    commandID = "combat_hold",
+    encounterEpisodeID = "horde:stale",
+})
+T.equal(staleAffected, 0, "stale tactical command is rejected")
+T.equal(staleReason, "hold",
+    "stubbed encounter owner surfaces rejected stale result without order mutation")
+
 PNC.FacilityJobs = {
     ToggleManual = function()
         return false, "WATER_CONTAINER_FULL"
@@ -374,7 +412,7 @@ T.equal(manualRefillReason, "WATER_CONTAINER_FULL",
     "manual refill preserves the facility rejection reason")
 PNC.FacilityJobs = nil
 
-T.equal(#PNC.CompanionCommands.List(), 16, "registered command count")
+T.equal(#PNC.CompanionCommands.List(), 19, "registered command count")
 T.equal(PNC.CompanionCommands.Get("scavenge_nearby").clientOnly, true,
     "scavenge command opens its client setup UI")
 T.equal(#PNC.CompanionCommands.ListGroups(), 3,

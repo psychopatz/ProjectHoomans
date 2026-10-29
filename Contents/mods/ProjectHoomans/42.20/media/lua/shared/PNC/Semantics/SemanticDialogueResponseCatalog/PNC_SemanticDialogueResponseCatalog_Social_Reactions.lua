@@ -22,6 +22,35 @@ local function followUp(id, fallback, reference)
     }
 end
 
+local HORDE_CHOICE_KEYS = {
+    engage = "UI_PNC_Conversation_Content_SemanticCombatHordeChoiceEngageNeutral01",
+    avoid = "UI_PNC_Conversation_Content_SemanticCombatHordeChoiceAvoidNeutral01",
+    hold = "UI_PNC_Conversation_Content_SemanticCombatHordeChoiceHoldNeutral01",
+}
+
+local function tacticalChoice(id, fallback, action)
+    local key = HORDE_CHOICE_KEYS[id]
+    return {
+        id = "semantic.combat.horde.choice." .. id,
+        labelKey = key,
+        labelFallback = fallback,
+        utteranceKey = key,
+        utteranceFallback = fallback,
+        frame = {
+            intent = "REQUEST",
+            speechAct = "REQUEST",
+            action = action,
+            target = "SELF",
+        },
+    }
+end
+
+local HORDE_TACTICAL_OFFERS = {
+    tacticalChoice("engage", "Take them.", "COMBAT_ENGAGE"),
+    tacticalChoice("avoid", "Go around.", "COMBAT_AVOID"),
+    tacticalChoice("hold", "Hold for now.", "COMBAT_HOLD"),
+}
+
 local FOLLOW_UP_OFFERS = {
     horde = {
         followUp("location", "Where are they?", "EVENT_LOCATION"),
@@ -235,6 +264,47 @@ for _, role in ipairs({ "witness", "killer" }) do
         Catalog.Register(poolID, { variants = variants })
     end
 end
+
+Catalog.Register("semantic.combat.horde.prompt", {
+    variants = {
+        response(
+            "semantic.combat.horde.prompt",
+            "eager",
+            { combatReactionStyle = { "aggressive", "brave" } },
+            4,
+            "QUESTION",
+            "combat",
+            HORDE_TACTICAL_OFFERS
+        ),
+        response(
+            "semantic.combat.horde.prompt",
+            "shaken",
+            { combatReactionStyle = "shaken" },
+            4,
+            "QUESTION",
+            "combat",
+            HORDE_TACTICAL_OFFERS
+        ),
+        response(
+            "semantic.combat.horde.prompt",
+            "reserved",
+            { combatReactionStyle = { "reserved", "cold" } },
+            3,
+            "QUESTION",
+            "combat",
+            HORDE_TACTICAL_OFFERS
+        ),
+        response(
+            "semantic.combat.horde.prompt",
+            "default",
+            nil,
+            0,
+            "QUESTION",
+            "combat",
+            HORDE_TACTICAL_OFFERS
+        ),
+    },
+})
 
 Catalog.Register("semantic.combat.horde", {
     variants = {

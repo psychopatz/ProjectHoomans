@@ -324,4 +324,68 @@ Adapter.RegisterAction("CAMP", {
     },
 })
 
+local function registerCombatIntentAction(action, commandID)
+    Adapter.RegisterAction(action, {
+        capabilityID = "pnc:companion." .. string.lower(action),
+        owner = "PNC.CompanionCommands",
+        route = "existing_companion_command",
+        workflowKind = "simple_command",
+        templateVersion = 1,
+        contractVersion = 1,
+        commandID = commandID,
+        handlerID = "PNC.Client.SendCompanionCommand",
+        targetScope = "single",
+        triggerFrames = {
+            { intent = "REQUEST", speechAct = "REQUEST", action = action },
+        },
+        requiredSlots = {
+            npcID = {
+                type = "entity",
+                owner = "dialogue_context",
+                source = "npcID",
+            },
+        },
+        permissionGate = {
+            type = "pnc:semantic_context",
+            capabilityID = "pnc:companion." .. string.lower(action),
+            requiresTarget = true,
+            requiresAuthority = true,
+        },
+        outcomeMapping = {
+            queued = "queued",
+            accepted = "queued",
+            pending = "queued",
+            network_queued = "queued",
+            rejected = "rejected",
+            failed = "failed",
+        },
+        responsePools = {
+            queued = {
+                templateID = "semantic.command.accepted",
+            },
+            rejected = {
+                templateID = "semantic.action.unavailable",
+            },
+            failed = {
+                templateID = "semantic.action.unavailable",
+            },
+        },
+        arguments = {
+            npcID = "actor_target",
+            encounterEpisodeID = "semantic_modifier",
+        },
+        requires = {
+            "conversation_or_companion_authority",
+            "active_combat_encounter",
+        },
+        result = {
+            "requested", "rejected", "queued", "accepted", "completed",
+        },
+    })
+end
+
+registerCombatIntentAction("COMBAT_ENGAGE", "combat_engage")
+registerCombatIntentAction("COMBAT_AVOID", "combat_avoid")
+registerCombatIntentAction("COMBAT_HOLD", "combat_hold")
+
 return Adapter

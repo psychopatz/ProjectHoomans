@@ -278,6 +278,132 @@
           }
         ]
       }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.combat.horde.ack.engage_eager",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Fuck yeah. Let's go.",
+              "TL": "Pucha, sige! Tara."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.combat.horde.ack.engage_hesitant",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Fuck... alright. I'm with you.",
+              "TL": "Pucha... sige. Kasama mo ako."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.combat.horde.ack.engage_reserved",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Alright. Moving.",
+              "TL": "Sige. Galaw."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.combat.horde.ack.engage_default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I'm with you. Let's go.",
+              "TL": "Kasama mo ako. Tara."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.combat.horde.ack.avoid_relief",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good. Let's go around.",
+              "TL": "Mabuti. Umikot tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.combat.horde.ack.avoid_default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Copy. We go around.",
+              "TL": "Sige. Iikot tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.combat.horde.ack.hold_eager",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Holding. Say when.",
+              "TL": "Hawak muna. Sabihin mo kung kailan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.combat.horde.ack.hold_hesitant",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Okay. Holding here.",
+              "TL": "Sige. Dito muna ako."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "commands_emotes",
+      "semanticTemplateID": "semantic.combat.horde.ack.hold_default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Holding for now.",
+              "TL": "Hinto muna tayo."
+            }
+          }
+        ]
+      }
     }
   ],
   "schema": "pnc.conversation.shard.v1",

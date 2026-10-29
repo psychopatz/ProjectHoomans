@@ -8,6 +8,8 @@ local Targeting = PNC.BehaviorTargeting
 local BehaviorCombat = PNC.BehaviorCombat
 local Perception = PNC.Perception
 local CombatTactics = PNC.CombatTactics
+local EncounterIntent = PNC.Semantics
+    and PNC.Semantics.CombatEncounterIntent or nil
 
 local function targetWithinConstraint(target, constraint)
     local dx
@@ -78,16 +80,21 @@ local function tryEngageTarget(record, zombie, constraint, options)
     return Internal.EngageResolvedTarget(record, zombie, target, constraint)
 end
 
-local function tryAvoidThreat(record, zombie, options)
+local function tryAvoidThreat(record, zombie, options, forced)
     local threat
     local moved
     local reason
-    if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
-        ~= tostring(Const.ATTACK_TYPE_NONE or "none")
+    if forced ~= true
+        and tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
+            ~= tostring(Const.ATTACK_TYPE_NONE or "none")
     then
         return false
     end
-    Common.ClearCombatTarget(record, "attack_disabled", zombie)
+    Common.ClearCombatTarget(
+        record,
+        forced == true and "encounter_avoid" or "attack_disabled",
+        zombie
+    )
     threat = Perception and Perception.ResolveCompanionProtectionTarget
         and Perception.ResolveCompanionProtectionTarget(
             record,
@@ -112,7 +119,28 @@ local function tryAvoidThreat(record, zombie, options)
 end
 
 function Internal.TryRespondToThreat(record, zombie, constraint, options)
-    if tryAvoidThreat(record, zombie, options) then return true end
+    local encounterIntent
+    if EncounterIntent
+        and type(EncounterIntent.ObserveOwnerEngaged) == "function"
+    then
+        encounterIntent = EncounterIntent.ObserveOwnerEngaged(
+            record,
+            options and options.ownerEngaged == true,
+            PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+        )
+    elseif EncounterIntent
+        and type(EncounterIntent.IntentFor) == "function"
+    then
+        encounterIntent = EncounterIntent.IntentFor(record)
+    end
+    if encounterIntent == "avoid" then
+        return tryAvoidThreat(record, zombie, options, true)
+    end
+    if encounterIntent == "hold" or encounterIntent == "undecided" then
+        Common.ClearCombatTarget(record, "encounter_" .. encounterIntent, zombie)
+        return false
+    end
+    if tryAvoidThreat(record, zombie, options, false) then return true end
     return tryEngageTarget(record, zombie, constraint, options)
 end
 

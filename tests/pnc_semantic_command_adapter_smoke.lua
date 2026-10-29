@@ -90,4 +90,36 @@ T.equal(commandCalls[3].scope, "single",
 T.equal(#commandCalls, 3,
     "single camp creates one bounded transport call")
 
+local engage = Adapter.Dispatch({
+    action = "COMBAT_ENGAGE",
+    modifiers = { encounterEpisodeID = "horde:active" },
+}, {
+    npcID = "npc-alice",
+    requestID = "combat-choice:1",
+})
+T.equal(engage.status, "accepted",
+    "combat engage reuses the existing semantic command adapter")
+T.equal(commandCalls[4].commandID, "combat_engage",
+    "combat engage maps to transient companion command")
+T.equal(commandCalls[4].context.encounterEpisodeID, "horde:active",
+    "active encounter identity reaches command transport")
+
+local avoid = Adapter.Dispatch({
+    action = "COMBAT_AVOID",
+    modifiers = { encounterEpisodeID = "horde:active" },
+}, { npcID = "npc-alice" })
+T.equal(avoid.status, "accepted", "combat avoid uses registered command path")
+T.equal(commandCalls[5].commandID, "combat_avoid",
+    "combat avoid command mapping")
+
+local hold = Adapter.Dispatch({
+    action = "COMBAT_HOLD",
+    modifiers = { encounterEpisodeID = "horde:active" },
+}, { npcID = "npc-alice" })
+T.equal(hold.status, "accepted", "combat hold uses registered command path")
+T.equal(commandCalls[6].commandID, "combat_hold",
+    "combat hold command mapping")
+T.equal(#commandCalls, 6,
+    "three tactical choices each create one bounded transport call")
+
 T.finish("pnc_semantic_command_adapter_smoke")

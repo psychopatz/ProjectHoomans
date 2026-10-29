@@ -116,6 +116,8 @@ function Adapter.Dispatch(actionIntent, context)
     end
 
     local npcID = context.npcID or context.targetID
+    local encounterEpisodeID = actionIntent.modifiers
+        and actionIntent.modifiers.encounterEpisodeID or nil
     local commandContext = {
         origin = "semantic_dialogue",
         commandSource = "semantic_dialogue",
@@ -126,6 +128,7 @@ function Adapter.Dispatch(actionIntent, context)
         campSiteHint = context.campSiteHint,
         groupID = context.groupID,
         groupTurnID = context.groupTurnID,
+        encounterEpisodeID = encounterEpisodeID,
     }
     local request = {
         commandID = commandID,

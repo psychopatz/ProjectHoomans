@@ -56,6 +56,8 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
         dialogueID = type(context) == "table" and context.dialogueID or nil,
         campSiteHint = campSiteHint,
         targetIDs = Internal.GroupTargetIDs(scope, context),
+        encounterEpisodeID = type(context) == "table"
+            and context.encounterEpisodeID or nil,
     }
     if Core.IsClientOnly and Core.IsClientOnly() then
         if not sendClientCommand then

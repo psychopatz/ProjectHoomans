@@ -62,6 +62,104 @@
           }
         ]
       }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.horde.prompt.eager",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's a hell of a crowd. We taking them?",
+              "TL": "Ang dami nila. Susugod ba tayo?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.horde.prompt.shaken",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Fuck... that's a lot. Are we really fighting all of them?",
+              "TL": "Pucha... ang dami nila. Lalabanan talaga natin lahat 'yan?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.horde.prompt.reserved",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Horde ahead. Engage or go around?",
+              "TL": "May kuyog sa unahan. Lalaban o iiwas?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.horde.prompt.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's a lot of them. We fighting or going around?",
+              "TL": "Ang dami nila. Lalaban ba tayo o iiwas?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.horde.choice.engage",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Take them.",
+              "TL": "Sugurin natin."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.horde.choice.avoid",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Go around.",
+              "TL": "Umikot tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.horde.choice.hold",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Hold for now.",
+              "TL": "Hinto muna."
+            }
+          }
+        ]
+      }
     }
   ],
   "schema": "pnc.conversation.shard.v1",

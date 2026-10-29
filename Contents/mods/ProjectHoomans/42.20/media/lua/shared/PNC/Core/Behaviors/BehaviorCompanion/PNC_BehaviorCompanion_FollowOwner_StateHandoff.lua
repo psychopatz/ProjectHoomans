@@ -13,6 +13,8 @@ if type(H) ~= "table" then return Companion end
 local Registry = H.Registry
 local AnimationScenes = H.AnimationScenes
 local Diagnostics = H.Diagnostics
+local EncounterIntent = PNC.Semantics
+    and PNC.Semantics.CombatEncounterIntent or nil
 
 function H.Prepare(record, zombie, owner, now)
     if record.ownerUsername ~= owner:getUsername() then
@@ -24,6 +26,13 @@ function H.Prepare(record, zombie, owner, now)
     record.ownerOnlineID = owner:getOnlineID()
     local followState = Internal.UpdateOwnerMotionState(record, owner, now)
     local ownerEngaged = Internal.UpdateOwnerCombatState(record, owner, now)
+    if EncounterIntent
+        and type(EncounterIntent.ObserveOwnerEngaged) == "function"
+    then
+        EncounterIntent.ObserveOwnerEngaged(
+            record, ownerEngaged == true, now
+        )
+    end
     local followStateChanged = followState.ownerMovingChanged == true
     -- A follower may still be inside its formation tolerance when the owner
     -- first moves. End ambient presentation immediately instead of waiting

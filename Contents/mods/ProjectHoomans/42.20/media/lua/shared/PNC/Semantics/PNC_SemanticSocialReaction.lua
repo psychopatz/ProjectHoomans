@@ -131,6 +131,9 @@ local function poolFor(spec)
     if eventType == "zombie_horde_encounter"
         or eventType == "zombie_horde_detected"
     then
+        if context.combatTacticalPrompt == true then
+            return "semantic.combat.horde.prompt"
+        end
         return "semantic.combat.horde"
     end
     if eventType == "bandit_attack" then

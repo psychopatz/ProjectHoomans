@@ -22,7 +22,7 @@ return {
         ["domain"] = "command",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Command",
-        ["recordCount"] = 56,
+        ["recordCount"] = 65,
     },
     {
         ["domain"] = "compatibility",
@@ -40,7 +40,7 @@ return {
         ["domain"] = "event",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Event",
-        ["recordCount"] = 97,
+        ["recordCount"] = 104,
     },
     {
         ["domain"] = "greeting",

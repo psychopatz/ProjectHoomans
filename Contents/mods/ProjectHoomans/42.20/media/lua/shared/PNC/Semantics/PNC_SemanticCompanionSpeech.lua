@@ -13,6 +13,8 @@ local Authority = PNC.Semantics.RealizationAuthority
     or require "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
 local SpeechRealization = PNC.Semantics.SpeechRealization
     or require "PNC/Semantics/PNC_SpeechRealization"
+local CombatReactionProfile = PNC.Semantics.CombatReactionProfile
+    or require "PNC/Semantics/PNC_SemanticCombatReactionProfile"
 
 Speech.VERSION = 1
 Speech.CONTENT_OWNER = "projecthoomans.dialogue_content.commands_emotes"
@@ -152,6 +154,32 @@ function Speech.ResolveNPCCommand(commandID, outcome, context)
     context.commandID = commandID
     context.commandOutcome = outcome
     context.action = commandID
+
+    if outcome ~= "invalid"
+        and (commandID == "combat_engage"
+            or commandID == "combat_avoid"
+            or commandID == "combat_hold")
+    then
+        local record = context.npcRecord or context.target
+        local profile = record and CombatReactionProfile
+            and type(CombatReactionProfile.Build) == "function"
+            and CombatReactionProfile.Build(record, context.playerKey, {
+                role = "witness",
+                actorKind = "player",
+                zombieObservation = record.runtime
+                    and record.runtime.zombieObservation,
+            }) or nil
+        context.combatReactionStyle = profile
+            and profile.combatReactionStyle or "practical"
+        context.combatReactionMood = profile
+            and profile.combatReactionMood or "steady"
+        return resolve("semantic.combat.horde.ack", {
+            act = "ACK",
+            topic = "combat",
+            realizationFamily = "combat_horde_ack",
+        }, context)
+    end
+
     return resolve("semantic.command.reply", {
         act = outcome == "invalid" and "REACT" or "ACK",
         topic = "companion_command",

@@ -136,16 +136,29 @@ local function branchOfferIR(offer, origin, frame, view)
     if source.identityClaim ~= nil then
         socialContext.identityClaim = source.identityClaim
     end
-    local extensions = {}
+    local modifiers = copyValue(source.modifiers) or {}
+    if origin and origin.eventRef and source.action ~= nil then
+        modifiers.encounterEpisodeID = tostring(origin.eventRef)
+    end
+    local extensions = copyValue(source.extensions) or {}
     if source.reference ~= nil then
         extensions.dialogueFollowUp = "CONTEXT_REFERENCE"
         extensions.topic = "conversation"
         extensions.contextQuestion = source.reference
     end
-    local target = source.target and {
-        kind = "conversation_actor",
-        ref = source.target,
-    } or nil
+    local target
+    if source.target == "SELF" and actorID ~= nil then
+        target = {
+            kind = "actor",
+            id = actorID,
+            source = "conversation",
+        }
+    elseif source.target ~= nil then
+        target = {
+            kind = "conversation_actor",
+            ref = source.target,
+        }
+    end
     local ir = IR.New({
         kind = "semantic_suggestion_frame",
         rawText = resolvedText(
@@ -165,6 +178,7 @@ local function branchOfferIR(offer, origin, frame, view)
         target = target,
         destination = copyValue(source.destination),
         slots = slots,
+        modifiers = modifiers,
         socialContext = socialContext,
         references = source.reference and { reference = source.reference } or nil,
         extensions = extensions,
@@ -179,9 +193,6 @@ local function branchOfferIR(offer, origin, frame, view)
             branchOfferConstraints = copyValue(offer.constraints),
         },
     })
-    if actorID ~= nil and ir.target == nil and source.target == "SELF" then
-        ir.target = { kind = "actor", id = actorID, source = "conversation" }
-    end
     return ir
 end
 

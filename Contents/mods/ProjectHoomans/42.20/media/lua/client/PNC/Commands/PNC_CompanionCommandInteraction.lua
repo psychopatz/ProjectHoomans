@@ -190,6 +190,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
                     and "companion_command_rejection"
                     or "companion_command_acknowledgement",
                 npcID = respondent and respondent.id,
+                npcRecord = respondent,
                 commandID = commandID,
                 commandOutcome = outcome,
                 commandReason = context and context.commandReason or nil,

@@ -16,6 +16,8 @@ local BehaviorCombat = H.BehaviorCombat
 local Perception = H.Perception
 local TryRespondToImmediateThreat = H.TryRespondToImmediateThreat
 local SetFollowMode = H.SetFollowMode
+local EncounterIntent = PNC.Semantics
+    and PNC.Semantics.CombatEncounterIntent or nil
 
 function H.TryHandle(record, zombie, followState, hazard, retreatState, now)
     local hordeCount = tonumber(hazard and hazard.count) or 0
@@ -63,7 +65,11 @@ function H.TryHandle(record, zombie, followState, hazard, retreatState, now)
         return true
     end
     combatTarget = record.runtime and record.runtime.target or nil
+    local encounterIntent = EncounterIntent
+        and type(EncounterIntent.IntentFor) == "function"
+        and EncounterIntent.IntentFor(record) or nil
     if combatTarget and combatTarget.kind == "zombie"
+        and (encounterIntent == nil or encounterIntent == "engage")
         and BehaviorCombat and BehaviorCombat.TickEngage
         and tostring(record.attackType or Const.ATTACK_TYPE_AUTO)
             ~= tostring(Const.ATTACK_TYPE_NONE or "none")

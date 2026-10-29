@@ -53,6 +53,9 @@ local COMMAND_ACTIONS = {
     QUEST_TURN_IN = true,
     RECRUIT = true,
     RELATIONSHIP_PROPOSAL = true,
+    COMBAT_ENGAGE = true,
+    COMBAT_AVOID = true,
+    COMBAT_HOLD = true,
 }
 
 function Policy.GetCommandActions()

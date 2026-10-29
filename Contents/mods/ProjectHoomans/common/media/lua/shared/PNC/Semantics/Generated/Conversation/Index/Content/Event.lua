@@ -1,5 +1,32 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
+    ["phrase.semantic.combat.horde.choice.avoid"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+        },
+        ["id"] = "phrase.semantic.combat.horde.choice.avoid",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_horde_reactions.json",
+    },
+    ["phrase.semantic.combat.horde.choice.engage"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+        },
+        ["id"] = "phrase.semantic.combat.horde.choice.engage",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_horde_reactions.json",
+    },
+    ["phrase.semantic.combat.horde.choice.hold"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+        },
+        ["id"] = "phrase.semantic.combat.horde.choice.hold",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_horde_reactions.json",
+    },
     ["phrase.semantic.combat.horde.deescalated"] = {
         ["domain"] = "event",
         ["generated"] = {
@@ -24,6 +51,42 @@ return {
             "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
         },
         ["id"] = "phrase.semantic.combat.horde.escalated",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_horde_reactions.json",
+    },
+    ["phrase.semantic.combat.horde.prompt.default"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+        },
+        ["id"] = "phrase.semantic.combat.horde.prompt.default",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_horde_reactions.json",
+    },
+    ["phrase.semantic.combat.horde.prompt.eager"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+        },
+        ["id"] = "phrase.semantic.combat.horde.prompt.eager",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_horde_reactions.json",
+    },
+    ["phrase.semantic.combat.horde.prompt.reserved"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+        },
+        ["id"] = "phrase.semantic.combat.horde.prompt.reserved",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_horde_reactions.json",
+    },
+    ["phrase.semantic.combat.horde.prompt.shaken"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+        },
+        ["id"] = "phrase.semantic.combat.horde.prompt.shaken",
         ["kind"] = "content",
         ["source"] = "content/event/combat_horde_reactions.json",
     },

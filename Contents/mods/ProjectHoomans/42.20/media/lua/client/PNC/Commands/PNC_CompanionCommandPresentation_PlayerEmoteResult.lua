@@ -340,6 +340,7 @@ function Presentation.SyncAcknowledgement(zombie, snapshot, modData)
             feedback.reason == "rejected" and "invalid" or "valid",
             {
                 npcID = snapshot and snapshot.id,
+                npcRecord = snapshot,
                 commandID = feedback.id,
                 commandOutcome = feedback.reason == "rejected"
                     and "invalid" or "valid",
