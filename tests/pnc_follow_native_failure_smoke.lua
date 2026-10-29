@@ -174,4 +174,61 @@ T.equal(completeCalls, 0,
 T.truthy(stalledLane.ownerMode == "native_backoff",
     "follow native stall did not retain native lane ownership")
 
+-- A companion retains ORDER_FOLLOW while combat temporarily owns movement.
+-- That standing order must not make a combat slot/kite/fire-lane failure use
+-- FollowOwner's special retry loop.
+Internal.noteNativeGoalFailure = function() return false end
+local combatLane = {
+    goal = { x = 6, y = 10.5, z = 0 },
+    intentReason = "closing_to_melee_slot",
+    requestedOrder = "follow",
+    navigationProvider = "engine_path",
+    lastProgressAt = now,
+    lastGoalProgressAt = now,
+}
+local invalidatesBeforeCombat = invalidateCalls
+local combatHandled, combatState = Internal.recordNativeMove(
+    record,
+    body,
+    combatLane,
+    navigation,
+    PNC.EnginePathPlanner,
+    now,
+    "engine_path_failed",
+    body:getX(),
+    body:getY(),
+    body:getZ()
+)
+T.truthy(combatHandled and combatState == "engine_path_failed",
+    "combat failure on a follower used the FollowOwner recovery lane")
+T.equal(combatLane.followNativeRecoveryCount, nil,
+    "combat movement inherited FollowOwner retry state")
+T.equal(combatLane.nativeBackoffUntil, nil,
+    "combat movement inherited FollowOwner native backoff")
+T.equal(invalidateCalls, invalidatesBeforeCombat,
+    "combat failure was immediately recycled as a follow replan")
+
+-- Generic combat recovery is allowed to fall back after repeated no-progress
+-- timeouts rather than circling forever on Behavior2 replans.
+combatLane.lastGoalProgressAt = 0
+combatLane.lastProgressAt = 0
+combatLane.noProgressCount = 1
+now = now + 3000
+local timeoutHandled, timeoutState = Internal.recordNativeMove(
+    record,
+    body,
+    combatLane,
+    navigation,
+    PNC.EnginePathPlanner,
+    now,
+    "native_path_moving",
+    body:getX(),
+    body:getY(),
+    body:getZ()
+)
+T.truthy(timeoutHandled and timeoutState == "native_path_fallback",
+    "stalled combat movement on a follower did not use generic fallback")
+T.equal(fallbackCalls, 1,
+    "stalled follower combat never escaped the native path timeout loop")
+
 T.finish("pnc_follow_native_failure_smoke")

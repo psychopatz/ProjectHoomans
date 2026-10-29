@@ -6,13 +6,13 @@ local Const = PNC.Const or {}
 
 local function isFollowOwnerLane(lane)
     if not lane then return false end
-    if string.sub(tostring(lane.intentReason or ""), 1, 12)
+    -- A companion can retain ORDER_FOLLOW while combat temporarily owns its
+    -- movement. Classifying by the standing order makes melee slots, kites and
+    -- fire-lane moves use FollowOwner's endless native-repath policy, which is
+    -- exactly the MP circling/timeout loop seen in live logs. Only movement
+    -- actually requested by the follow-owner lane gets that recovery policy.
+    return string.sub(tostring(lane.intentReason or ""), 1, 12)
         == "follow_owner"
-    then
-        return true
-    end
-    return tostring(lane.requestedOrder or "")
-        == tostring(Const.ORDER_FOLLOW or "follow")
 end
 
 local function followNativeRetryJitterMs(record, lane, retryCount)

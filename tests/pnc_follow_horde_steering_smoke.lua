@@ -227,6 +227,9 @@ record.runtime.followHazard = nil
 record.runtime.followState.ownerSampleX = ownerX
 record.runtime.followState.ownerSampleY = 0
 record.runtime.followState.ownerSampleAt = now
+-- MP follow deliberately keeps the moving lease across a short packet gap.
+-- Advance beyond that grace before asserting the true stationary hold.
+now = now + 500
 lastMove = nil
 local haltsBeforeStandstill = haltCalls
 T.truthy(PNC.BehaviorCompanion.Tick(record, {

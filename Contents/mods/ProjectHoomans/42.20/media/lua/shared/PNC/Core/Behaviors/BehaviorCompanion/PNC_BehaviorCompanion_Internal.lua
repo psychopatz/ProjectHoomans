@@ -248,22 +248,46 @@ function Internal.UpdateOwnerMotionState(record, owner, now)
     local ownerY = owner:getY()
     local elapsed = now - (tonumber(state.ownerSampleAt) or now)
     local moved = false
+    local physicalMoved = false
     local reportedMoving
     local dx
     local dy
+    local dirX
+    local dirY
     local epsilon = tonumber(Const.FOLLOW_OWNER_MOVE_EPSILON) or 0.08
+    local stopGraceMs = math.max(
+        0,
+        tonumber(Const.FOLLOW_OWNER_STOP_GRACE_MS) or 450
+    )
 
     reportedMoving = (owner.isPlayerMoving and owner:isPlayerMoving())
         or (owner.isRunning and owner:isRunning())
         or (owner.isSprinting and owner:isSprinting())
         or false
-    if reportedMoving then
-        moved = true
-    elseif state.ownerSampleX ~= nil and elapsed > 0 then
+    if state.ownerSampleX ~= nil and elapsed > 0 then
         dx = ownerX - state.ownerSampleX
         dy = ownerY - state.ownerSampleY
-        moved = (dx * dx) + (dy * dy) >= epsilon * epsilon
+        physicalMoved = (dx * dx) + (dy * dy) >= epsilon * epsilon
+        if physicalMoved then
+            dirX, dirY = Internal.NormalizeDirection(dx, dy)
+            if dirX and dirY then
+                -- Formation orientation follows actual owner travel, not the
+                -- player's aim/facing direction. This is especially important
+                -- for remote players whose facing packets can rotate while
+                -- their movement trajectory is unchanged.
+                state.ownerTravelDirX = dirX
+                state.ownerTravelDirY = dirY
+                state.ownerTravelDirAt = now
+            end
+        end
     end
+    if reportedMoving or physicalMoved then
+        state.ownerLastMovedAt = now
+    end
+    moved = reportedMoving
+        or physicalMoved
+        or now - (tonumber(state.ownerLastMovedAt) or -math.huge)
+            < stopGraceMs
 
     state.ownerMoving = moved
     state.ownerMovingChanged = moved ~= wasMoving
@@ -274,6 +298,19 @@ function Internal.UpdateOwnerMotionState(record, owner, now)
     state.ownerSampleY = ownerY
     state.ownerSampleAt = now
     return state
+end
+
+function Internal.ResolveFollowHeading(record, owner)
+    local state = Internal.GetFollowState(record)
+    local dx = tonumber(state.ownerTravelDirX)
+    local dy = tonumber(state.ownerTravelDirY)
+    if dx ~= nil and dy ~= nil then
+        dx, dy = Internal.NormalizeDirection(dx, dy)
+        if dx and dy then
+            return dx, dy
+        end
+    end
+    return Internal.ResolveOwnerForward(owner)
 end
 
 function Internal.UpdateOwnerCombatState(record, owner, now)

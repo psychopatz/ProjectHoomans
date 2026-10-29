@@ -86,6 +86,10 @@ Const.THREAT_GUARD_VALIDATE_MS = 250
 Const.THREAT_GUARD_RELEASE_GRACE_MS = 900
 Const.FOLLOW_COMBAT_LEASH_DISTANCE = 5.5
 Const.FOLLOW_OWNER_MOVE_EPSILON = 0.08
+-- Remote-player interpolation can briefly report no movement between packets.
+-- Preserve the moving state across that tiny gap so formation/path ownership
+-- does not flip every network sample.
+Const.FOLLOW_OWNER_STOP_GRACE_MS = 450
 Const.FOLLOW_HORDE_AVOID_RADIUS = 6.5
 Const.FOLLOW_HORDE_AVOID_COUNT = 3
 Const.FOLLOW_HORDE_NEAR_DISTANCE = 2.4

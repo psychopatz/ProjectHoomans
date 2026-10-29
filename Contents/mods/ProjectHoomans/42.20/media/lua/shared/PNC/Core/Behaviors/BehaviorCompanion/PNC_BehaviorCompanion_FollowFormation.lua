@@ -48,7 +48,11 @@ local function buildFollowFormation(record, owner, now, ownerMoving)
     for i = 1, #followers do
         slots[tostring(followers[i].id)] = i - 1
     end
-    fx, fy = Internal.ResolveOwnerForward(owner)
+    if Internal.ResolveFollowHeading then
+        fx, fy = Internal.ResolveFollowHeading(record, owner)
+    else
+        fx, fy = Internal.ResolveOwnerForward(owner)
+    end
     return {
         expiresAt = now + (
             ownerMoving
