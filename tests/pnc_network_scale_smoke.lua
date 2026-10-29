@@ -324,8 +324,8 @@ PNC.Network.ClientState.snapshots = {
     },
 }
 local bodyIdentityIndex = PNC.Network.RefreshClientBodyIdentityIndex()
-T.equal(bodyIdentityIndex["73"], true,
-    "client body identity index includes live carrier")
+T.equal(bodyIdentityIndex["73"], nil,
+    "roster hints do not establish managed identity")
 T.equal(bodyIdentityIndex["74"], nil,
     "client body identity index excludes abstract carrier")
 T.equal(bodyIdentityIndex["75"], nil,

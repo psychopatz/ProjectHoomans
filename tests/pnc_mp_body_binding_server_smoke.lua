@@ -48,10 +48,16 @@ r.presenceState = "live"
 local c = B.Build(r)
 live = nil
 local removed = B.Build(r)
+T.equal(removed, nil, "live shell grace does not publish premature retirement")
+r.presenceState = "abstract"
+removed = B.Build(r)
 T.equal(removed.operation, "unbind")
 T.equal(removed.previousIncarnation, c.incarnation)
 T.equal(removed.previousOnlineId, c.onlineId)
 T.truthy(removed.revision > c.revision)
+local repeatedUnbind = B.Build(r)
+T.equal(repeatedUnbind.previousIncarnation, c.incarnation,
+    "every client receives exact predecessor even on repeated unbind publication")
 isServer = function() return false end
 T.equal(B.Build(r), nil, "SP payload has no MP binding")
 return T.finish("pnc_mp_body_binding_server_smoke")

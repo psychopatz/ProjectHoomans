@@ -47,4 +47,19 @@ for n=1,10 do c.Receive({protocol=1, session="old_session", revision=6+n,
     npcId="npc"..n, operation="unbind"}, 215) end
 local entries, observations = c.Counts()
 T.truthy(entries <= 3 and observations <= 3, "all client state capped")
+local removes = 0
+local retirement = B.NewClient({onRemove=function() removes=removes+1 end})
+retirement.Observe({}, 50, 0)
+retirement.Receive(msg(1, "l1", 50), 1)
+T.falsy(retirement.Receive({protocol=1,session="s1",revision=2,npcId="a",
+    operation="unbind",previousIncarnation="old",previousOnlineId=50}, 2),
+    "late old-incarnation unbind cannot release current shell")
+T.truthy(retirement.Receive({protocol=1,session="s1",revision=3,npcId="a",
+    operation="unbind",previousIncarnation="l1",previousOnlineId=50}, 3))
+T.equal(removes, 1, "unbind arriving before remove retires its exact predecessor")
+retirement.Receive({protocol=1,session="s1",revision=4,npcId="a",
+    operation="unbind",previousIncarnation="l1",previousOnlineId=50}, 4)
+T.equal(removes, 1, "repeated unbind cannot remove twice")
+local diagnostics = c.Diagnostics()
+T.truthy(diagnostics.rejected > 0 and diagnostics.entries <= diagnostics.limit)
 return T.finish("pnc_mp_body_binding_client_smoke")

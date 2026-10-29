@@ -30,6 +30,12 @@ T.equal(second:getModData().PNC_BodyLease, b)
 r.runtime.bodyLease = nil
 local c = L.StampLiveBody(r, second)
 T.truthy(c ~= b, "released and recycled object gets new incarnation")
+local oldRestamped = L.StampLiveBody(r, first)
+T.truthy(oldRestamped ~= a and oldRestamped ~= b and oldRestamped ~= c,
+    "revisiting an earlier physical object cannot resurrect its old receipt")
+first:getModData().PNC_BodyLease = nil
+T.truthy(L.StampLiveBody(r, first) ~= oldRestamped,
+    "engine-cleared/recycled object cannot retain its prior incarnation")
 isServer = function() return false end
 r.runtime.bodyLease = "sp_restored_lease"
 T.equal(L.StampLiveBody(r, body()), "sp_restored_lease", "SP restoration unchanged")
@@ -60,4 +66,11 @@ T.equal(#notified, 1)
 T.equal(notified[1].lease, lease, "removal captures lease before engine mutation")
 T.equal(notified[1].online, 77)
 T.equal(r.runtime.bodyLease, nil, "verified removal clears incarnation")
+T.load("ProjectHoomans", "shared", "PNC/Core/Persistence/PNC_Persistence_CoreProvider.lua")
+local provider = { Actors = { Provider = { Project = function(actor) return actor end } } }
+local base = { runtime = { bodyLease = "physical_lease" } }
+local projected = PNC.Persistence.CoreProvider.BuildRecord({ actorId="a",
+    providerLease={leaseID="provider_lease"} }, provider, base)
+T.equal(projected.runtime.bodyLease, "physical_lease", "provider projection cannot overwrite MP incarnation")
+T.equal(projected.runtime.coreProviderLease, "provider_lease", "provider ownership remains separate")
 return T.finish("pnc_mp_body_incarnation_smoke")

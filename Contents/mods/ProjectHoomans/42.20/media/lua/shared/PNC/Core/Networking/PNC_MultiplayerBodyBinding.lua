@@ -6,6 +6,7 @@ PNC.MultiplayerBodyBinding = Binding
 local receipts = setmetatable({}, { __mode = "k" })
 local session
 local revision = 0
+local diagnostics = { binds=0, unbinds=0, removes=0, lastReason="idle" }
 
 function Binding.ValidOnlineID(value)
     local id = tonumber(value)
@@ -19,19 +20,19 @@ local function currentShell(record)
     if record.alive == false or record.presenceState ~= PNC.Const.PRESENCE_LIVE
         or not runtime or not runtime.bodyLease
         or not registry or not registry.GetLiveZombie
-    then return nil end
+    then return nil, nil, nil, "not_live" end
     local body = registry.GetLiveZombie(record.id)
     if not body or not body.getModData or not body.getOnlineID
         or (body.isDead and body:isDead())
         or (body.getSquare and not body:getSquare())
-    then return nil end
+    then return nil, nil, nil, "no_attached_shell" end
     local md = body:getModData()
     if not md or md.PNC_NPC ~= true or md.PNC_BodyKind ~= "live"
         or tostring(md.PNC_UUID) ~= tostring(record.id)
         or tostring(md.PNC_BodyLease) ~= tostring(runtime.bodyLease)
-    then return nil end
+    then return nil, nil, nil, "identity_conflict" end
     local onlineID = tonumber(body:getOnlineID())
-    if not Binding.ValidOnlineID(onlineID) then return nil end
+    if not Binding.ValidOnlineID(onlineID) then return nil, nil, nil, "invalid_online_id" end
     return body, onlineID, tostring(runtime.bodyLease)
 end
 
@@ -40,8 +41,15 @@ function Binding.Build(record)
         return nil
     end
     if not session then session = PNC.Core.GenerateID("body_binding_session") end
-    local body, onlineID, lease = currentShell(record)
+    local body, onlineID, lease, reason = currentShell(record)
+    -- A detached frame during Presence's body-loss grace is not an
+    -- authoritative lifetime transition. Do not retire replicas prematurely.
+    if reason == "no_attached_shell" and record.alive ~= false
+        and record.presenceState == PNC.Const.PRESENCE_LIVE then return nil end
     local operation = body and "bind" or "unbind"
+    local key = body and "binds" or "unbinds"
+    diagnostics[key] = diagnostics[key] + 1
+    diagnostics.lastReason = reason or "verified_registry_shell"
     local previous = receipts[record]
     -- Each authoritative publication is fresh proof for bounded client TTLs.
     -- Revisions order publications; lease equality still defines incarnation.
@@ -58,6 +66,10 @@ function Binding.Build(record)
         message.previousIncarnation = previous.incarnation
         message.previousOnlineId = previous.onlineId
     end
+    if operation == "unbind" and previous and previous.operation == "unbind" then
+        message.previousIncarnation = previous.previousIncarnation
+        message.previousOnlineId = previous.previousOnlineId
+    end
     receipts[record] = message
     return message
 end
@@ -70,8 +82,14 @@ function Binding.Removal(npcId, incarnation, onlineId)
         or not Binding.ValidOnlineID(onlineId) then return nil end
     if not session then session = PNC.Core.GenerateID("body_binding_session") end
     revision = revision + 1
+    diagnostics.removes = diagnostics.removes + 1
+    diagnostics.lastReason = "exact_removal"
     return { protocol = 1, session = session, revision = revision,
         npcId = tostring(npcId), incarnation = incarnation,
         onlineId = tonumber(onlineId), operation = "remove" }
+end
+function Binding.Diagnostics()
+    return { binds=diagnostics.binds, unbinds=diagnostics.unbinds,
+        removes=diagnostics.removes, lastReason=diagnostics.lastReason, revision=revision }
 end
 return Binding

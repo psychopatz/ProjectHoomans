@@ -13,6 +13,7 @@ local Const = PNC.Const
 -- weak shell receipt so restored/provider leases cannot be reused for a new
 -- physical incarnation. SP deliberately retains its local lease semantics.
 local shellReceipts = setmetatable({}, { __mode = "k" })
+local activeShells = setmetatable({}, { __mode = "kv" })
 local shellSerial = 0
 local function ensureIncarnation(record, zombie, runtime)
     if not isServer or isServer() ~= true then
@@ -22,13 +23,17 @@ local function ensureIncarnation(record, zombie, runtime)
         return
     end
     local receipt = shellReceipts[zombie]
-    if receipt and receipt.id == record.id and runtime.bodyLease ~= nil then
+    local md = zombie.getModData and zombie:getModData()
+    if receipt and activeShells[record] == zombie and receipt.id == record.id
+        and runtime.bodyLease ~= nil and md
+        and md.PNC_UUID == tostring(record.id) and md.PNC_BodyLease == receipt.lease then
         runtime.bodyLease = receipt.lease
         return
     end
     shellSerial = shellSerial + 1
     runtime.bodyLease = Core.GenerateID("body") .. "_" .. tostring(shellSerial)
     shellReceipts[zombie] = { id = record.id, lease = runtime.bodyLease }
+    activeShells[record] = zombie
 end
 
 local function validEngineIdentity(value)

@@ -105,30 +105,12 @@ PNC.Network.Internal = PNC.Network.Internal or {}
 local Network = PNC.Network
 local ServerState = Network.ServerState
 
--- Native IsoZombie updates run before the client presence tick. Keep a small
--- identity index beside the roster so the early OnZombieUpdate safety hook
--- can recognize a carrier before presentation has written PNC modData.
--- Rebuilding is explicit and only happens when roster state changes; it is
--- never a per-zombie or per-frame scan.
+-- Deprecated compatibility hook. Roster online IDs are hints, never client
+-- body identity. Canonical MultiplayerBodyBinding owns managed admission.
 function Network.RefreshClientBodyIdentityIndex()
-    local index = {}
-    local snapshot
-    local onlineID
-    for _, candidate in pairs(Network.ClientState.snapshots or {}) do
-        snapshot = candidate
-        if type(snapshot) == "table"
-            and snapshot.presenceState == "live"
-            and snapshot.alive ~= false
-        then
-            onlineID = tonumber(snapshot.liveBodyOnlineID)
-            if onlineID ~= nil and onlineID >= 0 then
-                index[tostring(onlineID)] = true
-            end
-        end
-    end
-    Network.ClientState.managedBodyOnlineIDs = index
+    Network.ClientState.managedBodyOnlineIDs = {}
     Network.ClientState.managedBodyOnlineIDsReady = true
-    return index
+    return Network.ClientState.managedBodyOnlineIDs
 end
 
 function Network.ResetServerState()

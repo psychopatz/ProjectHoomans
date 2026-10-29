@@ -41,6 +41,13 @@ local function position(actor)
     }
 end
 
+local function projectProviderLease(record, leaseID)
+    record.runtime.coreProviderLease = leaseID
+    -- Provider ownership may outlive several physical MP shells. Only
+    -- BodyLifecycle assigns the physical incarnation on an MP server.
+    if not isServer or isServer() ~= true then record.runtime.bodyLease = leaseID end
+end
+
 local function buildRecord(actor, baseRecord)
     local record = type(baseRecord) == "table" and baseRecord or {}
     local lease = actor and actor.providerLease or {}
@@ -58,7 +65,7 @@ local function buildRecord(actor, baseRecord)
     record.z = point.z
     record.runtime = record.runtime or {}
     record.runtime.coreActorID = tostring(actor.actorId)
-    record.runtime.bodyLease = lease.leaseID
+    projectProviderLease(record, lease.leaseID)
     record.runtime.coreProvider = lease.provider
     return record
 end
@@ -150,7 +157,7 @@ function Adapter.Materialize(actor, core, spec)
     then
         return nil, "body_lease_active"
     end
-    record.runtime.bodyLease = projection.providerLease.leaseID
+    projectProviderLease(record, projection.providerLease.leaseID)
     lifecycle = spec.lifecycle or PNC.BodyLifecycle
     factory = spec.bodyFactory or spec.spawn
     if type(factory) ~= "function" and lifecycle
@@ -192,7 +199,7 @@ function Adapter.Materialize(actor, core, spec)
         if type(rollback) == "function" then rollback(body, record, spec) end
         return nil, reason
     end
-    record.runtime.bodyLease = nextActor.providerLease.leaseID
+    projectProviderLease(record, nextActor.providerLease.leaseID)
     if lifecycle and type(lifecycle.StampLiveBody) == "function" then
         lifecycle.StampLiveBody(record, body)
     end

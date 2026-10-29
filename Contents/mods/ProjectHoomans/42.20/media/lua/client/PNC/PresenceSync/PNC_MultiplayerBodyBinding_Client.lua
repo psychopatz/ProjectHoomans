@@ -8,6 +8,7 @@ function Binding.NewClient(options)
     local client = {}
     local entries, owners, observed, observedUntil
     local count, observedCount, session, retiredRevision
+    local diagnostics
     local limit = options.limit or 512
     local ttl = options.ttl or 10000
     local bodies = setmetatable({}, { __mode = "v" })
@@ -16,11 +17,13 @@ function Binding.NewClient(options)
         observed = setmetatable({}, { __mode = "v" })
         bodies = setmetatable({}, { __mode = "v" })
         count, observedCount, session, retiredRevision = 0, 0, nil, 0
+        diagnostics = { accepted=0, rejected=0, duplicates=0, binds=0, releases=0, lastReason="reset" }
     end
     reset()
 
     local function release(entry)
         local body = bodies[entry.npcId]
+        if body then diagnostics.releases = diagnostics.releases + 1 end
         if body and options.onUnbind then options.onUnbind(body, entry) end
         bodies[entry.npcId] = nil
         if owners[entry.onlineId] == entry.npcId then
@@ -41,11 +44,12 @@ function Binding.NewClient(options)
         if options.canBind and not options.canBind(body, entry) then return nil end
         bodies[entry.npcId] = body
         entry.usedRevision = entry.revision
+        diagnostics.binds = diagnostics.binds + 1
         if options.onBind then options.onBind(body, entry) end
         return body
     end
 
-    function client.Receive(message, now)
+    local function receiveMessage(message, now)
         if type(message) ~= "table" or message.protocol ~= 1
             or type(message.npcId) ~= "string" or #message.npcId == 0 or #message.npcId > 128
             or type(message.session) ~= "string" or #message.session == 0 or #message.session > 256
@@ -72,6 +76,11 @@ function Binding.NewClient(options)
             and (current.incarnation ~= message.incarnation
                 or current.onlineId ~= message.onlineId)
         then return false, "different_incarnation" end
+        if message.operation == "unbind" and message.previousIncarnation ~= nil
+            and current and current.operation == "bind"
+            and (current.incarnation ~= message.previousIncarnation
+                or current.onlineId ~= message.previousOnlineId)
+        then return false, "different_incarnation" end
         local owner = message.operation == "bind" and owners[message.onlineId] or nil
         if owner and owner ~= message.npcId then return false, "conflict" end
         session = message.session
@@ -81,6 +90,9 @@ function Binding.NewClient(options)
             local body = bodies[current.npcId]
             local retiresShell = message.operation == "remove"
                 or (message.operation == "bind" and current.operation == "bind")
+                or (message.operation == "unbind"
+                    and message.previousIncarnation == current.incarnation
+                    and message.previousOnlineId == current.onlineId)
             if retiresShell and body and options.onRemove
                 and (not options.isValid or options.isValid(body, current)) then
                 options.onRemove(body, current)
@@ -98,6 +110,20 @@ function Binding.NewClient(options)
         if entry.operation == "bind" then owners[entry.onlineId] = entry.npcId end
         reconcile(entry, now)
         return true
+    end
+
+    function client.Receive(message, now)
+        local accepted, reason = receiveMessage(message, now)
+        if accepted then diagnostics.accepted = diagnostics.accepted + 1
+        else diagnostics.rejected = diagnostics.rejected + 1 end
+        if reason == "duplicate" then diagnostics.duplicates = diagnostics.duplicates + 1 end
+        diagnostics.lastReason = reason or "accepted"
+        return accepted, reason
+    end
+    function client.Diagnostics()
+        local result = { entries=count, observed=observedCount, limit=limit, ttl=ttl }
+        for key, value in pairs(diagnostics) do result[key] = value end
+        return result
     end
 
     function client.Observe(body, onlineId, now)
