@@ -37,6 +37,8 @@ PNC = {
         PRESENCE_LIVE = "live",
         PRESENCE_ABSTRACT = "abstract",
         PRESENCE_CORPSE = "corpse",
+        ORDER_FOLLOW = "follow",
+        BODY_SHELL_REHYDRATE_ANON_RADIUS = 1.0,
         BODY_TAG_VERSION = 1,
         BODY_SHELL_VERSION = 1,
         BODY_SHELL_RESPAWN_DELAY_MS = 50,
@@ -152,6 +154,86 @@ T.truthy(Lifecycle.InterceptLoadedShell(legacySeedBody, "late_seed_restore"),
     "mixed startup seed shell was not intercepted")
 T.equal(legacySeedBody.wasRemoved(), true,
     "mixed startup seed shell remained in the world")
+
+-- Multiplayer can finish startup before this chunk is streamed. A replacement
+-- companion may already be canonical when the old zero-ID startup shell later
+-- enters the server census. That old shell is still a duplicate, but only the
+-- narrow owned/following startup_seed lane may reclaim it.
+Lifecycle.HuskLedger.loaded = false
+Lifecycle.HuskLedger.entries = {}
+Lifecycle.HuskLedger.index = {}
+store.entries = {
+    { 175.25, 275.25, 0, "888", 100, 0, "mp_late_companion",
+        "startup_seed" },
+}
+records.mp_late_companion = {
+    id = "mp_late_companion",
+    alive = true,
+    recruited = true,
+    ownerUsername = "alice",
+    ownerOnlineID = 41,
+    orderSpec = { kind = "follow" },
+    presenceState = "live",
+    x = 180,
+    y = 280,
+    z = 0,
+    runtime = { bodyLease = "new_mp_lease" },
+}
+local mpCanonical = makeBody({
+    x = 180, y = 280, z = 0, outfitID = 999,
+    modData = {
+        PNC_UUID = "mp_late_companion",
+        PNC_NPC = true,
+        PNC_BodyKind = "live",
+        PNC_BodyLease = "new_mp_lease",
+    },
+})
+PNC.Registry.LiveByID.mp_late_companion = mpCanonical
+local mpLateHusk = makeBody({
+    x = 175.25, y = 275.25, z = 0, outfitID = 0, clothed = true,
+})
+T.truthy(Lifecycle.FindHuskEntry(mpLateHusk),
+    "late-stream MP startup shell was hidden by the replacement canonical body")
+T.truthy(Lifecycle.InterceptLoadedShell(mpLateHusk, "mp_late_stream"),
+    "late-stream MP startup shell was not reclaimed")
+T.equal(mpLateHusk.wasRemoved(), true,
+    "late-stream MP startup shell survived beside the replacement companion")
+
+-- The same positional evidence is not sufficient for an unowned neutral.
+Lifecycle.HuskLedger.loaded = false
+Lifecycle.HuskLedger.entries = {}
+Lifecycle.HuskLedger.index = {}
+store.entries = {
+    { 190.25, 290.25, 0, "777", 100, 0, "mp_neutral",
+        "startup_seed" },
+}
+records.mp_neutral = {
+    id = "mp_neutral",
+    alive = true,
+    recruited = false,
+    presenceState = "live",
+    x = 195,
+    y = 295,
+    z = 0,
+    runtime = { bodyLease = "neutral_lease" },
+}
+local neutralCanonical = makeBody({
+    x = 195, y = 295, z = 0, outfitID = 778,
+    modData = {
+        PNC_UUID = "mp_neutral",
+        PNC_NPC = true,
+        PNC_BodyKind = "live",
+        PNC_BodyLease = "neutral_lease",
+    },
+})
+PNC.Registry.LiveByID.mp_neutral = neutralCanonical
+local ordinaryNearOldNeutral = makeBody({
+    x = 190.25, y = 290.25, z = 0, outfitID = 0, clothed = true,
+})
+T.falsy(Lifecycle.FindHuskEntry(ordinaryNearOldNeutral),
+    "position-only ordinary zombie was attributed to an unowned neutral")
+T.equal(ordinaryNearOldNeutral.wasRemoved(), false,
+    "ordinary zombie near an old neutral position was removed")
 
 -- Vehicle reservation: an anonymous stale shell may be removed, but a marked
 -- canonical passenger body must remain owned by the vehicle lane.

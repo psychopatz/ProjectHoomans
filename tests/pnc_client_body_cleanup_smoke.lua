@@ -188,6 +188,34 @@ T.equal(exact.wasRemoved(), true, "exact server-directed body removed")
 T.equal(removalCollision.wasRemoved(), false,
     "online-ID collision was not removed with another NPC")
 
+-- A multiplayer shell can lose all PNC ModData after server restart/streaming.
+-- The server-assigned online ID still names the exact network zombie and must
+-- be sufficient for authoritative cleanup on every connected client.
+local anonymousOnlineHusk = makeBody({
+    instanceID = 0,
+    onlineID = 31,
+    x = 6,
+    y = 6,
+    naked = true,
+})
+local anonymousWrongOnline = makeBody({
+    instanceID = 0,
+    onlineID = 32,
+    x = 6.1,
+    y = 6,
+    naked = true,
+})
+T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({
+    id = "lost_uuid_npc",
+    bodyInstanceID = "0",
+    bodyOnlineID = 31,
+    reason = "loaded_husk_sweep",
+}), 1, "anonymous exact-online-id husk removal count")
+T.equal(anonymousOnlineHusk.wasRemoved(), true,
+    "anonymous exact-online-id husk survived server removal")
+T.equal(anonymousWrongOnline.wasRemoved(), false,
+    "nearby anonymous zombie with another online id was removed")
+
 local ordinaryZeroInstance = makeBody({
     instanceID = 0,
     onlineID = nil,

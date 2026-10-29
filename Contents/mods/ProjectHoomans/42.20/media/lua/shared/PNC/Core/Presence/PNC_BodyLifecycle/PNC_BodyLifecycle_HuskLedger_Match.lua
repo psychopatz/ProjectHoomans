@@ -246,8 +246,16 @@ local function isLegacyAnonymousHusk(entry, zombie, radiusSq)
         and not (passenger and passenger.active == true)
     then
         -- A stale registry lease can leave the record marked live after the
-        -- original body was virtualized. Permit the exact ledger migration
-        -- only when no attached canonical body still owns that record.
+        -- original body was virtualized. Normally an attached canonical body
+        -- means a nearby anonymous zombie cannot be attributed safely.
+        --
+        -- Multiplayer streaming has one stricter exception: startup can finish
+        -- while the old shell's chunk is unloaded, materialize a replacement,
+        -- then stream the historical zero-ID shell in later. For a persisted
+        -- startup_seed belonging to an owned/following companion, the ledger
+        -- position plus a distinct attached canonical body is positive
+        -- duplicate evidence. Keep this lane tight so an ordinary zombie near
+        -- a neutral NPC can never be reclaimed by position alone.
         canonical = registry.GetLiveZombie and registry.GetLiveZombie(entry.npcId)
             or registry.LiveByID and registry.LiveByID[tostring(entry.npcId)]
         if canonical then
@@ -257,7 +265,35 @@ local function isLegacyAnonymousHusk(entry, zombie, radiusSq)
                 canonicalAttached = ok and attached == true
             end
             if canonicalAttached then
-                return false
+                local orderKind = tostring(record.orderSpec
+                    and record.orderSpec.kind or "")
+                local ownedCompanion = record.recruited == true
+                    or tostring(record.ownerUsername or "") ~= ""
+                    or orderKind == tostring(Const.ORDER_FOLLOW or "follow")
+                local sexMatches = true
+                if zombie.isFemale and record.isFemale ~= nil then
+                    local ok, female = pcall(zombie.isFemale, zombie)
+                    sexMatches = not ok
+                        or (female == true) == (record.isFemale == true)
+                end
+                local duplicateRadius = math.min(
+                    math.sqrt(radiusSq),
+                    tonumber(Const.BODY_SHELL_REHYDRATE_ANON_RADIUS) or 1.0
+                )
+                if reason ~= "startup_seed"
+                    or not ownedCompanion
+                    or zombie == canonical
+                    or not sexMatches
+                    or not isUnmarkedBody(zombie)
+                    or not samePosition(
+                        entry,
+                        zombie,
+                        duplicateRadius * duplicateRadius
+                    )
+                then
+                    return false
+                end
+                return true
             end
         end
     end

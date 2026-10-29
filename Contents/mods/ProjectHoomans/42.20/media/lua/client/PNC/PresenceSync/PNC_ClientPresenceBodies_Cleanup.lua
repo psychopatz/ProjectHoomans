@@ -124,13 +124,20 @@ function Cleanup.RemoveBodyInstance(args)
                 and modData and tostring(modData.PNC_UUID or "") == wantedID
         end
         if identifierMatch and not isProtectedBody(body) then
-            -- The server may provide a persistent-outfit hint for an
-            -- anonymous restored shell, but that number is not an actor
-            -- identity on the client. Only remove a marked PNC body here;
-            -- anonymous shells are removed by the authoritative server lane.
-            if not wantedID
-                or not (modData and tostring(modData.PNC_UUID or "")
-                    == wantedID)
+            -- In multiplayer the server-assigned online zombie ID is an exact
+            -- live-object identity. A restored husk can lose all PNC ModData
+            -- before the removal packet reaches a client, so an exact online
+            -- ID must remain sufficient to remove that anonymous replica.
+            --
+            -- Persistent outfit IDs are not unique actor identities. Keep
+            -- those removals gated by the PNC UUID to avoid deleting an
+            -- ordinary zombie that happens to reuse an outfit/carrier ID.
+            if wantedOnline == nil
+                and (
+                    not wantedID
+                    or not (modData and tostring(modData.PNC_UUID or "")
+                        == wantedID)
+                )
             then
                 identifierMatch = false
             end

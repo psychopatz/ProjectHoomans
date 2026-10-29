@@ -513,6 +513,17 @@ local function removeHusk(record)
             detached
         )
     end
+    if detached
+        and PNC.Network
+        and PNC.Network.BroadcastBodyRemoval
+    then
+        PNC.Network.BroadcastBodyRemoval(
+            record.entry and record.entry.npcId or nil,
+            record.identity and record.identity.outfitID or nil,
+            record.identity and record.identity.onlineID or nil,
+            record.reason or "husk_reaper_removal"
+        )
+    end
     return detached
 end
 

@@ -21,6 +21,7 @@ local BODY_ROOT = SHARED .. "PNC/Core/Presence/PNC_BodyLifecycle/"
 
 local records = {}
 local nowMs = 10000
+local bodyRemovalBroadcasts = {}
 
 PNC = {
     Core = {
@@ -43,6 +44,17 @@ PNC = {
         BODY_LOST_GRACE_MS = 400,
         HUSK_LEDGER_MATCH_RADIUS = 2.0,
         HUSK_REAP_MAX_ATTEMPTS = 4,
+    },
+    Network = {
+        BroadcastBodyRemoval = function(id, instanceID, onlineID, reason)
+            bodyRemovalBroadcasts[#bodyRemovalBroadcasts + 1] = {
+                id = id,
+                instanceID = instanceID,
+                onlineID = onlineID,
+                reason = reason,
+            }
+            return true
+        end,
     },
     BehaviorCommon = {},
     PathService = {
@@ -195,6 +207,12 @@ T.equal(husk.current, nil, "husk still occupies a square")
 T.equal(Lifecycle.HuskLedgerCount(), 0, "reaped husk left its loss armed")
 T.equal(Reaper.reaped, 1, "reap was not counted")
 T.equal(Reaper.abandoned, 0, "clean reap was recorded as abandoned")
+T.equal(#bodyRemovalBroadcasts, 1,
+    "verified server husk reap did not broadcast body removal")
+T.equal(bodyRemovalBroadcasts[1].id, record.id,
+    "husk body removal broadcast lost the NPC identity")
+T.equal(bodyRemovalBroadcasts[1].onlineID, 7,
+    "husk body removal broadcast lost the exact MP online body id")
 
 -- 6. A husk that comes back wearing a different persistent outfit is not ours
 -- to delete; it must be left alone and the loss must stay armed.
