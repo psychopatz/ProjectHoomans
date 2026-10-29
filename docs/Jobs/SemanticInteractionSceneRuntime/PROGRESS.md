@@ -1,6 +1,6 @@
 # Progress — Semantic Interaction Scene Runtime
 
-**Status:** PLANNED / NOT IMPLEMENTED — S0 baseline and productionization contracts are next.
+**Status:** ACTIVE — S0 accepted; S1 production Project Hoomans actor adapter is next.
 
 **Planning base:** ProjectHoomans `47aaad69`, existing `main`.
 
@@ -33,23 +33,36 @@ The current scene smoke already proves NPC-to-NPC semantic interaction in isolat
 - no generic Scene Observatory exists;
 - combat group conversation should be an adopter, not a separate exchange engine.
 
-## ONE current Next Chunk — S0A
+## S0 accepted — baseline and authority freeze
 
-Establish production-grounded baselines without changing production semantics.
+S0 evidence is recorded in `S0_BASELINE.md`.
 
-S0A must:
-1. run and capture existing InteractionScene/Scheduler/Provider/Director-focused Lua baselines;
-2. capture current Scheduler constants, LOD policy and per-scene scheduler construction;
-3. prove normal player DialoguePolicy uses the same InteractionDirector as scenes;
-4. enumerate current canonical InteractionCatalog beats/behaviors and stimulus indexes;
-5. prove actor adapters are test-only;
-6. capture player-pair lifecycle key/storage shape and why it must not become NPC transcript storage;
-7. trace current NPCSpeech actor/target envelope through server/client presentation and identify where player audience is assumed;
-8. mechanically show dormant `AMBIENT_SOCIAL_OPPORTUNITY / FACTION_EVENT / TASK_EVENT / ACTOR_JOINED / ACTOR_LEFT` production usage;
-9. add static tests/contracts preventing generated-text reparsing, per-NPC polling and transcript persistence;
-10. record exact evidence in this file and then continue to S1 automatically.
+Accepted baseline:
+- InteractionScene/Scheduler/Provider foundation remains generic and bounded;
+- Scheduler caps are 16 active scenes / 4 participants / 8 turns / 8 recent events, with Scene history capped at 8;
+- Scene.New currently owns an isolated one-scene Scheduler, proving the missing global runtime seam;
+- player dialogue and InteractionScene share InteractionDirector authority;
+- production has no registered Project Hoomans external-actor adapter;
+- player lifecycle persistence remains keyed `playerUUID|npcID`;
+- NPCSpeech preserves actor/target identity;
+- generic non-player stimulus types exist but are mostly dormant in production;
+- no transcript persistence, generated-text reparsing, Scene/Scheduler tick hook or Scene ModData store.
 
-No production behavior change should occur in S0A except minimal observability/test seams needed to prove current contracts.
+Focused acceptance: **4/4 PASS**.
+
+## ONE current Next Chunk — S1
+
+Implement the production Project Hoomans actor adapter through the existing InteractionProviders registration seam.
+
+S1 must:
+1. adapt only real managed Project Hoomans NPC records;
+2. project identity/capabilities, disposition/personality, panic/stress/needs/activity and bounded traits from existing record/runtime/context authorities;
+3. project directed relationship/faction relation through existing relationship/faction/social authority rather than duplicate state;
+4. project bounded known fact refs from existing knowledge/evidence authority;
+5. fail closed for missing/dead/invalid actors;
+6. register exactly once without breaking third-party adapter ordering;
+7. add real managed-NPC Scene fixtures proving asymmetric A->B/B->A context where authority differs;
+8. add no persistent storage and perform no mutation.
 
 ## Remaining mandatory phases
 
