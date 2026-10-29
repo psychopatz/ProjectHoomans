@@ -28,6 +28,14 @@ Adopters.COMBAT_COOLDOWN_MS = 12000
 Adopters.KNOWLEDGE_COOLDOWN_MS = 20000
 Adopters.EXCURSION_COOLDOWN_MS = 5000
 
+Adopters._metrics = Adopters._metrics or {
+    actorQueries = 0,
+    hordeEvents = 0,
+    knowledgeEvents = 0,
+    excursionEvents = 0,
+}
+local metrics = Adopters._metrics
+
 local manager = Adopters._manager
 if type(manager) ~= "table" then
     manager = Opportunity.New(Runtime.Default())
@@ -113,6 +121,7 @@ local function localActors(x, y, radius)
     if not spatial or type(spatial.QueryActors) ~= "function" then
         return nil, "scene_actor_query_unavailable"
     end
+    metrics.actorQueries = metrics.actorQueries + 1
     return spatial.QueryActors(x, y, radius)
 end
 
@@ -471,13 +480,30 @@ function Adopters.Manager()
     return manager
 end
 
+function Adopters.Snapshot()
+    return {
+        schemaVersion = Adopters.VERSION,
+        metrics = {
+            actorQueries = metrics.actorQueries,
+            hordeEvents = metrics.hordeEvents,
+            knowledgeEvents = metrics.knowledgeEvents,
+            excursionEvents = metrics.excursionEvents,
+        },
+    }
+end
+
 function Adopters.ResetForTests(runtime)
+    metrics.actorQueries = 0
+    metrics.hordeEvents = 0
+    metrics.knowledgeEvents = 0
+    metrics.excursionEvents = 0
     manager = Opportunity.New(runtime or Runtime.Default())
     Adopters._manager = manager
     return manager
 end
 
 function Adopters.OnHordeTransition(record, spec)
+    metrics.hordeEvents = metrics.hordeEvents + 1
     spec = type(spec) == "table" and spec or {}
     if tostring(spec.phase or "") ~= "started" then
         return false, "scene_horde_not_initial_transition"
@@ -540,6 +566,7 @@ function Adopters.OnHordeTransition(record, spec)
 end
 
 function Adopters.OnWorldKnowledgeFact(spec)
+    metrics.knowledgeEvents = metrics.knowledgeEvents + 1
     spec = type(spec) == "table" and spec or {}
     local factID = clean(spec.factID, 128)
     if not factID then return false, "scene_fact_missing" end
@@ -574,6 +601,7 @@ function Adopters.OnWorldKnowledgeFact(spec)
 end
 
 function Adopters.OnExcursionChanged(payload)
+    metrics.excursionEvents = metrics.excursionEvents + 1
     payload = type(payload) == "table" and payload or {}
     if tostring(payload.reason or "") ~= "phase_changed" then
         return true, "scene_excursion_non_phase_change"

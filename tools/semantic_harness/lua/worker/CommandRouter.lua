@@ -10,6 +10,7 @@ local Persona = require "worker/CommandRouter_Persona"
 local Simulation = require "worker/CommandRouter_Simulation"
 local Talk = require "worker/CommandRouter_Talk"
 local CombatObservatory = require "worker/CommandRouter_CombatObservatory"
+local SceneObservatory = require "worker/CommandRouter_SceneObservatory"
 local InteractionLifecycle = require "worker/CommandRouter_InteractionLifecycle"
 
 local Handlers = {
@@ -23,6 +24,7 @@ local Handlers = {
     Simulation,
     Talk,
     CombatObservatory,
+    SceneObservatory,
     InteractionLifecycle,
 }
 

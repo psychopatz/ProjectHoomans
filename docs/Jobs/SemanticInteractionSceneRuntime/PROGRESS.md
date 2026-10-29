@@ -1,6 +1,6 @@
 # Progress — Semantic Interaction Scene Runtime
 
-**Status:** ACTIVE — S0–S6 accepted; S7 Scene Observatory and Semantic Lab support are next.
+**Status:** ACTIVE — S0–S7 accepted; S8 extensibility, scale and final developer acceptance are next.
 
 **Planning base:** ProjectHoomans `47aaad69`, existing `main`.
 
@@ -189,18 +189,41 @@ S6 evidence:
 - all changed/untracked S6 Lua, including generated artifacts, through installed Kahlua compiler: **21/21 PASS**;
 - `git diff --check`: clean.
 
-## ONE current Next Chunk — S7
+## S7 accepted — Scene Observatory and Semantic Lab worker support
 
-Implement the generic read-only Scene Observatory and real Semantic Lab/worker inspection support.
+Accepted implementation:
+- `PNC_SemanticInteractionSceneObservatory` composes read-only bounded projections from the live Scene Runtime and optional Opportunity manager;
+- inspection exposes runtime/admission metrics, active Scene IDs/status/LOD, participant IDs/roles, topic, current semantic speaker/recipient, bounded history acts/behavior IDs, grounding refs, Director beat state and continuation decision;
+- Opportunity provenance includes provider/proposal identity, admission/rejection reason, audience count and delivered fanout;
+- optional adopter metrics expose bounded actor-query/event counters without a new telemetry store;
+- Scheduler keeps only the last eight compact closure rows so termination reasons remain explainable after Scene removal;
+- observer response eligibility is explicit: observers never receive response authority; only an addressed player waiting on `player_input_required` can be eligible;
+- no actor records, world blobs, raw/rendered text, transcript, ModData or polling state are projected.
 
-S7 must:
-1. expose bounded runtime/admission metrics and active Scene IDs/status/LOD;
-2. expose participant IDs/roles, semantic source/recipient and observer policy without transcript text;
-3. expose topic, bounded semantic history acts/IDs, grounded fact/event refs, active beat/selected behavior and continuation decision;
-4. expose Opportunity provider provenance, admission/rejection/suppression reason, query/fanout counters and termination reason;
-5. provide narrow real-worker inspection commands/fixtures instead of a monolithic state dump;
-6. explain why a Scene opened, who spoke to whom, why continuation happened/stopped, and why a player did/did not receive choices;
-7. remain read-only, bounded, no ModData and no rendered transcript.
+Semantic Harness support:
+- `SCENE_OBSERVATORY_FIXTURE` creates a disposable production-Lua Scene fixture;
+- `SCENE_OBSERVATORY_INSPECT` reads the same production Runtime/Opportunity/Observatory state without mutation;
+- Python worker exposes bounded `scene_observatory_fixture` and `scene_observatory_inspect` APIs;
+- repeated inspection is stable/read-only and bounded to 1–8 scenes/history rows.
+
+S7 evidence:
+- production Observatory/runtime Lua matrix: **3/3 PASS**;
+- generic Scene + existing Combat Observatory real-worker tests: **5/5 PASS**;
+- full `pnc_semantic` selection: **134/134 PASS**;
+- all changed/untracked S7 Lua through installed Kahlua compiler: **7/7 PASS**;
+- Python compilation and `git diff --check`: clean.
+
+## ONE current Next Chunk — S8
+
+Complete extensibility, scale/stress and final developer acceptance.
+
+S8 must:
+1. add a synthetic fourth domain using only public Opportunity/content/provider seams, with no SceneRuntime/InteractionDirector/Scheduler/generic-continuation algorithm changes;
+2. stress simultaneous scenes, burst events, large registries with few local actors, TTL/turn caps, participant death/leave and distant semantic-only LOD;
+3. prove no pairwise scene explosion and bounded audience/participant/history/provider state;
+4. prove urgent/high-priority opportunities coexist with or suppress lower-value opportunities according to existing admission policy without a new scheduler;
+5. run full Lua + semantic/player-conversation regressions, real worker/Observatory suites, deterministic CodeBuilder, EN/TL/source consistency, installed-PZ Kahlua verification, static no-scan/no-transcript/no-routine-LLM guards and `git diff --check`;
+6. record exact final evidence and hand native SP/MP timing/readability to the user without launching the game.
 
 ## Remaining mandatory phases
 

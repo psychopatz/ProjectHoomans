@@ -15,6 +15,7 @@ Scheduler.MAX_ACTIVE_SCENES = 16
 Scheduler.MAX_PARTICIPANTS = 4
 Scheduler.MAX_TURNS_PER_SCENE = 8
 Scheduler.MAX_RECENT_EVENTS = 8
+Scheduler.MAX_RECENT_CLOSURES = 8
 Scheduler.NEARBY_DISTANCE = 60
 
 local function copy(value)
@@ -83,6 +84,7 @@ function Scheduler.New(options)
         schemaVersion = Scheduler.VERSION,
         scenes = {},
         order = {},
+        recentClosures = {},
         metrics = {
             eventsSubmitted = 0,
             directorEvaluations = 0,
@@ -168,6 +170,17 @@ function Scheduler.New(options)
             end
         end
         self.metrics.scenesClosed = self.metrics.scenesClosed + 1
+        self.recentClosures[#self.recentClosures + 1] = {
+            id = scene.id,
+            reason = scene.closeReason,
+            turnCount = scene.turnCount,
+            maxTurns = scene.maxTurns,
+            lod = scene.lod,
+            participantCount = #scene.participants,
+        }
+        while #self.recentClosures > Scheduler.MAX_RECENT_CLOSURES do
+            table.remove(self.recentClosures, 1)
+        end
         return copy(scene)
     end
 
@@ -288,6 +301,7 @@ function Scheduler.New(options)
             schemaVersion = Scheduler.VERSION,
             activeSceneCount = #scenes,
             scenes = scenes,
+            recentClosures = copy(self.recentClosures),
             metrics = copy(self.metrics),
             limits = {
                 maxActiveScenes = self.maxActiveScenes,

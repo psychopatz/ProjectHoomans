@@ -735,6 +735,38 @@ class LuaSemanticWorker:
             payload["eventRef"] = str(event_ref)
         return self._request("COMBAT_OBSERVATORY_INSPECT", payload)
 
+    def scene_observatory_fixture(
+        self, fixture: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Run a bounded Interaction Scene fixture through production Lua."""
+        if not isinstance(fixture, dict):
+            raise ValueError("scene observatory fixture must be an object")
+        return self._request("SCENE_OBSERVATORY_FIXTURE", fixture)
+
+    def scene_observatory_inspect(
+        self,
+        *,
+        scene_id: str | None = None,
+        scene_limit: int = 8,
+        history_limit: int = 8,
+    ) -> dict[str, Any]:
+        """Read the bounded production Interaction Scene Observatory."""
+        if type(scene_limit) is not int or scene_limit < 1 or scene_limit > 8:
+            raise ValueError("scene observatory scene limit must be 1 to 8")
+        if (
+            type(history_limit) is not int
+            or history_limit < 1
+            or history_limit > 8
+        ):
+            raise ValueError("scene observatory history limit must be 1 to 8")
+        payload: dict[str, Any] = {
+            "sceneLimit": scene_limit,
+            "historyLimit": history_limit,
+        }
+        if scene_id is not None:
+            payload["sceneID"] = str(scene_id)
+        return self._request("SCENE_OBSERVATORY_INSPECT", payload)
+
     def fact_catalog(self) -> list[dict[str, Any]]:
         return self._authoring.fact_catalog()
 
