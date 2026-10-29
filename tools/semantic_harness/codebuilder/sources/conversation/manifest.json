@@ -106,6 +106,12 @@
       "path": "content/event/combat_kill_killer_reactions.json"
     },
     {
+      "domain": "event",
+      "kind": "content",
+      "order": 1504,
+      "path": "content/event/combat_horde_reactions.json"
+    },
+    {
       "domain": "compatibility",
       "kind": "content",
       "order": 1600,

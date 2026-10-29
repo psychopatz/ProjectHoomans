@@ -1,4 +1,8 @@
 {
+  "UI_PNC_Conversation_Content_SemanticCombatHordeDeescalatedNeutral01": "They're thinning out. Don't relax yet.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeDefaultNeutral01": "Horde nearby. Keep your eyes up.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeEscalatedNeutral01": "More are piling in. This is getting bad.",
+  "UI_PNC_Conversation_Content_SemanticCombatHordeStartedNeutral01": "That's a lot of them. Stay sharp.",
   "UI_PNC_Conversation_Content_SemanticCombatReactionDefaultNeutral01": "Good work. Keep watching the area.",
   "UI_PNC_Conversation_Content_SemanticCombatReactionKillKillerAggressive01Neutral01": "Got one. Who's next?",
   "UI_PNC_Conversation_Content_SemanticCombatReactionKillKillerAggressive02Neutral01": "Down. Give me another.",

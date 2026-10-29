@@ -1,5 +1,41 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
+    ["phrase.semantic.combat.horde.deescalated"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+        },
+        ["id"] = "phrase.semantic.combat.horde.deescalated",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_horde_reactions.json",
+    },
+    ["phrase.semantic.combat.horde.default"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+        },
+        ["id"] = "phrase.semantic.combat.horde.default",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_horde_reactions.json",
+    },
+    ["phrase.semantic.combat.horde.escalated"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+        },
+        ["id"] = "phrase.semantic.combat.horde.escalated",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_horde_reactions.json",
+    },
+    ["phrase.semantic.combat.horde.started"] = {
+        ["domain"] = "event",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+        },
+        ["id"] = "phrase.semantic.combat.horde.started",
+        ["kind"] = "content",
+        ["source"] = "content/event/combat_horde_reactions.json",
+    },
     ["phrase.semantic.combat.reaction.default"] = {
         ["domain"] = "event",
         ["generated"] = {

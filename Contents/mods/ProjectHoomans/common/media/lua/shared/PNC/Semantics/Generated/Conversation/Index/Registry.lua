@@ -40,7 +40,7 @@ return {
         ["domain"] = "event",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Event",
-        ["recordCount"] = 93,
+        ["recordCount"] = 97,
     },
     {
         ["domain"] = "greeting",

@@ -181,6 +181,20 @@ return {
             ["sourceShard"] = "content/conversation.json",
         },
         {
+            ["bytes"] = 2810,
+            ["domain"] = "event",
+            ["kind"] = "Content",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+            ["recordCount"] = 4,
+            ["recordIDs"] = {
+                "phrase.semantic.combat.horde.deescalated",
+                "phrase.semantic.combat.horde.default",
+                "phrase.semantic.combat.horde.escalated",
+                "phrase.semantic.combat.horde.started",
+            },
+            ["sourceShard"] = "content/event/combat_horde_reactions.json",
+        },
+        {
             ["bytes"] = 16114,
             ["domain"] = "event",
             ["kind"] = "Content",
@@ -1924,13 +1938,17 @@ return {
             ["sourceShard"] = "@index/content/conversation",
         },
         {
-            ["bytes"] = 35376,
+            ["bytes"] = 36840,
             ["domain"] = "event",
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Event",
-            ["recordCount"] = 93,
+            ["recordCount"] = 97,
             ["recordIDs"] = {
+                "phrase.semantic.combat.horde.deescalated",
+                "phrase.semantic.combat.horde.default",
+                "phrase.semantic.combat.horde.escalated",
+                "phrase.semantic.combat.horde.started",
                 "phrase.semantic.combat.reaction.default",
                 "phrase.semantic.combat.reaction.kill_killer_aggressive_01",
                 "phrase.semantic.combat.reaction.kill_killer_aggressive_02",
@@ -2643,5 +2661,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "4193c7d44a3c7c245803ac15e7d2780832bbc89d2b3df8b2b46f3d8b0aa8a10e",
+    ["wholeModelFingerprint"] = "0a47f37d3a84e4491762422a6409c8bafba0b03443afe5f4c98f183b7f76a6e5",
 }

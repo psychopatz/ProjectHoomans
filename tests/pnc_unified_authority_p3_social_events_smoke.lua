@@ -154,8 +154,8 @@ local horde = resolve(
         }),
     }
 )
-T.equal(horde.realizationID, "semantic.combat.reaction.threat",
-    "horde uses the semantic combat threat realization")
+T.equal(horde.realizationID, "semantic.combat.horde.default",
+    "legacy horde event uses the dedicated semantic horde authority")
 T.equal(#horde.offerIDs, 3,
     "horde exposes its bounded grounded follow-up set")
 

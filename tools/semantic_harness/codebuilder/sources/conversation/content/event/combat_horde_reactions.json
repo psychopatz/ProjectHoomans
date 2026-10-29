@@ -1,0 +1,74 @@
+{
+  "domain": "event",
+  "groups": {
+    "events": {
+      "contentOwner": "projecthoomans.dialogue_content.events"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.horde.started",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's a lot of them. Stay sharp.",
+              "TL": "Ang dami nila. Mag-ingat tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.horde.escalated",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "More are piling in. This is getting bad.",
+              "TL": "Dumarami sila. Lumalala ito."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.horde.deescalated",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "They're thinning out. Don't relax yet.",
+              "TL": "Kumokonti sila. Huwag munang kampante."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.horde.default",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Horde nearby. Keep your eyes up.",
+              "TL": "May kuyog na malapit. Magmatyag tayo."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Horde Combat Reaction Content",
+    "version": "1"
+  },
+  "version": 1
+}

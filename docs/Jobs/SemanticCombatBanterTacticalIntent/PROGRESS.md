@@ -1,6 +1,6 @@
 # Progress — Semantic Combat Banter & Tactical Intent
 
-**Status:** ACTIVE — B0 characterization accepted; B1 horde episode/routing implementation is next.
+**Status:** ACTIVE — B0 and B1 accepted; B2 tactical follower encounter intent is next.
 **Planning base:** ProjectHoomans `8632bc30`, existing `main`.
 **Parent foundation:** `docs/Jobs/OpenEndedSemanticCombatAwareness/` is developer-complete and remains accepted unless this job reproduces a regression in an owning layer.
 **Native PZ:** user live regression supplied; new job's developer implementation/acceptance not yet run.
@@ -39,14 +39,36 @@ The target is active co-op gameplay banter:
 
 B0 regression/ownership characterization is recorded in `B0_BASELINE.md` and passes **3/3** focused Lua tests. It proves the live wrong-horde fallback, stable-horde re-open bug, missing semantic clear owner, active-conversation-only offer projection, absent presentation-class contract, and dropped weapon/action kill context.
 
-## ONE current Next Chunk — B1
+## B1 accepted — canonical horde episode/routing
 
-Implement canonical horde episode/routing:
-1. make `PNC_ZombieObservation` the single semantic horde-observation caller and deliver both above- and below-threshold observations;
-2. remove duplicate semantic horde calls from follow/combat behavior while preserving their gameplay threat logic;
-3. make `ObserveZombieHorde` edge/episode driven with explicit start, material escalation/de-escalation, stable and clear outcomes;
-4. route runtime `zombie_horde_encounter` into a dedicated horde semantic pool with correct EN/TL content and grounded quantity/location follow-ups;
-5. keep stable hordes silent and add focused regression/scan guards.
+Accepted implementation:
+- `PNC_ZombieObservation` is the sole semantic horde transition caller and observes both above/below threshold from the existing Perception frame;
+- follow/combat behavior no longer independently emits semantic horde events;
+- horde runtime state is edge-driven: `started / stable / escalated / deescalated / cleared`;
+- stable hordes stay silent regardless of elapsed presentation cooldown;
+- a new episode is possible only after a real clear;
+- runtime `zombie_horde_encounter` and legacy `zombie_horde_detected` route through `semantic.combat.horde`;
+- horde start/escalation/de-escalation/default have authored EN/TL content and grounded location/quantity/happened offers.
+
+B1 evidence:
+- focused B0/B1 + social/follow/combat matrix: **6/6 PASS**;
+- full `pnc_semantic` selection: **111/111 PASS**;
+- horde content: **4/4 EN+TL**, non-identical translations;
+- two consecutive CodeBuilder generations: byte-identical, **180 files / 419 phrase families**;
+- changed/untracked Lua through installed Kahlua compiler: **15/15 PASS**;
+- `git diff --check`: clean;
+- no new global zombie scan.
+
+## ONE current Next Chunk — B2
+
+Implement runtime-only follower tactical encounter intent:
+1. add a bounded current-horde intent owner with `undecided / engage / avoid / hold`, separate from permanent `record.attackType`;
+2. bind intent to the active horde episode and clear it when that episode clears;
+3. choose at most one eligible follower spokesperson for the unresolved prompt;
+4. expose semantic engage/avoid/hold offers through the existing response-plan/click authority;
+5. let owner attack behavior resolve `engage` implicitly and clear stale prompt state;
+6. preserve immediate self-defense regardless of intent;
+7. add personality-aware acknowledgement strategy after engage/avoid/hold without blocking combat.
 
 ## Remaining mandatory phases
 

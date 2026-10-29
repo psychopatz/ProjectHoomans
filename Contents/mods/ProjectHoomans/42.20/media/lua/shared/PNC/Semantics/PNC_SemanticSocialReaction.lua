@@ -128,6 +128,11 @@ local function poolFor(spec)
         if not allowed[style] then style = "practical" end
         return "semantic.combat.kill." .. role .. "." .. style
     end
+    if eventType == "zombie_horde_encounter"
+        or eventType == "zombie_horde_detected"
+    then
+        return "semantic.combat.horde"
+    end
     if eventType == "bandit_attack" then
         return "semantic.compat.bandits.hooman_hurt"
     end

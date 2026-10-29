@@ -34,7 +34,6 @@ if type(ContextProviders) ~= "table" then
     ContextProviders = ok and loaded or nil
 end
 local WITNESS_RADIUS = tonumber(Const and Const.ZOMBIE_TARGET_RADIUS) or 12
-local ZOMBIE_HORDE_CLEAR_MS = 3000
 local ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS = 12000
 local MAX_RECENT_AWARENESS_PLAYERS = 128
 local recentAwarenessByPlayer = {}
@@ -274,6 +273,57 @@ local function countBand(count)
     return "few"
 end
 
+local function pressureBand(count)
+    local classifier = PNC and PNC.ZombieObservation
+    if classifier and type(classifier.Classify) == "function" then
+        local classified = classifier.Classify(count)
+        return classified and classified.band or "none"
+    end
+    count = math.max(0, tonumber(count) or 0)
+    if count <= 0 then return "none" end
+    if count <= 2 then return "few" end
+    if count <= 5 then return "several" end
+    if count <= 11 then return "horde" end
+    return "massive_horde"
+end
+
+local PRESSURE_RANK = {
+    none = 0,
+    few = 1,
+    several = 2,
+    horde = 3,
+    massive_horde = 4,
+}
+
+local function pressureRank(band)
+    return PRESSURE_RANK[tostring(band or "none")] or 0
+end
+
+local function quantityText(count, band)
+    count = math.max(0, math.floor(tonumber(count) or 0))
+    if count > 0 then
+        return tostring(count) .. " zombies are close enough to matter."
+    end
+    if band == "massive_horde" then return "A massive horde is nearby." end
+    if band == "horde" then return "A horde is nearby." end
+    if band == "several" then return "Several zombies are nearby." end
+    if band == "few" then return "A few zombies are nearby." end
+    return "The immediate area looks clear."
+end
+
+local function hordeSummary(phase)
+    if phase == "escalated" then
+        return "the nearby zombie horde grew more dangerous"
+    end
+    if phase == "deescalated" then
+        return "the nearby zombie horde is thinning out"
+    end
+    if phase == "cleared" then
+        return "the nearby zombie horde cleared"
+    end
+    return "a zombie horde was detected"
+end
+
 local function locationFact(record)
     local x = tonumber(record and record.x)
     local y = tonumber(record and record.y)
@@ -287,17 +337,34 @@ local function locationFact(record)
     )
 end
 
-local function awarenessFacts(record, eventID, eventType, band, count, reason)
+local function awarenessFacts(
+    record,
+    eventID,
+    eventType,
+    band,
+    count,
+    reason,
+    phase,
+    episodeID
+)
+    local pressure = pressureBand(count)
     local fact = {
         eventRef = eventID,
         authoritative = true,
         disclosure = "player",
         location = locationFact(record),
         countBand = band,
+        count = count ~= nil and math.max(
+            0, math.floor(tonumber(count) or 0)
+        ) or nil,
+        pressureBand = pressure,
+        quantity = quantityText(count, pressure),
         summary = eventType == ZOMBIE_HORDE_MEMORY
-            and "a zombie horde was detected"
+            and hordeSummary(phase)
             or "the group retreated to recover stamina",
         retreatReason = reason,
+        hordePhase = phase,
+        hordeEpisodeID = episodeID,
     }
     if count ~= nil then fact.countBand = countBand(count) end
     return { [tostring(eventID)] = fact }
@@ -305,8 +372,10 @@ end
 
 local function currentHordeCount(record)
     local runtime = record and record.runtime or nil
+    local observation = runtime and runtime.zombieObservation or nil
     local assessment = runtime and runtime.combatThreatAssessment or nil
-    return tonumber(assessment and assessment.hordeCount)
+    return tonumber(observation and observation.hordeCount)
+        or tonumber(assessment and assessment.hordeCount)
         or tonumber(runtime and runtime.hordeCount)
 end
 
@@ -329,13 +398,17 @@ local function observeEventFacts(eventRef, npcID, record)
         and Registry.Get(npcID) or nil
     if not record then return nil end
     local count = currentHordeCount(record)
+    local episode = record.runtime
+        and record.runtime.zombieHordeAwareness or nil
     return awarenessFacts(
         record,
         eventRef,
         eventType,
         countBand(count),
         count,
-        record.runtime and record.runtime.retreatReason
+        record.runtime and record.runtime.retreatReason,
+        episode and episode.lastPhase,
+        episode and episode.episodeID
     )
 end
 
@@ -377,7 +450,9 @@ local function emitZombieAwareness(
     source,
     now,
     count,
-    reason
+    reason,
+    phase,
+    episodeID
 )
     local npcID = tostring(record and record.id or "")
     local radiusSq = WITNESS_RADIUS * WITNESS_RADIUS
@@ -434,9 +509,22 @@ local function emitZombieAwareness(
             memoryType = eventType,
             source = source,
             zombieCountBand = band,
+            combatPressure = pressureBand(count),
+            nearbyZombieCount = math.max(
+                0, math.floor(tonumber(count) or 0)
+            ),
+            hordePhase = phase,
+            hordeEpisodeID = episodeID,
             factRefs = { eventID },
             semanticEventFacts = awarenessFacts(
-                record, eventID, eventType, band, count, reason
+                record,
+                eventID,
+                eventType,
+                band,
+                count,
+                reason,
+                phase,
+                episodeID
             ),
             retreatReason = reason,
             npcType = role,
@@ -544,43 +632,99 @@ end
 function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
     local runtime
     local state
-    local lastDetectedAt
     local eventType = ZOMBIE_HORDE_MEMORY
     local eventID
-    count = math.max(0, tonumber(count) or 0)
-    threshold = math.max(1, tonumber(threshold) or 4)
+    local band
+    local previousBand
+    local phase
+    local previousRank
+    local currentRank
+    count = math.max(0, math.floor(tonumber(count) or 0))
+    threshold = math.max(1, math.floor(tonumber(threshold) or 4))
     now = tonumber(now) or (Core and Core.Now and Core.Now()) or 0
     if not record or record.alive == false or not record.id then
         return false, "invalid_observer"
     end
-    if count < threshold then
-        return false, "below_horde_threshold"
-    end
-    runtime = record.runtime
-    state = runtime and runtime.zombieHordeAwareness or nil
-    lastDetectedAt = tonumber(state and state.lastDetectedAt)
-    if lastDetectedAt and now >= lastDetectedAt
-        and now - lastDetectedAt < ZOMBIE_HORDE_CLEAR_MS
-    then
-        state.lastDetectedAt = now
-        return false, "horde_episode_active"
-    end
-    runtime = runtime or {}
-    state = state or {}
+
+    runtime = record.runtime or {}
+    state = runtime.zombieHordeAwareness or {
+        active = false,
+        sequence = 0,
+    }
     record.runtime = runtime
     runtime.zombieHordeAwareness = state
-    state.lastDetectedAt = now
+
+    band = pressureBand(count)
+    previousBand = tostring(state.lastBand or "none")
+    state.lastObservedAt = now
+    state.lastCount = count
+
+    if count < threshold then
+        state.lastBand = band
+        if state.active == true then
+            state.active = false
+            state.lastPhase = "cleared"
+            state.clearedAt = now
+            state.lastEpisodeID = state.episodeID
+            state.episodeID = nil
+            return false, "horde_episode_cleared"
+        end
+        state.lastPhase = "clear"
+        return false, "below_horde_threshold"
+    end
+
+    if state.active ~= true then
+        state.active = true
+        state.sequence = math.max(
+            0, math.floor(tonumber(state.sequence) or 0)
+        ) + 1
+        state.startedAt = now
+        state.lastBand = band
+        state.lastPhase = "started"
+        eventID = newZombieAwarenessEventID(record, eventType, now)
+        state.episodeID = eventID
+        emitZombieAwareness(
+            record,
+            eventType,
+            "social.zombie_horde_detected",
+            eventID,
+            source or "zombie_observation",
+            now,
+            count,
+            nil,
+            "started",
+            state.episodeID
+        )
+        return true, eventID, "started"
+    end
+
+    previousRank = pressureRank(previousBand)
+    currentRank = pressureRank(band)
+    state.lastBand = band
+    if currentRank > previousRank then
+        phase = "escalated"
+    elseif currentRank < previousRank then
+        phase = "deescalated"
+    else
+        state.lastPhase = "stable"
+        return false, "horde_episode_stable"
+    end
+
+    state.lastPhase = phase
     eventID = newZombieAwarenessEventID(record, eventType, now)
     emitZombieAwareness(
         record,
         eventType,
         "social.zombie_horde_detected",
         eventID,
-        source or "combat",
+        source or "zombie_observation",
         now,
-        count
+        count,
+        nil,
+        phase,
+        state.episodeID
     )
-    return true, eventID
+    return true, eventID, phase
 end
 
 function Hooks.RecordZombieStaminaRetreat(record, reason, now)

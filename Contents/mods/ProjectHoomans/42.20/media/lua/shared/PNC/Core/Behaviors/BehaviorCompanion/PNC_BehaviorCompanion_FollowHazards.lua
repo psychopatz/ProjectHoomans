@@ -14,23 +14,6 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 -- filter below, so sharing cannot make a follower react to a distant zombie.
 local FOLLOW_CANDIDATE_REUSE_DISTANCE = 3.0
 
-local function observeZombieHorde(record, count, threshold, now)
-    if (tonumber(count) or 0) < (tonumber(threshold) or 3) then
-        return
-    end
-    local hooks = PNC and PNC.SocialEventHooks
-    if hooks and type(hooks.ObserveZombieHorde) == "function" then
-        pcall(
-            hooks.ObserveZombieHorde,
-            record,
-            count,
-            threshold,
-            now,
-            "follow"
-        )
-    end
-end
-
 local function getSharedCandidates(record, x, y, z, radius, now)
     local ownerKey = Internal.GetFollowOwnerKey(record)
     local reuseRadius = FOLLOW_CANDIDATE_REUSE_DISTANCE
@@ -161,7 +144,6 @@ function Internal.AssessFollowHazards(record, zombie, now)
         cached.nearestDistance = nil
     end
     runtime.followHazard = cached
-    observeZombieHorde(record, cached.count, hordeThreshold, now)
     return cached
 end
 

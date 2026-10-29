@@ -236,6 +236,47 @@ for _, role in ipairs({ "witness", "killer" }) do
     end
 end
 
+Catalog.Register("semantic.combat.horde", {
+    variants = {
+        response(
+            "semantic.combat.horde",
+            "escalated",
+            { hordePhase = "escalated" },
+            4,
+            "WARN",
+            "combat",
+            FOLLOW_UP_OFFERS.horde
+        ),
+        response(
+            "semantic.combat.horde",
+            "deescalated",
+            { hordePhase = "deescalated" },
+            3,
+            "REACT",
+            "combat",
+            FOLLOW_UP_OFFERS.horde
+        ),
+        response(
+            "semantic.combat.horde",
+            "started",
+            { hordePhase = { "started", nil } },
+            2,
+            "WARN",
+            "combat",
+            FOLLOW_UP_OFFERS.horde
+        ),
+        response(
+            "semantic.combat.horde",
+            "default",
+            nil,
+            0,
+            "WARN",
+            "combat",
+            FOLLOW_UP_OFFERS.horde
+        ),
+    },
+})
+
 Catalog.Register("semantic.combat.reaction", {
     variants = {
         response(

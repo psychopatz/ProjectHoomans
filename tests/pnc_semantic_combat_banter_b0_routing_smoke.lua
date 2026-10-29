@@ -14,7 +14,7 @@ local Reactions = T.load(
     "PNC/Semantics/PNC_SemanticSocialReaction.lua"
 )
 
-local function fact(eventRef)
+local function fact(eventRef, phase)
     return {
         [eventRef] = {
             eventRef = eventRef,
@@ -22,69 +22,95 @@ local function fact(eventRef)
             disclosure = "player",
             summary = "a zombie horde was detected",
             location = { x = 10, y = 20, z = 0 },
+            count = 6,
             countBand = "several",
+            quantity = "6 zombies are close enough to matter.",
+            hordePhase = phase,
         },
     }
 end
 
-local eventRef = "social:zombie_horde_encounter:npc-b0:1000:1"
+local eventRef = "social:zombie_horde_encounter:npc-b1:1000:1"
 local horde = T.truthy(Reactions.Resolve({
     eventType = "zombie_horde_encounter",
     eventID = eventRef,
-    npcID = "npc-b0",
+    npcID = "npc-b1",
     act = "REACT",
     topic = "combat",
     context = {
         eventType = "zombie_horde_encounter",
         eventRef = eventRef,
+        hordePhase = "started",
         factRefs = { eventRef },
-        semanticEventFacts = fact(eventRef),
+        semanticEventFacts = fact(eventRef, "started"),
     },
-}), "production horde event resolves")
+}), "runtime horde event resolves")
 
 T.equal(
     horde.responsePlanID,
-    "semantic.combat.reaction",
-    "horde event reaches the generic combat pool"
+    "semantic.combat.horde",
+    "runtime horde event uses its dedicated semantic pool"
 )
 T.equal(
     horde.realizationID,
-    "semantic.combat.reaction.default",
-    "B0 regression: runtime horde event falls through to generic default"
+    "semantic.combat.horde.started",
+    "runtime horde start selects the dedicated start realization"
 )
 T.equal(
     horde.fallback,
-    "Good work. Keep watching the area.",
-    "B0 regression reproduces the live wrong horde line"
+    "That's a lot of them. Stay sharp.",
+    "runtime horde no longer uses the generic good-work fallback"
 )
 T.equal(
     #(horde.offerIDs or {}),
-    1,
-    "generic fallback exposes only the generic combat follow-up"
+    3,
+    "horde start carries the bounded grounded horde follow-ups"
 )
 
+local escalationRef = "social:zombie_horde_encounter:npc-b1:2000:2"
+local escalation = T.truthy(Reactions.Resolve({
+    eventType = "zombie_horde_encounter",
+    eventID = escalationRef,
+    npcID = "npc-b1",
+    act = "REACT",
+    topic = "combat",
+    context = {
+        eventType = "zombie_horde_encounter",
+        eventRef = escalationRef,
+        hordePhase = "escalated",
+        factRefs = { escalationRef },
+        semanticEventFacts = fact(escalationRef, "escalated"),
+    },
+}), "horde escalation resolves")
+T.equal(
+    escalation.realizationID,
+    "semantic.combat.horde.escalated",
+    "material horde escalation has dedicated wording"
+)
+
+local legacyRef = "event:b1:legacy-horde"
 local legacy = T.truthy(Reactions.Resolve({
     eventType = "zombie_horde_detected",
-    eventID = "event:b0:legacy-horde",
-    npcID = "npc-b0",
+    eventID = legacyRef,
+    npcID = "npc-b1",
     act = "REACT",
     topic = "combat",
     context = {
         eventType = "zombie_horde_detected",
-        eventRef = "event:b0:legacy-horde",
-        factRefs = { "event:b0:legacy-horde" },
-        semanticEventFacts = fact("event:b0:legacy-horde"),
+        eventRef = legacyRef,
+        factRefs = { legacyRef },
+        semanticEventFacts = fact(legacyRef),
     },
 }), "legacy horde event resolves")
 T.equal(
-    legacy.realizationID,
-    "semantic.combat.reaction.threat",
-    "dedicated horde branch currently recognizes the older event name"
+    legacy.responsePlanID,
+    "semantic.combat.horde",
+    "legacy horde event routes through the same dedicated horde authority"
 )
 T.equal(
     #(legacy.offerIDs or {}),
     3,
-    "dedicated horde branch carries the intended grounded follow-ups"
+    "legacy horde compatibility retains grounded follow-ups"
 )
 
 T.finish("pnc_semantic_combat_banter_b0_routing_smoke")

@@ -123,12 +123,15 @@ function Observation.ObserveRecord(record, now)
     }
     record.runtime.zombieObservation = cached
 
-    if cached.tacticalHorde then
-        local hooks = PNC and PNC.SocialEventHooks
-        if hooks and type(hooks.ObserveZombieHorde) == "function" then
-            pcall(hooks.ObserveZombieHorde,
-                record, horde, threshold, now, "ambient")
-        end
+    -- This canonical observation sees both sides of the threshold, so it
+    -- owns semantic horde episode transitions. Gameplay combat/follow systems
+    -- may consume the same cached facts but must not independently emit horde
+    -- semantic events.
+    local hooks = PNC and PNC.SocialEventHooks
+    if hooks and type(hooks.ObserveZombieHorde) == "function" then
+        hooks.ObserveZombieHorde(
+            record, horde, threshold, now, "zombie_observation"
+        )
     end
     return cached
 end

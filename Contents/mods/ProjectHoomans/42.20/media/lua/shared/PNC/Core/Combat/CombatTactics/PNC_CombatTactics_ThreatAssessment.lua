@@ -13,22 +13,6 @@ local Perception = PNC.Perception
 local Stamina = PNC.Stamina
 local Relationships = PNC.Relationships
 
-local function observeZombieHorde(record, count, now)
-    local threshold = tonumber(Const.COMBAT_HORDE_COUNT) or 4
-    if (tonumber(count) or 0) < threshold then return end
-    local hooks = PNC and PNC.SocialEventHooks
-    if hooks and type(hooks.ObserveZombieHorde) == "function" then
-        pcall(
-            hooks.ObserveZombieHorde,
-            record,
-            count,
-            threshold,
-            now,
-            "combat"
-        )
-    end
-end
-
 function Internal.CountZombiesNearPoint(x, y, z, radius, cacheKey)
     local zombies
     local count = 0
@@ -183,7 +167,6 @@ function Internal.AssessThreat(record, target)
         staminaCurrent = report.staminaCurrent,
         assessedAt = now,
     }
-    observeZombieHorde(record, report.hordeCount, now)
     return report
 end
 
