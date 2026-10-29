@@ -134,3 +134,5 @@ Do not implement as mandatory B0–B9 work unless needed for architecture correc
 - special infected concepts not present in Project Zomboid;
 - large-scale squad command wheel redesign;
 - LLM-authored routine combat chatter.
+
+Autonomous neutral/hostile/faction NPC-to-NPC encounter conversation is now owned by the dedicated successor job `docs/Jobs/SemanticNPCGroupConversation/`. Do not retrofit that scope into completed B0-B9 phases.
