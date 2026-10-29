@@ -1,3 +1,4 @@
+local BodyBinding = require "PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime"
 --[[
     PNC Client Presence Bodies
     Indexes replicated bodies and removes stale or duplicate local shells.
@@ -23,6 +24,11 @@ local Cleanup = require
 -- authoritative local-body index in that interval, so expose the same
 -- lease/instance/UUID validation without making callers reach into Internal.
 function Sync.ResolveBodyForNPC(id, snapshot)
+    if PNC.Core.IsClientOnly() then
+        snapshot = snapshot or (ClientState and ClientState.snapshots[tostring(id)])
+        if not snapshot or tostring(snapshot.id) ~= tostring(id) then return nil end
+        return BodyBinding.Resolve(snapshot)
+    end
     return Registry.ResolveForNPC(
         Sync,
         id,
@@ -32,6 +38,10 @@ function Sync.ResolveBodyForNPC(id, snapshot)
 end
 
 local function refreshBodyMap(now)
+    if PNC.Core.IsClientOnly() then
+        BodyBinding.Sweep(now)
+        return
+    end
     local cell
     local zombieList
     local onlineID
@@ -84,6 +94,7 @@ end
 
 Internal.RefreshBodyMap = refreshBodyMap
 Internal.ResolveSnapshotBody = function(snapshot)
+    if PNC.Core.IsClientOnly() then return BodyBinding.Resolve(snapshot) end
     return Registry.ResolveSnapshotBody(Sync, snapshot)
 end
 Internal.PruneSnapshotDuplicates = Cleanup.PruneSnapshotDuplicates

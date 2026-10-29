@@ -51,8 +51,15 @@ local unrelatedZombie = {
     getVariableBoolean = function() return false end,
     getOnlineID = function() return 74 end,
 }
+T.equal(PNC.Core.IsManagedNPCBody(untaggedReplica), false,
+    "online ID hint cannot admit an unbound replica")
+T.equal(PNC.Core.IsManagedNPCBody(legacyManagedBody), false,
+    "client ModData alone cannot admit a replica")
+PNC.MultiplayerBodyBinding = { IsClientBody = function(body)
+    return body == untaggedReplica
+end }
 T.equal(PNC.Core.IsManagedNPCBody(untaggedReplica), true,
-    "roster identity recognizes an unpresented remote carrier")
+    "client managed-body admission uses canonical binding")
 T.equal(PNC.Core.IsManagedNPCBody(unrelatedZombie), false,
     "roster identity does not classify an unrelated zombie")
 

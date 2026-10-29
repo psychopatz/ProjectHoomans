@@ -1,3 +1,4 @@
+local BodyBinding = require "PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime"
 --[[
     PNC Client Presence Sync
     Public facade, shared reconciliation state, and client event wiring.
@@ -38,6 +39,7 @@ require "PNC/PresenceSync/PNC_ClientZombieStimulus"
 require "PNC/PresenceSync/PNC_ClientPresenceTick"
 
 local function onResetLua()
+    BodyBinding.Reset()
     Sync.BodyByID = {}
     Sync.BodyByOnlineID = {}
     Sync.BodyByInstanceID = {}
@@ -78,6 +80,7 @@ function Sync.OnReplicaVisualUpdate(zombie)
     then
         return
     end
+    BodyBinding.Observe(zombie)
     modData = zombie.getModData
         and zombie:getModData() or nil
     id = modData and modData.PNC_NPC == true
@@ -87,6 +90,7 @@ function Sync.OnReplicaVisualUpdate(zombie)
         and ClientState.snapshots[tostring(id)]
         or nil
     if not snapshot
+        or BodyBinding.Resolve(snapshot) ~= zombie
         or snapshot.interestDetailed == false
         or snapshot.presenceState
             ~= PNC.Const.PRESENCE_LIVE
@@ -125,3 +129,8 @@ end
 if Events and Events.OnResetLua then
     Events.OnResetLua.Add(onResetLua)
 end
+
+-- Connection lifecycle clears only transient binding state; full-sync retries
+-- within an existing connection must not reset incarnation freshness.
+if Events and Events.OnDisconnect then Events.OnDisconnect.Add(BodyBinding.Reset) end
+if Events and Events.OnGameStart then Events.OnGameStart.Add(BodyBinding.Reset) end

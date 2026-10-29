@@ -1,3 +1,4 @@
+local BodyBinding = require "PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime"
 --[[
     PNC Client Roster Commands
     Applies roster synchronization, record deltas, and removal commands.
@@ -234,6 +235,7 @@ local function storeSnapshot(
     then
         return current
     end
+    BodyBinding.AcceptSnapshot(incoming)
     if Diagnostics and Diagnostics.FollowerPresenceAuditEnabled == true then
         logClientPresenceTransition(current, incoming, eventName)
         logClientPresencePosition(current, incoming, eventName)

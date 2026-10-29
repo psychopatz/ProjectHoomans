@@ -62,6 +62,9 @@ PNC = {
             removed_npc = { key = "stale" },
         },
         Internal = {
+            ResolveSnapshotBody = function(received)
+                return received == snapshot and body or nil
+            end,
             ApplySnapshotFacing = function()
                 facingCount = facingCount + 1
             end,

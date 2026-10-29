@@ -80,9 +80,13 @@ local function applySnapshots(
         if snapshot and snapshot.interestDetailed ~= false
             and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false
         then
-            body = resolveSnapshotBody
-                and resolveSnapshotBody(snapshot)
-                or resolveSnapshotBodyFromIndexes(snapshot)
+            if remoteReplica then
+                body = resolveSnapshotBody and resolveSnapshotBody(snapshot) or nil
+            else
+                body = resolveSnapshotBody
+                    and resolveSnapshotBody(snapshot)
+                    or resolveSnapshotBodyFromIndexes(snapshot)
+            end
             if body then
                 if applyLocalVisuals
                     or snapshot.healthState == "incapacitated"

@@ -83,6 +83,9 @@ local function removeLocalBody(body)
 end
 
 function Cleanup.RemoveBodyInstance(args)
+    -- MP removals require canonical incarnation proof. Legacy online/outfit
+    -- hints cannot authorize deletion of a potentially recycled vanilla ID.
+    if Core and Core.IsClientOnly and Core.IsClientOnly() then return 0 end
     local cell
     local zombieList
     local wantedInstance
@@ -160,6 +163,8 @@ function Cleanup.RemoveBodyInstance(args)
 end
 
 function Cleanup.PruneSnapshotDuplicates(snapshot, canonicalBody)
+    -- MP replacement/unbind is reconciler-owned; UUID census is legacy only.
+    if Core and Core.IsClientOnly and Core.IsClientOnly() then return 0 end
     local id
     local revisionKey
     local cell

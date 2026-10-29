@@ -1,240 +1,58 @@
 local T = require "tests/support/test"
-
-local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
 T.addPackagePaths()
-
-local FILE =
-    T.path("ProjectHoomans", "client", "PNC/PNC_ClientPresenceSync.lua")
-
-local function makeList(values)
-    return {
-        size = function() return #values end,
-        get = function(_, index) return values[index + 1] end,
-    }
-end
-
-local bodies = {}
-local function makeBody(spec)
-    local removed = false
-    local modData = spec.modData or {}
-    local worn = spec.naked and {} or { "shirt" }
-    local visuals = spec.naked and {} or { "shirt_visual" }
-    local body = {
-        getModData = function() return modData end,
-        getPersistentOutfitID = function() return spec.instanceID end,
-        getOnlineID = function() return spec.onlineID end,
-        getX = function() return spec.x end,
-        getY = function() return spec.y end,
-        getZ = function() return spec.z or 0 end,
-        getWornItems = function() return makeList(worn) end,
-        getItemVisuals = function() return makeList(visuals) end,
-        isDead = function() return removed end,
-        setVariable = function() end,
-        removeFromWorld = function() removed = true end,
-        removeFromSquare = function() removed = true end,
-    }
-    body.wasRemoved = function() return removed end
-    bodies[#bodies + 1] = body
-    return body
-end
-
-local canonical = makeBody({
-    instanceID = 1001,
-    onlineID = 11,
-    x = 10,
-    y = 10,
-    modData = {
-        PNC_NPC = true,
-        PNC_UUID = "npc_client",
-        PNC_BodyKind = "live",
-        PNC_BodyLease = "lease-new",
-    },
-})
-local duplicate = makeBody({
-    instanceID = 1002,
-    onlineID = 12,
-    x = 10.2,
-    y = 10,
-    modData = {
-        PNC_NPC = true,
-        PNC_UUID = "npc_client",
-        PNC_BodyKind = "live",
-        PNC_BodyLease = "lease-old",
-    },
-})
-local ordinaryNakedNearby = makeBody({
-    instanceID = 1003,
-    onlineID = 13,
-    x = 10.4,
-    y = 10,
-    naked = true,
-})
-local unrelatedNaked = makeBody({
-    instanceID = 1004,
-    onlineID = 14,
-    x = 30,
-    y = 30,
-    naked = true,
-})
-local onlineIDCollision = makeBody({
-    instanceID = 1005,
-    onlineID = 11,
-    x = 40,
-    y = 40,
-    modData = {
-        PNC_NPC = true,
-        PNC_UUID = "different_npc",
-        PNC_BodyLease = "different-lease",
-    },
-})
-
-getCell = function()
-    return {
-        getZombieList = function() return makeList(bodies) end,
-    }
-end
-getSpecificPlayer = function() return nil end
-
+local now = 100
+local scans = 0
+local removed = 0
+local md = {}
+local body = { getModData = function() return md end,
+    getOnlineID = function() return 50 end,
+    removeFromWorld = function() removed = removed + 1 end }
 PNC = {
-    Const = {
-        PRESENCE_LIVE = "live",
-        PRESENCE_ABSTRACT = "abstract",
-        BODY_TAG_VERSION = 1,
-        BODY_SHELL_VERSION = 1,
-        CLIENT_BODY_SCAN_MS = 750,
-        CLIENT_BODY_SCAN_UNRESOLVED_MS = 200,
-    },
-    Core = {
-        Now = function() return 1000 end,
-        IsClientOnly = function() return true end,
-        LogInfo = function() end,
-        LogWarn = function() end,
-    },
-    Network = {
-        ClientState = {
-            snapshots = {
-                npc_client = {
-                    id = "npc_client",
-                    alive = true,
-                    presenceState = "live",
-                    presenceRevision = 7,
-                    liveBodyInstanceID = 1001,
-                    liveBodyOnlineID = 11,
-                    liveBodyLease = "lease-new",
-                    x = 10,
-                    y = 10,
-                    z = 0,
-                    visualState = {},
-                },
-            },
-        },
-        GetZombieOnlineID = function(body)
-            local value = body:getOnlineID()
-            return value and value >= 0 and value or nil
-        end,
-    },
-    ClientInterpolation = {},
-    LiveBodyControl = {
-        EnforceManagedSafety = function() return true end,
-        MaintainHumanizedBody = function() return true end,
-    },
+    Core = { Now = function() return now end, IsClientOnly = function() return true end },
+    Const = { PRESENCE_LIVE = "live" },
+    Network = { ClientState = { snapshots = {} } },
+    Client = { Internal = {} },
+    ClientPresenceSync = { Internal = { CanRequestRemoteSync = function() return true end },
+        BodyByID = {}, BodyByLease = {}, BodyByOnlineID = {}, BodyByInstanceID = {},
+        NativePathStateByBody = {} },
 }
-
-T.load(FILE)
-
-PNC.ClientPresenceSync.OnTick()
-T.equal(canonical.wasRemoved(), false, "canonical client body preserved")
-T.equal(duplicate.wasRemoved(), true, "old UUID body pruned")
-T.equal(ordinaryNakedNearby.wasRemoved(), false,
-    "nearby ordinary naked body preserved")
-T.equal(unrelatedNaked.wasRemoved(), false, "unrelated naked body preserved")
-T.equal(onlineIDCollision.wasRemoved(), false,
-    "online-ID collision body preserved")
-T.equal(onlineIDCollision:getModData().PNC_UUID, "different_npc",
-    "online-ID collision was not rebound to the wrong NPC")
-T.equal(PNC.ClientPresenceSync.BodyByID.npc_client, false,
-    "duplicate NPC UUIDs were not left ambiguous in the body registry")
-T.equal(
-    PNC.ClientPresenceSync.BodyByLease["npc_client:lease-new"],
-    canonical,
-    "body registry lost the canonical lease identity"
-)
-T.equal(PNC.ClientPresenceSync.BodyByOnlineID["11"], false,
-    "duplicate online IDs were not left ambiguous in the body registry")
-T.equal(PNC.ClientPresenceSync.BodyByInstanceID["1001"], canonical,
-    "body registry lost the canonical instance identity")
-
-local exact = makeBody({
-    instanceID = 2001,
-    onlineID = 21,
-    x = 5,
-    y = 5,
-    modData = { PNC_NPC = true, PNC_UUID = "other" },
-})
-local removalCollision = makeBody({
-    instanceID = 2002,
-    onlineID = 21,
-    x = 5.2,
-    y = 5,
-    modData = { PNC_NPC = true, PNC_UUID = "not_other" },
-})
-T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({
-    id = "other",
-    bodyInstanceID = "2001",
-    bodyOnlineID = 21,
-    reason = "server_startup_cleanup",
-}), 1, "exact client body removal count")
-T.equal(exact.wasRemoved(), true, "exact server-directed body removed")
-T.equal(removalCollision.wasRemoved(), false,
-    "online-ID collision was not removed with another NPC")
-
--- A multiplayer shell can lose all PNC ModData after server restart/streaming.
--- The server-assigned online ID still names the exact network zombie and must
--- be sufficient for authoritative cleanup on every connected client.
-local anonymousOnlineHusk = makeBody({
-    instanceID = 0,
-    onlineID = 31,
-    x = 6,
-    y = 6,
-    naked = true,
-})
-local anonymousWrongOnline = makeBody({
-    instanceID = 0,
-    onlineID = 32,
-    x = 6.1,
-    y = 6,
-    naked = true,
-})
-T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({
-    id = "lost_uuid_npc",
-    bodyInstanceID = "0",
-    bodyOnlineID = 31,
-    reason = "loaded_husk_sweep",
-}), 1, "anonymous exact-online-id husk removal count")
-T.equal(anonymousOnlineHusk.wasRemoved(), true,
-    "anonymous exact-online-id husk survived server removal")
-T.equal(anonymousWrongOnline.wasRemoved(), false,
-    "nearby anonymous zombie with another online id was removed")
-
-local ordinaryZeroInstance = makeBody({
-    instanceID = 0,
-    onlineID = nil,
-    x = 80,
-    y = 80,
-    naked = true,
-})
-T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({
-    id = "zero_id_test",
-    bodyInstanceID = "0",
-    reason = "server_startup_cleanup",
-}), 0, "zero instance ID did not match an ordinary zombie")
-T.equal(ordinaryZeroInstance.wasRemoved(), false,
-    "ordinary zero-instance zombie was preserved")
-
-getCell = function() return nil end
-PNC.ClientPresenceSync.Internal.RefreshBodyMap(1000)
-T.equal(PNC.ClientPresenceSync.BodyByID.npc_client, nil,
-    "body registry retained entries while the local cell was unavailable")
-T.finish("pnc_client_body_cleanup_smoke")
-
-T.finish("pnc_client_body_cleanup_smoke")
+getCell = function() scans = scans + 1; error("MP reconciliation must not census zombies") end
+local R = require "PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime"
+T.load("ProjectHoomans", "client", "PNC/Networking/PNC_ClientRosterCommands_Snapshots.lua")
+T.load("ProjectHoomans", "client", "PNC/PresenceSync/PNC_ClientPresenceBodies.lua")
+local s = { id = "npc_a", alive = true, presenceState = "live", liveBodyLease = "l1",
+    liveBodyOnlineID = 50, replicaSequence = 1,
+    bodyBinding = {protocol=1, session="s", revision=1, npcId="npc_a",
+        operation="bind", incarnation="l1", onlineId=50} }
+R.Observe(body)
+T.equal(md.PNC_UUID, nil, "vanilla replica cannot invent PNC identity")
+PNC.Client.Internal.StoreSnapshot(s)
+T.equal(md.PNC_UUID, "npc_a", "accepted binding stamps post-bind cache")
+T.equal(PNC.ClientPresenceSync.ResolveBodyForNPC("npc_a"), body,
+    "consumer resolves exclusively through canonical binding")
+T.equal(PNC.ClientPresenceSync.ResolveBodyForNPC("different", s), nil)
+local stale = {id="npc_a", presenceState="live", liveBodyLease="stale",
+    liveBodyOnlineID=50, replicaSequence=0}
+PNC.Client.Internal.StoreSnapshot(stale)
+T.equal(PNC.ClientPresenceSync.ResolveBodyForNPC("npc_a"), body,
+    "stale snapshot cannot replace binding")
+local spoof = {id="npc_a", presenceState="live", liveBodyLease="l1",
+    liveBodyOnlineID=50}
+T.equal(R.Resolve(spoof), nil, "UUID/online ID/lease hints alone cannot admit presentation")
+PNC.ClientPresenceSync.Internal.RefreshBodyMap(now)
+T.equal(scans, 0, "MP refresh performs no zombie census")
+T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({id="npc_a",bodyOnlineID=50}), 0)
+T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({id="ordinary",bodyOnlineID=50}), 0)
+T.equal(removed, 0, "legacy removal hints cannot delete ordinary/recycled zombies")
+T.equal(PNC.ClientPresenceSync.Internal.PruneSnapshotDuplicates(s, body), 0)
+local state = { snapshot = s }
+PNC.ClientPresenceSync.NativePathStateByBody[body] = state
+R.Reset()
+T.equal(md.PNC_UUID, nil, "connection reset clears only owned cache")
+T.equal(PNC.ClientPresenceSync.BodyByID.npc_a, nil)
+T.truthy(state.releasePending, "unbind retires stale movement control")
+T.equal(R.Resolve(s), nil, "reset requires new authoritative binding")
+now = 200
+PNC.Core.IsClientOnly = function() return false end
+T.equal(R.AcceptSnapshot(s), false, "SP cannot enter MP admission")
+return T.finish("pnc_client_body_cleanup_smoke")
