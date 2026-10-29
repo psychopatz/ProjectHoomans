@@ -1,6 +1,6 @@
 # Progress — Semantic Interaction Scene Runtime
 
-**Status:** ACTIVE — S0 accepted; S1 production Project Hoomans actor adapter is next.
+**Status:** ACTIVE — S0–S1 accepted; S2 global Scene Runtime/admission is next.
 
 **Planning base:** ProjectHoomans `47aaad69`, existing `main`.
 
@@ -50,19 +50,38 @@ Accepted baseline:
 
 Focused acceptance: **4/4 PASS**.
 
-## ONE current Next Chunk — S1
+## S1 accepted — production Project Hoomans actor adapter
 
-Implement the production Project Hoomans actor adapter through the existing InteractionProviders registration seam.
+Accepted implementation:
+- `projecthoomans.managed_npc` registers through the existing InteractionProviders adapter seam;
+- only the exact live record returned by `PNC.Registry.Get(id)` can adapt;
+- disposition maps existing social personality into the generic contract;
+- panic/stress/needs/activity/traits come from existing managed NPC state;
+- directed personal relationship uses canonical `npc:<id>` relationship keys;
+- directed faction relation uses existing faction read authority;
+- known fact refs come from existing WorldKnowledge conversation context;
+- dead/unmanaged actors fail closed;
+- installation is idempotent and state-free.
 
-S1 must:
-1. adapt only real managed Project Hoomans NPC records;
-2. project identity/capabilities, disposition/personality, panic/stress/needs/activity and bounded traits from existing record/runtime/context authorities;
-3. project directed relationship/faction relation through existing relationship/faction/social authority rather than duplicate state;
-4. project bounded known fact refs from existing knowledge/evidence authority;
-5. fail closed for missing/dead/invalid actors;
-6. register exactly once without breaking third-party adapter ordering;
-7. add real managed-NPC Scene fixtures proving asymmetric A->B/B->A context where authority differs;
-8. add no persistent storage and perform no mutation.
+S1 evidence:
+- actor-adapter/Scene/provider/relationship/world-knowledge matrix: **5/5 PASS**;
+- changed/untracked Lua through installed Kahlua compiler: **13/13 PASS**;
+- `git diff --check`: clean;
+- no new persistence/mutation owner.
+
+## ONE current Next Chunk — S2
+
+Implement one production global Scene Runtime/Registry around the accepted Scene/Scheduler.
+
+S2 must:
+1. let Scene.New use an injected shared Scheduler while preserving isolated construction for tests;
+2. add one default runtime with active-scene map/order, global cap and deterministic IDs;
+3. own explicit Open/Get/Close, TTL expiry and bounded runtime metrics;
+4. terminate scenes when an actor becomes unavailable/dead/leaves;
+5. expose explicit visibility/LOD updates without a polling tick;
+6. preserve Scene participant/turn/history caps;
+7. provide a bounded explicit admission seam only; generic Opportunity Providers remain S5;
+8. add no world scan, ModData or automatic tick loop.
 
 ## Remaining mandatory phases
 

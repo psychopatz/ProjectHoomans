@@ -420,4 +420,9 @@ end
 
 local EvidenceAdapters = require "PNC/Semantics/PNC_SemanticInteractionEvidenceAdapters"
 EvidenceAdapters.Install(Providers)
+
+local ActorAdapter = require
+    "PNC/Semantics/PNC_SemanticInteractionActorAdapter_ProjectHoomans"
+ActorAdapter.Install(Providers)
+
 return Providers
