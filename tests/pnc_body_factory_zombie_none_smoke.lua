@@ -12,6 +12,8 @@ local primaryResult
 local fallbackBody
 local spawnsDisabled = true
 local nowMs = 100
+local preclaimCount = 0
+local preclaimInsideSpawnWindow = false
 
 -- Kahlua throws when Lua indexes a member the exposer does not publish, and
 -- the engine dumps a stack trace for every caught Java exception. Model that
@@ -82,6 +84,16 @@ T.load(SHARED
 
 local Lifecycle = PNC.BodyLifecycle
 local Internal = Lifecycle.Internal
+Lifecycle.PreclaimLiveBody = function(record, body)
+    preclaimCount = preclaimCount + 1
+    preclaimInsideSpawnWindow = Internal.SpawnInProgress == true
+    local modData = body:getModData()
+    modData.PNC_UUID = record.id
+    modData.PNC_NPC = true
+    modData.PNC_BodyKind = "live"
+    modData.PNC_BodyLease = "body_preclaim"
+    return "body_preclaim"
+end
 local position = { x = 10, y = 20, z = 0 }
 
 T.truthy(Lifecycle.AreZombieSpawnsDisabled(),
@@ -108,6 +120,11 @@ T.equal(fallbackRecord.health, 1,
 T.equal(fallbackRecord.female, true,
     "fallback body gender hint was not applied")
 T.equal(owned, 1, "fallback body was not marked as owned")
+T.equal(preclaimCount, 1, "fallback body was not preclaimed")
+T.truthy(preclaimInsideSpawnWindow,
+    "fallback body was preclaimed after the MP spawn window closed")
+T.equal(fallbackBody:getModData().PNC_UUID, "npc_1",
+    "preclaim did not stamp NPC identity before exposure")
 T.falsy(Internal.SpawnInProgress, "spawn window was left open")
 
 -- An explicit disable remains available for deployments that want to fail
@@ -135,6 +152,10 @@ zombie, factory = Lifecycle.SpawnLiveBody(
     { id = "npc_2" }, position, "test_primary")
 T.equal(factory, "addZombiesInOutfit", "primary factory was not preferred")
 T.equal(fallbackCalls, 1, "fallback ran even though the primary succeeded")
+T.equal(preclaimCount, 2,
+    "primary body was returned before authoritative preclaim")
+T.equal(fallbackBody:getModData().PNC_UUID, "npc_2",
+    "primary body was exposed without its PNC UUID")
 T.equal(fallbackRecord.female, nil,
     "primary bodies must not be re-configured by the factory")
 
