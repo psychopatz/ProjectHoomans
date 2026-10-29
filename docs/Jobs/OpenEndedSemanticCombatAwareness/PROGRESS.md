@@ -4,6 +4,7 @@
 **Follow-on base:** `1940bf2a`.
 **Branch:** existing `main`.
 **Native PZ:** not launched; user-owned verification remains.
+**Follow-on owner:** new combat-banter/tactical-intent work is tracked in `docs/Jobs/SemanticCombatBanterTacticalIntent/`; this completed job remains the accepted foundation.
 
 ## Current accepted state
 
