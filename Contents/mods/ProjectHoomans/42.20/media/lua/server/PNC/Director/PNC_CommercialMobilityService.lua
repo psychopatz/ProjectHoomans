@@ -109,9 +109,20 @@ local function historyKey(entry)
     return tostring(entry and (entry.communityID or entry.locationID) or "")
 end
 
-local function onCooldown(faction, target, at)
+local function onCooldown(faction, target, at, options)
+    if type(options) == "table"
+        and type(options.cooldown) == "function"
+    then
+        local ok, result = pcall(options.cooldown, copy(target), at)
+        if ok and result == true then return true end
+        if not ok then
+            diagnostic("cooldown", "external", result)
+            return true
+        end
+    end
     local wanted = targetKey(target)
-    for _, entry in ipairs(faction.mobile.settlementHistory or {}) do
+    local history = faction.mobile and faction.mobile.settlementHistory or {}
+    for _, entry in ipairs(history) do
         if historyKey(entry) == wanted
             and finite(entry.cooldownUntil, 0) > at
         then
@@ -121,8 +132,17 @@ local function onCooldown(faction, target, at)
     return false
 end
 
-local function isEligibleFaction(faction, at)
+local function isEligibleFaction(faction, at, options)
     local mobile = faction and faction.mobile or nil
+    if type(options) == "table" and options.resident == true then
+        if not faction or faction.status ~= "active" then
+            return false, "resident_faction_not_active"
+        end
+        if mobile then
+            return false, "resident_faction_is_mobile"
+        end
+        return true, "resident_eligible"
+    end
     if not faction or faction.status ~= "active"
         or not mobile or mobile.active ~= true
         or tostring(mobile.mobilityIntent or "")
@@ -147,7 +167,7 @@ local function isEligibleFaction(faction, at)
     return true, "eligible"
 end
 
-local function safeTarget(faction, target, at)
+local function safeTarget(faction, target, at, options)
     local locations = PNC.AbstractLocations
     local visitService = PNC.MobileSettlementVisitService
     local location
@@ -178,7 +198,9 @@ local function safeTarget(faction, target, at)
     eligible, reason = visitService.IsSettlementVisitEligible(
         faction,
         target,
-        at
+        at,
+        type(options) == "table" and options.resident == true
+            and { allowResident = true } or nil
     )
     if not eligible then return false, reason end
     return true, "eligible", location
@@ -198,7 +220,7 @@ local function scorerValue(value)
     return clamp(value, -25, 25, 0)
 end
 
-function Service.SelectDestination(factionOrID, at)
+function Service.SelectDestination(factionOrID, at, options)
     local faction = type(factionOrID) == "table" and factionOrID
         or Factions and Factions.Get and Factions.Get(factionOrID)
     local candidates = {}
@@ -206,15 +228,18 @@ function Service.SelectDestination(factionOrID, at)
     local selectedScore
     local eligibilityReason
     local now = worldAge(at)
+    options = type(options) == "table" and options or {}
     if not H or type(H.ResolveSettlementDepartureTargets) ~= "function" then
         return nil, "settlement_target_resolver_unavailable", candidates
     end
     if not faction then return nil, "faction_not_found", candidates end
     local eligible
-    eligible, eligibilityReason = isEligibleFaction(faction, now)
+    eligible, eligibilityReason = isEligibleFaction(faction, now, options)
     if not eligible then return nil, eligibilityReason, candidates end
     local raw = H.ResolveSettlementDepartureTargets(faction, {
         commercial = true,
+        origin = options.origin,
+        excludeCommunityID = options.excludeCommunityID,
         candidateLimit = Config
             and Config.COMMERCIAL_DESTINATION_CANDIDATE_LIMIT
             or Constants.COMMERCIAL_DESTINATION_CANDIDATE_LIMIT or 16,
@@ -222,10 +247,10 @@ function Service.SelectDestination(factionOrID, at)
     local seen = {}
     for _, target in ipairs(raw or {}) do
         local key = targetKey(target)
-        if not seen[key] and not onCooldown(faction, target, now) then
+        if not seen[key] and not onCooldown(faction, target, now, options) then
             seen[key] = true
             local safe, reason, location = safeTarget(
-                faction, target, now)
+                faction, target, now, options)
             if safe then
                 target.danger = finite(location and location.danger, 0)
                 local score, distance = baseScore(target)
@@ -278,23 +303,28 @@ function Service.SelectDestination(factionOrID, at)
     return selected, "commercial_destination_selected", candidates
 end
 
-function Service.StartCommercialTravel(factionOrID, target, at)
+function Service.StartCommercialTravel(factionOrID, target, at, options)
     local faction = type(factionOrID) == "table" and factionOrID
         or Factions and Factions.Get and Factions.Get(factionOrID)
     local selected
     local reason
+    options = type(options) == "table" and options or {}
     if not faction then return false, "faction_not_found" end
     if not target then
-        selected, reason = Service.SelectDestination(faction, at)
+        selected, reason = Service.SelectDestination(faction, at, options)
         if not selected then return false, reason end
         target = selected
     end
-    local safe, safeReason = safeTarget(faction, target, worldAge(at))
+    local safe, safeReason = safeTarget(
+        faction, target, worldAge(at), options)
     if not safe then return false, safeReason end
     if not MobileDirector
         or type(MobileDirector.StartSettlementTravel) ~= "function"
     then
         return false, "mobile_travel_api_unavailable"
+    end
+    if options.resident == true then
+        return false, "resident_excursion_requires_participant_travel"
     end
     return MobileDirector.StartSettlementTravel(
         faction.id,

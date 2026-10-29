@@ -167,6 +167,12 @@ function Types.NormalizeMobileGroup(value)
         playerRoam = playerRoam,
         mobilityIntent = mobilityIntent,
         settlementHistory = settlementHistory,
+        -- Keep arrival identities monotonic after an old travel record is
+        -- cleared, so a later destination cannot reuse its visit id.
+        lastTravelRevision = math.max(
+            0,
+            math.floor(Internal.Finite(source.lastTravelRevision, 0))
+        ),
         lastDepartureAt = source.lastDepartureAt == nil
             and -1 or math.max(-1, math.floor(Internal.Finite(
                 source.lastDepartureAt,

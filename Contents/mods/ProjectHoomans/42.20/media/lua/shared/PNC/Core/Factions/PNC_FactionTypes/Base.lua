@@ -169,6 +169,7 @@ local function normalizeExcursion(value)
     local homeFactionID
     local homeCommunityID
     local purpose
+    local visitIntent
     local publicReason
     local failure
     if not source then return nil end
@@ -202,6 +203,12 @@ local function normalizeExcursion(value)
         source.purpose,
         Constants.EXCURSION_MAX_PURPOSE_LENGTH or 96
     ) or "general"
+    visitIntent = Internal.SafeString(
+        source.visitIntent or source.intent,
+        Constants.EXCURSION_MAX_INTENT_LENGTH
+            or Constants.MOBILE_SETTLEMENT_VISIT_INTENT_MAX_LENGTH
+            or 96
+    ) or Constants.MOBILE_SETTLEMENT_VISIT_INTENT_GENERAL
     publicReason = Internal.SafeString(
         source.publicReason,
         Constants.EXCURSION_MAX_REASON_LENGTH or 128
@@ -227,6 +234,7 @@ local function normalizeExcursion(value)
         state = Constants.EXCURSION_STATES[source.state]
             and source.state or Constants.EXCURSION_STATE_AT_HOME,
         purpose = purpose,
+        visitIntent = visitIntent,
         publicReason = publicReason,
         participants = participants,
         itinerary = itinerary,

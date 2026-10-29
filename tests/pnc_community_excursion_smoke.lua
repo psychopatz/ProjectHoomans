@@ -116,11 +116,16 @@ local observed = {}
 local listenerFailure = function()
     error("listener must not interrupt excursion state")
 end
+local listenerRejects = function()
+    return false, "listener_rejected_for_diagnostics"
+end
 local listener = function(payload)
     observed[#observed + 1] = payload.state
 end
 T.truthy(Service.RegisterListener(listenerFailure),
     "failure listener registers within bounded observer budget")
+T.truthy(Service.RegisterListener(listenerRejects),
+    "false listener registers within bounded observer budget")
 T.truthy(Service.RegisterListener(listener),
     "observer listener registers within bounded observer budget")
 
@@ -251,5 +256,11 @@ T.truthy(#events >= #observed,
     "authoritative changes emit persistence events")
 T.truthy(#warnings >= 1,
     "observer failures are diagnosed without breaking lifecycle")
+local listenerDiagnostics = Service.GetListenerDiagnostics(8)
+T.truthy(#listenerDiagnostics >= 1,
+    "false listener returns are retained as diagnostics")
+T.equal(listenerDiagnostics[#listenerDiagnostics].reason,
+    "listener_rejected_for_diagnostics",
+    "false listener diagnostics preserve the rejection reason")
 
 T.finish("pnc_community_excursion_smoke")

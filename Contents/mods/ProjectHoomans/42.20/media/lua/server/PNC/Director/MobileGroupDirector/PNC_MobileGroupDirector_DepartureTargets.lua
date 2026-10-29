@@ -94,10 +94,25 @@ local function targetFromLocation(location, kind, ids)
     }
 end
 
+local function originPoint(faction, options)
+    local mobile = faction and faction.mobile or nil
+    local configured = type(options) == "table" and options.origin or nil
+    if type(configured) == "table"
+        and tonumber(configured.x) ~= nil
+        and tonumber(configured.y) ~= nil
+    then
+        return configured
+    end
+    return mobile and mobile.site and mobile.site.home or { x = 0, y = 0 }
+end
+
 local function addCommunityTargets(output, faction, options)
     local communities = PNC.Communities
     local commercial = type(options) == "table"
         and options.commercial == true
+    local origin = originPoint(faction, options)
+    local excludedCommunityID = type(options) == "table"
+        and options.excludeCommunityID or nil
     if not communities or not communities.ListSites
         or not communities.Get
     then
@@ -105,7 +120,9 @@ local function addCommunityTargets(output, faction, options)
     end
     for _, site in ipairs(communities.ListSites() or {}) do
         if site.occupantCommunityID
-            and not (faction.mobile.site
+            and tostring(site.occupantCommunityID)
+                ~= tostring(excludedCommunityID or "")
+            and not (faction.mobile and faction.mobile.site
                 and faction.mobile.site.id == site.id)
         then
             local community = communities.Get(site.occupantCommunityID)
@@ -130,10 +147,7 @@ local function addCommunityTargets(output, faction, options)
                         target.playerOwned = playerOwned
                         target.hasPlayerMembers = hasPlayerMembers(
                             ownerFaction)
-                        target.distanceSq = distanceSq(
-                            faction.mobile.site.home,
-                            target
-                        )
+                        target.distanceSq = distanceSq(origin, target)
                         output[#output + 1] = target
                     end
                 end
@@ -142,12 +156,13 @@ local function addCommunityTargets(output, faction, options)
     end
 end
 
-local function addPlayerBaseTargets(output, faction)
+local function addPlayerBaseTargets(output, faction, options)
     local repository = PNC.SettlementRepository
     local baseService = PNC.BaseService
     local locations = PNC.AbstractLocations
     if not repository or not repository.State
         or not baseService or not baseService.BuildSnapshot
+        or not faction or not faction.mobile
     then
         return
     end
@@ -184,9 +199,7 @@ local function addPlayerBaseTargets(output, faction)
                         math.sqrt(((bounds.maxX - bounds.minX) / 2) ^ 2
                             + ((bounds.maxY - bounds.minY) / 2) ^ 2)))
                     target.distanceSq = distanceSq(
-                        faction.mobile.site.home,
-                        target
-                    )
+                        originPoint(faction, options), target)
                     output[#output + 1] = target
                 end
             end
@@ -198,7 +211,7 @@ function H.ResolveSettlementDepartureTargets(faction, options)
     local output = {}
     options = type(options) == "table" and options or {}
     addCommunityTargets(output, faction, options)
-    addPlayerBaseTargets(output, faction)
+    addPlayerBaseTargets(output, faction, options)
     local hostile = faction.archetypeID == "looter"
     table.sort(output, function(left, right)
         local leftPriority = left.kind == (hostile

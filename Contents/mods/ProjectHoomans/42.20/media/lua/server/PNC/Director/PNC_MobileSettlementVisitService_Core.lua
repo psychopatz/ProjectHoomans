@@ -169,7 +169,50 @@ end
 -- The generic temporary-visit gate intentionally reuses the same bounded
 -- settlement/relationship safety checks as admission, but its caller owns no
 -- membership transfer and therefore never consults the AI join chance.
-function Service.IsSettlementVisitEligible(factionOrID, target, at)
+function Service.IsSettlementVisitEligible(
+    factionOrID,
+    target,
+    at,
+    options
+)
+    options = type(options) == "table" and options or {}
+    if options.allowResident == true then
+        local faction = type(factionOrID) == "table" and factionOrID
+            or Factions and Factions.Get and Factions.Get(factionOrID)
+        local community
+        local destination
+        if not faction or faction.status ~= "active" then
+            return false, "faction_not_active"
+        end
+        if not target or (target.kind ~= "ai_settlement"
+            and target.kind ~= "player_colony"
+            and target.kind ~= "settlement"
+        ) then
+            return false, "not_settlement_target"
+        end
+        community = targetCommunity(target)
+        if not community then
+            return false, "settlement_community_missing"
+        end
+        destination = targetFaction(target, community)
+        if not destination or destination.status ~= "active" then
+            return false, "settlement_faction_missing"
+        end
+        if target.kind == "player_colony"
+            and not hasPlayerMembers(destination)
+        then
+            return false, "player_settlement_owner_missing"
+        end
+        if tostring(community.factionID or "")
+            ~= tostring(destination.id or "")
+        then
+            return false, "settlement_faction_mismatch"
+        end
+        if isHostileToSettlement(faction, destination, worldAge(at)) then
+            return false, "hostile_settlement_relationship"
+        end
+        return true, "eligible", community, destination
+    end
     return Service.IsAdmissionEligible(factionOrID, target, at)
 end
 

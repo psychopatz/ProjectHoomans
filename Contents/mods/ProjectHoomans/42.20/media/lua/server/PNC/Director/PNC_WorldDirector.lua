@@ -87,6 +87,11 @@ function Director.Initialize(force)
         Groups.RefreshLOD(group, now)
     end
     Locations.ReconcileOccupancy()
+    if CommunityExcursionService
+        and CommunityExcursionService.RegisterTravelHandlers
+    then
+        CommunityExcursionService.RegisterTravelHandlers()
+    end
     if PNC.PopulationDirector and PNC.PopulationDirector.Initialize then
         PNC.PopulationDirector.Initialize(force)
     end
@@ -179,6 +184,25 @@ function Director.Initialize(force)
         end,
         { budget = Config.COMMERCIAL_MOBILITY_BUDGET or 4,
             startAt = now + (Config.COMMERCIAL_MOBILITY_INTERVAL_HOURS
+                or 6) })
+    Scheduler.RegisterJob("CommunityExcursionPolicies",
+        Config.COMMUNITY_EXCURSION_POLICY_INTERVAL_HOURS or 6,
+        function(at, budget)
+            if Director.Paused or not CommunityExcursionService
+                or not CommunityExcursionService.PumpPolicies
+            then
+                return 0
+            end
+            return CommunityExcursionService.PumpPolicies(
+                at,
+                math.min(
+                    tonumber(budget) or Config.DIRECTOR_JOB_BUDGET,
+                    Config.COMMUNITY_EXCURSION_POLICY_BUDGET or 4
+                )
+            )
+        end,
+        { budget = Config.COMMUNITY_EXCURSION_POLICY_BUDGET or 4,
+            startAt = now + (Config.COMMUNITY_EXCURSION_POLICY_INTERVAL_HOURS
                 or 6) })
     Scheduler.RegisterJob("CommunityExcursions",
         Config.COMMUNITY_EXCURSION_INTERVAL_HOURS or 1,

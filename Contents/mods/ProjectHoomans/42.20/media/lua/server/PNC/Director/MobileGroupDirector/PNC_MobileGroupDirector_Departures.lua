@@ -164,14 +164,18 @@ function Director.StartSettlementTravel(factionID, target, at, options)
         destination = target,
         startedAt = at,
         departureDay = H.DepartureDay(at),
-        revision = (faction.mobile.travel
-            and tonumber(faction.mobile.travel.revision) or 0) + 1,
+        revision = math.max(
+            tonumber(faction.mobile.lastTravelRevision) or 0,
+            faction.mobile.travel
+                and tonumber(faction.mobile.travel.revision) or 0
+        ) + 1,
     }
     local ok, reason, mobile = Factions.UpdateMobileGroup(
         faction.id,
         {
             activity = Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT,
             travel = travel,
+            lastTravelRevision = travel.revision,
             ambient = nil,
             lastDepartureAt = at,
         },
