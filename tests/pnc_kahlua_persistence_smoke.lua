@@ -339,5 +339,31 @@ T.equal(startingRestored.generation.relationshipSince, "before_outbreak",
 T.equal(startingRestored.generation.playerCharacterUUID,
     "char_starting_player", "starting companion owner was restored")
 
+local ownedFollower = deepCopy(record)
+ownedFollower.id = "npc_owned_follower"
+ownedFollower.ownerUsername = "Psychopatz"
+ownedFollower.ownerCharacterUUID = "char_owner_uuid"
+ownedFollower.orderSpec = {
+    kind = "follow",
+    ownerUsername = "Psychopatz",
+    ownerOnlineID = 55,
+    ownerCharacterUUID = "char_owner_uuid",
+}
+local ownedFollowerPayload = PNC.Persistence.SerializeRecord(ownedFollower)
+T.equal(ownedFollowerPayload.ownerCharacterUUID, "char_owner_uuid",
+    "companion character ownership was not serialized")
+T.equal(ownedFollowerPayload.orderSpec.ownerCharacterUUID, "char_owner_uuid",
+    "follow order character ownership was not serialized")
+T.equal(ownedFollowerPayload.orderSpec.ownerOnlineID, nil,
+    "session-scoped owner online id leaked into durable follow order")
+local ownedFollowerRestored = PNC.Persistence.DeserializeRecord(
+    ownedFollowerPayload,
+    ownedFollower.id
+)
+T.equal(ownedFollowerRestored.ownerCharacterUUID, "char_owner_uuid",
+    "companion character ownership did not survive reload")
+T.equal(ownedFollowerRestored.orderSpec.ownerCharacterUUID, "char_owner_uuid",
+    "follow order character ownership did not survive reload")
+
 next = originalNext
 T.finish("pnc_kahlua_persistence_smoke")

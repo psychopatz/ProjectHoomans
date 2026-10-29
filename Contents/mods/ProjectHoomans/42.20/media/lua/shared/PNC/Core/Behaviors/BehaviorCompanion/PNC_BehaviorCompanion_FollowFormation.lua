@@ -7,16 +7,37 @@ local Registry = PNC.Registry
 local TraversalQuery = PNC.TraversalQuery
 local FollowFormationCache = {}
 
+local function ownerCharacterUUID(value)
+    local order = value and value.orderSpec or nil
+    local generation = value and value.generation or nil
+    local uuid = value and value.ownerCharacterUUID
+        or order and order.ownerCharacterUUID
+        or generation
+            and tostring(generation.source or "") == "starting_companion_trait"
+            and generation.playerCharacterUUID
+        or nil
+    return uuid ~= nil and tostring(uuid) or nil
+end
+
 local function isSameFollowGroup(record, other)
     local otherOrder
     local otherOwnerID
     local recordOwnerID
+    local otherCharacterUUID
+    local recordCharacterUUID
     if not record or not other or other.alive == false then
         return false
     end
     otherOrder = other.orderSpec or {}
     if tostring(otherOrder.kind or "") ~= Const.ORDER_FOLLOW then
         return false
+    end
+    otherCharacterUUID = ownerCharacterUUID(other)
+    recordCharacterUUID = ownerCharacterUUID(record)
+    if otherCharacterUUID ~= nil or recordCharacterUUID ~= nil then
+        return otherCharacterUUID ~= nil
+            and recordCharacterUUID ~= nil
+            and otherCharacterUUID == recordCharacterUUID
     end
     otherOwnerID = tonumber(other.ownerOnlineID)
     recordOwnerID = tonumber(record.ownerOnlineID)

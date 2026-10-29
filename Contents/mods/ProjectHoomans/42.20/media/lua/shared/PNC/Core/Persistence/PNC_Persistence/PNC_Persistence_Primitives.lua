@@ -441,6 +441,10 @@ function Internal.sanitizeOrderSpec(orderSpec, record)
     spec.roamMode = Internal.normalizeString(spec.roamMode)
     spec.moveMode = Internal.normalizeString(spec.moveMode)
     spec.ownerUsername = Internal.normalizeString(spec.ownerUsername)
+    spec.ownerCharacterUUID = Internal.normalizeString(
+        spec.ownerCharacterUUID
+    )
+    -- Online IDs are session-scoped; the character UUID is the durable owner.
     spec.ownerOnlineID = nil
     spec.journeyId = Internal.normalizeString(spec.journeyId)
     return spec

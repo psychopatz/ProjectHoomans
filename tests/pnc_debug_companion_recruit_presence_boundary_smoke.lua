@@ -40,7 +40,7 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.DebugCompanionRecruit[name]), "function",
         "entry point preserves DebugCompanionRecruit." .. name)
 end
-T.equal(publicCount, 6, "debug companion recruit public function count")
+T.equal(publicCount, 8, "debug companion recruit public function count")
 T.equal(PNC.Recruitment, PNC.DebugCompanionRecruit,
     "legacy Recruitment alias remains stable")
 

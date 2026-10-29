@@ -171,6 +171,8 @@ function OrderSystem.Normalize(record, orderSpec)
             kind = kind,
             ownerUsername = spec.ownerUsername or record.ownerUsername,
             ownerOnlineID = spec.ownerOnlineID or record.ownerOnlineID,
+            ownerCharacterUUID = spec.ownerCharacterUUID
+                or record.ownerCharacterUUID,
             -- Follow owns movement, but the last authoritative home anchor
             -- remains durable so an explicit Go Home can resume the same
             -- destination after an abstract/save-load interval.

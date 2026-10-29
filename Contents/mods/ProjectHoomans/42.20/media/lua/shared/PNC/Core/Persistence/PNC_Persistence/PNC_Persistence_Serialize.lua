@@ -236,6 +236,9 @@ function Persistence.SerializeRecord(record)
         skillBaseLevels = serializeSkillBaseLevels(record),
         tacticalClass = record.tacticalClass,
         ownerUsername = Internal.normalizeString(record.ownerUsername),
+        ownerCharacterUUID = Internal.normalizeString(
+            record.ownerCharacterUUID
+        ),
         identity = identity,
         appearance = appearance,
         appearanceContract = appearanceContract,

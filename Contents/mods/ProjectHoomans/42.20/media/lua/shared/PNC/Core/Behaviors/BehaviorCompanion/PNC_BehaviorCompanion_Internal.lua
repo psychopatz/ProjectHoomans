@@ -21,9 +21,20 @@ function Internal.SetFollowMode(record, mode)
 end
 
 function Internal.GetFollowOwnerKey(record, owner)
+    local generation = record and record.generation or nil
+    local orderSpec = record and record.orderSpec or nil
+    local characterUUID = record and record.ownerCharacterUUID
+        or orderSpec and orderSpec.ownerCharacterUUID
+        or generation
+            and tostring(generation.source or "") == "starting_companion_trait"
+            and generation.playerCharacterUUID
+        or nil
     local onlineID = owner and owner.getOnlineID
         and tonumber(owner:getOnlineID())
         or tonumber(record and record.ownerOnlineID)
+    if characterUUID ~= nil and tostring(characterUUID) ~= "" then
+        return "character:" .. tostring(characterUUID)
+    end
     if onlineID ~= nil then
         return "id:" .. tostring(onlineID)
     end

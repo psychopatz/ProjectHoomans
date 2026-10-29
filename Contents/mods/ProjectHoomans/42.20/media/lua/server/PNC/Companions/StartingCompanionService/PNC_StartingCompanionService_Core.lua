@@ -67,6 +67,23 @@ function H.OwnerMatches(record, player)
     if not record or record.recruited ~= true then return false end
     local username = player and player.getUsername
         and player:getUsername() or nil
+    local expectedUUID = record.ownerCharacterUUID
+        or record.generation
+            and record.generation.playerCharacterUUID
+        or record.orderSpec
+            and record.orderSpec.ownerCharacterUUID
+        or nil
+    if expectedUUID ~= nil
+        and PNC.PlayerCharacters
+        and PNC.PlayerCharacters.GetCharacterUUID
+    then
+        local currentUUID = PNC.PlayerCharacters.GetCharacterUUID(player)
+        if currentUUID == nil
+            or tostring(currentUUID) ~= tostring(expectedUUID)
+        then
+            return false
+        end
+    end
     return username ~= nil and record.ownerUsername == username
 end
 

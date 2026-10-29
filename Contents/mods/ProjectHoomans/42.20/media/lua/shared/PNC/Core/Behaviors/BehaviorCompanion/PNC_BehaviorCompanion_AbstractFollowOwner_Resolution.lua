@@ -37,7 +37,24 @@ function H.Resolve(record, runtime, now)
         if record.ownerOnlineID == nil and orderSpec.ownerOnlineID ~= nil then
             record.ownerOnlineID = orderSpec.ownerOnlineID
         end
-        if record.ownerUsername ~= nil or record.ownerOnlineID ~= nil then
+        if record.ownerCharacterUUID == nil
+            and orderSpec.ownerCharacterUUID ~= nil
+        then
+            record.ownerCharacterUUID = orderSpec.ownerCharacterUUID
+        end
+        if record.ownerCharacterUUID == nil
+            and record.generation
+            and tostring(record.generation.source or "")
+                == "starting_companion_trait"
+            and record.generation.playerCharacterUUID ~= nil
+        then
+            record.ownerCharacterUUID =
+                tostring(record.generation.playerCharacterUUID)
+        end
+        if record.ownerUsername ~= nil
+            or record.ownerOnlineID ~= nil
+            or record.ownerCharacterUUID ~= nil
+        then
             owner = Common.GetOwner(record)
         end
     end

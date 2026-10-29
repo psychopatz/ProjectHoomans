@@ -59,6 +59,9 @@ local function buildDefinition(
             raw.anchorZ or raw.z or 0
         ),
         ownerUsername = Internal.normalizeString(raw.ownerUsername),
+        ownerCharacterUUID = Internal.normalizeString(
+            raw.ownerCharacterUUID
+        ),
         identitySeed = raw.identitySeed
             or (identity and identity.seed) or nil,
         identity = identity,
@@ -180,7 +183,11 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     record.anchorX = Internal.normalizeNumber(anchor.x, record.anchorX)
     record.anchorY = Internal.normalizeNumber(anchor.y, record.anchorY)
     record.anchorZ = Internal.normalizeNumber(anchor.z, record.anchorZ)
-    record.ownerUsername = Internal.normalizeString(raw.ownerUsername) or record.ownerUsername
+    record.ownerUsername = Internal.normalizeString(raw.ownerUsername)
+        or record.ownerUsername
+    record.ownerCharacterUUID = Internal.normalizeString(
+        raw.ownerCharacterUUID
+    ) or record.ownerCharacterUUID
     record.weaponMode = tostring(raw.weaponMode or record.weaponMode or "melee")
     record.attackType = PNC.Types and PNC.Types.NormalizeAttackType
         and PNC.Types.NormalizeAttackType(raw.attackType, record.weaponMode)

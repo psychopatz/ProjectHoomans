@@ -17,13 +17,33 @@ local EncounterIntent = PNC.Semantics
     and PNC.Semantics.CombatEncounterIntent or nil
 
 function H.Prepare(record, zombie, owner, now)
+    local ownerCharacterUUID = PNC.PlayerCharacters
+        and PNC.PlayerCharacters.GetCharacterUUID
+        and PNC.PlayerCharacters.GetCharacterUUID(owner) or nil
+    local ownerChanged = false
     if record.ownerUsername ~= owner:getUsername() then
         record.ownerUsername = owner:getUsername()
-        if Registry and Registry.MarkDirty then
-            Registry.MarkDirty(record, "owner")
-        end
+        ownerChanged = true
     end
     record.ownerOnlineID = owner:getOnlineID()
+    if ownerCharacterUUID ~= nil
+        and tostring(record.ownerCharacterUUID or "")
+            ~= tostring(ownerCharacterUUID)
+    then
+        record.ownerCharacterUUID = tostring(ownerCharacterUUID)
+        ownerChanged = true
+    end
+    if record.orderSpec
+        and tostring(record.orderSpec.kind or "")
+            == tostring(PNC.Const.ORDER_FOLLOW or "follow")
+    then
+        record.orderSpec.ownerUsername = record.ownerUsername
+        record.orderSpec.ownerOnlineID = record.ownerOnlineID
+        record.orderSpec.ownerCharacterUUID = record.ownerCharacterUUID
+    end
+    if ownerChanged and Registry and Registry.MarkDirty then
+        Registry.MarkDirty(record, "owner")
+    end
     local followState = Internal.UpdateOwnerMotionState(record, owner, now)
     local ownerEngaged = Internal.UpdateOwnerCombatState(record, owner, now)
     if EncounterIntent

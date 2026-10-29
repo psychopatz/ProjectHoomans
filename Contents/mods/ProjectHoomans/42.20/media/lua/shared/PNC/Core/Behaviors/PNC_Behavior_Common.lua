@@ -194,6 +194,37 @@ function Common.ClearCombatTarget(record, reason, zombie)
     )
 end
 
+local function expectedOwnerCharacterUUID(record, orderSpec)
+    local generation = record and record.generation or nil
+    local expected = record and record.ownerCharacterUUID or nil
+    if expected == nil and orderSpec then
+        expected = orderSpec.ownerCharacterUUID
+    end
+    if expected == nil
+        and generation
+        and tostring(generation.source or "") == "starting_companion_trait"
+    then
+        expected = generation.playerCharacterUUID
+    end
+    if expected == nil or tostring(expected) == "" then return nil end
+    return tostring(expected)
+end
+
+local function ownerCharacterMatches(record, orderSpec, owner)
+    local expected = expectedOwnerCharacterUUID(record, orderSpec)
+    local service
+    local actual
+    if not expected then return true end
+    service = PNC.PlayerCharacters
+    if not service or not service.GetCharacterUUID then
+        -- Client/UI contexts may not own the authoritative character service.
+        -- Server simulation has it and therefore enforces the durable UUID.
+        return true
+    end
+    actual = service.GetCharacterUUID(owner)
+    return actual ~= nil and tostring(actual) == expected
+end
+
 function Common.GetOwner(record)
     local orderSpec
     local username
@@ -213,14 +244,19 @@ function Common.GetOwner(record)
     end
     owner = Core.ResolvePlayerByOnlineID(onlineID)
     if owner then
-        if username == nil
+        if (username == nil
             or not owner.getUsername
-            or owner:getUsername() == username
+            or owner:getUsername() == username)
+            and ownerCharacterMatches(record, orderSpec, owner)
         then
             return owner
         end
     end
-    return Core.ResolvePlayerByUsername(username)
+    owner = Core.ResolvePlayerByUsername(username)
+    if owner and ownerCharacterMatches(record, orderSpec, owner) then
+        return owner
+    end
+    return nil
 end
 
 -- Returns the already-selected hostile target only while a follow-order

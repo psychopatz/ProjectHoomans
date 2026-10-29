@@ -142,6 +142,8 @@ function OrderSystem.SetOrder(record, orderSpec)
             or record.ownerUsername
         record.ownerOnlineID = record.orderSpec.ownerOnlineID
             or record.ownerOnlineID
+        record.ownerCharacterUUID = record.orderSpec.ownerCharacterUUID
+            or record.ownerCharacterUUID
     end
     record.runtime.target = nil
     record.runtime.lastPathX = nil

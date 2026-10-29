@@ -43,6 +43,14 @@ function H.EnsureIdentityAndProfile(player, callback, at)
                 faction.id, "player_identity_bound")
         end
     end
+    if uuid and PNC.Recruitment
+        and PNC.Recruitment.ReconcileCharacterOwnership
+    then
+        -- A replacement survivor can reuse the same MP username/account. Clear
+        -- stale personal follow ownership from dead/retired character UUIDs
+        -- before evaluating this character's starting-companion traits.
+        PNC.Recruitment.ReconcileCharacterOwnership(player, uuid)
+    end
     if uuid and PNC.StartingCompanions and PNC.StartingCompanions.Ensure then
         local granted = PNC.StartingCompanions.Ensure(player, uuid, at)
         if granted == true and PNC.Network

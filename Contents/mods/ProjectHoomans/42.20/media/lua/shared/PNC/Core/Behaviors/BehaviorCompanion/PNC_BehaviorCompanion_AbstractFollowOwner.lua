@@ -141,11 +141,17 @@ function Internal.TickAbstractFollowOwner(record, now)
         return true
     end
     if owner then
+        local ownerCharacterUUID = PNC.PlayerCharacters
+            and PNC.PlayerCharacters.GetCharacterUUID
+            and PNC.PlayerCharacters.GetCharacterUUID(owner) or nil
         if owner.getUsername then
             record.ownerUsername = owner:getUsername()
         end
         if owner.getOnlineID then
             record.ownerOnlineID = owner:getOnlineID()
+        end
+        if ownerCharacterUUID ~= nil then
+            record.ownerCharacterUUID = tostring(ownerCharacterUUID)
         end
         if record.orderSpec
             and tostring(record.orderSpec.kind or "") == tostring(
@@ -154,6 +160,8 @@ function Internal.TickAbstractFollowOwner(record, now)
         then
             record.orderSpec.ownerUsername = record.ownerUsername
             record.orderSpec.ownerOnlineID = record.ownerOnlineID
+            record.orderSpec.ownerCharacterUUID =
+                record.ownerCharacterUUID
         end
         targetX = tonumber(owner:getX()) or beforeX
         targetY = tonumber(owner:getY()) or beforeY
