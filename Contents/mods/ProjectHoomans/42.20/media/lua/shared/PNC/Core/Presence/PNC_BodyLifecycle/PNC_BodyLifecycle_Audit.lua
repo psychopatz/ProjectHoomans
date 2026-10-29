@@ -24,6 +24,7 @@ function Lifecycle.AuditLoadedBodies(now, force)
         rebound = 0,
         duplicates = 0,
         corpses = 0,
+        offCensusRetained = 0,
     }
     local i
     local zombie
@@ -206,17 +207,44 @@ function Lifecycle.AuditLoadedBodies(now, force)
             local id = tostring(candidate.id)
             local registered = reg.LiveByID and reg.LiveByID[id] or nil
             if candidate.presenceState == Const.PRESENCE_LIVE and not accepted[id] then
-                -- Use the same verified release lane as explicit abstraction.
-                -- If the body is still attached and engine removal fails, the
-                -- helper keeps the lease and this audit will retry it later.
-                if Lifecycle.RemoveLiveBody(
-                    candidate,
-                    registered,
-                    registered and "audit_body_invalid" or "audit_body_missing"
-                ) then
-                    stats.removed = stats.removed + 1
+                -- Multiplayer world streaming makes the current lifecycle
+                -- census an observation window, not a complete ownership
+                -- ledger. A valid attached body may temporarily be absent
+                -- from getCell():getZombieList() while another player/chunk
+                -- owns the stream. Never convert "not observed this audit"
+                -- into "body missing" when the authoritative registry still
+                -- points at an attached, lease-matched live body.
+                if registered
+                    and Internal.isBodyAttached
+                    and Internal.isBodyAttached(registered) == true
+                    and Internal.matchesRecordBody
+                    and Internal.matchesRecordBody(candidate, registered) == true
+                then
+                    if candidate.runtime then
+                        candidate.runtime.bodyLostSince = nil
+                    end
+                    Internal.ensureRuntime(candidate).lastAuditAt = now
+                    Internal.mark(
+                        candidate,
+                        "live",
+                        "bound",
+                        "body_audit_off_census"
+                    )
+                    stats.offCensusRetained =
+                        (tonumber(stats.offCensusRetained) or 0) + 1
                 else
-                    stats.deferred = stats.deferred + 1
+                    -- Only a genuinely missing/detached or identity-invalid
+                    -- handle may release the lease. The verified release lane
+                    -- then owns husk-ledger creation and cleanup.
+                    if Lifecycle.RemoveLiveBody(
+                        candidate,
+                        registered,
+                        registered and "audit_body_invalid" or "audit_body_missing"
+                    ) then
+                        stats.removed = stats.removed + 1
+                    else
+                        stats.deferred = stats.deferred + 1
+                    end
                 end
             end
         end)

@@ -60,6 +60,11 @@ Const.FOLLOW_PATH_BLOCKED_COOLDOWN_MS = 1200
 -- Stagger visible follower native retries so one blocked edge does not make
 -- every member of an owner group invalidate Behavior2 in the same frame.
 Const.FOLLOW_NATIVE_REPATH_JITTER_MS = 350
+-- Native Behavior2 can keep producing small physical motion without reducing
+-- distance to the owner in MP. Count failures across route revisions so a
+-- follower cannot orbit forever simply because each replan starts a new lane.
+Const.FOLLOW_NATIVE_FAILURE_WINDOW_MS = 15000
+Const.FOLLOW_NATIVE_FAILURES_BEFORE_FALLBACK = 3
 Const.NPC_GROUNDED_RECOVERY_MS = 1400
 Const.NPC_GROUNDED_COUNTER_STAGGER_CHANCE = 0.40
 Const.NPC_GROUNDED_COUNTER_STAGGER_RANGE = 2.25

@@ -91,6 +91,8 @@ local function requestTraversalHandoff(record, zombie, lane, reason)
     return false
 end
 
+local activateNativeFallback
+
 local function scheduleFollowNativeRepath(
     record,
     zombie,
@@ -111,6 +113,45 @@ local function scheduleFollowNativeRepath(
         lane.lastRecoveryReason = "follow_native_repath_backoff"
         return true, "native_repath_backoff"
     end
+
+    -- Lane revisions are intentionally cheap for a moving owner, but they
+    -- must not reset the failure budget. Keep a record-level streak across
+    -- revisions and clear it only when distance-to-goal actually improves.
+    local runtime = record and (record.runtime or {}) or {}
+    if record then record.runtime = runtime end
+    local followState = runtime.followState or {}
+    runtime.followState = followState
+    local failureWindow = math.max(
+        1000,
+        tonumber(Const.FOLLOW_NATIVE_FAILURE_WINDOW_MS) or 15000
+    )
+    local lastFailureAt = tonumber(followState.nativeFailureAt) or -math.huge
+    if now - lastFailureAt > failureWindow then
+        followState.nativeFailureStreak = 0
+    end
+    followState.nativeFailureAt = now
+    followState.nativeFailureStreak =
+        (tonumber(followState.nativeFailureStreak) or 0) + 1
+    if followState.nativeFailureStreak >= math.max(
+        2,
+        tonumber(Const.FOLLOW_NATIVE_FAILURES_BEFORE_FALLBACK) or 3
+    ) then
+        followState.nativeFailureStreak = 0
+        activateNativeFallback(
+            record,
+            lane,
+            now,
+            reason or "follow_native_repath_exhausted"
+        )
+        lane.lastProgressAt = now
+        lane.lastGoalProgressAt = now
+        lane.noProgressCount = 0
+        if Internal.clearNativeGoalBlock then
+            Internal.clearNativeGoalBlock(lane)
+        end
+        return true, "native_path_fallback"
+    end
+
     local retryCount = math.min(
         8,
         (tonumber(lane.followNativeRecoveryCount) or 0) + 1
@@ -159,7 +200,7 @@ local function scheduleFollowNativeRepath(
     return true, "native_repath"
 end
 
-local function activateNativeFallback(record, lane, now, reason)
+activateNativeFallback = function(record, lane, now, reason)
     local router = PNC.NavigationRouter
     local durationMs = math.max(
         1000,
@@ -322,7 +363,13 @@ local function recordPhysicalStep(
     end
 end
 
-local function recordGoalProgress(lane, now, goalDistance, goalProgress)
+local function recordGoalProgress(
+    record,
+    lane,
+    now,
+    goalDistance,
+    goalProgress
+)
     if goalProgress >= 0.01 then
         lane.bestGoalDistance = goalDistance
         lane.lastProgressAt = now
@@ -330,6 +377,14 @@ local function recordGoalProgress(lane, now, goalDistance, goalProgress)
         lane.nonProgressStepCount = 0
         lane.noProgressCount = 0
         lane.blockReason = nil
+        if isFollowOwnerLane(lane)
+            and record
+            and record.runtime
+            and record.runtime.followState
+        then
+            record.runtime.followState.nativeFailureStreak = 0
+            record.runtime.followState.nativeFailureAt = nil
+        end
     else
         lane.nonProgressStepCount =
             (tonumber(lane.nonProgressStepCount) or 0) + 1
@@ -598,7 +653,7 @@ function Internal.recordNativeMove(
     then
         PNC.Presence.ClearTraversalHandoff(record, "native_progress")
     end
-    recordGoalProgress(lane, now, goalDistance, goalProgress)
+    recordGoalProgress(record, lane, now, goalDistance, goalProgress)
     if Internal.syncRecordPosition then
         Internal.syncRecordPosition(record, zombie)
     end

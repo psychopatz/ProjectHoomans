@@ -174,6 +174,36 @@ T.equal(completeCalls, 0,
 T.truthy(stalledLane.ownerMode == "native_backoff",
     "follow native stall did not retain native lane ownership")
 
+-- A third distinct route revision inside the MP failure window must stop
+-- recycling Behavior2 forever and use the bounded local fallback.
+now = now + 2000
+local thirdLane = {
+    goal = { x = 3.5, y = 10.5, z = 0 },
+    intentReason = "follow_owner_run",
+    requestedOrder = "follow",
+    navigationProvider = "engine_path",
+    lastProgressAt = now,
+    lastGoalProgressAt = now,
+}
+local thirdHandled, thirdState = Internal.recordNativeMove(
+    record,
+    body,
+    thirdLane,
+    navigation,
+    PNC.EnginePathPlanner,
+    now,
+    "engine_path_failed",
+    body:getX(),
+    body:getY(),
+    body:getZ()
+)
+T.truthy(thirdHandled and thirdState == "native_path_fallback",
+    "repeated MP follow failures across revisions never escaped native pathing")
+T.equal(fallbackCalls, 1,
+    "repeated follow-native failures did not activate bounded fallback")
+T.equal(record.runtime.followState.nativeFailureStreak, 0,
+    "follow failure streak was not reset after fallback activation")
+
 -- A companion retains ORDER_FOLLOW while combat temporarily owns movement.
 -- That standing order must not make a combat slot/kite/fire-lane failure use
 -- FollowOwner's special retry loop.
@@ -228,7 +258,7 @@ local timeoutHandled, timeoutState = Internal.recordNativeMove(
 )
 T.truthy(timeoutHandled and timeoutState == "native_path_fallback",
     "stalled combat movement on a follower did not use generic fallback")
-T.equal(fallbackCalls, 1,
+T.equal(fallbackCalls, 2,
     "stalled follower combat never escaped the native path timeout loop")
 
 T.finish("pnc_follow_native_failure_smoke")
