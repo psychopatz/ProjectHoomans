@@ -140,3 +140,11 @@ Finish M0 engine-boundary/snapshot fixtures and SP lifecycle evidence; audit bod
 - Focused MP body/replica/streaming/follow/player-damage/combat-target selection: 33/33. This proves protocol/client isolation, not native movement or combat execution; existing focused movement/combat regressions remain part of final acceptance.
 - No runtime source changed in this chunk, so no additional changed-runtime compiler invocation is required. git diff --check passes.
 - Next mandatory work: M7 pre-conversion corpse lease capture and death/reanimation stale-proof matrix; then complete retained M5 heuristic audit and M8 requirement-by-requirement full acceptance. Parent remains active.
+
+## M7 death-binding integration checkpoint
+
+- Corpse conversion now captures the source shell lease before engine conversion clears/copies ModData and before detach invalidates the runtime lease. The existing-corpse reuse branch also retires the exact source incarnation. Existing corpse inventory/clothing/announcement authority remains unchanged.
+- Corpse clothing regression now clears the source lease inside the synthetic engine constructor and requires the removal publication to retain the original lease.
+- Added infected/noninfected protocol death matrix using actual server descriptors: death unbind, stale live rejection after corpse/reanimation, late joining client, exact removal and reset/reconstruction from authoritative dead state. This is synthetic identity evidence; actual native corpse/reanimation remains user-owned.
+- Focused corpse/death/reanimation/infection/binding: 26/26. Full suite before the final new matrix: 967/967 (8.27s). Installed-PZ Kahlua compilation of changed corpse runtime passes. git diff --check clean.
+- Next mandatory chunk: M8 completion audit of every M0–M8 requirement, including retained M5 carrier/population heuristics, connection/interest loss, combat and movement source consumers, diagnostics, static budgets/persistence, complete acceptance matrix and final full isolated suite/compiler checks. Do not mark complete until the audit closes all developer-side gaps.

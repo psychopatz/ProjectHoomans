@@ -119,7 +119,9 @@ local corpse = {
         transmitCount = transmitCount + 1
     end,
 }
+local sourceModData = { PNC_UUID = "npc_corpse_clothes", PNC_BodyLease = "lease" }
 local zombie = {
+    getModData = function() return sourceModData end,
     getInventory = function() return container end,
     getWornItems = function() return sourceWorn end,
     getItemVisuals = function() return makeList({ liveVisual }) end,
@@ -199,11 +201,12 @@ PNC = {
         MarkDirty = function() end,
     },
     Network = {
-        BroadcastBodyRemoval = function(id, instanceID, onlineID, reason)
+        BroadcastBodyRemoval = function(id, instanceID, onlineID, reason, bodyLease)
             T.equal(id, record.id, "removed corpse source NPC identity")
             T.equal(instanceID, "123", "removed corpse source instance identity")
             T.equal(onlineID, 42, "removed corpse source online identity")
             T.equal(reason, "test_death", "removed corpse source reason")
+            T.equal(bodyLease, "lease", "corpse retirement preserves pre-conversion incarnation")
             bodyRemovalCount = bodyRemovalCount + 1
         end,
     },
@@ -212,6 +215,7 @@ PNC = {
 IsoDeadBody = {
     new = function()
         directCorpseCount = directCorpseCount + 1
+        sourceModData.PNC_BodyLease = nil -- engine conversion may clear source identity
         -- Reproduce an engine conversion that occasionally omits a source-body
         -- item. Finalization must restore the card on the returned corpse.
         local i

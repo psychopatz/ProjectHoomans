@@ -208,11 +208,21 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
     local runtime
     local sourceBodyInstanceID
     local sourceBodyOnlineID
+    local sourceBodyLease
     local factionID
     local factionName
     if not record or not zombie then
         return false, nil
     end
+    -- Capture the live incarnation before engine conversion copies/clears
+    -- ModData and detachLiveBody invalidates the record's runtime lease.
+    local sourceData = zombie.getModData and zombie:getModData()
+    sourceBodyLease = sourceData and tostring(sourceData.PNC_UUID or "") == tostring(record.id)
+        and sourceData.PNC_BodyLease or nil
+    sourceBodyInstanceID = Internal.GetStartupBodyInstanceID
+        and Internal.GetStartupBodyInstanceID(zombie)
+        or zombie.getPersistentOutfitID and zombie:getPersistentOutfitID() or nil
+    sourceBodyOnlineID = Internal.normalizeOnlineID(zombie)
     runtime = Internal.ensureRuntime(record)
     existing = findExistingCorpse(record, zombie)
     if existing then
@@ -238,6 +248,11 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
         Internal.clearBodyCombat(zombie)
         Internal.removeZombie(zombie)
         record.presenceState = Const.PRESENCE_CORPSE
+        if isServer and isServer() == true and PNC.Network
+            and PNC.Network.BroadcastBodyRemoval then
+            PNC.Network.BroadcastBodyRemoval(record.id, sourceBodyInstanceID,
+                sourceBodyOnlineID, reason or "death", sourceBodyLease)
+        end
         Internal.detachLiveBody(record, reason or "death")
         Internal.mark(record, "corpse", "inert_loaded", reason or "death")
         runtime.corpseState = "inert_loaded"
@@ -362,7 +377,8 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
             record.id,
             sourceBodyInstanceID,
             sourceBodyOnlineID,
-            reason or "death"
+            reason or "death",
+            sourceBodyLease
         )
     end
     return converted, corpse or failureReason
