@@ -92,3 +92,14 @@ Finish M0 engine-boundary/snapshot fixtures and SP lifecycle evidence; audit bod
 - Server regression covers valid/idempotent binding, replacement predecessor, invalid online IDs, mismatched UUID, death/abstract rejection, shell loss/unbind and SP separation. Network-scale fixture now provides Core.GenerateID for session issuance.
 - Full isolated Lua suite: 965/965. Installed PZ Kahlua compiler: all three changed/new runtime files pass. git diff --check clean.
 - Next mandatory chunk: M3 client bounded reconciliation; M4 consumer routing. M2 exact explicit removal delivery and full lifecycle publication remain integration work under M5/M7, not accepted yet.
+
+## M3 bounded client reconciler checkpoint
+
+- Added client half of the canonical seam (`NewClient`) with message-first/replica-first reconciliation, immutable tuple copies, publication/session freshness validation, idempotent duplicate handling, exact online-ID ownership conflict rejection, weak body references, capped actor/observed entries, TTL expiration, scalar retirement watermark, and explicit reset.
+- Reused online ID on a different observed engine object clears local presentation via callback and requires a fresh authoritative publication before rebinding. No engine deletion, Registry mutation, persistence, or full-world scan exists in this module.
+- Revised server publication semantics: every Build emits a fresh session revision while retaining the same incarnation for the same shell. This is required to recover safely after client TTL expiration without replaying old proof; duplicate delivered messages remain idempotent.
+- Client tests cover both arrival orders, duplicate presentation count, replacement release, stale/reordered packets, conflicting identity, ID recycling, reaffirmation, pending TTL, expired replay, session locking/reset, unbind and capacity.
+- Focused MP body/network/presence/replica: 130/130. Full suite: 966/966. Installed-PZ Kahlua compilation: both changed/new runtime files pass. Static Kahlua ERROR scan: zero. git diff --check clean.
+- Read-only A-Life comparison inspected ShellAdapter identity stamps, Watchdog identity validation, AIFence death/generation handling, Animations explicit onlineId+UID+generation publication, AnimationClient bounded pending/weak observations, Executor shell identity/death handling. Reference graph is stale; direct bounded source excerpts used. No reference code was edited/copied/imported.
+- New migration files are not tracked by the graph generation; implementation/source tests are direct evidence, not graph completeness.
+- **Next mandatory chunk: M4 runtime integration.** The new client reconciler is deliberately not wired yet. Route accepted snapshot ingestion, OnZombieUpdate observation, session reset and ClientPresenceSync resolution through it; remove MP UUID/outfit fallback paths. Then finish M5–M8. The migration is not operationally complete.

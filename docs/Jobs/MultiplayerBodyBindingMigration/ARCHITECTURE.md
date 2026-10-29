@@ -268,3 +268,24 @@ must pair lease equality with the existing replicaSequence/presenceRevision
 ordering and a server-session boundary. This ordering is transport freshness,
 not a parallel physical generation authority. Death invalidation, ordering and
 reconnect integration remain mandatory in later phases.
+
+## Binding transport freshness and client bounds
+
+Each authoritative descriptor publication receives a strictly increasing
+revision within one server session, including unchanged relations. This lets
+clients expire old proof and safely accept a later server reaffirmation without
+changing body incarnation or rebuilding presentation. Duplicate delivery of the
+same revision does not extend its TTL. Lease equality identifies the shell;
+revision only orders messages.
+
+The client reconciler is constructed by `MultiplayerBodyBinding.NewClient`.
+Its default bounds are 512 actor entries, 512 weak observed replica references,
+and 10 seconds TTL. The integration must sweep at a bounded cadence and reset
+on connection lifecycle. Expired entries advance a scalar retirement watermark,
+so evicting a tombstone cannot let an older packet reclaim a recycled online ID.
+A fresh authoritative publication can recover from expiration. ID reuse on a
+different local object requires fresh proof after the previous observation.
+
+This reconciler never mutates Registry or deletes an engine object. Admission,
+cache stamping/clearing and local body validity are supplied by the client
+presence integration, which must remain the only runtime consumer adapter.

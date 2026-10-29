@@ -19,7 +19,9 @@ local a = B.Build(r)
 T.equal(a.operation, "bind")
 T.equal(a.incarnation, "lease_a")
 T.equal(a.onlineId, 50)
-T.equal(B.Build(r), a, "unchanged binding is idempotent")
+local repeatA = B.Build(r)
+T.equal(repeatA.incarnation, a.incarnation, "unchanged shell keeps incarnation")
+T.truthy(repeatA.revision > a.revision, "publication renews authoritative proof")
 r.runtime.bodyLease = "lease_b"
 md.PNC_BodyLease = "lease_b"
 onlineID = 60

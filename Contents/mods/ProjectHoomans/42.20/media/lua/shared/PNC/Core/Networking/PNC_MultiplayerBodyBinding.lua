@@ -43,16 +43,18 @@ function Binding.Build(record)
     local body, onlineID, lease = currentShell(record)
     local operation = body and "bind" or "unbind"
     local previous = receipts[record]
-    if previous and previous.operation == operation
-        and previous.onlineId == onlineID and previous.incarnation == lease
-    then return previous end
+    -- Each authoritative publication is fresh proof for bounded client TTLs.
+    -- Revisions order publications; lease equality still defines incarnation.
     revision = revision + 1
     local message = {
         protocol = 1, session = session, revision = revision,
         npcId = tostring(record.id), operation = operation,
         incarnation = lease, onlineId = onlineID,
     }
-    if previous and previous.operation == "bind" then
+    if previous and previous.operation == "bind"
+        and (operation ~= "bind" or previous.onlineId ~= onlineID
+            or previous.incarnation ~= lease)
+    then
         message.previousIncarnation = previous.incarnation
         message.previousOnlineId = previous.onlineId
     end
