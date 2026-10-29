@@ -68,7 +68,11 @@ function Input.SubmitSemanticFrame(view, frame, options)
     return Internal.SubmitSingle(
         view,
         Suggestions.ResolveFrameText(frame),
-        { semanticFrame = frame }
+        {
+            semanticFrame = frame,
+            semanticTransientSurface = type(options) == "table"
+                and options.transientCombatSurface == true,
+        }
     )
 end
 

@@ -18,6 +18,8 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
     local value = prepared.value
     local part = prepared.part
     local semanticFrame = prepared.semanticFrame
+    local transientSemanticSurface =
+        prepared.semanticTransientSurface == true
     local router = interpretation.router
     local service = interpretation.service
     local context = interpretation.context
@@ -171,10 +173,12 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
         view,
         value,
         result,
-        { deferResponse = deferIdentityResponse == true
+        { deferResponse = transientSemanticSurface
+            or deferIdentityResponse == true
             or deferGossipResponse == true
             or deferCompoundResponse == true,
-            skipInputPresentation = compoundPart and compoundIndex ~= 1,
+            skipInputPresentation = transientSemanticSurface
+                or compoundPart and compoundIndex ~= 1,
             inputValue = compoundPart and compoundIndex == 1
                 and part.compoundRoot or value }
     )
@@ -201,7 +205,7 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
             sequence = result and result.sequence,
         }
     end
-    if submitted == true then
+    if submitted == true and not transientSemanticSurface then
         Internal.RefreshSuggestions(view, result)
     end
     traceTurn(view, value, result, "semantic_input_local", {

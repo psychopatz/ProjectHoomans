@@ -8,6 +8,7 @@ PNC.Semantics.CombatEncounterIntent = Service
 
 Service.VERSION = 1
 Service.Teams = Service.Teams or {}
+Service.Notifier = Service.Notifier or nil
 
 local ALLOWED = {
     undecided = true,
@@ -47,6 +48,18 @@ local function memberCount(state)
     local count = 0
     for _ in pairs(state and state.members or {}) do count = count + 1 end
     return count
+end
+
+local function notify(record, state, reason)
+    local callback = Service.Notifier
+    if type(callback) ~= "function" then return false end
+    local ok = pcall(callback, record, state, reason)
+    return ok == true
+end
+
+function Service.SetNotifier(callback)
+    Service.Notifier = type(callback) == "function" and callback or nil
+    return Service.Notifier ~= nil
 end
 
 local function teamFor(record, create)
@@ -101,11 +114,13 @@ function Service.OnHordeTransition(record, phase, episodeID, now)
             state.active = false
             state.intent = "undecided"
             state.spokespersonID = nil
+            state.lastPromptEventRef = state.promptEventRef
             state.promptEventRef = nil
             state.resolvedBy = nil
             state.resolvedAt = nil
             state.clearedAt = now
             state.revision = (tonumber(state.revision) or 0) + 1
+            notify(record, state, "team_cleared")
         end
         return state, state.active and "member_cleared" or "team_cleared"
     end
@@ -117,6 +132,7 @@ function Service.OnHordeTransition(record, phase, episodeID, now)
             state.intent = "undecided"
             state.startedAt = now
             state.spokespersonID = npcID
+            state.promptNPCID = npcID
             state.promptEventRef = tostring(episodeID or "")
             state.resolvedBy = nil
             state.resolvedAt = nil
@@ -170,6 +186,7 @@ function Service.Resolve(record, intent, expectedEventRef, source, now)
     state.resolvedBy = tostring(source or "semantic")
     state.resolvedAt = tonumber(now) or 0
     state.revision = (tonumber(state.revision) or 0) + 1
+    notify(record, state, "intent_resolved")
     return true, intent, state
 end
 
@@ -203,7 +220,9 @@ function Service.Snapshot(record)
         active = state.active == true,
         intent = tostring(state.intent or "undecided"),
         spokespersonID = state.spokespersonID,
+        promptNPCID = state.promptNPCID,
         promptEventRef = state.promptEventRef,
+        lastPromptEventRef = state.lastPromptEventRef,
         revision = tonumber(state.revision) or 0,
         memberCount = memberCount(state),
         resolvedBy = state.resolvedBy,

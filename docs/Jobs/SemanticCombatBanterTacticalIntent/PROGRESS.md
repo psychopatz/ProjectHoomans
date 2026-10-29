@@ -1,6 +1,6 @@
 # Progress — Semantic Combat Banter & Tactical Intent
 
-**Status:** ACTIVE — B0–B2 accepted; B3 non-modal combat response surface is next.
+**Status:** ACTIVE — B0–B3 accepted; B4 unified combat-moment context and banter arbiter is next.
 **Planning base:** ProjectHoomans `8632bc30`, existing `main`.
 **Parent foundation:** `docs/Jobs/OpenEndedSemanticCombatAwareness/` is developer-complete and remains accepted unless this job reproduces a regression in an owning layer.
 **Native PZ:** user live regression supplied; new job's developer implementation/acceptance not yet run.
@@ -83,15 +83,36 @@ B2 evidence:
 - static guard: no added ModData root, `getZombieList()`, or `getCell()` hot-path traversal;
 - `git diff --check`: clean.
 
-## ONE current Next Chunk — B3
+## B3 accepted — non-modal tactical response surface
 
-Implement a non-modal combat response surface for active `TACTICAL_PROMPT` offers:
-1. expose the same active lifecycle/offer projection while the full conversation UI is closed;
-2. render a small combat-choice strip without creating a second semantic candidate or action authority;
-3. submit the existing typed semantic click frame through the normal dialogue input/command path;
-4. when the full conversation UI is open, keep using its existing Response Channel instead of duplicating the strip;
-5. resolution, implicit owner action, timeout or episode clear must remove/disable stale combat choices;
-6. add headless UI-model parity tests; native visual feel remains user-owned.
+Accepted implementation:
+- closed-conversation tactical prompts project the same lifecycle `offerIDs` through normal `DialogueSuggestions` into a runtime-only headless semantic host;
+- compact rows retain canonical typed `semantic_click_frame` payloads and submit through `DialogueInput.SubmitSemanticFrame`;
+- transient surface submissions suppress chat transcript/duplicate deterministic-response presentation only; action dispatch remains the existing semantic/companion authority;
+- the compact strip is hidden whenever the full conversation for the same NPC is open, leaving the existing Response Channel as presentation owner;
+- explicit choice, timeout, authoritative implicit engage and horde clear invalidate the compact prompt;
+- server-to-client intent state sync is bounded runtime presentation state only;
+- the combat strip is non-modal and does not capture gameplay input.
+
+B3 evidence:
+- focused surface/state-sync/tactical/input matrix: **5/5 PASS**;
+- full `pnc_semantic` selection: **116/116 PASS**;
+- client router/companion/speech/input selection: **3/3 PASS**;
+- changed/untracked Lua through installed Kahlua compiler: **14/14 PASS**;
+- `git diff --check`: clean;
+- static guards: no new `getZombieList`, ModData or routine LLM path;
+- native visual/feel gate not run and remains user-owned.
+
+## ONE current Next Chunk — B4
+
+Implement the unified Combat Moment Context + banter arbiter:
+1. project one bounded authoritative moment contract for combat speech candidates;
+2. feed existing kill coalescing into one arbiter rather than creating a parallel kill throttle;
+3. rank urgency/novelty and enforce speaker/family/team chatter budgets;
+4. make silence an explicit common result for ordinary repeated kills;
+5. let urgent tactical/warning moments outrank ordinary boasts;
+6. expose bounded arbiter decision/rejection reasons for later Observatory work;
+7. prove bounded fanout with multiple nearby NPCs and burst kills, with no new all-NPC scan, persistence or LLM path.
 
 ## Remaining mandatory phases
 
@@ -110,6 +131,6 @@ B0 baseline -> B1 horde episode/routing -> B2 team tactical intent -> B3 non-mod
 
 ## Evidence status
 
-Planning/audit only at this revision. No B0–B9 gate is accepted yet.
+B0–B3 are developer-accepted with focused and broad evidence above. B4–B9 remain mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
 
 Git history is the implementation diary; keep this file as current truth rather than appending per-commit narratives.

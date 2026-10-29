@@ -13,6 +13,8 @@ require "PNC/Semantics/PNC_SemanticGiftLifecycle"
 require "PNC/Semantics/PNC_SemanticGiftContext"
 require "PNC/Conversation/Composition/PNC_ConversationClientComposition"
 require "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime"
+require "PNC/Semantics/PNC_SemanticCombatResponseSurface"
+require "PNC/UI/Conversation/PNC_CombatResponseStrip"
 
 local Conversation = PNC.Conversation
 local SemanticRuntime = Conversation and Conversation.Semantic

@@ -19,6 +19,8 @@ function Internal.PrepareSingleSubmission(view, value, part)
 
     local semanticFrame = type(part) == "table"
         and part.semanticFrame or nil
+    local semanticTransientSurface = type(part) == "table"
+        and part.semanticTransientSurface == true
     -- Keep the submitting host available to asynchronous local projections.
     -- Full-screen conversations are discoverable through Core's singleton,
     -- while compact/headless conversations are deliberately not global.  The
@@ -46,6 +48,7 @@ function Internal.PrepareSingleSubmission(view, value, part)
                 value = value,
                 part = part,
                 semanticFrame = semanticFrame,
+                semanticTransientSurface = semanticTransientSurface,
                 compoundParts = turn.parts,
             }
         end
@@ -55,6 +58,7 @@ function Internal.PrepareSingleSubmission(view, value, part)
         value = value,
         part = part,
         semanticFrame = semanticFrame,
+        semanticTransientSurface = semanticTransientSurface,
     }
 end
 

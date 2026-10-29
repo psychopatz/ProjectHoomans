@@ -236,6 +236,34 @@ function Network.SendSocialGreeting(targetPlayer, greeting)
     return false
 end
 
+-- Runtime-only invalidation/state projection for the active tactical combat
+-- prompt. This transports authority state only; it never owns the encounter
+-- decision or semantic choice.
+function Network.SendCombatEncounterIntentState(targetPlayer, payload)
+    payload = type(payload) == "table" and payload or {}
+    payload.serverTime = Core and Core.Now and Core.Now() or payload.serverTime
+    if isServer and isServer() and targetPlayer and sendServerCommand then
+        sendServerCommand(
+            targetPlayer,
+            Const.MODULE,
+            Const.CMD_COMBAT_ENCOUNTER_INTENT_STATE,
+            payload
+        )
+        return true
+    elseif not isServer or not isServer() then
+        if type(triggerEvent) == "function" then
+            triggerEvent(
+                "OnServerCommand",
+                Const.MODULE,
+                Const.CMD_COMBAT_ENCOUNTER_INTENT_STATE,
+                payload
+            )
+            return true
+        end
+    end
+    return false
+end
+
 -- Builds the same player-facing relationship summary used by the conversation
 -- request and sends it through Network.SendConversationRelationship.  Callers
 -- should use this after an authoritative mutation when they have an NPC id but

@@ -42,6 +42,23 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
         payload
     )
     reason = enqueueReason
+    if accepted == true
+        and receive.context
+        and receive.context.presentationClass == "TACTICAL_PROMPT"
+    then
+        local surface = PNC.Semantics
+            and PNC.Semantics.CombatResponseSurface or nil
+        if type(surface) ~= "table" then
+            local ok, loaded = pcall(
+                require,
+                "PNC/Semantics/PNC_SemanticCombatResponseSurface"
+            )
+            surface = ok and loaded or nil
+        end
+        if surface and type(surface.ObserveReceive) == "function" then
+            surface.ObserveReceive(receive)
+        end
+    end
     if accepted == true and ambientFlavor.pumpImmediately == true
         and type(Client.Pump) == "function"
     then

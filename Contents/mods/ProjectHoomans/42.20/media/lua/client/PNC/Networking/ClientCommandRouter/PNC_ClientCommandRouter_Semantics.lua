@@ -31,6 +31,26 @@ Internal.RegisterServerCommand(Const.CMD_SEMANTIC_COGNITION, function(args)
     Cognition.ApplyPayload(args or {})
 end)
 
+if Const.CMD_COMBAT_ENCOUNTER_INTENT_STATE then
+    Internal.RegisterServerCommand(
+        Const.CMD_COMBAT_ENCOUNTER_INTENT_STATE,
+        function(args)
+            local surface = PNC.Semantics
+                and PNC.Semantics.CombatResponseSurface or nil
+            if type(surface) ~= "table" then
+                local ok, loaded = pcall(
+                    require,
+                    "PNC/Semantics/PNC_SemanticCombatResponseSurface"
+                )
+                surface = ok and loaded or nil
+            end
+            if surface and type(surface.ApplyAuthorityState) == "function" then
+                surface.ApplyAuthorityState(args or {})
+            end
+        end
+    )
+end
+
 if Const.CMD_SEMANTIC_TASK_RESULT then
     Internal.RegisterServerCommand(Const.CMD_SEMANTIC_TASK_RESULT,
         function(args)

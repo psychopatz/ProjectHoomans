@@ -48,6 +48,41 @@ local recentAwarenessOrder = {}
 local ZOMBIE_HORDE_MEMORY = "zombie_horde_encounter"
 local ZOMBIE_STAMINA_MEMORY = "zombie_stamina_retreat"
 
+local function sendEncounterIntentState(record, state, reason)
+    if not record or type(state) ~= "table"
+        or not Core or type(Core.ForEachPlayer) ~= "function"
+        or not Network
+        or type(Network.SendCombatEncounterIntentState) ~= "function"
+        or not EncounterIntent
+        or type(EncounterIntent.MatchesOwner) ~= "function"
+    then
+        return false
+    end
+    local eventRef = state.promptEventRef or state.lastPromptEventRef
+    if eventRef == nil or tostring(eventRef) == "" then return false end
+    local sent = false
+    Core.ForEachPlayer(function(player)
+        if player and EncounterIntent.MatchesOwner(record, player) == true then
+            if Network.SendCombatEncounterIntentState(player, {
+                npcID = tostring(state.promptNPCID or record.id or ""),
+                eventRef = tostring(eventRef),
+                active = state.active == true,
+                intent = tostring(state.intent or "undecided"),
+                revision = tonumber(state.revision) or 0,
+                reason = tostring(reason or "state_changed"),
+                resolvedBy = state.resolvedBy,
+            }) == true then
+                sent = true
+            end
+        end
+    end)
+    return sent
+end
+
+if EncounterIntent and type(EncounterIntent.SetNotifier) == "function" then
+    EncounterIntent.SetNotifier(sendEncounterIntentState)
+end
+
 local function call(object, method, ...)
     if not object or not object[method] then
         return nil
