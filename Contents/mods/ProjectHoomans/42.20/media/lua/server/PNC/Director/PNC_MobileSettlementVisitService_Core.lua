@@ -15,8 +15,11 @@ local Config = PNC.DirectorConfig
 local Factions = PNC.Factions
 local Communities = PNC.Communities
 local Store = PNC.AbstractWorldStore
+local Core = PNC.Core
+local MAX_ARRIVAL_LISTENER_DIAGNOSTICS = 32
 
 Service.ArrivalListeners = Service.ArrivalListeners or {}
+Service.ArrivalListenerDiagnostics = Service.ArrivalListenerDiagnostics or {}
 
 local function copy(value)
     return PNC.Core and PNC.Core.DeepCopy and PNC.Core.DeepCopy(value)
@@ -197,22 +200,75 @@ function Service.UnregisterArrivalListener(listener)
     return false
 end
 
+local function listenerDiagnostic(index, reason, kind)
+    local diagnostics = Service.ArrivalListenerDiagnostics
+    local value = tostring(reason or "arrival_listener_failed")
+    if #value > 256 then value = string.sub(value, 1, 256) end
+    diagnostics[#diagnostics + 1] = {
+        index = index,
+        kind = kind or "rejected",
+        reason = value,
+        at = worldAge(),
+    }
+    while #diagnostics > MAX_ARRIVAL_LISTENER_DIAGNOSTICS do
+        table.remove(diagnostics, 1)
+    end
+end
+
+-- Runtime diagnostics are intentionally bounded and non-persistent. They
+-- make a clean `false, reason` consumer result visible without allowing a
+-- listener failure to interrupt Hoomans' authoritative arrival lifecycle.
+function Service.GetArrivalListenerDiagnostics(limit)
+    local diagnostics = Service.ArrivalListenerDiagnostics
+    local output = {}
+    local count = #diagnostics
+    local requested = math.floor(tonumber(limit) or count)
+    local first
+    if requested < 1 then return output end
+    requested = math.min(requested, MAX_ARRIVAL_LISTENER_DIAGNOSTICS)
+    first = math.max(1, count - requested + 1)
+    for index = first, count do
+        output[#output + 1] = copy(diagnostics[index])
+    end
+    return output
+end
+
 function Service.NotifySettlementArrival(details)
     local listeners = Service.ArrivalListeners
     local index
     local ok
+    local accepted
     local reason
+    local summary = {
+        notified = 0,
+        rejected = 0,
+        failed = 0,
+    }
     if type(details) ~= "table" then return false end
     for index = 1, #listeners do
-        ok, reason = pcall(listeners[index], copy(details))
-        if not ok and Core and type(Core.LogWarn) == "function" then
+        -- This pcall is the external observer callback boundary. A consumer
+        -- must never break the Hoomans-owned arrival transition.
+        ok, accepted, reason = pcall(listeners[index], copy(details))
+        summary.notified = summary.notified + 1
+        if not ok then
+            summary.failed = summary.failed + 1
+            listenerDiagnostic(index, accepted, "error")
+        elseif accepted == false then
+            summary.rejected = summary.rejected + 1
+            listenerDiagnostic(index, reason, "rejected")
+        end
+        if (not ok or accepted == false)
+            and Core and type(Core.LogWarn) == "function"
+        then
             Core.LogWarn(
                 "PNC settlement arrival listener failed index="
-                    .. tostring(index) .. " error=" .. tostring(reason)
+                    .. tostring(index) .. " kind="
+                    .. tostring(not ok and "error" or "rejected")
+                    .. " reason=" .. tostring(not ok and accepted or reason)
             )
         end
     end
-    return true
+    return true, summary
 end
 
 

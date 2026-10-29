@@ -287,6 +287,20 @@ local arrivalListener = function(details)
 end
 T.truthy(Service.RegisterArrivalListener(arrivalListener),
     "settlement arrival observer registers")
+local cleanFailureCalls = 0
+local continuationCalls = 0
+local cleanFailureListener = function()
+    cleanFailureCalls = cleanFailureCalls + 1
+    return false, "test_listener_declined"
+end
+local continuationListener = function()
+    continuationCalls = continuationCalls + 1
+    return true
+end
+T.truthy(Service.RegisterArrivalListener(cleanFailureListener),
+    "clean-failure observer registers")
+T.truthy(Service.RegisterArrivalListener(continuationListener),
+    "observer after clean failure registers")
 
 local noVisit, noVisitReason = Service.OnSettlementArrival(
     factions.faction_mobile,
@@ -333,8 +347,27 @@ T.equal(arrivalNotifications[1].faction.id, "faction_mobile",
     "arrival notification carries the source faction")
 T.equal(arrivalNotifications[1].travel.revision, 1,
     "arrival notification carries the travel revision")
+T.equal(cleanFailureCalls, 1,
+    "clean-failure observer is called once")
+T.equal(continuationCalls, 1,
+    "a clean-failure observer does not stop later observers")
+local diagnostics = Service.GetArrivalListenerDiagnostics(8)
+local foundDiagnostic = false
+for _, diagnostic in ipairs(diagnostics) do
+    if diagnostic.reason == "test_listener_declined"
+        and diagnostic.kind == "rejected"
+    then
+        foundDiagnostic = true
+    end
+end
+T.truthy(foundDiagnostic,
+    "clean listener false/reason is visible in bounded diagnostics")
 T.truthy(Service.UnregisterArrivalListener(arrivalListener),
     "settlement arrival observer unregisters")
+T.truthy(Service.UnregisterArrivalListener(cleanFailureListener),
+    "clean-failure observer unregisters")
+T.truthy(Service.UnregisterArrivalListener(continuationListener),
+    "later observer unregisters")
 
 T.equal(factions.faction_mobile.mobile.visit.expiresAt, 22,
     "visit has a bounded expiry")
