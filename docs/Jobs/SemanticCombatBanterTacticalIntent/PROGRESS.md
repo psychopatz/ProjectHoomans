@@ -1,6 +1,6 @@
 # Progress — Semantic Combat Banter & Tactical Intent
 
-**Status:** ACTIVE — B0–B3 accepted; B4 unified combat-moment context and banter arbiter is next.
+**Status:** ACTIVE — B0–B4 accepted; B5 weapon/action-aware zombie kill banter is next.
 **Planning base:** ProjectHoomans `8632bc30`, existing `main`.
 **Parent foundation:** `docs/Jobs/OpenEndedSemanticCombatAwareness/` is developer-complete and remains accepted unless this job reproduces a regression in an owning layer.
 **Native PZ:** user live regression supplied; new job's developer implementation/acceptance not yet run.
@@ -103,16 +103,36 @@ B3 evidence:
 - static guards: no new `getZombieList`, ModData or routine LLM path;
 - native visual/feel gate not run and remains user-owned.
 
-## ONE current Next Chunk — B4
+## B4 accepted — unified Combat Moment Context + banter arbiter
 
-Implement the unified Combat Moment Context + banter arbiter:
-1. project one bounded authoritative moment contract for combat speech candidates;
-2. feed existing kill coalescing into one arbiter rather than creating a parallel kill throttle;
-3. rank urgency/novelty and enforce speaker/family/team chatter budgets;
-4. make silence an explicit common result for ordinary repeated kills;
-5. let urgent tactical/warning moments outrank ordinary boasts;
-6. expose bounded arbiter decision/rejection reasons for later Observatory work;
-7. prove bounded fanout with multiple nearby NPCs and burst kills, with no new all-NPC scan, persistence or LLM path.
+Accepted implementation:
+- new `semantic.combat.moment.v1` is the bounded runtime contract shared by horde/tactical awareness and kill chatter;
+- the moment carries event/actor/target/outcome, pressure, mood/style/relationship, encounter, attack/weapon slots, burst, urgency/priority and presentation class while forcing routine `llmEligible=false / memoryEligible=false`;
+- one `CombatBanterArbiter` now owns burst stream coalescing, speaker cooldowns, semantic-family cooldowns, team/audience priority holds and speaker budgets;
+- the former per-record `runtime.semanticCombatReaction` throttle and separate awareness-player cooldown registry are retired from production decision logic;
+- rapid kills still coalesce before the spatial witness query;
+- tactical/horde warnings share the same arbiter and can suppress lower-priority ordinary kill boasts for the same player;
+- silence is explicit and explainable through bounded decision reasons such as `stream_cooldown`, `speaker_cooldown`, `higher_priority_active` and `team_budget`;
+- arbiter runtime maps and recent decision trace are bounded.
+
+B4 evidence:
+- focused arbiter/kill/profile/horde/social matrix: **7/7 PASS**;
+- full `pnc_semantic` selection: **117/117 PASS**;
+- changed/untracked Lua through installed Kahlua compiler: **6/6 PASS**;
+- existing player-kill fanout test still proves one spatial NPC query, max two speakers and pre-query coalescing;
+- static scan finds no production `semanticCombatReaction`, `PlayerReactionState`, `reserveAwarenessPresentation` or `recentAwarenessByPlayer` throttle remnants;
+- `git diff --check`: clean.
+
+## ONE current Next Chunk — B5
+
+Implement weapon/action-aware zombie kill banter:
+1. pass actual resolved kill weapon/action/body-part/wound facts from `CombatResolution` into the combat moment;
+2. normalize weapon family and combat skill through existing Equipment/Skills authorities;
+3. include real weapon skill level and sanitized optional display name without exposing internal full-type IDs;
+4. add predicate fields needed to distinguish firearm/blade/axe/spear/blunt/unarmed and head/neck vs other outcomes;
+5. author varied EN/TL kill families with high-skill confident vs low-skill nervous firearm behavior and personality-aware melee/gore behavior;
+6. preserve generic fallbacks for unknown/modded weapons;
+7. prove incompatible lines cannot select and routine kill fanout/performance remains bounded.
 
 ## Remaining mandatory phases
 
@@ -131,6 +151,6 @@ B0 baseline -> B1 horde episode/routing -> B2 team tactical intent -> B3 non-mod
 
 ## Evidence status
 
-B0–B3 are developer-accepted with focused and broad evidence above. B4–B9 remain mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
+B0–B4 are developer-accepted with focused and broad evidence above. B5–B9 remain mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
 
 Git history is the implementation diary; keep this file as current truth rather than appending per-commit narratives.

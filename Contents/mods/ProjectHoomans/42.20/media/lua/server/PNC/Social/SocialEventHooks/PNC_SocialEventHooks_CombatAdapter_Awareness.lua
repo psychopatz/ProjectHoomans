@@ -21,6 +21,12 @@ local EncounterIntent = PNC.Semantics
 local CombatReactionProfile = PNC.Semantics
     and PNC.Semantics.CombatReactionProfile
     or require "PNC/Semantics/PNC_SemanticCombatReactionProfile"
+local CombatMoment = PNC.Semantics
+    and PNC.Semantics.CombatMoment
+    or require "PNC/Semantics/PNC_SemanticCombatMoment"
+local BanterArbiter = PNC.Semantics
+    and PNC.Semantics.CombatBanterArbiter
+    or require "PNC/Semantics/PNC_SemanticCombatBanterArbiter"
 local SocialReactions = PNC.Semantics
     and PNC.Semantics.SocialReactions or nil
 if not SocialReactions then
@@ -41,9 +47,6 @@ if type(ContextProviders) ~= "table" then
 end
 local WITNESS_RADIUS = tonumber(Const and Const.ZOMBIE_TARGET_RADIUS) or 12
 local ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS = 12000
-local MAX_RECENT_AWARENESS_PLAYERS = 128
-local recentAwarenessByPlayer = {}
-local recentAwarenessOrder = {}
 
 local ZOMBIE_HORDE_MEMORY = "zombie_horde_encounter"
 local ZOMBIE_STAMINA_MEMORY = "zombie_stamina_retreat"
@@ -271,34 +274,6 @@ local function rememberZombieAwareness(
         tags = tags,
     })
     return added == true and memoryID or nil
-end
-
-local function reserveAwarenessPresentation(playerKey, now)
-    local key = tostring(playerKey or "")
-    local expiresAt = recentAwarenessByPlayer[key]
-    local oldest
-    if key == "" then return false end
-    if expiresAt and now < expiresAt
-        and expiresAt - now
-            <= ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS
-    then
-        return false
-    end
-    while #recentAwarenessOrder >= MAX_RECENT_AWARENESS_PLAYERS do
-        oldest = table.remove(recentAwarenessOrder, 1)
-        if oldest
-            and recentAwarenessByPlayer[oldest.key] == oldest.expiresAt
-        then
-            recentAwarenessByPlayer[oldest.key] = nil
-        end
-    end
-    expiresAt = now + ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS
-    recentAwarenessByPlayer[key] = expiresAt
-    recentAwarenessOrder[#recentAwarenessOrder + 1] = {
-        key = key,
-        expiresAt = expiresAt,
-    }
-    return true
 end
 
 local function countBand(count)
@@ -530,18 +505,9 @@ local function emitZombieAwareness(
         end
         playerKey = Hooks.ResolvePlayerKey(player)
         if not playerKey then return end
-        memoryID = rememberZombieAwareness(
-            record,
-            playerKey,
-            eventType,
-            worldAgeHours,
-            band,
-            source
-        )
         if not Network
             or type(Network.SendConversationRelationshipForNPC)
                 ~= "function"
-            or not reserveAwarenessPresentation(playerKey, now)
         then
             return
         end
@@ -560,6 +526,64 @@ local function emitZombieAwareness(
                 zombieObservation = record.runtime
                     and record.runtime.zombieObservation,
             }) or nil
+        local encounter = EncounterIntent
+            and type(EncounterIntent.Snapshot) == "function"
+            and EncounterIntent.Snapshot(record) or nil
+        local presentationClass = tacticalPrompt == true
+            and "TACTICAL_PROMPT" or "BARK"
+        local momentKind = tacticalPrompt == true
+            and "tactical_prompt"
+            or eventType == ZOMBIE_HORDE_MEMORY
+                and "horde_warning" or "combat_warning"
+        local combatMoment = CombatMoment.Build({
+            kind = momentKind,
+            eventType = eventType,
+            actorKind = "npc",
+            actorID = npcID,
+            targetKind = "zombie_group",
+            outcome = "observed",
+            pressureBand = pressureBand(count),
+            nearbyCount = math.max(
+                0, math.floor(tonumber(count) or 0)
+            ),
+            reactionMood = combatProfile
+                and combatProfile.combatReactionMood or "steady",
+            reactionStyle = combatProfile
+                and combatProfile.combatReactionStyle or "practical",
+            relationshipState = state,
+            relationshipTier = tier,
+            encounterID = episodeID,
+            encounterIntent = encounter and encounter.intent,
+            presentationClass = presentationClass,
+            source = source,
+            occurredAt = now,
+        })
+        local awarenessFamily = tacticalPrompt == true
+            and "horde_tactical_prompt" or tostring(eventType)
+        local allowed = BanterArbiter.Reserve({
+            streamKey = "awareness:" .. tostring(playerKey)
+                .. ":" .. awarenessFamily,
+            now = now,
+            cooldownMs = ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS,
+            maxSpeakers = 1,
+            speakerID = npcID,
+            audienceKey = tostring(playerKey),
+            family = awarenessFamily,
+            speakerCooldownMs = 0,
+            familyCooldownMs = ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS,
+            priorityHoldMs = tacticalPrompt == true and 5000 or 3000,
+            priority = combatMoment.priority,
+            moment = combatMoment,
+        })
+        if allowed ~= true then return end
+        memoryID = rememberZombieAwareness(
+            record,
+            playerKey,
+            eventType,
+            worldAgeHours,
+            band,
+            source
+        )
         context = {
             eventType = eventType,
             memoryID = memoryID,
@@ -573,8 +597,8 @@ local function emitZombieAwareness(
             hordePhase = phase,
             hordeEpisodeID = episodeID,
             combatTacticalPrompt = tacticalPrompt == true,
-            presentationClass = tacticalPrompt == true
-                and "TACTICAL_PROMPT" or "BARK",
+            presentationClass = presentationClass,
+            combatMoment = CombatMoment.Snapshot(combatMoment),
             combatReactionStyle = combatProfile
                 and combatProfile.combatReactionStyle or "practical",
             combatReactionMood = combatProfile
@@ -653,7 +677,7 @@ local function emitZombieAwareness(
                 offerIDs = realization.offerIDs,
                 semanticEventFacts = context.semanticEventFacts,
                 family = "zombie_awareness",
-                priority = 12,
+                priority = combatMoment.priority,
                 weight = 0.25,
                 llmEligible = false,
                 memoryEligible = false,
@@ -672,6 +696,8 @@ local function emitZombieAwareness(
                 ttlMs = 8000,
                 holdMs = 1800,
                 context = context,
+                presentationClass = presentationClass,
+                combatMoment = CombatMoment.Snapshot(combatMoment),
                 source = {
                     kind = "semantic_speech",
                     channel = "combat",
@@ -687,11 +713,7 @@ local function emitZombieAwareness(
             result
         )
         if ok and sent == true then
-            recentAwarenessByPlayer[tostring(playerKey)] =
-                now + ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS
             emitted = emitted + 1
-        else
-            recentAwarenessByPlayer[tostring(playerKey)] = nil
         end
     end)
     return emitted
@@ -860,7 +882,6 @@ H.CombatSocialRole = socialRole
 H.CombatDayIndex = dayIndex
 H.CombatMemoryToday = memoryToday
 H.CombatRememberZombieAwareness = rememberZombieAwareness
-H.CombatReserveAwarenessPresentation = reserveAwarenessPresentation
 H.CombatCountBand = countBand
 H.CombatPlayerCanHearNPC = playerCanHearNPC
 H.CombatNewZombieAwarenessEventID = newZombieAwarenessEventID

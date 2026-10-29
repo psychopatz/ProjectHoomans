@@ -22,6 +22,10 @@ local Reactions = PNC.Semantics.SocialReactions
     or require "PNC/Semantics/PNC_SemanticSocialReaction"
 local Profile = PNC.Semantics.CombatReactionProfile
     or require "PNC/Semantics/PNC_SemanticCombatReactionProfile"
+local Moment = PNC.Semantics.CombatMoment
+    or require "PNC/Semantics/PNC_SemanticCombatMoment"
+local Arbiter = PNC.Semantics.CombatBanterArbiter
+    or require "PNC/Semantics/PNC_SemanticCombatBanterArbiter"
 
 Service.VERSION = 1
 Service.REACTION_RADIUS = tonumber(Const and Const.ZOMBIE_TARGET_RADIUS) or 12
@@ -29,7 +33,7 @@ Service.MAX_PLAYER_KILL_SPEAKERS = 2
 Service.MAX_NPC_KILL_LISTENERS = 2
 Service.SPEAKER_COOLDOWN_MS = 5000
 Service.PLAYER_REACTION_COOLDOWN_MS = 5000
-Service.PlayerReactionState = Service.PlayerReactionState or {}
+Service.BANTER_PRIORITY = 24
 Service.EventSequence = tonumber(Service.EventSequence) or 0
 
 local function call(object, method, ...)
@@ -77,26 +81,6 @@ local function liveBody(record)
     return body
 end
 
-local function speakerReservation(record, now)
-    record.runtime = record.runtime or {}
-    local state = record.runtime.semanticCombatReaction
-    if type(state) ~= "table" then
-        state = { nextEligibleAt = 0, suppressedKills = 0, sequence = 0 }
-        record.runtime.semanticCombatReaction = state
-    end
-    state.suppressedKills = math.min(
-        99, math.max(0, math.floor(tonumber(state.suppressedKills) or 0)) + 1
-    )
-    if now < (tonumber(state.nextEligibleAt) or 0) then
-        return false, state.suppressedKills
-    end
-    local burst = state.suppressedKills
-    state.suppressedKills = 0
-    state.nextEligibleAt = now + Service.SPEAKER_COOLDOWN_MS
-    state.sequence = math.max(0, math.floor(tonumber(state.sequence) or 0)) + 1
-    return true, burst, state.sequence
-end
-
 local function newEventID(record, eventType, now, sequence)
     Service.EventSequence = (tonumber(Service.EventSequence) or 0) + 1
     return table.concat({
@@ -106,7 +90,9 @@ local function newEventID(record, eventType, now, sequence)
     }, ":")
 end
 
-local function eventFacts(eventID, eventType, record, profile, spec, burst)
+local function eventFacts(
+    eventID, eventType, record, profile, spec, burst, moment
+)
     local x = tonumber(spec.x or record.x)
     local y = tonumber(spec.y or record.y)
     local z = tonumber(spec.z or record.z)
@@ -137,11 +123,15 @@ local function eventFacts(eventID, eventType, record, profile, spec, burst)
             nextAction = profile.nextAction,
             actorKind = actorKind,
             killBurstCount = burst,
+            combatMomentKind = moment and moment.kind or "kill",
+            combatMomentPriority = moment and moment.priority or nil,
         },
     }
 end
 
-local function ambientPayload(record, profile, eventType, eventID, facts, burst)
+local function ambientPayload(
+    record, profile, eventType, eventID, facts, burst, moment
+)
     local context = {
         eventType = eventType,
         eventRef = eventID,
@@ -159,6 +149,8 @@ local function ambientPayload(record, profile, eventType, eventID, facts, burst)
         factRefs = { eventID },
         semanticEventFacts = facts,
         killBurstCount = burst,
+        presentationClass = "BARK",
+        combatMoment = Moment.Snapshot(moment),
     }
     local realization = Reactions and type(Reactions.Resolve) == "function"
         and Reactions.Resolve({
@@ -223,6 +215,8 @@ local function ambientPayload(record, profile, eventType, eventID, facts, burst)
             ttlMs = 7000,
             holdMs = 1600,
             context = context,
+            presentationClass = "BARK",
+            combatMoment = Moment.Snapshot(moment),
             source = {
                 kind = "semantic_speech",
                 channel = "combat",
@@ -232,15 +226,19 @@ local function ambientPayload(record, profile, eventType, eventID, facts, burst)
     }, nil, realization
 end
 
-local function sendReaction(player, record, profile, eventType, spec, now, burst, sequence)
+local function sendReaction(
+    player, record, profile, eventType, spec, now, burst, sequence, moment
+)
     if not Network or type(Network.SendConversationRelationshipForNPC)
         ~= "function" then
         return false, "relationship_transport_unavailable"
     end
     local eventID = newEventID(record, eventType, now, sequence)
-    local facts = eventFacts(eventID, eventType, record, profile, spec, burst)
+    local facts = eventFacts(
+        eventID, eventType, record, profile, spec, burst, moment
+    )
     local payload, reason = ambientPayload(
-        record, profile, eventType, eventID, facts, burst
+        record, profile, eventType, eventID, facts, burst, moment
     )
     if not payload then return false, reason end
     local ok, sent = pcall(
@@ -288,6 +286,52 @@ local function sortedNearbyPlayers(x, y)
     return rows
 end
 
+local function zombieKey(zombie)
+    local value = call(zombie, "getOnlineID")
+        or call(zombie, "getPersistentOutfitID")
+    if value == nil then return nil end
+    return tostring(value)
+end
+
+local function baseKillMoment(eventType, actorKind, actorID, zombie, spec, now)
+    return Moment.Build({
+        kind = "kill",
+        eventType = eventType,
+        actorKind = actorKind,
+        actorID = actorID,
+        targetKind = "zombie",
+        targetID = zombieKey(zombie),
+        outcome = "killed",
+        attackType = spec.attackType,
+        attackKind = spec.attackKind,
+        weaponFullType = spec.weaponFullType,
+        weaponDisplayName = spec.weaponDisplayName,
+        weaponFamily = spec.weaponFamily,
+        weaponSkill = spec.weaponSkill,
+        weaponSkillLevel = spec.weaponSkillLevel,
+        partID = spec.partID or spec.partId,
+        woundType = spec.woundType,
+        exceptional = spec.exceptional == true,
+        priority = spec.priority or Service.BANTER_PRIORITY,
+        presentationClass = "BARK",
+        source = spec.source,
+        occurredAt = now,
+    })
+end
+
+local function speakerMoment(base, profile, burst)
+    return Moment.WithSpeaker(base, {
+        pressureBand = profile.combatPressure,
+        nearbyCount = profile.nearbyZombieCount,
+        healthState = profile.healthState,
+        reactionMood = profile.combatReactionMood,
+        reactionStyle = profile.combatReactionStyle,
+        relationshipState = profile.relationshipState,
+        relationshipTier = profile.relationshipTier,
+        burstCount = burst,
+    })
+end
+
 function Service.OnPlayerKill(player, zombie, spec)
     spec = type(spec) == "table" and spec or {}
     if not player or not zombie then return 0, "kill_context_invalid" end
@@ -295,24 +339,25 @@ function Service.OnPlayerKill(player, zombie, spec)
     local y = coordinate(zombie, "getY", spec.y)
     local z = coordinate(zombie, "getZ", spec.z)
     if not x or not y or not z then return 0, "kill_position_unavailable" end
+
     local key = playerKey(player)
     local now = tonumber(spec.now) or (Core and Core.Now and Core.Now()) or 0
-    local reactionState = Service.PlayerReactionState[key]
-    if type(reactionState) ~= "table" then
-        reactionState = { nextEligibleAt = 0, suppressedKills = 0 }
-        Service.PlayerReactionState[key] = reactionState
-    end
-    reactionState.suppressedKills = math.min(
-        99, math.max(0,
-            math.floor(tonumber(reactionState.suppressedKills) or 0)) + 1
+    local baseMoment = baseKillMoment(
+        "zombie_kill_witnessed", "player", key, zombie, spec, now
     )
-    if now < (tonumber(reactionState.nextEligibleAt) or 0) then
-        return 0, "reaction_coalesced"
+    local gate, gateReason, globalBurst = Arbiter.Begin({
+        streamKey = "player_kill:" .. key,
+        now = now,
+        cooldownMs = Service.PLAYER_REACTION_COOLDOWN_MS,
+        maxSpeakers = Service.MAX_PLAYER_KILL_SPEAKERS,
+        priority = baseMoment.priority,
+        moment = baseMoment,
+    })
+    if not gate then
+        return 0, gateReason == "stream_cooldown"
+            and "reaction_coalesced" or gateReason
     end
-    local globalBurst = reactionState.suppressedKills
-    reactionState.suppressedKills = 0
-    reactionState.nextEligibleAt =
-        now + Service.PLAYER_REACTION_COOLDOWN_MS
+
     local radiusSq = Service.REACTION_RADIUS * Service.REACTION_RADIUS
     local emitted = 0
     for _, record in ipairs(sortedNearbyNPCs(x, y)) do
@@ -323,20 +368,32 @@ function Service.OnPlayerKill(player, zombie, spec)
                 tonumber(record.y) or y) <= radiusSq
             and canSee(record, player) and canSee(record, zombie)
         then
-            local eligible, burst, sequence = speakerReservation(record, now)
-            if eligible then
-                local profile = Profile.Build(record, key, {
-                    role = "witness",
-                    actorKind = "player",
-                    inCombat = record.runtime
-                        and record.runtime.target ~= nil,
-                    zombieObservation = record.runtime
-                        and record.runtime.zombieObservation,
-                })
+            local profile = Profile.Build(record, key, {
+                role = "witness",
+                actorKind = "player",
+                inCombat = record.runtime
+                    and record.runtime.target ~= nil,
+                zombieObservation = record.runtime
+                    and record.runtime.zombieObservation,
+            })
+            local moment = speakerMoment(
+                baseMoment, profile, math.max(1, tonumber(globalBurst) or 1)
+            )
+            local allowed = Arbiter.Consider(gate, {
+                now = now,
+                speakerID = tostring(record.id),
+                audienceKey = key,
+                family = "combat_kill_witness",
+                speakerCooldownMs = Service.SPEAKER_COOLDOWN_MS,
+                familyCooldownMs = Service.SPEAKER_COOLDOWN_MS,
+                priority = moment.priority,
+                moment = moment,
+            })
+            if allowed then
                 local sent = sendReaction(
                     player, record, profile, "zombie_kill_witnessed",
                     { actorKind = "player", x = x, y = y, z = z },
-                    now, math.max(globalBurst, burst), sequence
+                    now, moment.burstCount, nil, moment
                 )
                 if sent then emitted = emitted + 1 end
             end
@@ -352,12 +409,32 @@ function Service.OnNPCKill(record, zombie, spec)
         return 0, "kill_context_invalid"
     end
     local now = tonumber(spec.now) or (Core and Core.Now and Core.Now()) or 0
-    local eligible, burst, sequence = speakerReservation(record, now)
-    if not eligible then return 0, "speaker_cooldown" end
     local x = coordinate(zombie, "getX", spec.x or record.x)
     local y = coordinate(zombie, "getY", spec.y or record.y)
     local z = coordinate(zombie, "getZ", spec.z or record.z)
     if not x or not y or not z then return 0, "kill_position_unavailable" end
+
+    local baseMoment = baseKillMoment(
+        "zombie_kill_self",
+        "npc",
+        tostring(record.id or ""),
+        zombie,
+        spec,
+        now
+    )
+    local gate, gateReason, burst = Arbiter.Begin({
+        streamKey = "npc_kill:" .. tostring(record.id or ""),
+        now = now,
+        cooldownMs = Service.SPEAKER_COOLDOWN_MS,
+        maxSpeakers = Service.MAX_NPC_KILL_LISTENERS,
+        priority = baseMoment.priority,
+        moment = baseMoment,
+    })
+    if not gate then
+        return 0, gateReason == "stream_cooldown"
+            and "speaker_cooldown" or gateReason
+    end
+
     local radiusSq = Service.REACTION_RADIUS * Service.REACTION_RADIUS
     local listeners = 0
     local eventType = "zombie_kill_self"
@@ -378,12 +455,25 @@ function Service.OnNPCKill(record, zombie, spec)
                 zombieObservation = record.runtime
                     and record.runtime.zombieObservation,
             })
-            local sent = sendReaction(
-                player, record, profile, eventType,
-                { actorKind = "npc", x = x, y = y, z = z },
-                now, burst, sequence
+            local moment = speakerMoment(
+                baseMoment, profile, math.max(1, tonumber(burst) or 1)
             )
-            if sent then listeners = listeners + 1 end
+            local allowed = Arbiter.Consider(gate, {
+                now = now,
+                audienceKey = key,
+                family = "combat_kill_self",
+                familyCooldownMs = Service.SPEAKER_COOLDOWN_MS,
+                priority = moment.priority,
+                moment = moment,
+            })
+            if allowed then
+                local sent = sendReaction(
+                    player, record, profile, eventType,
+                    { actorKind = "npc", x = x, y = y, z = z },
+                    now, moment.burstCount, nil, moment
+                )
+                if sent then listeners = listeners + 1 end
+            end
         end
     end
     return listeners, listeners > 0 and "semantic_reaction_emitted"
@@ -391,7 +481,9 @@ function Service.OnNPCKill(record, zombie, spec)
 end
 
 function Service.ResetRuntime()
-    Service.PlayerReactionState = {}
+    if Arbiter and type(Arbiter.ResetRuntime) == "function" then
+        Arbiter.ResetRuntime()
+    end
     Service.EventSequence = 0
 end
 

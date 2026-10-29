@@ -151,6 +151,18 @@ T.equal(sends[1].payload.ambientFlavor.memoryEligible, false,
     "routine kill speech is not memory eligible")
 T.equal(sends[1].payload.ambientFlavor.llmEligible, false,
     "routine kill does not invoke expensive LLM generation")
+T.equal(sends[1].payload.ambientFlavor.presentationClass, "BARK",
+    "routine kill is explicitly non-blocking combat chatter")
+T.equal(
+    sends[1].payload.ambientFlavor.context.combatMoment.schema,
+    "semantic.combat.moment.v1",
+    "routine kill carries the unified bounded combat-moment contract"
+)
+T.equal(
+    sends[1].payload.ambientFlavor.context.combatMoment.kind,
+    "kill",
+    "kill reaction moment identifies its authoritative event kind"
+)
 T.equal(#sends[1].payload.ambientFlavor.offerIDs, 4,
     "kill reaction exposes grounded follow-ups")
 T.equal(
@@ -160,6 +172,10 @@ T.equal(
 )
 T.falsy(PNC.SocialEvents,
     "routine semantic reaction requires no SocialEvents mutation owner")
+for _, record in ipairs(records) do
+    T.falsy(record.runtime.semanticCombatReaction,
+        "unified arbiter replaces the old per-record kill throttle")
+end
 
 now = 1200
 local coalesced, coalescedReason = Service.OnPlayerKill(
