@@ -65,3 +65,12 @@ Developer completion requires all M0-M8 gates plus final full-suite/static/compi
 
 ### Next mandatory chunk
 Finish M0 engine-boundary/snapshot fixtures and SP lifecycle evidence; audit bodyLease for M1, then continue M2–M8. No migration phase is yet accepted in full.
+
+## M0 engine-boundary fixture checkpoint
+
+- Installed PZ compiler actually executed successfully using game root `/home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid`: 2/2 changed runtime sources passed. Initial invocation at the parent directory failed to locate the JAR; the earlier M0A entry was premature until this corrected invocation. No game was launched.
+- Java baseline manifest identifies 42.22, Steam build 26221929, JAR SHA256 90c54b84ebc160ae053cbefe30c7713826ca4fdb4934fde53c9ebde0ff9892f3. Current `zombie/popman/NetworkZombieSimulator.java` lines 158–176 directly confirm unknown online ID creates a local zombie and inserts it in IDToZombieMap. Graph Java coverage reports metadata_changed; direct current-source verification used.
+- Added synthetic engine-contract fixture proving separate clients/server objects and ModData, shared onlineId, idempotent duplicate vanilla packets. It deliberately does not claim to test a binding implementation.
+- Expanded focused suite: 131/131. Full isolated Lua suite: 963/963 (7.32s). git diff --check clean.
+- Preliminary lease audit: beginMaterialization clears runtime.bodyLease; StampLiveBody assigns it; detach/unregister clear it; RebindRestoredBody may restore startupBodyHint.lease. M1 must explicitly address restored leases plus unordered opaque tokens before accepting incarnation safety.
+- Next: finish snapshot/local lifecycle contract evidence for M0; complete M1 lease audit and then implement canonical binding M2–M8. Parent remains active.
