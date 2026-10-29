@@ -324,6 +324,49 @@ T.equal(records[committedTarget.id].runtime.forceSyncEvent,
     "combat_damage",
     "accepted NPC damage queues one coalesced combat snapshot")
 
+-- A companion attack commits against the short-lived owner-defense alert.
+-- The alert may expire before the animation hit frame, but the captured,
+-- actionable proof must remain valid for that already-committed strike.
+followerA.recruited = true
+followerA.ownerOnlineID = 42
+now = now + 2000
+T.equal(PNC.Perception.FindNPCGroupAlert(followerA, 6, true), nil,
+    "owner-defense alert expires before delayed hit")
+local committedAfterExpiry, committedAfterExpiryReason =
+    PNC.CombatResolution.ApplyNPCDamage(
+        hostile,
+        body(1, 0),
+        {
+            attackerKind = "npc",
+            attackerID = "follower_a",
+            amount = 4,
+            groupAlert = true,
+            ownerDefense = true,
+            alertOnly = false,
+            alertSequence = ownerDefenseTarget.alertSequence,
+        }
+    )
+T.truthy(committedAfterExpiry,
+    "committed companion owner-defense hit survives alert expiry")
+T.equal(committedAfterExpiryReason, "hit_npc",
+    "expired-alert companion hit uses normal NPC damage result")
+local peacefulRejected, peacefulReason =
+    PNC.CombatResolution.ApplyNPCDamage(
+        hostile,
+        body(1, 0),
+        {
+            attackerKind = "npc",
+            attackerID = "follower_a",
+            amount = 4,
+            groupAlert = false,
+            ownerDefense = false,
+        }
+    )
+T.falsy(peacefulRejected,
+    "companion cannot damage an NPC without hostile/defense authorization")
+T.equal(peacefulReason, "npc_target_not_allowed",
+    "unauthorized companion hit remains blocked")
+
 local secondDamageApplied = PNC.CombatResolution.ApplyNPCDamage(
     records[committedTarget.id],
     body(2, 0),

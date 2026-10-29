@@ -264,6 +264,17 @@ T.equal(idleStarted, true,
 Scene.End(record, npc, "lease-idle-enemy", "test")
 T.equal(Safety.Check(spec), nil,
     "idle nearby enemy does not close client conversation")
+
+-- Injury and presentation holds are not live danger. A survivor may still be
+-- bleeding or visually in a recent combat stance after the attacker is gone.
+record.health = { recentDamageUntil = now + 10000 }
+record.runtime.inCombatUntil = now + 10000
+T.equal(Safety.Check(spec), nil,
+    "recent damage and combat hold do not block a safe conversation")
+T.equal(Scene.HasThreat(record, npc, player, 8), false,
+    "server threat guard ignores injury/presentation-only holds")
+record.health.recentDamageUntil = 0
+record.runtime.inCombatUntil = 0
 enemyTarget = player
 local dangerStarted, dangerReason = Scene.Begin(
     record,

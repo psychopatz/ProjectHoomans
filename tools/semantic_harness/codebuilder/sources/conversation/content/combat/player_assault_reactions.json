@@ -1,0 +1,69 @@
+{
+  "domain": "combat",
+  "groups": {
+    "player_assault": {
+      "contentOwner": "projecthoomans.dialogue_content.combat"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "player_assault",
+      "semanticTemplateID": "semantic.combat.player_assaulted.shaken",
+      "styles": {
+        "neutral": [
+          {"translations": {"EN": "What the hell?! Stay back!", "TL": "Ano ba?! Lumayo ka!"}},
+          {"translations": {"EN": "Why are you attacking me?! Get back!", "TL": "Bakit mo ako inaatake?! Lumayo ka!"}}
+        ]
+      }
+    },
+    {
+      "group": "player_assault",
+      "semanticTemplateID": "semantic.combat.player_assaulted.aggressive",
+      "styles": {
+        "neutral": [
+          {"translations": {"EN": "You just made a big mistake.", "TL": "Malaking pagkakamali ang ginawa mo."}},
+          {"translations": {"EN": "All right. You want a fight, you've got one.", "TL": "Sige. Gusto mo ng laban, makukuha mo."}}
+        ]
+      }
+    },
+    {
+      "group": "player_assault",
+      "semanticTemplateID": "semantic.combat.player_assaulted.brave",
+      "styles": {
+        "neutral": [
+          {"translations": {"EN": "That's it. You're done.", "TL": "Tama na. Tapos ka na."}},
+          {"translations": {"EN": "Bad choice. Defend yourself.", "TL": "Maling desisyon. Ipagtanggol mo ang sarili mo."}}
+        ]
+      }
+    },
+    {
+      "group": "player_assault",
+      "semanticTemplateID": "semantic.combat.player_assaulted.reserved",
+      "styles": {
+        "neutral": [
+          {"translations": {"EN": "Back off. Now.", "TL": "Lumayo ka. Ngayon na."}},
+          {"translations": {"EN": "Enough. Stay away from me.", "TL": "Tama na. Lumayo ka sa akin."}}
+        ]
+      }
+    },
+    {
+      "group": "player_assault",
+      "semanticTemplateID": "semantic.combat.player_assaulted.default",
+      "styles": {
+        "neutral": [
+          {"translations": {"EN": "Why did you do that?!", "TL": "Bakit mo ginawa iyon?!"}},
+          {"translations": {"EN": "What the hell is wrong with you?!", "TL": "Ano bang problema mo?!"}}
+        ]
+      }
+    }
+  ],
+  "playerChoices": [],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Combat Reaction Content",
+    "version": "1"
+  },
+  "version": 1
+}

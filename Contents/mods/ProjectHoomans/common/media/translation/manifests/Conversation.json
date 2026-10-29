@@ -2,6 +2,7 @@
   "languages": {
     "EN": [
       "EN/Conversation/Apology.json",
+      "EN/Conversation/Combat.json",
       "EN/Conversation/Combat_Banter.json",
       "EN/Conversation/Combat_Human_Banter.json",
       "EN/Conversation/Command.json",
@@ -32,6 +33,7 @@
     ],
     "TL": [
       "TL/Conversation/Apology.json",
+      "TL/Conversation/Combat.json",
       "TL/Conversation/Combat_Banter.json",
       "TL/Conversation/Combat_Human_Banter.json",
       "TL/Conversation/Command.json",

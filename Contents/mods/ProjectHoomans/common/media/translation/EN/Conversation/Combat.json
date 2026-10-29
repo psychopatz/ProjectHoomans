@@ -1,0 +1,12 @@
+{
+  "UI_PNC_Conversation_Content_SemanticCombatPlayerAssaultedAggressiveNeutral01": "You just made a big mistake.",
+  "UI_PNC_Conversation_Content_SemanticCombatPlayerAssaultedAggressiveNeutral02": "All right. You want a fight, you've got one.",
+  "UI_PNC_Conversation_Content_SemanticCombatPlayerAssaultedBraveNeutral01": "That's it. You're done.",
+  "UI_PNC_Conversation_Content_SemanticCombatPlayerAssaultedBraveNeutral02": "Bad choice. Defend yourself.",
+  "UI_PNC_Conversation_Content_SemanticCombatPlayerAssaultedDefaultNeutral01": "Why did you do that?!",
+  "UI_PNC_Conversation_Content_SemanticCombatPlayerAssaultedDefaultNeutral02": "What the hell is wrong with you?!",
+  "UI_PNC_Conversation_Content_SemanticCombatPlayerAssaultedReservedNeutral01": "Back off. Now.",
+  "UI_PNC_Conversation_Content_SemanticCombatPlayerAssaultedReservedNeutral02": "Enough. Stay away from me.",
+  "UI_PNC_Conversation_Content_SemanticCombatPlayerAssaultedShakenNeutral01": "What the hell?! Stay back!",
+  "UI_PNC_Conversation_Content_SemanticCombatPlayerAssaultedShakenNeutral02": "Why are you attacking me?! Get back!"
+}

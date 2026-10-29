@@ -3,6 +3,21 @@ return {
     ["schema"] = "pnc.conversation.runtime-manifest.v1",
     ["shards"] = {
         {
+            ["bytes"] = 5248,
+            ["domain"] = "combat",
+            ["kind"] = "Content",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Content/Combat/PlayerAssaultReactions",
+            ["recordCount"] = 5,
+            ["recordIDs"] = {
+                "phrase.semantic.combat.player_assaulted.aggressive",
+                "phrase.semantic.combat.player_assaulted.brave",
+                "phrase.semantic.combat.player_assaulted.default",
+                "phrase.semantic.combat.player_assaulted.reserved",
+                "phrase.semantic.combat.player_assaulted.shaken",
+            },
+            ["sourceShard"] = "content/combat/player_assault_reactions.json",
+        },
+        {
             ["bytes"] = 20217,
             ["domain"] = "combat_banter",
             ["kind"] = "Content",
@@ -1990,6 +2005,22 @@ return {
             ["sourceShard"] = "@index/content/apology",
         },
         {
+            ["bytes"] = 2037,
+            ["domain"] = "combat",
+            ["indexKind"] = "content",
+            ["kind"] = "Index",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Combat",
+            ["recordCount"] = 5,
+            ["recordIDs"] = {
+                "phrase.semantic.combat.player_assaulted.aggressive",
+                "phrase.semantic.combat.player_assaulted.brave",
+                "phrase.semantic.combat.player_assaulted.default",
+                "phrase.semantic.combat.player_assaulted.reserved",
+                "phrase.semantic.combat.player_assaulted.shaken",
+            },
+            ["sourceShard"] = "@index/content/combat",
+        },
+        {
             ["bytes"] = 11071,
             ["domain"] = "combat_banter",
             ["indexKind"] = "content",
@@ -2927,15 +2958,15 @@ return {
             ["sourceShard"] = "@index/ui/static_suggestions",
         },
         {
-            ["bytes"] = 5476,
+            ["bytes"] = 5661,
             ["domain"] = "index",
             ["kind"] = "IndexRegistry",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Registry",
-            ["recordCount"] = 28,
+            ["recordCount"] = 29,
             ["recordIDs"] = {
             },
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "a9d1adadce3a53905aa9f2545c156b69a04b87c6adc9e9fd74f22cb19ea2536a",
+    ["wholeModelFingerprint"] = "c6b3e9dc06099ea08001d85d071c10ca099a7e5b1c6c608144fc7386309a1e87",
 }

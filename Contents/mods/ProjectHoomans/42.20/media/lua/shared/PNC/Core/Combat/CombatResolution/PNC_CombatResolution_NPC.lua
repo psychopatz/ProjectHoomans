@@ -55,11 +55,43 @@ local function resolveOwnerDefense(attackerRecord, targetRecord, hit)
     local perception = PNC.Perception
     local radius
     local alert
+    local companionOwned = attackerRecord
+        and attackerRecord.recruited == true
+        and (
+            attackerRecord.ownerOnlineID ~= nil
+            or tostring(attackerRecord.ownerUsername or "") ~= ""
+            or attackerRecord.orderSpec
+                and tostring(attackerRecord.orderSpec.kind or "") == "follow"
+        )
     if not hit
         or hit.groupAlert ~= true
         or hit.ownerDefense ~= true
     then
         return false, "not_owner_defense_alert"
+    end
+    local factions = PNC.Factions
+    if factions and type(factions.GetFactionID) == "function" then
+        local attackerFactionID = factions.GetFactionID(attackerRecord)
+        local targetFactionID = factions.GetFactionID(targetRecord)
+        if attackerFactionID ~= nil
+            and targetFactionID ~= nil
+            and tostring(attackerFactionID) == tostring(targetFactionID)
+        then
+            return false, "same_faction"
+        end
+    end
+    -- Owner-defense evidence is captured when the companion commits the
+    -- attack because the impact lands on a delayed animation frame.  The
+    -- short-lived perception alert may legitimately expire before that frame;
+    -- do not invalidate an already-authorized companion strike solely because
+    -- the live alert aged out.  This path is intentionally companion-only.
+    if companionOwned
+        and hit.alertOnly ~= true
+        and hit.alertSequence ~= nil
+        and targetRecord
+        and targetRecord.id ~= nil
+    then
+        return true, "committed_owner_defense"
     end
     if not attackerRecord
         or not perception
@@ -256,7 +288,34 @@ function Resolution.ApplyNPCDamage(targetRecord, targetBody, hit)
     if hit and hit.attackerKind == "player"
         and relationships and relationships.ProvokeNeutralByPlayer
     then
-        relationships.ProvokeNeutralByPlayer(targetRecord)
+        local provoked = relationships.ProvokeNeutralByPlayer(targetRecord)
+        if provoked == true then
+            local player = Core and Core.ResolvePlayerByOnlineID
+                and Core.ResolvePlayerByOnlineID(hit.attackerOnlineID)
+                or Core and Core.ResolvePlayerByUsername
+                    and Core.ResolvePlayerByUsername(hit.attackerUsername)
+                or nil
+            local reactionService = PNC.SemanticCombatReactionService
+                or PNC.Semantics
+                    and PNC.Semantics.CombatReactionService or nil
+            if player and reactionService
+                and type(reactionService.OnPlayerAssaultedNPC) == "function"
+            then
+                reactionService.OnPlayerAssaultedNPC(
+                    targetRecord,
+                    player,
+                    {
+                        attackType = hit.attackType,
+                        attackKind = hit.attackKind,
+                        woundType = hit.woundType,
+                        x = targetRecord.x,
+                        y = targetRecord.y,
+                        z = targetRecord.z,
+                        hostilityReason = "attacked_by_player",
+                    }
+                )
+            end
+        end
     end
     targetRecord.runtime = targetRecord.runtime or {}
     if network then

@@ -308,9 +308,9 @@ function Safety.HasDanger(
     local ignoredTalkingTarget = hostileTalkingTarget or passiveTalkingTarget
     if (runtime.target ~= nil and not ignoredTalkingTarget)
         or (runtime.attackAction ~= nil and not hostileTalkingTarget)
-        or (current < (tonumber(runtime.inCombatUntil) or 0)
-            and not hostileTalkingTarget)
-        or current < (tonumber(health.recentDamageUntil) or 0)
+        -- Presentation/injury holds are not proof of a live threat.  A
+        -- drawn weapon, recent wound, or bleeding state must not keep dialogue
+        -- unsafe after target/attack authority has cleared.
     then
         return true
     end

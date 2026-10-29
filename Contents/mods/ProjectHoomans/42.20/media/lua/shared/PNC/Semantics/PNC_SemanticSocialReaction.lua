@@ -113,6 +113,9 @@ local function poolFor(spec)
     if spec.poolID then return tostring(spec.poolID) end
     local eventType = string.lower(tostring(spec.eventType or ""))
     local context = type(spec.context) == "table" and spec.context or {}
+    if eventType == "player_assaulted_npc" then
+        return "semantic.player_assaulted_npc"
+    end
     if eventType == "zombie_kill_witnessed"
         or eventType == "zombie_kill_self"
     then

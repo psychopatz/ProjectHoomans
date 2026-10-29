@@ -112,6 +112,12 @@
       "path": "content/event/combat_horde_reactions.json"
     },
     {
+      "domain": "combat",
+      "kind": "content",
+      "order": 1510,
+      "path": "content/combat/player_assault_reactions.json"
+    },
+    {
       "domain": "combat_banter",
       "kind": "content",
       "order": 1550,

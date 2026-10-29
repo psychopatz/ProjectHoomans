@@ -38,9 +38,9 @@ local function runtimeHasThreat(record, player, ignoreTalkingNPC)
     local ignoredTalkingTarget = hostileTalkingTarget or passiveTalkingTarget
     return (runtime.target ~= nil and not ignoredTalkingTarget)
         or (runtime.attackAction ~= nil and not hostileTalkingTarget)
-        or (current < (tonumber(runtime.inCombatUntil) or 0)
-            and not hostileTalkingTarget)
-        or current < (tonumber(health.recentDamageUntil) or 0)
+        -- Presentation/injury holds are not proof of a live threat.  A
+        -- drawn weapon, recent wound, or bleeding state must not keep dialogue
+        -- unsafe after target/attack authority has cleared.
 end
 
 local function hasZombieThreat(

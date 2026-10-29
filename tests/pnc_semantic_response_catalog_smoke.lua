@@ -116,6 +116,16 @@ local rainyWhatsUp = Catalog.Select(
 T.equal(rainyWhatsUp.id, "semantic.question.whats_up.weather",
     "what's up can use current weather as grounded context")
 
+local assaulted = Catalog.Select(
+    "semantic.player_assaulted_npc",
+    { npcID = "mara", combatReactionStyle = "aggressive" },
+    "player_assaulted"
+)
+T.equal(assaulted.templateID, "semantic.combat.player_assaulted.aggressive",
+    "player assault reaction selects the aggression-aware semantic family")
+T.equal(assaulted.fallback, "You just made a big mistake.",
+    "player assault reaction has an appropriate hostile-transition fallback")
+
 T.falsy(Catalog.Select("missing_pool", {}, "missing"),
     "missing pools fail safely")
 

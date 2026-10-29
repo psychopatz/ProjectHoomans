@@ -54,6 +54,44 @@ Catalog.Register("semantic.hostile_remark", {
     },
 })
 
+Catalog.Register("semantic.player_assaulted_npc", {
+    variants = {
+        {
+            id = "semantic.player_assaulted_npc.shaken",
+            templateID = "semantic.combat.player_assaulted.shaken",
+            fallback = "What the hell?! Stay back!",
+            when = { combatReactionStyle = "shaken" },
+            priority = 5,
+        },
+        {
+            id = "semantic.player_assaulted_npc.aggressive",
+            templateID = "semantic.combat.player_assaulted.aggressive",
+            fallback = "You just made a big mistake.",
+            when = { combatReactionStyle = "aggressive" },
+            priority = 5,
+        },
+        {
+            id = "semantic.player_assaulted_npc.brave",
+            templateID = "semantic.combat.player_assaulted.brave",
+            fallback = "That's it. You're done.",
+            when = { combatReactionStyle = "brave" },
+            priority = 4,
+        },
+        {
+            id = "semantic.player_assaulted_npc.reserved",
+            templateID = "semantic.combat.player_assaulted.reserved",
+            fallback = "Back off. Now.",
+            when = { combatReactionStyle = "reserved" },
+            priority = 3,
+        },
+        {
+            id = "semantic.player_assaulted_npc.default",
+            templateID = "semantic.combat.player_assaulted.default",
+            fallback = "Why did you do that?!",
+        },
+    },
+})
+
 Catalog.Register("semantic.threat", {
     variants = {
         {

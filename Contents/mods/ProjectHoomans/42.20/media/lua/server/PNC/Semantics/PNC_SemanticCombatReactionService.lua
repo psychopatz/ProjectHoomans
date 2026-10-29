@@ -101,7 +101,9 @@ local function eventFacts(
     local actorKind = tostring(spec.actorKind or "player")
     local humanKill = eventType == "hostile_npc_kill_self"
     local summary
-    if humanKill then
+    if eventType == "player_assaulted_npc" then
+        summary = "the player attacked this survivor and provoked a hostile response"
+    elseif humanKill then
         summary = "the NPC killed a hostile survivor nearby"
     elseif eventType == "zombie_kill_self" then
         summary = burst > 1
@@ -146,6 +148,8 @@ local function eventFacts(
         },
     }
 end
+
+local reactionFamily
 
 local function ambientPayload(
     record, profile, eventType, eventID, facts, burst, moment
@@ -231,7 +235,7 @@ local function ambientPayload(
             factRefs = { eventID },
             offerIDs = realization.offerIDs or {},
             semanticEventFacts = facts,
-            family = "combat_kill_reaction",
+            family = reactionFamily(eventType),
             priority = 24,
             weight = 0.5,
             llmEligible = false,
@@ -262,7 +266,10 @@ local function ambientPayload(
     }, nil, realization
 end
 
-local function reactionFamily(eventType)
+reactionFamily = function(eventType)
+    if eventType == "player_assaulted_npc" then
+        return "combat_player_assaulted"
+    end
     if eventType == "zombie_kill_witnessed" then
         return "combat_kill_witness"
     end
@@ -680,6 +687,83 @@ function Service.OnNPCHumanKill(record, targetRecord, targetBody, spec)
     end
     return listeners, listeners > 0 and "semantic_reaction_emitted"
         or "no_listener"
+end
+
+function Service.OnPlayerAssaultedNPC(record, player, spec)
+    spec = type(spec) == "table" and spec or {}
+    if not record or record.alive == false or not player then
+        return 0, "assault_context_invalid"
+    end
+    local now = tonumber(spec.now) or (Core and Core.Now and Core.Now()) or 0
+    local x = tonumber(spec.x or record.x)
+    local y = tonumber(spec.y or record.y)
+    local z = tonumber(spec.z or record.z)
+    if not x or not y or not z then
+        return 0, "assault_position_unavailable"
+    end
+    local key = playerKey(player)
+    local profile = Profile.Build(record, key, {
+        role = "victim",
+        actorKind = "player",
+        inCombat = true,
+        zombieObservation = record.runtime
+            and record.runtime.zombieObservation,
+    })
+    local moment = Moment.Build({
+        kind = "assault",
+        eventType = "player_assaulted_npc",
+        actorKind = "player",
+        actorID = key,
+        targetKind = "human_npc",
+        targetID = tostring(record.id or ""),
+        outcome = "provoked_hostility",
+        attackType = spec.attackType,
+        attackKind = spec.attackKind,
+        woundType = spec.woundType,
+        pressureBand = profile.combatPressure,
+        healthState = profile.healthState,
+        reactionMood = profile.combatReactionMood,
+        reactionStyle = profile.combatReactionStyle,
+        relationshipState = profile.relationshipState,
+        relationshipTier = profile.relationshipTier,
+        priority = 40,
+        presentationClass = "BARK",
+        source = "player_assault",
+        occurredAt = now,
+    })
+    local allowed, reason = Arbiter.Begin({
+        streamKey = "player_assaulted_npc:" .. tostring(record.id or ""),
+        now = now,
+        cooldownMs = Service.SPEAKER_COOLDOWN_MS,
+        maxSpeakers = 1,
+        priority = moment.priority,
+        moment = moment,
+    })
+    if not allowed then
+        return 0, reason == "stream_cooldown"
+            and "speaker_cooldown" or reason
+    end
+    local sent = sendReaction(
+        player,
+        record,
+        profile,
+        "player_assaulted_npc",
+        {
+            actorKind = "player",
+            targetKind = "human_npc",
+            targetID = tostring(record.id or ""),
+            hostilityReason = spec.hostilityReason or "attacked_by_player",
+            nextAction = "Defend against the attacker.",
+            x = x, y = y, z = z,
+        },
+        now,
+        1,
+        nil,
+        moment
+    )
+    return sent and 1 or 0,
+        sent and "semantic_reaction_emitted"
+            or "semantic_reaction_suppressed"
 end
 
 function Service.ResetRuntime()
