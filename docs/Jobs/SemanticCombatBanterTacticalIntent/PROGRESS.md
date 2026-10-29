@@ -1,6 +1,6 @@
 # Progress — Semantic Combat Banter & Tactical Intent
 
-**Status:** PLANNED — implementation not started.
+**Status:** ACTIVE — B0 characterization accepted; B1 horde episode/routing implementation is next.
 **Planning base:** ProjectHoomans `8632bc30`, existing `main`.
 **Parent foundation:** `docs/Jobs/OpenEndedSemanticCombatAwareness/` is developer-complete and remains accepted unless this job reproduces a regression in an owning layer.
 **Native PZ:** user live regression supplied; new job's developer implementation/acceptance not yet run.
@@ -35,19 +35,18 @@ The target is active co-op gameplay banter:
 - hostile-human kill commentary is distinct from zombie commentary;
 - silence is common and valid.
 
-## ONE current Next Chunk — B0A
+## B0 accepted baseline
 
-Establish regression and ownership tests before changing production behavior.
+B0 regression/ownership characterization is recorded in `B0_BASELINE.md` and passes **3/3** focused Lua tests. It proves the live wrong-horde fallback, stable-horde re-open bug, missing semantic clear owner, active-conversation-only offer projection, absent presentation-class contract, and dropped weapon/action kill context.
 
-B0A must:
-1. add a focused regression proving `zombie_horde_encounter` currently misses the horde-specific response branch and falls to generic combat default;
-2. characterize the current stable-horde re-presentation/episode-close failure using production awareness state/callers;
-3. enumerate combat response families and mark current `BARK / TACTICAL_PROMPT / TERMINAL / UNCLASSIFIED` status without changing content;
-4. prove the current open-conversation offer projection and missing closed-conversation tactical surface;
-5. prove which weapon/action facts exist in CombatResolution and which are absent from `OnNPCKill`;
-6. record focused baseline commands/results in this file.
+## ONE current Next Chunk — B1
 
-Do not fix B1+ behavior inside B0A unless a minimal harness seam is required to observe production truth.
+Implement canonical horde episode/routing:
+1. make `PNC_ZombieObservation` the single semantic horde-observation caller and deliver both above- and below-threshold observations;
+2. remove duplicate semantic horde calls from follow/combat behavior while preserving their gameplay threat logic;
+3. make `ObserveZombieHorde` edge/episode driven with explicit start, material escalation/de-escalation, stable and clear outcomes;
+4. route runtime `zombie_horde_encounter` into a dedicated horde semantic pool with correct EN/TL content and grounded quantity/location follow-ups;
+5. keep stable hordes silent and add focused regression/scan guards.
 
 ## Remaining mandatory phases
 
