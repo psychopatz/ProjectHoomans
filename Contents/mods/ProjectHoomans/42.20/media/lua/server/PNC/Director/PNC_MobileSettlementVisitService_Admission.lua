@@ -176,6 +176,9 @@ function Service.AdmitPlayer(player, npcID, visitID, at)
         Service.ExpireFaction(source, at)
         return false, "settlement_visit_expired"
     end
+    if tostring(visit.kind or "") ~= "settlement_admission" then
+        return false, "settlement_admission_required"
+    end
     if tostring(visit.id or "") ~= tostring(visitID or "") then
         return false, "settlement_visit_mismatch"
     end

@@ -201,7 +201,8 @@ function Service.GetNPCVisit(npcID, player, at)
     end
     return {
         active = true,
-        kind = "settlement_admission",
+        kind = visit.kind or "settlement_admission",
+        intent = visit.intent,
         visitID = visit.id,
         communityID = visit.communityID,
         settlementFactionID = visit.settlementFactionID,

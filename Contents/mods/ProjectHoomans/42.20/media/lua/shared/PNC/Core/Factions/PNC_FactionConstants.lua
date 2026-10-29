@@ -72,9 +72,16 @@ Constants.VALID_MOBILE_ACTIVITY_STATES = {
 }
 Constants.MOBILE_TRAVEL_SETTLEMENT = "settlement"
 Constants.MOBILE_TRAVEL_PURPOSE_ADMISSION = "settlement_admission"
+-- Generic temporary settlement presence. Admission remains a separate
+-- purpose so visits such as commerce never enter membership-transfer rules.
+Constants.MOBILE_TRAVEL_PURPOSE_SETTLEMENT_VISIT = "settlement_visit"
 Constants.MOBILE_TRAVEL_PURPOSE_HOSTILE_CONTACT = "hostile_contact"
+Constants.MOBILE_SETTLEMENT_VISIT_INTENT_GENERAL = "general"
+Constants.MOBILE_SETTLEMENT_VISIT_INTENT_COMMERCIAL = "commercial"
+Constants.MOBILE_SETTLEMENT_VISIT_INTENT_MAX_LENGTH = 96
 Constants.VALID_MOBILE_TRAVEL_PURPOSES = {
     [Constants.MOBILE_TRAVEL_PURPOSE_ADMISSION] = true,
+    [Constants.MOBILE_TRAVEL_PURPOSE_SETTLEMENT_VISIT] = true,
     [Constants.MOBILE_TRAVEL_PURPOSE_HOSTILE_CONTACT] = true,
 }
 Constants.MOBILE_PLAYER_ROAM_PHASE_APPROACH = "approach"

@@ -228,11 +228,16 @@ local function normalizeMobileTravel(value)
     )
     if not destination then return nil end
     local startedAt = Internal.Timestamp(value.startedAt, 0)
+    local intent = Internal.SafeString(
+        value.intent,
+        Constants.MOBILE_SETTLEMENT_VISIT_INTENT_MAX_LENGTH or 96
+    )
     return {
         kind = Constants.MOBILE_TRAVEL_SETTLEMENT,
         purpose = Constants.VALID_MOBILE_TRAVEL_PURPOSES[value.purpose]
             and value.purpose
             or Constants.MOBILE_TRAVEL_PURPOSE_ADMISSION,
+        intent = intent or Constants.MOBILE_SETTLEMENT_VISIT_INTENT_GENERAL,
         destination = destination,
         startedAt = startedAt,
         departureDay = math.max(
@@ -278,10 +283,19 @@ local function normalizeSettlementVisit(value)
     for npcID, _ in pairs(completedMemberIDs) do
         pendingMemberIDs[npcID] = nil
     end
+    local kind = value.kind == "settlement_visit"
+        and "settlement_visit" or "settlement_admission"
+    local intent = Internal.SafeString(
+        value.intent,
+        Constants.MOBILE_SETTLEMENT_VISIT_INTENT_MAX_LENGTH or 96
+    )
     return {
         schemaVersion = Constants.MOBILE_SETTLEMENT_VISIT_SCHEMA_VERSION,
         id = visitID,
-        kind = "settlement_admission",
+        kind = kind,
+        intent = kind == "settlement_visit"
+            and (intent or Constants.MOBILE_SETTLEMENT_VISIT_INTENT_GENERAL)
+            or nil,
         settlementFactionID = settlementFactionID,
         communityID = communityID,
         siteID = Internal.SafeString(value.siteID, Constants.ID_MAX_LENGTH),

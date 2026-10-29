@@ -30,7 +30,11 @@ PNC = {
         ID_MAX_LENGTH = 192,
         MOBILE_TRAVEL_SETTLEMENT = "settlement",
         MOBILE_TRAVEL_PURPOSE_ADMISSION = "settlement_admission",
+        MOBILE_TRAVEL_PURPOSE_SETTLEMENT_VISIT = "settlement_visit",
         MOBILE_TRAVEL_PURPOSE_HOSTILE_CONTACT = "hostile_contact",
+        MOBILE_SETTLEMENT_VISIT_INTENT_GENERAL = "general",
+        MOBILE_SETTLEMENT_VISIT_INTENT_COMMERCIAL = "commercial",
+        MOBILE_SETTLEMENT_VISIT_INTENT_MAX_LENGTH = 96,
     },
     DirectorConfig = {
         MOBILE_SETTLEMENT_VISIT_HOURS = 12,
@@ -44,6 +48,7 @@ PNC = {
 }
 PNC.FactionConstants.VALID_MOBILE_TRAVEL_PURPOSES = {
     settlement_admission = true,
+    settlement_visit = true,
     hostile_contact = true,
 }
 local sandboxChance = 100
@@ -99,6 +104,13 @@ factions.faction_ai_mobile = {
     mobile = { active = true },
     memberIDs = { npc_ai = true },
 }
+factions.faction_commercial = {
+    id = "faction_commercial",
+    status = "active",
+    archetypeID = "trader",
+    mobile = { active = true },
+    memberIDs = { npc_commercial = true },
+}
 factions.faction_ai_owner = {
     id = "faction_ai_owner",
     status = "active",
@@ -128,6 +140,12 @@ registry.npc_looter = {
 registry.npc_ai = {
     id = "npc_ai", alive = true,
     affiliation = { factionID = "faction_ai_mobile", role = "civilian",
+        rank = "member", membershipStatus = "member" },
+    hostility = { attackPlayers = false },
+}
+registry.npc_commercial = {
+    id = "npc_commercial", alive = true,
+    affiliation = { factionID = "faction_commercial", role = "trader",
         rank = "member", membershipStatus = "member" },
     hostility = { attackPlayers = false },
 }
@@ -257,6 +275,66 @@ T.equal(registry.npc_ai.affiliation.communityID, "community_ai",
     "AI settlement admission adds the NPC to the community")
 T.falsy(factions.faction_ai_mobile.mobile,
     "an emptied AI mobile group is cleared after admission")
+
+local commercialStarted, commercialReason = Service.OnSettlementArrival(
+    factions.faction_commercial,
+    target,
+    {
+        kind = "settlement",
+        purpose = "settlement_visit",
+        intent = "commercial",
+        revision = 9,
+    },
+    at,
+    nil,
+    {}
+)
+T.truthy(commercialStarted, commercialReason)
+T.equal(commercialReason, "settlement_visit_started",
+    "generic temporary settlement visit starts")
+T.equal(registry.npc_commercial.affiliation.factionID,
+    "faction_commercial",
+    "temporary settlement visit never transfers faction membership")
+T.truthy(factions.faction_commercial.mobile.visit,
+    "temporary settlement visit persists bounded state")
+T.equal(factions.faction_commercial.mobile.visit.kind, "settlement_visit",
+    "temporary visit is distinct from admission")
+T.equal(factions.faction_commercial.mobile.visit.intent, "commercial",
+    "temporary visit preserves its extensible intent")
+local commercialPresentation = Service.GetNPCVisit(
+    "npc_commercial", {}, at)
+T.truthy(commercialPresentation,
+    "temporary visit has the normal public/social presentation")
+T.equal(commercialPresentation.kind, "settlement_visit",
+    "presentation keeps non-admission visit kind")
+T.equal(commercialPresentation.intent, "commercial",
+    "presentation keeps visit intent")
+local commercialAdmission, commercialAdmissionReason = Service.AdmitPlayer(
+    {}, "npc_commercial", commercialPresentation.visitID, at)
+T.falsy(commercialAdmission, commercialAdmissionReason)
+T.equal(commercialAdmissionReason, "settlement_admission_required",
+    "temporary visit cannot be consumed by the admission action")
+local duplicateCommercial, duplicateCommercialReason =
+    Service.OnSettlementArrival(
+        factions.faction_commercial,
+        target,
+        {
+            kind = "settlement",
+            purpose = "settlement_visit",
+            intent = "commercial",
+            revision = 9,
+        },
+        at,
+        nil,
+        {}
+    )
+T.truthy(duplicateCommercial, duplicateCommercialReason)
+T.equal(duplicateCommercialReason, "duplicate_settlement_visit",
+    "same temporary arrival revision is idempotent")
+T.truthy(Service.ExpireFaction(factions.faction_commercial, 23),
+    "temporary visit uses the shared bounded expiry path")
+T.falsy(factions.faction_commercial.mobile.visit,
+    "expired temporary visit is cleared")
 
 sandboxChance = 0
 local sandboxBlocked, sandboxBlockedReason = Service.OnSettlementArrival(

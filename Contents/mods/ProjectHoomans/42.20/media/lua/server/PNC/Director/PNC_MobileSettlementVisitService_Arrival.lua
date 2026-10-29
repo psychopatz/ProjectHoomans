@@ -31,6 +31,14 @@ function Service.OnSettlementArrival(factionOrID, target, travel, at, group, rep
     local joined = 0
     local lastAdmissionReason
     local joinChance = 0
+    local temporaryVisit
+    local visitKind
+    local visitIntent
+    local visitID
+    local currentVisit
+    local updated
+    local updatedReason
+    local updatedMobile
     if type(travel) ~= "table"
         or travel.kind ~= Constants.MOBILE_TRAVEL_SETTLEMENT
     then
@@ -59,8 +67,25 @@ function Service.OnSettlementArrival(factionOrID, target, travel, at, group, rep
     if travel.purpose == Constants.MOBILE_TRAVEL_PURPOSE_HOSTILE_CONTACT then
         return false, "hostile_contact_travel"
     end
+    temporaryVisit = travel.purpose
+        == Constants.MOBILE_TRAVEL_PURPOSE_SETTLEMENT_VISIT
+    visitKind = temporaryVisit and "settlement_visit"
+        or "settlement_admission"
+    visitIntent = temporaryVisit
+        and Service.NormalizeSettlementVisitIntent(travel.intent)
+        or nil
+    visitID = tostring(faction and faction.id or "") .. ":"
+        .. tostring(visitKind) .. ":"
+        .. tostring(travel.revision or 0)
+    currentVisit = faction and faction.mobile and faction.mobile.visit or nil
+    if temporaryVisit and currentVisit
+        and tostring(currentVisit.id or "") == visitID
+        and Service.IsVisitActive(currentVisit, at)
+    then
+        return true, "duplicate_settlement_visit", currentVisit
+    end
     eligible, reason, community, destination =
-        Service.IsAdmissionEligible(faction, target, at)
+        Service.IsSettlementVisitEligible(faction, target, at)
     if not eligible then return false, reason end
 
     -- The arrival is now accepted by the Hoomans-owned lifecycle. Notify
@@ -76,9 +101,49 @@ function Service.OnSettlementArrival(factionOrID, target, travel, at, group, rep
         reports = copy(reports),
         community = copy(community),
         destination = copy(destination),
+        visitKind = visitKind,
+        visitIntent = visitIntent,
     })
 
     ids = memberIDs(faction, group)
+    if temporaryVisit then
+        visit = {
+            active = true,
+            id = visitID,
+            kind = visitKind,
+            intent = visitIntent,
+            settlementFactionID = destination.id,
+            communityID = community.id,
+            siteID = target.siteID,
+            locationID = target.locationID,
+            startedAt = worldAge(at),
+            expiresAt = worldAge(at)
+                + (tonumber(Config.MOBILE_SETTLEMENT_VISIT_HOURS) or 12),
+            pendingMemberIDs = {},
+            completedMemberIDs = {},
+            revision = 1,
+        }
+        for _, npcID in ipairs(ids) do
+            local record = PNC.Registry and PNC.Registry.Get
+                and PNC.Registry.Get(npcID) or nil
+            if record and record.alive ~= false
+                and not (record.hostility
+                    and record.hostility.attackPlayers == true)
+            then
+                visit.pendingMemberIDs[npcID] = true
+            end
+        end
+        if not hasEntries(visit.pendingMemberIDs) then
+            return false, "no_settlement_visit_members"
+        end
+        updated, updatedReason, updatedMobile = Factions.UpdateMobileGroup(
+            faction.id,
+            { visit = visit },
+            "mobile_settlement_visit_started"
+        )
+        if not updated then return false, updatedReason end
+        return true, "settlement_visit_started", updatedMobile
+    end
     if target.kind == "ai_settlement" then
         joinChance = aiJoinChance()
         for _, npcID in ipairs(ids) do
@@ -116,9 +181,8 @@ function Service.OnSettlementArrival(factionOrID, target, travel, at, group, rep
     end
     visit = {
         active = true,
-        id = tostring(faction.id) .. ":settlement_visit:"
-            .. tostring(travel.revision or 0),
-        kind = "settlement_admission",
+        id = visitID,
+        kind = visitKind,
         settlementFactionID = destination.id,
         communityID = community.id,
         siteID = target.siteID,

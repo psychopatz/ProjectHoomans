@@ -166,9 +166,29 @@ function Service.IsAdmissionEligible(factionOrID, target, at)
     return true, "eligible", community, destination
 end
 
+-- The generic temporary-visit gate intentionally reuses the same bounded
+-- settlement/relationship safety checks as admission, but its caller owns no
+-- membership transfer and therefore never consults the AI join chance.
+function Service.IsSettlementVisitEligible(factionOrID, target, at)
+    return Service.IsAdmissionEligible(factionOrID, target, at)
+end
+
+function Service.NormalizeSettlementVisitIntent(value)
+    local maximum = Constants
+        and Constants.MOBILE_SETTLEMENT_VISIT_INTENT_MAX_LENGTH or 96
+    value = tostring(value or "")
+    if value == "" then
+        return Constants and Constants.MOBILE_SETTLEMENT_VISIT_INTENT_GENERAL
+            or "general"
+    end
+    if #value > maximum then value = string.sub(value, 1, maximum) end
+    return value
+end
+
 function Service.IsVisitActive(visit, at)
     return type(visit) == "table"
-        and tostring(visit.kind or "") == "settlement_admission"
+        and (tostring(visit.kind or "") == "settlement_admission"
+            or tostring(visit.kind or "") == "settlement_visit")
         and (tonumber(visit.expiresAt) or 0) > worldAge(at)
 end
 
