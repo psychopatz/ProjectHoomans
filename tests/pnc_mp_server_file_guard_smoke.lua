@@ -113,6 +113,9 @@ listing:close()
 -- proposal policy persistence.
 -- PNC_SocialGreetingService_TryGreet is loaded by the social greeting
 -- composition root.
+-- PNC_CommunityPlaceProjection and
+-- PNC_SemanticCommunityRoleWhereabouts are loaded by the server composition
+-- root for authoritative semantic place projection and live role facts.
 -- PNC_ServerLLMSocialReactionCommandHandler_Handle is loaded by the LLM
 -- social reaction authority composition root.
 -- PNC_ServerSemanticSocialInteractionCommandHandler_Handle is loaded by the
@@ -151,7 +154,7 @@ listing:close()
 -- activity root.
 -- The three need-facility effect spokes are loaded by its guarded root.
 -- The four UniqueNPCRegistry providers are loaded by its guarded root.
-T.equal(#serverOnlyFiles, 1000,
+T.equal(#serverOnlyFiles, 1003,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

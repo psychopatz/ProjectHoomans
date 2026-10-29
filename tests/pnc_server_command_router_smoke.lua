@@ -2,6 +2,7 @@ local T = require "tests/support/test"
 T.addPackagePaths({
     { "ProjectHoomans", "shared" },
     { "ProjectHoomans", "server" },
+    { "ProjectHoomans", "common_lua" },
 })
 
 local transferArgs
