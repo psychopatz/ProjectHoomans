@@ -15,6 +15,11 @@ local function activeRecord(record)
         and record.presenceState ~= Const.PRESENCE_CORPSE
 end
 
+local function expectsRehydration(record)
+    return record and record.runtime
+        and record.runtime.startupRehydrateExpected == true
+end
+
 local function canonicalBody(reg, record)
     local zombie
     if not reg or not record or not reg.GetLiveZombie then
@@ -46,13 +51,44 @@ local function addRecordMatch(batch, match)
     id = tostring(match.record.id)
     group = batch.recordMatches[id]
     if not group then
-        group = { items = {}, positional = 0 }
+        group = { items = {}, positional = 0, rehydrate = 0 }
         batch.recordMatches[id] = group
     end
     group.items[#group.items + 1] = match
     if match.reason == "signature_position" then
         group.positional = group.positional + 1
     end
+    if match.rehydrateEligible == true then
+        group.rehydrate = group.rehydrate + 1
+    end
+end
+
+local function rehydrateDistance(match)
+    local record = match and match.record or nil
+    local body = match and match.body or nil
+    local hint = record and record.runtime
+        and record.runtime.startupBodyHint or nil
+    local x = hint and tonumber(hint.x) or record and tonumber(record.x)
+    local y = hint and tonumber(hint.y) or record and tonumber(record.y)
+    local z = hint and tonumber(hint.z) or record and tonumber(record.z)
+    if not body or not x or not y or not z
+        or not body.getX or not body.getY or not body.getZ
+    then
+        return math.huge
+    end
+    local dz = (tonumber(body:getZ()) or 0) - z
+    local dx = (tonumber(body:getX()) or 0) - x
+    local dy = (tonumber(body:getY()) or 0) - y
+    return dx * dx + dy * dy + dz * dz * 16
+end
+
+local function rehydrateStrength(match)
+    local reason = match and tostring(match.reason or "") or ""
+    if reason == "uuid" then return 4 end
+    if reason == "population_id" then return 3 end
+    if reason == "body_hint" then return 2 end
+    if reason == "legacy_rehydrate" then return 1 end
+    return 0
 end
 
 local function chooseCandidate(candidates)
@@ -156,6 +192,7 @@ local function buildBatch(now)
             ordinaryUnknown = 0,
             orphanSignatures = 0,
             blockedRecords = 0,
+            pendingRehydrate = 0,
         },
     }
     local i
@@ -211,7 +248,9 @@ local function buildBatch(now)
                             candidates = {
                                 {
                                     record = record,
-                                    reason = "legacy_ledger",
+                                    reason = expectsRehydration(record)
+                                        and "legacy_rehydrate"
+                                        or "legacy_ledger",
                                     score = 400000,
                                     identity = true,
                                     ledgerEntry = legacyEntry,
@@ -245,6 +284,19 @@ local function buildBatch(now)
                     candidate, ambiguousReason = chooseCandidate(candidates)
                     if candidate then
                         candidate.body = zombie
+                        candidate.rehydrateTracked =
+                            expectsRehydration(candidate.record)
+                        candidate.rehydrateEligible =
+                            candidate.reason == "population_id"
+                            or (
+                                candidate.rehydrateTracked == true
+                                and candidate.identity == true
+                                and (
+                                    candidate.reason == "uuid"
+                                    or candidate.reason == "body_hint"
+                                    or candidate.reason == "legacy_rehydrate"
+                                )
+                            )
                         if Internal.IsCanonicalStartupBody(
                             candidate.record,
                             zombie
@@ -315,15 +367,58 @@ local function buildBatch(now)
         end
     end
 
-    -- A positional carrier match is safe only when it is one-to-one. If two
-    -- shells compete for one record, or one shell sits within the carrier
-    -- radius of several records, leave the bodies in place and defer the
-    -- record. Identity/ledger matches remain independently actionable.
+    -- Rehydration is one-to-one. A saved live record may have several proven
+    -- historical shells near the saved position after previous failed
+    -- restarts. Adopt exactly one winner, preferring the closest body to the
+    -- saved live-body position and then the strongest identity proof. The
+    -- remaining proven matches stay actionable as duplicate cleanup.
     local id
     local group
     local match
+    local winner
+    local winnerDistance
+    local winnerStrength
     for id, group in pairs(batch.recordMatches) do
-        if group.positional > 0
+        if group.rehydrate > 0 then
+            for i = 1, #group.items do
+                match = group.items[i]
+                if match.rehydrateEligible == true then
+                    local distance = rehydrateDistance(match)
+                    local strength = rehydrateStrength(match)
+                    if not winner
+                        or distance < winnerDistance
+                        or (distance == winnerDistance
+                            and strength > winnerStrength)
+                    then
+                        winner = match
+                        winnerDistance = distance
+                        winnerStrength = strength
+                    end
+                end
+            end
+            if winner then
+                winner.rehydrateWinner = true
+                if winner.rehydrateTracked == true then
+                    batch.stats.pendingRehydrate =
+                        batch.stats.pendingRehydrate + 1
+                    markBlocked(batch, winner.record, "rehydration_pending")
+                end
+                for i = 1, #group.items do
+                    match = group.items[i]
+                    if match.rehydrateEligible == true
+                        and match ~= winner
+                    then
+                        match.rehydrateDuplicate = true
+                    end
+                end
+            end
+        end
+
+        -- A positional carrier match is safe only when it is one-to-one. If
+        -- there is no positive rehydration winner and several shells compete,
+        -- leave positional-only bodies in place and defer the record.
+        if group.rehydrate <= 0
+            and group.positional > 0
             and (#group.items > 1 or group.positional > 1)
         then
             markBlocked(batch, group.items[1].record,
@@ -335,6 +430,9 @@ local function buildBatch(now)
                 end
             end
         end
+        winner = nil
+        winnerDistance = nil
+        winnerStrength = nil
     end
 
     for zombie, match in pairs(batch.matches) do
@@ -385,6 +483,9 @@ function Lifecycle.IsStartupRecordBlocked(record, now)
         return false, nil
     end
     reason = batch.blockedRecords[tostring(record.id)]
+    if reason == "rehydration_pending" then
+        return true, reason
+    end
     if reason ~= nil then
         -- Let the record-local preflight remove a separate, positively
         -- identified shell first. The unmarked body still keeps the gate

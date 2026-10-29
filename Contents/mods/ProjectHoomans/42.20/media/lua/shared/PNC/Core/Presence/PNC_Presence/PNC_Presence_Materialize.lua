@@ -509,6 +509,18 @@ function Presence.Materialize(record, reason, nearest)
         end
         return nil, "startup_not_ready"
     end
+    if record.runtime
+        and record.runtime.startupRehydrateExpected == true
+    then
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(
+                record,
+                "startup_rehydration",
+                "startup_rehydration_pending"
+            )
+        end
+        return nil, "startup_rehydration_pending"
+    end
     prepareRecord(record)
     now = Core.Now()
     if not allowStartupMaterialization(record, now) then

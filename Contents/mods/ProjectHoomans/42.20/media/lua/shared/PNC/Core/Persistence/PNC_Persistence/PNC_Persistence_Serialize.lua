@@ -127,12 +127,16 @@ local function addBodyHint(payload, record)
     local lease = runtime.bodyLease
         or startupBodyHint and startupBodyHint.lease
         or runtime.lastLiveBodyLease or nil
+    local wasLive = record.presenceState == Const.PRESENCE_LIVE
+        or runtime.startupRehydrateExpected == true
+        or startupBodyHint and startupBodyHint.wasLive == true
     if instanceID == nil and populationID == nil
     then
         return
     end
     payload.bodyHint = {
         instanceID = instanceID,
+        wasLive = wasLive == true,
         onlineID = onlineID,
         lease = lease,
         populationId = populationID,

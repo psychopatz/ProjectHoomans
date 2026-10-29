@@ -164,6 +164,9 @@ local function restoreBodyHint(record, raw)
     if bodyHint
         and (bodyHint.instanceID ~= nil or bodyHint.populationId ~= nil)
     then
+        local wasLive = bodyHint.wasLive == true
+            or (bodyHint.wasLive == nil
+                and Internal.normalizeString(bodyHint.lease) ~= nil)
         record.runtime.startupBodyHint = {
             instanceID = bodyHint.instanceID ~= nil
                 and tostring(bodyHint.instanceID) or nil,
@@ -173,7 +176,13 @@ local function restoreBodyHint(record, raw)
             x = Internal.normalizeNumber(bodyHint.x, record.x),
             y = Internal.normalizeNumber(bodyHint.y, record.y),
             z = Internal.normalizeNumber(bodyHint.z, record.z),
+            wasLive = wasLive == true,
         }
+        -- Runtime presence is rebuilt as abstract until the engine body has
+        -- been rediscovered. Preserve whether the save actually owned a live
+        -- body so startup can adopt that body instead of treating it as an
+        -- historical husk and spawning a replacement.
+        record.runtime.startupRehydrateExpected = wasLive == true
         record.runtime.lastLiveBodyInstanceID =
             record.runtime.startupBodyHint.instanceID
         record.runtime.lastLiveBodyPopulationID =

@@ -3,6 +3,31 @@ local Internal = Lifecycle.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
+local function finalizeRehydrationMisses(now)
+    local reg = Internal.registry and Internal.registry() or nil
+    if not reg or not reg.ForEach then return 0 end
+    local missed = 0
+    reg.ForEach(function(record)
+        if record and record.alive ~= false
+            and record.runtime
+            and record.runtime.startupRehydrateExpected == true
+            and record.presenceState ~= Const.PRESENCE_LIVE
+        then
+            record.runtime.startupRehydrateExpected = nil
+            record.runtime.startupRehydrateMissed = true
+            record.runtime.lifecycle = record.runtime.lifecycle or {}
+            record.runtime.lifecycle.lastReason = "startup_rehydrate_missed"
+            record.runtime.lifecycle.lastTransitionAt = now
+            missed = missed + 1
+        end
+    end)
+    if missed > 0 and Core.LogInfo then
+        Core.LogInfo("PNC startup rehydration fallback count="
+            .. tostring(missed))
+    end
+    return missed
+end
+
 function Lifecycle.BeginStartupBodyCleanup(now, forceReset)
     local state = Lifecycle.StartupCleanup
     if state.begun == true and forceReset ~= true then
@@ -73,7 +98,9 @@ function Lifecycle.PumpStartupBodyCleanup(now, force)
     end
     if state.passes >= (tonumber(Const.BODY_SHELL_STARTUP_PASSES) or 3)
         and state.quietPasses >= 2
+        and (tonumber(stats.pendingRehydrate) or 0) <= 0
     then
+        finalizeRehydrationMisses(now)
         state.active = false
         state.complete = true
         state.completedAt = now
@@ -112,6 +139,7 @@ function Lifecycle.IsStartupBodyCleanupComplete()
             state.nextMaterializeAt = now
             state.nextMaintenanceAt = now
                 + (tonumber(Const.BODY_SHELL_MAINTENANCE_MS) or 1000)
+            finalizeRehydrationMisses(now)
             if Core.LogWarn then
                 Core.LogWarn("PNC startup body cleanup fail-open"
                     .. " reason=deadline"
@@ -148,6 +176,10 @@ function Lifecycle.OnEarlyWorldReady()
         then
             reg.Load()
             Lifecycle.StartupCleanup.earlyRegistryLoad = false
+            -- Early callbacks may have seeded from a provisional registry.
+            -- Rerun the bounded seed after the definitive ModData reload; the
+            -- ledger deduplicates matching rows, so this is idempotent.
+            Lifecycle.HuskLedgerSeeded = false
         end
         Lifecycle.RunStartupBodyCleanupNow(Core.Now(), "world_ready", true)
     end

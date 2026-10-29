@@ -2,6 +2,30 @@ local Lifecycle = PNC.BodyLifecycle
 local Internal = Lifecycle.Internal
 local Core = PNC.Core
 
+local function quarantineRehydrateCandidate(zombie, source)
+    if not zombie then return end
+    if PNC.LiveBodyControl
+        and PNC.LiveBodyControl.ApplyHumanizedBodyFlags
+    then
+        PNC.LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
+        if PNC.LiveBodyControl.SuppressZombieSounds then
+            PNC.LiveBodyControl.SuppressZombieSounds(zombie)
+        end
+    elseif Internal.clearBodyCombat then
+        Internal.clearBodyCombat(zombie)
+    end
+    if PNC.LiveBodyControl
+        and PNC.LiveBodyControl.EnforceManagedSafety
+        and Core.IsManagedNPCBody
+        and Core.IsManagedNPCBody(zombie)
+    then
+        PNC.LiveBodyControl.EnforceManagedSafety(
+            zombie,
+            source or "startup_rehydrate_quarantine"
+        )
+    end
+end
+
 function Lifecycle.SweepPersistedLiveShells(now)
     local batch
     local stats
@@ -30,7 +54,56 @@ function Lifecycle.SweepPersistedLiveShells(now)
         return stats
     end
 
-    -- `batch.bodies` is a snapshot. The removal API verifies detachment, so a
+    -- Rehydrate winners before deleting any competing shell. This makes the
+    -- saved live body claim atomic from the perspective of the second cleanup
+    -- pass: once one body is rebound, every other proven body for that record
+    -- is unambiguously a duplicate.
+    for i = 1, #batch.bodies do
+        zombie = batch.bodies[i]
+        match = batch.matches[zombie]
+        if match and not match.disabled
+            and match.rehydrateWinner == true
+        then
+            record = match.record
+            passenger = record and record.runtime
+                and record.runtime.vehiclePassenger or nil
+            if not (passenger and passenger.active == true)
+                and not Internal.IsCanonicalStartupBody(record, zombie)
+            then
+                if match.rehydrateTracked == true then
+                    quarantineRehydrateCandidate(
+                        zombie,
+                        "startup_rehydrate_candidate"
+                    )
+                end
+                if PNC.Presence and PNC.Presence.RebindRestoredBody
+                    and PNC.Presence.RebindRestoredBody(
+                        record,
+                        zombie,
+                        "startup_" .. tostring(match.reason or "rehydrate")
+                    )
+                then
+                    match.rebound = true
+                    stats.rebound = stats.rebound + 1
+                    record.runtime.startupRehydrateExpected = nil
+                    record.runtime.startupRehydrateMissed = nil
+                    if match.ledgerEntry and Lifecycle.ConsumeHuskEntry then
+                        Lifecycle.ConsumeHuskEntry(match.ledgerEntry)
+                    end
+                else
+                    match.rebindFailed = true
+                    if match.rehydrateTracked == true then
+                        -- Do not destroy the only viable restored body because
+                        -- a transient configure/engine call failed. Keep it
+                        -- harmless and retry on the next startup pass.
+                        stats.blocked = stats.blocked + 1
+                    end
+                end
+            end
+        end
+    end
+
+    -- batch.bodies is a snapshot. The removal API verifies detachment, so a
     -- body removed earlier in this pass is harmless if a later engine callback
     -- still exposes the stale reference.
     for i = 1, #batch.bodies do
@@ -45,7 +118,43 @@ function Lifecycle.SweepPersistedLiveShells(now)
             passenger = record and record.runtime
                 and record.runtime.vehiclePassenger or nil
             if not Internal.IsCanonicalStartupBody(record, zombie) then
-                if matchReason == "legacy_ledger" then
+                if match.rebound == true then
+                    -- Rebind succeeded in the first pass. Trust that result
+                    -- for this snapshot even if a lightweight test/provider
+                    -- does not expose the registry pointer immediately.
+                elseif match.rehydrateWinner == true
+                    and match.rebindFailed == true
+                    and match.rehydrateTracked == true
+                then
+                    quarantineRehydrateCandidate(
+                        zombie,
+                        "startup_rehydrate_retry"
+                    )
+                elseif match.rehydrateWinner == true
+                    and match.rebindFailed == true
+                then
+                    if Internal.RemoveStartupShell(
+                        record,
+                        zombie,
+                        "startup_rebind_failed",
+                        legacyEntry
+                    ) then
+                        stats.removed = stats.removed + 1
+                    else
+                        stats.blocked = stats.blocked + 1
+                    end
+                elseif match.rehydrateDuplicate == true then
+                    if Internal.RemoveStartupShell(
+                        record,
+                        zombie,
+                        "startup_rehydrate_duplicate",
+                        legacyEntry
+                    ) then
+                        stats.removed = stats.removed + 1
+                    else
+                        stats.blocked = stats.blocked + 1
+                    end
+                elseif matchReason == "legacy_ledger" then
                     if Internal.RemoveStartupShell(
                         record,
                         zombie,
@@ -71,25 +180,14 @@ function Lifecycle.SweepPersistedLiveShells(now)
                     else
                         stats.blocked = stats.blocked + 1
                     end
-                elseif matchReason == "population_id"
-                    and PNC.Presence
-                    and PNC.Presence.RebindRestoredBody
-                then
-                    if PNC.Presence.RebindRestoredBody(
-                        record,
+                elseif match.rehydrateWinner == true then
+                    -- A successful winner is canonical by now. Reaching this
+                    -- branch means ownership could not be proven; fail closed.
+                    quarantineRehydrateCandidate(
                         zombie,
-                        "startup_population_rebind"
-                    ) then
-                        stats.rebound = stats.rebound + 1
-                    elseif Internal.RemoveStartupShell(
-                        record,
-                        zombie,
-                        "startup_rebind_failed"
-                    ) then
-                        stats.removed = stats.removed + 1
-                    else
-                        stats.blocked = stats.blocked + 1
-                    end
+                        "startup_rehydrate_unresolved"
+                    )
+                    stats.blocked = stats.blocked + 1
                 elseif Internal.RemoveStartupShell(
                     record,
                     zombie,
@@ -165,6 +263,14 @@ function Lifecycle.InterceptLoadedShell(zombie, source)
     if not registryWasLoaded then
         Lifecycle.StartupCleanup.earlyRegistryLoad = true
     end
+    -- OnZombieUpdate can precede OnGameStart. Seed the current-save body hint
+    -- now so a zero-ID restored shell can be proven and neutralized before it
+    -- receives a vanilla hostile update. If this load was provisional, the
+    -- world-ready coordinator resets the once-per-session guard and reseeds
+    -- after the definitive registry reload.
+    if Lifecycle.SeedHuskLedgerFromRecords then
+        Lifecycle.SeedHuskLedgerFromRecords(Core.Now())
+    end
     if Lifecycle.StartupCleanup.begun ~= true then
         Lifecycle.BeginStartupBodyCleanup(Core.Now(), false)
     end
@@ -178,6 +284,16 @@ function Lifecycle.InterceptLoadedShell(zombie, source)
             and Lifecycle.IsLegacyAnonymousHusk(legacyEntry, zombie)
         then
             record = reg.Get and reg.Get(legacyEntry.npcId) or nil
+            if record and record.runtime
+                and record.runtime.startupRehydrateExpected == true
+                and not Internal.IsCanonicalStartupBody(record, zombie)
+            then
+                quarantineRehydrateCandidate(
+                    zombie,
+                    tostring(source or "early_shell") .. "_rehydrate_pending"
+                )
+                return false
+            end
             if record and not Internal.IsCanonicalStartupBody(record, zombie) then
                 return Internal.RemoveStartupShell(
                     record,
@@ -209,6 +325,16 @@ function Lifecycle.InterceptLoadedShell(zombie, source)
                     == "ambiguous_")
                 and not Internal.IsCanonicalStartupBody(record, zombie)
             then
+                if record.runtime
+                    and record.runtime.startupRehydrateExpected == true
+                then
+                    quarantineRehydrateCandidate(
+                        zombie,
+                        tostring(source or "early_shell")
+                            .. "_rehydrate_pending"
+                    )
+                    return false
+                end
                 return Internal.RemoveStartupShell(
                     record,
                     zombie,
@@ -226,6 +352,15 @@ function Lifecycle.InterceptLoadedShell(zombie, source)
         return false
     end
     if record and not Internal.IsCanonicalStartupBody(record, zombie) then
+        if record.runtime
+            and record.runtime.startupRehydrateExpected == true
+        then
+            quarantineRehydrateCandidate(
+                zombie,
+                tostring(source or "early_shell") .. "_rehydrate_pending"
+            )
+            return false
+        end
         return Internal.RemoveStartupShell(
             record,
             zombie,
