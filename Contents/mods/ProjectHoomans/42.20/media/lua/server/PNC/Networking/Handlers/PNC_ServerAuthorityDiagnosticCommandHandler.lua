@@ -102,6 +102,28 @@ Router.Register(Const.CMD_DIRECTOR_DEBUG_REQUEST,
     end
 )
 
+Router.Register(Const.CMD_SEMANTIC_SOCIAL_DEBUG_REQUEST,
+    function(player)
+        if not Router.CanUseDebug(player) then
+            Network.SendSemanticSocialDebug(
+                player, nil, false, "not_authorized"
+            )
+            return
+        end
+        local audit = PNC.Semantics
+            and PNC.Semantics.SocialDirectorAudit or nil
+        if not audit or type(audit.BuildSnapshot) ~= "function" then
+            Network.SendSemanticSocialDebug(
+                player, nil, true, "semantic_social_debug_unavailable"
+            )
+            return
+        end
+        Network.SendSemanticSocialDebug(
+            player, audit.BuildSnapshot(), true, nil
+        )
+    end
+)
+
 Router.Register(Const.CMD_WORLD_EFFECT_DEBUG_REQUEST,
     function(player, args, rawArgs)
         if not Router.CanUseDebug(player) then

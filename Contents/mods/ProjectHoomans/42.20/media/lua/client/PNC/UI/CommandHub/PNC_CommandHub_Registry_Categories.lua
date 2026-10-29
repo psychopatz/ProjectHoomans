@@ -28,6 +28,9 @@ local stockpileBootstrapEnabled = Internal.StockpileBootstrapEnabled
 local stockpileBootstrapDisabledTooltip = Internal.StockpileBootstrapDisabledTooltip
 local buildStockpile = Internal.BuildStockpile
 local openBase = Internal.OpenBase
+local socialDirectorDebugAvailable = Internal.SocialDirectorDebugAvailable
+local openSocialDirectorDebug = Internal.OpenSocialDirectorDebug
+local isSocialDirectorDebugOpen = Internal.IsSocialDirectorDebugOpen
 
 if type(Registry) ~= "table" or type(Gates) ~= "table"
     or type(isOpen) ~= "function" or type(toggleChild) ~= "function"
@@ -36,7 +39,7 @@ then
 end
 
 Registry.SetCategoryOrder({ "work", "workshop", "zone", "scavenge", "colony", "events", "colonist", "storage",
-    "research", "stockpile", "base" })
+    "research", "stockpile", "base", "ai_debug" })
 
 Registry.RegisterCategory({
     id = "work",
@@ -238,6 +241,22 @@ Registry.RegisterCategory({
     disabledTooltip = Gates.BaseDisabledTooltip,
     onClick = toggleChild("base", openBase),
     selected = function() return isOpen("base") end,
+    closeHub = false,
+})
+
+Registry.RegisterCategory({
+    id = "ai_debug",
+    source = "ProjectHoomans",
+    order = 90,
+    useChildren = false,
+    titleKey = "UI_PNC_CommandHub_Category_AIDirectorDebug",
+    titleFallback = "AI Director",
+    tooltipKey = "UI_PNC_CommandHub_AIDirectorDebugHelp",
+    tooltipFallback = "Inspect Semantic Social Director decisions and capture reasoning",
+    visible = socialDirectorDebugAvailable,
+    enabled = socialDirectorDebugAvailable,
+    onClick = openSocialDirectorDebug,
+    selected = isSocialDirectorDebugOpen,
     closeHub = false,
 })
 

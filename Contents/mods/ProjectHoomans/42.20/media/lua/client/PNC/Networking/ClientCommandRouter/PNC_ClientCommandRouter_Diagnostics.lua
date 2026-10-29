@@ -71,6 +71,13 @@ Internal.RegisterServerCommand(Const.CMD_DIRECTOR_DEBUG, function(args)
     ClientState.lastDirectorDebugReceiveAt = Core.Now()
 end)
 
+Internal.RegisterServerCommand(Const.CMD_SEMANTIC_SOCIAL_DEBUG, function(args)
+    ClientState.semanticSocialDebugAuthorized = args.authorized == true
+    ClientState.semanticSocialDebug = args.snapshot
+    ClientState.semanticSocialDebugReason = args.reason
+    ClientState.lastSemanticSocialDebugReceiveAt = Core.Now()
+end)
+
 Internal.RegisterServerCommand(Const.CMD_WORLD_EFFECT_DEBUG, function(args)
     ClientState.worldEffectDebugAuthorized = args.authorized == true
     ClientState.worldEffectDebug = args.snapshot

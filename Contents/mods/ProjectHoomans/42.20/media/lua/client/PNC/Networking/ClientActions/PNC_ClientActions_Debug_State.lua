@@ -81,4 +81,17 @@ return {
         ClientState.lastDirectorDebugReceiveAt = Core.Now()
         return snapshot ~= nil
     end,
+
+    semantic_social_debug_action = function(_, args)
+        local audit = PNC.Semantics and PNC.Semantics.SocialDirectorAudit or nil
+        if not audit or type(audit.PerformAction) ~= "function" then
+            return false
+        end
+        local snapshot, reason = audit.PerformAction(args)
+        ClientState.semanticSocialDebugAuthorized = snapshot ~= nil
+        ClientState.semanticSocialDebug = snapshot
+        ClientState.semanticSocialDebugReason = reason
+        ClientState.lastSemanticSocialDebugReceiveAt = Core.Now()
+        return snapshot ~= nil, reason
+    end,
 }

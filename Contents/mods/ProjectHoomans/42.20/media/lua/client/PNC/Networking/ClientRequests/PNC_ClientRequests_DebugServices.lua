@@ -152,6 +152,34 @@ function Client.RequestDirectorDebug(groupID, locationID, populationSectorID)
     return true
 end
 
+function Client.RequestSemanticSocialDebug()
+    local player = Internal.GetPlayer()
+    if not Client.CanUseDebug() then
+        ClientState.semanticSocialDebugAuthorized = false
+        ClientState.semanticSocialDebug = nil
+        ClientState.semanticSocialDebugReason = "not_authorized"
+        return false, "not_authorized"
+    end
+    ClientState.lastSemanticSocialDebugRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE,
+                Const.CMD_SEMANTIC_SOCIAL_DEBUG_REQUEST, {})
+            return true, "sent"
+        end
+        return false, "player_unavailable"
+    end
+    local audit = PNC.Semantics and PNC.Semantics.SocialDirectorAudit or nil
+    if not audit or type(audit.BuildSnapshot) ~= "function" then
+        return false, "semantic_social_debug_unavailable"
+    end
+    ClientState.semanticSocialDebugAuthorized = true
+    ClientState.semanticSocialDebug = audit.BuildSnapshot()
+    ClientState.semanticSocialDebugReason = nil
+    ClientState.lastSemanticSocialDebugReceiveAt = Core.Now()
+    return true
+end
+
 function Client.RequestWorldEffectDebug(state, kind, limit)
     local player = Internal.GetPlayer()
     local args = {

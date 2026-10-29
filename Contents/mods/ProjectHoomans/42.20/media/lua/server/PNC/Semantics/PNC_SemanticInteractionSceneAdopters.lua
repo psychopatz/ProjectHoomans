@@ -22,6 +22,8 @@ local SocialConversation = require
     "PNC/Semantics/SemanticSocial/PNC_SemanticSocialConversation"
 local SocialConsequences = require
     "PNC/Semantics/PNC_SemanticSocialConsequenceService"
+local SocialAudit = require
+    "PNC/Semantics/PNC_SemanticSocialDirectorAudit"
 local SceneTransport = require
     "PNC/Semantics/PNC_SemanticInteractionSceneTransport"
 
@@ -71,6 +73,7 @@ if type(socialConversation) ~= "table" then
     })
     Adopters._socialConversation = socialConversation
 end
+SocialAudit.Bind(socialDirector, socialConversation)
 
 local function clean(value, maximum)
     value = tostring(value or "")
@@ -689,6 +692,7 @@ function Adopters.ResetForTests(runtime)
         effectSink = SocialConsequences.Apply,
     })
     Adopters._socialConversation = socialConversation
+    SocialAudit.Bind(socialDirector, socialConversation)
     return manager
 end
 

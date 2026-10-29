@@ -163,6 +163,26 @@ local function openBase(_, owner)
     return false
 end
 
+local function socialDirectorDebugAvailable()
+    return PNC.Client
+        and type(PNC.Client.CanUseDebug) == "function"
+        and PNC.Client.CanUseDebug() == true
+        and PNC.SemanticSocialDirectorDebugUI
+        and type(PNC.SemanticSocialDirectorDebugUI.Open) == "function"
+        or false
+end
+
+local function openSocialDirectorDebug()
+    if not socialDirectorDebugAvailable() then return false end
+    return PNC.SemanticSocialDirectorDebugUI.Open() ~= nil
+end
+
+local function isSocialDirectorDebugOpen()
+    local ui = PNC.SemanticSocialDirectorDebugUI
+    return ui and type(ui.IsOpen) == "function"
+        and ui.IsOpen() == true or false
+end
+
 local function scavengeSnapshot()
     local state = PNC.Network and PNC.Network.ClientState or nil
     local sessionId = state and state.activeScavengeSessionId or nil
@@ -262,5 +282,8 @@ Internal.StockpileBootstrapEnabled = stockpileBootstrapEnabled
 Internal.StockpileBootstrapDisabledTooltip = stockpileBootstrapDisabledTooltip
 Internal.BuildStockpile = buildStockpile
 Internal.OpenBase = openBase
+Internal.SocialDirectorDebugAvailable = socialDirectorDebugAvailable
+Internal.OpenSocialDirectorDebug = openSocialDirectorDebug
+Internal.IsSocialDirectorDebugOpen = isSocialDirectorDebugOpen
 
 return Internal

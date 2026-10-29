@@ -44,6 +44,21 @@ function H.HandleDiagnosticAction(player, args)
         )
         return true
     end
+    if args.action == "semantic_social_debug_action" then
+        local audit = PNC.Semantics
+            and PNC.Semantics.SocialDirectorAudit or nil
+        if not audit or type(audit.PerformAction) ~= "function" then
+            network.SendSemanticSocialDebug(
+                player, nil, true, "semantic_social_debug_unavailable"
+            )
+            return true
+        end
+        local snapshot, reason = audit.PerformAction(args)
+        network.SendSemanticSocialDebug(
+            player, snapshot, true, reason
+        )
+        return true
+    end
     return false
 end
 

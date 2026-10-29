@@ -145,6 +145,39 @@ Result:
 - a synthetic future FACTION_EVENT/REPAIR social domain adopts through public Social Director/Scene/affordance seams without generic algorithm special-casing;
 - Observatory remains read-only and stores no transcript.
 
+## Post-D8 diagnostics extension — in-game Social Director audit
+
+Implemented after the D0-D8 acceptance at user request:
+
+- a dedicated server-side `PNC_SemanticSocialDirectorAudit` provides an **opt-in, transient, bounded** decision audit;
+- capture is **disabled by default**;
+- when capture is disabled, the original live `SocialDirector:Submit` and `SocialConversation:EvaluateTurn` methods execute unchanged: the audit provider removes its instance overrides, so the shared hot decision paths contain **no debug branch, row construction, copy, serialization, network send, polling, or persistence work**;
+- enabling capture temporarily wraps only those two live instance methods and records semantic decision metadata after their normal authority completes;
+- disabling capture restores the original metatable methods immediately;
+- the capture is capped at **48 newest decision rows** and reports dropped-oldest count;
+- admission rows explain normalization failures, chatter-budget suppression and Scene admission/rejection;
+- turn rows expose bounded NPC candidates, semantic strategies, eligibility, contextual scores/modifiers, selected actor/target/strategy, silence and player-wait decisions;
+- rendered conversation transcript text is not retained;
+- the recorder has no `Events.OnTick`, `ModData`, live-registry scan, zombie scan, rendered-text reparse or LLM path;
+- debug access reuses the existing debug authorization/network authority rather than adding a gameplay command bypass;
+- the Project Hoomans Command Hub now exposes a debug-authorized **AI Director** entry that opens the dedicated audit window;
+- the audit window supports **REFRESH**, **ENABLE AUDIT**, **DISABLE AUDIT**, and **CLEAR CAPTURE**;
+- the window only auto-refreshes while capture is enabled; closing the window leaves an explicitly enabled capture active so a user can reproduce a bug and inspect it afterward;
+- EN/TL Command Hub translation key sets remain identical.
+
+Diagnostics-extension validation:
+
+- final isolated repository Lua suite: **957/957 PASS**;
+- focused audit + Social Director/conversation + Command Hub/network/debug-authority suite: **9/9 PASS**;
+- real Semantic Harness Scene Observatory/coherent-conversation regression: **11/11 PASS**;
+- installed Build 42 Kahlua semantic verification: **132/132 PASS**;
+- installed Build 42 Kahlua verification of all **12 changed production Lua files**: **12/12 PASS**;
+- `git diff --check`: PASS;
+- static disabled-path proof: no audit/debug references in the shared Social Director or Social Conversation hot-path source;
+- static audit-provider proof: no tick, persistence, full-NPC/zombie scan, transcript, rendered-text reparse or routine LLM path.
+
+For native debugging, open **Command Hub -> AI Director**, enable capture, reproduce the issue, then inspect admission and turn-choice rows. Disable capture again after the reproduction when diagnostics are no longer needed.
+
 ## Known pre-existing unrelated harness failure
 
 The C10 mutation-matrix case `unsafe_item_typo` for `give me waterr` currently expects transport count 0 but observes 1 while still producing the safe `ASK_CLARIFICATION` / `unresolved_action_reference` result.

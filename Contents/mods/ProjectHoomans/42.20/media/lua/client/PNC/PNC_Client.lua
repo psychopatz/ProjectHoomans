@@ -173,6 +173,11 @@ local function onResetLua()
     ClientState.directorDebug = nil
     ClientState.directorDebugAuthorized = false
     ClientState.directorDebugReason = nil
+    ClientState.semanticSocialDebug = nil
+    ClientState.semanticSocialDebugAuthorized = false
+    ClientState.semanticSocialDebugReason = nil
+    ClientState.lastSemanticSocialDebugRequestAt = 0
+    ClientState.lastSemanticSocialDebugReceiveAt = 0
     ClientState.colonyManagement = nil
     ClientState.colonyManagementRevision = 0
     ClientState.colonyBase = nil

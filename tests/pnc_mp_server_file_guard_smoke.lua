@@ -121,8 +121,10 @@ listing:close()
 -- PNC_ServerSemanticSocialInteractionCommandHandler_Handle is loaded by the
 -- semantic social authority composition root.
 -- PNC_ServerSemanticSocialInteractionCommandHandler_ApplySocialEvent and
--- PNC_SemanticSocialConsequenceService is loaded by the guarded semantic
--- Interaction Scene adopter composition root.
+-- PNC_SemanticSocialConsequenceService and
+-- PNC_SemanticSocialDirectorAudit are loaded by the guarded semantic
+-- Interaction Scene adopter composition root. The audit provider is inert
+-- until an authorized debug action explicitly enables runtime capture.
 -- PNC_ServerLLMSocialReactionCommandHandler_ApplyEffect and
 -- PNC_ServerLLMSocialReactionCommandHandler_BuildResult and
 -- PNC_ServerLLMSocialReactionCommandHandler_DeliverResult are loaded by their
@@ -156,7 +158,7 @@ listing:close()
 -- activity root.
 -- The three need-facility effect spokes are loaded by its guarded root.
 -- The four UniqueNPCRegistry providers are loaded by its guarded root.
-T.equal(#serverOnlyFiles, 1006,
+T.equal(#serverOnlyFiles, 1007,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 
