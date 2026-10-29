@@ -42,4 +42,4 @@ All mandatory B0–B9 developer work is accepted. The system now has episode-dri
 
 See `PROGRESS.md` for exact acceptance evidence. The job is maintenance-ready; native SP/MP timing, chatter feel and compact-strip usability remain the user-owned live gate unless explicitly reassigned.
 
-The successor generalization for neutral/hostile/faction NPC-to-NPC encounter conversation is `docs/Jobs/SemanticNPCGroupConversation/`. That job must reuse this accepted foundation rather than reopening B0-B9.
+The broader successor is `docs/Jobs/SemanticInteractionSceneRuntime/`. It productionizes the existing generic Interaction Scene subsystem; combat group conversation is one adopter and must reuse this accepted B0-B9 foundation rather than reopening it.

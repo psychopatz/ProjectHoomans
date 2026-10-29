@@ -135,4 +135,4 @@ Do not implement as mandatory B0–B9 work unless needed for architecture correc
 - large-scale squad command wheel redesign;
 - LLM-authored routine combat chatter.
 
-Autonomous neutral/hostile/faction NPC-to-NPC encounter conversation is now owned by the dedicated successor job `docs/Jobs/SemanticNPCGroupConversation/`. Do not retrofit that scope into completed B0-B9 phases.
+Autonomous NPC/multi-actor conversation is now owned by the broader `docs/Jobs/SemanticInteractionSceneRuntime/` successor. Combat cohorts are an adopter of that generic runtime; do not retrofit the subsystem into completed B0-B9 phases.
