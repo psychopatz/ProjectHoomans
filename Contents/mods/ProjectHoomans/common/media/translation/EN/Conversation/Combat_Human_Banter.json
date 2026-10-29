@@ -1,0 +1,23 @@
+{
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillAggressiveLine01Neutral01": "He's down. Keep pushing.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillAggressiveLine02Neutral01": "One less bastard shooting at us.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillAggressiveLine03Neutral01": "Threat's dead. Eyes up.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillBraveLine01Neutral01": "Threat's down. Stay sharp.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillBraveLine02Neutral01": "He's done. Watch the rest.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillBraveLine03Neutral01": "Down. Don't freeze up now.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillColdLine01Neutral01": "One less problem.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillColdLine02Neutral01": "He's dead. Move.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillColdLine03Neutral01": "Finished. Check the others.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillPracticalLine01Neutral01": "He's down. Check the area.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillPracticalLine02Neutral01": "Fight's not over until we check the rest.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillPracticalLine03Neutral01": "He's dead. Reload and scan.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillReservedLine01Neutral01": "He's down.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillReservedLine02Neutral01": "Done.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillReservedLine03Neutral01": "Clear.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillShakenLine01Neutral01": "Jesus... he's dead.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillShakenLine02Neutral01": "Fuck. That was a person.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillShakenLine03Neutral01": "He's down... let's just get out of here.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillSupportiveLine01Neutral01": "He's down. You alright?",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillSupportiveLine02Neutral01": "It's over. Stay close to me.",
+  "UI_PNC_Conversation_Content_SemanticCombatHumanKillSupportiveLine03Neutral01": "He's dead. Check yourself for hits."
+}

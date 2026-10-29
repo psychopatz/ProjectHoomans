@@ -66,6 +66,11 @@ local FOLLOW_UP_OFFERS = {
         followUp("health", "Are you okay?", "EVENT_HEALTH"),
         followUp("next", "What now?", "EVENT_NEXT"),
     },
+    humanKill = {
+        followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
+        followUp("health", "Are you okay?", "EVENT_HEALTH"),
+        followUp("next", "What now?", "EVENT_NEXT"),
+    },
     retreat = {
         followUp("happened", "What happened?", "EVENT_WHAT_HAPPENED"),
     },
@@ -385,6 +390,24 @@ for _, role in ipairs({ "witness", "killer" }) do
         end
         Catalog.Register(poolID, { variants = variants })
     end
+end
+
+for _, style in ipairs(KILL_REACTION_STYLES) do
+    local poolID = "semantic.combat.human_kill." .. style
+    local variants = {}
+    for variantIndex = 1, 3 do
+        variants[#variants + 1] = response(
+            poolID,
+            string.format("line_%02d", variantIndex),
+            nil,
+            0,
+            "REACT",
+            "combat",
+            FOLLOW_UP_OFFERS.humanKill,
+            poolID
+        )
+    end
+    Catalog.Register(poolID, { variants = variants })
 end
 
 Catalog.Register("semantic.combat.horde.prompt", {

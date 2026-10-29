@@ -5,8 +5,8 @@ local Registry = PNC.Semantics.ConversationRegistry or {}
 PNC.Semantics.ConversationRegistry = Registry
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
-Registry.CONTENT_FINGERPRINT = "a1f691bce2fda1c94c9c615967ffe03256111f0317af956b28036cb2d01d3161"
-Registry.WHOLE_MODEL_FINGERPRINT = "f7110e8819558867a64c41681f521216bbd398b180dcde753298e7036f8325e6"
+Registry.CONTENT_FINGERPRINT = "28ab11c740d79606ba9c81e5284b76490e8715fb426612da0d8f3282d9d89d5f"
+Registry.WHOLE_MODEL_FINGERPRINT = "677b3e5051b1f92bdd0aec42547a8024ac55e97192527f1ef8babbea8c247706"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -49,233 +49,235 @@ local function appendUI(loaded)
 end
 local loaded01 = require "PNC/Semantics/Generated/Conversation/Content/CombatBanter/WeaponKillReactions"
 appendContent(loaded01)
-local loaded02 = require "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Camp"
+local loaded02 = require "PNC/Semantics/Generated/Conversation/Content/CombatHumanBanter/HumanKillReactions"
 appendContent(loaded02)
-local loaded03 = require "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Follow"
+local loaded03 = require "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Camp"
 appendContent(loaded03)
-local loaded04 = require "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/ReturnHome"
+local loaded04 = require "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Follow"
 appendContent(loaded04)
-local loaded05 = require "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Stay"
+local loaded05 = require "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/ReturnHome"
 appendContent(loaded05)
-local loaded06 = require "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/StopFollowing"
+local loaded06 = require "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Stay"
 appendContent(loaded06)
-local loaded07 = require "PNC/Semantics/Generated/Conversation/Content/Command/Player"
+local loaded07 = require "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/StopFollowing"
 appendContent(loaded07)
-local loaded08 = require "PNC/Semantics/Generated/Conversation/Content/Command/Replies"
+local loaded08 = require "PNC/Semantics/Generated/Conversation/Content/Command/Player"
 appendContent(loaded08)
-local loaded09 = require "PNC/Semantics/Generated/Conversation/Content/Compatibility"
+local loaded09 = require "PNC/Semantics/Generated/Conversation/Content/Command/Replies"
 appendContent(loaded09)
-local loaded10 = require "PNC/Semantics/Generated/Conversation/Content/Conversation"
+local loaded10 = require "PNC/Semantics/Generated/Conversation/Content/Compatibility"
 appendContent(loaded10)
-local loaded11 = require "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions"
+local loaded11 = require "PNC/Semantics/Generated/Conversation/Content/Conversation"
 appendContent(loaded11)
-local loaded12 = require "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions"
+local loaded12 = require "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions"
 appendContent(loaded12)
-local loaded13 = require "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions"
+local loaded13 = require "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions"
 appendContent(loaded13)
-local loaded14 = require "PNC/Semantics/Generated/Conversation/Content/Event/Medical"
+local loaded14 = require "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions"
 appendContent(loaded14)
-local loaded15 = require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions"
+local loaded15 = require "PNC/Semantics/Generated/Conversation/Content/Event/Medical"
 appendContent(loaded15)
-local loaded16 = require "PNC/Semantics/Generated/Conversation/Content/Greeting"
+local loaded16 = require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions"
 appendContent(loaded16)
-local loaded17 = require "PNC/Semantics/Generated/Conversation/Content/Health"
+local loaded17 = require "PNC/Semantics/Generated/Conversation/Content/Greeting"
 appendContent(loaded17)
-local loaded18 = require "PNC/Semantics/Generated/Conversation/Content/Knowledge"
+local loaded18 = require "PNC/Semantics/Generated/Conversation/Content/Health"
 appendContent(loaded18)
-local loaded19 = require "PNC/Semantics/Generated/Conversation/Content/Navigation"
+local loaded19 = require "PNC/Semantics/Generated/Conversation/Content/Knowledge"
 appendContent(loaded19)
-local loaded20 = require "PNC/Semantics/Generated/Conversation/Content/Needs"
+local loaded20 = require "PNC/Semantics/Generated/Conversation/Content/Navigation"
 appendContent(loaded20)
-local loaded21 = require "PNC/Semantics/Generated/Conversation/Content/Quest"
+local loaded21 = require "PNC/Semantics/Generated/Conversation/Content/Needs"
 appendContent(loaded21)
-local loaded22 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Conversation"
+local loaded22 = require "PNC/Semantics/Generated/Conversation/Content/Quest"
 appendContent(loaded22)
-local loaded23 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Player"
+local loaded23 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Conversation"
 appendContent(loaded23)
-local loaded24 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply"
+local loaded24 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Player"
 appendContent(loaded24)
-local loaded25 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ArgumentDeescalate"
+local loaded25 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply"
 appendContent(loaded25)
-local loaded26 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ArgumentRetaliate"
+local loaded26 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ArgumentDeescalate"
 appendContent(loaded26)
-local loaded27 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ContextClarify"
+local loaded27 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ArgumentRetaliate"
 appendContent(loaded27)
-local loaded28 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/FirstContactChallenge"
+local loaded28 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ContextClarify"
 appendContent(loaded28)
-local loaded29 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryAcknowledge"
+local loaded29 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/FirstContactChallenge"
 appendContent(loaded29)
-local loaded30 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryAcknowledgeFlavor"
+local loaded30 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryAcknowledge"
 appendContent(loaded30)
-local loaded31 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryFollowup"
+local loaded31 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryAcknowledgeFlavor"
 appendContent(loaded31)
-local loaded32 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/NewsAcknowledge"
+local loaded32 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryFollowup"
 appendContent(loaded32)
-local loaded33 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEventWarning"
+local loaded33 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/NewsAcknowledge"
 appendContent(loaded33)
-local loaded34 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEventWarningFlavor"
+local loaded34 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEventWarning"
 appendContent(loaded34)
-local loaded35 = require "PNC/Semantics/Generated/Conversation/Content/Social/Reactions"
+local loaded35 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEventWarningFlavor"
 appendContent(loaded35)
-local loaded36 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AcceptedGeneric"
+local loaded36 = require "PNC/Semantics/Generated/Conversation/Content/Social/Reactions"
 appendContent(loaded36)
-local loaded37 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire"
+local loaded37 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AcceptedGeneric"
 appendContent(loaded37)
-local loaded38 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology"
+local loaded38 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire"
 appendContent(loaded38)
-local loaded39 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName"
+local loaded39 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology"
 appendContent(loaded39)
-local loaded40 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort"
+local loaded40 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName"
 appendContent(loaded40)
-local loaded41 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment"
+local loaded41 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort"
 appendContent(loaded41)
-local loaded42 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt"
+local loaded42 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment"
 appendContent(loaded42)
-local loaded43 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile"
+local loaded43 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt"
 appendContent(loaded43)
-local loaded44 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult"
+local loaded44 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile"
 appendContent(loaded44)
-local loaded45 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Orientation"
+local loaded45 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult"
 appendContent(loaded45)
-local loaded46 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Personality"
+local loaded46 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Orientation"
 appendContent(loaded46)
-local loaded47 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise"
+local loaded47 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Personality"
 appendContent(loaded47)
-local loaded48 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Relationship"
+local loaded48 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise"
 appendContent(loaded48)
-local loaded49 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic"
+local loaded49 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Relationship"
 appendContent(loaded49)
-local loaded50 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual"
+local loaded50 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic"
 appendContent(loaded50)
-local loaded51 = require "PNC/Semantics/Generated/Conversation/Content/SocialApology"
+local loaded51 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual"
 appendContent(loaded51)
-local loaded52 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Consume"
+local loaded52 = require "PNC/Semantics/Generated/Conversation/Content/SocialApology"
 appendContent(loaded52)
-local loaded53 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Drink"
+local loaded53 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Consume"
 appendContent(loaded53)
-local loaded54 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Eat"
+local loaded54 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Drink"
 appendContent(loaded54)
-local loaded55 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Fetch"
+local loaded55 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Eat"
 appendContent(loaded55)
-local loaded56 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Gift"
+local loaded56 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Fetch"
 appendContent(loaded56)
-local loaded57 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Give"
+local loaded57 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Gift"
 appendContent(loaded57)
-local loaded58 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Refill"
+local loaded58 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Give"
 appendContent(loaded58)
-local loaded59 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/WaitAt"
+local loaded59 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Refill"
 appendContent(loaded59)
-local loaded60 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/Cooldown"
+local loaded60 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/WaitAt"
 appendContent(loaded60)
-local loaded61 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderCamp"
+local loaded61 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/Cooldown"
 appendContent(loaded61)
-local loaded62 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderFollow"
+local loaded62 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderCamp"
 appendContent(loaded62)
-local loaded63 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderGeneric"
+local loaded63 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderFollow"
 appendContent(loaded63)
-local loaded64 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderRejected"
+local loaded64 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderGeneric"
 appendContent(loaded64)
-local loaded65 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderStay"
+local loaded65 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderRejected"
 appendContent(loaded65)
-local loaded66 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedAdmire"
+local loaded66 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderStay"
 appendContent(loaded66)
-local loaded67 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedApology"
+local loaded67 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedAdmire"
 appendContent(loaded67)
-local loaded68 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedComfort"
+local loaded68 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedApology"
 appendContent(loaded68)
-local loaded69 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedCompliment"
+local loaded69 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedComfort"
 appendContent(loaded69)
-local loaded70 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedFlirt"
+local loaded70 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedCompliment"
 appendContent(loaded70)
-local loaded71 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedGeneric"
+local loaded71 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedFlirt"
 appendContent(loaded71)
-local loaded72 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedHostile"
+local loaded72 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedGeneric"
 appendContent(loaded72)
-local loaded73 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedInsult"
+local loaded73 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedHostile"
 appendContent(loaded73)
-local loaded74 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedPraise"
+local loaded74 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedInsult"
 appendContent(loaded74)
-local loaded75 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedRomantic"
+local loaded75 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedPraise"
 appendContent(loaded75)
-local loaded76 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedSexual"
+local loaded76 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedRomantic"
 appendContent(loaded76)
-local loaded77 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedGame"
+local loaded77 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedSexual"
 appendContent(loaded77)
-local loaded78 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedGeneric"
+local loaded78 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedGame"
 appendContent(loaded78)
-local loaded79 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedHostile"
+local loaded79 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedGeneric"
 appendContent(loaded79)
-local loaded80 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedSexual"
+local loaded80 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedHostile"
 appendContent(loaded80)
-local loaded81 = require "PNC/Semantics/Generated/Conversation/Content/Wellbeing"
+local loaded81 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedSexual"
 appendContent(loaded81)
-local loaded82 = require "PNC/Semantics/Generated/Conversation/Content/PlayerChoices"
-appendContentChoices(loaded82)
-local loaded83 = require "PNC/Semantics/Generated/Conversation/Patterns/SemanticFlows"
-appendPatterns(loaded83)
-local loaded84 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/GreetingWhatsUp"
+local loaded82 = require "PNC/Semantics/Generated/Conversation/Content/Wellbeing"
+appendContent(loaded82)
+local loaded83 = require "PNC/Semantics/Generated/Conversation/Content/PlayerChoices"
+appendContentChoices(loaded83)
+local loaded84 = require "PNC/Semantics/Generated/Conversation/Patterns/SemanticFlows"
 appendPatterns(loaded84)
-local loaded85 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/Identity"
+local loaded85 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/GreetingWhatsUp"
 appendPatterns(loaded85)
-local loaded86 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/WeatherNeeds"
+local loaded86 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/Identity"
 appendPatterns(loaded86)
-local loaded87 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/WellbeingActivity"
+local loaded87 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/WeatherNeeds"
 appendPatterns(loaded87)
-local loaded88 = require "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal"
+local loaded88 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/WellbeingActivity"
 appendPatterns(loaded88)
-local loaded89 = require "PNC/Semantics/Generated/Conversation/Responses/Common/NeedsWeather"
-appendResponses(loaded89)
-local loaded90 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Questions"
+local loaded89 = require "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal"
+appendPatterns(loaded89)
+local loaded90 = require "PNC/Semantics/Generated/Conversation/Responses/Common/NeedsWeather"
 appendResponses(loaded90)
-local loaded91 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Social"
+local loaded91 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Questions"
 appendResponses(loaded91)
-local loaded92 = require "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses"
+local loaded92 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Social"
 appendResponses(loaded92)
-local loaded93 = require "PNC/Semantics/Generated/Conversation/Responses/SemanticFlows"
+local loaded93 = require "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses"
 appendResponses(loaded93)
-local loaded94 = require "PNC/Semantics/Generated/Conversation/Flows/SemanticFlows"
-appendFlows(loaded94)
-local loaded95 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeMemory"
-appendBehaviors(loaded95)
-local loaded96 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeNews"
+local loaded94 = require "PNC/Semantics/Generated/Conversation/Responses/SemanticFlows"
+appendResponses(loaded94)
+local loaded95 = require "PNC/Semantics/Generated/Conversation/Flows/SemanticFlows"
+appendFlows(loaded95)
+local loaded96 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeMemory"
 appendBehaviors(loaded96)
-local loaded97 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeRepair"
+local loaded97 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeNews"
 appendBehaviors(loaded97)
-local loaded98 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeReply"
+local loaded98 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeRepair"
 appendBehaviors(loaded98)
-local loaded99 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeThanks"
+local loaded99 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeReply"
 appendBehaviors(loaded99)
-local loaded100 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AskMemoryFollowup"
+local loaded100 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeThanks"
 appendBehaviors(loaded100)
-local loaded101 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Challenge"
+local loaded101 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AskMemoryFollowup"
 appendBehaviors(loaded101)
-local loaded102 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/ClarifyContext"
+local loaded102 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Challenge"
 appendBehaviors(loaded102)
-local loaded103 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Deescalate"
+local loaded103 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/ClarifyContext"
 appendBehaviors(loaded103)
-local loaded104 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/EndConversation"
+local loaded104 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Deescalate"
 appendBehaviors(loaded104)
-local loaded105 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Reconcile"
+local loaded105 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/EndConversation"
 appendBehaviors(loaded105)
-local loaded106 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally"
+local loaded106 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Reconcile"
 appendBehaviors(loaded106)
-local loaded107 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Warn"
+local loaded107 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally"
 appendBehaviors(loaded107)
-local loaded108 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/WorldEventWarn"
+local loaded108 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Warn"
 appendBehaviors(loaded108)
-local loaded109 = require "PNC/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation"
-appendBeats(loaded109)
-local loaded110 = require "PNC/Semantics/Generated/Conversation/Beats/Social/Reconciliation"
+local loaded109 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/WorldEventWarn"
+appendBehaviors(loaded109)
+local loaded110 = require "PNC/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation"
 appendBeats(loaded110)
-local loaded111 = require "PNC/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact"
+local loaded111 = require "PNC/Semantics/Generated/Conversation/Beats/Social/Reconciliation"
 appendBeats(loaded111)
-local loaded112 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn"
-local loaded113 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl"
-local loaded114 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesEn"
-local loaded115 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesTl"
-local loaded116 = require "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes"
-local loaded117 = require "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"
-appendUI(loaded117)
+local loaded112 = require "PNC/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact"
+appendBeats(loaded112)
+local loaded113 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn"
+local loaded114 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl"
+local loaded115 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesEn"
+local loaded116 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesTl"
+local loaded117 = require "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes"
+local loaded118 = require "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"
+appendUI(loaded118)
 for key, family in pairs(Registry.PHRASE_FAMILIES) do
     if type(family) == "table" and family.id then Registry.PHRASE_FAMILIES[key] = family end
 end

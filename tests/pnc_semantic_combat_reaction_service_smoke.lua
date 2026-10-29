@@ -263,4 +263,51 @@ T.falsy(string.find(
     sends[1].payload.ambientFlavor.text, "Base.", 1, true
 ), "internal item type never leaks through named-weapon flavor")
 
+Service.ResetRuntime()
+sends = {}
+now = 16000
+local hostileTarget = {
+    id = "human-target",
+    alive = false,
+    x = 2,
+    y = 0,
+    z = 0,
+}
+local humanListeners, humanReason = Service.OnNPCHumanKill(
+    records[1],
+    hostileTarget,
+    nil,
+    {
+        now = now,
+        attackType = "ranged",
+        attackKind = "ranged",
+        weaponItem = {
+            getFullType = function() return "Base.Pistol" end,
+            getDisplayName = function() return "M9 Pistol" end,
+        },
+        weaponFullType = "Base.Pistol",
+        partId = "Torso_Upper",
+        woundType = "bullet",
+        hostilityReason = "enemy",
+    }
+)
+T.equal(humanListeners, 1, "hostile-human self-kill speaks to nearby player")
+T.equal(humanReason, "semantic_reaction_emitted",
+    "hostile-human kill uses the semantic combat reaction service")
+T.equal(sends[1].reason, "hostile_npc_kill_self",
+    "hostile-human kill uses a distinct event type")
+local humanContext = sends[1].payload.ambientFlavor.context
+T.equal(humanContext.combatMoment.targetKind, "human_npc",
+    "hostile-human combat moment cannot masquerade as zombie kill")
+T.equal(
+    sends[1].payload.ambientFlavor.llmEligible,
+    false,
+    "routine hostile-human kill bark remains non-LLM"
+)
+T.equal(
+    sends[1].payload.ambientFlavor.memoryEligible,
+    false,
+    "routine hostile-human kill bark remains non-memory"
+)
+
 T.finish("pnc_semantic_combat_reaction_service_smoke")

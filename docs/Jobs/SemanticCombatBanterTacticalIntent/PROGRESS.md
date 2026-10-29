@@ -1,6 +1,6 @@
 # Progress — Semantic Combat Banter & Tactical Intent
 
-**Status:** ACTIVE — B0–B5 accepted; B6 hostile-human kill commentary is next.
+**Status:** ACTIVE — B0–B6 accepted; B7 combat-language quality and branching standardization is next.
 **Planning base:** ProjectHoomans `8632bc30`, existing `main`.
 **Parent foundation:** `docs/Jobs/OpenEndedSemanticCombatAwareness/` is developer-complete and remains accepted unless this job reproduces a regression in an owning layer.
 **Native PZ:** user live regression supplied; new job's developer implementation/acceptance not yet run.
@@ -145,16 +145,37 @@ B5 evidence:
 - no new global zombie scan, routine persistence or LLM path;
 - `git diff --check`: clean.
 
-## ONE current Next Chunk — B6
+## B6 accepted — hostile-human NPC kill commentary
 
-Implement hostile-human NPC kill commentary:
-1. emit one authoritative semantic combat moment when an NPC kill transitions a hostile human NPC to dead;
-2. pass the same actual weapon/action context through `CombatWeaponContext`;
-3. keep existing death/faction/social side-effect owners unchanged and exactly-once;
-4. route human-kill semantics to distinct content families that cannot select zombie-only gore wording;
-5. use grounded personality/relationship/faction context only when already available;
-6. keep routine human-kill chatter transient, non-LLM and non-memory;
-7. prove zombie and hostile-human kill families remain distinct and no duplicate death/relationship/faction mutation occurs.
+Accepted implementation:
+- NPC-vs-NPC combat observes the authoritative `targetRecord.alive: true -> false` transition after the existing damage writer commits death;
+- the semantic bridge is observer-only: existing social damage, faction aggression and network removal owners remain unchanged and exactly-once;
+- actual hit weapon/action/body-part/wound context and a grounded hostility reason are forwarded into the same `CombatWeaponContext / CombatMoment` path;
+- routine human-kill bark uses event `hostile_npc_kill_self` and targetKind `human_npc`;
+- human kills route into distinct `semantic.combat.human_kill.<style>` pools and cannot select zombie blade/teeth/molars wording;
+- three authored EN/TL variants exist for each aggressive/supportive/shaken/brave/reserved/cold/practical style in a dedicated `combat_human_banter` ownership domain;
+- human-kill follow-ups are happened/health/next only; zombie quantity follow-up is not inherited;
+- repeated damage on an already-dead target cannot re-emit the semantic kill or duplicate faction/social/removal effects;
+- routine human-kill presentation remains transient, non-LLM and non-memory.
+
+B6 evidence:
+- focused human selection/bridge/service/NPC-damage matrix: **4/4 PASS**;
+- full `pnc_semantic`: **121/121 PASS**;
+- human-kill content: **21/21 EN+TL** with static zombie/gore exclusion;
+- two consecutive CodeBuilder generations: byte-identical, **188 files / 482 phrase families**;
+- changed/untracked Lua through installed Kahlua compiler: **12/12 PASS**;
+- `git diff --check`: clean.
+
+## ONE current Next Chunk — B7
+
+Standardize combat presentation class and language/branching contracts:
+1. make combat response plans/families explicitly declare `BARK`, `TACTICAL_PROMPT`, or intentional `TERMINAL`;
+2. require tactical prompts to carry grounded executable offers while bark/terminal families remain valid with zero required offers;
+3. keep optional contextual continuations on barks distinct from response-required prompts;
+4. audit all non-legacy combat pools to zero unclassified families;
+5. strengthen personality/intensity/profanity variation without single-trait deterministic stereotypes;
+6. ensure semantic-click and typed equivalent tactical replies still converge on the same gameplay action;
+7. add catalog/compiler/harness checks for EN/TL coverage, presentation classification and anti-repeat behavior.
 
 ## Remaining mandatory phases
 
@@ -173,6 +194,6 @@ B0 baseline -> B1 horde episode/routing -> B2 team tactical intent -> B3 non-mod
 
 ## Evidence status
 
-B0–B5 are developer-accepted with focused and broad evidence above. B6–B9 remain mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
+B0–B6 are developer-accepted with focused and broad evidence above. B7–B9 remain mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
 
 Git history is the implementation diary; keep this file as current truth rather than appending per-commit narratives.

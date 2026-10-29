@@ -99,8 +99,11 @@ local function eventFacts(
     local y = tonumber(spec.y or record.y)
     local z = tonumber(spec.z or record.z)
     local actorKind = tostring(spec.actorKind or "player")
+    local humanKill = eventType == "hostile_npc_kill_self"
     local summary
-    if eventType == "zombie_kill_self" then
+    if humanKill then
+        summary = "the NPC killed a hostile survivor nearby"
+    elseif eventType == "zombie_kill_self" then
         summary = burst > 1
             and "the NPC killed another zombie during the fight"
             or "the NPC killed a zombie nearby"
@@ -122,8 +125,14 @@ local function eventFacts(
             quantity = profile.quantity,
             health = profile.health,
             healthState = profile.healthState,
-            nextAction = profile.nextAction,
+            nextAction = humanKill
+                and (spec.nextAction
+                    or "Check the area and make sure the fight is over.")
+                or profile.nextAction,
             actorKind = actorKind,
+            targetKind = spec.targetKind,
+            targetID = spec.targetID,
+            hostilityReason = spec.hostilityReason,
             killBurstCount = burst,
             weaponFamily = moment and moment.weaponFamily,
             weaponSkill = moment and moment.weaponSkill,
@@ -317,14 +326,14 @@ local function zombieKey(zombie)
     return tostring(value)
 end
 
-local function baseKillMoment(eventType, actorKind, actorID, zombie, spec, now)
+local function baseKillMoment(eventType, actorKind, actorID, target, spec, now)
     return Moment.Build({
         kind = "kill",
         eventType = eventType,
         actorKind = actorKind,
         actorID = actorID,
-        targetKind = "zombie",
-        targetID = zombieKey(zombie),
+        targetKind = spec.targetKind or "zombie",
+        targetID = spec.targetID or zombieKey(target),
         outcome = "killed",
         attackType = spec.attackType,
         attackKind = spec.attackKind,
@@ -510,6 +519,109 @@ function Service.OnNPCKill(record, zombie, spec)
                 local sent = sendReaction(
                     player, record, profile, eventType,
                     { actorKind = "npc", x = x, y = y, z = z },
+                    now, moment.burstCount, nil, moment
+                )
+                if sent then listeners = listeners + 1 end
+            end
+        end
+    end
+    return listeners, listeners > 0 and "semantic_reaction_emitted"
+        or "no_listener"
+end
+
+function Service.OnNPCHumanKill(record, targetRecord, targetBody, spec)
+    spec = type(spec) == "table" and spec or {}
+    if not record or record.alive == false
+        or not targetRecord or targetRecord.alive ~= false
+    then
+        return 0, "kill_context_invalid"
+    end
+    local now = tonumber(spec.now) or (Core and Core.Now and Core.Now()) or 0
+    local x = tonumber(spec.x or targetRecord.x or record.x)
+    local y = tonumber(spec.y or targetRecord.y or record.y)
+    local z = tonumber(spec.z or targetRecord.z or record.z)
+    if not x or not y or not z then return 0, "kill_position_unavailable" end
+
+    local weapon = WeaponContext.Build(record, spec)
+    spec.attackType = weapon.attackType
+    spec.attackKind = weapon.attackKind
+    spec.weaponFullType = weapon.weaponFullType
+    spec.weaponDisplayName = weapon.weaponDisplayName
+    spec.weaponFamily = weapon.weaponFamily
+    spec.weaponSkill = weapon.weaponSkill
+    spec.weaponSkillLevel = weapon.weaponSkillLevel
+    spec.weaponSkillBand = weapon.weaponSkillBand
+    spec.weaponNameEligible = weapon.weaponNameEligible
+    spec.partId = weapon.partID
+    spec.hitZone = weapon.hitZone
+    spec.woundType = weapon.woundType
+    spec.targetKind = "human_npc"
+    spec.targetID = tostring(targetRecord.id or "")
+    spec.x, spec.y, spec.z = x, y, z
+
+    local eventType = "hostile_npc_kill_self"
+    local baseMoment = baseKillMoment(
+        eventType,
+        "npc",
+        tostring(record.id or ""),
+        targetRecord,
+        spec,
+        now
+    )
+    local gate, gateReason, burst = Arbiter.Begin({
+        streamKey = "npc_kill:" .. tostring(record.id or ""),
+        now = now,
+        cooldownMs = Service.SPEAKER_COOLDOWN_MS,
+        maxSpeakers = Service.MAX_NPC_KILL_LISTENERS,
+        priority = baseMoment.priority,
+        moment = baseMoment,
+    })
+    if not gate then
+        return 0, gateReason == "stream_cooldown"
+            and "speaker_cooldown" or gateReason
+    end
+
+    local radiusSq = Service.REACTION_RADIUS * Service.REACTION_RADIUS
+    local listeners = 0
+    for _, player in ipairs(sortedNearbyPlayers(x, y)) do
+        if listeners >= Service.MAX_NPC_KILL_LISTENERS then break end
+        local px = coordinate(player, "getX")
+        local py = coordinate(player, "getY")
+        local pz = coordinate(player, "getZ")
+        if px and py and pz and math.abs(pz - z) < 1
+            and distanceSq(x, y, px, py) <= radiusSq
+            and canSee(record, player)
+        then
+            local key = playerKey(player)
+            local profile = Profile.Build(record, key, {
+                role = "killer",
+                actorKind = "npc",
+                inCombat = true,
+                zombieObservation = record.runtime
+                    and record.runtime.zombieObservation,
+            })
+            local moment = speakerMoment(
+                baseMoment, profile, math.max(1, tonumber(burst) or 1)
+            )
+            local allowed = Arbiter.Consider(gate, {
+                now = now,
+                audienceKey = key,
+                family = "combat_human_kill_self",
+                familyCooldownMs = Service.SPEAKER_COOLDOWN_MS,
+                priority = moment.priority,
+                moment = moment,
+            })
+            if allowed then
+                local sent = sendReaction(
+                    player, record, profile, eventType,
+                    {
+                        actorKind = "npc",
+                        targetKind = "human_npc",
+                        targetID = spec.targetID,
+                        hostilityReason = spec.hostilityReason,
+                        nextAction = spec.nextAction,
+                        x = x, y = y, z = z,
+                    },
                     now, moment.burstCount, nil, moment
                 )
                 if sent then listeners = listeners + 1 end

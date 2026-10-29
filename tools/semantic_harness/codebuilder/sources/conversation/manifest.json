@@ -118,6 +118,12 @@
       "path": "content/combat_banter/weapon_kill_reactions.json"
     },
     {
+      "domain": "combat_human_banter",
+      "kind": "content",
+      "order": 1560,
+      "path": "content/combat_human_banter/human_kill_reactions.json"
+    },
+    {
       "domain": "compatibility",
       "kind": "content",
       "order": 1600,

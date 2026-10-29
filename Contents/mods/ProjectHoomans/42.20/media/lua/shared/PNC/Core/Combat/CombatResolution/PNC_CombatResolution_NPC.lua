@@ -103,6 +103,7 @@ function Resolution.ApplyNPCDamage(targetRecord, targetBody, hit)
     local enemy
     local ownerDefenseAllowed
     local ownerDefenseReason
+    local targetWasAlive
     if not targetRecord or not wounds or not wounds.ApplyCombatDamage then
         return false, "invalid_npc_target", attachTargetState({
             outcome = "invalid_npc_target",
@@ -111,6 +112,7 @@ function Resolution.ApplyNPCDamage(targetRecord, targetBody, hit)
                 or "wound_service_unavailable",
         }, targetRecord, targetBody)
     end
+    targetWasAlive = targetRecord.alive ~= false
     if hit and hit.attackerKind == "npc" and hit.attackerID
         and PNC.Registry and PNC.Registry.Get
         and relationships and relationships.AreNPCsEnemies
@@ -208,6 +210,45 @@ function Resolution.ApplyNPCDamage(targetRecord, targetBody, hit)
                     ),
                     damage = hit and tonumber(hit.amount) or 0,
                     callback = "npc_damage",
+                }
+            )
+        end
+    end
+    if targetWasAlive
+        and targetRecord.alive == false
+        and hit and hit.attackerKind == "npc"
+        and hit.attackerID
+        and attackerRecord
+    then
+        local reactionService = PNC.SemanticCombatReactionService
+            or PNC.Semantics
+                and PNC.Semantics.CombatReactionService or nil
+        if reactionService
+            and type(reactionService.OnNPCHumanKill) == "function"
+        then
+            local hostilityReason = enemy == true
+                and "enemy"
+                or hit.immediateSelfDefense == true
+                    and "immediate_self_defense"
+                    or ownerDefenseAllowed == true
+                        and "owner_defense"
+                        or "authorized_hostile"
+            reactionService.OnNPCHumanKill(
+                attackerRecord,
+                targetRecord,
+                targetBody,
+                {
+                    x = targetRecord.x,
+                    y = targetRecord.y,
+                    z = targetRecord.z,
+                    attackType = hit.attackType,
+                    attackKind = hit.attackKind,
+                    weaponItem = hit.weaponItem,
+                    weaponFullType = hit.weaponFullType,
+                    partId = hit.partId,
+                    woundType = hit.woundType,
+                    hostilityReason = hostilityReason,
+                    source = "npc_combat_resolution",
                 }
             )
         end

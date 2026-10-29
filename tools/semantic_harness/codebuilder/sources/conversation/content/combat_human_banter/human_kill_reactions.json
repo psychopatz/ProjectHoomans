@@ -1,0 +1,312 @@
+{
+  "domain": "combat_human_banter",
+  "groups": {
+    "combat_human": {
+      "contentOwner": "projecthoomans.dialogue_content.combat_human"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.aggressive.line_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "He's down. Keep pushing.",
+              "TL": "Bagsak na siya. Tuloy ang laban."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.aggressive.line_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "One less bastard shooting at us.",
+              "TL": "Isang tarantado na lang ang hindi babaril sa atin."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.aggressive.line_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Threat's dead. Eyes up.",
+              "TL": "Patay na ang banta. Magmatyag."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.supportive.line_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "He's down. You alright?",
+              "TL": "Bagsak na siya. Ayos ka?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.supportive.line_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's over. Stay close to me.",
+              "TL": "Tapos na. Dumikit ka sa akin."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.supportive.line_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "He's dead. Check yourself for hits.",
+              "TL": "Patay na siya. Tingnan mo kung tinamaan ka."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.shaken.line_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Jesus... he's dead.",
+              "TL": "Diyos ko... patay na siya."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.shaken.line_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Fuck. That was a person.",
+              "TL": "Fuck. Tao 'yon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.shaken.line_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "He's down... let's just get out of here.",
+              "TL": "Bagsak na siya... umalis na tayo rito."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.brave.line_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Threat's down. Stay sharp.",
+              "TL": "Bagsak ang banta. Magmatyag."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.brave.line_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "He's done. Watch the rest.",
+              "TL": "Tapos na siya. Bantayan ang iba."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.brave.line_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Down. Don't freeze up now.",
+              "TL": "Bagsak. Huwag kang titigil ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.reserved.line_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "He's down.",
+              "TL": "Bagsak na siya."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.reserved.line_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Done.",
+              "TL": "Tapos."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.reserved.line_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Clear.",
+              "TL": "Malinis."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.cold.line_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "One less problem.",
+              "TL": "Isang problema ang nabawas."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.cold.line_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "He's dead. Move.",
+              "TL": "Patay na siya. Kilos."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.cold.line_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Finished. Check the others.",
+              "TL": "Tapos na. Tingnan ang iba."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.practical.line_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "He's down. Check the area.",
+              "TL": "Bagsak na siya. Suriin ang paligid."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.practical.line_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Fight's not over until we check the rest.",
+              "TL": "Hindi tapos ang laban hangga't hindi natin nasusuri ang iba."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "combat_human",
+      "semanticTemplateID": "semantic.combat.human_kill.practical.line_03",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "He's dead. Reload and scan.",
+              "TL": "Patay na siya. Mag-reload at magmasid."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Hostile Human Kill Banter",
+    "version": "1"
+  },
+  "version": 1
+}

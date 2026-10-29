@@ -25,6 +25,12 @@ return {
         ["recordCount"] = 26,
     },
     {
+        ["domain"] = "combat_human_banter",
+        ["kind"] = "content",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/CombatHumanBanter",
+        ["recordCount"] = 21,
+    },
+    {
         ["domain"] = "command",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Command",

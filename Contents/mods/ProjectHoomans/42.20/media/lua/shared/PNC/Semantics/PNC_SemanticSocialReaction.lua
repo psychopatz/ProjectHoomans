@@ -128,6 +128,15 @@ local function poolFor(spec)
         if not allowed[style] then style = "practical" end
         return "semantic.combat.kill." .. role .. "." .. style
     end
+    if eventType == "hostile_npc_kill_self" then
+        local style = tostring(context.combatReactionStyle or "practical")
+        local allowed = {
+            aggressive = true, supportive = true, shaken = true,
+            brave = true, reserved = true, cold = true, practical = true,
+        }
+        if not allowed[style] then style = "practical" end
+        return "semantic.combat.human_kill." .. style
+    end
     if eventType == "zombie_horde_encounter"
         or eventType == "zombie_horde_detected"
     then
