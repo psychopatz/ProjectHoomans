@@ -13,6 +13,7 @@ local removed = {}
 local consumed = {}
 local quarantineCount = 0
 local rebindSucceeds = true
+local bodyIsNaked = true
 
 local record = {
     id = "npc_restart_rehydrate",
@@ -118,7 +119,7 @@ Internal.IsProtectedBody = function() return false end
 Internal.GetLiveShellIdentity = function()
     return nil, false, false
 end
-Internal.IsNakedStartupShell = function() return true end
+Internal.IsNakedStartupShell = function() return bodyIsNaked end
 Internal.StartupDistanceSqToRecord = function(body, candidate)
     local dx = body:getX() - candidate.x
     local dy = body:getY() - candidate.y
@@ -233,6 +234,116 @@ T.falsy(intercepted, "early callback claimed a destructive interception")
 T.equal(removed[bodyA], nil, "early callback removed rehydration candidate")
 T.truthy(quarantineCount > 0,
     "early callback did not neutralize rehydration candidate")
+
+-- Exact live failure from SP logs: PZ restores the follower with no UUID,
+-- no population id and persistent outfit id 0. Do not declare rehydration
+-- missed in frame 0. Quarantine the unique saved-position body, then adopt it
+-- only after a real-frame settle interval.
+entries[bodyA] = nil
+record.presenceState = "abstract"
+record.recruited = true
+record.orderSpec = { kind = "follow" }
+record.runtime.bodyLease = nil
+record.runtime.startupRehydrateExpected = true
+record.runtime.startupBodyHint.wasLive = true
+Registry.LiveByID[record.id] = nil
+bodies = { bodyA }
+bodyA.x = 100.25
+bodyA.y = 200.25
+removed = {}
+events = {}
+quarantineCount = 0
+rebindSucceeds = true
+now = 5000
+PNC.BodyLifecycle.StartupCleanup.startedAt = now
+PNC.BodyLifecycle.StartupCleanup.lastBatch = nil
+
+stats = PNC.BodyLifecycle.SweepPersistedLiveShells(now)
+T.equal(stats.rebound, 0,
+    "anonymous restored follower was adopted in the frame-zero race window")
+T.equal(stats.unresolvedRehydrate, 1,
+    "anonymous restored follower did not hold rehydration open")
+T.truthy(quarantineCount > 0,
+    "anonymous restored follower was not neutralized during settle")
+T.equal(Registry.LiveByID[record.id], nil,
+    "anonymous restored follower bound before settle")
+
+now = now + 800
+-- Engine clothing may have appeared by now while UUID/outfit identity is
+-- still absent; the same quarantined body must remain adoptable.
+bodyIsNaked = false
+PNC.BodyLifecycle.StartupCleanup.lastBatch = nil
+stats = PNC.BodyLifecycle.SweepPersistedLiveShells(now)
+T.equal(stats.rebound, 1,
+    "anonymous zero-ID follower was not adopted after settle")
+T.equal(Registry.LiveByID[record.id], bodyA,
+    "anonymous zero-ID follower did not become the canonical live body")
+T.equal(removed[bodyA], nil,
+    "anonymous rehydration winner was removed instead of adopted")
+T.equal(record.runtime.startupRehydrateExpected, nil,
+    "anonymous adoption did not clear the rehydration claim")
+
+-- The anonymous fallback is companion-only. A non-owned NPC/ordinary zombie
+-- at the same coordinates remains unresolved rather than being converted into
+-- an NPC from position alone.
+record.presenceState = "abstract"
+record.recruited = false
+record.orderSpec = nil
+record.ownerUsername = nil
+record.runtime.startupRehydrateExpected = true
+bodyIsNaked = true
+Registry.LiveByID[record.id] = nil
+removed = {}
+events = {}
+quarantineCount = 0
+now = 7000
+PNC.BodyLifecycle.StartupCleanup.startedAt = now - 2000
+PNC.BodyLifecycle.StartupCleanup.lastBatch = nil
+
+stats = PNC.BodyLifecycle.SweepPersistedLiveShells(now)
+T.equal(stats.rebound, 0,
+    "position-only ordinary zombie was incorrectly adopted")
+T.truthy((stats.ordinaryUnknown or 0) > 0,
+    "ordinary anonymous zombie did not remain in the unknown lane")
+T.equal(Registry.LiveByID[record.id], nil,
+    "ordinary anonymous zombie became a live NPC")
+
+-- The startup coordinator must not burn all reconciliation attempts in frame
+-- zero. A unique anonymous companion keeps startup active, then a later tick
+-- re-evaluates and adopts it after the settle interval.
+record.presenceState = "abstract"
+record.recruited = true
+record.orderSpec = { kind = "follow" }
+record.runtime.startupRehydrateExpected = true
+record.runtime.startupBodyHint.wasLive = true
+Registry.LiveByID[record.id] = nil
+removed = {}
+events = {}
+quarantineCount = 0
+rebindSucceeds = true
+now = 9000
+PNC.Core.LogInfo = function() end
+PNC.Core.LogWarn = function() end
+PNC.BodyLifecycle.HuskLedgerSeeded = false
+T.load(ROOT
+    .. "PNC_BodyLifecycle_Startup/PNC_BodyLifecycle_Startup_Coordinator.lua")
+
+local startup = PNC.BodyLifecycle.RunStartupBodyCleanupNow(
+    now,
+    "test_frame_zero",
+    true
+)
+T.falsy(startup.complete,
+    "frame-zero anonymous companion incorrectly completed startup")
+T.equal(startup.lastStats.unresolvedRehydrate, 1,
+    "frame-zero anonymous companion did not hold the startup gate")
+
+now = now + 800
+PNC.BodyLifecycle.OnStartupReconcileTick()
+T.equal(Registry.LiveByID[record.id], bodyA,
+    "later startup tick did not adopt anonymous companion")
+T.equal(record.presenceState, "live",
+    "later startup tick did not restore live presence")
 
 -- Persistence must distinguish a body that was live when saved from an old
 -- abstract body hint; this flag is the admission contract used above.

@@ -54,6 +54,16 @@ function Lifecycle.SweepPersistedLiveShells(now)
         return stats
     end
 
+    -- An anonymous saved-position companion candidate is not yet safe to
+    -- adopt, but it is safe to make harmless while the engine finishes
+    -- restoring the body. This closes the hostile-zombie frame gap.
+    for anonymousBody in pairs(batch.anonymousRehydrate or {}) do
+        quarantineRehydrateCandidate(
+            anonymousBody,
+            "startup_anonymous_rehydrate_settle"
+        )
+    end
+
     -- Rehydrate winners before deleting any competing shell. This makes the
     -- saved live body claim atomic from the perspective of the second cleanup
     -- pass: once one body is rebound, every other proven body for that record

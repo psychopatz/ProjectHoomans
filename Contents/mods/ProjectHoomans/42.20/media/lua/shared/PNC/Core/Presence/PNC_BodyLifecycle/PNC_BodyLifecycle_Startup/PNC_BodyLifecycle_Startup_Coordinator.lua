@@ -44,6 +44,7 @@ function Lifecycle.BeginStartupBodyCleanup(now, forceReset)
     state.lastBatch = nil
     state.settleUntil = 0
     state.nextMaterializeAt = 0
+    state.nextReconcileAt = state.startedAt
     return state
 end
 
@@ -99,6 +100,7 @@ function Lifecycle.PumpStartupBodyCleanup(now, force)
     if state.passes >= (tonumber(Const.BODY_SHELL_STARTUP_PASSES) or 3)
         and state.quietPasses >= 2
         and (tonumber(stats.pendingRehydrate) or 0) <= 0
+        and (tonumber(stats.unresolvedRehydrate) or 0) <= 0
     then
         finalizeRehydrationMisses(now)
         state.active = false
@@ -157,6 +159,24 @@ function Lifecycle.OnEarlyZombieUpdate(zombie)
     Lifecycle.InterceptLoadedShell(zombie, "early_zombie_update")
 end
 
+function Lifecycle.OnStartupReconcileTick()
+    local state = Lifecycle.StartupCleanup
+    local now
+    if not Core.IsAuthority()
+        or not state
+        or state.active ~= true
+    then
+        return
+    end
+    now = Core.Now()
+    if now < (tonumber(state.nextReconcileAt) or 0) then
+        return
+    end
+    state.nextReconcileAt = now
+        + (tonumber(Const.BODY_SHELL_REHYDRATE_PUMP_MS) or 100)
+    Lifecycle.PumpStartupBodyCleanup(now, false)
+end
+
 function Lifecycle.OnEarlyLivingCharacter(character)
     if instanceof and instanceof(character, "IsoZombie") then
         Lifecycle.InterceptLoadedShell(character, "early_character_create")
@@ -183,6 +203,13 @@ function Lifecycle.OnEarlyWorldReady()
         end
         Lifecycle.RunStartupBodyCleanupNow(Core.Now(), "world_ready", true)
     end
+end
+
+if Events and Events.OnTick then
+    if Events.OnTick.Remove then
+        Events.OnTick.Remove(Lifecycle.OnStartupReconcileTick)
+    end
+    Events.OnTick.Add(Lifecycle.OnStartupReconcileTick)
 end
 
 if Events and Events.OnZombieUpdate then

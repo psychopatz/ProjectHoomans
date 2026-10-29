@@ -20,6 +20,51 @@ local function expectsRehydration(record)
         and record.runtime.startupRehydrateExpected == true
 end
 
+local function ownsAnonymousRehydrateLane(record)
+    local hint = record and record.runtime
+        and record.runtime.startupBodyHint or nil
+    local orderKind = tostring(record and record.orderSpec
+        and record.orderSpec.kind or "")
+    return expectsRehydration(record)
+        and hint and hint.wasLive == true
+        and (
+            record.recruited == true
+            or tostring(record.ownerUsername or "") ~= ""
+            or orderKind == tostring(Const.ORDER_FOLLOW or "follow")
+        )
+end
+
+local function anonymousRehydrateMatch(record, zombie, now)
+    local hint = record and record.runtime
+        and record.runtime.startupBodyHint or nil
+    local radius = tonumber(Const.BODY_SHELL_REHYDRATE_ANON_RADIUS) or 1.0
+    local startedAt = Lifecycle.StartupCleanup
+        and tonumber(Lifecycle.StartupCleanup.startedAt) or tonumber(now) or 0
+    local settle = tonumber(Const.BODY_SHELL_REHYDRATE_ANON_SETTLE_MS) or 750
+    local distance
+    if not ownsAnonymousRehydrateLane(record)
+        or not hint
+        or not zombie
+    then
+        return false, false
+    end
+    distance = Internal.StartupDistanceSqToRecord(zombie, {
+        x = tonumber(hint.x) or tonumber(record.x),
+        y = tonumber(hint.y) or tonumber(record.y),
+        z = tonumber(hint.z) or tonumber(record.z),
+    })
+    if distance == nil or distance > radius * radius then
+        return false, false
+    end
+    if zombie.isFemale and record.isFemale ~= nil then
+        local bodyFemale = zombie:isFemale() == true
+        if bodyFemale ~= (record.isFemale == true) then
+            return false, false
+        end
+    end
+    return true, (tonumber(now) or 0) - startedAt >= settle
+end
+
 local function canonicalBody(reg, record)
     local zombie
     if not reg or not record or not reg.GetLiveZombie then
@@ -88,6 +133,7 @@ local function rehydrateStrength(match)
     if reason == "population_id" then return 3 end
     if reason == "body_hint" then return 2 end
     if reason == "legacy_rehydrate" then return 1 end
+    if reason == "anonymous_rehydrate" then return 0 end
     return 0
 end
 
@@ -180,6 +226,7 @@ local function buildBatch(now)
         orphanStrong = {},
         orphanLedger = {},
         unknownBodies = {},
+        anonymousRehydrate = {},
         blockedRecords = {},
         recordMatches = {},
         stats = {
@@ -193,6 +240,7 @@ local function buildBatch(now)
             orphanSignatures = 0,
             blockedRecords = 0,
             pendingRehydrate = 0,
+            unresolvedRehydrate = 0,
         },
     }
     local i
@@ -207,6 +255,8 @@ local function buildBatch(now)
     local candidate
     local ambiguousReason
     local nearby
+    local anonymousRecord
+    local anonymousSettled
 
     if not Core.IsAuthority() or not reg or not reg.EnsureLoaded then
         return batch
@@ -335,12 +385,74 @@ local function buildBatch(now)
                         batch.stats.orphanSignatures =
                             batch.stats.orphanSignatures + 1
                     end
-                elseif naked then
-                    -- Naked bodies are not deletion candidates. During the
-                    -- startup window, however, report one near an abstract
-                    -- record so materialization cannot create a duplicate.
+                else
+                    -- PZ can restore a saved companion shell before its
+                    -- ModData/outfit identity is available. Its clothing may
+                    -- also appear before the PNC identity does, so the narrow
+                    -- saved-live companion lane applies to any unmarked body;
+                    -- the generic unknown-body guard below remains naked-only.
+                    -- A current-save
+                    -- saved-live follower gets one narrow fallback: exactly
+                    -- one anonymous body, essentially on the saved body
+                    -- position, with matching sex when the engine exposes it.
+                    -- Keep it quarantined across real frames before adoption.
                     nearby = nearbyUnmarkedRecords(records, reg, zombie)
-                    if #nearby > 0 then
+                    anonymousRecord = nil
+                    anonymousSettled = false
+                    if #nearby == 1 then
+                        local eligible
+                        eligible, anonymousSettled =
+                            anonymousRehydrateMatch(nearby[1], zombie, now)
+                        if eligible then
+                            anonymousRecord = nearby[1]
+                        end
+                    end
+                    if anonymousRecord then
+                        if anonymousSettled then
+                            candidate = {
+                                record = anonymousRecord,
+                                reason = "anonymous_rehydrate",
+                                score = 1,
+                                identity = false,
+                                body = zombie,
+                                rehydrateTracked = true,
+                                rehydrateEligible = true,
+                                anonymous = true,
+                            }
+                            batch.matches[zombie] = candidate
+                            addRecordMatch(batch, candidate)
+                            if Lifecycle.IdentityAudit
+                                and Lifecycle.IdentityAudit.Capture
+                            then
+                                Lifecycle.IdentityAudit.Capture(
+                                    zombie,
+                                    "startup_anonymous_rehydrate_candidate",
+                                    anonymousRecord.id,
+                                    true
+                                )
+                            end
+                        else
+                            batch.anonymousRehydrate[zombie] = anonymousRecord
+                            batch.unknownBodies[zombie] = nearby
+                            batch.stats.unresolvedRehydrate =
+                                batch.stats.unresolvedRehydrate + 1
+                            markBlocked(
+                                batch,
+                                anonymousRecord,
+                                "anonymous_rehydrate_settle"
+                            )
+                            if Lifecycle.IdentityAudit
+                                and Lifecycle.IdentityAudit.Capture
+                            then
+                                Lifecycle.IdentityAudit.Capture(
+                                    zombie,
+                                    "startup_anonymous_rehydrate_settle",
+                                    anonymousRecord.id,
+                                    true
+                                )
+                            end
+                        end
+                    elseif naked and #nearby > 0 then
                         batch.unknownBodies[zombie] = nearby
                         batch.stats.ordinaryUnknown =
                             batch.stats.ordinaryUnknown + 1

@@ -47,6 +47,12 @@ Const.BODY_SHELL_CARRIER_VERSION = 1
 Const.BODY_SHELL_RESPAWN_DELAY_MS = 50
 Const.BODY_SHELL_MAINTENANCE_MS = 1000
 Const.BODY_SHELL_STARTUP_PASSES = 3
+-- A zero-ID restored companion can surface before PZ has reconstructed enough
+-- body metadata to distinguish it from an ordinary zombie. Keep that unique
+-- saved-position candidate quarantined across real frames before adopting it.
+Const.BODY_SHELL_REHYDRATE_ANON_SETTLE_MS = 750
+Const.BODY_SHELL_REHYDRATE_ANON_RADIUS = 1.0
+Const.BODY_SHELL_REHYDRATE_PUMP_MS = 100
 -- Leave a short engine-population settling window after shell cleanup before
 -- presence resumes. Re-materialization is then spaced so a relog near several
 -- NPCs cannot create a same-frame zombie burst.
