@@ -242,6 +242,33 @@ return {
         ["kind"] = "behavior",
         ["source"] = "behaviors/social/scene_runtime_adopters.json",
     },
+    ["behavior.scene_post_combat_clear"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDirector",
+        },
+        ["id"] = "behavior.scene_post_combat_clear",
+        ["kind"] = "behavior",
+        ["source"] = "behaviors/social/social_conversation_director.json",
+    },
+    ["behavior.scene_task_work_assigned"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDirector",
+        },
+        ["id"] = "behavior.scene_task_work_assigned",
+        ["kind"] = "behavior",
+        ["source"] = "behaviors/social/social_conversation_director.json",
+    },
+    ["behavior.scene_task_work_completed"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDirector",
+        },
+        ["id"] = "behavior.scene_task_work_completed",
+        ["kind"] = "behavior",
+        ["source"] = "behaviors/social/social_conversation_director.json",
+    },
     ["behavior.warn"] = {
         ["dependents"] = {
             "beat.argument_escalation",

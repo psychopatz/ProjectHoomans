@@ -68,6 +68,7 @@ function Stimulus.Normalize(value)
             topic = boundedText(semantic.topic, 128),
             factID = boundedText(semantic.factID, 128),
             eventID = boundedText(semantic.eventID, 128),
+            modifiers = ValueBounds.Copy(semantic.modifiers) or {},
         },
         text = boundedText(value.text, Stimulus.MAX_TEXT),
         payload = ValueBounds.Copy(value.payload),

@@ -11,6 +11,8 @@ local records = {}
 local spatialQueries = 0
 local deliveredPackets = {}
 local excursionListener
+local taskListeners = {}
+local testNow = 1000
 
 local function player(id, x)
     return {
@@ -53,9 +55,15 @@ local combatA = record("npc-combat-a", 10, "faction-red", 0.5, 0.5)
 local combatB = record("npc-combat-b", 11, "faction-red", 0.9, 0.5)
 local followerA = record("npc-follow-a", 50, "faction-follow-a", 0.5, 0.5)
 local followerB = record("npc-follow-b", 51, "faction-follow-b", 0.7, 0.5)
+local followerC = record("npc-follow-c", 52, "faction-follow-c", 0.6, 0.5)
 followerA.ownerOnlineID = 77
 followerB.ownerOnlineID = 77
+followerC.ownerOnlineID = 77
 local soloA = record("npc-solo-a", 80, "faction-solo", 0.5, 0.5)
+local raiderA = record("npc-raider-a", 130, "faction-raider", 0.8, 0.6)
+local raiderB = record("npc-raider-b", 131, "faction-raider", 0.7, 0.5)
+raiderA.npcType = "raider"
+raiderB.npcType = "raider"
 local newsFact = "wkg:death:scene-s6"
 local newsA = record(
     "npc-news-a", 500, "faction-blue", 0.5, 0.5, { newsFact }
@@ -88,13 +96,19 @@ PNC = {
             end
             if x < 65 then
                 return {
-                    npcs = { followerA, followerB },
+                    npcs = { followerA, followerB, followerC },
                     players = {},
                 }
             end
             if x < 100 then
                 return {
                     npcs = { soloA },
+                    players = {},
+                }
+            end
+            if x < 200 then
+                return {
+                    npcs = { raiderA, raiderB },
                     players = {},
                 }
             end
@@ -169,6 +183,14 @@ PNC = {
             return nil
         end,
     },
+    Tasking = {
+        Events = {
+            Subscribe = function(eventType, listener)
+                taskListeners[eventType] = listener
+                return true
+            end,
+        },
+    },
     CommunityExcursionService = {
         RegisterListener = function(listener)
             excursionListener = listener
@@ -203,7 +225,7 @@ local runtime = Runtime.ResetForTests({
     maxActiveScenes = 8,
     maxParticipants = 4,
     maxTurns = 8,
-    clock = function() return 1000 end,
+    clock = function() return testNow end,
 })
 Adopters.ResetForTests(runtime)
 Banter.ResetRuntime()
@@ -220,6 +242,10 @@ T.truthy(providerIDs["projecthoomans.scene.community_excursion"],
     "community excursion production provider registered")
 T.equal(excursionListener, Adopters.OnExcursionChanged,
     "adopter hub registers through existing excursion listener API")
+T.equal(taskListeners.TASK_LEASE_CREATED, Adopters.OnTaskEvent,
+    "task assignment social adopter uses existing Tasking listener API")
+T.equal(taskListeners.TASK_LEASE_RELEASED, Adopters.OnTaskEvent,
+    "task completion social adopter uses existing Tasking listener API")
 
 local beforeCombatQueries = spatialQueries
 local combatAccepted, combat = Adopters.OnHordeTransition(combatA, {
@@ -293,6 +319,32 @@ T.falsy(repeatAccepted,
 T.equal(repeatReason, "scene_horde_not_initial_transition",
     "horde scene start is episode-bounded")
 
+local beforePostCombatQueries = spatialQueries
+local postCombatAccepted, postCombat = Adopters.OnHordeTransition(combatA, {
+    phase = "cleared",
+    episodeID = "horde:episode:s6",
+    eventID = "horde:event:s6",
+    pressureBand = "few",
+    nearbyCount = 1,
+    source = "perception",
+    now = 4000,
+})
+T.truthy(postCombatAccepted,
+    postCombat and postCombat.reason or "post-combat social scene admitted")
+T.equal(spatialQueries - beforePostCombatQueries, 1,
+    "post-combat social opportunity performs one bounded local cohort query")
+T.equal(postCombat.proposal.providerID,
+    "projecthoomans.scene.social_director",
+    "post-combat reaction uses generic Social Director")
+T.equal(postCombat.initialResult.interactionPlan.behaviorID,
+    "behavior.scene_post_combat_clear",
+    "cleared horde selects generated decompression behavior")
+T.equal(postCombat.initialResult.interactionPlan.dialogueAct, "INFORM",
+    "post-combat line is presentation over authoritative cleared state")
+T.truthy(postCombat.socialConversation
+    and #postCombat.socialConversation.steps >= 1,
+    "post-combat line can receive actor-neutral NPC semantic reaction")
+
 Banter.ResetRuntime()
 local followerAccepted, followerScene = Adopters.OnHordeTransition(followerA, {
     phase = "started",
@@ -306,8 +358,74 @@ local followerAccepted, followerScene = Adopters.OnHordeTransition(followerA, {
 T.truthy(followerAccepted,
     followerScene and followerScene.reason
         or "same-owner followers form a combat conversation cohort")
-T.equal(#followerScene.proposal.participants, 2,
-    "same-owner follower cohort does not require matching faction IDs")
+T.equal(#followerScene.proposal.participants, 3,
+    "same-owner followers share one bounded multi-participant cohort")
+T.equal(followerScene.scene:Snapshot().participantCount, 3,
+    "three followers remain one Scene rather than pairwise sub-scenes")
+
+local beforeTaskQueries = spatialQueries
+local taskListener = taskListeners.TASK_LEASE_CREATED
+local taskHandled, taskReason, taskScene = taskListener({
+    npcId = "npc-follow-a", eventId = "task-event:s6", domain = "TaskLeaseService",
+}, {
+    id = "task-event:s6",
+    type = "TASK_LEASE_CREATED",
+    source = "TaskLeaseService",
+    npcId = "npc-follow-a",
+    entityId = "lease:s6",
+    revision = 1,
+    cause = "assigned",
+    payload = {
+        taskId = "work:repair:s6",
+        sourceDomain = "WorkTaskProvider",
+        phase = "ASSIGNED",
+    },
+})
+T.truthy(taskHandled, taskReason or "task event listener remains nonblocking")
+T.equal(spatialQueries - beforeTaskQueries, 1,
+    "task social event performs one bounded teammate query")
+T.truthy(taskScene and taskScene.accepted,
+    "task assignment can admit one social Scene")
+T.equal(taskScene.proposal.providerID, "projecthoomans.scene.social_director",
+    "task coordination reuses generic Social Director")
+T.equal(taskScene.initialResult.interactionPlan.behaviorID,
+    "behavior.scene_task_work_assigned",
+    "task assignment resolves generated work-status behavior")
+T.equal(taskScene.initialResult.stimulus.semantic.modifiers.taskID,
+    "work:repair:s6",
+    "task dialogue reads authoritative event payload without owning task state")
+
+-- Assignment and completion intentionally share the WORK topic. Advance
+-- beyond the ambient topic cooldown before proving completion chatter.
+testNow = testNow + 13000
+local completionListener = taskListeners.TASK_LEASE_RELEASED
+local completionHandled, completionReason, completionScene = completionListener({
+    npcId = "npc-follow-c", eventId = "task-complete:s6",
+    domain = "TaskLeaseService",
+}, {
+    id = "task-complete:s6",
+    type = "TASK_LEASE_RELEASED",
+    source = "TaskLeaseService",
+    npcId = "npc-follow-c",
+    entityId = "lease:complete:s6",
+    revision = 2,
+    cause = "complete",
+    payload = {
+        taskId = "work:haul:s6",
+        sourceDomain = "WorkTaskProvider",
+        phase = "DONE",
+    },
+})
+T.truthy(completionHandled,
+    completionReason or "completed work social event remains nonblocking")
+T.truthy(completionScene and completionScene.accepted,
+    "completed work can admit a separate social Scene")
+T.equal(completionScene.initialResult.interactionPlan.behaviorID,
+    "behavior.scene_task_work_completed",
+    "completed work selects canonical generated completion behavior")
+T.equal(completionScene.proposal.providerID,
+    "projecthoomans.scene.social_director",
+    "task completion stays on the generic Social Director path")
 
 Banter.ResetRuntime()
 local soloAccepted, soloReason = Adopters.OnHordeTransition(soloA, {
@@ -324,6 +442,29 @@ T.falsy(soloAccepted,
 T.equal(soloReason, "scene_horde_no_local_teammate",
     "solo cohort rejection is explicit and non-mutating")
 
+local raiderAccepted, raiderScene = Adopters.OnHordeTransition(raiderA, {
+    phase = "cleared",
+    episodeID = "horde:episode:raider-s6",
+    eventID = "horde:event:raider-s6",
+    pressureBand = "few",
+    nearbyCount = 1,
+    source = "perception",
+    now = 5000,
+})
+T.truthy(raiderAccepted,
+    raiderScene and raiderScene.reason
+        or "raider teammates can converse without player participation")
+T.equal(#raiderScene.proposal.participants, 2,
+    "raider social scene uses one bounded same-faction cohort")
+T.equal(#raiderScene.proposal.audience, 0,
+    "raider conversation does not require a player observer")
+T.equal(raiderScene.proposal.providerID,
+    "projecthoomans.scene.social_director",
+    "hostile-role NPCs use the same generic social machinery")
+T.equal(raiderScene.initialResult.interactionPlan.behaviorID,
+    "behavior.scene_post_combat_clear",
+    "raider decompression uses the same generated semantic behavior")
+
 local beforeNewsQueries = spatialQueries
 local newsAccepted, news = Adopters.OnWorldKnowledgeFact({
     factID = newsFact,
@@ -339,22 +480,33 @@ T.equal(spatialQueries - beforeNewsQueries, 1,
     "grounded news admission uses exactly one combined local actor query")
 T.equal(#news.proposal.audience, 1,
     "nearby player can overhear grounded NPC news without joining scene")
-T.equal(news.proposal.providerID, "projecthoomans.scene.grounded_news",
-    "known fact routes through generic grounded-news provider")
+T.equal(news.proposal.providerID, "projecthoomans.scene.social_director",
+    "known fact routes through generic Social Director provider")
 T.equal(news.initialResult.interactionPlan.behaviorID,
     "behavior.scene_grounded_news_share",
     "known fact produces generated grounded disclosure")
 T.equal(news.initialResult.interactionPlan.groundedFactRefs[1], newsFact,
     "initial disclosure remains grounded in real WorldKnowledge fact")
-T.equal(news.finalResult.interactionPlan.behaviorID,
-    "behavior.scene_news_followup_answer",
-    "sociable listener follow-up returns to knowledgeable speaker")
-T.equal(news.finalResult.interactionPlan.groundedFactRefs[1], newsFact,
-    "follow-up answer retains original grounded fact")
-T.equal(news.finalResult.stimulus.source.actorID, "npc-news-b",
-    "listener becomes semantic follow-up source")
-T.equal(news.finalResult.stimulus.targets[1], "npc-news-a",
-    "follow-up returns to original knowledgeable speaker")
+local newsConversation = news.socialConversation
+T.truthy(newsConversation and #newsConversation.steps >= 1,
+    "grounded news continues through actor-neutral NPC affordances")
+local newsStep = newsConversation.steps[1]
+T.equal(newsStep.mode, "emit",
+    "listener selects one semantic reply instead of generic auto-continuation: "
+        .. tostring(newsStep.reason))
+T.equal(newsStep.selected.providerID, "projecthoomans.generated_affordances",
+    "listener reuses the same generated affordance provider as player choices")
+T.equal(newsStep.request.sourceID, "npc-news-b",
+    "listener becomes semantic affordance source")
+T.equal(newsStep.request.responderID, "npc-news-a",
+    "selected affordance returns to original knowledgeable speaker")
+T.equal(newsStep.request.factRefs[1], newsFact,
+    "selected NPC semantic reply retains the disclosed grounded fact")
+T.truthy(newsStep.result.semanticHistoryEvent ~= nil,
+    "selected NPC act is accepted into canonical Scene history")
+T.truthy(newsStep.terminal == true
+    or newsStep.result.interactionPlan ~= nil,
+    "addressee may answer or naturally remain silent after NPC reply")
 
 local unknownAccepted, unknownReason = Adopters.OnWorldKnowledgeFact({
     factID = "wkg:unknown:s6",
@@ -383,8 +535,8 @@ local excursion = Adopters.Manager():Snapshot().lastAdmission
 T.truthy(excursion and excursion.accepted,
     "real excursion listener admits a generic Scene opportunity")
 T.equal(excursion.providerID,
-    "projecthoomans.scene.community_excursion",
-    "excursion routes through same Opportunity manager")
+    "projecthoomans.scene.social_director",
+    "excursion routes through Social Director on the same Opportunity manager")
 
 local runtimeSnapshot = runtime:Snapshot()
 T.truthy(runtimeSnapshot.metrics.admissionAccepted >= 3,

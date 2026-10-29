@@ -894,6 +894,21 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
                     record, "cleared", clearedEpisodeID, now
                 )
             end
+            local sceneAdopters = PNC.Semantics
+                and PNC.Semantics.InteractionSceneAdopters or nil
+            if sceneAdopters
+                and type(sceneAdopters.OnHordeTransition) == "function"
+            then
+                sceneAdopters.OnHordeTransition(record, {
+                    phase = "cleared",
+                    episodeID = clearedEpisodeID,
+                    eventID = clearedEpisodeID,
+                    pressureBand = band,
+                    nearbyCount = count,
+                    source = source or "zombie_observation",
+                    now = now,
+                })
+            end
             return false, "horde_episode_cleared"
         end
         state.lastPhase = "clear"

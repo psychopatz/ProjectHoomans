@@ -257,7 +257,7 @@ local definitionCount = 0
 for _, _ in pairs(PNC.SocialEventDefinitions) do
     definitionCount = definitionCount + 1
 end
-T.equal(definitionCount, 23, "social event definitions")
+T.equal(definitionCount, 26, "social event definitions")
 T.truthy(PNC.SocialEventDefinitions.necroa_mask_removed,
     "Necroa mask removal definition")
 T.truthy(PNC.SocialEventDefinitions.necroa_player_mask_removed,
@@ -298,6 +298,46 @@ T.equal(
     "unsafe_event",
     "unsafe event rejected"
 )
+
+-- Autonomous semantic NPC hostility uses the same SocialEvent transaction
+-- without masquerading as a player-originated event.
+local sceneActor = newRecord("npc_social_scene_actor")
+local sceneTarget = newRecord("npc_social_scene_target")
+local sceneActorKey = PNC.EntityRef.ForNPC(sceneActor.id)
+local sceneTargetKey = PNC.EntityRef.ForNPC(sceneTarget.id)
+local npcDialogueInsult = {
+    id = "social:semantic_scene:test:1",
+    type = "npc_dialogue_insult",
+    actorKey = sceneActorKey,
+    targetKey = sceneTargetKey,
+    occurredAt = 1.5,
+    sourceSystem = "semantic_scene",
+    context = {
+        sceneID = "scene:test",
+        sequence = 1,
+        speechAct = "HOSTILE_REMARK",
+    },
+}
+local npcDialogueResult = PNC.SocialEvents.Emit(npcDialogueInsult)
+T.truthy(npcDialogueResult.ok,
+    "autonomous NPC dialogue consequence uses SocialEvent authority")
+local sceneRelationship = PNC.Relationships.Get(
+    sceneTarget.id,
+    sceneActorKey
+)
+T.truthy(sceneRelationship and sceneRelationship.approval < 0,
+    "NPC dialogue hostility changes target directed relationship")
+T.equal(memoryCount(sceneRelationship, "npc_spoke_insult"), 1,
+    "NPC dialogue hostility records one NPC-specific relationship memory")
+local sceneConduct = PNC.Conduct.GetForEntity(sceneActorKey)
+T.equal(evidenceCount(sceneConduct, "npc_dialogue_insult"), 1,
+    "NPC dialogue hostility records one conduct evidence row")
+T.equal(PNC.SocialEvents.Emit(npcDialogueInsult).reason, "duplicate_event",
+    "replayed semantic Scene consequence is exactly-once deduplicated")
+T.equal(memoryCount(
+    PNC.Relationships.Get(sceneTarget.id, sceneActorKey),
+    "npc_spoke_insult"
+), 1, "duplicate semantic Scene consequence creates no second memory")
 
 -- 4-9. Treatment effects, dedupe, cooldown, and expiry.
 local treated = event(

@@ -1,0 +1,133 @@
+{
+  "schema": "pnc.conversation.shard.v1",
+  "version": 1,
+  "kind": "content",
+  "domain": "social",
+  "source": {
+    "name": "Project Hoomans Social Conversation Director Content",
+    "version": "1",
+    "contentLicense": "Project Hoomans authored content"
+  },
+  "groups": {
+    "interaction": {
+      "contentOwner": "projecthoomans.dialogue_content.social_interaction"
+    }
+  },
+  "phraseFamilies": [
+    {
+      "semanticTemplateID": "semantic.interaction.scene.task_work_assigned",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "I've got work to do. I'll get on it.",
+              "TL": "May trabaho akong gagawin. Aasikasuhin ko na."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "I've got this job. I'll take care of it.",
+              "TL": "Ako na sa trabahong ito. Aasikasuhin ko."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Got a job. On it.",
+              "TL": "May trabaho. Sige."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Work's assigned. I'll handle my part.",
+              "TL": "Naitalaga na ang trabaho. Gagawin ko ang parte ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.task_work_completed",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's done. One less thing to worry about.",
+              "TL": "Tapos na. Isang alalahanin ang nabawas."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "Finished that job. We're good here.",
+              "TL": "Tapos na ang trabaho. Ayos na rito."
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Job's done.",
+              "TL": "Tapos na."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Task's finished. Moving on.",
+              "TL": "Tapos ang gawain. Susunod naman."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "semanticTemplateID": "semantic.interaction.scene.post_combat_clear",
+      "group": "interaction",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Looks clear now. That got rough for a minute.",
+              "TL": "Mukhang malinaw na. Naging delikado sandali."
+            }
+          }
+        ],
+        "warm": [
+          {
+            "translations": {
+              "EN": "We're clear. Everyone still with me?",
+              "TL": "Ligtas na tayo. Ayos pa ba kayong lahat?"
+            }
+          }
+        ],
+        "terse": [
+          {
+            "translations": {
+              "EN": "Clear. Hell of a mess.",
+              "TL": "Malinaw na. Grabe iyon."
+            }
+          }
+        ],
+        "guarded": [
+          {
+            "translations": {
+              "EN": "Area's clear for now. Don't relax too much.",
+              "TL": "Malinaw muna ang lugar. Huwag masyadong kampante."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "playerChoices": []
+}

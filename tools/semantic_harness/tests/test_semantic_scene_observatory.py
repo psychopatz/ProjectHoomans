@@ -35,6 +35,34 @@ def scene_fixture() -> dict:
 
 
 
+def social_scene_fixture() -> dict:
+    return {
+        "social": True,
+        "eventID": "scene:worker:social-task",
+        "stimulusType": "TASK_EVENT",
+        "intent": "TASK_WORK_ASSIGNED",
+        "speechAct": "INFORM",
+        "subject": "WORK",
+        "topic": "WORK",
+        "motive": "COORDINATE",
+        "relevance": 0.9,
+        "participants": [
+            {
+                "id": "npc-social-a",
+                "confidence": 0.6,
+                "sociability": 0.6,
+            },
+            {
+                "id": "npc-social-b",
+                "confidence": 0.6,
+                "sociability": 0.9,
+            },
+        ],
+        "historyLimit": 4,
+        "sceneLimit": 4,
+    }
+
+
 def tactical_scene_fixture() -> dict:
     fixture = scene_fixture()
     fixture.update(
@@ -157,6 +185,38 @@ class SemanticSceneObservatoryTests(unittest.TestCase):
         self.assertEqual(first["runtime"], again["runtime"])
         self.assertEqual(first["opportunity"], again["opportunity"])
 
+
+    def test_worker_exposes_social_director_and_affordance_trace(self) -> None:
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            view = worker.scene_observatory_fixture(social_scene_fixture())
+
+        self.assertTrue(view["ok"])
+        self.assertEqual(view["type"], "scene_observatory_social_fixture")
+        self.assertEqual(view["workerKind"], "production_lua")
+        self.assertEqual(view["sceneCount"], 1)
+        social = view["adopter"]["social"]
+        self.assertEqual(
+            social["providerID"],
+            "projecthoomans.scene.social_director",
+        )
+        self.assertTrue(social["admission"]["accepted"])
+        self.assertEqual(social["admission"]["motive"], "COORDINATE")
+        self.assertEqual(social["admission"]["speakerID"], "npc-social-a")
+        self.assertEqual(social["admission"]["recipientID"], "npc-social-b")
+        self.assertEqual(len(social["admission"]["participantIDs"]), 2)
+        self.assertGreaterEqual(social["budget"]["metrics"]["checks"], 1)
+        self.assertIn(view["socialStep"]["mode"], {"emit", "terminate"})
+        conversation = social["conversation"]
+        self.assertGreaterEqual(conversation["metrics"]["evaluations"], 1)
+        choices = conversation["lastDecision"]["choices"]
+        self.assertGreaterEqual(len(choices), 1)
+        self.assertLessEqual(choices[0]["frontierCount"], 8)
+        self.assertGreaterEqual(len(choices[0]["frontier"]), 1)
+        for candidate in choices[0]["frontier"]:
+            self.assertIn("strategy", candidate)
+            self.assertNotIn("text", candidate)
+            self.assertNotIn("utterance", candidate)
+        assert_no_transcript_fields(self, view)
 
     def test_worker_exposes_bounded_tactical_spatial_without_transcript(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:

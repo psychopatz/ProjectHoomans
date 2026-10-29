@@ -1,8 +1,10 @@
--- Generated semantic player-affordance provider.
+-- Generated semantic affordance provider.
 --
 -- This provider derives bounded conversational strategies from the already
--- selected DiscourseFrame / InteractionPlan. It never parses text and never
--- executes gameplay authority.
+-- selected DiscourseFrame / InteractionPlan. The historical provider ID stays
+-- stable for player UI compatibility, while an explicit affordanceResponder
+-- lets NPC/scene actors consume the same semantic frontier. It never parses
+-- text and never executes gameplay authority.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
@@ -22,6 +24,8 @@ local Stimulus = require "PNC/Semantics/PNC_SemanticInteractionStimulus"
 local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
 local ContinuationPolicy = require
     "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticAffordanceContinuationPolicy"
+local Responder = require
+    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticAffordanceResponder"
 
 local HOSTILE_ACTS = {
     INSULT = true,
@@ -50,39 +54,6 @@ local function copy(value, depth)
         end
     end
     return output
-end
-
-local function traitListHas(traits, trait)
-    if type(traits) ~= "table" then return false end
-    if traits[trait] == true then return true end
-    for key, value in pairs(traits) do
-        if type(key) == "string" and value == true
-            and tostring(key) == trait
-        then
-            return true
-        end
-        if tostring(value) == trait then return true end
-        if type(value) == "table"
-            and tostring(value.id or value.type or value.name or "") == trait
-        then
-            return true
-        end
-    end
-    return false
-end
-
-local function playerHasTrait(context, trait)
-    context = type(context) == "table" and context or {}
-    if traitListHas(context.playerTraits, trait) then return true end
-    local player = type(context.player) == "table" and context.player or {}
-    return traitListHas(player.traits, trait)
-end
-
-local function playerHasAnyTrait(context, values)
-    for _, trait in ipairs(values or {}) do
-        if playerHasTrait(context, trait) then return trait end
-    end
-    return nil
 end
 
 local function discourse(context)
@@ -290,12 +261,10 @@ local function semanticFor(strategy, frame, context)
             selfState = true,
         }, details
     elseif strategy == "DISCLOSE_NAME" then
-        local playerName = tostring(
-            type(context) == "table" and context.playerName or ""
-        )
-        if playerName == "" then return nil end
+        local responderName = Responder.Name(context)
+        if responderName == "" then return nil end
         details.slots = {
-            identityClaim = { name = playerName },
+            identityClaim = { name = responderName },
         }
         details.socialContext = {
             directed = false,
@@ -304,7 +273,7 @@ local function semanticFor(strategy, frame, context)
             identityClaim = true,
         }
         details.selfDirected = true
-        details.utteranceSlots = { name = playerName }
+        details.utteranceSlots = { name = responderName }
         details.safeSlots = { name = true }
         return "INFORM", "INFORM", "IDENTITY", {
             identityClaim = true,
@@ -333,7 +302,7 @@ local function strategyPlan(strategy, stance, context, frame, ir)
         semanticFor(strategy, frame, context)
     details = type(details) == "table" and details or {}
     local plan = UtterancePlan.New({
-        speaker = "player",
+        speaker = Responder.Speaker(context),
         target = details.selfDirected and "self" or "recipient",
         dialogueAct = speechAct,
         strategy = strategy,
@@ -428,7 +397,7 @@ local function candidate(strategy, stance, context, reason)
             subject = subject,
             target = details.selfDirected
                 and nil
-                or { kind = "conversation_actor", ref = "npc" },
+                or Responder.RecipientTarget(context),
             slots = copy(details.slots) or {},
             modifiers = modifiers,
             socialContext = copy(details.socialContext) or {
@@ -458,7 +427,7 @@ local function candidate(strategy, stance, context, reason)
             realization = realized,
         },
         utterancePlan = plan,
-        visibility = "player",
+        visibility = Responder.Visibility(context),
     }
 end
 
@@ -517,23 +486,23 @@ function Provider.collect(context)
         add(output, seen, candidate(
             "ASK_WHY", "NEUTRAL", context, "hostility_followup"
         ))
-        local challengeTrait = playerHasAnyTrait(
+        local challengeTrait = Responder.HasAnyTrait(
             context, { "Brave", "Desensitized" }
         )
         if challengeTrait then
             add(output, seen, candidate(
                 "CALL_BLUFF", "NEGATIVE", context,
-                "player_trait:" .. challengeTrait
+                Responder.TraitReason(context, challengeTrait)
             ))
         end
-        local empathyTrait = playerHasAnyTrait(
+        local empathyTrait = Responder.HasAnyTrait(
             context,
             { "Empathetic", "Kind", "KindHearted", "Pacifist" }
         )
         if empathyTrait then
             add(output, seen, candidate(
                 "COMFORT", "POSITIVE", context,
-                "player_trait:" .. empathyTrait
+                Responder.TraitReason(context, empathyTrait)
             ))
         end
         return output
@@ -578,12 +547,16 @@ function Provider.collect(context)
 
     local act = npcResponseAct(context)
         or upper(ir.speechAct or ir.intent)
-    if act == "INFORM" or act == "ANSWER" then
+    if act == "INFORM" or act == "ANSWER" or act == "DISCLOSE" then
+        local reasonPrefix = act == "DISCLOSE"
+            and "npc_disclosure" or "npc_answer"
         add(output, seen, candidate(
-            "ACKNOWLEDGE", "NEUTRAL", context, "npc_answer_acknowledgement"
+            "ACKNOWLEDGE", "NEUTRAL", context,
+            reasonPrefix .. "_acknowledgement"
         ))
         add(output, seen, candidate(
-            "ASK_FOLLOWUP", "NEUTRAL", context, "npc_answer_followup"
+            "ASK_FOLLOWUP", "NEUTRAL", context,
+            reasonPrefix .. "_followup"
         ))
     elseif act == "AGREE" or act == "DISAGREE"
         or act == "ACKNOWLEDGE"
@@ -603,6 +576,17 @@ function Provider.collect(context)
         ))
     end
     return output
+end
+
+-- Explicit actor entry point for autonomous Scene consumers. The ordinary
+-- collect(context) path remains the registered player-compatible provider.
+function Provider.collectForResponder(context, responder)
+    if type(responder) ~= "table" then return {} end
+    context = type(context) == "table" and context or {}
+    local projected = {}
+    for key, value in pairs(context) do projected[key] = value end
+    projected.affordanceResponder = copy(responder)
+    return Provider.collect(projected)
 end
 
 return Provider

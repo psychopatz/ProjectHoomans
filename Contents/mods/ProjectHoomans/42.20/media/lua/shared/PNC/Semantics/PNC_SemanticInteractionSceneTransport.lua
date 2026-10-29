@@ -228,6 +228,109 @@ function Transport.BuildPacket(scene, result, audience)
     return packet
 end
 
+function Transport.BuildAffordancePacket(scene, selected, spec, audience)
+    selected = type(selected) == "table" and selected or {}
+    spec = type(spec) == "table" and spec or {}
+    audience = type(audience) == "table" and audience or {}
+    local speakerID = clean(spec.speakerID, 96)
+    local recipientID = clean(spec.recipientID, 96)
+    local display = type(selected.display) == "table"
+        and selected.display or {}
+    local text = clean(
+        display.utterance or display.utteranceFallback
+        or display.label or display.labelFallback,
+        768
+    )
+    if not scene or not speakerID or not recipientID or not text then
+        return nil, "scene_affordance_identity_invalid"
+    end
+    local sequence = tonumber(spec.sequence)
+        or (scene.semanticState and tonumber(scene.semanticState.sequence) or 0) + 1
+    local packet = {
+        schemaVersion = Transport.VERSION,
+        kind = "semantic_scene_speech",
+        sceneID = clean(scene.id, 128),
+        eventID = table.concat({
+            tostring(scene.id or "scene"),
+            "input",
+            tostring(sequence),
+            speakerID,
+        }, ":"),
+        sequence = sequence,
+        speakerID = speakerID,
+        recipientID = recipientID,
+        behaviorID = clean(selected.id, 128),
+        act = clean(
+            selected.frame and (
+                selected.frame.speechAct or selected.frame.intent
+            ) or selected.strategy or "REACT",
+            64
+        ),
+        topic = clean(
+            selected.frame and selected.frame.topic or spec.topic,
+            96
+        ),
+        text = text,
+        responsePlanID = nil,
+        realizationFamily = clean(
+            display.realization and (
+                display.realization.realizationFamily
+                or display.realization.phraseFamilyID
+            ),
+            128
+        ),
+        realizationID = clean(
+            display.realization and (
+                display.realization.phraseID
+                or display.realization.selectionID
+            ),
+            128
+        ),
+        factRefs = boundedList(spec.factRefs, Transport.MAX_FACT_REFS),
+        eventRefs = boundedList(spec.eventRefs, Transport.MAX_FACT_REFS),
+        offerIDs = {},
+        responsePlan = nil,
+        continuation = nil,
+        audienceRole = "observer",
+        observerOnly = true,
+        recipientKind = "npc",
+    }
+    return packet
+end
+
+function Transport.DeliverAffordance(scene, selected, spec, audience)
+    audience = type(audience) == "table" and audience or {}
+    local network = PNC.Network
+    local send = network and network.Internal
+        and network.Internal.SendToPlayer or nil
+    local command = PNC.Const and PNC.Const.CMD_SEMANTIC_SCENE_SPEECH or nil
+    if type(send) ~= "function" or not command then
+        return 0, "scene_transport_unavailable"
+    end
+    local sent = 0
+    local seen = {}
+    for index = 1, math.min(#audience, Transport.MAX_AUDIENCE) do
+        local row = audience[index]
+        local player = type(row) == "table" and row.player or nil
+        local key = clean(
+            type(row) == "table"
+                and (row.actorID or row.playerID or row.key)
+                or nil,
+            96
+        )
+        if player and key and not seen[key] then
+            local packet = Transport.BuildAffordancePacket(
+                scene, selected, spec, row
+            )
+            if packet and send(player, command, packet) == true then
+                sent = sent + 1
+                seen[key] = true
+            end
+        end
+    end
+    return sent, sent > 0 and "delivered" or "no_audience"
+end
+
 function Transport.Deliver(scene, result, audience)
     audience = type(audience) == "table" and audience or {}
     local network = PNC.Network

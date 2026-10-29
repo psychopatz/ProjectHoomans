@@ -657,6 +657,27 @@ function Scene.New(spec)
         )
     end
 
+    function Methods:RememberPresentedRefs(targetID, result)
+        targetID = boundedID(targetID)
+        if not targetID or not self.participants[targetID] then
+            return false, "scene_disclosure_target_unknown"
+        end
+        result = type(result) == "table" and result or {}
+        local plan = type(result.interactionPlan) == "table"
+            and result.interactionPlan or {}
+        rememberDisclosure(self, targetID, {
+            payload = {
+                factRefs = boundedRefs(
+                    plan.groundedFactRefs, Scene.MAX_FACT_REFS
+                ),
+                eventRefs = boundedRefs(
+                    plan.groundedEventRefs, Scene.MAX_WORLD_EVENTS
+                ),
+            },
+        })
+        return true
+    end
+
     function Methods:Continue(result)
         if self.status ~= "active" then return nil, "scene_closed" end
         result = type(result) == "table" and result or {}

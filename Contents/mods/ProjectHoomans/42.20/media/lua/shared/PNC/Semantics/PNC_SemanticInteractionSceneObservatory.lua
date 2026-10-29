@@ -381,6 +381,148 @@ local function defaultManager()
     return nil
 end
 
+local function socialProjection(snapshot)
+    local social = type(snapshot) == "table"
+        and type(snapshot.social) == "table"
+        and snapshot.social or nil
+    local conversation = type(snapshot) == "table"
+        and type(snapshot.socialConversation) == "table"
+        and snapshot.socialConversation or nil
+    if not social and not conversation then return nil end
+
+    local socialDecision = social
+        and type(social.lastDecision) == "table"
+        and social.lastDecision or {}
+    local opportunity = type(socialDecision.opportunity) == "table"
+        and socialDecision.opportunity or {}
+    local budget = social
+        and type(social.budget) == "table"
+        and social.budget or {}
+    local budgetDecision = type(budget.lastDecision) == "table"
+        and budget.lastDecision or {}
+    local conversationDecision = conversation
+        and type(conversation.lastDecision) == "table"
+        and conversation.lastDecision or {}
+
+    local turnRows = {}
+    for index = 1, math.min(
+        #(type(conversationDecision.rows) == "table"
+            and conversationDecision.rows or {}),
+        4
+    ) do
+        local row = conversationDecision.rows[index]
+        turnRows[#turnRows + 1] = {
+            actorID = clean(row.actorID, 128),
+            role = clean(row.role, 32),
+            eligible = row.eligible == true,
+            reason = clean(row.reason, 128),
+            score = number(row.score),
+            waitForPlayer = row.waitForPlayer == true,
+            targetID = clean(row.targetID, 128),
+        }
+    end
+
+    local choices = {}
+    for index = 1, math.min(
+        #(type(conversationDecision.choices) == "table"
+            and conversationDecision.choices or {}),
+        4
+    ) do
+        local choice = conversationDecision.choices[index]
+        local frontier = {}
+        for frontierIndex = 1, math.min(
+            #(type(choice.frontier) == "table"
+                and choice.frontier or {}),
+            8
+        ) do
+            local row = choice.frontier[frontierIndex]
+            frontier[#frontier + 1] = {
+                candidateID = clean(row.candidateID, 128),
+                strategy = clean(row.strategy, 64),
+                eligible = row.eligible == true,
+                reason = clean(row.reason, 128),
+                score = number(row.score),
+            }
+        end
+        choices[#choices + 1] = {
+            actorID = clean(choice.actorID, 128),
+            reason = clean(choice.reason, 128),
+            selectedID = clean(choice.selectedID, 128),
+            selectedStrategy = clean(choice.selectedStrategy, 64),
+            selectedScore = number(choice.selectedScore),
+            frontierCount = number(choice.frontierCount),
+            frontier = frontier,
+        }
+    end
+
+    return {
+        providerID = social and clean(social.providerID, 128) or nil,
+        metrics = social and scalarFields(social.metrics, {
+            "submitted", "admitted", "rejected",
+            "silent", "budgetRejected",
+        }) or {},
+        admission = social and {
+            accepted = socialDecision.accepted == true,
+            reason = clean(socialDecision.reason, 128),
+            sceneID = clean(socialDecision.sceneID, 128),
+            motive = clean(opportunity.motive, 64),
+            relevance = number(opportunity.relevance),
+            priority = number(opportunity.priority),
+            eventType = clean(opportunity.eventType, 64),
+            eventID = clean(opportunity.eventID, 128),
+            topic = clean(opportunity.topic, 96),
+            speakerID = clean(opportunity.speakerID, 128),
+            recipientID = clean(opportunity.recipientID, 128),
+            participantIDs = boundedList(opportunity.participantIDs, 4),
+            factRefs = boundedList(opportunity.factRefs, Observatory.MAX_REFS),
+            eventRefs = boundedList(opportunity.eventRefs, Observatory.MAX_REFS),
+        } or nil,
+        budget = {
+            actorCooldownCount = number(budget.actorCooldownCount) or 0,
+            pairCooldownCount = number(budget.pairCooldownCount) or 0,
+            topicCooldownCount = number(budget.topicCooldownCount) or 0,
+            areaCount = number(budget.areaCount) or 0,
+            metrics = scalarFields(budget.metrics, {
+                "checks", "reserved", "rejected", "urgentBypass",
+            }),
+            lastDecision = {
+                allowed = budgetDecision.allowed == true,
+                reason = clean(budgetDecision.reason, 128),
+                actorID = clean(budgetDecision.actorID, 128),
+                targetID = clean(budgetDecision.targetID, 128),
+                topic = clean(budgetDecision.topic, 96),
+                areaKey = clean(budgetDecision.areaKey, 96),
+                priority = number(budgetDecision.priority),
+            },
+        },
+        conversation = {
+            metrics = conversation and scalarFields(conversation.metrics, {
+                "evaluations", "emitted", "silence",
+                "playerWaits", "interjections",
+            }) or {},
+            historySceneCount = conversation
+                and number(conversation.historySceneCount) or 0,
+            contextSceneCount = conversation
+                and number(conversation.contextSceneCount) or 0,
+            lastDecision = {
+                mode = clean(conversationDecision.mode, 32),
+                reason = clean(conversationDecision.reason, 128),
+                actorID = clean(conversationDecision.actorID, 128),
+                targetID = clean(conversationDecision.targetID, 128),
+                currentSpeakerID = clean(
+                    conversationDecision.currentSpeakerID, 128
+                ),
+                currentRecipientID = clean(
+                    conversationDecision.currentRecipientID, 128
+                ),
+                motive = clean(conversationDecision.motive, 64),
+                rows = turnRows,
+                choices = choices,
+            },
+        },
+    }
+end
+
 local function adopterProjection()
     local adopters = PNC.Semantics.InteractionSceneAdopters
     if type(adopters) ~= "table"
@@ -391,9 +533,10 @@ local function adopterProjection()
     local snapshot = adopters.Snapshot()
     return {
         metrics = scalarFields(snapshot and snapshot.metrics, {
-            "actorQueries", "hordeEvents",
-            "knowledgeEvents", "excursionEvents",
+            "actorQueries", "hordeEvents", "postCombatEvents",
+            "knowledgeEvents", "excursionEvents", "taskEvents",
         }),
+        social = socialProjection(snapshot),
     }
 end
 

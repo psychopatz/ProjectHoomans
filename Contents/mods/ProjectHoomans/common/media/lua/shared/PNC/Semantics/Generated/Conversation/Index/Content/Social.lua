@@ -378,6 +378,33 @@ return {
         ["kind"] = "content",
         ["source"] = "content/social/interaction/scene_runtime_adopters.json",
     },
+    ["phrase.semantic.interaction.scene.post_combat_clear"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SocialConversationDirector",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.post_combat_clear",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/social_conversation_director.json",
+    },
+    ["phrase.semantic.interaction.scene.task_work_assigned"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SocialConversationDirector",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.task_work_assigned",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/social_conversation_director.json",
+    },
+    ["phrase.semantic.interaction.scene.task_work_completed"] = {
+        ["domain"] = "social",
+        ["generated"] = {
+            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SocialConversationDirector",
+        },
+        ["id"] = "phrase.semantic.interaction.scene.task_work_completed",
+        ["kind"] = "content",
+        ["source"] = "content/social/interaction/social_conversation_director.json",
+    },
     ["phrase.semantic.interaction.world_event.warning"] = {
         ["domain"] = "social",
         ["generated"] = {

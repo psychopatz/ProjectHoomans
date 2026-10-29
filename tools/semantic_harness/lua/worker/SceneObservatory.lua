@@ -128,6 +128,119 @@ function SceneObservatory.fixture(context, payload)
     local world = fixtureWorld(payload)
 
     Opportunity.ResetProvidersForTests()
+
+    if payload.social == true then
+        local SocialDirector = require
+            "PNC/Semantics/SemanticSocial/PNC_SemanticSocialDirector"
+        local SocialConversation = require
+            "PNC/Semantics/SemanticSocial/PNC_SemanticSocialConversation"
+        local runtime = Runtime.ResetForTests({
+            maxActiveScenes = 4,
+            maxParticipants = 4,
+            maxTurns = 8,
+            clock = function()
+                return tonumber(context.Runtime.now) or 1000
+            end,
+        })
+        local manager = Opportunity.New(runtime)
+        local director, directorReason = SocialDirector.New(manager, {
+            clock = function()
+                return tonumber(context.Runtime.now) or 1000
+            end,
+        })
+        if not director then return nil, directorReason end
+        local controller = SocialConversation.New()
+        local recipientID = tostring(
+            payload.recipientID or rows[2].id
+        )
+        local admission = director:Submit({
+            id = "worker-social:" .. eventID,
+            motive = tostring(payload.motive or "COORDINATE"),
+            relevance = tonumber(payload.relevance) or 0.9,
+            priority = tonumber(payload.priority) or 40,
+            eventType = stimulusType,
+            eventID = eventID,
+            intent = intent,
+            speechAct = speechAct,
+            subject = payload.subject or "SCENE_SOCIAL_FIXTURE",
+            topic = topic,
+            speakerID = responderID,
+            recipientID = recipientID,
+            participants = rows,
+            factRefs = type(payload.factRefs) == "table"
+                and payload.factRefs or {},
+            eventRefs = { eventID },
+            perceived = payload.perceived ~= false,
+            distance = tonumber(payload.distance) or 8,
+            maxTurns = tonumber(payload.maxTurns) or 4,
+            areaKey = tostring(payload.areaKey or "worker-social"),
+            allowNpcAfterPlayer = payload.allowNpcAfterPlayer == true,
+        })
+        if admission.accepted ~= true then
+            return nil, admission.reason or "scene_social_admission_failed"
+        end
+        controller:RegisterScene(
+            admission.scene,
+            admission.socialOpportunity,
+            admission.proposal and admission.proposal.audience or {}
+        )
+        local step = controller:Advance(
+            admission.scene,
+            admission.initialResult,
+            admission.socialOpportunity
+        )
+
+        PNC.Semantics.InteractionSceneAdopters = {
+            _semanticHarnessSceneObservatory = true,
+            Manager = function() return manager end,
+            Snapshot = function()
+                return {
+                    metrics = {
+                        actorQueries = 0,
+                        hordeEvents = 0,
+                        postCombatEvents = 0,
+                        knowledgeEvents = 0,
+                        excursionEvents = 0,
+                        taskEvents = 0,
+                    },
+                    social = director:Snapshot(),
+                    socialConversation = controller:Snapshot(),
+                }
+            end,
+        }
+
+        context.Runtime.sceneObservatoryRuntime = runtime
+        context.Runtime.sceneObservatoryManager = manager
+        context.Runtime.sceneObservatorySceneID = admission.sceneID
+
+        local view = Observatory.Inspect({
+            runtime = runtime,
+            opportunityManager = manager,
+            sceneID = admission.sceneID,
+            sceneLimit = tonumber(payload.sceneLimit),
+            historyLimit = tonumber(payload.historyLimit),
+        })
+        view.ok = true
+        view.type = "scene_observatory_social_fixture"
+        view.sourceKind = "FIXTURE"
+        view.workerKind = "production_lua"
+        view.socialStep = {
+            mode = step and step.mode or nil,
+            reason = step and step.reason or nil,
+            selectedStrategy = step and step.selected
+                and step.selected.strategy or nil,
+        }
+        return view
+    end
+
+    if PNC.Semantics
+        and type(PNC.Semantics.InteractionSceneAdopters) == "table"
+        and PNC.Semantics.InteractionSceneAdopters
+            ._semanticHarnessSceneObservatory == true
+    then
+        PNC.Semantics.InteractionSceneAdopters = nil
+    end
+
     local registered, registerReason = Opportunity.RegisterProvider({
         id = "semantic_harness.scene_observatory",
         order = 1,

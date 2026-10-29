@@ -90,6 +90,13 @@ local function handle(player, args)
                 role = "recipient",
             },
         })
+        local socialAdopters = PNC.Semantics
+            and PNC.Semantics.InteractionSceneAdopters or nil
+        if socialAdopters
+            and type(socialAdopters.ResumeSocialAfterPlayer) == "function"
+        then
+            socialAdopters.ResumeSocialAfterPlayer(scene, result, key)
+        end
         if result.continuation
             and result.continuation.mode == "terminate"
         then

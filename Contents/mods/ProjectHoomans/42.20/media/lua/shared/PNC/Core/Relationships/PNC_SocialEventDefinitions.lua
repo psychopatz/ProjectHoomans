@@ -236,11 +236,14 @@ local function dialogueHostilityDefinition(
     respect,
     morale,
     decayPerDay,
-    tags
+    tags,
+    sourceSystem
 )
     return {
         id = id,
-        allowedSourceSystems = { semantic_dialogue = true },
+        allowedSourceSystems = {
+            [sourceSystem or "semantic_dialogue"] = true,
+        },
         targetMemory = {
             type = memoryType,
             approvalEffect = approval,
@@ -286,6 +289,42 @@ Definitions.player_dialogue_threat = dialogueHostilityDefinition(
     -4,
     0.025,
     { hostile = true, dialogue = true, threat = true }
+)
+
+-- Autonomous semantic Scenes use NPC-specific event types rather than
+-- masquerading as player dialogue. SocialEventService remains the only owner
+-- of relationship/conduct mutation for these consequences.
+Definitions.npc_dialogue_hostile_remark = dialogueHostilityDefinition(
+    "npc_dialogue_hostile_remark",
+    "npc_spoke_hostile_remark",
+    -2,
+    -2,
+    -1,
+    0.08,
+    { hostile = true, dialogue = true, profanity = true, npc = true },
+    "semantic_scene"
+)
+
+Definitions.npc_dialogue_insult = dialogueHostilityDefinition(
+    "npc_dialogue_insult",
+    "npc_spoke_insult",
+    -4,
+    -3,
+    -1,
+    0.05,
+    { hostile = true, dialogue = true, abuse = true, npc = true },
+    "semantic_scene"
+)
+
+Definitions.npc_dialogue_threat = dialogueHostilityDefinition(
+    "npc_dialogue_threat",
+    "npc_threatened_npc",
+    -8,
+    -8,
+    -4,
+    0.025,
+    { hostile = true, dialogue = true, threat = true, npc = true },
+    "semantic_scene"
 )
 
 Definitions.player_emote_thumbsdown = {
@@ -436,6 +475,9 @@ local semanticByType = {
     player_spoke_hostile_remark = { retentionSalience = 130, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
     player_spoke_insult = { retentionSalience = 150, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
     player_threatened_npc = { retentionSalience = 200, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
+    npc_spoke_hostile_remark = { retentionSalience = 130, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
+    npc_spoke_insult = { retentionSalience = 150, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
+    npc_threatened_npc = { retentionSalience = 200, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
     player_disapproved = { retentionSalience = 60, classes = { "disapproval" }, relations = {} },
     player_greeted = { retentionSalience = 30, classes = { "greeting" }, relations = {} },
     npc_greeted_player = { retentionSalience = 30, classes = { "greeting" }, relations = {} },

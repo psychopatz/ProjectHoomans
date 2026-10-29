@@ -1,10 +1,10 @@
 # Roadmap — Semantic Social Conversation Director
 
-**Status:** PLANNED — implementation not started.
+**Status:** DEVELOPER COMPLETE — D0-D8 accepted; READY FOR USER LIVE TEST.
 
 **Parent objective:** implement the complete agnostic Social Conversation Director so multiple Project Hoomans NPCs can engage in grounded, performant, emergent semantic conversations by reusing the existing Scene Runtime and semantic affordance/choice system across companions, neutral/faction NPCs, hostile teams and player-participating scenes.
 
-All D0-D8 phases are mandatory developer-side work.
+All D0-D8 phases were mandatory developer-side work and are now accepted. Native SP/MP timing/readability/noise tuning remains user-owned.
 
 ## D0 — Baseline and affordance authority freeze
 

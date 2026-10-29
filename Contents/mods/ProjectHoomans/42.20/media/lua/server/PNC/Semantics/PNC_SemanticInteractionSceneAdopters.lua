@@ -16,6 +16,14 @@ local EncounterIntent = require
     "PNC/Semantics/PNC_SemanticCombatEncounterIntent"
 local BanterArbiter = require
     "PNC/Semantics/PNC_SemanticCombatBanterArbiter"
+local SocialDirector = require
+    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialDirector"
+local SocialConversation = require
+    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialConversation"
+local SocialConsequences = require
+    "PNC/Semantics/PNC_SemanticSocialConsequenceService"
+local SceneTransport = require
+    "PNC/Semantics/PNC_SemanticInteractionSceneTransport"
 
 local Adopters = PNC.Semantics.InteractionSceneAdopters or {}
 PNC.Semantics.InteractionSceneAdopters = Adopters
@@ -27,12 +35,16 @@ Adopters.MAX_PARTICIPANTS = 4
 Adopters.COMBAT_COOLDOWN_MS = 12000
 Adopters.KNOWLEDGE_COOLDOWN_MS = 20000
 Adopters.EXCURSION_COOLDOWN_MS = 5000
+Adopters.TASK_SOCIAL_COOLDOWN_MS = 9000
+Adopters.POST_COMBAT_COOLDOWN_MS = 15000
 
 Adopters._metrics = Adopters._metrics or {
     actorQueries = 0,
     hordeEvents = 0,
+    postCombatEvents = 0,
     knowledgeEvents = 0,
     excursionEvents = 0,
+    taskEvents = 0,
 }
 local metrics = Adopters._metrics
 
@@ -40,6 +52,24 @@ local manager = Adopters._manager
 if type(manager) ~= "table" then
     manager = Opportunity.New(Runtime.Default())
     Adopters._manager = manager
+end
+
+local function managerClock()
+    return type(manager) == "table" and type(manager.Now) == "function"
+        and manager:Now() or 0
+end
+
+local socialDirector = Adopters._socialDirector
+if type(socialDirector) ~= "table" then
+    socialDirector = SocialDirector.New(manager, { clock = managerClock })
+    Adopters._socialDirector = socialDirector
+end
+local socialConversation = Adopters._socialConversation
+if type(socialConversation) ~= "table" then
+    socialConversation = SocialConversation.New({
+        effectSink = SocialConsequences.Apply,
+    })
+    Adopters._socialConversation = socialConversation
 end
 
 local function clean(value, maximum)
@@ -502,32 +532,215 @@ function Adopters.Manager()
     return manager
 end
 
+function Adopters.SocialDirector()
+    return socialDirector
+end
+
+function Adopters.SocialConversation()
+    return socialConversation
+end
+
+local function deliverConversationSteps(scene, social, audience, conversation)
+    for _, step in ipairs(
+        type(conversation) == "table"
+            and type(conversation.steps) == "table"
+            and conversation.steps or {}
+    ) do
+        if step.mode == "emit" and step.selected and step.result then
+            SceneTransport.DeliverAffordance(
+                scene,
+                step.selected,
+                {
+                    speakerID = step.decision and step.decision.actorID,
+                    recipientID = step.decision and step.decision.targetID,
+                    topic = social and social.topic,
+                    factRefs = step.request and step.request.factRefs,
+                    eventRefs = step.request and step.request.eventRefs,
+                    sequence = step.result.semanticHistoryEvent
+                        and step.result.semanticHistoryEvent.sequence,
+                },
+                audience
+            )
+            SceneTransport.Deliver(scene, step.result, audience)
+        end
+    end
+end
+
+function Adopters.SubmitSocial(spec)
+    spec = type(spec) == "table" and spec or {}
+    if type(socialDirector) ~= "table"
+        or type(socialDirector.Submit) ~= "function"
+    then
+        return false, "social_director_unavailable"
+    end
+    local result = socialDirector:Submit(spec)
+    if not result or result.accepted ~= true then
+        return false, result and result.reason or "social_scene_rejected", result
+    end
+    local social = result.socialOpportunity or spec
+    local audience = result.proposal and result.proposal.audience or {}
+    if type(socialConversation) == "table"
+        and type(socialConversation.RegisterScene) == "function"
+    then
+        socialConversation:RegisterScene(result.scene, social, audience)
+    end
+
+    if spec.runConversation == false
+        or type(socialConversation) ~= "table"
+        or type(socialConversation.Run) ~= "function"
+    then
+        return true, "social_scene_admitted", result
+    end
+
+    local conversation = socialConversation:Run(
+        result.scene,
+        result.initialResult,
+        social,
+        { maxSteps = math.min(3, tonumber(spec.maxSocialSteps) or 3) }
+    )
+    result.socialConversation = conversation
+
+    -- The Opportunity manager already transported the opening response.
+    -- Selected NPC semantic inputs and their resulting Scene responses share
+    -- the same canonical Scene speech channel.
+    deliverConversationSteps(result.scene, social, audience, conversation)
+
+    if result.scene.status ~= "active"
+        and type(socialConversation.ForgetScene) == "function"
+    then
+        socialConversation:ForgetScene(result.scene.id)
+    end
+    return true, "social_scene_admitted", result
+end
+
+function Adopters.ResumeSocialAfterPlayer(scene, result, playerID)
+    if type(socialConversation) ~= "table"
+        or type(socialConversation.SceneContext) ~= "function"
+        or not scene or not scene.id
+    then
+        return nil, "social_scene_unregistered"
+    end
+    local social = socialConversation:SceneContext(scene.id)
+    if type(social) ~= "table" then
+        return nil, "social_scene_unregistered"
+    end
+
+    local audience = socialConversation:SceneAudience(scene.id)
+    -- The server Scene-response handler already delivers this immediate NPC
+    -- response to the replying player. Fan it out here only to other
+    -- registered observers, then continue the social scene if policy allows.
+    local otherAudience = {}
+    for _, row in ipairs(type(audience) == "table" and audience or {}) do
+        if tostring(row.actorID or "") ~= tostring(playerID or "") then
+            otherAudience[#otherAudience + 1] = row
+        end
+    end
+    if #otherAudience > 0 then
+        SceneTransport.Deliver(scene, result, otherAudience)
+    end
+
+    local conversation = socialConversation:Run(
+        scene,
+        result,
+        social,
+        { maxSteps = 3 }
+    )
+    deliverConversationSteps(scene, social, audience, conversation)
+    if scene.status ~= "active"
+        and type(socialConversation.ForgetScene) == "function"
+    then
+        socialConversation:ForgetScene(scene.id)
+    end
+    return conversation, "social_scene_resumed"
+end
+
 function Adopters.Snapshot()
     return {
         schemaVersion = Adopters.VERSION,
         metrics = {
             actorQueries = metrics.actorQueries,
             hordeEvents = metrics.hordeEvents,
+            postCombatEvents = metrics.postCombatEvents or 0,
             knowledgeEvents = metrics.knowledgeEvents,
             excursionEvents = metrics.excursionEvents,
+            taskEvents = metrics.taskEvents or 0,
         },
+        social = type(socialDirector) == "table"
+            and type(socialDirector.Snapshot) == "function"
+            and socialDirector:Snapshot() or nil,
+        socialConversation = type(socialConversation) == "table"
+            and type(socialConversation.Snapshot) == "function"
+            and socialConversation:Snapshot() or nil,
     }
 end
 
 function Adopters.ResetForTests(runtime)
     metrics.actorQueries = 0
     metrics.hordeEvents = 0
+    metrics.postCombatEvents = 0
     metrics.knowledgeEvents = 0
     metrics.excursionEvents = 0
+    metrics.taskEvents = 0
     manager = Opportunity.New(runtime or Runtime.Default())
     Adopters._manager = manager
+    socialDirector = SocialDirector.New(manager, { clock = managerClock })
+    Adopters._socialDirector = socialDirector
+    socialConversation = SocialConversation.New({
+        effectSink = SocialConsequences.Apply,
+    })
+    Adopters._socialConversation = socialConversation
     return manager
 end
 
 function Adopters.OnHordeTransition(record, spec)
     metrics.hordeEvents = metrics.hordeEvents + 1
     spec = type(spec) == "table" and spec or {}
-    if tostring(spec.phase or "") ~= "started" then
+    local phase = tostring(spec.phase or "")
+    if phase == "cleared" then
+        metrics.postCombatEvents = (metrics.postCombatEvents or 0) + 1
+        local participants, audience = localCombatContext(record)
+        if #participants < 2 then
+            return false, "scene_post_combat_no_local_teammate"
+        end
+        local episodeID = clean(spec.episodeID or spec.eventID, 128)
+        if not episodeID then
+            return false, "scene_post_combat_episode_missing"
+        end
+        local eventRef = episodeID .. ":cleared"
+        local teamKey = EncounterIntent.OwnerKey(record)
+            or factionID(record)
+            or tostring(record.id)
+        local accepted, reason, result = Adopters.SubmitSocial({
+            id = "post-combat:" .. eventRef,
+            motive = "REACT",
+            relevance = 0.8,
+            priority = 55,
+            eventType = "DANGER_CHANGED",
+            eventID = eventRef,
+            intent = "POST_COMBAT_CLEAR",
+            speechAct = "INFORM",
+            subject = "ZOMBIE_HORDE",
+            topic = "COMBAT",
+            speakerID = tostring(record.id),
+            recipientID = tostring(participants[2].id),
+            participants = participants,
+            audience = audience,
+            eventRefs = { episodeID, eventRef },
+            modifiers = {
+                hordePhase = "cleared",
+                pressureBand = spec.pressureBand,
+                nearbyCount = tonumber(spec.nearbyCount) or 0,
+            },
+            perceived = true,
+            ttlMs = 10000,
+            maxTurns = 3,
+            cooldownMs = Adopters.POST_COMBAT_COOLDOWN_MS,
+            areaKey = "combat-team:" .. tostring(teamKey),
+            maxSocialSteps = 2,
+        })
+        return accepted, result or reason
+    end
+    if phase ~= "started" then
         return false, "scene_horde_not_initial_transition"
     end
     local participants, audience = localCombatContext(record)
@@ -607,20 +820,111 @@ function Adopters.OnWorldKnowledgeFact(spec)
         return false, "scene_fact_speaker_unknown"
     end
 
-    local result = manager:Admit({
-        type = "AMBIENT_SOCIAL_OPPORTUNITY",
-        id = clean(spec.eventID, 128) or factID,
+    local recipient = participants[2]
+    local accepted, reason, result = Adopters.SubmitSocial({
+        id = "social-news:" .. tostring(clean(spec.eventID, 128) or factID),
+        motive = "INFORM",
+        relevance = tonumber(spec.relevance) or 0.8,
+        priority = tonumber(spec.priority) or 35,
+        eventType = "AMBIENT_SOCIAL_OPPORTUNITY",
         eventID = clean(spec.eventID, 128),
-        factID = factID,
-        kind = clean(spec.kind, 96),
-    }, {
-        authority = "world_knowledge",
-        factVerified = true,
+        intent = "SHARE_GROUNDED_NEWS",
+        speechAct = "DISCLOSE",
+        subject = clean(spec.kind, 96) or "NEWS",
+        topic = "NEWS",
+        speakerID = tostring(speaker.id),
+        recipientID = tostring(recipient.id),
         participants = participants,
         audience = audience,
-        speakerID = tostring(speaker.id),
+        factRefs = { factID },
+        eventRefs = spec.eventID and { tostring(spec.eventID) } or {},
+        perceived = true,
+        ttlMs = 15000,
+        maxTurns = 4,
+        cooldownMs = Adopters.KNOWLEDGE_COOLDOWN_MS,
+        areaKey = clean(spec.areaKey, 96)
+            or clean(spec.factionID, 96)
+            or "knowledge-local",
+        maxSocialSteps = 3,
     })
-    return result.accepted == true, result
+    if not accepted then return false, reason end
+    return true, result
+end
+
+function Adopters.OnTaskEvent(_, event)
+    metrics.taskEvents = (metrics.taskEvents or 0) + 1
+    event = type(event) == "table" and event or {}
+    local eventType = tostring(event.type or "")
+    local intent
+    local motive
+    local relevance
+    if eventType == "TASK_LEASE_CREATED" then
+        intent = "TASK_WORK_ASSIGNED"
+        motive = "COORDINATE"
+        relevance = 0.55
+    elseif eventType == "TASK_LEASE_RELEASED"
+        and tostring(event.cause or "") == "complete"
+    then
+        intent = "TASK_WORK_COMPLETED"
+        motive = "ACKNOWLEDGE"
+        relevance = 0.60
+    else
+        return true, "scene_task_event_ignored"
+    end
+
+    local registry = PNC.Registry
+    local record = registry and type(registry.Get) == "function"
+        and registry.Get(event.npcId) or nil
+    if not record or record.alive == false then
+        return true, "scene_task_actor_unavailable"
+    end
+    local participants, audience = localCombatContext(record)
+    if #participants < 2 then
+        return true, "scene_task_no_local_teammate"
+    end
+    local payload = type(event.payload) == "table" and event.payload or {}
+    local eventRef = clean(event.id, 128)
+        or table.concat({
+            "task-social",
+            tostring(record.id),
+            tostring(eventType),
+            tostring(event.revision or 0),
+        }, ":")
+    local teamKey = EncounterIntent.OwnerKey(record)
+        or factionID(record)
+        or tostring(record.id)
+
+    local accepted, reason, result = Adopters.SubmitSocial({
+        id = "social-task:" .. eventRef,
+        motive = motive,
+        relevance = relevance,
+        priority = eventType == "TASK_LEASE_RELEASED" and 28 or 32,
+        eventType = "TASK_EVENT",
+        eventID = eventRef,
+        intent = intent,
+        speechAct = "INFORM",
+        subject = "WORK",
+        topic = "WORK",
+        speakerID = tostring(record.id),
+        recipientID = tostring(participants[2].id),
+        participants = participants,
+        audience = audience,
+        eventRefs = { eventRef },
+        modifiers = {
+            taskEventType = eventType,
+            taskID = clean(payload.taskId, 128),
+            sourceDomain = clean(payload.sourceDomain, 96),
+            taskPhase = clean(payload.phase or payload.to, 64),
+        },
+        perceived = true,
+        ttlMs = 10000,
+        maxTurns = 3,
+        cooldownMs = Adopters.TASK_SOCIAL_COOLDOWN_MS,
+        areaKey = "task-team:" .. tostring(teamKey),
+        maxSocialSteps = 2,
+    })
+    return true, accepted and "scene_task_social_admitted"
+        or reason or "scene_task_social_suppressed", result
 end
 
 function Adopters.OnExcursionChanged(payload)
@@ -635,20 +939,43 @@ function Adopters.OnExcursionChanged(payload)
     if #participants < 2 then
         return true, "scene_excursion_no_local_pair"
     end
-    local result = manager:Admit({
-        type = "TASK_EVENT",
-        id = clean(payload.id, 128),
-        excursionID = clean(payload.id, 128),
-        state = tostring(payload.state or ""),
-        revision = tonumber(payload.revision) or 0,
-    }, {
-        authority = "community_excursion_service",
+    local intent = EXCURSION_INTENT[tostring(payload.state or "")]
+    if not intent then return true, "scene_excursion_state_ignored" end
+    local eventRef = table.concat({
+        "excursion",
+        tostring(clean(payload.id, 128) or factionID),
+        tostring(payload.state or ""),
+        tostring(math.max(0, math.floor(tonumber(payload.revision) or 0))),
+    }, ":")
+    local accepted, reason = Adopters.SubmitSocial({
+        id = eventRef,
+        motive = "INFORM",
+        relevance = 0.7,
+        priority = 20,
+        eventType = "TASK_EVENT",
+        eventID = eventRef,
+        intent = intent,
+        speechAct = "INFORM",
+        subject = "COMMUNITY_EXCURSION",
+        topic = "EXCURSION",
+        speakerID = tostring(participants[1].id),
+        recipientID = tostring(participants[2].id),
         participants = participants,
         audience = audience,
-        factionID = factionID,
+        eventRefs = { eventRef },
+        modifiers = {
+            excursionState = tostring(payload.state or ""),
+            excursionRevision = tonumber(payload.revision) or 0,
+        },
+        perceived = true,
+        ttlMs = 12000,
+        maxTurns = 3,
+        cooldownMs = Adopters.EXCURSION_COOLDOWN_MS,
+        areaKey = factionID,
+        maxSocialSteps = 2,
     })
-    return true, result.accepted == true and "scene_excursion_admitted"
-        or result.reason or "scene_excursion_suppressed"
+    return true, accepted and "scene_excursion_admitted"
+        or reason or "scene_excursion_suppressed"
 end
 
 registerProviders()
@@ -656,6 +983,20 @@ registerProviders()
 local excursion = PNC.CommunityExcursionService
 if excursion and type(excursion.RegisterListener) == "function" then
     excursion.RegisterListener(Adopters.OnExcursionChanged)
+end
+
+local taskEvents = PNC.Tasking and PNC.Tasking.Events or nil
+if taskEvents and type(taskEvents.Subscribe) == "function" then
+    taskEvents.Subscribe(
+        "TASK_LEASE_CREATED",
+        Adopters.OnTaskEvent,
+        "semantic_social_task_adopter"
+    )
+    taskEvents.Subscribe(
+        "TASK_LEASE_RELEASED",
+        Adopters.OnTaskEvent,
+        "semantic_social_task_adopter"
+    )
 end
 
 return Adopters
