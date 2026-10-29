@@ -1,6 +1,6 @@
 # Progress — Semantic Interaction Scene Runtime
 
-**Status:** ACTIVE — S0–S4 accepted; S5 opportunity-provider admission is next.
+**Status:** ACTIVE — S0–S5 accepted; S6 cross-domain production adopters are next.
 
 **Planning base:** ProjectHoomans `47aaad69`, existing `main`.
 
@@ -127,18 +127,45 @@ S4 evidence:
 - changed S4 Lua through installed Kahlua compiler: **16/16 PASS**;
 - `git diff --check`: clean.
 
-## ONE current Next Chunk — S5
+## S5 accepted — event-driven Opportunity Providers
 
-Implement the generic event-driven Opportunity Provider registry and admission path.
+Accepted implementation:
+- public `InteractionOpportunity` registry supports bounded provider registration with deterministic order;
+- providers receive only caller-supplied canonical event/context and return declarative proposals;
+- proposals are normalized/capped to 4 participants, 8 audience listeners, bounded fact/event refs, TTL/turn budgets and canonical stimulus types before Runtime admission;
+- Scene now exposes one generic `EmitStimulus` entry for existing stimulus families while preserving actor knowledge checks;
+- one Opportunity manager owns active-key dedupe, bounded cooldowns, admission metrics, first-stimulus dispatch and optional semantic continuation;
+- accepted opportunities always open through the same global SceneRuntime/Scheduler;
+- presentation fanout reuses the S4 transport and is capped before delivery;
+- core Opportunity code performs no world/player/NPC scan and owns no tick or persistence.
 
-S5 must:
-1. define a bounded provider registration/evaluation contract with deterministic priority/order;
-2. accept caller-supplied authoritative event/context, never scan the world itself;
-3. allow providers to propose participants, initial stimulus, topic, TTL/turn budget, LOD hints and bounded audience;
-4. validate/cap all proposals before Runtime.Open;
-5. dedupe/cool down opportunities generically so repeated event pulses do not scene-spam;
-6. expose accepted/rejected provider/admission reasons and metrics;
-7. keep domain-specific combat/social/task policy out of the core registry; those adopters arrive in S6.
+S5 evidence:
+- opportunity/runtime/scene focused matrix: **5/5 PASS**;
+- two unrelated event sources (`FACTION_EVENT`, `TASK_EVENT`) admitted through the same Runtime;
+- full `pnc_semantic` selection: **129/129 PASS**;
+- changed S5 Lua through installed Kahlua compiler: **3/3 PASS**;
+- `git diff --check`: clean.
+
+## ONE current Next Chunk — S6
+
+Implement three real production adopter families using the S5 public seam and existing authorities.
+
+S6A combat:
+- reuse existing combat/perception/cohort/Encounter Intent/Banter authority;
+- submit bounded tactical/horde opportunities without a new scan or Combat Exchange Director;
+- dialogue must express actual tactical state only.
+
+S6B grounded social knowledge:
+- submit real known memory/news/gossip facts;
+- source cannot disclose unknown/private facts;
+- allow semantic follow-up/acknowledgement through generic continuation.
+
+S6C non-combat gameplay:
+- use a real task/community/excursion authority;
+- submit request/status/news opportunity without mutating gameplay outside its owner;
+- prove NPC->NPC semantic follow-up.
+
+All adopters must register through Opportunity and canonical conversation content seams; none may own scheduler/history/continuation.
 
 ## Remaining mandatory phases
 

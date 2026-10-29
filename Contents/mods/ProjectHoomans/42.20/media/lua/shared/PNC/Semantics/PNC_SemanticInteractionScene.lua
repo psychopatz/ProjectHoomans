@@ -7,6 +7,7 @@ local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
 local Presentation = require
     "PNC/Semantics/PNC_SemanticInteractionPresentation"
 local Scheduler = require "PNC/Semantics/PNC_SemanticInteractionScheduler"
+local Stimulus = require "PNC/Semantics/PNC_SemanticInteractionStimulus"
 local Continuation = require
     "PNC/Semantics/PNC_SemanticInteractionContinuation"
 local ValueBounds = require "PNC/Semantics/PNC_SemanticValueBounds"
@@ -440,6 +441,86 @@ function Scene.New(spec)
     instance.semanticState = makeSemanticState(instance)
 
     local Methods = {}
+
+    function Methods:EmitStimulus(request)
+        request = type(request) == "table" and request or {}
+        if self.status ~= "active" then return nil, "scene_closed" end
+        local stimulusType = tostring(request.type or "")
+        if stimulusType == "NPC_SEMANTIC_ACT" then
+            return self:EmitSemanticAct(request)
+        end
+        if stimulusType == "WORLD_EVENT"
+            or stimulusType == "DANGER_CHANGED"
+        then
+            return self:EmitWorldEvent(request)
+        end
+
+        local allowed = false
+        for _, value in ipairs(Stimulus.Types()) do
+            if value == stimulusType then
+                allowed = true
+                break
+            end
+        end
+        if not allowed then return nil, "scene_stimulus_type_invalid" end
+
+        local responderID = boundedID(request.responderID)
+        local responder = responderID and self.participants[responderID] or nil
+        if not responder then return nil, "scene_responder_unknown" end
+        local sourceID = boundedID(request.sourceID)
+        local source = sourceID and self.participants[sourceID] or nil
+        if sourceID and not source then return nil, "scene_source_unknown" end
+        if sourceID and sourceID == responderID then
+            return nil, "scene_self_response_invalid"
+        end
+
+        local factRefs = boundedRefs(
+            request.factRefs, Scene.MAX_FACT_REFS
+        )
+        if source then
+            local knows, knowledgeReason = sourceKnowsFacts(
+                self, source, responder, factRefs
+            )
+            if not knows then return nil, knowledgeReason end
+        end
+        local eventRefs = boundedRefs(
+            request.eventRefs, Scene.MAX_WORLD_EVENTS
+        )
+        local projection, projectionReason = projectionFor(
+            self, responder, source
+        )
+        if not projection then return nil, projectionReason end
+
+        local sourceKind = source and (
+            source.isPlayer == true and "player" or "npc"
+        ) or "engine"
+        local stimulus = {
+            type = stimulusType,
+            source = {
+                kind = sourceKind,
+                actorID = sourceID,
+                providerID = request.providerID
+                    or "interaction.scene.opportunity",
+            },
+            targets = { responderID },
+            semantic = {
+                intent = request.intent,
+                speechAct = request.speechAct,
+                subject = request.subject,
+                topic = request.topic or self.topic,
+                confidence = tonumber(request.confidence) or 1,
+                eventID = request.eventID,
+                modifiers = copy(request.modifiers) or {},
+            },
+            payload = {
+                factRefs = factRefs,
+                eventRefs = eventRefs,
+            },
+        }
+        return process(
+            self, stimulus, sourceID, responderID, projection, request
+        )
+    end
 
     function Methods:EmitSemanticAct(request)
         request = type(request) == "table" and request or {}
