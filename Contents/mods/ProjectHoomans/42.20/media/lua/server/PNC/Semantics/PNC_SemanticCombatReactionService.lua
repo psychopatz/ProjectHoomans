@@ -262,6 +262,16 @@ local function ambientPayload(
     }, nil, realization
 end
 
+local function reactionFamily(eventType)
+    if eventType == "zombie_kill_witnessed" then
+        return "combat_kill_witness"
+    end
+    if eventType == "hostile_npc_kill_self" then
+        return "combat_human_kill_self"
+    end
+    return "combat_kill_self"
+end
+
 local function sendReaction(
     player, record, profile, eventType, spec, now, burst, sequence, moment
 )
@@ -273,10 +283,26 @@ local function sendReaction(
     local facts = eventFacts(
         eventID, eventType, record, profile, spec, burst, moment
     )
-    local payload, reason = ambientPayload(
+    local payload, reason, realization = ambientPayload(
         record, profile, eventType, eventID, facts, burst, moment
     )
-    if not payload then return false, reason end
+    local audienceKey = playerKey(player)
+    local family = reactionFamily(eventType)
+    if not payload then
+        if Arbiter and type(Arbiter.RecordPresentation) == "function" then
+            Arbiter.RecordPresentation({
+                accepted = false,
+                reason = reason or "semantic_realization_unavailable",
+                at = now,
+                speakerID = tostring(record.id or ""),
+                audienceKey = audienceKey,
+                family = family,
+                moment = moment,
+                eventRef = eventID,
+            })
+        end
+        return false, reason
+    end
     local ok, sent = pcall(
         Network.SendConversationRelationshipForNPC,
         player,
@@ -284,7 +310,28 @@ local function sendReaction(
         eventType,
         payload
     )
-    return ok and sent == true,
+    local delivered = ok and sent == true
+    if Arbiter and type(Arbiter.RecordPresentation) == "function" then
+        Arbiter.RecordPresentation({
+            accepted = delivered,
+            reason = delivered and "presentation_sent"
+                or ok and "presentation_transport_refused"
+                or "presentation_transport_error",
+            at = now,
+            speakerID = tostring(record.id or ""),
+            audienceKey = audienceKey,
+            family = family,
+            moment = moment,
+            eventRef = eventID,
+            responsePlanID = realization and realization.responsePlanID,
+            realizationID = realization and realization.realizationID,
+            presentationClass = realization and realization.presentationClass
+                or payload.ambientFlavor
+                    and payload.ambientFlavor.presentationClass,
+            offerIDs = realization and realization.offerIDs,
+        })
+    end
+    return delivered,
         ok and (sent == true and eventID or "transport_refused")
             or "transport_error"
 end

@@ -9,6 +9,7 @@ local Knowledge = require "worker/CommandRouter_Knowledge"
 local Persona = require "worker/CommandRouter_Persona"
 local Simulation = require "worker/CommandRouter_Simulation"
 local Talk = require "worker/CommandRouter_Talk"
+local CombatObservatory = require "worker/CommandRouter_CombatObservatory"
 local InteractionLifecycle = require "worker/CommandRouter_InteractionLifecycle"
 
 local Handlers = {
@@ -21,6 +22,7 @@ local Handlers = {
     Persona,
     Simulation,
     Talk,
+    CombatObservatory,
     InteractionLifecycle,
 }
 

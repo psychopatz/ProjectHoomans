@@ -1,6 +1,6 @@
 # Progress — Semantic Combat Banter & Tactical Intent
 
-**Status:** ACTIVE — B0–B7 accepted; B8 Semantic Lab / Observatory observability is next.
+**Status:** ACTIVE — B0–B8 accepted; B9 broad regression/performance/developer acceptance is next.
 **Planning base:** ProjectHoomans `8632bc30`, existing `main`.
 **Parent foundation:** `docs/Jobs/OpenEndedSemanticCombatAwareness/` is developer-complete and remains accepted unless this job reproduces a regression in an owning layer.
 **Native PZ:** user live regression supplied; new job's developer implementation/acceptance not yet run.
@@ -188,17 +188,35 @@ B7 evidence:
 - installed Kahlua compiler: **10/10 changed/untracked Lua PASS**;
 - Python compilation and `git diff --check`: clean.
 
-## ONE current Next Chunk — B8
+## B8 accepted — bounded Combat Observatory
 
-Expose bounded, read-only Combat Observatory inspection from real production state:
-1. horde episode state/transitions and current encounter intent;
-2. current combat moment context;
-3. arbiter speak/silence decisions and rejection reason;
-4. selected presentation class and response-plan offers;
-5. weapon family/skill/name-eligibility predicates;
-6. cooldown/team/speaker/family budget reasons;
-7. a compact agent-facing explanation of why the NPC spoke, stayed silent, asked, or selected a line;
-8. reuse existing `CombatMoment.Snapshot`, `CombatEncounterIntent.Snapshot`, `CombatBanterArbiter.Snapshot` and response-catalog APIs; do not add a monolithic trace dump or a second state owner.
+Accepted implementation:
+- one read-only `SemanticCombatObservatory` composes bounded projections from the existing horde episode runtime, `CombatEncounterIntent.Snapshot`, `CombatMoment.Snapshot`, `CombatBanterArbiter.Snapshot` and response-catalog offer authority;
+- the arbiter records bounded terminal presentation annotations in its existing decision ring without changing eligibility/gameplay decisions;
+- inspection exposes current horde phase/count, encounter intent, combat moment, latest gate/presentation decision, selected presentation class, response-plan offers and weapon predicates;
+- explanation output distinguishes `asked / spoke / silent / eligible / unknown` and retains stable reasons such as `presentation_sent` or `higher_priority_active`;
+- the Semantic Harness worker exposes bounded fixture/inspect commands using real production Lua modules; fixture setup is disposable and inspection itself is read-only;
+- inspection is capped at 8 decision rows/offers and adds no scanner, persistence, LLM or monolithic trace owner.
+
+B8 evidence:
+- focused Combat Observatory/arbiter/intent/weapon Lua matrix: **4/4 PASS**;
+- real Python↔Lua worker Observatory tests: **3/3 PASS**;
+- full `pnc_semantic` selection: **123/123 PASS**;
+- changed/untracked Lua through installed Kahlua compiler: **8/8 PASS**;
+- Python compilation and `git diff --check`: clean;
+- static guards: no new global zombie scan, ModData/persistence or routine LLM path.
+
+## ONE current Next Chunk — B9
+
+Run the final developer acceptance sweep:
+1. full Lua suite plus affected combat/semantic focused matrices;
+2. bounded real Semantic Harness worker suites including B7/B8, Unified Evidence/follow-up and conversation regressions;
+3. transient lifecycle/persistence and performance/fanout guards;
+4. deterministic CodeBuilder double-generation and EN/TL/source consistency;
+5. installed-PZ Kahlua verification for the final changed/generated Lua closure;
+6. static guards for new scans, ModData roots, routine LLM and retired parallel throttle paths;
+7. source/save immutability checks where save-backed cases are used;
+8. `git diff --check`, exact evidence recording and accurate native SP/MP status.
 
 ## Remaining mandatory phases
 
@@ -217,6 +235,6 @@ B0 baseline -> B1 horde episode/routing -> B2 team tactical intent -> B3 non-mod
 
 ## Evidence status
 
-B0–B7 are developer-accepted with focused and broad evidence above. B8–B9 remain mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
+B0–B8 are developer-accepted with focused and broad evidence above. B9 remains mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
 
 Git history is the implementation diary; keep this file as current truth rather than appending per-commit narratives.

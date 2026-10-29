@@ -639,6 +639,20 @@ local function emitZombieAwareness(
             or type(realization.fallback) ~= "string"
             or realization.fallback == ""
         then
+            if BanterArbiter
+                and type(BanterArbiter.RecordPresentation) == "function"
+            then
+                BanterArbiter.RecordPresentation({
+                    accepted = false,
+                    reason = "semantic_realization_unavailable",
+                    at = now,
+                    speakerID = npcID,
+                    audienceKey = tostring(playerKey),
+                    family = awarenessFamily,
+                    moment = combatMoment,
+                    eventRef = eventID,
+                })
+            end
             audit({
                 "luaSide=server",
                 "event=SemanticAwarenessPresentation",
@@ -715,9 +729,28 @@ local function emitZombieAwareness(
             eventType,
             result
         )
-        if ok and sent == true then
-            emitted = emitted + 1
+        local delivered = ok and sent == true
+        if BanterArbiter
+            and type(BanterArbiter.RecordPresentation) == "function"
+        then
+            BanterArbiter.RecordPresentation({
+                accepted = delivered,
+                reason = delivered and "presentation_sent"
+                    or ok and "presentation_transport_refused"
+                    or "presentation_transport_error",
+                at = now,
+                speakerID = npcID,
+                audienceKey = tostring(playerKey),
+                family = awarenessFamily,
+                moment = combatMoment,
+                eventRef = eventID,
+                responsePlanID = realization.responsePlanID,
+                realizationID = realization.realizationID,
+                presentationClass = presentationClass,
+                offerIDs = realization.offerIDs,
+            })
         end
+        if delivered then emitted = emitted + 1 end
     end)
     return emitted
 end

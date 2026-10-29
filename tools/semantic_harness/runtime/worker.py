@@ -710,6 +710,31 @@ class LuaSemanticWorker:
             pool_id, offset=offset, limit=limit
         )
 
+    def combat_observatory_fixture(
+        self, fixture: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Run bounded combat setup through production Lua, then inspect it."""
+        if not isinstance(fixture, dict):
+            raise ValueError("combat observatory fixture must be an object")
+        return self._request("COMBAT_OBSERVATORY_FIXTURE", fixture)
+
+    def combat_observatory_inspect(
+        self,
+        *,
+        npc_id: str | None = None,
+        event_ref: str | None = None,
+        limit: int = 8,
+    ) -> dict[str, Any]:
+        """Read the current bounded production Combat Observatory projection."""
+        if type(limit) is not int or limit < 1 or limit > 8:
+            raise ValueError("combat observatory limit must be 1 to 8")
+        payload: dict[str, Any] = {"limit": limit}
+        if npc_id is not None:
+            payload["npcID"] = str(npc_id)
+        if event_ref is not None:
+            payload["eventRef"] = str(event_ref)
+        return self._request("COMBAT_OBSERVATORY_INSPECT", payload)
+
     def fact_catalog(self) -> list[dict[str, Any]]:
         return self._authoring.fact_catalog()
 

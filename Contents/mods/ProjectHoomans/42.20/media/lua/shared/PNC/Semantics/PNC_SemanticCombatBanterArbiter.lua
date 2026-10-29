@@ -27,6 +27,42 @@ local function clean(value)
     return value ~= "" and value or nil
 end
 
+local function boundedList(source, limit)
+    local output = {}
+    for index = 1, math.min(
+        #(type(source) == "table" and source or {}),
+        math.max(1, tonumber(limit) or 8)
+    ) do
+        local value = clean(source[index])
+        if value then output[#output + 1] = value end
+    end
+    return output
+end
+
+local MOMENT_FIELDS = {
+    "kind", "eventType", "actorKind", "actorID", "targetKind", "targetID",
+    "outcome", "attackType", "attackKind", "weaponDisplayName",
+    "weaponFamily", "weaponSkill", "weaponSkillLevel", "weaponSkillBand",
+    "weaponNameEligible", "hitZone", "woundType", "pressureBand",
+    "nearbyCount", "healthState", "reactionMood", "reactionStyle",
+    "relationshipState", "relationshipTier", "encounterID",
+    "encounterIntent", "burstCount", "priority", "urgency",
+    "presentationClass", "source", "occurredAt",
+}
+
+local function momentSummary(moment)
+    if type(moment) ~= "table" then return nil end
+    local output = {
+        schema = "semantic.combat.moment.summary.v1",
+    }
+    for index = 1, #MOMENT_FIELDS do
+        local key = MOMENT_FIELDS[index]
+        local value = moment[key]
+        if value ~= nil then output[key] = value end
+    end
+    return output
+end
+
 local function boundedState(map, order, key)
     key = clean(key)
     if not key then return nil end
@@ -59,6 +95,13 @@ local function recordDecision(spec)
         priority = tonumber(spec.priority
             or spec.moment and spec.moment.priority) or 0,
         burstCount = tonumber(spec.burstCount) or nil,
+        eventRef = clean(spec.eventRef),
+        responsePlanID = clean(spec.responsePlanID),
+        realizationID = clean(spec.realizationID),
+        presentationClass = clean(spec.presentationClass)
+            or clean(spec.moment and spec.moment.presentationClass),
+        offerIDs = boundedList(spec.offerIDs, 8),
+        moment = momentSummary(spec.moment),
     }
     while #Arbiter.Decisions >= Arbiter.DECISION_LIMIT do
         table.remove(Arbiter.Decisions, 1)
@@ -228,6 +271,31 @@ function Arbiter.Reserve(spec)
     if not gate then return false, reason, burst end
     local accepted, speakerReason = Arbiter.Consider(gate, spec)
     return accepted, speakerReason, burst, gate
+end
+
+-- Diagnostic-only terminal annotation for the same bounded decision ring.
+-- This never changes chatter eligibility or gameplay authority.
+function Arbiter.RecordPresentation(spec)
+    spec = type(spec) == "table" and spec or {}
+    return recordDecision({
+        accepted = spec.accepted == true,
+        stage = "presentation",
+        reason = spec.reason or (spec.accepted == true
+            and "presentation_sent" or "presentation_not_sent"),
+        at = spec.at,
+        streamKey = spec.streamKey,
+        speakerID = spec.speakerID,
+        audienceKey = spec.audienceKey,
+        family = spec.family,
+        moment = spec.moment,
+        priority = spec.priority,
+        burstCount = spec.burstCount,
+        eventRef = spec.eventRef,
+        responsePlanID = spec.responsePlanID,
+        realizationID = spec.realizationID,
+        presentationClass = spec.presentationClass,
+        offerIDs = spec.offerIDs,
+    })
 end
 
 function Arbiter.Snapshot(limit)
