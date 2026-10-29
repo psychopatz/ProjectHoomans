@@ -125,3 +125,11 @@ Finish M0 engine-boundary/snapshot fixtures and SP lifecycle evidence; audit bod
 - Focused MP/body/network/husk/startup/restored/replica: 18/18. Full suite: 966/966 (8.19s); final expanded focused fixture also passes. Installed-PZ compiler: all 8 changed runtime files pass. git diff --check clean.
 - Existing graph BroadcastBodyRemoval node is stale and bare-name trace fails; current source and literal callsite reads used. No exhaustive graph claim.
 - Next mandatory chunk: complete M5 streaming/replacement and legacy heuristic classification/static cleanup, then M6 multi-client roles/combat/movement, M7 corpse/infection exact invalidation, M8 full acceptance. Corpse conversion removal still needs pre-conversion lease capture in M7. No native acceptance is claimed.
+
+## M5 anonymous-identity safety audit
+
+- Removed the zero-ID ledger exception which used saved position, companion ownership and gender to identify/delete a zombie. Closed anonymous startup rehydration which used the same non-identity evidence to adopt a vanilla zombie. Rules now apply equally to companions, neutral NPCs and vehicle reservations.
+- This intentionally supersedes unsafe historical-save recovery expectations: a genuinely anonymous old shell cannot be distinguished from an ordinary zombie and is preserved. Local SP constructor/stamping semantics remain intact; this safety correction does not introduce an MP dependency into SP. Native acceptance must distinguish identifiable current shells from unrecoverable anonymous historical saves.
+- Updated legacy/restart tests to require protection of zero-ID coincident zombies before/after settle and while companions are canonical. Identifiable restart/population/carrier lanes remain tested separately.
+- Full Lua: 966/966 (8.22s). Changed runtime sources compile under installed-PZ Kahlua. git diff --check clean.
+- Remaining M5 audit: population/carrier legacy lanes and complete same-session/multi-client convergence. Next implement M6 client-isolation fixture and M7 pre-conversion death retirement; M8 must audit all retained heuristic paths, budgets and persistence before completion.

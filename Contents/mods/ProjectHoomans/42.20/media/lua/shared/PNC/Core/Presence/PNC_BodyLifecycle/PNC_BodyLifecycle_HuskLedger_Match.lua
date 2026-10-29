@@ -187,128 +187,10 @@ local function isUnmarkedBody(zombie)
         and modData.PNC_DeathMarkerID == nil
 end
 
--- Legacy saves contain ledger rows written while PZ returned persistent outfit
--- id 0. Those rows cannot prove engine identity. They remain recoverable only
--- through a much narrower migration lane: the row must name a live NPC, the
--- NPC must currently be abstract/bodyless (or have a vehicle reservation),
--- the body must be unmarked, and it must still be at the recorded shell
--- position. Clothing is intentionally not part of the proof: PZ can apply a
--- default outfit while restoring a zero-ID population shell. This is
--- deliberately not a general naked-zombie rule.
-local function isLegacyAnonymousHusk(entry, zombie, radiusSq)
-    local registry
-    local record
-    local passenger
-    local reason
-    local bodyOutfitID
-    local bodyOutfitIsZero = false
-    local canonical
-    local canonicalAttached
-    if not entry or not zombie or entry.npcId == nil then
-        return false
-    end
-    reason = tostring(entry.reason or "")
-    if reason ~= "audit_after_virtualization"
-        and reason ~= "audit_removal_unverified"
-        and reason ~= "audit_body_missing"
-        and reason ~= "audit_stale_handle"
-        and reason ~= "missing_body_handle"
-        and reason ~= "startup_seed"
-    then
-        return false
-    end
-    if validEngineIdentity(entry.populationId) then
-        return false
-    end
-    if zombie.getPersistentOutfitID then
-        local ok
-        ok, bodyOutfitID = pcall(zombie.getPersistentOutfitID, zombie)
-        bodyOutfitIsZero = ok and (bodyOutfitID == nil
-            or tonumber(bodyOutfitID) == 0)
-    end
-    -- Most old rows have outfitId=0. A few startup_seed rows contain the
-    -- pre-virtualization id, while the body restored by PZ now reports 0;
-    -- permit that one known migration shape only.
-    if validEngineIdentity(entry.outfitId)
-        and not (reason == "startup_seed" and bodyOutfitIsZero)
-    then
-        return false
-    end
-    registry = Internal.registry and Internal.registry() or nil
-    record = registry and registry.Get and registry.Get(entry.npcId) or nil
-    if not record or record.alive == false
-        or record.presenceState == Const.PRESENCE_CORPSE
-    then
-        return false
-    end
-    passenger = record.runtime and record.runtime.vehiclePassenger or nil
-    if record.presenceState == Const.PRESENCE_LIVE
-        and not (passenger and passenger.active == true)
-    then
-        -- A stale registry lease can leave the record marked live after the
-        -- original body was virtualized. Normally an attached canonical body
-        -- means a nearby anonymous zombie cannot be attributed safely.
-        --
-        -- Multiplayer streaming has one stricter exception: startup can finish
-        -- while the old shell's chunk is unloaded, materialize a replacement,
-        -- then stream the historical zero-ID shell in later. For a persisted
-        -- startup_seed belonging to an owned/following companion, the ledger
-        -- position plus a distinct attached canonical body is positive
-        -- duplicate evidence. Keep this lane tight so an ordinary zombie near
-        -- a neutral NPC can never be reclaimed by position alone.
-        canonical = registry.GetLiveZombie and registry.GetLiveZombie(entry.npcId)
-            or registry.LiveByID and registry.LiveByID[tostring(entry.npcId)]
-        if canonical then
-            canonicalAttached = true
-            if Internal.isBodyAttached then
-                local ok, attached = pcall(Internal.isBodyAttached, canonical)
-                canonicalAttached = ok and attached == true
-            end
-            if canonicalAttached then
-                local orderKind = tostring(record.orderSpec
-                    and record.orderSpec.kind or "")
-                local ownedCompanion = record.recruited == true
-                    or tostring(record.ownerUsername or "") ~= ""
-                    or orderKind == tostring(Const.ORDER_FOLLOW or "follow")
-                local sexMatches = true
-                if zombie.isFemale and record.isFemale ~= nil then
-                    local ok, female = pcall(zombie.isFemale, zombie)
-                    sexMatches = not ok
-                        or (female == true) == (record.isFemale == true)
-                end
-                local duplicateRadius = math.min(
-                    math.sqrt(radiusSq),
-                    tonumber(Const.BODY_SHELL_REHYDRATE_ANON_RADIUS) or 1.0
-                )
-                if reason ~= "startup_seed"
-                    or not ownedCompanion
-                    or zombie == canonical
-                    or not sexMatches
-                    or not isUnmarkedBody(zombie)
-                    or not samePosition(
-                        entry,
-                        zombie,
-                        duplicateRadius * duplicateRadius
-                    )
-                then
-                    return false
-                end
-                return true
-            end
-        end
-    end
-    -- Clothing is not proof here: PZ can apply a default outfit while
-    -- restoring a zero-ID population shell. The ledger, record state, marker
-    -- absence and exact position are the migration proof.
-    if not isUnmarkedBody(zombie) then
-        return false
-    end
-    return samePosition(entry, zombie, radiusSq)
-end
-
+-- Historical zero-ID rows are retained for diagnostics, but position,
+-- companion ownership and gender cannot prove which vanilla zombie they name.
 function Lifecycle.IsLegacyAnonymousHusk(entry, zombie)
-    local radius = tonumber(Const.HUSK_LEDGER_MATCH_RADIUS) or 2
-    return isLegacyAnonymousHusk(entry, zombie, radius * radius)
+    return false
 end
 
 --[[
@@ -484,11 +366,8 @@ local function matchesEntry(entry, zombie, radiusSq, includeAbandoned)
     then
         return true
     end
-    if isLegacyAnonymousHusk(entry, zombie, radiusSq) then
-        return true
-    end
     if not validEngineIdentity(entry.outfitId) then
-        return isLegacyAnonymousHusk(entry, zombie, radiusSq)
+        return false
     end
     if outfitId == nil
         or tostring(entry.outfitId) ~= tostring(outfitId)

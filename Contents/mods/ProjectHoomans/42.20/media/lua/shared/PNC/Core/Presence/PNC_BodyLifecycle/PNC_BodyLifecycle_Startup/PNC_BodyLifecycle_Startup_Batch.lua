@@ -20,49 +20,10 @@ local function expectsRehydration(record)
         and record.runtime.startupRehydrateExpected == true
 end
 
-local function ownsAnonymousRehydrateLane(record)
-    local hint = record and record.runtime
-        and record.runtime.startupBodyHint or nil
-    local orderKind = tostring(record and record.orderSpec
-        and record.orderSpec.kind or "")
-    return expectsRehydration(record)
-        and hint and hint.wasLive == true
-        and (
-            record.recruited == true
-            or tostring(record.ownerUsername or "") ~= ""
-            or orderKind == tostring(Const.ORDER_FOLLOW or "follow")
-        )
-end
-
+-- Kept as a closed compatibility lane while old batch diagnostics exist.
+-- Saved position, gender and companion ownership cannot identify a shell.
 local function anonymousRehydrateMatch(record, zombie, now)
-    local hint = record and record.runtime
-        and record.runtime.startupBodyHint or nil
-    local radius = tonumber(Const.BODY_SHELL_REHYDRATE_ANON_RADIUS) or 1.0
-    local startedAt = Lifecycle.StartupCleanup
-        and tonumber(Lifecycle.StartupCleanup.startedAt) or tonumber(now) or 0
-    local settle = tonumber(Const.BODY_SHELL_REHYDRATE_ANON_SETTLE_MS) or 750
-    local distance
-    if not ownsAnonymousRehydrateLane(record)
-        or not hint
-        or not zombie
-    then
-        return false, false
-    end
-    distance = Internal.StartupDistanceSqToRecord(zombie, {
-        x = tonumber(hint.x) or tonumber(record.x),
-        y = tonumber(hint.y) or tonumber(record.y),
-        z = tonumber(hint.z) or tonumber(record.z),
-    })
-    if distance == nil or distance > radius * radius then
-        return false, false
-    end
-    if zombie.isFemale and record.isFemale ~= nil then
-        local bodyFemale = zombie:isFemale() == true
-        if bodyFemale ~= (record.isFemale == true) then
-            return false, false
-        end
-    end
-    return true, (tonumber(now) or 0) - startedAt >= settle
+    return false, false
 end
 
 local function canonicalBody(reg, record)

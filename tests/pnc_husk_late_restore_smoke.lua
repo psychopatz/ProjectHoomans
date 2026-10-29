@@ -122,14 +122,14 @@ local legacyBody = makeBody({
     x = 100.4, y = 200.6, z = 0, clothed = true, outfitID = 0,
 })
 T.equal(Lifecycle.HuskLedgerCount(), 1, "legacy ledger row did not load")
-T.truthy(Lifecycle.FindHuskEntry(legacyBody),
-    "zero-identity legacy row was not position matched")
-T.truthy(Lifecycle.InterceptLoadedShell(legacyBody, "late_restore"),
-    "late restored legacy shell was not intercepted")
-T.equal(legacyBody.wasRemoved(), true,
-    "late restored legacy shell remained in the world")
-T.equal(Lifecycle.HuskLedgerCount(), 0,
-    "legacy row was not consumed after verified removal")
+T.falsy(Lifecycle.FindHuskEntry(legacyBody),
+    "zero-identity row must not identify an ordinary zombie")
+T.falsy(Lifecycle.InterceptLoadedShell(legacyBody, "late_restore"),
+    "anonymous zombie must not be intercepted")
+T.equal(legacyBody.wasRemoved(), false,
+    "anonymous zombie was deleted by positional coincidence")
+T.equal(Lifecycle.HuskLedgerCount(), 1,
+    "unproven legacy row must remain diagnostic evidence")
 
 -- Some older startup seeds contain the historical nonzero outfit id even
 -- though the body restored by PZ now reports zero. That mixed row is also a
@@ -150,10 +150,10 @@ records.legacy_seed = {
     runtime = {},
 }
 local legacySeedBody = makeBody({ x = 150.4, y = 250.6, z = 0 })
-T.truthy(Lifecycle.InterceptLoadedShell(legacySeedBody, "late_seed_restore"),
-    "mixed startup seed shell was not intercepted")
-T.equal(legacySeedBody.wasRemoved(), true,
-    "mixed startup seed shell remained in the world")
+T.falsy(Lifecycle.InterceptLoadedShell(legacySeedBody, "late_seed_restore"),
+    "mixed seed must not identify a zero-ID zombie")
+T.equal(legacySeedBody.wasRemoved(), false,
+    "mixed seed deleted an unidentified zombie")
 
 -- Multiplayer can finish startup before this chunk is streamed. A replacement
 -- companion may already be canonical when the old zero-ID startup shell later
@@ -192,12 +192,12 @@ PNC.Registry.LiveByID.mp_late_companion = mpCanonical
 local mpLateHusk = makeBody({
     x = 175.25, y = 275.25, z = 0, outfitID = 0, clothed = true,
 })
-T.truthy(Lifecycle.FindHuskEntry(mpLateHusk),
-    "late-stream MP startup shell was hidden by the replacement canonical body")
-T.truthy(Lifecycle.InterceptLoadedShell(mpLateHusk, "mp_late_stream"),
-    "late-stream MP startup shell was not reclaimed")
-T.equal(mpLateHusk.wasRemoved(), true,
-    "late-stream MP startup shell survived beside the replacement companion")
+T.falsy(Lifecycle.FindHuskEntry(mpLateHusk),
+    "companion ownership must not prove anonymous identity")
+T.falsy(Lifecycle.InterceptLoadedShell(mpLateHusk, "mp_late_stream"),
+    "anonymous companion-position zombie must remain unclaimed")
+T.equal(mpLateHusk.wasRemoved(), false,
+    "unidentified zombie near companion was deleted")
 
 -- The same positional evidence is not sufficient for an unowned neutral.
 Lifecycle.HuskLedger.loaded = false
@@ -254,10 +254,10 @@ records.passenger = {
     runtime = { vehiclePassenger = { active = true } },
 }
 local passengerShell = makeBody({ x = 300.4, y = 400.6, z = 0 })
-T.truthy(Lifecycle.InterceptLoadedShell(passengerShell, "vehicle_shell"),
-    "anonymous vehicle shell was not reclaimed")
-T.equal(passengerShell.wasRemoved(), true,
-    "anonymous vehicle shell remained in the world")
+T.falsy(Lifecycle.InterceptLoadedShell(passengerShell, "vehicle_shell"),
+    "vehicle reservation must not identify an anonymous zombie")
+T.equal(passengerShell.wasRemoved(), false,
+    "vehicle reservation deleted an anonymous zombie")
 
 Lifecycle.HuskLedger.loaded = false
 Lifecycle.HuskLedger.entries = {}

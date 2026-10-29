@@ -235,10 +235,8 @@ T.equal(removed[bodyA], nil, "early callback removed rehydration candidate")
 T.truthy(quarantineCount > 0,
     "early callback did not neutralize rehydration candidate")
 
--- Exact live failure from SP logs: PZ restores the follower with no UUID,
--- no population id and persistent outfit id 0. Do not declare rehydration
--- missed in frame 0. Quarantine the unique saved-position body, then adopt it
--- only after a real-frame settle interval.
+-- A zero-ID zombie at a saved companion position is indistinguishable from
+-- an ordinary zombie. Neither ownership nor a settle delay establishes identity.
 entries[bodyA] = nil
 record.presenceState = "abstract"
 record.recruited = true
@@ -261,10 +259,10 @@ PNC.BodyLifecycle.StartupCleanup.lastBatch = nil
 stats = PNC.BodyLifecycle.SweepPersistedLiveShells(now)
 T.equal(stats.rebound, 0,
     "anonymous restored follower was adopted in the frame-zero race window")
-T.equal(stats.unresolvedRehydrate, 1,
+T.equal(stats.unresolvedRehydrate, 0,
     "anonymous restored follower did not hold rehydration open")
-T.truthy(quarantineCount > 0,
-    "anonymous restored follower was not neutralized during settle")
+T.equal(quarantineCount, 0,
+    "anonymous ordinary zombie must not be neutralized by positional coincidence")
 T.equal(Registry.LiveByID[record.id], nil,
     "anonymous restored follower bound before settle")
 
@@ -274,18 +272,11 @@ now = now + 800
 bodyIsNaked = false
 PNC.BodyLifecycle.StartupCleanup.lastBatch = nil
 stats = PNC.BodyLifecycle.SweepPersistedLiveShells(now)
-T.equal(stats.rebound, 1,
-    "anonymous zero-ID follower was not adopted after settle")
-T.equal(Registry.LiveByID[record.id], bodyA,
-    "anonymous zero-ID follower did not become the canonical live body")
-T.equal(removed[bodyA], nil,
-    "anonymous rehydration winner was removed instead of adopted")
-T.equal(record.runtime.startupRehydrateExpected, nil,
-    "anonymous adoption did not clear the rehydration claim")
+T.equal(stats.rebound, 0, "settle delay cannot invent shell identity")
+T.equal(Registry.LiveByID[record.id], nil, "position-only zombie cannot become a companion")
+T.equal(removed[bodyA], nil, "unidentified zombie remains protected")
 
--- The anonymous fallback is companion-only. A non-owned NPC/ordinary zombie
--- at the same coordinates remains unresolved rather than being converted into
--- an NPC from position alone.
+-- The same protection applies to a non-owned NPC position.
 record.presenceState = "abstract"
 record.recruited = false
 record.orderSpec = nil
@@ -333,17 +324,14 @@ local startup = PNC.BodyLifecycle.RunStartupBodyCleanupNow(
     "test_frame_zero",
     true
 )
-T.falsy(startup.complete,
-    "frame-zero anonymous companion incorrectly completed startup")
-T.equal(startup.lastStats.unresolvedRehydrate, 1,
-    "frame-zero anonymous companion did not hold the startup gate")
-
+T.equal(startup.lastStats.unresolvedRehydrate, 0,
+    "anonymous position cannot hold an identity reconciliation claim")
 now = now + 800
 PNC.BodyLifecycle.OnStartupReconcileTick()
-T.equal(Registry.LiveByID[record.id], bodyA,
-    "later startup tick did not adopt anonymous companion")
-T.equal(record.presenceState, "live",
-    "later startup tick did not restore live presence")
+T.equal(Registry.LiveByID[record.id], nil,
+    "startup must not adopt an anonymous ordinary zombie")
+T.equal(record.presenceState, "abstract",
+    "unidentified candidate must not force live presence")
 
 -- Persistence must distinguish a body that was live when saved from an old
 -- abstract body hint; this flag is the admission contract used above.
