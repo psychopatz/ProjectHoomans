@@ -58,6 +58,7 @@ PNC = {
         COMBAT_DEBUG_CONE_HALF_ANGLE_DEGREES = 55,
     },
     Core = {
+        GenerateID = function(prefix) return prefix .. "_scale_session" end,
         Now = function() return 2000 end,
         IsAuthority = function() return true end,
         Distance = function(x1, y1, x2, y2)

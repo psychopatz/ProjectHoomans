@@ -83,3 +83,12 @@ Finish M0 engine-boundary/snapshot fixtures and SP lifecycle evidence; audit bod
 - Focused body/incarnation/restored/foundation/presence/restart/husk/reanimation: 151/151. Installed-PZ Kahlua compilation and static ERROR scan of changed runtime file pass. git diff --check passes.
 - M0 local restoration is established by factory regression plus existing presence/restart/restored lifecycle suites; native SP remains user-owned. Protocol snapshot projection itself remains unchanged so far.
 - Next mandatory chunk: M2 canonical MultiplayerBodyBinding shared/server protocol and snapshot publication, including transport freshness/session handling. M1 death invalidation/complete lifecycle acceptance remains to be proved with M7; do not claim full migration acceptance.
+
+## M2 server descriptor checkpoint
+
+- Added canonical shared `PNC_MultiplayerBodyBinding` seam. Server descriptors validate current Registry shell, live Presence/alive state, matching UUID/bodyKind/bodyLease, attachment where exposed, and signed-short nonnegative integer online ID. Client/server object identity is never inferred from position/outfit.
+- Binding descriptors carry protocol/session/publication revision, npcId/incarnation/onlineId, bind/unbind operation and exact predecessor when replaced/invalidated. A weak record-keyed receipt cache is transient, not persisted; publication revision orders transport updates and is not a second incarnation token.
+- Detailed and presence/combat payloads include the descriptor through existing interested-client routing. Global roster summaries remain unchanged. SP Build returns nil.
+- Server regression covers valid/idempotent binding, replacement predecessor, invalid online IDs, mismatched UUID, death/abstract rejection, shell loss/unbind and SP separation. Network-scale fixture now provides Core.GenerateID for session issuance.
+- Full isolated Lua suite: 965/965. Installed PZ Kahlua compiler: all three changed/new runtime files pass. git diff --check clean.
+- Next mandatory chunk: M3 client bounded reconciliation; M4 consumer routing. M2 exact explicit removal delivery and full lifecycle publication remain integration work under M5/M7, not accepted yet.

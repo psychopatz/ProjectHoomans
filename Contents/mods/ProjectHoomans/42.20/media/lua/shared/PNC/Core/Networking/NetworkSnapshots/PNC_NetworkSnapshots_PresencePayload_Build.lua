@@ -1,3 +1,4 @@
+local BodyBinding = require "PNC/Core/Networking/PNC_MultiplayerBodyBinding"
 -- Shared presence payload builder provider.
 local Network = PNC.Network
 local H = Network.Internal.PresencePayload
@@ -104,6 +105,7 @@ function Network.BuildPresenceDelta(record)
         replicaSequence = record.runtime
             and record.runtime.replicaSequence or nil,
         liveBodyInstanceID = record.liveBodyInstanceID,
+        bodyBinding = BodyBinding.Build(record),
         liveBodyOnlineID = record.liveBodyOnlineID,
         liveBodyLease = record.runtime and record.runtime.bodyLease or nil,
         aiState = aiState,
@@ -179,6 +181,7 @@ function Network.BuildCombatDamageDelta(record)
         presenceRevision = record and record.presenceRevision or nil,
         replicaSequence = runtime.replicaSequence,
         liveBodyInstanceID = record and record.liveBodyInstanceID or nil,
+        bodyBinding = BodyBinding.Build(record),
         liveBodyOnlineID = record and record.liveBodyOnlineID or nil,
         liveBodyLease = runtime.bodyLease,
     }

@@ -1,3 +1,4 @@
+local BodyBinding = require "PNC/Core/Networking/PNC_MultiplayerBodyBinding"
 local Network = PNC.Network
 local H = Network.Internal.DetailedPayload
 if not H then return Network end
@@ -139,6 +140,7 @@ function Network.BuildSnapshot(record, inventorySummaryOverride)
     snapshot.replicaSequence = record.runtime
         and record.runtime.replicaSequence or nil
     snapshot.liveBodyInstanceID = record.liveBodyInstanceID
+    snapshot.bodyBinding = BodyBinding.Build(record)
     snapshot.liveBodyOnlineID = record.liveBodyOnlineID
     snapshot.liveBodyLease = record.runtime
         and record.runtime.bodyLease or nil
