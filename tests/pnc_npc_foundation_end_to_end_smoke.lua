@@ -120,6 +120,7 @@ end
 local restocked, restockReason = Policy.Restock(record, stock, {
     authority = "server",
     atSettlement = true,
+    settlementID = "settlement:p9:integration",
     earned = true,
     now = 24,
 })

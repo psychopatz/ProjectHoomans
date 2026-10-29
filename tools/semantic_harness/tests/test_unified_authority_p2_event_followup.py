@@ -73,11 +73,11 @@ class UnifiedAuthorityP2EventFollowUpTests(unittest.TestCase):
                 "semantic_response_catalog",
             )
             self.assertEqual(
-                realization["responsePlanID"], "semantic.combat.reaction"
+                realization["responsePlanID"], "semantic.combat.horde"
             )
             self.assertEqual(
                 realization["realizationID"],
-                "semantic.combat.reaction.threat",
+                "semantic.combat.horde.default",
             )
             self.assertEqual(
                 result["responseWindow"]["activeBeat"]["eventRef"],

@@ -331,6 +331,8 @@ local expectedConversationComposition = {
     "PNC/Semantics/PNC_SemanticGiftContext",
     "PNC/Conversation/Composition/PNC_ConversationClientComposition",
     "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime",
+    "PNC/Semantics/PNC_SemanticCombatResponseSurface",
+    "PNC/UI/Conversation/PNC_CombatResponseStrip",
     "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation",
     "PNC/Integrations/PBrainZ/PNC_PBrainZ",
     "PNC/Integrations/PBrainZ/PNC_PBrainZ_Bridge",

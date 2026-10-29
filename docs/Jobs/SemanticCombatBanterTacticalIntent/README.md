@@ -36,8 +36,8 @@ See:
 
 ## Current state
 
-Planning base is ProjectHoomans `8632bc30` on existing `main`.
+Planning base was ProjectHoomans `8632bc30` on existing `main`.
 
-Implementation has not started. Begin with B0A in `PROGRESS.md`: establish production-grounded regression contracts before modifying horde, banter, weapon commentary, or UI behavior.
+All mandatory B0–B9 developer work is accepted. The system now has episode-driven horde semantics, runtime follower encounter intent, shared semantic tactical choices across full/compact UI, unified combat-moment arbitration, weapon-aware zombie banter, distinct hostile-human kill banter, explicit presentation classes and bounded Combat Observatory inspection.
 
-Native SP/MP feel validation remains user-owned unless explicitly reassigned.
+See `PROGRESS.md` for exact acceptance evidence. The job is maintenance-ready; native SP/MP timing, chatter feel and compact-strip usability remain the user-owned live gate unless explicitly reassigned.

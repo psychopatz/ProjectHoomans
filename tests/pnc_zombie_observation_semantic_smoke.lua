@@ -31,7 +31,8 @@ PNC = {
             T.equal(count, 8, "ambient horde count")
             T.equal(threshold, 4, "ambient horde threshold")
             T.equal(observedAt, now, "ambient horde timestamp")
-            T.equal(source, "ambient", "ambient horde source")
+            T.equal(source, "zombie_observation",
+                "canonical semantic horde observation source")
             return true, "event"
         end,
     },

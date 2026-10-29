@@ -1,25 +1,25 @@
 # Progress — Semantic Combat Banter & Tactical Intent
 
-**Status:** ACTIVE — B0–B8 accepted; B9 broad regression/performance/developer acceptance is next.
+**Status:** DEVELOPER COMPLETE / MAINTENANCE-READY — B0–B9 accepted; native SP/MP visual/feel validation remains user-owned.
 **Planning base:** ProjectHoomans `8632bc30`, existing `main`.
 **Parent foundation:** `docs/Jobs/OpenEndedSemanticCombatAwareness/` is developer-complete and remains accepted unless this job reproduces a regression in an owning layer.
-**Native PZ:** user live regression supplied; new job's developer implementation/acceptance not yet run.
+**Native PZ:** developer acceptance is complete; post-implementation SP/MP visual/feel validation has not been rerun and remains user-owned.
 
 ## Current verified truth
 
-The new job is justified by current production/runtime evidence:
+The combat-banter/tactical-intent roadmap is developer-complete:
 
-- live `social:zombie_horde_encounter` can realize through generic `semantic.combat.reaction.default`, producing the wrong line `Good work. Keep watching the area.`;
-- the actual zombie-kill semantic path is separate and can select a kill-specific line such as `Good kill. Don't let up.`;
-- horde episode observation can re-present a still-active encounter because the semantic clear transition is not reliably owned by current above-threshold callers;
-- kill reactions already support grounded transient follow-ups, but combat/event response families are not uniformly classified as interactive vs autonomous/terminal;
-- semantic response buttons are primarily tied to the open conversation surface; there is no general non-modal combat tactical-choice renderer;
-- follower behavior already owns permanent `attackType`, owner-engaged state, self-defense, retreat and horde handling, but has no current-encounter `undecided/engage/avoid/hold` team intent;
-- CombatResolution already has authoritative weapon item/full type, attack type, wound/body-part and kill state;
-- Equipment/Firearms/Skills already classify firearm/melee family and weapon skill;
-- the current NPC zombie-kill reaction call drops most of that weapon/action context;
-- hostile-human NPC kills do not yet use an equivalent semantic combat-commentary path;
-- there is no single general combat-banter arbiter across warnings, tactical prompts, kill boasts and silence.
+- runtime `zombie_horde_encounter` uses the dedicated horde semantic authority rather than the old generic `Good work. Keep watching the area.` fallback;
+- horde awareness is an edge-driven episode owned from the existing ZombieObservation frame, with stable hordes silent and real clear/new-episode transitions;
+- followers share runtime-only `undecided / engage / avoid / hold` encounter intent without mutating permanent `attackType`, and owner combat can resolve engage implicitly;
+- tactical questions carry executable semantic offers and render through either the normal conversation Response Channel or the non-modal combat strip without duplicate action authority;
+- routine combat speech is explicitly `BARK`, tactical questions are `TACTICAL_PROMPT`, and all non-legacy combat response families are classified;
+- one Combat Moment contract and one Combat Banter Arbiter own priority, coalescing, speaker/family/team budgets and explainable silence;
+- zombie-kill commentary is grounded in the actual weapon/action/body-part/skill context and can use safe weapon names sparingly;
+- hostile-human kill commentary is a distinct semantic family and does not inherit zombie gore language;
+- routine combat presentation remains transient, non-LLM and non-memory, while optional follow-ups reuse the existing interaction lifecycle;
+- the bounded Combat Observatory can explain why an NPC asked, spoke or stayed silent using the real production Moment/Encounter/Arbiter/ResponseCatalog owners;
+- no new global zombie scan, combat ModData ledger, per-kill LLM path or retired parallel reaction throttle remains.
 
 ## Required product behavior
 
@@ -206,21 +206,29 @@ B8 evidence:
 - Python compilation and `git diff --check`: clean;
 - static guards: no new global zombie scan, ModData/persistence or routine LLM path.
 
-## ONE current Next Chunk — B9
+## B9 accepted — broad regression/performance/developer acceptance
 
-Run the final developer acceptance sweep:
-1. full Lua suite plus affected combat/semantic focused matrices;
-2. bounded real Semantic Harness worker suites including B7/B8, Unified Evidence/follow-up and conversation regressions;
-3. transient lifecycle/persistence and performance/fanout guards;
-4. deterministic CodeBuilder double-generation and EN/TL/source consistency;
-5. installed-PZ Kahlua verification for the final changed/generated Lua closure;
-6. static guards for new scans, ModData roots, routine LLM and retired parallel throttle paths;
-7. source/save immutability checks where save-backed cases are used;
-8. `git diff --check`, exact evidence recording and accurate native SP/MP status.
+Final acceptance:
+- complete ProjectHoomans Lua suite: **929/929 PASS**;
+- focused combat performance/lifecycle matrix: **7/7 PASS**, including one spatial witness query, max-two routine speakers, pre-query rapid-kill coalescing, team-budget silence, horde episode stability, tactical prompt surface and transient lifecycle;
+- headless real-worker/Unified Evidence/follow-up/Response Observatory/CodeBuilder matrix: **52 tests PASS**;
+- Response Quality Matrix + headless translation integration: **23 tests PASS**;
+- isolated Tk/Xvfb Response Observatory coverage: **2/2 PASS**;
+- isolated Tk/Xvfb translation/Studio coverage: **1/1 PASS**;
+- save-backed live-regression immutability: **2/2 PASS**, including unchanged source-save hash;
+- deterministic CodeBuilder double generation: byte-identical, **188 generated files / 482 phrase families**, with no generated drift;
+- combat authored content validation: **58 EN/TL rows** across horde, weapon-aware zombie and hostile-human banter;
+- job-wide changed Lua through the installed Project Zomboid Kahlua compiler: **84/84 PASS**;
+- static guards: retired parallel throttle state absent; no new combat global zombie scan, combat ModData root or routine LLM path;
+- Python compilation and `git diff --check`: clean.
+
+B9 also refreshed five stale acceptance fixtures to the already-accepted/current contracts: conversation composition includes the combat response surface, constants include the encounter-intent state command, ZombieObservation reports its canonical semantic source, the DynamicTrading integration fixture supplies the now-required settlement ID, and the worker event-follow-up assertion expects the dedicated horde pool. No production behavior was changed by those fixture refreshes.
+
+All mandatory B0–B9 developer work is complete. Future work is maintenance or explicitly optional extension work from `ROADMAP.md`. Native SP/MP timing, simultaneous-speaker feel, compact-strip usability and subjective chatter frequency remain the user-owned live acceptance gate.
 
 ## Remaining mandatory phases
 
-B0 baseline -> B1 horde episode/routing -> B2 team tactical intent -> B3 non-modal combat choice -> B4 moment context/arbiter -> B5 weapon-aware zombie kills -> B6 hostile-human kills -> B7 content/branching standardization -> B8 observability -> B9 broad acceptance.
+None on the developer side. Native SP/MP visual/feel validation remains user-owned.
 
 ## Hard constraints
 
@@ -235,6 +243,6 @@ B0 baseline -> B1 horde episode/routing -> B2 team tactical intent -> B3 non-mod
 
 ## Evidence status
 
-B0–B8 are developer-accepted with focused and broad evidence above. B9 remains mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
+B0–B9 are developer-accepted. The job is maintenance-ready; only the explicitly user-owned native SP/MP visual/feel gate remains unrun after implementation.
 
 Git history is the implementation diary; keep this file as current truth rather than appending per-commit narratives.

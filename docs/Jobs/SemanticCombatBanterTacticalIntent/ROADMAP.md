@@ -2,6 +2,8 @@
 
 **Parent objective:** make combat dialogue an active, grounded, non-blocking co-op gameplay system: correct horde episodes, real follower tactical decisions, autonomous personality-aware combat banter, weapon/action-aware kill commentary, and appropriate interactive response surfaces, while preserving existing combat/perception/semantic authorities and performance.
 
+**Developer status:** B0–B9 ACCEPTED / maintenance-ready. Native SP/MP visual/feel validation remains user-owned.
+
 All phases below are mandatory unless explicitly marked future/optional.
 
 ## B0 — Reproduce and contract the current regressions
