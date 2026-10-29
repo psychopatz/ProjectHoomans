@@ -1,6 +1,6 @@
 # Progress — Semantic Interaction Scene Runtime
 
-**Status:** ACTIVE — S0–S1 accepted; S2 global Scene Runtime/admission is next.
+**Status:** ACTIVE — S0–S2 accepted; S3 semantic continuation is next.
 
 **Planning base:** ProjectHoomans `47aaad69`, existing `main`.
 
@@ -69,19 +69,34 @@ S1 evidence:
 - `git diff --check`: clean;
 - no new persistence/mutation owner.
 
-## ONE current Next Chunk — S2
+## S2 accepted — global Scene Runtime/admission
 
-Implement one production global Scene Runtime/Registry around the accepted Scene/Scheduler.
+Accepted implementation:
+- Scene.New accepts an injected Scheduler while preserving isolated construction for existing tests/callers;
+- Scheduler stores a bounded per-scene maxTurns value, so one shared Scheduler can safely host scenes with different turn budgets;
+- one lazy default SceneRuntime owns global scene registry/order, deterministic generated IDs, admission metrics and the shared Scheduler;
+- Runtime Open/Get/Close/Sweep/UpdateVisibility/ActorUnavailable are explicit caller-driven operations;
+- TTL expiry and actor-unavailable termination are bounded and observable;
+- actor object identity is preserved through admission so production adapters see canonical managed records;
+- no tick hook, world/zombie scan or ModData store was added.
 
-S2 must:
-1. let Scene.New use an injected shared Scheduler while preserving isolated construction for tests;
-2. add one default runtime with active-scene map/order, global cap and deterministic IDs;
-3. own explicit Open/Get/Close, TTL expiry and bounded runtime metrics;
-4. terminate scenes when an actor becomes unavailable/dead/leaves;
-5. expose explicit visibility/LOD updates without a polling tick;
-6. preserve Scene participant/turn/history caps;
-7. provide a bounded explicit admission seam only; generic Opportunity Providers remain S5;
-8. add no world scan, ModData or automatic tick loop.
+S2 evidence:
+- runtime/adapter/scene/scheduler/provider matrix: **5/5 PASS**;
+- S2 Lua through installed Kahlua compiler: **4/4 PASS**;
+- focused `git diff --check`: clean.
+
+## ONE current Next Chunk — S3
+
+Implement generic semantic continuation from a selected InteractionPlan/behavior into a subsequent Scene stimulus.
+
+S3 must:
+1. project continuation from semantic behavior/plan metadata, never rendered text;
+2. keep explicit source/target and grounded fact/event refs;
+3. support terminate, wait-for-external-input and emit-next-act outcomes;
+4. never auto-answer on behalf of a player participant;
+5. enforce live-participant target validity, max turns, TTL and bounded loop/strategy anti-repeat;
+6. expose continuation decision/reason in Scene result/snapshot;
+7. prove multi-turn memory/news and warning/proposal chains without Parser/NLU calls.
 
 ## Remaining mandatory phases
 

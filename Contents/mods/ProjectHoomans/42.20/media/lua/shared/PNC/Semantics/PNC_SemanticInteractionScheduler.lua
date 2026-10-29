@@ -135,6 +135,10 @@ function Scheduler.New(options)
             perceived = spec.perceived == true,
             distance = tonumber(spec.distance),
             turnCount = 0,
+            maxTurns = math.min(
+                self.maxTurns,
+                math.max(1, tonumber(spec.maxTurns) or self.maxTurns)
+            ),
             status = "active",
             recentEvents = {},
         }
@@ -204,7 +208,7 @@ function Scheduler.New(options)
     )
         local scene = self.scenes[tostring(sceneID or "")]
         if not scene then return nil, "scene_unknown" end
-        if scene.turnCount >= self.maxTurns then
+        if scene.turnCount >= (scene.maxTurns or self.maxTurns) then
             self:CloseScene(scene.id, "turn_limit")
             return nil, "scene_turn_limit"
         end

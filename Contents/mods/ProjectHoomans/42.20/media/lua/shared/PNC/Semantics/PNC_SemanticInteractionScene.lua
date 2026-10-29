@@ -301,20 +301,33 @@ function Scene.New(spec)
     local participants, participantOrder, reason = participantMap(spec)
     if not participants then return nil, reason end
 
-    local scheduler = Scheduler.New({
-        maxActiveScenes = 1,
-        maxParticipants = #participantOrder,
-        maxTurns = math.min(
-            tonumber(spec.maxTurns) or Scheduler.MAX_TURNS_PER_SCENE,
-            Scheduler.MAX_TURNS_PER_SCENE
-        ),
-    })
+    local scheduler = spec.scheduler
+    local ownsScheduler = false
+    if scheduler == nil then
+        scheduler = Scheduler.New({
+            maxActiveScenes = 1,
+            maxParticipants = #participantOrder,
+            maxTurns = Scheduler.MAX_TURNS_PER_SCENE,
+        })
+        ownsScheduler = true
+    end
+    if type(scheduler) ~= "table"
+        or type(scheduler.OpenScene) ~= "function"
+        or type(scheduler.HandleStimulus) ~= "function"
+        or type(scheduler.CloseScene) ~= "function"
+    then
+        return nil, "scene_scheduler_invalid"
+    end
     local scheduled, scheduleReason = scheduler:OpenScene({
         id = id,
         participants = participantOrder,
         playerParticipant = spec.playerParticipant == true,
         perceived = spec.perceived == true,
         distance = spec.distance,
+        maxTurns = math.min(
+            tonumber(spec.maxTurns) or Scheduler.MAX_TURNS_PER_SCENE,
+            Scheduler.MAX_TURNS_PER_SCENE
+        ),
     })
     if not scheduled then return nil, scheduleReason end
 
@@ -341,6 +354,7 @@ function Scene.New(spec)
         world = world,
         worldEvents = worldEvents,
         scheduler = scheduler,
+        ownsScheduler = ownsScheduler,
     }
     instance.semanticState = makeSemanticState(instance)
 
