@@ -13,7 +13,74 @@ if type(registerPattern) ~= "function" then
     error("semantic catalog question module requires RegisterPattern")
 end
 
+local traderTarget = {
+    kind = "community_role",
+    id = "trader",
+    role = "trader",
+    text = "the trader",
+    unresolved = false,
+}
+
 function Internal.RegisterLocationQuestions()
+    registerPattern(
+        "pnc.question.community_role_whereabouts.your_trader",
+        {
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "your" },
+            { kind = "literal", value = "trader" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "COMMUNITY_ROLE_WHEREABOUTS",
+            target = traderTarget,
+            slots = { role = "trader" },
+        },
+        0.98,
+        120
+    )
+
+    registerPattern(
+        "pnc.question.community_role_whereabouts.the_trader",
+        {
+            { kind = "literal", value = "where's" },
+            { kind = "literal", value = "the" },
+            { kind = "literal", value = "trader" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "COMMUNITY_ROLE_WHEREABOUTS",
+            target = traderTarget,
+            slots = { role = "trader" },
+        },
+        0.98,
+        121
+    )
+
+    registerPattern(
+        "pnc.question.community_role_whereabouts.trader_went",
+        {
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "know" },
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "the" },
+            { kind = "literal", value = "trader" },
+            { kind = "literal", value = "went" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "COMMUNITY_ROLE_WHEREABOUTS",
+            target = traderTarget,
+            slots = { role = "trader" },
+        },
+        0.98,
+        122
+    )
+
     registerPattern(
         "pnc.question.where",
         {

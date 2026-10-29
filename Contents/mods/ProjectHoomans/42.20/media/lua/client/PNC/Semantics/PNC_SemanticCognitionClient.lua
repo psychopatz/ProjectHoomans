@@ -157,20 +157,35 @@ local function applyMemoryGossip(id, payload, pending)
     return true
 end
 
-local function notifyDialogueGossip(id, payload, pending)
+local function notifyDialogueRequest(id, payload, pending)
     local requests = ClientState.semanticCognitionDialogueRequests
     local requestID = tostring(pending and pending.requestID or "")
     local request = requests and requests[requestID] or nil
     local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local complete
+    local ok
+    local accepted
+    local reason
     if requestID ~= "" and requests then
         requests[requestID] = nil
     end
-    if pending and string.upper(tostring(pending.subject or ""))
-        == "GOSSIP"
-        and request and input
+    if not request or not input then return end
+    if string.upper(tostring(pending and pending.subject or "")) == "GOSSIP"
         and type(input.CompleteGossipRequest) == "function"
     then
-        pcall(input.CompleteGossipRequest, request, payload)
+        complete = input.CompleteGossipRequest
+    elseif request.kind == "fact"
+        and type(input.CompleteFactRequest) == "function"
+    then
+        complete = input.CompleteFactRequest
+    end
+    if complete then
+        ok, accepted, reason = pcall(complete, request, payload)
+        if not ok or accepted == false then
+            ClientState.lastSemanticCognitionFailure = ok
+                and (reason or "dialogue_cognition_completion_rejected")
+                or "dialogue_cognition_completion_failed"
+        end
     end
 end
 
@@ -185,7 +200,7 @@ local function rejectPending(id, pending, reason)
     if ClientState.pendingSemanticCognition then
         ClientState.pendingSemanticCognition[id] = nil
     end
-    notifyDialogueGossip(id, payload, pending)
+    notifyDialogueRequest(id, payload, pending)
     return false, reason
 end
 
@@ -294,7 +309,7 @@ function Client.ApplyPayload(payload)
             applyMemoryGossip(id, payload, pending)
             applyWorldKnowledgeGossip(id, payload, pending)
             ClientState.pendingSemanticCognition[id] = nil
-            notifyDialogueGossip(id, payload, pending)
+            notifyDialogueRequest(id, payload, pending)
         end
         return false, ClientState.lastSemanticCognitionFailure
     end
@@ -310,7 +325,7 @@ function Client.ApplyPayload(payload)
             applyMemoryGossip(id, payload, pending)
             applyWorldKnowledgeGossip(id, payload, pending)
             ClientState.pendingSemanticCognition[id] = nil
-            notifyDialogueGossip(id, payload, pending)
+            notifyDialogueRequest(id, payload, pending)
         end
         return false, reason
     end
@@ -321,7 +336,7 @@ function Client.ApplyPayload(payload)
         applyMemoryGossip(id, payload, pending)
         applyWorldKnowledgeGossip(id, payload, pending)
         ClientState.pendingSemanticCognition[id] = nil
-        notifyDialogueGossip(id, payload, pending)
+        notifyDialogueRequest(id, payload, pending)
     end
     return true, changed == true and "updated" or reason
 end

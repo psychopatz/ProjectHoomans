@@ -15,6 +15,7 @@ require "PNC/Semantics/PNC_SemanticDialogueLocalResponse_Questions_Observations"
 require "PNC/Semantics/PNC_SemanticDialogueLocalResponse_Questions_Facts"
 require "PNC/Semantics/PNC_SemanticDialogueLocalResponse_Questions_Context"
 require "PNC/Semantics/PNC_SemanticDialogueLocalResponse_Questions_Conversation"
+require "PNC/Semantics/PNC_SemanticDialogueLocalResponse_Questions_Whereabouts"
 
 return function(ir, state, context)
     if type(ir) ~= "table" then return nil end
@@ -71,6 +72,9 @@ return function(ir, state, context)
     end
     if ir.subject == "CONTEXT_REFERENCE" then
         return Internal.ResolveContextReferenceQuestion(ir, state, context)
+    end
+    if ir.subject == "COMMUNITY_ROLE_WHEREABOUTS" then
+        return Internal.ResolveCommunityRoleWhereabouts(ir, state, context)
     end
     if ir.subject == "NEEDS" or ir.subject == "QUANTITY" then
         return Internal.ResolveNeeds(ir, state, context)

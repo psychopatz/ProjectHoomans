@@ -49,6 +49,33 @@ local function publicFact(fact)
     return output
 end
 
+local function appendEphemeralFacts(output, rawFacts, requestedSubject, targetID)
+    local index
+    local rawFact
+    local fact
+    local include
+    local key
+    if type(rawFacts) ~= "table" then return end
+    for index = 1, math.min(#rawFacts, Projection.MAX_FACTS) do
+        rawFact = rawFacts[index]
+        fact = type(rawFact) == "table"
+            and Projection.NormalizeFact(rawFact) or nil
+        if fact then
+            include = requestedSubject == nil
+                or fact.subject == requestedSubject
+            if include and targetID ~= nil then
+                include = tostring(fact.targetID or "")
+                    == tostring(targetID)
+            end
+            if include and fact.clientVisible ~= false then
+                key = fact.key or Projection.Key(
+                    fact.subject, fact.targetID)
+                if key then output.facts[key] = publicFact(fact) end
+            end
+        end
+    end
+end
+
 local function scopeIncludes(fact, rawScope)
     local scope = type(rawScope) == "table" and rawScope or {}
     local requestedSubject = subject(scope.subject)
@@ -138,6 +165,12 @@ function Projection.BuildClientProjection(raw, npcID, options)
             output.facts[key] = publicFact(fact)
         end
     end
+    appendEphemeralFacts(
+        output,
+        type(options) == "table" and options.ephemeralFacts or nil,
+        directSubject,
+        targetID
+    )
     return output
 end
 

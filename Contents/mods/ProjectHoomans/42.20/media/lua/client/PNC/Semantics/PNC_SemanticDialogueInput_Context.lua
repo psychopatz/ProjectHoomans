@@ -109,6 +109,7 @@ Internal.ClearPendingGiftConsent = function(view)
     return false
 end
 Internal.RequestCognitionForIR = Requests.RequestCognitionForIR
+Internal.IsDeferredFactSubject = Requests.IsDeferredFactSubject
 Internal.PrepareIdentityRequest = Requests.PrepareIdentityRequest
 Internal.DispatchIdentityRequest = Requests.DispatchIdentityRequest
 Internal.RequestIdentityForIR = function(view, ir, context)

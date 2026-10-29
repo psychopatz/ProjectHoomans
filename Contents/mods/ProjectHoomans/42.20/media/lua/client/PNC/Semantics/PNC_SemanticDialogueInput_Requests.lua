@@ -2,6 +2,14 @@
 PNC = PNC or {}
 
 local Requests = {}
+local DEFERRED_FACT_SUBJECTS = {
+    COMMUNITY_ROLE_WHEREABOUTS = true,
+}
+
+function Requests.IsDeferredFactSubject(subject)
+    return DEFERRED_FACT_SUBJECTS[string.upper(tostring(subject or ""))]
+        == true
+end
 
 function Requests.RequestCognitionForIR(view, ir)
     local subject
@@ -17,6 +25,7 @@ function Requests.RequestCognitionForIR(view, ir)
     local pending
     local waiting = false
     local isGossip = false
+    local isDeferredFact = false
     local npcID = tostring(view and view.spec and view.spec.npcID or "")
     local session = view and view.session or nil
     if session then
@@ -45,6 +54,7 @@ function Requests.RequestCognitionForIR(view, ir)
         end
     elseif ir.intent == "QUESTION" then
         subject = tostring(ir.subject or "")
+        isDeferredFact = Requests.IsDeferredFactSubject(subject)
         if subject == ""
             or subject == "TIME"
             or subject == "DATE"
@@ -57,7 +67,9 @@ function Requests.RequestCognitionForIR(view, ir)
         end
         fact = ir.extensions and ir.extensions.facts
             and ir.extensions.facts[subject] or nil
-        if type(fact) == "table" and fact.status == "known" then
+        if not isDeferredFact
+            and type(fact) == "table" and fact.status == "known"
+        then
             return false, "fact_already_known"
         end
         target = ir.target
@@ -93,7 +105,7 @@ function Requests.RequestCognitionForIR(view, ir)
         if session then session.semanticMemoryTargetID = nil end
         return accepted, reason, requestID, false
     end
-    if isGossip then
+    if isGossip or isDeferredFact then
         local clientState = PNC.Network and PNC.Network.ClientState or nil
         local pendingRequests = clientState
             and clientState.pendingSemanticCognition or nil
@@ -111,8 +123,14 @@ function Requests.RequestCognitionForIR(view, ir)
                 session = session,
                 npcID = npcID,
                 requestID = tostring(requestID),
+                kind = isGossip and "gossip" or "fact",
+                subject = subject,
             }
-            session.semanticGossipRequestID = tostring(requestID)
+            if isGossip then
+                session.semanticGossipRequestID = tostring(requestID)
+            else
+                session.semanticFactRequestID = tostring(requestID)
+            end
         end
     end
     return accepted, reason, requestID, waiting

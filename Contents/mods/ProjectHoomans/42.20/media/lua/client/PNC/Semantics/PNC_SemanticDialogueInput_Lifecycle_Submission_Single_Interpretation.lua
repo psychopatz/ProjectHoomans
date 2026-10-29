@@ -174,9 +174,27 @@ function Internal.InterpretSingleSubmission(view, prepared)
     local cognitionRequestID
     local cognitionPending
     local clearSemanticMemoryTarget = false
+    local deferredFactSubject = preview.ir
+        and Internal.IsDeferredFactSubject
+        and Internal.IsDeferredFactSubject(preview.ir.subject)
     if Internal.RequestCognitionForIR then
         cognitionAccepted, _, cognitionRequestID, cognitionPending =
             Internal.RequestCognitionForIR(view, preview.ir)
+        if cognitionPending == true and deferredFactSubject
+            and not view.groupConversation
+        then
+            local clientState = PNC.Network and PNC.Network.ClientState
+                or nil
+            local requests = clientState
+                and clientState.semanticCognitionDialogueRequests or nil
+            local pendingRequest = requests
+                and requests[tostring(cognitionRequestID or "")] or nil
+            if pendingRequest then
+                pendingRequest.router = router
+                pendingRequest.options = options
+            end
+            view.session.semanticFactRequestOptions = options
+        end
         if preview.ir and preview.ir.intent == "GOSSIP"
             and cognitionAccepted == true
             and cognitionPending ~= true
@@ -185,6 +203,28 @@ function Internal.InterpretSingleSubmission(view, prepared)
             -- Rebuild the snapshot after the server fills its memory cache so
             -- this same turn can use the returned gossip.
             context = Internal.ShallowContext(view)
+            clearSemanticMemoryTarget = true
+        elseif deferredFactSubject
+            and cognitionAccepted == true
+            and cognitionPending ~= true
+        then
+            -- Single-player/server-hosted cognition can finish synchronously.
+            -- Re-resolve the same IR so the authoritative live fact reaches
+            -- the normal policy and response realization on this turn.
+            context = Internal.ShallowContext(view)
+            if type(Internal.ResolveReferences) == "function" then
+                preview.ir = Internal.ResolveReferences(
+                    preview.ir,
+                    router.state,
+                    context,
+                    options
+                ) or preview.ir
+                preview.decision = router:Decide(
+                    preview.ir,
+                    context,
+                    options
+                )
+            end
             clearSemanticMemoryTarget = true
         end
     end

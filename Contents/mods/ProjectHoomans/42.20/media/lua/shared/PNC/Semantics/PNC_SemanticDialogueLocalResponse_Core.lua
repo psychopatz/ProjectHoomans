@@ -70,7 +70,7 @@ end
 local FALLBACK_ARGUMENT_ORDER = {
     "content", "topic", "location", "npcName", "playerName", "activity",
     "kind", "factStatus", "weather", "needType", "hour", "minute",
-    "gameDay", "state",
+    "gameDay", "state", "role", "destination", "direction", "eta",
 }
 
 local function renderFallback(fallback, args, translationArgs)

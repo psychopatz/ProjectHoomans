@@ -27,6 +27,119 @@ local MemoryEvents = Memory and Memory.Events or nil
 local WorldKnowledge = PNC.WorldKnowledge
 
 Service.VERSION = 1
+Service.MAX_LIVE_FACT_PROVIDERS = 8
+Service.LiveFactProviders = Service.LiveFactProviders or {}
+Service.LiveFactProvidersByID = Service.LiveFactProvidersByID or {}
+
+local function liveFactProviderSupports(provider, subject)
+    local subjects = provider and provider.subjects
+    return type(subjects) ~= "table" or subjects[subject] == true
+end
+
+local function sortLiveFactProviders()
+    table.sort(Service.LiveFactProviders, function(left, right)
+        local leftPriority = tonumber(left.priority) or 0
+        local rightPriority = tonumber(right.priority) or 0
+        if leftPriority == rightPriority then
+            return left.id < right.id
+        end
+        return leftPriority > rightPriority
+    end)
+end
+
+function Service.RegisterLiveFactProvider(id, provider, priority)
+    local existing
+    local entry
+    local index
+    id = tostring(id or "")
+    if id == "" or #id > 96
+        or string.find(id, "[^%w_%.%-]")
+        or type(provider) ~= "table"
+        or type(provider.Resolve) ~= "function"
+    then
+        return false, "invalid_live_fact_provider"
+    end
+    existing = Service.LiveFactProvidersByID[id]
+    entry = {
+        id = id,
+        provider = provider,
+        priority = tonumber(priority or provider.priority) or 0,
+        subjects = provider.subjects,
+    }
+    Service.LiveFactProvidersByID[id] = entry
+    if existing then
+        for index = 1, #Service.LiveFactProviders do
+            if Service.LiveFactProviders[index] == existing then
+                Service.LiveFactProviders[index] = entry
+                sortLiveFactProviders()
+                return true, "live_fact_provider_replaced"
+            end
+        end
+    end
+    if #Service.LiveFactProviders >= Service.MAX_LIVE_FACT_PROVIDERS then
+        Service.LiveFactProvidersByID[id] = existing
+        return false, "live_fact_provider_limit"
+    end
+    Service.LiveFactProviders[#Service.LiveFactProviders + 1] = entry
+    sortLiveFactProviders()
+    return true, "live_fact_provider_registered"
+end
+
+function Service.UnregisterLiveFactProvider(id)
+    local entry = Service.LiveFactProvidersByID[tostring(id or "")]
+    local index
+    if not entry then return false end
+    for index = #Service.LiveFactProviders, 1, -1 do
+        if Service.LiveFactProviders[index] == entry then
+            table.remove(Service.LiveFactProviders, index)
+            break
+        end
+    end
+    Service.LiveFactProvidersByID[tostring(id or "")] = nil
+    return true
+end
+
+local function liveFactsFor(record, player, options)
+    local output = {}
+    local subject = tostring(options and options.subject or "")
+    local providerOptions = {}
+    local viewer
+    local index
+    local entry
+    local fact
+    local reason
+    if subject == "" then return output end
+    for key, value in pairs(type(options) == "table" and options or {}) do
+        providerOptions[key] = value
+    end
+    viewer = providerOptions.viewer
+    if type(viewer) ~= "table" then
+        viewer = {}
+        if PNC.Factions
+            and type(PNC.Factions.GetPlayerFaction) == "function"
+        then
+            local faction = PNC.Factions.GetPlayerFaction(player)
+            if type(faction) == "table" and faction.id then
+                viewer.factionID = faction.id
+                viewer.homeFactionID = faction.id
+            end
+        end
+        providerOptions.viewer = viewer
+    end
+    for index = 1, #Service.LiveFactProviders do
+        entry = Service.LiveFactProviders[index]
+        if liveFactProviderSupports(entry.provider, subject) then
+            fact, reason = entry.provider.Resolve(
+                record, player, providerOptions)
+            if type(fact) == "table" then
+                fact.subject = fact.subject or subject
+                output[#output + 1] = fact
+                break
+            end
+        end
+    end
+    return output
+end
 
 local function authority()
     return Core and Core.IsAuthority and Core.IsAuthority() == true
@@ -281,6 +394,7 @@ function Service.BuildForConversation(player, npcID, options)
     local reason
     local valid
     local projection
+    local request
     options = type(options) == "table" and options or {}
     if not authority() then return nil, "not_authority" end
     record, reason = resolveRecord(npcID)
@@ -296,10 +410,12 @@ function Service.BuildForConversation(player, npcID, options)
         options.conversationToken or options.token
     )
     if valid ~= true then return nil, reason or "invalid_conversation" end
+    request = requestOptions(options)
+    request.ephemeralFacts = liveFactsFor(record, player, options)
     projection = Projection.BuildClientProjection(
         storeFor(record),
         record.id,
-        requestOptions(options)
+        request
     )
     if projection then
         local identity = type(record.identity) == "table"

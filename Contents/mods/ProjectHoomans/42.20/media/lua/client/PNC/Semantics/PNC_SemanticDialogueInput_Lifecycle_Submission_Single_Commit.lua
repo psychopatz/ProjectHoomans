@@ -78,12 +78,27 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
         and preview.ir and preview.ir.intent == "GOSSIP"
         and finalDecision.branch == "GOSSIP_RECEIVED"
         and not view.groupConversation
+    local deferFactResponse = cognitionPending == true
+        and cognitionRequestID ~= nil
+        and preview.ir
+        and Internal.IsDeferredFactSubject
+        and Internal.IsDeferredFactSubject(preview.ir.subject)
+        and not view.groupConversation
     if deferGossipResponse then
         view.session.semanticGossipRequestID = tostring(cognitionRequestID)
         view.session.semanticGossipRequestValue = value
         view.session.semanticGossipRequestResult = result
         view.session.semanticDialoguePending = {
             kind = "semantic_gossip",
+            requestID = tostring(cognitionRequestID),
+        }
+    end
+    if deferFactResponse then
+        view.session.semanticFactRequestID = tostring(cognitionRequestID)
+        view.session.semanticFactRequestValue = value
+        view.session.semanticFactRequestResult = result
+        view.session.semanticDialoguePending = {
+            kind = "semantic_fact",
             requestID = tostring(cognitionRequestID),
         }
     end
@@ -176,6 +191,7 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
         { deferResponse = transientSemanticSurface
             or deferIdentityResponse == true
             or deferGossipResponse == true
+            or deferFactResponse == true
             or deferCompoundResponse == true,
             skipInputPresentation = transientSemanticSurface
                 or compoundPart and compoundIndex ~= 1,
